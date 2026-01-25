@@ -1,0 +1,504 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide reCAPTCHA badge - required attribution text shown on forms instead */
+.grecaptcha-badge {
+  visibility: hidden !important;
+}
+
+:root {
+  /* Softer, eye-friendly backgrounds - no harsh pure whites */
+  --background: hsl(40, 20%, 96%);
+  --foreground: hsl(220, 20%, 25%);
+  --muted: hsl(40, 15%, 93%);
+  --muted-foreground: hsl(220, 15%, 50%);
+  --popover: hsl(40, 15%, 98%);
+  --popover-foreground: hsl(220, 20%, 25%);
+  --card: hsl(40, 15%, 98%);
+  --card-foreground: hsl(220, 20%, 25%);
+  --border: hsl(35, 15%, 88%);
+  --input: hsl(35, 15%, 88%);
+  /* Softer, calmer teal - trust without coldness (darkened for accessibility) */
+  --primary: hsl(185, 60%, 32%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(35, 20%, 96%);
+  --secondary-foreground: hsl(220, 20%, 25%);
+  --accent: hsl(35, 20%, 96%);
+  --accent-foreground: hsl(220, 20%, 25%);
+  --destructive: hsl(0, 72%, 55%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(185, 60%, 38%);
+  --radius: 0.75rem;
+  
+  /* Family-focused brand colors (darkened for accessibility) */
+  --brand-teal: hsl(185, 60%, 35%);
+  --brand-teal-dark: hsl(185, 60%, 28%);
+  --brand-coral: hsl(12, 70%, 60%);
+  --brand-coral-dark: hsl(12, 70%, 50%);
+  --brand-amber: hsl(38, 85%, 55%);
+  --brand-amber-dark: hsl(35, 80%, 48%);
+  --brand-orange: hsl(25, 90%, 55%);
+  
+  /* Softer, approachable cyber colors */
+  --cyber-blue: hsl(200, 75%, 50%);
+  --cyber-blue-dark: hsl(210, 70%, 42%);
+  --security-green: hsl(158, 60%, 42%);
+  --security-green-dark: hsl(158, 60%, 32%);
+  --warning-amber: hsl(38, 85%, 55%);
+  --alert-red: hsl(0, 70%, 50%);
+  --brand-red: hsl(0, 72%, 45%);
+  --brand-red-dark: hsl(0, 75%, 38%);
+  
+  /* Family-safe palette */
+  --cyber-primary: hsl(185, 60%, 35%);
+  --cyber-secondary: hsl(158, 60%, 42%);
+  --cyber-accent: hsl(38, 85%, 55%);
+  --cyber-danger: hsl(0, 72%, 55%);
+  --cyber-success: hsl(145, 60%, 40%);
+  --cyber-warning: hsl(35, 80%, 50%);
+  --cyber-info: hsl(200, 75%, 50%);
+  
+  /* Warm, protective gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(185, 60%, 38%) 0%, hsl(185, 60%, 28%) 100%);
+  --gradient-security: linear-gradient(135deg, hsl(158, 60%, 42%) 0%, hsl(158, 60%, 32%) 100%);
+  --gradient-hero: linear-gradient(135deg, hsl(220, 25%, 18%) 0%, hsl(220, 20%, 25%) 100%);
+}
+
+.dark {
+  /* Warmer dark mode with slight warmth */
+  --background: hsl(220, 25%, 8%);
+  --foreground: hsl(30, 15%, 95%);
+  --muted: hsl(220, 20%, 14%);
+  --muted-foreground: hsl(30, 10%, 65%);
+  --popover: hsl(220, 25%, 10%);
+  --popover-foreground: hsl(30, 15%, 95%);
+  --card: hsl(220, 25%, 10%);
+  --card-foreground: hsl(30, 15%, 95%);
+  --border: hsl(220, 20%, 18%);
+  --input: hsl(220, 20%, 18%);
+  --primary: hsl(185, 60%, 42%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(220, 20%, 14%);
+  --secondary-foreground: hsl(30, 15%, 95%);
+  --accent: hsl(220, 20%, 14%);
+  --accent-foreground: hsl(30, 15%, 95%);
+  --destructive: hsl(0, 65%, 40%);
+  --destructive-foreground: hsl(30, 15%, 95%);
+  --ring: hsl(185, 60%, 48%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  /* Global focus styles for accessibility (WCAG 2.1 AA) */
+  :focus-visible {
+    outline: 2px solid hsl(185, 60%, 35%);
+    outline-offset: 2px;
+  }
+  
+  /* Remove default outline when not using keyboard navigation */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+  
+  /* Enhanced focus for interactive elements */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid hsl(185, 60%, 35%);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+  }
+  
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+  }
+  
+  h2 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  
+  h3 {
+    font-size: clamp(1.25rem, 3vw, 2rem);
+  }
+  
+  p {
+    line-height: 1.7;
+  }
+}
+
+@layer utilities {
+  .cyber-gradient {
+    background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-blue-dark));
+  }
+  
+  .security-gradient {
+    background: linear-gradient(135deg, var(--security-green), var(--security-green-dark));
+  }
+  
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .dark .glass-effect {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.8s ease-out forwards;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  /* Text truncation utilities */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+  
+  /* Professional shadow utilities */
+  .shadow-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  
+  .shadow-card-hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Mobile optimizations */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Typography improvements */
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Improve touch targets on mobile */
+  button, a[role="button"], .touch-target {
+    min-height: 48px !important;
+    min-width: 48px !important;
+  }
+  
+  /* Better spacing for mobile */
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Better text sizing for mobile */
+  input, textarea, select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Optimize card layouts for mobile */
+  .grid > * {
+    margin-bottom: 1rem;
+  }
+  
+  /* Enhanced mobile typography */
+  h1 {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+    line-height: 1.2 !important;
+  }
+  
+  h2 {
+    font-size: clamp(1.5rem, 6vw, 2.25rem) !important;
+    line-height: 1.3 !important;
+  }
+  
+  h3 {
+    font-size: clamp(1.25rem, 5vw, 1.875rem) !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Improved button spacing */
+  .flex.gap-4 {
+    gap: 0.75rem !important;
+  }
+  
+  /* Better padding for mobile cards */
+  .p-6, .p-8 {
+    padding: 1.5rem !important;
+  }
+}
+
+/* Desktop-specific enhancements for polish */
+@media (min-width: 1024px) {
+  /* Balanced spacing - wide but not sparse */
+  .container {
+    max-width: 1280px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  /* Better card hover effects for desktop */
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+  }
+  
+  /* Smoother transitions for desktop interactions */
+  a, button {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  /* Better typography scaling for large screens */
+  h1 {
+    font-size: clamp(2.5rem, 4vw, 3.75rem);
+    letter-spacing: -0.02em;
+  }
+  
+  h2 {
+    font-size: clamp(2rem, 3vw, 2.75rem);
+    letter-spacing: -0.01em;
+  }
+  
+  /* Enhanced section padding for desktop */
+  section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+  
+  /* Better grid gaps for wider screens */
+  .grid.gap-6 {
+    gap: 2rem;
+  }
+  
+  .grid.gap-4 {
+    gap: 1.5rem;
+  }
+  
+  /* Desktop-only interactive card enhancements */
+  .desktop-card-interactive {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.3s ease-out,
+                border-color 0.3s ease;
+  }
+  
+  .desktop-card-interactive:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2),
+                0 12px 24px -8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .desktop-card-interactive:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 12px 24px -8px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Desktop hero split layout support */
+  .desktop-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  
+  /* Better visual hierarchy for desktop */
+  .desktop-section-wide {
+    max-width: 1400px;
+  }
+}
+
+/* Extra large screens - more breathing room */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1400px;
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+  
+  /* Even more generous spacing */
+  section {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+  
+  /* Larger hero on XL screens */
+  .desktop-hero-grid {
+    gap: 4rem;
+  }
+  
+  /* Enhanced typography for large displays */
+  h1 {
+    font-size: clamp(3rem, 5vw, 4.5rem);
+  }
+  
+  h2 {
+    font-size: clamp(2.25rem, 4vw, 3rem);
+  }
+}
+
+/* 2XL screens (1536px+) - Tailwind 2xl breakpoint */
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+  
+  /* 4-column card grids on 2xl */
+  .desktop-grid-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  
+  /* Wider hero layouts */
+  .desktop-hero-grid {
+    gap: 4.5rem;
+  }
+  
+  /* Better text readability - constrain line length */
+  .prose-desktop {
+    max-width: 75ch;
+  }
+  
+  /* Enhanced section spacing */
+  section {
+    padding-top: 7rem;
+    padding-bottom: 7rem;
+  }
+}
+
+/* Ultra-wide screens */
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1600px;
+  }
+  
+  .desktop-hero-grid {
+    gap: 5rem;
+  }
+  
+  /* Even more generous spacing for ultra-wide */
+  section {
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+  }
+}
+
+/* Desktop visual polish - depth and micro-interactions */
+@media (min-width: 1024px) {
+  /* Subtle floating effect on focus for inputs */
+  input:focus, textarea:focus {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Button hover depth */
+  button:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+  
+  button:not(:disabled):active {
+    transform: translateY(0);
+  }
+  
+  /* Enhanced link hover states */
+  a:not(.no-hover-effect):hover {
+    text-decoration-thickness: 2px;
+  }
+  
+  /* Smooth scroll behavior for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Better focus rings for accessibility */
+  :focus-visible {
+    outline: 2px solid var(--brand-teal);
+    outline-offset: 2px;
+  }
+  
+  /* Desktop glass morphism enhancement */
+  .glass-desktop {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  
+  /* Subtle parallax-ready sections */
+  .desktop-depth-layer {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}

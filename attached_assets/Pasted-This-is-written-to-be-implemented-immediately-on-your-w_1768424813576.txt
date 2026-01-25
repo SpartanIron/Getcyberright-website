@@ -1,0 +1,166 @@
+This is written to be implemented immediately on your website. No placeholders, no brackets, no drafting notes.
+
+⸻
+
+TERMS OF SERVICE
+
+GetCyberRight
+
+Effective Date: January 14, 2026
+
+⸻
+
+1. Introduction
+
+GetCyberRight (“GetCyberRight,” “Platform,” or “Services”) is a digital service platform powered and operated by ColorCodeSolutions LLC (“Company,” “we,” “us,” or “our”).
+
+These Terms of Service (“Terms”) govern your access to and use of the GetCyberRight website, applications, content, tools, and related services. By accessing or using the Platform, you agree to be bound by these Terms. If you do not agree, you may not access or use the Services.
+
+⸻
+
+2. Platform Purpose
+
+GetCyberRight is a for-profit digital safety and awareness platform designed to help individuals and families better understand online risks, digital behavior, and responsible technology use.
+
+The Platform provides educational content, tools, and services. GetCyberRight is not a government entity, nonprofit organization, law enforcement agency, or legal advisory service.
+
+⸻
+
+3. Eligibility
+
+You must be at least 18 years of age to create an account or use the Services. By using the Platform, you represent and warrant that you meet this requirement.
+
+⸻
+
+4. Account Responsibilities
+
+You are responsible for:
+	•	Maintaining the confidentiality of your account credentials
+	•	All activity that occurs under your account
+	•	Providing accurate, current, and complete information
+
+We reserve the right to suspend or terminate accounts that violate these Terms.
+
+⸻
+
+5. Intellectual Property
+
+All content, software, designs, trademarks, service marks, logos, and proprietary materials associated with GetCyberRight are owned by or licensed to ColorCodeSolutions LLC and are protected by applicable intellectual property laws.
+
+You may not copy, reproduce, distribute, modify, reverse-engineer, or create derivative works without prior written consent.
+
+⸻
+
+6. Acceptable Use
+
+You agree not to:
+	•	Use the Platform for unlawful or harmful purposes
+	•	Attempt to gain unauthorized access to systems or data
+	•	Interfere with the security or operation of the Platform
+	•	Misrepresent your identity or affiliation
+
+⸻
+
+7. Disclaimers
+
+GetCyberRight provides educational and informational content only. The Platform does not guarantee prevention of cyber incidents, online harm, or security breaches.
+
+Use of the Platform is at your own risk.
+
+⸻
+
+8. Limitation of Liability
+
+To the maximum extent permitted by law, ColorCodeSolutions LLC shall not be liable for any indirect, incidental, consequential, or punitive damages arising out of or related to your use of the Platform.
+
+⸻
+
+9. Termination
+
+We may suspend or terminate access to the Platform at our discretion, without notice, for violations of these Terms or applicable law.
+
+⸻
+
+10. Governing Law
+
+These Terms are governed by the laws of the State of the United States in which ColorCodeSolutions LLC is registered, without regard to conflict-of-law principles.
+
+⸻
+
+11. Contact
+
+Questions regarding these Terms may be directed to:
+ColorCodeSolutions LLC
+support@getcyberright.com
+
+⸻
+
+⸻
+
+PRIVACY POLICY
+
+GetCyberRight
+
+Effective Date: January 14, 2026
+
+⸻
+
+1. Overview
+
+This Privacy Policy explains how ColorCodeSolutions LLC, operating the GetCyberRight platform, collects, uses, stores, and protects your personal information.
+
+⸻
+
+2. Information We Collect
+
+We may collect:
+	•	Personal information (name, email address, account details)
+	•	Usage and analytics data
+	•	Device, browser, and interaction information
+
+⸻
+
+3. How We Use Information
+
+Information is used to:
+	•	Provide and improve Platform services
+	•	Communicate updates and service notifications
+	•	Monitor security, performance, and compliance
+
+⸻
+
+4. Data Sharing
+
+We do not sell personal information. Data may be shared with trusted third-party service providers solely to operate and maintain the Platform.
+
+⸻
+
+5. Data Security
+
+ColorCodeSolutions LLC implements reasonable administrative, technical, and physical safeguards to protect personal information. No system is completely secure, and absolute security cannot be guaranteed.
+
+⸻
+
+6. User Rights
+
+Depending on applicable law, you may request access, correction, or deletion of your personal information by contacting us.
+
+⸻
+
+7. Children’s Privacy
+
+The Platform is not directed to children under the age of 13, and we do not knowingly collect personal information from children.
+
+⸻
+
+8. Changes to This Policy
+
+We may update this Privacy Policy periodically. Continued use of the Platform constitutes acceptance of any changes.
+
+⸻
+
+9. Contact
+
+Privacy inquiries may be directed to:
+ColorCodeSolutions LLC – Privacy Office
+privacy@getcyberright.com

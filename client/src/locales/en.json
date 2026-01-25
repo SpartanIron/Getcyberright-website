@@ -1,0 +1,226 @@
+{
+  "nav": {
+    "familyProtection": "Family Safety",
+    "youthSafety": "Youth Safety",
+    "parentGuide": "Parent Guide",
+    "seniorProtection": "Senior Protection",
+    "dailyTips": "Daily Tips",
+    "news": "News",
+    "resources": "Resources",
+    "learn": "Learn",
+    "about": "About",
+    "threatIntelligence": "Threat Intel",
+    "scamChecker": "Scam Checker",
+    "breachChecker": "Breach Checker",
+    "passwordGenerator": "Security Key Generator",
+    "threatTrends": "Threat Trends",
+    "tools": "Tools",
+    "skillCheck": "Skill Check",
+    "feedback": "Feedback",
+    "impact": "Impact",
+    "more": "More"
+  },
+  "home": {
+    "badge": "Cybersecurity Made Simple for Families",
+    "subtitle": "Get cyber right, together.",
+    "headline": "Protecting Your",
+    "headlineHighlight": "Family",
+    "headlineSuffix": "Across Generations",
+    "description": "GetCyberRight helps families stay safe online without fear, confusion, or technical overload. We protect what matters while helping everyone understand how to make smarter choices in a digital world.",
+    "dailySafetyTips": "Digital Safety Tips",
+    "latestCyberNews": "Latest Cyber News",
+    "trustedBy": "Security should feel supportive, not stressful",
+    "freeResources": "We walk with you, so your family never has to face cyber threats alone."
+  },
+  "footer": {
+    "tagline": "Based in the United States. Serving families across the Americas, Africa, Europe, Asia, and beyond.",
+    "content": "Content",
+    "latestNews": "Latest News",
+    "tutorials": "Tutorials",
+    "interviews": "Interviews",
+    "analysis": "Analysis",
+    "career": "Career",
+    "careerPaths": "Career Paths",
+    "certifications": "Certifications",
+    "jobBoard": "Job Board",
+    "salaryGuide": "Salary Guide",
+    "safetyGuides": "Safety Guides",
+    "youthSafety": "Youth Safety",
+    "seniorProtection": "Senior Protection",
+    "allResources": "All Resources",
+    "skillCheck": "Skill Check",
+    "copyright": "© 2025 GetCyberRight.com. All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "contact": "Contact"
+  },
+  "resources": {
+    "title": "Cyber Safety Resources",
+    "subtitle": "Trusted Resources for Families Worldwide",
+    "description": "Free tools and guides you can actually use. Everything here works on mobile, is easy to understand, and was designed with families in mind.",
+    "emergency": {
+      "title": "Been Scammed? Act Now!",
+      "subtitle": "Report within 24 hours for best chance of recovery",
+      "button": "Get Emergency Help"
+    },
+    "youthToolkit": "Youth Safety Toolkit",
+    "youthDescription": "Help keep your kids safe online",
+    "seniorCenter": "Senior Protection Center",
+    "seniorDescription": "Stay safe from scams and fraud",
+    "securityTools": "Free Security Tools",
+    "toolsDescription": "Protect your devices without spending money",
+    "emergencyContacts": "Emergency Contacts by Country",
+    "emergencyDescription": "Select your country to see who to call",
+    "selectCountry": "Select your country...",
+    "internationalOrgs": "International Organizations"
+  },
+  "common": {
+    "learnMore": "Learn More",
+    "visitWebsite": "Visit Website",
+    "selectYourCountry": "Select Your Country",
+    "countriesAvailable": "We cover {{count}} countries across {{regions}} regions"
+  },
+  "impact": {
+    "seo": {
+      "title": "Our Impact - GetCyberRight Success Stories & Community Partners",
+      "description": "See how GetCyberRight is protecting families across the Americas, Africa, Europe, Asia, and beyond. Read success stories, view impact statistics, and learn how to partner with us.",
+      "keywords": "getcyberright impact, cybersecurity success stories, digital safety worldwide, community partners, family protection testimonials"
+    },
+    "hero": {
+      "badge": "Making a Difference Together",
+      "title": "Our Impact",
+      "description": "Real stories from real families. See how we're helping protect communities across the Americas, Africa, Europe, Asia, and beyond from online threats.",
+      "shareTitle": "See how GetCyberRight is protecting families",
+      "shareDescription": "Real success stories and impact statistics from our digital safety platform"
+    },
+    "stats": {
+      "title": "Impact by the Numbers",
+      "description": "Every number represents a family better protected from online threats",
+      "familiesReached": "Families Reached",
+      "countriesWithContacts": "Countries with Emergency Contacts",
+      "tipsDelivered": "Safety Tips Delivered",
+      "regionsGlobal": "Global Regions Covered",
+      "freeResources": "Free Resources",
+      "updatedIntel": "Updated Threat Intelligence"
+    },
+    "stories": {
+      "badge": "Real Stories, Real Impact",
+      "title": "Success Stories",
+      "description": "Hear from families who are using GetCyberRight resources to protect their loved ones. These stories inspire us to keep building and improving.",
+      "shareCta": {
+        "title": "Share Your Story",
+        "description": "Has GetCyberRight helped you or your family? We'd love to hear from you. Your story could inspire others to protect their loved ones.",
+        "button": "Submit Your Story"
+      },
+      "grace": {
+        "quote": "After my mother almost lost her savings to a mobile money scam, GetCyberRight's Senior Protection guide helped our whole family understand the warning signs. She now confidently uses her phone without fear.",
+        "role": "Daughter",
+        "category": "Senior Protection"
+      },
+      "david": {
+        "quote": "My teenage son was being cyberbullied on a gaming platform. The Youth Safety resources gave us the words to have a real conversation and steps to protect his accounts. He's much happier now.",
+        "role": "Father",
+        "category": "Youth Safety"
+      },
+      "margaret": {
+        "quote": "I received a suspicious WhatsApp message claiming to be from my bank. Thanks to the scam checker tool, I verified it was fraud before clicking any links. You saved me from losing everything.",
+        "role": "Grandmother",
+        "category": "Scam Prevention"
+      },
+      "samuel": {
+        "quote": "As a teacher, I use the printable guides in my classroom. Students now understand why they shouldn't share passwords or personal photos online. This should be taught in every school.",
+        "role": "Secondary School Teacher",
+        "category": "Education"
+      },
+      "faith": {
+        "quote": "My elderly father fell for a SIM swap scam. After using the Emergency Help page, we reported it within hours and recovered 60% of the stolen funds. Your step-by-step guide was a lifesaver.",
+        "role": "Daughter",
+        "category": "Emergency Recovery"
+      },
+      "james": {
+        "quote": "I'm a community worker and I share GetCyberRight resources during outreach visits. Families trust the simple language and practical advice. It's making a real difference in our community.",
+        "role": "Community Health Worker",
+        "category": "Community Impact"
+      }
+    },
+    "partners": {
+      "badge": "Building Together",
+      "title": "Our Partners",
+      "description": "We're building a network of schools, organizations, and businesses committed to digital safety. Join us in protecting families.",
+      "comingSoon": "Coming Soon",
+      "schools": {
+        "name": "Partner Schools",
+        "description": "Educational institutions using our curriculum and resources"
+      },
+      "community": {
+        "name": "Community Organizations",
+        "description": "NGOs and community groups distributing our safety materials"
+      },
+      "business": {
+        "name": "Local Businesses",
+        "description": "Companies sponsoring digital safety workshops"
+      },
+      "government": {
+        "name": "Government Agencies",
+        "description": "Official partnerships for public awareness campaigns"
+      },
+      "cta": {
+        "title": "Become a Partner",
+        "description": "Join our mission to protect families from online threats. Whether you're a school, NGO, or business, we have partnership opportunities for you.",
+        "button": "Get in Touch"
+      },
+      "benefits": {
+        "title": "Partner Benefits"
+      }
+    },
+    "benefits": {
+      "brandedMaterials": "Access to branded safety materials for your organization",
+      "recognition": "Recognition on our Impact page and social media",
+      "workshops": "Co-branded workshops and training sessions",
+      "priorityAccess": "Priority access to new resources and guides",
+      "quarterlyReports": "Quarterly impact reports for your community",
+      "directSupport": "Direct support from our team"
+    },
+    "cta": {
+      "title": "Be Part of Our Story",
+      "description": "Every family protected, every scam prevented, every child kept safe online is a victory we celebrate together. Join our community and help spread digital safety awareness.",
+      "primaryButton": "Start Protecting Your Family",
+      "secondaryButton": "Learn Our Story"
+    }
+  },
+  "carousel": {
+    "slide1": {
+      "headline": "Keeping Your Family Safe Online",
+      "subtext": "Free tools and plain-language guides to protect your whole family, from kids on social media to seniors targeted by scammers."
+    },
+    "slide2": {
+      "headline": "Bridging Generations Through Digital Safety",
+      "subtext": "Helping grandparents and grandchildren navigate the online world together, safely and confidently."
+    },
+    "slide3": {
+      "headline": "Teen Safety in the Digital Age",
+      "subtext": "Practical guidance to help young people recognize scams, protect their privacy, and stay safe online."
+    },
+    "slide4": {
+      "headline": "Protecting Seniors from Online Threats",
+      "subtext": "Simple, clear resources to help older adults avoid scams and use technology with confidence."
+    },
+    "slide5": {
+      "headline": "Safe Screen Time for Kids",
+      "subtext": "Age-appropriate guidance for parents to create healthy digital boundaries for their children."
+    },
+    "slide6": {
+      "headline": "Connected Families, Protected Lives",
+      "subtext": "Learn together as a family how to stay safe in the digital world."
+    }
+  },
+  "scamChecker": {
+    "title": "Scam Checker",
+    "subtitle": "Check if something is a scam",
+    "checkButton": "Check If It's a Scam",
+    "passwordButton": "Create Strong Passwords",
+    "alwaysFree": "Always Free",
+    "noSignup": "No Sign-up Required",
+    "expertSources": "Expert Sources"
+  }
+}

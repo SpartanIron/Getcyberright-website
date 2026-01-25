@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# Environment variables
+.env
+
+# Replit-specific
+.replit
+.upm
+
+# OS junk
+.DS_Store
+
+# Generated assets
+server/public
+
+# Vite artifacts
+vite.config.ts.*
+
+# Archives
+*.tar.gz
