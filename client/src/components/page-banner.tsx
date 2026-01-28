@@ -15,21 +15,21 @@ export function PageBanner({
 }: PageBannerProps) {
   return (
     <section 
-      className="bg-muted/30 border-b"
+      className="bg-slate-900"
       data-testid="section-page-banner"
     >
       <div className="max-w-7xl mx-auto">
         <div className={`flex flex-col ${imagePosition === "left" ? "md:flex-row-reverse" : "md:flex-row"} min-h-[280px] md:min-h-[320px]`}>
           <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:px-12 py-10 md:py-16">
             <h1 
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground leading-tight"
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight"
               data-testid="text-banner-title"
             >
               {title}
             </h1>
             {subtitle && (
               <p 
-                className="mt-4 text-lg text-muted-foreground max-w-xl leading-relaxed"
+                className="mt-4 text-lg text-white/80 max-w-xl leading-relaxed"
                 data-testid="text-banner-subtitle"
               >
                 {subtitle}
