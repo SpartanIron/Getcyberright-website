@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Play, Shield, Lock, AlertTriangle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Play, Shield, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import logoImage from "@assets/image_(3)_1769558492356.png";
@@ -12,7 +12,6 @@ export function HeroSection() {
     <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-8 pb-16 sm:pt-12 sm:pb-24 lg:pt-16 lg:pb-32">
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,122 +76,122 @@ export function HeroSection() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative hidden lg:block h-[500px]"
+            className="relative hidden lg:block"
           >
-            <motion.div
-              initial={{ opacity: 0, x: 40, y: 20 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="absolute top-0 right-0 w-72 h-48 rounded-xl overflow-hidden shadow-2xl border-4 border-white/10 z-30"
-              style={{ transform: "rotate(3deg)" }}
-            >
-              <img 
-                src={familyImage} 
-                alt="Family staying safe online" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              <div className="absolute bottom-3 left-3 right-3">
-                <div className="flex items-center gap-2 text-white text-xs font-medium">
-                  <Shield className="w-3 h-3 text-primary" />
-                  <span>Family Protection</span>
+            <div className="relative h-[580px] w-full">
+              <motion.div
+                initial={{ opacity: 0, y: 30, rotate: 0 }}
+                animate={{ opacity: 1, y: 0, rotate: -3 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="absolute bottom-0 left-0 w-[340px] h-[240px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 z-10"
+              >
+                <img 
+                  src={businessImage} 
+                  alt="Small business owner using secure technology" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <div className="flex items-center gap-2 text-white">
+                    <Lock className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium">Business Security</span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: -30, y: -10 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="absolute top-24 left-0 w-64 h-44 rounded-xl overflow-hidden shadow-2xl border-4 border-white/10 z-20"
-              style={{ transform: "rotate(-4deg)" }}
-            >
-              <img 
-                src={seniorImage} 
-                alt="Senior using technology safely" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              <div className="absolute bottom-3 left-3 right-3">
-                <div className="flex items-center gap-2 text-white text-xs font-medium">
-                  <Lock className="w-3 h-3 text-primary" />
-                  <span>Senior Safety</span>
+              <motion.div
+                initial={{ opacity: 0, x: -30, rotate: 0 }}
+                animate={{ opacity: 1, x: 0, rotate: 4 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="absolute top-8 left-8 w-[280px] h-[200px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 z-20"
+              >
+                <img 
+                  src={seniorImage} 
+                  alt="Senior using technology safely with family" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <div className="flex items-center gap-2 text-white">
+                    <Shield className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium">Senior Safety</span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="absolute bottom-12 right-8 w-80 h-52 rounded-xl overflow-hidden shadow-2xl border-4 border-white/10 z-10"
-              style={{ transform: "rotate(-2deg)" }}
-            >
-              <img 
-                src={businessImage} 
-                alt="Small business cybersecurity" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              <div className="absolute bottom-3 left-3 right-3">
-                <div className="flex items-center gap-2 text-white text-xs font-medium">
-                  <AlertTriangle className="w-3 h-3 text-primary" />
-                  <span>Business Security</span>
+              <motion.div
+                initial={{ opacity: 0, x: 40, rotate: 0 }}
+                animate={{ opacity: 1, x: 0, rotate: -2 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="absolute top-16 right-0 w-[380px] h-[320px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 z-30"
+              >
+                <img 
+                  src={familyImage} 
+                  alt="Family using devices together safely" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <div className="flex items-center gap-2 text-white">
+                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    <span className="text-sm font-medium">Family Protected</span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.7 }}
-              className="absolute top-8 left-16 bg-white rounded-xl shadow-xl p-4 z-40"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.7 }}
+                className="absolute top-0 right-16 bg-white rounded-xl shadow-xl p-4 z-40"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Phishing Blocked</p>
+                    <p className="text-xs text-gray-500">Threat detected & stopped</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Phishing Blocked</p>
-                  <p className="text-xs text-gray-500">Threat detected & stopped</p>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.8 }}
-              className="absolute bottom-32 left-8 bg-white rounded-xl shadow-xl p-4 z-40"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <span className="text-primary font-bold text-sm">50K+</span>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.8 }}
+                className="absolute bottom-24 right-8 bg-white rounded-xl shadow-xl p-4 z-40"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-primary font-bold">50K+</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Families Protected</p>
+                    <p className="text-xs text-gray-500">Across 6 continents</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Families Protected</p>
-                  <p className="text-xs text-gray-500">Across 6 continents</p>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.9 }}
-              className="absolute top-40 right-4 bg-white rounded-xl shadow-xl p-3 z-40"
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium text-primary border-2 border-white">S</div>
-                  <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-xs font-medium text-accent border-2 border-white">M</div>
-                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-xs font-medium text-green-600 border-2 border-white">J</div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.9 }}
+                className="absolute top-48 left-0 bg-white rounded-xl shadow-xl p-3 z-40"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="flex -space-x-2">
+                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary border-2 border-white">S</div>
+                    <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center text-xs font-semibold text-accent border-2 border-white">M</div>
+                    <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-xs font-semibold text-green-600 border-2 border-white">J</div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-900">4.9/5 Rating</p>
+                    <p className="text-[10px] text-gray-500">2,500+ reviews</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-medium text-gray-900">4.9/5 Rating</p>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>
