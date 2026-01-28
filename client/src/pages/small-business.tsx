@@ -224,17 +224,6 @@ const businessTopics: BusinessTopic[] = [
   }
 ];
 
-function FloatingShapes() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="absolute top-20 left-10 w-16 h-16 rounded-full bg-slate-300/15 dark:bg-slate-500/10" />
-      <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-blue-300/15 dark:bg-blue-500/10" />
-      <div className="absolute bottom-32 left-1/4 w-12 h-12 rounded-full bg-green-300/15 dark:bg-green-500/10" />
-      <div className="absolute bottom-20 right-1/3 w-20 h-20 rounded-full bg-amber-300/15 dark:bg-amber-500/10" />
-    </div>
-  );
-}
-
 function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void }) {
   return (
     <>
@@ -246,16 +235,14 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
         colorVariant="slate"
       />
       
-      <div className="relative py-12">
-        <FloatingShapes />
-        
-        <div className="max-w-5xl mx-auto px-4 relative z-10">
+      <div className="py-12 bg-background">
+        <div className="max-w-5xl mx-auto px-4">
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {businessTopics.map((topic) => (
               <Card 
                 key={topic.id}
-                className="cursor-pointer transition-shadow hover:shadow-xl border-2 border-white/50 dark:border-white/10 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
+                className="cursor-pointer transition-shadow hover:shadow-lg border"
                 onClick={() => onSelectTopic(topic.id)}
                 onKeyDown={(e) => e.key === 'Enter' && onSelectTopic(topic.id)}
                 tabIndex={0}
@@ -265,8 +252,8 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
               >
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <div className={`w-14 h-14 rounded-xl ${topic.color} flex items-center justify-center shadow-lg`}>
-                      <topic.icon className="w-7 h-7 text-white" />
+                    <div className={`w-12 h-12 rounded-lg ${topic.color} flex items-center justify-center`}>
+                      <topic.icon className="w-6 h-6 text-white" />
                     </div>
                     <Badge 
                       className={topic.priority === 'Critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300' : topic.priority === 'Essential' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'}
@@ -281,23 +268,23 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
             ))}
           </div>
 
-          <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-2 border-green-200 dark:border-green-800">
-            <CardContent className="p-8">
+          <Card className="border">
+            <CardContent className="p-6">
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
-                    <DollarSign className="w-8 h-8 text-white" />
+                  <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-primary-foreground" />
                   </div>
                 </div>
                 <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                  <h3 className="text-lg font-semibold text-foreground mb-1">
                     Cost-Effective Security
                   </h3>
-                  <p className="text-muted-foreground">
-                    Each topic includes practical quick wins you can implement today and cost considerations to help you budget effectively.
+                  <p className="text-muted-foreground text-sm">
+                    Each topic includes practical quick wins and cost considerations to help you budget effectively.
                   </p>
                 </div>
-                <Button variant="outline" className="border-green-300 dark:border-green-700" onClick={() => {
+                <Button variant="outline" onClick={() => {
                   window.location.href = '/tools';
                 }} data-testid="button-security-tools">
                   Free Security Tools
@@ -306,13 +293,13 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
             </CardContent>
           </Card>
 
-          <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="mt-6 p-4 bg-muted/50 rounded-lg border">
             <div className="flex items-start gap-3">
-              <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+              <Lightbulb className="w-5 h-5 text-muted-foreground mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Start With the Basics</p>
-                <p className="text-sm text-blue-600 dark:text-blue-400">
-                  Focus on the fundamentals: strong passwords, multi-factor authentication, regular backups, and employee awareness. These address the majority of common threats.
+                <p className="text-sm font-medium text-foreground">Start With the Basics</p>
+                <p className="text-sm text-muted-foreground">
+                  Focus on the fundamentals: strong passwords, multi-factor authentication, regular backups, and employee awareness.
                 </p>
               </div>
             </div>
