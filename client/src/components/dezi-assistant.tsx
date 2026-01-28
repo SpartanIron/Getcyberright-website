@@ -169,13 +169,91 @@ function getResponse(userMessage: string): string {
   return safetyResponses["default"];
 }
 
+// Check if user has been welcomed this session
+const WELCOME_KEY = "dezi_welcomed_session";
+
 export function DeziAssistant() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showWelcomeBubble, setShowWelcomeBubble] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Create notification sound (soft chime)
+  useEffect(() => {
+    // Create audio context for notification sound
+    const createNotificationSound = () => {
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5 note
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } catch (e) {
+        // Audio not supported or blocked
+      }
+    };
+    
+    // Store the function for later use
+    (window as any).deziNotificationSound = createNotificationSound;
+  }, []);
+
+  // Track user interaction for sound permission
+  useEffect(() => {
+    const handleInteraction = () => {
+      setHasInteracted(true);
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+    };
+    
+    window.addEventListener('click', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
+    
+    return () => {
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+    };
+  }, []);
+
+  // Auto-welcome after delay (only once per session)
+  useEffect(() => {
+    const hasBeenWelcomed = sessionStorage.getItem(WELCOME_KEY);
+    
+    if (!hasBeenWelcomed) {
+      const timer = setTimeout(() => {
+        setShowWelcomeBubble(true);
+        sessionStorage.setItem(WELCOME_KEY, "true");
+        
+        // Play sound if user has interacted
+        if (hasInteracted && (window as any).deziNotificationSound) {
+          (window as any).deziNotificationSound();
+        }
+      }, 3000); // 3 second delay
+      
+      return () => clearTimeout(timer);
+    }
+  }, [hasInteracted]);
+
+  // Hide welcome bubble when panel opens
+  useEffect(() => {
+    if (isOpen) {
+      setShowWelcomeBubble(false);
+    }
+  }, [isOpen]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -190,6 +268,10 @@ export function DeziAssistant() {
       inputRef.current.focus();
     }
   }, [isOpen]);
+
+  const dismissWelcome = () => {
+    setShowWelcomeBubble(false);
+  };
 
   const handleSendMessage = async (text: string) => {
     if (!text.trim()) return;
@@ -392,6 +474,61 @@ export function DeziAssistant() {
                 </div>
               </CardContent>
             </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Welcome bubble - mobile friendly */}
+      <AnimatePresence>
+        {showWelcomeBubble && !isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-16 right-4 sm:right-6 z-50 max-w-[280px] sm:max-w-[320px]"
+            data-testid="dezi-welcome-bubble"
+          >
+            <div className="bg-card border shadow-lg rounded-xl p-4 relative">
+              {/* Close button */}
+              <button
+                onClick={dismissWelcome}
+                className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
+                aria-label="Dismiss welcome message"
+                data-testid="button-dismiss-welcome"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20 flex-shrink-0">
+                  <img 
+                    src={deziAvatar} 
+                    alt="Dezi" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 pr-4">
+                  <p className="font-medium text-sm text-foreground mb-1">Hi! I'm Dezi</p>
+                  <p className="text-sm text-muted-foreground">
+                    Your cybersecurity guide. How can I help you stay safe online today?
+                  </p>
+                </div>
+              </div>
+              
+              <Button
+                onClick={() => setIsOpen(true)}
+                size="sm"
+                className="w-full mt-3"
+                data-testid="button-welcome-chat"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Start a conversation
+              </Button>
+              
+              {/* Speech bubble pointer */}
+              <div className="absolute -bottom-2 right-6 w-4 h-4 bg-card border-b border-r rotate-45 transform" />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
