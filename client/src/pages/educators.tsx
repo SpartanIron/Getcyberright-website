@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,7 @@ import {
   ArrowRight, Lightbulb, GraduationCap, School,
   ClipboardList, Download
 } from "lucide-react";
+import bannerImage from "@/assets/banners/educators-banner.png";
 
 interface EducatorResource {
   id: string;
@@ -235,25 +237,19 @@ function FloatingShapes() {
 
 function EducatorsLanding({ onSelectResource }: { onSelectResource: (id: string) => void }) {
   return (
-    <div className="relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-blue-950/30" />
+    <>
+      <PageBanner
+        title="Teach Digital Safety"
+        subtitle="Classroom resources, lesson plans, and activities to help students become responsible digital citizens and stay safe online."
+        imageSrc={bannerImage}
+        imageAlt="Classroom teaching cybersecurity education"
+        colorVariant="indigo"
+      />
       
       <div className="relative py-12">
         <FloatingShapes />
         
         <div className="max-w-5xl mx-auto px-4 relative z-10">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-5 py-2.5 rounded-full mb-6 shadow-lg">
-              <GraduationCap className="w-5 h-5" />
-              <span className="font-semibold">Educators Hub</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Teach Digital Safety
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Classroom resources, lesson plans, and activities to help students become responsible digital citizens and stay safe online.
-            </p>
-          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {educatorResources.map((resource) => (
@@ -319,7 +315,7 @@ function EducatorsLanding({ onSelectResource }: { onSelectResource: (id: string)
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

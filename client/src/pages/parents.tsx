@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,7 @@ import {
   CheckCircle, Star, Users, AlertTriangle, Heart,
   ArrowRight, Lightbulb, Settings, Clock, BookOpen
 } from "lucide-react";
+import bannerImage from "@/assets/banners/parents-banner.png";
 
 interface ParentTopic {
   id: string;
@@ -214,25 +216,19 @@ function FloatingShapes() {
 
 function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void }) {
   return (
-    <div className="relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/30 dark:via-indigo-950/30 dark:to-purple-950/30" />
+    <>
+      <PageBanner
+        title="Protect Your Family Online"
+        subtitle="Practical tools and guidance to help you keep your children safe in the digital world while fostering healthy technology habits."
+        imageSrc={bannerImage}
+        imageAlt="Family learning about digital safety together"
+        colorVariant="blue"
+      />
       
       <div className="relative py-12">
         <FloatingShapes />
         
         <div className="max-w-5xl mx-auto px-4 relative z-10">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-5 py-2.5 rounded-full mb-6 shadow-lg">
-              <Heart className="w-5 h-5" />
-              <span className="font-semibold">Parents Safety Hub</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Protect Your Family Online
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Practical tools and guidance to help you keep your children safe in the digital world while fostering healthy technology habits.
-            </p>
-          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {parentTopics.map((topic) => (
@@ -295,7 +291,7 @@ function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

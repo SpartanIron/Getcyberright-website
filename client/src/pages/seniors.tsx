@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,7 @@ import {
   Users, Home, Lightbulb, ArrowRight, HelpCircle,
   Eye, MessageCircle, Smartphone, BadgeCheck
 } from "lucide-react";
+import bannerImage from "@/assets/banners/seniors-banner.png";
 
 interface SafetyTopic {
   id: string;
@@ -199,25 +201,19 @@ function FloatingShapes() {
 
 function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void }) {
   return (
-    <div className="relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-blue-50 dark:from-emerald-950/30 dark:via-teal-950/30 dark:to-blue-950/30" />
+    <>
+      <PageBanner
+        title="Stay Safe and Connected Online"
+        subtitle="Practical guidance to protect yourself from scams and fraud. Learn to recognize warning signs and take simple steps to stay secure."
+        imageSrc={bannerImage}
+        imageAlt="Seniors using technology safely"
+        colorVariant="teal"
+      />
       
       <div className="relative py-12">
         <FloatingShapes />
         
         <div className="max-w-5xl mx-auto px-4 relative z-10">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-5 py-2.5 rounded-full mb-6 shadow-lg">
-              <Shield className="w-5 h-5" />
-              <span className="font-semibold">Seniors Safety Hub</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Stay Safe and Connected Online
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Practical guidance to protect yourself from scams and fraud. Learn to recognize warning signs and take simple steps to stay secure.
-            </p>
-          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {seniorSafetyTopics.map((topic) => (
@@ -280,7 +276,7 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

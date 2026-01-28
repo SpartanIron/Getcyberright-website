@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,7 @@ import {
   ArrowRight, Lightbulb, DollarSign, Server,
   Smartphone, Key, Eye
 } from "lucide-react";
+import bannerImage from "@/assets/banners/small-business-banner.png";
 
 interface BusinessTopic {
   id: string;
@@ -235,25 +237,19 @@ function FloatingShapes() {
 
 function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void }) {
   return (
-    <div className="relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950/30 dark:via-blue-950/30 dark:to-indigo-950/30" />
+    <>
+      <PageBanner
+        title="Protect Your Business"
+        subtitle="Practical, cost-effective security guidance designed for small businesses. Build resilience against cyber threats without breaking your budget."
+        imageSrc={bannerImage}
+        imageAlt="Small business team working on cybersecurity"
+        colorVariant="slate"
+      />
       
       <div className="relative py-12">
         <FloatingShapes />
         
         <div className="max-w-5xl mx-auto px-4 relative z-10">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-slate-600 to-blue-600 text-white px-5 py-2.5 rounded-full mb-6 shadow-lg">
-              <Briefcase className="w-5 h-5" />
-              <span className="font-semibold">Small Business Hub</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Protect Your Business
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Practical, cost-effective security guidance designed for small businesses. Build resilience against cyber threats without breaking your budget.
-            </p>
-          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {businessTopics.map((topic) => (
@@ -323,7 +319,7 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
