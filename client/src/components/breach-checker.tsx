@@ -180,10 +180,10 @@ export function BreachChecker() {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-4">
+        <div className="space-y-4" role="search" aria-label="Email breach search">
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" aria-hidden="true" />
               <Input
                 type="email"
                 placeholder="Enter your email address"
@@ -191,6 +191,7 @@ export function BreachChecker() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-10"
                 disabled={isChecking}
+                aria-label="Email address to check for data breaches"
                 data-testid="input-breach-email"
               />
             </div>
@@ -207,16 +208,18 @@ export function BreachChecker() {
               <Button 
                 onClick={handleCheck}
                 disabled={!email || !email.includes("@") || isChecking}
+                aria-label={isChecking ? "Checking email for breaches" : "Check email for data breaches"}
+                aria-busy={isChecking}
                 data-testid="button-check-breach"
               >
                 {isChecking ? (
                   <>
-                    <Search className="w-4 h-4 mr-2 animate-pulse" />
+                    <Search className="w-4 h-4 mr-2 animate-pulse" aria-hidden="true" />
                     Checking...
                   </>
                 ) : (
                   <>
-                    <Search className="w-4 h-4 mr-2" />
+                    <Search className="w-4 h-4 mr-2" aria-hidden="true" />
                     Check Email
                   </>
                 )}
@@ -225,9 +228,9 @@ export function BreachChecker() {
           </div>
 
           {isChecking && (
-            <div className="text-center py-8">
+            <div className="text-center py-8" role="status" aria-label="Checking for data breaches">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-                <Search className="w-8 h-8 text-primary animate-pulse" />
+                <Search className="w-8 h-8 text-primary animate-pulse" aria-hidden="true" />
               </div>
               <p className="text-muted-foreground">Searching breach databases...</p>
               <p className="text-sm text-muted-foreground mt-1">This may take a few seconds</p>
@@ -235,7 +238,7 @@ export function BreachChecker() {
           )}
 
           {result && !isChecking && (
-            <div className={`rounded-lg border p-6 ${getStatusColor()}`}>
+            <div className={`rounded-lg border p-6 ${getStatusColor()}`} role="alert" aria-live="polite">
               <div className="flex flex-col items-center text-center mb-6">
                 {getStatusIcon()}
                 <div className="mt-4">

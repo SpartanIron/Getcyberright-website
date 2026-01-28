@@ -227,9 +227,11 @@ export function PasswordGenerator() {
           </TabsList>
         </Tabs>
 
-        <div className="relative">
+        <div className="relative" role="region" aria-label="Generated password display">
           <div 
             className="w-full p-4 pr-24 bg-muted rounded-lg font-mono text-lg break-all min-h-[60px] flex items-center"
+            aria-live="polite"
+            aria-label={showPassword ? "Generated password" : "Generated password hidden"}
             data-testid="text-generated-password"
           >
             {showPassword ? output : "•".repeat(output.length)}
@@ -239,25 +241,29 @@ export function PasswordGenerator() {
               size="icon" 
               variant="ghost"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
               data-testid="button-toggle-visibility"
             >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showPassword ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
             </Button>
             <Button 
               size="icon" 
               variant="ghost"
               onClick={regenerate}
+              aria-label="Generate new password"
               data-testid="button-regenerate-password"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4" aria-hidden="true" />
             </Button>
             <Button 
               size="icon" 
               variant="ghost"
               onClick={copyToClipboard}
+              aria-label={copied ? "Password copied" : "Copy password to clipboard"}
               data-testid="button-copy-password"
             >
-              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="w-4 h-4 text-green-500" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
             </Button>
           </div>
         </div>

@@ -20,7 +20,8 @@ import {
   Video,
   ClipboardCheck,
   Play,
-  FileText
+  FileText,
+  Printer
 } from "lucide-react";
 import bannerImage from "@/assets/banners/resources-banner.png";
 
@@ -851,27 +852,54 @@ export default function Resources() {
 
                             {/* Checklist Display */}
                             {resource.type === "checklist" && resource.checklistItems && (
-                              <div className="mb-8 space-y-3">
-                                <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                                  <ClipboardCheck className="w-5 h-5 text-primary" />
-                                  Your Checklist
-                                </h3>
-                                {resource.checklistItems.map((item, idx) => (
-                                  <div 
-                                    key={idx} 
-                                    className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg border hover-elevate"
+                              <div className="mb-8 space-y-3 checklist-print-area" role="region" aria-label="Interactive checklist">
+                                <div className="flex items-center justify-between gap-4 mb-4">
+                                  <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                                    <ClipboardCheck className="w-5 h-5 text-primary" aria-hidden="true" />
+                                    Your Checklist
+                                  </h3>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => window.print()}
+                                    className="no-print"
+                                    aria-label="Print this checklist"
+                                    data-testid="button-print-checklist"
                                   >
-                                    <input 
-                                      type="checkbox" 
-                                      className="mt-1 w-5 h-5 rounded border-primary text-primary focus:ring-primary cursor-pointer"
-                                      data-testid={`checklist-item-${idx}`}
-                                    />
-                                    <div className="flex-1">
-                                      <p className="font-medium text-foreground">{item.task}</p>
-                                      <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+                                    <Printer className="w-4 h-4 mr-2" aria-hidden="true" />
+                                    Print
+                                  </Button>
+                                </div>
+                                <div role="group" aria-label="Checklist items">
+                                  {resource.checklistItems.map((item, idx) => (
+                                    <div 
+                                      key={idx} 
+                                      className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg border hover-elevate checklist-item"
+                                    >
+                                      <input 
+                                        type="checkbox"
+                                        id={`checklist-${resource.slug}-${idx}`}
+                                        className="mt-1 w-5 h-5 rounded border-primary text-primary focus:ring-primary cursor-pointer"
+                                        aria-describedby={`checklist-desc-${resource.slug}-${idx}`}
+                                        data-testid={`checklist-item-${idx}`}
+                                      />
+                                      <div className="flex-1">
+                                        <label 
+                                          htmlFor={`checklist-${resource.slug}-${idx}`}
+                                          className="font-medium text-foreground cursor-pointer"
+                                        >
+                                          {item.task}
+                                        </label>
+                                        <p 
+                                          id={`checklist-desc-${resource.slug}-${idx}`}
+                                          className="text-sm text-muted-foreground mt-1"
+                                        >
+                                          {item.description}
+                                        </p>
+                                      </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  ))}
+                                </div>
                               </div>
                             )}
 

@@ -334,6 +334,7 @@ Example: 'URGENT: Your bank account has been compromised! Click here immediately
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="min-h-[140px] resize-none"
+              aria-label="Enter suspicious text message to analyze"
               data-testid="input-scam-content"
             />
           </TabsContent>
@@ -350,6 +351,7 @@ Dear Customer, Your recent order cannot be delivered. Please verify your payment
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="min-h-[140px] resize-none"
+              aria-label="Enter suspicious email content to analyze"
               data-testid="input-scam-email"
             />
           </TabsContent>
@@ -364,6 +366,7 @@ http://192.168.1.1/login/paypal"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="min-h-[140px] resize-none"
+              aria-label="Enter suspicious URLs to analyze"
               data-testid="input-scam-url"
             />
           </TabsContent>
@@ -374,24 +377,26 @@ http://192.168.1.1/login/paypal"
           onClick={handleCheck}
           disabled={!content.trim() || isChecking}
           size="lg"
+          aria-label={isChecking ? "Analyzing content for threats" : "Analyze content for threats"}
+          aria-busy={isChecking}
           data-testid="button-check-scam"
         >
           {isChecking ? (
             <>
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" role="status" aria-label="Analyzing" />
               Analyzing Content...
             </>
           ) : (
             <>
-              <Zap className="w-4 h-4 mr-2" />
+              <Zap className="w-4 h-4 mr-2" aria-hidden="true" />
               Analyze for Threats
             </>
           )}
         </Button>
 
         {result && result.overallRisk && (
-          <div className="space-y-4" data-testid="result-scam-check">
-            <div className={`p-6 rounded-xl border-2 ${getRiskColor(result.overallRisk)}`}>
+          <div className="space-y-4" role="region" aria-label="Scam analysis results" aria-live="polite" data-testid="result-scam-check">
+            <div className={`p-6 rounded-xl border-2 ${getRiskColor(result.overallRisk)}`} role="alert">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
                   {getRiskIcon(result.overallRisk)}
