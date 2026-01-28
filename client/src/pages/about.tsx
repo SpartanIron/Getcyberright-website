@@ -65,21 +65,20 @@ export default function About() {
             >
               <div className="space-y-6 text-muted-foreground leading-relaxed">
                 <p className="text-lg">
-                  Six years ago, I watched members of my own family lose 
-                  access to their social media accounts because of hacking and 
-                  identity theft. Hackers took control of those accounts and used 
-                  them to impersonate my relatives, sending messages asking for money.
+                  Six years ago, hackers took over my family's social media accounts 
+                  and impersonated my relatives to steal money. They sent messages 
+                  to friends and family, pretending to be people we trusted.
                 </p>
                 
                 <p>
                   My father was targeted multiple times by fake telecom "anti-fraud" 
                   calls that claimed to help secure his bank account, but instead 
-                  led to his accounts being wiped out again and again.
+                  led to his savings being drained repeatedly.
                 </p>
                 
                 <p>
                   What became clear was that this wasn't just happening to us. 
-                  <span className="text-foreground font-medium"> Millions of families 
+                  <span className="text-foreground font-medium">Millions of families 
                   are dealing with the same attacks</span>, often on their own, without 
                   knowing who to trust or where to turn for help.
                 </p>
@@ -93,7 +92,7 @@ export default function About() {
                 
                 <p>
                   When I searched for resources that could help everyone in my 
-                  family, from my kids to aging parents to cousins overseas, I 
+                  family—from my kids, to older parents, to cousins overseas—I 
                   came up short. Cybersecurity sites were written for corporations, 
                   full of tech jargon nobody could understand.
                 </p>
@@ -108,14 +107,15 @@ export default function About() {
                   technical background or a computer science degree.
                 </p>
                 
-                <blockquote className="border-l-4 border-accent pl-6 py-2 italic text-foreground not-italic font-medium bg-accent/5 rounded-r-lg">
-                  "My hope is that no family has to learn these lessons the hard way."
-                </blockquote>
+                <p className="border-l-4 border-accent pl-6 py-2 text-foreground font-medium bg-accent/5 rounded-r-lg">
+                  My hope is that no family has to learn these lessons the hard way.
+                </p>
                 
                 <p className="text-lg font-medium text-foreground">
                   Today, GetCyberRight serves families across six continents. From 
                   grandparents targeted by phone scams to kids navigating their 
-                  first devices, we are here to help.
+                  first devices, we're here to help. Start with our free Scam 
+                  Checker tool, or explore resources designed for your family.
                 </p>
               </div>
             </motion.div>
