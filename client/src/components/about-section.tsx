@@ -64,7 +64,7 @@ export function AboutSection() {
               <p>
                 As COVID-19 kept people isolated, criminals seized the opportunity. 
                 <span className="text-foreground font-medium">Millions of families 
-                found themselves under attack</span>—often alone, with nowhere to turn.
+                found themselves under attack</span>, often alone, with nowhere to turn.
               </p>
               
               <p>
@@ -74,8 +74,8 @@ export function AboutSection() {
               </p>
               
               <p>
-                When I searched for resources to protect my family—from my kids, to 
-                older parents, to cousins overseas—I came up short. Cybersecurity 
+                When I searched for resources to protect my family, from my kids to 
+                older parents to cousins overseas, I came up short. Cybersecurity 
                 information was written for corporations, not ordinary people.
               </p>
               
@@ -85,7 +85,7 @@ export function AboutSection() {
               
               <p>
                 We set out to create free, straightforward tools that anyone can use 
-                to determine whether something is a scam—no technical background required.
+                to determine whether something is a scam. No technical background required.
               </p>
               
               <p className="border-l-4 border-accent pl-4 py-1 text-foreground font-medium">

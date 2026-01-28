@@ -67,7 +67,7 @@ export default function About() {
                 <p className="text-lg">
                   For the past six years, my family has been on the front lines of 
                   a growing crisis. It started during the pandemic, when the world 
-                  moved online almost overnight—and cyber scams and digital fraud 
+                  moved online almost overnight, and cyber scams and digital fraud 
                   skyrocketed along with it.
                 </p>
                 
@@ -82,7 +82,7 @@ export default function About() {
                 <p>
                   As COVID-19 kept people isolated at home, criminals seized the 
                   opportunity. <span className="text-foreground font-medium">Millions 
-                  of families found themselves under attack</span>—often alone, unsure 
+                  of families found themselves under attack</span>, often alone, unsure 
                   who to trust, and with nowhere to turn for help.
                 </p>
                 
@@ -95,7 +95,7 @@ export default function About() {
                 
                 <p>
                   When I searched for resources that could protect everyone in my 
-                  family—from my kids, to older parents, to cousins overseas—I came 
+                  family, from my kids to older parents to cousins overseas, I came 
                   up short. Cybersecurity information was written for corporations, 
                   buried in technical jargon that ordinary people couldn't understand.
                 </p>
@@ -106,7 +106,7 @@ export default function About() {
                 
                 <p>
                   We set out to create free, straightforward tools that anyone can 
-                  use to determine whether something is a scam—without needing a 
+                  use to determine whether something is a scam, without needing a 
                   technical background or a computer science degree.
                 </p>
                 
