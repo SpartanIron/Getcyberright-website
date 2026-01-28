@@ -115,7 +115,7 @@ export default function About() {
                 </p>
                 
                 <p className="text-lg font-medium text-foreground">
-                  Today, GetCyberRight serves families across six continents. From 
+                  Today, GetCyberRight serves families all over the world. From 
                   grandparents targeted by phone scams to children navigating their 
                   first devices, we're here to help. Start with our free Scam 
                   Checker tool, or explore resources designed for your family.

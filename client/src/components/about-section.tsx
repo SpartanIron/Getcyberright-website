@@ -111,7 +111,7 @@ export function AboutSection() {
             
             <div className="bg-primary/5 rounded-lg p-6 border border-primary/10">
               <p className="text-lg font-semibold text-foreground mb-2">
-                Today, GetCyberRight serves families across six continents.
+                Today, GetCyberRight serves families all over the world.
               </p>
               <p className="text-muted-foreground">
                 From grandparents targeted by phone scams to kids navigating 
