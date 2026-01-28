@@ -64,7 +64,7 @@ export default function About() {
             >
               <div className="space-y-6 text-muted-foreground leading-relaxed">
                 <p className="text-lg">
-                  Between 2020 and 2025, I watched members of my own family lose 
+                  Six years ago, I watched members of my own family lose 
                   access to their social media accounts because of hacking and 
                   identity theft. Hackers took control of those accounts and used 
                   them to impersonate my relatives, sending messages asking for money.
