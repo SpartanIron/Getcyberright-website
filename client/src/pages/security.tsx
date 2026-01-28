@@ -1,7 +1,7 @@
 import { Shield, Lock, Server, Eye, FileCheck, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Navbar } from "@/components/navbar";
+import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 
 export default function SecurityPage() {
@@ -80,7 +80,7 @@ export default function SecurityPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
+      <Navigation />
       
       <main className="flex-1">
         <section className="py-16 px-4 bg-gradient-to-b from-slate-900 to-slate-800">
