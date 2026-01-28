@@ -9,12 +9,14 @@ import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
 import { PasswordGenerator } from "@/components/password-generator";
 import { ScamChecker } from "@/components/scam-checker";
+import { BreachChecker } from "@/components/breach-checker";
 import { ThreatTrends } from "@/components/threat-trends";
 import { 
   Shield, 
   Search,
   Lock,
   TrendingUp,
+  Database,
   AlertTriangle,
   FileText,
   Eye,
@@ -86,11 +88,16 @@ export default function Tools() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-8">
+              <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4 mb-8">
                 <TabsTrigger value="scam-checker" className="gap-2" data-testid="tab-scam-checker">
                   <Search className="w-4 h-4" />
                   <span className="hidden sm:inline">Scam Checker</span>
                   <span className="sm:hidden">Scam</span>
+                </TabsTrigger>
+                <TabsTrigger value="breach" className="gap-2" data-testid="tab-breach">
+                  <Database className="w-4 h-4" />
+                  <span className="hidden sm:inline">Breach Check</span>
+                  <span className="sm:hidden">Breach</span>
                 </TabsTrigger>
                 <TabsTrigger value="password" className="gap-2" data-testid="tab-password">
                   <Lock className="w-4 h-4" />
@@ -99,7 +106,7 @@ export default function Tools() {
                 </TabsTrigger>
                 <TabsTrigger value="trends" className="gap-2" data-testid="tab-trends">
                   <TrendingUp className="w-4 h-4" />
-                  <span className="hidden sm:inline">Threat Trends</span>
+                  <span className="hidden sm:inline">Trends</span>
                   <span className="sm:hidden">Trends</span>
                 </TabsTrigger>
               </TabsList>
@@ -107,6 +114,10 @@ export default function Tools() {
               <div className="max-w-3xl mx-auto">
                 <TabsContent value="scam-checker">
                   <ScamChecker />
+                </TabsContent>
+                
+                <TabsContent value="breach">
+                  <BreachChecker />
                 </TabsContent>
                 
                 <TabsContent value="password">
