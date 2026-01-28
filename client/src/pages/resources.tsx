@@ -16,9 +16,15 @@ import {
   ChevronDown,
   CheckCircle2,
   AlertTriangle,
-  Shield
+  Shield,
+  Video,
+  ClipboardCheck,
+  Play,
+  FileText
 } from "lucide-react";
 import bannerImage from "@/assets/banners/resources-banner.png";
+
+type ResourceType = "guide" | "video" | "checklist";
 
 interface Resource {
   slug: string;
@@ -27,11 +33,14 @@ interface Resource {
   category: string;
   readTime: string;
   featured: boolean;
+  type: ResourceType;
   content: {
     intro: string;
     sections: { title: string; content: string; tips?: string[] }[];
     conclusion: string;
   };
+  videoUrl?: string;
+  checklistItems?: { task: string; description: string }[];
 }
 
 const resources: Resource[] = [
@@ -42,6 +51,7 @@ const resources: Resource[] = [
     category: "Email Safety",
     readTime: "8 min read",
     featured: true,
+    type: "guide",
     content: {
       intro: "Phishing emails are one of the most common ways cybercriminals try to steal your personal information. Learning to recognize these deceptive messages is your first line of defense.",
       sections: [
@@ -76,6 +86,7 @@ const resources: Resource[] = [
     category: "Senior Safety",
     readTime: "6 min read",
     featured: true,
+    type: "guide",
     content: {
       intro: "Phone scams cost older Americans billions of dollars each year. Scammers specifically target seniors because they may be more trusting, have savings, and are less likely to report being scammed.",
       sections: [
@@ -110,6 +121,7 @@ const resources: Resource[] = [
     category: "Scam Awareness",
     readTime: "10 min read",
     featured: false,
+    type: "guide",
     content: {
       intro: "Romance scams involve criminals who build fake online relationships to steal money from their victims. These scammers are patient and manipulative, often spending weeks or months building trust before asking for money.",
       sections: [
@@ -144,6 +156,7 @@ const resources: Resource[] = [
     category: "Account Security",
     readTime: "5 min read",
     featured: false,
+    type: "guide",
     content: {
       intro: "Two factor authentication, often called 2FA, adds an extra layer of security to your accounts. Even if someone steals your password, they cannot get into your account without the second factor.",
       sections: [
@@ -178,6 +191,7 @@ const resources: Resource[] = [
     category: "Privacy",
     readTime: "12 min read",
     featured: false,
+    type: "guide",
     content: {
       intro: "Social media platforms collect and share more information about you than you might realize. Taking a few minutes to adjust your privacy settings can significantly reduce what strangers can see and limit data collection.",
       sections: [
@@ -212,6 +226,7 @@ const resources: Resource[] = [
     category: "Emergency Response",
     readTime: "4 min read",
     featured: true,
+    type: "guide",
     content: {
       intro: "We have all done it, clicked a link without thinking and then realized it might have been dangerous. The good news is that clicking a link alone usually will not infect your device. Here is what to do next.",
       sections: [
@@ -246,6 +261,7 @@ const resources: Resource[] = [
     category: "Family Safety",
     readTime: "9 min read",
     featured: false,
+    type: "guide",
     content: {
       intro: "Teaching children about online safety is essential in today's digital world. The key is having ongoing conversations that evolve as they grow, rather than one big talk.",
       sections: [
@@ -280,6 +296,7 @@ const resources: Resource[] = [
     category: "Business",
     readTime: "7 min read",
     featured: false,
+    type: "guide",
     content: {
       intro: "Small businesses are increasingly targeted by cybercriminals because they often lack the security resources of larger companies. The good news is that basic security does not require a large budget or technical expertise.",
       sections: [
@@ -306,6 +323,249 @@ const resources: Resource[] = [
       ],
       conclusion: "You do not need to be perfect at security to significantly reduce your risk. Start with these basics and gradually improve your security posture over time. The most important step is to start."
     }
+  },
+  // VIDEO TRAINING RESOURCES
+  {
+    slug: "phishing-email-red-flags-video",
+    title: "Phishing Email Red Flags: Visual Training",
+    excerpt: "Watch real examples of phishing emails and learn to spot the warning signs in under 5 minutes.",
+    category: "Email Safety",
+    readTime: "5 min watch",
+    featured: true,
+    type: "video",
+    content: {
+      intro: "This visual training walks you through real-world examples of phishing emails, showing you exactly what to look for before you click.",
+      sections: [
+        {
+          title: "Suspicious Sender Addresses",
+          content: "Learn to check where an email really comes from. Scammers often use addresses that look similar to legitimate companies but have subtle differences like extra letters or different domains.",
+          tips: ["Always hover over the sender name to see the full email address", "Watch for domains that end in unusual extensions", "Be suspicious of generic sender names like 'Customer Service'"]
+        },
+        {
+          title: "Urgent Language Tactics",
+          content: "See how scammers create panic to make you act without thinking. Common phrases include 'Your account will be closed' or 'Immediate action required.'",
+          tips: ["Legitimate companies rarely threaten immediate consequences", "Take a breath before responding to urgent requests", "Verify by contacting the company directly"]
+        },
+        {
+          title: "Fake Links and Buttons",
+          content: "Discover how to reveal where links actually go before clicking. Many phishing emails have buttons that lead to fake websites designed to steal your information.",
+          tips: ["Hover over links to see the true destination", "Look for misspelled website names", "When in doubt, type the website address directly in your browser"]
+        }
+      ],
+      conclusion: "Practice these skills whenever you receive an unexpected email. Taking a few seconds to verify can save you from a major security breach."
+    }
+  },
+  {
+    slug: "strong-password-creation-video",
+    title: "Creating Passwords That Are Easy to Remember But Hard to Crack",
+    excerpt: "Learn the passphrase method for creating strong passwords you will actually remember.",
+    category: "Account Security",
+    readTime: "4 min watch",
+    featured: false,
+    type: "video",
+    content: {
+      intro: "Forget everything you know about complex passwords with random characters. This training shows you a better way to create passwords that are both secure and memorable.",
+      sections: [
+        {
+          title: "Why Most Password Advice Is Wrong",
+          content: "Passwords like 'P@ssw0rd!' are not as secure as they seem. Learn why length matters more than complexity and how hackers actually crack passwords.",
+          tips: ["Longer passwords are exponentially harder to crack", "Random character substitutions are predictable to hackers", "Dictionary words alone are vulnerable to attack"]
+        },
+        {
+          title: "The Passphrase Method",
+          content: "Create passwords using four or more random words strung together. A password like 'correct horse battery staple' is both easier to remember and harder to crack than 'Tr0ub4dor&3'.",
+          tips: ["Use words that are unrelated to each other", "Add a number or symbol between words for extra security", "Make the phrase personally meaningful but not publicly known"]
+        },
+        {
+          title: "Using a Password Manager",
+          content: "See how password managers let you have unique, complex passwords for every account without having to remember them all.",
+          tips: ["Only remember one master password", "Password managers can generate random passwords for you", "Many browsers have built-in password managers"]
+        }
+      ],
+      conclusion: "Strong passwords do not have to be hard to remember. Use the passphrase method for passwords you type often, and let a password manager handle the rest."
+    }
+  },
+  {
+    slug: "recognizing-tech-support-scams-video",
+    title: "Tech Support Scam: What It Looks and Sounds Like",
+    excerpt: "See and hear actual tech support scam tactics so you can recognize them when they happen to you.",
+    category: "Senior Safety",
+    readTime: "6 min watch",
+    featured: true,
+    type: "video",
+    content: {
+      intro: "Tech support scams are designed to frighten you into thinking your computer has a serious problem. This training shows you exactly what these scams look and sound like.",
+      sections: [
+        {
+          title: "Fake Virus Warnings",
+          content: "See examples of fake popup warnings that claim your computer is infected. Learn why these scary messages are designed to make you panic and call a fake support number.",
+          tips: ["Real antivirus software does not tell you to call a phone number", "Close the browser if you see a scary popup", "Your computer cannot be infected just by viewing a webpage"]
+        },
+        {
+          title: "The Phone Call Script",
+          content: "Hear the typical phrases scammers use when they call or when you call them. They claim to be from Microsoft, Apple, or your internet provider and use technical language to confuse you.",
+          tips: ["Microsoft and Apple will never call you unsolicited", "Do not let anyone remotely access your computer", "Hang up immediately if pressured"]
+        },
+        {
+          title: "What They Want From You",
+          content: "Understand the end goal: scammers want remote access to your computer, payment for fake services, or your personal and financial information.",
+          tips: ["Never pay for tech support you did not initiate", "Gift cards are never a legitimate payment method", "Do not provide banking information over the phone"]
+        }
+      ],
+      conclusion: "When in doubt, hang up and call a trusted family member or friend. Legitimate tech support will never pressure you to act immediately."
+    }
+  },
+  {
+    slug: "social-media-privacy-walkthrough-video",
+    title: "Lock Down Your Facebook Privacy: Step by Step",
+    excerpt: "Follow along as we show you exactly where to find and change your Facebook privacy settings.",
+    category: "Privacy",
+    readTime: "7 min watch",
+    featured: false,
+    type: "video",
+    content: {
+      intro: "Facebook has dozens of privacy settings hidden in different places. This walkthrough shows you exactly where to find them and what each setting does.",
+      sections: [
+        {
+          title: "Who Can See Your Posts",
+          content: "Learn to control who sees what you share. By default, your posts may be visible to more people than you realize.",
+          tips: ["Set your default audience to Friends only", "Review past posts and limit their visibility", "Check who can see your friends list"]
+        },
+        {
+          title: "Who Can Find and Contact You",
+          content: "Control how people can find your profile and send you messages. You can limit searches by email or phone number.",
+          tips: ["Restrict who can send you friend requests", "Control who can look you up by phone number", "Review your profile's visibility to search engines"]
+        },
+        {
+          title: "Apps and Data Sharing",
+          content: "See which apps have access to your Facebook data and remove any you no longer use or trust.",
+          tips: ["Regularly review connected apps", "Remove access for apps you do not recognize", "Be cautious about new app permissions"]
+        }
+      ],
+      conclusion: "Take 10 minutes now to review your privacy settings. Your future self will thank you for protecting your personal information."
+    }
+  },
+  // CHECKLIST RESOURCES
+  {
+    slug: "weekly-security-checkup-checklist",
+    title: "Weekly Security Checkup: 5 Minute Routine",
+    excerpt: "A quick weekly routine to keep your accounts and devices secure. Print this out and check off each item.",
+    category: "Account Security",
+    readTime: "5 min checklist",
+    featured: true,
+    type: "checklist",
+    checklistItems: [
+      { task: "Review recent account activity", description: "Check your email, bank, and social media accounts for any logins or transactions you do not recognize." },
+      { task: "Update one password", description: "Pick one account each week to update with a stronger password. Over time, all your accounts will be more secure." },
+      { task: "Check for software updates", description: "Update your phone, computer, and apps. Updates often include important security fixes." },
+      { task: "Delete suspicious emails", description: "Clear out any suspicious emails without clicking links. Report phishing attempts if your email provider allows it." },
+      { task: "Review app permissions", description: "On your phone, check which apps have access to your location, camera, and microphone. Remove permissions that are not needed." }
+    ],
+    content: {
+      intro: "A consistent weekly routine is one of the best ways to maintain good security habits. This checklist takes just 5 minutes and can prevent major problems.",
+      sections: [],
+      conclusion: "Set a recurring reminder to complete this checklist each week. Consistency is more important than perfection."
+    }
+  },
+  {
+    slug: "travel-security-checklist",
+    title: "Before You Travel: Security Checklist",
+    excerpt: "Protect yourself from cyber threats while traveling. Complete this checklist before your next trip.",
+    category: "Privacy",
+    readTime: "10 min checklist",
+    featured: false,
+    type: "checklist",
+    checklistItems: [
+      { task: "Enable two-factor authentication on all accounts", description: "If your password is compromised while traveling, 2FA provides a crucial backup layer of security." },
+      { task: "Notify your bank of travel plans", description: "Prevent your cards from being frozen for suspicious activity. Most banks have an online form or app setting for this." },
+      { task: "Back up your devices", description: "Create a backup of your phone and laptop before you leave. If a device is lost or stolen, you will not lose your data." },
+      { task: "Download offline maps and documents", description: "Save maps and important travel documents offline so you do not need to connect to public WiFi to access them." },
+      { task: "Set up a VPN", description: "A VPN encrypts your internet connection on public WiFi. Consider a reputable paid service for better security." },
+      { task: "Enable device tracking", description: "Make sure Find My iPhone or Find My Device is enabled so you can locate or wipe a lost device." },
+      { task: "Use a travel email address", description: "Consider using a separate email for travel bookings to limit exposure if that account is compromised." },
+      { task: "Print backup copies of important documents", description: "Have paper copies of your passport, travel insurance, and emergency contacts in case you lose device access." }
+    ],
+    content: {
+      intro: "Traveling exposes you to additional security risks including public WiFi networks, device theft, and unfamiliar environments. This checklist helps you prepare.",
+      sections: [],
+      conclusion: "Complete this checklist at least a few days before you travel so you have time to address any issues that come up."
+    }
+  },
+  {
+    slug: "new-device-setup-checklist",
+    title: "New Device Security Setup Checklist",
+    excerpt: "Setting up a new phone, tablet, or computer? Complete these steps to start with strong security.",
+    category: "Account Security",
+    readTime: "15 min checklist",
+    featured: false,
+    type: "checklist",
+    checklistItems: [
+      { task: "Set a strong screen lock", description: "Use a 6-digit PIN at minimum, or better yet, a passphrase. Enable biometric unlock for convenience." },
+      { task: "Enable automatic updates", description: "Turn on automatic updates for both the operating system and apps. This ensures you always have the latest security patches." },
+      { task: "Set up device tracking", description: "Enable Find My iPhone, Find My Device, or similar tracking. This lets you locate, lock, or wipe a lost device." },
+      { task: "Review privacy settings", description: "Go through privacy settings and limit which apps can access your location, microphone, camera, and contacts." },
+      { task: "Install security software", description: "On computers, install reputable antivirus software. On phones, stick to official app stores to avoid malicious apps." },
+      { task: "Set up a backup system", description: "Configure automatic backups to the cloud or an external drive. Regular backups protect against data loss." },
+      { task: "Enable two-factor authentication", description: "Set up 2FA on your primary accounts, especially email and any financial accounts." },
+      { task: "Install a password manager", description: "Set up a password manager to generate and store strong, unique passwords for all your accounts." },
+      { task: "Customize lock screen notifications", description: "Hide sensitive notification previews from your lock screen so others cannot read them." },
+      { task: "Remove pre-installed bloatware", description: "Uninstall any unnecessary pre-installed apps that you will not use, especially those with excessive permissions." }
+    ],
+    content: {
+      intro: "The best time to secure a device is right when you set it up. Taking these steps now will protect you throughout the life of the device.",
+      sections: [],
+      conclusion: "Bookmark this checklist and use it every time you get a new device. Good security habits start on day one."
+    }
+  },
+  {
+    slug: "after-data-breach-checklist",
+    title: "What To Do After a Data Breach: Action Checklist",
+    excerpt: "Your data was exposed in a breach? Follow these steps immediately to protect yourself.",
+    category: "Emergency Response",
+    readTime: "20 min checklist",
+    featured: true,
+    type: "checklist",
+    checklistItems: [
+      { task: "Change the breached password immediately", description: "If you used that password anywhere else, change it on those accounts too. Each account should have a unique password." },
+      { task: "Enable two-factor authentication", description: "Add 2FA to the breached account and any other accounts where you used the same password." },
+      { task: "Check what data was exposed", description: "The breach notification should tell you what was leaked. This determines your next steps." },
+      { task: "Place a fraud alert with credit bureaus", description: "Contact Equifax, Experian, or TransUnion to place a free fraud alert. This makes it harder for thieves to open accounts in your name." },
+      { task: "Consider a credit freeze", description: "A credit freeze prevents new accounts from being opened in your name. You can temporarily lift it when needed." },
+      { task: "Review your credit reports", description: "Get free credit reports from annualcreditreport.com and look for accounts or inquiries you do not recognize." },
+      { task: "Monitor your financial accounts", description: "Watch your bank and credit card statements closely for the next several months for unauthorized charges." },
+      { task: "Be alert for phishing attempts", description: "Scammers may use the breached data to send targeted phishing emails. Be extra cautious with unexpected messages." },
+      { task: "Update security questions", description: "If security questions were exposed, change them on all accounts where you use similar questions." },
+      { task: "Document everything", description: "Keep records of the breach notification, your response steps, and any suspicious activity. This helps if you need to dispute fraud." }
+    ],
+    content: {
+      intro: "Data breaches are unfortunately common, but quick action can limit the damage. Follow these steps as soon as you learn your data was exposed.",
+      sections: [],
+      conclusion: "Complete these steps within the first 24 to 48 hours after learning of a breach. The faster you act, the better protected you will be."
+    }
+  },
+  {
+    slug: "family-security-conversation-checklist",
+    title: "Family Security Talk: Conversation Checklist",
+    excerpt: "Key topics to cover when talking with family members about online safety.",
+    category: "Family Safety",
+    readTime: "15 min checklist",
+    featured: false,
+    type: "checklist",
+    checklistItems: [
+      { task: "Explain why security matters", description: "Start with real examples of how scams affect real people. Avoid scare tactics but be honest about risks." },
+      { task: "Discuss password habits", description: "Talk about using different passwords for different accounts and how password managers can help." },
+      { task: "Cover phishing recognition", description: "Show examples of phishing emails and texts. Practice identifying red flags together." },
+      { task: "Set up two-factor authentication together", description: "Help family members enable 2FA on their most important accounts. Walk through the process step by step." },
+      { task: "Establish a verification protocol", description: "Create a family rule: verify any unexpected money requests by calling the person directly on a known phone number." },
+      { task: "Discuss social media privacy", description: "Review privacy settings together and talk about what is safe to share publicly." },
+      { task: "Create a family code word", description: "Establish a secret word only family members know. This helps verify identity in emergencies." },
+      { task: "Plan for emergencies", description: "Discuss what to do if someone thinks they have been scammed. Make sure everyone knows who to call for help." }
+    ],
+    content: {
+      intro: "Protecting your family online works best when everyone understands the basics. Use this checklist to guide important security conversations.",
+      sections: [],
+      conclusion: "Make security a regular topic, not a one-time lecture. Brief, ongoing conversations are more effective than lengthy presentations."
+    }
   }
 ];
 
@@ -322,10 +582,19 @@ const categoryMapping: Record<string, string> = {
   "emergency": "Emergency Response",
 };
 
+const typeLabels: Record<ResourceType, string> = {
+  guide: "Guide",
+  video: "Video Training",
+  checklist: "Checklist"
+};
+
+const resourceTypes: ResourceType[] = ["guide", "video", "checklist"];
+
 export default function Resources() {
   const searchString = useSearch();
   const params = new URLSearchParams(searchString);
   const categoryParam = params.get("category");
+  const typeParam = params.get("type") as ResourceType | null;
   
   const getInitialCategory = () => {
     if (!categoryParam) return "All";
@@ -335,19 +604,32 @@ export default function Resources() {
     return "All";
   };
 
+  const getInitialType = (): ResourceType | "All" => {
+    if (!typeParam) return "All";
+    if (resourceTypes.includes(typeParam)) return typeParam;
+    return "All";
+  };
+
   const [selectedCategory, setSelectedCategory] = useState(getInitialCategory);
+  const [selectedType, setSelectedType] = useState<ResourceType | "All">(getInitialType);
   const [expandedResource, setExpandedResource] = useState<string | null>(null);
 
   useEffect(() => {
     const newCategory = getInitialCategory();
+    const newType = getInitialType();
     if (newCategory !== selectedCategory) {
       setSelectedCategory(newCategory);
     }
+    if (newType !== selectedType) {
+      setSelectedType(newType);
+    }
   }, [searchString]);
 
-  const filteredResources = selectedCategory === "All" 
-    ? resources 
-    : resources.filter(r => r.category === selectedCategory);
+  const filteredResources = resources.filter(r => {
+    const categoryMatch = selectedCategory === "All" || r.category === selectedCategory;
+    const typeMatch = selectedType === "All" || r.type === selectedType;
+    return categoryMatch && typeMatch;
+  });
   
   const featuredResources = filteredResources.filter(r => r.featured);
   const allResources = filteredResources;
@@ -392,11 +674,17 @@ export default function Resources() {
                         onClick={() => handleResourceClick(resource.slug)}
                       >
                         <CardContent className="p-6">
-                          <div className="flex items-center gap-2 mb-3">
+                          <div className="flex items-center gap-2 mb-3 flex-wrap">
                             <Badge variant="secondary" className="bg-accent/10 text-accent border-accent/20">
                               Featured
                             </Badge>
                             <Badge variant="outline">{resource.category}</Badge>
+                            <Badge variant="outline" className="flex items-center gap-1">
+                              {resource.type === "video" && <Video className="w-3 h-3" />}
+                              {resource.type === "checklist" && <ClipboardCheck className="w-3 h-3" />}
+                              {resource.type === "guide" && <FileText className="w-3 h-3" />}
+                              {typeLabels[resource.type]}
+                            </Badge>
                           </div>
                           
                           <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-2">
@@ -409,11 +697,11 @@ export default function Resources() {
                           
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <Clock className="w-4 h-4" />
+                              {resource.type === "video" ? <Play className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
                               <span>{resource.readTime}</span>
                             </div>
                             <span className="text-primary text-sm font-medium flex items-center gap-1">
-                              {expandedResource === resource.slug ? "Close" : "Read more"} 
+                              {expandedResource === resource.slug ? "Close" : resource.type === "video" ? "Watch" : resource.type === "checklist" ? "View" : "Read more"} 
                               <ChevronDown className={`w-3 h-3 transition-transform ${expandedResource === resource.slug ? 'rotate-180' : ''}`} />
                             </span>
                           </div>
@@ -425,21 +713,78 @@ export default function Resources() {
               </>
             )}
 
-            <div className="flex flex-wrap gap-2 mb-8">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={category === selectedCategory ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => {
-                    setSelectedCategory(category);
-                    setExpandedResource(null);
-                  }}
-                  data-testid={`filter-${category.toLowerCase().replace(/\s/g, "-")}`}
-                >
-                  {category}
-                </Button>
-              ))}
+            <div className="flex flex-col gap-4 mb-8">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Filter by Topic</p>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <Button
+                      key={category}
+                      variant={category === selectedCategory ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        setSelectedCategory(category);
+                        setExpandedResource(null);
+                      }}
+                      data-testid={`filter-${category.toLowerCase().replace(/\s/g, "-")}`}
+                    >
+                      {category}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Filter by Type</p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant={selectedType === "All" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setSelectedType("All");
+                      setExpandedResource(null);
+                    }}
+                    data-testid="filter-type-all"
+                  >
+                    All Types
+                  </Button>
+                  <Button
+                    variant={selectedType === "guide" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setSelectedType("guide");
+                      setExpandedResource(null);
+                    }}
+                    data-testid="filter-type-guide"
+                  >
+                    <FileText className="w-4 h-4 mr-1" />
+                    Guides
+                  </Button>
+                  <Button
+                    variant={selectedType === "video" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setSelectedType("video");
+                      setExpandedResource(null);
+                    }}
+                    data-testid="filter-type-video"
+                  >
+                    <Video className="w-4 h-4 mr-1" />
+                    Videos
+                  </Button>
+                  <Button
+                    variant={selectedType === "checklist" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setSelectedType("checklist");
+                      setExpandedResource(null);
+                    }}
+                    data-testid="filter-type-checklist"
+                  >
+                    <ClipboardCheck className="w-4 h-4 mr-1" />
+                    Checklists
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <AnimatePresence mode="wait">
@@ -461,8 +806,14 @@ export default function Resources() {
                         <CardContent className="p-6 sm:p-8">
                           <div className="flex items-start justify-between gap-4 mb-6">
                             <div>
-                              <div className="flex items-center gap-2 mb-2">
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
                                 <Badge variant="outline">{resource.category}</Badge>
+                                <Badge variant="outline" className="flex items-center gap-1">
+                                  {resource.type === "video" && <Video className="w-3 h-3" />}
+                                  {resource.type === "checklist" && <ClipboardCheck className="w-3 h-3" />}
+                                  {resource.type === "guide" && <FileText className="w-3 h-3" />}
+                                  {typeLabels[resource.type]}
+                                </Badge>
                                 <span className="text-sm text-muted-foreground">{resource.readTime}</span>
                               </div>
                               <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
@@ -484,40 +835,93 @@ export default function Resources() {
                               {resource.content.intro}
                             </p>
 
-                            <div className="space-y-8">
-                              {resource.content.sections.map((section, idx) => (
-                                <div key={idx}>
-                                  <h3 className="text-xl font-semibold text-foreground mb-3 flex items-center gap-2">
-                                    <Shield className="w-5 h-5 text-primary" />
-                                    {section.title}
-                                  </h3>
-                                  <p className="text-muted-foreground mb-4">
-                                    {section.content}
-                                  </p>
-                                  {section.tips && section.tips.length > 0 && (
-                                    <div className="bg-muted/50 rounded-lg p-4">
-                                      <p className="font-medium text-sm mb-2 flex items-center gap-2">
-                                        <CheckCircle2 className="w-4 h-4 text-primary" />
-                                        Key Tips
-                                      </p>
-                                      <ul className="space-y-1">
-                                        {section.tips.map((tip, tipIdx) => (
-                                          <li key={tipIdx} className="text-sm text-muted-foreground flex items-start gap-2">
-                                            <span className="text-primary mt-1">•</span>
-                                            <span>{tip}</span>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                  )}
+                            {/* Video Training Display */}
+                            {resource.type === "video" && (
+                              <div className="mb-8 p-6 bg-muted/30 rounded-lg border flex flex-col items-center justify-center gap-4">
+                                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <Play className="w-8 h-8 text-primary" />
                                 </div>
-                              ))}
-                            </div>
+                                <p className="text-muted-foreground text-center">
+                                  Video training content - In a full implementation, this would embed an educational video player.
+                                  <br />
+                                  <span className="text-sm">For now, review the training topics below.</span>
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Checklist Display */}
+                            {resource.type === "checklist" && resource.checklistItems && (
+                              <div className="mb-8 space-y-3">
+                                <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                                  <ClipboardCheck className="w-5 h-5 text-primary" />
+                                  Your Checklist
+                                </h3>
+                                {resource.checklistItems.map((item, idx) => (
+                                  <div 
+                                    key={idx} 
+                                    className="flex items-start gap-3 p-4 bg-muted/30 rounded-lg border hover-elevate"
+                                  >
+                                    <input 
+                                      type="checkbox" 
+                                      className="mt-1 w-5 h-5 rounded border-primary text-primary focus:ring-primary cursor-pointer"
+                                      data-testid={`checklist-item-${idx}`}
+                                    />
+                                    <div className="flex-1">
+                                      <p className="font-medium text-foreground">{item.task}</p>
+                                      <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Standard Content Sections */}
+                            {resource.content.sections.length > 0 && (
+                              <div className="space-y-8">
+                                {resource.type === "video" && (
+                                  <h3 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                                    <BookOpen className="w-5 h-5 text-primary" />
+                                    Training Topics
+                                  </h3>
+                                )}
+                                {resource.content.sections.map((section, idx) => (
+                                  <div key={idx}>
+                                    <h3 className="text-xl font-semibold text-foreground mb-3 flex items-center gap-2">
+                                      {resource.type === "video" ? (
+                                        <Play className="w-5 h-5 text-primary" />
+                                      ) : (
+                                        <Shield className="w-5 h-5 text-primary" />
+                                      )}
+                                      {section.title}
+                                    </h3>
+                                    <p className="text-muted-foreground mb-4">
+                                      {section.content}
+                                    </p>
+                                    {section.tips && section.tips.length > 0 && (
+                                      <div className="bg-muted/50 rounded-lg p-4">
+                                        <p className="font-medium text-sm mb-2 flex items-center gap-2">
+                                          <CheckCircle2 className="w-4 h-4 text-primary" />
+                                          Key Tips
+                                        </p>
+                                        <ul className="space-y-1">
+                                          {section.tips.map((tip, tipIdx) => (
+                                            <li key={tipIdx} className="text-sm text-muted-foreground flex items-start gap-2">
+                                              <span className="text-primary mt-1">•</span>
+                                              <span>{tip}</span>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
 
                             <div className="mt-8 p-6 bg-primary/5 rounded-lg border border-primary/20">
                               <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2">
                                 <AlertTriangle className="w-5 h-5 text-primary" />
-                                Key Takeaway
+                                {resource.type === "checklist" ? "Remember" : "Key Takeaway"}
                               </h3>
                               <p className="text-muted-foreground">
                                 {resource.content.conclusion}
@@ -560,11 +964,19 @@ export default function Resources() {
                       <CardContent className="p-6">
                         <div className="flex items-start gap-4">
                           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <BookOpen className="w-5 h-5 text-primary" />
+                            {resource.type === "video" && <Video className="w-5 h-5 text-primary" />}
+                            {resource.type === "checklist" && <ClipboardCheck className="w-5 h-5 text-primary" />}
+                            {resource.type === "guide" && <FileText className="w-5 h-5 text-primary" />}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
                               <Badge variant="outline" className="text-xs">{resource.category}</Badge>
+                              <Badge variant="outline" className="text-xs flex items-center gap-1">
+                                {resource.type === "video" && <Play className="w-3 h-3" />}
+                                {resource.type === "checklist" && <ClipboardCheck className="w-3 h-3" />}
+                                {resource.type === "guide" && <FileText className="w-3 h-3" />}
+                                {typeLabels[resource.type]}
+                              </Badge>
                               <span className="text-xs text-muted-foreground">{resource.readTime}</span>
                             </div>
                             
@@ -590,11 +1002,14 @@ export default function Resources() {
                 <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground mb-2">No resources found</h3>
                 <p className="text-muted-foreground mb-4">
-                  No resources match the selected category.
+                  No resources match your selected filters.
                 </p>
                 <Button 
                   variant="outline" 
-                  onClick={() => setSelectedCategory("All")}
+                  onClick={() => {
+                    setSelectedCategory("All");
+                    setSelectedType("All");
+                  }}
                   data-testid="button-clear-filter"
                 >
                   View All Resources

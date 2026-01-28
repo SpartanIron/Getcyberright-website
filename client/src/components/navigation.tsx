@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink } from "lucide-react";
+import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@assets/image_(3)_1769558492356.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -39,8 +39,9 @@ const learnTopics = [
 ];
 
 const resourceTypes = [
-  { title: "All Guides", description: "Browse all security tutorials", href: "/resources", icon: FileText },
-  { title: "Scam Awareness", description: "Learn about current scam tactics", href: "/resources?category=scams", icon: AlertTriangle },
+  { title: "Security Guides", description: "Step-by-step protection tutorials", href: "/resources?type=guide", icon: FileText },
+  { title: "Video Training", description: "Watch and learn at your own pace", href: "/resources?type=video", icon: Video },
+  { title: "Checklists", description: "Printable security checklists", href: "/resources?type=checklist", icon: ClipboardCheck },
   { title: "Emergency Help", description: "What to do if you've been scammed", href: "/emergency-help", icon: Shield },
 ];
 
