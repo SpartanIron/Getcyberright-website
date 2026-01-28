@@ -8,12 +8,37 @@ import familyComputerImage from "@/assets/images/hero-family-computer.jpg";
 import businessTeamImage from "@/assets/images/hero-business-team.jpg";
 import smartphoneUserImage from "@/assets/images/hero-smartphone-user.jpg";
 
-const heroImages = [
-  { src: professionalImage, alt: "Professional using laptop securely" },
-  { src: seniorTabletImage, alt: "Senior person using tablet safely" },
-  { src: familyComputerImage, alt: "Family learning online safety together" },
-  { src: businessTeamImage, alt: "Business team discussing cybersecurity" },
-  { src: smartphoneUserImage, alt: "Person using smartphone securely" },
+const heroSlides = [
+  { 
+    src: professionalImage, 
+    alt: "Professional using laptop securely",
+    headline: "Free Cybersecurity Education for Everyone",
+    subtext: "Everything you need to protect yourself and your family from online threats, all in one place."
+  },
+  { 
+    src: seniorTabletImage, 
+    alt: "Senior person using tablet safely",
+    headline: "Stay Safe Online at Any Age",
+    subtext: "Simple, easy-to-follow guides designed specifically for seniors to navigate the digital world with confidence."
+  },
+  { 
+    src: familyComputerImage, 
+    alt: "Family learning online safety together",
+    headline: "Protect Your Family Online",
+    subtext: "Learn how to keep your children safe from online predators, cyberbullying, and inappropriate content."
+  },
+  { 
+    src: businessTeamImage, 
+    alt: "Business team discussing cybersecurity",
+    headline: "Security Training for Your Business",
+    subtext: "Equip your team with the knowledge to recognize threats and protect your organization from cyber attacks."
+  },
+  { 
+    src: smartphoneUserImage, 
+    alt: "Person using smartphone securely",
+    headline: "Secure Your Digital Life",
+    subtext: "From mobile banking to social media, learn how to protect your personal information on every device."
+  },
 ];
 
 export function HeroSection() {
@@ -21,24 +46,26 @@ export function HeroSection() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+      setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
 
   const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+    setCurrentIndex((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
+    setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
   };
+
+  const currentSlide = heroSlides[currentIndex];
 
   return (
     <section className="relative overflow-hidden min-h-[600px] lg:min-h-[700px]" data-testid="section-hero">
       {/* Full-width background image carousel */}
       <div className="absolute inset-0">
-        {heroImages.map((image, index) => (
+        {heroSlides.map((slide, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ${
@@ -46,8 +73,8 @@ export function HeroSection() {
             }`}
           >
             <img
-              src={image.src}
-              alt={image.alt}
+              src={slide.src}
+              alt={slide.alt}
               className="w-full h-full object-cover"
               data-testid={`img-hero-${index}`}
             />
@@ -60,12 +87,12 @@ export function HeroSection() {
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col justify-center min-h-[600px] lg:min-h-[700px] py-16 lg:py-0 max-w-2xl">
-          <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-white mb-6 leading-[1.1]" data-testid="text-hero-heading">
-            Free Cybersecurity Education for Everyone
+          <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-white mb-6 leading-[1.1] transition-opacity duration-500" data-testid="text-hero-heading">
+            {currentSlide.headline}
           </h1>
 
-          <p className="text-xl text-white/80 mb-8 leading-relaxed" data-testid="text-hero-subtext">
-            Everything you need to protect yourself and your family from online threats, all in one place.
+          <p className="text-xl text-white/80 mb-8 leading-relaxed transition-opacity duration-500" data-testid="text-hero-subtext">
+            {currentSlide.subtext}
           </p>
 
           <ul className="space-y-3 mb-10 text-left max-w-md">
@@ -119,7 +146,7 @@ export function HeroSection() {
         </Button>
         
         <div className="flex gap-2">
-          {heroImages.map((_, index) => (
+          {heroSlides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
