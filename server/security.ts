@@ -1,6 +1,7 @@
 import helmet from "helmet";
 import type { Express, Request, Response, NextFunction } from "express";
 import winston from "winston";
+import { checkRateLimitAlert, checkCSRFAlert, checkSuspiciousPatternAlert } from "./security-alerts";
 
 // Security Logger Configuration
 export const securityLogger = winston.createLogger({
@@ -72,6 +73,9 @@ class RateLimiter {
         this.blockedIPs.set(ip, now + this.BLOCK_DURATION);
         securityLogger.warn("IP blocked due to repeated rate limit violations", { ip, violations: record.violations });
       }
+      
+      // Trigger security alert for rate limit violations
+      checkRateLimitAlert(ip, record.violations);
       
       this.requests.set(ip, record);
       securityLogger.info("Rate limit exceeded", { ip, tier, count: record.count, limit: config.maxRequests });
@@ -167,6 +171,7 @@ export function securityLoggingMiddleware(req: Request, res: Response, next: Nex
         pattern: pattern.source,
         userAgent: req.headers["user-agent"],
       });
+      checkSuspiciousPatternAlert(ip, pattern.source, req.path);
       break;
     }
   }
@@ -243,11 +248,13 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
       const originHost = new URL(origin).host;
       if (originHost !== host) {
         securityLogger.warn("CSRF: Origin mismatch", { origin, host, ip });
+        checkCSRFAlert(ip, req.path);
         res.status(403).json({ error: "Invalid request origin" });
         return;
       }
     } catch {
       securityLogger.warn("CSRF: Invalid origin header", { origin, ip });
+      checkCSRFAlert(ip, req.path);
       res.status(403).json({ error: "Invalid request origin" });
       return;
     }
@@ -256,11 +263,13 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
       const refererHost = new URL(referer).host;
       if (refererHost !== host) {
         securityLogger.warn("CSRF: Referer mismatch", { referer, host, ip });
+        checkCSRFAlert(ip, req.path);
         res.status(403).json({ error: "Invalid request origin" });
         return;
       }
     } catch {
       securityLogger.warn("CSRF: Invalid referer header", { referer, ip });
+      checkCSRFAlert(ip, req.path);
       res.status(403).json({ error: "Invalid request origin" });
       return;
     }

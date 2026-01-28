@@ -8,6 +8,24 @@ const ALLOWED_TAGS = [
 
 const ALLOWED_ATTR = ["href", "title", "class", "id", "target", "rel"];
 
+// Add hook to enforce rel="noopener noreferrer" on all links with target="_blank"
+DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+  if (node.tagName === "A") {
+    const target = node.getAttribute("target");
+    if (target === "_blank") {
+      node.setAttribute("rel", "noopener noreferrer");
+    }
+    // Validate href to prevent javascript: and data: URLs
+    const href = node.getAttribute("href");
+    if (href) {
+      const lowerHref = href.toLowerCase().trim();
+      if (lowerHref.startsWith("javascript:") || lowerHref.startsWith("data:")) {
+        node.removeAttribute("href");
+      }
+    }
+  }
+});
+
 export function sanitizeHtml(dirty: string): string {
   return DOMPurify.sanitize(dirty, {
     ALLOWED_TAGS,
