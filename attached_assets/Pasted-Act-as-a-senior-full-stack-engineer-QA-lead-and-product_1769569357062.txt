@@ -1,0 +1,121 @@
+Act as a senior full-stack engineer, QA lead, and production readiness auditor.
+
+Objective:
+Perform a complete, site-wide audit of the entire GetCyberRight website and deliver a fully functional, production-ready system.
+
+This is not a cosmetic review.
+This is a functional, end-to-end production audit and implementation task.
+
+--------------------------------------------------
+AUDIT & REMEDIATION SCOPE (MANDATORY)
+--------------------------------------------------
+
+1. BUTTON FUNCTIONALITY
+- Identify every button across the entire website.
+- If a button does not perform a real action, implement the correct functionality.
+- No placeholder buttons.
+- No “coming soon” behavior.
+- Every button must:
+  • Trigger a valid navigation, action, or backend process
+  • Have proper loading, success, and error states
+  • Be accessible and keyboard-navigable
+
+--------------------------------------------------
+
+2. LINK VALIDATION
+- Crawl and validate every internal and external link.
+- Fix all broken, dead, or misrouted links.
+- Ensure all navigation paths resolve correctly.
+- Replace placeholder links (#, javascript:void(0), etc.) with real destinations.
+- Ensure links open in appropriate contexts (same tab vs new tab).
+
+--------------------------------------------------
+
+3. NON-EXISTENT TOOLS OR FEATURES
+- Identify any referenced tools, features, assessments, calculators, or applications that do not currently exist.
+- For each missing tool:
+  • Design it
+  • Build it
+  • Make it functional
+- No mockups.
+- No fake UI.
+- Every referenced tool must work end-to-end.
+
+--------------------------------------------------
+
+4. APPLICATION & TOOL REQUIREMENTS
+All tools and applications must:
+- Be usable by non-technical users
+- Have clear input, output, and instructions
+- Handle edge cases gracefully
+- Include validation, error handling, and user feedback
+- Be fully integrated into the site navigation and UX
+
+--------------------------------------------------
+BACKEND & DATA INTEGRATION
+--------------------------------------------------
+
+- Implement necessary backend logic for all forms, tools, and interactions.
+- Ensure data persistence where appropriate.
+- Secure all endpoints.
+- Use environment variables for secrets.
+- Ensure no broken API calls or console errors.
+
+--------------------------------------------------
+PRODUCTION READINESS STANDARDS
+--------------------------------------------------
+
+The site must meet the following criteria:
+
+- No dead UI elements
+- No broken links
+- No placeholder content
+- No console errors
+- No incomplete features
+- Fully responsive across devices
+- Accessible (keyboard, screen readers, contrast)
+- SEO-ready
+- Performance-optimized
+
+--------------------------------------------------
+QUALITY ASSURANCE
+--------------------------------------------------
+
+Perform a final QA pass that includes:
+- Manual interaction testing
+- Form submission testing
+- Tool usage testing
+- Navigation flow testing
+- Error and edge case testing
+
+Fix all issues discovered during QA.
+
+--------------------------------------------------
+DELIVERABLES
+--------------------------------------------------
+
+Output:
+- Fully functional, production-ready website
+- All buttons operational
+- All links working
+- All referenced tools built and usable
+- Clean, maintainable code
+- Clear comments where logic is non-obvious
+
+--------------------------------------------------
+NON-NEGOTIABLE RULES
+--------------------------------------------------
+
+- Do NOT leave placeholders
+- Do NOT describe functionality without implementing it
+- Do NOT defer work
+- If something is referenced, it must exist and work
+- If a user can click it, it must do something meaningful
+
+--------------------------------------------------
+FINAL SUCCESS CRITERIA
+--------------------------------------------------
+
+A real user should be able to navigate the entire site, click every button, use every tool, submit every form, and encounter zero broken experiences.
+
+This site must be ready for real users in a production environment.
