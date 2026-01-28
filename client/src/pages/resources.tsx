@@ -716,12 +716,8 @@ export default function Resources() {
                 {/* Expanded content for featured guides */}
                 {featuredResources.map(resource => 
                   expandedResource === resource.slug && (
-                    <motion.div
+                    <div
                       key={`expanded-${resource.slug}`}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
                       className="mb-16"
                     >
                       <Card className="border-2 border-primary/20" data-testid={`expanded-featured-${resource.slug}`}>
@@ -789,7 +785,7 @@ export default function Resources() {
                           </div>
                         </CardContent>
                       </Card>
-                    </motion.div>
+                    </div>
                   )
                 )}
               </>
