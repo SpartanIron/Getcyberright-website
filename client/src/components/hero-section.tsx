@@ -3,9 +3,9 @@ import { ArrowRight, CheckCircle2, Shield, Lock, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import logoImage from "@assets/image_(3)_1769558492356.png";
-import familyImage from "@/assets/images/family-laptop.jpg";
-import seniorImage from "@/assets/images/senior-tablet.jpg";
-import professionalImage from "@/assets/images/professional-laptop.jpg";
+import familyImage from "@/assets/images/hero-family.jpg";
+import seniorImage from "@/assets/images/seniors-learning.jpg";
+import professionalImage from "@/assets/images/business-team.jpg";
 
 export function HeroSection() {
   return (

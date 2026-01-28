@@ -1,10 +1,8 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
 import { TrustSignals } from "@/components/trust-signals";
-import { ProblemSolution } from "@/components/problem-solution";
 import { Features } from "@/components/features";
-import { EducationResources } from "@/components/education-resources";
-import { AboutSection } from "@/components/about-section";
+import { AudienceShowcase } from "@/components/audience-showcase";
 import { Testimonials } from "@/components/testimonials";
 import { ContactForm } from "@/components/contact-form";
 import { Newsletter } from "@/components/newsletter";
@@ -18,12 +16,9 @@ export default function Home() {
       <main>
         <HeroSection />
         <TrustSignals />
-        <ProblemSolution />
         <Features />
-        <EducationResources />
-        <AboutSection />
+        <AudienceShowcase />
         <Testimonials />
-        <ContactForm />
         <Newsletter />
         <CTASection />
       </main>
