@@ -3,9 +3,9 @@ import { ArrowRight, CheckCircle2, Play, Shield, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import logoImage from "@assets/image_(3)_1769558492356.png";
-import familyImage from "@/assets/images/family-devices.jpg";
-import seniorImage from "@/assets/images/senior-safety.jpg";
-import businessImage from "@/assets/images/small-business.jpg";
+import familyImage from "@/assets/images/family-laptop.jpg";
+import seniorImage from "@/assets/images/senior-tablet.jpg";
+import professionalImage from "@/assets/images/professional-laptop.jpg";
 
 export function HeroSection() {
   return (
@@ -86,8 +86,8 @@ export function HeroSection() {
                 className="absolute bottom-0 left-0 w-[340px] h-[240px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 z-10"
               >
                 <img 
-                  src={businessImage} 
-                  alt="Small business owner using secure technology" 
+                  src={professionalImage} 
+                  alt="Professional working securely on computer" 
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
