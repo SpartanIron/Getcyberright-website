@@ -12,6 +12,7 @@ import About from "@/pages/about";
 import Contact from "@/pages/contact";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
+import EmergencyHelp from "@/pages/emergency-help";
 
 function Router() {
   return (
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
+      <Route path="/emergency-help" component={EmergencyHelp} />
       <Route component={NotFound} />
     </Switch>
   );

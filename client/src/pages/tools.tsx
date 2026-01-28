@@ -1,194 +1,202 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
+import { PasswordGenerator } from "@/components/password-generator";
+import { ScamChecker } from "@/components/scam-checker";
+import { ThreatTrends } from "@/components/threat-trends";
 import { 
   Shield, 
-  FileCheck, 
-  AlertTriangle, 
   Search,
   Lock,
+  TrendingUp,
+  AlertTriangle,
+  FileText,
   Eye,
-  Download,
-  ArrowRight
+  ArrowRight,
+  BookOpen
 } from "lucide-react";
 import logoImage from "@assets/image_(3)_1769558492356.png";
 
-const tools = [
-  {
-    id: "scam-checker",
-    icon: Search,
-    title: "Scam Awareness Checklist",
-    description: "A simple questionnaire to help you determine if something you've received might be a scam. Answer a few questions and get instant guidance.",
-    category: "Assessment",
-    popular: true,
-    features: ["Instant results", "No signup required", "Printable version"]
-  },
+const guides = [
   {
     id: "phishing-guide",
     icon: AlertTriangle,
     title: "Phishing Red Flag Guide",
-    description: "Learn the telltale signs of phishing emails, texts, and calls. This visual guide shows you exactly what to look for before clicking or responding.",
+    description: "Learn the telltale signs of phishing emails, texts, and calls. This visual guide shows you exactly what to look for.",
     category: "Education",
-    popular: true,
-    features: ["Visual examples", "Real-world samples", "Quick reference card"]
+    features: ["Visual examples", "Real-world samples", "Quick reference"]
   },
   {
     id: "safety-assessment",
     icon: Shield,
     title: "Online Safety Assessment",
-    description: "Take a quick assessment of your current online safety practices. Get personalized recommendations based on your answers.",
+    description: "Take a quick assessment of your current online safety practices. Get personalized recommendations.",
     category: "Assessment",
-    popular: false,
     features: ["5-minute assessment", "Personalized tips", "Action plan"]
-  },
-  {
-    id: "password-guide",
-    icon: Lock,
-    title: "Password Security Guide",
-    description: "Everything you need to know about creating and managing strong passwords - explained simply for non-technical users.",
-    category: "Education",
-    popular: false,
-    features: ["Password tips", "Manager recommendations", "Recovery planning"]
   },
   {
     id: "privacy-checklist",
     icon: Eye,
     title: "Privacy Settings Checklist",
-    description: "Step-by-step guides for securing your privacy on Facebook, Instagram, and other major platforms. Keep your information safe.",
+    description: "Step-by-step guides for securing your privacy on Facebook, Instagram, and other major platforms.",
     category: "Guides",
-    popular: false,
     features: ["Platform-specific", "Screenshot guides", "Regular updates"]
   },
   {
     id: "incident-response",
-    icon: FileCheck,
+    icon: FileText,
     title: "What To Do If You've Been Scammed",
-    description: "If you think you've fallen victim to a scam, this guide walks you through exactly what to do next - step by step.",
+    description: "Step-by-step guide on exactly what to do if you think you've been scammed.",
     category: "Emergency",
-    popular: true,
-    features: ["Step-by-step actions", "Contact list", "Documentation help"]
+    features: ["Step-by-step actions", "Contact list", "Documentation help"],
+    href: "/emergency-help"
   }
 ];
 
 export default function Tools() {
+  const [activeTab, setActiveTab] = useState("scam-checker");
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
       <main>
-        <section className="py-16 sm:py-24 bg-gradient-to-b from-background to-muted/30">
+        <section className="py-16 sm:py-20 bg-gradient-to-b from-background to-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center max-w-3xl mx-auto"
-            >
+            <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
                 <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
                 <span>100% Free Tools</span>
               </div>
               
               <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
-                Free Protection Tools{" "}
-                <span className="text-primary">For Everyone</span>
+                Free Security Tools
               </h1>
               
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                No signup required. No hidden fees. Just practical tools and guides 
-                to help you stay safe online. Download, print, and share with your 
-                family and friends.
+              <p className="text-lg text-muted-foreground">
+                Check for scams, generate strong passwords, and stay informed about current threats. 
+                No signup required.
               </p>
-            </motion.div>
+            </div>
+
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-8">
+                <TabsTrigger value="scam-checker" className="gap-2" data-testid="tab-scam-checker">
+                  <Search className="w-4 h-4" />
+                  <span className="hidden sm:inline">Scam Checker</span>
+                  <span className="sm:hidden">Scam</span>
+                </TabsTrigger>
+                <TabsTrigger value="password" className="gap-2" data-testid="tab-password">
+                  <Lock className="w-4 h-4" />
+                  <span className="hidden sm:inline">Passwords</span>
+                  <span className="sm:hidden">Pass</span>
+                </TabsTrigger>
+                <TabsTrigger value="trends" className="gap-2" data-testid="tab-trends">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="hidden sm:inline">Threat Trends</span>
+                  <span className="sm:hidden">Trends</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="max-w-3xl mx-auto">
+                <TabsContent value="scam-checker">
+                  <ScamChecker />
+                </TabsContent>
+                
+                <TabsContent value="password">
+                  <PasswordGenerator />
+                </TabsContent>
+                
+                <TabsContent value="trends">
+                  <ThreatTrends />
+                </TabsContent>
+              </div>
+            </Tabs>
           </div>
         </section>
 
-        <section className="py-16 sm:py-24">
+        <section className="py-16 sm:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tools.map((tool, index) => (
-                <motion.div
-                  key={tool.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card className="h-full flex flex-col hover-elevate" data-testid={`tool-card-${tool.id}`}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-4 mb-2">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <tool.icon className="w-6 h-6 text-primary" />
-                        </div>
-                        <div className="flex gap-2">
-                          {tool.popular && (
-                            <Badge variant="secondary" className="bg-accent/10 text-accent border-accent/20">
-                              Popular
-                            </Badge>
-                          )}
-                          <Badge variant="outline">{tool.category}</Badge>
-                        </div>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                  Security Guides & Resources
+                </h2>
+                <p className="text-muted-foreground">
+                  Educational materials to help you stay protected
+                </p>
+              </div>
+              <Link href="/resources">
+                <Button variant="outline" data-testid="button-view-all-resources">
+                  View All
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {guides.map((guide) => (
+                <Card key={guide.id} className="hover-elevate" data-testid={`card-guide-${guide.id}`}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <guide.icon className="w-6 h-6 text-primary" />
                       </div>
-                      <CardTitle className="text-lg">{tool.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col">
-                      <p className="text-muted-foreground mb-4 flex-1">
-                        {tool.description}
-                      </p>
-                      
-                      <div className="space-y-4">
-                        <div className="flex flex-wrap gap-2">
-                          {tool.features.map((feature, featureIndex) => (
-                            <span 
-                              key={featureIndex}
-                              className="text-xs bg-muted px-2 py-1 rounded"
-                            >
-                              {feature}
-                            </span>
-                          ))}
-                        </div>
-                        
-                        <Button className="w-full" data-testid={`button-${tool.id}`}>
-                          <Download className="mr-2 w-4 h-4" />
-                          Get This Tool
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                      <Badge variant="outline">{guide.category}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardTitle className="text-lg mb-2">{guide.title}</CardTitle>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      {guide.description}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {guide.features.map((feature, idx) => (
+                        <span 
+                          key={idx}
+                          className="text-xs bg-muted px-2 py-1 rounded"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <Link href={guide.href || "/resources"}>
+                      <Button variant="outline" className="w-full" data-testid={`button-guide-${guide.id}`}>
+                        <BookOpen className="w-4 h-4 mr-2" />
+                        Read Guide
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="py-16 sm:py-24 bg-card border-y">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center max-w-2xl mx-auto"
-            >
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
-                Need Something Specific?
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                Can't find what you're looking for? We're always creating new resources 
-                based on what our community needs. Let us know what would help you stay safe.
-              </p>
-              <Link href="/contact">
-                <Button variant="outline" size="lg" data-testid="button-request-tool">
-                  Request a Tool
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
-            </motion.div>
+        <section className="py-16 sm:py-20 bg-red-50 dark:bg-red-950/20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
+              Been Scammed? Get Help Now
+            </h2>
+            <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+              If you think you've been scammed, don't panic. We have step-by-step guidance 
+              on what to do next to minimize damage and report the scam.
+            </p>
+            <Link href="/emergency-help">
+              <Button size="lg" variant="destructive" data-testid="button-emergency-help">
+                Get Emergency Help
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         </section>
 
