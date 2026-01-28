@@ -1,0 +1,80 @@
+Act as a senior visual designer and UX architect.
+
+Objective:
+Refine this split-layout section so the empty white space next to the image is intentionally styled using a theme color, and the text content stands out clearly and confidently against it.
+
+--------------------------------------------------
+BACKGROUND TREATMENT
+--------------------------------------------------
+
+Replace the plain white background area adjacent to the image with a brand-aligned theme color.
+
+Requirements:
+- Use a calm, enterprise-grade theme color (e.g., deep navy, muted blue, charcoal, or brand-approved tone)
+- The color must feel intentional and integrated into the overall design system
+- Avoid pure white in this section
+- No harsh saturation or loud tones
+- No gradients unless extremely subtle
+
+This background should:
+- Frame the content
+- Add visual weight and balance against the image
+- Increase perceived quality and intention
+
+--------------------------------------------------
+TEXT CONTRAST & EMPHASIS
+--------------------------------------------------
+
+Ensure all text placed on the theme-colored background:
+
+- Has strong contrast for readability
+- Immediately stands out visually
+- Feels confident and editorial, not washed out
+
+Typography rules:
+- Headline should be bold, high-contrast, and clearly dominant
+- Body text should be lighter in weight but still highly legible
+- Use color (white or near-white) intentionally for clarity, not decoration
+
+Text must feel:
+- Purposeful
+- Easy to read at a glance
+- Clearly separated from the image visually
+
+--------------------------------------------------
+LAYOUT & BALANCE
+--------------------------------------------------
+
+- Maintain the split layout:
+  • One side: high-quality image
+  • One side: themed background with text
+- Vertically center the text block
+- Provide generous padding so the text breathes
+- The section should feel balanced and composed, not crowded
+
+--------------------------------------------------
+VISUAL INTENT
+--------------------------------------------------
+
+This section should feel:
+- Editorial
+- Mission-driven
+- Trustworthy
+- Enterprise-grade
+
+Not:
+- Flat
+- Empty
+- Generic
+- Default-looking
+
+--------------------------------------------------
+QUALITY BAR
+--------------------------------------------------
+
+A user should immediately notice:
+- The background color is intentional, not a default
+- The text is clearly emphasized and readable
+- The section feels designed, not assembled
+
+Implement this background and text treatment so the section feels purposeful, premium, and aligned with the overall site theme.
