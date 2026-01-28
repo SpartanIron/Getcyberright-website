@@ -661,7 +661,7 @@ export default function Resources() {
               <>
                 <h2 className="text-2xl font-bold text-foreground mb-6">Featured Guides</h2>
                 
-                <div className="grid md:grid-cols-3 gap-6 mb-16">
+                <div className="grid md:grid-cols-3 gap-6 mb-8">
                   {featuredResources.map((resource, index) => (
                     <motion.div
                       key={resource.slug}
@@ -671,7 +671,7 @@ export default function Resources() {
                       transition={{ duration: 0.5, delay: index * 0.1 }}
                     >
                       <Card 
-                        className="h-full hover-elevate cursor-pointer" 
+                        className={`h-full hover-elevate cursor-pointer ${expandedResource === resource.slug ? 'ring-2 ring-primary' : ''}`}
                         data-testid={`featured-${resource.slug}`}
                         onClick={() => handleResourceClick(resource.slug)}
                       >
@@ -712,6 +712,86 @@ export default function Resources() {
                     </motion.div>
                   ))}
                 </div>
+                
+                {/* Expanded content for featured guides */}
+                {featuredResources.map(resource => 
+                  expandedResource === resource.slug && (
+                    <motion.div
+                      key={`expanded-${resource.slug}`}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="mb-16"
+                    >
+                      <Card className="border-2 border-primary/20" data-testid={`expanded-featured-${resource.slug}`}>
+                        <CardContent className="p-6 sm:p-8">
+                          <div className="flex items-start justify-between gap-4 mb-6">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                                {resource.type === "video" && <Video className="w-6 h-6 text-primary" />}
+                                {resource.type === "checklist" && <ClipboardCheck className="w-6 h-6 text-primary" />}
+                                {resource.type === "guide" && <FileText className="w-6 h-6 text-primary" />}
+                              </div>
+                              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+                                {resource.title}
+                              </h2>
+                            </div>
+                            <Button 
+                              size="icon" 
+                              variant="ghost"
+                              onClick={() => setExpandedResource(null)}
+                              data-testid="button-close-featured-article"
+                            >
+                              <X className="w-5 h-5" />
+                            </Button>
+                          </div>
+
+                          <div className="prose prose-gray dark:prose-invert max-w-none">
+                            <p className="text-lg text-muted-foreground mb-8">
+                              {resource.content.intro}
+                            </p>
+
+                            {resource.content.sections.length > 0 && (
+                              <div className="space-y-8">
+                                {resource.content.sections.map((section, idx) => (
+                                  <div key={idx}>
+                                    <h3 className="text-xl font-semibold text-foreground mb-3 flex items-center gap-2">
+                                      <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                                        {idx + 1}
+                                      </span>
+                                      {section.title}
+                                    </h3>
+                                    <div className="pl-10 space-y-2">
+                                      <p className="text-muted-foreground">{section.content}</p>
+                                      {section.tips && section.tips.length > 0 && (
+                                        <div className="mt-3 space-y-1">
+                                          {section.tips.map((tip: string, tidx: number) => (
+                                            <div key={tidx} className="flex items-start gap-2">
+                                              <CheckCircle2 className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
+                                              <p className="text-muted-foreground text-sm">{tip}</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {resource.content.conclusion && (
+                              <div className="mt-8 p-4 bg-primary/5 rounded-lg border border-primary/10">
+                                <h4 className="font-semibold text-foreground mb-2">Key Takeaway</h4>
+                                <p className="text-muted-foreground">{resource.content.conclusion}</p>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  )
+                )}
               </>
             )}
 
