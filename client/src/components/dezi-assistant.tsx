@@ -32,122 +32,92 @@ const suggestedPrompts = [
 ];
 
 const safetyResponses: Record<string, string> = {
-  "scam": `To determine if a message is a scam, look for these common warning signs:
+  "scam": `Great question! Spotting scams gets easier once you know what to look for.
 
-**Red Flags:**
-• Urgent language demanding immediate action
+**Common Warning Signs:**
+• Messages that create urgency or pressure you to act fast
 • Requests for money, gift cards, or wire transfers
-• Threats of account closure or legal action
-• Poor grammar or spelling errors
-• Suspicious sender addresses or phone numbers
-• Links that do not match the company claimed
+• Threats about account closures or legal action
+• Spelling mistakes and awkward grammar
+• Email addresses or phone numbers that look suspicious
+• Links that do not match the company they claim to be
 
-**What to Do:**
-• Do not click any links or download attachments
-• Do not reply or call back numbers in the message
-• Verify by contacting the company directly through their official website
-• Report the message to the FTC at ReportFraud.ftc.gov
+**Here is What You Can Do:**
+• Avoid clicking links or downloading attachments
+• Do not reply or call numbers in the message
+• Contact the company directly using their official website
+• Report suspicious messages to the FTC at ReportFraud.ftc.gov
 
-If you are still unsure, use our Scam Checker tool to analyze the message.`,
+If something feels off, trust your instincts. You can also use our Scam Checker tool to analyze any message you are unsure about.`,
 
-  "phishing": `Phishing is a type of online scam where criminals attempt to steal your personal information by pretending to be a trusted organization.
+  "phishing": `Phishing is one of the most common online scams, and understanding how it works can help you avoid it.
 
-**How Phishing Works:**
-• Scammers send emails, texts, or messages that appear to be from banks, tech companies, or government agencies
-• These messages often create urgency, claiming your account has been compromised
-• They include links to fake websites designed to look legitimate
-• When you enter your information, it goes directly to the criminals
+**How It Works:**
+Scammers send emails, texts, or messages pretending to be from trusted organizations like banks, tech companies, or government agencies. These messages usually claim something is wrong with your account and urge you to act quickly. They include links to fake websites that look real, and when you enter your information, it goes straight to the criminals.
 
-**Common Phishing Tactics:**
-• Fake password reset requests
-• Suspicious package delivery notifications
-• Prize or lottery winning announcements
-• Tax refund or IRS impersonation
+**Watch Out For:**
+• Unexpected password reset requests
+• Package delivery notifications you were not expecting
+• Prize or lottery announcements
+• Messages claiming to be from the IRS about refunds
 
-**Protection Tips:**
+**How to Protect Yourself:**
 • Never click links in unexpected messages
-• Verify requests by contacting organizations directly
-• Look for misspellings in sender addresses
-• Enable two-factor authentication on your accounts
+• When in doubt, contact the organization directly
+• Check sender addresses for misspellings
+• Turn on two factor authentication for your accounts
 
-For more information, visit CISA.gov or the FTC Consumer Protection page.`,
+You can learn more at CISA.gov or the FTC Consumer Protection page.`,
 
-  "family": `Protecting your family online involves creating awareness and establishing safety habits for everyone.
+  "family": `Keeping your family safe online is all about building good habits and having open conversations.
 
 **For Children:**
-• Use parental controls appropriate for their age
-• Keep devices in common areas of the home
-• Talk regularly about online safety in age-appropriate ways
-• Teach them to never share personal information online
-• Establish rules about screen time and app downloads
+Parental controls are a great starting point. Keep devices in common areas so you can stay involved, and talk about online safety in ways they can understand. Teach them never to share personal information, and set clear rules about screen time and app downloads.
 
 **For Teenagers:**
-• Discuss digital reputation and permanence of online content
-• Talk about the risks of sharing personal information
-• Encourage open communication about online interactions
-• Set expectations about appropriate online behavior
+Teens benefit from conversations about their digital reputation and how online content can stick around forever. Encourage them to come to you if something feels wrong, and help them understand the risks of oversharing personal details.
 
 **For Seniors:**
-• Help set up fraud alerts on financial accounts
-• Establish a family code word for emergencies
-• Review privacy settings on devices and accounts
-• Create a habit of verifying unexpected requests
+Help set up fraud alerts on bank accounts and establish a family code word for emergencies. Review privacy settings together and encourage them to verify any unexpected requests before responding.
 
-**General Family Safety:**
-• Use strong, unique passwords for each account
-• Enable two-factor authentication where possible
-• Keep software and devices updated
-• Discuss current scam trends together
+**For Everyone:**
+Use strong, unique passwords for each account. Enable two factor authentication whenever possible, keep your devices updated, and talk as a family about the latest scam trends.
 
-Visit StopBullying.gov for youth safety resources and AARP.org for senior protection guides.`,
+StopBullying.gov has great resources for youth, and AARP.org offers helpful guides for seniors.`,
 
-  "clicked": `If you clicked a suspicious link, do not panic. Here is what to do next:
+  "clicked": `First, take a breath. Clicking a suspicious link is not the end of the world, but here is what you should do right away.
 
-**Immediate Steps:**
-1. Close the browser tab or window immediately
-2. Do not enter any personal information
-3. Do not download anything if prompted
-4. Disconnect from the internet if concerned about malware
+**Right Now:**
+Close the browser tab or window immediately. If you have not entered any information or downloaded anything, you are probably fine. If you are worried about malware, you can disconnect from the internet temporarily.
 
-**Check for Damage:**
-• Run a full antivirus scan on your device
-• Check your browser for new extensions you did not install
-• Review your download folder for unfamiliar files
-• Look at installed programs for anything suspicious
+**Check Your Device:**
+Run a full antivirus scan. Look through your browser extensions for anything unfamiliar, check your downloads folder, and review your installed programs for anything you do not recognize.
 
-**If You Entered Information:**
-• Change your password immediately for that account
-• Change passwords on any other accounts using the same password
-• Enable two-factor authentication
-• Contact your bank if you entered financial information
-• Monitor your accounts for unauthorized activity
+**If You Entered Any Information:**
+Change the password for that account right away. If you use the same password elsewhere, change those too. Turn on two factor authentication, and if you entered bank or credit card details, contact your bank immediately. Keep an eye on your accounts for any unusual activity.
 
-**Ongoing Protection:**
-• Set up fraud alerts with credit bureaus if needed
-• Report the phishing attempt to the FTC
-• Watch for suspicious emails or calls in the coming weeks
+**Moving Forward:**
+Consider setting up fraud alerts with credit bureaus. Report the phishing attempt to the FTC, and stay alert for suspicious follow up emails or calls over the next few weeks.
 
-For detailed guidance, visit our Emergency Help page or the FTC at IdentityTheft.gov.`,
+Our Emergency Help page has more detailed guidance, and you can also visit IdentityTheft.gov.`,
 
-  "default": `I am here to help you understand online safety and protect yourself from digital threats.
+  "default": `Hello! I am Dezi, your online safety assistant. I am here to help you understand digital risks and learn how to protect yourself and your family.
 
-**I can help you with:**
-• Understanding whether a message might be a scam
-• Learning how common cyber threats work
-• Getting practical tips to protect your family
-• Knowing what steps to take after a security incident
+**I Can Help You With:**
+• Figuring out if a message might be a scam
+• Understanding how common cyber threats work
+• Sharing practical tips to keep your family safe online
+• Explaining what to do after a security incident
 
-**What I cannot do:**
-• Provide legal, medical, or financial advice
-• Guarantee that any message is safe or unsafe
-• Replace professional cybersecurity services
+**Keep in Mind:**
+I provide general educational information, but I cannot offer legal, medical, or financial advice. I also cannot guarantee whether any specific message is safe or dangerous, and I am not a replacement for professional cybersecurity services.
 
-For specific concerns about fraud or identity theft, I recommend contacting:
-• **FTC**: ReportFraud.ftc.gov
-• **FBI IC3**: ic3.gov for internet crimes
-• **Your bank**: For financial concerns
+**Need Help Right Now?**
+• Report fraud to the FTC at ReportFraud.ftc.gov
+• Report internet crimes to FBI IC3 at ic3.gov
+• Contact your bank for financial concerns
 
-Is there a specific safety topic I can help you learn about?`
+What would you like to learn about today?`
 };
 
 function getResponse(userMessage: string): string {
