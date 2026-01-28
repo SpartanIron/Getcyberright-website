@@ -103,9 +103,32 @@ Preferred communication style: Simple, everyday language.
 - Formats checklists with proper spacing and checkbox styling
 - Print button on each checklist resource
 
+## Kids Digital Safety Hub
+
+A dedicated section at `/kids` designed for children ages 8 to 16, featuring:
+
+### Age Segmentation
+- **Ages 8 to 11 (Foundations)**: Five beginner lessons covering personal information, passwords, spotting tricks, device safety, and trusted adults
+- **Ages 12 to 16 (Smart and Safe Online)**: Five intermediate lessons on social media, cyberbullying, gaming safety, phishing scams, and digital footprint
+
+### Features
+- Interactive quizzes with immediate feedback
+- Progress tracking with visual completion indicators
+- Spot the Scam game with real world scenarios
+- Parent and Educator section with conversation starters
+- No data collection, accounts, or external links
+
+### Design Principles
+- Larger text and kid friendly visuals
+- Empowering, non fear based language
+- Proper sentence structure and punctuation (no dashes)
+- Card based layouts with bright, controlled colors
+
 ## Recent Changes (Jan 2026)
+- Added Kids Digital Safety Hub with two age tracks and gamified learning
 - Added custom 404 page with helpful navigation links
 - Implemented print functionality for checklists
 - Added ARIA labels to scam checker, password generator, breach checker
 - Generated OG image for social media sharing
 - Added Twitter/Open Graph meta tags
+- Updated website logo to glowing teal padlock mascot

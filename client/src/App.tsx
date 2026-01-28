@@ -16,6 +16,7 @@ import Contact from "@/pages/contact";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import EmergencyHelp from "@/pages/emergency-help";
+import Kids from "@/pages/kids";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route path="/emergency-help" component={EmergencyHelp} />
+      <Route path="/kids" component={Kids} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck } from "lucide-react";
+import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck, Sparkles } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -16,7 +16,7 @@ import {
 
 const whoWeHelp = [
   { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/solutions#families", icon: Users },
-  { title: "Kids & Teens Hub", description: "Stay safe on social media, gaming, and online", href: "/solutions#families", icon: Shield },
+  { title: "Kids Safety Hub", description: "Fun, interactive lessons for ages 8 to 16", href: "/kids", icon: Sparkles, featured: true },
   { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/solutions#seniors", icon: Heart },
   { title: "Educators Hub", description: "Classroom resources for teaching digital citizenship", href: "/solutions#educators", icon: GraduationCap },
   { title: "Small Business", description: "Enterprise-grade protection made accessible", href: "/solutions#business", icon: Briefcase },
