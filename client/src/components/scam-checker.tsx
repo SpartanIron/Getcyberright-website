@@ -83,6 +83,26 @@ type URLAnalysis = {
   reasons: string[];
 };
 
+type URLReputationResult = {
+  url: string;
+  threatLevel: 'safe' | 'suspicious' | 'dangerous' | 'unknown';
+  phishTank: {
+    checked: boolean;
+    isPhishing: boolean | null;
+    verified?: boolean;
+    detailPage?: string | null;
+    error?: string;
+  };
+  urlhaus: {
+    checked: boolean;
+    isMalware: boolean | null;
+    threat?: string | null;
+    tags?: string[];
+    error?: string;
+  };
+  checkedAt: string;
+};
+
 const threatPatterns: { pattern: RegExp; category: string; indicator: string; severity: "low" | "medium" | "high" | "critical"; explanation: string }[] = [
   // Urgency & Pressure Tactics
   { pattern: /\b(urgent|immediately|right now|act fast|don't wait|hurry|expires? today|limited time|only \d+ left)\b/i, category: "Pressure Tactics", indicator: "Urgency language detected", severity: "medium", explanation: "Scammers create artificial urgency to prevent you from thinking critically. Legitimate organizations give you time to make decisions." },
@@ -998,6 +1018,10 @@ export function ScamChecker() {
   const [headerContent, setHeaderContent] = useState("");
   const [headerResult, setHeaderResult] = useState<EmailHeaderAnalysis | null>(null);
   const [isCheckingHeaders, setIsCheckingHeaders] = useState(false);
+  
+  // URL reputation checking state
+  const [urlReputations, setUrlReputations] = useState<Record<string, URLReputationResult>>({});
+  const [isCheckingReputation, setIsCheckingReputation] = useState<Record<string, boolean>>({});
 
   const handleCheck = () => {
     setIsChecking(true);
@@ -1013,6 +1037,46 @@ export function ScamChecker() {
       setHeaderResult(analyzeEmailHeaders(headerContent));
       setIsCheckingHeaders(false);
     }, 800);
+  };
+  
+  // Check URL reputation against phishing/malware databases
+  const checkUrlReputation = async (url: string) => {
+    setIsCheckingReputation(prev => ({ ...prev, [url]: true }));
+    
+    try {
+      const response = await fetch('/api/security/check-url-reputation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to check URL reputation');
+      }
+      
+      const data = await response.json();
+      setUrlReputations(prev => ({ ...prev, [url]: data }));
+    } catch (error) {
+      console.error('URL reputation check failed:', error);
+      setUrlReputations(prev => ({ 
+        ...prev, 
+        [url]: {
+          url,
+          threatLevel: 'unknown',
+          phishTank: { checked: false, isPhishing: null, error: 'Service unavailable' },
+          urlhaus: { checked: false, isMalware: null, error: 'Service unavailable' },
+          checkedAt: new Date().toISOString()
+        }
+      }));
+    } finally {
+      setIsCheckingReputation(prev => ({ ...prev, [url]: false }));
+    }
+  };
+  
+  // Auto-check all URLs when results are available
+  const checkAllUrlReputations = async (urls: URLAnalysis[]) => {
+    const urlsToCheck = urls.filter(u => !urlReputations[u.url] && !isCheckingReputation[u.url]);
+    await Promise.all(urlsToCheck.map(u => checkUrlReputation(u.url)));
   };
 
   const getRiskColor = (risk: string) => {
@@ -1440,34 +1504,157 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
 
             {result.urls.length > 0 && (
               <div className="space-y-3">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <LinkIcon className="w-4 h-4 text-blue-500" />
-                  URL Analysis ({result.urls.length})
-                </h4>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <LinkIcon className="w-4 h-4 text-blue-500" />
+                    URL Analysis ({result.urls.length})
+                  </h4>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => checkAllUrlReputations(result.urls)}
+                    disabled={Object.values(isCheckingReputation).some(v => v)}
+                    data-testid="button-check-url-reputation"
+                  >
+                    {Object.values(isCheckingReputation).some(v => v) ? (
+                      <>
+                        <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin mr-2" />
+                        Checking Databases...
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-3 h-3 mr-2" />
+                        Check Threat Databases
+                      </>
+                    )}
+                  </Button>
+                </div>
                 <div className="space-y-2">
-                  {result.urls.map((urlAnalysis, idx) => (
-                    <div key={idx} className={`p-3 rounded-lg border ${urlAnalysis.isSuspicious ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800' : 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'}`}>
-                      <div className="flex items-start gap-2">
-                        {urlAnalysis.isSuspicious ? (
-                          <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                        ) : (
-                          <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                        )}
-                        <div className="min-w-0">
-                          <p className="text-sm font-mono break-all">{urlAnalysis.url}</p>
-                          {urlAnalysis.reasons.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {urlAnalysis.reasons.map((reason, ridx) => (
-                                <Badge key={ridx} variant="secondary" className="text-xs">
-                                  {reason}
-                                </Badge>
-                              ))}
-                            </div>
+                  {result.urls.map((urlAnalysis, idx) => {
+                    const reputation = urlReputations[urlAnalysis.url];
+                    const isChecking = isCheckingReputation[urlAnalysis.url];
+                    
+                    return (
+                      <div key={idx} className={`p-3 rounded-lg border ${urlAnalysis.isSuspicious ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800' : 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'}`}>
+                        <div className="flex items-start gap-2">
+                          {urlAnalysis.isSuspicious ? (
+                            <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                          ) : (
+                            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                           )}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-mono break-all">{urlAnalysis.url}</p>
+                            {urlAnalysis.reasons.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {urlAnalysis.reasons.map((reason, ridx) => (
+                                  <Badge key={ridx} variant="secondary" className="text-xs">
+                                    {reason}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {/* Real-time reputation check results */}
+                            {isChecking && (
+                              <div className="mt-2 p-2 bg-muted/50 rounded border flex items-center gap-2">
+                                <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                                <span className="text-xs text-muted-foreground">Checking threat databases...</span>
+                              </div>
+                            )}
+                            
+                            {reputation && !isChecking && (
+                              <div className="mt-2 p-2 bg-muted/30 rounded border space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-medium">Threat Database Check:</span>
+                                  {reputation.threatLevel === 'dangerous' && (
+                                    <Badge className="bg-red-500 text-white text-xs">DANGEROUS</Badge>
+                                  )}
+                                  {reputation.threatLevel === 'safe' && (
+                                    <Badge className="bg-blue-500 text-white text-xs">Not in known threat lists</Badge>
+                                  )}
+                                  {reputation.threatLevel === 'unknown' && (
+                                    <Badge variant="secondary" className="text-xs">Check failed</Badge>
+                                  )}
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                  {/* PhishTank result */}
+                                  <div className={`p-1.5 rounded ${
+                                    reputation.phishTank.isPhishing 
+                                      ? 'bg-red-100 dark:bg-red-950/50' 
+                                      : reputation.phishTank.checked 
+                                        ? 'bg-green-100 dark:bg-green-950/50' 
+                                        : 'bg-gray-100 dark:bg-gray-800'
+                                  }`}>
+                                    <div className="font-medium flex items-center gap-1">
+                                      {reputation.phishTank.isPhishing ? (
+                                        <XCircle className="w-3 h-3 text-red-500" />
+                                      ) : reputation.phishTank.checked ? (
+                                        <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                      ) : (
+                                        <Info className="w-3 h-3 text-gray-400" />
+                                      )}
+                                      PhishTank
+                                    </div>
+                                    <div className="text-muted-foreground">
+                                      {reputation.phishTank.isPhishing 
+                                        ? 'PHISHING CONFIRMED' 
+                                        : reputation.phishTank.checked 
+                                          ? 'Not in database' 
+                                          : reputation.phishTank.error || 'Not checked'}
+                                    </div>
+                                  </div>
+                                  
+                                  {/* URLhaus result */}
+                                  <div className={`p-1.5 rounded ${
+                                    reputation.urlhaus.isMalware 
+                                      ? 'bg-red-100 dark:bg-red-950/50' 
+                                      : reputation.urlhaus.checked 
+                                        ? 'bg-green-100 dark:bg-green-950/50' 
+                                        : 'bg-gray-100 dark:bg-gray-800'
+                                  }`}>
+                                    <div className="font-medium flex items-center gap-1">
+                                      {reputation.urlhaus.isMalware ? (
+                                        <XCircle className="w-3 h-3 text-red-500" />
+                                      ) : reputation.urlhaus.checked ? (
+                                        <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                      ) : (
+                                        <Info className="w-3 h-3 text-gray-400" />
+                                      )}
+                                      URLhaus
+                                    </div>
+                                    <div className="text-muted-foreground">
+                                      {reputation.urlhaus.isMalware 
+                                        ? `MALWARE: ${reputation.urlhaus.threat || 'Confirmed'}` 
+                                        : reputation.urlhaus.checked 
+                                          ? 'Not in database' 
+                                          : reputation.urlhaus.error || 'Not checked'}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {(reputation.phishTank.isPhishing || reputation.urlhaus.isMalware) && (
+                                  <div className="text-xs text-red-600 dark:text-red-400 font-medium p-1 bg-red-100/50 dark:bg-red-900/30 rounded">
+                                    This URL is in known threat databases. Do NOT visit this link.
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+                </div>
+                
+                {/* Threat database info */}
+                <div className="text-xs text-muted-foreground p-2 bg-muted/30 rounded flex items-start gap-2">
+                  <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                  <span>
+                    Checks against PhishTank (community phishing database) and URLhaus (malware distribution database). 
+                    Note: URLs not found in these databases may still be dangerous. New threats take time to be reported. 
+                    Always exercise caution with unfamiliar links.
+                  </span>
                 </div>
               </div>
             )}

@@ -191,8 +191,13 @@ All educational content is based on verified, factual information from trusted s
 - URL entropy and brand similarity analysis
 - Urgency/pressure scoring with visual meter
 - Reply-To mismatch and bulk mailer detection
+- Real-time URL reputation checking against PhishTank (phishing database) and URLhaus (malware database)
+- Backend API proxy endpoints for threat database queries (with rate limiting and timeout handling)
 
 ## Recent Changes (Jan 2026)
+- Added real-time URL reputation checking against PhishTank and URLhaus threat databases
+- Implemented backend proxy endpoints with rate limiting (30 req/min per IP) and 10-second timeouts
+- Added URL validation to block private/localhost IPs from being checked
 - Updated all statistics to latest available data: FTC Consumer Sentinel 2024 (March 2025), FBI IC3 2024 Report, and FTC Data Spotlights (Aug/Dec 2025)
 - Added Email Header Analysis tab to Scam Checker with authentication checking
 - Content review: removed specific percentages, added data source attribution
