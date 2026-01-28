@@ -1014,11 +1014,15 @@ function ParentSection() {
 
       </div>
 
-      <div className="bg-red-600 dark:bg-red-800 py-12">
+      <div className="bg-gradient-to-r from-rose-400 via-red-400 to-orange-400 dark:from-rose-600 dark:via-red-600 dark:to-orange-600 py-12">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-white mb-2">Our Safety Promise</h3>
-            <p className="text-red-100">Built with child protection as our top priority.</p>
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
+              <Heart className="w-5 h-5 text-white" />
+              <span className="font-medium text-white">Your Safety Matters</span>
+            </div>
+            <h3 className="text-3xl font-bold text-white mb-2">Our Promise to You</h3>
+            <p className="text-white/90 text-lg">We keep you safe while you learn and have fun.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             <Card className="text-center p-6">
