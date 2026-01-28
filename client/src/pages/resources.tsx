@@ -89,7 +89,7 @@ const resources: Resource[] = [
     featured: true,
     type: "guide",
     content: {
-      intro: "Phone scams cost older Americans billions of dollars each year. Scammers specifically target seniors because they may be more trusting, have savings, and are less likely to report being scammed.",
+      intro: "Phone scams cost older Americans billions of dollars each year. According to FBI IC3 data, adults 60 and older lost $4.9 billion to fraud in 2024. Scammers specifically target seniors because they may be more trusting, have savings, and are less likely to report being scammed.",
       sections: [
         {
           title: "Common Phone Scam Types",
@@ -118,7 +118,7 @@ const resources: Resource[] = [
   {
     slug: "romance-scam-warning-signs",
     title: "Romance Scam Warning Signs Everyone Should Know",
-    excerpt: "Romance scams cost victims billions each year. Learn to recognize the patterns scammers use to build false trust and request money.",
+    excerpt: "Romance scams cost victims hundreds of millions each year. Learn to recognize the patterns scammers use to build false trust and request money.",
     category: "Scam Awareness",
     readTime: "10 min read",
     featured: false,

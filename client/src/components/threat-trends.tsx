@@ -19,6 +19,7 @@ import {
   Target
 } from "lucide-react";
 
+// Data from FTC Consumer Sentinel 2024 Data Book (March 2025) and FBI IC3 2024 Report
 const stats: {
   id: string;
   label: string;
@@ -30,92 +31,93 @@ const stats: {
 }[] = [
   {
     id: "reports",
-    label: "Scam Reports (2024)",
-    value: "2.9M",
-    change: "+12%",
-    trending: "up",
+    label: "Fraud Reports (2024)",
+    value: "2.6M",
+    change: "stable",
+    trending: "neutral",
     icon: AlertTriangle,
-    detail: "Up from 2.6M in 2023",
+    detail: "FTC Consumer Sentinel",
   },
   {
     id: "losses",
     label: "Total Money Lost",
-    value: "$10.3B",
-    change: "+14%",
+    value: "$12.5B",
+    change: "+25%",
     trending: "up",
     icon: DollarSign,
-    detail: "Highest on record",
+    detail: "FTC: Record high in 2024",
   },
   {
     id: "seniors",
-    label: "Victims Aged 60+",
-    value: "101K",
-    change: "+25%",
+    label: "Senior Losses (60+)",
+    value: "$4.9B",
+    change: "+43%",
     trending: "up",
     icon: Users,
-    detail: "Fastest growing demographic",
+    detail: "FBI IC3: 147K complaints",
   },
   {
     id: "median",
     label: "Median Loss per Victim",
-    value: "$500",
-    change: "+8%",
+    value: "$497",
+    change: "+5%",
     trending: "up",
     icon: Target,
-    detail: "Varies by scam type",
+    detail: "FTC 2024 Data Book",
   },
 ];
 
+// Data from FBI IC3 2024 Report and FTC Consumer Sentinel 2024
 const topScamTypes = [
   { 
     name: "Investment Scams", 
-    losses: "$4.57B", 
-    percentage: 44, 
-    change: "+21%",
-    victims: "47,500",
-    description: "Cryptocurrency and fake investment schemes promising high returns",
+    losses: "$6.57B", 
+    percentage: 40, 
+    change: "+33%",
+    victims: "48,000+",
+    description: "Cryptocurrency and fake investment schemes, including 'pig butchering' scams",
     targetAudience: "Adults 30-60",
     prevention: "Never invest based on unsolicited offers. Verify with SEC before investing."
   },
   { 
-    name: "Romance Scams", 
-    losses: "$1.14B", 
-    percentage: 11, 
-    change: "+8%",
-    victims: "19,200",
-    description: "Scammers create fake relationships to extract money over time",
-    targetAudience: "Adults 40+, lonely individuals",
-    prevention: "Never send money to someone you haven't met in person."
+    name: "Business Email Compromise", 
+    losses: "$2.77B", 
+    percentage: 17, 
+    change: "+10%",
+    victims: "21,442",
+    description: "Hacked or spoofed emails tricking businesses into wire transfers",
+    targetAudience: "Business employees",
+    prevention: "Always verify large payment requests via phone call to a known number."
   },
   { 
     name: "Tech Support Scams", 
-    losses: "$924M", 
+    losses: "$1.46B", 
     percentage: 9, 
-    change: "+15%",
-    victims: "32,100",
+    change: "+18%",
+    victims: "35,000+",
     description: "Fake computer virus alerts leading to remote access fraud",
     targetAudience: "Seniors 60+",
     prevention: "Tech companies never call you first. Hang up and call official support."
   },
   { 
+    name: "Romance Scams", 
+    losses: "$697M", 
+    percentage: 4, 
+    change: "-39%",
+    victims: "58,000+",
+    description: "Scammers create fake relationships to extract money over time",
+    targetAudience: "Adults 40+, lonely individuals",
+    prevention: "Never send money to someone you haven't met in person."
+  },
+  { 
     name: "Government Impersonation", 
     losses: "$789M", 
-    percentage: 8, 
-    change: "+32%",
-    victims: "28,700",
+    percentage: 5, 
+    change: "+28%",
+    victims: "28,000+",
     description: "Fake IRS, Social Security, or Medicare agents demanding payment",
     targetAudience: "Seniors, immigrants",
     prevention: "Government never demands immediate payment via gift cards or wire."
-  },
-  { 
-    name: "Business Email Compromise", 
-    losses: "$675M", 
-    percentage: 7, 
-    change: "-3%",
-    victims: "8,900",
-    description: "Hacked or spoofed emails tricking businesses into wire transfers",
-    targetAudience: "Business employees",
-    prevention: "Always verify large payment requests via phone call to a known number."
   },
 ];
 
@@ -201,7 +203,7 @@ export function ThreatTrends() {
           <div>
             <CardTitle className="text-xl">Threat Intelligence Dashboard</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Based on FTC Consumer Sentinel and FBI IC3 public reports
+              2024 data from FTC Consumer Sentinel and FBI IC3 annual reports
             </p>
           </div>
         </div>
