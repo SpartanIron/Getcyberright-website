@@ -19,11 +19,14 @@ function DecorativeCircles({ position }: { position: "left" | "right" }) {
   const isRight = position === "right";
   
   return (
-    <>
+    <div 
+      className="absolute inset-0 pointer-events-none overflow-hidden"
+      style={{ zIndex: 0 }}
+      aria-hidden="true"
+    >
       {/* Deep red circle - largest, furthest back */}
       <div 
-        className="absolute rounded-full pointer-events-none"
-        aria-hidden="true"
+        className="absolute rounded-full"
         style={{
           width: "clamp(280px, 40vw, 500px)",
           height: "clamp(280px, 40vw, 500px)",
@@ -35,8 +38,7 @@ function DecorativeCircles({ position }: { position: "left" | "right" }) {
       
       {/* Muted orange circle - medium, middle layer */}
       <div 
-        className="absolute rounded-full pointer-events-none"
-        aria-hidden="true"
+        className="absolute rounded-full"
         style={{
           width: "clamp(220px, 32vw, 400px)",
           height: "clamp(220px, 32vw, 400px)",
@@ -48,8 +50,7 @@ function DecorativeCircles({ position }: { position: "left" | "right" }) {
       
       {/* Soft blue circle - smallest, front layer */}
       <div 
-        className="absolute rounded-full pointer-events-none"
-        aria-hidden="true"
+        className="absolute rounded-full"
         style={{
           width: "clamp(160px, 24vw, 300px)",
           height: "clamp(160px, 24vw, 300px)",
@@ -58,7 +59,7 @@ function DecorativeCircles({ position }: { position: "left" | "right" }) {
           backgroundColor: "rgba(59, 130, 246, 0.4)",
         }}
       />
-    </>
+    </div>
   );
 }
 
