@@ -1,7 +1,16 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cookieParser from "cookie-parser";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import {
+  configureHelmet,
+  securityLoggingMiddleware,
+  csrfProtection,
+  requestSizeLimiter,
+  registerSecurityEndpoints,
+  securityLogger,
+} from "./security";
 
 const app = express();
 const httpServer = createServer(app);
@@ -12,15 +21,32 @@ declare module "http" {
   }
 }
 
+// Security: Configure Helmet security headers first
+configureHelmet(app);
+
+// Security: Request size limiting (100KB for JSON, 50KB for forms)
+app.use(requestSizeLimiter(102400));
+
+// Security: Parse cookies for session management
+app.use(cookieParser());
+
+// Security: Logging middleware
+app.use(securityLoggingMiddleware);
+
+// Body parsing with size limits
 app.use(
   express.json({
+    limit: "100kb",
     verify: (req, _res, buf) => {
       req.rawBody = buf;
     },
   }),
 );
 
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: "50kb" }));
+
+// Security: CSRF protection for POST/PUT/DELETE requests
+app.use(csrfProtection);
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -60,6 +86,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Register security testing endpoints
+  registerSecurityEndpoints(app);
+  
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {

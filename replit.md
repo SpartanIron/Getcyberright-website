@@ -194,6 +194,52 @@ All educational content is based on verified, factual information from trusted s
 - Real-time URL reputation checking against PhishTank (phishing database) and URLhaus (malware database)
 - Backend API proxy endpoints for threat database queries (with rate limiting and timeout handling)
 
+## Security Architecture
+
+### Security Middleware Stack (server/security.ts)
+The application implements enterprise-grade security controls:
+
+**Security Headers (Helmet.js)**
+- Content-Security-Policy: Restricts script/style sources, blocks frames, limits connections
+- Strict-Transport-Security (HSTS): 1 year max-age with preload
+- X-Frame-Options: DENY (prevents clickjacking)
+- X-Content-Type-Options: nosniff
+- Referrer-Policy: strict-origin-when-cross-origin
+- Cross-Origin-Opener-Policy/Resource-Policy
+
+**Rate Limiting**
+- Three tiers: strict (10 req/min), standard (30 req/min), relaxed (100 req/min)
+- Contact/newsletter forms use strict tier
+- Security check endpoints use standard tier
+- IP-based tracking with automatic blocking after 3 violations
+- Block duration: 5 minutes
+
+**CSRF Protection**
+- Origin/Referer header validation for all POST/PUT/DELETE requests
+- Logs all CSRF violations with IP and request details
+
+**Request Security**
+- JSON payload limit: 100KB
+- Form payload limit: 50KB
+- Suspicious pattern detection (XSS, SQL injection, path traversal)
+- All security events logged with Winston
+
+**Cookie Security**
+- HttpOnly: true
+- Secure: true (in production)
+- SameSite: strict
+- Max-age: 24 hours
+
+### Compliance Mapping
+| Control | Standard | Implementation |
+|---------|----------|----------------|
+| Security Headers | OWASP ASVS 14.4 | Helmet.js |
+| Input Validation | OWASP ASVS 5.1 | Zod + Drizzle ORM |
+| Rate Limiting | CIS Control 9 | Custom middleware |
+| Secure Transport | ISO 27001 A.14.1.2 | HTTPS (Replit) |
+| Secrets Management | NIST 800-53 SC-12 | Replit Secrets |
+| Logging | ISO 27001 A.12.4 | Winston |
+
 ## Recent Changes (Jan 2026)
 - Added real-time URL reputation checking against PhishTank and URLhaus threat databases
 - Implemented backend proxy endpoints with rate limiting (30 req/min per IP) and 10-second timeouts
