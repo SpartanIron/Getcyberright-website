@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
+import { LogoCarousel } from "@/components/logo-carousel";
 import { TrustStrip } from "@/components/trust-strip";
 import { Capabilities } from "@/components/capabilities";
 import { AudienceShowcase } from "@/components/audience-showcase";
@@ -13,6 +14,7 @@ export default function Home() {
       <Navigation />
       <main>
         <HeroSection />
+        <LogoCarousel />
         <TrustStrip />
         <Capabilities />
         <AudienceShowcase />
