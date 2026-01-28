@@ -1,8 +1,8 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
 import { LogoCarousel } from "@/components/logo-carousel";
+import { FeaturesGrid } from "@/components/features-grid";
 import { TrustStrip } from "@/components/trust-strip";
-import { Capabilities } from "@/components/capabilities";
 import { AudienceShowcase } from "@/components/audience-showcase";
 import { SocialProof } from "@/components/social-proof";
 import { CTAFooter } from "@/components/cta-footer";
@@ -15,8 +15,8 @@ export default function Home() {
       <main>
         <HeroSection />
         <LogoCarousel />
+        <FeaturesGrid />
         <TrustStrip />
-        <Capabilities />
         <AudienceShowcase />
         <SocialProof />
         <CTAFooter />
