@@ -151,6 +151,15 @@ export function Footer() {
                     support@getcyberright.com
                   </a>
                 </div>
+                <span className="hidden sm:inline text-muted-foreground/50">|</span>
+                <a href="mailto:partnerships@getcyberright.com" className="hover:text-foreground transition-colors" data-testid="text-partnerships-email">
+                  Partnerships
+                </a>
+                <span className="hidden sm:inline text-muted-foreground/50">|</span>
+                <a href="mailto:advertising@getcyberright.com" className="hover:text-foreground transition-colors" data-testid="text-advertising-email">
+                  Advertising
+                </a>
+                <span className="hidden sm:inline text-muted-foreground/50">|</span>
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4" />
                   <span data-testid="text-users">Serving families in 50+ countries</span>
