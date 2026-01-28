@@ -7,7 +7,7 @@ import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
 import { Link } from "wouter";
 import { Shield, Heart, Users, Globe, ArrowRight } from "lucide-react";
-import bannerImage from "@/assets/images/banner-about.png";
+import bannerImage from "@/assets/banners/about-banner.png";
 
 const values = [
   {
@@ -46,10 +46,10 @@ export default function About() {
       
       <main>
         <PageBanner
-          title="Why We Built GetCyberRight"
-          subtitle="This isn't just another cybersecurity website. It's a mission born from watching our own family members fall victim to scams."
+          title="A Mission Born from Personal Experience"
+          subtitle="We watched our own family members fall victim to scams. That's why we built something different—clear guidance from people who understand what's at stake."
           imageSrc={bannerImage}
-          imageAlt="Team of cybersecurity educators in collaborative discussion"
+          imageAlt="Diverse team of educators collaborating in a bright modern office around a mission-focused whiteboard"
           imagePosition="left"
         />
 

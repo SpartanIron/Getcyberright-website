@@ -24,7 +24,7 @@ import {
   ArrowRight,
   BookOpen
 } from "lucide-react";
-import bannerImage from "@/assets/images/banner-tools.png";
+import bannerImage from "@/assets/banners/tools-banner.png";
 
 const guides = [
   {
@@ -71,10 +71,10 @@ export default function Tools() {
       
       <main>
         <PageBanner
-          title="Free Security Tools"
-          subtitle="Check for scams, generate strong passwords, and stay informed about current threats. No signup required."
+          title="Solve Problems, Not Learn Software"
+          subtitle="Run a scam check, create an unbreakable password, or see what threats are trending—all without creating an account or downloading anything."
           imageSrc={bannerImage}
-          imageAlt="Person using digital security tools on laptop"
+          imageAlt="Modern workspace with laptop displaying security checkmarks and password generator in bright natural light"
           imagePosition="left"
         />
 

@@ -17,7 +17,7 @@ import {
   AlertTriangle,
   Shield
 } from "lucide-react";
-import bannerImage from "@/assets/images/banner-resources.png";
+import bannerImage from "@/assets/banners/resources-banner.png";
 
 interface Resource {
   slug: string;
@@ -333,10 +333,10 @@ export default function Resources() {
       
       <main>
         <PageBanner
-          title="Learn to Protect Yourself Online"
-          subtitle="Guides, articles, and educational content written in plain language. No tech jargon, just practical knowledge you can use today."
+          title="Your Security Education Library"
+          subtitle="Practical guides and articles written in everyday language. Learn at your own pace, with content you can actually understand and apply."
           imageSrc={bannerImage}
-          imageAlt="People reading educational resources in a library"
+          imageAlt="Cozy library corner with open guidebooks and educational materials on a wooden table with warm ambient lighting"
           imagePosition="right"
         />
 

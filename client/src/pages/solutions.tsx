@@ -17,7 +17,7 @@ import {
   AlertTriangle,
   Lock
 } from "lucide-react";
-import bannerImage from "@/assets/images/banner-solutions.png";
+import bannerImage from "@/assets/banners/solutions-banner.png";
 import familyImage from "@/assets/images/family-devices.jpg";
 import seniorImage from "@/assets/images/senior-safety.jpg";
 import businessImage from "@/assets/images/small-business.jpg";
@@ -101,10 +101,10 @@ export default function Solutions() {
       
       <main>
         <PageBanner
-          title="Cybersecurity Protection For Real People"
-          subtitle="Whether you are protecting your family, helping a senior relative, securing your small business, or educating your community, we have resources designed specifically for you."
+          title="Protection Designed for Your World"
+          subtitle="Whether you're securing your family, supporting an elderly relative, protecting your business, or educating your community—we built solutions for the way you actually live."
           imageSrc={bannerImage}
-          imageAlt="Family learning about online safety together"
+          imageAlt="Multi-generational family gathered in living room learning about internet safety together on a tablet"
           imagePosition="right"
         />
 

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import bannerImage from "@/assets/images/banner-terms.png";
+import bannerImage from "@/assets/banners/terms-banner.png";
 
 export default function Terms() {
   return (
@@ -11,10 +11,10 @@ export default function Terms() {
       
       <main>
         <PageBanner
-          title="Terms of Service"
-          subtitle="Last updated: January 2026. Please read these terms carefully before using our services."
+          title="Terms of Using This Site"
+          subtitle="The legal agreement for using GetCyberRight. Last updated January 2026. Written as clearly as we can make legal documents."
           imageSrc={bannerImage}
-          imageAlt="Legal document representing terms of service"
+          imageAlt="Professional desk with official terms document and elegant pen in a formal signing environment"
           imagePosition="right"
         />
 

@@ -14,7 +14,7 @@ import {
   CheckCircle2,
   Clock
 } from "lucide-react";
-import bannerImage from "@/assets/images/banner-emergency.png";
+import bannerImage from "@/assets/banners/emergency-banner.png";
 
 const immediateSteps = [
   {
@@ -112,10 +112,10 @@ export default function EmergencyHelp() {
       
       <main>
         <PageBanner
-          title="Emergency Help: What To Do If You've Been Scammed"
-          subtitle="If you think you've been scammed, don't panic. Quick action can minimize the damage. Follow these steps immediately."
+          title="You've Been Scammed. Here's What To Do Now."
+          subtitle="The first few hours matter most. Stay calm, follow these steps in order, and minimize the damage. We'll walk you through everything."
           imageSrc={bannerImage}
-          imageAlt="Support specialist helping someone with emergency assistance"
+          imageAlt="Calm crisis support setting with a professional helping someone review recovery documents at a desk"
           imagePosition="left"
         />
 

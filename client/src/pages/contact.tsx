@@ -30,7 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertContactMessageSchema } from "@shared/schema";
 import { z } from "zod";
 import { Mail, Phone, Clock, Send, CheckCircle2, MapPin } from "lucide-react";
-import bannerImage from "@/assets/images/banner-contact.png";
+import bannerImage from "@/assets/banners/contact-banner.png";
 
 const contactMethods = [
   {
@@ -108,10 +108,10 @@ export default function Contact() {
       
       <main>
         <PageBanner
-          title="We're Here to Help"
-          subtitle="Have questions about cybersecurity? Need help protecting your family or organization? We're just a message away."
+          title="Questions? We Answer Them."
+          subtitle="Whether you're unsure where to start or need specific guidance, our team is here. No question is too simple, and we respond to every message."
           imageSrc={bannerImage}
-          imageAlt="Friendly customer service representative ready to help"
+          imageAlt="Welcoming customer service professional at a clean modern desk ready to assist with headset nearby"
           imagePosition="right"
         />
 

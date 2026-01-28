@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import bannerImage from "@/assets/images/banner-privacy.png";
+import bannerImage from "@/assets/banners/privacy-banner.png";
 
 export default function Privacy() {
   return (
@@ -11,10 +11,10 @@ export default function Privacy() {
       
       <main>
         <PageBanner
-          title="Privacy Policy"
-          subtitle="Last updated: January 2026. We take your privacy seriously and protect your data."
+          title="How We Protect Your Information"
+          subtitle="Plain-language privacy policy. Last updated January 2026. We collect minimal data and never sell your information."
           imageSrc={bannerImage}
-          imageAlt="Secure padlock representing privacy protection"
+          imageAlt="Secure document environment with padlock symbolism representing data protection and privacy policy"
           imagePosition="left"
         />
 
