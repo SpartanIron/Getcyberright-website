@@ -125,9 +125,9 @@ export function Footer() {
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
-              <a href="mailto:support@getcyberright.com" className="hover:text-white transition-colors">Support</a>
-              <a href="mailto:partnerships@getcyberright.com" className="hover:text-white transition-colors">Partnerships</a>
-              <a href="mailto:advertising@getcyberright.com" className="hover:text-white transition-colors">Advertising</a>
+              <Link href="/support" className="hover:text-white transition-colors">Support</Link>
+              <Link href="/partnerships" className="hover:text-white transition-colors">Partnerships</Link>
+              <Link href="/advertising" className="hover:text-white transition-colors">Advertising</Link>
             </div>
           </div>
 

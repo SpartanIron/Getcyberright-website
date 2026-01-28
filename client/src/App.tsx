@@ -21,6 +21,9 @@ import Seniors from "@/pages/seniors";
 import Parents from "@/pages/parents";
 import Educators from "@/pages/educators";
 import SmallBusiness from "@/pages/small-business";
+import Support from "@/pages/support";
+import Partnerships from "@/pages/partnerships";
+import Advertising from "@/pages/advertising";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -49,6 +52,9 @@ function Router() {
       <Route path="/parents" component={Parents} />
       <Route path="/educators" component={Educators} />
       <Route path="/small-business" component={SmallBusiness} />
+      <Route path="/support" component={Support} />
+      <Route path="/partnerships" component={Partnerships} />
+      <Route path="/advertising" component={Advertising} />
       <Route component={NotFound} />
     </Switch>
   );
