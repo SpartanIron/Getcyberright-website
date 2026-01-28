@@ -79,8 +79,8 @@ export function PageBanner({
         <div className={`flex flex-col ${imagePosition === "left" ? "md:flex-row-reverse" : "md:flex-row"} min-h-[280px] md:min-h-[320px]`}>
           {/* Text content section with decorative circles */}
           <div className="flex-1 relative overflow-hidden">
-            {/* Decorative circles positioned at edge where text meets image */}
-            <DecorativeCircles position={imagePosition === "left" ? "left" : "right"} />
+            {/* Decorative circles bleed off the outer edge of solid-color section */}
+            <DecorativeCircles position={imagePosition === "left" ? "right" : "left"} />
             
             {/* Text content */}
             <div className="relative z-10 flex flex-col justify-center h-full px-6 sm:px-8 lg:px-12 py-10 md:py-16">
