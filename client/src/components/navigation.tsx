@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, Video, BookOpen, ChevronRight, ExternalLink } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@assets/image_(3)_1769558492356.png";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -251,6 +252,7 @@ export function Navigation() {
           </NavigationMenu>
 
           <div className="hidden lg:flex items-center gap-3">
+            <ThemeToggle />
             <Link href="/tools">
               <Button variant="default" size="default" data-testid="button-get-protection">
                 Check If It's a Scam
@@ -345,9 +347,10 @@ export function Navigation() {
                   Contact
                 </Link>
 
-                <div className="pt-4">
+                <div className="flex items-center justify-between pt-4">
+                  <ThemeToggle />
                   <Link href="/tools" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full" data-testid="mobile-button-get-protection">
+                    <Button data-testid="mobile-button-get-protection">
                       Check If It's a Scam
                     </Button>
                   </Link>
