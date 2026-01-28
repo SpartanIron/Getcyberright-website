@@ -38,7 +38,7 @@ const businessTopics: BusinessTopic[] = [
     color: "bg-blue-500",
     priority: "Essential",
     content: {
-      intro: "Your employees are both your greatest asset and your biggest security vulnerability. Over 90% of successful cyberattacks start with a phishing email. Regular security awareness training transforms your staff from potential weak points into your first line of defense.",
+      intro: "Your employees are both your greatest asset and your biggest security vulnerability. The vast majority of successful cyberattacks begin with social engineering, particularly phishing emails. Regular security awareness training transforms your staff from potential weak points into your first line of defense.",
       risks: [
         "Employees clicking on phishing links or opening malicious attachments.",
         "Staff sharing passwords or writing them down in visible locations.",
@@ -102,7 +102,7 @@ const businessTopics: BusinessTopic[] = [
     color: "bg-purple-500",
     priority: "Essential",
     content: {
-      intro: "Weak and reused passwords are involved in over 80% of data breaches. Small businesses often struggle with password management as they grow, leading to shared accounts, sticky note passwords, and forgotten access when employees leave. A systematic approach to access management reduces risk significantly.",
+      intro: "Weak and reused passwords are a leading cause of data breaches. Small businesses often struggle with password management as they grow, leading to shared accounts, sticky note passwords, and forgotten access when employees leave. A systematic approach to access management reduces risk significantly.",
       risks: [
         "Password reuse allowing one breach to compromise multiple accounts.",
         "Shared accounts making it impossible to track who did what.",

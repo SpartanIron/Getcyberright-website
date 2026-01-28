@@ -200,7 +200,9 @@ export function ThreatTrends() {
           </div>
           <div>
             <CardTitle className="text-xl">Threat Intelligence Dashboard</CardTitle>
-            <p className="text-sm text-muted-foreground">Real-time scam statistics and protection insights</p>
+            <p className="text-sm text-muted-foreground">
+              Based on FTC Consumer Sentinel and FBI IC3 public reports
+            </p>
           </div>
         </div>
       </CardHeader>

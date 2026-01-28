@@ -166,7 +166,35 @@ All hub pages follow a consistent structure:
 - Cross-links to related hubs and resources
 - Accessible cards with keyboard navigation and ARIA labels
 
+## Content Guidelines and Data Sources
+
+All educational content is based on verified, factual information from trusted sources:
+
+### Primary Data Sources
+- **FTC Consumer Sentinel**: Scam statistics, fraud reports, and consumer loss data
+- **FBI IC3 (Internet Crime Complaint Center)**: Cybercrime statistics and trends
+- **CISA**: Cybersecurity best practices and threat advisories
+- **Medicare.gov**: Medicare fraud information
+- **StopBullying.gov**: Cyberbullying prevention resources
+- **Common Sense Media**: Digital citizenship curriculum
+- **ESRB**: Video game ratings and family guides
+
+### Content Principles
+- No fabricated statistics or unverifiable percentages
+- General statements (e.g., "billions in losses") backed by government data
+- Warning signs and protection tips based on documented scam patterns
+- Educational content uses empowering, non-fear-based language
+- All tools run 100% client-side with no data collection
+
+### Scam Checker Features
+- Email Header Analysis with SPF/DKIM/DMARC authentication checking
+- URL entropy and brand similarity analysis
+- Urgency/pressure scoring with visual meter
+- Reply-To mismatch and bulk mailer detection
+
 ## Recent Changes (Jan 2026)
+- Added Email Header Analysis tab to Scam Checker with authentication checking
+- Content review: removed specific percentages, added data source attribution
 - Added Seniors Hub with 6 safety topics for older adults
 - Added Parents Hub with family online safety resources
 - Added Educators Hub with classroom curriculum resources
