@@ -15,6 +15,10 @@ import {
   AlertTriangle
 } from "lucide-react";
 import logoImage from "@assets/image_(3)_1769558492356.png";
+import familyImage from "@/assets/images/family-devices.jpg";
+import seniorImage from "@/assets/images/senior-safety.jpg";
+import businessImage from "@/assets/images/small-business.jpg";
+import educatorImage from "@/assets/images/educator-training.jpg";
 
 const solutions = [
   {
@@ -22,6 +26,7 @@ const solutions = [
     icon: Users,
     title: "For Families",
     subtitle: "Protect Your Loved Ones Online",
+    image: familyImage,
     problem: "Your family shares devices, clicks links, and trusts messages from people they know. But hackers exploit exactly that trust - impersonating relatives, sending fake alerts, and targeting the most vulnerable members of your household.",
     solution: "GetCyberRight gives every family member the knowledge to spot scams before they cause harm. Our guides are written in plain language that grandparents and teenagers alike can understand and apply.",
     features: [
@@ -37,6 +42,7 @@ const solutions = [
     icon: Heart,
     title: "For Seniors",
     subtitle: "Stay Safe Without the Tech Jargon",
+    image: seniorImage,
     problem: "Scammers specifically target seniors with fake tech support calls, romance scams, and impersonation schemes. These attacks often succeed because the 'help' sounds legitimate and the technology feels overwhelming.",
     solution: "We've created resources specifically for seniors - no confusing tech terms, no complicated steps. Just clear, simple guidance on recognizing when something isn't right and what to do about it.",
     features: [
@@ -52,6 +58,7 @@ const solutions = [
     icon: Briefcase,
     title: "For Small Businesses",
     subtitle: "Enterprise Security, Made Accessible",
+    image: businessImage,
     problem: "Small businesses face the same cyber threats as large corporations but without dedicated IT teams or security budgets. One successful attack can mean lost customers, stolen data, and devastating financial damage.",
     solution: "GetCyberRight provides small business owners with practical security measures that don't require a technical background. Protect your business, your employees, and your customers with actionable steps you can implement today.",
     features: [
@@ -67,6 +74,7 @@ const solutions = [
     icon: GraduationCap,
     title: "For Educators & Communities",
     subtitle: "Teach Digital Safety Effectively",
+    image: educatorImage,
     problem: "Schools, libraries, and community organizations want to help their members stay safe online, but cybersecurity training materials are often too technical, too boring, or too focused on corporate environments.",
     solution: "Our educational resources are designed for community settings. Use our materials to run workshops, distribute guides, and empower your community with practical cybersecurity knowledge.",
     features: [
@@ -170,19 +178,29 @@ export default function Solutions() {
                   transition={{ duration: 0.5, delay: 0.2 }}
                   className={index % 2 === 1 ? 'lg:order-1' : ''}
                 >
-                  <Card>
-                    <CardContent className="p-6">
-                      <h3 className="font-semibold text-foreground mb-4">What You'll Get</h3>
-                      <ul className="space-y-3">
-                        {solution.features.map((feature, featureIndex) => (
-                          <li key={featureIndex} className="flex items-center gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-accent flex-shrink-0" />
-                            <span className="text-muted-foreground">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
+                  <div className="relative rounded-2xl overflow-hidden shadow-xl">
+                    <img 
+                      src={solution.image} 
+                      alt={solution.title} 
+                      className="w-full h-64 sm:h-80 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <Card className="bg-white/95 backdrop-blur-sm">
+                        <CardContent className="p-4">
+                          <h3 className="font-semibold text-foreground mb-3 text-sm">What You'll Get</h3>
+                          <ul className="space-y-2">
+                            {solution.features.map((feature, featureIndex) => (
+                              <li key={featureIndex} className="flex items-center gap-2">
+                                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                                <span className="text-muted-foreground text-sm">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
                 </motion.div>
               </div>
             </div>
