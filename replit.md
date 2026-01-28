@@ -83,3 +83,29 @@ Preferred communication style: Simple, everyday language.
 ### Development Tools
 - **Replit Plugins**: Runtime error overlay, cartographer, and dev banner for Replit environment
 - **TypeScript**: Strict type checking across the entire codebase
+
+## Accessibility Features
+- ARIA labels on all interactive elements (buttons, inputs, results)
+- Screen reader support with aria-live regions for dynamic content updates
+- Proper form labels and descriptions for checklist items
+- Role attributes for semantic structure (region, alert, search, group)
+
+## SEO & Social Sharing
+- Meta description and keywords in index.html
+- Open Graph tags for Facebook/LinkedIn sharing
+- Twitter Card meta tags for Twitter sharing
+- OG image at `/og-image.png` for social media previews
+- Favicon using the teal padlock mascot logo
+
+## Print Support
+- Print stylesheet in index.css for checklist printing
+- Hides navigation, footer, and non-essential UI when printing
+- Formats checklists with proper spacing and checkbox styling
+- Print button on each checklist resource
+
+## Recent Changes (Jan 2026)
+- Added custom 404 page with helpful navigation links
+- Implemented print functionality for checklists
+- Added ARIA labels to scam checker, password generator, breach checker
+- Generated OG image for social media sharing
+- Added Twitter/Open Graph meta tags
