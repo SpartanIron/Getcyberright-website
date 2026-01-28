@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Users, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 import professionalImage from "@/assets/images/professional-laptop.jpg";
-import seniorTabletImage from "@/assets/images/hero-senior-tablet.png";
-import familyComputerImage from "@/assets/images/hero-family-computer.png";
-import businessTeamImage from "@/assets/images/hero-business-team.png";
-import smartphoneUserImage from "@/assets/images/hero-smartphone-user.png";
+import seniorTabletImage from "@/assets/images/hero-senior-tablet.jpg";
+import familyComputerImage from "@/assets/images/hero-family-computer.jpg";
+import businessTeamImage from "@/assets/images/hero-business-team.jpg";
+import smartphoneUserImage from "@/assets/images/hero-smartphone-user.jpg";
 
 const heroImages = [
   { src: professionalImage, alt: "Professional using laptop securely" },
