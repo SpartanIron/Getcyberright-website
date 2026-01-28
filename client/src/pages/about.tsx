@@ -65,36 +65,39 @@ export default function About() {
             >
               <div className="space-y-6 text-muted-foreground leading-relaxed">
                 <p className="text-lg">
-                  Six years ago, hackers took over my family's social media accounts 
-                  and impersonated my relatives to steal money. They sent messages 
-                  to friends and family, pretending to be people we trusted.
+                  For the past six years, my family has been on the front lines of 
+                  a growing crisis. It started during the pandemic, when the world 
+                  moved online almost overnight—and cyber scams and digital fraud 
+                  skyrocketed along with it.
                 </p>
                 
                 <p>
-                  My father was targeted multiple times by fake telecom "anti-fraud" 
-                  calls that claimed to help secure his bank account, but instead 
-                  led to his savings being drained repeatedly.
+                  Hackers took over my relatives' social media accounts and used them 
+                  to impersonate people we trusted, sending messages to friends and 
+                  family asking for money. My father was targeted repeatedly by fake 
+                  telecom "anti-fraud" calls that claimed to secure his bank account, 
+                  but instead drained his savings more than once.
                 </p>
                 
                 <p>
-                  What became clear was that this wasn't just happening to us. 
-                  <span className="text-foreground font-medium">Millions of families 
-                  are dealing with the same attacks</span>, often on their own, without 
-                  knowing who to trust or where to turn for help.
+                  As COVID-19 kept people isolated at home, criminals seized the 
+                  opportunity. <span className="text-foreground font-medium">Millions 
+                  of families found themselves under attack</span>—often alone, unsure 
+                  who to trust, and with nowhere to turn for help.
                 </p>
                 
                 <p>
-                  At the same time, my own kids are growing up in a world where 
-                  screens are everywhere. They're already on tablets, learning apps, 
-                  and asking about social media. The question of what they might 
+                  At the same time, my own children were growing up in a world where 
+                  screens are everywhere. They're already on tablets, exploring learning 
+                  apps, and asking about social media. The thought of what they might 
                   encounter online keeps me up at night.
                 </p>
                 
                 <p>
-                  When I searched for resources that could help everyone in my 
-                  family—from my kids, to older parents, to cousins overseas—I 
-                  came up short. Cybersecurity sites were written for corporations, 
-                  full of tech jargon nobody could understand.
+                  When I searched for resources that could protect everyone in my 
+                  family—from my kids, to older parents, to cousins overseas—I came 
+                  up short. Cybersecurity information was written for corporations, 
+                  buried in technical jargon that ordinary people couldn't understand.
                 </p>
                 
                 <p className="text-foreground font-semibold text-xl">
@@ -102,8 +105,8 @@ export default function About() {
                 </p>
                 
                 <p>
-                  We wanted to create free, straightforward tools that anyone can 
-                  use to check whether something is a scam, without needing a 
+                  We set out to create free, straightforward tools that anyone can 
+                  use to determine whether something is a scam—without needing a 
                   technical background or a computer science degree.
                 </p>
                 
@@ -113,7 +116,7 @@ export default function About() {
                 
                 <p className="text-lg font-medium text-foreground">
                   Today, GetCyberRight serves families across six continents. From 
-                  grandparents targeted by phone scams to kids navigating their 
+                  grandparents targeted by phone scams to children navigating their 
                   first devices, we're here to help. Start with our free Scam 
                   Checker tool, or explore resources designed for your family.
                 </p>
