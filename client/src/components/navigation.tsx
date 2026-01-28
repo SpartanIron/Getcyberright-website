@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, Video, BookOpen, ChevronRight, ExternalLink } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@assets/image_(3)_1769558492356.png";
 import {
@@ -13,18 +13,35 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
-const solutionItems = [
-  { title: "For Families", description: "Protect your loved ones from online threats", href: "/solutions#families" },
-  { title: "For Seniors", description: "Simple cybersecurity guidance for everyday safety", href: "/solutions#seniors" },
-  { title: "For Small Business", description: "Enterprise-grade protection made accessible", href: "/solutions#business" },
-  { title: "For Educators", description: "Train and protect your entire community", href: "/solutions#educators" },
+const whoWeHelp = [
+  { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/solutions#families", icon: Users },
+  { title: "Kids & Teens Hub", description: "Stay safe on social media, gaming, and online", href: "/solutions#families", icon: Shield },
+  { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/solutions#seniors", icon: Heart },
+  { title: "Educators Hub", description: "Classroom resources for teaching digital citizenship", href: "/solutions#educators", icon: GraduationCap },
+  { title: "Small Business", description: "Enterprise-grade protection made accessible", href: "/solutions#business", icon: Briefcase },
 ];
 
-const resourceItems = [
-  { title: "All Resources", description: "Browse our full library of guides and articles", href: "/resources" },
-  { title: "Security Guides", description: "Step-by-step protection tutorials", href: "/resources" },
-  { title: "Scam Alerts", description: "Latest scam warnings and how to avoid them", href: "/resources" },
-  { title: "Video Training", description: "Watch and learn at your own pace", href: "/resources" },
+const freeTools = [
+  { title: "Scam Checker", description: "Check URLs, emails, phone numbers for scams", href: "/tools", icon: Search, badge: "Popular" },
+  { title: "Breach Checker", description: "Check if your email was exposed in a data breach", href: "/tools", icon: AlertTriangle },
+  { title: "Password Generator", description: "Create strong, secure passwords instantly", href: "/tools", icon: Lock },
+  { title: "Threat Trends", description: "Global scam statistics and trends", href: "/tools", icon: Shield },
+];
+
+const learnTopics = [
+  { title: "Phishing & Scams", description: "Recognize and avoid phishing attacks", href: "/resources" },
+  { title: "Online Privacy", description: "Protect your personal information", href: "/resources" },
+  { title: "Password Security", description: "Best practices for strong passwords", href: "/resources" },
+  { title: "Social Media Safety", description: "Stay safe on social platforms", href: "/resources" },
+  { title: "Mobile Security", description: "Secure your smartphone and tablet", href: "/resources" },
+  { title: "Identity Theft", description: "Prevent and recover from identity theft", href: "/resources" },
+];
+
+const resourceTypes = [
+  { title: "Security Guides", description: "Step-by-step protection tutorials", href: "/resources", icon: FileText },
+  { title: "Video Training", description: "Watch and learn at your own pace", href: "/resources", icon: Video },
+  { title: "Checklists", description: "Printable security checklists", href: "/resources", icon: BookOpen },
+  { title: "Emergency Help", description: "What to do if you've been scammed", href: "/contact", icon: AlertTriangle },
 ];
 
 export function Navigation() {
@@ -61,70 +78,149 @@ export function Navigation() {
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList className="gap-1">
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-solutions">
-                  Solutions
+                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-who-we-help">
+                  Who We Help
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                    {solutionItems.map((item) => (
-                      <li key={item.title}>
-                        <NavigationMenuLink asChild>
+                  <div className="w-[600px] p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Find Your Path</h3>
+                      <Link href="/solutions" className="text-sm text-primary flex items-center gap-1 hover:underline">
+                        View all solutions <ChevronRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {whoWeHelp.map((item) => (
+                        <NavigationMenuLink asChild key={item.title}>
                           <Link
                             href={item.href}
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover-elevate"
+                            className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
                             data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
                           >
-                            <div className="text-sm font-medium leading-none">
-                              {item.title}
+                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <item.icon className="w-5 h-5 text-primary" />
                             </div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              {item.description}
-                            </p>
+                            <div>
+                              <div className="text-sm font-medium text-foreground mb-0.5">
+                                {item.title}
+                              </div>
+                              <p className="text-xs text-muted-foreground leading-snug">
+                                {item.description}
+                              </p>
+                            </div>
                           </Link>
                         </NavigationMenuLink>
-                      </li>
-                    ))}
-                  </ul>
+                      ))}
+                    </div>
+                  </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link
-                    href="/tools"
-                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate ${location === '/tools' ? 'text-primary' : ''}`}
-                    data-testid="nav-free-tools"
-                  >
-                    Free Tools
-                  </Link>
-                </NavigationMenuLink>
+                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-free-tools">
+                  Free Tools
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-[500px] p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Security Tools</h3>
+                      <Link href="/tools" className="text-sm text-primary flex items-center gap-1 hover:underline">
+                        View all tools <ChevronRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {freeTools.map((item) => (
+                        <NavigationMenuLink asChild key={item.title}>
+                          <Link
+                            href={item.href}
+                            className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
+                            data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                          >
+                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                              <item.icon className="w-5 h-5 text-accent" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 mb-0.5">
+                                <span className="text-sm font-medium text-foreground">
+                                  {item.title}
+                                </span>
+                                {item.badge && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">
+                                    {item.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground leading-snug">
+                                {item.description}
+                              </p>
+                            </div>
+                          </Link>
+                        </NavigationMenuLink>
+                      ))}
+                    </div>
+                    <div className="mt-4 pt-4 border-t">
+                      <p className="text-xs text-muted-foreground">
+                        All tools are 100% free. No signup required.
+                      </p>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-resources">
-                  Resources
+                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-learn">
+                  Learn
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                    {resourceItems.map((item) => (
-                      <li key={item.title}>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            href={item.href}
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover-elevate"
-                            data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                          >
-                            <div className="text-sm font-medium leading-none">
-                              {item.title}
-                            </div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              {item.description}
-                            </p>
+                  <div className="w-[700px] p-6">
+                    <div className="grid grid-cols-3 gap-6">
+                      <div className="col-span-2">
+                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-3">Core Safety Topics</h3>
+                        <div className="grid grid-cols-2 gap-2">
+                          {learnTopics.map((item) => (
+                            <NavigationMenuLink asChild key={item.title}>
+                              <Link
+                                href={item.href}
+                                className="block rounded-md p-2 transition-colors hover-elevate"
+                                data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                              >
+                                <div className="text-sm font-medium text-foreground">
+                                  {item.title}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  {item.description}
+                                </p>
+                              </Link>
+                            </NavigationMenuLink>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="border-l pl-6">
+                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-3">Resource Types</h3>
+                        <div className="space-y-2">
+                          {resourceTypes.map((item) => (
+                            <NavigationMenuLink asChild key={item.title}>
+                              <Link
+                                href={item.href}
+                                className="flex items-center gap-2 rounded-md p-2 transition-colors hover-elevate"
+                                data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                              >
+                                <item.icon className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-sm text-foreground">
+                                  {item.title}
+                                </span>
+                              </Link>
+                            </NavigationMenuLink>
+                          ))}
+                        </div>
+                        <div className="mt-4 pt-4 border-t">
+                          <Link href="/resources" className="text-sm text-primary flex items-center gap-1 hover:underline">
+                            View All Resources <ExternalLink className="w-3 h-3" />
                           </Link>
-                        </NavigationMenuLink>
-                      </li>
-                    ))}
-                  </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
@@ -135,7 +231,7 @@ export function Navigation() {
                     className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate ${location === '/about' ? 'text-primary' : ''}`}
                     data-testid="nav-about"
                   >
-                    About
+                    About Us
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -157,7 +253,7 @@ export function Navigation() {
           <div className="hidden lg:flex items-center gap-3">
             <Link href="/tools">
               <Button variant="default" size="default" data-testid="button-get-protection">
-                Get Free Protection Tools
+                Check If It's a Scam
               </Button>
             </Link>
           </div>
@@ -169,18 +265,19 @@ export function Navigation() {
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto">
               <nav className="flex flex-col gap-4 mt-8">
                 <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-muted-foreground">Solutions</h4>
-                  {solutionItems.map((item) => (
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Who We Help</h4>
+                  {whoWeHelp.map((item) => (
                     <Link
                       key={item.title}
                       href={item.href}
-                      className="block py-2 text-foreground transition-colors"
+                      className="flex items-center gap-3 py-2 text-foreground transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                       data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
                     >
+                      <item.icon className="w-4 h-4 text-primary" />
                       {item.title}
                     </Link>
                   ))}
@@ -188,19 +285,26 @@ export function Navigation() {
 
                 <div className="h-px bg-border" />
 
-                <Link
-                  href="/tools"
-                  className="py-2 text-foreground transition-colors font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                  data-testid="mobile-link-free-tools"
-                >
-                  Free Tools
-                </Link>
+                <div className="space-y-3">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Free Tools</h4>
+                  {freeTools.map((item) => (
+                    <Link
+                      key={item.title}
+                      href={item.href}
+                      className="flex items-center gap-3 py-2 text-foreground transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                      data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                    >
+                      <item.icon className="w-4 h-4 text-accent" />
+                      {item.title}
+                    </Link>
+                  ))}
+                </div>
 
                 <div className="h-px bg-border" />
 
                 <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-muted-foreground">Resources</h4>
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Learn</h4>
                   <Link
                     href="/resources"
                     className="block py-2 text-foreground transition-colors"
@@ -209,6 +313,16 @@ export function Navigation() {
                   >
                     All Resources
                   </Link>
+                  {learnTopics.slice(0, 4).map((item) => (
+                    <Link
+                      key={item.title}
+                      href={item.href}
+                      className="block py-2 text-foreground/70 transition-colors text-sm"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.title}
+                    </Link>
+                  ))}
                 </div>
 
                 <div className="h-px bg-border" />
@@ -219,7 +333,7 @@ export function Navigation() {
                   onClick={() => setMobileMenuOpen(false)}
                   data-testid="mobile-link-about"
                 >
-                  About
+                  About Us
                 </Link>
 
                 <Link
@@ -234,7 +348,7 @@ export function Navigation() {
                 <div className="pt-4">
                   <Link href="/tools" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full" data-testid="mobile-button-get-protection">
-                      Get Free Protection Tools
+                      Check If It's a Scam
                     </Button>
                   </Link>
                 </div>

@@ -8,32 +8,32 @@ import { Quote, Star, ChevronLeft, ChevronRight } from "lucide-react";
 const testimonials = [
   {
     quote:
-      "After my mother almost fell for a phone scam, I found GetCyberRight. Their guides helped us secure her accounts and now she feels confident using the internet safely.",
-    name: "Sarah Mitchell",
-    role: "Family Caregiver",
+      "My mom almost sent $5,000 to a 'grandchild' who was supposedly in jail. Thanks to what I learned here, I recognized it as a scam and stopped her in time.",
+    name: "Sarah M.",
+    role: "Protecting her parents",
     initials: "SM",
     rating: 5,
   },
   {
     quote:
-      "As a small business owner, I didn't have the budget for expensive security training. GetCyberRight's free resources helped me train my entire team on phishing awareness.",
-    name: "James Rodriguez",
-    role: "Small Business Owner",
-    initials: "JR",
+      "The Scam Checker saved me. I got a text about a package delivery and was about to click. Checked it here first and found out it was a phishing link.",
+    name: "Marcus T.",
+    role: "First-time user",
+    initials: "MT",
     rating: 5,
   },
   {
     quote:
-      "The checklists are exactly what I needed. Simple, practical steps that I could actually follow without needing an IT degree. I finally feel in control of my online security.",
-    name: "Patricia Chen",
-    role: "Retired Teacher",
-    initials: "PC",
+      "Finally, safety advice I can actually understand! No confusing tech jargon. I set up parental controls on all my kids' devices in one afternoon.",
+    name: "Jennifer L.",
+    role: "Mom of 3",
+    initials: "JL",
     rating: 5,
   },
   {
     quote:
       "My 75-year-old father was being targeted by romance scammers. GetCyberRight helped us recognize the warning signs and protect him from financial ruin.",
-    name: "Michael Thompson",
+    name: "Michael T.",
     role: "Son & Caregiver",
     initials: "MT",
     rating: 5,
@@ -41,7 +41,7 @@ const testimonials = [
   {
     quote:
       "We use GetCyberRight materials in our community center to educate seniors. The content is clear, respectful, and doesn't make anyone feel stupid for not knowing tech.",
-    name: "Linda Washington",
+    name: "Linda W.",
     role: "Community Center Director",
     initials: "LW",
     rating: 5,
@@ -49,7 +49,7 @@ const testimonials = [
   {
     quote:
       "After clicking a suspicious link, I panicked. The 'What To Do Next' guide walked me through exactly what steps to take. Invaluable resource!",
-    name: "David Kim",
+    name: "David K.",
     role: "College Student",
     initials: "DK",
     rating: 5,

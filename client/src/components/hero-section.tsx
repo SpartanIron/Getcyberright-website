@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Play, Shield, Lock } from "lucide-react";
+import { ArrowRight, CheckCircle2, Shield, Lock, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import logoImage from "@assets/image_(3)_1769558492356.png";
@@ -24,36 +24,35 @@ export function HeroSection() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm text-white text-sm font-medium mb-6 border border-white/20">
               <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
-              <span>Trusted Cybersecurity Education</span>
+              <span>Free Cyber Safety for Families</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6 leading-tight">
-              Protecting People From{" "}
-              <span className="text-primary">Modern Cyber Scams</span>
+              Keeping Your Family{" "}
+              <span className="text-primary">Safe Online</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-white/70 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Simple, practical cybersecurity education and tools for families,
-              seniors, and organizations. Stay safe online without the technical
-              jargon.
+              Free tools and plain-language guides to protect your whole family, 
+              from kids on social media to seniors targeted by scammers.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
               <Link href="/tools">
                 <Button size="lg" className="text-base w-full sm:w-auto" data-testid="button-hero-primary-cta">
-                  Get Free Protection Resources
-                  <ArrowRight className="ml-2 w-4 h-4" />
+                  <Search className="mr-2 w-4 h-4" />
+                  Check If It's a Scam
                 </Button>
               </Link>
-              <Link href="/resources">
+              <Link href="/tools">
                 <Button
                   variant="outline"
                   size="lg"
                   className="text-base border-white/30 text-white bg-white/5 backdrop-blur-sm w-full sm:w-auto"
                   data-testid="button-hero-secondary-cta"
                 >
-                  <Play className="mr-2 w-4 h-4" />
-                  Learn How Scammers Operate
+                  <Lock className="mr-2 w-4 h-4" />
+                  Create Strong Passwords
                 </Button>
               </Link>
             </div>
@@ -61,15 +60,15 @@ export function HeroSection() {
             <div className="flex flex-wrap gap-x-6 gap-y-3 justify-center lg:justify-start text-sm text-white/60">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>100% Free Resources</span>
+                <span>Always Free</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>No Technical Knowledge Required</span>
+                <span>No Sign-up Required</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span>Trusted by Thousands</span>
+                <span>Expert Sources</span>
               </div>
             </div>
           </motion.div>
@@ -116,7 +115,7 @@ export function HeroSection() {
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="flex items-center gap-2 text-white">
                     <Shield className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium">Senior Safety</span>
+                    <span className="text-sm font-medium">Seniors Hub</span>
                   </div>
                 </div>
               </motion.div>
@@ -136,7 +135,7 @@ export function HeroSection() {
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="flex items-center gap-2 text-white">
                     <CheckCircle2 className="w-4 h-4 text-green-400" />
-                    <span className="text-sm font-medium">Family Protected</span>
+                    <span className="text-sm font-medium">Parents Hub</span>
                   </div>
                 </div>
               </motion.div>
@@ -152,8 +151,8 @@ export function HeroSection() {
                     <CheckCircle2 className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Phishing Blocked</p>
-                    <p className="text-xs text-gray-500">Threat detected & stopped</p>
+                    <p className="text-sm font-semibold text-gray-900">Scam Detected</p>
+                    <p className="text-xs text-gray-500">Link verified as unsafe</p>
                   </div>
                 </div>
               </motion.div>
@@ -166,11 +165,11 @@ export function HeroSection() {
               >
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-primary font-bold">50K+</span>
+                    <span className="text-primary font-bold">100%</span>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Families Protected</p>
-                    <p className="text-xs text-gray-500">Across 6 continents</p>
+                    <p className="text-sm font-semibold text-gray-900">Free Forever</p>
+                    <p className="text-xs text-gray-500">No hidden costs</p>
                   </div>
                 </div>
               </motion.div>
@@ -182,14 +181,12 @@ export function HeroSection() {
                 className="absolute top-48 left-0 bg-white rounded-xl shadow-xl p-3 z-40"
               >
                 <div className="flex items-center gap-2">
-                  <div className="flex -space-x-2">
-                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary border-2 border-white">S</div>
-                    <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center text-xs font-semibold text-accent border-2 border-white">M</div>
-                    <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-xs font-semibold text-green-600 border-2 border-white">J</div>
+                  <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-accent" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-gray-900">4.9/5 Rating</p>
-                    <p className="text-[10px] text-gray-500">2,500+ reviews</p>
+                    <p className="text-xs font-semibold text-gray-900">50+ Countries</p>
+                    <p className="text-[10px] text-gray-500">Serving families worldwide</p>
                   </div>
                 </div>
               </motion.div>

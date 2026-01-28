@@ -1,35 +1,40 @@
 import { motion } from "framer-motion";
-import { Building2, Users, Award, ShieldCheck } from "lucide-react";
+import { Shield, Lock, Clock, Ban } from "lucide-react";
 
 const trustItems = [
   {
-    icon: Users,
-    stat: "50,000+",
-    label: "Protected Users",
+    icon: Shield,
+    stat: "100%",
+    label: "Free Forever",
+    sublabel: "No hidden costs",
   },
   {
-    icon: Building2,
-    stat: "500+",
-    label: "Organizations Trained",
+    icon: Ban,
+    stat: "0",
+    label: "Data Sold",
+    sublabel: "We never sell your info",
   },
   {
-    icon: Award,
-    stat: "10+ Years",
-    label: "Cybersecurity Experience",
+    icon: Lock,
+    stat: "9",
+    label: "Scam Check Types",
+    sublabel: "URLs, SMS, email & more",
   },
   {
-    icon: ShieldCheck,
-    stat: "99.9%",
-    label: "Threat Detection Rate",
+    icon: Clock,
+    stat: "24/7",
+    label: "Always Available",
+    sublabel: "Check anytime, anywhere",
   },
 ];
 
-const partners = [
-  "Cybersecurity Alliance",
-  "Digital Safety Council",
-  "National Fraud Prevention",
-  "Senior Protection Network",
-  "Small Business Security Association",
+const trustedSources = [
+  { name: "FBI IC3", description: "Internet Crime Center" },
+  { name: "CISA", description: "Cybersecurity Agency" },
+  { name: "INTERPOL", description: "Global Police" },
+  { name: "FTC", description: "Trade Commission" },
+  { name: "Google", description: "Safe Browsing API" },
+  { name: "PhishTank", description: "Phishing Database" },
 ];
 
 export function TrustSignals() {
@@ -44,7 +49,7 @@ export function TrustSignals() {
           className="text-center mb-10"
         >
           <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-            Trusted by Organizations Nationwide
+            Why Families Trust GetCyberRight
           </p>
         </motion.div>
 
@@ -67,7 +72,8 @@ export function TrustSignals() {
               <p className="text-3xl sm:text-4xl font-bold text-foreground mb-1">
                 {item.stat}
               </p>
-              <p className="text-sm text-muted-foreground">{item.label}</p>
+              <p className="text-sm font-medium text-foreground">{item.label}</p>
+              <p className="text-xs text-muted-foreground">{item.sublabel}</p>
             </div>
           ))}
         </motion.div>
@@ -79,14 +85,18 @@ export function TrustSignals() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="border-t pt-8"
         >
+          <p className="text-center text-sm text-muted-foreground mb-6">
+            Information You Can Trust - All our scam detection and safety advice is based on official sources
+          </p>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-            {partners.map((partner) => (
+            {trustedSources.map((source) => (
               <div
-                key={partner}
-                className="text-sm font-medium text-muted-foreground/70 hover:text-muted-foreground transition-colors"
-                data-testid={`partner-${partner.toLowerCase().replace(/\s/g, "-")}`}
+                key={source.name}
+                className="text-center"
+                data-testid={`source-${source.name.toLowerCase().replace(/\s/g, "-")}`}
               >
-                {partner}
+                <p className="text-sm font-semibold text-foreground">{source.name}</p>
+                <p className="text-xs text-muted-foreground">{source.description}</p>
               </div>
             ))}
           </div>

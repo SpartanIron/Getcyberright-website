@@ -1,56 +1,47 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import {
-  BookOpen,
-  Video,
-  FileCheck,
-  Users,
-  Headphones,
-  Bell,
+  Search,
+  AlertTriangle,
+  Lock,
+  TrendingUp,
+  ArrowRight,
 } from "lucide-react";
 
-const features = [
+const tools = [
   {
-    icon: BookOpen,
-    title: "Security Guides",
+    icon: Search,
+    title: "Scam Checker",
     description:
-      "Step-by-step tutorials written in plain language. Learn how to secure your accounts, devices, and personal information.",
-    highlight: "50+ guides available",
+      "Check URLs, emails, and phone numbers instantly. Find out if something is a scam before you click or respond.",
+    highlight: "Most Popular",
+    href: "/tools",
   },
   {
-    icon: Video,
-    title: "Video Training",
+    icon: AlertTriangle,
+    title: "Breach Checker",
     description:
-      "Watch and learn at your own pace with our library of educational videos covering common threats and prevention.",
-    highlight: "New videos weekly",
+      "Check if your email was exposed in a data breach. We never store your email - checked against Have I Been Pwned database.",
+    highlight: "Privacy First",
+    href: "/tools",
   },
   {
-    icon: FileCheck,
-    title: "Security Checklists",
+    icon: Lock,
+    title: "Password Generator",
     description:
-      "Downloadable checklists to audit your own security. Perfect for families and small businesses.",
-    highlight: "Print-friendly format",
+      "Create strong, secure passwords instantly. Never use weak passwords again with our random password generator.",
+    highlight: "Instant Results",
+    href: "/tools",
   },
   {
-    icon: Users,
-    title: "Family Protection Plans",
+    icon: TrendingUp,
+    title: "Threat Trends",
     description:
-      "Complete guides for protecting every member of your household, from kids to grandparents.",
-    highlight: "Age-appropriate content",
-  },
-  {
-    icon: Headphones,
-    title: "Expert Support",
-    description:
-      "Access to cybersecurity experts who can answer your questions in terms you can understand.",
-    highlight: "Email & phone support",
-  },
-  {
-    icon: Bell,
-    title: "Scam Alerts",
-    description:
-      "Stay informed with real-time alerts about new scams targeting your area and demographic.",
-    highlight: "Real-time updates",
+      "Stay informed with global scam statistics and trending cyber threats. Know what to watch out for.",
+    highlight: "Real-time Data",
+    href: "/tools",
   },
 ];
 
@@ -66,21 +57,21 @@ export function Features() {
           className="text-center max-w-3xl mx-auto mb-16"
         >
           <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
-            Free Resources
+            Free Security Tools
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Everything You Need to Stay Safe Online
+            Protect Yourself With Our Free Tools
           </h2>
           <p className="text-lg text-muted-foreground">
-            Access our complete library of cybersecurity resources, tools, and
-            training materials at no cost.
+            No signup required. Check if something is a scam, generate secure passwords, 
+            and stay informed about the latest threats.
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {tools.map((tool, index) => (
             <motion.div
-              key={feature.title}
+              key={tool.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -88,26 +79,46 @@ export function Features() {
             >
               <Card
                 className="h-full hover-elevate"
-                data-testid={`feature-card-${index}`}
+                data-testid={`tool-card-${index}`}
               >
-                <CardContent className="p-6">
+                <CardContent className="p-6 flex flex-col h-full">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-primary" />
+                    <tool.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="inline-flex items-center text-xs font-medium text-accent mb-2">
+                    {tool.highlight}
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">
-                    {feature.title}
+                    {tool.title}
                   </h3>
-                  <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
-                    {feature.description}
+                  <p className="text-muted-foreground mb-4 text-sm leading-relaxed flex-1">
+                    {tool.description}
                   </p>
-                  <div className="inline-flex items-center text-sm font-medium text-accent">
-                    {feature.highlight}
-                  </div>
+                  <Link href={tool.href}>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Try Now <ArrowRight className="ml-2 w-3 h-3" />
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="text-center mt-12"
+        >
+          <Link href="/tools">
+            <Button size="lg" data-testid="button-view-all-tools">
+              View All Tools
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );
