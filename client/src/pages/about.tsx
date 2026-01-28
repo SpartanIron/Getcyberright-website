@@ -49,7 +49,7 @@ export default function About() {
           title="A Mission Born from Personal Experience"
           subtitle="We watched our own family members fall victim to scams. That's why we built something different—clear guidance from people who understand what's at stake."
           imageSrc={bannerImage}
-          imageAlt="Diverse multi-racial GetCyberRight team wearing branded red shirts, smiling together in a modern office"
+          imageAlt="Diverse GetCyberRight team with African woman leader in the center, all wearing branded red shirts in a modern office"
           imagePosition="left"
         />
 
