@@ -6,7 +6,6 @@ import professionalImage from "@/assets/images/professional-laptop.jpg";
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-slate-900 min-h-[600px] lg:min-h-[700px]" data-testid="section-hero">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center min-h-[600px] lg:min-h-[700px] gap-8 lg:gap-12 py-16 lg:py-0">
