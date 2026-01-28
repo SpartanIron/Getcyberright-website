@@ -15,20 +15,22 @@ const colorClasses = {
   blue: "bg-blue-900",
 };
 
-function DecorativeCircles() {
+function DecorativeCircles({ position }: { position: "left" | "right" }) {
+  const isRight = position === "right";
+  
   return (
     <div 
-      className="absolute bottom-0 right-0 pointer-events-none overflow-hidden w-full h-full"
+      className="absolute inset-0 pointer-events-none"
       aria-hidden="true"
     >
       {/* Deep red circle - largest, furthest back */}
       <div 
         className="absolute rounded-full"
         style={{
-          width: "clamp(200px, 30vw, 380px)",
-          height: "clamp(200px, 30vw, 380px)",
-          bottom: "-20%",
-          right: "-10%",
+          width: "clamp(220px, 35vw, 420px)",
+          height: "clamp(220px, 35vw, 420px)",
+          bottom: "-40%",
+          ...(isRight ? { right: "-35%" } : { left: "-35%" }),
           backgroundColor: "rgba(185, 28, 28, 0.35)",
         }}
       />
@@ -37,10 +39,10 @@ function DecorativeCircles() {
       <div 
         className="absolute rounded-full"
         style={{
-          width: "clamp(160px, 24vw, 300px)",
-          height: "clamp(160px, 24vw, 300px)",
-          bottom: "-8%",
-          right: "5%",
+          width: "clamp(180px, 28vw, 340px)",
+          height: "clamp(180px, 28vw, 340px)",
+          bottom: "-25%",
+          ...(isRight ? { right: "-20%" } : { left: "-20%" }),
           backgroundColor: "rgba(234, 88, 12, 0.28)",
         }}
       />
@@ -49,10 +51,10 @@ function DecorativeCircles() {
       <div 
         className="absolute rounded-full"
         style={{
-          width: "clamp(120px, 18vw, 220px)",
-          height: "clamp(120px, 18vw, 220px)",
-          bottom: "8%",
-          right: "-5%",
+          width: "clamp(140px, 22vw, 260px)",
+          height: "clamp(140px, 22vw, 260px)",
+          bottom: "-10%",
+          ...(isRight ? { right: "-25%" } : { left: "-25%" }),
           backgroundColor: "rgba(59, 130, 246, 0.25)",
         }}
       />
@@ -77,8 +79,8 @@ export function PageBanner({
         <div className={`flex flex-col ${imagePosition === "left" ? "md:flex-row-reverse" : "md:flex-row"} min-h-[280px] md:min-h-[320px]`}>
           {/* Text content section with decorative circles */}
           <div className="flex-1 relative overflow-hidden">
-            {/* Decorative circles positioned in corner of solid-color section */}
-            <DecorativeCircles />
+            {/* Decorative circles positioned at edge where text meets image */}
+            <DecorativeCircles position={imagePosition === "left" ? "left" : "right"} />
             
             {/* Text content */}
             <div className="relative z-10 flex flex-col justify-center h-full px-6 sm:px-8 lg:px-12 py-10 md:py-16">
