@@ -25,9 +25,9 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { name: "LinkedIn", icon: SiLinkedin, href: "#" },
-  { name: "Facebook", icon: SiFacebook, href: "#" },
-  { name: "YouTube", icon: SiYoutube, href: "#" },
+  { name: "LinkedIn", icon: SiLinkedin, href: "https://www.linkedin.com/company/getcyberright" },
+  { name: "Facebook", icon: SiFacebook, href: "https://www.facebook.com/getcyberright" },
+  { name: "YouTube", icon: SiYoutube, href: "https://www.youtube.com/@getcyberright" },
 ];
 
 export function Footer() {

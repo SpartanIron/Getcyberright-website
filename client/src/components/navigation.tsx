@@ -42,7 +42,7 @@ const resourceTypes = [
   { title: "Security Guides", description: "Step-by-step protection tutorials", href: "/resources", icon: FileText },
   { title: "Video Training", description: "Watch and learn at your own pace", href: "/resources", icon: Video },
   { title: "Checklists", description: "Printable security checklists", href: "/resources", icon: BookOpen },
-  { title: "Emergency Help", description: "What to do if you've been scammed", href: "/contact", icon: AlertTriangle },
+  { title: "Emergency Help", description: "What to do if you've been scammed", href: "/emergency-help", icon: AlertTriangle },
 ];
 
 export function Navigation() {
