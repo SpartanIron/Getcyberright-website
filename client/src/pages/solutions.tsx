@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
+import { Link } from "wouter";
 import { 
   Users, 
   Heart, 
@@ -12,7 +13,8 @@ import {
   ArrowRight,
   Shield,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Lock
 } from "lucide-react";
 import logoImage from "@assets/image_(3)_1769558492356.png";
 import familyImage from "@/assets/images/family-devices.jpg";
@@ -35,7 +37,8 @@ const solutions = [
       "Social media protection tips",
       "How to talk to kids about online safety"
     ],
-    cta: "Get Family Protection Guide"
+    cta: "Get Family Protection Guide",
+    stats: { value: "15K+", label: "Families Protected" }
   },
   {
     id: "seniors",
@@ -51,7 +54,8 @@ const solutions = [
       "What to do if you've been scammed",
       "Family communication templates"
     ],
-    cta: "Get Senior Safety Guide"
+    cta: "Get Senior Safety Guide",
+    stats: { value: "10K+", label: "Seniors Helped" }
   },
   {
     id: "business",
@@ -67,7 +71,8 @@ const solutions = [
       "Customer data security basics",
       "Incident response planning"
     ],
-    cta: "Get Business Security Kit"
+    cta: "Get Business Security Kit",
+    stats: { value: "5K+", label: "Businesses Secured" }
   },
   {
     id: "educators",
@@ -83,7 +88,8 @@ const solutions = [
       "Community presentation slides",
       "Printable safety guides"
     ],
-    cta: "Get Educator Resources"
+    cta: "Get Educator Resources",
+    stats: { value: "500+", label: "Organizations" }
   }
 ];
 
@@ -93,7 +99,7 @@ export default function Solutions() {
       <Navigation />
       
       <main>
-        <section className="py-16 sm:py-24 bg-gradient-to-b from-background to-muted/30">
+        <section className="py-16 sm:py-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -101,17 +107,17 @@ export default function Solutions() {
               transition={{ duration: 0.5 }}
               className="text-center max-w-3xl mx-auto"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium mb-6 border border-white/20">
                 <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
                 <span>Solutions for Everyone</span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
+              <h1 className="text-4xl sm:text-5xl font-bold mb-6">
                 Cybersecurity Protection{" "}
                 <span className="text-primary">For Real People</span>
               </h1>
               
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-lg text-white/70 leading-relaxed">
                 Whether you're protecting your family, helping a senior relative, 
                 securing your small business, or educating your community - we have 
                 resources designed specifically for you.
@@ -124,10 +130,10 @@ export default function Solutions() {
           <section 
             key={solution.id}
             id={solution.id}
-            className={`py-16 sm:py-24 ${index % 2 === 0 ? 'bg-background' : 'bg-card border-y'}`}
+            className={`py-16 sm:py-24 ${index % 2 === 0 ? 'bg-background' : 'bg-muted/30'}`}
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+              <div className={`grid lg:grid-cols-2 gap-12 lg:gap-16 items-center`}>
                 <motion.div
                   initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -164,11 +170,22 @@ export default function Solutions() {
                       </div>
                     </div>
                   </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {solution.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-sm text-muted-foreground">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                   
-                  <Button size="lg" data-testid={`button-${solution.id}-cta`}>
-                    {solution.cta}
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
+                  <Link href="/tools">
+                    <Button size="lg" data-testid={`button-${solution.id}-cta`}>
+                      {solution.cta}
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
                 </motion.div>
                 
                 <motion.div
@@ -176,30 +193,55 @@ export default function Solutions() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className={index % 2 === 1 ? 'lg:order-1' : ''}
+                  className={`relative ${index % 2 === 1 ? 'lg:order-1' : ''}`}
                 >
-                  <div className="relative rounded-2xl overflow-hidden shadow-xl">
-                    <img 
-                      src={solution.image} 
-                      alt={solution.title} 
-                      className="w-full h-64 sm:h-80 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <Card className="bg-white/95 backdrop-blur-sm">
-                        <CardContent className="p-4">
-                          <h3 className="font-semibold text-foreground mb-3 text-sm">What You'll Get</h3>
-                          <ul className="space-y-2">
-                            {solution.features.map((feature, featureIndex) => (
-                              <li key={featureIndex} className="flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                                <span className="text-muted-foreground text-sm">{feature}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                    </div>
+                  <div className="relative h-80 sm:h-96">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.3 }}
+                      className="absolute inset-4 rounded-2xl overflow-hidden shadow-2xl"
+                      style={{ transform: index % 2 === 0 ? "rotate(2deg)" : "rotate(-2deg)" }}
+                    >
+                      <img 
+                        src={solution.image} 
+                        alt={solution.title} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: 0.5 }}
+                      className={`absolute ${index % 2 === 0 ? '-bottom-4 -left-4' : '-bottom-4 -right-4'} bg-white dark:bg-card rounded-xl shadow-xl p-4 z-10`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                          <span className="text-primary font-bold text-sm">{solution.stats.value}</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">{solution.stats.label}</p>
+                          <p className="text-xs text-muted-foreground">and counting</p>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: 0.6 }}
+                      className={`absolute ${index % 2 === 0 ? '-top-2 -right-2' : '-top-2 -left-2'} bg-white dark:bg-card rounded-xl shadow-xl p-3 z-10`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-500" />
+                        <span className="text-sm font-medium text-foreground">100% Free</span>
+                      </div>
+                    </motion.div>
                   </div>
                 </motion.div>
               </div>
