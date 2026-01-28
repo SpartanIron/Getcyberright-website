@@ -1,6 +1,7 @@
-import { Shield, Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import { SiLinkedin, SiFacebook, SiYoutube } from "react-icons/si";
 import { Link } from "wouter";
+import logoImage from "@assets/image_(3)_1769558492356.png";
 
 const footerLinks = {
   solutions: [
@@ -41,9 +42,7 @@ export function Footer() {
         <div className="py-12 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           <div className="col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4" data-testid="footer-link-logo">
-              <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary">
-                <Shield className="w-6 h-6 text-primary-foreground" />
-              </div>
+              <img src={logoImage} alt="GetCyberRight" className="w-10 h-10 object-contain" />
               <span className="font-semibold text-lg text-foreground">
                 GetCyberRight
               </span>

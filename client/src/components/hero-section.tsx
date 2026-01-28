@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Shield, ArrowRight, CheckCircle2, Play } from "lucide-react";
+import { ArrowRight, CheckCircle2, Play, Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import logoImage from "@assets/image_(3)_1769558492356.png";
 
 export function HeroSection() {
   return (
@@ -24,7 +25,7 @@ export function HeroSection() {
             className="text-center lg:text-left"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-              <Shield className="w-4 h-4" />
+              <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
               <span>Trusted Cybersecurity Education</span>
             </div>
 
