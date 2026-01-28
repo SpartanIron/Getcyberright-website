@@ -102,7 +102,7 @@ export default function Solutions() {
       <main>
         <PageBanner
           title="Protection Designed for Your World"
-          subtitle="Whether you're securing your family, supporting an elderly relative, protecting your business, or educating your community—we built solutions for the way you actually live."
+          subtitle="Whether you're securing your family, supporting an elderly relative, protecting your business, or educating your community, we built solutions for the way you actually live."
           imageSrc={bannerImage}
           imageAlt="Multi-generational family gathered in living room learning about internet safety together on a tablet"
           imagePosition="right"
