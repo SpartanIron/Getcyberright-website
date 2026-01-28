@@ -12,7 +12,7 @@ export function HeroSection() {
           
           <div className="w-full lg:w-1/2 z-10 text-center lg:text-left">
             <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-white mb-6 leading-[1.1]" data-testid="text-hero-heading">
-              #1 Free Cybersecurity Education Platform
+              Free Cybersecurity Education for Everyone
             </h1>
 
             <p className="text-xl text-white/80 mb-8 leading-relaxed" data-testid="text-hero-subtext">

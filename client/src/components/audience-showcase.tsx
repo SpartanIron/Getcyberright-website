@@ -15,7 +15,7 @@ const audiences = [
     description: "From toddlers with tablets to teenagers on social media. Get age-appropriate guides for the whole family.",
     icon: Users,
     href: "/resources",
-    stats: "12M+ Families Protected",
+    stats: "Free Family Resources",
   },
   {
     id: "seniors",
@@ -25,7 +25,7 @@ const audiences = [
     description: "Learn to spot scams, protect your identity, and use technology with confidence. No tech jargon, just clear steps.",
     icon: Heart,
     href: "/resources",
-    stats: "500K+ Seniors Helped",
+    stats: "Plain Language Guides",
   },
   {
     id: "business",
@@ -35,7 +35,7 @@ const audiences = [
     description: "Free security awareness training for small businesses. Protect your company from phishing and social engineering.",
     icon: Briefcase,
     href: "/resources",
-    stats: "50K+ Businesses Trained",
+    stats: "Free Training Materials",
   },
 ];
 

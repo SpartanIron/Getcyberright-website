@@ -1,22 +1,34 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Quote } from "lucide-react";
+import { Shield, AlertTriangle, Lock } from "lucide-react";
 
-const testimonials = [
+const useCases = [
   {
-    quote: "My mom almost sent $5,000 to a 'grandchild' in jail. Thanks to what I learned here, I stopped her in time.",
-    name: "Sarah M.",
-    outcome: "Prevented grandparent scam",
+    icon: AlertTriangle,
+    scenario: "Suspicious Email Received",
+    description: "A suspicious email arrives claiming your account has been compromised and asking you to click a link immediately.",
+    solution: "Use our Scam Checker tool to analyze the message and identify common phishing indicators before taking any action.",
+    outcome: "Recognize phishing attempts",
   },
   {
-    quote: "The Scam Checker saved me. I got a text about a package and was about to click. Checked it here first and it was a phishing link.",
-    name: "Marcus T.",
-    outcome: "Avoided phishing attack",
+    icon: Shield,
+    scenario: "Protecting Elderly Family Members",
+    description: "An elderly family member receives calls from strangers claiming to be relatives or officials asking for money or personal information.",
+    solution: "Our guides teach families how to verify caller identity and establish safety protocols for emergencies.",
+    outcome: "Prevent impostor scams",
   },
   {
-    quote: "Finally, safety advice I can understand! No tech jargon. Set up parental controls on all my kids' devices in one afternoon.",
-    name: "Jennifer L.",
-    outcome: "Protected her 3 children",
+    icon: Lock,
+    scenario: "Password Security Challenges",
+    description: "You need to create strong, unique passwords for multiple accounts but struggle to remember complex combinations.",
+    solution: "Our Password Generator creates secure passwords and passphrases, with guidance on using password managers effectively.",
+    outcome: "Strengthen account security",
   },
+];
+
+const features = [
+  { label: "Free Tools", sublabel: "Scam Checker, Password Generator" },
+  { label: "Educational Guides", sublabel: "Written in plain language" },
+  { label: "Expert Sources", sublabel: "Based on FBI, FTC, CISA guidance" },
 ];
 
 export function SocialProof() {
@@ -25,43 +37,42 @@ export function SocialProof() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-social-proof-heading">
-            Real People, Real Protection
+            How We Help You Stay Safe
           </h2>
           <p className="text-lg text-muted-foreground">
-            Thousands of families use our free tools every day.
+            Practical tools and guidance for common cybersecurity challenges
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((item, index) => (
-            <Card key={item.name} data-testid={`card-testimonial-${index}`}>
+          {useCases.map((item, index) => (
+            <Card key={item.scenario} data-testid={`card-usecase-${index}`}>
               <CardContent className="pt-6 pb-6 px-6">
-                <Quote className="w-8 h-8 text-primary/30 mb-4" />
-                <blockquote className="text-foreground mb-6 leading-relaxed">
-                  "{item.quote}"
-                </blockquote>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <item.icon className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2">{item.scenario}</h3>
+                <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+                  {item.description}
+                </p>
                 <div className="border-t pt-4">
-                  <p className="font-semibold text-foreground">{item.name}</p>
-                  <p className="text-sm text-primary">{item.outcome}</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    <span className="font-medium text-foreground">Our solution:</span> {item.solution}
+                  </p>
+                  <p className="text-sm text-primary font-medium">{item.outcome}</p>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="flex justify-center gap-12 mt-16 pt-8 border-t">
-          <div className="text-center" data-testid="stat-families">
-            <p className="text-4xl font-bold text-foreground">50,000+</p>
-            <p className="text-sm text-muted-foreground">Families Protected</p>
-          </div>
-          <div className="text-center" data-testid="stat-countries">
-            <p className="text-4xl font-bold text-foreground">50+</p>
-            <p className="text-sm text-muted-foreground">Countries</p>
-          </div>
-          <div className="text-center" data-testid="stat-rating">
-            <p className="text-4xl font-bold text-foreground">4.9/5</p>
-            <p className="text-sm text-muted-foreground">User Rating</p>
-          </div>
+        <div className="flex flex-wrap justify-center gap-8 sm:gap-12 mt-16 pt-8 border-t">
+          {features.map((item) => (
+            <div key={item.label} className="text-center" data-testid={`feature-${item.label.toLowerCase().replace(/\s/g, "-")}`}>
+              <p className="text-lg font-semibold text-foreground">{item.label}</p>
+              <p className="text-sm text-muted-foreground">{item.sublabel}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

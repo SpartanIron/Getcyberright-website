@@ -38,7 +38,7 @@ const solutions = [
       "How to talk to kids about online safety"
     ],
     cta: "Get Family Protection Guide",
-    stats: { value: "15K+", label: "Families Protected" }
+    stats: { value: "Free", label: "Family Resources" }
   },
   {
     id: "seniors",
@@ -55,7 +55,7 @@ const solutions = [
       "Family communication templates"
     ],
     cta: "Get Senior Safety Guide",
-    stats: { value: "10K+", label: "Seniors Helped" }
+    stats: { value: "Free", label: "Senior Guides" }
   },
   {
     id: "business",
@@ -72,7 +72,7 @@ const solutions = [
       "Incident response planning"
     ],
     cta: "Get Business Security Kit",
-    stats: { value: "5K+", label: "Businesses Secured" }
+    stats: { value: "Free", label: "Business Training" }
   },
   {
     id: "educators",
@@ -89,7 +89,7 @@ const solutions = [
       "Printable safety guides"
     ],
     cta: "Get Educator Resources",
-    stats: { value: "500+", label: "Organizations" }
+    stats: { value: "Free", label: "Workshop Materials" }
   }
 ];
 
