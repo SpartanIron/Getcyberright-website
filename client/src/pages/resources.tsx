@@ -652,6 +652,7 @@ export default function Resources() {
           imageSrc={bannerImage}
           imageAlt="Cozy library corner with open guidebooks and educational materials on a wooden table with warm ambient lighting"
           imagePosition="right"
+          colorVariant="indigo"
         />
 
         <section className="py-12 sm:py-16">

@@ -4,7 +4,16 @@ interface PageBannerProps {
   imageSrc: string;
   imageAlt: string;
   imagePosition?: "left" | "right";
+  colorVariant?: "slate" | "teal" | "indigo" | "red" | "blue";
 }
+
+const colorClasses = {
+  slate: "bg-slate-900",
+  teal: "bg-teal-900",
+  indigo: "bg-indigo-900",
+  red: "bg-red-950",
+  blue: "bg-blue-900",
+};
 
 export function PageBanner({
   title,
@@ -12,10 +21,11 @@ export function PageBanner({
   imageSrc,
   imageAlt,
   imagePosition = "right",
+  colorVariant = "slate",
 }: PageBannerProps) {
   return (
     <section 
-      className="bg-slate-900"
+      className={colorClasses[colorVariant]}
       data-testid="section-page-banner"
     >
       <div className="max-w-7xl mx-auto">

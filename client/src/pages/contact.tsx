@@ -113,6 +113,7 @@ export default function Contact() {
           imageSrc={bannerImage}
           imageAlt="Welcoming customer service professional at a clean modern desk ready to assist with headset nearby"
           imagePosition="right"
+          colorVariant="blue"
         />
 
         <section className="py-12 sm:py-16">

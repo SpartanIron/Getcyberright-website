@@ -51,6 +51,7 @@ export default function About() {
           imageSrc={bannerImage}
           imageAlt="Diverse GetCyberRight team with African woman leader in the center, all wearing branded red shirts in a modern office"
           imagePosition="left"
+          colorVariant="slate"
         />
 
         <section className="py-16 sm:py-24">

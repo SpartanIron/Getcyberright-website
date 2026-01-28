@@ -76,6 +76,7 @@ export default function Tools() {
           imageSrc={bannerImage}
           imageAlt="Modern workspace with laptop displaying security checkmarks and password generator in bright natural light"
           imagePosition="left"
+          colorVariant="teal"
         />
 
         <section className="py-16 sm:py-20">

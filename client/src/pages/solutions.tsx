@@ -106,6 +106,7 @@ export default function Solutions() {
           imageSrc={bannerImage}
           imageAlt="Multi-generational family gathered in living room learning about internet safety together on a tablet"
           imagePosition="right"
+          colorVariant="red"
         />
 
         {solutions.map((solution, index) => (
