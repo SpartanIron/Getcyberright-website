@@ -1,13 +1,10 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
-import { TrustSignals } from "@/components/trust-signals";
-import { ToolsCarousel } from "@/components/tools-carousel";
+import { TrustStrip } from "@/components/trust-strip";
+import { Capabilities } from "@/components/capabilities";
 import { AudienceShowcase } from "@/components/audience-showcase";
-import { ExpertBanner } from "@/components/expert-banner";
-import { Testimonials } from "@/components/testimonials";
-import { TrustedBy } from "@/components/trusted-by";
-import { Newsletter } from "@/components/newsletter";
-import { CTASection } from "@/components/cta-section";
+import { SocialProof } from "@/components/social-proof";
+import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
 
 export default function Home() {
@@ -16,14 +13,11 @@ export default function Home() {
       <Navigation />
       <main>
         <HeroSection />
-        <TrustSignals />
-        <ToolsCarousel />
+        <TrustStrip />
+        <Capabilities />
         <AudienceShowcase />
-        <ExpertBanner />
-        <Testimonials />
-        <TrustedBy />
-        <Newsletter />
-        <CTASection />
+        <SocialProof />
+        <CTAFooter />
       </main>
       <Footer />
     </div>
