@@ -25,7 +25,7 @@ const values = [
     icon: Globe,
     title: "Global Reach",
     description:
-      "Serving families across six continents who face the same threats we do.",
+      "Serving families all over the world who face the same threats we do.",
   },
 ];
 

@@ -236,8 +236,8 @@ export function Testimonials() {
             <p className="text-sm text-muted-foreground">Average Rating</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-primary">6</p>
-            <p className="text-sm text-muted-foreground">Continents</p>
+            <p className="text-3xl font-bold text-primary">Global</p>
+            <p className="text-sm text-muted-foreground">Reach</p>
           </div>
         </motion.div>
       </div>

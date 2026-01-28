@@ -28,12 +28,12 @@ const values = [
   {
     icon: Globe,
     title: "Global Reach",
-    description: "Serving families across six continents who face the same threats we do."
+    description: "Serving families all over the world who face the same threats we do."
   }
 ];
 
 const stats = [
-  { value: "6", label: "Continents Served" },
+  { value: "Global", label: "Reach" },
   { value: "100%", label: "Free Resources" },
   { value: "24/7", label: "Access Available" },
   { value: "0", label: "Technical Jargon" }
