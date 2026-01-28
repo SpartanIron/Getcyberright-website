@@ -30,7 +30,7 @@ const audiences = [
   {
     id: "business",
     image: businessImage,
-    title: "For Businesses",
+    title: "For Small Businesses",
     subtitle: "Train Your Team",
     description: "Free security awareness training for small businesses. Protect your company from phishing and social engineering.",
     icon: Briefcase,
