@@ -1,7 +1,7 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 import { SiLinkedin, SiFacebook, SiYoutube } from "react-icons/si";
 import { Link } from "wouter";
-import logoImage from "@assets/image_(3)_1769558492356.png";
+import logoImage from "@/assets/logo.png";
 
 const footerLinks = {
   solutions: [

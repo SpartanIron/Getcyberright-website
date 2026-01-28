@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Shield, Heart, Users, Globe } from "lucide-react";
-import logoImage from "@assets/image_(3)_1769558492356.png";
+import logoImage from "@/assets/logo.png";
 
 const values = [
   {
