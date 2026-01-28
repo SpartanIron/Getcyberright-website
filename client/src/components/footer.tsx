@@ -141,6 +141,18 @@ export function Footer() {
               <span>Sources: FBI IC3, CISA, INTERPOL, FTC</span>
             </div>
           </div>
+
+          <div className="mt-4 text-center text-xs text-slate-500">
+            <span>www.GetCyberRight.com is powered by </span>
+            <a 
+              href="https://colorcodesolutions.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-white transition-colors"
+            >
+              ColorCode Solutions
+            </a>
+          </div>
         </div>
       </div>
     </footer>
