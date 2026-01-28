@@ -1012,28 +1012,37 @@ function ParentSection() {
           </CardContent>
         </Card>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card className="text-center p-6">
-            <Shield className="w-10 h-10 text-teal-500 mx-auto mb-4" />
-            <h4 className="font-semibold text-foreground mb-2">No Data Collection</h4>
-            <p className="text-sm text-muted-foreground">
-              We do not collect any personal information from children. No accounts, no tracking, no profiles.
-            </p>
-          </Card>
-          <Card className="text-center p-6">
-            <Lock className="w-10 h-10 text-blue-500 mx-auto mb-4" />
-            <h4 className="font-semibold text-foreground mb-2">No External Links</h4>
-            <p className="text-sm text-muted-foreground">
-              All learning happens on this page. Children are never directed to external websites.
-            </p>
-          </Card>
-          <Card className="text-center p-6">
-            <Heart className="w-10 h-10 text-pink-500 mx-auto mb-4" />
-            <h4 className="font-semibold text-foreground mb-2">Child Safety First</h4>
-            <p className="text-sm text-muted-foreground">
-              Content is designed to empower, not frighten. We use positive, encouraging language throughout.
-            </p>
-          </Card>
+      </div>
+
+      <div className="bg-red-600 dark:bg-red-800 py-12">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-white mb-2">Our Safety Promise</h3>
+            <p className="text-red-100">Built with child protection as our top priority.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="text-center p-6">
+              <Shield className="w-10 h-10 text-teal-500 mx-auto mb-4" />
+              <h4 className="font-semibold text-foreground mb-2">No Data Collection</h4>
+              <p className="text-sm text-muted-foreground">
+                We do not collect any personal information from children. No accounts, no tracking, no profiles.
+              </p>
+            </Card>
+            <Card className="text-center p-6">
+              <Lock className="w-10 h-10 text-blue-500 mx-auto mb-4" />
+              <h4 className="font-semibold text-foreground mb-2">No External Links</h4>
+              <p className="text-sm text-muted-foreground">
+                All learning happens on this page. Children are never directed to external websites.
+              </p>
+            </Card>
+            <Card className="text-center p-6">
+              <Heart className="w-10 h-10 text-pink-500 mx-auto mb-4" />
+              <h4 className="font-semibold text-foreground mb-2">Child Safety First</h4>
+              <p className="text-sm text-muted-foreground">
+                Content is designed to empower, not frighten. We use positive, encouraging language throughout.
+              </p>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
