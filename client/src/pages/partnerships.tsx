@@ -1,4 +1,5 @@
 import { PageBanner } from "@/components/page-banner";
+import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -168,6 +169,8 @@ export default function Partnerships() {
           <p className="text-sm text-muted-foreground mt-4">partnerships@getcyberright.com</p>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }
