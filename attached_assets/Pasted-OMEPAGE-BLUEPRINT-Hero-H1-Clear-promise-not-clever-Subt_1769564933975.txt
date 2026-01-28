@@ -1,0 +1,157 @@
+OMEPAGE BLUEPRINT
+Hero
+
+H1: Clear promise (not clever)
+
+Subtext: Who it’s for + why it matters
+
+Primary CTA
+
+Secondary text link CTA
+
+Trust Strip
+
+Logos / text trust indicators
+
+No animation
+
+Subtle divider
+
+Problem → Solution
+
+Real human problems
+
+Calm language
+
+3-column max
+
+Capabilities
+
+Cards
+
+Benefit-driven copy
+
+Consistent iconography
+
+Education Focus
+
+Tools
+
+Resources
+
+Learning paths
+
+Social Proof
+
+Quotes
+
+Outcomes, not hype
+
+CTA Footer
+
+One message
+
+One action
+
+No distractions
+
+📄 SOLUTIONS PAGE BLUEPRINT
+Hero (Who this is for)
+↓
+Audience Sections (Families, Seniors, SMBs)
+↓
+How We Help (Simple steps)
+↓
+CTA
+
+
+No feature dumps.
+No technical explanations.
+
+📚 RESOURCES BLUEPRINT
+Hero
+↓
+Filterable Content Grid
+↓
+Pagination
+↓
+CTA (Subscribe / Learn More)
+
+
+Reading experience > volume.
+
+ℹ️ ABOUT PAGE BLUEPRINT
+Mission
+↓
+Why We Exist
+↓
+Values
+↓
+Trust Statement
+
+
+No founder ego.
+No marketing language.
+
+3️⃣ REVIEW: WHAT BREAKS ENTERPRISE TRUST ON GETCYBERRIGHT (HONEST)
+
+Here’s the hard truth, as requested.
+
+❌ Current Trust Breakers
+1. Visual Noise
+
+Too many competing ideas
+
+Inconsistent spacing
+
+Sections feel “stacked,” not designed
+
+Fix: enforce layout tokens strictly.
+
+2. Unclear Primary Action
+
+Multiple CTAs
+
+No obvious “start here”
+
+Fix: one primary CTA across the entire site.
+
+3. Over-Explanation
+
+Too much text before reassurance
+
+Reads like explanation, not guidance
+
+Fix: shorten copy by ~40%.
+
+4. Inconsistent Typography
+
+Headings don’t feel authoritative
+
+Body text feels dense
+
+Fix: larger headings, more breathing room.
+
+5. Lack of Immediate Trust Signals
+
+No early reassurance
+
+No visible validation
+
+Fix: trust strip directly below hero.
+
+🧠 The Enterprise Trust Rule
+
+If a user has to work to understand or trust you, you’ve already lost.
+
+FINAL EXECUTIVE SUMMARY
+
+If you do only these three things, GetCyberRight will feel enterprise-grade:
+
+Lock the design tokens and never break them
+
+Reuse page structures relentlessly
+
+Remove anything that creates visual or cognitive noise
+
+That’s exactly how KnowBe4 wins.

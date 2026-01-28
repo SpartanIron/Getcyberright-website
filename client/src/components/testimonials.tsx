@@ -137,7 +137,7 @@ export function Testimonials() {
               size="icon"
               onClick={prevSlide}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex"
-              data-testid="button-carousel-prev"
+              data-testid="button-testimonial-prev"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
@@ -196,7 +196,7 @@ export function Testimonials() {
               size="icon"
               onClick={nextSlide}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex"
-              data-testid="button-carousel-next"
+              data-testid="button-testimonial-next"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>

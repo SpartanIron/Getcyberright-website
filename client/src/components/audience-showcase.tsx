@@ -5,7 +5,6 @@ import { ArrowRight, Users, Heart, Briefcase } from "lucide-react";
 import familyImage from "@/assets/images/hero-family.jpg";
 import seniorsImage from "@/assets/images/seniors-learning.jpg";
 import businessImage from "@/assets/images/business-team.jpg";
-import expertImage from "@/assets/images/security-expert.jpg";
 
 const audiences = [
   {
@@ -117,55 +116,6 @@ export function AudienceShowcase() {
             </motion.div>
           ))}
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-20 relative overflow-hidden rounded-2xl"
-          data-testid="card-expert-banner"
-        >
-          <div className="absolute inset-0">
-            <img
-              src={expertImage}
-              alt="Cybersecurity expert"
-              className="w-full h-full object-cover object-top"
-              data-testid="img-expert"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 via-gray-900/80 to-gray-900/60" />
-          </div>
-          <div className="relative py-16 px-8 sm:py-20 sm:px-12 lg:px-16">
-            <div className="max-w-2xl">
-              <p className="text-primary font-medium mb-2">Expert Resources</p>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4" data-testid="text-expert-heading">
-                Created by Security Professionals
-              </h3>
-              <p className="text-lg text-white/70 mb-6" data-testid="text-expert-desc">
-                All our guides and tools are developed by certified cybersecurity experts 
-                and reviewed regularly to keep up with the latest threats.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link href="/resources">
-                  <Button size="lg" data-testid="button-browse-resources">
-                    Browse All Resources
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
-                <Link href="/contact">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-white/30 text-white bg-white/10 backdrop-blur-sm"
-                    data-testid="button-contact-experts"
-                  >
-                    Contact Our Experts
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </section>
   );
