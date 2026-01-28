@@ -193,7 +193,7 @@ All educational content is based on verified, factual information from trusted s
 - Reply-To mismatch and bulk mailer detection
 
 ## Recent Changes (Jan 2026)
-- Updated all statistics to 2024 data from FTC Consumer Sentinel (March 2025) and FBI IC3 2024 Report
+- Updated all statistics to latest available data: FTC Consumer Sentinel 2024 (March 2025), FBI IC3 2024 Report, and FTC Data Spotlights (Aug/Dec 2025)
 - Added Email Header Analysis tab to Scam Checker with authentication checking
 - Content review: removed specific percentages, added data source attribution
 - Added Seniors Hub with 6 safety topics for older adults

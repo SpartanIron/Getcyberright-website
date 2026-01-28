@@ -19,7 +19,8 @@ import {
   Target
 } from "lucide-react";
 
-// Data from FTC Consumer Sentinel 2024 Data Book (March 2025) and FBI IC3 2024 Report
+// Data from FTC Consumer Sentinel 2024 Data Book (March 2025), FBI IC3 2024 Report,
+// and FTC Data Spotlights (August & December 2025)
 const stats: {
   id: string;
   label: string;
@@ -54,16 +55,16 @@ const stats: {
     change: "+43%",
     trending: "up",
     icon: Users,
-    detail: "FBI IC3: 147K complaints",
+    detail: "FBI IC3 2024 Report",
   },
   {
     id: "median",
-    label: "Median Loss per Victim",
-    value: "$497",
-    change: "+5%",
+    label: "Victims Losing Money",
+    value: "38%",
+    change: "+11pts",
     trending: "up",
     icon: Target,
-    detail: "FTC 2024 Data Book",
+    detail: "Up from 27% in 2023",
   },
 ];
 
@@ -121,6 +122,7 @@ const topScamTypes = [
   },
 ];
 
+// Recent alerts based on FTC 2025 Data Spotlights and FBI IC3 warnings
 const recentAlerts = [
   {
     id: "ai-voice",
@@ -131,25 +133,25 @@ const recentAlerts = [
     howToProtect: "Create a family safe word. Always hang up and call the person directly.",
   },
   {
-    id: "package",
-    title: "Fake Package Delivery Texts",
-    description: "Phishing texts claiming your package couldn't be delivered, asking for a small 'redelivery fee.'",
+    id: "rental-scams",
+    title: "Rental Scams on Social Media",
+    description: "FTC reports $65M lost to rental scams. 50% start on Facebook with fake listings demanding upfront payments.",
     severity: "high" as const,
-    date: "Active Now",
-    howToProtect: "Track packages only through official carrier apps or websites.",
+    date: "Dec 2025",
+    howToProtect: "Never pay before seeing a property in person. Verify ownership through public records.",
   },
   {
-    id: "crypto-recovery",
-    title: "Crypto Recovery Scams",
-    description: "Fake services promising to recover lost cryptocurrency. They charge upfront fees and steal more money.",
-    severity: "high" as const,
-    date: "Active Now",
-    howToProtect: "Lost crypto is almost never recoverable. These 'recovery services' are scams.",
+    id: "imposter-seniors",
+    title: "Imposter Scams Targeting Seniors",
+    description: "4x increase in seniors losing $10K+ to imposter scams. Losses over $100K jumped to $445M in 2024.",
+    severity: "critical" as const,
+    date: "Aug 2025",
+    howToProtect: "Government and banks never call demanding immediate payment or gift cards.",
   },
   {
-    id: "ai-deepfake",
-    title: "Deepfake Video Scams",
-    description: "AI-generated videos of celebrities or executives promoting fake investments or giveaways.",
+    id: "pig-butchering",
+    title: "Investment 'Pig Butchering' Scams",
+    description: "Romance-based crypto scams caused $5.8B in losses. Scammers build relationships before pushing fake investments.",
     severity: "medium" as const,
     date: "Emerging",
     howToProtect: "Verify investment opportunities through official company channels only.",
@@ -203,7 +205,7 @@ export function ThreatTrends() {
           <div>
             <CardTitle className="text-xl">Threat Intelligence Dashboard</CardTitle>
             <p className="text-sm text-muted-foreground">
-              2024 data from FTC Consumer Sentinel and FBI IC3 annual reports
+              Latest data from FTC Consumer Sentinel, FBI IC3, and 2025 FTC Data Spotlights
             </p>
           </div>
         </div>
