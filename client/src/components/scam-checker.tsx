@@ -33,6 +33,12 @@ type DetectedThreat = {
   explanation: string;
 };
 
+type UrgencyAnalysis = {
+  score: number;
+  level: string;
+  triggers: string[];
+};
+
 type AnalysisResult = {
   overallRisk: "safe" | "low" | "medium" | "high" | "critical";
   confidenceScore: number;
@@ -42,6 +48,7 @@ type AnalysisResult = {
   urls: URLAnalysis[];
   recommendations: string[];
   educationalTips: string[];
+  urgencyAnalysis?: UrgencyAnalysis;
 };
 
 type URLAnalysis = {
@@ -239,6 +246,212 @@ function extractUrls(content: string): string[] {
   return content.match(urlPattern) || [];
 }
 
+// Calculate Shannon entropy for randomness detection
+function calculateEntropy(text: string): number {
+  if (!text || text.length === 0) return 0;
+  
+  const freq: Record<string, number> = {};
+  for (const char of text.toLowerCase()) {
+    freq[char] = (freq[char] || 0) + 1;
+  }
+  
+  let entropy = 0;
+  const len = text.length;
+  for (const char in freq) {
+    const p = freq[char] / len;
+    entropy -= p * Math.log2(p);
+  }
+  
+  return entropy;
+}
+
+// Analyze URL entropy - high entropy indicates random/malicious URLs
+function analyzeUrlEntropy(url: string): { isHigh: boolean; entropy: number; reason: string } {
+  // Extract the path and query parts for entropy analysis
+  const urlParts = url.replace(/^https?:\/\//, '').split('/');
+  const pathAndQuery = urlParts.slice(1).join('/');
+  
+  if (!pathAndQuery || pathAndQuery.length < 10) {
+    return { isHigh: false, entropy: 0, reason: "" };
+  }
+  
+  const entropy = calculateEntropy(pathAndQuery);
+  
+  // High entropy (> 4.5) suggests random strings often used in malicious URLs
+  if (entropy > 4.5 && pathAndQuery.length > 20) {
+    return { 
+      isHigh: true, 
+      entropy, 
+      reason: `High URL randomness detected (entropy: ${entropy.toFixed(2)}) - often indicates malicious links` 
+    };
+  }
+  
+  return { isHigh: false, entropy, reason: "" };
+}
+
+// Detect excessive subdomain depth
+function analyzeSubdomainDepth(url: string): { isDeep: boolean; depth: number; reason: string } {
+  const domain = url.replace(/^https?:\/\//, '').split('/')[0];
+  const subdomains = domain.split('.');
+  
+  // Remove TLD and main domain, count subdomains
+  const depth = Math.max(0, subdomains.length - 2);
+  
+  if (depth >= 3) {
+    return {
+      isDeep: true,
+      depth,
+      reason: `Excessive subdomain depth (${depth} levels) - often used to hide malicious domains`
+    };
+  }
+  
+  return { isDeep: false, depth, reason: "" };
+}
+
+// Detect Base64 encoded content in URLs
+function detectBase64Payload(url: string): { found: boolean; reason: string } {
+  // Look for Base64-like patterns in URL (long strings of alphanumeric + /+=)
+  const base64Pattern = /[A-Za-z0-9+/=]{40,}/;
+  const match = url.match(base64Pattern);
+  
+  if (match && match[0].length >= 40) {
+    // Verify it looks like valid Base64
+    const candidate = match[0];
+    if (candidate.length % 4 === 0 || candidate.endsWith('=')) {
+      return {
+        found: true,
+        reason: "Possible encoded/obfuscated payload detected in URL"
+      };
+    }
+  }
+  
+  return { found: false, reason: "" };
+}
+
+// Detect Punycode (internationalized domain) spoofing
+function detectPunycode(url: string): { found: boolean; domain: string; reason: string } {
+  const domain = url.replace(/^https?:\/\//, '').split('/')[0];
+  
+  // Punycode domains start with "xn--"
+  if (domain.includes('xn--')) {
+    return {
+      found: true,
+      domain,
+      reason: "Internationalized domain (Punycode) detected - may be impersonating a legitimate site"
+    };
+  }
+  
+  return { found: false, domain: "", reason: "" };
+}
+
+// Levenshtein distance for brand similarity
+function levenshteinDistance(a: string, b: string): number {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  const matrix: number[][] = [];
+
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
+// Known brands for similarity checking
+const knownBrands = [
+  "paypal", "amazon", "apple", "google", "microsoft", "facebook", 
+  "instagram", "netflix", "twitter", "linkedin", "youtube", "ebay",
+  "walmart", "target", "costco", "chase", "wellsfargo", "bankofamerica",
+  "citibank", "usbank", "capitalone", "americanexpress", "discover",
+  "venmo", "cashapp", "zelle", "coinbase", "binance", "robinhood"
+];
+
+// Check for brand similarity (catch subtle misspellings)
+function detectBrandSimilarity(domain: string): { found: boolean; brand: string; distance: number; reason: string } {
+  // Clean domain - remove TLD and subdomains
+  const cleanDomain = domain.replace(/^https?:\/\//, '').split('/')[0];
+  const domainParts = cleanDomain.split('.');
+  const mainDomain = domainParts.length >= 2 ? domainParts[domainParts.length - 2] : domainParts[0];
+  
+  for (const brand of knownBrands) {
+    // Skip exact matches (those are legit)
+    if (mainDomain === brand) continue;
+    
+    const distance = levenshteinDistance(mainDomain.toLowerCase(), brand);
+    const similarity = 1 - (distance / Math.max(mainDomain.length, brand.length));
+    
+    // If 80%+ similar but not exact, it's suspicious
+    if (similarity >= 0.75 && similarity < 1 && distance <= 3) {
+      return {
+        found: true,
+        brand,
+        distance,
+        reason: `Domain "${mainDomain}" is suspiciously similar to "${brand}" (${Math.round(similarity * 100)}% match)`
+      };
+    }
+  }
+  
+  return { found: false, brand: "", distance: 0, reason: "" };
+}
+
+// Calculate urgency/pressure score
+function calculateUrgencyScore(content: string): { score: number; level: string; triggers: string[] } {
+  const triggers: string[] = [];
+  let score = 0;
+  
+  const urgencyPatterns = [
+    { pattern: /\b(urgent|urgently|emergency|immediately|right now|asap)\b/gi, weight: 3, label: "Urgent language" },
+    { pattern: /\b(act (fast|now)|don't (wait|delay)|hurry|quick|fast)\b/gi, weight: 2, label: "Pressure to act quickly" },
+    { pattern: /\b(expires?|expiring|deadline|final|last chance|limited time)\b/gi, weight: 2, label: "Time pressure" },
+    { pattern: /\b(warning|alert|notice|attention|important)\b/gi, weight: 1, label: "Warning language" },
+    { pattern: /\b(suspended|terminated|closed|frozen|locked|disabled)\b/gi, weight: 3, label: "Account threat" },
+    { pattern: /\b(verify|confirm|validate|update).{0,20}(now|immediately|today)/gi, weight: 3, label: "Immediate action request" },
+    { pattern: /\b(only \d+ (left|remaining|available)|while supplies last)\b/gi, weight: 2, label: "Scarcity tactics" },
+    { pattern: /!!+|\?\?+/g, weight: 1, label: "Excessive punctuation" },
+    { pattern: /[A-Z]{4,}/g, weight: 1, label: "Shouting (all caps)" },
+    { pattern: /\b(risk|danger|threat|compromise|breach)\b/gi, weight: 2, label: "Fear language" },
+  ];
+  
+  for (const { pattern, weight, label } of urgencyPatterns) {
+    const matches = content.match(pattern);
+    if (matches && matches.length > 0) {
+      score += weight * Math.min(matches.length, 3); // Cap at 3 matches per pattern
+      if (!triggers.includes(label)) {
+        triggers.push(label);
+      }
+    }
+  }
+  
+  // Normalize score to 0-100
+  const normalizedScore = Math.min(100, Math.round((score / 30) * 100));
+  
+  let level = "Low";
+  if (normalizedScore >= 70) level = "Critical";
+  else if (normalizedScore >= 50) level = "High";
+  else if (normalizedScore >= 30) level = "Moderate";
+  
+  return { score: normalizedScore, level, triggers };
+}
+
 function analyzeUrl(url: string): URLAnalysis {
   const reasons: string[] = [];
   let isSuspicious = false;
@@ -271,6 +484,41 @@ function analyzeUrl(url: string): URLAnalysis {
   const homoglyphs = detectHomoglyphs(url);
   if (homoglyphs.found) {
     reasons.push(`Lookalike characters detected: ${homoglyphs.examples.join(', ')}`);
+    isSuspicious = true;
+  }
+  
+  // Check URL entropy (randomness)
+  const entropyResult = analyzeUrlEntropy(url);
+  if (entropyResult.isHigh) {
+    reasons.push(entropyResult.reason);
+    isSuspicious = true;
+  }
+  
+  // Check subdomain depth
+  const subdomainResult = analyzeSubdomainDepth(url);
+  if (subdomainResult.isDeep) {
+    reasons.push(subdomainResult.reason);
+    isSuspicious = true;
+  }
+  
+  // Check for Base64 encoded payloads
+  const base64Result = detectBase64Payload(url);
+  if (base64Result.found) {
+    reasons.push(base64Result.reason);
+    isSuspicious = true;
+  }
+  
+  // Check for Punycode domains
+  const punycodeResult = detectPunycode(url);
+  if (punycodeResult.found) {
+    reasons.push(punycodeResult.reason);
+    isSuspicious = true;
+  }
+  
+  // Check brand similarity (Levenshtein distance)
+  const brandSimilarity = detectBrandSimilarity(url);
+  if (brandSimilarity.found) {
+    reasons.push(brandSimilarity.reason);
     isSuspicious = true;
   }
   
@@ -436,6 +684,19 @@ function analyzeContent(content: string): AnalysisResult {
     "Always verify requests for money or information through a separate, trusted channel"
   ];
 
+  // Calculate urgency/manipulation score
+  const urgencyAnalysis = calculateUrgencyScore(content);
+  
+  // Add urgency as a threat if significant
+  if (urgencyAnalysis.score >= 30) {
+    threats.push({
+      category: "Manipulation Tactics",
+      indicator: `${urgencyAnalysis.level} pressure level detected (Score: ${urgencyAnalysis.score}/100)`,
+      severity: urgencyAnalysis.score >= 70 ? "critical" : urgencyAnalysis.score >= 50 ? "high" : "medium",
+      explanation: `This message uses ${urgencyAnalysis.triggers.slice(0, 3).join(', ').toLowerCase()} to pressure you into quick action. Take your time to verify independently.`
+    });
+  }
+
   return {
     overallRisk,
     confidenceScore,
@@ -444,7 +705,8 @@ function analyzeContent(content: string): AnalysisResult {
     threats,
     urls: urlAnalyses,
     recommendations,
-    educationalTips
+    educationalTips,
+    urgencyAnalysis
   };
 }
 
@@ -610,6 +872,58 @@ http://192.168.1.1/login/paypal"
                 </div>
               </div>
             </div>
+
+            {/* Urgency/Manipulation Score Meter */}
+            {result.urgencyAnalysis && result.urgencyAnalysis.score > 0 && (
+              <div className="p-4 bg-muted/50 rounded-lg border">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-yellow-500" />
+                    Pressure/Urgency Analysis
+                  </h4>
+                  <Badge className={
+                    result.urgencyAnalysis.score >= 70 ? "bg-red-500 text-white" :
+                    result.urgencyAnalysis.score >= 50 ? "bg-orange-500 text-white" :
+                    result.urgencyAnalysis.score >= 30 ? "bg-yellow-500 text-black" :
+                    "bg-blue-500 text-white"
+                  }>
+                    {result.urgencyAnalysis.level}
+                  </Badge>
+                </div>
+                
+                {/* Pressure Meter */}
+                <div className="mb-3">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-muted-foreground">Manipulation Level</span>
+                    <span className="font-medium">{result.urgencyAnalysis.score}/100</span>
+                  </div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all ${
+                        result.urgencyAnalysis.score >= 70 ? "bg-red-500" :
+                        result.urgencyAnalysis.score >= 50 ? "bg-orange-500" :
+                        result.urgencyAnalysis.score >= 30 ? "bg-yellow-500" :
+                        "bg-blue-500"
+                      }`}
+                      style={{ width: `${result.urgencyAnalysis.score}%` }}
+                    />
+                  </div>
+                </div>
+                
+                {result.urgencyAnalysis.triggers.length > 0 && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Detected manipulation tactics:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {result.urgencyAnalysis.triggers.map((trigger, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {trigger}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {result.threats.length > 0 && (
               <div className="space-y-3">

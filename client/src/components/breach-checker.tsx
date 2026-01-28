@@ -19,7 +19,10 @@ import {
   Mail,
   Key,
   RefreshCw,
-  EyeOff
+  EyeOff,
+  Copy,
+  Sparkles,
+  Zap
 } from "lucide-react";
 import zxcvbn from "zxcvbn";
 
@@ -39,6 +42,8 @@ interface PasswordResult {
   crackTime: string;
   suggestions: string[];
   breachCount?: number;
+  patternAnalysis?: PasswordPatternAnalysis;
+  entropyBits?: number;
 }
 
 // Disposable email domain list (common throwaway email services)
@@ -67,6 +72,312 @@ const commonPasswords = new Set([
 function isDisposableEmail(email: string): boolean {
   const domain = email.split('@')[1]?.toLowerCase();
   return domain ? disposableEmailDomains.has(domain) : false;
+}
+
+// Keyboard walk patterns (common keyboard sequences)
+const keyboardPatterns = [
+  'qwerty', 'qwertyuiop', 'asdf', 'asdfgh', 'asdfghjkl', 'zxcv', 'zxcvbn', 'zxcvbnm',
+  'qazwsx', 'qweasd', '1qaz2wsx', '1q2w3e4r', 'zaq12wsx', 'qwe123', 'asd123',
+  '1234qwer', 'qwer1234', 'poiuy', 'lkjhg', 'mnbvc', '!@#$%', '!@#$%^', '!@#$%^&*',
+  '123qwe', 'qwe123asd', 'asdzxc', 'zxcasd', 'wasd', 'wsad', 'arrow',
+  // Number pad patterns
+  '147258', '258369', '123654', '789456', '456123', '321654', '987654',
+  // Diagonal patterns
+  'qaz', 'wsx', 'edc', 'rfv', 'tgb', 'yhn', 'ujm',
+];
+
+// Detect keyboard walk patterns
+function detectKeyboardPattern(password: string): { found: boolean; pattern: string } {
+  const lower = password.toLowerCase();
+  
+  for (const pattern of keyboardPatterns) {
+    if (lower.includes(pattern)) {
+      return { found: true, pattern };
+    }
+    // Check reversed
+    const reversed = pattern.split('').reverse().join('');
+    if (lower.includes(reversed)) {
+      return { found: true, pattern: reversed };
+    }
+  }
+  
+  return { found: false, pattern: '' };
+}
+
+// Leetspeak mapping
+const leetMap: Record<string, string[]> = {
+  'a': ['4', '@'],
+  'e': ['3'],
+  'i': ['1', '!'],
+  'o': ['0'],
+  's': ['5', '$'],
+  't': ['7', '+'],
+  'l': ['1', '|'],
+  'b': ['8'],
+  'g': ['9'],
+};
+
+// Detect leetspeak substitutions
+function detectLeetspeak(password: string): { found: boolean; original: string } {
+  // Convert potential leetspeak to normal letters
+  let normalized = password.toLowerCase();
+  
+  for (const [letter, replacements] of Object.entries(leetMap)) {
+    for (const replacement of replacements) {
+      normalized = normalized.split(replacement).join(letter);
+    }
+  }
+  
+  // Check if the normalized version is in common passwords
+  if (commonPasswords.has(normalized) && normalized !== password.toLowerCase()) {
+    return { found: true, original: normalized };
+  }
+  
+  // Check for common leetspeak passwords
+  const commonLeet = ['p@ssword', 'p@ssw0rd', 'p4ssword', 'p4$$word', 'pa$$word', 'pa55word', 'l3tme1n', 'w3lcome', 'adm1n', 'qu3rty'];
+  for (const leet of commonLeet) {
+    if (password.toLowerCase() === leet) {
+      return { found: true, original: leet };
+    }
+  }
+  
+  return { found: false, original: '' };
+}
+
+// Detect date patterns in password
+function detectDatePattern(password: string): { found: boolean; type: string } {
+  const patterns = [
+    // Year patterns (embedded or standalone) - 1940-2029
+    { regex: /(19[4-9]\d|20[0-2]\d)/, type: 'year' },
+    // Date formats with separators
+    { regex: /(0?[1-9]|1[0-2])[\/\-](0?[1-9]|[12]\d|3[01])[\/\-](\d{2}|\d{4})/, type: 'date (MM/DD/YY)' },
+    { regex: /(0?[1-9]|[12]\d|3[01])[\/\-](0?[1-9]|1[0-2])[\/\-](\d{2}|\d{4})/, type: 'date (DD/MM/YY)' },
+    // Month abbreviations with numbers
+    { regex: /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\d{1,4}/i, type: 'month + year' },
+    { regex: /\d{4}(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i, type: 'year + month' },
+    // Birthday references (case insensitive, anywhere in password)
+    { regex: /(birthday|bday|born|dob)/i, type: 'birthday reference' },
+    // Common year endings like password2023
+    { regex: /[a-z](20[1-2]\d|19[89]\d)$/i, type: 'year suffix' },
+  ];
+  
+  for (const { regex, type } of patterns) {
+    if (regex.test(password)) {
+      return { found: true, type };
+    }
+  }
+  
+  return { found: false, type: '' };
+}
+
+// Detect sequential patterns
+function detectSequentialPattern(password: string): { found: boolean; type: string } {
+  const lower = password.toLowerCase();
+  
+  // Alphabetic sequences
+  const alphaSequences = ['abc', 'bcd', 'cde', 'def', 'efg', 'fgh', 'ghi', 'hij', 'ijk', 'jkl', 'klm', 'lmn', 'mno', 'nop', 'opq', 'pqr', 'qrs', 'rst', 'stu', 'tuv', 'uvw', 'vwx', 'wxy', 'xyz'];
+  
+  for (const seq of alphaSequences) {
+    if (lower.includes(seq)) {
+      return { found: true, type: 'alphabetic sequence' };
+    }
+    // Check reversed
+    if (lower.includes(seq.split('').reverse().join(''))) {
+      return { found: true, type: 'reversed alphabetic sequence' };
+    }
+  }
+  
+  // Numeric sequences
+  const numericSequences = ['012', '123', '234', '345', '456', '567', '678', '789', '890'];
+  
+  for (const seq of numericSequences) {
+    if (password.includes(seq)) {
+      return { found: true, type: 'numeric sequence' };
+    }
+    // Check reversed
+    if (password.includes(seq.split('').reverse().join(''))) {
+      return { found: true, type: 'reversed numeric sequence' };
+    }
+  }
+  
+  return { found: false, type: '' };
+}
+
+// Detect repeated characters
+function detectRepeatedChars(password: string): { found: boolean; char: string; count: number } {
+  const repeatedPattern = /(.)\1{2,}/g;
+  const matches = password.match(repeatedPattern);
+  
+  if (matches && matches.length > 0) {
+    const longest = matches.reduce((a, b) => a.length >= b.length ? a : b);
+    return { found: true, char: longest[0], count: longest.length };
+  }
+  
+  return { found: false, char: '', count: 0 };
+}
+
+// Calculate password entropy (bits)
+function calculatePasswordEntropy(password: string): { entropy: number; rating: string } {
+  if (!password) return { entropy: 0, rating: 'none' };
+  
+  let charsetSize = 0;
+  
+  if (/[a-z]/.test(password)) charsetSize += 26;
+  if (/[A-Z]/.test(password)) charsetSize += 26;
+  if (/[0-9]/.test(password)) charsetSize += 10;
+  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password)) charsetSize += 32;
+  if (/\s/.test(password)) charsetSize += 1;
+  
+  // Entropy = log2(charset^length) = length * log2(charset)
+  const entropy = password.length * Math.log2(charsetSize || 1);
+  
+  let rating = 'Very Weak';
+  if (entropy >= 80) rating = 'Very Strong';
+  else if (entropy >= 60) rating = 'Strong';
+  else if (entropy >= 40) rating = 'Moderate';
+  else if (entropy >= 28) rating = 'Weak';
+  
+  return { entropy: Math.round(entropy), rating };
+}
+
+// Analyze password patterns and return detailed feedback
+interface PasswordPatternAnalysis {
+  keyboardPattern?: string;
+  leetspeak?: string;
+  datePattern?: string;
+  sequentialPattern?: string;
+  repeatedChars?: { char: string; count: number };
+  entropy: { bits: number; rating: string };
+  warnings: string[];
+}
+
+function analyzePasswordPatterns(password: string): PasswordPatternAnalysis {
+  const warnings: string[] = [];
+  const analysis: PasswordPatternAnalysis = {
+    entropy: { bits: 0, rating: 'none' },
+    warnings: []
+  };
+  
+  // Check keyboard patterns
+  const keyboard = detectKeyboardPattern(password);
+  if (keyboard.found) {
+    analysis.keyboardPattern = keyboard.pattern;
+    warnings.push(`Contains keyboard pattern "${keyboard.pattern}" which is easily guessed`);
+  }
+  
+  // Check leetspeak
+  const leet = detectLeetspeak(password);
+  if (leet.found) {
+    analysis.leetspeak = leet.original;
+    warnings.push(`Leetspeak variation of "${leet.original}" - this is a well known trick`);
+  }
+  
+  // Check date patterns
+  const date = detectDatePattern(password);
+  if (date.found) {
+    analysis.datePattern = date.type;
+    warnings.push(`Contains ${date.type} - avoid personal dates in passwords`);
+  }
+  
+  // Check sequential patterns
+  const sequential = detectSequentialPattern(password);
+  if (sequential.found) {
+    analysis.sequentialPattern = sequential.type;
+    warnings.push(`Contains ${sequential.type} - sequential patterns are easily guessed`);
+  }
+  
+  // Check repeated characters
+  const repeated = detectRepeatedChars(password);
+  if (repeated.found) {
+    analysis.repeatedChars = { char: repeated.char, count: repeated.count };
+    warnings.push(`Contains ${repeated.count} repeated "${repeated.char}" characters`);
+  }
+  
+  // Calculate entropy
+  const entropyResult = calculatePasswordEntropy(password);
+  analysis.entropy = { bits: entropyResult.entropy, rating: entropyResult.rating };
+  
+  if (entropyResult.entropy < 28) {
+    warnings.push(`Very low entropy (${entropyResult.entropy} bits) - password is too short or simple`);
+  } else if (entropyResult.entropy < 40) {
+    warnings.push(`Low entropy (${entropyResult.entropy} bits) - consider adding more variety`);
+  }
+  
+  analysis.warnings = warnings;
+  return analysis;
+}
+
+// Diceware-style word list for passphrase generation (EFF long word list subset)
+const passphraseWords = [
+  'abacus', 'abdomen', 'ability', 'abroad', 'absorb', 'accent', 'access', 'account', 
+  'accuse', 'achieve', 'acquire', 'across', 'action', 'active', 'actual', 'adapt',
+  'address', 'adjust', 'admit', 'adult', 'advance', 'advice', 'affair', 'afford',
+  'afraid', 'agenda', 'agree', 'ahead', 'airport', 'alarm', 'album', 'alert',
+  'alien', 'alive', 'alley', 'allow', 'almost', 'alone', 'alpha', 'already',
+  'always', 'amaze', 'amount', 'anchor', 'ancient', 'angel', 'anger', 'animal',
+  'ankle', 'annual', 'answer', 'antique', 'anxiety', 'apart', 'appeal', 'apple',
+  'apply', 'approve', 'arch', 'arena', 'argue', 'arise', 'armor', 'army',
+  'around', 'arrow', 'artist', 'aspect', 'assign', 'assist', 'assume', 'athlete',
+  'atomic', 'attach', 'attack', 'attend', 'author', 'autumn', 'avenue', 'average',
+  'avoid', 'awake', 'award', 'aware', 'awesome', 'awful', 'bacon', 'badge',
+  'balance', 'balcony', 'bamboo', 'banana', 'banner', 'barely', 'barrel', 'basic',
+  'basket', 'battle', 'beach', 'beacon', 'beauty', 'become', 'before', 'begin',
+  'behave', 'behind', 'believe', 'below', 'bench', 'benefit', 'berry', 'beyond',
+  'bicycle', 'blanket', 'blossom', 'board', 'border', 'bottle', 'bottom', 'bounce',
+  'bracket', 'brain', 'branch', 'brave', 'bread', 'breeze', 'bridge', 'bright',
+  'broken', 'bronze', 'brother', 'bubble', 'bucket', 'budget', 'buffalo', 'bundle',
+  'burden', 'butter', 'button', 'cabin', 'cable', 'cactus', 'camera', 'campus',
+  'canal', 'cancel', 'candle', 'canvas', 'canyon', 'capable', 'capital', 'captain',
+  'capture', 'carbon', 'career', 'carpet', 'carrot', 'castle', 'casual', 'catalog',
+  'ceiling', 'cement', 'center', 'central', 'century', 'cereal', 'certain', 'chain',
+  'champion', 'change', 'channel', 'chapter', 'charge', 'cherry', 'chicken', 'chief',
+  'choice', 'choose', 'chronic', 'circle', 'citizen', 'civil', 'claim', 'clarify',
+  'classic', 'clean', 'clever', 'client', 'climate', 'clinic', 'clock', 'closet',
+  'clothes', 'cluster', 'clutter', 'coach', 'coast', 'coconut', 'coffee', 'collect',
+  'color', 'column', 'combine', 'comfort', 'comic', 'common', 'company', 'compass',
+  'compile', 'complex', 'concert', 'conduct', 'confirm', 'congress', 'connect', 'consider',
+  'contact', 'contain', 'contest', 'context', 'control', 'convert', 'cookie', 'copper',
+  'corner', 'correct', 'cosmic', 'costume', 'cotton', 'country', 'couple', 'courage',
+  'cousin', 'cover', 'cowboy', 'craft', 'crater', 'crazy', 'cream', 'credit',
+  'creek', 'cricket', 'crisis', 'crisp', 'critic', 'cross', 'crowd', 'cruel',
+  'cruise', 'crystal', 'culture', 'cupboard', 'curious', 'current', 'curtain', 'custom',
+  'cycle', 'daisy', 'damage', 'dance', 'danger', 'daring', 'daughter', 'dawn',
+  'debate', 'decade', 'decide', 'decline', 'decorate', 'decrease', 'defend', 'define',
+  'degree', 'delay', 'deliver', 'demand', 'denial', 'dentist', 'depart', 'depend',
+  'deposit', 'depth', 'deputy', 'derive', 'describe', 'desert', 'design', 'desktop',
+  'detail', 'detect', 'develop', 'device', 'devote', 'diagram', 'diamond', 'diary',
+  'diesel', 'differ', 'digital', 'dignity', 'dinner', 'dinosaur', 'direct', 'disagree',
+  'disaster', 'discover', 'discuss', 'disease', 'display', 'distance', 'divide', 'dizzy',
+  'doctor', 'dolphin', 'domain', 'donate', 'donkey', 'double', 'dragon', 'drama',
+  'drawer', 'dream', 'dress', 'drink', 'driver', 'driveway', 'drought', 'drum',
+  'eagle', 'early', 'earth', 'easily', 'eastern', 'eclipse', 'ecology', 'economy',
+  'educate', 'effect', 'effort', 'either', 'elastic', 'elbow', 'elder', 'electric',
+  'elegant', 'element', 'elephant', 'elevator', 'embrace', 'emerge', 'emotion', 'emperor',
+  'empire', 'employ', 'empty', 'enable', 'encode', 'encore', 'endless', 'endorse',
+  'enemy', 'energy', 'engage', 'engine', 'enhance', 'enjoy', 'enough', 'enrich',
+  'enroll', 'ensure', 'entire', 'entry', 'envelope', 'episode', 'equal', 'equip',
+  'escape', 'essence', 'estate', 'eternal', 'ethics', 'evidence', 'evolve', 'exact',
+  'example', 'exceed', 'exchange', 'excite', 'exclude', 'excuse', 'execute', 'exercise',
+  'exhaust', 'exhibit', 'exile', 'exist', 'exotic', 'expand', 'expect', 'expense'
+];
+
+// Generate a secure passphrase
+function generatePassphrase(wordCount: number = 4, separator: string = '-'): string {
+  const words: string[] = [];
+  const array = new Uint32Array(wordCount);
+  crypto.getRandomValues(array);
+  
+  for (let i = 0; i < wordCount; i++) {
+    const index = array[i] % passphraseWords.length;
+    words.push(passphraseWords[index]);
+  }
+  
+  // Optionally add a number for extra entropy
+  const numArray = new Uint32Array(1);
+  crypto.getRandomValues(numArray);
+  const randomNum = (numArray[0] % 99) + 1;
+  
+  return words.join(separator) + separator + randomNum;
 }
 
 // Validate email format
@@ -258,6 +569,9 @@ function simulateBreachCheck(email: string): BreachResult {
 
 // Check password comprehensively
 async function checkPassword(password: string): Promise<PasswordResult> {
+  // Analyze password patterns
+  const patternAnalysis = analyzePasswordPatterns(password);
+  
   // First check if it's a known common password
   if (commonPasswords.has(password.toLowerCase())) {
     return {
@@ -272,7 +586,9 @@ async function checkPassword(password: string): Promise<PasswordResult> {
         "Mix uppercase, lowercase, numbers, and symbols",
         "Use a password manager to generate strong passwords"
       ],
-      breachCount: 999999
+      breachCount: 999999,
+      patternAnalysis,
+      entropyBits: patternAnalysis.entropy.bits
     };
   }
   
@@ -281,6 +597,9 @@ async function checkPassword(password: string): Promise<PasswordResult> {
   
   // Check against Have I Been Pwned
   const hibpResult = await checkPasswordHIBP(password);
+  
+  // Merge pattern warnings with zxcvbn feedback
+  const allSuggestions = [...patternAnalysis.warnings, ...strength.feedback];
   
   if (hibpResult.breached && hibpResult.count > 0) {
     return {
@@ -294,41 +613,55 @@ async function checkPassword(password: string): Promise<PasswordResult> {
         "Choose a completely different password",
         "Consider using a passphrase with 4 or more random words",
         "Use a password manager to generate unique passwords",
-        ...strength.feedback
+        ...allSuggestions.slice(0, 3)
       ],
-      breachCount: hibpResult.count
+      breachCount: hibpResult.count,
+      patternAnalysis,
+      entropyBits: patternAnalysis.entropy.bits
     };
   }
   
+  // Check if pattern analysis found concerning issues
+  const hasPatternIssues = patternAnalysis.warnings.length > 0;
+  
   // Password is not in breach database
-  if (strength.score >= 3) {
+  if (strength.score >= 3 && !hasPatternIssues) {
     return {
       status: "safe",
       message: "This password was not found in any known data breaches and has good strength.",
       strength: strength.score,
       strengthLabel: strength.label,
       crackTime: strength.crackTime,
-      suggestions: strength.feedback.length > 0 ? strength.feedback : [
+      suggestions: allSuggestions.length > 0 ? allSuggestions : [
         "Your password appears strong",
         "Enable two factor authentication for extra security",
         "Never reuse passwords across multiple accounts"
-      ]
+      ],
+      patternAnalysis,
+      entropyBits: patternAnalysis.entropy.bits
     };
   }
+  
+  // Adjust strength score if pattern issues found
+  const adjustedScore = hasPatternIssues ? Math.max(0, strength.score - 1) : strength.score;
   
   return {
     status: "weak",
     message: hibpResult.count === -1 
       ? "Unable to check breach database, but password strength analysis completed."
-      : "This password was not found in breaches, but could be stronger.",
-    strength: strength.score,
-    strengthLabel: strength.label,
+      : hasPatternIssues
+        ? "This password contains predictable patterns that make it easier to guess."
+        : "This password was not found in breaches, but could be stronger.",
+    strength: adjustedScore,
+    strengthLabel: hasPatternIssues && adjustedScore <= 1 ? "Patterned" : strength.label,
     crackTime: strength.crackTime,
     suggestions: [
-      ...strength.feedback,
+      ...allSuggestions,
       "Consider making your password longer",
       "Add more variety with uppercase, numbers, and symbols"
-    ]
+    ].slice(0, 6),
+    patternAnalysis,
+    entropyBits: patternAnalysis.entropy.bits
   };
 }
 
@@ -347,6 +680,20 @@ export function BreachChecker() {
   const [isCheckingPassword, setIsCheckingPassword] = useState(false);
   const [passwordResult, setPasswordResult] = useState<PasswordResult | null>(null);
   const [hasCheckedPassword, setHasCheckedPassword] = useState(false);
+  
+  // Passphrase generator state
+  const [generatedPassphrase, setGeneratedPassphrase] = useState<string>("");
+  const [showPassphrase, setShowPassphrase] = useState(false);
+  
+  const handleGeneratePassphrase = () => {
+    const newPassphrase = generatePassphrase(4, '-');
+    setGeneratedPassphrase(newPassphrase);
+    setShowPassphrase(true);
+  };
+  
+  const handleCopyPassphrase = () => {
+    navigator.clipboard.writeText(generatedPassphrase);
+  };
 
   const handleCheckEmail = async () => {
     const validation = isValidEmail(email);
@@ -695,7 +1042,7 @@ export function BreachChecker() {
                 </div>
 
                 {/* Password Strength Meter */}
-                <div className="mb-6">
+                <div className="mb-4">
                   <div className="flex justify-between text-sm mb-2">
                     <span>Password Strength</span>
                     <span>Time to crack: {passwordResult.crackTime}</span>
@@ -711,6 +1058,46 @@ export function BreachChecker() {
                     ))}
                   </div>
                 </div>
+                
+                {/* Entropy Display */}
+                {passwordResult.entropyBits !== undefined && (
+                  <div className="mb-4 p-3 bg-background/50 rounded-lg">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="flex items-center gap-2">
+                        <Lock className="w-4 h-4" />
+                        Entropy
+                      </span>
+                      <Badge variant="outline" className={
+                        passwordResult.entropyBits >= 60 ? "border-green-500 text-green-600" :
+                        passwordResult.entropyBits >= 40 ? "border-yellow-500 text-yellow-600" :
+                        "border-red-500 text-red-600"
+                      }>
+                        {passwordResult.entropyBits} bits ({passwordResult.patternAnalysis?.entropy.rating || 'Unknown'})
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Higher entropy means more randomness and better security. Aim for 60+ bits.
+                    </p>
+                  </div>
+                )}
+                
+                {/* Pattern Analysis Warnings */}
+                {passwordResult.patternAnalysis && passwordResult.patternAnalysis.warnings.length > 0 && (
+                  <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-950/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                    <p className="font-medium text-sm text-yellow-800 dark:text-yellow-200 mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      Pattern Issues Detected
+                    </p>
+                    <ul className="space-y-1">
+                      {passwordResult.patternAnalysis.warnings.slice(0, 4).map((warning, idx) => (
+                        <li key={idx} className="text-xs text-yellow-700 dark:text-yellow-300 flex items-start gap-2">
+                          <span className="mt-0.5">•</span>
+                          <span>{warning}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 <p className="text-center mb-6">{passwordResult.message}</p>
 
@@ -740,15 +1127,54 @@ export function BreachChecker() {
                     <p className="text-xs text-muted-foreground">Checks 700M+ passwords</p>
                   </div>
                   <div className="p-4 bg-muted/50 rounded-lg text-center">
-                    <ShieldCheck className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <p className="font-medium text-sm">Strength Analysis</p>
-                    <p className="text-xs text-muted-foreground">Powered by zxcvbn</p>
+                    <Zap className="w-8 h-8 text-primary mx-auto mb-2" />
+                    <p className="font-medium text-sm">Pattern Detection</p>
+                    <p className="text-xs text-muted-foreground">Keyboard, dates, sequences</p>
                   </div>
                   <div className="p-4 bg-muted/50 rounded-lg text-center">
-                    <EyeOff className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <p className="font-medium text-sm">Privacy First</p>
-                    <p className="text-xs text-muted-foreground">Password never sent in full</p>
+                    <ShieldCheck className="w-8 h-8 text-primary mx-auto mb-2" />
+                    <p className="font-medium text-sm">Entropy Analysis</p>
+                    <p className="text-xs text-muted-foreground">Measures true randomness</p>
                   </div>
+                </div>
+                
+                {/* Passphrase Generator */}
+                <div className="p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border border-primary/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                      <span className="font-medium text-sm">Need a Strong Password?</span>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      onClick={handleGeneratePassphrase}
+                      data-testid="button-generate-passphrase"
+                    >
+                      <RefreshCw className="w-3 h-3 mr-1" />
+                      Generate Passphrase
+                    </Button>
+                  </div>
+                  
+                  {generatedPassphrase && showPassphrase && (
+                    <div className="mt-3 p-3 bg-background rounded-lg border">
+                      <div className="flex items-center justify-between gap-2">
+                        <code className="flex-1 font-mono text-sm break-all">{generatedPassphrase}</code>
+                        <Button size="icon" variant="ghost" onClick={handleCopyPassphrase} data-testid="button-copy-passphrase">
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Passphrases like this are easy to remember but very hard to crack. 
+                        Save this somewhere safe.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {!generatedPassphrase && (
+                    <p className="text-xs text-muted-foreground">
+                      We will generate a secure passphrase using random words. Easier to remember than random characters.
+                    </p>
+                  )}
                 </div>
                 
                 <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-900">
