@@ -16,7 +16,9 @@ import {
   MessageSquare,
   Shield,
   Eye,
-  Zap
+  Zap,
+  FileText,
+  Server
 } from "lucide-react";
 
 type ThreatCategory = {
@@ -37,6 +39,30 @@ type UrgencyAnalysis = {
   score: number;
   level: string;
   triggers: string[];
+};
+
+type EmailHeaderAnalysis = {
+  overallRisk: "safe" | "low" | "medium" | "high" | "critical";
+  findings: {
+    category: string;
+    status: "pass" | "fail" | "warning" | "info";
+    detail: string;
+    explanation: string;
+  }[];
+  recommendations: string[];
+  parsedHeaders: {
+    from?: string;
+    replyTo?: string;
+    returnPath?: string;
+    receivedChain: string[];
+    spf?: string;
+    dkim?: string;
+    dmarc?: string;
+    xMailer?: string;
+    xOriginatingIP?: string;
+    contentType?: string;
+    mimeVersion?: string;
+  };
 };
 
 type AnalysisResult = {
@@ -452,6 +478,258 @@ function calculateUrgencyScore(content: string): { score: number; level: string;
   return { score: normalizedScore, level, triggers };
 }
 
+// Analyze email headers for security issues
+function analyzeEmailHeaders(headers: string): EmailHeaderAnalysis {
+  const findings: EmailHeaderAnalysis["findings"] = [];
+  const recommendations: string[] = [];
+  const parsedHeaders: EmailHeaderAnalysis["parsedHeaders"] = {
+    receivedChain: []
+  };
+  
+  const lines = headers.split(/\r?\n/);
+  let currentHeader = "";
+  let currentValue = "";
+  const headerMap: Record<string, string> = {};
+  
+  // Common header names to detect even with leading whitespace
+  const knownHeaders = /^(from|to|reply-to|return-path|received|subject|date|message-id|x-mailer|x-originating-ip|authentication-results|content-type|mime-version|dkim-signature|arc-authentication-results):/i;
+  
+  // Parse headers (handling line continuations but also recognizing headers with accidental indentation)
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    
+    // Check if this line looks like a new header (even if indented)
+    const looksLikeNewHeader = knownHeaders.test(trimmedLine) || /^[a-zA-Z][a-zA-Z0-9-]*:/.test(trimmedLine);
+    
+    if (/^\s/.test(line) && currentHeader && !looksLikeNewHeader) {
+      // True continuation - starts with space and doesn't look like a header
+      currentValue += " " + trimmedLine;
+    } else {
+      // Save current header
+      if (currentHeader) {
+        const key = currentHeader.toLowerCase();
+        if (key === "received") {
+          parsedHeaders.receivedChain.push(currentValue);
+        } else {
+          headerMap[key] = currentValue;
+        }
+      }
+      // Start new header
+      const colonIndex = trimmedLine.indexOf(":");
+      if (colonIndex > 0) {
+        currentHeader = trimmedLine.substring(0, colonIndex).trim();
+        currentValue = trimmedLine.substring(colonIndex + 1).trim();
+      }
+    }
+  }
+  // Don't forget the last header
+  if (currentHeader) {
+    const key = currentHeader.toLowerCase();
+    if (key === "received") {
+      parsedHeaders.receivedChain.push(currentValue);
+    } else {
+      headerMap[key] = currentValue;
+    }
+  }
+  
+  // Extract key headers
+  parsedHeaders.from = headerMap["from"];
+  parsedHeaders.replyTo = headerMap["reply-to"];
+  parsedHeaders.returnPath = headerMap["return-path"];
+  parsedHeaders.xMailer = headerMap["x-mailer"];
+  parsedHeaders.xOriginatingIP = headerMap["x-originating-ip"];
+  parsedHeaders.contentType = headerMap["content-type"];
+  parsedHeaders.mimeVersion = headerMap["mime-version"];
+  
+  // Check authentication results
+  const authResults = headerMap["authentication-results"] || "";
+  
+  // SPF Check
+  if (/spf=pass/i.test(authResults)) {
+    parsedHeaders.spf = "pass";
+    findings.push({
+      category: "SPF (Sender Policy Framework)",
+      status: "pass",
+      detail: "SPF verification passed",
+      explanation: "The sending server is authorized to send emails for this domain."
+    });
+  } else if (/spf=fail/i.test(authResults) || /spf=softfail/i.test(authResults)) {
+    parsedHeaders.spf = "fail";
+    findings.push({
+      category: "SPF (Sender Policy Framework)",
+      status: "fail",
+      detail: "SPF verification failed",
+      explanation: "The sending server may not be authorized to send emails for this domain. This is a major red flag."
+    });
+    recommendations.push("Be very cautious - SPF failure means the sender may be spoofing their email address.");
+  } else if (/spf=/i.test(authResults)) {
+    parsedHeaders.spf = "neutral";
+    findings.push({
+      category: "SPF (Sender Policy Framework)",
+      status: "warning",
+      detail: "SPF result is neutral or unknown",
+      explanation: "The domain's SPF record doesn't clearly authorize or reject this server."
+    });
+  }
+  
+  // DKIM Check
+  if (/dkim=pass/i.test(authResults)) {
+    parsedHeaders.dkim = "pass";
+    findings.push({
+      category: "DKIM (Domain Keys)",
+      status: "pass",
+      detail: "DKIM signature verified",
+      explanation: "The email's cryptographic signature is valid, confirming it hasn't been altered."
+    });
+  } else if (/dkim=fail/i.test(authResults)) {
+    parsedHeaders.dkim = "fail";
+    findings.push({
+      category: "DKIM (Domain Keys)",
+      status: "fail",
+      detail: "DKIM verification failed",
+      explanation: "The email's signature is invalid. The message may have been altered or forged."
+    });
+    recommendations.push("DKIM failure suggests the email may have been tampered with or is fraudulent.");
+  }
+  
+  // DMARC Check
+  if (/dmarc=pass/i.test(authResults)) {
+    parsedHeaders.dmarc = "pass";
+    findings.push({
+      category: "DMARC Policy",
+      status: "pass",
+      detail: "DMARC policy passed",
+      explanation: "The email passes the domain's anti-spoofing policy."
+    });
+  } else if (/dmarc=fail/i.test(authResults)) {
+    parsedHeaders.dmarc = "fail";
+    findings.push({
+      category: "DMARC Policy",
+      status: "fail",
+      detail: "DMARC policy failed",
+      explanation: "The email violates the domain's anti-spoofing policy. Likely fraudulent."
+    });
+    recommendations.push("DMARC failure is a strong indicator of email spoofing.");
+  }
+  
+  // Check From vs Reply-To mismatch
+  if (parsedHeaders.from && parsedHeaders.replyTo) {
+    const fromDomain = parsedHeaders.from.match(/@([a-zA-Z0-9.-]+)/)?.[1]?.toLowerCase();
+    const replyToDomain = parsedHeaders.replyTo.match(/@([a-zA-Z0-9.-]+)/)?.[1]?.toLowerCase();
+    
+    if (fromDomain && replyToDomain && fromDomain !== replyToDomain) {
+      findings.push({
+        category: "Reply-To Mismatch",
+        status: "warning",
+        detail: `From domain (${fromDomain}) differs from Reply-To (${replyToDomain})`,
+        explanation: "Scammers often set a different reply-to address to capture your responses while impersonating someone else."
+      });
+      recommendations.push("Be cautious when the reply address differs from the sender address.");
+    }
+  }
+  
+  // Check Return-Path vs From mismatch
+  if (parsedHeaders.from && parsedHeaders.returnPath) {
+    const fromDomain = parsedHeaders.from.match(/@([a-zA-Z0-9.-]+)/)?.[1]?.toLowerCase();
+    const returnPathDomain = parsedHeaders.returnPath.match(/@([a-zA-Z0-9.-]+)/)?.[1]?.toLowerCase();
+    
+    if (fromDomain && returnPathDomain && fromDomain !== returnPathDomain) {
+      findings.push({
+        category: "Return-Path Mismatch",
+        status: "warning",
+        detail: `From domain differs from Return-Path`,
+        explanation: "The bounce address differs from the displayed sender. Could indicate a forwarded or spoofed email."
+      });
+    }
+  }
+  
+  // Check received chain for suspicious patterns
+  const receivedChain = parsedHeaders.receivedChain;
+  if (receivedChain.length > 0) {
+    findings.push({
+      category: "Email Path",
+      status: "info",
+      detail: `Email passed through ${receivedChain.length} server(s)`,
+      explanation: "This shows the route the email took to reach you."
+    });
+    
+    // Check for suspicious countries or services in path
+    const suspiciousPatterns = [
+      { pattern: /\b(tor|onion|vpn|proxy)\b/i, reason: "anonymizing service" },
+      { pattern: /\b(tempmail|guerrilla|mailinator|10minute|throwaway)\b/i, reason: "disposable email service" },
+    ];
+    
+    for (const received of receivedChain) {
+      for (const { pattern, reason } of suspiciousPatterns) {
+        if (pattern.test(received)) {
+          findings.push({
+            category: "Suspicious Relay",
+            status: "warning",
+            detail: `Possible ${reason} in email path`,
+            explanation: "The email passed through infrastructure commonly used to hide identity."
+          });
+          break;
+        }
+      }
+    }
+  }
+  
+  // Check X-Mailer for suspicious clients
+  if (parsedHeaders.xMailer) {
+    const suspiciousMailers = [
+      /^PHPMailer/i,
+      /swiftmailer/i,
+      /mass\s?mail/i,
+      /bulk\s?mail/i,
+    ];
+    
+    for (const pattern of suspiciousMailers) {
+      if (pattern.test(parsedHeaders.xMailer)) {
+        findings.push({
+          category: "Bulk Mailer Detected",
+          status: "warning",
+          detail: `Email client: ${parsedHeaders.xMailer}`,
+          explanation: "This email appears to be sent via a bulk mailing system, common with marketing or spam."
+        });
+        break;
+      }
+    }
+  }
+  
+  // Check for missing critical headers
+  if (!parsedHeaders.from) {
+    findings.push({
+      category: "Missing From Header",
+      status: "fail",
+      detail: "No From header found",
+      explanation: "A legitimate email should always have a From header."
+    });
+  }
+  
+  // Calculate overall risk
+  const failCount = findings.filter(f => f.status === "fail").length;
+  const warnCount = findings.filter(f => f.status === "warning").length;
+  
+  let overallRisk: EmailHeaderAnalysis["overallRisk"] = "safe";
+  if (failCount >= 2) overallRisk = "critical";
+  else if (failCount >= 1) overallRisk = "high";
+  else if (warnCount >= 2) overallRisk = "medium";
+  else if (warnCount >= 1) overallRisk = "low";
+  
+  // Add general recommendations
+  if (findings.length === 0) {
+    findings.push({
+      category: "No Authentication Headers",
+      status: "info",
+      detail: "No SPF/DKIM/DMARC results found",
+      explanation: "Email authentication headers may be missing or the headers provided are incomplete."
+    });
+    recommendations.push("If possible, view the full email headers to get complete authentication results.");
+  }
+  
+  return { overallRisk, findings, recommendations, parsedHeaders };
+}
+
 function analyzeUrl(url: string): URLAnalysis {
   const reasons: string[] = [];
   let isSuspicious = false;
@@ -715,6 +993,11 @@ export function ScamChecker() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [activeTab, setActiveTab] = useState("text");
+  
+  // Email header analysis state
+  const [headerContent, setHeaderContent] = useState("");
+  const [headerResult, setHeaderResult] = useState<EmailHeaderAnalysis | null>(null);
+  const [isCheckingHeaders, setIsCheckingHeaders] = useState(false);
 
   const handleCheck = () => {
     setIsChecking(true);
@@ -722,6 +1005,14 @@ export function ScamChecker() {
       setResult(analyzeContent(content));
       setIsChecking(false);
     }, 1200);
+  };
+  
+  const handleHeaderCheck = () => {
+    setIsCheckingHeaders(true);
+    setTimeout(() => {
+      setHeaderResult(analyzeEmailHeaders(headerContent));
+      setIsCheckingHeaders(false);
+    }, 800);
   };
 
   const getRiskColor = (risk: string) => {
@@ -771,16 +1062,20 @@ export function ScamChecker() {
       </CardHeader>
       <CardContent className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="text" className="gap-2">
+          <TabsList className="grid w-full grid-cols-4 mb-4">
+            <TabsTrigger value="text" className="gap-1.5" data-testid="tab-message">
               <MessageSquare className="w-4 h-4" />
               <span className="hidden sm:inline">Message</span>
             </TabsTrigger>
-            <TabsTrigger value="email" className="gap-2">
+            <TabsTrigger value="email" className="gap-1.5" data-testid="tab-email">
               <Mail className="w-4 h-4" />
               <span className="hidden sm:inline">Email</span>
             </TabsTrigger>
-            <TabsTrigger value="url" className="gap-2">
+            <TabsTrigger value="headers" className="gap-1.5" data-testid="tab-headers">
+              <Server className="w-4 h-4" />
+              <span className="hidden sm:inline">Headers</span>
+            </TabsTrigger>
+            <TabsTrigger value="url" className="gap-1.5" data-testid="tab-url">
               <LinkIcon className="w-4 h-4" />
               <span className="hidden sm:inline">URL</span>
             </TabsTrigger>
@@ -829,6 +1124,201 @@ http://192.168.1.1/login/paypal"
               aria-label="Enter suspicious URLs to analyze"
               data-testid="input-scam-url"
             />
+          </TabsContent>
+          
+          <TabsContent value="headers" className="space-y-4">
+            <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800 mb-2">
+              <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                To view email headers: In Gmail, open the email and click the three dots menu, then "Show original". 
+                In Outlook, open the email properties. Copy all the header text and paste it below.
+              </p>
+            </div>
+            <Textarea
+              placeholder="Paste email headers here...
+
+Example:
+Received: from mail-server.example.com
+From: support@company.com
+Reply-To: scammer@evil.com
+Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
+              value={headerContent}
+              onChange={(e) => setHeaderContent(e.target.value)}
+              className="min-h-[140px] resize-none font-mono text-xs"
+              aria-label="Enter email headers to analyze"
+              data-testid="input-email-headers"
+            />
+            
+            <Button 
+              className="w-full" 
+              onClick={handleHeaderCheck}
+              disabled={!headerContent.trim() || isCheckingHeaders}
+              size="lg"
+              data-testid="button-check-headers"
+            >
+              {isCheckingHeaders ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Analyzing Headers...
+                </>
+              ) : (
+                <>
+                  <Server className="w-4 h-4 mr-2" />
+                  Analyze Email Headers
+                </>
+              )}
+            </Button>
+            
+            {headerResult && (
+              <div className="space-y-4" data-testid="result-header-analysis">
+                <div className={`p-4 rounded-xl border-2 ${getRiskColor(headerResult.overallRisk)}`}>
+                  <div className="flex items-center gap-3">
+                    {getRiskIcon(headerResult.overallRisk)}
+                    <div>
+                      <h3 className="font-bold text-lg">
+                        {headerResult.overallRisk === "safe" ? "Headers Look Legitimate" :
+                         headerResult.overallRisk === "low" ? "Minor Concerns Found" :
+                         headerResult.overallRisk === "medium" ? "Some Issues Detected" :
+                         headerResult.overallRisk === "high" ? "Significant Issues Found" :
+                         "Critical Authentication Failures"}
+                      </h3>
+                      <p className="text-sm opacity-90">
+                        {headerResult.findings.length} finding(s) from email header analysis
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Authentication Summary */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className={`p-3 rounded-lg text-center ${
+                    headerResult.parsedHeaders.spf === "pass" ? "bg-green-50 dark:bg-green-950/30" :
+                    headerResult.parsedHeaders.spf === "fail" ? "bg-red-50 dark:bg-red-950/30" :
+                    "bg-muted/50"
+                  }`}>
+                    <p className="text-xs text-muted-foreground mb-1">SPF</p>
+                    <Badge variant={headerResult.parsedHeaders.spf === "pass" ? "default" : headerResult.parsedHeaders.spf === "fail" ? "destructive" : "secondary"}>
+                      {headerResult.parsedHeaders.spf || "N/A"}
+                    </Badge>
+                  </div>
+                  <div className={`p-3 rounded-lg text-center ${
+                    headerResult.parsedHeaders.dkim === "pass" ? "bg-green-50 dark:bg-green-950/30" :
+                    headerResult.parsedHeaders.dkim === "fail" ? "bg-red-50 dark:bg-red-950/30" :
+                    "bg-muted/50"
+                  }`}>
+                    <p className="text-xs text-muted-foreground mb-1">DKIM</p>
+                    <Badge variant={headerResult.parsedHeaders.dkim === "pass" ? "default" : headerResult.parsedHeaders.dkim === "fail" ? "destructive" : "secondary"}>
+                      {headerResult.parsedHeaders.dkim || "N/A"}
+                    </Badge>
+                  </div>
+                  <div className={`p-3 rounded-lg text-center ${
+                    headerResult.parsedHeaders.dmarc === "pass" ? "bg-green-50 dark:bg-green-950/30" :
+                    headerResult.parsedHeaders.dmarc === "fail" ? "bg-red-50 dark:bg-red-950/30" :
+                    "bg-muted/50"
+                  }`}>
+                    <p className="text-xs text-muted-foreground mb-1">DMARC</p>
+                    <Badge variant={headerResult.parsedHeaders.dmarc === "pass" ? "default" : headerResult.parsedHeaders.dmarc === "fail" ? "destructive" : "secondary"}>
+                      {headerResult.parsedHeaders.dmarc || "N/A"}
+                    </Badge>
+                  </div>
+                </div>
+                
+                {/* Findings */}
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Analysis Findings
+                  </h4>
+                  {headerResult.findings.map((finding, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`p-3 rounded-lg border ${
+                        finding.status === "pass" ? "bg-green-50/50 dark:bg-green-950/20 border-green-200 dark:border-green-800" :
+                        finding.status === "fail" ? "bg-red-50/50 dark:bg-red-950/20 border-red-200 dark:border-red-800" :
+                        finding.status === "warning" ? "bg-yellow-50/50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800" :
+                        "bg-muted/30 border-muted"
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        {finding.status === "pass" && <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />}
+                        {finding.status === "fail" && <XCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />}
+                        {finding.status === "warning" && <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />}
+                        {finding.status === "info" && <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />}
+                        <div>
+                          <p className="font-medium text-sm">{finding.category}</p>
+                          <p className="text-sm text-muted-foreground">{finding.detail}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{finding.explanation}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Recommendations */}
+                {headerResult.recommendations.length > 0 && (
+                  <div className="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
+                    <h4 className="font-semibold text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      Recommendations
+                    </h4>
+                    <ul className="space-y-1">
+                      {headerResult.recommendations.map((rec, idx) => (
+                        <li key={idx} className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
+                          <span className="mt-1">•</span>
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Parsed Header Info */}
+                {headerResult.parsedHeaders.from && (
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-2">Extracted Information</p>
+                    <div className="space-y-1 text-sm">
+                      <p><span className="text-muted-foreground">From:</span> {headerResult.parsedHeaders.from}</p>
+                      {headerResult.parsedHeaders.replyTo && (
+                        <p><span className="text-muted-foreground">Reply-To:</span> {headerResult.parsedHeaders.replyTo}</p>
+                      )}
+                      {headerResult.parsedHeaders.xMailer && (
+                        <p><span className="text-muted-foreground">Mailer:</span> {headerResult.parsedHeaders.xMailer}</p>
+                      )}
+                      <p><span className="text-muted-foreground">Hops:</span> {headerResult.parsedHeaders.receivedChain.length} server(s)</p>
+                    </div>
+                  </div>
+                )}
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => { setHeaderResult(null); setHeaderContent(""); }}
+                  className="w-full"
+                  data-testid="button-reset-headers"
+                >
+                  Check Another Email
+                </Button>
+              </div>
+            )}
+            
+            {!headerResult && !isCheckingHeaders && (
+              <div className="grid sm:grid-cols-3 gap-3 text-center">
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <Shield className="w-6 h-6 text-primary mx-auto mb-2" />
+                  <p className="font-medium text-xs">SPF/DKIM/DMARC</p>
+                  <p className="text-xs text-muted-foreground">Email authentication</p>
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <Mail className="w-6 h-6 text-primary mx-auto mb-2" />
+                  <p className="font-medium text-xs">Sender Verification</p>
+                  <p className="text-xs text-muted-foreground">From vs Reply-To</p>
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <Server className="w-6 h-6 text-primary mx-auto mb-2" />
+                  <p className="font-medium text-xs">Routing Analysis</p>
+                  <p className="text-xs text-muted-foreground">Server path check</p>
+                </div>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
 
