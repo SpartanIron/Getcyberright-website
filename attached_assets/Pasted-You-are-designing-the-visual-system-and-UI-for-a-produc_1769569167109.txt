@@ -1,0 +1,163 @@
+You are designing the visual system and UI for a production-grade cybersecurity platform.
+
+The design must reflect an enterprise-level, trust-first aesthetic comparable to leading cybersecurity companies. This is not a startup or marketing-heavy design. It must feel calm, authoritative, and professional.
+
+--------------------------------------------------
+GLOBAL VISUAL STYLE
+--------------------------------------------------
+
+Overall Tone:
+- Enterprise-grade
+- Calm and reassuring
+- Visually restrained
+- Highly readable
+- Trust-forward, not flashy
+
+Avoid:
+- Bright or playful visuals
+- Loud gradients
+- Decorative animations
+- Startup-style “wow” effects
+
+--------------------------------------------------
+COLOR & BACKGROUND TREATMENT
+--------------------------------------------------
+
+Use a deep navy-to-charcoal gradient as the primary hero background.
+- Gradient must be subtle and low contrast
+- Background should feel quiet and stable
+- No sharp color transitions
+- No textured or noisy backgrounds
+
+Neutral backgrounds (white / soft gray) should be used for content sections to create visual breathing room.
+
+The primary brand color is reserved strictly for:
+- Primary CTA buttons
+- Key interactive elements
+
+Never use the brand color decoratively.
+
+--------------------------------------------------
+LAYOUT & COMPOSITION
+--------------------------------------------------
+
+Use an asymmetrical hero layout:
+- Text content is left-aligned and vertically centered
+- A large photographic visual is positioned on the right
+- Image may slightly overlap the background or container edges for depth
+
+Layout must feel intentional and balanced, not experimental.
+
+All pages should follow a consistent structure:
+- Hero
+- Context / trust section
+- Core content blocks
+- Reinforcement or social proof
+- Clear CTA section
+
+Consistency across pages is mandatory.
+
+--------------------------------------------------
+TYPOGRAPHY
+--------------------------------------------------
+
+Typography should communicate confidence and clarity.
+
+Rules:
+- One primary sans-serif font (Inter or system equivalent)
+- Large, bold headlines with simple language
+- No decorative fonts
+- High contrast between text and background
+- Comfortable line height and generous spacing
+
+Headlines should feel authoritative, not clever or playful.
+
+--------------------------------------------------
+GRAPHIC ELEMENTS
+--------------------------------------------------
+
+Use subtle abstract geometric elements sparingly:
+- Soft circles
+- Arcs
+- Dotted or mesh-style patterns
+
+Rules:
+- Very low opacity
+- Background use only
+- Must never compete with text or CTAs
+
+If the shapes draw attention, they are too strong.
+
+--------------------------------------------------
+IMAGERY
+--------------------------------------------------
+
+Use professional, human-centered photography:
+- Realistic people
+- Everyday work, learning, or home scenarios
+- Natural lighting
+- Calm expressions
+
+Avoid:
+- Overly staged stock photos
+- Aggressive or dramatic imagery
+- Hacker or dark-room clichés
+
+Images should reinforce trust and relatability.
+
+--------------------------------------------------
+CALLS TO ACTION (CTAs)
+--------------------------------------------------
+
+Each page should have:
+- One clear primary CTA
+- Secondary actions must be visually muted
+
+Primary CTA characteristics:
+- Solid fill using brand color
+- Clear, reassuring language
+- Prominent placement near headlines
+
+No competing CTAs.
+No urgency pressure.
+
+--------------------------------------------------
+SPACING & DENSITY
+--------------------------------------------------
+
+Use generous spacing throughout:
+- Large section padding
+- Clear separation between content blocks
+- Avoid dense or compressed layouts
+
+Enterprise design should feel composed and breathable.
+
+--------------------------------------------------
+MOTION & INTERACTIONS
+--------------------------------------------------
+
+Motion must be subtle and purposeful:
+- Gentle fade-ins
+- Slight vertical movement
+- Simple hover states
+
+No parallax.
+No large transitions.
+No decorative animation.
+
+Motion should reinforce clarity, not attract attention.
+
+--------------------------------------------------
+FINAL QUALITY BAR
+--------------------------------------------------
+
+The final UI should feel:
+- Enterprise-grade
+- Trustworthy
+- Calm and authoritative
+- Graphically polished without excess
+
+A first-time visitor should immediately feel:
+“This is a serious cybersecurity platform I can trust.”
+
+Build the UI to this standard across all pages.
