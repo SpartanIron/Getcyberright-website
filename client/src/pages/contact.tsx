@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { PageBanner } from "@/components/page-banner";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -29,7 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertContactMessageSchema } from "@shared/schema";
 import { z } from "zod";
 import { Mail, Phone, Clock, Send, CheckCircle2, MapPin } from "lucide-react";
-import logoImage from "@assets/image_(3)_1769558492356.png";
+import bannerImage from "@/assets/images/banner-contact.png";
 
 const contactMethods = [
   {
@@ -106,31 +107,13 @@ export default function Contact() {
       <Navigation />
       
       <main>
-        <section className="py-16 sm:py-24 bg-gradient-to-b from-background to-muted/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center max-w-3xl mx-auto"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-                <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
-                <span>Get in Touch</span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
-                We're Here to{" "}
-                <span className="text-primary">Help</span>
-              </h1>
-              
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Have questions about cybersecurity? Need help protecting your family 
-                or organization? We're just a message away.
-              </p>
-            </motion.div>
-          </div>
-        </section>
+        <PageBanner
+          title="We're Here to Help"
+          subtitle="Have questions about cybersecurity? Need help protecting your family or organization? We're just a message away."
+          imageSrc={bannerImage}
+          imageAlt="Friendly customer service representative ready to help"
+          imagePosition="right"
+        />
 
         <section className="py-12 sm:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

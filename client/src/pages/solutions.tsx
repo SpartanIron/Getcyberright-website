@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
+import { PageBanner } from "@/components/page-banner";
 import { Link } from "wouter";
 import { 
   Users, 
@@ -16,7 +17,7 @@ import {
   AlertTriangle,
   Lock
 } from "lucide-react";
-import logoImage from "@assets/image_(3)_1769558492356.png";
+import bannerImage from "@/assets/images/banner-solutions.png";
 import familyImage from "@/assets/images/family-devices.jpg";
 import seniorImage from "@/assets/images/senior-safety.jpg";
 import businessImage from "@/assets/images/small-business.jpg";
@@ -99,32 +100,13 @@ export default function Solutions() {
       <Navigation />
       
       <main>
-        <section className="py-16 sm:py-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center max-w-3xl mx-auto"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium mb-6 border border-white/20">
-                <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
-                <span>Solutions for Everyone</span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl font-bold mb-6">
-                Cybersecurity Protection{" "}
-                <span className="text-primary">For Real People</span>
-              </h1>
-              
-              <p className="text-lg text-white/70 leading-relaxed">
-                Whether you are protecting your family, helping a senior relative, 
-                securing your small business, or educating your community, we have 
-                resources designed specifically for you.
-              </p>
-            </motion.div>
-          </div>
-        </section>
+        <PageBanner
+          title="Cybersecurity Protection For Real People"
+          subtitle="Whether you are protecting your family, helping a senior relative, securing your small business, or educating your community, we have resources designed specifically for you."
+          imageSrc={bannerImage}
+          imageAlt="Family learning about online safety together"
+          imagePosition="right"
+        />
 
         {solutions.map((solution, index) => (
           <section 

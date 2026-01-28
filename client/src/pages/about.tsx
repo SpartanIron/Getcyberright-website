@@ -4,9 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
+import { PageBanner } from "@/components/page-banner";
 import { Link } from "wouter";
 import { Shield, Heart, Users, Globe, ArrowRight } from "lucide-react";
-import logoImage from "@assets/image_(3)_1769558492356.png";
+import bannerImage from "@/assets/images/banner-about.png";
 
 const values = [
   {
@@ -34,7 +35,7 @@ const values = [
 const stats = [
   { value: "6", label: "Continents Served" },
   { value: "100%", label: "Free Resources" },
-  { value: "50K+", label: "Families Helped" },
+  { value: "24/7", label: "Access Available" },
   { value: "0", label: "Technical Jargon" }
 ];
 
@@ -44,44 +45,16 @@ export default function About() {
       <Navigation />
       
       <main>
-        <section className="py-16 sm:py-24 bg-gradient-to-b from-background to-muted/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center max-w-3xl mx-auto"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-                <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
-                <span>Our Story</span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
-                Why We Built{" "}
-                <span className="text-primary">GetCyberRight</span>
-              </h1>
-              
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                This isn't just another cybersecurity website. It's a mission born 
-                from watching our own family members fall victim to scams.
-              </p>
-            </motion.div>
-          </div>
-        </section>
+        <PageBanner
+          title="Why We Built GetCyberRight"
+          subtitle="This isn't just another cybersecurity website. It's a mission born from watching our own family members fall victim to scams."
+          imageSrc={bannerImage}
+          imageAlt="Team of cybersecurity educators in collaborative discussion"
+          imagePosition="left"
+        />
 
         <section className="py-16 sm:py-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="flex justify-center mb-8"
-            >
-              <img src={logoImage} alt="GetCyberRight" className="w-32 h-32 object-contain" />
-            </motion.div>
-            
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

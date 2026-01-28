@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
+import { PageBanner } from "@/components/page-banner";
 import { PasswordGenerator } from "@/components/password-generator";
 import { ScamChecker } from "@/components/scam-checker";
 import { BreachChecker } from "@/components/breach-checker";
@@ -23,7 +24,7 @@ import {
   ArrowRight,
   BookOpen
 } from "lucide-react";
-import logoImage from "@assets/image_(3)_1769558492356.png";
+import bannerImage from "@/assets/images/banner-tools.png";
 
 const guides = [
   {
@@ -69,24 +70,16 @@ export default function Tools() {
       <Navigation />
       
       <main>
-        <section className="py-16 sm:py-20 bg-gradient-to-b from-background to-muted/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-                <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
-                <span>100% Free Tools</span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
-                Free Security Tools
-              </h1>
-              
-              <p className="text-lg text-muted-foreground">
-                Check for scams, generate strong passwords, and stay informed about current threats. 
-                No signup required.
-              </p>
-            </div>
+        <PageBanner
+          title="Free Security Tools"
+          subtitle="Check for scams, generate strong passwords, and stay informed about current threats. No signup required."
+          imageSrc={bannerImage}
+          imageAlt="Person using digital security tools on laptop"
+          imagePosition="left"
+        />
 
+        <section className="py-16 sm:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4 mb-8">
                 <TabsTrigger value="scam-checker" className="gap-2" data-testid="tab-scam-checker">

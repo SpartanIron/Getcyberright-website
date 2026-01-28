@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import logoImage from "@assets/image_(3)_1769558492356.png";
+import { PageBanner } from "@/components/page-banner";
+import bannerImage from "@/assets/images/banner-terms.png";
 
 export default function Terms() {
   return (
@@ -9,29 +10,13 @@ export default function Terms() {
       <Navigation />
       
       <main>
-        <section className="py-16 sm:py-24 bg-gradient-to-b from-background to-muted/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center max-w-3xl mx-auto"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-                <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
-                <span>Legal</span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
-                Terms of Service
-              </h1>
-              
-              <p className="text-muted-foreground">
-                Last updated: January 2026
-              </p>
-            </motion.div>
-          </div>
-        </section>
+        <PageBanner
+          title="Terms of Service"
+          subtitle="Last updated: January 2026. Please read these terms carefully before using our services."
+          imageSrc={bannerImage}
+          imageAlt="Legal document representing terms of service"
+          imagePosition="right"
+        />
 
         <section className="py-12 sm:py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">

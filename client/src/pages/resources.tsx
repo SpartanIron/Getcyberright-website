@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
+import { PageBanner } from "@/components/page-banner";
 import { 
   ArrowRight, 
   Clock, 
@@ -16,7 +17,7 @@ import {
   AlertTriangle,
   Shield
 } from "lucide-react";
-import logoImage from "@assets/image_(3)_1769558492356.png";
+import bannerImage from "@/assets/images/banner-resources.png";
 
 interface Resource {
   slug: string;
@@ -331,31 +332,13 @@ export default function Resources() {
       <Navigation />
       
       <main>
-        <section className="py-16 sm:py-24 bg-gradient-to-b from-background to-muted/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center max-w-3xl mx-auto"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-                <img src={logoImage} alt="" className="w-5 h-5 object-contain" />
-                <span>Educational Resources</span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
-                Learn to Protect Yourself{" "}
-                <span className="text-primary">Online</span>
-              </h1>
-              
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Guides, articles, and educational content written in plain language. 
-                No tech jargon, just practical knowledge you can use today.
-              </p>
-            </motion.div>
-          </div>
-        </section>
+        <PageBanner
+          title="Learn to Protect Yourself Online"
+          subtitle="Guides, articles, and educational content written in plain language. No tech jargon, just practical knowledge you can use today."
+          imageSrc={bannerImage}
+          imageAlt="People reading educational resources in a library"
+          imagePosition="right"
+        />
 
         <section className="py-12 sm:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -13,6 +14,7 @@ import {
   CheckCircle2,
   Clock
 } from "lucide-react";
+import bannerImage from "@/assets/images/banner-emergency.png";
 
 const immediateSteps = [
   {
@@ -109,23 +111,13 @@ export default function EmergencyHelp() {
       <Navigation />
       
       <main>
-        <section className="py-16 sm:py-20 bg-red-600 text-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 text-white text-sm font-medium mb-6">
-              <AlertTriangle className="w-4 h-4" />
-              <span>Emergency Response</span>
-            </div>
-            
-            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
-              Been Scammed? Here's What To Do
-            </h1>
-            
-            <p className="text-lg text-white/90 max-w-2xl mx-auto">
-              Take a deep breath. We'll guide you through the steps to minimize damage, 
-              report the scam, and protect yourself from further harm.
-            </p>
-          </div>
-        </section>
+        <PageBanner
+          title="Emergency Help: What To Do If You've Been Scammed"
+          subtitle="If you think you've been scammed, don't panic. Quick action can minimize the damage. Follow these steps immediately."
+          imageSrc={bannerImage}
+          imageAlt="Support specialist helping someone with emergency assistance"
+          imagePosition="left"
+        />
 
         <section className="py-12 sm:py-16 bg-red-50 dark:bg-red-950/20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
