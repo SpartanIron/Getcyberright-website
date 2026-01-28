@@ -45,15 +45,17 @@ export function HeroSection() {
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-base border-white/30 text-white bg-white/5 backdrop-blur-sm"
-                data-testid="button-hero-secondary-cta"
-              >
-                <Play className="mr-2 w-4 h-4" />
-                Learn How Scammers Operate
-              </Button>
+              <Link href="/resources">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-base border-white/30 text-white bg-white/5 backdrop-blur-sm w-full sm:w-auto"
+                  data-testid="button-hero-secondary-cta"
+                >
+                  <Play className="mr-2 w-4 h-4" />
+                  Learn How Scammers Operate
+                </Button>
+              </Link>
             </div>
 
             <div className="flex flex-wrap gap-x-6 gap-y-3 justify-center lg:justify-start text-sm text-white/60">

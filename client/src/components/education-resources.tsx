@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Clock, BookOpen, Video, FileText } from "lucide-react";
+import { Link } from "wouter";
 
 const resources = [
   {
@@ -75,10 +76,12 @@ export function EducationResources() {
                 </li>
               ))}
             </ul>
-            <Button data-testid="button-browse-resources">
-              Browse All Resources
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
+            <Link href="/resources">
+              <Button data-testid="button-browse-resources">
+                Browse All Resources
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
           </motion.div>
 
           <motion.div

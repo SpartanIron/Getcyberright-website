@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -181,10 +182,12 @@ export default function Tools() {
                 Can't find what you're looking for? We're always creating new resources 
                 based on what our community needs. Let us know what would help you stay safe.
               </p>
-              <Button variant="outline" size="lg" data-testid="button-request-tool">
-                Request a Tool
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
+              <Link href="/contact">
+                <Button variant="outline" size="lg" data-testid="button-request-tool">
+                  Request a Tool
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
             </motion.div>
           </div>
         </section>

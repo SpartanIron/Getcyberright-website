@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Shield, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Link } from "wouter";
 
 export function CTASection() {
   return (
@@ -32,23 +33,27 @@ export function CTASection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button
-              size="lg"
-              variant="secondary"
-              className="text-base"
-              data-testid="button-cta-primary"
-            >
-              Get Free Protection Resources
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-base border-white/30 text-white bg-transparent"
-              data-testid="button-cta-secondary"
-            >
-              Talk to Our Team
-            </Button>
+            <Link href="/tools">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="text-base w-full sm:w-auto"
+                data-testid="button-cta-primary"
+              >
+                Get Free Protection Resources
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+            <Link href="/contact">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-base border-white/30 text-white bg-transparent w-full sm:w-auto"
+                data-testid="button-cta-secondary"
+              >
+                Talk to Our Team
+              </Button>
+            </Link>
           </div>
 
           <div className="flex flex-wrap gap-x-6 gap-y-3 justify-center text-sm text-white/80">
