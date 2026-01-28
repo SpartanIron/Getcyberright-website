@@ -127,9 +127,157 @@ const regionResources: Record<string, RegionResources> = {
 const suggestedPrompts = [
   { text: "Is this message a scam?", icon: AlertTriangle },
   { text: "How do phishing scams work?", icon: HelpCircle },
+  { text: "Generate a strong password", icon: Shield },
   { text: "How can I protect my family online?", icon: Shield },
-  { text: "What should I do if I clicked a suspicious link?", icon: AlertTriangle },
 ];
+
+// Scam analysis patterns
+const scamPatterns = {
+  urgency: [
+    /act now/i, /urgent/i, /immediately/i, /expires?\s*(today|soon|in \d+)/i,
+    /limited time/i, /don't wait/i, /hurry/i, /last chance/i, /final notice/i,
+    /within 24 hours/i, /account will be/i, /suspended/i, /terminated/i,
+  ],
+  money: [
+    /gift\s*card/i, /wire\s*transfer/i, /bitcoin/i, /crypto/i, /payment/i,
+    /send\s*money/i, /western\s*union/i, /moneygram/i, /zelle/i, /venmo/i,
+    /\$\d+/i, /won\s*(a|the)/i, /lottery/i, /inheritance/i, /million/i,
+  ],
+  threats: [
+    /arrest/i, /warrant/i, /legal\s*action/i, /lawsuit/i, /police/i,
+    /irs/i, /tax/i, /owe/i, /debt/i, /collection/i, /jail/i, /court/i,
+  ],
+  impersonation: [
+    /amazon/i, /apple/i, /microsoft/i, /google/i, /paypal/i, /netflix/i,
+    /bank\s*of/i, /wells\s*fargo/i, /chase/i, /citibank/i, /social\s*security/i,
+    /medicare/i, /ssa/i, /government/i, /federal/i,
+  ],
+  suspicious: [
+    /click\s*(here|this|below)/i, /verify\s*(your|account)/i, /confirm\s*(your|identity)/i,
+    /update\s*(your|payment)/i, /unusual\s*activity/i, /security\s*alert/i,
+    /password\s*(expired|reset)/i, /login\s*attempt/i, /compromised/i,
+  ],
+  grammar: [
+    /dear\s*(customer|user|sir|madam|friend)/i, /kindly/i, /revert\s*back/i,
+    /do\s*the\s*needful/i, /hereby/i, /humbly/i,
+  ],
+};
+
+interface ScamAnalysisResult {
+  isLikelyScam: boolean;
+  riskLevel: "low" | "medium" | "high";
+  redFlags: string[];
+  score: number;
+}
+
+function analyzeForScam(text: string): ScamAnalysisResult {
+  const redFlags: string[] = [];
+  let score = 0;
+
+  // Check urgency patterns
+  const urgencyMatches = scamPatterns.urgency.filter(p => p.test(text));
+  if (urgencyMatches.length > 0) {
+    redFlags.push("Creates urgency or pressure to act fast");
+    score += urgencyMatches.length * 15;
+  }
+
+  // Check money/payment patterns
+  const moneyMatches = scamPatterns.money.filter(p => p.test(text));
+  if (moneyMatches.length > 0) {
+    redFlags.push("Mentions money, payments, or financial transactions");
+    score += moneyMatches.length * 20;
+  }
+
+  // Check threat patterns
+  const threatMatches = scamPatterns.threats.filter(p => p.test(text));
+  if (threatMatches.length > 0) {
+    redFlags.push("Contains threats or mentions legal action");
+    score += threatMatches.length * 25;
+  }
+
+  // Check impersonation patterns
+  const impersonationMatches = scamPatterns.impersonation.filter(p => p.test(text));
+  if (impersonationMatches.length > 0) {
+    redFlags.push("Claims to be from a well-known company or government agency");
+    score += impersonationMatches.length * 15;
+  }
+
+  // Check suspicious action patterns
+  const suspiciousMatches = scamPatterns.suspicious.filter(p => p.test(text));
+  if (suspiciousMatches.length > 0) {
+    redFlags.push("Asks you to click links or verify account information");
+    score += suspiciousMatches.length * 20;
+  }
+
+  // Check grammar patterns (common in scams)
+  const grammarMatches = scamPatterns.grammar.filter(p => p.test(text));
+  if (grammarMatches.length > 0) {
+    redFlags.push("Uses unusual or overly formal language");
+    score += grammarMatches.length * 10;
+  }
+
+  // Check for URLs
+  const urlPattern = /https?:\/\/[^\s]+|www\.[^\s]+/gi;
+  const urls = text.match(urlPattern);
+  if (urls && urls.length > 0) {
+    redFlags.push("Contains links (be cautious before clicking)");
+    score += 10;
+  }
+
+  // Check for phone numbers
+  const phonePattern = /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g;
+  if (phonePattern.test(text)) {
+    redFlags.push("Contains phone numbers (verify before calling)");
+    score += 5;
+  }
+
+  // Determine risk level
+  let riskLevel: "low" | "medium" | "high" = "low";
+  if (score >= 60) riskLevel = "high";
+  else if (score >= 30) riskLevel = "medium";
+
+  return {
+    isLikelyScam: score >= 40,
+    riskLevel,
+    redFlags,
+    score: Math.min(score, 100),
+  };
+}
+
+function generatePassword(length: number = 16): string {
+  const lowercase = "abcdefghijkmnopqrstuvwxyz";
+  const uppercase = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const numbers = "23456789";
+  const symbols = "!@#$%^&*";
+  const allChars = lowercase + uppercase + numbers + symbols;
+
+  let password = "";
+  // Ensure at least one of each type
+  password += lowercase[Math.floor(Math.random() * lowercase.length)];
+  password += uppercase[Math.floor(Math.random() * uppercase.length)];
+  password += numbers[Math.floor(Math.random() * numbers.length)];
+  password += symbols[Math.floor(Math.random() * symbols.length)];
+
+  // Fill the rest
+  for (let i = password.length; i < length; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)];
+  }
+
+  // Shuffle the password
+  return password.split("").sort(() => Math.random() - 0.5).join("");
+}
+
+function looksLikePastedContent(text: string): boolean {
+  // Detect if user pasted a message to analyze
+  const indicators = [
+    text.length > 100,
+    text.includes("\n"),
+    /^(from|subject|dear|hi|hello|attention)/i.test(text.trim()),
+    /"[^"]{20,}"/.test(text), // Quoted text
+    /received.*message|got.*email|someone.*sent/i.test(text),
+  ];
+  return indicators.filter(Boolean).length >= 2;
+}
 
 function getRegionResources(countryCode: string): RegionResources {
   return regionResources[countryCode] || regionResources.DEFAULT;
@@ -140,24 +288,101 @@ function getResponse(userMessage: string, region: RegionInfo | null): string {
   const r = region ? getRegionResources(region.countryCode) : regionResources.DEFAULT;
   const regionNote = region?.detected ? `\n\nI noticed you are connecting from ${r.name}. ` : "\n\n";
   
+  // Password generation request
+  if (lowerMessage.includes("password") && (lowerMessage.includes("generate") || lowerMessage.includes("create") || lowerMessage.includes("make") || lowerMessage.includes("new") || lowerMessage.includes("strong"))) {
+    const password = generatePassword(16);
+    return `Here is a strong, randomly generated password for you:
+
+**Your New Password:**
+\`${password}\`
+
+This password is 16 characters long and includes uppercase letters, lowercase letters, numbers, and symbols. Here are some tips:
+
+**Best Practices:**
+• Use a different password for each account
+• Consider using a password manager to store your passwords securely
+• Enable two factor authentication when available
+• Never share your passwords with anyone
+
+Would you like me to generate another password, or would you prefer to use our Password Generator tool for more options like custom length and character types?`;
+  }
+
+  // Check if user pasted content that looks like a message to analyze
+  // Trigger analysis for: pasted content, URLs/phone numbers present, or user asking to check something
+  const hasUrl = /https?:\/\/[^\s]+|www\.[^\s]+/i.test(userMessage);
+  const hasPhone = /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/.test(userMessage);
+  const isAskingToCheck = /check|analyze|is this|look at|what do you think/i.test(lowerMessage);
+  const shouldAnalyze = looksLikePastedContent(userMessage) || hasUrl || hasPhone || (isAskingToCheck && userMessage.length > 50);
+  
+  if (shouldAnalyze) {
+    const analysis = analyzeForScam(userMessage);
+    
+    if (analysis.redFlags.length > 0) {
+      const riskText = analysis.riskLevel === "high" ? "HIGH RISK" : analysis.riskLevel === "medium" ? "MEDIUM RISK" : "LOW RISK";
+      
+      let response = `I analyzed the message you shared. Here is what I found:
+
+**Risk Assessment: ${riskText}**
+
+**Red Flags Detected:**
+${analysis.redFlags.map(flag => `• ${flag}`).join("\n")}
+
+`;
+      if (analysis.isLikelyScam) {
+        response += `**My Assessment:**
+This message shows several warning signs commonly found in scam messages. I would recommend not clicking any links, not calling any numbers in the message, and not providing any personal information.
+
+If you received this unexpectedly, it is best to contact the company directly using their official website or phone number you find yourself.
+`;
+      } else {
+        response += `**My Assessment:**
+While this message has some elements worth noting, it may not necessarily be a scam. However, you should still be cautious. Verify the sender through official channels before taking any action.
+`;
+      }
+      
+      response += `
+**Want a Deeper Analysis?**
+For a more detailed check including email header analysis and URL reputation scanning, try our full Scam Checker tool.
+
+If this is a scam, you can report it to ${r.fraudReport}${r.fraudReportUrl ? ` at ${r.fraudReportUrl}` : ""}.`;
+      
+      return response;
+    } else if (shouldAnalyze && userMessage.length > 30) {
+      // No red flags found but user asked for analysis
+      return `I looked at the message you shared and did not find any obvious red flags. That said, no automated check is perfect.
+
+**Signs This Might Be Legitimate:**
+• No urgent language or pressure tactics detected
+• No obvious requests for money or personal information
+• No threatening language found
+
+**Still Not Sure?**
+Trust your instincts. If something feels off, it is always worth verifying. You can:
+• Contact the sender through their official website
+• Look up the company's real phone number and call them directly
+• Use our full Scam Checker tool for email header analysis and URL reputation checks
+
+Stay safe, and let me know if you have any other questions!`;
+    }
+  }
+  
   if (lowerMessage.includes("scam") || lowerMessage.includes("suspicious") || lowerMessage.includes("fraud") || lowerMessage.includes("fake")) {
-    return `Great question! Spotting scams gets easier once you know what to look for.
+    return `I can help you figure out if something is a scam! You can paste a suspicious message, email, or text directly into this chat and I will analyze it for red flags.
 
-**Common Warning Signs:**
-• Messages that create urgency or pressure you to act fast
-• Requests for money, gift cards, or wire transfers
-• Threats about account closures or legal action
-• Spelling mistakes and awkward grammar
-• Email addresses or phone numbers that look suspicious
-• Links that do not match the company they claim to be
+**What I Look For:**
+• Urgency or pressure tactics
+• Requests for money or gift cards
+• Threats or legal action claims
+• Impersonation of known companies
+• Suspicious links or requests
 
-**Here is What You Can Do:**
-• Avoid clicking links or downloading attachments
-• Do not reply or call numbers in the message
-• Contact the company directly using their official website
-• Report suspicious messages to ${r.fraudReport}${r.fraudReportUrl ? ` at ${r.fraudReportUrl}` : ""}
+**To Get Started:**
+Just paste the message you received and I will give you a quick assessment.
 
-If something feels off, trust your instincts. You can also use our Scam Checker tool to analyze any message you are unsure about.`;
+**For Detailed Analysis:**
+Our Scam Checker tool offers even more features like email header analysis and URL reputation checking. You can find it in the Tools section.
+
+Go ahead and paste a message if you have one, or ask me anything about staying safe online.`;
   }
 
   if (lowerMessage.includes("phishing") || lowerMessage.includes("email") || lowerMessage.includes("text message")) {
