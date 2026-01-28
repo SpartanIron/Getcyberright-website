@@ -129,7 +129,49 @@ A dedicated section at `/kids` designed for children ages 8 to 16, featuring:
 - Encouraging badges and celebration elements
 - Card based layouts with bright, controlled colors
 
+## Audience Hub Pages
+
+The website features dedicated hub pages for each target audience, providing curated content and resources specific to their needs:
+
+### Seniors Hub (`/seniors`)
+- 6 safety topics: Romance scams, Tech support scams, Medicare fraud, Phone/email scams, Financial scams, Online safety basics
+- Emerald/teal/blue gradient theme
+- Warning signs and protection steps for each topic
+- Links to emergency help resources
+
+### Parents Hub (`/parents`)
+- 6 topics: Device controls, Social media safety, Screen time management, Gaming safety, Online predators, Digital footprint
+- Blue/indigo/purple gradient theme
+- Conversation starters for talking with children
+- Links to Kids Hub for child-appropriate content
+
+### Educators Hub (`/educators`)
+- 6 classroom resources: Digital citizenship, Cyberbullying prevention, Privacy/security, Media literacy, Responsible gaming, Institutional security
+- Indigo/purple/blue gradient theme
+- Learning objectives, classroom activities, discussion questions
+- Grade level indicators for each resource
+
+### Small Business Hub (`/small-business`)
+- 6 business security topics: Employee training, Phishing protection, Password management, Data protection, Vendor risk, Incident response
+- Slate/blue/indigo gradient theme
+- Priority indicators (Critical, Essential, Important)
+- Cost considerations for budget planning
+- Quick wins for immediate action
+
+### Design Patterns
+All hub pages follow a consistent structure:
+- FloatingShapes component for visual interest
+- Topic/resource card grid with hover states
+- Detailed topic view with structured content sections
+- Cross-links to related hubs and resources
+- Accessible cards with keyboard navigation and ARIA labels
+
 ## Recent Changes (Jan 2026)
+- Added Seniors Hub with 6 safety topics for older adults
+- Added Parents Hub with family online safety resources
+- Added Educators Hub with classroom curriculum resources
+- Added Small Business Hub with workplace security guidance
+- Updated navigation to link directly to all hub pages
 - Added Kids Digital Safety Hub with two age tracks and gamified learning
 - Added custom 404 page with helpful navigation links
 - Implemented print functionality for checklists

@@ -1,0 +1,461 @@
+import { useState } from "react";
+import { Navigation } from "@/components/navigation";
+import { Footer } from "@/components/footer";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Shield, BookOpen, Users, Presentation, FileText,
+  CheckCircle, Star, AlertTriangle, MessageCircle,
+  ArrowRight, Lightbulb, GraduationCap, School,
+  ClipboardList, Download
+} from "lucide-react";
+
+interface EducatorResource {
+  id: string;
+  title: string;
+  description: string;
+  icon: typeof Shield;
+  color: string;
+  gradeLevel: string;
+  content: {
+    overview: string;
+    learningObjectives: string[];
+    classroomActivities: string[];
+    discussionQuestions: string[];
+    additionalResources: string;
+  };
+}
+
+const educatorResources: EducatorResource[] = [
+  {
+    id: "digital-citizenship",
+    title: "Digital Citizenship Fundamentals",
+    description: "Teach students to be responsible, respectful, and safe online.",
+    icon: Users,
+    color: "bg-blue-500",
+    gradeLevel: "All Grades",
+    content: {
+      overview: "Digital citizenship encompasses the norms of appropriate and responsible technology use. Students need to understand that online actions have real consequences, and that being a good digital citizen means treating others with respect, protecting privacy, and contributing positively to online communities.",
+      learningObjectives: [
+        "Define digital citizenship and explain why it matters.",
+        "Identify the rights and responsibilities of being online.",
+        "Demonstrate respectful online communication.",
+        "Recognize the permanence of digital actions.",
+        "Apply ethical thinking to online situations."
+      ],
+      classroomActivities: [
+        "Digital Citizenship Pledge: Have students create and sign a class pledge for responsible online behavior.",
+        "Scenario Cards: Present various online situations and have students discuss appropriate responses.",
+        "Online vs. Offline: Compare how we treat people in person versus online and discuss differences.",
+        "Digital Footprint Timeline: Create a visual showing how online actions accumulate over time.",
+        "Role Reversal: Have students consider how they would feel receiving different types of online messages."
+      ],
+      discussionQuestions: [
+        "What makes someone a good digital citizen?",
+        "How is communicating online different from talking in person?",
+        "What would you do if you saw someone being treated badly online?",
+        "Why do you think some people act differently online than they do in person?"
+      ],
+      additionalResources: "Common Sense Media offers free K-12 digital citizenship curriculum aligned with educational standards."
+    }
+  },
+  {
+    id: "cyberbullying-prevention",
+    title: "Cyberbullying Prevention",
+    description: "Recognize, prevent, and respond to online harassment.",
+    icon: AlertTriangle,
+    color: "bg-red-500",
+    gradeLevel: "Grades 3-12",
+    content: {
+      overview: "Cyberbullying can happen 24 hours a day, follows students home, and can spread quickly to large audiences. Unlike traditional bullying, digital content can be preserved and shared repeatedly. Teaching students to recognize cyberbullying and empowering bystanders to act are key prevention strategies.",
+      learningObjectives: [
+        "Define cyberbullying and distinguish it from other online conflicts.",
+        "Identify the different roles in cyberbullying situations.",
+        "Develop strategies for responding to cyberbullying.",
+        "Understand the emotional impact of cyberbullying on victims.",
+        "Learn how to be an upstander rather than a bystander."
+      ],
+      classroomActivities: [
+        "Anonymous Story Sharing: Let students submit experiences with online conflict (anonymously) for class discussion.",
+        "Upstander Strategies: Brainstorm and role-play ways to support someone being cyberbullied.",
+        "Screenshot Analysis: Review example screenshots (created for training) and discuss what makes content harmful.",
+        "Support Network Mapping: Have students identify trusted adults they could turn to for help.",
+        "Empathy Exercise: Write letters from the perspective of different people involved in a cyberbullying situation."
+      ],
+      discussionQuestions: [
+        "Why might someone who is kind in person behave differently online?",
+        "What can make it hard to stand up for someone being bullied online?",
+        "How can you tell the difference between joking around and cyberbullying?",
+        "What should you do if a friend shows you mean messages someone sent them?"
+      ],
+      additionalResources: "StopBullying.gov provides research-based resources for educators on preventing and responding to cyberbullying."
+    }
+  },
+  {
+    id: "privacy-security",
+    title: "Privacy and Security Basics",
+    description: "Help students protect their personal information online.",
+    icon: Shield,
+    color: "bg-green-500",
+    gradeLevel: "Grades 4-12",
+    content: {
+      overview: "Students often share personal information online without considering the consequences. Teaching privacy and security helps students understand what information is sensitive, how it can be misused, and practical steps to protect themselves. Strong passwords and privacy settings are foundational skills.",
+      learningObjectives: [
+        "Identify what constitutes personal and sensitive information.",
+        "Explain why privacy matters and how information can be misused.",
+        "Create strong, memorable passwords.",
+        "Configure basic privacy settings on common platforms.",
+        "Recognize phishing attempts and suspicious requests."
+      ],
+      classroomActivities: [
+        "Personal Info Sorting: Sort examples of information into 'safe to share' and 'keep private' categories.",
+        "Password Challenge: Create the strongest password that is still memorable using creative techniques.",
+        "Privacy Audit: Walk through privacy settings on a sample account (teacher-controlled demo).",
+        "Phishing Detective: Analyze example emails and identify red flags that indicate phishing.",
+        "Data Trail Mapping: Trace how much data is collected during a typical day of device use."
+      ],
+      discussionQuestions: [
+        "What might happen if someone got access to your accounts?",
+        "Why do apps and websites want to collect information about us?",
+        "How do you decide whether to share personal information online?",
+        "What would you do if you accidentally shared something private?"
+      ],
+      additionalResources: "The National Cyber Security Alliance provides educational materials at StaySafeOnline.org for teaching security fundamentals."
+    }
+  },
+  {
+    id: "media-literacy",
+    title: "Media Literacy and Misinformation",
+    description: "Develop critical thinking skills for evaluating online content.",
+    icon: BookOpen,
+    color: "bg-purple-500",
+    gradeLevel: "Grades 5-12",
+    content: {
+      overview: "Students encounter a constant stream of information online, but not all of it is accurate or trustworthy. Media literacy teaches students to think critically about the content they consume, verify information before sharing, and understand how algorithms and bias shape what they see.",
+      learningObjectives: [
+        "Distinguish between facts, opinions, and misinformation.",
+        "Apply lateral reading techniques to verify information.",
+        "Identify bias in media sources.",
+        "Understand how algorithms personalize content.",
+        "Evaluate the credibility of online sources."
+      ],
+      classroomActivities: [
+        "Source Comparison: Analyze how different sources report on the same event.",
+        "Fact-Checking Practice: Use fact-checking websites to verify viral claims.",
+        "Bias Detective: Identify loaded language and perspective in sample articles.",
+        "Algorithm Experiment: Compare search results and social feeds across different accounts.",
+        "Create Misinformation: Have students create (harmless) fake news to understand how it spreads."
+      ],
+      discussionQuestions: [
+        "How do you decide if something you see online is true?",
+        "Why might someone create or share false information?",
+        "How does the content you see online differ from what your friends see?",
+        "What responsibility do we have before sharing information?"
+      ],
+      additionalResources: "NewsLit.org and the Stanford History Education Group offer free media literacy curriculum and lesson plans."
+    }
+  },
+  {
+    id: "responsible-gaming",
+    title: "Responsible Gaming and Screen Time",
+    description: "Address gaming safety, balance, and healthy digital habits.",
+    icon: Presentation,
+    color: "bg-orange-500",
+    gradeLevel: "Grades 3-10",
+    content: {
+      overview: "Gaming is a significant part of many students' lives. While games can be educational and social, they also present risks including exposure to inappropriate content, in-game purchases, and excessive screen time. Teaching balanced digital habits helps students develop healthy relationships with technology.",
+      learningObjectives: [
+        "Recognize the benefits and risks of online gaming.",
+        "Identify strategies for maintaining gaming balance.",
+        "Understand how game design can encourage overuse.",
+        "Practice safe communication in gaming environments.",
+        "Develop personal screen time management skills."
+      ],
+      classroomActivities: [
+        "Game Rating Research: Investigate what different game ratings mean and why they matter.",
+        "Time Tracking Challenge: Have students track their screen time for a week and reflect on patterns.",
+        "Design a Balanced Day: Create sample daily schedules that include gaming alongside other activities.",
+        "Gaming Safety Rules: Collaboratively create classroom guidelines for safe online gaming.",
+        "Reflection Journals: Weekly entries about how technology use affected their week."
+      ],
+      discussionQuestions: [
+        "What makes it hard to stop playing a game?",
+        "How do you feel after spending a long time on screens?",
+        "What are some positive things you have learned or experienced through gaming?",
+        "How could you help a friend who seems to be gaming too much?"
+      ],
+      additionalResources: "The Entertainment Software Rating Board (ESRB) provides family gaming guides and rating information at ESRB.org."
+    }
+  },
+  {
+    id: "institutional-security",
+    title: "School Technology Policies",
+    description: "Best practices for protecting school networks and data.",
+    icon: School,
+    color: "bg-teal-500",
+    gradeLevel: "Educators",
+    content: {
+      overview: "Schools are increasingly targets for cyberattacks, and educators play an important role in maintaining security. Understanding basic security practices, recognizing threats, and knowing how to respond to incidents helps protect student data and school operations.",
+      learningObjectives: [
+        "Understand common threats facing educational institutions.",
+        "Follow best practices for protecting student data.",
+        "Recognize and report suspicious activities or communications.",
+        "Maintain security while using technology in instruction.",
+        "Model good security behaviors for students."
+      ],
+      classroomActivities: [
+        "Policy Review: Examine your school's acceptable use policy and discuss with students.",
+        "Incident Response Planning: Know who to contact and what steps to take if you suspect a breach.",
+        "Password Hygiene: Ensure all your accounts use strong, unique passwords.",
+        "Phishing Awareness: Learn to recognize targeted attacks that may use school information.",
+        "Data Minimization: Only collect and retain student data that is necessary."
+      ],
+      discussionQuestions: [
+        "What student information are we responsible for protecting?",
+        "How would you handle a student who violated acceptable use policies?",
+        "What should you do if you receive a suspicious email that appears to be from administration?",
+        "How can we balance educational technology use with security?"
+      ],
+      additionalResources: "The Consortium for School Networking (CoSN) provides cybersecurity resources specifically designed for K-12 education at CoSN.org."
+    }
+  }
+];
+
+function FloatingShapes() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute top-20 left-10 w-16 h-16 rounded-full bg-indigo-300/15 dark:bg-indigo-500/10" />
+      <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-purple-300/15 dark:bg-purple-500/10" />
+      <div className="absolute bottom-32 left-1/4 w-12 h-12 rounded-full bg-blue-300/15 dark:bg-blue-500/10" />
+      <div className="absolute bottom-20 right-1/3 w-20 h-20 rounded-full bg-teal-300/15 dark:bg-teal-500/10" />
+    </div>
+  );
+}
+
+function EducatorsLanding({ onSelectResource }: { onSelectResource: (id: string) => void }) {
+  return (
+    <div className="relative">
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-blue-950/30" />
+      
+      <div className="relative py-12">
+        <FloatingShapes />
+        
+        <div className="max-w-5xl mx-auto px-4 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-5 py-2.5 rounded-full mb-6 shadow-lg">
+              <GraduationCap className="w-5 h-5" />
+              <span className="font-semibold">Educators Hub</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+              Teach Digital Safety
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Classroom resources, lesson plans, and activities to help students become responsible digital citizens and stay safe online.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {educatorResources.map((resource) => (
+              <Card 
+                key={resource.id}
+                className="cursor-pointer transition-shadow hover:shadow-xl border-2 border-white/50 dark:border-white/10 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
+                onClick={() => onSelectResource(resource.id)}
+                onKeyDown={(e) => e.key === 'Enter' && onSelectResource(resource.id)}
+                tabIndex={0}
+                role="button"
+                aria-label={`View ${resource.title} resource`}
+                data-testid={`card-resource-${resource.id}`}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-14 h-14 rounded-xl ${resource.color} flex items-center justify-center shadow-lg`}>
+                      <resource.icon className="w-7 h-7 text-white" />
+                    </div>
+                    <Badge variant="secondary" className="text-xs">{resource.gradeLevel}</Badge>
+                  </div>
+                  <h3 className="font-semibold text-lg text-foreground mb-2">{resource.title}</h3>
+                  <p className="text-muted-foreground text-sm">{resource.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 border-2 border-teal-200 dark:border-teal-800">
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center shadow-lg">
+                    <Users className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Kids Digital Safety Hub
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Interactive lessons designed for students ages 8 to 16. Use these self-guided modules as supplementary learning materials.
+                  </p>
+                </div>
+                <Button variant="outline" className="border-teal-300 dark:border-teal-700" onClick={() => {
+                  window.location.href = '/kids';
+                }} data-testid="button-kids-hub">
+                  View Student Resources
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="mt-8 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+            <div className="flex items-start gap-3">
+              <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Integrate Into Your Curriculum</p>
+                <p className="text-sm text-indigo-600 dark:text-indigo-400">
+                  These resources are designed to be flexible. Adapt activities to fit your classroom needs and students' developmental levels.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResourceContent({ 
+  resource, 
+  onBack 
+}: { 
+  resource: EducatorResource;
+  onBack: () => void;
+}) {
+  return (
+    <div className="relative">
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-blue-950/30" />
+      
+      <div className="relative py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <Button 
+            variant="ghost" 
+            onClick={onBack} 
+            className="mb-6"
+            data-testid="button-back-to-resources"
+          >
+            <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+            Back to All Resources
+          </Button>
+
+          <Card className="mb-8">
+            <CardHeader>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-16 h-16 rounded-xl ${resource.color} flex items-center justify-center shadow-lg`}>
+                    <resource.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl">{resource.title}</CardTitle>
+                    <CardDescription className="text-base">{resource.description}</CardDescription>
+                  </div>
+                </div>
+                <Badge>{resource.gradeLevel}</Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              <div>
+                <h4 className="font-semibold text-lg text-foreground mb-3">Overview</h4>
+                <p className="text-muted-foreground leading-relaxed">{resource.content.overview}</p>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+                <h4 className="font-semibold text-lg text-blue-800 dark:text-blue-200 mb-4 flex items-center gap-2">
+                  <Star className="w-5 h-5" />
+                  Learning Objectives
+                </h4>
+                <ul className="space-y-3">
+                  {resource.content.learningObjectives.map((objective, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-blue-700 dark:text-blue-300">{objective}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
+                <h4 className="font-semibold text-lg text-green-800 dark:text-green-200 mb-4 flex items-center gap-2">
+                  <ClipboardList className="w-5 h-5" />
+                  Classroom Activities
+                </h4>
+                <ul className="space-y-4">
+                  {resource.content.classroomActivities.map((activity, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-sm flex-shrink-0">{index + 1}</span>
+                      <span className="text-green-700 dark:text-green-300">{activity}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800">
+                <h4 className="font-semibold text-lg text-purple-800 dark:text-purple-200 mb-4 flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5" />
+                  Discussion Questions
+                </h4>
+                <ul className="space-y-3">
+                  {resource.content.discussionQuestions.map((question, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="text-purple-500 font-bold text-lg">?</span>
+                      <span className="text-purple-700 dark:text-purple-300">{question}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800">
+                <h4 className="font-semibold text-lg text-amber-800 dark:text-amber-200 mb-3 flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5" />
+                  Additional Resources
+                </h4>
+                <p className="text-amber-700 dark:text-amber-300">{resource.content.additionalResources}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-center">
+            <Button onClick={onBack} variant="outline" data-testid="button-explore-more">
+              Explore More Resources
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function Educators() {
+  const [selectedResource, setSelectedResource] = useState<string | null>(null);
+
+  const currentResource = selectedResource 
+    ? educatorResources.find(r => r.id === selectedResource) 
+    : null;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
+      <main>
+        {currentResource ? (
+          <ResourceContent 
+            resource={currentResource}
+            onBack={() => setSelectedResource(null)}
+          />
+        ) : (
+          <EducatorsLanding onSelectResource={setSelectedResource} />
+        )}
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

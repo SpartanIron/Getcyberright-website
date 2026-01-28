@@ -17,6 +17,10 @@ import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import EmergencyHelp from "@/pages/emergency-help";
 import Kids from "@/pages/kids";
+import Seniors from "@/pages/seniors";
+import Parents from "@/pages/parents";
+import Educators from "@/pages/educators";
+import SmallBusiness from "@/pages/small-business";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -41,6 +45,10 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/emergency-help" component={EmergencyHelp} />
       <Route path="/kids" component={Kids} />
+      <Route path="/seniors" component={Seniors} />
+      <Route path="/parents" component={Parents} />
+      <Route path="/educators" component={Educators} />
+      <Route path="/small-business" component={SmallBusiness} />
       <Route component={NotFound} />
     </Switch>
   );

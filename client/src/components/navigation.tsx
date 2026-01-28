@@ -15,11 +15,11 @@ import {
 } from "@/components/ui/navigation-menu";
 
 const whoWeHelp = [
-  { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/solutions#families", icon: Users },
+  { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/parents", icon: Users, featured: true },
   { title: "Kids Safety Hub", description: "Fun, interactive lessons for ages 8 to 16", href: "/kids", icon: Sparkles, featured: true },
-  { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/solutions#seniors", icon: Heart },
-  { title: "Educators Hub", description: "Classroom resources for teaching digital citizenship", href: "/solutions#educators", icon: GraduationCap },
-  { title: "Small Business", description: "Enterprise-grade protection made accessible", href: "/solutions#business", icon: Briefcase },
+  { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/seniors", icon: Heart, featured: true },
+  { title: "Educators Hub", description: "Classroom resources for teaching digital citizenship", href: "/educators", icon: GraduationCap, featured: true },
+  { title: "Small Business", description: "Enterprise-grade protection made accessible", href: "/small-business", icon: Briefcase, featured: true },
 ];
 
 const freeTools = [
