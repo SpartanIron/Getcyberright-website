@@ -29,7 +29,7 @@ function DecorativeCircles({ position }: { position: "left" | "right" }) {
           height: "clamp(280px, 40vw, 500px)",
           bottom: "-30%",
           ...(isRight ? { right: "-10%" } : { left: "-10%" }),
-          backgroundColor: "rgba(185, 28, 28, 0.35)",
+          backgroundColor: "rgba(185, 28, 28, 0.55)",
         }}
       />
       
@@ -42,7 +42,7 @@ function DecorativeCircles({ position }: { position: "left" | "right" }) {
           height: "clamp(220px, 32vw, 400px)",
           bottom: "-15%",
           ...(isRight ? { right: "-5%" } : { left: "-5%" }),
-          backgroundColor: "rgba(234, 88, 12, 0.28)",
+          backgroundColor: "rgba(234, 88, 12, 0.45)",
         }}
       />
       
@@ -55,7 +55,7 @@ function DecorativeCircles({ position }: { position: "left" | "right" }) {
           height: "clamp(160px, 24vw, 300px)",
           bottom: "0%",
           ...(isRight ? { right: "-8%" } : { left: "-8%" }),
-          backgroundColor: "rgba(59, 130, 246, 0.25)",
+          backgroundColor: "rgba(59, 130, 246, 0.4)",
         }}
       />
     </>
