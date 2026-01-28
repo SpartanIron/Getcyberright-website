@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import bannerImage from "@/assets/banners/solutions-banner.png";
 import familyImage from "@/assets/images/family-devices.jpg";
-import seniorImage from "@/assets/images/senior-safety.jpg";
+import seniorImage from "@/assets/images/senior-safety.png";
 import businessImage from "@/assets/images/small-business.jpg";
 import educatorImage from "@/assets/images/educator-training.jpg";
 
