@@ -250,6 +250,11 @@ export function DeziAssistant() {
             transition={{ duration: 0.2 }}
             className="fixed bottom-20 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[70vh]"
             onKeyDown={handleKeyDown}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="dezi-title"
+            aria-describedby="dezi-description"
+            id="dezi-dialog"
             data-testid="dezi-panel"
           >
             <Card className="shadow-2xl border-primary/20 overflow-hidden flex flex-col max-h-[70vh]">
@@ -265,14 +270,14 @@ export function DeziAssistant() {
                       />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white text-sm">Dezi</h3>
-                      <p className="text-white/70 text-xs">Your Online Safety Assistant</p>
+                      <h3 id="dezi-title" className="font-semibold text-white text-sm" data-testid="text-dezi-name">Dezi</h3>
+                      <p id="dezi-description" className="text-white/70 text-xs" data-testid="text-dezi-role">Your Online Safety Assistant</p>
                     </div>
                   </div>
                   <Button 
                     size="icon" 
                     variant="ghost" 
-                    className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8"
+                    className="text-white/70"
                     onClick={handleClose}
                     aria-label="Close Dezi assistant"
                     data-testid="button-close-dezi"
@@ -347,7 +352,7 @@ export function DeziAssistant() {
                         </div>
                       ))}
                       {isTyping && (
-                        <div className="flex justify-start">
+                        <div className="flex justify-start" data-testid="indicator-dezi-typing">
                           <div className="bg-muted rounded-lg p-3 flex items-center gap-2">
                             <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
                             <span className="text-sm text-muted-foreground">Dezi is typing...</span>
@@ -381,7 +386,7 @@ export function DeziAssistant() {
                     </Button>
                   </form>
                   
-                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                  <p className="text-xs text-muted-foreground mt-2 text-center" data-testid="text-dezi-disclosure">
                     Dezi provides general educational guidance and does not replace professional advice.
                   </p>
                 </div>
@@ -398,9 +403,11 @@ export function DeziAssistant() {
       >
         <Button
           onClick={() => setIsOpen(!isOpen)}
-          className={`rounded-full shadow-lg ${isOpen ? 'bg-muted text-muted-foreground hover:bg-muted/80' : 'bg-primary'} px-4 py-6 gap-2`}
+          className={`rounded-full shadow-lg ${isOpen ? 'bg-muted text-muted-foreground' : ''} gap-2`}
           data-testid="button-open-dezi"
           aria-label={isOpen ? "Close Dezi" : "Open Dezi safety assistant"}
+          aria-expanded={isOpen}
+          aria-controls="dezi-dialog"
         >
           {isOpen ? (
             <>
