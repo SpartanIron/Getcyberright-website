@@ -49,7 +49,7 @@ export default function About() {
           title="A Mission Born from Personal Experience"
           subtitle="We watched our own family members fall victim to scams. That's why we built something different—clear guidance from people who understand what's at stake."
           imageSrc={bannerImage}
-          imageAlt="Diverse team of educators collaborating in a bright modern office around a mission-focused whiteboard"
+          imageAlt="Professional portrait of our founder, an African man from Ghana, leading our cybersecurity education mission"
           imagePosition="left"
         />
 
