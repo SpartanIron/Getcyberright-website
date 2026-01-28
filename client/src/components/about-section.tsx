@@ -11,9 +11,9 @@ const values = [
   },
   {
     icon: Heart,
-    title: "Family-Centered",
+    title: "Family Centered",
     description:
-      "Built for real families - from grandparents to kids on their first devices.",
+      "Built for real families, from grandparents to kids on their first devices.",
   },
   {
     icon: Users,
@@ -78,7 +78,7 @@ export function AboutSection() {
               
               <p>
                 When I searched for resources that could help everyone in my 
-                family - from my kids to aging parents to cousins overseas - I 
+                family, from my kids to aging parents to cousins overseas, I 
                 came up short. Cybersecurity sites were written for corporations, 
                 full of tech jargon nobody could understand.
               </p>
@@ -120,7 +120,7 @@ export function AboutSection() {
               </p>
               <p className="text-muted-foreground">
                 From grandparents targeted by phone scams to kids navigating 
-                their first devices - we're here to help.
+                their first devices, we are here to help.
               </p>
             </div>
             

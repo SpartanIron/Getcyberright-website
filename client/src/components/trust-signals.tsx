@@ -86,7 +86,7 @@ export function TrustSignals() {
           className="border-t pt-8"
         >
           <p className="text-center text-sm text-muted-foreground mb-6">
-            Information You Can Trust - All our scam detection and safety advice is based on official sources
+            Information You Can Trust. All our scam detection and safety advice is based on official sources.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
             {trustedSources.map((source) => (

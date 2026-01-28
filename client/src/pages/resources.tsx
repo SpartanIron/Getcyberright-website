@@ -36,8 +36,8 @@ const resources = [
   },
   {
     slug: "setting-up-two-factor-authentication",
-    title: "Setting Up Two-Factor Authentication (Without the Confusion)",
-    excerpt: "Two-factor authentication is one of the best ways to protect your accounts. We explain what it is and how to set it up - simply.",
+    title: "Setting Up Two Factor Authentication Without the Confusion",
+    excerpt: "Two factor authentication is one of the best ways to protect your accounts. We explain what it is and how to set it up simply.",
     category: "Account Security",
     readTime: "5 min read",
     featured: false

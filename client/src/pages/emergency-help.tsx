@@ -16,7 +16,7 @@ import {
 
 const immediateSteps = [
   {
-    title: "Don't Panic - Act Quickly",
+    title: "Stay Calm and Act Quickly",
     description: "The first few hours are critical. Stay calm and work through these steps methodically.",
     icon: Clock,
   },
@@ -75,12 +75,12 @@ const scamSpecificActions = [
     ]
   },
   {
-    type: "Sent Money (Wire, Gift Cards, Crypto)",
+    type: "Sent Money via Wire, Gift Cards, or Crypto",
     actions: [
       "Contact your bank or the wire transfer service immediately",
-      "Report gift card fraud to the retailer (they may be able to recover funds)",
+      "Report gift card fraud to the retailer as they may be able to recover funds",
       "For crypto, report to the exchange used for the transaction",
-      "Unfortunately, these payments are often unrecoverable - focus on preventing further loss"
+      "Unfortunately, these payments are often unrecoverable so focus on preventing further loss"
     ]
   },
   {
@@ -131,7 +131,7 @@ export default function EmergencyHelp() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
               <Clock className="w-6 h-6 text-red-600" />
-              Immediate Steps (Do These First)
+              Immediate Steps to Take First
             </h2>
             
             <div className="grid sm:grid-cols-2 gap-4">

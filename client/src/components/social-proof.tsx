@@ -8,7 +8,7 @@ const testimonials = [
     outcome: "Prevented grandparent scam",
   },
   {
-    quote: "The Scam Checker saved me. I got a text about a package and was about to click. Checked it here first — phishing link.",
+    quote: "The Scam Checker saved me. I got a text about a package and was about to click. Checked it here first and it was a phishing link.",
     name: "Marcus T.",
     outcome: "Avoided phishing attack",
   },

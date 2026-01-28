@@ -23,7 +23,7 @@ const tools = [
     icon: AlertTriangle,
     title: "Breach Checker",
     description:
-      "Check if your email was exposed in a data breach. We never store your email - checked against Have I Been Pwned database.",
+      "Check if your email was exposed in a data breach. We never store your email and it is checked against the Have I Been Pwned database.",
     highlight: "Privacy First",
     href: "/tools",
   },

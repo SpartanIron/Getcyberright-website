@@ -29,7 +29,7 @@ const solutions = [
     title: "For Families",
     subtitle: "Protect Your Loved Ones Online",
     image: familyImage,
-    problem: "Your family shares devices, clicks links, and trusts messages from people they know. But hackers exploit exactly that trust - impersonating relatives, sending fake alerts, and targeting the most vulnerable members of your household.",
+    problem: "Your family shares devices, clicks links, and trusts messages from people they know. But hackers exploit exactly that trust by impersonating relatives, sending fake alerts, and targeting the most vulnerable members of your household.",
     solution: "GetCyberRight gives every family member the knowledge to spot scams before they cause harm. Our guides are written in plain language that grandparents and teenagers alike can understand and apply.",
     features: [
       "Family-friendly security checklists",
@@ -47,7 +47,7 @@ const solutions = [
     subtitle: "Stay Safe Without the Tech Jargon",
     image: seniorImage,
     problem: "Scammers specifically target seniors with fake tech support calls, romance scams, and impersonation schemes. These attacks often succeed because the 'help' sounds legitimate and the technology feels overwhelming.",
-    solution: "We've created resources specifically for seniors - no confusing tech terms, no complicated steps. Just clear, simple guidance on recognizing when something isn't right and what to do about it.",
+    solution: "We have created resources specifically for seniors with no confusing tech terms and no complicated steps. Just clear, simple guidance on recognizing when something is not right and what to do about it.",
     features: [
       "Phone scam recognition guide",
       "Email safety made simple",
@@ -118,8 +118,8 @@ export default function Solutions() {
               </h1>
               
               <p className="text-lg text-white/70 leading-relaxed">
-                Whether you're protecting your family, helping a senior relative, 
-                securing your small business, or educating your community - we have 
+                Whether you are protecting your family, helping a senior relative, 
+                securing your small business, or educating your community, we have 
                 resources designed specifically for you.
               </p>
             </motion.div>

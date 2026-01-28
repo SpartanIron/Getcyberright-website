@@ -401,10 +401,10 @@ export function ThreatTrends() {
               <div className="text-sm">
                 <p className="font-medium mb-1">Universal Protection Tips</p>
                 <ul className="space-y-1 text-muted-foreground">
-                  <li>• Slow down - scammers create urgency to prevent clear thinking</li>
-                  <li>• Verify independently - contact organizations through official channels</li>
+                  <li>• Slow down because scammers create urgency to prevent clear thinking</li>
+                  <li>• Verify independently by contacting organizations through official channels</li>
                   <li>• Never pay with gift cards, wire transfers, or cryptocurrency</li>
-                  <li>• Trust your instincts - if something feels wrong, it probably is</li>
+                  <li>• Trust your instincts because if something feels wrong, it probably is</li>
                 </ul>
               </div>
             </div>

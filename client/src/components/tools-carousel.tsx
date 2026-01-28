@@ -30,7 +30,7 @@ const tools = [
     title: "Breach Checker",
     subtitle: "Protect Your Identity",
     description:
-      "Check if your email was exposed in a data breach. We never store your email - checked against the Have I Been Pwned database.",
+      "Check if your email was exposed in a data breach. We never store your email and it is checked against the Have I Been Pwned database.",
     features: ["Email breach check", "Password exposure alerts", "Privacy first", "Instant results"],
     href: "/tools",
     badge: "Privacy First",

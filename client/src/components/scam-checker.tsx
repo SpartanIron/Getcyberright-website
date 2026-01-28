@@ -186,26 +186,26 @@ function analyzeContent(content: string): AnalysisResult {
     overallRisk = "safe";
     confidenceScore = 75;
     title = "No Obvious Threats Detected";
-    summary = "We didn't detect common scam patterns. This doesn't guarantee safety—always verify unexpected messages through official channels.";
+    summary = "We did not detect common scam patterns. This does not guarantee safety so always verify unexpected messages through official channels.";
   } else if (totalScore <= 2) {
     overallRisk = "low";
     confidenceScore = 60;
-    title = "Low Risk - Minor Concerns";
+    title = "Low Risk with Minor Concerns";
     summary = "A few elements warrant attention, but this may be legitimate. Verify through official channels if unsure.";
   } else if (totalScore <= 5) {
     overallRisk = "medium";
     confidenceScore = 70;
-    title = "Medium Risk - Proceed with Caution";
+    title = "Medium Risk. Proceed with Caution";
     summary = "This content contains multiple warning signs. We recommend verifying through official channels before taking any action.";
   } else if (totalScore <= 10) {
     overallRisk = "high";
     confidenceScore = 85;
-    title = "High Risk - Likely a Scam";
+    title = "High Risk. Likely a Scam";
     summary = "This content contains several major red flags commonly found in scams. Do not engage with this message.";
   } else {
     overallRisk = "critical";
     confidenceScore = 95;
-    title = "Critical Risk - Almost Certainly a Scam";
+    title = "Critical Risk. Almost Certainly a Scam";
     summary = "This content matches multiple known scam patterns. Delete immediately and do not respond, click links, or provide any information.";
   }
   

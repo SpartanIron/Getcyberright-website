@@ -17,7 +17,7 @@ export function HeroSection() {
             </h1>
 
             <p className="text-xl text-white/80 mb-8 leading-relaxed" data-testid="text-hero-subtext">
-              Everything you need to protect yourself and your family from online threats — all in one place.
+              Everything you need to protect yourself and your family from online threats, all in one place.
             </p>
 
             <ul className="space-y-3 mb-10 text-left mx-auto lg:mx-0 max-w-md">
@@ -31,7 +31,7 @@ export function HeroSection() {
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                   <Users className="w-3.5 h-3.5 text-primary" />
                 </div>
-                <span>Guides for families, seniors & businesses</span>
+                <span>Guides for families, seniors, and businesses</span>
               </li>
               <li className="flex items-center gap-3 text-white/90">
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">

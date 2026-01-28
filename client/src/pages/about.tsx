@@ -16,8 +16,8 @@ const values = [
   },
   {
     icon: Heart,
-    title: "Family-Centered",
-    description: "Built for real families - from grandparents to kids on their first devices."
+    title: "Family Centered",
+    description: "Built for real families, from grandparents to kids on their first devices."
   },
   {
     icon: Users,
@@ -119,7 +119,7 @@ export default function About() {
                 
                 <p>
                   When I searched for resources that could help everyone in my 
-                  family - from my kids to aging parents to cousins overseas - I 
+                  family, from my kids to aging parents to cousins overseas, I 
                   came up short. Cybersecurity sites were written for corporations, 
                   full of tech jargon nobody could understand.
                 </p>
@@ -141,7 +141,7 @@ export default function About() {
                 <p className="text-lg font-medium text-foreground">
                   Today, GetCyberRight serves families across six continents. From 
                   grandparents targeted by phone scams to kids navigating their 
-                  first devices - we're here to help.
+                  first devices, we are here to help.
                 </p>
               </div>
             </motion.div>

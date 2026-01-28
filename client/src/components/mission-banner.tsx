@@ -28,7 +28,7 @@ export function MissionBanner() {
               </h2>
               
               <p className="text-white/80 text-base sm:text-lg leading-relaxed mb-8" data-testid="text-mission-description">
-                From everyday browsing to protecting your family — we help you build habits that keep you safe, confident, and in control online.
+                From everyday browsing to protecting your family, we help you build habits that keep you safe, confident, and in control online.
               </p>
               
               <Link href="/about">

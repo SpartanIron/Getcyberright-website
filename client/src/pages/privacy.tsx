@@ -52,8 +52,8 @@ export default function Privacy() {
                   </p>
                   <p>
                     We believe in transparency and want you to understand exactly what 
-                    data we collect and why. After all, we're a cybersecurity education 
-                    organization - protecting your information is at the core of what we do.
+                    data we collect and why. After all, we are a cybersecurity education 
+                    organization and protecting your information is at the core of what we do.
                   </p>
                 </section>
 
