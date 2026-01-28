@@ -15,6 +15,7 @@ const footerLinks = {
     { name: "Scam Checker", href: "/scam-checker" },
     { name: "Password Generator", href: "/password-generator" },
     { name: "Breach Checker", href: "/breach-checker" },
+    { name: "Threat Trends", href: "/threat-trends" },
   ],
   company: [
     { name: "About", href: "/about" },
