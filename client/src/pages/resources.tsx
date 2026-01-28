@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -865,16 +865,8 @@ export default function Resources() {
               </div>
             </div>
 
-            <AnimatePresence mode="wait">
-              {expandedResource && (
-                <motion.div
-                  key="expanded-content"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="mb-8"
-                >
+            {expandedResource && (
+                <div className="mb-8">
                   {(() => {
                     const resource = getResourceBySlug(expandedResource);
                     if (!resource) return null;
@@ -1047,9 +1039,8 @@ export default function Resources() {
                       </Card>
                     );
                   })()}
-                </motion.div>
+                </div>
               )}
-            </AnimatePresence>
 
             {!expandedResource && (
               <div className="grid md:grid-cols-2 gap-6">
