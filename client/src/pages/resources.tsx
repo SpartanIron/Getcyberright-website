@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
+import { useSearch } from "wouter";
 import { 
   ArrowRight, 
   Clock, 
@@ -310,9 +311,39 @@ const resources: Resource[] = [
 
 const categories = ["All", "Email Safety", "Senior Safety", "Scam Awareness", "Account Security", "Privacy", "Emergency Response", "Family Safety", "Business"];
 
+const categoryMapping: Record<string, string> = {
+  "phishing": "Email Safety",
+  "scams": "Scam Awareness",
+  "privacy": "Privacy",
+  "passwords": "Account Security",
+  "seniors": "Senior Safety",
+  "family": "Family Safety",
+  "business": "Business",
+  "emergency": "Emergency Response",
+};
+
 export default function Resources() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const searchString = useSearch();
+  const params = new URLSearchParams(searchString);
+  const categoryParam = params.get("category");
+  
+  const getInitialCategory = () => {
+    if (!categoryParam) return "All";
+    const mappedCategory = categoryMapping[categoryParam.toLowerCase()];
+    if (mappedCategory && categories.includes(mappedCategory)) return mappedCategory;
+    if (categories.includes(categoryParam)) return categoryParam;
+    return "All";
+  };
+
+  const [selectedCategory, setSelectedCategory] = useState(getInitialCategory);
   const [expandedResource, setExpandedResource] = useState<string | null>(null);
+
+  useEffect(() => {
+    const newCategory = getInitialCategory();
+    if (newCategory !== selectedCategory) {
+      setSelectedCategory(newCategory);
+    }
+  }, [searchString]);
 
   const filteredResources = selectedCategory === "All" 
     ? resources 

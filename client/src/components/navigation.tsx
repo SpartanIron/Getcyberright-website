@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, Video, BookOpen, ChevronRight, ExternalLink } from "lucide-react";
+import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@assets/image_(3)_1769558492356.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -30,19 +30,18 @@ const freeTools = [
 ];
 
 const learnTopics = [
-  { title: "Phishing & Scams", description: "Recognize and avoid phishing attacks", href: "/resources" },
-  { title: "Online Privacy", description: "Protect your personal information", href: "/resources" },
-  { title: "Password Security", description: "Best practices for strong passwords", href: "/resources" },
-  { title: "Social Media Safety", description: "Stay safe on social platforms", href: "/resources" },
-  { title: "Mobile Security", description: "Secure your smartphone and tablet", href: "/resources" },
-  { title: "Identity Theft", description: "Prevent and recover from identity theft", href: "/resources" },
+  { title: "Phishing & Email Scams", description: "Recognize and avoid phishing attacks", href: "/resources?category=phishing" },
+  { title: "Online Privacy", description: "Protect your personal information", href: "/resources?category=privacy" },
+  { title: "Password & Account Security", description: "Best practices for strong passwords", href: "/resources?category=passwords" },
+  { title: "Senior Safety", description: "Protection for older adults", href: "/resources?category=seniors" },
+  { title: "Family Online Safety", description: "Keep your whole family protected", href: "/resources?category=family" },
+  { title: "Small Business Security", description: "Protect your business from threats", href: "/resources?category=business" },
 ];
 
 const resourceTypes = [
-  { title: "Security Guides", description: "Step-by-step protection tutorials", href: "/resources", icon: FileText },
-  { title: "Video Training", description: "Watch and learn at your own pace", href: "/resources", icon: Video },
-  { title: "Checklists", description: "Printable security checklists", href: "/resources", icon: BookOpen },
-  { title: "Emergency Help", description: "What to do if you've been scammed", href: "/emergency-help", icon: AlertTriangle },
+  { title: "All Guides", description: "Browse all security tutorials", href: "/resources", icon: FileText },
+  { title: "Scam Awareness", description: "Learn about current scam tactics", href: "/resources?category=scams", icon: AlertTriangle },
+  { title: "Emergency Help", description: "What to do if you've been scammed", href: "/emergency-help", icon: Shield },
 ];
 
 export function Navigation() {
