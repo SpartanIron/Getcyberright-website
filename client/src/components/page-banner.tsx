@@ -25,11 +25,11 @@ function DecorativeCircles() {
       <div 
         className="absolute rounded-full"
         style={{
-          width: "clamp(180px, 25vw, 320px)",
-          height: "clamp(180px, 25vw, 320px)",
-          bottom: "-15%",
-          right: "-8%",
-          backgroundColor: "rgba(185, 28, 28, 0.15)",
+          width: "clamp(200px, 30vw, 380px)",
+          height: "clamp(200px, 30vw, 380px)",
+          bottom: "-20%",
+          right: "-10%",
+          backgroundColor: "rgba(185, 28, 28, 0.35)",
         }}
       />
       
@@ -37,11 +37,11 @@ function DecorativeCircles() {
       <div 
         className="absolute rounded-full"
         style={{
-          width: "clamp(140px, 20vw, 260px)",
-          height: "clamp(140px, 20vw, 260px)",
-          bottom: "-5%",
-          right: "2%",
-          backgroundColor: "rgba(234, 88, 12, 0.12)",
+          width: "clamp(160px, 24vw, 300px)",
+          height: "clamp(160px, 24vw, 300px)",
+          bottom: "-8%",
+          right: "5%",
+          backgroundColor: "rgba(234, 88, 12, 0.28)",
         }}
       />
       
@@ -49,11 +49,11 @@ function DecorativeCircles() {
       <div 
         className="absolute rounded-full"
         style={{
-          width: "clamp(100px, 15vw, 200px)",
-          height: "clamp(100px, 15vw, 200px)",
-          bottom: "5%",
-          right: "-3%",
-          backgroundColor: "rgba(59, 130, 246, 0.12)",
+          width: "clamp(120px, 18vw, 220px)",
+          height: "clamp(120px, 18vw, 220px)",
+          bottom: "8%",
+          right: "-5%",
+          backgroundColor: "rgba(59, 130, 246, 0.25)",
         }}
       />
     </div>
