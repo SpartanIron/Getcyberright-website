@@ -10,8 +10,26 @@ import {
   Shield, Lock, Eye, MessageCircle, Gamepad2, Users, 
   CheckCircle, Star, Trophy, BookOpen, Heart, 
   Smartphone, AlertCircle, ThumbsUp, ArrowRight,
-  GraduationCap, Home, Lightbulb, Target
+  GraduationCap, Home, Lightbulb, Target, Sparkles
 } from "lucide-react";
+
+// Floating decorative shapes component for kid-friendly design
+function FloatingShapes() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Subtle decorative circles - no animation for cleaner look */}
+      <div className="absolute top-20 left-10 w-16 h-16 rounded-full bg-teal-300/15 dark:bg-teal-500/10" />
+      <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-purple-300/15 dark:bg-purple-500/10" />
+      <div className="absolute bottom-32 left-1/4 w-12 h-12 rounded-full bg-pink-300/15 dark:bg-pink-500/10" />
+      <div className="absolute bottom-20 right-1/3 w-20 h-20 rounded-full bg-blue-300/15 dark:bg-blue-500/10" />
+      
+      {/* Single subtle star */}
+      <div className="absolute top-32 left-1/3 text-yellow-400/30 dark:text-yellow-500/15">
+        <Star className="w-8 h-8 fill-current" />
+      </div>
+    </div>
+  );
+}
 
 type AgeGroup = "8-11" | "12-16" | null;
 type ActiveModule = string | null;
@@ -379,111 +397,119 @@ const spotTheScamItems: SpotTheScamItem[] = [
 
 function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) {
   return (
-    <div className="py-12">
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 px-4 py-2 rounded-full mb-6">
-            <Shield className="w-5 h-5" />
-            <span className="font-medium">Kids Digital Safety Hub</span>
+    <div className="relative">
+      {/* Colorful gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-50 via-purple-50 to-pink-50 dark:from-teal-950/30 dark:via-purple-950/30 dark:to-pink-950/30" />
+      
+      <div className="relative py-12">
+        <FloatingShapes />
+        
+        <div className="max-w-5xl mx-auto px-4 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-500 to-blue-500 text-white px-5 py-2.5 rounded-full mb-6 shadow-lg">
+              <Shield className="w-5 h-5" />
+              <span className="font-semibold">Kids Digital Safety Hub</span>
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+              Learn to Stay Safe Online
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Fun and easy lessons to help you become a smart and safe internet explorer. Choose your age group to get started.
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Learn to Stay Safe Online
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Fun and easy lessons to help you become a smart and safe internet explorer. Choose your age group to get started.
-          </p>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          <Card 
-            className="relative overflow-visible cursor-pointer transition-transform hover:scale-[1.02] border-2 border-teal-200 dark:border-teal-800"
-            onClick={() => onSelectAge("8-11")}
-            data-testid="card-age-8-11"
-          >
-            <CardHeader className="text-center pb-2">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center">
-                <Star className="w-10 h-10 text-white" />
-              </div>
-              <CardTitle className="text-2xl">Ages 8 to 11</CardTitle>
-              <CardDescription className="text-lg">Foundations</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-muted-foreground mb-4">
-                Start your internet safety journey with fun lessons about passwords, personal information, and staying safe online.
-              </p>
-              <div className="flex flex-wrap justify-center gap-2 mb-4">
-                <Badge variant="secondary">Beginner Friendly</Badge>
-                <Badge variant="secondary">5 Lessons</Badge>
-                <Badge variant="secondary">Fun Quizzes</Badge>
-              </div>
-              <Button className="w-full" data-testid="button-start-8-11">
-                Start Learning <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="relative overflow-visible cursor-pointer transition-transform hover:scale-[1.02] border-2 border-purple-200 dark:border-purple-800"
-            onClick={() => onSelectAge("12-16")}
-            data-testid="card-age-12-16"
-          >
-            <CardHeader className="text-center pb-2">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center">
-                <Trophy className="w-10 h-10 text-white" />
-              </div>
-              <CardTitle className="text-2xl">Ages 12 to 16</CardTitle>
-              <CardDescription className="text-lg">Smart and Safe Online</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-muted-foreground mb-4">
-                Level up your digital skills with lessons on social media, gaming safety, spotting scams, and building a positive online reputation.
-              </p>
-              <div className="flex flex-wrap justify-center gap-2 mb-4">
-                <Badge variant="secondary">Intermediate</Badge>
-                <Badge variant="secondary">5 Lessons</Badge>
-                <Badge variant="secondary">Real Scenarios</Badge>
-              </div>
-              <Button className="w-full" data-testid="button-start-12-16">
-                Start Learning <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-2">
-          <CardContent className="p-8">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                  <GraduationCap className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <Card 
+              className="relative overflow-visible cursor-pointer transition-shadow hover:shadow-xl border-2 border-teal-200 dark:border-teal-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
+              onClick={() => onSelectAge("8-11")}
+              data-testid="card-age-8-11"
+            >
+              <CardHeader className="text-center pb-2">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center shadow-lg">
+                  <Star className="w-10 h-10 text-white" />
                 </div>
+                <CardTitle className="text-2xl">Ages 8 to 11</CardTitle>
+                <CardDescription className="text-lg">Foundations</CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-muted-foreground mb-4">
+                  Start your internet safety journey with fun lessons about passwords, personal information, and staying safe online.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2 mb-4">
+                  <Badge className="bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-300">Beginner Friendly</Badge>
+                  <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">5 Lessons</Badge>
+                  <Badge className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300">Fun Quizzes</Badge>
+                </div>
+                <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-500" data-testid="button-start-8-11">
+                  Start Learning <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="relative overflow-visible cursor-pointer transition-shadow hover:shadow-xl border-2 border-purple-200 dark:border-purple-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
+              onClick={() => onSelectAge("12-16")}
+              data-testid="card-age-12-16"
+            >
+              <CardHeader className="text-center pb-2">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg">
+                  <Trophy className="w-10 h-10 text-white" />
+                </div>
+                <CardTitle className="text-2xl">Ages 12 to 16</CardTitle>
+                <CardDescription className="text-lg">Smart and Safe Online</CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-muted-foreground mb-4">
+                  Level up your digital skills with lessons on social media, gaming safety, spotting scams, and building a positive online reputation.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2 mb-4">
+                  <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300">Intermediate</Badge>
+                  <Badge className="bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-300">5 Lessons</Badge>
+                  <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">Real Scenarios</Badge>
+                </div>
+                <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500" data-testid="button-start-12-16">
+                  Start Learning <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-2 border-blue-200 dark:border-blue-800">
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg">
+                    <GraduationCap className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    For Parents and Educators
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Learn how this section works, what your kids will learn, and get conversation starters to discuss online safety together.
+                  </p>
+                </div>
+                <Button variant="outline" className="border-blue-300 dark:border-blue-700" onClick={() => {
+                  const element = document.getElementById('parent-section');
+                  element?.scrollIntoView({ behavior: 'smooth' });
+                }} data-testid="button-parent-info">
+                  Learn More
+                </Button>
               </div>
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  For Parents and Educators
-                </h3>
-                <p className="text-muted-foreground">
-                  Learn how this section works, what your kids will learn, and get conversation starters to discuss online safety together.
+            </CardContent>
+          </Card>
+
+          <div className="mt-8 p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg border border-teal-200 dark:border-teal-800">
+            <div className="flex items-start gap-3">
+              <Shield className="w-5 h-5 text-teal-600 dark:text-teal-400 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-teal-800 dark:text-teal-200">Built for Learning, Not Data Collection</p>
+                <p className="text-sm text-teal-600 dark:text-teal-400">
+                  This section does not collect any personal information from children. No accounts, no tracking, no ads. Just safe learning.
                 </p>
               </div>
-              <Button variant="outline" onClick={() => {
-                const element = document.getElementById('parent-section');
-                element?.scrollIntoView({ behavior: 'smooth' });
-              }} data-testid="button-parent-info">
-                Learn More
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="mt-8 p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg border border-teal-200 dark:border-teal-800">
-          <div className="flex items-start gap-3">
-            <Shield className="w-5 h-5 text-teal-600 dark:text-teal-400 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-teal-800 dark:text-teal-200">Built for Learning, Not Data Collection</p>
-              <p className="text-sm text-teal-600 dark:text-teal-400">
-                This section does not collect any personal information from children. No accounts, no tracking, no ads. Just safe learning.
-              </p>
             </div>
           </div>
         </div>
@@ -511,35 +537,50 @@ function LearningTrack({
   const trackTitle = ageGroup === "8-11" ? "Foundations" : "Smart and Safe Online";
   const trackColor = ageGroup === "8-11" ? "teal" : "purple";
 
-  return (
-    <div className="py-8">
-      <div className="max-w-5xl mx-auto px-4">
-        <Button 
-          variant="ghost" 
-          onClick={onBack} 
-          className="mb-6"
-          data-testid="button-back-to-ages"
-        >
-          <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-          Back to Age Selection
-        </Button>
+  const bgGradient = ageGroup === "8-11" 
+    ? "from-teal-50 via-cyan-50 to-blue-50 dark:from-teal-950/30 dark:via-cyan-950/30 dark:to-blue-950/30"
+    : "from-purple-50 via-pink-50 to-rose-50 dark:from-purple-950/30 dark:via-pink-950/30 dark:to-rose-950/30";
 
-        <div className="mb-8">
-          <Badge className={`mb-4 ${trackColor === 'teal' ? 'bg-teal-500' : 'bg-purple-500'}`}>
-            Ages {ageGroup}
-          </Badge>
-          <h2 className="text-3xl font-bold text-foreground mb-2">{trackTitle}</h2>
-          <p className="text-muted-foreground">
-            Complete each lesson and quiz to earn your safety badges. You have completed {completedModules.length} of {modules.length} lessons.
-          </p>
-          
-          <div className="mt-4 w-full bg-muted rounded-full h-3">
-            <div 
-              className={`h-3 rounded-full transition-all duration-500 ${trackColor === 'teal' ? 'bg-teal-500' : 'bg-purple-500'}`}
-              style={{ width: `${(completedModules.length / modules.length) * 100}%` }}
-            />
+  return (
+    <div className="relative">
+      <div className={`absolute inset-0 bg-gradient-to-br ${bgGradient}`} />
+      <FloatingShapes />
+      
+      <div className="relative py-8">
+        <div className="max-w-5xl mx-auto px-4">
+          <Button 
+            variant="ghost" 
+            onClick={onBack} 
+            className="mb-6"
+            data-testid="button-back-to-ages"
+          >
+            <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+            Back to Age Selection
+          </Button>
+
+          <div className="mb-8 p-6 bg-white/60 dark:bg-card/60 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/10">
+            <div className="flex items-center gap-3 mb-4">
+              <Badge className={`${trackColor === 'teal' ? 'bg-gradient-to-r from-teal-500 to-blue-500' : 'bg-gradient-to-r from-purple-500 to-pink-500'} text-white shadow-md`}>
+                Ages {ageGroup}
+              </Badge>
+              <div className="flex gap-1">
+                {[...Array(completedModules.length)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-500 fill-current" />
+                ))}
+              </div>
+            </div>
+            <h2 className="text-3xl font-bold text-foreground mb-2">{trackTitle}</h2>
+            <p className="text-muted-foreground">
+              Complete each lesson and quiz to earn your safety badges. You have completed {completedModules.length} of {modules.length} lessons.
+            </p>
+            
+            <div className="mt-4 w-full bg-muted rounded-full h-4 overflow-hidden">
+              <div 
+                className={`h-4 rounded-full transition-all duration-500 ${trackColor === 'teal' ? 'bg-gradient-to-r from-teal-400 to-blue-500' : 'bg-gradient-to-r from-purple-400 to-pink-500'}`}
+                style={{ width: `${(completedModules.length / modules.length) * 100}%` }}
+              />
+            </div>
           </div>
-        </div>
 
         {activeModule ? (
           <ModuleContent 
@@ -553,54 +594,71 @@ function LearningTrack({
             onBack={() => setActiveModule(null)}
             isCompleted={completedModules.includes(activeModule)}
           />
-        ) : (
-          <div className="grid md:grid-cols-2 gap-4">
-            {modules.map((module) => {
-              const isCompleted = completedModules.includes(module.id);
-              return (
-                <Card 
-                  key={module.id}
-                  className={`cursor-pointer transition-all hover:shadow-md ${isCompleted ? 'border-green-300 dark:border-green-700 bg-green-50/50 dark:bg-green-900/10' : ''}`}
-                  onClick={() => setActiveModule(module.id)}
-                  data-testid={`card-module-${module.id}`}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className={`w-12 h-12 rounded-lg ${module.color} flex items-center justify-center flex-shrink-0`}>
-                        <module.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-lg text-foreground">{module.title}</h3>
-                          {isCompleted && <CheckCircle className="w-5 h-5 text-green-500" />}
+          ) : (
+            <div className="grid md:grid-cols-2 gap-5">
+              {modules.map((module, index) => {
+                const isCompleted = completedModules.includes(module.id);
+                return (
+                  <Card 
+                    key={module.id}
+                    className={`cursor-pointer transition-shadow hover:shadow-xl bg-white/80 dark:bg-card/80 backdrop-blur-sm border-2 ${isCompleted ? 'border-green-400 dark:border-green-600 ring-2 ring-green-200 dark:ring-green-800' : 'border-white/50 dark:border-white/10'}`}
+                    onClick={() => setActiveModule(module.id)}
+                    data-testid={`card-module-${module.id}`}
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className={`w-14 h-14 rounded-xl ${module.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                          <module.icon className="w-7 h-7 text-white" />
                         </div>
-                        <p className="text-muted-foreground">{module.description}</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-lg text-foreground">{module.title}</h3>
+                            {isCompleted && (
+                              <div className="flex items-center gap-1">
+                                <CheckCircle className="w-5 h-5 text-green-500" />
+                                <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-muted-foreground">{module.description}</p>
+                          {!isCompleted && (
+                            <Badge className="mt-2 bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
+                              Ready to start
+                            </Badge>
+                          )}
+                          {isCompleted && (
+                            <Badge className="mt-2 bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300">
+                              Completed
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
 
-        {completedModules.length === modules.length && !activeModule && (
-          <Card className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-300 dark:border-yellow-700">
-            <CardContent className="p-8 text-center">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
-                <Trophy className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-2">Congratulations!</h3>
-              <p className="text-muted-foreground text-lg mb-4">
-                You have completed all the lessons in the {trackTitle} track. You are now a certified internet safety champion.
-              </p>
-              <div className="flex justify-center gap-2">
-                <Badge className="bg-yellow-500 text-white">All Lessons Complete</Badge>
-                <Badge className="bg-orange-500 text-white">Safety Champion</Badge>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          {completedModules.length === modules.length && !activeModule && (
+            <Card className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-300 dark:border-yellow-700 shadow-xl">
+              <CardContent className="p-8 text-center">
+                <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
+                  <Trophy className="w-12 h-12 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-2">Congratulations!</h3>
+                <p className="text-muted-foreground text-lg mb-4">
+                  You have completed all the lessons in the {trackTitle} track. You are now a certified internet safety champion.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-md">All Lessons Complete</Badge>
+                  <Badge className="bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md">Safety Champion</Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -795,24 +853,35 @@ function SpotTheScamGame() {
 
   if (gameComplete) {
     return (
-      <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+      <Card className="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 border-2 border-purple-200 dark:border-purple-800 shadow-xl">
         <CardContent className="p-8 text-center">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center">
-            <Trophy className="w-10 h-10 text-white" />
+          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-400 via-pink-500 to-orange-400 flex items-center justify-center shadow-lg">
+            <Trophy className="w-12 h-12 text-white" />
           </div>
           <h3 className="text-2xl font-bold text-foreground mb-2">Game Complete!</h3>
+          <div className="flex justify-center gap-1 mb-4">
+            {[...Array(score)].map((_, i) => (
+              <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
+            ))}
+            {[...Array(spotTheScamItems.length - score)].map((_, i) => (
+              <Star key={i} className="w-6 h-6 text-gray-300 dark:text-gray-600" />
+            ))}
+          </div>
           <p className="text-xl text-muted-foreground mb-4">
             You scored {score} out of {spotTheScamItems.length}
           </p>
           {score === spotTheScamItems.length ? (
-            <Badge className="bg-green-500 text-white mb-4">Perfect Score! Scam Spotter Expert!</Badge>
+            <Badge className="bg-gradient-to-r from-green-400 to-emerald-500 text-white mb-4 shadow-md">Perfect Score! Scam Spotter Expert!</Badge>
           ) : score >= spotTheScamItems.length / 2 ? (
-            <Badge className="bg-blue-500 text-white mb-4">Great Job! Keep Learning!</Badge>
+            <Badge className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white mb-4 shadow-md">Great Job! Keep Learning!</Badge>
           ) : (
-            <Badge className="bg-orange-500 text-white mb-4">Good Try! Practice Makes Perfect!</Badge>
+            <Badge className="bg-gradient-to-r from-orange-400 to-amber-500 text-white mb-4 shadow-md">Good Try! Practice Makes Perfect!</Badge>
           )}
           <div className="pt-4">
-            <Button onClick={resetGame} data-testid="button-play-again">Play Again</Button>
+            <Button onClick={resetGame} className="bg-gradient-to-r from-purple-500 to-pink-500" data-testid="button-play-again">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Play Again
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -820,14 +889,16 @@ function SpotTheScamGame() {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-2 border-orange-200 dark:border-orange-800 shadow-lg">
+      <CardHeader className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/30 dark:to-yellow-950/30">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-orange-500" />
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 flex items-center justify-center shadow-md">
+              <AlertCircle className="w-5 h-5 text-white" />
+            </div>
             Spot the Scam
           </CardTitle>
-          <Badge variant="outline">
+          <Badge className="bg-gradient-to-r from-orange-400 to-yellow-500 text-white shadow-md">
             {currentIndex + 1} of {spotTheScamItems.length}
           </Badge>
         </div>
@@ -835,8 +906,8 @@ function SpotTheScamGame() {
           Read the scenario and decide if it is a scam or legitimate.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="bg-muted/50 rounded-lg p-6">
+      <CardContent className="space-y-6 pt-6">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-6 border border-blue-100 dark:border-blue-900">
           <p className="text-lg text-foreground">{currentItem.scenario}</p>
         </div>
 
