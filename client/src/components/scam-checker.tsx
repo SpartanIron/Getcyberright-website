@@ -95,14 +95,143 @@ const suspiciousUrlPatterns = [
   { pattern: /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/, reason: "IP address instead of domain name" },
   { pattern: /@/, reason: "@ symbol in URL (credential injection)" },
   { pattern: /paypal|amazon|apple|google|microsoft|facebook|netflix|bank/i, reason: "Mentions major brand but may be fake" },
-  { pattern: /\.(tk|ml|ga|cf|gq|xyz|top|club|online|site|website)$/i, reason: "Free or suspicious TLD" },
+  { pattern: /\.(tk|ml|ga|cf|gq|xyz|top|club|online|site|website|buzz|work|link|click|info|biz|pw|cc|ws)$/i, reason: "Free or suspicious TLD" },
   { pattern: /-login|-verify|-secure|-account|-update|-confirm/i, reason: "Suspicious subdomain/path pattern" },
-  { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i, reason: "URL shortener hiding destination" },
+  { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly|is\.gd|buff\.ly|adf\.ly|shorturl|v\.gd|rb\.gy|cutt\.ly|trib\.al/i, reason: "URL shortener hiding destination" },
+  { pattern: /\.(exe|zip|rar|scr|bat|cmd|msi|jar|vbs|js)$/i, reason: "Potentially malicious file download" },
 ];
 
 const legitDomains = [
   /^(https?:\/\/)?(www\.)?(google|microsoft|apple|amazon|facebook|twitter|linkedin|instagram|youtube|netflix|paypal|github|dropbox|zoom|slack)\.com/i,
   /^(https?:\/\/)?(www\.)?[a-z0-9-]+\.(gov|edu|mil)/i,
+];
+
+// Typosquatting detection - common brand misspellings
+const typosquattingPatterns: { brand: string; variants: RegExp[] }[] = [
+  { brand: "PayPal", variants: [/paypa[l1]|paypai|paypol|payp[a@]l|p[a@]ypal|paaypal/i] },
+  { brand: "Amazon", variants: [/amaz[o0]n|amazom|arnazon|amzon|amazn|amaazon|amazoon/i] },
+  { brand: "Apple", variants: [/app[l1]e|appie|aple|applle|aaple/i] },
+  { brand: "Google", variants: [/g[o0][o0]gle|googel|gogle|googlle|g00gle/i] },
+  { brand: "Microsoft", variants: [/micr[o0]s[o0]ft|mircosoft|microsft|micosoft|micros0ft/i] },
+  { brand: "Netflix", variants: [/netf[l1]ix|netfiix|netfix|nettflix|netfl1x/i] },
+  { brand: "Facebook", variants: [/faceb[o0][o0]k|facebok|facbook|faceboook|fac3book/i] },
+  { brand: "Instagram", variants: [/[i1]nstagram|instagran|instgram|instagrem|1nstagram/i] },
+  { brand: "Bank of America", variants: [/bankofamer[i1]ca|bank0famerica|bankofamerica\d/i] },
+  { brand: "Chase", variants: [/chas[e3]bank|chase\d|chasecom/i] },
+  { brand: "Wells Fargo", variants: [/we[l1][l1]sfargo|wellsfarg0|weilsfargo/i] },
+  { brand: "Walmart", variants: [/wa[l1]mart|walmrt|walmaart|walmart\d/i] },
+];
+
+// Homograph attack detection - lookalike Unicode characters
+const homoglyphMap: Record<string, string[]> = {
+  'a': ['\u0430', '\u00e0', '\u00e1', '\u0101', '\u0103'], // Cyrillic а, accented variants
+  'e': ['\u0435', '\u00e8', '\u00e9', '\u0113', '\u0117'], // Cyrillic е
+  'o': ['\u043e', '\u00f2', '\u00f3', '\u014d', '\u014f', '\u0030'], // Cyrillic о, 0
+  'i': ['\u0456', '\u00ec', '\u00ed', '\u0131', '\u0031', '\u006c'], // Cyrillic і, 1, l
+  'c': ['\u0441', '\u00e7'], // Cyrillic с
+  's': ['\u0455'], // Cyrillic ѕ
+  'p': ['\u0440'], // Cyrillic р
+  'x': ['\u0445'], // Cyrillic х
+  'y': ['\u0443'], // Cyrillic у
+  'l': ['\u006c', '\u0031', '\u007c'], // 1, |
+  'n': ['\u0578'], // Armenian ո
+};
+
+function detectHomoglyphs(text: string): { found: boolean; examples: string[] } {
+  const examples: string[] = [];
+  const lowerText = text.toLowerCase();
+  
+  for (const [latin, homoglyphs] of Object.entries(homoglyphMap)) {
+    for (const homoglyph of homoglyphs) {
+      if (text.includes(homoglyph)) {
+        examples.push(`"${homoglyph}" looks like "${latin}"`);
+      }
+    }
+  }
+  
+  // Check for mixed scripts (Cyrillic + Latin in same word)
+  const cyrillicPattern = /[\u0400-\u04FF]/;
+  const latinPattern = /[a-zA-Z]/;
+  const words = text.split(/\s+/);
+  
+  for (const word of words) {
+    if (cyrillicPattern.test(word) && latinPattern.test(word) && word.length > 3) {
+      examples.push(`Mixed scripts in "${word}"`);
+    }
+  }
+  
+  return { found: examples.length > 0, examples: examples.slice(0, 3) };
+}
+
+function detectTyposquatting(url: string): { brand: string; found: boolean } | null {
+  const domain = url.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0].toLowerCase();
+  
+  for (const { brand, variants } of typosquattingPatterns) {
+    for (const variant of variants) {
+      if (variant.test(domain) && !domain.includes(brand.toLowerCase().replace(/\s/g, ''))) {
+        return { brand, found: true };
+      }
+    }
+  }
+  return null;
+}
+
+// Cryptocurrency address patterns
+const cryptoPatterns = [
+  { name: "Bitcoin", pattern: /\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b/, severity: "high" as const },
+  { name: "Bitcoin (Bech32)", pattern: /\bbc1[a-z0-9]{39,59}\b/, severity: "high" as const },
+  { name: "Ethereum", pattern: /\b0x[a-fA-F0-9]{40}\b/, severity: "high" as const },
+  { name: "Monero", pattern: /\b4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}\b/, severity: "high" as const },
+];
+
+function detectCryptoAddresses(text: string): { type: string; address: string }[] {
+  const found: { type: string; address: string }[] = [];
+  
+  for (const { name, pattern } of cryptoPatterns) {
+    const matches = text.match(pattern);
+    if (matches) {
+      for (const match of matches) {
+        found.push({ type: name, address: match.slice(0, 20) + '...' });
+      }
+    }
+  }
+  
+  return found;
+}
+
+// Phone number extraction
+const phonePatterns = [
+  /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, // US format
+  /\b\(\d{3}\)\s*\d{3}[-.]?\d{4}\b/g, // (123) 456-7890
+  /\b\+1[-.\s]?\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/g, // +1 format
+  /\b1[-.\s]?800[-.\s]?\d{3}[-.\s]?\d{4}\b/gi, // Toll-free
+  /\b1[-.\s]?888[-.\s]?\d{3}[-.\s]?\d{4}\b/gi,
+  /\b1[-.\s]?877[-.\s]?\d{3}[-.\s]?\d{4}\b/gi,
+  /\b1[-.\s]?866[-.\s]?\d{3}[-.\s]?\d{4}\b/gi,
+];
+
+function extractPhoneNumbers(text: string): string[] {
+  const phones: Set<string> = new Set();
+  
+  for (const pattern of phonePatterns) {
+    const matches = text.match(pattern);
+    if (matches) {
+      matches.forEach(m => phones.add(m.replace(/\s+/g, '')));
+    }
+  }
+  
+  return Array.from(phones);
+}
+
+// Grammar and spelling red flags common in scam messages
+const grammarRedFlags = [
+  { pattern: /\bdear\s+(customer|user|member|valued|sir\/madam|friend)\b/i, issue: "Generic greeting often used in mass phishing" },
+  { pattern: /\b(kindly|please to|do the needful|revert back)\b/i, issue: "Unusual phrasing common in scam emails" },
+  { pattern: /\b(your account have been|your account has been compromise|you has won|you has been selected)\b/i, issue: "Grammar errors suggesting non-native scammer" },
+  { pattern: /\b(click bellow|click belllow|clik here|clck here)\b/i, issue: "Misspelled call-to-action" },
+  { pattern: /!!!+|\?\?\?+|\.\.\.\.+/g, issue: "Excessive punctuation" },
+  { pattern: /[A-Z]{5,}/g, issue: "Excessive capitalization" },
+  { pattern: /\$\s*\d{1,3}(,\d{3})*(\.\d{2})?\s*(million|billion|thousand)/i, issue: "Large money amount mentioned" },
 ];
 
 function extractUrls(content: string): string[] {
@@ -112,20 +241,42 @@ function extractUrls(content: string): string[] {
 
 function analyzeUrl(url: string): URLAnalysis {
   const reasons: string[] = [];
-  let isSuspicious = true;
+  let isSuspicious = false;
   
+  // Check if it's a known legitimate domain first
+  let isLegit = false;
   for (const legit of legitDomains) {
     if (legit.test(url)) {
-      isSuspicious = false;
+      isLegit = true;
       break;
     }
   }
   
+  // Check for suspicious patterns
   for (const { pattern, reason } of suspiciousUrlPatterns) {
     if (pattern.test(url)) {
       reasons.push(reason);
       isSuspicious = true;
     }
+  }
+  
+  // Check for typosquatting
+  const typosquat = detectTyposquatting(url);
+  if (typosquat) {
+    reasons.push(`Possible ${typosquat.brand} typosquatting`);
+    isSuspicious = true;
+  }
+  
+  // Check for homograph attacks
+  const homoglyphs = detectHomoglyphs(url);
+  if (homoglyphs.found) {
+    reasons.push(`Lookalike characters detected: ${homoglyphs.examples.join(', ')}`);
+    isSuspicious = true;
+  }
+  
+  // Override suspicious flag if it's a known legitimate domain
+  if (isLegit && reasons.length === 0) {
+    isSuspicious = false;
   }
   
   return { url, isSuspicious, reasons };
@@ -172,9 +323,56 @@ function analyzeContent(content: string): AnalysisResult {
     });
   }
   
+  // Check for cryptocurrency addresses
+  const cryptoAddresses = detectCryptoAddresses(content);
+  if (cryptoAddresses.length > 0) {
+    threats.push({
+      category: "Cryptocurrency Request",
+      indicator: `${cryptoAddresses.length} cryptocurrency address(es) found: ${cryptoAddresses.map(c => c.type).join(', ')}`,
+      severity: "critical",
+      explanation: "Cryptocurrency addresses in unsolicited messages are a major red flag. Legitimate businesses rarely request crypto payments, and these transactions cannot be reversed."
+    });
+  }
+  
+  // Check for phone numbers
+  const phoneNumbers = extractPhoneNumbers(content);
+  if (phoneNumbers.length > 0) {
+    threats.push({
+      category: "Phone Number Detected",
+      indicator: `${phoneNumbers.length} phone number(s) found`,
+      severity: "medium",
+      explanation: "Phone numbers in suspicious messages may connect you to scam call centers. Never call numbers provided in unsolicited messages. Verify numbers through official websites."
+    });
+  }
+  
+  // Check for grammar red flags
+  for (const { pattern, issue } of grammarRedFlags) {
+    if (pattern.test(content)) {
+      threats.push({
+        category: "Writing Style Red Flag",
+        indicator: issue,
+        severity: "low",
+        explanation: "This writing pattern is commonly seen in scam messages. Professional organizations typically use proper grammar and personalized greetings."
+      });
+      break; // Only add one grammar warning
+    }
+  }
+  
+  // Check for homograph attacks in the full content
+  const contentHomoglyphs = detectHomoglyphs(content);
+  if (contentHomoglyphs.found) {
+    threats.push({
+      category: "Homograph Attack",
+      indicator: `Deceptive characters detected: ${contentHomoglyphs.examples.join(', ')}`,
+      severity: "high",
+      explanation: "This message contains characters designed to look like normal letters but are actually different. Scammers use this trick to create fake website addresses."
+    });
+  }
+  
   // Calculate risk score
   let totalScore = threats.reduce((sum, t) => sum + severityScores[t.severity], 0);
   totalScore += suspiciousUrls.length * 2;
+  totalScore += cryptoAddresses.length * 3;
   
   // Determine overall risk
   let overallRisk: AnalysisResult["overallRisk"];
