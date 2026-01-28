@@ -21,6 +21,8 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  displayedContent?: string;
+  isStreaming?: boolean;
   timestamp: Date;
 }
 
@@ -257,19 +259,54 @@ export function DeziAssistant() {
     setInputValue("");
     setIsTyping(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 700));
+    // Initial thinking delay
+    await new Promise((resolve) => setTimeout(resolve, 600 + Math.random() * 400));
 
     const response = getResponse(text);
+    const messageId = (Date.now() + 1).toString();
     
+    // Add message with streaming flag
     const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
+      id: messageId,
       role: "assistant",
       content: response,
+      displayedContent: "",
+      isStreaming: true,
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, assistantMessage]);
     setIsTyping(false);
+
+    // Stream the response word by word
+    const words = response.split(" ");
+    let currentContent = "";
+    
+    for (let i = 0; i < words.length; i++) {
+      currentContent += (i === 0 ? "" : " ") + words[i];
+      const contentSnapshot = currentContent;
+      
+      setMessages((prev) => 
+        prev.map((msg) => 
+          msg.id === messageId 
+            ? { ...msg, displayedContent: contentSnapshot }
+            : msg
+        )
+      );
+      
+      // Variable delay for natural pacing
+      const delay = words[i].includes("\n") ? 80 : (15 + Math.random() * 25);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
+    // Mark streaming complete
+    setMessages((prev) => 
+      prev.map((msg) => 
+        msg.id === messageId 
+          ? { ...msg, isStreaming: false, displayedContent: response }
+          : msg
+      )
+    );
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -387,10 +424,16 @@ export function DeziAssistant() {
                                   <img src={deziAvatar} alt="" className="w-full h-full object-cover" />
                                 </div>
                                 <span className="text-xs font-medium text-muted-foreground">Dezi</span>
+                                {message.isStreaming && (
+                                  <span className="w-1.5 h-4 bg-primary/60 animate-pulse ml-1" />
+                                )}
                               </div>
                             )}
                             <div className="text-sm whitespace-pre-wrap leading-relaxed">
-                              {message.content.split("\n").map((line, idx) => {
+                              {(message.role === "assistant" && message.displayedContent !== undefined
+                                ? message.displayedContent
+                                : message.content
+                              ).split("\n").map((line, idx) => {
                                 if (line.startsWith("**") && line.endsWith("**")) {
                                   return <p key={idx} className="font-semibold mt-3 mb-1">{line.replace(/\*\*/g, "")}</p>;
                                 }
