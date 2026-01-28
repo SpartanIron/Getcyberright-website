@@ -636,7 +636,17 @@ export default function Resources() {
   const allResources = filteredResources;
 
   const handleResourceClick = (slug: string) => {
-    setExpandedResource(expandedResource === slug ? null : slug);
+    const newSlug = expandedResource === slug ? null : slug;
+    setExpandedResource(newSlug);
+    
+    if (newSlug) {
+      setTimeout(() => {
+        const expandedElement = document.querySelector(`[data-testid="expanded-featured-${newSlug}"], [data-testid="article-expanded-${newSlug}"]`);
+        if (expandedElement) {
+          expandedElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
   };
 
   const getResourceBySlug = (slug: string) => resources.find(r => r.slug === slug);
