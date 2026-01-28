@@ -405,9 +405,24 @@ export function DeziAssistant() {
                       ))}
                       {isTyping && (
                         <div className="flex justify-start" data-testid="indicator-dezi-typing">
-                          <div className="bg-muted rounded-lg p-3 flex items-center gap-2">
-                            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">Dezi is typing...</span>
+                          <div className="bg-muted rounded-lg p-3 flex items-center gap-3">
+                            <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0">
+                              <img src={deziAvatar} alt="" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span 
+                                className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" 
+                                style={{ animationDelay: "0ms", animationDuration: "600ms" }} 
+                              />
+                              <span 
+                                className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" 
+                                style={{ animationDelay: "150ms", animationDuration: "600ms" }} 
+                              />
+                              <span 
+                                className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" 
+                                style={{ animationDelay: "300ms", animationDuration: "600ms" }} 
+                              />
+                            </div>
                           </div>
                         </div>
                       )}
