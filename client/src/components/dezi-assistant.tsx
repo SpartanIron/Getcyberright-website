@@ -26,6 +26,104 @@ interface Message {
   timestamp: Date;
 }
 
+interface RegionInfo {
+  country: string;
+  countryCode: string;
+  detected: boolean;
+}
+
+interface RegionResources {
+  name: string;
+  fraudReport: string;
+  fraudReportUrl: string;
+  cyberCrime: string;
+  cyberCrimeUrl: string;
+  identityTheft: string;
+  identityTheftUrl: string;
+  consumerProtection: string;
+  consumerProtectionUrl: string;
+}
+
+const regionResources: Record<string, RegionResources> = {
+  US: {
+    name: "United States",
+    fraudReport: "FTC",
+    fraudReportUrl: "ReportFraud.ftc.gov",
+    cyberCrime: "FBI IC3",
+    cyberCrimeUrl: "ic3.gov",
+    identityTheft: "IdentityTheft.gov",
+    identityTheftUrl: "IdentityTheft.gov",
+    consumerProtection: "FTC Consumer Protection",
+    consumerProtectionUrl: "consumer.ftc.gov",
+  },
+  GB: {
+    name: "United Kingdom",
+    fraudReport: "Action Fraud",
+    fraudReportUrl: "actionfraud.police.uk",
+    cyberCrime: "NCSC",
+    cyberCrimeUrl: "ncsc.gov.uk",
+    identityTheft: "CIFAS",
+    identityTheftUrl: "cifas.org.uk",
+    consumerProtection: "Citizens Advice",
+    consumerProtectionUrl: "citizensadvice.org.uk",
+  },
+  CA: {
+    name: "Canada",
+    fraudReport: "Canadian Anti-Fraud Centre",
+    fraudReportUrl: "antifraudcentre-centreantifraude.ca",
+    cyberCrime: "Cyber Centre",
+    cyberCrimeUrl: "cyber.gc.ca",
+    identityTheft: "CAFC",
+    identityTheftUrl: "antifraudcentre-centreantifraude.ca",
+    consumerProtection: "Competition Bureau",
+    consumerProtectionUrl: "competitionbureau.gc.ca",
+  },
+  AU: {
+    name: "Australia",
+    fraudReport: "Scamwatch",
+    fraudReportUrl: "scamwatch.gov.au",
+    cyberCrime: "ReportCyber",
+    cyberCrimeUrl: "cyber.gov.au/report",
+    identityTheft: "IDCARE",
+    identityTheftUrl: "idcare.org",
+    consumerProtection: "ACCC",
+    consumerProtectionUrl: "accc.gov.au",
+  },
+  NZ: {
+    name: "New Zealand",
+    fraudReport: "Netsafe",
+    fraudReportUrl: "netsafe.org.nz",
+    cyberCrime: "CERT NZ",
+    cyberCrimeUrl: "cert.govt.nz",
+    identityTheft: "IDCARE",
+    identityTheftUrl: "idcare.org",
+    consumerProtection: "Commerce Commission",
+    consumerProtectionUrl: "comcom.govt.nz",
+  },
+  IE: {
+    name: "Ireland",
+    fraudReport: "Garda Fraud",
+    fraudReportUrl: "garda.ie",
+    cyberCrime: "NCSC Ireland",
+    cyberCrimeUrl: "ncsc.gov.ie",
+    identityTheft: "Data Protection Commission",
+    identityTheftUrl: "dataprotection.ie",
+    consumerProtection: "CCPC",
+    consumerProtectionUrl: "ccpc.ie",
+  },
+  DEFAULT: {
+    name: "your region",
+    fraudReport: "your local fraud reporting agency",
+    fraudReportUrl: "",
+    cyberCrime: "your national cyber security centre",
+    cyberCrimeUrl: "",
+    identityTheft: "your local identity protection service",
+    identityTheftUrl: "",
+    consumerProtection: "your consumer protection agency",
+    consumerProtectionUrl: "",
+  },
+};
+
 const suggestedPrompts = [
   { text: "Is this message a scam?", icon: AlertTriangle },
   { text: "How do phishing scams work?", icon: HelpCircle },
@@ -33,8 +131,17 @@ const suggestedPrompts = [
   { text: "What should I do if I clicked a suspicious link?", icon: AlertTriangle },
 ];
 
-const safetyResponses: Record<string, string> = {
-  "scam": `Great question! Spotting scams gets easier once you know what to look for.
+function getRegionResources(countryCode: string): RegionResources {
+  return regionResources[countryCode] || regionResources.DEFAULT;
+}
+
+function getResponse(userMessage: string, region: RegionInfo | null): string {
+  const lowerMessage = userMessage.toLowerCase();
+  const r = region ? getRegionResources(region.countryCode) : regionResources.DEFAULT;
+  const regionNote = region?.detected ? `\n\nI noticed you are connecting from ${r.name}. ` : "\n\n";
+  
+  if (lowerMessage.includes("scam") || lowerMessage.includes("suspicious") || lowerMessage.includes("fraud") || lowerMessage.includes("fake")) {
+    return `Great question! Spotting scams gets easier once you know what to look for.
 
 **Common Warning Signs:**
 • Messages that create urgency or pressure you to act fast
@@ -48,11 +155,13 @@ const safetyResponses: Record<string, string> = {
 • Avoid clicking links or downloading attachments
 • Do not reply or call numbers in the message
 • Contact the company directly using their official website
-• Report suspicious messages to the FTC at ReportFraud.ftc.gov
+• Report suspicious messages to ${r.fraudReport}${r.fraudReportUrl ? ` at ${r.fraudReportUrl}` : ""}
 
-If something feels off, trust your instincts. You can also use our Scam Checker tool to analyze any message you are unsure about.`,
+If something feels off, trust your instincts. You can also use our Scam Checker tool to analyze any message you are unsure about.`;
+  }
 
-  "phishing": `Phishing is one of the most common online scams, and understanding how it works can help you avoid it.
+  if (lowerMessage.includes("phishing") || lowerMessage.includes("email") || lowerMessage.includes("text message")) {
+    return `Phishing is one of the most common online scams, and understanding how it works can help you avoid it.
 
 **How It Works:**
 Scammers send emails, texts, or messages pretending to be from trusted organizations like banks, tech companies, or government agencies. These messages usually claim something is wrong with your account and urge you to act quickly. They include links to fake websites that look real, and when you enter your information, it goes straight to the criminals.
@@ -61,17 +170,18 @@ Scammers send emails, texts, or messages pretending to be from trusted organizat
 • Unexpected password reset requests
 • Package delivery notifications you were not expecting
 • Prize or lottery announcements
-• Messages claiming to be from the IRS about refunds
+• Messages claiming to be from tax authorities about refunds
 
 **How to Protect Yourself:**
 • Never click links in unexpected messages
 • When in doubt, contact the organization directly
 • Check sender addresses for misspellings
 • Turn on two factor authentication for your accounts
+${regionNote}You can report phishing attempts to ${r.cyberCrime}${r.cyberCrimeUrl ? ` at ${r.cyberCrimeUrl}` : ""} or learn more from ${r.consumerProtection}${r.consumerProtectionUrl ? ` at ${r.consumerProtectionUrl}` : ""}.`;
+  }
 
-You can learn more at CISA.gov or the FTC Consumer Protection page.`,
-
-  "family": `Keeping your family safe online is all about building good habits and having open conversations.
+  if (lowerMessage.includes("family") || lowerMessage.includes("kids") || lowerMessage.includes("children") || lowerMessage.includes("protect") || lowerMessage.includes("senior") || lowerMessage.includes("parent")) {
+    return `Keeping your family safe online is all about building good habits and having open conversations.
 
 **For Children:**
 Parental controls are a great starting point. Keep devices in common areas so you can stay involved, and talk about online safety in ways they can understand. Teach them never to share personal information, and set clear rules about screen time and app downloads.
@@ -84,10 +194,11 @@ Help set up fraud alerts on bank accounts and establish a family code word for e
 
 **For Everyone:**
 Use strong, unique passwords for each account. Enable two factor authentication whenever possible, keep your devices updated, and talk as a family about the latest scam trends.
+${regionNote}For additional resources, visit ${r.consumerProtection}${r.consumerProtectionUrl ? ` at ${r.consumerProtectionUrl}` : ""}.`;
+  }
 
-StopBullying.gov has great resources for youth, and AARP.org offers helpful guides for seniors.`,
-
-  "clicked": `First, take a breath. Clicking a suspicious link is not the end of the world, but here is what you should do right away.
+  if (lowerMessage.includes("clicked") || lowerMessage.includes("link") || lowerMessage.includes("what should i do") || lowerMessage.includes("accident")) {
+    return `First, take a breath. Clicking a suspicious link is not the end of the world, but here is what you should do right away.
 
 **Right Now:**
 Close the browser tab or window immediately. If you have not entered any information or downloaded anything, you are probably fine. If you are worried about malware, you can disconnect from the internet temporarily.
@@ -99,11 +210,12 @@ Run a full antivirus scan. Look through your browser extensions for anything unf
 Change the password for that account right away. If you use the same password elsewhere, change those too. Turn on two factor authentication, and if you entered bank or credit card details, contact your bank immediately. Keep an eye on your accounts for any unusual activity.
 
 **Moving Forward:**
-Consider setting up fraud alerts with credit bureaus. Report the phishing attempt to the FTC, and stay alert for suspicious follow up emails or calls over the next few weeks.
+Consider setting up fraud alerts with credit bureaus. Report the phishing attempt to ${r.fraudReport}${r.fraudReportUrl ? ` at ${r.fraudReportUrl}` : ""}, and stay alert for suspicious follow up emails or calls over the next few weeks.
+${regionNote}Our Emergency Help page has more detailed guidance, and you can also contact ${r.identityTheft}${r.identityTheftUrl ? ` at ${r.identityTheftUrl}` : ""} for identity protection support.`;
+  }
 
-Our Emergency Help page has more detailed guidance, and you can also visit IdentityTheft.gov.`,
-
-  "default": `Hello! I am Dezi, your online safety assistant. I am here to help you understand digital risks and learn how to protect yourself and your family.
+  // Default welcome message with region-specific resources
+  return `Hello! I am Dezi, your online safety assistant.${region?.detected ? ` I see you are connecting from ${r.name}.` : ""} I am here to help you understand digital risks and learn how to protect yourself and your family.
 
 **I Can Help You With:**
 • Figuring out if a message might be a scam
@@ -115,30 +227,11 @@ Our Emergency Help page has more detailed guidance, and you can also visit Ident
 I provide general educational information, but I cannot offer legal, medical, or financial advice. I also cannot guarantee whether any specific message is safe or dangerous, and I am not a replacement for professional cybersecurity services.
 
 **Need Help Right Now?**
-• Report fraud to the FTC at ReportFraud.ftc.gov
-• Report internet crimes to FBI IC3 at ic3.gov
+• Report fraud to ${r.fraudReport}${r.fraudReportUrl ? ` at ${r.fraudReportUrl}` : ""}
+• Report cyber crimes to ${r.cyberCrime}${r.cyberCrimeUrl ? ` at ${r.cyberCrimeUrl}` : ""}
 • Contact your bank for financial concerns
 
-What would you like to learn about today?`
-};
-
-function getResponse(userMessage: string): string {
-  const lowerMessage = userMessage.toLowerCase();
-  
-  if (lowerMessage.includes("scam") || lowerMessage.includes("suspicious") || lowerMessage.includes("fraud") || lowerMessage.includes("fake")) {
-    return safetyResponses["scam"];
-  }
-  if (lowerMessage.includes("phishing") || lowerMessage.includes("email") || lowerMessage.includes("text message")) {
-    return safetyResponses["phishing"];
-  }
-  if (lowerMessage.includes("family") || lowerMessage.includes("kids") || lowerMessage.includes("children") || lowerMessage.includes("protect") || lowerMessage.includes("senior") || lowerMessage.includes("parent")) {
-    return safetyResponses["family"];
-  }
-  if (lowerMessage.includes("clicked") || lowerMessage.includes("link") || lowerMessage.includes("what should i do") || lowerMessage.includes("accident")) {
-    return safetyResponses["clicked"];
-  }
-  
-  return safetyResponses["default"];
+What would you like to learn about today?`;
 }
 
 // Check if user has been welcomed this session
@@ -151,9 +244,38 @@ export function DeziAssistant() {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [region, setRegion] = useState<RegionInfo | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Detect user region on mount
+  useEffect(() => {
+    const detectRegion = async () => {
+      try {
+        // Use free IP geolocation API (no API key required)
+        const response = await fetch("https://ip-api.com/json/?fields=status,country,countryCode", {
+          signal: AbortSignal.timeout(5000),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === "success") {
+            setRegion({
+              country: data.country,
+              countryCode: data.countryCode,
+              detected: true,
+            });
+          }
+        }
+      } catch (error) {
+        // Silently fail, will use default resources
+        console.log("Region detection unavailable, using default resources");
+      }
+    };
+
+    detectRegion();
+  }, []);
 
   // Create notification sound (soft chime)
   useEffect(() => {
@@ -262,7 +384,7 @@ export function DeziAssistant() {
     // Initial thinking delay
     await new Promise((resolve) => setTimeout(resolve, 600 + Math.random() * 400));
 
-    const response = getResponse(text);
+    const response = getResponse(text, region);
     const messageId = (Date.now() + 1).toString();
     
     // Add message with streaming flag
