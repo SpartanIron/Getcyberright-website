@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { DeziAssistant } from "@/components/dezi-assistant";
+import { WelcomeOverlay } from "@/components/welcome-overlay";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Solutions from "@/pages/solutions";
@@ -77,6 +78,7 @@ function App() {
         <TooltipProvider>
           <ScrollToTop />
           <Toaster />
+          <WelcomeOverlay />
           <Router />
           <DeziAssistant />
         </TooltipProvider>
