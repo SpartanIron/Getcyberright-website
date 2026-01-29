@@ -8,6 +8,8 @@ import { PageBanner } from "@/components/page-banner";
 import { Link } from "wouter";
 import { Shield, Heart, Users, Globe, ArrowRight } from "lucide-react";
 import bannerImage from "@/assets/banners/about-banner.png";
+import familySecurityImage from "@/assets/images/about-family-security.jpg";
+import seniorsLearningImage from "@/assets/images/seniors-learning-tech.jpg";
 
 const values = [
   {
@@ -92,6 +94,16 @@ export default function About() {
                   apps, and asking about social media. The thought of what they might 
                   encounter online keeps me up at night.
                 </p>
+
+                {/* Visual break - family security image */}
+                <div className="my-8 rounded-lg overflow-hidden shadow-lg">
+                  <img 
+                    src={familySecurityImage} 
+                    alt="Family learning together about online safety"
+                    className="w-full h-auto object-cover"
+                    data-testid="img-about-family-security"
+                  />
+                </div>
                 
                 <p>
                   When I searched for resources that could protect everyone in my 
@@ -121,6 +133,16 @@ export default function About() {
                 <p className="border-l-4 border-accent pl-6 py-2 text-foreground font-medium bg-accent/5 rounded-r-lg">
                   My hope is that no family or business has to learn these lessons the hard way.
                 </p>
+
+                {/* Visual break - seniors learning image */}
+                <div className="my-8 rounded-lg overflow-hidden shadow-lg">
+                  <img 
+                    src={seniorsLearningImage} 
+                    alt="Senior learning technology with family support"
+                    className="w-full h-auto object-cover"
+                    data-testid="img-about-seniors-learning"
+                  />
+                </div>
                 
                 <p className="text-lg font-medium text-foreground">
                   Today, GetCyberRight serves families and small businesses around 
