@@ -7,6 +7,8 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
 import { setupAuth, registerAuthRoutes, isAuthenticated, authStorage } from "./replit_integrations/auth";
+import { stripeService } from "./stripeService";
+import { getStripePublishableKey } from "./stripeClient";
 
 // URL reputation checking schemas with validation
 const urlCheckSchema = z.object({
@@ -360,58 +362,120 @@ export async function registerRoutes(
     });
   });
 
-  // Subscription webhook endpoint - for payment provider integration only
-  // This endpoint is secured by a webhook secret and should only be called by Stripe/payment provider
-  const subscriptionWebhookSchema = z.object({
-    userId: z.string(),
-    tier: z.enum(["free", "essential", "professional", "enterprise"]),
-    expiresAt: z.string().datetime().optional()
+  // Get Stripe publishable key for frontend
+  app.get("/api/stripe/publishable-key", async (req, res) => {
+    try {
+      const publishableKey = await getStripePublishableKey();
+      res.json({ publishableKey });
+    } catch (error) {
+      console.error("Error getting Stripe publishable key:", error);
+      res.status(500).json({ error: "Stripe not configured" });
+    }
   });
 
-  app.post("/api/subscription/webhook", strictRateLimit, async (req: any, res) => {
+  // Create checkout session for subscription
+  app.post("/api/stripe/create-checkout-session", isAuthenticated, async (req: any, res) => {
     try {
-      // Verify webhook secret - in production, use Stripe webhook signature verification
-      const webhookSecret = req.headers["x-webhook-secret"];
-      const expectedSecret = process.env.SUBSCRIPTION_WEBHOOK_SECRET;
-      
-      if (!expectedSecret || webhookSecret !== expectedSecret) {
-        securityLogger.warn("Invalid subscription webhook attempt", { 
-          ip: req.ip,
-          hasSecret: !!webhookSecret 
-        });
-        return res.status(403).json({ error: "Forbidden" });
+      const { priceId } = req.body;
+      if (!priceId) {
+        return res.status(400).json({ error: "Price ID is required" });
       }
 
-      const { userId, tier, expiresAt } = subscriptionWebhookSchema.parse(req.body);
-      
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
       const user = await authStorage.getUser(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
 
-      const expirationDate = expiresAt ? new Date(expiresAt) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-      
-      await db.update(users)
-        .set({ 
-          subscriptionTier: tier,
-          subscriptionExpiresAt: expirationDate,
-          updatedAt: new Date()
-        })
-        .where(eq(users.id, userId));
-
-      securityLogger.info("Subscription updated via webhook", { userId, tier });
-      
-      res.json({ 
-        success: true, 
-        tier,
-        expiresAt: expirationDate.toISOString()
-      });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Invalid webhook data", details: error.errors });
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripeService.createCustomer(user.email || '', userId);
+        await stripeService.updateUserStripeInfo(userId, { stripeCustomerId: customer.id });
+        customerId = customer.id;
       }
-      console.error("Error processing subscription webhook:", error);
-      res.status(500).json({ error: "Failed to process webhook" });
+
+      const domains = process.env.REPLIT_DOMAINS?.split(',') || [];
+      const baseUrl = domains[0] ? `https://${domains[0]}` : 'http://localhost:5000';
+
+      const session = await stripeService.createCheckoutSession(
+        customerId,
+        priceId,
+        `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+        `${baseUrl}/pricing`
+      );
+
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
+  // Create customer portal session for managing subscriptions
+  app.post("/api/stripe/create-portal-session", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const user = await authStorage.getUser(userId);
+      if (!user || !user.stripeCustomerId) {
+        return res.status(400).json({ error: "No active subscription found" });
+      }
+
+      const domains = process.env.REPLIT_DOMAINS?.split(',') || [];
+      const baseUrl = domains[0] ? `https://${domains[0]}` : 'http://localhost:5000';
+
+      const session = await stripeService.createCustomerPortalSession(
+        user.stripeCustomerId,
+        `${baseUrl}/dashboard`
+      );
+
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error("Error creating portal session:", error);
+      res.status(500).json({ error: "Failed to create portal session" });
+    }
+  });
+
+  // Get Stripe products and prices for pricing page
+  app.get("/api/stripe/products", async (req, res) => {
+    try {
+      const rows = await stripeService.listProductsWithPrices(true);
+      
+      const productsMap = new Map();
+      for (const row of rows as any[]) {
+        if (!productsMap.has(row.product_id)) {
+          productsMap.set(row.product_id, {
+            id: row.product_id,
+            name: row.product_name,
+            description: row.product_description,
+            active: row.product_active,
+            metadata: row.product_metadata,
+            prices: []
+          });
+        }
+        if (row.price_id) {
+          productsMap.get(row.product_id).prices.push({
+            id: row.price_id,
+            unitAmount: row.unit_amount,
+            currency: row.currency,
+            recurring: row.recurring,
+            active: row.price_active,
+            metadata: row.price_metadata,
+          });
+        }
+      }
+
+      res.json({ products: Array.from(productsMap.values()) });
+    } catch (error) {
+      console.error("Error fetching Stripe products:", error);
+      res.json({ products: [] });
     }
   });
 
