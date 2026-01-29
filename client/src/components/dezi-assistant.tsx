@@ -133,8 +133,22 @@ const regionResources: Record<string, RegionResources> = {
 const suggestedPrompts = [
   { text: "Is this message a scam?", icon: AlertTriangle },
   { text: "How do phishing scams work?", icon: HelpCircle },
-  { text: "Generate a strong password", icon: Shield },
+  { text: "Generate a strong password", icon: Shield, premiumOnly: true },
   { text: "How can I protect my family online?", icon: Shield },
+];
+
+const FREE_MESSAGE_LIMIT = 5;
+const FREE_ANALYSIS_LIMIT = 2;
+const FREE_MESSAGE_COUNT_KEY = "dezi_free_message_count";
+const FREE_ANALYSIS_COUNT_KEY = "dezi_free_analysis_count";
+
+// Premium-only features list
+const premiumFeatures = [
+  "Unlimited conversations with Dezi",
+  "Advanced scam analysis with detailed reports",
+  "Password generation tool",
+  "Personalized regional resources",
+  "Priority response formatting",
 ];
 
 // Scam analysis patterns
@@ -477,12 +491,34 @@ export function DeziAssistant() {
   const [isTyping, setIsTyping] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [region, setRegion] = useState<RegionInfo | null>(null);
+  const [freeMessageCount, setFreeMessageCount] = useState(0);
+  const [freeAnalysisCount, setFreeAnalysisCount] = useState(0);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Check if user has premium access (Essential tier or higher)
   const isPremiumUser = user && hasTierAccess(user.subscriptionTier || "free", SUBSCRIPTION_TIERS.ESSENTIAL);
+  
+  // Track remaining free messages
+  const remainingFreeMessages = FREE_MESSAGE_LIMIT - freeMessageCount;
+  const remainingFreeAnalyses = FREE_ANALYSIS_LIMIT - freeAnalysisCount;
+  const hasReachedMessageLimit = !isPremiumUser && freeMessageCount >= FREE_MESSAGE_LIMIT;
+  const hasReachedAnalysisLimit = !isPremiumUser && freeAnalysisCount >= FREE_ANALYSIS_LIMIT;
+
+  // Load free usage counts from localStorage
+  useEffect(() => {
+    const savedMessageCount = localStorage.getItem(FREE_MESSAGE_COUNT_KEY);
+    const savedAnalysisCount = localStorage.getItem(FREE_ANALYSIS_COUNT_KEY);
+    
+    if (savedMessageCount) {
+      setFreeMessageCount(parseInt(savedMessageCount, 10));
+    }
+    if (savedAnalysisCount) {
+      setFreeAnalysisCount(parseInt(savedAnalysisCount, 10));
+    }
+  }, []);
 
   // Detect user region on mount
   useEffect(() => {
@@ -602,8 +638,84 @@ export function DeziAssistant() {
     setShowWelcomeBubble(false);
   };
 
+  const incrementFreeMessageCount = () => {
+    const newCount = freeMessageCount + 1;
+    setFreeMessageCount(newCount);
+    localStorage.setItem(FREE_MESSAGE_COUNT_KEY, newCount.toString());
+  };
+
+  const incrementFreeAnalysisCount = () => {
+    const newCount = freeAnalysisCount + 1;
+    setFreeAnalysisCount(newCount);
+    localStorage.setItem(FREE_ANALYSIS_COUNT_KEY, newCount.toString());
+  };
+
   const handleSendMessage = async (text: string) => {
     if (!text.trim()) return;
+
+    const lowerText = text.toLowerCase();
+    
+    // Check if this is a premium-only request for free users
+    const isPasswordRequest = lowerText.includes("password") && 
+      (lowerText.includes("generate") || lowerText.includes("create") || lowerText.includes("make"));
+    
+    const isPastedContent = looksLikePastedContent(text);
+    const isAnalysisRequest = isPastedContent || 
+      /https?:\/\/[^\s]+|www\.[^\s]+/i.test(text) ||
+      /check|analyze|is this|look at/i.test(lowerText);
+
+    // Check limits for free users
+    if (!isPremiumUser) {
+      // Password generation is premium-only
+      if (isPasswordRequest) {
+        const upgradeMessage: Message = {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: `Password generation is a premium feature. Upgrade to Essential or higher to unlock this and other advanced capabilities.`,
+          timestamp: new Date(),
+        };
+        
+        const userMessage: Message = {
+          id: (Date.now() - 1).toString(),
+          role: "user",
+          content: text.trim(),
+          timestamp: new Date(),
+        };
+        
+        setMessages((prev) => [...prev, userMessage, upgradeMessage]);
+        setInputValue("");
+        setShowUpgradePrompt(true);
+        return;
+      }
+
+      // Check message limit
+      if (hasReachedMessageLimit) {
+        setShowUpgradePrompt(true);
+        return;
+      }
+
+      // Check analysis limit for scam analysis requests
+      if (isAnalysisRequest && hasReachedAnalysisLimit) {
+        const upgradeMessage: Message = {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: `You have used your ${FREE_ANALYSIS_LIMIT} free scam analyses. Upgrade to Essential or higher for unlimited advanced scam analysis with detailed reports.`,
+          timestamp: new Date(),
+        };
+        
+        const userMessage: Message = {
+          id: (Date.now() - 1).toString(),
+          role: "user",
+          content: text.trim(),
+          timestamp: new Date(),
+        };
+        
+        setMessages((prev) => [...prev, userMessage, upgradeMessage]);
+        setInputValue("");
+        setShowUpgradePrompt(true);
+        return;
+      }
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -616,10 +728,19 @@ export function DeziAssistant() {
     setInputValue("");
     setIsTyping(true);
 
+    // Track usage for free users
+    if (!isPremiumUser) {
+      incrementFreeMessageCount();
+      if (isAnalysisRequest) {
+        incrementFreeAnalysisCount();
+      }
+    }
+
     // Initial thinking delay
     await new Promise((resolve) => setTimeout(resolve, 600 + Math.random() * 400));
 
-    const response = getResponse(text, region);
+    // For free users, use simpler responses without region-specific resources
+    const response = getResponse(text, isPremiumUser ? region : null);
     const messageId = (Date.now() + 1).toString();
     
     // Add message with streaming flag
@@ -735,49 +856,43 @@ export function DeziAssistant() {
 
               <CardContent className="p-0 flex flex-col flex-1 min-h-0">
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[200px] max-h-[40vh]">
-                  {/* Premium upgrade prompt for non-premium users */}
-                  {!isPremiumUser ? (
-                    <div className="space-y-4 py-4">
-                      <div className="text-center">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Lock className="w-8 h-8 text-primary" />
+                  {/* Upgrade prompt when limit reached */}
+                  {showUpgradePrompt && !isPremiumUser && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-4"
+                    >
+                      <div className="flex items-start gap-3">
+                        <Crown className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="font-medium text-sm text-foreground mb-1">
+                            Unlock Full Access
+                          </p>
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Upgrade for unlimited conversations, advanced scam analysis, and password generation.
+                          </p>
+                          <Link href="/pricing">
+                            <Button size="sm" data-testid="button-upgrade-dezi-inline">
+                              <Crown className="w-3 h-3 mr-1" />
+                              View Plans
+                            </Button>
+                          </Link>
                         </div>
-                        <h4 className="font-semibold text-foreground mb-2">
-                          Unlock Dezi AI Assistant
-                        </h4>
-                        <p className="text-muted-foreground text-sm mb-4 max-w-xs mx-auto">
-                          Get personalized security guidance, real-time threat analysis, and expert advice with our Premium subscription.
-                        </p>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={() => setShowUpgradePrompt(false)}
+                          data-testid="button-dismiss-upgrade"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
                       </div>
-
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Sparkles className="w-4 h-4 text-primary" />
-                          <span>24/7 AI-powered security guidance</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Shield className="w-4 h-4 text-primary" />
-                          <span>Personalized threat assessments</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <MessageCircle className="w-4 h-4 text-primary" />
-                          <span>Unlimited conversations with Dezi</span>
-                        </div>
-                      </div>
-
-                      <div className="pt-2 space-y-2">
-                        <Link href="/pricing">
-                          <Button className="w-full" data-testid="button-upgrade-dezi">
-                            <Crown className="w-4 h-4 mr-2" />
-                            View Premium Plans
-                          </Button>
-                        </Link>
-                        <p className="text-xs text-center text-muted-foreground">
-                          Starting at $9/month
-                        </p>
-                      </div>
-                    </div>
-                  ) : messages.length === 0 ? (
+                    </motion.div>
+                  )}
+                  
+                  {messages.length === 0 ? (
                     <div className="space-y-4">
                       <div className="text-center py-4">
                         <p className="text-muted-foreground text-sm mb-4">
@@ -797,10 +912,28 @@ export function DeziAssistant() {
                             data-testid={`button-prompt-${idx}`}
                           >
                             <prompt.icon className="w-4 h-4 text-primary flex-shrink-0" />
-                            <span>{prompt.text}</span>
+                            <span className="flex-1">{prompt.text}</span>
+                            {prompt.premiumOnly && !isPremiumUser && (
+                              <Badge variant="secondary" className="text-xs">
+                                <Crown className="w-3 h-3 mr-1" />
+                                Pro
+                              </Badge>
+                            )}
                           </button>
                         ))}
                       </div>
+                      
+                      {/* Free usage counter */}
+                      {!isPremiumUser && (
+                        <div className="mt-4 pt-3 border-t">
+                          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                            <span>Free messages: {remainingFreeMessages}/{FREE_MESSAGE_LIMIT}</span>
+                            <Link href="/pricing" className="text-primary hover:underline">
+                              Upgrade
+                            </Link>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <>
@@ -873,35 +1006,56 @@ export function DeziAssistant() {
                   )}
                 </div>
 
-                {/* Only show input form for premium users */}
-                {isPremiumUser && (
-                  <div className="border-t p-3 bg-background flex-shrink-0">
-                    <form onSubmit={handleSubmit} className="flex gap-2">
-                      <Input
-                        ref={inputRef}
-                        type="text"
-                        placeholder="Ask about online safety..."
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        className="flex-1"
-                        disabled={isTyping}
-                        data-testid="input-dezi-message"
-                      />
-                      <Button 
-                        type="submit" 
-                        size="icon" 
-                        disabled={!inputValue.trim() || isTyping}
-                        data-testid="button-send-message"
-                      >
-                        <Send className="w-4 h-4" />
-                      </Button>
-                    </form>
-                    
-                    <p className="text-xs text-muted-foreground mt-2 text-center" data-testid="text-dezi-disclosure">
-                      Dezi provides general educational guidance and does not replace professional advice.
-                    </p>
-                  </div>
-                )}
+                {/* Input form for all users */}
+                <div className="border-t p-3 bg-background flex-shrink-0">
+                  {hasReachedMessageLimit ? (
+                    <div className="text-center py-2">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        You have reached your free message limit.
+                      </p>
+                      <Link href="/pricing">
+                        <Button size="sm" data-testid="button-upgrade-dezi">
+                          <Crown className="w-4 h-4 mr-2" />
+                          Upgrade for Unlimited Access
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <>
+                      <form onSubmit={handleSubmit} className="flex gap-2">
+                        <Input
+                          ref={inputRef}
+                          type="text"
+                          placeholder="Ask about online safety..."
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          className="flex-1"
+                          disabled={isTyping}
+                          data-testid="input-dezi-message"
+                        />
+                        <Button 
+                          type="submit" 
+                          size="icon" 
+                          disabled={!inputValue.trim() || isTyping}
+                          data-testid="button-send-message"
+                        >
+                          <Send className="w-4 h-4" />
+                        </Button>
+                      </form>
+                      
+                      <div className="flex items-center justify-between gap-2 mt-2">
+                        <p className="text-xs text-muted-foreground" data-testid="text-dezi-disclosure">
+                          General guidance only, not professional advice.
+                        </p>
+                        {!isPremiumUser && (
+                          <span className="text-xs text-muted-foreground" data-testid="text-free-counter">
+                            {remainingFreeMessages} left
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </motion.div>
