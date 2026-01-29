@@ -13,8 +13,14 @@ import {
   HelpCircle,
   ExternalLink,
   ChevronDown,
-  Loader2
+  Loader2,
+  Lock,
+  Sparkles,
+  Crown
 } from "lucide-react";
+import { Link } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
+import { hasTierAccess, SUBSCRIPTION_TIERS } from "@shared/models/auth";
 import deziAvatar from "@/assets/images/dezi-avatar.png";
 
 interface Message {
@@ -463,6 +469,7 @@ What would you like to learn about today?`;
 const WELCOME_KEY = "dezi_welcomed_session";
 
 export function DeziAssistant() {
+  const { user, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showWelcomeBubble, setShowWelcomeBubble] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -473,6 +480,9 @@ export function DeziAssistant() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Check if user has premium access (Essential tier or higher)
+  const isPremiumUser = user && hasTierAccess(user.subscriptionTier || "free", SUBSCRIPTION_TIERS.ESSENTIAL);
 
   // Detect user region on mount
   useEffect(() => {
@@ -725,7 +735,49 @@ export function DeziAssistant() {
 
               <CardContent className="p-0 flex flex-col flex-1 min-h-0">
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[200px] max-h-[40vh]">
-                  {messages.length === 0 ? (
+                  {/* Premium upgrade prompt for non-premium users */}
+                  {!isPremiumUser ? (
+                    <div className="space-y-4 py-4">
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Lock className="w-8 h-8 text-primary" />
+                        </div>
+                        <h4 className="font-semibold text-foreground mb-2">
+                          Unlock Dezi AI Assistant
+                        </h4>
+                        <p className="text-muted-foreground text-sm mb-4 max-w-xs mx-auto">
+                          Get personalized security guidance, real-time threat analysis, and expert advice with our Premium subscription.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Sparkles className="w-4 h-4 text-primary" />
+                          <span>24/7 AI-powered security guidance</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Shield className="w-4 h-4 text-primary" />
+                          <span>Personalized threat assessments</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <MessageCircle className="w-4 h-4 text-primary" />
+                          <span>Unlimited conversations with Dezi</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 space-y-2">
+                        <Link href="/pricing">
+                          <Button className="w-full" data-testid="button-upgrade-dezi">
+                            <Crown className="w-4 h-4 mr-2" />
+                            View Premium Plans
+                          </Button>
+                        </Link>
+                        <p className="text-xs text-center text-muted-foreground">
+                          Starting at $9/month
+                        </p>
+                      </div>
+                    </div>
+                  ) : messages.length === 0 ? (
                     <div className="space-y-4">
                       <div className="text-center py-4">
                         <p className="text-muted-foreground text-sm mb-4">
@@ -821,32 +873,35 @@ export function DeziAssistant() {
                   )}
                 </div>
 
-                <div className="border-t p-3 bg-background flex-shrink-0">
-                  <form onSubmit={handleSubmit} className="flex gap-2">
-                    <Input
-                      ref={inputRef}
-                      type="text"
-                      placeholder="Ask about online safety..."
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      className="flex-1"
-                      disabled={isTyping}
-                      data-testid="input-dezi-message"
-                    />
-                    <Button 
-                      type="submit" 
-                      size="icon" 
-                      disabled={!inputValue.trim() || isTyping}
-                      data-testid="button-send-message"
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </form>
-                  
-                  <p className="text-xs text-muted-foreground mt-2 text-center" data-testid="text-dezi-disclosure">
-                    Dezi provides general educational guidance and does not replace professional advice.
-                  </p>
-                </div>
+                {/* Only show input form for premium users */}
+                {isPremiumUser && (
+                  <div className="border-t p-3 bg-background flex-shrink-0">
+                    <form onSubmit={handleSubmit} className="flex gap-2">
+                      <Input
+                        ref={inputRef}
+                        type="text"
+                        placeholder="Ask about online safety..."
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        className="flex-1"
+                        disabled={isTyping}
+                        data-testid="input-dezi-message"
+                      />
+                      <Button 
+                        type="submit" 
+                        size="icon" 
+                        disabled={!inputValue.trim() || isTyping}
+                        data-testid="button-send-message"
+                      >
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </form>
+                    
+                    <p className="text-xs text-muted-foreground mt-2 text-center" data-testid="text-dezi-disclosure">
+                      Dezi provides general educational guidance and does not replace professional advice.
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -885,21 +940,39 @@ export function DeziAssistant() {
                 </div>
                 <div className="flex-1 pr-4">
                   <p className="font-medium text-sm text-foreground mb-1">Hi! I'm Dezi</p>
-                  <p className="text-sm text-muted-foreground">
-                    Your cybersecurity guide. How can I help you stay safe online today?
-                  </p>
+                  {isPremiumUser ? (
+                    <p className="text-sm text-muted-foreground">
+                      Your cybersecurity guide. How can I help you stay safe online today?
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Your AI security assistant. Upgrade to Premium for personalized guidance.
+                    </p>
+                  )}
                 </div>
               </div>
               
-              <Button
-                onClick={() => setIsOpen(true)}
-                size="sm"
-                className="w-full mt-3"
-                data-testid="button-welcome-chat"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Start a conversation
-              </Button>
+              {isPremiumUser ? (
+                <Button
+                  onClick={() => setIsOpen(true)}
+                  size="sm"
+                  className="w-full mt-3"
+                  data-testid="button-welcome-chat"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Start a conversation
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setIsOpen(true)}
+                  size="sm"
+                  className="w-full mt-3"
+                  data-testid="button-welcome-upgrade"
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  Unlock Dezi
+                </Button>
+              )}
               
               {/* Speech bubble pointer */}
               <div className="absolute -bottom-2 right-6 w-4 h-4 bg-card border-b border-r rotate-45 transform" />
