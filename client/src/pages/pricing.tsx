@@ -1,0 +1,242 @@
+import { motion } from "framer-motion";
+import { Navigation } from "@/components/navigation";
+import { Footer } from "@/components/footer";
+import { PageBanner } from "@/components/page-banner";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Check, 
+  Shield, 
+  Users, 
+  Briefcase,
+  Building2,
+  ArrowRight
+} from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import bannerImage from "@/assets/banners/resources-banner.png";
+
+interface PricingTier {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  period: string;
+  icon: typeof Shield;
+  features: string[];
+  highlighted?: boolean;
+  buttonText: string;
+  badge?: string;
+}
+
+const pricingTiers: PricingTier[] = [
+  {
+    id: "free",
+    name: "Free",
+    description: "Essential tools for personal protection",
+    price: "$0",
+    period: "forever",
+    icon: Shield,
+    features: [
+      "Scam Checker tool",
+      "Password Generator",
+      "Breach Checker",
+      "Basic security guides",
+      "Email newsletter"
+    ],
+    buttonText: "Get Started"
+  },
+  {
+    id: "essential",
+    name: "Essential",
+    description: "Enhanced protection for families",
+    price: "$9",
+    period: "per month",
+    icon: Users,
+    features: [
+      "Everything in Free, plus:",
+      "Priority scam analysis",
+      "Extended threat reports",
+      "Family safety toolkit",
+      "Monthly security webinars",
+      "Email support"
+    ],
+    highlighted: true,
+    buttonText: "Start Free Trial",
+    badge: "Most Popular"
+  },
+  {
+    id: "professional",
+    name: "Professional",
+    description: "Comprehensive security for small teams",
+    price: "$29",
+    period: "per month",
+    icon: Briefcase,
+    features: [
+      "Everything in Essential, plus:",
+      "Up to 5 team members",
+      "Business email protection",
+      "Employee training resources",
+      "Quarterly security reviews",
+      "Priority support"
+    ],
+    buttonText: "Start Free Trial"
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    description: "Custom solutions for organizations",
+    price: "Custom",
+    period: "contact us",
+    icon: Building2,
+    features: [
+      "Everything in Professional, plus:",
+      "Unlimited team members",
+      "Custom training programs",
+      "Dedicated account manager",
+      "API access",
+      "SLA guarantee"
+    ],
+    buttonText: "Contact Sales"
+  }
+];
+
+export default function Pricing() {
+  const { user, isAuthenticated } = useAuth();
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
+      <main>
+        <PageBanner
+          title="Pricing Plans"
+          subtitle="Choose the protection level that fits your needs. All plans include our core security tools."
+          imageSrc={bannerImage}
+          imageAlt="Cybersecurity protection plans"
+          imagePosition="right"
+          colorVariant="blue"
+        />
+
+        <section className="py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl font-bold text-foreground mb-4">Simple, Transparent Pricing</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                No hidden fees. Cancel anytime. All premium plans include a 14-day free trial.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {pricingTiers.map((tier, index) => (
+                <motion.div
+                  key={tier.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card 
+                    className={`h-full flex flex-col ${tier.highlighted ? 'border-primary ring-2 ring-primary/20' : ''}`}
+                    data-testid={`pricing-card-${tier.id}`}
+                  >
+                    <CardHeader>
+                      {tier.badge && (
+                        <Badge className="w-fit mb-2">{tier.badge}</Badge>
+                      )}
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
+                        <tier.icon className="w-5 h-5 text-primary" />
+                      </div>
+                      <CardTitle className="text-xl">{tier.name}</CardTitle>
+                      <CardDescription>{tier.description}</CardDescription>
+                      <div className="pt-4">
+                        <span className="text-3xl font-bold text-foreground">{tier.price}</span>
+                        <span className="text-muted-foreground ml-1">/{tier.period}</span>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex-1">
+                      <ul className="space-y-3">
+                        {tier.features.map((feature) => (
+                          <li key={feature} className="flex items-start gap-2 text-sm">
+                            <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                            <span className="text-muted-foreground">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                    <CardFooter>
+                      {tier.id === "free" ? (
+                        isAuthenticated ? (
+                          <Button className="w-full" variant="outline" disabled>
+                            Current Plan
+                          </Button>
+                        ) : (
+                          <Button className="w-full" variant="outline" asChild>
+                            <a href="/api/login">
+                              {tier.buttonText}
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </a>
+                          </Button>
+                        )
+                      ) : tier.id === "enterprise" ? (
+                        <Button className="w-full" variant="outline" asChild>
+                          <a href="mailto:sales@getcyberright.com">
+                            {tier.buttonText}
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button 
+                          className="w-full" 
+                          variant={tier.highlighted ? "default" : "outline"}
+                        >
+                          {tier.buttonText}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <h3 className="text-2xl font-bold text-foreground mb-4">
+                    Not sure which plan is right for you?
+                  </h3>
+                  <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+                    Our team can help you find the perfect solution for your family or business. 
+                    Schedule a free consultation to discuss your needs.
+                  </p>
+                  <Button size="lg" asChild>
+                    <a href="mailto:support@getcyberright.com">
+                      Schedule a Consultation
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </section>
+      </main>
+      
+      <Footer />
+    </div>
+  );
+}

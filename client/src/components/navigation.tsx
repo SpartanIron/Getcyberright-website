@@ -1,10 +1,19 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck, Sparkles } from "lucide-react";
+import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck, Sparkles, LogIn, LogOut, LayoutDashboard } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useAuth } from "@/hooks/use-auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -49,6 +58,14 @@ export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location] = useLocation();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
+
+  const displayName = user?.firstName 
+    ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ''}`
+    : user?.email || "Member";
+  const initials = user?.firstName 
+    ? `${user.firstName[0]}${user.lastName ? user.lastName[0] : ''}`
+    : (user?.email ? user.email[0].toUpperCase() : 'U');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -265,6 +282,53 @@ export function Navigation() {
 
           <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full" data-testid="button-user-menu">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user?.profileImageUrl || undefined} alt={displayName} />
+                      <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{displayName}</p>
+                      {user?.email && (
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      )}
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="flex items-center cursor-pointer">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/pricing" className="flex items-center cursor-pointer">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Pricing
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="outline" size="default" asChild data-testid="button-login">
+                <a href="/api/login">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Log In
+                </a>
+              </Button>
+            )}
             <Link href="/tools">
               <Button variant="default" size="default" data-testid="button-get-protection">
                 Check If It's a Scam
@@ -367,6 +431,44 @@ export function Navigation() {
                 >
                   Contact
                 </Link>
+
+                <div className="h-px bg-border" />
+
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="py-2 text-foreground transition-colors font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
+                      data-testid="mobile-link-dashboard"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/pricing"
+                      className="py-2 text-foreground transition-colors font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
+                      data-testid="mobile-link-pricing"
+                    >
+                      Pricing
+                    </Link>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => { logout(); setMobileMenuOpen(false); }}
+                      data-testid="mobile-button-logout"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Log Out
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="outline" asChild data-testid="mobile-button-login">
+                    <a href="/api/login" onClick={() => setMobileMenuOpen(false)}>
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Log In
+                    </a>
+                  </Button>
+                )}
 
                 <div className="flex items-center justify-between pt-4">
                   <ThemeToggle />

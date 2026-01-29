@@ -21,6 +21,7 @@ const footerLinks = {
     { name: "About", href: "/about" },
     { name: "Resources", href: "/resources" },
     { name: "Events", href: "/events" },
+    { name: "Pricing", href: "/pricing" },
     { name: "Emergency Help", href: "/emergency-help" },
     { name: "Contact", href: "/contact" },
   ],

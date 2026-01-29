@@ -1,9 +1,12 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, SUBSCRIPTION_TIERS, hasTierAccess, users } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
+import { setupAuth, registerAuthRoutes, isAuthenticated, authStorage } from "./replit_integrations/auth";
 
 // URL reputation checking schemas with validation
 const urlCheckSchema = z.object({
@@ -53,6 +56,10 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
+  // Setup Replit Auth (must be before other routes)
+  await setupAuth(app);
+  registerAuthRoutes(app);
+
   // Contact form - strict rate limiting (10 req/min)
   app.post("/api/contact", strictRateLimit, async (req, res) => {
     try {
@@ -263,6 +270,148 @@ export async function registerRoutes(
         console.error('URL reputation check error:', error);
         res.status(500).json({ error: "Failed to check URL reputation" });
       }
+    }
+  });
+
+  // Get user subscription status (protected route)
+  app.get("/api/subscription/status", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      const user = await authStorage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const now = new Date();
+      const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
+      const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
+      
+      res.json({
+        tier: effectiveTier,
+        expiresAt: user.subscriptionExpiresAt,
+        isExpired,
+        availableTiers: Object.values(SUBSCRIPTION_TIERS)
+      });
+    } catch (error) {
+      console.error("Error fetching subscription status:", error);
+      res.status(500).json({ error: "Failed to fetch subscription status" });
+    }
+  });
+
+  // Premium content access check middleware using shared tier hierarchy
+  const requireSubscription = (requiredTier: string) => {
+    return async (req: any, res: Response, next: Function) => {
+      try {
+        const userId = req.user?.claims?.sub;
+        if (!userId) {
+          return res.status(401).json({ error: "Unauthorized" });
+        }
+        
+        const user = await authStorage.getUser(userId);
+        if (!user) {
+          return res.status(401).json({ error: "User not found" });
+        }
+        
+        const now = new Date();
+        const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
+        const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
+        
+        // Use shared tier access helper
+        if (!hasTierAccess(effectiveTier, requiredTier)) {
+          return res.status(403).json({ 
+            error: "Subscription required",
+            requiredTier,
+            currentTier: effectiveTier
+          });
+        }
+        
+        next();
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+        res.status(500).json({ error: "Failed to check subscription" });
+      }
+    };
+  };
+
+  // Example protected premium content endpoints
+  app.get("/api/premium/webinar-archive", isAuthenticated, requireSubscription("essential"), async (req, res) => {
+    res.json({ 
+      message: "Access granted to webinar archive",
+      content: [
+        { id: 1, title: "Phishing Prevention Masterclass", duration: "45 min" },
+        { id: 2, title: "Secure Password Strategies", duration: "30 min" },
+        { id: 3, title: "Family Digital Safety Workshop", duration: "60 min" }
+      ]
+    });
+  });
+
+  app.get("/api/premium/training-materials", isAuthenticated, requireSubscription("professional"), async (req, res) => {
+    res.json({ 
+      message: "Access granted to training materials",
+      content: [
+        { id: 1, title: "Employee Security Training Kit", type: "PDF" },
+        { id: 2, title: "Quarterly Threat Report Q1 2026", type: "PDF" },
+        { id: 3, title: "Security Policy Templates", type: "DOCX" }
+      ]
+    });
+  });
+
+  // Subscription webhook endpoint - for payment provider integration only
+  // This endpoint is secured by a webhook secret and should only be called by Stripe/payment provider
+  const subscriptionWebhookSchema = z.object({
+    userId: z.string(),
+    tier: z.enum(["free", "essential", "professional", "enterprise"]),
+    expiresAt: z.string().datetime().optional()
+  });
+
+  app.post("/api/subscription/webhook", strictRateLimit, async (req: any, res) => {
+    try {
+      // Verify webhook secret - in production, use Stripe webhook signature verification
+      const webhookSecret = req.headers["x-webhook-secret"];
+      const expectedSecret = process.env.SUBSCRIPTION_WEBHOOK_SECRET;
+      
+      if (!expectedSecret || webhookSecret !== expectedSecret) {
+        securityLogger.warn("Invalid subscription webhook attempt", { 
+          ip: req.ip,
+          hasSecret: !!webhookSecret 
+        });
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      const { userId, tier, expiresAt } = subscriptionWebhookSchema.parse(req.body);
+      
+      const user = await authStorage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const expirationDate = expiresAt ? new Date(expiresAt) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      
+      await db.update(users)
+        .set({ 
+          subscriptionTier: tier,
+          subscriptionExpiresAt: expirationDate,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, userId));
+
+      securityLogger.info("Subscription updated via webhook", { userId, tier });
+      
+      res.json({ 
+        success: true, 
+        tier,
+        expiresAt: expirationDate.toISOString()
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid webhook data", details: error.errors });
+      }
+      console.error("Error processing subscription webhook:", error);
+      res.status(500).json({ error: "Failed to process webhook" });
     }
   });
 
