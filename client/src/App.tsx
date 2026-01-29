@@ -30,6 +30,9 @@ import Events from "@/pages/events";
 import Pricing from "@/pages/pricing";
 import Dashboard from "@/pages/dashboard";
 import CheckoutSuccess from "@/pages/checkout-success";
+import ThreatTrendsPage from "@/pages/threat-trends";
+import ReportScam from "@/pages/report-scam";
+import Checklists from "@/pages/checklists";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -66,6 +69,9 @@ function Router() {
       <Route path="/pricing" component={Pricing} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
+      <Route path="/threat-trends" component={ThreatTrendsPage} />
+      <Route path="/report-scam" component={ReportScam} />
+      <Route path="/checklists" component={Checklists} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -37,3 +37,26 @@ export const insertNewsletterSubscriberSchema = createInsertSchema(newsletterSub
 
 export type InsertNewsletterSubscriber = z.infer<typeof insertNewsletterSubscriberSchema>;
 export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+
+export const scamReports = pgTable("scam_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  scamType: text("scam_type").notNull(),
+  description: text("description").notNull(),
+  scammerContact: text("scammer_contact"),
+  amountLost: text("amount_lost"),
+  reporterEmail: text("reporter_email"),
+  anonymous: text("anonymous").default("true"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertScamReportSchema = createInsertSchema(scamReports).pick({
+  scamType: true,
+  description: true,
+  scammerContact: true,
+  amountLost: true,
+  reporterEmail: true,
+  anonymous: true,
+});
+
+export type InsertScamReport = z.infer<typeof insertScamReportSchema>;
+export type ScamReport = typeof scamReports.$inferSelect;

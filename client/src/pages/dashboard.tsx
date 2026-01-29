@@ -21,6 +21,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { NotificationSettings } from "@/components/notification-settings";
 
 const premiumResources = [
   {
@@ -270,6 +271,16 @@ export default function Dashboard() {
                 );
               })}
             </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-8"
+          >
+            <h2 className="text-xl font-bold text-foreground mb-4">Notification Preferences</h2>
+            <NotificationSettings />
           </motion.div>
         </div>
       </main>

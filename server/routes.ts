@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, SUBSCRIPTION_TIERS, hasTierAccess, users } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -97,6 +97,35 @@ export async function registerRoutes(
         res.status(400).json({ error: "Invalid email address", details: error.errors });
       } else {
         res.status(500).json({ error: "Failed to subscribe" });
+      }
+    }
+  });
+
+  // Scam report submission - strict rate limiting
+  app.post("/api/scam-reports", strictRateLimit, async (req, res) => {
+    try {
+      const validatedData = insertScamReportSchema.parse(req.body);
+      
+      const [report] = await db.insert(scamReports).values({
+        scamType: validatedData.scamType,
+        description: validatedData.description,
+        scammerContact: validatedData.scammerContact || null,
+        amountLost: validatedData.amountLost || null,
+        reporterEmail: validatedData.reporterEmail || null,
+        anonymous: validatedData.anonymous ? "true" : "false",
+      }).returning();
+      
+      securityLogger.info("Scam report submitted", { 
+        scamType: validatedData.scamType,
+        hasContact: !!validatedData.scammerContact 
+      });
+      res.json({ success: true, reportId: report.id });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid report data", details: error.errors });
+      } else {
+        console.error("Scam report error:", error);
+        res.status(500).json({ error: "Failed to submit report" });
       }
     }
   });
