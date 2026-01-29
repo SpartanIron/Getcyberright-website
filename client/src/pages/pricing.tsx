@@ -148,10 +148,10 @@ export default function Pricing() {
                   >
                     <CardHeader>
                       {tier.badge && (
-                        <Badge className="w-fit mb-2">{tier.badge}</Badge>
+                        <Badge className="w-fit mb-2 bg-accent text-white">{tier.badge}</Badge>
                       )}
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
-                        <tier.icon className="w-5 h-5 text-primary" />
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${tier.highlighted ? 'bg-accent/10' : 'bg-primary/10'}`}>
+                        <tier.icon className={`w-5 h-5 ${tier.highlighted ? 'text-accent' : 'text-primary'}`} />
                       </div>
                       <CardTitle className="text-xl">{tier.name}</CardTitle>
                       <CardDescription>{tier.description}</CardDescription>

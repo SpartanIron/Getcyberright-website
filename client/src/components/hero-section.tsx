@@ -87,9 +87,9 @@ export function HeroSection() {
       {/* Decorative circles - pointer-events-none so they don't block clicks */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute top-1/3 -left-32 w-64 h-64 rounded-full bg-white/5 blur-2xl" />
-        <div className="absolute bottom-20 right-1/4 w-48 h-48 rounded-full bg-primary/5 blur-2xl" />
-        <div className="absolute top-1/2 right-10 w-32 h-32 rounded-full border border-white/10" />
+        <div className="absolute top-1/3 -left-32 w-64 h-64 rounded-full bg-accent/15 blur-2xl" />
+        <div className="absolute bottom-20 right-1/4 w-48 h-48 rounded-full bg-accent/10 blur-2xl" />
+        <div className="absolute top-1/2 right-10 w-32 h-32 rounded-full border border-accent/20" />
         <div className="absolute bottom-1/3 left-1/4 w-24 h-24 rounded-full border border-primary/20" />
       </div>
 

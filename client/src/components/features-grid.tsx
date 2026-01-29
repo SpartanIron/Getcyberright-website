@@ -44,8 +44,8 @@ const features = [
 
 const variantStyles = {
   light: "bg-gray-100 dark:bg-gray-800 text-foreground",
-  dark: "bg-cyan-800 dark:bg-cyan-900 text-white",
-  medium: "bg-gray-300 dark:bg-gray-700 text-foreground",
+  dark: "bg-primary dark:bg-primary/90 text-white",
+  medium: "bg-accent dark:bg-accent/90 text-white",
   pattern: "bg-slate-800 dark:bg-slate-900 text-white bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:20px_20px]",
 };
 

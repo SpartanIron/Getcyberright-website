@@ -17,8 +17,8 @@ export function MissionBanner() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/20" />
 
         <div className="absolute right-8 top-8 w-32 h-32 rounded-full bg-primary opacity-90 hidden lg:block" />
-        <div className="absolute right-24 top-32 w-20 h-20 rounded-full bg-primary/60 hidden lg:block" />
-        <div className="absolute right-4 bottom-20 w-16 h-16 rounded-full bg-primary/40 hidden lg:block" />
+        <div className="absolute right-24 top-32 w-20 h-20 rounded-full bg-accent/80 hidden lg:block" />
+        <div className="absolute right-4 bottom-20 w-16 h-16 rounded-full bg-accent/50 hidden lg:block" />
 
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
           <div className="w-full max-w-md lg:max-w-lg">

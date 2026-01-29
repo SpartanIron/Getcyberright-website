@@ -8,6 +8,8 @@ const useCases = [
     description: "A suspicious email arrives claiming your account has been compromised and asking you to click a link immediately.",
     solution: "Use our Scam Checker tool to analyze the message and identify common phishing indicators before taking any action.",
     outcome: "Recognize phishing attempts",
+    iconColor: "text-accent",
+    bgColor: "bg-accent/10",
   },
   {
     icon: Shield,
@@ -15,6 +17,8 @@ const useCases = [
     description: "An elderly family member receives calls from strangers claiming to be relatives or officials asking for money or personal information.",
     solution: "Our guides teach families how to verify caller identity and establish safety protocols for emergencies.",
     outcome: "Prevent impostor scams",
+    iconColor: "text-primary",
+    bgColor: "bg-primary/10",
   },
   {
     icon: Lock,
@@ -22,6 +26,8 @@ const useCases = [
     description: "You need to create strong, unique passwords for multiple accounts but struggle to remember complex combinations.",
     solution: "Our Password Generator creates secure passwords and passphrases, with guidance on using password managers effectively.",
     outcome: "Strengthen account security",
+    iconColor: "text-accent",
+    bgColor: "bg-accent/10",
   },
 ];
 
@@ -48,8 +54,8 @@ export function SocialProof() {
           {useCases.map((item, index) => (
             <Card key={item.scenario} data-testid={`card-usecase-${index}`}>
               <CardContent className="pt-6 pb-6 px-6">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <item.icon className="w-6 h-6 text-primary" />
+                <div className={`w-12 h-12 rounded-lg ${item.bgColor} flex items-center justify-center mb-4`}>
+                  <item.icon className={`w-6 h-6 ${item.iconColor}`} />
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">{item.scenario}</h3>
                 <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
