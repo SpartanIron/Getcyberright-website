@@ -28,6 +28,7 @@ import Security from "@/pages/security";
 import Events from "@/pages/events";
 import Pricing from "@/pages/pricing";
 import Dashboard from "@/pages/dashboard";
+import CheckoutSuccess from "@/pages/checkout-success";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -63,6 +64,7 @@ function Router() {
       <Route path="/events" component={Events} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route component={NotFound} />
     </Switch>
   );

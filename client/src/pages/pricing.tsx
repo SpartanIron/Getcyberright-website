@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -11,9 +12,13 @@ import {
   Users, 
   Briefcase,
   Building2,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import bannerImage from "@/assets/banners/resources-banner.png";
 
 interface PricingTier {
@@ -27,6 +32,7 @@ interface PricingTier {
   highlighted?: boolean;
   buttonText: string;
   badge?: string;
+  stripePriceId?: string;
 }
 
 const pricingTiers: PricingTier[] = [
@@ -62,7 +68,7 @@ const pricingTiers: PricingTier[] = [
       "Email support"
     ],
     highlighted: true,
-    buttonText: "Start Free Trial",
+    buttonText: "Subscribe Now",
     badge: "Most Popular"
   },
   {
@@ -80,7 +86,7 @@ const pricingTiers: PricingTier[] = [
       "Quarterly security reviews",
       "Priority support"
     ],
-    buttonText: "Start Free Trial"
+    buttonText: "Subscribe Now"
   },
   {
     id: "enterprise",
@@ -101,8 +107,91 @@ const pricingTiers: PricingTier[] = [
   }
 ];
 
+interface StripeProduct {
+  id: string;
+  name: string;
+  metadata?: { tier?: string };
+  prices: Array<{
+    id: string;
+    unitAmount: number;
+    currency: string;
+    recurring?: { interval: string };
+  }>;
+}
+
 export default function Pricing() {
   const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+  const { data: stripeData } = useQuery<{ products: StripeProduct[] }>({
+    queryKey: ['/api/stripe/products'],
+  });
+
+  const getMonthlyPriceId = (tierId: string): string | null => {
+    if (!stripeData?.products) return null;
+    
+    const tierNameMap: Record<string, string> = {
+      essential: 'GetCyberRight Essential',
+      professional: 'GetCyberRight Professional',
+      enterprise: 'GetCyberRight Enterprise'
+    };
+    
+    const product = stripeData.products.find(p => 
+      p.name === tierNameMap[tierId] || 
+      p.metadata?.tier === tierId
+    );
+    
+    if (!product) return null;
+    
+    const monthlyPrice = product.prices.find(p => 
+      p.recurring?.interval === 'month'
+    );
+    
+    return monthlyPrice?.id || null;
+  };
+
+  const handleSubscribe = async (tierId: string) => {
+    if (!isAuthenticated) {
+      window.location.href = '/api/login';
+      return;
+    }
+
+    const priceId = getMonthlyPriceId(tierId);
+    if (!priceId) {
+      toast({
+        title: "Error",
+        description: "Subscription plan not available. Please try again later.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoadingTier(tierId);
+    
+    try {
+      const response = await apiRequest('POST', '/api/stripe/create-checkout-session', {
+        priceId
+      });
+      
+      const data = await response.json();
+      
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start checkout. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingTier(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -194,9 +283,15 @@ export default function Pricing() {
                         <Button 
                           className="w-full" 
                           variant={tier.highlighted ? "default" : "outline"}
+                          onClick={() => handleSubscribe(tier.id)}
+                          disabled={loadingTier === tier.id}
+                          data-testid={`button-subscribe-${tier.id}`}
                         >
+                          {loadingTier === tier.id ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : null}
                           {tier.buttonText}
-                          <ArrowRight className="w-4 h-4 ml-2" />
+                          {loadingTier !== tier.id && <ArrowRight className="w-4 h-4 ml-2" />}
                         </Button>
                       )}
                     </CardFooter>
