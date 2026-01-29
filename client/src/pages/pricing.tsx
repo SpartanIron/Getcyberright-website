@@ -67,9 +67,7 @@ const pricingTiers: PricingTier[] = [
       "Monthly security webinars",
       "Email support"
     ],
-    highlighted: true,
-    buttonText: "Subscribe Now",
-    badge: "Most Popular"
+    buttonText: "Subscribe Now"
   },
   {
     id: "professional",
@@ -86,7 +84,9 @@ const pricingTiers: PricingTier[] = [
       "Quarterly security reviews",
       "Priority support"
     ],
-    buttonText: "Subscribe Now"
+    highlighted: true,
+    buttonText: "Subscribe Now",
+    badge: "Most Popular"
   },
   {
     id: "enterprise",
@@ -124,12 +124,16 @@ export default function Pricing() {
   const { toast } = useToast();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
 
-  const { data: stripeData } = useQuery<{ products: StripeProduct[] }>({
+  const { data: stripeData, isLoading: isLoadingProducts } = useQuery<{ products: StripeProduct[] }>({
     queryKey: ['/api/stripe/products'],
+    staleTime: 1000 * 60 * 5,
+    retry: 2,
   });
 
+  const hasStripeProducts = stripeData?.products && stripeData.products.length > 0;
+
   const getMonthlyPriceId = (tierId: string): string | null => {
-    if (!stripeData?.products) return null;
+    if (!stripeData?.products || stripeData.products.length === 0) return null;
     
     const tierNameMap: Record<string, string> = {
       essential: 'GetCyberRight Essential',
@@ -159,11 +163,18 @@ export default function Pricing() {
 
     const priceId = getMonthlyPriceId(tierId);
     if (!priceId) {
-      toast({
-        title: "Error",
-        description: "Subscription plan not available. Please try again later.",
-        variant: "destructive"
-      });
+      if (isLoadingProducts) {
+        toast({
+          title: "Loading",
+          description: "Please wait while we load subscription options.",
+        });
+      } else {
+        toast({
+          title: "Subscription Unavailable",
+          description: "Our payment system is being configured. Please try again in a few minutes or contact support.",
+          variant: "destructive"
+        });
+      }
       return;
     }
 
@@ -284,14 +295,16 @@ export default function Pricing() {
                           className="w-full" 
                           variant={tier.highlighted ? "default" : "outline"}
                           onClick={() => handleSubscribe(tier.id)}
-                          disabled={loadingTier === tier.id}
+                          disabled={loadingTier === tier.id || isLoadingProducts}
                           data-testid={`button-subscribe-${tier.id}`}
                         >
                           {loadingTier === tier.id ? (
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : isLoadingProducts ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                           ) : null}
                           {tier.buttonText}
-                          {loadingTier !== tier.id && <ArrowRight className="w-4 h-4 ml-2" />}
+                          {loadingTier !== tier.id && !isLoadingProducts && <ArrowRight className="w-4 h-4 ml-2" />}
                         </Button>
                       )}
                     </CardFooter>
