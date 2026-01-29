@@ -12,7 +12,7 @@ export function CTAFooter() {
               Start Protecting Your Family Today
             </h2>
             <p className="text-sm text-white/70 mt-1">
-              It's free, instant, and requires no sign-up.
+              Free tools available instantly. No sign-up required.
             </p>
           </div>
           <Link href="/tools">

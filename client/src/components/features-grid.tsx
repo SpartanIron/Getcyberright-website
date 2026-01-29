@@ -74,7 +74,7 @@ export function FeaturesGrid() {
             Everything You Need to Stay Safe Online
           </h2>
           <p className="text-lg text-muted-foreground">
-            Free tools, guides, and support for individuals and families.
+            Tools, guides, and support for families and small businesses.
           </p>
         </motion.div>
 

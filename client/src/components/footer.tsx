@@ -20,6 +20,7 @@ const footerLinks = {
   company: [
     { name: "About", href: "/about" },
     { name: "Resources", href: "/resources" },
+    { name: "Events", href: "/events" },
     { name: "Emergency Help", href: "/emergency-help" },
     { name: "Contact", href: "/contact" },
   ],
@@ -42,7 +43,7 @@ export function Footer() {
               <span className="font-semibold text-white">GetCyberRight</span>
             </Link>
             <p className="text-sm leading-relaxed mb-4">
-              Free cyber protection for every family member.
+              Cyber protection resources for families and small businesses.
             </p>
             <div className="flex gap-2">
               {socialLinks.map((social) => (
@@ -120,7 +121,7 @@ export function Footer() {
                 <MapPin className="w-3 h-3" /> United States
               </span>
               <span className="flex items-center gap-1">
-                <Shield className="w-3 h-3" /> 100% Free
+                <Shield className="w-3 h-3" /> Free Tools Available
               </span>
               <span>Trusted by families in 50+ countries</span>
             </div>

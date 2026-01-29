@@ -77,8 +77,8 @@ const quickLinks = [
 
 const faqs = [
   {
-    question: "Is GetCyberRight really free?",
-    answer: "Yes, 100% free. All our tools, guides, and resources are available at no cost. We believe everyone deserves protection from cyber threats, regardless of their budget."
+    question: "Are GetCyberRight tools free to use?",
+    answer: "Yes, our core tools and educational resources are free to use. We offer premium features and services for those who want additional support, but the essential protection tools will always remain accessible."
   },
   {
     question: "Do you store my data when I use your tools?",

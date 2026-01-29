@@ -25,6 +25,7 @@ import Support from "@/pages/support";
 import Partnerships from "@/pages/partnerships";
 import Advertising from "@/pages/advertising";
 import Security from "@/pages/security";
+import Events from "@/pages/events";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -57,6 +58,7 @@ function Router() {
       <Route path="/partnerships" component={Partnerships} />
       <Route path="/advertising" component={Advertising} />
       <Route path="/security" component={Security} />
+      <Route path="/events" component={Events} />
       <Route component={NotFound} />
     </Switch>
   );

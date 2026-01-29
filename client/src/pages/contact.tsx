@@ -303,11 +303,11 @@ export default function Contact() {
                   <div className="space-y-4">
                     <div className="p-4 rounded-lg bg-muted/50">
                       <h3 className="font-semibold text-foreground mb-1">
-                        Is GetCyberRight really free?
+                        Are your tools free to use?
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Yes! All our tools, guides, and resources are 100% free. 
-                        No hidden fees, no premium tiers.
+                        Yes! Our core tools and educational resources are free to use. 
+                        We also offer premium features for those who want additional support.
                       </p>
                     </div>
                     

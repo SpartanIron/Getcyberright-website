@@ -39,7 +39,7 @@ const solutions = [
       "How to talk to kids about online safety"
     ],
     cta: "Get Family Protection Guide",
-    stats: { value: "Free", label: "Family Resources" }
+    stats: { value: "Free", label: "Core Resources" }
   },
   {
     id: "seniors",
@@ -56,7 +56,7 @@ const solutions = [
       "Family communication templates"
     ],
     cta: "Get Senior Safety Guide",
-    stats: { value: "Free", label: "Senior Guides" }
+    stats: { value: "Free", label: "Core Resources" }
   },
   {
     id: "business",
@@ -73,7 +73,7 @@ const solutions = [
       "Incident response planning"
     ],
     cta: "Get Business Security Kit",
-    stats: { value: "Free", label: "Business Training" }
+    stats: { value: "Free", label: "Core Resources" }
   },
   {
     id: "educators",
@@ -90,7 +90,7 @@ const solutions = [
       "Printable safety guides"
     ],
     cta: "Get Educator Resources",
-    stats: { value: "Free", label: "Workshop Materials" }
+    stats: { value: "Free", label: "Core Resources" }
   }
 ];
 
@@ -222,7 +222,7 @@ export default function Solutions() {
                     >
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-500" />
-                        <span className="text-sm font-medium text-foreground">100% Free</span>
+                        <span className="text-sm font-medium text-foreground">Free Tools</span>
                       </div>
                     </motion.div>
                   </div>

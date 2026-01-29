@@ -12,8 +12,8 @@ const heroSlides = [
   { 
     src: professionalImage, 
     alt: "Professional using laptop securely",
-    headline: "Free Cybersecurity Education for Everyone",
-    subtext: "Everything you need to protect yourself and your family from online threats, all in one place."
+    headline: "Cybersecurity Education for Everyone",
+    subtext: "Everything you need to protect yourself, your family, and your business from online threats."
   },
   { 
     src: seniorTabletImage, 
@@ -109,7 +109,7 @@ export function HeroSection() {
               <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                 <Shield className="w-3.5 h-3.5 text-primary" />
               </div>
-              <span>Free scam detection tools</span>
+              <span>Scam detection tools</span>
             </li>
             <li className="flex items-center gap-3 text-white/90">
               <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">

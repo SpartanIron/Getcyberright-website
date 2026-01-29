@@ -1,5 +1,5 @@
 const trustIndicators = [
-  { label: "100% Free", sublabel: "No hidden costs" },
+  { label: "Free Tools", sublabel: "No hidden costs" },
   { label: "No Sign-up", sublabel: "Start instantly" },
   { label: "Expert Sources", sublabel: "FBI, CISA, FTC" },
   { label: "Privacy First", sublabel: "We never sell data" },

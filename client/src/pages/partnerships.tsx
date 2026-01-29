@@ -114,8 +114,8 @@ export default function Partnerships() {
             </Card>
             <Card className="text-center p-6">
               <CardContent className="pt-4">
-                <div className="text-3xl font-bold text-primary mb-2">100%</div>
-                <p className="text-muted-foreground">Free Resources</p>
+                <div className="text-3xl font-bold text-primary mb-2">Free</div>
+                <p className="text-muted-foreground">Core Tools</p>
               </CardContent>
             </Card>
             <Card className="text-center p-6">

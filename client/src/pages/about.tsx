@@ -17,8 +17,8 @@ const values = [
   },
   {
     icon: Heart,
-    title: "Family Centered",
-    description: "Built for real families, from grandparents to kids on their first devices."
+    title: "Family and Business Focused",
+    description: "Built for families and small businesses who need practical security guidance."
   },
   {
     icon: Users,
@@ -28,13 +28,13 @@ const values = [
   {
     icon: Globe,
     title: "Global Reach",
-    description: "Serving families all over the world who face the same threats we do."
+    description: "Serving families and businesses around the world who face the same threats."
   }
 ];
 
 const stats = [
   { value: "Global", label: "Reach" },
-  { value: "100%", label: "Free Resources" },
+  { value: "Free", label: "Core Tools" },
   { value: "24/7", label: "Access Available" },
   { value: "0", label: "Technical Jargon" }
 ];
@@ -105,20 +105,28 @@ export default function About() {
                 </p>
                 
                 <p>
-                  We set out to create free, straightforward tools that anyone can 
+                  We set out to create straightforward tools that anyone can 
                   use to determine whether something is a scam, without needing a 
                   technical background or a computer science degree.
                 </p>
+
+                <p>
+                  Along the way, we discovered that small business owners face the 
+                  same challenges. They need enterprise-grade security knowledge but 
+                  often lack dedicated IT teams or massive budgets. A single phishing 
+                  email can devastate a small business just as easily as it can 
+                  empty a family's savings.
+                </p>
                 
                 <p className="border-l-4 border-accent pl-6 py-2 text-foreground font-medium bg-accent/5 rounded-r-lg">
-                  My hope is that no family has to learn these lessons the hard way.
+                  My hope is that no family or business has to learn these lessons the hard way.
                 </p>
                 
                 <p className="text-lg font-medium text-foreground">
-                  Today, GetCyberRight serves families all over the world. From 
-                  grandparents targeted by phone scams to children navigating their 
-                  first devices, we're here to help. Start with our free Scam 
-                  Checker tool, or explore resources designed for your family.
+                  Today, GetCyberRight serves families and small businesses around 
+                  the world. From grandparents targeted by phone scams to 
+                  entrepreneurs protecting customer data, we are here to help. Start 
+                  with our Scam Checker tool, or explore resources designed for you.
                 </p>
               </div>
             </motion.div>
@@ -184,6 +192,55 @@ export default function About() {
           </div>
         </section>
 
+        <section className="py-16 sm:py-24 bg-muted/30">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-8"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">How We Operate</h2>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card>
+                <CardContent className="p-8">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    GetCyberRight is supported by carefully selected advertising partners, 
+                    corporate partnerships, and premium subscriptions. This sustainable 
+                    business model allows us to keep our core tools and educational 
+                    resources accessible to everyone who needs them.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    We only work with advertisers whose products genuinely help protect 
+                    users. We never use fear-based marketing, and we are transparent 
+                    about sponsored content. Your trust is more important than any 
+                    advertising revenue.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed">
+                    If you are interested in partnering with us or advertising on our 
+                    platform, please visit our{" "}
+                    <Link href="/partnerships" className="text-primary hover:underline">
+                      Partnerships
+                    </Link>{" "}
+                    or{" "}
+                    <Link href="/advertising" className="text-primary hover:underline">
+                      Advertising
+                    </Link>{" "}
+                    pages.
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </section>
+
         <section className="py-16 sm:py-24 bg-primary">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -194,10 +251,10 @@ export default function About() {
               className="text-center"
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Ready to Protect Your Family?
+                Ready to Get Started?
               </h2>
               <p className="text-white/80 max-w-2xl mx-auto mb-8">
-                Start with our free tools and resources. No signup required, 
+                Explore our tools and resources. No signup required, 
                 no technical knowledge needed.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

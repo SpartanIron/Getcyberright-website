@@ -161,7 +161,7 @@ export function Navigation() {
                     </div>
                     <div className="mt-4 pt-4 border-t">
                       <p className="text-xs text-muted-foreground">
-                        All tools are 100% free. No signup required.
+                        Free tools available. No signup required.
                       </p>
                     </div>
                   </div>
@@ -233,6 +233,18 @@ export function Navigation() {
                     data-testid="nav-about"
                   >
                     About Us
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
+                    href="/events"
+                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate ${location === '/events' ? 'text-primary' : ''}`}
+                    data-testid="nav-events"
+                  >
+                    Events
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -336,6 +348,15 @@ export function Navigation() {
                   data-testid="mobile-link-about"
                 >
                   About Us
+                </Link>
+
+                <Link
+                  href="/events"
+                  className="py-2 text-foreground transition-colors font-medium"
+                  onClick={() => setMobileMenuOpen(false)}
+                  data-testid="mobile-link-events"
+                >
+                  Events
                 </Link>
 
                 <Link
