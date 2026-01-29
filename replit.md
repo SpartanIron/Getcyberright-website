@@ -10,6 +10,21 @@ The application is built as a full-stack TypeScript project with a React fronten
 
 Preferred communication style: Simple, everyday language.
 
+## Brand Identity
+
+### Color Scheme (Logo-Aligned)
+The site uses an enterprise teal and orange color scheme matching the friendly padlock mascot logo:
+- **Primary Teal**: HSL 174 65% 42% - Main brand color (buttons, links, accents)
+- **Accent Orange**: HSL 32 95% 52% - Secondary accent (highlights, charts)
+- **Dark Navy**: Used for text and dark UI elements
+- **Warning Red**: Preserved for errors, critical warnings, and destructive actions
+
+### Design Principles
+- No emoji usage anywhere in the application
+- Flat, minimal aesthetic with subtle shadows
+- Enterprise-grade professional appearance
+- Audience hub pages have their own color themes while maintaining brand consistency
+
 ## System Architecture
 
 ### Frontend Architecture
