@@ -179,7 +179,7 @@ export function HeroSection() {
 
       {/* Content positioned centered within the navy background area */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16 h-full flex items-center justify-center lg:justify-start">
-        <div className="max-w-lg lg:ml-[3%] xl:ml-[5%] text-center lg:text-left">
+        <div className="max-w-lg text-center lg:text-left">
           {/* Fixed height headline container prevents layout shift */}
           <div className="h-[120px] lg:h-[140px] flex items-start justify-center lg:justify-start">
             <h1 
