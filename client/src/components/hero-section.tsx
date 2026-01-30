@@ -64,7 +64,7 @@ export function HeroSection() {
   const currentSlide = heroSlides[currentIndex];
 
   return (
-    <section className="relative w-full overflow-hidden h-[500px] lg:h-[520px]" data-testid="section-hero">
+    <section className="relative w-full overflow-hidden h-[520px] lg:h-[560px]" data-testid="section-hero">
       {/* Base layer - full width image on right side with fixed container */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Fixed container ensures all images display at exactly the same size */}
@@ -181,9 +181,9 @@ export function HeroSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16 h-full flex items-center justify-center lg:justify-start">
         <div className="max-w-lg text-center lg:text-left">
           {/* Fixed height headline container prevents layout shift */}
-          <div className="h-[120px] lg:h-[140px] flex items-start justify-center lg:justify-start">
+          <div className="h-[140px] lg:h-[160px] flex items-start justify-center lg:justify-start">
             <h1 
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.1] transition-opacity duration-500" 
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] transition-opacity duration-500" 
               data-testid="text-hero-heading"
             >
               {currentSlide.headline}
@@ -193,7 +193,7 @@ export function HeroSection() {
           {/* Fixed height subtext container */}
           <div className="h-[60px] lg:h-[70px] mb-4">
             <p 
-              className="text-base lg:text-lg text-white/80 leading-relaxed transition-opacity duration-500" 
+              className="text-lg lg:text-xl text-white/80 leading-relaxed transition-opacity duration-500" 
               data-testid="text-hero-subtext"
             >
               {currentSlide.subtext}
