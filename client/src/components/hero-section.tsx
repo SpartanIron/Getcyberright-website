@@ -64,7 +64,7 @@ export function HeroSection() {
   const currentSlide = heroSlides[currentIndex];
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ minHeight: "500px" }} data-testid="section-hero">
+    <section className="relative w-full overflow-hidden h-[500px] lg:h-[520px]" data-testid="section-hero">
       {/* Base layer - full width image on right side with fixed container */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Fixed container ensures all images display at exactly the same size */}
@@ -178,21 +178,27 @@ export function HeroSection() {
       </div>
 
       {/* Content positioned on the left over the colored background */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16 h-full flex items-center">
         <div className="max-w-lg">
-          <h1 
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 leading-[1.1] transition-opacity duration-500" 
-            data-testid="text-hero-heading"
-          >
-            {currentSlide.headline}
-          </h1>
+          {/* Fixed height headline container prevents layout shift */}
+          <div className="h-[120px] lg:h-[140px] flex items-start">
+            <h1 
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.1] transition-opacity duration-500" 
+              data-testid="text-hero-heading"
+            >
+              {currentSlide.headline}
+            </h1>
+          </div>
 
-          <p 
-            className="text-base lg:text-lg text-white/80 mb-6 leading-relaxed transition-opacity duration-500" 
-            data-testid="text-hero-subtext"
-          >
-            {currentSlide.subtext}
-          </p>
+          {/* Fixed height subtext container */}
+          <div className="h-[60px] lg:h-[70px] mb-4">
+            <p 
+              className="text-base lg:text-lg text-white/80 leading-relaxed transition-opacity duration-500" 
+              data-testid="text-hero-subtext"
+            >
+              {currentSlide.subtext}
+            </p>
+          </div>
 
           <ul className="space-y-2 mb-8 text-sm lg:text-base">
             <li className="flex items-center gap-2 text-white/90">
