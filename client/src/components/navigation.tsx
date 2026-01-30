@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck, Sparkles } from "lucide-react";
+import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck, Sparkles, Brain } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -24,9 +24,9 @@ const whoWeHelp = [
 
 const freeTools = [
   { title: "Scam Checker", description: "Check URLs, emails, phone numbers for scams", href: "/tools", icon: Search, badge: "Popular" },
+  { title: "AI & Cyber Safety", description: "Protect yourself from AI-powered threats", href: "/ai-safety", icon: Brain, badge: "New" },
   { title: "Breach Checker", description: "Check if your email was exposed in a data breach", href: "/tools", icon: AlertTriangle },
   { title: "Password Generator", description: "Create strong, secure passwords instantly", href: "/tools", icon: Lock },
-  { title: "Threat Trends", description: "Global scam statistics and trends", href: "/tools", icon: Shield },
 ];
 
 const learnTopics = [

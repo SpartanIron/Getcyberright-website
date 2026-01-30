@@ -33,6 +33,7 @@ import CheckoutSuccess from "@/pages/checkout-success";
 import ThreatTrendsPage from "@/pages/threat-trends";
 import ReportScam from "@/pages/report-scam";
 import Checklists from "@/pages/checklists";
+import AISafety from "@/pages/ai-safety";
 import AdminDashboard from "@/pages/admin/index";
 import AdminUsers from "@/pages/admin/users";
 import AdminMessages from "@/pages/admin/messages";
@@ -79,6 +80,7 @@ function Router() {
       <Route path="/threat-trends" component={ThreatTrendsPage} />
       <Route path="/report-scam" component={ReportScam} />
       <Route path="/checklists" component={Checklists} />
+      <Route path="/ai-safety" component={AISafety} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/users" component={AdminUsers} />
       <Route path="/admin/messages" component={AdminMessages} />
