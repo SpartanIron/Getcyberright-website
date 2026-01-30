@@ -13,31 +13,41 @@ const heroSlides = [
     src: professionalImage, 
     alt: "Professional using laptop securely",
     headline: "Cybersecurity Education for Everyone",
-    subtext: "Everything you need to protect yourself, your family, and your business from online threats."
+    subtext: "Everything you need to protect yourself, your family, and your business from online threats.",
+    bgColor: "rgb(15 23 42)", // Navy
+    accentColor: "hsl(174 65% 42%)", // Teal
   },
   { 
     src: seniorTabletImage, 
     alt: "Senior person using tablet safely",
     headline: "Stay Safe Online at Any Age",
-    subtext: "Simple, easy-to-follow guides designed specifically for seniors to navigate the digital world with confidence."
+    subtext: "Simple, easy-to-follow guides designed specifically for seniors to navigate the digital world with confidence.",
+    bgColor: "hsl(174 65% 25%)", // Dark Teal
+    accentColor: "hsl(174 65% 50%)", // Lighter Teal
   },
   { 
     src: familyComputerImage, 
     alt: "Family learning online safety together",
     headline: "Protect Your Family Online",
-    subtext: "Learn how to keep your children safe from online predators, cyberbullying, and inappropriate content."
+    subtext: "Learn how to keep your children safe from online predators, cyberbullying, and inappropriate content.",
+    bgColor: "hsl(200 60% 20%)", // Deep Blue
+    accentColor: "hsl(174 65% 42%)", // Teal
   },
   { 
     src: businessTeamImage, 
     alt: "Business team discussing cybersecurity",
     headline: "Security Training for Your Business",
-    subtext: "Equip your team with the knowledge to recognize threats and protect your organization from cyber attacks."
+    subtext: "Equip your team with the knowledge to recognize threats and protect your organization from cyber attacks.",
+    bgColor: "hsl(220 50% 18%)", // Slate Blue
+    accentColor: "hsl(32 95% 52%)", // Orange
   },
   { 
     src: smartphoneUserImage, 
     alt: "Person using smartphone securely",
     headline: "Secure Your Digital Life",
-    subtext: "From mobile banking to social media, learn how to protect your personal information on every device."
+    subtext: "From mobile banking to social media, learn how to protect your personal information on every device.",
+    bgColor: "hsl(180 50% 20%)", // Teal-Cyan
+    accentColor: "hsl(174 65% 50%)", // Bright Teal
   },
 ];
 
@@ -57,8 +67,8 @@ export function HeroSection() {
     <section className="relative w-full overflow-hidden" style={{ minHeight: "500px" }} data-testid="section-hero">
       {/* Base layer - full width image on right side */}
       <div className="absolute inset-0">
-        {/* Image positioned on right half */}
-        <div className="absolute right-0 top-0 bottom-0 w-full lg:w-3/5">
+        {/* Image positioned on right - more exposed with adjusted curve */}
+        <div className="absolute right-0 top-0 bottom-0 w-full lg:w-2/3">
           {heroSlides.map((slide, index) => (
             <div
               key={index}
@@ -77,74 +87,68 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Curved navy background overlay
-          This SVG creates a curved shape that covers the left side and wraps
-          around the image with a smooth Bézier curve that "hugs" the photo.
-          The curve sweeps from top-right downward in a convex arc.
+      {/* Curved background overlay - different color per slide
+          The curve is brought inward to expose more of the image.
+          Path uses a gentler curve with control point closer to the edge.
       */}
       <svg 
-        className="absolute inset-0 w-full h-full pointer-events-none"
+        className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-1000"
         viewBox="0 0 1440 500"
         preserveAspectRatio="none"
         aria-hidden="true"
       >
         <defs>
-          {/* Gradient for the teal glow effect on the curve edge */}
+          {/* Gradient for the accent glow effect on the curve edge */}
           <linearGradient id="curveEdgeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(174 65% 42%)" stopOpacity="0" />
-            <stop offset="70%" stopColor="hsl(174 65% 42%)" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="hsl(174 65% 42%)" stopOpacity="0.6" />
+            <stop offset="0%" stopColor={currentSlide.accentColor} stopOpacity="0" />
+            <stop offset="70%" stopColor={currentSlide.accentColor} stopOpacity="0.4" />
+            <stop offset="100%" stopColor={currentSlide.accentColor} stopOpacity="0.7" />
           </linearGradient>
         </defs>
         
-        {/* Main curved navy shape
+        {/* Main curved shape - brought inward for more image exposure
             Path breakdown:
             M0,0 - Start at top-left corner
-            L800,0 - Line across top to x=800
-            Q1050,250 800,500 - Quadratic Bézier curve: control point pushes curve outward (convex)
+            L680,0 - Line across top to x=680 (less than before)
+            Q880,250 680,500 - Gentler curve with control point at (880,250)
             L0,500 - Line to bottom-left
             Z - Close the path
-            
-            The curve creates a smooth arc that bulges outward into the image area
         */}
         <path
-          d="M0,0 L800,0 Q1050,250 800,500 L0,500 Z"
-          fill="rgb(15 23 42)"
+          d="M0,0 L680,0 Q880,250 680,500 L0,500 Z"
+          fill={currentSlide.bgColor}
+          className="transition-all duration-1000"
         />
         
-        {/* Teal accent glow along the curve edge */}
+        {/* Accent glow along the curve edge */}
         <path
-          d="M800,0 Q1050,250 800,500"
+          d="M680,0 Q880,250 680,500"
           fill="none"
           stroke="url(#curveEdgeGlow)"
           strokeWidth="4"
+          className="transition-all duration-1000"
         />
         
-        {/* Secondary thinner teal line */}
+        {/* Secondary thinner accent line */}
         <path
-          d="M810,10 Q1060,250 810,490"
+          d="M690,10 Q890,250 690,490"
           fill="none"
-          stroke="hsl(174 65% 42% / 0.3)"
+          stroke={currentSlide.accentColor}
+          strokeOpacity="0.3"
           strokeWidth="2"
+          className="transition-all duration-1000"
         />
       </svg>
 
-      {/* Decorative teal dotted/particle arc on left side of navy area */}
-      <div className="absolute left-0 top-0 bottom-0 w-1/3 overflow-hidden pointer-events-none" aria-hidden="true">
-        <svg className="absolute -left-20 top-1/2 -translate-y-1/2 w-[400px] h-[400px]" viewBox="0 0 400 400">
-          {/* Dotted arc pattern */}
-          <defs>
-            <radialGradient id="dotGradient">
-              <stop offset="0%" stopColor="hsl(174 65% 42%)" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="hsl(174 65% 42%)" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          {/* Generate dotted arc pattern */}
-          {Array.from({ length: 60 }).map((_, i) => {
-            const angle = (i / 60) * Math.PI * 0.8 + Math.PI * 0.6;
-            const radius = 150 + Math.random() * 40;
-            const x = 200 + Math.cos(angle) * radius;
-            const y = 200 + Math.sin(angle) * radius;
+      {/* Decorative particle arc on left side */}
+      <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none" aria-hidden="true">
+        <svg className="absolute -left-16 top-1/2 -translate-y-1/2 w-[350px] h-[350px]" viewBox="0 0 350 350">
+          {/* Generate dotted arc pattern with current accent color */}
+          {Array.from({ length: 50 }).map((_, i) => {
+            const angle = (i / 50) * Math.PI * 0.7 + Math.PI * 0.65;
+            const radius = 120 + Math.random() * 35;
+            const x = 175 + Math.cos(angle) * radius;
+            const y = 175 + Math.sin(angle) * radius;
             const size = 1 + Math.random() * 2;
             return (
               <circle
@@ -152,17 +156,20 @@ export function HeroSection() {
                 cx={x}
                 cy={y}
                 r={size}
-                fill="hsl(174 65% 42%)"
-                opacity={0.3 + Math.random() * 0.4}
+                fill={currentSlide.accentColor}
+                opacity={0.2 + Math.random() * 0.4}
+                className="transition-all duration-1000"
               />
             );
           })}
           {/* Curved line through the dots */}
           <path
-            d="M50,350 Q200,200 350,50"
+            d="M40,310 Q175,175 310,40"
             fill="none"
-            stroke="hsl(174 65% 42% / 0.4)"
+            stroke={currentSlide.accentColor}
+            strokeOpacity="0.3"
             strokeWidth="1"
+            className="transition-all duration-1000"
           />
         </svg>
       </div>
@@ -174,9 +181,9 @@ export function HeroSection() {
         <div className="absolute bottom-16 -right-6 w-24 h-24 rounded-full bg-accent/50" />
       </div>
 
-      {/* Content positioned on the left over the navy background */}
+      {/* Content positioned on the left over the colored background */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
-        <div className="max-w-xl">
+        <div className="max-w-lg">
           <h1 
             className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 leading-[1.1] transition-opacity duration-500" 
             data-testid="text-hero-heading"
