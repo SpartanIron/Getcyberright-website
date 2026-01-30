@@ -65,24 +65,20 @@ export function HeroSection() {
 
   return (
     <section className="relative w-full overflow-hidden" style={{ minHeight: "500px" }} data-testid="section-hero">
-      {/* Base layer - full width image on right side */}
-      <div className="absolute inset-0">
-        {/* Image positioned on right - more exposed with adjusted curve */}
-        <div className="absolute right-0 top-0 bottom-0 w-full lg:w-2/3">
+      {/* Base layer - full width image on right side with fixed container */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Fixed container ensures all images display at exactly the same size */}
+        <div className="absolute right-0 top-0 w-full lg:w-2/3 h-full">
           {heroSlides.map((slide, index) => (
-            <div
+            <img
               key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
+              src={slide.src}
+              alt={slide.alt}
+              className={`absolute inset-0 w-full h-full object-cover object-[center_30%] transition-opacity duration-1000 ${
                 index === currentIndex ? "opacity-100" : "opacity-0"
               }`}
-            >
-              <img
-                src={slide.src}
-                alt={slide.alt}
-                className="w-full h-full object-cover object-center"
-                data-testid={`img-hero-${index}`}
-              />
-            </div>
+              data-testid={`img-hero-${index}`}
+            />
           ))}
         </div>
       </div>
