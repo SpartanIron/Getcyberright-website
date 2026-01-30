@@ -87,13 +87,13 @@ Preferred communication style: Simple, everyday language.
 - **Regional Content Personalization**:
   - Auto-detection of user region via IP geolocation (ip-api.com)
   - Manual region selection with localStorage persistence
-  - 10 supported regions: US (Northeast, Southeast, Midwest, Southwest, West), UK, Canada, Australia, EU, plus Global fallback
+  - 7 supported regions: United States, United Kingdom, Canada, Australia, European Union, Africa, plus Global fallback
   - Region-specific threat trends with severity levels and case counts
   - Local reporting agencies and emergency contacts per region
   - API endpoints: `/api/region/detect`, `/api/region/list`, `/api/region/:code`, `/api/region/:code/threats`
   - RegionSelector component (compact/full modes) and RegionalThreatsCard
   - Integrated into Dashboard and Emergency Help pages
-  - Data model in `shared/regions.ts` with state-to-region and country-to-region mappings
+  - Data model in `shared/regions.ts` with country-to-region mappings for all African countries
 
 ### Premium Subscription Tiers
 - **Tier Access Control**: `hasTierAccess()` function in `server/routes.ts` handles feature gating

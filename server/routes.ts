@@ -27,7 +27,6 @@ import {
   getRegionByCode, 
   getThreatsByRegion, 
   ALL_REGIONS, 
-  US_STATE_TO_REGION, 
   COUNTRY_TO_REGION,
   DEFAULT_REGION
 } from "@shared/regions";
@@ -1063,13 +1062,8 @@ export async function registerRoutes(
           const geoData = await geoResponse.json() as { status: string; countryCode?: string; region?: string };
           
           if (geoData.status === 'success' && geoData.countryCode) {
-            if (geoData.countryCode === 'US' && geoData.region) {
-              // Map US state to region
-              regionCode = US_STATE_TO_REGION[geoData.region] || "US-NORTHEAST";
-            } else {
-              // Map country to region
-              regionCode = COUNTRY_TO_REGION[geoData.countryCode] || "GLOBAL";
-            }
+            // Map country to region (US, UK, CA, AU, EU, AF, or GLOBAL)
+            regionCode = COUNTRY_TO_REGION[geoData.countryCode] || "GLOBAL";
           }
         }
       } catch (geoError) {
