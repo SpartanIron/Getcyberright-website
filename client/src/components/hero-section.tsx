@@ -177,11 +177,11 @@ export function HeroSection() {
         <div className="absolute bottom-16 -right-6 w-24 h-24 rounded-full bg-accent/50" />
       </div>
 
-      {/* Content positioned on the left over the colored background */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16 h-full flex items-center">
-        <div className="max-w-lg">
+      {/* Content positioned centered within the navy background area */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16 h-full flex items-center justify-center lg:justify-start">
+        <div className="max-w-lg lg:ml-[8%] xl:ml-[12%] text-center lg:text-left">
           {/* Fixed height headline container prevents layout shift */}
-          <div className="h-[120px] lg:h-[140px] flex items-start">
+          <div className="h-[120px] lg:h-[140px] flex items-start justify-center lg:justify-start">
             <h1 
               className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.1] transition-opacity duration-500" 
               data-testid="text-hero-heading"
