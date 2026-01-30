@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
 import { users, contactMessages, newsletterSubscribers, scamReports } from "@shared/schema";
-import { authStorage, isAuthenticated } from "./replit_integrations/auth";
+import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql } from "drizzle-orm";
 import { securityLogger } from "./security";
 import { z } from "zod";
@@ -14,16 +14,15 @@ const updateUserSchema = z.object({
 
 // Admin middleware - checks if authenticated user has isAdmin = true
 // Must be used AFTER isAuthenticated middleware
-export const isAdmin = async (req: any, res: Response, next: NextFunction) => {
+export const isAdminMiddleware = async (req: any, res: Response, next: NextFunction) => {
   try {
-    const userId = req.user?.claims?.sub;
-    if (!userId) {
+    const user = req.user;
+    if (!user) {
       return res.status(401).json({ error: "Unauthorized" });
     }
     
-    const user = await authStorage.getUser(userId);
-    if (!user || !user.isAdmin) {
-      securityLogger.warn("Unauthorized admin access attempt", { userId });
+    if (!user.isAdmin) {
+      securityLogger.warn("Unauthorized admin access attempt", { userId: user.id });
       return res.status(403).json({ error: "Admin access required" });
     }
     
@@ -35,8 +34,8 @@ export const isAdmin = async (req: any, res: Response, next: NextFunction) => {
 };
 
 export function registerAdminRoutes(app: Express) {
-  // Dashboard stats - protected by both isAuthenticated and isAdmin
-  app.get("/api/admin/stats", isAuthenticated, isAdmin, async (req, res) => {
+  // Dashboard stats - protected by both isAuthenticated and isAdminMiddleware
+  app.get("/api/admin/stats", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const [userCount] = await db.select({ count: count() }).from(users);
       const [messageCount] = await db.select({ count: count() }).from(contactMessages);
@@ -63,7 +62,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // User management
-  app.get("/api/admin/users", isAuthenticated, isAdmin, async (req, res) => {
+  app.get("/api/admin/users", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const allUsers = await db
         .select()
@@ -76,7 +75,7 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.patch("/api/admin/users/:id", isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch("/api/admin/users/:id", isAuthenticated, isAdminMiddleware, async (req: any, res) => {
     try {
       const { id } = req.params;
       
@@ -99,7 +98,7 @@ export function registerAdminRoutes(app: Express) {
         .returning();
       
       securityLogger.info("Admin updated user", { 
-        adminId: req.user.claims.sub, 
+        adminId: req.user.id, 
         targetUserId: id, 
         changes: updateData 
       });
@@ -111,19 +110,19 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/users/:id", isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete("/api/admin/users/:id", isAuthenticated, isAdminMiddleware, async (req: any, res) => {
     try {
       const { id } = req.params;
       
       // Prevent self-deletion
-      if (id === req.user.claims.sub) {
+      if (id === req.user.id) {
         return res.status(400).json({ error: "Cannot delete your own account" });
       }
       
       await db.delete(users).where(eq(users.id, id));
       
       securityLogger.info("Admin deleted user", { 
-        adminId: req.user.claims.sub, 
+        adminId: req.user.id, 
         deletedUserId: id 
       });
       
@@ -135,7 +134,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // Contact messages management
-  app.get("/api/admin/contact-messages", isAuthenticated, isAdmin, async (req, res) => {
+  app.get("/api/admin/contact-messages", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const messages = await db
         .select()
@@ -148,7 +147,7 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/contact-messages/:id", isAuthenticated, isAdmin, async (req, res) => {
+  app.delete("/api/admin/contact-messages/:id", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const { id } = req.params;
       await db.delete(contactMessages).where(eq(contactMessages.id, id));
@@ -160,7 +159,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // Newsletter subscribers management
-  app.get("/api/admin/newsletter-subscribers", isAuthenticated, isAdmin, async (req, res) => {
+  app.get("/api/admin/newsletter-subscribers", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const subscribers = await db
         .select()
@@ -173,7 +172,7 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/newsletter-subscribers/:id", isAuthenticated, isAdmin, async (req, res) => {
+  app.delete("/api/admin/newsletter-subscribers/:id", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const { id } = req.params;
       await db.delete(newsletterSubscribers).where(eq(newsletterSubscribers.id, id));
@@ -185,7 +184,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // Export newsletter subscribers as CSV
-  app.get("/api/admin/newsletter-subscribers/export", isAuthenticated, isAdmin, async (req, res) => {
+  app.get("/api/admin/newsletter-subscribers/export", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const subscribers = await db
         .select()
@@ -206,7 +205,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // Scam reports management
-  app.get("/api/admin/scam-reports", isAuthenticated, isAdmin, async (req, res) => {
+  app.get("/api/admin/scam-reports", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const reports = await db
         .select()
@@ -219,7 +218,7 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/scam-reports/:id", isAuthenticated, isAdmin, async (req, res) => {
+  app.delete("/api/admin/scam-reports/:id", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const { id } = req.params;
       await db.delete(scamReports).where(eq(scamReports.id, id));
@@ -233,13 +232,12 @@ export function registerAdminRoutes(app: Express) {
   // Check if current user is admin - protected by isAuthenticated to ensure proper session
   app.get("/api/admin/check", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
-      if (!userId) {
+      const user = req.user;
+      if (!user) {
         return res.json({ isAdmin: false });
       }
       
-      const user = await authStorage.getUser(userId);
-      res.json({ isAdmin: user?.isAdmin || false });
+      res.json({ isAdmin: user.isAdmin || false });
     } catch (error) {
       res.json({ isAdmin: false });
     }

@@ -6,7 +6,7 @@ import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
-import { setupAuth, registerAuthRoutes, isAuthenticated, authStorage } from "./replit_integrations/auth";
+import { registerAuthRoutes, isAuthenticated } from "./auth";
 import { stripeService } from "./stripeService";
 import { getStripePublishableKey } from "./stripeClient";
 import { registerAdminRoutes } from "./admin";
@@ -59,8 +59,7 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
-  // Setup Replit Auth (must be before other routes)
-  await setupAuth(app);
+  // Register custom auth routes
   registerAuthRoutes(app);
   
   // Register admin routes
@@ -311,14 +310,9 @@ export async function registerRoutes(
   // Get user subscription status (protected route)
   app.get("/api/subscription/status", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
-      if (!userId) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-      
-      const user = await authStorage.getUser(userId);
+      const user = req.user;
       if (!user) {
-        return res.status(404).json({ error: "User not found" });
+        return res.status(401).json({ error: "Unauthorized" });
       }
       
       const now = new Date();
@@ -341,14 +335,9 @@ export async function registerRoutes(
   const requireSubscription = (requiredTier: string) => {
     return async (req: any, res: Response, next: Function) => {
       try {
-        const userId = req.user?.claims?.sub;
-        if (!userId) {
-          return res.status(401).json({ error: "Unauthorized" });
-        }
-        
-        const user = await authStorage.getUser(userId);
+        const user = req.user;
         if (!user) {
-          return res.status(401).json({ error: "User not found" });
+          return res.status(401).json({ error: "Unauthorized" });
         }
         
         const now = new Date();
@@ -414,20 +403,15 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Price ID is required" });
       }
 
-      const userId = req.user?.claims?.sub;
-      if (!userId) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const user = await authStorage.getUser(userId);
+      const user = req.user;
       if (!user) {
-        return res.status(404).json({ error: "User not found" });
+        return res.status(401).json({ error: "Unauthorized" });
       }
 
       let customerId = user.stripeCustomerId;
       if (!customerId) {
-        const customer = await stripeService.createCustomer(user.email || '', userId);
-        await stripeService.updateUserStripeInfo(userId, { stripeCustomerId: customer.id });
+        const customer = await stripeService.createCustomer(user.email || '', user.id);
+        await stripeService.updateUserStripeInfo(user.id, { stripeCustomerId: customer.id });
         customerId = customer.id;
       }
 
@@ -451,12 +435,7 @@ export async function registerRoutes(
   // Create customer portal session for managing subscriptions
   app.post("/api/stripe/create-portal-session", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
-      if (!userId) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const user = await authStorage.getUser(userId);
+      const user = req.user;
       if (!user || !user.stripeCustomerId) {
         return res.status(400).json({ error: "No active subscription found" });
       }

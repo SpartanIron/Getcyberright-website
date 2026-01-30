@@ -2,278 +2,58 @@
 
 ## Overview
 
-GetCyberRight is a cybersecurity education website designed to provide simple, practical security guidance for families, seniors, and organizations. The platform focuses on protecting users from modern cyber threats like phishing, romance scams, identity theft, and tech support scams through accessible educational content, security guides, and community resources.
-
-The application is built as a full-stack TypeScript project with a React frontend and Express backend, featuring a landing page with multiple sections including hero, features, testimonials, contact forms, and newsletter signup.
+GetCyberRight is a cybersecurity education platform designed to provide practical security guidance for families, seniors, and organizations. It aims to protect users from modern cyber threats through accessible educational content, security guides, and community resources. The project envisions empowering users with the knowledge to defend against phishing, scams, and identity theft, establishing itself as a leading resource for digital safety. The application is a full-stack TypeScript project with a React frontend and Express backend.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
 
-## Brand Identity
-
-### Color Scheme (Logo-Aligned)
-The site uses an enterprise teal and orange color scheme matching the friendly padlock mascot logo:
-- **Primary Teal**: HSL 174 65% 42% - Main brand color (buttons, links, accents)
-- **Accent Orange**: HSL 32 95% 52% - Secondary accent (highlights, charts)
-- **Dark Navy**: Used for text and dark UI elements
-- **Warning Red**: Preserved for errors, critical warnings, and destructive actions
-
-### Design Principles
-- No emoji usage anywhere in the application
-- Flat, minimal aesthetic with subtle shadows
-- Enterprise-grade professional appearance
-- Audience hub pages have their own color themes while maintaining brand consistency
-
 ## System Architecture
 
+### Brand Identity & Design
+- **Color Scheme**: Enterprise teal and orange, matching the padlock mascot logo. Specific colors for primary, accent, dark UI, and warnings.
+- **Design Principles**: Flat, minimal aesthetic with subtle shadows, professional appearance, no emoji usage. Audience hub pages (Kids, Seniors, Parents, Educators, Small Business) have distinct color themes while maintaining brand consistency.
+- **UI/UX**: Emphasis on accessibility (ARIA labels, screen reader support), SEO (meta tags, Open Graph, Twitter Cards), and print support for checklists.
+- **Kids Digital Safety Hub**: Features age-segmented lessons (8-11, 12-16) with interactive quizzes, progress tracking, and gamified elements. Designed with larger text, kid-friendly visuals, empowering language, and colorful gradient backgrounds.
+- **Audience Hub Pages**: Dedicated sections for Seniors, Parents, Educators, and Small Business, each with curated content, specific gradient themes, and consistent structural patterns (e.g., FloatingShapes component, card grids, detailed topic views).
+
 ### Frontend Architecture
-- **Framework**: React 18 with TypeScript
-- **Routing**: Wouter (lightweight React router)
-- **State Management**: TanStack Query (React Query) for server state
-- **Styling**: Tailwind CSS with CSS variables for theming
-- **UI Components**: shadcn/ui component library (Radix UI primitives)
-- **Animations**: Framer Motion for subtle page animations
-- **Forms**: React Hook Form with Zod validation
-- **Build Tool**: Vite with hot module replacement
+- **Framework**: React 18 with TypeScript.
+- **Routing**: Wouter.
+- **State Management**: TanStack Query (React Query).
+- **Styling**: Tailwind CSS with CSS variables, shadcn/ui component library (Radix UI primitives).
+- **Animations**: Framer Motion.
+- **Forms**: React Hook Form with Zod validation.
+- **Build Tool**: Vite.
 
 ### Backend Architecture
-- **Framework**: Express 5 on Node.js
-- **Language**: TypeScript with ES modules
-- **API Design**: REST endpoints for contact form and newsletter subscriptions
-- **Validation**: Zod schemas shared between frontend and backend
-- **Session Storage**: Memory-based storage (MemStorage class) with interface for future database migration
+- **Framework**: Express 5 on Node.js with TypeScript.
+- **API Design**: REST endpoints for contact form and newsletter subscriptions.
+- **Validation**: Zod schemas shared between frontend and backend.
+- **Authentication**: Custom authentication system with email/password, TOTP MFA, backup codes, account lockout, session management (PostgreSQL), email verification, and password reset.
 
 ### Data Layer
-- **ORM**: Drizzle ORM configured for PostgreSQL
-- **Schema Location**: `shared/schema.ts` contains all database table definitions
-- **Schema Generation**: drizzle-zod for automatic Zod schema generation from database tables
-- **Current Tables**: users, contact_messages, newsletter_subscribers
+- **ORM**: Drizzle ORM configured for PostgreSQL.
+- **Schema**: `shared/schema.ts` for database table definitions, with `drizzle-zod` for automatic Zod schema generation.
+- **Tables**: `users`, `contact_messages`, `newsletter_subscribers`.
 
-### Project Structure
-```
-├── client/           # React frontend application
-│   ├── src/
-│   │   ├── components/   # UI and page components
-│   │   ├── hooks/        # Custom React hooks
-│   │   ├── lib/          # Utilities and query client
-│   │   └── pages/        # Route page components
-├── server/           # Express backend
-│   ├── index.ts      # Server entry point
-│   ├── routes.ts     # API route definitions
-│   ├── storage.ts    # Data storage abstraction
-│   └── vite.ts       # Vite dev server integration
-├── shared/           # Shared code between frontend/backend
-│   └── schema.ts     # Database schemas and types
-└── migrations/       # Drizzle database migrations
-```
+### Security Architecture
+- **Security Middleware**: Implemented via `server/security.ts` using Helmet.js for security headers (CSP, HSTS, X-Frame-Options, etc.).
+- **Rate Limiting**: Three tiers (strict, standard, relaxed) with IP-based tracking and automatic blocking.
+- **CSRF Protection**: Origin/Referer header validation for state-changing requests.
+- **Request Security**: JSON/form payload limits, suspicious pattern detection (XSS, SQLi), all security events logged.
+- **Cookie Security**: HttpOnly, Secure, SameSite=strict.
+- **Compliance**: Mapped controls to OWASP ASVS, CIS Control, ISO 27001, and NIST 800-53.
 
-### Build and Development
-- **Development**: Vite dev server with Express middleware integration
-- **Production Build**: esbuild for server bundling, Vite for client bundling
-- **Output**: `dist/` directory with `index.cjs` (server) and `public/` (client assets)
+### Content & Tools
+- **Content Guidelines**: All educational content is based on verified data from sources like FTC Consumer Sentinel, FBI IC3, CISA, Medicare.gov, etc. Emphasis on empowering, non-fear-based language.
+- **Scam Checker**: Features Email Header Analysis (SPF/DKIM/DMARC), URL entropy/brand similarity, urgency scoring, Reply-To mismatch detection, and real-time URL reputation checking.
 
 ## External Dependencies
 
-### Database
-- **PostgreSQL**: Primary database (configured via DATABASE_URL environment variable)
-- **Drizzle Kit**: Database migration and schema push tool (`npm run db:push`)
-
-### UI Framework
-- **Radix UI**: Headless component primitives for accessibility
-- **shadcn/ui**: Pre-built component implementations using Radix
-- **Lucide React**: Icon library
-- **react-icons**: Additional icon sets (social media icons)
-
-### Form and Validation
-- **Zod**: Schema validation for both frontend forms and API requests
-- **React Hook Form**: Form state management and validation integration
-- **@hookform/resolvers**: Zod resolver for React Hook Form
-
-### Styling
-- **Tailwind CSS**: Utility-first CSS framework
-- **class-variance-authority**: Component variant management
-- **tailwind-merge**: Intelligent class merging
-
-### Development Tools
-- **Replit Plugins**: Runtime error overlay, cartographer, and dev banner for Replit environment
-- **TypeScript**: Strict type checking across the entire codebase
-
-## Accessibility Features
-- ARIA labels on all interactive elements (buttons, inputs, results)
-- Screen reader support with aria-live regions for dynamic content updates
-- Proper form labels and descriptions for checklist items
-- Role attributes for semantic structure (region, alert, search, group)
-
-## SEO & Social Sharing
-- Meta description and keywords in index.html
-- Open Graph tags for Facebook/LinkedIn sharing
-- Twitter Card meta tags for Twitter sharing
-- OG image at `/og-image.png` for social media previews
-- Favicon using the teal padlock mascot logo
-
-## Print Support
-- Print stylesheet in index.css for checklist printing
-- Hides navigation, footer, and non-essential UI when printing
-- Formats checklists with proper spacing and checkbox styling
-- Print button on each checklist resource
-
-## Kids Digital Safety Hub
-
-A dedicated section at `/kids` designed for children ages 8 to 16, featuring:
-
-### Age Segmentation
-- **Ages 8 to 11 (Foundations)**: Five beginner lessons covering personal information, passwords, spotting tricks, device safety, and trusted adults
-- **Ages 12 to 16 (Smart and Safe Online)**: Five intermediate lessons on social media, cyberbullying, gaming safety, phishing scams, and digital footprint
-
-### Features
-- Interactive quizzes with immediate feedback
-- Progress tracking with visual completion indicators
-- Spot the Scam game with real world scenarios
-- Parent and Educator section with conversation starters
-- No data collection, accounts, or external links
-
-### Design Principles
-- Larger text and kid friendly visuals
-- Empowering, non fear based language
-- Proper sentence structure and punctuation (no dashes)
-- Colorful gradient backgrounds (teal theme for ages 8-11, purple theme for ages 12-16)
-- Floating decorative shapes with gentle animations
-- Playful card designs with shadows and hover effects
-- Visual progress indicators with star rewards
-- Encouraging badges and celebration elements
-- Card based layouts with bright, controlled colors
-
-## Audience Hub Pages
-
-The website features dedicated hub pages for each target audience, providing curated content and resources specific to their needs:
-
-### Seniors Hub (`/seniors`)
-- 6 safety topics: Romance scams, Tech support scams, Medicare fraud, Phone/email scams, Financial scams, Online safety basics
-- Emerald/teal/blue gradient theme
-- Warning signs and protection steps for each topic
-- Links to emergency help resources
-
-### Parents Hub (`/parents`)
-- 6 topics: Device controls, Social media safety, Screen time management, Gaming safety, Online predators, Digital footprint
-- Blue/indigo/purple gradient theme
-- Conversation starters for talking with children
-- Links to Kids Hub for child-appropriate content
-
-### Educators Hub (`/educators`)
-- 6 classroom resources: Digital citizenship, Cyberbullying prevention, Privacy/security, Media literacy, Responsible gaming, Institutional security
-- Indigo/purple/blue gradient theme
-- Learning objectives, classroom activities, discussion questions
-- Grade level indicators for each resource
-
-### Small Business Hub (`/small-business`)
-- 6 business security topics: Employee training, Phishing protection, Password management, Data protection, Vendor risk, Incident response
-- Slate/blue/indigo gradient theme
-- Priority indicators (Critical, Essential, Important)
-- Cost considerations for budget planning
-- Quick wins for immediate action
-
-### Design Patterns
-All hub pages follow a consistent structure:
-- FloatingShapes component for visual interest
-- Topic/resource card grid with hover states
-- Detailed topic view with structured content sections
-- Cross-links to related hubs and resources
-- Accessible cards with keyboard navigation and ARIA labels
-
-## Content Guidelines and Data Sources
-
-All educational content is based on verified, factual information from trusted sources:
-
-### Primary Data Sources
-- **FTC Consumer Sentinel**: Scam statistics, fraud reports, and consumer loss data
-- **FBI IC3 (Internet Crime Complaint Center)**: Cybercrime statistics and trends
-- **CISA**: Cybersecurity best practices and threat advisories
-- **Medicare.gov**: Medicare fraud information
-- **StopBullying.gov**: Cyberbullying prevention resources
-- **Common Sense Media**: Digital citizenship curriculum
-- **ESRB**: Video game ratings and family guides
-
-### Content Principles
-- No fabricated statistics or unverifiable percentages
-- General statements (e.g., "billions in losses") backed by government data
-- Warning signs and protection tips based on documented scam patterns
-- Educational content uses empowering, non-fear-based language
-- All tools run 100% client-side with no data collection
-
-### Scam Checker Features
-- Email Header Analysis with SPF/DKIM/DMARC authentication checking
-- URL entropy and brand similarity analysis
-- Urgency/pressure scoring with visual meter
-- Reply-To mismatch and bulk mailer detection
-- Real-time URL reputation checking against PhishTank (phishing database) and URLhaus (malware database)
-- Backend API proxy endpoints for threat database queries (with rate limiting and timeout handling)
-
-## Security Architecture
-
-### Security Middleware Stack (server/security.ts)
-The application implements enterprise-grade security controls:
-
-**Security Headers (Helmet.js)**
-- Content-Security-Policy: Restricts script/style sources, blocks frames, limits connections
-- Strict-Transport-Security (HSTS): 1 year max-age with preload
-- X-Frame-Options: DENY (prevents clickjacking)
-- X-Content-Type-Options: nosniff
-- Referrer-Policy: strict-origin-when-cross-origin
-- Cross-Origin-Opener-Policy/Resource-Policy
-
-**Rate Limiting**
-- Three tiers: strict (10 req/min), standard (30 req/min), relaxed (100 req/min)
-- Contact/newsletter forms use strict tier
-- Security check endpoints use standard tier
-- IP-based tracking with automatic blocking after 3 violations
-- Block duration: 5 minutes
-
-**CSRF Protection**
-- Origin/Referer header validation for all POST/PUT/DELETE requests
-- Logs all CSRF violations with IP and request details
-
-**Request Security**
-- JSON payload limit: 100KB
-- Form payload limit: 50KB
-- Suspicious pattern detection (XSS, SQL injection, path traversal)
-- All security events logged with Winston
-
-**Cookie Security**
-- HttpOnly: true
-- Secure: true (in production)
-- SameSite: strict
-- Max-age: 24 hours
-
-### Compliance Mapping
-| Control | Standard | Implementation |
-|---------|----------|----------------|
-| Security Headers | OWASP ASVS 14.4 | Helmet.js |
-| Input Validation | OWASP ASVS 5.1 | Zod + Drizzle ORM |
-| Rate Limiting | CIS Control 9 | Custom middleware |
-| Secure Transport | ISO 27001 A.14.1.2 | HTTPS (Replit) |
-| Secrets Management | NIST 800-53 SC-12 | Replit Secrets |
-| Logging | ISO 27001 A.12.4 | Winston |
-
-## Recent Changes (Jan 2026)
-- Added real-time URL reputation checking against PhishTank and URLhaus threat databases
-- Implemented backend proxy endpoints with rate limiting (30 req/min per IP) and 10-second timeouts
-- Added URL validation to block private/localhost IPs from being checked
-- Updated all statistics to latest available data: FTC Consumer Sentinel 2024 (March 2025), FBI IC3 2024 Report, and FTC Data Spotlights (Aug/Dec 2025)
-- Added Email Header Analysis tab to Scam Checker with authentication checking
-- Content review: removed specific percentages, added data source attribution
-- Added Seniors Hub with 6 safety topics for older adults
-- Added Parents Hub with family online safety resources
-- Added Educators Hub with classroom curriculum resources
-- Added Small Business Hub with workplace security guidance
-- Updated navigation to link directly to all hub pages
-- Added Kids Digital Safety Hub with two age tracks and gamified learning
-- Added custom 404 page with helpful navigation links
-- Implemented print functionality for checklists
-- Added ARIA labels to scam checker, password generator, breach checker
-- Generated OG image for social media sharing
-- Added Twitter/Open Graph meta tags
-- Updated website logo to glowing teal padlock mascot
-- Added DOMPurify sanitization with hardened link handling (rel="noopener noreferrer")
-- Implemented security alerting system with severity-based alerts for rate limiting, CSRF, and suspicious patterns
-- Added security documentation page at /security with compliance mappings
+- **Database**: PostgreSQL, Drizzle Kit (for migrations).
+- **UI Framework**: Radix UI, shadcn/ui, Lucide React, react-icons.
+- **Form & Validation**: Zod, React Hook Form, @hookform/resolvers.
+- **Styling**: Tailwind CSS, class-variance-authority, tailwind-merge.
+- **Authentication**: `connect-pg-simple` (for PostgreSQL sessions), `bcrypt` (password hashing), `speakeasy` (TOTP MFA), `qrcode`.
+- **Threat Intelligence**: PhishTank API, URLhaus API (proxied via backend with rate limiting).

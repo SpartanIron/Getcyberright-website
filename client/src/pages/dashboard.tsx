@@ -70,10 +70,10 @@ export default function Dashboard() {
         variant: "destructive"
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        setLocation("/login");
       }, 1000);
     }
-  }, [isLoading, isAuthenticated, toast]);
+  }, [isLoading, isAuthenticated, toast, setLocation]);
 
   if (isLoading) {
     return (

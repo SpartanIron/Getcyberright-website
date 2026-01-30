@@ -322,12 +322,12 @@ export function Navigation() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="outline" size="default" asChild data-testid="button-login">
-                <a href="/api/login">
+              <Link href="/login">
+                <Button variant="outline" size="default" data-testid="button-login">
                   <LogIn className="mr-2 h-4 w-4" />
                   Log In
-                </a>
-              </Button>
+                </Button>
+              </Link>
             )}
             <Link href="/tools">
               <Button variant="default" size="default" data-testid="button-get-protection">
@@ -462,12 +462,12 @@ export function Navigation() {
                     </Button>
                   </>
                 ) : (
-                  <Button variant="outline" asChild data-testid="mobile-button-login">
-                    <a href="/api/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" data-testid="mobile-button-login">
                       <LogIn className="w-4 h-4 mr-2" />
                       Log In
-                    </a>
-                  </Button>
+                    </Button>
+                  </Link>
                 )}
 
                 <div className="flex items-center justify-between pt-4">

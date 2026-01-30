@@ -3,7 +3,7 @@ import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Export auth models (users and sessions tables for Replit Auth)
+// Export auth models (custom email/password authentication with MFA)
 export * from "./models/auth";
 
 export const contactMessages = pgTable("contact_messages", {
