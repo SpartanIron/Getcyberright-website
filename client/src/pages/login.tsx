@@ -70,7 +70,13 @@ export default function Login() {
       // Wait for auth query to refetch before navigating
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
-      setLocation("/admin");
+      
+      // Redirect to change password if required, otherwise to admin
+      if (data.user?.mustChangePassword) {
+        setLocation("/admin/change-password");
+      } else {
+        setLocation("/admin");
+      }
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {

@@ -41,7 +41,13 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      setLocation("/api/login");
+      setLocation("/login");
+    }
+  }, [authLoading, user, setLocation]);
+
+  useEffect(() => {
+    if (!authLoading && user?.mustChangePassword) {
+      setLocation("/admin/change-password");
     }
   }, [authLoading, user, setLocation]);
 

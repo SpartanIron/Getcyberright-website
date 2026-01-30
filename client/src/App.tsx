@@ -38,6 +38,7 @@ import AdminUsers from "@/pages/admin/users";
 import AdminMessages from "@/pages/admin/messages";
 import AdminSubscribers from "@/pages/admin/subscribers";
 import AdminScamReports from "@/pages/admin/scam-reports";
+import AdminChangePassword from "@/pages/admin/change-password";
 import Login from "@/pages/login";
 
 function ScrollToTop() {
@@ -83,6 +84,7 @@ function Router() {
       <Route path="/admin/messages" component={AdminMessages} />
       <Route path="/admin/subscribers" component={AdminSubscribers} />
       <Route path="/admin/scam-reports" component={AdminScamReports} />
+      <Route path="/admin/change-password" component={AdminChangePassword} />
       <Route path="/login" component={Login} />
       <Route component={NotFound} />
     </Switch>
