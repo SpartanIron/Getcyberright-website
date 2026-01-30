@@ -137,8 +137,8 @@ const suggestedPrompts = [
   { text: "How can I protect my family online?", icon: Shield },
 ];
 
-const FREE_MESSAGE_LIMIT = 5;
-const FREE_ANALYSIS_LIMIT = 2;
+const FREE_MESSAGE_LIMIT = 20;
+const FREE_ANALYSIS_LIMIT = 10;
 const FREE_MESSAGE_COUNT_KEY = "dezi_free_message_count";
 const FREE_ANALYSIS_COUNT_KEY = "dezi_free_analysis_count";
 
@@ -671,7 +671,7 @@ export function DeziAssistant() {
         const upgradeMessage: Message = {
           id: Date.now().toString(),
           role: "assistant",
-          content: `Password generation is a premium feature. Upgrade to Essential or higher to unlock this and other advanced capabilities.`,
+          content: `Password generation through Dezi is a premium feature. However, you can use our free Password Generator tool on the Tools page! Just visit /tools and scroll to the Password Generator section. Would you like help with anything else?`,
           timestamp: new Date(),
         };
         
@@ -870,7 +870,7 @@ export function DeziAssistant() {
                             Unlock Full Access
                           </p>
                           <p className="text-xs text-muted-foreground mb-3">
-                            Upgrade for unlimited conversations, advanced scam analysis, and password generation.
+                            Get unlimited conversations, advanced scam analysis, and password generation with Premium.
                           </p>
                           <Link href="/pricing">
                             <Button size="sm" data-testid="button-upgrade-dezi-inline">
@@ -1011,12 +1011,12 @@ export function DeziAssistant() {
                   {hasReachedMessageLimit ? (
                     <div className="text-center py-2">
                       <p className="text-sm text-muted-foreground mb-2">
-                        You have reached your free message limit.
+                        You've used your {FREE_MESSAGE_LIMIT} free messages. Come back tomorrow or upgrade for unlimited access.
                       </p>
                       <Link href="/pricing">
                         <Button size="sm" data-testid="button-upgrade-dezi">
-                          <Crown className="w-4 h-4 mr-2" />
-                          Upgrade for Unlimited Access
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Get Unlimited Access
                         </Button>
                       </Link>
                     </div>
@@ -1094,39 +1094,21 @@ export function DeziAssistant() {
                 </div>
                 <div className="flex-1 pr-4">
                   <p className="font-medium text-sm text-foreground mb-1">Hi! I'm Dezi</p>
-                  {isPremiumUser ? (
-                    <p className="text-sm text-muted-foreground">
-                      Your cybersecurity guide. How can I help you stay safe online today?
-                    </p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Your AI security assistant. Upgrade to Premium for personalized guidance.
-                    </p>
-                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Your AI security assistant. Ask me anything about staying safe online.
+                  </p>
                 </div>
               </div>
               
-              {isPremiumUser ? (
-                <Button
-                  onClick={() => setIsOpen(true)}
-                  size="sm"
-                  className="w-full mt-3"
-                  data-testid="button-welcome-chat"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Start a conversation
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => setIsOpen(true)}
-                  size="sm"
-                  className="w-full mt-3"
-                  data-testid="button-welcome-upgrade"
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Unlock Dezi
-                </Button>
-              )}
+              <Button
+                onClick={() => setIsOpen(true)}
+                size="sm"
+                className="w-full mt-3"
+                data-testid="button-welcome-chat"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Start a conversation
+              </Button>
               
               {/* Speech bubble pointer */}
               <div className="absolute -bottom-2 right-6 w-4 h-4 bg-card border-b border-r rotate-45 transform" />
