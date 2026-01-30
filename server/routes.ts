@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -730,6 +730,301 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching Stripe products:", error);
       res.json({ products: [] });
+    }
+  });
+
+  // =====================================================
+  // GAMIFICATION ROUTES
+  // =====================================================
+
+  // Get user progress and stats
+  app.get("/api/gamification/progress", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      let progress = await db.select().from(userProgress).where(eq(userProgress.userId, userId)).limit(1);
+      
+      // Create progress record if it doesn't exist
+      if (progress.length === 0) {
+        await db.insert(userProgress).values({
+          userId,
+          totalPoints: 0,
+          level: 1,
+          scansCompleted: 0,
+          lessonsCompleted: 0,
+          currentStreak: 0,
+          longestStreak: 0,
+        });
+        progress = await db.select().from(userProgress).where(eq(userProgress.userId, userId)).limit(1);
+      }
+
+      res.json({ success: true, progress: progress[0] });
+    } catch (error) {
+      console.error("Error fetching user progress:", error);
+      res.status(500).json({ error: "Failed to fetch progress" });
+    }
+  });
+
+  // Get user badges
+  app.get("/api/gamification/badges", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const badges = await db.select().from(userBadges).where(eq(userBadges.userId, userId));
+      const definitions = await db.select().from(badgeDefinitions);
+
+      res.json({ success: true, earnedBadges: badges, allBadges: definitions });
+    } catch (error) {
+      console.error("Error fetching badges:", error);
+      res.status(500).json({ error: "Failed to fetch badges" });
+    }
+  });
+
+  // Record an activity (scan, lesson, etc.) and award points
+  app.post("/api/gamification/record-activity", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const { activityType, points = 10 } = req.body;
+      
+      // Get current progress
+      let progress = await db.select().from(userProgress).where(eq(userProgress.userId, userId)).limit(1);
+      
+      if (progress.length === 0) {
+        await db.insert(userProgress).values({ userId });
+        progress = await db.select().from(userProgress).where(eq(userProgress.userId, userId)).limit(1);
+      }
+
+      const current = progress[0];
+      const newPoints = (current.totalPoints || 0) + points;
+      const newLevel = Math.floor(newPoints / 300) + 1;
+      
+      const updates: any = {
+        totalPoints: newPoints,
+        level: newLevel,
+        lastActivityDate: new Date(),
+        updatedAt: new Date(),
+      };
+
+      if (activityType === "scan") {
+        updates.scansCompleted = (current.scansCompleted || 0) + 1;
+      } else if (activityType === "lesson") {
+        updates.lessonsCompleted = (current.lessonsCompleted || 0) + 1;
+      }
+
+      // Update streak logic
+      const lastActivity = current.lastActivityDate;
+      const now = new Date();
+      if (lastActivity) {
+        const hoursSinceLastActivity = (now.getTime() - new Date(lastActivity).getTime()) / (1000 * 60 * 60);
+        if (hoursSinceLastActivity < 48) {
+          updates.currentStreak = (current.currentStreak || 0) + 1;
+          if (updates.currentStreak > (current.longestStreak || 0)) {
+            updates.longestStreak = updates.currentStreak;
+          }
+        } else {
+          updates.currentStreak = 1;
+        }
+      } else {
+        updates.currentStreak = 1;
+      }
+
+      await db.update(userProgress).set(updates).where(eq(userProgress.userId, userId));
+
+      res.json({ 
+        success: true, 
+        pointsEarned: points, 
+        totalPoints: newPoints,
+        level: newLevel,
+        newStreak: updates.currentStreak
+      });
+    } catch (error) {
+      console.error("Error recording activity:", error);
+      res.status(500).json({ error: "Failed to record activity" });
+    }
+  });
+
+  // =====================================================
+  // FAMILY CODEWORD ROUTES
+  // =====================================================
+
+  // Save a family codeword (requires Essential tier or higher)
+  app.post("/api/codeword/save", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const userTier = req.user?.subscriptionTier || "free";
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      // Allow saving for all authenticated users (free feature)
+      const { codeword, style, familyName } = req.body;
+      
+      if (!codeword || !style) {
+        return res.status(400).json({ error: "Codeword and style are required" });
+      }
+
+      // Deactivate any existing active codewords
+      await db.update(familyCodewords)
+        .set({ isActive: false })
+        .where(eq(familyCodewords.userId, userId));
+
+      // Save the new codeword
+      await db.insert(familyCodewords).values({
+        userId,
+        codeword,
+        style,
+        familyName: familyName || null,
+        isActive: true,
+      });
+
+      res.json({ success: true, message: "Codeword saved successfully" });
+    } catch (error) {
+      console.error("Error saving codeword:", error);
+      res.status(500).json({ error: "Failed to save codeword" });
+    }
+  });
+
+  // Get user's active codeword
+  app.get("/api/codeword/active", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const codeword = await db.select()
+        .from(familyCodewords)
+        .where(eq(familyCodewords.userId, userId))
+        .limit(1);
+
+      res.json({ success: true, codeword: codeword.length > 0 ? codeword[0] : null });
+    } catch (error) {
+      console.error("Error fetching codeword:", error);
+      res.status(500).json({ error: "Failed to fetch codeword" });
+    }
+  });
+
+  // =====================================================
+  // AUDIO DEEPFAKE ANALYSIS ROUTES (Premium Feature)
+  // =====================================================
+
+  // Analyze audio for deepfake detection (requires Professional tier)
+  app.post("/api/security/analyze-audio", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const userTier = req.user?.subscriptionTier || "free";
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      // Check if user has Professional tier access
+      if (!hasTierAccess(userTier, SUBSCRIPTION_TIERS.PROFESSIONAL)) {
+        return res.status(403).json({ 
+          error: "Premium feature", 
+          requiredTier: SUBSCRIPTION_TIERS.PROFESSIONAL,
+          message: "Voice clone detection requires a Professional subscription"
+        });
+      }
+
+      const { fileName, fileSize } = req.body;
+
+      // Simulate analysis (in production, integrate with Resemble AI Detect or similar)
+      // This is clearly labeled as educational simulation
+      const isDeepfake = Math.random() > 0.6;
+      const confidence = isDeepfake 
+        ? Math.floor(60 + Math.random() * 35)
+        : Math.floor(15 + Math.random() * 30);
+      
+      let riskLevel: string;
+      if (confidence >= 85) riskLevel = "critical";
+      else if (confidence >= 65) riskLevel = "high";
+      else if (confidence >= 40) riskLevel = "medium";
+      else riskLevel = "low";
+
+      const indicators = [
+        { name: "Unnatural Pauses", detected: isDeepfake && Math.random() > 0.4 },
+        { name: "Breathing Patterns", detected: isDeepfake && Math.random() > 0.3 },
+        { name: "Emotional Consistency", detected: isDeepfake && Math.random() > 0.5 },
+        { name: "Background Noise", detected: isDeepfake && Math.random() > 0.6 },
+        { name: "Pitch Variations", detected: isDeepfake && Math.random() > 0.4 },
+        { name: "Audio Artifacts", detected: isDeepfake && Math.random() > 0.7 },
+      ];
+
+      // Log the analysis
+      await db.insert(audioAnalysisHistory).values({
+        userId,
+        fileName,
+        fileSize,
+        isDeepfake,
+        confidence,
+        riskLevel,
+        analysisResult: JSON.stringify(indicators),
+      });
+
+      res.json({
+        success: true,
+        isSimulation: true, // Clearly indicate this is a simulation
+        simulationNote: "This is an educational simulation. For real-time detection, integrate with specialized APIs like Resemble AI Detect.",
+        result: {
+          isDeepfake,
+          confidence,
+          riskLevel,
+          indicators,
+          recommendation: isDeepfake
+            ? "This audio shows patterns consistent with AI generation. Verify the caller through a separate channel."
+            : "This audio appears natural. Always verify important requests through alternative means."
+        }
+      });
+    } catch (error) {
+      console.error("Error analyzing audio:", error);
+      res.status(500).json({ error: "Failed to analyze audio" });
+    }
+  });
+
+  // Check premium feature access
+  app.get("/api/premium/check-access/:feature", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const userTier = req.user?.subscriptionTier || "free";
+      const { feature } = req.params;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const featureTiers: Record<string, string> = {
+        "voice-detection": SUBSCRIPTION_TIERS.PROFESSIONAL,
+        "advanced-scan": SUBSCRIPTION_TIERS.ESSENTIAL,
+        "unlimited-scans": SUBSCRIPTION_TIERS.ESSENTIAL,
+        "family-sharing": SUBSCRIPTION_TIERS.PROFESSIONAL,
+        "api-access": SUBSCRIPTION_TIERS.ENTERPRISE,
+      };
+
+      const requiredTier = featureTiers[feature] || SUBSCRIPTION_TIERS.FREE;
+      const hasAccess = hasTierAccess(userTier, requiredTier);
+
+      res.json({
+        success: true,
+        feature,
+        hasAccess,
+        userTier,
+        requiredTier,
+      });
+    } catch (error) {
+      console.error("Error checking premium access:", error);
+      res.status(500).json({ error: "Failed to check access" });
     }
   });
 

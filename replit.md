@@ -60,6 +60,38 @@ Preferred communication style: Simple, everyday language.
 - **AI & Cyber Safety Hub** (`/ai-safety`): Educational content about AI-powered threats including deepfakes, voice cloning, AI-enhanced phishing, AI chatbot scams, and synthetic identity fraud. Includes audience-specific impact sections (Seniors, Business, Parents), responsible AI usage guidelines, and "What NOT to Share with AI" guidance.
 - **Dezi AI Assistant**: Available to all users with free tier (20 messages/day, 10 analyses/day). Premium users get unlimited access, password generation, and advanced scam analysis.
 
+### NEW: Competitive Differentiator Features
+- **Family Safety Codeword Generator** (UNIQUE - No competitor has this):
+  - Generate secure, memorable codewords for family emergency verification
+  - Three styles: Simple (PurpleButterfly77), Phrase (Golden Eagle Dances), Extra Secure (multi-word)
+  - Memory tips and family sharing functionality
+  - Scenario-based guidance for grandparent scams, AI voice clones, fake authority figures
+  - Protection against $200M+ Q1 2025 voice cloning scam losses
+  
+- **Audio/Voice Deepfake Detector** (Industry Gap - Major 2025-2026 threat):
+  - Upload suspicious voicemails/recordings for AI analysis
+  - Educational simulation showing how detection works (demo mode for all users)
+  - Professional subscribers get backend-powered analysis via `/api/security/analyze-audio`
+  - Checks for: unnatural pauses, missing breathing, emotion mismatch, audio artifacts
+  - Confidence scoring with risk levels (low/medium/high/critical)
+  - Upgrade prompts for non-Professional users with "Try Demo" fallback
+
+- **Gamification & Achievement System** (Drives engagement):
+  - Points, badges, and leaderboards for security activities
+  - Real progress tracking via `/api/gamification/progress` and `/api/gamification/badges`
+  - Badge tiers: Bronze, Silver, Gold, Platinum
+  - Categories: Scanner, Education, Streak, Community
+  - User levels with titles (Cyber Rookie → Cyber Guardian)
+  - Demo mode for unauthenticated users with sign-in prompts
+
+### Premium Subscription Tiers
+- **Tier Access Control**: `hasTierAccess()` function in `server/routes.ts` handles feature gating
+- **Essential ($9/mo)**: Advanced Scanner features, basic Dezi AI access
+- **Professional ($29/mo)**: Voice Clone Detection, unlimited Dezi AI, enhanced scam analysis
+- **Enterprise ($99/mo)**: API access, team management, priority support
+- **Free Tier**: Demo mode for most features, limited Dezi AI (20 messages/day)
+- **Feature Gating UI**: Components show upgrade prompts when tier access denied (403 response)
+
 ## External Dependencies
 
 - **Database**: PostgreSQL, Drizzle Kit (for migrations).

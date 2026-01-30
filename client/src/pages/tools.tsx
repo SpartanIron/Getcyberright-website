@@ -13,6 +13,9 @@ import { ScamChecker } from "@/components/scam-checker";
 import { BreachChecker } from "@/components/breach-checker";
 import { ThreatTrends } from "@/components/threat-trends";
 import { AdvancedScan } from "@/components/advanced-scan";
+import { FamilyCodeword } from "@/components/family-codeword";
+import { AudioDeepfakeDetector } from "@/components/audio-deepfake-detector";
+import { GamificationBadges } from "@/components/gamification-badges";
 import { 
   Shield, 
   Search,
@@ -24,7 +27,10 @@ import {
   Eye,
   ArrowRight,
   BookOpen,
-  ShieldAlert
+  ShieldAlert,
+  Users,
+  Radio,
+  Trophy
 } from "lucide-react";
 import bannerImage from "@/assets/banners/tools-banner.png";
 
@@ -84,31 +90,38 @@ export default function Tools() {
         <section className="py-16 sm:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-5 mb-8">
-                <TabsTrigger value="scam-checker" className="gap-2" data-testid="tab-scam-checker">
+              <TabsList className="grid w-full max-w-5xl mx-auto grid-cols-4 sm:grid-cols-8 mb-8 h-auto gap-1">
+                <TabsTrigger value="scam-checker" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-scam-checker">
                   <Search className="w-4 h-4" />
-                  <span className="hidden sm:inline">Scam Checker</span>
-                  <span className="sm:hidden">Scam</span>
+                  <span className="text-xs sm:text-sm">Scam</span>
                 </TabsTrigger>
-                <TabsTrigger value="advanced" className="gap-2" data-testid="tab-advanced">
+                <TabsTrigger value="advanced" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-advanced">
                   <ShieldAlert className="w-4 h-4" />
-                  <span className="hidden sm:inline">Advanced</span>
-                  <span className="sm:hidden">Adv</span>
+                  <span className="text-xs sm:text-sm">Advanced</span>
                 </TabsTrigger>
-                <TabsTrigger value="breach" className="gap-2" data-testid="tab-breach">
+                <TabsTrigger value="voice-clone" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-voice-clone">
+                  <Radio className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Voice AI</span>
+                </TabsTrigger>
+                <TabsTrigger value="codeword" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-codeword">
+                  <Users className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Codeword</span>
+                </TabsTrigger>
+                <TabsTrigger value="breach" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-breach">
                   <Database className="w-4 h-4" />
-                  <span className="hidden sm:inline">Breach Check</span>
-                  <span className="sm:hidden">Breach</span>
+                  <span className="text-xs sm:text-sm">Breach</span>
                 </TabsTrigger>
-                <TabsTrigger value="password" className="gap-2" data-testid="tab-password">
+                <TabsTrigger value="password" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-password">
                   <Lock className="w-4 h-4" />
-                  <span className="hidden sm:inline">Passwords</span>
-                  <span className="sm:hidden">Pass</span>
+                  <span className="text-xs sm:text-sm">Password</span>
                 </TabsTrigger>
-                <TabsTrigger value="trends" className="gap-2" data-testid="tab-trends">
+                <TabsTrigger value="achievements" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-achievements">
+                  <Trophy className="w-4 h-4" />
+                  <span className="text-xs sm:text-sm">Rewards</span>
+                </TabsTrigger>
+                <TabsTrigger value="trends" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-trends">
                   <TrendingUp className="w-4 h-4" />
-                  <span className="hidden sm:inline">Trends</span>
-                  <span className="sm:hidden">Trends</span>
+                  <span className="text-xs sm:text-sm">Trends</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -121,12 +134,24 @@ export default function Tools() {
                   <AdvancedScan />
                 </TabsContent>
                 
+                <TabsContent value="voice-clone">
+                  <AudioDeepfakeDetector />
+                </TabsContent>
+                
+                <TabsContent value="codeword">
+                  <FamilyCodeword />
+                </TabsContent>
+                
                 <TabsContent value="breach">
                   <BreachChecker />
                 </TabsContent>
                 
                 <TabsContent value="password">
                   <PasswordGenerator />
+                </TabsContent>
+                
+                <TabsContent value="achievements">
+                  <GamificationBadges />
                 </TabsContent>
                 
                 <TabsContent value="trends">
