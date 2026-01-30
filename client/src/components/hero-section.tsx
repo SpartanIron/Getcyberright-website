@@ -64,165 +64,216 @@ export function HeroSection() {
   const currentSlide = heroSlides[currentIndex];
 
   return (
-    <section className="relative w-full overflow-hidden min-h-[480px] lg:h-[600px]" data-testid="section-hero">
-      {/* Mobile: Full background color overlay */}
-      <div 
-        className="absolute inset-0 lg:hidden transition-colors duration-1000"
-        style={{ backgroundColor: currentSlide.bgColor }}
-      />
-      
-      {/* Mobile: Background image with darker overlay for better text contrast */}
-      <div className="absolute inset-0 lg:hidden">
-        {heroSlides.map((slide, index) => (
-          <img
-            key={index}
-            src={slide.src}
-            alt={slide.alt}
-            className={`absolute inset-0 w-full h-full object-cover object-[center_30%] transition-opacity duration-1000 ${
-              index === currentIndex ? "opacity-20" : "opacity-0"
-            }`}
-          />
-        ))}
-        {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/30" />
-      </div>
-
-      {/* Desktop: Image on right side */}
-      <div className="absolute inset-0 overflow-hidden hidden lg:block">
-        <div className="absolute right-0 top-0 w-2/3 h-full">
+    <section className="relative w-full overflow-hidden" data-testid="section-hero">
+      {/* ===== MOBILE LAYOUT: Stacked - Image on top, Content below ===== */}
+      <div className="lg:hidden">
+        {/* Mobile: Clear image at top */}
+        <div className="relative w-full h-[220px] sm:h-[280px] overflow-hidden">
           {heroSlides.map((slide, index) => (
             <img
               key={index}
               src={slide.src}
               alt={slide.alt}
-              className={`absolute inset-0 w-full h-full object-cover object-[center_30%] transition-opacity duration-1000 ${
+              className={`absolute inset-0 w-full h-full object-cover object-[center_25%] transition-opacity duration-1000 ${
                 index === currentIndex ? "opacity-100" : "opacity-0"
               }`}
-              data-testid={`img-hero-${index}`}
             />
           ))}
         </div>
-      </div>
-
-      {/* Desktop: Curved background overlay */}
-      <svg 
-        className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-1000 hidden lg:block"
-        viewBox="0 0 1440 500"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <defs>
-          <linearGradient id="curveEdgeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={currentSlide.accentColor} stopOpacity="0" />
-            <stop offset="70%" stopColor={currentSlide.accentColor} stopOpacity="0.4" />
-            <stop offset="100%" stopColor={currentSlide.accentColor} stopOpacity="0.7" />
-          </linearGradient>
-        </defs>
         
-        <path
-          d="M0,0 L680,0 Q880,250 680,500 L0,500 Z"
-          fill={currentSlide.bgColor}
-          className="transition-all duration-1000"
-        />
-        
-        <path
-          d="M680,0 Q880,250 680,500"
-          fill="none"
-          stroke="url(#curveEdgeGlow)"
-          strokeWidth="4"
-          className="transition-all duration-1000"
-        />
-        
-        <path
-          d="M690,10 Q890,250 690,490"
-          fill="none"
-          stroke={currentSlide.accentColor}
-          strokeOpacity="0.3"
-          strokeWidth="2"
-          className="transition-all duration-1000"
-        />
-      </svg>
-
-      {/* Desktop only: Decorative particle arc */}
-      <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none invisible lg:visible" aria-hidden="true">
-        <svg className="absolute -left-16 top-1/2 -translate-y-1/2 w-[350px] h-[350px]" viewBox="0 0 350 350">
-          {Array.from({ length: 50 }).map((_, i) => {
-            const angle = (i / 50) * Math.PI * 0.7 + Math.PI * 0.65;
-            const radius = 120 + Math.random() * 35;
-            const x = 175 + Math.cos(angle) * radius;
-            const y = 175 + Math.sin(angle) * radius;
-            const size = 1 + Math.random() * 2;
-            return (
-              <circle
-                key={i}
-                cx={x}
-                cy={y}
-                r={size}
-                fill={currentSlide.accentColor}
-                opacity={0.2 + Math.random() * 0.4}
-                className="transition-all duration-1000"
-              />
-            );
-          })}
-          <path
-            d="M40,310 Q175,175 310,40"
-            fill="none"
-            stroke={currentSlide.accentColor}
-            strokeOpacity="0.3"
-            strokeWidth="1"
-            className="transition-all duration-1000"
-          />
-        </svg>
-      </div>
-
-      {/* Desktop: Orange accent circles - hidden on mobile */}
-      <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-visible pointer-events-none hidden lg:block" aria-hidden="true">
-        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-accent/80" />
-        <div className="absolute top-24 right-4 w-20 h-20 rounded-full bg-accent/60" />
-        <div className="absolute bottom-16 -right-6 w-24 h-24 rounded-full bg-accent/50" />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 lg:py-16 h-full flex items-center">
-        <div className="max-w-lg mx-auto lg:mx-0 text-center lg:text-left">
-          {/* Headline */}
-          <div className="mb-4 lg:min-h-[180px] lg:flex lg:items-start">
+        {/* Mobile: Content on solid background */}
+        <div 
+          className="relative px-5 py-8 transition-colors duration-1000"
+          style={{ backgroundColor: currentSlide.bgColor }}
+        >
+          <div className="max-w-md mx-auto text-center">
             <h1 
-              className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] transition-opacity duration-500" 
-              data-testid="text-hero-heading"
+              className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3 leading-[1.15]" 
+              data-testid="text-hero-heading-mobile"
             >
               {currentSlide.headline}
             </h1>
-          </div>
 
-          {/* Subtext */}
-          <div className="mb-5 lg:min-h-[60px]">
-            <p 
-              className="text-sm sm:text-base lg:text-lg text-white/80 font-medium leading-relaxed transition-opacity duration-500" 
-              data-testid="text-hero-subtext"
-            >
+            <p className="text-sm sm:text-base text-white/80 font-medium mb-4 leading-relaxed">
               {currentSlide.subtext}
             </p>
+
+            <ul className="space-y-1.5 mb-5 text-xs sm:text-sm font-medium">
+              <li className="flex items-center justify-center gap-2 text-white/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                <span>Scam detection tools</span>
+              </li>
+              <li className="flex items-center justify-center gap-2 text-white/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                <span>Guides for families, seniors, and businesses</span>
+              </li>
+              <li className="flex items-center justify-center gap-2 text-white/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                <span>Plain language security education</span>
+              </li>
+            </ul>
+
+            <Link href="/tools">
+              <Button 
+                size="default" 
+                className="rounded-full px-5 bg-accent text-accent-foreground border-accent-border shadow-lg" 
+                data-testid="button-hero-primary-cta-mobile"
+              >
+                Get Started
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
           </div>
+          
+          {/* Mobile carousel dots */}
+          <div className="flex justify-center gap-2 mt-6">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === currentIndex ? "bg-white w-5" : "bg-white/40"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
 
-          {/* Bullet points */}
-          <ul className="space-y-2 mb-6 text-xs sm:text-sm font-medium">
-            <li className="flex items-center justify-center lg:justify-start gap-2 text-white/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-              <span>Scam detection tools</span>
-            </li>
-            <li className="flex items-center justify-center lg:justify-start gap-2 text-white/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-              <span>Guides for families, seniors, and businesses</span>
-            </li>
-            <li className="flex items-center justify-center lg:justify-start gap-2 text-white/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-              <span>Plain language security education</span>
-            </li>
-          </ul>
+      {/* ===== DESKTOP LAYOUT: Side by side with curved background ===== */}
+      <div className="hidden lg:block h-[600px]">
+        {/* Desktop: Image on right side */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute right-0 top-0 w-2/3 h-full">
+            {heroSlides.map((slide, index) => (
+              <img
+                key={index}
+                src={slide.src}
+                alt={slide.alt}
+                className={`absolute inset-0 w-full h-full object-cover object-[center_30%] transition-opacity duration-1000 ${
+                  index === currentIndex ? "opacity-100" : "opacity-0"
+                }`}
+                data-testid={`img-hero-${index}`}
+              />
+            ))}
+          </div>
+        </div>
 
-          {/* CTA Button */}
-          <div className="flex justify-center lg:justify-start">
+        {/* Desktop: Curved background overlay */}
+        <svg 
+          className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-1000"
+          viewBox="0 0 1440 500"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id="curveEdgeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={currentSlide.accentColor} stopOpacity="0" />
+              <stop offset="70%" stopColor={currentSlide.accentColor} stopOpacity="0.4" />
+              <stop offset="100%" stopColor={currentSlide.accentColor} stopOpacity="0.7" />
+            </linearGradient>
+          </defs>
+          
+          <path
+            d="M0,0 L680,0 Q880,250 680,500 L0,500 Z"
+            fill={currentSlide.bgColor}
+            className="transition-all duration-1000"
+          />
+          
+          <path
+            d="M680,0 Q880,250 680,500"
+            fill="none"
+            stroke="url(#curveEdgeGlow)"
+            strokeWidth="4"
+            className="transition-all duration-1000"
+          />
+          
+          <path
+            d="M690,10 Q890,250 690,490"
+            fill="none"
+            stroke={currentSlide.accentColor}
+            strokeOpacity="0.3"
+            strokeWidth="2"
+            className="transition-all duration-1000"
+          />
+        </svg>
+
+        {/* Desktop: Decorative particle arc */}
+        <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none" aria-hidden="true">
+          <svg className="absolute -left-16 top-1/2 -translate-y-1/2 w-[350px] h-[350px]" viewBox="0 0 350 350">
+            {Array.from({ length: 50 }).map((_, i) => {
+              const angle = (i / 50) * Math.PI * 0.7 + Math.PI * 0.65;
+              const radius = 120 + Math.random() * 35;
+              const x = 175 + Math.cos(angle) * radius;
+              const y = 175 + Math.sin(angle) * radius;
+              const size = 1 + Math.random() * 2;
+              return (
+                <circle
+                  key={i}
+                  cx={x}
+                  cy={y}
+                  r={size}
+                  fill={currentSlide.accentColor}
+                  opacity={0.2 + Math.random() * 0.4}
+                  className="transition-all duration-1000"
+                />
+              );
+            })}
+            <path
+              d="M40,310 Q175,175 310,40"
+              fill="none"
+              stroke={currentSlide.accentColor}
+              strokeOpacity="0.3"
+              strokeWidth="1"
+              className="transition-all duration-1000"
+            />
+          </svg>
+        </div>
+
+        {/* Desktop: Orange accent circles */}
+        <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-visible pointer-events-none" aria-hidden="true">
+          <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-accent/80" />
+          <div className="absolute top-24 right-4 w-20 h-20 rounded-full bg-accent/60" />
+          <div className="absolute bottom-16 -right-6 w-24 h-24 rounded-full bg-accent/50" />
+        </div>
+
+        {/* Desktop: Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 h-full flex items-center">
+          <div className="max-w-lg">
+            <div className="min-h-[180px] flex items-start">
+              <h1 
+                className="text-6xl font-bold tracking-tight text-white leading-[1.1] transition-opacity duration-500" 
+                data-testid="text-hero-heading"
+              >
+                {currentSlide.headline}
+              </h1>
+            </div>
+
+            <div className="min-h-[60px] mb-4">
+              <p 
+                className="text-lg text-white/80 font-medium leading-relaxed transition-opacity duration-500" 
+                data-testid="text-hero-subtext"
+              >
+                {currentSlide.subtext}
+              </p>
+            </div>
+
+            <ul className="space-y-2 mb-8 text-sm font-medium">
+              <li className="flex items-center gap-2 text-white/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                <span>Scam detection tools</span>
+              </li>
+              <li className="flex items-center gap-2 text-white/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                <span>Guides for families, seniors, and businesses</span>
+              </li>
+              <li className="flex items-center gap-2 text-white/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                <span>Plain language security education</span>
+              </li>
+            </ul>
+
             <Link href="/tools">
               <Button 
                 size="lg" 
@@ -235,23 +286,23 @@ export function HeroSection() {
             </Link>
           </div>
         </div>
-      </div>
 
-      {/* Carousel indicators */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 lg:left-8 lg:translate-x-0 z-20 flex gap-2">
-        {heroSlides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900 ${
-              index === currentIndex 
-                ? "bg-white w-5" 
-                : "bg-white/40 hover-elevate"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-            data-testid={`button-carousel-dot-${index}`}
-          />
-        ))}
+        {/* Desktop carousel dots */}
+        <div className="absolute bottom-4 left-8 z-20 flex gap-2">
+          {heroSlides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900 ${
+                index === currentIndex 
+                  ? "bg-white w-5" 
+                  : "bg-white/40 hover-elevate"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+              data-testid={`button-carousel-dot-${index}`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
