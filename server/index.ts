@@ -16,6 +16,10 @@ import { getStripeSync } from './stripeClient';
 import { WebhookHandlers } from './webhookHandlers';
 
 const app = express();
+
+// Trust proxy for Replit - required for secure cookies behind proxy
+app.set('trust proxy', 1);
+
 const httpServer = createServer(app);
 
 declare module "http" {
