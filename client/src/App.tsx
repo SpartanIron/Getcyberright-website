@@ -33,6 +33,11 @@ import CheckoutSuccess from "@/pages/checkout-success";
 import ThreatTrendsPage from "@/pages/threat-trends";
 import ReportScam from "@/pages/report-scam";
 import Checklists from "@/pages/checklists";
+import AdminDashboard from "@/pages/admin/index";
+import AdminUsers from "@/pages/admin/users";
+import AdminMessages from "@/pages/admin/messages";
+import AdminSubscribers from "@/pages/admin/subscribers";
+import AdminScamReports from "@/pages/admin/scam-reports";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -72,6 +77,11 @@ function Router() {
       <Route path="/threat-trends" component={ThreatTrendsPage} />
       <Route path="/report-scam" component={ReportScam} />
       <Route path="/checklists" component={Checklists} />
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/messages" component={AdminMessages} />
+      <Route path="/admin/subscribers" component={AdminSubscribers} />
+      <Route path="/admin/scam-reports" component={AdminScamReports} />
       <Route component={NotFound} />
     </Switch>
   );
