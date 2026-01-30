@@ -53,71 +53,92 @@ const heroSlides = [
 
 export function HeroSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
+        setTimeout(() => setIsTransitioning(false), 100);
+      }, 500);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleSlideChange = (index: number) => {
+    if (index === currentIndex || isTransitioning) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentIndex(index);
+      setTimeout(() => setIsTransitioning(false), 100);
+    }, 300);
+  };
 
   const currentSlide = heroSlides[currentIndex];
 
   return (
     <section className="relative w-full overflow-hidden" style={{ minHeight: "500px" }} data-testid="section-hero">
-      {/* Base layer - full width image on right side */}
-      <div className="absolute inset-0">
-        {/* Image positioned on right - more exposed with adjusted curve */}
-        <div className="absolute right-0 top-0 bottom-0 w-full lg:w-2/3">
-          {heroSlides.map((slide, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                index === currentIndex ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <img
-                src={slide.src}
-                alt={slide.alt}
-                className="w-full h-full object-cover object-center"
-                data-testid={`img-hero-${index}`}
-              />
-            </div>
-          ))}
-        </div>
+      {/* Solid background that matches current slide - prevents any gaps */}
+      <div 
+        className="absolute inset-0 transition-colors duration-700 ease-in-out"
+        style={{ backgroundColor: currentSlide.bgColor }}
+      />
+
+      {/* Image container - fixed dimensions, overflow hidden for consistency */}
+      <div className="absolute right-0 top-0 bottom-0 w-full lg:w-2/3 overflow-hidden">
+        {/* Single image display with crossfade */}
+        {heroSlides.map((slide, index) => (
+          <div
+            key={index}
+            className="absolute inset-0"
+            style={{
+              opacity: index === currentIndex ? 1 : 0,
+              transform: index === currentIndex ? 'scale(1)' : 'scale(1.05)',
+              transition: 'opacity 700ms ease-in-out, transform 700ms ease-in-out',
+              zIndex: index === currentIndex ? 1 : 0,
+            }}
+          >
+            <img
+              src={slide.src}
+              alt={slide.alt}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center center' }}
+              data-testid={`img-hero-${index}`}
+            />
+          </div>
+        ))}
       </div>
 
-      {/* Curved background overlay - different color per slide
-          The curve is brought inward to expose more of the image.
-          Path uses a gentler curve with control point closer to the edge.
-      */}
+      {/* Curved background overlay - synced color transitions */}
       <svg 
-        className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-1000"
+        className="absolute inset-0 w-full h-full pointer-events-none"
         viewBox="0 0 1440 500"
         preserveAspectRatio="none"
         aria-hidden="true"
+        style={{ transition: 'all 700ms ease-in-out' }}
       >
         <defs>
-          {/* Gradient for the accent glow effect on the curve edge */}
           <linearGradient id="curveEdgeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={currentSlide.accentColor} stopOpacity="0" />
-            <stop offset="70%" stopColor={currentSlide.accentColor} stopOpacity="0.4" />
-            <stop offset="100%" stopColor={currentSlide.accentColor} stopOpacity="0.7" />
+            <stop offset="0%" stopColor={currentSlide.accentColor} stopOpacity="0">
+              <animate attributeName="stop-color" dur="700ms" fill="freeze" />
+            </stop>
+            <stop offset="70%" stopColor={currentSlide.accentColor} stopOpacity="0.4">
+              <animate attributeName="stop-color" dur="700ms" fill="freeze" />
+            </stop>
+            <stop offset="100%" stopColor={currentSlide.accentColor} stopOpacity="0.7">
+              <animate attributeName="stop-color" dur="700ms" fill="freeze" />
+            </stop>
           </linearGradient>
         </defs>
         
-        {/* Main curved shape - brought inward for more image exposure
-            Path breakdown:
-            M0,0 - Start at top-left corner
-            L680,0 - Line across top to x=680 (less than before)
-            Q880,250 680,500 - Gentler curve with control point at (880,250)
-            L0,500 - Line to bottom-left
-            Z - Close the path
-        */}
+        {/* Main curved shape */}
         <path
           d="M0,0 L680,0 Q880,250 680,500 L0,500 Z"
-          fill={currentSlide.bgColor}
-          className="transition-all duration-1000"
+          style={{ 
+            fill: currentSlide.bgColor,
+            transition: 'fill 700ms ease-in-out'
+          }}
         />
         
         {/* Accent glow along the curve edge */}
@@ -126,50 +147,57 @@ export function HeroSection() {
           fill="none"
           stroke="url(#curveEdgeGlow)"
           strokeWidth="4"
-          className="transition-all duration-1000"
         />
         
         {/* Secondary thinner accent line */}
         <path
           d="M690,10 Q890,250 690,490"
           fill="none"
-          stroke={currentSlide.accentColor}
+          style={{
+            stroke: currentSlide.accentColor,
+            transition: 'stroke 700ms ease-in-out'
+          }}
           strokeOpacity="0.3"
           strokeWidth="2"
-          className="transition-all duration-1000"
         />
       </svg>
 
       {/* Decorative particle arc on left side */}
       <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none" aria-hidden="true">
-        <svg className="absolute -left-16 top-1/2 -translate-y-1/2 w-[350px] h-[350px]" viewBox="0 0 350 350">
-          {/* Generate dotted arc pattern with current accent color */}
+        <svg 
+          className="absolute -left-16 top-1/2 -translate-y-1/2 w-[350px] h-[350px]"
+          viewBox="0 0 350 350"
+          style={{ transition: 'all 700ms ease-in-out' }}
+        >
           {Array.from({ length: 50 }).map((_, i) => {
             const angle = (i / 50) * Math.PI * 0.7 + Math.PI * 0.65;
-            const radius = 120 + Math.random() * 35;
+            const radius = 120 + (i * 0.7);
             const x = 175 + Math.cos(angle) * radius;
             const y = 175 + Math.sin(angle) * radius;
-            const size = 1 + Math.random() * 2;
+            const size = 1 + (i % 3) * 0.5;
             return (
               <circle
                 key={i}
                 cx={x}
                 cy={y}
                 r={size}
-                fill={currentSlide.accentColor}
-                opacity={0.2 + Math.random() * 0.4}
-                className="transition-all duration-1000"
+                style={{
+                  fill: currentSlide.accentColor,
+                  transition: 'fill 700ms ease-in-out'
+                }}
+                opacity={0.2 + (i % 5) * 0.1}
               />
             );
           })}
-          {/* Curved line through the dots */}
           <path
             d="M40,310 Q175,175 310,40"
             fill="none"
-            stroke={currentSlide.accentColor}
+            style={{
+              stroke: currentSlide.accentColor,
+              transition: 'stroke 700ms ease-in-out'
+            }}
             strokeOpacity="0.3"
             strokeWidth="1"
-            className="transition-all duration-1000"
           />
         </svg>
       </div>
@@ -181,24 +209,41 @@ export function HeroSection() {
         <div className="absolute bottom-16 -right-6 w-24 h-24 rounded-full bg-accent/50" />
       </div>
 
-      {/* Content positioned on the left over the colored background */}
+      {/* Content with smooth text transitions */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
         <div className="max-w-lg">
           <h1 
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 leading-[1.1] transition-opacity duration-500" 
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 leading-[1.1]" 
+            style={{
+              opacity: isTransitioning ? 0 : 1,
+              transform: isTransitioning ? 'translateY(10px)' : 'translateY(0)',
+              transition: 'opacity 300ms ease-out, transform 300ms ease-out'
+            }}
             data-testid="text-hero-heading"
           >
             {currentSlide.headline}
           </h1>
 
           <p 
-            className="text-base lg:text-lg text-white/80 mb-6 leading-relaxed transition-opacity duration-500" 
+            className="text-base lg:text-lg text-white/80 mb-6 leading-relaxed" 
+            style={{
+              opacity: isTransitioning ? 0 : 1,
+              transform: isTransitioning ? 'translateY(10px)' : 'translateY(0)',
+              transition: 'opacity 300ms ease-out 50ms, transform 300ms ease-out 50ms'
+            }}
             data-testid="text-hero-subtext"
           >
             {currentSlide.subtext}
           </p>
 
-          <ul className="space-y-2 mb-8 text-sm lg:text-base">
+          <ul 
+            className="space-y-2 mb-8 text-sm lg:text-base"
+            style={{
+              opacity: isTransitioning ? 0 : 1,
+              transform: isTransitioning ? 'translateY(10px)' : 'translateY(0)',
+              transition: 'opacity 300ms ease-out 100ms, transform 300ms ease-out 100ms'
+            }}
+          >
             <li className="flex items-center gap-2 text-white/90">
               <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
               <span>Scam detection tools</span>
@@ -213,16 +258,24 @@ export function HeroSection() {
             </li>
           </ul>
 
-          <Link href="/tools">
-            <Button 
-              size="lg" 
-              className="rounded-full px-6 py-5 bg-accent text-accent-foreground border-accent-border shadow-lg" 
-              data-testid="button-hero-primary-cta"
-            >
-              Get Started
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
-          </Link>
+          <div
+            style={{
+              opacity: isTransitioning ? 0 : 1,
+              transform: isTransitioning ? 'translateY(10px)' : 'translateY(0)',
+              transition: 'opacity 300ms ease-out 150ms, transform 300ms ease-out 150ms'
+            }}
+          >
+            <Link href="/tools">
+              <Button 
+                size="lg" 
+                className="rounded-full px-6 py-5 bg-accent text-accent-foreground border-accent-border shadow-lg" 
+                data-testid="button-hero-primary-cta"
+              >
+                Get Started
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -231,11 +284,11 @@ export function HeroSection() {
         {heroSlides.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900 ${
+            onClick={() => handleSlideChange(index)}
+            className={`h-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900 ${
               index === currentIndex 
-                ? "bg-white w-5" 
-                : "bg-white/40 hover-elevate"
+                ? "bg-white w-6" 
+                : "bg-white/40 w-2 hover-elevate"
             }`}
             aria-label={`Go to slide ${index + 1}`}
             data-testid={`button-carousel-dot-${index}`}
