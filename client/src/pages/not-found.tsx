@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead } from "@/components/seo-head";
 import { Home, Search, BookOpen, Shield, ArrowLeft, HelpCircle } from "lucide-react";
 import logoImage from "@/assets/logo.png";
 
@@ -36,9 +37,10 @@ const helpfulLinks = [
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead title="Page Not Found" description="The page you're looking for doesn't exist." />
       <Navigation />
       
-      <main className="flex-1 flex items-center justify-center py-16 px-4">
+      <main tabIndex={-1} className="flex-1 flex items-center justify-center py-16 px-4">
         <div className="max-w-2xl w-full text-center">
           <div className="mb-8">
             <img 

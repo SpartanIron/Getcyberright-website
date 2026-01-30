@@ -2,14 +2,16 @@ import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
+import { SEOHead } from "@/components/seo-head";
 import bannerImage from "@/assets/banners/privacy-banner.png";
 
 export default function Privacy() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Privacy Policy" description="Our commitment to protecting your personal information and data." />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="How We Protect Your Information"
           subtitle="Plain-language privacy policy. Last updated January 2026. We collect minimal data and never sell your information."

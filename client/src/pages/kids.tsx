@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import kidsBannerImage from "@/assets/images/kids-safety-banner.jpg";
 import { Button } from "@/components/ui/button";
@@ -1135,8 +1136,9 @@ export default function Kids() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.kids} />
       <Navigation />
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="Kids Digital Safety Hub"
           subtitle="Fun, interactive lessons to help young people stay safe online. Choose your age group and start learning today."

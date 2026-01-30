@@ -119,10 +119,10 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-slate-400">
               <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3" /> United States
+                <MapPin className="w-3 h-3" aria-hidden="true" /> United States
               </span>
               <span className="flex items-center gap-1">
-                <Shield className="w-3 h-3" /> Free Tools Available
+                <Shield className="w-3 h-3" aria-hidden="true" /> Free Tools Available
               </span>
               <span>Trusted by families in 50+ countries</span>
             </div>

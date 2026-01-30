@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -115,7 +116,7 @@ export default function Register() {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="py-20 px-4 sm:px-6 lg:px-8">
+        <main tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -145,9 +146,10 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.register} />
       <Navigation />
       
-      <main className="py-20 px-4 sm:px-6 lg:px-8">
+      <main tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

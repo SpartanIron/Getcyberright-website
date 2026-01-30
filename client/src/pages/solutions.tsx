@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Link } from "wouter";
 import { 
   Users, 
@@ -97,9 +98,10 @@ const solutions = [
 export default function Solutions() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.solutions} />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="Protection Designed for Your World"
           subtitle="Whether you're securing your family, supporting an elderly relative, protecting your business, or educating your community, we built solutions for the way you actually live."

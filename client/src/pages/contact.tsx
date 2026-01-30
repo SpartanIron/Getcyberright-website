@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import {
   Select,
   SelectContent,
@@ -104,9 +105,10 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.contact} />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="Questions? We Answer Them."
           subtitle="Whether you're unsure where to start or need specific guidance, our team is here. No question is too simple, and we respond to every message."

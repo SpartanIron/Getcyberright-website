@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -117,9 +118,10 @@ export default function ReportScam() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.reportScam} />
       <Navigation />
 
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="Report a Scam"
           subtitle="Help protect others by reporting scams you've encountered. Your report helps us track emerging threats and warn the community."

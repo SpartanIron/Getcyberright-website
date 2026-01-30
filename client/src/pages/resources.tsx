@@ -7,6 +7,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { useSearch } from "wouter";
 import { 
   ArrowRight, 
@@ -653,9 +654,10 @@ export default function Resources() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.resources} />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="Your Security Education Library"
           subtitle="Practical guides and articles written in everyday language. Learn at your own pace, with content you can actually understand and apply."

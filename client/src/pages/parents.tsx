@@ -5,6 +5,7 @@ import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { 
   Shield, Lock, Eye, MessageCircle, Smartphone, Gamepad2,
   CheckCircle, Star, Users, AlertTriangle, Heart,
@@ -403,9 +404,10 @@ export default function Parents() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.parents} />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         {currentTopic ? (
           <TopicContent 
             topic={currentTopic}

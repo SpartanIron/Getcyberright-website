@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { 
   Phone, 
   Globe, 
@@ -753,9 +754,10 @@ export default function EmergencyHelp() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.emergencyHelp} />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="Emergency Help"
           subtitle="Find the right authorities to contact when you or someone you know has been targeted by a scam. Select your region and country below."

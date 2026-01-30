@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Link } from "wouter";
 import { Shield, Heart, Users, Globe, ArrowRight } from "lucide-react";
 import bannerImage from "@/assets/banners/about-banner.png";
@@ -44,9 +45,10 @@ const stats = [
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.about} />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="A Mission Born from Personal Experience"
           subtitle="We watched our own family members fall victim to scams. That's why we built something different: clear guidance from people who understand what's at stake."

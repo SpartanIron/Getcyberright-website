@@ -16,6 +16,7 @@ import { AdvancedScan } from "@/components/advanced-scan";
 import { FamilyCodeword } from "@/components/family-codeword";
 import { AudioDeepfakeDetector } from "@/components/audio-deepfake-detector";
 import { GamificationBadges } from "@/components/gamification-badges";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { 
   Shield, 
   Search,
@@ -75,9 +76,10 @@ export default function Tools() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.tools} />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="Solve Problems, Not Learn Software"
           subtitle="Run a scam check, create an unbreakable password, or see what threats are trending. All without creating an account or downloading anything."

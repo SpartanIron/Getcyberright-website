@@ -5,6 +5,7 @@ import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { 
   Shield, Lock, Phone, Heart, Mail, CreditCard,
   CheckCircle, Star, BookOpen, AlertTriangle,
@@ -380,9 +381,10 @@ export default function Seniors() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.seniors} />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         {currentTopic ? (
           <TopicContent 
             topic={currentTopic}

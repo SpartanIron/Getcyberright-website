@@ -9,12 +9,14 @@ import { AudienceShowcase } from "@/components/audience-showcase";
 import { SocialProof } from "@/components/social-proof";
 import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.home} />
       <Navigation />
-      <main id="main-content" role="main" aria-label="Main content">
+      <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
         <HeroSection />
         <LogoCarousel />
         <ValueProposition />

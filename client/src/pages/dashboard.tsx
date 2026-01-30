@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -102,9 +103,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.dashboard} />
       <Navigation />
       
-      <main className="py-12 px-4 sm:px-6 lg:px-8">
+      <main tabIndex={-1} className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

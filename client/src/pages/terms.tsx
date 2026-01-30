@@ -2,14 +2,16 @@ import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
+import { SEOHead } from "@/components/seo-head";
 import bannerImage from "@/assets/banners/terms-banner.png";
 
 export default function Terms() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Terms of Service" description="Terms and conditions for using GetCyberRight services." />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         <PageBanner
           title="Terms of Using This Site"
           subtitle="The legal agreement for using GetCyberRight. Last updated January 2026. Written as clearly as we can make legal documents."

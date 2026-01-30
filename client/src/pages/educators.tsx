@@ -5,6 +5,7 @@ import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { 
   Shield, BookOpen, Users, Presentation, FileText,
   CheckCircle, Star, AlertTriangle, MessageCircle,
@@ -438,9 +439,10 @@ export default function Educators() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.educators} />
       <Navigation />
       
-      <main>
+      <main tabIndex={-1}>
         {currentResource ? (
           <ResourceContent 
             resource={currentResource}
