@@ -48,6 +48,7 @@ Preferred communication style: Simple, everyday language.
 ### Content & Tools
 - **Content Guidelines**: All educational content is based on verified data from sources like FTC Consumer Sentinel, FBI IC3, CISA, Medicare.gov, etc. Emphasis on empowering, non-fear-based language.
 - **Scam Checker**: Features Email Header Analysis (SPF/DKIM/DMARC), URL entropy/brand similarity, urgency scoring, Reply-To mismatch detection, and real-time URL reputation checking.
+- **AI & Cyber Safety Hub** (`/ai-safety`): Educational content about AI-powered threats including deepfakes, voice cloning, AI-enhanced phishing, AI chatbot scams, and synthetic identity fraud. Includes audience-specific impact sections (Seniors, Business, Parents), responsible AI usage guidelines, and "What NOT to Share with AI" guidance. Future premium features planned: AI-powered chat assistant for cyber questions, AI-enhanced scam analysis.
 
 ## External Dependencies
 
