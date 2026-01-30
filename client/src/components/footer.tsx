@@ -12,9 +12,9 @@ const footerLinks = {
     { name: "Small Business", href: "/small-business" },
   ],
   tools: [
-    { name: "Scam Checker", href: "/scam-checker" },
-    { name: "Password Generator", href: "/password-generator" },
-    { name: "Breach Checker", href: "/breach-checker" },
+    { name: "Scam Checker", href: "/tools" },
+    { name: "Password Generator", href: "/tools" },
+    { name: "Breach Checker", href: "/tools" },
     { name: "Threat Trends", href: "/threat-trends" },
   ],
   company: [
@@ -35,7 +35,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-300">
+    <footer className="bg-slate-900 text-slate-300" role="contentinfo" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
           <div className="col-span-2 md:col-span-1">

@@ -1,0 +1,159 @@
+import { motion } from "framer-motion";
+import { Shield, Brain, Users, Mic, Lock, Award, CheckCircle, ArrowRight } from "lucide-react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+
+const differentiators = [
+  {
+    icon: Mic,
+    title: "Voice Clone Detection",
+    description: "Industry-first AI-powered detection of deepfake audio. Protect against scammers impersonating your loved ones.",
+    highlight: "Exclusive Feature",
+    color: "text-red-500",
+    bgColor: "bg-red-500/10",
+  },
+  {
+    icon: Lock,
+    title: "Family Safety Codewords",
+    description: "Generate secret verification phrases your family uses to confirm identities during suspicious calls.",
+    highlight: "Patent-Pending",
+    color: "text-primary",
+    bgColor: "bg-primary/10",
+  },
+  {
+    icon: Brain,
+    title: "Dezi AI Assistant",
+    description: "Your personal cybersecurity advisor. Get instant answers about suspicious messages, links, and threats.",
+    highlight: "AI-Powered",
+    color: "text-accent",
+    bgColor: "bg-accent/10",
+  },
+  {
+    icon: Award,
+    title: "Gamified Learning",
+    description: "Earn badges and track progress as you learn. Security education that's actually engaging.",
+    highlight: "Fun & Effective",
+    color: "text-amber-500",
+    bgColor: "bg-amber-500/10",
+  },
+];
+
+const trustPoints = [
+  "Based on FTC, FBI IC3, and CISA guidelines",
+  "No technical jargon - plain language you understand",
+  "Free tools available - no signup required",
+  "Tailored for families, seniors, and small businesses",
+];
+
+export function ValueProposition() {
+  return (
+    <section 
+      className="py-16 md:py-24 bg-gradient-to-b from-background to-muted/30"
+      aria-labelledby="value-prop-heading"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
+        >
+          <h2 
+            id="value-prop-heading" 
+            className="text-3xl md:text-4xl font-bold text-foreground mb-4"
+          >
+            Why Choose GetCyberRight?
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            We combine cutting-edge AI technology with plain-language education to protect 
+            you from the latest cyber threats.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {differentiators.map((item, index) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="relative bg-card rounded-xl p-6 border shadow-sm hover-elevate"
+              data-testid={`card-differentiator-${index}`}
+            >
+              <div className={`w-12 h-12 rounded-lg ${item.bgColor} flex items-center justify-center mb-4`}>
+                <item.icon className={`w-6 h-6 ${item.color}`} aria-hidden="true" />
+              </div>
+              <span className="inline-block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                {item.highlight}
+              </span>
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                {item.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {item.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-card rounded-2xl border p-8 md:p-10"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-4">
+                <Shield className="w-6 h-6 text-primary" aria-hidden="true" />
+                <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+                  Trusted Protection
+                </span>
+              </div>
+              <h3 className="text-2xl font-bold text-foreground mb-4">
+                Cybersecurity Education You Can Trust
+              </h3>
+              <ul className="space-y-3" aria-label="Trust points">
+                {trustPoints.map((point, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <span className="text-muted-foreground">{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
+              <Link href="/tools">
+                <Button size="lg" className="w-full sm:w-auto gap-2" data-testid="button-try-tools">
+                  Try Our Free Tools
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </Button>
+              </Link>
+              <Link href="/pricing">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto" data-testid="button-view-pricing">
+                  View Pricing Plans
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mt-12 text-center"
+        >
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <Users className="w-4 h-4" aria-hidden="true" />
+            <span>Join thousands of families and businesses staying safe online</span>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}

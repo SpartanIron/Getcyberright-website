@@ -58,7 +58,7 @@ const buttonVariants = {
 
 export function FeaturesGrid() {
   return (
-    <section className="py-16 sm:py-24 bg-background" data-testid="section-features-grid">
+    <section className="py-16 sm:py-24 bg-background" data-testid="section-features-grid" aria-labelledby="features-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -70,7 +70,7 @@ export function FeaturesGrid() {
           <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
             What We Offer
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-features-heading">
+          <h2 id="features-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-features-heading">
             Everything You Need to Stay Safe Online
           </h2>
           <p className="text-lg text-muted-foreground">
@@ -117,7 +117,7 @@ export function FeaturesGrid() {
                     data-testid={`button-feature-${feature.id}`}
                   >
                     {feature.cta}
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
                   </Button>
                 </Link>
               </motion.div>

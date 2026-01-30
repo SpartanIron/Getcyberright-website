@@ -41,7 +41,7 @@ const audiences = [
 
 export function AudienceShowcase() {
   return (
-    <section className="py-16 sm:py-24 bg-background" data-testid="section-audience-showcase">
+    <section className="py-16 sm:py-24 bg-background" data-testid="section-audience-showcase" aria-labelledby="audience-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -53,7 +53,7 @@ export function AudienceShowcase() {
           <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
             Who We Protect
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-audience-heading">
+          <h2 id="audience-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-audience-heading">
             Cybersecurity for Everyone
           </h2>
           <p className="text-lg text-muted-foreground">
@@ -109,7 +109,7 @@ export function AudienceShowcase() {
                 <Link href={audience.href}>
                   <Button size="lg" data-testid={`button-audience-${audience.id}`}>
                     Learn More
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
                   </Button>
                 </Link>
               </div>

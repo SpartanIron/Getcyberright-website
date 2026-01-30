@@ -30,19 +30,15 @@ const freeTools = [
 ];
 
 const learnTopics = [
-  { title: "Phishing & Email Scams", description: "Recognize and avoid phishing attacks", href: "/resources?category=phishing" },
-  { title: "Online Privacy", description: "Protect your personal information", href: "/resources?category=privacy" },
-  { title: "Password & Account Security", description: "Best practices for strong passwords", href: "/resources?category=passwords" },
-  { title: "Senior Safety", description: "Protection for older adults", href: "/resources?category=seniors" },
-  { title: "Family Online Safety", description: "Keep your whole family protected", href: "/resources?category=family" },
-  { title: "Small Business Security", description: "Protect your business from threats", href: "/resources?category=business" },
+  { title: "Phishing & Email Scams", description: "Recognize and avoid phishing attacks", href: "/resources?category=phishing", icon: AlertTriangle },
+  { title: "Online Privacy", description: "Protect your personal information", href: "/resources?category=privacy", icon: Lock },
+  { title: "Password Security", description: "Best practices for strong passwords", href: "/resources?category=passwords", icon: Shield },
 ];
 
-const resourceTypes = [
-  { title: "Security Guides", description: "Step-by-step protection tutorials", href: "/resources?type=guide", icon: FileText },
-  { title: "Video Training", description: "Watch and learn at your own pace", href: "/resources?type=video", icon: Video },
-  { title: "Checklists", description: "Printable security checklists", href: "/resources?type=checklist", icon: ClipboardCheck },
+const quickLinks = [
+  { title: "All Resources", description: "Browse our complete library", href: "/resources", icon: FileText },
   { title: "Emergency Help", description: "What to do if you've been scammed", href: "/emergency-help", icon: Shield },
+  { title: "Checklists", description: "Printable security checklists", href: "/checklists", icon: ClipboardCheck },
 ];
 
 export function Navigation() {
@@ -59,14 +55,23 @@ export function Navigation() {
   }, []);
 
   return (
-    <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/95 backdrop-blur-md border-b shadow-sm"
-          : "bg-background"
-      }`}
-      data-testid="header-navigation"
-    >
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+        data-testid="link-skip-navigation"
+      >
+        Skip to main content
+      </a>
+      <header
+        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+          isScrolled
+            ? "bg-background/95 backdrop-blur-md border-b shadow-sm"
+            : "bg-background"
+        }`}
+        data-testid="header-navigation"
+        role="banner"
+      >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2" data-testid="link-logo">
@@ -76,7 +81,7 @@ export function Navigation() {
             </span>
           </Link>
 
-          <NavigationMenu className="hidden lg:flex">
+          <NavigationMenu className="hidden lg:flex" aria-label="Main navigation">
             <NavigationMenuList className="gap-1">
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent" data-testid="nav-who-we-help">
@@ -173,52 +178,51 @@ export function Navigation() {
                   Learn
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-[700px] p-6">
-                    <div className="grid grid-cols-3 gap-6">
-                      <div className="col-span-2">
-                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-3">Core Safety Topics</h3>
-                        <div className="grid grid-cols-2 gap-2">
-                          {learnTopics.map((item) => (
-                            <NavigationMenuLink asChild key={item.title}>
-                              <Link
-                                href={item.href}
-                                className="block rounded-md p-2 transition-colors hover-elevate"
-                                data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                              >
-                                <div className="text-sm font-medium text-foreground">
-                                  {item.title}
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                  {item.description}
-                                </p>
-                              </Link>
-                            </NavigationMenuLink>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="border-l pl-6">
-                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-3">Resource Types</h3>
-                        <div className="space-y-2">
-                          {resourceTypes.map((item) => (
-                            <NavigationMenuLink asChild key={item.title}>
-                              <Link
-                                href={item.href}
-                                className="flex items-center gap-2 rounded-md p-2 transition-colors hover-elevate"
-                                data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                              >
-                                <item.icon className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-sm text-foreground">
-                                  {item.title}
-                                </span>
-                              </Link>
-                            </NavigationMenuLink>
-                          ))}
-                        </div>
-                        <div className="mt-4 pt-4 border-t">
-                          <Link href="/resources" className="text-sm text-primary flex items-center gap-1 hover:underline">
-                            View All Resources <ExternalLink className="w-3 h-3" />
+                  <div className="w-[500px] p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Learn & Resources</h3>
+                      <Link href="/resources" className="text-sm text-primary flex items-center gap-1 hover:underline">
+                        Browse all <ChevronRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      {learnTopics.map((item) => (
+                        <NavigationMenuLink asChild key={item.title}>
+                          <Link
+                            href={item.href}
+                            className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
+                            data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                          >
+                            <div className="flex-shrink-0 w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+                              <item.icon className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-foreground">
+                                {item.title}
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {item.description}
+                              </p>
+                            </div>
                           </Link>
-                        </div>
+                        </NavigationMenuLink>
+                      ))}
+                    </div>
+                    <div className="pt-4 border-t">
+                      <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Quick Links</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {quickLinks.map((item) => (
+                          <NavigationMenuLink asChild key={item.title}>
+                            <Link
+                              href={item.href}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm bg-muted/50 text-foreground transition-colors hover-elevate"
+                              data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                            >
+                              <item.icon className="w-3.5 h-3.5" />
+                              {item.title}
+                            </Link>
+                          </NavigationMenuLink>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -274,13 +278,13 @@ export function Navigation() {
 
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="lg:hidden">
-              <Button variant="ghost" size="icon" data-testid="button-mobile-menu">
-                <Menu className="h-5 w-5" />
+              <Button variant="ghost" size="icon" aria-label="Open navigation menu" data-testid="button-mobile-menu">
+                <Menu className="h-5 w-5" aria-hidden="true" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto">
-              <nav className="flex flex-col gap-4 mt-8">
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto" aria-label="Mobile navigation menu">
+              <nav className="flex flex-col gap-4 mt-8" aria-label="Mobile navigation">
                 <div className="space-y-3">
                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Who We Help</h4>
                   {whoWeHelp.map((item) => (
@@ -319,24 +323,32 @@ export function Navigation() {
 
                 <div className="space-y-3">
                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Learn</h4>
-                  <Link
-                    href="/resources"
-                    className="block py-2 text-foreground transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                    data-testid="mobile-link-resources"
-                  >
-                    All Resources
-                  </Link>
-                  {learnTopics.slice(0, 4).map((item) => (
+                  {learnTopics.map((item) => (
                     <Link
                       key={item.title}
                       href={item.href}
-                      className="block py-2 text-foreground/70 transition-colors text-sm"
+                      className="flex items-center gap-3 py-2 text-foreground transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
+                      data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
                     >
+                      <item.icon className="w-4 h-4 text-primary" />
                       {item.title}
                     </Link>
                   ))}
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {quickLinks.map((item) => (
+                      <Link
+                        key={item.title}
+                        href={item.href}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs bg-muted/50 text-foreground"
+                        onClick={() => setMobileMenuOpen(false)}
+                        data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                      >
+                        <item.icon className="w-3 h-3" />
+                        {item.title}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="h-px bg-border" />
@@ -384,5 +396,6 @@ export function Navigation() {
         </div>
       </div>
     </header>
+    </>
   );
 }

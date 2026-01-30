@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
 import { LogoCarousel } from "@/components/logo-carousel";
+import { ValueProposition } from "@/components/value-proposition";
 import { FeaturesGrid } from "@/components/features-grid";
 import { MissionBanner } from "@/components/mission-banner";
 import { TrustStrip } from "@/components/trust-strip";
@@ -13,9 +14,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main>
+      <main id="main-content" role="main" aria-label="Main content">
         <HeroSection />
         <LogoCarousel />
+        <ValueProposition />
         <FeaturesGrid />
         <MissionBanner />
         <TrustStrip />
