@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Users, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import professionalImage from "@/assets/images/professional-laptop.jpg";
 import seniorTabletImage from "@/assets/images/hero-senior-tablet.jpg";
@@ -51,226 +51,189 @@ export function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
-  };
-
   const currentSlide = heroSlides[currentIndex];
 
   return (
-    <section className="relative overflow-hidden min-h-[85vh]" data-testid="section-hero">
-      {/* Deep Navy Background - Full Section */}
-      <div className="absolute inset-0 bg-slate-900" />
-      
-      {/* SVG Curved Background Overlay
-          This creates the signature curved arc that wraps around the image.
-          The path uses Bézier curves (Q command) to create a smooth organic arc
-          that starts from top-right and sweeps down to bottom-right.
-          The curve "hugs" the image container creating a layered visual effect.
+    <section className="relative w-full overflow-hidden" style={{ minHeight: "500px" }} data-testid="section-hero">
+      {/* Base layer - full width image on right side */}
+      <div className="absolute inset-0">
+        {/* Image positioned on right half */}
+        <div className="absolute right-0 top-0 bottom-0 w-full lg:w-3/5">
+          {heroSlides.map((slide, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentIndex ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <img
+                src={slide.src}
+                alt={slide.alt}
+                className="w-full h-full object-cover object-center"
+                data-testid={`img-hero-${index}`}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Curved navy background overlay
+          This SVG creates a curved shape that covers the left side and wraps
+          around the image with a smooth Bézier curve that "hugs" the photo.
+          The curve sweeps from top-right downward in a convex arc.
       */}
       <svg 
         className="absolute inset-0 w-full h-full pointer-events-none"
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
+        viewBox="0 0 1440 500"
+        preserveAspectRatio="none"
         aria-hidden="true"
       >
         <defs>
-          {/* Gradient for subtle depth on the curved edge */}
-          <linearGradient id="curveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.1" />
-            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+          {/* Gradient for the teal glow effect on the curve edge */}
+          <linearGradient id="curveEdgeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="hsl(174 65% 42%)" stopOpacity="0" />
+            <stop offset="70%" stopColor="hsl(174 65% 42%)" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="hsl(174 65% 42%)" stopOpacity="0.6" />
           </linearGradient>
-          
-          {/* Dotted arc pattern for decorative overlay */}
-          <pattern id="dottedArc" patternUnits="userSpaceOnUse" width="20" height="20">
-            <circle cx="2" cy="2" r="1" fill="hsl(var(--primary))" opacity="0.3" />
-          </pattern>
         </defs>
         
-        {/* Main curved shape - dark navy that wraps around the image area
+        {/* Main curved navy shape
             Path breakdown:
-            M0,0 - Start at top-left
-            L850,0 - Draw line to x=850 at top
-            Q920,450 850,900 - Quadratic curve: control point at (920,450), end at (850,900)
-            L0,900 - Line to bottom-left
-            Z - Close path
+            M0,0 - Start at top-left corner
+            L800,0 - Line across top to x=800
+            Q1050,250 800,500 - Quadratic Bézier curve: control point pushes curve outward (convex)
+            L0,500 - Line to bottom-left
+            Z - Close the path
+            
+            The curve creates a smooth arc that bulges outward into the image area
         */}
         <path
-          d="M0,0 L850,0 Q920,450 850,900 L0,900 Z"
+          d="M0,0 L800,0 Q1050,250 800,500 L0,500 Z"
           fill="rgb(15 23 42)"
-          className="drop-shadow-2xl"
         />
         
-        {/* Decorative teal curved accent line following the main curve */}
+        {/* Teal accent glow along the curve edge */}
         <path
-          d="M850,0 Q920,450 850,900"
+          d="M800,0 Q1050,250 800,500"
           fill="none"
-          stroke="url(#curveGradient)"
-          strokeWidth="3"
+          stroke="url(#curveEdgeGlow)"
+          strokeWidth="4"
         />
         
-        {/* Outer dotted decorative arc */}
+        {/* Secondary thinner teal line */}
         <path
-          d="M880,-50 Q980,450 880,950"
+          d="M810,10 Q1060,250 810,490"
           fill="none"
-          stroke="url(#dottedArc)"
-          strokeWidth="80"
-          strokeDasharray="4 12"
-          opacity="0.4"
+          stroke="hsl(174 65% 42% / 0.3)"
+          strokeWidth="2"
         />
       </svg>
 
-      {/* Decorative floating elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        {/* Teal glow accents */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute bottom-1/4 left-10 w-48 h-48 rounded-full bg-primary/5 blur-2xl" />
-        
-        {/* Orange accent shapes on the right side */}
-        <div className="absolute top-20 right-20 w-24 h-24 rounded-full bg-accent/30 blur-sm hidden lg:block" />
-        <div className="absolute top-40 right-8 w-16 h-16 rounded-full bg-accent/40 hidden lg:block" />
-        <div className="absolute bottom-32 right-32 w-20 h-20 rounded-full bg-accent/25 blur-sm hidden lg:block" />
+      {/* Decorative teal dotted/particle arc on left side of navy area */}
+      <div className="absolute left-0 top-0 bottom-0 w-1/3 overflow-hidden pointer-events-none" aria-hidden="true">
+        <svg className="absolute -left-20 top-1/2 -translate-y-1/2 w-[400px] h-[400px]" viewBox="0 0 400 400">
+          {/* Dotted arc pattern */}
+          <defs>
+            <radialGradient id="dotGradient">
+              <stop offset="0%" stopColor="hsl(174 65% 42%)" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="hsl(174 65% 42%)" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          {/* Generate dotted arc pattern */}
+          {Array.from({ length: 60 }).map((_, i) => {
+            const angle = (i / 60) * Math.PI * 0.8 + Math.PI * 0.6;
+            const radius = 150 + Math.random() * 40;
+            const x = 200 + Math.cos(angle) * radius;
+            const y = 200 + Math.sin(angle) * radius;
+            const size = 1 + Math.random() * 2;
+            return (
+              <circle
+                key={i}
+                cx={x}
+                cy={y}
+                r={size}
+                fill="hsl(174 65% 42%)"
+                opacity={0.3 + Math.random() * 0.4}
+              />
+            );
+          })}
+          {/* Curved line through the dots */}
+          <path
+            d="M50,350 Q200,200 350,50"
+            fill="none"
+            stroke="hsl(174 65% 42% / 0.4)"
+            strokeWidth="1"
+          />
+        </svg>
       </div>
 
-      {/* Content Grid - Left text, Right image */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[85vh] py-16">
-          
-          {/* Left Content */}
-          <div className="flex flex-col justify-center order-2 lg:order-1">
-            <h1 
-              className="text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold tracking-tight text-white mb-6 leading-[1.15] transition-opacity duration-500" 
-              data-testid="text-hero-heading"
+      {/* Orange accent circles on right side */}
+      <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-visible pointer-events-none hidden lg:block" aria-hidden="true">
+        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-accent/80" />
+        <div className="absolute top-24 right-4 w-20 h-20 rounded-full bg-accent/60" />
+        <div className="absolute bottom-16 -right-6 w-24 h-24 rounded-full bg-accent/50" />
+      </div>
+
+      {/* Content positioned on the left over the navy background */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
+        <div className="max-w-xl">
+          <h1 
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-4 leading-[1.1] transition-opacity duration-500" 
+            data-testid="text-hero-heading"
+          >
+            {currentSlide.headline}
+          </h1>
+
+          <p 
+            className="text-base lg:text-lg text-white/80 mb-6 leading-relaxed transition-opacity duration-500" 
+            data-testid="text-hero-subtext"
+          >
+            {currentSlide.subtext}
+          </p>
+
+          <ul className="space-y-2 mb-8 text-sm lg:text-base">
+            <li className="flex items-center gap-2 text-white/90">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+              <span>Scam detection tools</span>
+            </li>
+            <li className="flex items-center gap-2 text-white/90">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+              <span>Guides for families, seniors, and businesses</span>
+            </li>
+            <li className="flex items-center gap-2 text-white/90">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+              <span>Plain language security education</span>
+            </li>
+          </ul>
+
+          <Link href="/tools">
+            <Button 
+              size="lg" 
+              className="rounded-full px-6 py-5 bg-accent text-accent-foreground border-accent-border shadow-lg" 
+              data-testid="button-hero-primary-cta"
             >
-              {currentSlide.headline}
-            </h1>
-
-            <p 
-              className="text-lg lg:text-xl text-white/80 mb-8 leading-relaxed transition-opacity duration-500 max-w-lg" 
-              data-testid="text-hero-subtext"
-            >
-              {currentSlide.subtext}
-            </p>
-
-            <ul className="space-y-3 mb-10 text-left max-w-md">
-              <li className="flex items-center gap-3 text-white/90">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-3.5 h-3.5 text-primary" />
-                </div>
-                <span>Scam detection tools</span>
-              </li>
-              <li className="flex items-center gap-3 text-white/90">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Users className="w-3.5 h-3.5 text-primary" />
-                </div>
-                <span>Guides for families, seniors, and businesses</span>
-              </li>
-              <li className="flex items-center gap-3 text-white/90">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="w-3.5 h-3.5 text-primary" />
-                </div>
-                <span>Plain language security education</span>
-              </li>
-            </ul>
-
-            <div className="flex flex-col sm:flex-row items-start gap-4">
-              <Link href="/tools">
-                <Button 
-                  size="lg" 
-                  className="text-lg px-8 py-6 rounded-full shadow-lg shadow-accent/30 bg-accent text-accent-foreground border-accent-border" 
-                  data-testid="button-hero-primary-cta"
-                >
-                  Check If It's a Scam
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Link href="/resources">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="text-lg px-8 py-6 rounded-full border-white/30 text-white backdrop-blur-sm" 
-                  data-testid="button-hero-secondary-cta"
-                >
-                  Browse Resources
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Right Image Container - Positioned within the curve */}
-          <div className="relative order-1 lg:order-2 flex items-center justify-center lg:justify-end">
-            {/* Image wrapper with curved frame effect */}
-            <div className="relative w-full max-w-md lg:max-w-lg xl:max-w-xl">
-              {/* Teal circular frame around image */}
-              <div className="absolute -inset-4 lg:-inset-6 rounded-full border-2 border-primary/30 opacity-60" />
-              <div className="absolute -inset-8 lg:-inset-12 rounded-full border border-primary/20 opacity-40" />
-              
-              {/* Image carousel container - sharp rectangular, unmasked */}
-              <div className="relative aspect-[4/3] lg:aspect-square shadow-2xl">
-                {heroSlides.map((slide, index) => (
-                  <div
-                    key={index}
-                    className={`absolute inset-0 transition-opacity duration-1000 ${
-                      index === currentIndex ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    <img
-                      src={slide.src}
-                      alt={slide.alt}
-                      className="w-full h-full object-cover"
-                      data-testid={`img-hero-${index}`}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+              Get Started
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </Link>
         </div>
       </div>
 
-      {/* Carousel Navigation */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={goToPrevious}
-          className="text-white backdrop-blur-sm"
-          aria-label="Previous image"
-          data-testid="button-carousel-prev"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
-        
-        <div className="flex gap-2">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900 ${
-                index === currentIndex 
-                  ? "bg-white w-6" 
-                  : "bg-white/50 hover-elevate"
-              }`}
-              aria-label={`Go to image ${index + 1}`}
-              data-testid={`button-carousel-dot-${index}`}
-            />
-          ))}
-        </div>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={goToNext}
-          className="text-white backdrop-blur-sm"
-          aria-label="Next image"
-          data-testid="button-carousel-next"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </Button>
+      {/* Carousel indicators */}
+      <div className="absolute bottom-4 left-6 lg:left-8 z-20 flex gap-2">
+        {heroSlides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900 ${
+              index === currentIndex 
+                ? "bg-white w-5" 
+                : "bg-white/40 hover-elevate"
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+            data-testid={`button-carousel-dot-${index}`}
+          />
+        ))}
       </div>
     </section>
   );
