@@ -64,11 +64,30 @@ export function HeroSection() {
   const currentSlide = heroSlides[currentIndex];
 
   return (
-    <section className="relative w-full overflow-hidden h-[580px] lg:h-[600px]" data-testid="section-hero">
-      {/* Base layer - full width image on right side with fixed container */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Fixed container ensures all images display at exactly the same size */}
-        <div className="absolute right-0 top-0 w-full lg:w-2/3 h-full">
+    <section className="relative w-full overflow-hidden min-h-[480px] lg:h-[600px]" data-testid="section-hero">
+      {/* Mobile: Full background color overlay */}
+      <div 
+        className="absolute inset-0 lg:hidden transition-colors duration-1000"
+        style={{ backgroundColor: currentSlide.bgColor }}
+      />
+      
+      {/* Mobile: Background image with overlay */}
+      <div className="absolute inset-0 lg:hidden">
+        {heroSlides.map((slide, index) => (
+          <img
+            key={index}
+            src={slide.src}
+            alt={slide.alt}
+            className={`absolute inset-0 w-full h-full object-cover object-[center_30%] transition-opacity duration-1000 ${
+              index === currentIndex ? "opacity-30" : "opacity-0"
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Desktop: Image on right side */}
+      <div className="absolute inset-0 overflow-hidden hidden lg:block">
+        <div className="absolute right-0 top-0 w-2/3 h-full">
           {heroSlides.map((slide, index) => (
             <img
               key={index}
@@ -83,18 +102,14 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Curved background overlay - different color per slide
-          The curve is brought inward to expose more of the image.
-          Path uses a gentler curve with control point closer to the edge.
-      */}
+      {/* Desktop: Curved background overlay */}
       <svg 
-        className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-1000"
+        className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-1000 hidden lg:block"
         viewBox="0 0 1440 500"
         preserveAspectRatio="none"
         aria-hidden="true"
       >
         <defs>
-          {/* Gradient for the accent glow effect on the curve edge */}
           <linearGradient id="curveEdgeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor={currentSlide.accentColor} stopOpacity="0" />
             <stop offset="70%" stopColor={currentSlide.accentColor} stopOpacity="0.4" />
@@ -102,21 +117,12 @@ export function HeroSection() {
           </linearGradient>
         </defs>
         
-        {/* Main curved shape - brought inward for more image exposure
-            Path breakdown:
-            M0,0 - Start at top-left corner
-            L680,0 - Line across top to x=680 (less than before)
-            Q880,250 680,500 - Gentler curve with control point at (880,250)
-            L0,500 - Line to bottom-left
-            Z - Close the path
-        */}
         <path
           d="M0,0 L680,0 Q880,250 680,500 L0,500 Z"
           fill={currentSlide.bgColor}
           className="transition-all duration-1000"
         />
         
-        {/* Accent glow along the curve edge */}
         <path
           d="M680,0 Q880,250 680,500"
           fill="none"
@@ -125,7 +131,6 @@ export function HeroSection() {
           className="transition-all duration-1000"
         />
         
-        {/* Secondary thinner accent line */}
         <path
           d="M690,10 Q890,250 690,490"
           fill="none"
@@ -136,10 +141,9 @@ export function HeroSection() {
         />
       </svg>
 
-      {/* Decorative particle arc on left side */}
-      <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none" aria-hidden="true">
+      {/* Desktop: Decorative particle arc - hidden on mobile */}
+      <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none hidden lg:block" aria-hidden="true">
         <svg className="absolute -left-16 top-1/2 -translate-y-1/2 w-[350px] h-[350px]" viewBox="0 0 350 350">
-          {/* Generate dotted arc pattern with current accent color */}
           {Array.from({ length: 50 }).map((_, i) => {
             const angle = (i / 50) * Math.PI * 0.7 + Math.PI * 0.65;
             const radius = 120 + Math.random() * 35;
@@ -158,7 +162,6 @@ export function HeroSection() {
               />
             );
           })}
-          {/* Curved line through the dots */}
           <path
             d="M40,310 Q175,175 310,40"
             fill="none"
@@ -170,66 +173,70 @@ export function HeroSection() {
         </svg>
       </div>
 
-      {/* Orange accent circles on right side */}
+      {/* Desktop: Orange accent circles - hidden on mobile */}
       <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-visible pointer-events-none hidden lg:block" aria-hidden="true">
         <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-accent/80" />
         <div className="absolute top-24 right-4 w-20 h-20 rounded-full bg-accent/60" />
         <div className="absolute bottom-16 -right-6 w-24 h-24 rounded-full bg-accent/50" />
       </div>
 
-      {/* Content positioned centered within the navy background area */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16 h-full flex items-center justify-center lg:justify-start">
-        <div className="max-w-lg text-center lg:text-left">
-          {/* Fixed height headline container prevents layout shift */}
-          <div className="min-h-[160px] lg:min-h-[180px] mb-4 flex items-start justify-center lg:justify-start">
+      {/* Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 lg:py-16 h-full flex items-center">
+        <div className="max-w-lg mx-auto lg:mx-0 text-center lg:text-left">
+          {/* Headline */}
+          <div className="mb-4 lg:min-h-[180px] lg:flex lg:items-start">
             <h1 
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] transition-opacity duration-500" 
+              className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1] transition-opacity duration-500" 
               data-testid="text-hero-heading"
             >
               {currentSlide.headline}
             </h1>
           </div>
 
-          {/* Fixed height subtext container */}
-          <div className="min-h-[50px] lg:min-h-[60px] mb-4">
+          {/* Subtext */}
+          <div className="mb-5 lg:min-h-[60px]">
             <p 
-              className="text-base lg:text-lg text-white/70 font-medium leading-relaxed transition-opacity duration-500" 
+              className="text-sm sm:text-base lg:text-lg text-white/80 font-medium leading-relaxed transition-opacity duration-500" 
               data-testid="text-hero-subtext"
             >
               {currentSlide.subtext}
             </p>
           </div>
 
-          <ul className="space-y-2 mb-8 text-sm font-medium">
-            <li className="flex items-center gap-2 text-white/70">
+          {/* Bullet points */}
+          <ul className="space-y-2 mb-6 text-xs sm:text-sm font-medium">
+            <li className="flex items-center justify-center lg:justify-start gap-2 text-white/80">
               <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
               <span>Scam detection tools</span>
             </li>
-            <li className="flex items-center gap-2 text-white/70">
+            <li className="flex items-center justify-center lg:justify-start gap-2 text-white/80">
               <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
               <span>Guides for families, seniors, and businesses</span>
             </li>
-            <li className="flex items-center gap-2 text-white/70">
+            <li className="flex items-center justify-center lg:justify-start gap-2 text-white/80">
               <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
               <span>Plain language security education</span>
             </li>
           </ul>
 
-          <Link href="/tools">
-            <Button 
-              size="lg" 
-              className="rounded-full px-6 py-5 bg-accent text-accent-foreground border-accent-border shadow-lg" 
-              data-testid="button-hero-primary-cta"
-            >
-              Get Started
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
-          </Link>
+          {/* CTA Button */}
+          <div className="flex justify-center lg:justify-start">
+            <Link href="/tools">
+              <Button 
+                size="lg" 
+                className="rounded-full px-6 py-5 bg-accent text-accent-foreground border-accent-border shadow-lg" 
+                data-testid="button-hero-primary-cta"
+              >
+                Get Started
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Carousel indicators */}
-      <div className="absolute bottom-4 left-6 lg:left-8 z-20 flex gap-2">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 lg:left-8 lg:translate-x-0 z-20 flex gap-2">
         {heroSlides.map((_, index) => (
           <button
             key={index}
