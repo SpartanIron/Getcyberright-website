@@ -71,7 +71,7 @@ export function HeroSection() {
         style={{ backgroundColor: currentSlide.bgColor }}
       />
       
-      {/* Mobile: Background image with overlay */}
+      {/* Mobile: Background image with darker overlay for better text contrast */}
       <div className="absolute inset-0 lg:hidden">
         {heroSlides.map((slide, index) => (
           <img
@@ -79,10 +79,12 @@ export function HeroSection() {
             src={slide.src}
             alt={slide.alt}
             className={`absolute inset-0 w-full h-full object-cover object-[center_30%] transition-opacity duration-1000 ${
-              index === currentIndex ? "opacity-30" : "opacity-0"
+              index === currentIndex ? "opacity-20" : "opacity-0"
             }`}
           />
         ))}
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/30" />
       </div>
 
       {/* Desktop: Image on right side */}
@@ -141,8 +143,8 @@ export function HeroSection() {
         />
       </svg>
 
-      {/* Desktop: Decorative particle arc - hidden on mobile */}
-      <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none hidden lg:block" aria-hidden="true">
+      {/* Desktop only: Decorative particle arc */}
+      <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none invisible lg:visible" aria-hidden="true">
         <svg className="absolute -left-16 top-1/2 -translate-y-1/2 w-[350px] h-[350px]" viewBox="0 0 350 350">
           {Array.from({ length: 50 }).map((_, i) => {
             const angle = (i / 50) * Math.PI * 0.7 + Math.PI * 0.65;
