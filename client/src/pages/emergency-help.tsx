@@ -6,6 +6,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { SEOHead, pageSEO } from "@/components/seo-head";
+import { RegionSelector } from "@/components/region-selector";
 import { 
   Phone, 
   Globe, 
@@ -765,6 +766,12 @@ export default function EmergencyHelp() {
           imageAlt="Emergency help and support resources"
           imagePosition="left"
         />
+
+        <section className="py-8 bg-primary/5 border-b">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <RegionSelector showThreats={false} />
+          </div>
+        </section>
 
         <section className="py-12 sm:py-16 bg-red-50 dark:bg-red-950/20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

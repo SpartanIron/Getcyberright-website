@@ -23,6 +23,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { NotificationSettings } from "@/components/notification-settings";
+import { RegionSelector, RegionalThreatsCard } from "@/components/region-selector";
 
 const premiumResources = [
   {
@@ -230,10 +231,27 @@ export default function Dashboard() {
             </motion.div>
           </div>
 
+          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <RegionSelector className="h-full" />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <RegionalThreatsCard className="h-full" />
+            </motion.div>
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
           >
             <h2 className="text-xl font-bold text-foreground mb-4">Premium Resources</h2>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -278,7 +296,7 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
             className="mt-8"
           >
             <h2 className="text-xl font-bold text-foreground mb-4">Notification Preferences</h2>

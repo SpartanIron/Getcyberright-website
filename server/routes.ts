@@ -23,6 +23,14 @@ import {
   phoneCheckSchema,
   domainCheckSchema
 } from "./threatIntelligence";
+import { 
+  getRegionByCode, 
+  getThreatsByRegion, 
+  ALL_REGIONS, 
+  US_STATE_TO_REGION, 
+  COUNTRY_TO_REGION,
+  DEFAULT_REGION
+} from "@shared/regions";
 
 // URL reputation checking schemas with validation
 const urlCheckSchema = z.object({
@@ -1026,6 +1034,99 @@ export async function registerRoutes(
       console.error("Error checking premium access:", error);
       res.status(500).json({ error: "Failed to check access" });
     }
+  });
+
+  // =====================
+  // REGIONAL CONTENT API
+  // =====================
+
+  // Get user's detected region from IP
+  app.get("/api/region/detect", async (req: Request, res: Response) => {
+    try {
+      // Get IP from various headers (for proxies) or connection
+      const forwardedFor = req.headers['x-forwarded-for'];
+      const ip = typeof forwardedFor === 'string' 
+        ? forwardedFor.split(',')[0].trim() 
+        : req.socket.remoteAddress || '';
+
+      // Use ip-api.com for free geolocation (rate limited but sufficient)
+      let regionCode = "GLOBAL";
+      
+      try {
+        const geoResponse = await fetchWithTimeout(
+          `http://ip-api.com/json/${ip}?fields=status,countryCode,region`,
+          { method: 'GET' },
+          5000
+        );
+        
+        if (geoResponse.ok) {
+          const geoData = await geoResponse.json() as { status: string; countryCode?: string; region?: string };
+          
+          if (geoData.status === 'success' && geoData.countryCode) {
+            if (geoData.countryCode === 'US' && geoData.region) {
+              // Map US state to region
+              regionCode = US_STATE_TO_REGION[geoData.region] || "US-NORTHEAST";
+            } else {
+              // Map country to region
+              regionCode = COUNTRY_TO_REGION[geoData.countryCode] || "GLOBAL";
+            }
+          }
+        }
+      } catch (geoError) {
+        console.log("Geolocation lookup failed, using default region");
+      }
+
+      const regionInfo = getRegionByCode(regionCode);
+      const threats = getThreatsByRegion(regionCode);
+
+      res.json({
+        success: true,
+        detectedRegion: regionCode,
+        region: regionInfo,
+        threats: threats.slice(0, 5), // Top 5 threats
+      });
+    } catch (error) {
+      console.error("Error detecting region:", error);
+      res.json({
+        success: true,
+        detectedRegion: "GLOBAL",
+        region: DEFAULT_REGION,
+        threats: getThreatsByRegion("GLOBAL").slice(0, 5),
+      });
+    }
+  });
+
+  // Get all available regions
+  app.get("/api/region/list", (_req: Request, res: Response) => {
+    res.json({
+      success: true,
+      regions: ALL_REGIONS,
+    });
+  });
+
+  // Get region info by code
+  app.get("/api/region/:code", (req: Request, res: Response) => {
+    const code = req.params.code as string;
+    const regionInfo = getRegionByCode(code);
+    const threats = getThreatsByRegion(code);
+
+    res.json({
+      success: true,
+      region: regionInfo,
+      threats,
+    });
+  });
+
+  // Get threat trends for a region
+  app.get("/api/region/:code/threats", (req: Request, res: Response) => {
+    const code = req.params.code as string;
+    const threats = getThreatsByRegion(code);
+
+    res.json({
+      success: true,
+      regionCode: code,
+      threats,
+    });
   });
 
   return httpServer;
