@@ -13,10 +13,9 @@ import {
   Eye, 
   EyeOff,
   LogIn,
-  ArrowRight,
   AlertCircle
 } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { queryClient } from "@/lib/queryClient";
@@ -71,7 +70,7 @@ export default function Login() {
       // Wait for auth query to refetch before navigating
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
-      setLocation("/dashboard");
+      setLocation("/admin");
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {
@@ -141,12 +140,7 @@ export default function Login() {
                       </div>
 
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="password">Password</Label>
-                          <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                            Forgot password?
-                          </Link>
-                        </div>
+                        <Label htmlFor="password">Password</Label>
                         <div className="relative">
                           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
@@ -223,15 +217,6 @@ export default function Login() {
                   )}
                 </form>
 
-                <div className="mt-6 pt-6 border-t">
-                  <p className="text-center text-sm text-muted-foreground">
-                    Do not have an account?{" "}
-                    <Link href="/register" className="text-primary hover:underline font-medium">
-                      Create one
-                      <ArrowRight className="inline w-3 h-3 ml-1" />
-                    </Link>
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </motion.div>

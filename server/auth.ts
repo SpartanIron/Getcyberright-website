@@ -123,8 +123,12 @@ export function registerAuthRoutes(app: Express) {
     name: "gcr.sid",
   }));
   
-  // Register new user
+  // Register new user - DISABLED (admin-only system)
   app.post("/api/auth/register", async (req, res) => {
+    return res.status(403).json({ error: "Public registration is disabled. Please contact an administrator." });
+    
+    // Original registration code disabled:
+    /*
     try {
       const validatedData = registerSchema.parse(req.body);
       
@@ -177,6 +181,7 @@ export function registerAuthRoutes(app: Express) {
       console.error("Registration error:", error);
       res.status(500).json({ error: "Registration failed" });
     }
+    */
   });
   
   // Login

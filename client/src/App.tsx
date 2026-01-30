@@ -39,7 +39,6 @@ import AdminMessages from "@/pages/admin/messages";
 import AdminSubscribers from "@/pages/admin/subscribers";
 import AdminScamReports from "@/pages/admin/scam-reports";
 import Login from "@/pages/login";
-import Register from "@/pages/register";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -85,7 +84,6 @@ function Router() {
       <Route path="/admin/subscribers" component={AdminSubscribers} />
       <Route path="/admin/scam-reports" component={AdminScamReports} />
       <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
       <Route component={NotFound} />
     </Switch>
   );
