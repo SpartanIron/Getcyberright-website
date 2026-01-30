@@ -68,7 +68,9 @@ export default function Login() {
         description: "You have been successfully logged in.",
       });
 
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Wait for auth query to refetch before navigating
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
       setLocation("/dashboard");
     } catch (err) {
       setError("An error occurred. Please try again.");
