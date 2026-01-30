@@ -10,6 +10,19 @@ import { registerAuthRoutes, isAuthenticated } from "./auth";
 import { stripeService } from "./stripeService";
 import { getStripePublishableKey } from "./stripeClient";
 import { registerAdminRoutes } from "./admin";
+import { 
+  checkGoogleSafeBrowsing, 
+  checkVirusTotal, 
+  checkDomainAge, 
+  checkSSLCertificate, 
+  checkPhoneNumber,
+  calculateTrustScore,
+  analyzeQRContent,
+  getDeepfakeEducation,
+  urlCheckSchema as tiUrlCheckSchema,
+  phoneCheckSchema,
+  domainCheckSchema
+} from "./threatIntelligence";
 
 // URL reputation checking schemas with validation
 const urlCheckSchema = z.object({
@@ -303,6 +316,235 @@ export async function registerRoutes(
       } else {
         console.error('URL reputation check error:', error);
         res.status(500).json({ error: "Failed to check URL reputation" });
+      }
+    }
+  });
+
+  // Google Safe Browsing check
+  app.post("/api/security/check-google-safe-browsing", standardRateLimit, async (req, res) => {
+    try {
+      const { url } = urlCheckSchema.parse(req.body);
+      const result = await checkGoogleSafeBrowsing(url);
+      res.json({ success: true, url, ...result });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid URL", details: error.errors });
+      } else {
+        console.error('Google Safe Browsing error:', error);
+        res.status(500).json({ success: false, error: "Service temporarily unavailable" });
+      }
+    }
+  });
+
+  // VirusTotal check
+  app.post("/api/security/check-virustotal", standardRateLimit, async (req, res) => {
+    try {
+      const { url } = urlCheckSchema.parse(req.body);
+      const result = await checkVirusTotal(url);
+      res.json({ success: true, url, ...result });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid URL", details: error.errors });
+      } else {
+        console.error('VirusTotal error:', error);
+        res.status(500).json({ success: false, error: "Service temporarily unavailable" });
+      }
+    }
+  });
+
+  // Domain age / WHOIS check
+  app.post("/api/security/check-domain-age", standardRateLimit, async (req, res) => {
+    try {
+      const { domain } = domainCheckSchema.parse(req.body);
+      const result = await checkDomainAge(domain);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid domain", details: error.errors });
+      } else {
+        console.error('Domain age check error:', error);
+        res.status(500).json({ success: false, error: "Service temporarily unavailable" });
+      }
+    }
+  });
+
+  // SSL Certificate check
+  app.post("/api/security/check-ssl", standardRateLimit, async (req, res) => {
+    try {
+      const { url } = urlCheckSchema.parse(req.body);
+      const result = await checkSSLCertificate(url);
+      res.json({ success: true, url, ...result });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid URL", details: error.errors });
+      } else {
+        console.error('SSL check error:', error);
+        res.status(500).json({ success: false, error: "Service temporarily unavailable" });
+      }
+    }
+  });
+
+  // Phone number check
+  app.post("/api/security/check-phone", standardRateLimit, async (req, res) => {
+    try {
+      const { phone } = phoneCheckSchema.parse(req.body);
+      const result = await checkPhoneNumber(phone);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid phone number", details: error.errors });
+      } else {
+        console.error('Phone check error:', error);
+        res.status(500).json({ success: false, error: "Service temporarily unavailable" });
+      }
+    }
+  });
+
+  // QR Code content analysis
+  app.post("/api/security/analyze-qr", standardRateLimit, async (req, res) => {
+    try {
+      const schema = z.object({ content: z.string().min(1).max(5000) });
+      const { content } = schema.parse(req.body);
+      const result = analyzeQRContent(content);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid QR content", details: error.errors });
+      } else {
+        console.error('QR analysis error:', error);
+        res.status(500).json({ success: false, error: "Analysis failed" });
+      }
+    }
+  });
+
+  // Deepfake education endpoint
+  app.get("/api/security/deepfake-education/:type", standardRateLimit, async (req, res) => {
+    try {
+      const validTypes = ["image", "video", "audio", "text"];
+      const contentType = req.params.type as "image" | "video" | "audio" | "text";
+      if (!validTypes.includes(contentType)) {
+        return res.status(400).json({ error: "Invalid content type. Must be: image, video, audio, or text" });
+      }
+      const result = getDeepfakeEducation(contentType);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error('Deepfake education error:', error);
+      res.status(500).json({ success: false, error: "Failed to fetch education content" });
+    }
+  });
+
+  // Comprehensive URL scan (combines all checks)
+  app.post("/api/security/comprehensive-scan", standardRateLimit, async (req, res) => {
+    try {
+      const { url } = urlCheckSchema.parse(req.body);
+      
+      // Extract domain for domain age check
+      let domain = "";
+      try {
+        const parsedUrl = new URL(url);
+        domain = parsedUrl.hostname;
+      } catch {
+        domain = url;
+      }
+
+      // Run all checks in parallel
+      const [googleSB, virusTotal, domainAge, sslCert, phishTankResult, urlhausResult] = await Promise.allSettled([
+        checkGoogleSafeBrowsing(url),
+        checkVirusTotal(url),
+        checkDomainAge(domain),
+        checkSSLCertificate(url),
+        // PhishTank check
+        (async () => {
+          const formData = new URLSearchParams();
+          formData.append('url', url);
+          formData.append('format', 'json');
+          
+          const response = await fetchWithTimeout('https://checkurl.phishtank.com/checkurl/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString(),
+          }, 10000);
+          
+          if (!response.ok) throw new Error('PhishTank API error');
+          const data = await response.json();
+          return {
+            checked: true,
+            isPhishing: data.results?.in_database === true && data.results?.valid === true
+          };
+        })(),
+        // URLhaus check
+        (async () => {
+          const formData = new URLSearchParams();
+          formData.append('url', url);
+          
+          const response = await fetchWithTimeout('https://urlhaus-api.abuse.ch/v1/url/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString(),
+          }, 10000);
+          
+          if (!response.ok) throw new Error('URLhaus API error');
+          const data = await response.json();
+          return {
+            checked: true,
+            isMalware: data.query_status === 'ok'
+          };
+        })()
+      ]);
+
+      // Extract results
+      const googleSBResult = googleSB.status === 'fulfilled' ? googleSB.value : undefined;
+      const virusTotalResult = virusTotal.status === 'fulfilled' ? virusTotal.value : undefined;
+      const domainAgeResult = domainAge.status === 'fulfilled' ? domainAge.value : undefined;
+      const sslResult = sslCert.status === 'fulfilled' ? sslCert.value : undefined;
+      const phishTank = phishTankResult.status === 'fulfilled' ? phishTankResult.value : { checked: false, isPhishing: null };
+      const urlhaus = urlhausResult.status === 'fulfilled' ? urlhausResult.value : { checked: false, isMalware: null };
+
+      // Calculate trust score
+      const trustScore = calculateTrustScore(
+        domainAgeResult,
+        sslResult,
+        googleSBResult,
+        virusTotalResult,
+        phishTank,
+        urlhaus
+      );
+
+      // Determine overall threat level
+      let overallThreatLevel: "safe" | "low" | "medium" | "high" | "critical" = "low";
+      if (phishTank.isPhishing || urlhaus.isMalware || googleSBResult?.isThreat) {
+        overallThreatLevel = "critical";
+      } else if ((virusTotalResult?.positives ?? 0) > 3) {
+        overallThreatLevel = "high";
+      } else if (trustScore.score < 40) {
+        overallThreatLevel = "high";
+      } else if (trustScore.score < 60) {
+        overallThreatLevel = "medium";
+      } else if (trustScore.score < 75) {
+        overallThreatLevel = "low";
+      } else {
+        overallThreatLevel = "safe";
+      }
+
+      res.json({
+        success: true,
+        url,
+        overallThreatLevel,
+        trustScore,
+        googleSafeBrowsing: googleSBResult,
+        virusTotal: virusTotalResult,
+        domainAge: domainAgeResult,
+        sslCertificate: sslResult,
+        phishTank,
+        urlhaus,
+        checkedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid URL", details: error.errors });
+      } else {
+        console.error('Comprehensive scan error:', error);
+        res.status(500).json({ success: false, error: "Scan failed" });
       }
     }
   });

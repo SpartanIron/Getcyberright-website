@@ -118,6 +118,49 @@ GetCyberRight offers powerful free tools to attract users and demonstrate value:
 
 **User Value:** Immediate protection before clicking suspicious links or responding to scam messages
 
+### Advanced Security Scanner (NEW)
+**Description:** Industry-leading comprehensive threat analysis with multi-engine scanning
+
+**URL Scanning Tab:**
+- **Multi-Engine Threat Detection:** Google Safe Browsing API, VirusTotal (70+ antivirus engines), PhishTank, URLhaus
+- **Domain Age Analysis:** RDAP/WHOIS lookup reveals newly registered domains (high-risk indicator)
+- **SSL Certificate Analysis:** Certificate validation, issuer verification, expiration check, Extended Validation detection
+- **Website Trust Score:** 0-100 rating with A-F letter grades based on 6 weighted factors
+
+**Phone Number Lookup Tab:**
+- Risk analysis for phone numbers
+- Scam area code detection (premium rate, toll-free abuse patterns)
+- Geographic origin identification
+- Carrier type classification
+
+**Screenshot OCR Tab:**
+- Upload images of suspicious text messages, emails, or social media posts
+- Tesseract.js-powered text extraction
+- Automatic scam pattern detection in extracted text
+- No data stored - privacy-first analysis
+
+**QR Code Scanner Tab:**
+- Upload QR code images to reveal hidden URLs
+- jsQR decoding technology
+- Threat analysis of decoded URLs before visiting
+- Protection against malicious QR codes in public places
+
+**Deepfake & AI Education Tab:**
+- Interactive guide for identifying AI-generated content
+- Video deepfake detection indicators
+- Audio/voice clone recognition tips
+- AI-generated image identification
+- AI-written text detection patterns
+- Self-assessment quizzes
+
+**Technical Implementation:**
+- All API calls proxied through backend for security
+- Rate limiting on all external API requests
+- Graceful degradation when optional APIs unavailable
+- Privacy-first: no user data stored or logged
+
+**Competitive Advantage:** Combines features from Norton Genie, Bitdefender Scamio, VirusTotal, and ScamAdviser into one unified tool
+
 ### Breach Checker
 **Description:** Check if email addresses have been compromised in known data breaches
 

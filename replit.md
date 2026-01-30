@@ -48,7 +48,17 @@ Preferred communication style: Simple, everyday language.
 ### Content & Tools
 - **Content Guidelines**: All educational content is based on verified data from sources like FTC Consumer Sentinel, FBI IC3, CISA, Medicare.gov, etc. Emphasis on empowering, non-fear-based language.
 - **Scam Checker**: Features Email Header Analysis (SPF/DKIM/DMARC), URL entropy/brand similarity, urgency scoring, Reply-To mismatch detection, and real-time URL reputation checking.
-- **AI & Cyber Safety Hub** (`/ai-safety`): Educational content about AI-powered threats including deepfakes, voice cloning, AI-enhanced phishing, AI chatbot scams, and synthetic identity fraud. Includes audience-specific impact sections (Seniors, Business, Parents), responsible AI usage guidelines, and "What NOT to Share with AI" guidance. Future premium features planned: AI-powered chat assistant for cyber questions, AI-enhanced scam analysis.
+- **Advanced Security Scanner** (NEW): Comprehensive threat analysis tool with:
+  - **Multi-Engine URL Scanning**: Google Safe Browsing API, VirusTotal integration, PhishTank, URLhaus
+  - **Domain Age Check**: RDAP/WHOIS lookup for domain registration age analysis
+  - **SSL Certificate Analysis**: Certificate validation, issuer verification, expiration check, EV detection
+  - **Trust Score Algorithm**: 0-100 website trustworthiness rating with A-F grades
+  - **Phone Number Lookup**: Risk analysis for phone numbers with scam area code detection
+  - **Screenshot OCR**: Image upload with Tesseract.js text extraction for analyzing suspicious messages
+  - **QR Code Scanner**: Upload QR code images to reveal and analyze their contents before scanning
+  - **Deepfake Education**: Interactive guide for identifying AI-generated video, audio, image, and text content
+- **AI & Cyber Safety Hub** (`/ai-safety`): Educational content about AI-powered threats including deepfakes, voice cloning, AI-enhanced phishing, AI chatbot scams, and synthetic identity fraud. Includes audience-specific impact sections (Seniors, Business, Parents), responsible AI usage guidelines, and "What NOT to Share with AI" guidance.
+- **Dezi AI Assistant**: Available to all users with free tier (20 messages/day, 10 analyses/day). Premium users get unlimited access, password generation, and advanced scam analysis.
 
 ## External Dependencies
 
@@ -57,4 +67,5 @@ Preferred communication style: Simple, everyday language.
 - **Form & Validation**: Zod, React Hook Form, @hookform/resolvers.
 - **Styling**: Tailwind CSS, class-variance-authority, tailwind-merge.
 - **Authentication**: `connect-pg-simple` (for PostgreSQL sessions), `bcrypt` (password hashing), `speakeasy` (TOTP MFA), `qrcode`.
-- **Threat Intelligence**: PhishTank API, URLhaus API (proxied via backend with rate limiting).
+- **Threat Intelligence**: PhishTank API, URLhaus API, Google Safe Browsing API (optional), VirusTotal API (optional), RDAP/WHOIS for domain age (all proxied via backend with rate limiting).
+- **Image Processing**: Tesseract.js (OCR text extraction), jsQR (QR code decoding).

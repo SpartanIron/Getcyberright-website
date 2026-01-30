@@ -12,6 +12,7 @@ import { PasswordGenerator } from "@/components/password-generator";
 import { ScamChecker } from "@/components/scam-checker";
 import { BreachChecker } from "@/components/breach-checker";
 import { ThreatTrends } from "@/components/threat-trends";
+import { AdvancedScan } from "@/components/advanced-scan";
 import { 
   Shield, 
   Search,
@@ -22,7 +23,8 @@ import {
   FileText,
   Eye,
   ArrowRight,
-  BookOpen
+  BookOpen,
+  ShieldAlert
 } from "lucide-react";
 import bannerImage from "@/assets/banners/tools-banner.png";
 
@@ -82,11 +84,16 @@ export default function Tools() {
         <section className="py-16 sm:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4 mb-8">
+              <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-5 mb-8">
                 <TabsTrigger value="scam-checker" className="gap-2" data-testid="tab-scam-checker">
                   <Search className="w-4 h-4" />
                   <span className="hidden sm:inline">Scam Checker</span>
                   <span className="sm:hidden">Scam</span>
+                </TabsTrigger>
+                <TabsTrigger value="advanced" className="gap-2" data-testid="tab-advanced">
+                  <ShieldAlert className="w-4 h-4" />
+                  <span className="hidden sm:inline">Advanced</span>
+                  <span className="sm:hidden">Adv</span>
                 </TabsTrigger>
                 <TabsTrigger value="breach" className="gap-2" data-testid="tab-breach">
                   <Database className="w-4 h-4" />
@@ -105,9 +112,13 @@ export default function Tools() {
                 </TabsTrigger>
               </TabsList>
 
-              <div className="max-w-3xl mx-auto">
+              <div className="max-w-4xl mx-auto">
                 <TabsContent value="scam-checker">
                   <ScamChecker />
+                </TabsContent>
+                
+                <TabsContent value="advanced">
+                  <AdvancedScan />
                 </TabsContent>
                 
                 <TabsContent value="breach">
