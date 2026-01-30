@@ -11,6 +11,7 @@ const differentiators = [
     highlight: "Exclusive Feature",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
+    href: "/tools",
   },
   {
     icon: Lock,
@@ -19,6 +20,7 @@ const differentiators = [
     highlight: "Patent-Pending",
     color: "text-primary",
     bgColor: "bg-primary/10",
+    href: "/tools",
   },
   {
     icon: Brain,
@@ -27,6 +29,7 @@ const differentiators = [
     highlight: "AI-Powered",
     color: "text-accent",
     bgColor: "bg-accent/10",
+    href: "/tools",
   },
   {
     icon: Award,
@@ -35,6 +38,7 @@ const differentiators = [
     highlight: "Fun & Effective",
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
+    href: "/dashboard",
   },
 ];
 
@@ -73,28 +77,32 @@ export function ValueProposition() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {differentiators.map((item, index) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative bg-card rounded-xl p-6 border shadow-sm hover-elevate"
-              data-testid={`card-differentiator-${index}`}
-            >
-              <div className={`w-12 h-12 rounded-lg ${item.bgColor} flex items-center justify-center mb-4`}>
-                <item.icon className={`w-6 h-6 ${item.color}`} aria-hidden="true" />
-              </div>
-              <span className="inline-block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                {item.highlight}
-              </span>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                {item.title}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {item.description}
-              </p>
-            </motion.div>
+            <Link key={item.title} href={item.href}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative bg-card rounded-xl p-6 border shadow-sm hover-elevate cursor-pointer h-full"
+                data-testid={`card-differentiator-${index}`}
+              >
+                <div className={`w-12 h-12 rounded-lg ${item.bgColor} flex items-center justify-center mb-4`}>
+                  <item.icon className={`w-6 h-6 ${item.color}`} aria-hidden="true" />
+                </div>
+                <span className="inline-block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  {item.highlight}
+                </span>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {item.description}
+                </p>
+                <div className="mt-4 flex items-center text-sm font-medium text-primary">
+                  Learn more <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
+                </div>
+              </motion.div>
+            </Link>
           ))}
         </div>
 
