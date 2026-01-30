@@ -193,24 +193,24 @@ export function HeroSection() {
           {/* Fixed height subtext container */}
           <div className="h-[60px] lg:h-[70px] mb-4">
             <p 
-              className="text-lg lg:text-xl text-white/80 leading-relaxed transition-opacity duration-500" 
+              className="text-base lg:text-lg text-white/60 leading-relaxed transition-opacity duration-500" 
               data-testid="text-hero-subtext"
             >
               {currentSlide.subtext}
             </p>
           </div>
 
-          <ul className="space-y-2 mb-8 text-sm lg:text-base">
-            <li className="flex items-center gap-2 text-white/90">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+          <ul className="space-y-2 mb-8 text-sm">
+            <li className="flex items-center gap-2 text-white/60">
+              <span className="w-1 h-1 rounded-full bg-primary/70 flex-shrink-0" />
               <span>Scam detection tools</span>
             </li>
-            <li className="flex items-center gap-2 text-white/90">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+            <li className="flex items-center gap-2 text-white/60">
+              <span className="w-1 h-1 rounded-full bg-primary/70 flex-shrink-0" />
               <span>Guides for families, seniors, and businesses</span>
             </li>
-            <li className="flex items-center gap-2 text-white/90">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+            <li className="flex items-center gap-2 text-white/60">
+              <span className="w-1 h-1 rounded-full bg-primary/70 flex-shrink-0" />
               <span>Plain language security education</span>
             </li>
           </ul>
