@@ -84,6 +84,17 @@ Preferred communication style: Simple, everyday language.
   - User levels with titles (Cyber Rookie → Cyber Guardian)
   - Demo mode for unauthenticated users with sign-in prompts
 
+- **Regional Content Personalization**:
+  - Auto-detection of user region via IP geolocation (ip-api.com)
+  - Manual region selection with localStorage persistence
+  - 10 supported regions: US (Northeast, Southeast, Midwest, Southwest, West), UK, Canada, Australia, EU, plus Global fallback
+  - Region-specific threat trends with severity levels and case counts
+  - Local reporting agencies and emergency contacts per region
+  - API endpoints: `/api/region/detect`, `/api/region/list`, `/api/region/:code`, `/api/region/:code/threats`
+  - RegionSelector component (compact/full modes) and RegionalThreatsCard
+  - Integrated into Dashboard and Emergency Help pages
+  - Data model in `shared/regions.ts` with state-to-region and country-to-region mappings
+
 ### Premium Subscription Tiers
 - **Tier Access Control**: `hasTierAccess()` function in `server/routes.ts` handles feature gating
 - **Essential ($9/mo)**: Advanced Scanner features, basic Dezi AI access
