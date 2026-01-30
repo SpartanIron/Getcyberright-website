@@ -93,6 +93,7 @@ export function registerAuthRoutes(app: Express) {
   
   const sessionSecret = process.env.SESSION_SECRET;
   const isProduction = process.env.NODE_ENV === "production";
+  const isReplit = !!process.env.REPLIT_DOMAINS || !!process.env.REPL_SLUG;
   
   if (!sessionSecret) {
     if (isProduction) {
@@ -100,6 +101,9 @@ export function registerAuthRoutes(app: Express) {
     }
     console.warn("SESSION_SECRET not set, using fallback secret (NOT for production!)");
   }
+  
+  // On Replit, always use secure cookies since it serves over HTTPS
+  const useSecureCookies = isProduction || isReplit;
   
   app.use(session({
     store: new PgStore({
@@ -111,9 +115,9 @@ export function registerAuthRoutes(app: Express) {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: isProduction,
+      secure: useSecureCookies,
       httpOnly: true,
-      sameSite: isProduction ? "strict" : "lax", // strict in production, lax in development for Replit proxy
+      sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
     name: "gcr.sid",
