@@ -51,7 +51,7 @@ export default function CheckoutSuccess() {
                     <p className="mt-1">
                       Need help?{" "}
                       <a 
-                        href="mailto:support@getcyberright.com" 
+                        href="mailto:info@getcyberright.com" 
                         className="text-primary hover:underline"
                       >
                         Contact Support

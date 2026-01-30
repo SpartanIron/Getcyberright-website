@@ -333,7 +333,7 @@ export default function Pricing() {
                     Schedule a free consultation to discuss your needs.
                   </p>
                   <Button size="lg" asChild>
-                    <a href="mailto:support@getcyberright.com">
+                    <a href="mailto:info@getcyberright.com">
                       Schedule a Consultation
                     </a>
                   </Button>

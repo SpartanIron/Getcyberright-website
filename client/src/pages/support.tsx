@@ -21,7 +21,7 @@ const supportOptions = [
     icon: HelpCircle,
     title: "General Questions",
     description: "Questions about our tools, resources, or how to use the website",
-    email: "support@getcyberright.com",
+    email: "info@getcyberright.com",
     response: "Within 24-48 hours"
   },
   {
@@ -192,12 +192,12 @@ export default function Support() {
             Can't find what you're looking for? Our support team is ready to assist you.
           </p>
           <Button size="lg" asChild>
-            <a href="mailto:support@getcyberright.com" className="inline-flex items-center gap-2">
+            <a href="mailto:info@getcyberright.com" className="inline-flex items-center gap-2">
               <Mail className="w-5 h-5" />
               Email Support Team
             </a>
           </Button>
-          <p className="text-sm text-muted-foreground mt-4">support@getcyberright.com</p>
+          <p className="text-sm text-muted-foreground mt-4">info@getcyberright.com</p>
         </div>
       </section>
 

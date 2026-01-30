@@ -36,13 +36,13 @@ const contactMethods = [
   {
     icon: Mail,
     title: "Email Us",
-    description: "support@getcyberright.com",
+    description: "info@getcyberright.com",
     detail: "We respond within 24 hours"
   },
   {
     icon: Phone,
     title: "Call Us",
-    description: "1-800-CYBER-SAFE",
+    description: "+1 571-577-8442",
     detail: "Mon-Fri 9am-5pm EST"
   },
   {
