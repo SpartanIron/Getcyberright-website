@@ -9,6 +9,7 @@ import { createRateLimitMiddleware, securityLogger } from "./security";
 import { setupAuth, registerAuthRoutes, isAuthenticated, authStorage } from "./replit_integrations/auth";
 import { stripeService } from "./stripeService";
 import { getStripePublishableKey } from "./stripeClient";
+import { registerAdminRoutes } from "./admin";
 
 // URL reputation checking schemas with validation
 const urlCheckSchema = z.object({
@@ -61,6 +62,9 @@ export async function registerRoutes(
   // Setup Replit Auth (must be before other routes)
   await setupAuth(app);
   registerAuthRoutes(app);
+  
+  // Register admin routes
+  registerAdminRoutes(app);
 
   // Contact form - strict rate limiting (10 req/min)
   app.post("/api/contact", strictRateLimit, async (req, res) => {
