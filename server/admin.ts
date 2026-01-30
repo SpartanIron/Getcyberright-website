@@ -1,11 +1,19 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
 import { users, contactMessages, newsletterSubscribers, scamReports } from "@shared/schema";
-import { authStorage } from "./replit_integrations/auth";
+import { authStorage, isAuthenticated } from "./replit_integrations/auth";
 import { eq, desc, count, sql } from "drizzle-orm";
 import { securityLogger } from "./security";
+import { z } from "zod";
 
-// Admin middleware - checks if user is authenticated and has isAdmin = true
+// Validation schemas for admin operations
+const updateUserSchema = z.object({
+  isAdmin: z.boolean().optional(),
+  subscriptionTier: z.enum(["free", "essential", "professional", "enterprise"]).optional(),
+});
+
+// Admin middleware - checks if authenticated user has isAdmin = true
+// Must be used AFTER isAuthenticated middleware
 export const isAdmin = async (req: any, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.claims?.sub;
@@ -27,8 +35,8 @@ export const isAdmin = async (req: any, res: Response, next: NextFunction) => {
 };
 
 export function registerAdminRoutes(app: Express) {
-  // Dashboard stats
-  app.get("/api/admin/stats", isAdmin, async (req, res) => {
+  // Dashboard stats - protected by both isAuthenticated and isAdmin
+  app.get("/api/admin/stats", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const [userCount] = await db.select({ count: count() }).from(users);
       const [messageCount] = await db.select({ count: count() }).from(contactMessages);
@@ -55,7 +63,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // User management
-  app.get("/api/admin/users", isAdmin, async (req, res) => {
+  app.get("/api/admin/users", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const allUsers = await db
         .select()
@@ -68,10 +76,17 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.patch("/api/admin/users/:id", isAdmin, async (req: any, res) => {
+  app.patch("/api/admin/users/:id", isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const { isAdmin: makeAdmin, subscriptionTier } = req.body;
+      
+      // Validate request body with Zod
+      const validationResult = updateUserSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ error: "Invalid data", details: validationResult.error.errors });
+      }
+      
+      const { isAdmin: makeAdmin, subscriptionTier } = validationResult.data;
       
       const updateData: any = {};
       if (typeof makeAdmin === "boolean") updateData.isAdmin = makeAdmin;
@@ -96,7 +111,7 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/users/:id", isAdmin, async (req: any, res) => {
+  app.delete("/api/admin/users/:id", isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const { id } = req.params;
       
@@ -120,7 +135,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // Contact messages management
-  app.get("/api/admin/contact-messages", isAdmin, async (req, res) => {
+  app.get("/api/admin/contact-messages", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const messages = await db
         .select()
@@ -133,7 +148,7 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/contact-messages/:id", isAdmin, async (req, res) => {
+  app.delete("/api/admin/contact-messages/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await db.delete(contactMessages).where(eq(contactMessages.id, id));
@@ -145,7 +160,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // Newsletter subscribers management
-  app.get("/api/admin/newsletter-subscribers", isAdmin, async (req, res) => {
+  app.get("/api/admin/newsletter-subscribers", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const subscribers = await db
         .select()
@@ -158,7 +173,7 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/newsletter-subscribers/:id", isAdmin, async (req, res) => {
+  app.delete("/api/admin/newsletter-subscribers/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await db.delete(newsletterSubscribers).where(eq(newsletterSubscribers.id, id));
@@ -170,7 +185,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // Export newsletter subscribers as CSV
-  app.get("/api/admin/newsletter-subscribers/export", isAdmin, async (req, res) => {
+  app.get("/api/admin/newsletter-subscribers/export", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const subscribers = await db
         .select()
@@ -191,7 +206,7 @@ export function registerAdminRoutes(app: Express) {
   });
 
   // Scam reports management
-  app.get("/api/admin/scam-reports", isAdmin, async (req, res) => {
+  app.get("/api/admin/scam-reports", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const reports = await db
         .select()
@@ -204,7 +219,7 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/scam-reports/:id", isAdmin, async (req, res) => {
+  app.delete("/api/admin/scam-reports/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await db.delete(scamReports).where(eq(scamReports.id, id));
@@ -215,8 +230,8 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  // Check if current user is admin
-  app.get("/api/admin/check", async (req: any, res) => {
+  // Check if current user is admin - protected by isAuthenticated to ensure proper session
+  app.get("/api/admin/check", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub;
       if (!userId) {
