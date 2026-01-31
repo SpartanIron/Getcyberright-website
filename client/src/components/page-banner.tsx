@@ -82,7 +82,7 @@ export function PageBanner({
       <DecorativeCircles position={circlePosition} />
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className={`flex flex-col ${imagePosition === "left" ? "md:flex-row-reverse" : "md:flex-row"} min-h-[280px] md:min-h-[320px]`}>
+        <div className={`flex flex-col ${imagePosition === "left" ? "md:flex-row-reverse" : "md:flex-row"} min-h-[320px] md:min-h-[400px] lg:min-h-[450px]`}>
           {/* Text content section */}
           <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:px-12 py-10 md:py-16">
             <h1 
@@ -106,7 +106,7 @@ export function PageBanner({
             <img
               src={imageSrc}
               alt={imageAlt}
-              className="w-full h-48 md:h-full object-cover"
+              className="w-full h-56 md:h-full object-cover"
               loading="eager"
               data-testid="img-banner"
             />
