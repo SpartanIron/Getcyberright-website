@@ -38,7 +38,7 @@ export function TrustedBy() {
               className="text-center group"
               data-testid={`logo-${org.name.toLowerCase()}`}
             >
-              <div className="text-lg sm:text-xl font-bold text-foreground/70 group-hover:text-foreground transition-colors">
+              <div className="text-lg sm:text-xl font-bold text-muted-foreground group-hover:text-foreground transition-colors">
                 {org.name}
               </div>
               <div className="text-xs text-muted-foreground">

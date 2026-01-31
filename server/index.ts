@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
+import compression from "compression";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -27,6 +28,19 @@ declare module "http" {
 
 // Security: Configure Helmet security headers first
 configureHelmet(app);
+
+// Performance: Enable gzip compression for responses
+app.use(compression({
+  level: 6, // Balanced compression level
+  threshold: 1024, // Only compress responses > 1KB
+  filter: (req, res) => {
+    // Don't compress if client doesn't support it
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    return compression.filter(req, res);
+  }
+}));
 
 // Security: Request size limiting (100KB for JSON, 50KB for forms)
 app.use(requestSizeLimiter(102400));

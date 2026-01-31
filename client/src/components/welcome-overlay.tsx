@@ -107,7 +107,7 @@ export function WelcomeOverlay() {
             size="icon"
             variant="ghost"
             onClick={handleDismiss}
-            className="absolute top-4 right-4 text-white/60"
+            className="absolute top-4 right-4 text-white/80"
             aria-label="Skip welcome screen"
             data-testid="button-dismiss-welcome"
           >
@@ -138,13 +138,13 @@ export function WelcomeOverlay() {
                 className="w-20 h-20 mx-auto mb-6"
                 data-testid="img-welcome-logo"
               />
-              <h1
+              <h2
                 id="welcome-title"
                 className="text-3xl sm:text-4xl font-bold text-white mb-4"
                 data-testid="text-welcome-title"
               >
                 Welcome to GetCyberRight
-              </h1>
+              </h2>
               <p className="text-lg text-white/80 max-w-md mx-auto leading-relaxed">
                 You're safe here. We help everyday people protect themselves online, 
                 no technical knowledge required.
@@ -157,7 +157,7 @@ export function WelcomeOverlay() {
               transition={{ duration: 0.4, delay: 0.5 }}
               className="mb-8"
             >
-              <p className="text-white/60 text-sm mb-4 uppercase tracking-wide font-medium">
+              <p className="text-white/80 text-sm mb-4 uppercase tracking-wide font-medium">
                 What brought you here today?
               </p>
               <div className="space-y-3">
@@ -188,7 +188,7 @@ export function WelcomeOverlay() {
                         <p className="font-medium">{pathway.title}</p>
                         <p
                           className={`text-sm font-normal ${
-                            pathway.isPrimary ? "text-primary-foreground/80" : "text-white/60"
+                            pathway.isPrimary ? "text-primary-foreground/90" : "text-white/80"
                           }`}
                         >
                           {pathway.description}
@@ -205,7 +205,7 @@ export function WelcomeOverlay() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 1 }}
-              className="text-white/40 text-sm"
+              className="text-white/70 text-sm"
             >
               <p>Trusted by families in 50+ countries</p>
             </motion.div>

@@ -19,12 +19,12 @@ export function LogoCarousel() {
     <section className="py-12 bg-muted/30 border-y border-border/50 overflow-hidden" data-testid="section-logo-carousel">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Shield className="w-4 h-4 text-foreground/70 dark:text-white/80" />
-          <p className="text-center text-sm text-foreground/80 dark:text-white uppercase tracking-wider font-semibold">
+          <Shield className="w-4 h-4 text-muted-foreground" />
+          <p className="text-center text-sm text-foreground dark:text-white uppercase tracking-wider font-semibold">
             Trusted Sources
           </p>
         </div>
-        <p className="text-center text-xs text-foreground/60 dark:text-white/70">
+        <p className="text-center text-xs text-muted-foreground">
           Sources listed for educational reference and public guidance purposes
         </p>
       </div>
@@ -50,10 +50,10 @@ export function LogoCarousel() {
               className="flex-shrink-0 flex flex-col items-center justify-center px-4 py-2 opacity-80 hover:opacity-100 transition-opacity duration-300"
               data-testid={`source-${source.name.toLowerCase().replace(/\s/g, "-")}-${index}`}
             >
-              <span className="text-sm font-bold text-foreground/80 dark:text-white whitespace-nowrap tracking-wide">
+              <span className="text-sm font-bold text-foreground whitespace-nowrap tracking-wide">
                 {source.name}
               </span>
-              <span className="text-xs text-foreground/50 dark:text-white/60 whitespace-nowrap">
+              <span className="text-xs text-muted-foreground whitespace-nowrap">
                 {source.focus}
               </span>
             </div>

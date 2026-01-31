@@ -1101,7 +1101,7 @@ export function DeziAssistant() {
                             {message.role === "assistant" && (
                               <div className="flex items-center gap-2 mb-2">
                                 <div className="w-5 h-5 rounded-full overflow-hidden">
-                                  <img src={deziAvatar} alt="" className="w-full h-full object-cover" />
+                                  <img src={deziAvatar} alt="Dezi AI assistant" className="w-full h-full object-cover" />
                                 </div>
                                 <span className="text-xs font-medium text-muted-foreground">Dezi</span>
                                 {message.isStreaming && (
@@ -1130,7 +1130,7 @@ export function DeziAssistant() {
                         <div className="flex justify-start" data-testid="indicator-dezi-typing">
                           <div className="bg-muted rounded-lg p-3 flex items-center gap-3">
                             <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0">
-                              <img src={deziAvatar} alt="" className="w-full h-full object-cover" />
+                              <img src={deziAvatar} alt="Dezi AI assistant" className="w-full h-full object-cover" />
                             </div>
                             <div className="flex items-center gap-1">
                               <span 
@@ -1286,7 +1286,7 @@ export function DeziAssistant() {
           ) : (
             <>
               <div className="w-6 h-6 rounded-full overflow-hidden border border-white/30">
-                <img src={deziAvatar} alt="" className="w-full h-full object-cover" />
+                <img src={deziAvatar} alt="Dezi AI assistant" className="w-full h-full object-cover" />
               </div>
               <span className="hidden sm:inline">Ask Dezi</span>
               <MessageCircle className="w-5 h-5 sm:hidden" />
