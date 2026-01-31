@@ -45,9 +45,11 @@ export default function Privacy() {
                 <section>
                   <h2 className="text-2xl font-bold text-foreground mb-4">1. Introduction</h2>
                   <p>
-                    GetCyberRight ("we," "us," or "our") operates the website getcyberright.com (the "Service"). 
-                    This Privacy Policy informs you of our policies regarding the collection, use, and disclosure 
-                    of personal data when you use our Service and the choices you have associated with that data.
+                    GetCyberRight is a service operated by ColorCode Solutions LLC, a North Carolina limited 
+                    liability company ("ColorCode Solutions," "we," "us," or "our"). We operate the website 
+                    getcyberright.com (the "Service"). This Privacy Policy informs you of our policies regarding 
+                    the collection, use, and disclosure of personal data when you use our Service and the choices 
+                    you have associated with that data.
                   </p>
                   <p>
                     As a cybersecurity education organization, we understand the importance of protecting your 
@@ -371,7 +373,8 @@ export default function Privacy() {
                     data practices, please contact us:
                   </p>
                   <div className="bg-muted/30 rounded-lg p-6 mt-4 border">
-                    <p className="font-semibold text-foreground mb-2">GetCyberRight</p>
+                    <p className="font-semibold text-foreground mb-2">ColorCode Solutions LLC</p>
+                    <p className="text-sm text-muted-foreground mb-2">Operating as GetCyberRight</p>
                     <p className="mb-1">301 S McDowell Street, Suite 125</p>
                     <p className="mb-1">Charlotte, NC 28204</p>
                     <p className="mb-1">United States</p>

@@ -46,9 +46,10 @@ export default function Terms() {
                   <h2 className="text-2xl font-bold text-foreground mb-4">1. Acceptance of Terms</h2>
                   <p>
                     Welcome to GetCyberRight. These Terms of Service ("Terms") constitute a legally binding 
-                    agreement between you ("you" or "User") and GetCyberRight ("we," "us," or "our") governing 
-                    your access to and use of the getcyberright.com website and all associated services, 
-                    features, content, and applications (collectively, the "Service").
+                    agreement between you ("you" or "User") and ColorCode Solutions LLC, a North Carolina 
+                    limited liability company operating as GetCyberRight ("ColorCode Solutions," "GetCyberRight," 
+                    "we," "us," or "our"), governing your access to and use of the getcyberright.com website 
+                    and all associated services, features, content, and applications (collectively, the "Service").
                   </p>
                   <p>
                     By accessing or using the Service, you acknowledge that you have read, understood, and 
@@ -195,7 +196,7 @@ export default function Terms() {
                   <h3 className="text-xl font-semibold text-foreground mb-3">6.1 Our Content</h3>
                   <p>
                     The Service and its original content, features, and functionality are owned by 
-                    GetCyberRight and are protected by international copyright, trademark, patent, trade 
+                    ColorCode Solutions LLC and are protected by international copyright, trademark, patent, trade 
                     secret, and other intellectual property or proprietary rights laws. This includes but 
                     is not limited to: text, graphics, logos, icons, images, audio clips, digital downloads, 
                     data compilations, and software.
@@ -379,7 +380,7 @@ export default function Terms() {
 
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">13.2 Arbitration Agreement</h3>
                   <p>
-                    If we cannot resolve the dispute informally, you and GetCyberRight agree that any 
+                    If we cannot resolve the dispute informally, you and ColorCode Solutions LLC agree that any 
                     dispute, claim, or controversy arising out of or relating to these Terms or the 
                     Service shall be resolved through binding arbitration administered by the American 
                     Arbitration Association in accordance with its Commercial Arbitration Rules.
@@ -387,7 +388,7 @@ export default function Terms() {
 
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">13.3 Class Action Waiver</h3>
                   <p>
-                    YOU AND GETCYBERRIGHT AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN 
+                    YOU AND COLORCODE SOLUTIONS LLC AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN 
                     YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY 
                     PURPORTED CLASS OR REPRESENTATIVE PROCEEDING.
                   </p>
@@ -474,7 +475,8 @@ export default function Terms() {
                     If you have any questions about these Terms of Service, please contact us:
                   </p>
                   <div className="bg-muted/30 rounded-lg p-6 mt-4 border">
-                    <p className="font-semibold text-foreground mb-2">GetCyberRight</p>
+                    <p className="font-semibold text-foreground mb-2">ColorCode Solutions LLC</p>
+                    <p className="text-sm text-muted-foreground mb-2">Operating as GetCyberRight</p>
                     <p className="mb-1">301 S McDowell Street, Suite 125</p>
                     <p className="mb-1">Charlotte, NC 28204</p>
                     <p className="mb-1">United States</p>
