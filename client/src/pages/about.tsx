@@ -10,7 +10,7 @@ import { Link } from "wouter";
 import { Shield, Heart, Users, Globe, ArrowRight } from "lucide-react";
 import bannerImage from "@/assets/banners/about-banner.png";
 import familySecurityImage from "@/assets/images/about-family-security.jpg";
-import seniorsLearningImage from "@/assets/images/seniors-learning-tech.jpg";
+import seniorsLearningImage from "@/assets/images/professional-black-woman.png";
 
 const values = [
   {
