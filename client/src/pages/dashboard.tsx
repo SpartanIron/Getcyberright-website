@@ -125,12 +125,9 @@ export default function Dashboard() {
                     </Avatar>
                     <div>
                       <h1 className="text-2xl font-bold text-foreground">
-                        Welcome to Your Protection Hub, {user.firstName || 'Member'}
+                        Welcome back, {user.firstName || 'Member'}
                       </h1>
-                      <p className="text-sm text-muted-foreground mt-1 mb-2">
-                        GetCyberRight stands between you and the risks you should not have to face alone.
-                      </p>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 mt-1">
                         <Badge className={tierBadgeColors[userTier]}>
                           <Crown className="w-3 h-3 mr-1" />
                           {userTier.charAt(0).toUpperCase() + userTier.slice(1)} Plan

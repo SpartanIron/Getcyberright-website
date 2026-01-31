@@ -204,8 +204,8 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
   return (
     <>
       <PageBanner
-        title="Protection for Every Generation"
-        subtitle="You deserve security that follows you beyond your devices. We stand between you and the risks you should not have to face alone."
+        title="Stay Safe and Connected Online"
+        subtitle="Practical guidance to protect yourself from scams and fraud. Learn to recognize warning signs and take simple steps to stay secure."
         imageSrc={bannerImage}
         imageAlt="Seniors using technology safely"
         colorVariant="teal"
