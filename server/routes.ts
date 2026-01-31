@@ -101,6 +101,36 @@ export async function registerRoutes(
     }
   });
 
+  // SSL Health Check Endpoint for external monitoring services
+  app.get('/api/health/ssl', standardRateLimit, async (_req: Request, res: Response) => {
+    try {
+      const domain = process.env.APP_DOMAIN || 'getcyberright.com';
+      const result = await checkSSLCertificate(`https://${domain}`);
+      
+      const isHealthy = result.valid && !result.isExpired && (result.daysUntilExpiry ?? 0) > 7;
+      
+      res.status(isHealthy ? 200 : 503).json({
+        status: isHealthy ? 'healthy' : 'warning',
+        domain,
+        ssl: {
+          valid: result.valid,
+          expired: result.isExpired,
+          daysUntilExpiry: result.daysUntilExpiry,
+          issuer: result.issuer,
+          riskLevel: result.riskLevel
+        },
+        checkedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('SSL health check error:', error);
+      res.status(503).json({
+        status: 'error',
+        error: 'Failed to check SSL certificate',
+        checkedAt: new Date().toISOString()
+      });
+    }
+  });
+
   // Register custom auth routes
   registerAuthRoutes(app);
   
