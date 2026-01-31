@@ -341,8 +341,8 @@ export default function Contact() {
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                       <div className="text-muted-foreground">
-                        <p>123 Security Lane, Suite 100</p>
-                        <p>Cybertown, CT 06001</p>
+                        <p>301 S McDowell Street, Suite 125</p>
+                        <p>Charlotte, NC 28204</p>
                         <p>United States</p>
                       </div>
                     </div>
