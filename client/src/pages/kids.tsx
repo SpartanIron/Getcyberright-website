@@ -1141,7 +1141,7 @@ export default function Kids() {
       <main tabIndex={-1}>
         <PageBanner
           title="Kids Digital Safety Hub"
-          subtitle="Fun, interactive lessons to help young people stay safe online. Choose your age group and start learning today."
+          subtitle="Cyber threats affect every generation. We protect what matters most: your children. Fun, interactive lessons to help young people stay safe online."
           colorVariant="teal"
           imageSrc={kidsBannerImage}
           imageAlt="Children learning about internet safety on computers"

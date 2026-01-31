@@ -219,8 +219,8 @@ function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
   return (
     <>
       <PageBanner
-        title="Protect Your Family Online"
-        subtitle="Practical tools and guidance to help you keep your children safe in the digital world while fostering healthy technology habits."
+        title="Family Safety for Every Generation"
+        subtitle="We protect what matters most: your family. Practical tools and trusted guidance to help you keep your children safe in the digital world."
         imageSrc={bannerImage}
         imageAlt="Family learning about digital safety together"
         colorVariant="blue"

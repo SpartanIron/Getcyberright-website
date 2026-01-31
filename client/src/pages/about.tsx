@@ -15,23 +15,23 @@ import seniorsLearningImage from "@/assets/images/seniors-learning-tech.jpg";
 const values = [
   {
     icon: Shield,
-    title: "Protection First",
-    description: "Everyone deserves to feel safe online, regardless of technical ability."
+    title: "People First Protection",
+    description: "We protect what matters most: you. Security that follows you beyond the devices you use."
   },
   {
     icon: Heart,
-    title: "Family and Business Focused",
-    description: "Built for families and small businesses who need practical security guidance."
+    title: "Family Safety for Every Generation",
+    description: "Cyber threats affect everyone. We prioritize protecting your entire family from digital risks."
   },
   {
     icon: Users,
-    title: "No Jargon",
-    description: "Plain language that anyone can understand, no computer science degree required."
+    title: "Clarity Over Confusion",
+    description: "Trusted guidance through plain language education. No technical jargon, just clear knowledge you can act on."
   },
   {
     icon: Globe,
-    title: "Global Reach",
-    description: "Serving families and businesses around the world who face the same threats."
+    title: "Real World Protection",
+    description: "Practical security for real lives. Not theoretical concepts, but actionable protection you can use today."
   }
 ];
 
@@ -50,8 +50,8 @@ export default function About() {
       
       <main tabIndex={-1}>
         <PageBanner
-          title="A Mission Born from Personal Experience"
-          subtitle="We watched our own family members fall victim to scams. That's why we built something different: clear guidance from people who understand what's at stake."
+          title="A Cyber Protection Powerhouse Built to Protect People"
+          subtitle="We go beyond securing devices, accounts, and data. We focus on protecting individuals, families, and digital identities in a world where cyber risk is personal and constantly evolving."
           imageSrc={bannerImage}
           imageAlt="Diverse GetCyberRight team with African woman leader in the center, all wearing branded red shirts in a modern office"
           imagePosition="left"

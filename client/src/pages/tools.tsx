@@ -81,8 +81,8 @@ export default function Tools() {
       
       <main tabIndex={-1}>
         <PageBanner
-          title="Solve Problems, Not Learn Software"
-          subtitle="Run a scam check, create an unbreakable password, or see what threats are trending. All without creating an account or downloading anything."
+          title="Your Cyber Protection Arsenal"
+          subtitle="This is not a collection of tools. It is a human centered cyber protection ecosystem designed to guide, defend, and empower you throughout your digital life. No account required."
           imageSrc={bannerImage}
           imageAlt="Modern workspace with laptop displaying security checkmarks and password generator in bright natural light"
           imagePosition="left"

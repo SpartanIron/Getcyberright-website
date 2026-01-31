@@ -229,8 +229,8 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
   return (
     <>
       <PageBanner
-        title="Protect Your Business"
-        subtitle="Practical, cost-effective security guidance designed for small businesses. Build resilience against cyber threats without breaking your budget."
+        title="Real World Protection for Your Business"
+        subtitle="We protect what matters most: your business and your people. Practical security guidance designed for small businesses facing real threats."
         imageSrc={bannerImage}
         imageAlt="Small business team working on cybersecurity"
         colorVariant="slate"
