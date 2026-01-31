@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { trackToolUsage } from "@/lib/analytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -177,6 +178,9 @@ export function PasswordGenerator() {
       setOutput(generatePassphrase(wordCount, separator, capitalizeWords, includePassphraseNumber));
     }
     setCopied(false);
+    
+    // Track tool usage per regeneration
+    trackToolUsage('password-generator', true, { mode });
   }, [mode, length, includeUppercase, includeNumbers, includeSymbols, easyToType, wordCount, separator, capitalizeWords, includePassphraseNumber]);
 
   useEffect(() => {

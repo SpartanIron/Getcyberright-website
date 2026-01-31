@@ -60,3 +60,42 @@ export const trackEvent = (
     value: value,
   });
 };
+
+// Generate or retrieve session ID for anonymous tracking
+const getSessionId = (): string => {
+  const key = 'gcr_session_id';
+  let sessionId = sessionStorage.getItem(key);
+  if (!sessionId) {
+    sessionId = 'sess_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+    sessionStorage.setItem(key, sessionId);
+  }
+  return sessionId;
+};
+
+// Track tool usage for internal analytics
+export const trackToolUsage = async (
+  toolName: string, 
+  completed: boolean = false, 
+  metadata?: Record<string, any>
+) => {
+  try {
+    const sessionId = getSessionId();
+    
+    await fetch('/api/track/tool', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        toolName,
+        sessionId,
+        completed,
+        metadata: metadata ? JSON.stringify(metadata) : undefined,
+      }),
+    });
+
+    // Also track as GA event
+    trackEvent('tool_usage', 'tools', toolName);
+  } catch (error) {
+    // Silently fail - tracking shouldn't break the app
+    console.debug('Tool tracking failed:', error);
+  }
+};

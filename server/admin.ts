@@ -315,16 +315,69 @@ export function registerAdminRoutes(app: Express) {
   });
 }
 
-// Public endpoint for logging tool usage (no auth required)
+// Allowed tool names for validation
+const ALLOWED_TOOLS = [
+  'scam-checker',
+  'password-generator', 
+  'family-codeword',
+  'url-scanner',
+  'phone-lookup',
+  'qr-scanner',
+  'deepfake-education',
+  'dezi-ai',
+  'voice-detector',
+  'security-scanner',
+  'email-header-check'
+];
+
+// Simple in-memory rate limiter for tracking endpoint
+const trackingRateLimiter = new Map<string, { count: number; resetTime: number }>();
+const TRACKING_RATE_LIMIT = 30; // max requests per window
+const TRACKING_RATE_WINDOW = 60 * 1000; // 1 minute window
+
+function checkTrackingRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = trackingRateLimiter.get(ip);
+  
+  if (!entry || now > entry.resetTime) {
+    trackingRateLimiter.set(ip, { count: 1, resetTime: now + TRACKING_RATE_WINDOW });
+    return true;
+  }
+  
+  if (entry.count >= TRACKING_RATE_LIMIT) {
+    return false;
+  }
+  
+  entry.count++;
+  return true;
+}
+
+// Public endpoint for logging tool usage (with rate limiting)
 export function registerToolTrackingRoutes(app: Express) {
   app.post("/api/track/tool", async (req: any, res) => {
     try {
+      // Rate limiting check
+      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+      if (!checkTrackingRateLimit(clientIP)) {
+        return res.status(429).json({ error: "Rate limit exceeded" });
+      }
+
       const validation = insertToolUsageSchema.safeParse(req.body);
       if (!validation.success) {
         return res.status(400).json({ error: "Invalid data" });
       }
 
       const { toolName, sessionId, countryCode, completed, metadata } = validation.data;
+      
+      // Validate tool name against allowlist
+      if (!ALLOWED_TOOLS.includes(toolName)) {
+        return res.status(400).json({ error: "Invalid tool name" });
+      }
+      
+      // Limit metadata length to prevent abuse
+      if (metadata && metadata.length > 500) {
+        return res.status(400).json({ error: "Metadata too large" });
+      }
       
       // Get user ID from session if authenticated
       const userId = req.user?.id || null;

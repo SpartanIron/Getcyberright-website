@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { trackToolUsage } from "@/lib/analytics";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -123,6 +124,7 @@ export function FamilyCodeword() {
   const handleGenerate = (style: CodewordStyle) => {
     setGeneratedCodeword(generateCodeword(style));
     setCopied(false);
+    trackToolUsage('family-codeword', true, { style });
   };
 
   const copyToClipboard = async () => {

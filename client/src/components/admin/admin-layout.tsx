@@ -8,7 +8,8 @@ import {
   Newspaper, 
   AlertTriangle,
   ArrowLeft,
-  Shield
+  Shield,
+  BarChart3
 } from "lucide-react";
 import logoImage from "@/assets/logo.png";
 
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/subscribers", label: "Subscribers", icon: Newspaper },
   { href: "/admin/scam-reports", label: "Scam Reports", icon: AlertTriangle },
+  { href: "/admin/tool-analytics", label: "Tool Analytics", icon: BarChart3 },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {
