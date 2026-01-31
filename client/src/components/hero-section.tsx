@@ -1,184 +1,105 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Shield, Users, Heart, Globe } from "lucide-react";
 import { Link } from "wouter";
 import professionalImage from "@/assets/images/professional-laptop.jpg";
-import seniorTabletImage from "@/assets/images/hero-senior-tablet.jpg";
-import familyComputerImage from "@/assets/images/hero-family-computer.jpg";
-import businessTeamImage from "@/assets/images/hero-business-team.jpg";
-import smartphoneUserImage from "@/assets/images/hero-smartphone-user.jpg";
-
-const heroSlides = [
-  { 
-    src: professionalImage, 
-    alt: "Professional using laptop securely",
-    headline: "Cybersecurity Education for Everyone",
-    subtext: "Everything you need to protect yourself, your family, and your business from online threats.",
-    bgColor: "rgb(15 23 42)", // Navy
-    accentColor: "hsl(174 65% 42%)", // Teal
-  },
-  { 
-    src: seniorTabletImage, 
-    alt: "Senior person using tablet safely",
-    headline: "Stay Safe Online at Any Age",
-    subtext: "Simple, easy-to-follow guides designed specifically for seniors to navigate the digital world with confidence.",
-    bgColor: "hsl(174 65% 25%)", // Dark Teal
-    accentColor: "hsl(174 65% 50%)", // Lighter Teal
-  },
-  { 
-    src: familyComputerImage, 
-    alt: "Family learning online safety together",
-    headline: "Protect Your Family Online",
-    subtext: "Learn how to keep your children safe from online predators, cyberbullying, and inappropriate content.",
-    bgColor: "hsl(200 60% 20%)", // Deep Blue
-    accentColor: "hsl(174 65% 42%)", // Teal
-  },
-  { 
-    src: businessTeamImage, 
-    alt: "Business team discussing cybersecurity",
-    headline: "Security Training for Your Business",
-    subtext: "Equip your team with the knowledge to recognize threats and protect your organization from cyber attacks.",
-    bgColor: "hsl(220 50% 18%)", // Slate Blue
-    accentColor: "hsl(32 95% 52%)", // Orange
-  },
-  { 
-    src: smartphoneUserImage, 
-    alt: "Person using smartphone securely",
-    headline: "Secure Your Digital Life",
-    subtext: "From mobile banking to social media, learn how to protect your personal information on every device.",
-    bgColor: "hsl(180 50% 20%)", // Teal-Cyan
-    accentColor: "hsl(174 65% 50%)", // Bright Teal
-  },
-];
 
 export function HeroSection() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const currentSlide = heroSlides[currentIndex];
-
   return (
     <section className="relative w-full overflow-hidden" data-testid="section-hero">
-      {/* ===== MOBILE LAYOUT: Stacked - Image on top, Content below ===== */}
+      {/* ===== MOBILE LAYOUT ===== */}
       <div className="lg:hidden">
-        {/* Mobile: Clear image at top */}
-        <div className="relative w-full h-[220px] sm:h-[280px] overflow-hidden">
-          {heroSlides.map((slide, index) => (
-            <img
-              key={index}
-              src={slide.src}
-              alt={slide.alt}
-              className={`absolute inset-0 w-full h-full object-cover object-[center_25%] transition-opacity duration-1000 ${
-                index === currentIndex ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          ))}
+        <div className="relative w-full h-[200px] sm:h-[260px] overflow-hidden">
+          <img
+            src={professionalImage}
+            alt="Professional cybersecurity protection"
+            className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 to-slate-900/80" />
         </div>
         
-        {/* Mobile: Content on solid background */}
-        <div 
-          className="relative px-5 py-8 transition-colors duration-1000"
-          style={{ backgroundColor: currentSlide.bgColor }}
-        >
+        <div className="relative px-5 py-8 bg-slate-900">
           <div className="max-w-md mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full mb-4">
+              <Shield className="w-4 h-4 text-primary" />
+              <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+                Cyber Protection Powerhouse
+              </span>
+            </div>
+            
             <h1 
-              className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3 leading-[1.15]" 
+              className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 leading-[1.15]" 
               data-testid="text-hero-heading-mobile"
             >
-              {currentSlide.headline}
+              Welcome to GetCyberRight
             </h1>
 
             <p className="text-sm sm:text-base text-white/80 font-medium mb-4 leading-relaxed">
-              {currentSlide.subtext}
+              You have not simply accessed a website. You have entered a cyber protection powerhouse built to protect people.
             </p>
 
-            <ul className="space-y-1.5 mb-5 text-xs sm:text-sm font-medium">
-              <li className="flex items-center justify-center gap-2 text-white/80">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                <span>Scam detection tools</span>
+            <p className="text-xs sm:text-sm text-white/70 mb-6 leading-relaxed">
+              We go beyond securing devices, accounts, and data. We focus on protecting individuals, families, and digital identities in a world where cyber risk is personal and constantly evolving.
+            </p>
+
+            <ul className="space-y-2 mb-6 text-xs sm:text-sm font-medium text-left max-w-xs mx-auto">
+              <li className="flex items-start gap-3 text-white/80">
+                <Globe className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <span>Security that follows you beyond your devices</span>
               </li>
-              <li className="flex items-center justify-center gap-2 text-white/80">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                <span>Guides for families, seniors, and businesses</span>
+              <li className="flex items-start gap-3 text-white/80">
+                <Heart className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <span>Family safety for every generation</span>
               </li>
-              <li className="flex items-center justify-center gap-2 text-white/80">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                <span>Plain language security education</span>
+              <li className="flex items-start gap-3 text-white/80">
+                <Users className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <span>Real world protection for real lives</span>
               </li>
             </ul>
 
             <Link href="/tools">
               <Button 
                 size="default" 
-                className="rounded-full px-5 bg-accent text-accent-foreground border-accent-border shadow-lg" 
+                className="rounded-full px-6 bg-accent text-accent-foreground border-accent-border shadow-lg" 
                 data-testid="button-hero-primary-cta-mobile"
               >
-                Get Started
+                Begin Your Protected Experience
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
           </div>
-          
-          {/* Mobile carousel dots */}
-          <div className="flex justify-center gap-2 mt-6">
-            {heroSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex ? "bg-white w-5" : "bg-white/40"
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
         </div>
       </div>
 
-      {/* ===== DESKTOP LAYOUT: Side by side with curved background ===== */}
-      <div className="hidden lg:block h-[600px]">
-        {/* Desktop: Image on right side */}
+      {/* ===== DESKTOP LAYOUT ===== */}
+      <div className="hidden lg:block min-h-[650px]">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute right-0 top-0 w-2/3 h-full">
-            {heroSlides.map((slide, index) => (
-              <img
-                key={index}
-                src={slide.src}
-                alt={slide.alt}
-                className={`absolute inset-0 w-full h-full object-cover object-[center_30%] transition-opacity duration-1000 ${
-                  index === currentIndex ? "opacity-100" : "opacity-0"
-                }`}
-                data-testid={`img-hero-${index}`}
-              />
-            ))}
+            <img
+              src={professionalImage}
+              alt="Professional cybersecurity protection"
+              className="absolute inset-0 w-full h-full object-cover object-[center_30%]"
+              data-testid="img-hero-main"
+            />
           </div>
         </div>
 
-        {/* Desktop: Curved background overlay */}
         <svg 
-          className="absolute inset-0 w-full h-full pointer-events-none transition-colors duration-1000"
+          className="absolute inset-0 w-full h-full pointer-events-none"
           viewBox="0 0 1440 500"
           preserveAspectRatio="none"
           aria-hidden="true"
         >
           <defs>
             <linearGradient id="curveEdgeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={currentSlide.accentColor} stopOpacity="0" />
-              <stop offset="70%" stopColor={currentSlide.accentColor} stopOpacity="0.4" />
-              <stop offset="100%" stopColor={currentSlide.accentColor} stopOpacity="0.7" />
+              <stop offset="0%" stopColor="hsl(174 65% 42%)" stopOpacity="0" />
+              <stop offset="70%" stopColor="hsl(174 65% 42%)" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="hsl(174 65% 42%)" stopOpacity="0.7" />
             </linearGradient>
           </defs>
           
           <path
             d="M0,0 L680,0 Q880,250 680,500 L0,500 Z"
-            fill={currentSlide.bgColor}
-            className="transition-all duration-1000"
+            fill="rgb(15 23 42)"
           />
           
           <path
@@ -186,20 +107,17 @@ export function HeroSection() {
             fill="none"
             stroke="url(#curveEdgeGlow)"
             strokeWidth="4"
-            className="transition-all duration-1000"
           />
           
           <path
             d="M690,10 Q890,250 690,490"
             fill="none"
-            stroke={currentSlide.accentColor}
+            stroke="hsl(174 65% 42%)"
             strokeOpacity="0.3"
             strokeWidth="2"
-            className="transition-all duration-1000"
           />
         </svg>
 
-        {/* Desktop: Decorative particle arc */}
         <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none" aria-hidden="true">
           <svg className="absolute -left-16 top-1/2 -translate-y-1/2 w-[350px] h-[350px]" viewBox="0 0 350 350">
             {Array.from({ length: 50 }).map((_, i) => {
@@ -214,94 +132,86 @@ export function HeroSection() {
                   cx={x}
                   cy={y}
                   r={size}
-                  fill={currentSlide.accentColor}
+                  fill="hsl(174 65% 42%)"
                   opacity={0.2 + Math.random() * 0.4}
-                  className="transition-all duration-1000"
                 />
               );
             })}
             <path
               d="M40,310 Q175,175 310,40"
               fill="none"
-              stroke={currentSlide.accentColor}
+              stroke="hsl(174 65% 42%)"
               strokeOpacity="0.3"
               strokeWidth="1"
-              className="transition-all duration-1000"
             />
           </svg>
         </div>
 
-        {/* Desktop: Orange accent circles */}
         <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-visible pointer-events-none" aria-hidden="true">
           <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-accent/80" />
           <div className="absolute top-24 right-4 w-20 h-20 rounded-full bg-accent/60" />
           <div className="absolute bottom-16 -right-6 w-24 h-24 rounded-full bg-accent/50" />
         </div>
 
-        {/* Desktop: Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 h-full flex items-center">
-          <div className="max-w-lg">
-            <div className="min-h-[180px] flex items-start">
-              <h1 
-                className="text-6xl font-bold tracking-tight text-white leading-[1.1] transition-opacity duration-500" 
-                data-testid="text-hero-heading"
-              >
-                {currentSlide.headline}
-              </h1>
+          <div className="max-w-xl">
+            <div className="inline-flex items-center gap-2 bg-primary/20 px-4 py-2 rounded-full mb-6">
+              <Shield className="w-5 h-5 text-primary" />
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+                Cyber Protection Powerhouse
+              </span>
             </div>
 
-            <div className="min-h-[60px] mb-4">
-              <p 
-                className="text-lg text-white/80 font-medium leading-relaxed transition-opacity duration-500" 
-                data-testid="text-hero-subtext"
-              >
-                {currentSlide.subtext}
-              </p>
-            </div>
+            <h1 
+              className="text-5xl xl:text-6xl font-bold tracking-tight text-white leading-[1.1] mb-6" 
+              data-testid="text-hero-heading"
+            >
+              Welcome to GetCyberRight
+            </h1>
 
-            <ul className="space-y-2 mb-8 text-sm font-medium">
-              <li className="flex items-center gap-2 text-white/80">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                <span>Scam detection tools</span>
+            <p 
+              className="text-xl text-white/90 font-medium leading-relaxed mb-4" 
+              data-testid="text-hero-subtext"
+            >
+              You have not simply accessed a website. You have entered a cyber protection powerhouse built to protect people.
+            </p>
+
+            <p className="text-base text-white/75 leading-relaxed mb-8">
+              At GetCyberRight, we go beyond securing devices, accounts, and data. We focus on protecting individuals, families, and digital identities in a world where cyber risk is personal and constantly evolving.
+            </p>
+
+            <ul className="space-y-3 mb-10 text-sm font-medium">
+              <li className="flex items-center gap-3 text-white/85">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Globe className="w-4 h-4 text-primary flex-shrink-0" />
+                </div>
+                <span>Security that follows you beyond your devices</span>
               </li>
-              <li className="flex items-center gap-2 text-white/80">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                <span>Guides for families, seniors, and businesses</span>
+              <li className="flex items-center gap-3 text-white/85">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Heart className="w-4 h-4 text-primary flex-shrink-0" />
+                </div>
+                <span>Family safety because cyber threats affect every generation</span>
               </li>
-              <li className="flex items-center gap-2 text-white/80">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                <span>Plain language security education</span>
+              <li className="flex items-center gap-3 text-white/85">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-primary flex-shrink-0" />
+                </div>
+                <span>Real world protection for real lives</span>
               </li>
             </ul>
 
             <Link href="/tools">
               <Button 
                 size="lg" 
-                className="rounded-full px-6 py-5 bg-accent text-accent-foreground border-accent-border shadow-lg" 
+                className="rounded-full px-8 py-6 text-base bg-accent text-accent-foreground border-accent-border shadow-lg" 
                 data-testid="button-hero-primary-cta"
               >
-                Get Started
-                <ArrowRight className="ml-2 w-4 h-4" />
+                Begin Your Protected Experience
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
           </div>
-        </div>
-
-        {/* Desktop carousel dots */}
-        <div className="absolute bottom-4 left-8 z-20 flex gap-2">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-900 ${
-                index === currentIndex 
-                  ? "bg-white w-5" 
-                  : "bg-white/40 hover-elevate"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-              data-testid={`button-carousel-dot-${index}`}
-            />
-          ))}
         </div>
       </div>
     </section>

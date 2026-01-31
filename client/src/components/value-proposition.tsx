@@ -1,14 +1,49 @@
 import { motion } from "framer-motion";
-import { Shield, Brain, Users, Mic, Lock, Award, CheckCircle, ArrowRight } from "lucide-react";
+import { Shield, Brain, Users, Mic, Lock, Award, Heart, Globe, CheckCircle, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
 const differentiators = [
   {
+    icon: Globe,
+    title: "Security Beyond Devices",
+    description: "We provide protection that follows you wherever your digital life takes you, not just the hardware you use.",
+    color: "text-primary",
+    bgColor: "bg-primary/10",
+    href: "/tools",
+  },
+  {
+    icon: Shield,
+    title: "Clarity Over Confusion",
+    description: "Trusted guidance through plain language education. No technical jargon, just clear security knowledge you can act on.",
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
+    href: "/resources",
+  },
+  {
+    icon: Heart,
+    title: "Family Safety First",
+    description: "Cyber threats affect every generation. We prioritize protecting your entire family from digital risks.",
+    color: "text-red-500",
+    bgColor: "bg-red-500/10",
+    href: "/kids",
+  },
+  {
+    icon: Users,
+    title: "Real World Protection",
+    description: "Practical security for real lives. Not theoretical concepts, but actionable protection you can use today.",
+    color: "text-accent",
+    bgColor: "bg-accent/10",
+    href: "/tools",
+  },
+];
+
+const exclusiveFeatures = [
+  {
     icon: Mic,
     title: "Voice Clone Detection",
-    description: "Industry-first AI-powered detection of deepfake audio. Protect against scammers impersonating your loved ones.",
-    highlight: "Exclusive Feature",
+    description: "Industry-first AI-powered detection of deepfake audio.",
+    highlight: "Exclusive",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     href: "/tools",
@@ -16,7 +51,7 @@ const differentiators = [
   {
     icon: Lock,
     title: "Family Safety Codewords",
-    description: "Generate secret verification phrases your family uses to confirm identities during suspicious calls.",
+    description: "Secret verification phrases to confirm identities during suspicious calls.",
     highlight: "Patent-Pending",
     color: "text-primary",
     bgColor: "bg-primary/10",
@@ -25,7 +60,7 @@ const differentiators = [
   {
     icon: Brain,
     title: "Dezi AI Assistant",
-    description: "Your personal cybersecurity advisor. Get instant answers about suspicious messages, links, and threats.",
+    description: "Your personal cybersecurity advisor for instant threat analysis.",
     highlight: "AI-Powered",
     color: "text-accent",
     bgColor: "bg-accent/10",
@@ -34,19 +69,12 @@ const differentiators = [
   {
     icon: Award,
     title: "Gamified Learning",
-    description: "Earn badges and track progress as you learn. Security education that's actually engaging.",
-    highlight: "Fun & Effective",
+    description: "Earn badges and track progress as you master security skills.",
+    highlight: "Engaging",
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
     href: "/dashboard",
   },
-];
-
-const trustPoints = [
-  "Based on FTC, FBI IC3, and CISA guidelines",
-  "No technical jargon - plain language you understand",
-  "Free tools available - no signup required",
-  "Tailored for families, seniors, and small businesses",
 ];
 
 export function ValueProposition() {
@@ -61,21 +89,39 @@ export function ValueProposition() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-6"
         >
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-4">
+            <Shield className="w-4 h-4 text-primary" />
+            <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+              People First Protection
+            </span>
+          </div>
           <h2 
             id="value-prop-heading" 
             className="text-3xl md:text-4xl font-bold text-foreground mb-4"
           >
-            Why Choose GetCyberRight?
+            What Sets GetCyberRight Apart
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            We combine cutting-edge AI technology with plain-language education to protect 
-            you from the latest cyber threats.
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            This is not a collection of tools. It is a human centered cyber protection ecosystem 
+            designed to guide, defend, and empower you throughout your digital life.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="text-center mb-12"
+        >
+          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+            Our approach to cybersecurity is grounded in people first protection.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {differentiators.map((item, index) => (
             <Link key={item.title} href={item.href}>
               <motion.div
@@ -85,6 +131,49 @@ export function ValueProposition() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="relative bg-card rounded-xl p-6 border shadow-sm hover-elevate cursor-pointer h-full"
                 data-testid={`card-differentiator-${index}`}
+              >
+                <div className={`w-12 h-12 rounded-lg ${item.bgColor} flex items-center justify-center mb-4`}>
+                  <item.icon className={`w-6 h-6 ${item.color}`} aria-hidden="true" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {item.description}
+                </p>
+                <div className="mt-4 flex items-center text-sm font-medium text-primary">
+                  Learn more <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
+                </div>
+              </motion.div>
+            </Link>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-center mb-8"
+        >
+          <h3 className="text-2xl font-bold text-foreground mb-2">
+            Exclusive Protection Tools
+          </h3>
+          <p className="text-muted-foreground">
+            Features you will not find anywhere else
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {exclusiveFeatures.map((item, index) => (
+            <Link key={item.title} href={item.href}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="relative bg-card rounded-xl p-6 border shadow-sm hover-elevate cursor-pointer h-full"
+                data-testid={`card-feature-${index}`}
               >
                 <div className={`w-12 h-12 rounded-lg ${item.bgColor} flex items-center justify-center mb-4`}>
                   <item.icon className={`w-6 h-6 ${item.color}`} aria-hidden="true" />
@@ -99,7 +188,7 @@ export function ValueProposition() {
                   {item.description}
                 </p>
                 <div className="mt-4 flex items-center text-sm font-medium text-primary">
-                  Learn more <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
+                  Explore <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
                 </div>
               </motion.div>
             </Link>
@@ -125,12 +214,22 @@ export function ValueProposition() {
                 Cybersecurity Education You Can Trust
               </h3>
               <ul className="space-y-3" aria-label="Trust points">
-                {trustPoints.map((point, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                    <span className="text-muted-foreground">{point}</span>
-                  </li>
-                ))}
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <span className="text-muted-foreground">Based on FTC, FBI IC3, and CISA guidelines</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <span className="text-muted-foreground">No technical jargon. Plain language you understand</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <span className="text-muted-foreground">Free tools available. No signup required</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <span className="text-muted-foreground">Tailored for families, seniors, and small businesses</span>
+                </li>
               </ul>
             </div>
             <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
