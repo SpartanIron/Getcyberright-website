@@ -11,9 +11,6 @@ import {
   registerSecurityEndpoints,
   securityLogger,
 } from "./security";
-import { runMigrations } from 'stripe-replit-sync';
-import { getStripeSync } from './stripeClient';
-import { WebhookHandlers } from './webhookHandlers';
 
 const app = express();
 
@@ -25,48 +22,6 @@ const httpServer = createServer(app);
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
-  }
-}
-
-async function initStripe() {
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    console.warn('DATABASE_URL not set, Stripe integration disabled');
-    return false;
-  }
-
-  try {
-    console.log('Initializing Stripe schema...');
-    await runMigrations({ databaseUrl });
-    console.log('Stripe schema ready');
-
-    const stripeSync = await getStripeSync();
-
-    console.log('Setting up managed webhook...');
-    const domains = process.env.REPLIT_DOMAINS?.split(',') || [];
-    const webhookBaseUrl = domains[0] ? `https://${domains[0]}` : 'http://localhost:5000';
-    try {
-      const result = await stripeSync.findOrCreateManagedWebhook(
-        `${webhookBaseUrl}/api/stripe/webhook`
-      );
-      if (result?.webhook?.url) {
-        console.log(`Webhook configured: ${result.webhook.url}`);
-      } else {
-        console.log('Webhook setup completed (no URL returned)');
-      }
-    } catch (webhookError) {
-      console.warn('Webhook setup skipped (may not be supported in test mode):', webhookError);
-    }
-
-    console.log('Syncing Stripe data...');
-    stripeSync.syncBackfill()
-      .then(() => console.log('Stripe data synced'))
-      .catch((err: Error) => console.error('Error syncing Stripe data:', err));
-
-    return true;
-  } catch (error) {
-    console.error('Failed to initialize Stripe:', error);
-    return false;
   }
 }
 
@@ -82,35 +37,7 @@ app.use(cookieParser());
 // Security: Logging middleware
 app.use(securityLoggingMiddleware);
 
-// STRIPE WEBHOOK: Must be registered BEFORE express.json()
-app.post(
-  '/api/stripe/webhook',
-  express.raw({ type: 'application/json' }),
-  async (req, res) => {
-    const signature = req.headers['stripe-signature'];
-
-    if (!signature) {
-      return res.status(400).json({ error: 'Missing stripe-signature' });
-    }
-
-    try {
-      const sig = Array.isArray(signature) ? signature[0] : signature;
-
-      if (!Buffer.isBuffer(req.body)) {
-        console.error('STRIPE WEBHOOK ERROR: req.body is not a Buffer');
-        return res.status(500).json({ error: 'Webhook processing error' });
-      }
-
-      await WebhookHandlers.processWebhook(req.body as Buffer, sig);
-      res.status(200).json({ received: true });
-    } catch (error: any) {
-      console.error('Webhook error:', error.message);
-      res.status(400).json({ error: 'Webhook processing error' });
-    }
-  }
-);
-
-// Body parsing with size limits (AFTER webhook route)
+// Body parsing with size limits
 app.use(
   express.json({
     limit: "100kb",
@@ -163,9 +90,6 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize Stripe integration
-  await initStripe();
-  
   // Register security testing endpoints
   registerSecurityEndpoints(app);
   

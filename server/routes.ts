@@ -7,8 +7,6 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
 import { registerAuthRoutes, isAuthenticated } from "./auth";
-import { stripeService } from "./stripeService";
-import { getStripePublishableKey } from "./stripeClient";
 import { registerAdminRoutes } from "./admin";
 import { 
   checkGoogleSafeBrowsing, 
@@ -631,113 +629,6 @@ export async function registerRoutes(
         { id: 3, title: "Security Policy Templates", type: "DOCX" }
       ]
     });
-  });
-
-  // Get Stripe publishable key for frontend
-  app.get("/api/stripe/publishable-key", async (req, res) => {
-    try {
-      const publishableKey = await getStripePublishableKey();
-      res.json({ publishableKey });
-    } catch (error) {
-      console.error("Error getting Stripe publishable key:", error);
-      res.status(500).json({ error: "Stripe not configured" });
-    }
-  });
-
-  // Create checkout session for subscription
-  app.post("/api/stripe/create-checkout-session", isAuthenticated, async (req: any, res) => {
-    try {
-      const { priceId } = req.body;
-      if (!priceId) {
-        return res.status(400).json({ error: "Price ID is required" });
-      }
-
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      let customerId = user.stripeCustomerId;
-      if (!customerId) {
-        const customer = await stripeService.createCustomer(user.email || '', user.id);
-        await stripeService.updateUserStripeInfo(user.id, { stripeCustomerId: customer.id });
-        customerId = customer.id;
-      }
-
-      const domains = process.env.REPLIT_DOMAINS?.split(',') || [];
-      const baseUrl = domains[0] ? `https://${domains[0]}` : 'http://localhost:5000';
-
-      const session = await stripeService.createCheckoutSession(
-        customerId,
-        priceId,
-        `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        `${baseUrl}/pricing`
-      );
-
-      res.json({ url: session.url });
-    } catch (error) {
-      console.error("Error creating checkout session:", error);
-      res.status(500).json({ error: "Failed to create checkout session" });
-    }
-  });
-
-  // Create customer portal session for managing subscriptions
-  app.post("/api/stripe/create-portal-session", isAuthenticated, async (req: any, res) => {
-    try {
-      const user = req.user;
-      if (!user || !user.stripeCustomerId) {
-        return res.status(400).json({ error: "No active subscription found" });
-      }
-
-      const domains = process.env.REPLIT_DOMAINS?.split(',') || [];
-      const baseUrl = domains[0] ? `https://${domains[0]}` : 'http://localhost:5000';
-
-      const session = await stripeService.createCustomerPortalSession(
-        user.stripeCustomerId,
-        `${baseUrl}/dashboard`
-      );
-
-      res.json({ url: session.url });
-    } catch (error) {
-      console.error("Error creating portal session:", error);
-      res.status(500).json({ error: "Failed to create portal session" });
-    }
-  });
-
-  // Get Stripe products and prices for pricing page
-  app.get("/api/stripe/products", async (req, res) => {
-    try {
-      const rows = await stripeService.listProductsWithPrices(true);
-      
-      const productsMap = new Map();
-      for (const row of rows as any[]) {
-        if (!productsMap.has(row.product_id)) {
-          productsMap.set(row.product_id, {
-            id: row.product_id,
-            name: row.product_name,
-            description: row.product_description,
-            active: row.product_active,
-            metadata: row.product_metadata,
-            prices: []
-          });
-        }
-        if (row.price_id) {
-          productsMap.get(row.product_id).prices.push({
-            id: row.price_id,
-            unitAmount: row.unit_amount,
-            currency: row.currency,
-            recurring: row.recurring,
-            active: row.price_active,
-            metadata: row.price_metadata,
-          });
-        }
-      }
-
-      res.json({ products: Array.from(productsMap.values()) });
-    } catch (error) {
-      console.error("Error fetching Stripe products:", error);
-      res.json({ products: [] });
-    }
   });
 
   // =====================================================
