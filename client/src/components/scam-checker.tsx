@@ -304,9 +304,28 @@ const grammarRedFlags = [
   { pattern: /\$\s*\d{1,3}(,\d{3})*(\.\d{2})?\s*(million|billion|thousand)/i, issue: "Large money amount mentioned" },
 ];
 
+// Normalize URL to ensure it has a protocol
+function normalizeUrl(url: string): string {
+  let normalized = url.trim();
+  // Remove trailing punctuation that's likely not part of the URL
+  normalized = normalized.replace(/[.,;:!?]+$/, '');
+  // Add https:// if no protocol
+  if (!normalized.match(/^https?:\/\//i)) {
+    if (normalized.startsWith('www.')) {
+      normalized = 'https://' + normalized;
+    } else if (normalized.match(/^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}/)) {
+      // Looks like a domain without www
+      normalized = 'https://' + normalized;
+    }
+  }
+  return normalized;
+}
+
 function extractUrls(content: string): string[] {
-  const urlPattern = /https?:\/\/[^\s<>"{}|\\^`\[\]]+|www\.[^\s<>"{}|\\^`\[\]]+/gi;
-  return content.match(urlPattern) || [];
+  const urlPattern = /https?:\/\/[^\s<>"{}|\\^`\[\]]+|www\.[^\s<>"{}|\\^`\[\]]+|[a-zA-Z0-9][a-zA-Z0-9-]*\.(com|org|net|io|co|gov|edu|info|biz)[^\s<>"{}|\\^`\[\]]*/gi;
+  const matches = content.match(urlPattern) || [];
+  // Normalize all extracted URLs to have https://
+  return matches.map(normalizeUrl);
 }
 
 // Calculate Shannon entropy for randomness detection

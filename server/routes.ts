@@ -61,6 +61,18 @@ const urlCheckSchema = z.object({
 const strictRateLimit = createRateLimitMiddleware("strict");
 const standardRateLimit = createRateLimitMiddleware("standard");
 
+// URL normalization helper - ensures URLs have proper protocol
+function normalizeUrl(url: string): string {
+  let normalized = url.trim();
+  // Remove trailing punctuation
+  normalized = normalized.replace(/[.,;:!?]+$/, '');
+  // Add https:// if no protocol
+  if (!normalized.match(/^https?:\/\//i)) {
+    normalized = 'https://' + normalized;
+  }
+  return normalized;
+}
+
 // Fetch with timeout helper
 async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 10000): Promise<globalThis.Response> {
   const controller = new AbortController();
@@ -211,7 +223,9 @@ export async function registerRoutes(
   // URL reputation check - PhishTank (free, no API key required)
   app.post("/api/security/check-phishtank", standardRateLimit, async (req, res) => {
     try {
-      const { url } = urlCheckSchema.parse(req.body);
+      // Normalize URL before validation
+      const normalizedBody = { ...req.body, url: normalizeUrl(req.body.url || '') };
+      const { url } = urlCheckSchema.parse(normalizedBody);
       
       const formData = new URLSearchParams();
       formData.append('url', url);
@@ -258,7 +272,9 @@ export async function registerRoutes(
   // URL reputation check - URLhaus (abuse.ch - free, no API key required)
   app.post("/api/security/check-urlhaus", standardRateLimit, async (req, res) => {
     try {
-      const { url } = urlCheckSchema.parse(req.body);
+      // Normalize URL before validation
+      const normalizedBody = { ...req.body, url: normalizeUrl(req.body.url || '') };
+      const { url } = urlCheckSchema.parse(normalizedBody);
       
       const formData = new URLSearchParams();
       formData.append('url', url);
@@ -305,7 +321,9 @@ export async function registerRoutes(
   // Combined URL reputation check
   app.post("/api/security/check-url-reputation", standardRateLimit, async (req, res) => {
     try {
-      const { url } = urlCheckSchema.parse(req.body);
+      // Normalize URL before validation
+      const normalizedBody = { ...req.body, url: normalizeUrl(req.body.url || '') };
+      const { url } = urlCheckSchema.parse(normalizedBody);
       
       // Run both checks in parallel with timeouts
       const [phishTankResult, urlhausResult] = await Promise.allSettled([
@@ -433,7 +451,9 @@ export async function registerRoutes(
   // SSL Certificate check
   app.post("/api/security/check-ssl", standardRateLimit, async (req, res) => {
     try {
-      const { url } = urlCheckSchema.parse(req.body);
+      // Normalize URL before validation
+      const normalizedBody = { ...req.body, url: normalizeUrl(req.body.url || '') };
+      const { url } = urlCheckSchema.parse(normalizedBody);
       const result = await checkSSLCertificate(url);
       res.json({ success: true, url, ...result });
     } catch (error) {
