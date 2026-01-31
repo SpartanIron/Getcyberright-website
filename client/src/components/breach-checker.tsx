@@ -33,6 +33,7 @@ interface BreachDetail {
   description: string;
   severity: "low" | "medium" | "high" | "critical";
   recordCount?: string;
+  remediationSteps: string[];
 }
 
 interface BreachResult {
@@ -530,7 +531,14 @@ function simulateBreachCheck(email: string): BreachResult {
           dataTypes: ["Email addresses", "Passwords", "Names"],
           description: "A major data aggregation service exposed user credentials through an unsecured database.",
           severity: "high",
-          recordCount: "12 million"
+          recordCount: "12 million",
+          remediationSteps: [
+            "Change your password immediately on any account using this email",
+            "If you reused this password elsewhere, change those passwords too",
+            "Enable two-factor authentication (2FA) on all accounts",
+            "Check your accounts for any unauthorized activity or changes",
+            "Consider using a password manager to create unique passwords"
+          ]
         },
         {
           name: "Data Leak 2020",
@@ -538,7 +546,13 @@ function simulateBreachCheck(email: string): BreachResult {
           dataTypes: ["Email addresses", "IP addresses"],
           description: "User data was collected from multiple sources and compiled into a searchable database.",
           severity: "medium",
-          recordCount: "8 million"
+          recordCount: "8 million",
+          remediationSteps: [
+            "Be extra vigilant about phishing emails targeting this address",
+            "Verify sender identity before clicking links in emails",
+            "Consider using email aliases for new account signups",
+            "Report suspicious emails to your email provider"
+          ]
         },
         {
           name: "Security Incident 2019",
@@ -546,7 +560,12 @@ function simulateBreachCheck(email: string): BreachResult {
           dataTypes: ["Email addresses", "Usernames"],
           description: "Basic account information was exposed through a misconfigured API endpoint.",
           severity: "low",
-          recordCount: "500,000"
+          recordCount: "500,000",
+          remediationSteps: [
+            "No immediate action required for this low-severity incident",
+            "Monitor your accounts for unusual login attempts",
+            "Keep your security software up to date"
+          ]
         }
       ],
       recommendations: [
@@ -589,7 +608,14 @@ function simulateBreachCheck(email: string): BreachResult {
           dataTypes: ["Email addresses"],
           description: "Your email was found in a compiled list that aggregates data from various sources. This type of incident typically involves email addresses being collected from public sources, data broker lists, or minor security incidents. No passwords were included in this exposure.",
           severity: "low",
-          recordCount: "Unknown"
+          recordCount: "Unknown",
+          remediationSteps: [
+            "Update passwords for your most important accounts (banking, email, social media)",
+            "Enable two-factor authentication on financial and email accounts",
+            "Be cautious of unsolicited emails - scammers may target this address",
+            "Consider setting up a spam filter or email alias for future signups",
+            "Monitor your credit report for any unauthorized accounts"
+          ]
         }
       ],
       recommendations: [
@@ -990,7 +1016,24 @@ export function BreachChecker() {
                           </div>
                         </div>
                         
-                        <p className="text-sm text-muted-foreground">{breach.description}</p>
+                        <p className="text-sm text-muted-foreground mb-3">{breach.description}</p>
+                        
+                        {breach.remediationSteps && breach.remediationSteps.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-border/50">
+                            <p className="text-sm font-medium mb-2 flex items-center gap-2">
+                              <Shield className="w-4 h-4 text-primary" />
+                              Steps to Protect Yourself
+                            </p>
+                            <ul className="space-y-1.5">
+                              {breach.remediationSteps.map((step, i) => (
+                                <li key={i} className="flex items-start gap-2 text-sm">
+                                  <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                                  <span>{step}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
