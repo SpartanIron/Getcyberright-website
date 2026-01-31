@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
 import { registerAuthRoutes, isAuthenticated } from "./auth";
-import { registerAdminRoutes } from "./admin";
+import { registerAdminRoutes, registerToolTrackingRoutes } from "./admin";
 import { 
   checkGoogleSafeBrowsing, 
   checkVirusTotal, 
@@ -106,6 +106,9 @@ export async function registerRoutes(
   
   // Register admin routes
   registerAdminRoutes(app);
+  
+  // Register tool tracking routes (public)
+  registerToolTrackingRoutes(app);
 
   // Contact form - strict rate limiting (10 req/min)
   app.post("/api/contact", strictRateLimit, async (req, res) => {

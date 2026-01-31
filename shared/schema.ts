@@ -132,3 +132,27 @@ export const insertScamReportSchema = createInsertSchema(scamReports).pick({
 
 export type InsertScamReport = z.infer<typeof insertScamReportSchema>;
 export type ScamReport = typeof scamReports.$inferSelect;
+
+// Tool Usage Analytics
+export const toolUsage = pgTable("tool_usage", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  toolName: text("tool_name").notNull(),
+  userId: varchar("user_id"), // null for anonymous users
+  sessionId: varchar("session_id"), // track anonymous sessions
+  countryCode: varchar("country_code", { length: 2 }),
+  completed: boolean("completed").default(false),
+  metadata: text("metadata"), // JSON string for additional data
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertToolUsageSchema = createInsertSchema(toolUsage).pick({
+  toolName: true,
+  userId: true,
+  sessionId: true,
+  countryCode: true,
+  completed: true,
+  metadata: true,
+});
+
+export type InsertToolUsage = z.infer<typeof insertToolUsageSchema>;
+export type ToolUsage = typeof toolUsage.$inferSelect;

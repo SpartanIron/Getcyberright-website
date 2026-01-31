@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
-import { users, contactMessages, newsletterSubscribers, scamReports } from "@shared/schema";
+import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql } from "drizzle-orm";
 import { securityLogger } from "./security";
@@ -240,6 +240,108 @@ export function registerAdminRoutes(app: Express) {
       res.json({ isAdmin: user.isAdmin || false });
     } catch (error) {
       res.json({ isAdmin: false });
+    }
+  });
+
+  // Tool Usage Analytics - Admin Stats
+  app.get("/api/admin/tool-analytics", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      // Get total usage per tool
+      const toolStats = await db
+        .select({
+          toolName: toolUsage.toolName,
+          totalUsage: count(),
+          completedCount: sql<number>`COUNT(*) FILTER (WHERE ${toolUsage.completed} = true)`,
+        })
+        .from(toolUsage)
+        .groupBy(toolUsage.toolName)
+        .orderBy(sql`COUNT(*) DESC`);
+
+      // Get usage by country
+      const countryStats = await db
+        .select({
+          countryCode: toolUsage.countryCode,
+          totalUsage: count(),
+        })
+        .from(toolUsage)
+        .where(sql`${toolUsage.countryCode} IS NOT NULL`)
+        .groupBy(toolUsage.countryCode)
+        .orderBy(sql`COUNT(*) DESC`)
+        .limit(10);
+
+      // Get daily usage for last 30 days
+      const dailyUsage = await db
+        .select({
+          date: sql<string>`DATE(${toolUsage.createdAt})`,
+          totalUsage: count(),
+        })
+        .from(toolUsage)
+        .where(sql`${toolUsage.createdAt} >= NOW() - INTERVAL '30 days'`)
+        .groupBy(sql`DATE(${toolUsage.createdAt})`)
+        .orderBy(sql`DATE(${toolUsage.createdAt})`);
+
+      // Get total counts
+      const [totalCount] = await db.select({ count: count() }).from(toolUsage);
+      const [uniqueUsers] = await db
+        .select({ count: sql<number>`COUNT(DISTINCT ${toolUsage.userId})` })
+        .from(toolUsage)
+        .where(sql`${toolUsage.userId} IS NOT NULL`);
+      const [uniqueSessions] = await db
+        .select({ count: sql<number>`COUNT(DISTINCT ${toolUsage.sessionId})` })
+        .from(toolUsage);
+
+      // Get recent usage
+      const recentUsage = await db
+        .select()
+        .from(toolUsage)
+        .orderBy(desc(toolUsage.createdAt))
+        .limit(20);
+
+      res.json({
+        summary: {
+          totalUsage: totalCount.count,
+          uniqueUsers: uniqueUsers.count,
+          uniqueSessions: uniqueSessions.count,
+        },
+        toolStats,
+        countryStats,
+        dailyUsage,
+        recentUsage,
+      });
+    } catch (error) {
+      console.error("Admin tool analytics error:", error);
+      res.status(500).json({ error: "Failed to fetch tool analytics" });
+    }
+  });
+}
+
+// Public endpoint for logging tool usage (no auth required)
+export function registerToolTrackingRoutes(app: Express) {
+  app.post("/api/track/tool", async (req: any, res) => {
+    try {
+      const validation = insertToolUsageSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ error: "Invalid data" });
+      }
+
+      const { toolName, sessionId, countryCode, completed, metadata } = validation.data;
+      
+      // Get user ID from session if authenticated
+      const userId = req.user?.id || null;
+
+      await db.insert(toolUsage).values({
+        toolName,
+        userId,
+        sessionId,
+        countryCode,
+        completed: completed || false,
+        metadata,
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Tool tracking error:", error);
+      res.status(500).json({ error: "Failed to track tool usage" });
     }
   });
 }
