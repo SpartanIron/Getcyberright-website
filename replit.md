@@ -95,6 +95,19 @@ Preferred communication style: Simple, everyday language.
   - Integrated into Dashboard and Emergency Help pages
   - Data model in `shared/regions.ts` with country-to-region mappings for all African countries
 
+- **Tool Usage Analytics Dashboard** (Admin Feature):
+  - Tracks usage of all security tools across the platform
+  - Database table: `tool_usage` with tool name, user ID, session ID, country code, completion status
+  - Admin dashboard at `/admin/tool-analytics` with:
+    - Summary cards: Total Tool Uses, Unique Users, Unique Sessions
+    - Tool Popularity chart with usage bars
+    - Top Countries geographic distribution
+    - Daily Usage trend (last 30 days)
+    - Recent Activity table with latest tool events
+  - Rate-limited public tracking endpoint (30 req/min per IP)
+  - Validated tool names against allowlist
+  - Integrated tracking in: Scam Checker, Password Generator, Family Codeword
+
 ### Premium Subscription Tiers
 - **Tier Access Control**: `hasTierAccess()` function in `server/routes.ts` handles feature gating
 - **Essential ($9/mo)**: Advanced Scanner features, basic Dezi AI access
