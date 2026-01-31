@@ -26,12 +26,22 @@ import {
 } from "lucide-react";
 import zxcvbn from "zxcvbn";
 
+interface BreachDetail {
+  name: string;
+  date: string;
+  dataTypes: string[];
+  description: string;
+  severity: "low" | "medium" | "high" | "critical";
+  recordCount?: string;
+}
+
 interface BreachResult {
   status: "safe" | "compromised" | "warning";
   message: string;
   recommendations: string[];
   breachCount?: number;
   commonBreaches?: string[];
+  breachDetails?: BreachDetail[];
 }
 
 interface PasswordResult {
@@ -511,8 +521,34 @@ function simulateBreachCheck(email: string): BreachResult {
     return {
       status: "compromised",
       message: "This email domain has been associated with multiple data breaches.",
-      breachCount: Math.floor(Math.random() * 5) + 3,
+      breachCount: 3,
       commonBreaches: ["Sample Breach 2021", "Data Leak 2020", "Security Incident 2019"],
+      breachDetails: [
+        {
+          name: "Sample Breach 2021",
+          date: "March 2021",
+          dataTypes: ["Email addresses", "Passwords", "Names"],
+          description: "A major data aggregation service exposed user credentials through an unsecured database.",
+          severity: "high",
+          recordCount: "12 million"
+        },
+        {
+          name: "Data Leak 2020",
+          date: "August 2020",
+          dataTypes: ["Email addresses", "IP addresses"],
+          description: "User data was collected from multiple sources and compiled into a searchable database.",
+          severity: "medium",
+          recordCount: "8 million"
+        },
+        {
+          name: "Security Incident 2019",
+          date: "November 2019",
+          dataTypes: ["Email addresses", "Usernames"],
+          description: "Basic account information was exposed through a misconfigured API endpoint.",
+          severity: "low",
+          recordCount: "500,000"
+        }
+      ],
       recommendations: [
         "Change your password immediately for all accounts using this email",
         "Enable two factor authentication on all important accounts",
@@ -546,6 +582,16 @@ function simulateBreachCheck(email: string): BreachResult {
       status: "warning",
       message: "We found potential exposure in a minor data aggregation incident. This does not necessarily mean your password was compromised.",
       breachCount: 1,
+      breachDetails: [
+        {
+          name: "Data Aggregation Incident",
+          date: "2023",
+          dataTypes: ["Email addresses"],
+          description: "Your email was found in a compiled list that aggregates data from various sources. This type of incident typically involves email addresses being collected from public sources, data broker lists, or minor security incidents. No passwords were included in this exposure.",
+          severity: "low",
+          recordCount: "Unknown"
+        }
+      ],
       recommendations: [
         "As a precaution, update passwords for your most important accounts",
         "Enable two factor authentication on financial and email accounts",
@@ -897,19 +943,56 @@ export function BreachChecker() {
 
                 <p className="text-center mb-6">{emailResult.message}</p>
 
-                {emailResult.commonBreaches && emailResult.commonBreaches.length > 0 && (
-                  <div className="mb-6">
-                    <p className="font-medium mb-2 flex items-center gap-2">
+                {emailResult.breachDetails && emailResult.breachDetails.length > 0 && (
+                  <div className="mb-6 space-y-4">
+                    <p className="font-medium flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4" />
-                      Known Breaches
+                      Breach Details
                     </p>
-                    <div className="flex flex-wrap gap-2">
-                      {emailResult.commonBreaches.map((breach, idx) => (
-                        <Badge key={idx} variant="outline" className="bg-background/50">
-                          {breach}
-                        </Badge>
-                      ))}
-                    </div>
+                    {emailResult.breachDetails.map((breach, idx) => (
+                      <div key={idx} className="bg-background/70 rounded-lg p-4 border border-border/50">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <h4 className="font-semibold text-base">{breach.name}</h4>
+                          <Badge 
+                            variant="outline" 
+                            className={
+                              breach.severity === "critical" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border-red-300" :
+                              breach.severity === "high" ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-300" :
+                              breach.severity === "medium" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-300" :
+                              "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-300"
+                            }
+                          >
+                            {breach.severity.charAt(0).toUpperCase() + breach.severity.slice(1)} Severity
+                          </Badge>
+                        </div>
+                        
+                        <div className="grid sm:grid-cols-2 gap-3 text-sm mb-3">
+                          <div>
+                            <span className="text-muted-foreground">Date: </span>
+                            <span className="font-medium">{breach.date}</span>
+                          </div>
+                          {breach.recordCount && (
+                            <div>
+                              <span className="text-muted-foreground">Records Affected: </span>
+                              <span className="font-medium">{breach.recordCount}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="mb-3">
+                          <span className="text-sm text-muted-foreground">Data Exposed: </span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {breach.dataTypes.map((dataType, i) => (
+                              <Badge key={i} variant="secondary" className="text-xs">
+                                {dataType}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <p className="text-sm text-muted-foreground">{breach.description}</p>
+                      </div>
+                    ))}
                   </div>
                 )}
 
