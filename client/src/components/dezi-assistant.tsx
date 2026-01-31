@@ -117,13 +117,136 @@ const regionResources: Record<string, RegionResources> = {
     consumerProtection: "CCPC",
     consumerProtectionUrl: "ccpc.ie",
   },
+  // African Countries
+  GH: {
+    name: "Ghana",
+    fraudReport: "Ghana Police CID Cybercrime Unit",
+    fraudReportUrl: "police.gov.gh",
+    cyberCrime: "Cyber Security Authority Ghana",
+    cyberCrimeUrl: "csa.gov.gh",
+    identityTheft: "Data Protection Commission Ghana",
+    identityTheftUrl: "dataprotection.org.gh",
+    consumerProtection: "Consumer Protection Agency Ghana",
+    consumerProtectionUrl: "cpa.gov.gh",
+  },
+  NG: {
+    name: "Nigeria",
+    fraudReport: "EFCC (Economic and Financial Crimes Commission)",
+    fraudReportUrl: "efcc.gov.ng",
+    cyberCrime: "Nigeria CERT",
+    cyberCrimeUrl: "cert.gov.ng",
+    identityTheft: "NITDA",
+    identityTheftUrl: "nitda.gov.ng",
+    consumerProtection: "Federal Competition & Consumer Protection Commission",
+    consumerProtectionUrl: "fccpc.gov.ng",
+  },
+  ZA: {
+    name: "South Africa",
+    fraudReport: "SAPS Cybercrime",
+    fraudReportUrl: "saps.gov.za",
+    cyberCrime: "CSIRT South Africa",
+    cyberCrimeUrl: "cybersecurityhub.gov.za",
+    identityTheft: "SAFPS",
+    identityTheftUrl: "safps.org.za",
+    consumerProtection: "National Consumer Commission",
+    consumerProtectionUrl: "thencc.gov.za",
+  },
+  KE: {
+    name: "Kenya",
+    fraudReport: "DCI Cybercrime Unit",
+    fraudReportUrl: "dci.go.ke",
+    cyberCrime: "Kenya National CERT",
+    cyberCrimeUrl: "ke-cirt.go.ke",
+    identityTheft: "Office of Data Protection Commissioner",
+    identityTheftUrl: "odpc.go.ke",
+    consumerProtection: "Competition Authority of Kenya",
+    consumerProtectionUrl: "cak.go.ke",
+  },
+  EG: {
+    name: "Egypt",
+    fraudReport: "Ministry of Interior Cybercrime",
+    fraudReportUrl: "moiegypt.gov.eg",
+    cyberCrime: "EG-CERT",
+    cyberCrimeUrl: "egcert.eg",
+    identityTheft: "Personal Data Protection Center",
+    identityTheftUrl: "idsc.gov.eg",
+    consumerProtection: "Consumer Protection Agency Egypt",
+    consumerProtectionUrl: "cpa.gov.eg",
+  },
+  MA: {
+    name: "Morocco",
+    fraudReport: "DGSN Cybercrime Brigade",
+    fraudReportUrl: "dgsn.gov.ma",
+    cyberCrime: "maCERT",
+    cyberCrimeUrl: "macert.ma",
+    identityTheft: "CNDP Morocco",
+    identityTheftUrl: "cndp.ma",
+    consumerProtection: "Ministry of Commerce Morocco",
+    consumerProtectionUrl: "mcinet.gov.ma",
+  },
+  TZ: {
+    name: "Tanzania",
+    fraudReport: "Tanzania Police Cybercrime Unit",
+    fraudReportUrl: "polisi.go.tz",
+    cyberCrime: "TZ-CERT",
+    cyberCrimeUrl: "tzcert.go.tz",
+    identityTheft: "TCRA",
+    identityTheftUrl: "tcra.go.tz",
+    consumerProtection: "Fair Competition Commission",
+    consumerProtectionUrl: "competition.or.tz",
+  },
+  UG: {
+    name: "Uganda",
+    fraudReport: "Uganda Police Cybercrime Unit",
+    fraudReportUrl: "upf.go.ug",
+    cyberCrime: "CERT Uganda",
+    cyberCrimeUrl: "ug-cert.ug",
+    identityTheft: "Personal Data Protection Office",
+    identityTheftUrl: "pdpo.go.ug",
+    consumerProtection: "Uganda Consumer Protection Association",
+    consumerProtectionUrl: "consumerprotection.go.ug",
+  },
+  // European Union countries
+  DE: {
+    name: "Germany",
+    fraudReport: "Bundeskriminalamt (BKA)",
+    fraudReportUrl: "bka.de",
+    cyberCrime: "BSI (Federal Cyber Security)",
+    cyberCrimeUrl: "bsi.bund.de",
+    identityTheft: "BfDI Data Protection",
+    identityTheftUrl: "bfdi.bund.de",
+    consumerProtection: "Verbraucherzentrale",
+    consumerProtectionUrl: "verbraucherzentrale.de",
+  },
+  FR: {
+    name: "France",
+    fraudReport: "Pharos Platform",
+    fraudReportUrl: "internet-signalement.gouv.fr",
+    cyberCrime: "ANSSI",
+    cyberCrimeUrl: "ssi.gouv.fr",
+    identityTheft: "CNIL",
+    identityTheftUrl: "cnil.fr",
+    consumerProtection: "DGCCRF",
+    consumerProtectionUrl: "economie.gouv.fr/dgccrf",
+  },
+  IN: {
+    name: "India",
+    fraudReport: "National Cyber Crime Portal",
+    fraudReportUrl: "cybercrime.gov.in",
+    cyberCrime: "CERT-In",
+    cyberCrimeUrl: "cert-in.org.in",
+    identityTheft: "Cyber Crime Cell",
+    identityTheftUrl: "cybercrime.gov.in",
+    consumerProtection: "National Consumer Helpline",
+    consumerProtectionUrl: "consumerhelpline.gov.in",
+  },
   DEFAULT: {
     name: "your region",
-    fraudReport: "your local fraud reporting agency",
+    fraudReport: "your local police cybercrime unit",
     fraudReportUrl: "",
-    cyberCrime: "your national cyber security centre",
+    cyberCrime: "your national CERT (Computer Emergency Response Team)",
     cyberCrimeUrl: "",
-    identityTheft: "your local identity protection service",
+    identityTheft: "your data protection authority",
     identityTheftUrl: "",
     consumerProtection: "your consumer protection agency",
     consumerProtectionUrl: "",
@@ -460,21 +583,31 @@ ${regionNote}Our Emergency Help page has more detailed guidance, and you can als
   }
 
   // Default welcome message with region-specific resources
+  const hasSpecificResources = r.fraudReportUrl !== "";
+  const emergencyHelpNote = hasSpecificResources 
+    ? `\n\nVisit our **Emergency Help** page at /emergency-help for step-by-step guidance and more resources for ${r.name}.`
+    : `\n\nVisit our **Emergency Help** page at /emergency-help for step-by-step guidance. You can also select your region there to find specific reporting agencies for your country.`;
+
   return `Hello! I am Dezi, your online safety assistant.${region?.detected ? ` I see you are connecting from ${r.name}.` : ""} I am here to help you understand digital risks and learn how to protect yourself and your family.
 
 **I Can Help You With:**
-• Figuring out if a message might be a scam
-• Understanding how common cyber threats work
+• Analyzing suspicious messages for scam indicators
+• Explaining how common cyber threats work
 • Sharing practical tips to keep your family safe online
-• Explaining what to do after a security incident
+• Guiding you on what to do after a security incident
 
 **Keep in Mind:**
 I provide general educational information, but I cannot offer legal, medical, or financial advice. I also cannot guarantee whether any specific message is safe or dangerous, and I am not a replacement for professional cybersecurity services.
 
-**Need Help Right Now?**
-• Report fraud to ${r.fraudReport}${r.fraudReportUrl ? ` at ${r.fraudReportUrl}` : ""}
-• Report cyber crimes to ${r.cyberCrime}${r.cyberCrimeUrl ? ` at ${r.cyberCrimeUrl}` : ""}
-• Contact your bank for financial concerns
+**Need Help Right Now?**${hasSpecificResources ? `
+• **Report fraud:** ${r.fraudReport} at ${r.fraudReportUrl}
+• **Report cyber crimes:** ${r.cyberCrime} at ${r.cyberCrimeUrl}
+• **Identity theft help:** ${r.identityTheft} at ${r.identityTheftUrl}` : `
+• Report fraud to your local police cybercrime unit
+• Report cyber crimes to your national CERT (Computer Emergency Response Team)
+• For identity theft, contact your data protection authority`}
+• **Financial concerns:** Contact your bank immediately
+${emergencyHelpNote}
 
 What would you like to learn about today?`;
 }
