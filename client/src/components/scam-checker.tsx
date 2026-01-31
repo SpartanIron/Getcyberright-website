@@ -172,8 +172,11 @@ const suspiciousUrlPatterns = [
 
 const legitDomains = [
   /^(https?:\/\/)?(www\.)?(google|microsoft|apple|amazon|facebook|twitter|linkedin|instagram|youtube|netflix|paypal|github|dropbox|zoom|slack)\.com/i,
+  /^(https?:\/\/)?(www\.)?(gmail|outlook|hotmail|live|yahoo|aol|icloud|protonmail|proton)\.com/i,
   /^(https?:\/\/)?(www\.)?[a-z0-9-]+\.(gov|edu|mil)/i,
   /^(https?:\/\/)?(www\.)?getcyberright\.(com|org|net)/i,
+  /^(https?:\/\/)?(mail\.)?google\.com/i,
+  /^(https?:\/\/)?(www\.)?yahoo\.(com|co\.[a-z]+)/i,
 ];
 
 // Typosquatting detection - common brand misspellings
@@ -192,19 +195,24 @@ const typosquattingPatterns: { brand: string; variants: RegExp[] }[] = [
   { brand: "Walmart", variants: [/wa[l1]mart|walmrt|walmaart|walmart\d/i] },
 ];
 
-// Homograph attack detection - lookalike Unicode characters
+// Homograph attack detection - ONLY actual Unicode lookalike characters (not ASCII)
+// This detects real homograph attacks using Cyrillic/Greek/Armenian characters that look like Latin
 const homoglyphMap: Record<string, string[]> = {
-  'a': ['\u0430', '\u00e0', '\u00e1', '\u0101', '\u0103'], // Cyrillic а, accented variants
-  'e': ['\u0435', '\u00e8', '\u00e9', '\u0113', '\u0117'], // Cyrillic е
-  'o': ['\u043e', '\u00f2', '\u00f3', '\u014d', '\u014f', '\u0030'], // Cyrillic о, 0
-  'i': ['\u0456', '\u00ec', '\u00ed', '\u0131', '\u0031', '\u006c'], // Cyrillic і, 1, l
-  'c': ['\u0441', '\u00e7'], // Cyrillic с
+  'a': ['\u0430', '\u03B1'], // Cyrillic а, Greek α
+  'e': ['\u0435', '\u0454'], // Cyrillic е, є
+  'o': ['\u043e', '\u03BF'], // Cyrillic о, Greek ο
+  'i': ['\u0456', '\u0269'], // Cyrillic і, ɩ
+  'c': ['\u0441', '\u03F2'], // Cyrillic с, Greek ϲ
   's': ['\u0455'], // Cyrillic ѕ
-  'p': ['\u0440'], // Cyrillic р
-  'x': ['\u0445'], // Cyrillic х
-  'y': ['\u0443'], // Cyrillic у
-  'l': ['\u006c', '\u0031', '\u007c'], // 1, |
+  'p': ['\u0440', '\u03C1'], // Cyrillic р, Greek ρ
+  'x': ['\u0445', '\u03C7'], // Cyrillic х, Greek χ
+  'y': ['\u0443', '\u03C5'], // Cyrillic у, Greek υ
   'n': ['\u0578'], // Armenian ո
+  'g': ['\u0261'], // Latin small letter script g
+  'h': ['\u04BB'], // Cyrillic shha
+  'k': ['\u043A'], // Cyrillic к
+  'm': ['\u043C'], // Cyrillic м
+  'w': ['\u0461'], // Cyrillic omega
 };
 
 function detectHomoglyphs(text: string): { found: boolean; examples: string[] } {
@@ -797,6 +805,11 @@ function analyzeUrl(url: string): URLAnalysis {
       isLegit = true;
       break;
     }
+  }
+  
+  // Skip all suspicious checks for known legitimate domains
+  if (isLegit) {
+    return { url, isSuspicious: false, reasons: [] };
   }
   
   // Check for suspicious patterns
