@@ -51,7 +51,7 @@ export default function About() {
       <main tabIndex={-1}>
         <PageBanner
           title="A Cyber Protection Powerhouse Built to Protect People"
-          subtitle="We go beyond securing devices, accounts, and data. We focus on protecting individuals, families, and digital identities in a world where cyber risk is personal and constantly evolving."
+          subtitle="GetCyberRight was built with one mission: to make cybersecurity accessible, practical, and people-centered. Everyone deserves protection they can understand and trust."
           imageSrc={bannerImage}
           imageAlt="Diverse GetCyberRight team with African woman leader in the center, all wearing branded red shirts in a modern office"
           imagePosition="left"
