@@ -19,7 +19,8 @@ import {
   Eye,
   Zap,
   FileText,
-  Server
+  Server,
+  Lock
 } from "lucide-react";
 
 type ThreatCategory = {
@@ -102,6 +103,20 @@ type URLReputationResult = {
     error?: string;
   };
   checkedAt: string;
+};
+
+type SSLCheckResult = {
+  success: boolean;
+  url: string;
+  checked: boolean;
+  valid: boolean;
+  issuer?: string;
+  daysUntilExpiry?: number;
+  isExpired: boolean;
+  isEV: boolean;
+  isSelfSigned: boolean;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  error?: string;
 };
 
 const threatPatterns: { pattern: RegExp; category: string; indicator: string; severity: "low" | "medium" | "high" | "critical"; explanation: string }[] = [
@@ -1023,6 +1038,10 @@ export function ScamChecker() {
   // URL reputation checking state
   const [urlReputations, setUrlReputations] = useState<Record<string, URLReputationResult>>({});
   const [isCheckingReputation, setIsCheckingReputation] = useState<Record<string, boolean>>({});
+  
+  // SSL checking state
+  const [sslResults, setSslResults] = useState<Record<string, SSLCheckResult>>({});
+  const [isCheckingSSL, setIsCheckingSSL] = useState<Record<string, boolean>>({});
 
   const handleCheck = () => {
     setIsChecking(true);
@@ -1075,10 +1094,71 @@ export function ScamChecker() {
     }
   };
   
+  // Check SSL certificate for a URL
+  const checkSSL = async (url: string) => {
+    // Only check https URLs - skip http and bare domains
+    if (!url.startsWith('https://')) {
+      setSslResults(prev => ({
+        ...prev,
+        [url]: {
+          success: false,
+          url,
+          checked: true,
+          valid: false,
+          isExpired: false,
+          isEV: false,
+          isSelfSigned: false,
+          riskLevel: 'high',
+          error: 'Site does not use HTTPS'
+        }
+      }));
+      return;
+    }
+    
+    setIsCheckingSSL(prev => ({ ...prev, [url]: true }));
+    
+    try {
+      const response = await fetch('/api/security/check-ssl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to check SSL');
+      }
+      
+      const data = await response.json();
+      setSslResults(prev => ({ ...prev, [url]: data }));
+    } catch (error) {
+      console.error('SSL check failed:', error);
+      setSslResults(prev => ({
+        ...prev,
+        [url]: {
+          success: false,
+          url,
+          checked: false,
+          valid: false,
+          isExpired: false,
+          isEV: false,
+          isSelfSigned: false,
+          riskLevel: 'high',
+          error: 'Check failed'
+        }
+      }));
+    } finally {
+      setIsCheckingSSL(prev => ({ ...prev, [url]: false }));
+    }
+  };
+  
   // Auto-check all URLs when results are available
   const checkAllUrlReputations = async (urls: URLAnalysis[]) => {
     const urlsToCheck = urls.filter(u => !urlReputations[u.url] && !isCheckingReputation[u.url]);
-    await Promise.all(urlsToCheck.map(u => checkUrlReputation(u.url)));
+    const sslToCheck = urls.filter(u => !sslResults[u.url] && !isCheckingSSL[u.url]);
+    await Promise.all([
+      ...urlsToCheck.map(u => checkUrlReputation(u.url)),
+      ...sslToCheck.map(u => checkSSL(u.url))
+    ]);
   };
 
   const getRiskColor = (risk: string) => {
@@ -1535,6 +1615,8 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                   {result.urls.map((urlAnalysis, idx) => {
                     const reputation = urlReputations[urlAnalysis.url];
                     const isChecking = isCheckingReputation[urlAnalysis.url];
+                    const sslResult = sslResults[urlAnalysis.url];
+                    const isSslChecking = isCheckingSSL[urlAnalysis.url];
                     
                     return (
                       <div key={idx} className={`p-3 rounded-lg border ${urlAnalysis.isSuspicious ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800' : 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'}`}>
@@ -1579,7 +1661,7 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                   )}
                                 </div>
                                 
-                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div className="grid grid-cols-3 gap-2 text-xs">
                                   {/* PhishTank result */}
                                   <div className={`p-1.5 rounded ${
                                     reputation.phishTank.isPhishing 
@@ -1633,6 +1715,43 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                           : reputation.urlhaus.error || 'Not checked'}
                                     </div>
                                   </div>
+                                  
+                                  {/* SSL Certificate result */}
+                                  <div className={`p-1.5 rounded ${
+                                    sslResult?.valid === false
+                                      ? 'bg-red-100 dark:bg-red-950/50' 
+                                      : sslResult?.valid
+                                        ? 'bg-green-100 dark:bg-green-950/50' 
+                                        : isSslChecking
+                                          ? 'bg-blue-50 dark:bg-blue-950/50'
+                                          : 'bg-gray-100 dark:bg-gray-800'
+                                  }`}>
+                                    <div className="font-medium flex items-center gap-1">
+                                      {isSslChecking ? (
+                                        <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                                      ) : sslResult?.valid === false ? (
+                                        <XCircle className="w-3 h-3 text-red-500" />
+                                      ) : sslResult?.valid ? (
+                                        <Lock className="w-3 h-3 text-green-500" />
+                                      ) : (
+                                        <Lock className="w-3 h-3 text-gray-400" />
+                                      )}
+                                      SSL Cert
+                                    </div>
+                                    <div className="text-muted-foreground">
+                                      {isSslChecking 
+                                        ? 'Checking...'
+                                        : sslResult?.error?.includes('HTTPS')
+                                          ? 'No HTTPS'
+                                          : sslResult?.valid
+                                            ? sslResult.isEV ? 'EV Certificate' : 'Valid'
+                                            : sslResult?.isExpired
+                                              ? 'Expired'
+                                              : sslResult?.isSelfSigned
+                                                ? 'Self-signed'
+                                                : sslResult?.error || 'Not checked'}
+                                    </div>
+                                  </div>
                                 </div>
                                 
                                 {(reputation.phishTank.isPhishing || reputation.urlhaus.isMalware) && (
@@ -1653,8 +1772,8 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                 <div className="text-xs text-muted-foreground p-2 bg-muted/30 rounded flex items-start gap-2">
                   <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
                   <span>
-                    Checks against PhishTank (community phishing database) and URLhaus (malware distribution database). 
-                    Note: URLs not found in these databases may still be dangerous. New threats take time to be reported. 
+                    Checks against PhishTank (phishing), URLhaus (malware), and SSL certificate validity. 
+                    Note: URLs not found in threat databases may still be dangerous. New threats take time to be reported. 
                     Always exercise caution with unfamiliar links.
                   </span>
                 </div>

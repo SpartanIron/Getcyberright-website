@@ -41,7 +41,6 @@ const ThreatTrendsPage = lazy(() => import("@/pages/threat-trends"));
 const ReportScam = lazy(() => import("@/pages/report-scam"));
 const Checklists = lazy(() => import("@/pages/checklists"));
 const AISafety = lazy(() => import("@/pages/ai-safety"));
-const SSLChecker = lazy(() => import("@/pages/ssl-checker"));
 const AdminDashboard = lazy(() => import("@/pages/admin/index"));
 const AdminUsers = lazy(() => import("@/pages/admin/users"));
 const AdminMessages = lazy(() => import("@/pages/admin/messages"));
@@ -106,7 +105,6 @@ function Router() {
         <Route path="/report-scam" component={ReportScam} />
         <Route path="/checklists" component={Checklists} />
         <Route path="/ai-safety" component={AISafety} />
-        <Route path="/ssl-checker" component={SSLChecker} />
         <Route path="/admin" component={AdminDashboard} />
         <Route path="/admin/users" component={AdminUsers} />
         <Route path="/admin/messages" component={AdminMessages} />

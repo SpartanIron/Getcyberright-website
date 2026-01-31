@@ -182,8 +182,4 @@ export const pageSEO = {
     title: "Page Not Found",
     description: "The page you're looking for doesn't exist. Return to GetCyberRight homepage.",
   },
-  sslChecker: {
-    title: "SSL Certificate Checker",
-    description: "Check any website's SSL/TLS certificate security. Verify certificate validity, expiration, issuer, and encryption strength for free.",
-  },
 };

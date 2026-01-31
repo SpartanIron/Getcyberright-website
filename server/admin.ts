@@ -327,8 +327,7 @@ const ALLOWED_TOOLS = [
   'dezi-ai',
   'voice-detector',
   'security-scanner',
-  'email-header-check',
-  'ssl_checker'
+  'email-header-check'
 ];
 
 // Simple in-memory rate limiter for tracking endpoint
