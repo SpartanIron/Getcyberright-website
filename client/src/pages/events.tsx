@@ -20,7 +20,7 @@ import {
   Shield,
   Mail
 } from "lucide-react";
-import bannerImage from "@/assets/banners/resources-banner.png";
+import bannerImage from "@/assets/banners/events-banner.png";
 
 interface Event {
   id: string;
