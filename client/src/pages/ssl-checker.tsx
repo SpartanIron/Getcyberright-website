@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { trackToolUsage } from "@/lib/analytics";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -8,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { 
   Shield, 
@@ -32,7 +33,7 @@ import {
   ExternalLink,
   RefreshCw
 } from "lucide-react";
-import bannerImage from "@/assets/banners/security-banner.png";
+import bannerImage from "@/assets/banners/tools-banner.png";
 
 type SSLResult = {
   success: boolean;
@@ -90,42 +91,28 @@ function getGradeFromRisk(risk: string, valid: boolean, isExpired: boolean) {
 
 export default function SSLChecker() {
   const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<SSLResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const checkSSL = async () => {
+  const sslMutation = useMutation({
+    mutationFn: async (checkUrl: string) => {
+      trackToolUsage("ssl_checker", false);
+      const response = await apiRequest("POST", "/api/security/check-ssl", { url: checkUrl });
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || "Failed to check SSL certificate");
+      }
+      trackToolUsage("ssl_checker", true);
+      return data as SSLResult;
+    }
+  });
+
+  const checkSSL = () => {
     if (!url.trim()) {
-      setError("Please enter a URL or domain to check");
+      setValidationError("Please enter a URL or domain to check");
       return;
     }
-
-    setLoading(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      trackToolUsage("ssl_checker", false);
-      
-      const response = await fetch("/api/security/check-ssl", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim() }),
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setResult(data);
-        trackToolUsage("ssl_checker", true);
-      } else {
-        setError(data.error || "Failed to check SSL certificate");
-      }
-    } catch (err) {
-      setError("Failed to connect to the server. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    setValidationError(null);
+    sslMutation.mutate(url.trim());
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -133,6 +120,9 @@ export default function SSLChecker() {
       checkSSL();
     }
   };
+
+  const result = sslMutation.data;
+  const error = validationError || (sslMutation.error ? (sslMutation.error as Error).message : null);
 
   const grade = result ? getGradeFromRisk(result.riskLevel, result.valid, result.isExpired) : null;
 
@@ -177,10 +167,10 @@ export default function SSLChecker() {
                   />
                   <Button 
                     onClick={checkSSL} 
-                    disabled={loading}
+                    disabled={sslMutation.isPending}
                     data-testid="button-check-ssl"
                   >
-                    {loading ? (
+                    {sslMutation.isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Checking...
@@ -388,8 +378,9 @@ export default function SSLChecker() {
                   <div className="flex justify-end">
                     <Button 
                       variant="outline" 
-                      onClick={() => { setUrl(""); setResult(null); }}
+                      onClick={() => { setUrl(""); sslMutation.reset(); }}
                       className="gap-2"
+                      data-testid="button-check-another"
                     >
                       <RefreshCw className="w-4 h-4" />
                       Check Another

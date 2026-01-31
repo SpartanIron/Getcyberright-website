@@ -25,6 +25,7 @@ const whoWeHelp = [
 const freeTools = [
   { title: "Scam Checker", description: "Check URLs, emails, phone numbers for scams", href: "/tools", icon: Search, badge: "Popular" },
   { title: "AI & Cyber Safety", description: "Protect yourself from AI-powered threats", href: "/ai-safety", icon: Brain, badge: "New" },
+  { title: "SSL Checker", description: "Verify website SSL certificate security", href: "/ssl-checker", icon: Shield, badge: "New" },
   { title: "Breach Checker", description: "Check if your email was exposed in a data breach", href: "/tools", icon: AlertTriangle },
   { title: "Password Generator", description: "Create strong, secure passwords instantly", href: "/tools", icon: Lock },
 ];
