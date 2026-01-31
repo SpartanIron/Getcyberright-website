@@ -1,5 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
+import fs from "fs";
 import { storage } from "./storage";
 import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory } from "@shared/schema";
 import { db } from "./db";
@@ -77,6 +79,28 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
+  // Serve sitemap.xml
+  app.get('/sitemap.xml', (_req: Request, res: Response) => {
+    const sitemapPath = path.resolve(process.cwd(), 'client/public/sitemap.xml');
+    if (fs.existsSync(sitemapPath)) {
+      res.setHeader('Content-Type', 'application/xml');
+      res.sendFile(sitemapPath);
+    } else {
+      res.status(404).send('Sitemap not found');
+    }
+  });
+
+  // Serve robots.txt
+  app.get('/robots.txt', (_req: Request, res: Response) => {
+    const robotsPath = path.resolve(process.cwd(), 'client/public/robots.txt');
+    if (fs.existsSync(robotsPath)) {
+      res.setHeader('Content-Type', 'text/plain');
+      res.sendFile(robotsPath);
+    } else {
+      res.status(404).send('Robots.txt not found');
+    }
+  });
+
   // Register custom auth routes
   registerAuthRoutes(app);
   
