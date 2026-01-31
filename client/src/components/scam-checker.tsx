@@ -149,7 +149,7 @@ const threatPatterns: { pattern: RegExp; category: string; indicator: string; se
   
   // Malicious Links
   { pattern: /\b(click (here|this|below)|follow (this )?link|open (this )?attachment|download (this )?file)\b/i, category: "Malicious Link", indicator: "Click-bait language", severity: "medium", explanation: "Urgent requests to click links are suspicious. Hover over links to see the real destination before clicking." },
-  { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly|is\.gd|buff\.ly|adf\.ly|shorturl/i, category: "Malicious Link", indicator: "URL shortener detected", severity: "medium", explanation: "URL shorteners hide the true destination. Legitimate businesses use their own domains in official communications." },
+  { pattern: /bit\.ly\/|tinyurl\.com|\/\/t\.co\/|goo\.gl\/|ow\.ly\/|is\.gd\/|buff\.ly\/|adf\.ly\/|shorturl\.at|v\.gd\/|rb\.gy\/|cutt\.ly\/|trib\.al\//i, category: "Malicious Link", indicator: "URL shortener detected", severity: "medium", explanation: "URL shorteners hide the true destination. Legitimate businesses use their own domains in official communications." },
   
   // Advance Fee Fraud
   { pattern: /\b(processing fee|handling fee|shipping fee|insurance fee|customs fee|release fee|tax fee)\b/i, category: "Advance Fee Fraud", indicator: "Upfront fee request", severity: "high", explanation: "Requests for fees to release prizes, inheritances, or packages are classic advance-fee fraud. You should never pay to receive money." },
@@ -166,13 +166,14 @@ const suspiciousUrlPatterns = [
   { pattern: /paypal|amazon|apple|google|microsoft|facebook|netflix|bank/i, reason: "Mentions major brand but may be fake" },
   { pattern: /\.(tk|ml|ga|cf|gq|xyz|top|club|online|site|website|buzz|work|link|click|info|biz|pw|cc|ws)$/i, reason: "Free or suspicious TLD" },
   { pattern: /-login|-verify|-secure|-account|-update|-confirm/i, reason: "Suspicious subdomain/path pattern" },
-  { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly|is\.gd|buff\.ly|adf\.ly|shorturl|v\.gd|rb\.gy|cutt\.ly|trib\.al/i, reason: "URL shortener hiding destination" },
+  { pattern: /bit\.ly\/|tinyurl\.com|\/\/t\.co\/|goo\.gl\/|ow\.ly\/|is\.gd\/|buff\.ly\/|adf\.ly\/|shorturl\.at|v\.gd\/|rb\.gy\/|cutt\.ly\/|trib\.al\//i, reason: "URL shortener hiding destination" },
   { pattern: /\.(exe|zip|rar|scr|bat|cmd|msi|jar|vbs|js)$/i, reason: "Potentially malicious file download" },
 ];
 
 const legitDomains = [
   /^(https?:\/\/)?(www\.)?(google|microsoft|apple|amazon|facebook|twitter|linkedin|instagram|youtube|netflix|paypal|github|dropbox|zoom|slack)\.com/i,
   /^(https?:\/\/)?(www\.)?[a-z0-9-]+\.(gov|edu|mil)/i,
+  /^(https?:\/\/)?(www\.)?getcyberright\.(com|org|net)/i,
 ];
 
 // Typosquatting detection - common brand misspellings
