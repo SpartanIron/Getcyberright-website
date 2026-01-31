@@ -1,5 +1,6 @@
 import { PageBanner } from "@/components/page-banner";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -86,6 +87,7 @@ const partnershipTypes = [
 export default function Partnerships() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.partnerships} />
       <PageBanner
         title="Partner With Us"
         subtitle="Join our mission to protect families from cyber threats. Together, we can make the internet safer for everyone."

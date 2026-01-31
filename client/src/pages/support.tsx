@@ -1,5 +1,6 @@
 import { PageBanner } from "@/components/page-banner";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -101,6 +102,7 @@ const faqs = [
 export default function Support() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.support} />
       <PageBanner
         title="How Can We Help?"
         subtitle="Get the support you need. We're here to help you stay safe online."

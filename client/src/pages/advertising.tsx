@@ -1,5 +1,6 @@
 import { PageBanner } from "@/components/page-banner";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -66,6 +67,7 @@ const guidelines = [
 export default function Advertising() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.advertising} />
       <PageBanner
         title="Advertising Opportunities"
         subtitle="Reach security-conscious families and businesses through ethical, value-driven advertising."

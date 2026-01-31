@@ -138,4 +138,48 @@ export const pageSEO = {
     title: "Solutions",
     description: "Tailored cybersecurity solutions for families, seniors, educators, and small businesses.",
   },
+  terms: {
+    title: "Terms of Service",
+    description: "Read GetCyberRight's terms of service. Learn about our policies and your rights when using our platform.",
+  },
+  privacy: {
+    title: "Privacy Policy",
+    description: "Learn how GetCyberRight protects your data. Our privacy policy explains what we collect and how we use it.",
+  },
+  events: {
+    title: "Security Events & Webinars",
+    description: "Join our cybersecurity events, webinars, and training sessions. Learn from experts and stay protected.",
+  },
+  support: {
+    title: "Support Center",
+    description: "Get help with GetCyberRight. Find answers to common questions and contact our support team.",
+  },
+  checklists: {
+    title: "Security Checklists",
+    description: "Printable security checklists to help you stay safe online. Simple step-by-step guides for everyone.",
+  },
+  threatTrends: {
+    title: "Threat Trends",
+    description: "Stay informed about the latest cyber threats and scam trends. Real-time threat intelligence updates.",
+  },
+  partnerships: {
+    title: "Partnership Opportunities",
+    description: "Partner with GetCyberRight to bring cybersecurity education to your community or organization.",
+  },
+  security: {
+    title: "Our Security Practices",
+    description: "Learn how GetCyberRight keeps your data safe. Our security measures and certifications explained.",
+  },
+  advertising: {
+    title: "Advertising",
+    description: "Advertise with GetCyberRight. Reach security-conscious consumers with your trusted brand.",
+  },
+  checkoutSuccess: {
+    title: "Thank You",
+    description: "Your purchase was successful. Welcome to GetCyberRight premium protection.",
+  },
+  notFound: {
+    title: "Page Not Found",
+    description: "The page you're looking for doesn't exist. Return to GetCyberRight homepage.",
+  },
 };

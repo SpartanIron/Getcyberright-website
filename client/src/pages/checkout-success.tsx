@@ -1,19 +1,16 @@
-import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 
 export default function CheckoutSuccess() {
-  useEffect(() => {
-    document.title = "Subscription Confirmed - GetCyberRight";
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.checkoutSuccess} />
       <Navigation />
       
       <main className="py-20 px-4 sm:px-6 lg:px-8">

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 
 export default function SecurityPage() {
   const securityMeasures = [
@@ -80,6 +81,7 @@ export default function SecurityPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead {...pageSEO.security} />
       <Navigation />
       
       <main className="flex-1">

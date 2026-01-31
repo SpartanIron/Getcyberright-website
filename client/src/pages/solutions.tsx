@@ -193,6 +193,8 @@ export default function Solutions() {
                         src={solution.image} 
                         alt={solution.title} 
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                     </motion.div>

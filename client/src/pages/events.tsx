@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -130,6 +131,7 @@ const typeColors = {
 export default function Events() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead {...pageSEO.events} />
       <Navigation />
       
       <main>

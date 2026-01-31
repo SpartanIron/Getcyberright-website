@@ -81,6 +81,8 @@ export function AudienceShowcase() {
                       src={audience.image}
                       alt={audience.title}
                       className="w-full h-[300px] sm:h-[400px] object-cover"
+                      loading="lazy"
+                      decoding="async"
                       data-testid={`img-audience-${audience.id}`}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

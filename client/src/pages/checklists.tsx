@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead, pageSEO } from "@/components/seo-head";
 import { PageBanner } from "@/components/page-banner";
 import { PrintableChecklist, securityChecklists } from "@/components/printable-checklist";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,6 +19,7 @@ const checklistTabs = [
 export default function Checklists() {
   return (
     <div className="min-h-screen bg-background print:bg-white">
+      <SEOHead {...pageSEO.checklists} />
       <div className="print:hidden">
         <Navigation />
       </div>

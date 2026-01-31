@@ -12,6 +12,8 @@ export function ExpertBanner() {
           src={expertImage}
           alt="Cybersecurity expert"
           className="w-full h-full object-cover object-top"
+          loading="lazy"
+          decoding="async"
           data-testid="img-expert-banner"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 via-gray-900/85 to-gray-900/70" />

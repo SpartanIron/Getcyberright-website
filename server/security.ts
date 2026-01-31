@@ -289,20 +289,30 @@ export function configureHelmet(app: Express) {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "'unsafe-inline'"], // Required for Vite HMR in dev
-          styleSrc: ["'self'", "'unsafe-inline'"], // Required for styled-components/emotion
+          scriptSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            "https://www.googletagmanager.com",
+            "https://www.google-analytics.com",
+            "https://js.stripe.com",
+          ],
+          styleSrc: ["'self'", "'unsafe-inline'"],
           imgSrc: ["'self'", "data:", "blob:", "https:"],
-          fontSrc: ["'self'", "https://fonts.gstatic.com"],
+          fontSrc: ["'self'", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
           connectSrc: [
             "'self'",
             "https://ip-api.com",
             "https://checkurl.phishtank.com",
             "https://urlhaus-api.abuse.ch",
             "https://haveibeenpwned.com",
-            "ws:", // WebSocket for Vite HMR
+            "https://www.google-analytics.com",
+            "https://analytics.google.com",
+            "https://api.stripe.com",
+            "https://api.openai.com",
+            "ws:",
             "wss:",
           ],
-          frameSrc: ["'none'"],
+          frameSrc: ["https://js.stripe.com"],
           objectSrc: ["'none'"],
           baseUri: ["'self'"],
           formAction: ["'self'"],
