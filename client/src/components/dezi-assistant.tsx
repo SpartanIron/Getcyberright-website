@@ -585,8 +585,8 @@ ${regionNote}Our Emergency Help page has more detailed guidance, and you can als
   // Default welcome message with region-specific resources
   const hasSpecificResources = r.fraudReportUrl !== "";
   const emergencyHelpNote = hasSpecificResources 
-    ? `\n\nVisit our **Emergency Help** page at /emergency-help for step-by-step guidance and more resources for ${r.name}.`
-    : `\n\nVisit our **Emergency Help** page at /emergency-help for step-by-step guidance. You can also select your region there to find specific reporting agencies for your country.`;
+    ? `Visit our **Emergency Help** page at /emergency-help for step-by-step guidance and more resources for ${r.name}.`
+    : `Visit our **Emergency Help** page at /emergency-help for step-by-step guidance. You can also select your region there to find specific reporting agencies for your country.`;
 
   return `Hello! I am Dezi, your online safety assistant.${region?.detected ? ` I see you are connecting from ${r.name}.` : ""} I am here to help you understand digital risks and learn how to protect yourself and your family.
 
@@ -596,8 +596,22 @@ ${regionNote}Our Emergency Help page has more detailed guidance, and you can als
 • Sharing practical tips to keep your family safe online
 • Guiding you on what to do after a security incident
 
-**Keep in Mind:**
-I provide general educational information, but I cannot offer legal, medical, or financial advice. I also cannot guarantee whether any specific message is safe or dangerous, and I am not a replacement for professional cybersecurity services.
+**Protect Yourself Today:**
+• Use strong, unique passwords for every account
+• Enable two-factor authentication wherever possible
+• Never click links in unexpected messages
+• Verify requests by contacting organizations directly
+• Keep your devices and apps updated
+• Create a family safety codeword to verify emergency calls
+
+**Free Tools Available:**
+• **Scam Checker** - Analyze suspicious emails, URLs, and messages
+• **Password Generator** - Create strong, secure passwords instantly
+• **Family Codeword Generator** - Protect against impersonation scams
+• **Security Scanner** - Check websites for threats before visiting
+• **Printable Checklists** - Step-by-step security guides for your family
+
+Explore all our tools at /tools
 
 **Need Help Right Now?**${hasSpecificResources ? `
 • **Report fraud:** ${r.fraudReport} at ${r.fraudReportUrl}
@@ -607,6 +621,7 @@ I provide general educational information, but I cannot offer legal, medical, or
 • Report cyber crimes to your national CERT (Computer Emergency Response Team)
 • For identity theft, contact your data protection authority`}
 • **Financial concerns:** Contact your bank immediately
+
 ${emergencyHelpNote}
 
 What would you like to learn about today?`;
