@@ -928,6 +928,378 @@ export function analyzeQRContent(content: string): QRCodeAnalysisResult {
   };
 }
 
+// AlienVault OTX Integration (Free API for threat intelligence)
+export interface AlienVaultResult {
+  checked: boolean;
+  pulseCount: number;
+  malwareCount: number;
+  tags: string[];
+  firstSeen?: string;
+  lastSeen?: string;
+  riskLevel: "low" | "medium" | "high" | "critical";
+  error?: string;
+}
+
+// SSRF check for domain-based lookups
+function isDomainSafeForLookup(domain: string): boolean {
+  const lowerDomain = domain.toLowerCase();
+  
+  // Block localhost, internal, and private domains
+  const blockedPatterns = [
+    /^localhost$/,
+    /^127\./,
+    /^10\./,
+    /^172\.(1[6-9]|2\d|3[01])\./,
+    /^192\.168\./,
+    /^0\./,
+    /^169\.254\./,
+    /\.local$/,
+    /\.internal$/,
+    /\.localhost$/,
+    /^fc00:/,
+    /^fe80:/,
+    /^::1$/,
+  ];
+  
+  return !blockedPatterns.some(p => p.test(lowerDomain));
+}
+
+export async function checkAlienVaultOTX(domain: string): Promise<AlienVaultResult> {
+  try {
+    // Clean domain - extract hostname if URL
+    let cleanDomain = domain;
+    try {
+      const url = new URL(domain.includes("://") ? domain : `https://${domain}`);
+      cleanDomain = url.hostname;
+    } catch {}
+    
+    // SSRF protection - block internal network lookups
+    if (!isDomainSafeForLookup(cleanDomain)) {
+      return {
+        checked: false,
+        pulseCount: 0,
+        malwareCount: 0,
+        tags: [],
+        riskLevel: "low",
+        error: "Invalid domain for lookup"
+      };
+    }
+    
+    // AlienVault OTX API (free, no key required for basic queries)
+    const response = await fetchWithTimeout(
+      `https://otx.alienvault.com/api/v1/indicators/domain/${encodeURIComponent(cleanDomain)}/general`,
+      {
+        headers: {
+          "Accept": "application/json",
+          "User-Agent": "GetCyberRight-SecurityScanner/1.0"
+        }
+      },
+      10000
+    );
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        return {
+          checked: true,
+          pulseCount: 0,
+          malwareCount: 0,
+          tags: [],
+          riskLevel: "low"
+        };
+      }
+      throw new Error(`AlienVault API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    const pulseCount = data.pulse_info?.count || 0;
+    const tags = data.pulse_info?.pulses?.slice(0, 5).flatMap((p: any) => p.tags || []) || [];
+    const malwareCount = data.malware?.count || 0;
+    
+    // Determine risk level based on findings
+    let riskLevel: "low" | "medium" | "high" | "critical" = "low";
+    if (malwareCount > 0 || pulseCount >= 10) {
+      riskLevel = "critical";
+    } else if (pulseCount >= 5) {
+      riskLevel = "high";
+    } else if (pulseCount >= 2) {
+      riskLevel = "medium";
+    }
+    
+    return {
+      checked: true,
+      pulseCount,
+      malwareCount,
+      tags: [...new Set(tags)].slice(0, 10) as string[],
+      firstSeen: data.first_seen,
+      lastSeen: data.last_seen,
+      riskLevel
+    };
+  } catch (error) {
+    console.error("AlienVault OTX error:", error);
+    return {
+      checked: false,
+      pulseCount: 0,
+      malwareCount: 0,
+      tags: [],
+      riskLevel: "low",
+      error: "AlienVault lookup failed"
+    };
+  }
+}
+
+// Enhanced QR Code analysis with redirect chain following
+export interface EnhancedQRAnalysis extends QRCodeAnalysisResult {
+  redirectChain?: {
+    originalUrl: string;
+    finalUrl: string;
+    hops: number;
+    crossesDomains: boolean;
+  };
+  destinationPreview?: {
+    title?: string;
+    domain: string;
+    isHTTPS: boolean;
+    domainAge?: number;
+  };
+}
+
+export async function analyzeQRContentEnhanced(content: string): Promise<EnhancedQRAnalysis> {
+  // Get basic analysis first
+  const basicAnalysis = analyzeQRContent(content);
+  
+  // If it's a URL, do enhanced analysis
+  if (basicAnalysis.contentType === "url" && basicAnalysis.extractedData?.url) {
+    const url = basicAnalysis.extractedData.url;
+    
+    try {
+      // Follow redirect chain
+      const redirectChain = await followRedirectChain(url);
+      
+      // Get destination info
+      let destinationPreview: EnhancedQRAnalysis["destinationPreview"];
+      try {
+        const finalUrl = new URL(redirectChain.finalUrl);
+        destinationPreview = {
+          domain: finalUrl.hostname,
+          isHTTPS: finalUrl.protocol === "https:"
+        };
+        
+        // Check if redirects cross domains (suspicious)
+        if (redirectChain.crossesDomains) {
+          basicAnalysis.warnings.push("URL redirects through multiple different domains");
+          basicAnalysis.isSuspicious = true;
+          if (basicAnalysis.riskLevel !== "high") {
+            basicAnalysis.riskLevel = "medium";
+          }
+        }
+        
+        // Too many hops
+        if (redirectChain.hops >= 3) {
+          basicAnalysis.warnings.push(`URL has ${redirectChain.hops} redirects - may be hiding final destination`);
+          basicAnalysis.isSuspicious = true;
+        }
+      } catch {}
+      
+      return {
+        ...basicAnalysis,
+        redirectChain,
+        destinationPreview
+      };
+    } catch {
+      return basicAnalysis;
+    }
+  }
+  
+  return basicAnalysis;
+}
+
+// SSRF protection - check if URL is safe to fetch
+function isUrlSafeForFetch(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.toLowerCase();
+    
+    // Block localhost, private IPs, and internal networks
+    const blockedPatterns = [
+      /^localhost$/,
+      /^127\./,
+      /^10\./,
+      /^172\.(1[6-9]|2\d|3[01])\./,
+      /^192\.168\./,
+      /^0\./,
+      /^169\.254\./,
+      /^fc00:/,
+      /^fe80:/,
+      /^::1$/,
+      /^0\.0\.0\.0$/,
+      /\.local$/,
+      /\.internal$/,
+      /\.localhost$/,
+    ];
+    
+    // Only allow http/https
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return false;
+    }
+    
+    return !blockedPatterns.some(p => p.test(hostname));
+  } catch {
+    return false;
+  }
+}
+
+async function followRedirectChain(url: string, maxHops: number = 10): Promise<{
+  originalUrl: string;
+  finalUrl: string;
+  hops: number;
+  crossesDomains: boolean;
+}> {
+  const domains = new Set<string>();
+  let currentUrl = url;
+  let finalUrl = url;
+  let hops = 0;
+  
+  try {
+    // SSRF protection - validate URL before fetching
+    if (!isUrlSafeForFetch(url)) {
+      return { originalUrl: url, finalUrl: url, hops: 0, crossesDomains: false };
+    }
+    
+    const originalDomain = new URL(url).hostname;
+    domains.add(originalDomain);
+    
+    for (let i = 0; i < maxHops; i++) {
+      // SSRF protection - validate each redirect URL
+      if (!isUrlSafeForFetch(currentUrl)) {
+        break;
+      }
+      
+      const response = await fetch(currentUrl, {
+        method: "HEAD",
+        redirect: "manual",
+        headers: { "User-Agent": "GetCyberRight-SecurityScanner/1.0" },
+        signal: AbortSignal.timeout(5000)
+      });
+      
+      if (response.status >= 300 && response.status < 400) {
+        const location = response.headers.get("location");
+        if (location) {
+          hops++;
+          // Handle relative URLs
+          if (location.startsWith("/")) {
+            const baseUrl = new URL(currentUrl);
+            currentUrl = `${baseUrl.protocol}//${baseUrl.host}${location}`;
+          } else if (!location.startsWith("http")) {
+            const baseUrl = new URL(currentUrl);
+            currentUrl = `${baseUrl.protocol}//${baseUrl.host}/${location}`;
+          } else {
+            currentUrl = location;
+          }
+          
+          try {
+            domains.add(new URL(currentUrl).hostname);
+          } catch {}
+        } else {
+          break;
+        }
+      } else {
+        finalUrl = currentUrl;
+        break;
+      }
+    }
+  } catch {}
+  
+  return {
+    originalUrl: url,
+    finalUrl,
+    hops,
+    crossesDomains: domains.size > 1
+  };
+}
+
+// Email Authentication Scoring (Enhanced with ARC)
+export interface EmailAuthScore {
+  overallScore: number;
+  grade: "A" | "B" | "C" | "D" | "F";
+  spf: { pass: boolean; details?: string };
+  dkim: { pass: boolean; details?: string };
+  dmarc: { pass: boolean; policy?: string };
+  arc: { present: boolean; valid?: boolean };
+  bimi: { present: boolean; logoUrl?: string };
+  recommendations: string[];
+}
+
+export function calculateEmailAuthScore(headers: string): EmailAuthScore {
+  const recommendations: string[] = [];
+  let score = 0;
+  
+  // Parse authentication results
+  const authResults = headers.match(/authentication-results:.*?(?=\n[a-z-]+:|$)/gis)?.[0] || "";
+  const arcResults = headers.match(/arc-authentication-results:.*?(?=\n[a-z-]+:|$)/gis)?.[0] || "";
+  
+  // Check SPF
+  const spfMatch = authResults.match(/spf=(pass|fail|softfail|neutral|none)/i);
+  const spfPass = spfMatch?.[1]?.toLowerCase() === "pass";
+  if (spfPass) {
+    score += 25;
+  } else {
+    recommendations.push("SPF record is missing or failing - sender domain is not verified");
+  }
+  
+  // Check DKIM
+  const dkimMatch = authResults.match(/dkim=(pass|fail|none)/i);
+  const dkimPass = dkimMatch?.[1]?.toLowerCase() === "pass";
+  if (dkimPass) {
+    score += 30;
+  } else {
+    recommendations.push("DKIM signature is missing or invalid - message integrity not verified");
+  }
+  
+  // Check DMARC
+  const dmarcMatch = authResults.match(/dmarc=(pass|fail|none)/i);
+  const dmarcPass = dmarcMatch?.[1]?.toLowerCase() === "pass";
+  const dmarcPolicy = headers.match(/p=(none|quarantine|reject)/i)?.[1];
+  if (dmarcPass) {
+    score += 25;
+    if (dmarcPolicy === "reject") score += 5;
+  } else {
+    recommendations.push("DMARC policy is failing - domain owner has not enforced email authentication");
+  }
+  
+  // Check ARC (Authenticated Received Chain) - for forwarded emails
+  const arcPresent = /arc-authentication-results:/i.test(headers);
+  const arcValid = arcPresent && /arc=pass/i.test(headers);
+  if (arcValid) {
+    score += 10;
+  }
+  
+  // Check BIMI (Brand Indicators for Message Identification)
+  const bimiPresent = /bimi-selector:/i.test(headers) || /bimi-location:/i.test(headers);
+  const bimiLogo = headers.match(/bimi-location:\s*([^\n]+)/i)?.[1]?.trim();
+  if (bimiPresent) {
+    score += 5;
+  }
+  
+  // Calculate grade
+  let grade: "A" | "B" | "C" | "D" | "F" = "A";
+  if (score < 30) grade = "F";
+  else if (score < 50) grade = "D";
+  else if (score < 70) grade = "C";
+  else if (score < 85) grade = "B";
+  
+  return {
+    overallScore: Math.min(score, 100),
+    grade,
+    spf: { pass: spfPass, details: spfMatch?.[0] },
+    dkim: { pass: dkimPass, details: dkimMatch?.[0] },
+    dmarc: { pass: dmarcPass, policy: dmarcPolicy },
+    arc: { present: arcPresent, valid: arcValid },
+    bimi: { present: bimiPresent, logoUrl: bimiLogo },
+    recommendations
+  };
+}
+
 // Deepfake/AI content detection indicators
 export interface DeepfakeIndicators {
   contentType: "image" | "video" | "audio" | "text";

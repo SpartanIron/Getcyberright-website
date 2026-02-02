@@ -1,0 +1,60 @@
+CRITICAL GAPS (High Impact)
+No SMS/Smishing Detection
+Current: Only analyzes email/text content
+Missing: Sender ID spoofing detection, short code validation
+Impact: Smishing attacks up 700% in 2024
+No Real-time Threat Intelligence Feed
+Current: Static pattern matching
+Missing: Live threat feeds (AlienVault OTX, Abuse.ch)
+Impact: Zero-day scam campaigns go undetected
+No QR Code Deep Analysis
+Current: Basic content extraction
+Missing: Destination preview, redirect chain analysis
+Impact: QR-based phishing ("Quishing") is exploding
+No AI-Generated Content Detection
+Current: None
+Missing: GPT-detector, style analysis, perplexity scoring
+Impact: AI-generated phishing is 99% effective
+No Steganography Detection
+Current: None
+Missing: Image payload detection, hidden data extraction
+Impact: Malware hidden in images bypasses all checks
+HIGH PRIORITY GAPS
+Limited Brand Database
+Current: ~26 brands for similarity checking
+Needed: 500+ brands including regional banks, utilities
+Add: Dynamic brand database from Tranco/Majestic lists
+No URL Redirect Chain Analysis
+Current: Only final destination checked
+Missing: Full redirect chain (often 3-5 hops in phishing)
+Add: Recursive redirect following with timeout
+No Domain Reputation Scoring
+Current: Binary (safe/suspicious)
+Missing: Composite reputation from multiple sources
+Add: Aggregate score from Cisco Umbrella, OpenDNS
+No Email Authentication Scoring
+Current: Pass/fail for SPF/DKIM/DMARC
+Missing: Aggregate authentication score
+Add: BIMI verification, ARC chain analysis
+No Breach Date Freshness
+Current: XposedOrNot returns names only
+Missing: Breach dates, severity, data types from API
+Add: Detailed breach analytics integration
+MEDIUM PRIORITY GAPS
+No Password Exposure Context
+Missing: Which breaches contained this exact password
+Add: Password context from breach analytics
+No Dark Web Monitoring
+Missing: Check if email is being sold on markets
+Add: Hudson Rock, SpyCloud integration (requires API key)
+No Organization Impersonation
+Current: Only tech companies
+Missing: Government, healthcare, utility impersonation
+Add: IRS, SSA, Medicare, utility company patterns
+No Geolocation Risk
+Missing: Flag if sender IP is from high-risk country
+Add: IP geolocation and reputation scoring
+No Attachment Analysis
+Current: Only file extension checking
+Missing: MIME type validation, macro detection
+Add: File signature analysis, Office macro detection

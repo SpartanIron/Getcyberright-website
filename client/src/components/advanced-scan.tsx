@@ -29,6 +29,7 @@ import {
   Mic,
   FileText,
   Eye,
+  Search,
 } from "lucide-react";
 import { createWorker } from "tesseract.js";
 import jsQR from "jsqr";
@@ -93,6 +94,16 @@ type ComprehensiveScanResult = {
   };
   phishTank?: { checked: boolean; isPhishing: boolean | null };
   urlhaus?: { checked: boolean; isMalware: boolean | null };
+  alienVaultOTX?: {
+    checked: boolean;
+    pulseCount: number;
+    malwareCount: number;
+    tags: string[];
+    firstSeen?: string;
+    lastSeen?: string;
+    riskLevel: "low" | "medium" | "high" | "critical";
+    error?: string;
+  };
   checkedAt: string;
 };
 
@@ -594,6 +605,43 @@ export function AdvancedScan() {
                           </>
                         ) : (
                           <span className="text-muted-foreground">Scan pending</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AlienVault OTX Threat Intelligence */}
+                  {scanResult.alienVaultOTX?.checked && (
+                    <div className={`p-3 rounded-lg border ${
+                      scanResult.alienVaultOTX.riskLevel === "low" ? "bg-green-50 dark:bg-green-950/30" :
+                      scanResult.alienVaultOTX.riskLevel === "medium" ? "bg-yellow-50 dark:bg-yellow-950/30" :
+                      "bg-red-50 dark:bg-red-950/30"
+                    }`}>
+                      <div className="flex items-center gap-2 font-medium mb-1">
+                        <Search className="w-4 h-4" />
+                        AlienVault OTX
+                      </div>
+                      <div className="text-sm space-y-1">
+                        <div className={
+                          scanResult.alienVaultOTX.riskLevel === "low" ? "text-green-600 dark:text-green-400" :
+                          scanResult.alienVaultOTX.riskLevel === "medium" ? "text-yellow-600 dark:text-yellow-400" :
+                          "text-red-600 dark:text-red-400"
+                        }>
+                          {scanResult.alienVaultOTX.pulseCount === 0 
+                            ? "No known threats" 
+                            : `${scanResult.alienVaultOTX.pulseCount} threat intelligence pulses`}
+                        </div>
+                        {scanResult.alienVaultOTX.malwareCount > 0 && (
+                          <div className="text-xs text-red-600 dark:text-red-400">
+                            {scanResult.alienVaultOTX.malwareCount} malware samples associated
+                          </div>
+                        )}
+                        {scanResult.alienVaultOTX.tags && scanResult.alienVaultOTX.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {scanResult.alienVaultOTX.tags.slice(0, 5).map((tag: string, i: number) => (
+                              <Badge key={i} variant="secondary" className="text-xs">{tag}</Badge>
+                            ))}
+                          </div>
                         )}
                       </div>
                     </div>

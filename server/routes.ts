@@ -19,6 +19,9 @@ import {
   calculateTrustScore,
   analyzeQRContent,
   getDeepfakeEducation,
+  checkAlienVaultOTX,
+  analyzeQRContentEnhanced,
+  calculateEmailAuthScore,
   urlCheckSchema as tiUrlCheckSchema,
   phoneCheckSchema,
   domainCheckSchema
@@ -30,6 +33,18 @@ import {
   COUNTRY_TO_REGION,
   DEFAULT_REGION
 } from "@shared/regions";
+import {
+  analyzeSmishing,
+  analyzeAIContent,
+  analyzeRedirectChain,
+  analyzeFileForSteganography,
+  analyzeIPGeolocation,
+  analyzeAttachment,
+  calculateDomainReputation,
+  simulateDarkWebMonitoring,
+  categorizeBreachSeverity,
+  analyzePasswordExposure
+} from "./advancedThreatIntelligence";
 
 // URL reputation checking schemas with validation
 const urlCheckSchema = z.object({
@@ -610,6 +625,206 @@ export async function registerRoutes(
     }
   });
 
+  // SMS/Smishing Analysis
+  app.post("/api/security/analyze-smishing", standardRateLimit, async (req, res) => {
+    try {
+      const { content, sender } = z.object({
+        content: z.string().min(1).max(5000),
+        sender: z.string().max(50).optional()
+      }).parse(req.body);
+      
+      const result = analyzeSmishing(content, sender);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("Smishing analysis error:", error);
+      res.status(400).json({ success: false, error: "Invalid input" });
+    }
+  });
+
+  // AI-Generated Content Detection
+  app.post("/api/security/analyze-ai-content", standardRateLimit, async (req, res) => {
+    try {
+      const { content } = z.object({
+        content: z.string().min(50).max(10000)
+      }).parse(req.body);
+      
+      const result = analyzeAIContent(content);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("AI content analysis error:", error);
+      res.status(400).json({ success: false, error: "Invalid input - minimum 50 characters required" });
+    }
+  });
+
+  // URL Redirect Chain Analysis
+  app.post("/api/security/analyze-redirect-chain", standardRateLimit, async (req, res) => {
+    try {
+      const { url } = urlCheckSchema.parse(req.body);
+      const result = await analyzeRedirectChain(url, 10);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("Redirect chain analysis error:", error);
+      res.status(400).json({ success: false, error: "Failed to analyze redirect chain" });
+    }
+  });
+
+  // IP Geolocation Risk Analysis
+  app.post("/api/security/analyze-ip-geolocation", standardRateLimit, async (req, res) => {
+    try {
+      const { ip } = z.object({
+        ip: z.string().ip()
+      }).parse(req.body);
+      
+      const result = await analyzeIPGeolocation(ip);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("IP geolocation error:", error);
+      res.status(400).json({ success: false, error: "Invalid IP address" });
+    }
+  });
+
+  // Attachment Analysis
+  app.post("/api/security/analyze-attachment", standardRateLimit, async (req, res) => {
+    try {
+      const { filename, mimeType } = z.object({
+        filename: z.string().min(1).max(255),
+        mimeType: z.string().max(100).optional()
+      }).parse(req.body);
+      
+      const result = analyzeAttachment(filename, mimeType);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("Attachment analysis error:", error);
+      res.status(400).json({ success: false, error: "Invalid input" });
+    }
+  });
+
+  // Domain Reputation Score
+  app.post("/api/security/domain-reputation", standardRateLimit, async (req, res) => {
+    try {
+      const { domain } = z.object({
+        domain: z.string().min(1).max(253)
+      }).parse(req.body);
+      
+      // Run checks in parallel
+      const [domainAge, sslCert, phishTankResult, urlhausResult] = await Promise.allSettled([
+        checkDomainAge(domain),
+        checkSSLCertificate(`https://${domain}`),
+        (async () => {
+          const response = await fetch("https://checkurl.phishtank.com/checkurl/", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `url=${encodeURIComponent(`https://${domain}`)}&format=json`,
+            signal: AbortSignal.timeout(8000)
+          });
+          const data = await response.json();
+          return { isPhishing: data.results?.in_database && data.results?.verified };
+        })().catch(() => ({ isPhishing: null })),
+        (async () => {
+          const response = await fetch("https://urlhaus-api.abuse.ch/v1/url/", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `url=${encodeURIComponent(`https://${domain}`)}`,
+            signal: AbortSignal.timeout(8000)
+          });
+          const data = await response.json();
+          return { isMalware: data.query_status === "ok" };
+        })().catch(() => ({ isMalware: null }))
+      ]);
+      
+      const result = calculateDomainReputation(
+        domain,
+        undefined,
+        undefined,
+        domainAge.status === "fulfilled" ? domainAge.value : undefined,
+        sslCert.status === "fulfilled" ? sslCert.value : undefined,
+        phishTankResult.status === "fulfilled" ? phishTankResult.value : undefined,
+        urlhausResult.status === "fulfilled" ? urlhausResult.value : undefined
+      );
+      
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("Domain reputation error:", error);
+      res.status(400).json({ success: false, error: "Failed to calculate reputation" });
+    }
+  });
+
+  // AlienVault OTX Threat Intelligence
+  app.post("/api/security/alienvault-check", standardRateLimit, async (req, res) => {
+    try {
+      const { domain } = z.object({
+        domain: z.string().min(1).max(253)
+      }).parse(req.body);
+      
+      const result = await checkAlienVaultOTX(domain);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("AlienVault check error:", error);
+      res.status(400).json({ success: false, error: "Failed to check threat intelligence" });
+    }
+  });
+
+  // Enhanced QR Code Analysis with redirect chain
+  app.post("/api/security/analyze-qr-enhanced", standardRateLimit, async (req, res) => {
+    try {
+      const { content } = z.object({
+        content: z.string().min(1).max(5000)
+      }).parse(req.body);
+      
+      const result = await analyzeQRContentEnhanced(content);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("Enhanced QR analysis error:", error);
+      res.status(400).json({ success: false, error: "Failed to analyze QR content" });
+    }
+  });
+
+  // Email Authentication Scoring (SPF/DKIM/DMARC/ARC/BIMI)
+  app.post("/api/security/email-auth-score", standardRateLimit, async (req, res) => {
+    try {
+      const { headers } = z.object({
+        headers: z.string().min(1).max(50000)
+      }).parse(req.body);
+      
+      const result = calculateEmailAuthScore(headers);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("Email auth score error:", error);
+      res.status(400).json({ success: false, error: "Failed to calculate email authentication score" });
+    }
+  });
+
+  // Dark Web Monitoring (Educational)
+  app.post("/api/security/dark-web-check", standardRateLimit, async (req, res) => {
+    try {
+      const { email, breachCount } = z.object({
+        email: z.string().email(),
+        breachCount: z.number().min(0).max(1000).default(0)
+      }).parse(req.body);
+      
+      const result = simulateDarkWebMonitoring(email, breachCount);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("Dark web check error:", error);
+      res.status(400).json({ success: false, error: "Invalid input" });
+    }
+  });
+
+  // Password Exposure Context Analysis
+  app.post("/api/security/password-exposure", strictRateLimit, async (req, res) => {
+    try {
+      const { password } = z.object({
+        password: z.string().min(1).max(128)
+      }).parse(req.body);
+      
+      const result = analyzePasswordExposure(password);
+      res.json({ success: true, result });
+    } catch (error) {
+      console.error("Password exposure check error:", error);
+      res.status(400).json({ success: false, error: "Invalid input" });
+    }
+  });
+
   // Comprehensive URL scan (combines all checks)
   app.post("/api/security/comprehensive-scan", standardRateLimit, async (req, res) => {
     try {
@@ -624,8 +839,8 @@ export async function registerRoutes(
         domain = url;
       }
 
-      // Run all checks in parallel
-      const [googleSB, virusTotal, domainAge, sslCert, phishTankResult, urlhausResult] = await Promise.allSettled([
+      // Run all checks in parallel (including AlienVault OTX)
+      const [googleSB, virusTotal, domainAge, sslCert, phishTankResult, urlhausResult, alienVault] = await Promise.allSettled([
         checkGoogleSafeBrowsing(url),
         checkVirusTotal(url),
         checkDomainAge(domain),
@@ -666,7 +881,9 @@ export async function registerRoutes(
             checked: true,
             isMalware: data.query_status === 'ok'
           };
-        })()
+        })(),
+        // AlienVault OTX threat intelligence
+        checkAlienVaultOTX(domain)
       ]);
 
       // Extract results
@@ -676,6 +893,7 @@ export async function registerRoutes(
       const sslResult = sslCert.status === 'fulfilled' ? sslCert.value : undefined;
       const phishTank = phishTankResult.status === 'fulfilled' ? phishTankResult.value : { checked: false, isPhishing: null };
       const urlhaus = urlhausResult.status === 'fulfilled' ? urlhausResult.value : { checked: false, isMalware: null };
+      const alienVaultResult = alienVault.status === 'fulfilled' ? alienVault.value : undefined;
 
       // Calculate trust score
       const trustScore = calculateTrustScore(
@@ -687,15 +905,15 @@ export async function registerRoutes(
         urlhaus
       );
 
-      // Determine overall threat level
+      // Determine overall threat level (including AlienVault OTX data)
       let overallThreatLevel: "safe" | "low" | "medium" | "high" | "critical" = "low";
       if (phishTank.isPhishing || urlhaus.isMalware || googleSBResult?.isThreat) {
         overallThreatLevel = "critical";
-      } else if ((virusTotalResult?.positives ?? 0) > 3) {
+      } else if ((virusTotalResult?.positives ?? 0) > 3 || alienVaultResult?.riskLevel === "critical") {
         overallThreatLevel = "high";
-      } else if (trustScore.score < 40) {
+      } else if (trustScore.score < 40 || alienVaultResult?.riskLevel === "high") {
         overallThreatLevel = "high";
-      } else if (trustScore.score < 60) {
+      } else if (trustScore.score < 60 || alienVaultResult?.riskLevel === "medium") {
         overallThreatLevel = "medium";
       } else if (trustScore.score < 75) {
         overallThreatLevel = "low";
@@ -714,6 +932,7 @@ export async function registerRoutes(
         sslCertificate: sslResult,
         phishTank,
         urlhaus,
+        alienVaultOTX: alienVaultResult,
         checkedAt: new Date().toISOString()
       });
     } catch (error) {

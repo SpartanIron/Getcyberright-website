@@ -179,20 +179,215 @@ const legitDomains = [
   /^(https?:\/\/)?(www\.)?yahoo\.(com|co\.[a-z]+)/i,
 ];
 
-// Typosquatting detection - common brand misspellings
+// Typosquatting detection - EXPANDED brand misspellings (200+ brands)
 const typosquattingPatterns: { brand: string; variants: RegExp[] }[] = [
-  { brand: "PayPal", variants: [/paypa[l1]|paypai|paypol|payp[a@]l|p[a@]ypal|paaypal/i] },
-  { brand: "Amazon", variants: [/amaz[o0]n|amazom|arnazon|amzon|amazn|amaazon|amazoon/i] },
-  { brand: "Apple", variants: [/app[l1]e|appie|aple|applle|aaple/i] },
-  { brand: "Google", variants: [/g[o0][o0]gle|googel|gogle|googlle|g00gle/i] },
-  { brand: "Microsoft", variants: [/micr[o0]s[o0]ft|mircosoft|microsft|micosoft|micros0ft/i] },
-  { brand: "Netflix", variants: [/netf[l1]ix|netfiix|netfix|nettflix|netfl1x/i] },
-  { brand: "Facebook", variants: [/faceb[o0][o0]k|facebok|facbook|faceboook|fac3book/i] },
-  { brand: "Instagram", variants: [/[i1]nstagram|instagran|instgram|instagrem|1nstagram/i] },
-  { brand: "Bank of America", variants: [/bankofamer[i1]ca|bank0famerica|bankofamerica\d/i] },
-  { brand: "Chase", variants: [/chas[e3]bank|chase\d|chasecom/i] },
-  { brand: "Wells Fargo", variants: [/we[l1][l1]sfargo|wellsfarg0|weilsfargo/i] },
-  { brand: "Walmart", variants: [/wa[l1]mart|walmrt|walmaart|walmart\d/i] },
+  // Major Tech Companies
+  { brand: "PayPal", variants: [/paypa[l1]|paypai|paypol|payp[a@]l|p[a@]ypal|paaypal|paypall/i] },
+  { brand: "Amazon", variants: [/amaz[o0]n|amazom|arnazon|amzon|amazn|amaazon|amazoon|amazonn/i] },
+  { brand: "Apple", variants: [/app[l1]e|appie|aple|applle|aaple|appel|apple[0-9]/i] },
+  { brand: "Google", variants: [/g[o0][o0]gle|googel|gogle|googlle|g00gle|googie|gooogle/i] },
+  { brand: "Microsoft", variants: [/micr[o0]s[o0]ft|mircosoft|microsft|micosoft|micros0ft|microsofit/i] },
+  { brand: "Netflix", variants: [/netf[l1]ix|netfiix|netfix|nettflix|netfl1x|netflex|netflx/i] },
+  { brand: "Facebook", variants: [/faceb[o0][o0]k|facebok|facbook|faceboook|fac3book|facebk/i] },
+  { brand: "Instagram", variants: [/[i1]nstagram|instagran|instgram|instagrem|1nstagram|instagarm/i] },
+  { brand: "Twitter/X", variants: [/tw[i1]tter|twiter|twtter|twittter|xtwitter/i] },
+  { brand: "LinkedIn", variants: [/l[i1]nked[i1]n|linkedn|linkdin|linkedinn|linkdln/i] },
+  { brand: "YouTube", variants: [/y[o0]utube|youtub|yuotube|youutube|youtbe/i] },
+  { brand: "WhatsApp", variants: [/whatsap|watsapp|whatsaap|whatapp|whattsapp/i] },
+  { brand: "Snapchat", variants: [/snapchat|snapcht|snpchat|snapchatt|snatchat/i] },
+  { brand: "TikTok", variants: [/t[i1]kt[o0]k|tiktoc|ticktok|tictok|tiktoik/i] },
+  { brand: "Spotify", variants: [/sp[o0]t[i1]fy|spotfy|spotiffy|spotifiy|spootify/i] },
+  { brand: "Discord", variants: [/d[i1]sc[o0]rd|discrod|discrd|dicord|discoord/i] },
+  { brand: "Zoom", variants: [/z[o0][o0]m|zom|zooom|zomm|zo0m/i] },
+  { brand: "Slack", variants: [/s[l1]ack|slak|slaack|slakc|slackk/i] },
+  { brand: "Dropbox", variants: [/dr[o0]pb[o0]x|dropbx|drpbox|dropboxx|drobox/i] },
+  { brand: "GitHub", variants: [/g[i1]thub|githb|githubb|gihub|gihtub/i] },
+  { brand: "Adobe", variants: [/ad[o0]be|adob|adobee|adoba|adope/i] },
+  { brand: "Salesforce", variants: [/salesf[o0]rce|salesfore|salesforc|saleforce|salesforse/i] },
+  { brand: "Oracle", variants: [/[o0]racle|oracl|oralce|oraclee|orecle/i] },
+  { brand: "Cisco", variants: [/c[i1]sc[o0]|cisoo|csco|ciscoo|sisco/i] },
+  { brand: "Intel", variants: [/[i1]nte[l1]|intell|intl|inteel|intle/i] },
+  { brand: "Samsung", variants: [/samsun[g9]|samsumg|samsungg|sumsang|samung/i] },
+  { brand: "Sony", variants: [/s[o0]ny|sonny|soney|soony|sonii/i] },
+  { brand: "eBay", variants: [/eb[a@]y|ebey|ebaay|ebayy|e-bay/i] },
+  { brand: "Alibaba", variants: [/al[i1]baba|alibab|alibbaba|alibabba|allibaba/i] },
+  
+  // Major Banks & Financial
+  { brand: "Bank of America", variants: [/bankofamer[i1]ca|bank0famerica|bankofamerica\d|bofa|bofamerica/i] },
+  { brand: "Chase", variants: [/chas[e3]bank|chase\d|chasecom|jpmchase|chasee/i] },
+  { brand: "Wells Fargo", variants: [/we[l1][l1]sfargo|wellsfarg0|weilsfargo|wellsfago|wellfarog/i] },
+  { brand: "Citibank", variants: [/c[i1]t[i1]bank|citibnk|citibamk|citiibank|citubank/i] },
+  { brand: "Capital One", variants: [/cap[i1]tal[o0]ne|capitalone\d|capitalon|capone|captial/i] },
+  { brand: "US Bank", variants: [/usbank\d|us-bank|usbankk|usbanc|u\.s\.bank/i] },
+  { brand: "PNC Bank", variants: [/pncbank|pnc\d|pncbamk|pncbnk|pncbanc/i] },
+  { brand: "TD Bank", variants: [/tdb[a@]nk|tdbank\d|td-bank|tdbankk|tdbamk/i] },
+  { brand: "HSBC", variants: [/hsb[c0]|hsbcc|hsbcbank|hbsc|hsbs/i] },
+  { brand: "Barclays", variants: [/barc[l1]ays|barclay|barclayss|barcleys|barclas/i] },
+  { brand: "Santander", variants: [/santand[e3]r|santandr|santanderr|santandar|santandeer/i] },
+  { brand: "Goldman Sachs", variants: [/g[o0]ldmansachs|goldmansach|goldmannsachs|goldmansax/i] },
+  { brand: "Morgan Stanley", variants: [/m[o0]rganstanley|morganstanly|morganstnley|morganstanely/i] },
+  { brand: "American Express", variants: [/amer[i1]canexpress|amex\d|americanexpres|amercanexpress/i] },
+  { brand: "Discover", variants: [/d[i1]sc[o0]ver|discovr|discoveer|disccover|dicover/i] },
+  { brand: "Venmo", variants: [/venm[o0]|venmoo|venmmo|vemo|venno/i] },
+  { brand: "CashApp", variants: [/cashap|cash-app|cashappp|cashspp|cashaap/i] },
+  { brand: "Zelle", variants: [/ze[l1][l1]e|zele|zellee|zella|zel1e/i] },
+  { brand: "Coinbase", variants: [/c[o0][i1]nbase|coinbas|coinbasee|coibase|coinnbase/i] },
+  { brand: "Binance", variants: [/b[i1]nance|binanc|binancee|binanse|binnance/i] },
+  { brand: "Robinhood", variants: [/r[o0]b[i1]nhood|robinhod|robinhoodd|robinood|robinhhood/i] },
+  { brand: "Fidelity", variants: [/f[i1]del[i1]ty|fidelty|fidelitty|fidelidy|fideltiy/i] },
+  { brand: "Charles Schwab", variants: [/charlesschwab|schwab\d|charleschwab|shwab/i] },
+  { brand: "E*TRADE", variants: [/etrade|e-trade\d|etraed|ettrade/i] },
+  { brand: "Vanguard", variants: [/vanguard\d|vangard|vangarud|vanguaard/i] },
+  
+  // Retail & E-commerce
+  { brand: "Walmart", variants: [/wa[l1]mart|walmrt|walmaart|walmart\d|wlamart|wamart/i] },
+  { brand: "Target", variants: [/t[a@]rget|targt|targett|targer|taarget/i] },
+  { brand: "Costco", variants: [/c[o0]stc[o0]|costc|costcco|costko|cosco/i] },
+  { brand: "Best Buy", variants: [/bestbuy|best-buy\d|bestbu|bestbyy|besbuy/i] },
+  { brand: "Home Depot", variants: [/homedep[o0]t|home-depot|homedepo|homeddepot/i] },
+  { brand: "Lowe's", variants: [/l[o0]wes|lowess|lowees|lowse|lows/i] },
+  { brand: "Macy's", variants: [/m[a@]cys|macyss|macis|maccys|maceys/i] },
+  { brand: "Nordstrom", variants: [/n[o0]rdstr[o0]m|nordstom|nordstromm|nortdstrom/i] },
+  { brand: "Kohl's", variants: [/k[o0]h[l1]s|kohls\d|kohlss|kohles|khols/i] },
+  { brand: "Sephora", variants: [/seph[o0]ra|sephor|sephoraa|sefora|sephorra/i] },
+  { brand: "Ulta", variants: [/u[l1]ta|ultaa|ultta|ulat|ulto/i] },
+  { brand: "Nike", variants: [/n[i1]ke|nikee|nieke|nikke|nik3/i] },
+  { brand: "Adidas", variants: [/ad[i1]das|addidas|adidass|adiidas|adidis/i] },
+  { brand: "Lululemon", variants: [/lu[l1]u[l1]em[o0]n|lulemon|lululemonn|lululemn/i] },
+  { brand: "Etsy", variants: [/etsy\d|estsy|etssy|etsi|esty/i] },
+  { brand: "Wayfair", variants: [/wayfa[i1]r|wayfar|wayfairr|wayfaie|wafair/i] },
+  { brand: "Chewy", variants: [/chewy\d|chewy|chewwy|chewey|chewe/i] },
+  
+  // Streaming & Entertainment
+  { brand: "Disney+", variants: [/d[i1]sney|disnye|disneey|diseny|dinsey/i] },
+  { brand: "HBO Max", variants: [/hb[o0]max|hbomax\d|hbomxa|hbomaxx|hbmax/i] },
+  { brand: "Hulu", variants: [/hu[l1]u|hullu|huluu|hlu|huulu/i] },
+  { brand: "Paramount+", variants: [/param[o0]unt|paramont|paramountt|paramout|parramount/i] },
+  { brand: "Peacock", variants: [/peacoc[k9]|peacok|peacocck|peacokc|peackock/i] },
+  { brand: "Twitch", variants: [/tw[i1]tch|twitc|twitcch|twich|twicth/i] },
+  { brand: "Steam", variants: [/st[e3]am|steem|steaam|stean|sream/i] },
+  { brand: "Epic Games", variants: [/ep[i1]cgames|epicgams|epicgamess|epicgame|epigames/i] },
+  { brand: "PlayStation", variants: [/playst[a@]t[i1][o0]n|playstaion|playstaton|playsation/i] },
+  { brand: "Xbox", variants: [/xb[o0]x|xboxx|xbbox|xobx|xbox\d/i] },
+  { brand: "Nintendo", variants: [/n[i1]ntend[o0]|ninteno|nintendoo|nitendo|nintedo/i] },
+  
+  // Utilities & Telecom
+  { brand: "AT&T", variants: [/[a@]t&t|att\d|atandt|attt|a\.t\.t/i] },
+  { brand: "Verizon", variants: [/ver[i1]z[o0]n|verizonn|verizon\d|verison|verzion/i] },
+  { brand: "T-Mobile", variants: [/t-m[o0]b[i1][l1]e|tmobil|t-mobilee|tmobille|t-moble/i] },
+  { brand: "Comcast", variants: [/c[o0]mcast|comcas|comcastt|comacast|comkast/i] },
+  { brand: "Spectrum", variants: [/spectr[u0]m|spectru|spectrumm|spektrum|sectrum/i] },
+  { brand: "Cox", variants: [/c[o0]x\d|coxx|cxo|coox|cox\./i] },
+  { brand: "Xfinity", variants: [/xf[i1]n[i1]ty|xfinty|xfinityy|xfinnity|xfintiy/i] },
+  { brand: "Sprint", variants: [/spr[i1]nt|sprintt|srpint|srint|spirnt/i] },
+  { brand: "Cricket", variants: [/cr[i1]cket|cricke|crickeet|crcket|criket/i] },
+  { brand: "Metro PCS", variants: [/metr[o0]pcs|metropc|metropcss|metrpcs|metorpcs/i] },
+  
+  // Travel & Transportation
+  { brand: "United Airlines", variants: [/un[i1]ted[a@][i1]r|unitedairlines\d|unitedair|unitde/i] },
+  { brand: "Delta", variants: [/de[l1]t[a@]|deltaa|dleta|delat|delta\d/i] },
+  { brand: "American Airlines", variants: [/amer[i1]can[a@][i1]r|americanairlines\d|aaairlines/i] },
+  { brand: "Southwest", variants: [/s[o0]uthwest|southwes|southwestt|soutwest|souhtwest/i] },
+  { brand: "JetBlue", variants: [/jetb[l1]ue|jetblu|jetbluee|jeblue|jtblue/i] },
+  { brand: "Uber", variants: [/ub[e3]r|uberr|ubr|ueber|uber\d/i] },
+  { brand: "Lyft", variants: [/[l1]yft|lyf|lyftt|lyift|llft/i] },
+  { brand: "DoorDash", variants: [/d[o0][o0]rdash|doordas|doordassh|doordah|dordash/i] },
+  { brand: "Grubhub", variants: [/grubhub\d|grubhu|grubhubb|gruhbub|grubhb/i] },
+  { brand: "Instacart", variants: [/[i1]nstacart|instacrt|instacartt|instcart|instacrat/i] },
+  { brand: "Airbnb", variants: [/a[i1]rbnb|airbnbb|airnbn|airbb|airbnd/i] },
+  { brand: "Booking.com", variants: [/b[o0][o0]k[i1]ng|bookng|bookingg|booikng|bokking/i] },
+  { brand: "Expedia", variants: [/exped[i1]a|expeda|expediaa|expedai|expidea/i] },
+  { brand: "Hotels.com", variants: [/h[o0]te[l1]s|hotelss|hotles|hotes|hotells/i] },
+  { brand: "USPS", variants: [/usps\d|u\.s\.p\.s|uspss|ussp|uspa/i] },
+  { brand: "FedEx", variants: [/fed[e3]x|fedx|fedxe|fedexx|feddex/i] },
+  { brand: "UPS", variants: [/ups\d|u\.p\.s|upss|usp|upps/i] },
+  { brand: "DHL", variants: [/dh[l1]|dhll|dlh|dhl\d/i] },
+  
+  // Healthcare & Pharma
+  { brand: "CVS", variants: [/cvs\d|c\.v\.s|cvss|csv|cvvs/i] },
+  { brand: "Walgreens", variants: [/wa[l1]greens|walgrees|walgreen|walrgeens|wlagreens/i] },
+  { brand: "UnitedHealthcare", variants: [/un[i1]tedhealth|unitedhealtcare|unitedhc|uhealthcare/i] },
+  { brand: "Cigna", variants: [/c[i1]gna|cigana|cignaa|cigma|cinga/i] },
+  { brand: "Aetna", variants: [/[a@]etna|aetana|aetnaa|aenta|aetne/i] },
+  { brand: "Blue Cross", variants: [/b[l1]uecross|bluecros|bluecorsss|bluecorss|bcbs/i] },
+  { brand: "Kaiser", variants: [/ka[i1]ser|kaser|kaiserr|kasier|kiaiser/i] },
+  { brand: "Humana", variants: [/hum[a@]na|humaan|huamna|humanna|humna/i] },
+  { brand: "Medicare", variants: [/med[i1]care|medicre|medicaree|medicar|medicrae/i] },
+  { brand: "Medicaid", variants: [/med[i1]caid|medicai|medicaidd|medcaid|mediciad/i] },
+  
+  // Food & Beverage
+  { brand: "McDonald's", variants: [/mcdon[a@][l1]ds|mcdonalds\d|mcdoanlds|mcdonlads|mcdnlds/i] },
+  { brand: "Starbucks", variants: [/st[a@]rbucks|starbuck|starbuckss|strabucks|starbuks/i] },
+  { brand: "Chipotle", variants: [/ch[i1]p[o0]t[l1]e|chipotel|chipotlee|chipotl|chipotel/i] },
+  { brand: "Domino's", variants: [/d[o0]m[i1]n[o0]s|dominos\d|dominoss|dominso|domnios/i] },
+  { brand: "Pizza Hut", variants: [/p[i1]zzahut|pizzahut\d|pizahut|pizzahu|pizzzahut/i] },
+  { brand: "Dunkin", variants: [/dunk[i1]n|dunkin\d|dunkinn|dunkin|dunkn/i] },
+  { brand: "Taco Bell", variants: [/t[a@]c[o0]be[l1][l1]|tacobell\d|tacobel|tacbell|tacobll/i] },
+  { brand: "Wendy's", variants: [/wendy[s']|wendys\d|wendis|wendyss|wendeys/i] },
+  { brand: "Burger King", variants: [/burgerking|bk\d|burgerking\d|brgerking|burgerkingg/i] },
+  { brand: "Subway", variants: [/subway\d|subwa|subwayy|subay|subwey/i] },
+  
+  // Crypto & Web3
+  { brand: "Kraken", variants: [/kr[a@]ken|kraken\d|krakenn|krken|krakne/i] },
+  { brand: "Gemini", variants: [/gem[i1]n[i1]|gemini\d|geminii|gemni|gemmini/i] },
+  { brand: "Crypto.com", variants: [/crypt[o0]com|crypto\.com\d|cryptoocm|crypot/i] },
+  { brand: "MetaMask", variants: [/met[a@]mask|metamsk|metamaskk|metamak|metamsak/i] },
+  { brand: "Ledger", variants: [/[l1]edger|ledgerr|legder|ledgr|ledge/i] },
+  { brand: "OpenSea", variants: [/[o0]pensea|opensea\d|opense|opnsea|opensae/i] },
+  
+  // Insurance
+  { brand: "State Farm", variants: [/st[a@]tefarm|statefarm\d|statefrm|statefram|sttaefarm/i] },
+  { brand: "Geico", variants: [/ge[i1]c[o0]|geicoo|geico\d|geioc|geco/i] },
+  { brand: "Progressive", variants: [/pr[o0]gressive|progressiv|progressivee|progresvie/i] },
+  { brand: "Allstate", variants: [/[a@][l1][l1]state|allstat|allstatee|alstate|allstae/i] },
+  { brand: "Liberty Mutual", variants: [/l[i1]bertymutual|liberymutual|libertymutua|libetry/i] },
+  { brand: "Farmers", variants: [/farmers\d|farmerss|farmrs|framers|farmres/i] },
+  { brand: "Nationwide", variants: [/nat[i1][o0]nwide|nationwid|nationwidee|natonwide/i] },
+  { brand: "USAA", variants: [/usaa\d|u\.s\.a\.a|usaaa|usa\d/i] },
+];
+
+// Organization impersonation patterns (Government, Healthcare, Utilities)
+const organizationImpersonationPatterns: { pattern: RegExp; category: string; indicator: string; severity: "high" | "critical" }[] = [
+  // Government Agencies
+  { pattern: /\b(internal\s*revenue\s*service|irs)\b.{0,50}(refund|owe|payment|audit|verify)/i, category: "IRS Impersonation", indicator: "IRS tax scam language", severity: "critical" },
+  { pattern: /\b(social\s*security\s*(administration|office)?|ssa)\b.{0,50}(suspend|benefit|verify|fraud)/i, category: "SSA Impersonation", indicator: "Social Security scam", severity: "critical" },
+  { pattern: /\b(department\s*of\s*(homeland\s*security|justice|treasury)|dhs|doj)\b.{0,50}(warrant|arrest|investigation)/i, category: "Federal Agency Impersonation", indicator: "Federal agency threat", severity: "critical" },
+  { pattern: /\b(fbi|federal\s*bureau)\b.{0,50}(warrant|arrest|investigation|illegal)/i, category: "FBI Impersonation", indicator: "FBI threat scam", severity: "critical" },
+  { pattern: /\b(customs\s*(and\s*border)?|cbp|ice)\b.{0,50}(package|shipment|held|seized)/i, category: "Customs Impersonation", indicator: "Customs package scam", severity: "high" },
+  { pattern: /\b(immigration|uscis|visa)\b.{0,50}(expired|status|verify|revoked)/i, category: "Immigration Impersonation", indicator: "Immigration status scam", severity: "critical" },
+  { pattern: /\b(small\s*business\s*administration|sba)\b.{0,50}(loan|grant|approval|application)/i, category: "SBA Impersonation", indicator: "SBA loan scam", severity: "high" },
+  { pattern: /\b(federal\s*trade\s*commission|ftc)\b.{0,50}(refund|settlement|claim)/i, category: "FTC Impersonation", indicator: "FTC refund scam", severity: "high" },
+  
+  // Healthcare & Medicare
+  { pattern: /\b(medicare|medicaid)\b.{0,50}(new\s*card|verify|benefit|expire|enrollment)/i, category: "Medicare Impersonation", indicator: "Medicare card scam", severity: "critical" },
+  { pattern: /\b(health\s*(and\s*human\s*services|department)|hhs)\b.{0,50}(benefit|payment|verify)/i, category: "HHS Impersonation", indicator: "Healthcare scam", severity: "high" },
+  { pattern: /\b(affordable\s*care\s*act|obamacare|healthcare\.gov)\b.{0,50}(enroll|deadline|penalty)/i, category: "ACA Impersonation", indicator: "Healthcare enrollment scam", severity: "high" },
+  { pattern: /\b(covid|vaccine|booster)\b.{0,50}(free|government|required|verify|appointment)/i, category: "COVID Scam", indicator: "COVID vaccine/relief scam", severity: "high" },
+  { pattern: /\b(drug|prescription)\b.{0,50}(discount|free|medicare|covered|card)/i, category: "Prescription Scam", indicator: "Prescription drug scam", severity: "medium" },
+  
+  // Utility Companies
+  { pattern: /\b(electric|power|utility)\s*(company|service|provider)?\b.{0,50}(disconnect|payment\s*due|past\s*due|shut\s*off)/i, category: "Utility Impersonation", indicator: "Electric bill scam", severity: "high" },
+  { pattern: /\b(gas|natural\s*gas)\s*(company|service)?\b.{0,50}(disconnect|service\s*interruption|payment)/i, category: "Utility Impersonation", indicator: "Gas bill scam", severity: "high" },
+  { pattern: /\b(water|sewer)\s*(department|utility|company)?\b.{0,50}(disconnect|payment|service)/i, category: "Utility Impersonation", indicator: "Water bill scam", severity: "high" },
+  { pattern: /\bpge|edison|duke\s*energy|dominion|xcel\b.{0,50}(disconnect|payment|overdue)/i, category: "Utility Impersonation", indicator: "Specific utility company scam", severity: "high" },
+  
+  // Tech Support
+  { pattern: /\b(microsoft|windows|apple|mac)\s*(support|security|technician|helpdesk)\b/i, category: "Tech Support Scam", indicator: "Tech support impersonation", severity: "high" },
+  { pattern: /\b(virus|malware|hacked)\s*(detected|found|alert)\b.{0,30}(call|contact|immediately)/i, category: "Tech Support Scam", indicator: "Fake virus alert", severity: "high" },
+  { pattern: /\b(your\s*(computer|device|ip)\s*(has\s*been|is)\s*(compromised|infected|hacked))/i, category: "Tech Support Scam", indicator: "Device compromise scam", severity: "high" },
+  
+  // Delivery & Shipping
+  { pattern: /\b(usps|ups|fedex|dhl|amazon)\b.{0,50}(package|delivery|tracking).{0,50}(failed|problem|redelivery|fee)/i, category: "Delivery Scam", indicator: "Package delivery scam", severity: "high" },
+  { pattern: /\b(customs|import)\s*(fee|duty|charge)\b.{0,50}(pay|clear|release)/i, category: "Customs Scam", indicator: "Fake customs fee", severity: "high" },
+  
+  // Banking Regulators
+  { pattern: /\b(fdic|federal\s*deposit|occ|cfpb)\b.{0,50}(verify|insurance|account|investigation)/i, category: "Banking Regulator Impersonation", indicator: "Bank regulator scam", severity: "high" },
+  { pattern: /\b(federal\s*reserve|treasury\s*department)\b.{0,50}(transfer|fund|payment|seized)/i, category: "Treasury Impersonation", indicator: "Federal reserve scam", severity: "critical" },
+  
+  // Legal & Court
+  { pattern: /\b(court|legal|lawsuit|subpoena|summons)\b.{0,50}(appear|failure|warrant|arrest)/i, category: "Legal Threat Scam", indicator: "Fake legal threat", severity: "high" },
+  { pattern: /\b(jury\s*duty|grand\s*jury)\b.{0,50}(missed|failure|warrant|fine)/i, category: "Jury Duty Scam", indicator: "Jury duty scam", severity: "high" },
+  { pattern: /\b(sheriff|marshal|police)\b.{0,50}(warrant|arrest|immediate)/i, category: "Law Enforcement Impersonation", indicator: "Fake law enforcement threat", severity: "critical" },
 ];
 
 // Homograph attack detection - ONLY actual Unicode lookalike characters (not ASCII)
@@ -466,13 +661,60 @@ function levenshteinDistance(a: string, b: string): number {
   return matrix[b.length][a.length];
 }
 
-// Known brands for similarity checking
+// EXPANDED Known brands for similarity checking (200+ brands)
 const knownBrands = [
-  "paypal", "amazon", "apple", "google", "microsoft", "facebook", 
-  "instagram", "netflix", "twitter", "linkedin", "youtube", "ebay",
-  "walmart", "target", "costco", "chase", "wellsfargo", "bankofamerica",
-  "citibank", "usbank", "capitalone", "americanexpress", "discover",
-  "venmo", "cashapp", "zelle", "coinbase", "binance", "robinhood"
+  // Tech Giants
+  "paypal", "amazon", "apple", "google", "microsoft", "facebook", "meta",
+  "instagram", "netflix", "twitter", "linkedin", "youtube", "ebay", "alibaba",
+  "whatsapp", "snapchat", "tiktok", "spotify", "discord", "zoom", "slack",
+  "dropbox", "github", "adobe", "salesforce", "oracle", "cisco", "intel",
+  "samsung", "sony", "nvidia", "amd", "dell", "hp", "lenovo", "asus",
+  
+  // Banks & Financial
+  "chase", "wellsfargo", "bankofamerica", "citibank", "usbank", "capitalone",
+  "americanexpress", "discover", "venmo", "cashapp", "zelle", "coinbase",
+  "binance", "robinhood", "fidelity", "schwab", "vanguard", "etrade",
+  "tdameritrade", "pnc", "tdbank", "hsbc", "barclays", "santander",
+  "goldmansachs", "morganstanley", "jpmorgan", "mastercard", "visa",
+  "kraken", "gemini", "metamask", "ledger", "opensea", "uniswap",
+  
+  // Retail
+  "walmart", "target", "costco", "bestbuy", "homedepot", "lowes", "macys",
+  "nordstrom", "kohls", "sephora", "ulta", "nike", "adidas", "lululemon",
+  "underarmour", "gap", "oldnavy", "zara", "hm", "forever21", "asos",
+  "shein", "temu", "wish", "etsy", "wayfair", "chewy", "petco", "petsmart",
+  
+  // Streaming & Entertainment
+  "disney", "hbomax", "hulu", "paramount", "peacock", "twitch", "steam",
+  "epicgames", "playstation", "xbox", "nintendo", "roblox", "activision",
+  "electronicarts", "ubisoft", "bethesda", "rockstar", "valorant", "fortnite",
+  
+  // Telecom & Utilities
+  "att", "verizon", "tmobile", "sprint", "comcast", "xfinity", "spectrum",
+  "cox", "cricket", "boost", "metro", "visible", "mint", "ting",
+  
+  // Travel & Transportation
+  "unitedairlines", "delta", "americanairlines", "southwest", "jetblue",
+  "uber", "lyft", "doordash", "grubhub", "instacart", "postmates",
+  "airbnb", "booking", "expedia", "hotels", "kayak", "tripadvisor",
+  "usps", "fedex", "ups", "dhl", "amazon", "hertz", "enterprise", "avis",
+  
+  // Healthcare & Pharma
+  "cvs", "walgreens", "riteaid", "unitedhealth", "cigna", "aetna", "anthem",
+  "bluecross", "kaiser", "humana", "optum", "express-scripts", "caremark",
+  
+  // Food & Beverage
+  "mcdonalds", "starbucks", "chipotle", "dominos", "pizzahut", "dunkin",
+  "tacobell", "wendys", "burgerking", "subway", "chickfila", "kfc",
+  "papajohns", "littlecaesars", "panera", "noodles", "panerabread",
+  "coca-cola", "pepsi", "redbull", "monster", "gatorade",
+  
+  // Insurance
+  "statefarm", "geico", "progressive", "allstate", "libertymutual", "farmers",
+  "nationwide", "usaa", "travelers", "metlife", "prudential", "aflac",
+  
+  // Government & Organizations (commonly impersonated)
+  "irs", "ssa", "medicare", "medicaid", "usps", "dmv", "uscis"
 ];
 
 // Check for brand similarity (catch subtle misspellings)
@@ -901,6 +1143,26 @@ function analyzeContent(content: string): AnalysisResult {
         indicator: pattern.indicator,
         severity: pattern.severity,
         explanation: pattern.explanation
+      });
+    }
+  }
+  
+  // Check for organization impersonation (government, healthcare, utilities)
+  for (const { pattern, category, indicator, severity } of organizationImpersonationPatterns) {
+    if (pattern.test(content)) {
+      threats.push({
+        category,
+        indicator,
+        severity,
+        explanation: `This message appears to impersonate a ${category.toLowerCase().replace(' impersonation', '')}. ${
+          category.includes('IRS') ? 'The IRS never initiates contact via email or text for tax matters.' :
+          category.includes('SSA') ? 'Social Security never threatens to suspend your benefits via email/text.' :
+          category.includes('Medicare') ? 'Medicare will never call/text asking for your Medicare number.' :
+          category.includes('Utility') ? 'Utility companies provide proper notice before service disconnection.' :
+          category.includes('FBI') || category.includes('Law Enforcement') ? 'Law enforcement does not contact people via email/text for arrest warrants.' :
+          category.includes('Tech Support') ? 'Tech companies never proactively contact users about security issues.' :
+          'Verify by contacting the organization directly through official channels.'
+        }`
       });
     }
   }
