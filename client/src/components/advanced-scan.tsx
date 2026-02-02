@@ -416,7 +416,7 @@ export function AdvancedScan() {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Comprehensive scan includes: Google Safe Browsing, VirusTotal, domain age, SSL certificate, PhishTank, and URLhaus checks.
+                Checks website security, connection safety, and scans against known threat databases.
               </p>
             </div>
 

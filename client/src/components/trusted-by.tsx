@@ -5,8 +5,8 @@ const trustedOrganizations = [
   { name: "CISA", subtitle: "Cybersecurity Agency" },
   { name: "INTERPOL", subtitle: "International Police" },
   { name: "FTC", subtitle: "Federal Trade Commission" },
-  { name: "Google", subtitle: "Safe Browsing API" },
-  { name: "PhishTank", subtitle: "Community Phishing DB" },
+  { name: "Security DBs", subtitle: "Threat Databases" },
+  { name: "Experts", subtitle: "Security Researchers" },
 ];
 
 export function TrustedBy() {

@@ -33,8 +33,8 @@ const trustedSources = [
   { name: "CISA", description: "Cybersecurity Agency" },
   { name: "INTERPOL", description: "Global Police" },
   { name: "FTC", description: "Trade Commission" },
-  { name: "Google", description: "Safe Browsing API" },
-  { name: "PhishTank", description: "Phishing Database" },
+  { name: "Security DBs", description: "Threat Databases" },
+  { name: "Experts", description: "Security Researchers" },
 ];
 
 export function TrustSignals() {

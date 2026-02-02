@@ -2118,7 +2118,7 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                 </div>
                                 
                                 <div className="grid grid-cols-3 gap-2 text-xs">
-                                  {/* PhishTank result */}
+                                  {/* Phishing Check result */}
                                   <div className={`p-1.5 rounded ${
                                     reputation.phishTank.isPhishing 
                                       ? 'bg-red-100 dark:bg-red-950/50' 
@@ -2134,18 +2134,18 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                       ) : (
                                         <Info className="w-3 h-3 text-gray-400" />
                                       )}
-                                      PhishTank
+                                      Phishing
                                     </div>
                                     <div className="text-muted-foreground">
                                       {reputation.phishTank.isPhishing 
-                                        ? 'PHISHING CONFIRMED' 
+                                        ? 'DANGER - Fake site' 
                                         : reputation.phishTank.checked 
-                                          ? 'Not in database' 
-                                          : reputation.phishTank.error || 'Not checked'}
+                                          ? 'Not flagged' 
+                                          : 'Pending'}
                                     </div>
                                   </div>
                                   
-                                  {/* URLhaus result */}
+                                  {/* Malware Check result */}
                                   <div className={`p-1.5 rounded ${
                                     reputation.urlhaus.isMalware 
                                       ? 'bg-red-100 dark:bg-red-950/50' 
@@ -2161,18 +2161,18 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                       ) : (
                                         <Info className="w-3 h-3 text-gray-400" />
                                       )}
-                                      URLhaus
+                                      Malware
                                     </div>
                                     <div className="text-muted-foreground">
                                       {reputation.urlhaus.isMalware 
-                                        ? `MALWARE: ${reputation.urlhaus.threat || 'Confirmed'}` 
+                                        ? `DANGER - ${reputation.urlhaus.threat || 'Harmful'}` 
                                         : reputation.urlhaus.checked 
-                                          ? 'Not in database' 
-                                          : reputation.urlhaus.error || 'Not checked'}
+                                          ? 'Not flagged' 
+                                          : 'Pending'}
                                     </div>
                                   </div>
                                   
-                                  {/* SSL Certificate result */}
+                                  {/* Connection Security result */}
                                   <div className={`p-1.5 rounded ${
                                     sslResult?.valid === false
                                       ? 'bg-red-100 dark:bg-red-950/50' 
@@ -2192,20 +2192,20 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                       ) : (
                                         <Lock className="w-3 h-3 text-gray-400" />
                                       )}
-                                      SSL Cert
+                                      Secure
                                     </div>
                                     <div className="text-muted-foreground">
                                       {isSslChecking 
                                         ? 'Checking...'
                                         : sslResult?.error?.includes('HTTPS')
-                                          ? 'No HTTPS'
+                                          ? 'Not secure'
                                           : sslResult?.valid
-                                            ? sslResult.isEV ? 'EV Certificate' : 'Valid'
+                                            ? sslResult.isEV ? 'Verified' : 'Yes'
                                             : sslResult?.isExpired
                                               ? 'Expired'
                                               : sslResult?.isSelfSigned
-                                                ? 'Self-signed'
-                                                : sslResult?.error || 'Not checked'}
+                                                ? 'Unverified'
+                                                : 'Pending'}
                                     </div>
                                   </div>
                                 </div>
@@ -2228,9 +2228,8 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                 <div className="text-xs text-muted-foreground p-2 bg-muted/30 rounded flex items-start gap-2">
                   <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
                   <span>
-                    Checks against PhishTank (phishing), URLhaus (malware), and SSL certificate validity. 
-                    Note: URLs not found in threat databases may still be dangerous. New threats take time to be reported. 
-                    Always exercise caution with unfamiliar links.
+                    Links are checked against security databases for phishing, malware, and connection safety. 
+                    Note: New threats take time to be reported. Always exercise caution with unfamiliar links.
                   </span>
                 </div>
               </div>
