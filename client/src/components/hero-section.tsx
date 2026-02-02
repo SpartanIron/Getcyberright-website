@@ -14,7 +14,7 @@ export function HeroSection() {
             alt="Professional cybersecurity protection"
             className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 to-slate-900/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/20 to-slate-900/60" />
         </div>
         
         <div className="relative px-5 py-8 bg-slate-900">
