@@ -10,6 +10,8 @@ import {
   csrfProtection,
   requestSizeLimiter,
   registerSecurityEndpoints,
+  registerSecurityMetricsEndpoint,
+  apiAnomalyDetection,
   securityLogger,
 } from "./security";
 
@@ -50,6 +52,9 @@ app.use(cookieParser());
 
 // Security: Logging middleware
 app.use(securityLoggingMiddleware);
+
+// Security: API anomaly detection (MITRE ATT&CK T1071)
+app.use(apiAnomalyDetection);
 
 // Body parsing with size limits
 app.use(
@@ -106,6 +111,9 @@ app.use((req, res, next) => {
 (async () => {
   // Register security testing endpoints
   registerSecurityEndpoints(app);
+  
+  // Register security metrics endpoint for monitoring
+  registerSecurityMetricsEndpoint(app);
   
   await registerRoutes(httpServer, app);
 

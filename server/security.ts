@@ -1,9 +1,18 @@
 import helmet from "helmet";
 import type { Express, Request, Response, NextFunction } from "express";
 import winston from "winston";
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
 import { checkRateLimitAlert, checkCSRFAlert, checkSuspiciousPatternAlert } from "./security-alerts";
 
-// Security Logger Configuration
+// Ensure logs directory exists
+const logsDir = path.join(process.cwd(), "logs");
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
+
+// Security Logger Configuration with file output for centralized logging
 export const securityLogger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
@@ -12,6 +21,7 @@ export const securityLogger = winston.createLogger({
   ),
   defaultMeta: { service: "getcyberright-security" },
   transports: [
+    // Console transport for development
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
@@ -20,6 +30,27 @@ export const securityLogger = winston.createLogger({
           return `${timestamp} [SECURITY] ${level}: ${message}${metaStr}`;
         })
       ),
+    }),
+    // File transport for centralized logging / SIEM integration
+    new winston.transports.File({
+      filename: path.join(logsDir, "security.log"),
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      ),
+      maxsize: 10 * 1024 * 1024, // 10MB
+      maxFiles: 5, // Keep last 5 files
+    }),
+    // Separate file for security incidents only
+    new winston.transports.File({
+      filename: path.join(logsDir, "security-incidents.log"),
+      level: "warn",
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+      ),
+      maxsize: 10 * 1024 * 1024,
+      maxFiles: 10,
     }),
   ],
 });
@@ -400,3 +431,193 @@ setInterval(() => {
     }
   });
 }, 600000); // Every 10 minutes
+
+// ============================================
+// API ANOMALY DETECTION SYSTEM
+// MITRE ATT&CK: T1071 (Application Layer Protocol)
+// ============================================
+
+interface APIUsageRecord {
+  count: number;
+  endpoints: Map<string, number>;
+  lastRequest: number;
+  anomalyScore: number;
+  flagged: boolean;
+}
+
+class AnomalyDetector {
+  private usagePatterns: Map<string, APIUsageRecord> = new Map();
+  private readonly WINDOW_MS = 300000; // 5 minute window
+  private readonly MAX_ENDPOINTS_PER_WINDOW = 50; // Unusual if hitting many different endpoints
+  private readonly MAX_REQUESTS_PER_WINDOW = 200; // Unusual request volume
+  private readonly ANOMALY_THRESHOLD = 75; // Score threshold for flagging
+
+  recordRequest(ip: string, endpoint: string): { isAnomaly: boolean; score: number; reason?: string } {
+    const now = Date.now();
+    let record = this.usagePatterns.get(ip);
+
+    // Capture previous lastRequest time before updating (for rapid request detection)
+    const previousLastRequest = record?.lastRequest || now;
+
+    // Reset if window expired
+    if (!record || now - record.lastRequest > this.WINDOW_MS) {
+      record = {
+        count: 0,
+        endpoints: new Map(),
+        lastRequest: now,
+        anomalyScore: 0,
+        flagged: false,
+      };
+    }
+
+    record.count++;
+    record.endpoints.set(endpoint, (record.endpoints.get(endpoint) || 0) + 1);
+
+    // Calculate time since last request BEFORE updating lastRequest
+    const timeSinceLast = now - previousLastRequest;
+    
+    // Now update lastRequest for next call
+    record.lastRequest = now;
+
+    // Calculate anomaly score
+    let score = 0;
+    let reasons: string[] = [];
+
+    // Factor 1: High request volume (30 points max)
+    const volumeRatio = record.count / this.MAX_REQUESTS_PER_WINDOW;
+    if (volumeRatio > 0.5) {
+      score += Math.min(30, Math.round(volumeRatio * 30));
+      if (volumeRatio > 0.8) reasons.push("high_volume");
+    }
+
+    // Factor 2: Many different endpoints (30 points max)
+    const endpointRatio = record.endpoints.size / this.MAX_ENDPOINTS_PER_WINDOW;
+    if (endpointRatio > 0.3) {
+      score += Math.min(30, Math.round(endpointRatio * 30));
+      if (endpointRatio > 0.6) reasons.push("endpoint_scanning");
+    }
+
+    // Factor 3: Rapid sequential requests (20 points max)
+    // Only triggers if many requests with very short intervals
+    if (timeSinceLast < 100 && record.count > 10) {
+      score += 20;
+      reasons.push("rapid_requests");
+    }
+
+    // Factor 4: Unusual endpoint patterns (20 points max)
+    const suspiciousEndpoints = ["/api/admin", "/api/users", "/api/config", "/.env", "/wp-admin"];
+    for (const sus of suspiciousEndpoints) {
+      if (endpoint.includes(sus)) {
+        score += 20;
+        reasons.push("suspicious_endpoint");
+        break;
+      }
+    }
+
+    record.anomalyScore = score;
+    this.usagePatterns.set(ip, record);
+
+    const isAnomaly = score >= this.ANOMALY_THRESHOLD;
+    
+    if (isAnomaly && !record.flagged) {
+      record.flagged = true;
+      securityLogger.warn("API anomaly detected", {
+        ip,
+        score,
+        reasons,
+        requestCount: record.count,
+        uniqueEndpoints: record.endpoints.size,
+        mitreAttack: "T1071",
+      });
+    }
+
+    return { 
+      isAnomaly, 
+      score, 
+      reason: reasons.length > 0 ? reasons.join(", ") : undefined 
+    };
+  }
+
+  cleanup(): void {
+    const now = Date.now();
+    Array.from(this.usagePatterns.entries()).forEach(([ip, record]) => {
+      if (now - record.lastRequest > this.WINDOW_MS * 2) {
+        this.usagePatterns.delete(ip);
+      }
+    });
+  }
+
+  getStats(): { totalTracked: number; flaggedCount: number } {
+    let flaggedCount = 0;
+    this.usagePatterns.forEach(record => {
+      if (record.flagged) flaggedCount++;
+    });
+    return { totalTracked: this.usagePatterns.size, flaggedCount };
+  }
+}
+
+export const anomalyDetector = new AnomalyDetector();
+
+// Cleanup anomaly data every 10 minutes
+setInterval(() => anomalyDetector.cleanup(), 600000);
+
+// Anomaly detection middleware - only tracks /api routes to avoid noise from static assets
+export function apiAnomalyDetection(req: Request, res: Response, next: NextFunction) {
+  const endpoint = req.path;
+  
+  // Only track API endpoints, skip static assets and other routes
+  if (!endpoint.startsWith("/api")) {
+    return next();
+  }
+  
+  const ip = getClientIP(req);
+
+  const result = anomalyDetector.recordRequest(ip, endpoint);
+
+  // Add anomaly headers for monitoring (only on API routes)
+  res.setHeader("X-Anomaly-Score", result.score.toString());
+
+  // If high anomaly score, add extra rate limiting
+  if (result.isAnomaly) {
+    // Don't block, but add warning header and log
+    res.setHeader("X-Anomaly-Detected", "true");
+    
+    // For very high scores, consider additional protection
+    if (result.score > 90) {
+      securityLogger.error("Critical anomaly score - potential attack", {
+        ip,
+        score: result.score,
+        reason: result.reason,
+        endpoint,
+        mitreAttack: "T1071",
+      });
+    }
+  }
+
+  next();
+}
+
+// Generate CSP nonce for script tags (MITRE: M1021)
+export function generateCSPNonce(): string {
+  return crypto.randomBytes(16).toString("base64");
+}
+
+// Subresource Integrity helper for known external resources
+export const sriHashes = {
+  // Google Fonts Inter (example - these change with font versions)
+  googleFontsInter: "sha384-placeholder",
+  // Note: Google Analytics and Stripe scripts change frequently
+  // so SRI is not practical for them. Use CSP nonce instead.
+};
+
+// Security metrics endpoint for monitoring
+export function registerSecurityMetricsEndpoint(app: Express) {
+  app.get("/api/security/metrics", (req: Request, res: Response) => {
+    const anomalyStats = anomalyDetector.getStats();
+    res.json({
+      timestamp: new Date().toISOString(),
+      anomalyDetection: anomalyStats,
+      status: "operational",
+    });
+  });
+}
