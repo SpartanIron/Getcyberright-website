@@ -711,6 +711,49 @@ const knownBrands = [
   "dbs", "ocbc", "uob", "maybank", "cimb", "rhb", "publicbank", "hongleong",
   "kotak", "hdfc", "icici", "axis", "sbi", "pnb", "bob", "canara",
   
+  // Banks & Financial - Africa (80+ brands)
+  // South Africa
+  "fnb", "firstnationalbank", "standardbank", "absa", "nedbank", "capitec",
+  "investec", "africanbank", "bidvest", "grindrod", "sasfin", "mercantile",
+  "tymebank", "bankzero", "discovery", "oldmutual", "sanlam", "liberty",
+  // Nigeria
+  "gtbank", "guarantytrust", "firstbank", "zenithbank", "accessbank", "ubabank",
+  "fidelitybank", "unionbank", "sterlingbank", "wemabank", "keystonebank",
+  "polaris", "jaiz", "stanbic", "ecobank", "fcmb", "providus", "rubies",
+  "opay", "palmpay", "kuda", "moniepoint", "carbon", "fairmoney", "branch",
+  // Kenya
+  "kcb", "equitybank", "coopbank", "abcbank", "dtbbank", "familybank",
+  "ncba", "imbank", "stanbickenya", "standardchartered", "barclayskenya",
+  "mpesa", "safaricom", "airtel", "telkom", "mshwari", "fuliza", "tala",
+  // Ghana
+  "gcb", "ecobank", "stanbicghana", "absa", "fidelity", "calbank",
+  "zenith", "uba", "accessghana", "prudential", "societe", "republic",
+  "mtn", "vodafone", "airteltigo", "momo", "mobilemoney", "zeepay",
+  // Egypt
+  "nbe", "banquemisr", "cib", "qnb", "alexbank", "arabbank", "faisal",
+  "hsbc", "scb", "audi", "blom", "saib", "aaib", "mashreq", "emirates",
+  "vodafonecash", "etisalat", "orange", "wepay", "fawry", "paymob",
+  // Other African Countries
+  "attijariwafa", "bmce", "cih", "sgmb", "creditagricole", // Morocco
+  "biat", "stb", "bh", "amen", "bt", "bte", "zitouna", // Tunisia
+  "bea", "bna", "cnep", "cpa", "badr", "bdl", "gulf", // Algeria
+  "equity", "crdb", "nmb", "dtb", "exim", "tpb", "ncb", // Tanzania
+  "zanaco", "stanbiczambia", "fnbzambia", "barclays", "ab", "access", // Zambia
+  "cbz", "steward", "zb", "fbc", "nmb", "agribank", // Zimbabwe
+  "fnbnam", "bankwindhoek", "standardnam", "nednam", "letshego", // Namibia
+  "fnbbots", "stanbicbots", "barclays", "absa", "firstcapital", // Botswana
+  "gtbankrw", "bk", "cogebanque", "equity", "imbank", "accessrw", // Rwanda
+  "dfcu", "stanbicug", "centenary", "housingfinance", "postbank", // Uganda
+  
+  // African Telecom & Mobile Money (50+ brands)
+  "mtn", "safaricom", "airtel", "vodacom", "orange", "glo", "9mobile",
+  "ethiotelecom", "maroctelecom", "ooredoo", "tunisietelecom", "djezzy",
+  "econet", "telecel", "africell", "tigo", "millicom", "sonatel",
+  "mpesa", "momo", "airtelmoney", "orangemoney", "ecocash", "tigocash",
+  "paga", "flutterwave", "paystack", "interswitch", "cellulant", "chipper",
+  "wave", "mfs", "yup", "geopay", "zamtel", "movitel", "tmcel",
+  "mascom", "bemagosi", "mcel", "vodafone", "tmcel", "ethiotel",
+  
   // Retail - Major (100+ brands)
   "walmart", "target", "costco", "bestbuy", "homedepot", "lowes", "macys",
   "nordstrom", "kohls", "sephora", "ulta", "nike", "adidas", "lululemon",
