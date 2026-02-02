@@ -282,10 +282,15 @@ Earn points and badges for completing security activities - makes learning about
 |---------|------|-------------------|----------------------|---------------------|
 | Basic Scam Checker | Yes | Yes | Yes | Yes |
 | URL Security Scan | Limited | Full | Full | Full |
+| **Advanced Security Scanner** | No | Yes | Yes | Yes |
 | Dezi AI Messages | 20/day | 100/day | Unlimited | Unlimited |
 | Voice Deepfake Detector | Demo | Demo | Full | Full |
-| Advanced Scanner Features | Limited | Full | Full | Full |
 | Password Generator | Basic | Advanced | Advanced | Advanced |
+| Phone Number Risk Check | No | Yes | Yes | Yes |
+| QR Code Scanner | Yes | Yes | Yes | Yes |
+| Screenshot OCR Analysis | No | Yes | Yes | Yes |
+| Family Codeword Generator | Yes | Yes | Yes | Yes |
+| Regional Threat Intelligence | Basic | Full | Full | Full |
 | API Access | No | No | No | Yes |
 | Team Management | No | No | No | Yes |
 | Priority Support | No | No | Yes | Yes |
