@@ -428,224 +428,221 @@ export function AdvancedScan() {
             )}
 
             {scanResult && (
-              <div className="space-y-4 border rounded-lg p-4">
-                {/* Trust Score Header */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-lg">Trust Score</h3>
-                    <p className="text-sm text-muted-foreground">{scanResult.trustScore.summary}</p>
+              <div className="space-y-4 border rounded-lg p-4" data-testid="scan-results">
+                {/* Unified Verdict - Clear and Simple */}
+                <div className={`p-6 rounded-xl text-center ${
+                  scanResult.overallThreatLevel === "safe" ? "bg-green-100 dark:bg-green-950/50 border-2 border-green-300 dark:border-green-800" :
+                  scanResult.overallThreatLevel === "low" ? "bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900" :
+                  scanResult.overallThreatLevel === "medium" ? "bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-900" :
+                  scanResult.overallThreatLevel === "high" ? "bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900" :
+                  "bg-red-100 dark:bg-red-950/50 border-2 border-red-300 dark:border-red-800"
+                }`}>
+                  {/* Main Icon */}
+                  <div className="flex justify-center mb-3">
+                    {scanResult.overallThreatLevel === "safe" || scanResult.overallThreatLevel === "low" ? (
+                      <ShieldCheck className="w-16 h-16 text-green-600 dark:text-green-400" />
+                    ) : scanResult.overallThreatLevel === "medium" ? (
+                      <AlertTriangle className="w-16 h-16 text-yellow-600 dark:text-yellow-400" />
+                    ) : (
+                      <ShieldAlert className="w-16 h-16 text-red-600 dark:text-red-400" />
+                    )}
                   </div>
-                  <div className="text-center">
-                    <div className={`text-4xl font-bold ${getGradeColor(scanResult.trustScore.grade)}`}>
+                  
+                  {/* Clear Verdict */}
+                  <h3 className={`text-2xl font-bold mb-2 ${
+                    scanResult.overallThreatLevel === "safe" || scanResult.overallThreatLevel === "low" ? "text-green-700 dark:text-green-300" :
+                    scanResult.overallThreatLevel === "medium" ? "text-yellow-700 dark:text-yellow-300" :
+                    "text-red-700 dark:text-red-300"
+                  }`}>
+                    {scanResult.overallThreatLevel === "safe" ? "Safe to Visit" :
+                     scanResult.overallThreatLevel === "low" ? "Appears Safe" :
+                     scanResult.overallThreatLevel === "medium" ? "Proceed with Caution" :
+                     scanResult.overallThreatLevel === "high" ? "Potentially Dangerous" :
+                     "Dangerous - Avoid This Site"}
+                  </h3>
+                  
+                  {/* Trust Score */}
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    <span className={`text-4xl font-bold ${getGradeColor(scanResult.trustScore.grade)}`}>
                       {scanResult.trustScore.grade}
-                    </div>
-                    <div className="text-2xl font-semibold">{scanResult.trustScore.score}/100</div>
+                    </span>
+                    <span className="text-xl text-muted-foreground">
+                      ({scanResult.trustScore.score}/100)
+                    </span>
+                  </div>
+                  
+                  {/* Actionable Advice */}
+                  <div className={`p-3 rounded-lg mt-4 ${
+                    scanResult.overallThreatLevel === "safe" || scanResult.overallThreatLevel === "low" 
+                      ? "bg-green-200/50 dark:bg-green-900/30" 
+                      : scanResult.overallThreatLevel === "medium"
+                      ? "bg-yellow-200/50 dark:bg-yellow-900/30"
+                      : "bg-red-200/50 dark:bg-red-900/30"
+                  }`}>
+                    <p className="font-medium text-sm">
+                      {scanResult.overallThreatLevel === "safe" || scanResult.overallThreatLevel === "low" ? (
+                        <>No security issues found. You can proceed safely.</>
+                      ) : scanResult.overallThreatLevel === "medium" ? (
+                        <>Some concerns detected. Avoid entering personal information or passwords.</>
+                      ) : scanResult.overallThreatLevel === "high" ? (
+                        <>Security risks detected. Do not enter any sensitive information.</>
+                      ) : (
+                        <>This site has been flagged as dangerous. Do not visit, enter information, or download anything.</>
+                      )}
+                    </p>
                   </div>
                 </div>
 
-                {/* Overall Threat Level */}
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium">Overall Threat Level:</span>
-                  <Badge className={`${getThreatLevelColor(scanResult.overallThreatLevel)} text-white`}>
-                    {scanResult.overallThreatLevel.toUpperCase()}
-                  </Badge>
-                </div>
-
-                {/* Score Factors */}
+                {/* Key Findings - Simple Summary */}
                 <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Security Factors</h4>
+                  <h4 className="font-semibold text-sm flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    Key Findings
+                  </h4>
                   <div className="space-y-2">
-                    {scanResult.trustScore.factors.map((factor, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            {factor.status === "good" && <CheckCircle2 className="w-4 h-4 text-green-500" />}
-                            {factor.status === "warning" && <AlertTriangle className="w-4 h-4 text-yellow-500" />}
-                            {factor.status === "danger" && <XCircle className="w-4 h-4 text-red-500" />}
-                            <span>{factor.name}</span>
-                          </div>
-                          <span className="text-muted-foreground">{factor.score}/{factor.maxScore}</span>
-                        </div>
-                        <Progress value={(factor.score / factor.maxScore) * 100} className="h-1.5" />
-                        <p className="text-xs text-muted-foreground">{factor.details}</p>
+                    {/* Connection Security */}
+                    <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+                      {scanResult.sslCertificate?.valid ? (
+                        <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+                      ) : (
+                        <XCircle className="w-5 h-5 text-red-600 shrink-0" />
+                      )}
+                      <span className="text-sm">
+                        {scanResult.sslCertificate?.valid 
+                          ? "Secure connection (HTTPS)" 
+                          : "Connection not secure - your data could be intercepted"}
+                      </span>
+                    </div>
+                    
+                    {/* Domain Trust */}
+                    <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+                      {scanResult.domainAge?.ageInDays !== undefined && scanResult.domainAge.ageInDays > 180 ? (
+                        <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+                      ) : scanResult.domainAge?.ageInDays !== undefined && scanResult.domainAge.ageInDays > 30 ? (
+                        <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0" />
+                      ) : (
+                        <AlertTriangle className="w-5 h-5 text-orange-600 shrink-0" />
+                      )}
+                      <span className="text-sm">
+                        {scanResult.domainAge?.ageInDays !== undefined
+                          ? scanResult.domainAge.ageInDays > 365 
+                            ? `Established website (${Math.floor(scanResult.domainAge.ageInDays / 365)}+ years old)`
+                            : scanResult.domainAge.ageInDays > 180
+                            ? "Moderately established website"
+                            : scanResult.domainAge.ageInDays > 30
+                            ? `Relatively new website (${scanResult.domainAge.ageInDays} days old) - verify legitimacy`
+                            : `Very new website (${scanResult.domainAge.ageInDays} days old) - be extra cautious`
+                          : "Unable to verify website age"}
+                      </span>
+                    </div>
+                    
+                    {/* Threat Detection */}
+                    <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+                      {(scanResult.googleSafeBrowsing?.isThreat || 
+                        scanResult.phishTank?.isPhishing || 
+                        scanResult.urlhaus?.isMalware ||
+                        (scanResult.virusTotal?.positives ?? 0) > 0) ? (
+                        <XCircle className="w-5 h-5 text-red-600 shrink-0" />
+                      ) : (
+                        <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+                      )}
+                      <span className="text-sm">
+                        {scanResult.googleSafeBrowsing?.isThreat 
+                          ? "Flagged as dangerous by security databases"
+                          : scanResult.phishTank?.isPhishing
+                          ? "Known phishing site - designed to steal your information"
+                          : scanResult.urlhaus?.isMalware
+                          ? "Known malware distribution site"
+                          : (scanResult.virusTotal?.positives ?? 0) > 0
+                          ? `Detected by ${scanResult.virusTotal?.positives} security scanners`
+                          : "No threats detected in security databases"}
+                      </span>
+                    </div>
+                    
+                    {/* Threat Intelligence */}
+                    {scanResult.alienVaultOTX?.checked && (
+                      <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+                        {scanResult.alienVaultOTX.pulseCount === 0 ? (
+                          <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+                        ) : scanResult.alienVaultOTX.pulseCount < 3 ? (
+                          <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0" />
+                        ) : (
+                          <XCircle className="w-5 h-5 text-red-600 shrink-0" />
+                        )}
+                        <span className="text-sm">
+                          {scanResult.alienVaultOTX.pulseCount === 0
+                            ? "No suspicious activity reported"
+                            : scanResult.alienVaultOTX.pulseCount < 3
+                            ? "Some suspicious activity associated with this domain"
+                            : "Multiple security reports indicate potential threats"}
+                        </span>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
 
-                {/* Detailed Results */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {/* SSL Certificate */}
-                  {scanResult.sslCertificate?.checked && (
-                    <div className={`p-3 rounded-lg border ${
-                      scanResult.sslCertificate.valid ? "bg-green-50 dark:bg-green-950/30" : "bg-red-50 dark:bg-red-950/30"
-                    }`}>
-                      <div className="flex items-center gap-2 font-medium mb-1">
-                        <Lock className="w-4 h-4" />
-                        SSL Certificate
-                      </div>
-                      <div className="text-sm space-y-1">
-                        {scanResult.sslCertificate.valid ? (
-                          <>
-                            <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                              <CheckCircle2 className="w-3 h-3" /> Valid
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              Issuer: {scanResult.sslCertificate.issuer}
-                            </div>
-                            {scanResult.sslCertificate.daysUntilExpiry !== undefined && (
-                              <div className="text-xs text-muted-foreground">
-                                Expires in {scanResult.sslCertificate.daysUntilExpiry} days
-                              </div>
-                            )}
-                            {scanResult.sslCertificate.isEV && (
-                              <Badge variant="secondary" className="text-xs">Extended Validation</Badge>
-                            )}
-                          </>
-                        ) : (
-                          <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
-                            <XCircle className="w-3 h-3" /> 
-                            {scanResult.sslCertificate.error || "Invalid certificate"}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                {/* What To Do Next */}
+                <div className={`p-4 rounded-lg ${
+                  scanResult.overallThreatLevel === "safe" || scanResult.overallThreatLevel === "low" 
+                    ? "bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900" 
+                    : scanResult.overallThreatLevel === "medium"
+                    ? "bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900"
+                    : "bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900"
+                }`}>
+                  <h4 className="font-semibold text-sm mb-2">What To Do</h4>
+                  <ul className="text-sm space-y-1">
+                    {scanResult.overallThreatLevel === "safe" || scanResult.overallThreatLevel === "low" ? (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                          <span>You can proceed to use this website normally</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                          <span>Always verify you're on the correct URL before entering passwords</span>
+                        </li>
+                      </>
+                    ) : scanResult.overallThreatLevel === "medium" ? (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 shrink-0" />
+                          <span>Do not enter passwords or personal information</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 shrink-0" />
+                          <span>Verify this is the official website by searching for it independently</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 shrink-0" />
+                          <span>Do not download any files from this website</span>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="flex items-start gap-2">
+                          <XCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                          <span>Close this website immediately</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <XCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                          <span>Do not enter any information or click any links</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <XCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                          <span>If you entered credentials, change your password immediately</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <XCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                          <span>Report this site to help protect others</span>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </div>
 
-                  {/* Domain Age */}
-                  {scanResult.domainAge?.checked && (
-                    <div className={`p-3 rounded-lg border ${
-                      scanResult.domainAge.riskLevel === "low" ? "bg-green-50 dark:bg-green-950/30" :
-                      scanResult.domainAge.riskLevel === "medium" ? "bg-yellow-50 dark:bg-yellow-950/30" :
-                      "bg-red-50 dark:bg-red-950/30"
-                    }`}>
-                      <div className="flex items-center gap-2 font-medium mb-1">
-                        <Clock className="w-4 h-4" />
-                        Domain Age
-                      </div>
-                      <div className="text-sm space-y-1">
-                        <div className="font-medium">{scanResult.domainAge.domain}</div>
-                        {scanResult.domainAge.ageInDays !== undefined ? (
-                          <>
-                            <div className={`text-sm ${scanResult.domainAge.isNew ? "text-orange-600 dark:text-orange-400" : ""}`}>
-                              {scanResult.domainAge.ageInDays < 365 
-                                ? `${scanResult.domainAge.ageInDays} days old`
-                                : `${Math.floor(scanResult.domainAge.ageInDays / 365)} year(s) old`}
-                              {scanResult.domainAge.isNew && " (NEW)"}
-                            </div>
-                            {scanResult.domainAge.registrar && (
-                              <div className="text-xs text-muted-foreground">
-                                Registrar: {scanResult.domainAge.registrar}
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div className="text-xs text-muted-foreground">{scanResult.domainAge.error || "Age unavailable"}</div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Google Safe Browsing */}
-                  {scanResult.googleSafeBrowsing && (
-                    <div className={`p-3 rounded-lg border ${
-                      scanResult.googleSafeBrowsing.isThreat ? "bg-red-50 dark:bg-red-950/30" : 
-                      scanResult.googleSafeBrowsing.checked ? "bg-green-50 dark:bg-green-950/30" : "bg-gray-50 dark:bg-gray-800"
-                    }`}>
-                      <div className="flex items-center gap-2 font-medium mb-1">
-                        <Shield className="w-4 h-4" />
-                        Google Safe Browsing
-                      </div>
-                      <div className="text-sm">
-                        {scanResult.googleSafeBrowsing.error ? (
-                          <span className="text-muted-foreground">{scanResult.googleSafeBrowsing.error}</span>
-                        ) : scanResult.googleSafeBrowsing.isThreat ? (
-                          <div className="text-red-600 dark:text-red-400">
-                            <XCircle className="w-3 h-3 inline mr-1" />
-                            Threats: {scanResult.googleSafeBrowsing.threats.join(", ")}
-                          </div>
-                        ) : (
-                          <div className="text-green-600 dark:text-green-400">
-                            <CheckCircle2 className="w-3 h-3 inline mr-1" />
-                            No threats detected
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* VirusTotal */}
-                  {scanResult.virusTotal && (
-                    <div className={`p-3 rounded-lg border ${
-                      (scanResult.virusTotal.positives ?? 0) > 0 ? "bg-red-50 dark:bg-red-950/30" : 
-                      scanResult.virusTotal.checked ? "bg-green-50 dark:bg-green-950/30" : "bg-gray-50 dark:bg-gray-800"
-                    }`}>
-                      <div className="flex items-center gap-2 font-medium mb-1">
-                        <Server className="w-4 h-4" />
-                        VirusTotal
-                      </div>
-                      <div className="text-sm">
-                        {scanResult.virusTotal.error ? (
-                          <span className="text-muted-foreground">{scanResult.virusTotal.error}</span>
-                        ) : scanResult.virusTotal.total > 0 ? (
-                          <>
-                            <div className={scanResult.virusTotal.positives > 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}>
-                              {scanResult.virusTotal.positives}/{scanResult.virusTotal.total} engines detected threats
-                            </div>
-                            {scanResult.virusTotal.permalink && (
-                              <a 
-                                href={scanResult.virusTotal.permalink} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-xs text-primary flex items-center gap-1 mt-1"
-                              >
-                                View full report <ExternalLink className="w-3 h-3" />
-                              </a>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-muted-foreground">Scan pending</span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* AlienVault OTX Threat Intelligence */}
-                  {scanResult.alienVaultOTX?.checked && (
-                    <div className={`p-3 rounded-lg border ${
-                      scanResult.alienVaultOTX.riskLevel === "low" ? "bg-green-50 dark:bg-green-950/30" :
-                      scanResult.alienVaultOTX.riskLevel === "medium" ? "bg-yellow-50 dark:bg-yellow-950/30" :
-                      "bg-red-50 dark:bg-red-950/30"
-                    }`}>
-                      <div className="flex items-center gap-2 font-medium mb-1">
-                        <Search className="w-4 h-4" />
-                        AlienVault OTX
-                      </div>
-                      <div className="text-sm space-y-1">
-                        <div className={
-                          scanResult.alienVaultOTX.riskLevel === "low" ? "text-green-600 dark:text-green-400" :
-                          scanResult.alienVaultOTX.riskLevel === "medium" ? "text-yellow-600 dark:text-yellow-400" :
-                          "text-red-600 dark:text-red-400"
-                        }>
-                          {scanResult.alienVaultOTX.pulseCount === 0 
-                            ? "No known threats" 
-                            : `${scanResult.alienVaultOTX.pulseCount} threat intelligence pulses`}
-                        </div>
-                        {scanResult.alienVaultOTX.malwareCount > 0 && (
-                          <div className="text-xs text-red-600 dark:text-red-400">
-                            {scanResult.alienVaultOTX.malwareCount} malware samples associated
-                          </div>
-                        )}
-                        {scanResult.alienVaultOTX.tags && scanResult.alienVaultOTX.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {scanResult.alienVaultOTX.tags.slice(0, 5).map((tag: string, i: number) => (
-                              <Badge key={i} variant="secondary" className="text-xs">{tag}</Badge>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                {/* Scanned URL */}
+                <div className="text-xs text-muted-foreground text-center pt-2 border-t">
+                  Scanned: <span className="font-mono">{scanResult.url}</span>
                 </div>
               </div>
             )}
