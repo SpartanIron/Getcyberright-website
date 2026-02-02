@@ -363,7 +363,7 @@ const organizationImpersonationPatterns: { pattern: RegExp; category: string; in
   { pattern: /\b(health\s*(and\s*human\s*services|department)|hhs)\b.{0,50}(benefit|payment|verify)/i, category: "HHS Impersonation", indicator: "Healthcare scam", severity: "high" },
   { pattern: /\b(affordable\s*care\s*act|obamacare|healthcare\.gov)\b.{0,50}(enroll|deadline|penalty)/i, category: "ACA Impersonation", indicator: "Healthcare enrollment scam", severity: "high" },
   { pattern: /\b(covid|vaccine|booster)\b.{0,50}(free|government|required|verify|appointment)/i, category: "COVID Scam", indicator: "COVID vaccine/relief scam", severity: "high" },
-  { pattern: /\b(drug|prescription)\b.{0,50}(discount|free|medicare|covered|card)/i, category: "Prescription Scam", indicator: "Prescription drug scam", severity: "medium" },
+  { pattern: /\b(drug|prescription)\b.{0,50}(discount|free|medicare|covered|card)/i, category: "Prescription Scam", indicator: "Prescription drug scam", severity: "high" },
   
   // Utility Companies
   { pattern: /\b(electric|power|utility)\s*(company|service|provider)?\b.{0,50}(disconnect|payment\s*due|past\s*due|shut\s*off)/i, category: "Utility Impersonation", indicator: "Electric bill scam", severity: "high" },
@@ -663,58 +663,176 @@ function levenshteinDistance(a: string, b: string): number {
 
 // EXPANDED Known brands for similarity checking (200+ brands)
 const knownBrands = [
-  // Tech Giants
+  // Tech Giants (60+ brands)
   "paypal", "amazon", "apple", "google", "microsoft", "facebook", "meta",
   "instagram", "netflix", "twitter", "linkedin", "youtube", "ebay", "alibaba",
   "whatsapp", "snapchat", "tiktok", "spotify", "discord", "zoom", "slack",
   "dropbox", "github", "adobe", "salesforce", "oracle", "cisco", "intel",
   "samsung", "sony", "nvidia", "amd", "dell", "hp", "lenovo", "asus",
+  "ibm", "vmware", "sap", "intuit", "turbotax", "quickbooks", "mailchimp",
+  "hubspot", "zendesk", "atlassian", "jira", "confluence", "trello", "notion",
+  "monday", "asana", "figma", "canva", "grammarly", "evernote", "todoist",
+  "1password", "lastpass", "dashlane", "bitwarden", "nordvpn", "expressvpn",
+  "surfshark", "protonvpn", "protonmail", "tutanota", "signal", "telegram",
+  "wechat", "line", "viber", "skype", "teams", "webex", "gotomeeting",
+  "docusign", "hellosign", "pandadoc", "airtable", "coda", "clickup",
+  "basecamp", "freshdesk", "intercom", "drift", "crisp", "olark", "livechat",
+  "shopify", "woocommerce", "bigcommerce", "magento", "squarespace", "wix",
+  "godaddy", "namecheap", "cloudflare", "digitalocean", "aws", "azure",
+  "googlecloud", "heroku", "netlify", "vercel", "render", "railway",
   
-  // Banks & Financial
+  // Banks & Financial - US (80+ brands)
   "chase", "wellsfargo", "bankofamerica", "citibank", "usbank", "capitalone",
-  "americanexpress", "discover", "venmo", "cashapp", "zelle", "coinbase",
+  "americanexpress", "amex", "discover", "venmo", "cashapp", "zelle", "coinbase",
   "binance", "robinhood", "fidelity", "schwab", "vanguard", "etrade",
   "tdameritrade", "pnc", "tdbank", "hsbc", "barclays", "santander",
   "goldmansachs", "morganstanley", "jpmorgan", "mastercard", "visa",
   "kraken", "gemini", "metamask", "ledger", "opensea", "uniswap",
+  "citizensbank", "fifththird", "keybank", "regions", "huntington", "ally",
+  "marcus", "sofi", "chime", "current", "varo", "monzo", "revolut", "n26",
+  "wise", "transferwise", "worldremit", "remitly", "xoom", "westernunion",
+  "moneygram", "payoneer", "skrill", "neteller", "paysafe", "stripe",
+  "square", "clover", "toast", "lightspeed", "shopkeep", "revel",
+  "suntrust", "bbt", "truist", "synovus", "firsthorizon", "umpqua",
+  "webull", "acorns", "betterment", "wealthfront", "personalcapital",
+  "creditkarma", "experian", "equifax", "transunion", "annualcreditreport",
+  "mint", "ynab", "pocketguard", "honeydue", "copilot", "rocket",
   
-  // Retail
+  // Banks & Financial - International
+  "natwest", "lloyds", "halifax", "nationwide", "rbs", "tsb", "virgin",
+  "starling", "tandem", "atom", "triodos", "metro", "handelsbanken",
+  "deutschebank", "commerzbank", "bnpparibas", "creditagricole", "societe",
+  "unicredit", "intesa", "ing", "abn", "rabobank", "bunq", "knab",
+  "ubs", "creditsuisse", "postfinance", "raiffeisen", "erste", "bawag",
+  "nordea", "swedbank", "seb", "handelsbanken", "danske", "dnb", "storebrand",
+  "commonwealth", "westpac", "anz", "nab", "macquarie", "bendigo", "bankwest",
+  "icbc", "ccb", "abc", "boc", "bocom", "cmbchina", "spdb", "citic",
+  "mizuho", "mufg", "smbc", "resona", "shinsei", "aozora", "suruga",
+  "dbs", "ocbc", "uob", "maybank", "cimb", "rhb", "publicbank", "hongleong",
+  "kotak", "hdfc", "icici", "axis", "sbi", "pnb", "bob", "canara",
+  
+  // Retail - Major (100+ brands)
   "walmart", "target", "costco", "bestbuy", "homedepot", "lowes", "macys",
   "nordstrom", "kohls", "sephora", "ulta", "nike", "adidas", "lululemon",
   "underarmour", "gap", "oldnavy", "zara", "hm", "forever21", "asos",
   "shein", "temu", "wish", "etsy", "wayfair", "chewy", "petco", "petsmart",
+  "jcpenney", "belk", "dillards", "bloomingdales", "neiman", "saks", "barneys",
+  "anthropologie", "freepeople", "urbanoutfitters", "ae", "abercrombie", "hollister",
+  "express", "jcrew", "bananarepublic", "athleta", "uniqlo", "primark", "topshop",
+  "boohoo", "prettylittlething", "missguided", "fashionnova", "romwe", "zaful",
+  "puma", "newbalance", "asics", "reebok", "vans", "converse", "skechers",
+  "footlocker", "finishline", "champssports", "dickssporting", "academy", "rei",
+  "bass", "cabelas", "sportsmans", "scheels", "dunhams", "hibbett",
+  "ikea", "williams-sonoma", "pottery", "westelm", "crateandbarrel", "cb2",
+  "bedbathandbeyond", "pier1", "zgallerie", "worldmarket", "roomandboard",
+  "restorationhardware", "arhaus", "ethanallen", "lazyboy", "ashleyfurniture",
+  "overstock", "hayneedle", "houzz", "allmodern", "jossandmain", "birch",
+  "autozone", "oreilly", "advanceauto", "pepboys", "napa", "carquest",
+  "staples", "officemax", "officedepot", "uline", "quill", "vistaprint",
+  "michaels", "joann", "hobbylobby", "blick", "dickblick", "jerrysartarama",
+  "gamestop", "thinkgeek", "newegg", "microcenter", "bhphoto", "adorama",
   
-  // Streaming & Entertainment
-  "disney", "hbomax", "hulu", "paramount", "peacock", "twitch", "steam",
+  // Streaming & Entertainment (50+ brands)
+  "disney", "disneyplus", "hbomax", "hulu", "paramount", "peacock", "twitch", "steam",
   "epicgames", "playstation", "xbox", "nintendo", "roblox", "activision",
   "electronicarts", "ubisoft", "bethesda", "rockstar", "valorant", "fortnite",
+  "primevideo", "appletv", "discovery", "showtime", "starz", "britbox",
+  "acorn", "criterion", "mubi", "shudder", "amc", "sundancenow",
+  "crunchyroll", "funimation", "hidive", "vrv", "roosterteeth", "dropout",
+  "dazn", "espn", "fubo", "sling", "youtubetv", "directv", "dish",
+  "pandora", "deezer", "tidal", "amazonmusic", "applemusic", "soundcloud",
+  "bandcamp", "audiomack", "mixcloud", "beatport", "traxsource",
+  "blizzard", "riot", "bungie", "square-enix", "capcom", "konami", "sega",
+  "bandainamco", "2k", "take2", "thq", "paradox", "cdprojekt", "devolver",
   
-  // Telecom & Utilities
+  // Telecom & Utilities (40+ brands)
   "att", "verizon", "tmobile", "sprint", "comcast", "xfinity", "spectrum",
   "cox", "cricket", "boost", "metro", "visible", "mint", "ting",
+  "straighttalk", "tracfone", "consumer", "pageplus", "redpocket", "ultramobile",
+  "googlefi", "usmobile", "tello", "textnow", "freedompop", "republic",
+  "frontier", "centurylink", "lumen", "windstream", "consolidated", "cincinnati",
+  "atlantic", "optimum", "altice", "mediacom", "suddenlink", "wow",
+  "sce", "pge", "edison", "duke", "dominion", "entergy", "xcel",
+  "firstenergy", "aep", "southern", "nextera", "evergy", "ameren",
+  "nationalfuel", "atmos", "spire", "southwest", "cenpoint", "onegas",
   
-  // Travel & Transportation
+  // Travel & Transportation (60+ brands)
   "unitedairlines", "delta", "americanairlines", "southwest", "jetblue",
   "uber", "lyft", "doordash", "grubhub", "instacart", "postmates",
   "airbnb", "booking", "expedia", "hotels", "kayak", "tripadvisor",
-  "usps", "fedex", "ups", "dhl", "amazon", "hertz", "enterprise", "avis",
+  "usps", "fedex", "ups", "dhl", "hertz", "enterprise", "avis",
+  "alaskaair", "spirit", "frontier", "allegiant", "hawaiian", "sun",
+  "british", "lufthansa", "airfrance", "klm", "emirates", "qatar",
+  "etihad", "singapore", "cathay", "ana", "jal", "korean", "asiana",
+  "qantas", "virgin", "ryanair", "easyjet", "vueling", "norwegian",
+  "priceline", "hotwire", "orbitz", "travelocity", "cheapoair", "momondo",
+  "skyscanner", "google flights", "kiwi", "hopper", "scott", "going",
+  "marriott", "hilton", "hyatt", "ihg", "wyndham", "choice", "bestwestern",
+  "radisson", "accor", "fourseasons", "ritz", "waldorf", "conrad", "doubletree",
+  "homewood", "hampton", "residence", "springhill", "fairfield", "courtyard",
+  "budget", "national", "alamo", "thrifty", "dollar", "sixt", "europcar",
+  "turo", "getaround", "zipcar", "maven", "car2go", "lime", "bird", "spin",
   
-  // Healthcare & Pharma
+  // Healthcare & Pharma (50+ brands)
   "cvs", "walgreens", "riteaid", "unitedhealth", "cigna", "aetna", "anthem",
   "bluecross", "kaiser", "humana", "optum", "express-scripts", "caremark",
+  "centene", "molina", "wellcare", "healthnet", "oscar", "clover", "bright",
+  "devoted", "alignment", "carelon", "magellan", "beacon", "evicore",
+  "pfizer", "moderna", "jnj", "merck", "abbvie", "bms", "lilly", "amgen",
+  "gilead", "regeneron", "vertex", "biogen", "alexion", "incyte", "seagen",
+  "novartis", "roche", "sanofi", "gsk", "astrazeneca", "bayer", "boehringer",
+  "teladoc", "amwell", "mdlive", "doctor", "zocdoc", "healthgrades", "vitals",
+  "onemedical", "forward", "parsley", "carbon", "cityblock", "oak", "galileo",
+  "pillpack", "capsule", "alto", "medly", "nimble", "truepill", "amazon pharmacy",
   
-  // Food & Beverage
+  // Food & Beverage (60+ brands)
   "mcdonalds", "starbucks", "chipotle", "dominos", "pizzahut", "dunkin",
   "tacobell", "wendys", "burgerking", "subway", "chickfila", "kfc",
   "papajohns", "littlecaesars", "panera", "noodles", "panerabread",
   "coca-cola", "pepsi", "redbull", "monster", "gatorade",
+  "popeyes", "arbys", "sonic", "jackinthebox", "carls", "hardees",
+  "fiveguys", "shakeshack", "innout", "whataburger", "culvers", "cookout",
+  "wingstop", "buffalowild", "hooters", "applebees", "chilis", "tgifridays",
+  "olivegarden", "redlobster", "outback", "texas", "longhorn", "ruth",
+  "cheesecakefactory", "pf", "benihana", "maggianos", "capital", "mortons",
+  "denny", "ihop", "waffle", "cracker", "bobevans", "perkins", "shoneys",
+  "sweetgreen", "cava", "tender", "portillos", "jasons", "potbelly", "firehouse",
+  "jersymikes", "jimmyjohns", "whichwich", "quiznos", "schlotzskys", "mcalisters",
+  "smoothie", "jamba", "tropical", "nekter", "juice", "pressed", "suja",
+  "krispy", "cinnabon", "auntie", "wetzel", "greatamerican", "insomnia",
   
-  // Insurance
+  // Insurance (40+ brands)
   "statefarm", "geico", "progressive", "allstate", "libertymutual", "farmers",
   "nationwide", "usaa", "travelers", "metlife", "prudential", "aflac",
+  "hartford", "chubb", "aig", "zurich", "cna", "tokio", "sompo", "mitsui",
+  "erie", "american", "safeco", "mercury", "esurance", "21st", "kemper",
+  "lemonade", "root", "hippo", "next", "pie", "coterie", "vouch", "cowbell",
+  "newfront", "embroker", "founder", "brex", "ramp", "divvy", "airbase",
+  "northwestern", "newyork", "massmutal", "principal", "lincoln", "transamerica",
+  "voya", "brighthouse", "athene", "equitable", "jackson", "ameriprise", "edward",
   
-  // Government & Organizations (commonly impersonated)
-  "irs", "ssa", "medicare", "medicaid", "usps", "dmv", "uscis"
+  // Government & Organizations (30+ brands)
+  "irs", "ssa", "medicare", "medicaid", "usps", "dmv", "uscis",
+  "fbi", "cia", "nsa", "dhs", "ice", "cbp", "tsa", "atf", "dea", "marshals",
+  "fda", "cdc", "nih", "hhs", "epa", "dot", "faa", "nhtsa", "fcc", "ftc",
+  "sec", "finra", "cfpb", "occ", "fdic", "ncua", "fhfa", "fannie", "freddie",
+  "va", "hud", "sba", "gsa", "opm", "ssa", "uscourts", "supremecourt",
+  
+  // Crypto & Web3 (40+ brands)
+  "bitcoin", "ethereum", "solana", "cardano", "polkadot", "avalanche", "cosmos",
+  "polygon", "arbitrum", "optimism", "base", "linea", "zksync", "starknet",
+  "rarible", "foundation", "superrare", "nifty", "async", "catalog", "sound",
+  "aave", "compound", "makerdao", "lido", "rocketpool", "frax", "curve",
+  "sushiswap", "pancakeswap", "quickswap", "velodrome", "aerodrome", "balancer",
+  "fantom", "near", "algorand", "hedera", "tezos", "flow", "aptos", "sui",
+  "trustwallet", "phantom", "keplr", "rainbow", "argent", "safe", "gnosis",
+  
+  // Education & Learning (30+ brands)
+  "coursera", "udemy", "edx", "linkedin", "skillshare", "masterclass", "brilliant",
+  "khan", "duolingo", "babbel", "rosetta", "busuu", "memrise", "anki",
+  "chegg", "quizlet", "studyblue", "bartleby", "course", "studocu", "scribd",
+  "codecademy", "freecodecamp", "treehouse", "pluralsight", "udacity", "datacamp",
+  "leetcode", "hackerrank", "codewars", "exercism", "frontendmentor", "scrimba"
 ];
 
 // Check for brand similarity (catch subtle misspellings)
