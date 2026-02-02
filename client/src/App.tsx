@@ -48,6 +48,7 @@ const AdminSubscribers = lazy(() => import("@/pages/admin/subscribers"));
 const AdminScamReports = lazy(() => import("@/pages/admin/scam-reports"));
 const AdminChangePassword = lazy(() => import("@/pages/admin/change-password"));
 const AdminToolAnalytics = lazy(() => import("@/pages/admin/tool-analytics"));
+const AdminSecurity = lazy(() => import("@/pages/admin-security"));
 const Login = lazy(() => import("@/pages/login"));
 
 // Loading fallback component
@@ -111,6 +112,7 @@ function Router() {
         <Route path="/admin/subscribers" component={AdminSubscribers} />
         <Route path="/admin/scam-reports" component={AdminScamReports} />
         <Route path="/admin/tool-analytics" component={AdminToolAnalytics} />
+        <Route path="/admin/security" component={AdminSecurity} />
         <Route path="/admin/change-password" component={AdminChangePassword} />
         <Route path="/login" component={Login} />
         <Route component={NotFound} />

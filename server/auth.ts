@@ -8,7 +8,7 @@ import crypto from "crypto";
 import { db } from "./db";
 import { users, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema, changePasswordSchema, mfaVerifySchema } from "@shared/schema";
 import { eq } from "drizzle-orm";
-import { securityLogger } from "./security";
+import { securityLogger, failedLoginTracker, ipBlocklist } from "./security";
 import { z } from "zod";
 
 // Constants
@@ -190,9 +190,20 @@ export function registerAuthRoutes(app: Express) {
       const validatedData = loginSchema.parse(req.body);
       const clientIp = req.ip || req.socket.remoteAddress || "unknown";
       
+      // Check if IP is blocked due to brute force attempts
+      const blockStatus = ipBlocklist.isBlocked(clientIp);
+      if (blockStatus.blocked) {
+        return res.status(403).json({ 
+          error: "Too many failed login attempts. Please try again later.",
+          retryAfter: Math.ceil((blockStatus.remainingMs || 0) / 1000)
+        });
+      }
+      
       // Find user
       const [user] = await db.select().from(users).where(eq(users.email, validatedData.email.toLowerCase()));
       if (!user || !user.passwordHash) {
+        // Track failed attempt even for non-existent users (prevents user enumeration)
+        failedLoginTracker.recordFailedAttempt(clientIp, validatedData.email);
         securityLogger.warn("Login attempt for non-existent user", { email: validatedData.email, ip: clientIp });
         return res.status(401).json({ error: "Invalid email or password" });
       }
@@ -209,6 +220,8 @@ export function registerAuthRoutes(app: Express) {
       const passwordValid = await bcrypt.compare(validatedData.password, user.passwordHash);
       if (!passwordValid) {
         await incrementFailedAttempts(user.id);
+        // Track IP-based brute force attempts
+        failedLoginTracker.recordFailedAttempt(clientIp, user.email);
         securityLogger.warn("Failed login attempt", { userId: user.id, ip: clientIp });
         return res.status(401).json({ error: "Invalid email or password" });
       }
@@ -249,6 +262,7 @@ export function registerAuthRoutes(app: Express) {
           
           if (codeIndex === -1) {
             await incrementFailedAttempts(user.id);
+            failedLoginTracker.recordFailedAttempt(clientIp, user.email); // Track MFA failures
             securityLogger.warn("Failed MFA verification", { userId: user.id, ip: clientIp });
             return res.status(401).json({ error: "Invalid authentication code" });
           }
@@ -265,6 +279,7 @@ export function registerAuthRoutes(app: Express) {
       
       // Reset failed attempts and update login info
       await resetFailedAttempts(user.id);
+      failedLoginTracker.recordSuccessfulLogin(clientIp); // Clear IP-based tracking
       await db.update(users).set({
         lastLoginAt: new Date(),
         lastLoginIp: clientIp,
@@ -338,6 +353,7 @@ export function registerAuthRoutes(app: Express) {
         
         if (codeIndex === -1) {
           await incrementFailedAttempts(user.id);
+          failedLoginTracker.recordFailedAttempt(clientIp, user.email); // Track MFA failures
           return res.status(401).json({ error: "Invalid authentication code" });
         }
         
@@ -350,6 +366,7 @@ export function registerAuthRoutes(app: Express) {
       
       // Complete login
       await resetFailedAttempts(user.id);
+      failedLoginTracker.recordSuccessfulLogin(clientIp); // Clear IP-based tracking
       await db.update(users).set({
         lastLoginAt: new Date(),
         lastLoginIp: clientIp

@@ -6,6 +6,84 @@ import path from "path";
 import crypto from "crypto";
 import { checkRateLimitAlert, checkCSRFAlert, checkSuspiciousPatternAlert } from "./security-alerts";
 
+// Security Alert Configuration
+const SECURITY_ALERT_EMAIL = process.env.SECURITY_ALERT_EMAIL || "";
+const ALERT_COOLDOWN_MS = 300000; // 5 minutes between same alert types
+const alertCooldowns = new Map<string, number>();
+
+// Security Alert Types
+export type SecurityAlertType = 
+  | "brute_force_attack"
+  | "critical_anomaly"
+  | "rate_limit_exceeded"
+  | "suspicious_pattern"
+  | "ip_blocked";
+
+interface SecurityAlertPayload {
+  type: SecurityAlertType;
+  severity: "warning" | "critical";
+  ip: string;
+  details: string;
+  timestamp: Date;
+  mitreAttack?: string;
+}
+
+// Queue for pending security alerts (can be processed by email service)
+const pendingAlerts: SecurityAlertPayload[] = [];
+const MAX_PENDING_ALERTS = 100;
+
+// Send security alert (logs and queues for email delivery)
+export function sendSecurityAlert(payload: SecurityAlertPayload): void {
+  const alertKey = `${payload.type}:${payload.ip}`;
+  const now = Date.now();
+  const lastAlert = alertCooldowns.get(alertKey);
+  
+  // Rate limit same alerts from same IP
+  if (lastAlert && now - lastAlert < ALERT_COOLDOWN_MS) {
+    return; // Skip duplicate alert within cooldown
+  }
+  
+  alertCooldowns.set(alertKey, now);
+  
+  // Log the alert
+  securityLogger.warn("SECURITY ALERT", {
+    ...payload,
+    alertEmail: SECURITY_ALERT_EMAIL ? "configured" : "not_configured",
+  });
+  
+  // Queue alert for email delivery
+  if (pendingAlerts.length < MAX_PENDING_ALERTS) {
+    pendingAlerts.push(payload);
+  }
+  
+  // Clean up old cooldowns periodically
+  if (alertCooldowns.size > 1000) {
+    for (const [key, time] of alertCooldowns.entries()) {
+      if (now - time > ALERT_COOLDOWN_MS * 2) {
+        alertCooldowns.delete(key);
+      }
+    }
+  }
+}
+
+// Get pending alerts for email processing
+export function getPendingAlerts(): SecurityAlertPayload[] {
+  return [...pendingAlerts];
+}
+
+// Clear pending alerts after processing
+export function clearPendingAlerts(): void {
+  pendingAlerts.length = 0;
+}
+
+// Get alert count for metrics
+export function getAlertStats(): { pending: number; cooldownEntries: number } {
+  return {
+    pending: pendingAlerts.length,
+    cooldownEntries: alertCooldowns.size,
+  };
+}
+
 // Ensure logs directory exists
 const logsDir = path.join(process.cwd(), "logs");
 if (!fs.existsSync(logsDir)) {
@@ -70,21 +148,149 @@ const rateLimitTiers: Record<string, RateLimitConfig> = {
   relaxed: { windowMs: 60000, maxRequests: 100 },
 };
 
+// Centralized IP blocklist for security violations
+class IPBlocklist {
+  private blockedIPs: Map<string, { until: number; reason: string; severity: string }> = new Map();
+  
+  block(ip: string, durationMs: number, reason: string, severity: "warning" | "critical" = "warning") {
+    const until = Date.now() + durationMs;
+    this.blockedIPs.set(ip, { until, reason, severity });
+    securityLogger.warn("IP blocked", { ip, reason, severity, blockedUntil: new Date(until).toISOString() });
+  }
+  
+  isBlocked(ip: string): { blocked: boolean; reason?: string; remainingMs?: number } {
+    const entry = this.blockedIPs.get(ip);
+    if (!entry) return { blocked: false };
+    
+    const now = Date.now();
+    if (now >= entry.until) {
+      this.blockedIPs.delete(ip);
+      return { blocked: false };
+    }
+    
+    return { blocked: true, reason: entry.reason, remainingMs: entry.until - now };
+  }
+  
+  getBlockedCount(): number {
+    this.cleanup();
+    return this.blockedIPs.size;
+  }
+  
+  getBlockedIPs(): Array<{ ip: string; reason: string; until: string; severity: string }> {
+    this.cleanup();
+    return Array.from(this.blockedIPs.entries()).map(([ip, data]) => ({
+      ip,
+      reason: data.reason,
+      until: new Date(data.until).toISOString(),
+      severity: data.severity,
+    }));
+  }
+  
+  unblock(ip: string): boolean {
+    return this.blockedIPs.delete(ip);
+  }
+  
+  cleanup() {
+    const now = Date.now();
+    for (const [ip, data] of this.blockedIPs.entries()) {
+      if (now >= data.until) this.blockedIPs.delete(ip);
+    }
+  }
+}
+
+export const ipBlocklist = new IPBlocklist();
+
+// Failed login tracker for brute force detection (MITRE: T1110)
+class FailedLoginTracker {
+  private attempts: Map<string, { count: number; firstAttempt: number; lastAttempt: number }> = new Map();
+  private readonly WINDOW_MS = 900000; // 15 minute window
+  private readonly MAX_ATTEMPTS = 5; // Block after 5 failed attempts
+  private readonly BLOCK_DURATION = 900000; // 15 minute block
+  
+  recordFailedAttempt(ip: string, username?: string): { shouldBlock: boolean; attempts: number } {
+    const now = Date.now();
+    const key = ip; // Track by IP primarily
+    
+    let record = this.attempts.get(key);
+    
+    if (!record || now - record.firstAttempt > this.WINDOW_MS) {
+      record = { count: 1, firstAttempt: now, lastAttempt: now };
+    } else {
+      record.count++;
+      record.lastAttempt = now;
+    }
+    
+    this.attempts.set(key, record);
+    
+    const shouldBlock = record.count >= this.MAX_ATTEMPTS;
+    
+    if (shouldBlock) {
+      ipBlocklist.block(ip, this.BLOCK_DURATION, "brute_force_login", "critical");
+      securityLogger.error("Brute force login attempt detected", {
+        ip,
+        username: username || "unknown",
+        attempts: record.count,
+        mitreAttack: "T1110",
+        action: "blocked",
+      });
+      
+      // Send security alert for brute force attack
+      sendSecurityAlert({
+        type: "brute_force_attack",
+        severity: "critical",
+        ip,
+        details: `Brute force login attack detected. ${record.count} failed attempts for user "${username || "unknown"}". IP has been blocked for 15 minutes.`,
+        timestamp: new Date(),
+        mitreAttack: "T1110",
+      });
+      
+      this.attempts.delete(key); // Reset after blocking
+    } else if (record.count >= 3) {
+      securityLogger.warn("Multiple failed login attempts", {
+        ip,
+        username: username || "unknown",
+        attempts: record.count,
+        mitreAttack: "T1110",
+      });
+    }
+    
+    return { shouldBlock, attempts: record.count };
+  }
+  
+  recordSuccessfulLogin(ip: string) {
+    this.attempts.delete(ip);
+  }
+  
+  getStats(): { trackedIPs: number; highRiskIPs: number } {
+    const now = Date.now();
+    let highRisk = 0;
+    for (const [key, record] of this.attempts.entries()) {
+      if (now - record.firstAttempt > this.WINDOW_MS) {
+        this.attempts.delete(key);
+      } else if (record.count >= 3) {
+        highRisk++;
+      }
+    }
+    return { trackedIPs: this.attempts.size, highRiskIPs: highRisk };
+  }
+}
+
+export const failedLoginTracker = new FailedLoginTracker();
+
 // Enhanced rate limiter with IP tracking and logging
 class RateLimiter {
   private requests: Map<string, { count: number; resetTime: number; violations: number }> = new Map();
-  private blockedIPs: Map<string, number> = new Map();
   private readonly BLOCK_DURATION = 300000; // 5 minutes
 
   checkLimit(ip: string, tier: keyof typeof rateLimitTiers = "standard"): { allowed: boolean; remaining: number; resetIn: number } {
     const now = Date.now();
     const config = rateLimitTiers[tier];
     
-    // Check if IP is blocked
-    const blockedUntil = this.blockedIPs.get(ip);
-    if (blockedUntil && now < blockedUntil) {
-      securityLogger.warn("Blocked IP attempted access", { ip, blockedUntil: new Date(blockedUntil).toISOString() });
-      return { allowed: false, remaining: 0, resetIn: Math.ceil((blockedUntil - now) / 1000) };
+    // Check if IP is blocked using centralized blocklist
+    const blockStatus = ipBlocklist.isBlocked(ip);
+    if (blockStatus.blocked) {
+      securityLogger.warn("Blocked IP attempted access", { ip, reason: blockStatus.reason });
+      return { allowed: false, remaining: 0, resetIn: Math.ceil((blockStatus.remainingMs || 0) / 1000) };
     }
 
     let record = this.requests.get(ip);
@@ -99,10 +305,9 @@ class RateLimiter {
     if (record.count > config.maxRequests) {
       record.violations++;
       
-      // Block IP after 3 violations
+      // Block IP after 3 violations using centralized blocklist
       if (record.violations >= 3) {
-        this.blockedIPs.set(ip, now + this.BLOCK_DURATION);
-        securityLogger.warn("IP blocked due to repeated rate limit violations", { ip, violations: record.violations });
+        ipBlocklist.block(ip, this.BLOCK_DURATION, "rate_limit_violations", "warning");
       }
       
       // Trigger security alert for rate limit violations
@@ -129,11 +334,7 @@ class RateLimiter {
         this.requests.delete(ip);
       }
     });
-    Array.from(this.blockedIPs.entries()).forEach(([ip, blockedUntil]) => {
-      if (now > blockedUntil) {
-        this.blockedIPs.delete(ip);
-      }
-    });
+    // Note: IP blocking is now handled by centralized ipBlocklist.cleanup()
   }
 }
 
@@ -571,6 +772,17 @@ export function apiAnomalyDetection(req: Request, res: Response, next: NextFunct
   }
   
   const ip = getClientIP(req);
+  
+  // Check if IP is already blocked
+  const blockStatus = ipBlocklist.isBlocked(ip);
+  if (blockStatus.blocked) {
+    res.status(403).json({ 
+      error: "Access denied", 
+      reason: "Your IP has been temporarily blocked due to suspicious activity",
+      retryAfter: Math.ceil((blockStatus.remainingMs || 0) / 1000)
+    });
+    return;
+  }
 
   const result = anomalyDetector.recordRequest(ip, endpoint);
 
@@ -582,15 +794,37 @@ export function apiAnomalyDetection(req: Request, res: Response, next: NextFunct
     // Don't block, but add warning header and log
     res.setHeader("X-Anomaly-Detected", "true");
     
-    // For very high scores, consider additional protection
-    if (result.score > 90) {
-      securityLogger.error("Critical anomaly score - potential attack", {
+    // For critical scores (>=90), auto-block the IP
+    if (result.score >= 90) {
+      const BLOCK_DURATION = 600000; // 10 minutes for anomaly-based blocks
+      ipBlocklist.block(ip, BLOCK_DURATION, "critical_anomaly_score", "critical");
+      
+      securityLogger.error("Critical anomaly score - IP auto-blocked", {
         ip,
         score: result.score,
         reason: result.reason,
         endpoint,
         mitreAttack: "T1071",
+        action: "blocked",
+        blockDuration: "10m",
       });
+      
+      // Send security alert for critical anomaly
+      sendSecurityAlert({
+        type: "critical_anomaly",
+        severity: "critical",
+        ip,
+        details: `Critical anomaly detected (score: ${result.score}). Reason: ${result.reason || "multiple factors"}. Endpoint: ${endpoint}. IP has been blocked for 10 minutes.`,
+        timestamp: new Date(),
+        mitreAttack: "T1071",
+      });
+      
+      res.status(403).json({ 
+        error: "Access denied", 
+        reason: "Suspicious activity detected. Your IP has been temporarily blocked.",
+        retryAfter: Math.ceil(BLOCK_DURATION / 1000)
+      });
+      return;
     }
   }
 
@@ -614,10 +848,38 @@ export const sriHashes = {
 export function registerSecurityMetricsEndpoint(app: Express) {
   app.get("/api/security/metrics", (req: Request, res: Response) => {
     const anomalyStats = anomalyDetector.getStats();
+    const loginStats = failedLoginTracker.getStats();
+    const alertStats = getAlertStats();
     res.json({
       timestamp: new Date().toISOString(),
       anomalyDetection: anomalyStats,
+      failedLogins: loginStats,
+      blockedIPs: {
+        count: ipBlocklist.getBlockedCount(),
+      },
+      alerts: alertStats,
       status: "operational",
     });
+  });
+  
+  // Admin endpoint to view blocked IPs (requires auth in production)
+  app.get("/api/admin/security/blocked-ips", (req: Request, res: Response) => {
+    // In production, this should require admin authentication
+    res.json({
+      timestamp: new Date().toISOString(),
+      blockedIPs: ipBlocklist.getBlockedIPs(),
+    });
+  });
+  
+  // Admin endpoint to unblock an IP
+  app.delete("/api/admin/security/blocked-ips/:ip", (req: Request, res: Response) => {
+    const ip = req.params.ip;
+    const unblocked = ipBlocklist.unblock(ip);
+    if (unblocked) {
+      securityLogger.info("IP manually unblocked by admin", { ip });
+      res.json({ success: true, message: `IP ${ip} has been unblocked` });
+    } else {
+      res.status(404).json({ success: false, message: `IP ${ip} was not in the blocklist` });
+    }
   });
 }

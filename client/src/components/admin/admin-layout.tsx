@@ -24,6 +24,7 @@ const navItems = [
   { href: "/admin/subscribers", label: "Subscribers", icon: Newspaper },
   { href: "/admin/scam-reports", label: "Scam Reports", icon: AlertTriangle },
   { href: "/admin/tool-analytics", label: "Tool Analytics", icon: BarChart3 },
+  { href: "/admin/security", label: "Security", icon: Shield },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {

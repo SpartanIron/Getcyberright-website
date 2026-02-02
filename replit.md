@@ -49,6 +49,8 @@ Preferred communication style: Simple, everyday language.
 - **Security Metrics**: `GET /api/security/metrics` endpoint for monitoring anomaly detection stats.
 - **Compliance**: Mapped controls to OWASP ASVS, CIS Control, ISO 27001, NIST 800-53, and MITRE ATT&CK.
 - **MITRE ATT&CK Score**: 87/100 (A-) with strong prevention (88/100), detection (85/100), and response (80/100) capabilities.
+- **Failed Login Protection**: IP-based brute force detection with auto-blocking after 5 failed attempts (15-minute blocks).
+- **Admin Security Dashboard**: Real-time monitoring at `/admin/security` with blocked IP management and MITRE score visualization.
 
 ### Content & Tools
 - **Content Guidelines**: All educational content is based on verified data from sources like FTC Consumer Sentinel, FBI IC3, CISA, Medicare.gov, etc. Emphasis on empowering, non-fear-based language.
