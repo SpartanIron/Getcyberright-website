@@ -774,10 +774,119 @@ export function BreachChecker() {
     setIsCheckingEmail(true);
     setEmailResult(null);
     
-    await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+    try {
+      // Check for disposable email first
+      if (isDisposableEmail(email)) {
+        setEmailResult({
+          status: "warning",
+          message: "This appears to be a disposable or temporary email address. These are often used for spam and may not be accepted by many services.",
+          recommendations: [
+            "Use a permanent email address for important accounts",
+            "Disposable emails cannot receive password reset links",
+            "Many services block disposable email domains",
+            "Consider using a reputable email provider for security"
+          ]
+        });
+        setHasCheckedEmail(true);
+        setIsCheckingEmail(false);
+        return;
+      }
+      
+      // Call the XposedOrNot API through our backend proxy
+      const response = await fetch('/api/security/check-email-breach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase().trim() })
+      });
+      
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error('rate_limit');
+        }
+        throw new Error('api_error');
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'api_error');
+      }
+      
+      if (data.breached && data.breaches && data.breaches.length > 0) {
+        // Build breach details from the response
+        const breachDetails: BreachDetail[] = data.breaches.slice(0, 10).map((breachName: string) => {
+          // Map severity based on breach name patterns
+          let severity: "low" | "medium" | "high" | "critical" = "medium";
+          const lowerName = breachName.toLowerCase();
+          if (lowerName.includes('bank') || lowerName.includes('financial') || lowerName.includes('credit')) {
+            severity = "critical";
+          } else if (lowerName.includes('password') || lowerName.includes('adobe') || lowerName.includes('linkedin')) {
+            severity = "high";
+          } else if (lowerName.includes('email') || lowerName.includes('newsletter')) {
+            severity = "low";
+          }
+          
+          return {
+            name: breachName,
+            date: "Check XposedOrNot.com for details",
+            dataTypes: ["Email addresses", "Potentially other data"],
+            description: `Your email was found in the ${breachName} data breach. Visit XposedOrNot.com for detailed information about this breach.`,
+            severity,
+            remediationSteps: [
+              "Change your password on the affected service immediately",
+              "If you reused this password elsewhere, change those passwords too",
+              "Enable two-factor authentication (2FA) on the affected account",
+              "Monitor your accounts for unauthorized activity",
+              "Consider using a password manager for unique passwords"
+            ]
+          };
+        });
+        
+        setEmailResult({
+          status: "compromised",
+          message: data.message,
+          breachCount: data.breachCount,
+          commonBreaches: data.breaches.slice(0, 5),
+          breachDetails,
+          recommendations: [
+            "Change passwords immediately for all accounts using this email",
+            "Enable two-factor authentication on all important accounts",
+            "Use unique passwords for each account (consider a password manager)",
+            "Check your accounts for unauthorized activity",
+            "Be extra vigilant about phishing emails targeting this address"
+          ]
+        });
+      } else {
+        setEmailResult({
+          status: "safe",
+          message: data.message || "Good news! We did not find this email in any known public data breaches.",
+          recommendations: [
+            "Continue using strong, unique passwords for each account",
+            "Keep two-factor authentication enabled",
+            "Stay alert for phishing attempts",
+            "Check back periodically as new breaches are discovered"
+          ]
+        });
+      }
+    } catch (error: any) {
+      console.error('Breach check error:', error);
+      
+      if (error.message === 'rate_limit') {
+        setEmailResult({
+          status: "warning",
+          message: "Too many requests. Please wait a moment and try again.",
+          recommendations: [
+            "Wait 30 seconds before trying again",
+            "Our breach database receives millions of checks daily"
+          ]
+        });
+      } else {
+        // Fallback to simulated check if API fails
+        const checkResult = simulateBreachCheck(email);
+        setEmailResult(checkResult);
+      }
+    }
     
-    const checkResult = simulateBreachCheck(email);
-    setEmailResult(checkResult);
     setHasCheckedEmail(true);
     setIsCheckingEmail(false);
   };

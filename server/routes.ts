@@ -515,6 +515,101 @@ export async function registerRoutes(
     }
   });
 
+  // XposedOrNot breach check endpoint - enterprise-grade open source breach database
+  app.post("/api/security/check-email-breach", standardRateLimit, async (req, res) => {
+    try {
+      const emailSchema = z.object({
+        email: z.string().email()
+      });
+      
+      const { email } = emailSchema.parse(req.body);
+      
+      // Call XposedOrNot API for breach check
+      const checkResponse = await fetchWithTimeout(
+        `https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'GetCyberRight-SecurityPlatform/1.0'
+          }
+        },
+        15000
+      );
+      
+      if (checkResponse.status === 404) {
+        // No breaches found
+        return res.json({
+          success: true,
+          breached: false,
+          breaches: [],
+          message: "Good news! This email was not found in any known data breaches."
+        });
+      }
+      
+      if (!checkResponse.ok) {
+        throw new Error(`XposedOrNot API error: ${checkResponse.status}`);
+      }
+      
+      const checkData = await checkResponse.json();
+      
+      // Get detailed analytics if breaches found
+      let analyticsData = null;
+      if (checkData.breaches && checkData.breaches.length > 0) {
+        try {
+          const analyticsResponse = await fetchWithTimeout(
+            `https://api.xposedornot.com/v1/breach-analytics?email=${encodeURIComponent(email)}`,
+            {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'GetCyberRight-SecurityPlatform/1.0'
+              }
+            },
+            15000
+          );
+          
+          if (analyticsResponse.ok) {
+            analyticsData = await analyticsResponse.json();
+          }
+        } catch (analyticsError) {
+          console.log('Analytics fetch failed, continuing with basic data:', analyticsError);
+        }
+      }
+      
+      // Flatten breach names array (XposedOrNot returns nested arrays)
+      const breachNames = checkData.breaches ? 
+        checkData.breaches.flat().filter((b: string) => b && b.length > 0) : [];
+      
+      res.json({
+        success: true,
+        breached: breachNames.length > 0,
+        breaches: breachNames,
+        breachCount: breachNames.length,
+        analytics: analyticsData,
+        message: breachNames.length > 0 
+          ? `This email was found in ${breachNames.length} data breach${breachNames.length > 1 ? 'es' : ''}.`
+          : "Good news! This email was not found in any known data breaches."
+      });
+      
+    } catch (error: any) {
+      console.error('Breach check error:', error);
+      
+      // Handle rate limiting
+      if (error.message?.includes('429') || error.message?.includes('rate')) {
+        return res.status(429).json({
+          success: false,
+          error: "Too many requests. Please wait a moment and try again."
+        });
+      }
+      
+      res.status(500).json({
+        success: false,
+        error: "Unable to check breach status. Please try again later."
+      });
+    }
+  });
+
   // Comprehensive URL scan (combines all checks)
   app.post("/api/security/comprehensive-scan", standardRateLimit, async (req, res) => {
     try {
