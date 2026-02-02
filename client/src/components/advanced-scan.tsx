@@ -991,8 +991,7 @@ export function AdvancedScan() {
           <Info className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
           <div className="text-xs text-muted-foreground">
             <p>
-              These advanced scanning tools use multiple threat intelligence sources to provide comprehensive security analysis. 
-              Some features require API keys to be configured for full functionality.
+              Our security tools check websites, phone numbers, and messages against multiple threat databases to help keep you safe online.
             </p>
           </div>
         </div>
