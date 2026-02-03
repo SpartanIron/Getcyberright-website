@@ -3,8 +3,10 @@ import { newsletterSubscribers, newsletterIssues, threatItems } from "@shared/sc
 import { eq, desc, gte, and } from "drizzle-orm";
 import OpenAI from "openai";
 import { ContentGuardrails } from "@shared/contentGuardrails";
+import { Resend } from "resend";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 interface NewsletterContent {
   subject: string;
@@ -324,7 +326,7 @@ Privacy Policy: https://getcyberright.com/privacy
 
     const subscribers = await this.getActiveSubscribers();
     
-    if (!process.env.RESEND_API_KEY && !process.env.SENDGRID_API_KEY) {
+    if (!resend) {
       console.log(`[newsletter] Email service not configured. Would send to ${subscribers.length} subscribers.`);
       
       await db.update(newsletterIssues)
@@ -342,21 +344,58 @@ Privacy Policy: https://getcyberright.com/privacy
       };
     }
 
+    // Send emails via Resend
+    const subscriberEmails = subscribers.map(s => s.email);
+    let successCount = 0;
+    let failCount = 0;
+
+    // Send in batches to avoid rate limits (Resend free tier: 100/day)
+    const batchSize = 50;
+    for (let i = 0; i < subscriberEmails.length; i += batchSize) {
+      const batch = subscriberEmails.slice(i, i + batchSize);
+      
+      try {
+        // Send to each subscriber individually for better deliverability
+        for (const email of batch) {
+          try {
+            await resend.emails.send({
+              from: "GetCyberRight <newsletter@getcyberright.com>",
+              to: email,
+              subject: issue.subject,
+              html: issue.contentHtml || "",
+              text: issue.contentText || "",
+            });
+            successCount++;
+          } catch (emailError: any) {
+            console.error(`[newsletter] Failed to send to ${email}:`, emailError.message);
+            failCount++;
+          }
+        }
+      } catch (batchError: any) {
+        console.error(`[newsletter] Batch send error:`, batchError.message);
+        failCount += batch.length;
+      }
+    }
+
+    const status = failCount === 0 ? "sent" : (successCount > 0 ? "partially_sent" : "failed");
+    
     await db.update(newsletterIssues)
       .set({ 
-        status: "sent",
+        status,
         sentAt: new Date(),
-        recipientCount: subscribers.length,
+        recipientCount: successCount,
         updatedAt: new Date(),
       })
       .where(eq(newsletterIssues.id, issueId));
 
-    console.log(`[newsletter] Newsletter ${issueId} sent to ${subscribers.length} subscribers`);
+    console.log(`[newsletter] Newsletter ${issueId}: ${successCount} sent, ${failCount} failed`);
     
     return { 
-      success: true, 
-      message: `Newsletter sent to ${subscribers.length} subscribers`, 
-      recipientCount: subscribers.length 
+      success: successCount > 0, 
+      message: failCount === 0 
+        ? `Newsletter sent to ${successCount} subscribers` 
+        : `Newsletter sent to ${successCount} subscribers (${failCount} failed)`, 
+      recipientCount: successCount 
     };
   }
 
