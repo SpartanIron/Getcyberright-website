@@ -54,6 +54,7 @@ const AdminContentGovernance = lazy(() => import("@/pages/admin-content-governan
 const AdminCompliance = lazy(() => import("@/pages/admin-compliance"));
 const AdminNewsletter = lazy(() => import("@/pages/admin-newsletter"));
 const Login = lazy(() => import("@/pages/login"));
+const Register = lazy(() => import("@/pages/register"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
 const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
 
@@ -126,6 +127,7 @@ function Router() {
         <Route path="/admin/newsletter" component={AdminNewsletter} />
         <Route path="/admin/change-password" component={AdminChangePassword} />
         <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route component={NotFound} />
       </Switch>
