@@ -255,3 +255,41 @@ export const feedHealthAlerts = pgTable("feed_health_alerts", {
 });
 
 export type FeedHealthAlert = typeof feedHealthAlerts.$inferSelect;
+
+// Content Pages Registry - Catalog of all educational content for governance
+export const contentPages = pgTable("content_pages", {
+  id: varchar("id").primaryKey(),
+  title: text("title").notNull(),
+  path: text("path").notNull(),
+  section: text("section").notNull(), // kids, seniors, parents, educators, small-business, tools, general
+  audience: text("audience").notNull(), // kids, seniors, parents, educators, business, all
+  topics: text("topics").array().notNull(), // phishing, malware, identity-theft, social-engineering, etc.
+  lastManualUpdate: timestamp("last_manual_update"),
+  freshnessScore: integer("freshness_score").default(100), // 0-100 score
+  priorityLevel: text("priority_level").default("normal"), // low, normal, high, critical
+  needsReview: boolean("needs_review").default(false),
+  reviewReason: text("review_reason"),
+  relatedThreatCount: integer("related_threat_count").default(0),
+  lastThreatMatch: timestamp("last_threat_match"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type ContentPage = typeof contentPages.$inferSelect;
+export type InsertContentPage = typeof contentPages.$inferInsert;
+
+// Content Audit Log - Track content review and update actions
+export const contentAuditLog = pgTable("content_audit_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  pageId: varchar("page_id").notNull(),
+  action: text("action").notNull(), // flagged, reviewed, updated, dismissed
+  triggeredBy: text("triggered_by").notNull(), // system, admin, threat-match
+  threatItemId: varchar("threat_item_id"),
+  notes: text("notes"),
+  previousScore: integer("previous_score"),
+  newScore: integer("new_score"),
+  performedBy: varchar("performed_by"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ContentAuditLog = typeof contentAuditLog.$inferSelect;

@@ -46,6 +46,7 @@ import {
   analyzePasswordExposure
 } from "./advancedThreatIntelligence";
 import { threatIntelService } from "./threatIntelService";
+import { contentGovernanceService } from "./contentGovernanceService";
 import {
   scanConversation,
   getEmergencyResources,
@@ -1487,6 +1488,14 @@ export async function registerRoutes(
     threatIntelService.startScheduler();
   }).catch(err => console.error("Failed to initialize threat intel service:", err));
 
+  // Initialize content governance service
+  contentGovernanceService.initialize().then(() => {
+    // Run initial threat-to-content matching
+    contentGovernanceService.matchThreatsToContent()
+      .then(() => console.log("[content-governance] Initial content audit complete"))
+      .catch(err => console.error("[content-governance] Initial audit failed:", err));
+  }).catch(err => console.error("Failed to initialize content governance service:", err));
+
   // Get all feeds with status
   app.get("/api/threat-intel/feeds", async (req: Request, res: Response) => {
     try {
@@ -1579,6 +1588,93 @@ export async function registerRoutes(
       const alertId = req.params.alertId as string;
       await threatIntelService.resolveAlert(alertId);
       res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // ============== CONTENT GOVERNANCE API ==============
+
+  // Get content governance stats
+  app.get("/api/content-governance/stats", async (req: Request, res: Response) => {
+    try {
+      const stats = await contentGovernanceService.getGovernanceStats();
+      res.json({ success: true, stats });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get all content pages
+  app.get("/api/content-governance/pages", async (req: Request, res: Response) => {
+    try {
+      const section = req.query.section as string | undefined;
+      const needsReview = req.query.needsReview === "true";
+      
+      let pages;
+      if (needsReview) {
+        pages = await contentGovernanceService.getPagesNeedingReview();
+      } else if (section) {
+        pages = await contentGovernanceService.getPagesBySection(section);
+      } else {
+        pages = await contentGovernanceService.getAllPages();
+      }
+      
+      res.json({ success: true, pages });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Run full content audit
+  app.post("/api/content-governance/audit", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const result = await contentGovernanceService.runFullAudit();
+      res.json({ success: true, ...result });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Mark a page as reviewed
+  app.post("/api/content-governance/pages/:pageId/review", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const pageId = req.params.pageId as string;
+      const userId = (req as any).session?.userId || "admin";
+      const notes = req.body.notes as string | undefined;
+      
+      await contentGovernanceService.markPageReviewed(pageId, userId, notes);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Dismiss review flag for a page
+  app.post("/api/content-governance/pages/:pageId/dismiss", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const pageId = req.params.pageId as string;
+      const userId = (req as any).session?.userId || "admin";
+      const notes = req.body.notes as string | undefined;
+      
+      await contentGovernanceService.dismissReviewFlag(pageId, userId, notes);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get audit log
+  app.get("/api/content-governance/audit-log", async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const pageId = req.query.pageId as string | undefined;
+      
+      const log = pageId 
+        ? await contentGovernanceService.getPageAuditLog(pageId)
+        : await contentGovernanceService.getAuditLog(limit);
+      
+      res.json({ success: true, log });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }

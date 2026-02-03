@@ -14,7 +14,8 @@ import {
   RefreshCw,
   Unlock,
   Database,
-  ChevronRight
+  ChevronRight,
+  FileText
 } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -304,6 +305,34 @@ export default function AdminSecurity() {
               <Link href="/admin/threat-intelligence">
                 <Button data-testid="button-view-threat-intel">
                   Manage Feeds
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-purple-500/30 bg-gradient-to-br from-purple-50/50 to-background dark:from-purple-950/30" data-testid="card-content-governance-link">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-purple-600" />
+              Content Governance
+            </CardTitle>
+            <CardDescription>Automated content auditing and freshness monitoring</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">
+                  Monitors all educational content across Kids, Seniors, Parents, Educators, and Business hubs
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Automatic flagging when new threats match content topics
+                </p>
+              </div>
+              <Link href="/admin/content-governance">
+                <Button data-testid="button-view-content-governance">
+                  Manage Content
                   <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
