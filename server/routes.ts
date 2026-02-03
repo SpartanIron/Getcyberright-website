@@ -168,21 +168,30 @@ export async function registerRoutes(
     }
   });
 
-  // One-time admin setup endpoint (only works if no admin exists)
+  // One-time admin setup endpoint (only works if no admin exists, or resets password if email matches)
   app.post("/api/setup/admin", strictRateLimit, async (req: Request, res: Response) => {
     try {
       const { email, password, setupKey } = req.body;
       
-      // Verify setup key matches a secret or is first-time setup
+      // Verify setup key matches a secret
       const expectedSetupKey = process.env.ADMIN_PASSWORD || "initial-setup";
       if (setupKey !== expectedSetupKey) {
         return res.status(403).json({ error: "Invalid setup key" });
       }
       
-      // Check if any admin already exists
-      const existingAdmins = await db.select().from(users).where(eq(users.isAdmin, true));
-      if (existingAdmins.length > 0) {
-        return res.status(400).json({ error: "Admin account already exists. Please log in." });
+      // Check if this specific admin email already exists
+      const existingUser = await db.select().from(users).where(eq(users.email, email));
+      if (existingUser.length > 0) {
+        // Update password for existing admin
+        const bcrypt = await import("bcryptjs");
+        const passwordHash = await bcrypt.hash(password, 12);
+        await db.update(users).set({ 
+          passwordHash, 
+          isAdmin: true,
+          emailVerified: true 
+        }).where(eq(users.email, email));
+        console.log(`[setup] Admin password reset for: ${email}`);
+        return res.json({ success: true, message: "Admin password updated. You can now log in." });
       }
       
       // Validate email and password
