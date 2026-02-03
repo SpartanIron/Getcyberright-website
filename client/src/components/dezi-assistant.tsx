@@ -605,11 +605,11 @@ ${regionNote}Our Emergency Help page has more detailed guidance, and you can als
 • Create a family safety codeword to verify emergency calls
 
 **Free Tools Available:**
-• **Scam Checker** - Analyze suspicious emails, URLs, and messages
-• **Password Generator** - Create strong, secure passwords instantly
-• **Family Codeword Generator** - Protect against impersonation scams
-• **Security Scanner** - Check websites for threats before visiting
-• **Printable Checklists** - Step-by-step security guides for your family
+• **Scam Checker:** Analyze suspicious emails, URLs, and messages
+• **Password Generator:** Create strong, secure passwords instantly
+• **Family Codeword Generator:** Protect against impersonation scams
+• **Security Scanner:** Check websites for threats before visiting
+• **Printable Checklists:** Step by step security guides for your family
 
 Explore all our tools at /tools
 

@@ -50,6 +50,16 @@ The platform uses an enterprise teal and orange color scheme, maintaining a flat
 - **AI & Cyber Safety Hub**: Educational content on AI-powered threats like deepfakes and AI chatbot scams.
 - **Child Safety Conversation Scanner**: Client-side grooming pattern detection with risk scoring and regional emergency resources.
 - **Dezi AI Assistant**: Provides analysis and security assistance, with free and premium tiers.
+- **AI Content Refresh**: Automated content update recommendations based on threat intelligence with one click application.
+
+### AI Content Guardrails (shared/contentGuardrails.ts)
+The platform enforces strict content integrity standards for all AI-generated content:
+- **Truthfulness**: All recommendations must be factually accurate and traceable to provided threat data.
+- **Verifiability**: No fabrication of statistics, dates, CVE numbers, or incident details.
+- **Anti-Hallucination**: Automated detection of potential hallucination patterns with disclaimers.
+- **Writing Quality**: Proper sentence structure, punctuation, and no dashes as clause separators.
+- **Audience Adaptation**: Content complexity adjusted for kids, seniors, parents, educators, and businesses.
+- **Source Attribution**: All threat-based recommendations cite the original intelligence feed source.
 
 ### Competitive Differentiator Features
 - **Family Safety Codeword Generator**: Unique tool for generating secure codewords for emergency verification, protecting against voice cloning scams.

@@ -2,9 +2,125 @@ import { db } from "./db";
 import { contentPages, contentAuditLog, threatItems, ContentPage } from "@shared/schema";
 import { eq, desc, and, gte, sql, inArray } from "drizzle-orm";
 import OpenAI from "openai";
+import { ContentGuardrails } from "@shared/contentGuardrails";
 
 // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// Content integrity guardrails and validation functions
+const AI_GUARDRAILS = {
+  // System prompt with comprehensive guardrails for content integrity
+  systemPrompt: `You are a cybersecurity education content specialist working for GetCyberRight, a platform that helps families, seniors, and businesses stay safe online.
+
+CRITICAL CONTENT INTEGRITY REQUIREMENTS:
+
+1. TRUTHFULNESS AND ACCURACY:
+   - Only provide information that is factually accurate and verifiable
+   - Base all recommendations on the provided threat intelligence data
+   - Never fabricate statistics, dates, or specific incident details
+   - If uncertain about a fact, use qualifying language like "reports suggest" or "evidence indicates"
+   - Cite the source feed when referencing specific threats
+
+2. VERIFIABILITY:
+   - Every recommendation must be traceable to the provided threat data
+   - Do not invent threat actors, campaigns, or attack techniques not mentioned in the input
+   - Reference authoritative cybersecurity sources (CISA, FBI, FTC) when applicable
+   - Use established cybersecurity terminology correctly
+
+3. ANTI-HALLUCINATION MEASURES:
+   - Do not create fictional examples or scenarios not grounded in the threat data
+   - Do not attribute quotes or statements to individuals or organizations
+   - Do not invent technical details, CVE numbers, or vulnerability specifics
+   - Stay within the scope of the provided information
+
+4. WRITING QUALITY STANDARDS:
+   - Use proper sentence structure with complete sentences
+   - Apply correct punctuation including periods, commas, and quotation marks
+   - Never use dashes or hyphens to separate clauses; use commas, semicolons, or separate sentences instead
+   - Write in clear, accessible language appropriate for the target audience
+   - Avoid jargon unless necessary, and explain technical terms when used
+   - Use active voice and direct language
+   - Keep sentences concise and focused
+
+5. AUDIENCE APPROPRIATENESS:
+   - Adapt complexity based on the target audience (kids, seniors, parents, educators, businesses)
+   - For kids: Use simple language and relatable examples
+   - For seniors: Avoid technical jargon and provide step by step guidance
+   - For businesses: Include compliance and risk management considerations
+
+6. INNOVATION AND VALUE:
+   - Provide actionable, practical recommendations
+   - Focus on protective measures users can implement immediately
+   - Suggest educational content improvements that address emerging threats
+   - Prioritize high impact changes based on threat severity`,
+
+  // Validation and sanitization functions
+  validateRecommendations(recommendations: string[]): string[] {
+    return recommendations
+      .filter(rec => rec && rec.trim().length > 10) // Remove empty or too short
+      .map(rec => this.sanitizeText(rec))
+      .slice(0, 10); // Limit to 10 recommendations
+  },
+
+  sanitizeText(text: string): string {
+    if (!text) return "";
+    
+    return text
+      // Remove dashes used as separators (but keep hyphens in compound words like "well-known")
+      .replace(/\s+[-–—]\s+/g, "; ")
+      .replace(/^[-–—]\s+/gm, "")
+      // Fix sentence structure
+      .replace(/\s{2,}/g, " ")
+      // Ensure proper punctuation
+      .replace(/([a-z])([A-Z])/g, "$1. $2")
+      // Remove any markdown formatting
+      .replace(/[*_`#]/g, "")
+      // Clean up any remaining issues
+      .trim();
+  },
+
+  validateSuggestedUpdates(text: string): string {
+    if (!text) return "";
+    
+    let sanitized = this.sanitizeText(text);
+    
+    // Ensure it ends with proper punctuation
+    if (!/[.!?]$/.test(sanitized)) {
+      sanitized += ".";
+    }
+    
+    // Limit length for UI display
+    if (sanitized.length > 1000) {
+      sanitized = sanitized.substring(0, 997) + "...";
+    }
+    
+    return sanitized;
+  },
+
+  // Check for potential hallucination indicators
+  detectPotentialHallucination(text: string, providedThreats: string[]): boolean {
+    const hallucginationIndicators = [
+      /according to.*\d{4}\s+report/i,
+      /studies show that \d+%/i,
+      /\b(CVE-\d{4}-\d+)\b/i, // Specific CVE numbers not in input
+      /\b(APT-?\d+)\b/i, // Specific APT groups
+      /said\s+["'][^"']+["']/i, // Direct quotes
+      /on\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+,\s+\d{4}/i,
+    ];
+    
+    for (const pattern of hallucginationIndicators) {
+      if (pattern.test(text)) {
+        // Check if the matched content exists in provided threats
+        const match = text.match(pattern);
+        if (match && !providedThreats.some(t => t.toLowerCase().includes(match[0].toLowerCase()))) {
+          return true; // Potential hallucination detected
+        }
+      }
+    }
+    
+    return false;
+  },
+};
 
 // Topic categories that map threat types to content topics
 const TOPIC_KEYWORDS: Record<string, string[]> = {
@@ -394,48 +510,80 @@ export class ContentGovernanceService {
     if (process.env.OPENAI_API_KEY && relatedThreats.length > 0) {
       try {
         const threatSummary = relatedThreats.slice(0, 5).map(t => 
-          `- ${t.title}: ${t.description.substring(0, 150)}...`
+          `Source: ${t.source} | Severity: ${t.severity} | ${t.title}: ${t.description.substring(0, 150)}`
         ).join("\n");
         
-        const prompt = `You are a cybersecurity education content specialist. Analyze these recent threats and provide content update recommendations for a page titled "${page.title}" that covers topics: ${pageTopics.join(", ")}.
+        const userPrompt = `Analyze the following verified threat intelligence data and provide content update recommendations for the page titled "${page.title}" that covers these topics: ${pageTopics.join(", ")}.
 
-Recent threats affecting this page's topics:
+VERIFIED THREAT INTELLIGENCE DATA (from our threat feeds):
 ${threatSummary}
 
-Target audience: ${page.audience}
+TARGET AUDIENCE: ${page.audience}
 
-Provide your response as JSON with this format:
+TASK: Based ONLY on the threat data provided above, generate recommendations for updating this educational page. Every recommendation must be directly traceable to the provided threat information.
+
+Provide your response as JSON with this exact format:
 {
-  "recommendations": ["recommendation 1", "recommendation 2", ...],
-  "suggestedUpdates": "A brief paragraph describing what content sections should be updated and what new information to add"
+  "recommendations": ["Complete sentence recommendation 1.", "Complete sentence recommendation 2.", ...],
+  "suggestedUpdates": "A clear paragraph describing specific content sections to update based on the threats above. Use complete sentences with proper punctuation. Do not use dashes to separate ideas; use periods or semicolons instead."
 }
 
-Focus on practical, actionable updates that help the ${page.audience} audience protect themselves.`;
+Remember: Base all suggestions on the provided threat data. Use proper sentence structure without dashes as separators.`;
 
         const response = await openai.chat.completions.create({
           model: "gpt-5",
-          messages: [{ role: "user", content: prompt }],
+          messages: [
+            { role: "system", content: AI_GUARDRAILS.systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
           response_format: { type: "json_object" },
           max_completion_tokens: 1024,
         });
         
         const result = JSON.parse(response.choices[0].message.content || "{}");
-        recommendations = result.recommendations || [];
-        suggestedUpdates = result.suggestedUpdates || "";
+        
+        // Apply guardrails validation and sanitization
+        const rawRecommendations = result.recommendations || [];
+        const rawUpdates = result.suggestedUpdates || "";
+        
+        // Validate recommendations
+        recommendations = AI_GUARDRAILS.validateRecommendations(rawRecommendations);
+        
+        // Validate and sanitize suggested updates
+        suggestedUpdates = AI_GUARDRAILS.validateSuggestedUpdates(rawUpdates);
+        
+        // Check for potential hallucinations
+        const threatTexts = relatedThreats.map(t => `${t.title} ${t.description}`);
+        const combinedOutput = [...recommendations, suggestedUpdates].join(" ");
+        
+        if (AI_GUARDRAILS.detectPotentialHallucination(combinedOutput, threatTexts)) {
+          console.warn("[content-governance] Potential hallucination detected in AI output, adding disclaimer");
+          recommendations.unshift("Note: Review all recommendations against source threat data before implementation.");
+        }
+        
+        // Ensure we have at least some recommendations
+        if (recommendations.length === 0) {
+          recommendations = [
+            `Review content to address ${relatedThreats.length} new threats matching your topics.`,
+            "Update examples to reflect current attack patterns identified in threat intelligence.",
+            "Verify protective measures align with latest security guidance.",
+          ];
+        }
+        
       } catch (error: any) {
         console.error("[content-governance] AI recommendation error:", error.message);
         recommendations = [
-          `Review and update content based on ${relatedThreats.length} new related threats`,
-          `Ensure examples reflect current attack patterns`,
-          `Update protective measures section with latest guidance`,
+          `Review and update content based on ${relatedThreats.length} new related threats.`,
+          "Ensure examples reflect current attack patterns.",
+          "Update protective measures section with latest guidance.",
         ];
         suggestedUpdates = `This page has ${page.relatedThreatCount} new threats matching its topics. Review the threat intelligence feed and update the educational content to address these new attack vectors.`;
       }
     } else {
       recommendations = [
-        `Review and update content based on ${relatedThreats.length} new related threats`,
-        `Ensure examples reflect current attack patterns`,
-        `Update protective measures section with latest guidance`,
+        `Review and update content based on ${relatedThreats.length} new related threats.`,
+        "Ensure examples reflect current attack patterns.",
+        "Update protective measures section with latest guidance.",
       ];
       suggestedUpdates = `This page has ${page.relatedThreatCount} new threats matching its topics. Review the threat intelligence feed and update the educational content to address these new attack vectors.`;
     }
