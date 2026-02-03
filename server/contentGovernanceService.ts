@@ -457,6 +457,14 @@ export class ContentGovernanceService {
     recommendations: string[];
     suggestedUpdates: string;
     urgency: "low" | "medium" | "high" | "critical";
+    generatedContent: {
+      sections: Array<{
+        title: string;
+        content: string;
+        type: "new" | "update";
+      }>;
+      summary: string;
+    } | null;
   }> {
     const pages = await db.select().from(contentPages).where(eq(contentPages.id, pageId));
     if (pages.length === 0) {
@@ -506,6 +514,10 @@ export class ContentGovernanceService {
     // Generate AI recommendations if OpenAI key is available
     let recommendations: string[] = [];
     let suggestedUpdates = "";
+    let generatedContent: {
+      sections: Array<{ title: string; content: string; type: "new" | "update" }>;
+      summary: string;
+    } | null = null;
     
     if (process.env.OPENAI_API_KEY && relatedThreats.length > 0) {
       try {
@@ -513,22 +525,42 @@ export class ContentGovernanceService {
           `Source: ${t.source} | Severity: ${t.severity} | ${t.title}: ${t.description.substring(0, 150)}`
         ).join("\n");
         
-        const userPrompt = `Analyze the following verified threat intelligence data and provide content update recommendations for the page titled "${page.title}" that covers these topics: ${pageTopics.join(", ")}.
+        const userPrompt = `Analyze the following verified threat intelligence data and generate ACTUAL CONTENT to add or update on the page titled "${page.title}" that covers these topics: ${pageTopics.join(", ")}.
 
 VERIFIED THREAT INTELLIGENCE DATA (from our threat feeds):
 ${threatSummary}
 
 TARGET AUDIENCE: ${page.audience}
 
-TASK: Based ONLY on the threat data provided above, generate recommendations for updating this educational page. Every recommendation must be directly traceable to the provided threat information.
+TASK: Based ONLY on the threat data provided above, generate:
+1. Brief recommendations for content updates
+2. ACTUAL CONTENT SECTIONS that can be added directly to the page
 
 Provide your response as JSON with this exact format:
 {
-  "recommendations": ["Complete sentence recommendation 1.", "Complete sentence recommendation 2.", ...],
-  "suggestedUpdates": "A clear paragraph describing specific content sections to update based on the threats above. Use complete sentences with proper punctuation. Do not use dashes to separate ideas; use periods or semicolons instead."
+  "recommendations": ["Brief recommendation 1.", "Brief recommendation 2."],
+  "suggestedUpdates": "Brief summary of what is being updated.",
+  "contentSections": [
+    {
+      "title": "Section heading (e.g., 'New Phishing Patterns to Watch For')",
+      "content": "Full paragraph of educational content ready to be published. Write 2-4 sentences that are informative and actionable. Use complete sentences with proper punctuation. Never use dashes to separate ideas.",
+      "type": "new"
+    },
+    {
+      "title": "Updated Warning Signs",
+      "content": "Another paragraph of content. Make it specific and based on the threat data. Include actionable advice.",
+      "type": "update"
+    }
+  ]
 }
 
-Remember: Base all suggestions on the provided threat data. Use proper sentence structure without dashes as separators.`;
+WRITING RULES:
+- Use complete, professional sentences
+- Never use dashes to separate clauses; use periods, commas, or semicolons
+- Be specific and reference actual threat patterns from the data
+- Write content appropriate for the target audience
+- Each content section should be 50-150 words
+- Generate 2-4 content sections`;
 
         const response = await openai.chat.completions.create({
           model: "gpt-5",
@@ -545,6 +577,7 @@ Remember: Base all suggestions on the provided threat data. Use proper sentence 
         // Apply guardrails validation and sanitization
         const rawRecommendations = result.recommendations || [];
         const rawUpdates = result.suggestedUpdates || "";
+        const rawContentSections = result.contentSections || [];
         
         // Validate recommendations
         recommendations = AI_GUARDRAILS.validateRecommendations(rawRecommendations);
@@ -552,9 +585,23 @@ Remember: Base all suggestions on the provided threat data. Use proper sentence 
         // Validate and sanitize suggested updates
         suggestedUpdates = AI_GUARDRAILS.validateSuggestedUpdates(rawUpdates);
         
+        // Validate and sanitize content sections
+        generatedContent = {
+          sections: rawContentSections
+            .filter((s: any) => s.title && s.content)
+            .map((s: any) => ({
+              title: AI_GUARDRAILS.sanitizeText(s.title),
+              content: AI_GUARDRAILS.validateSuggestedUpdates(s.content),
+              type: s.type === "update" ? "update" as const : "new" as const,
+            }))
+            .slice(0, 5),
+          summary: suggestedUpdates,
+        };
+        
         // Check for potential hallucinations
         const threatTexts = relatedThreats.map(t => `${t.title} ${t.description}`);
-        const combinedOutput = [...recommendations, suggestedUpdates].join(" ");
+        const combinedOutput = [...recommendations, suggestedUpdates, 
+          ...generatedContent.sections.map(s => s.content)].join(" ");
         
         if (AI_GUARDRAILS.detectPotentialHallucination(combinedOutput, threatTexts)) {
           console.warn("[content-governance] Potential hallucination detected in AI output, adding disclaimer");
@@ -578,6 +625,7 @@ Remember: Base all suggestions on the provided threat data. Use proper sentence 
           "Update protective measures section with latest guidance.",
         ];
         suggestedUpdates = `This page has ${page.relatedThreatCount} new threats matching its topics. Review the threat intelligence feed and update the educational content to address these new attack vectors.`;
+        generatedContent = null;
       }
     } else {
       recommendations = [
@@ -586,6 +634,7 @@ Remember: Base all suggestions on the provided threat data. Use proper sentence 
         "Update protective measures section with latest guidance.",
       ];
       suggestedUpdates = `This page has ${page.relatedThreatCount} new threats matching its topics. Review the threat intelligence feed and update the educational content to address these new attack vectors.`;
+      generatedContent = null;
     }
     
     return {
@@ -595,6 +644,7 @@ Remember: Base all suggestions on the provided threat data. Use proper sentence 
       recommendations,
       suggestedUpdates,
       urgency,
+      generatedContent,
     };
   }
 

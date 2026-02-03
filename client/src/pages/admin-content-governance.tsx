@@ -60,6 +60,14 @@ interface RefreshData {
   recommendations: string[];
   suggestedUpdates: string;
   urgency: "low" | "medium" | "high" | "critical";
+  generatedContent: {
+    sections: Array<{
+      title: string;
+      content: string;
+      type: "new" | "update";
+    }>;
+    summary: string;
+  } | null;
 }
 
 function getPriorityColor(priority: string): string {
@@ -735,10 +743,45 @@ export default function AdminContentGovernance() {
                   </div>
                 </div>
 
+                {refreshData.generatedContent?.sections && refreshData.generatedContent.sections.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      Generated Content Preview
+                    </h4>
+                    <div className="space-y-4">
+                      {refreshData.generatedContent.sections.map((section, idx) => (
+                        <div key={idx} className="border rounded-lg overflow-hidden">
+                          <div className={`px-4 py-2 flex items-center justify-between ${
+                            section.type === "new" 
+                              ? "bg-green-50 dark:bg-green-950 border-b border-green-200 dark:border-green-800" 
+                              : "bg-blue-50 dark:bg-blue-950 border-b border-blue-200 dark:border-blue-800"
+                          }`}>
+                            <span className="font-medium text-sm">{section.title}</span>
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs ${
+                                section.type === "new" 
+                                  ? "text-green-700 border-green-300 dark:text-green-400" 
+                                  : "text-blue-700 border-blue-300 dark:text-blue-400"
+                              }`}
+                            >
+                              {section.type === "new" ? "New Section" : "Update"}
+                            </Badge>
+                          </div>
+                          <div className="p-4 bg-card">
+                            <p className="text-sm leading-relaxed">{section.content}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <h4 className="font-medium mb-2 flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    AI Recommendations
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    Summary of Changes
                   </h4>
                   <ul className="space-y-2">
                     {refreshData.recommendations.map((rec, idx) => (
@@ -748,13 +791,6 @@ export default function AdminContentGovernance() {
                       </li>
                     ))}
                   </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-medium mb-2">Suggested Updates</h4>
-                  <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-                    {refreshData.suggestedUpdates}
-                  </p>
                 </div>
 
                 <div>
