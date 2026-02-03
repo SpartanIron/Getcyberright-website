@@ -117,14 +117,26 @@ export default function AdminContentGovernance() {
     queryKey: ["/api/content-governance/audit-log"],
   });
 
+  const invalidateAllGovernanceQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/content-governance/stats"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/content-governance/pages"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/content-governance/pages", { needsReview: true }] });
+    queryClient.invalidateQueries({ queryKey: ["/api/content-governance/audit-log"] });
+  };
+
   const runAuditMutation = useMutation({
     mutationFn: () => apiRequest("POST", "/api/content-governance/audit"),
     onSuccess: () => {
       toast({ title: "Audit Complete", description: "Content audit has been run successfully." });
-      queryClient.invalidateQueries({ queryKey: ["/api/content-governance"] });
+      invalidateAllGovernanceQueries();
     },
-    onError: () => {
-      toast({ title: "Audit Failed", description: "Failed to run content audit.", variant: "destructive" });
+    onError: (error: any) => {
+      const isUnauthorized = error?.message?.includes("401") || error?.status === 401;
+      toast({ 
+        title: isUnauthorized ? "Admin Access Required" : "Audit Failed", 
+        description: isUnauthorized ? "You must be logged in as an admin to run audits." : "Failed to run content audit.", 
+        variant: "destructive" 
+      });
     },
   });
 
@@ -132,7 +144,15 @@ export default function AdminContentGovernance() {
     mutationFn: (pageId: string) => apiRequest("POST", `/api/content-governance/pages/${pageId}/review`),
     onSuccess: () => {
       toast({ title: "Page Marked Reviewed", description: "Content freshness has been reset." });
-      queryClient.invalidateQueries({ queryKey: ["/api/content-governance"] });
+      invalidateAllGovernanceQueries();
+    },
+    onError: (error: any) => {
+      const isUnauthorized = error?.message?.includes("401") || error?.status === 401;
+      toast({ 
+        title: isUnauthorized ? "Admin Access Required" : "Review Failed", 
+        description: isUnauthorized ? "You must be logged in as an admin to review content." : "Failed to mark page as reviewed.", 
+        variant: "destructive" 
+      });
     },
   });
 
@@ -140,7 +160,15 @@ export default function AdminContentGovernance() {
     mutationFn: (pageId: string) => apiRequest("POST", `/api/content-governance/pages/${pageId}/dismiss`),
     onSuccess: () => {
       toast({ title: "Review Dismissed", description: "Review flag has been dismissed." });
-      queryClient.invalidateQueries({ queryKey: ["/api/content-governance"] });
+      invalidateAllGovernanceQueries();
+    },
+    onError: (error: any) => {
+      const isUnauthorized = error?.message?.includes("401") || error?.status === 401;
+      toast({ 
+        title: isUnauthorized ? "Admin Access Required" : "Dismiss Failed", 
+        description: isUnauthorized ? "You must be logged in as an admin to dismiss reviews." : "Failed to dismiss review flag.", 
+        variant: "destructive" 
+      });
     },
   });
 

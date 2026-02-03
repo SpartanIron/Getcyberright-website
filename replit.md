@@ -2,7 +2,7 @@
 
 ## Overview
 
-GetCyberRight is a cybersecurity education platform designed to provide practical security guidance for families, seniors, and organizations. It aims to protect users from modern cyber threats through accessible educational content, security guides, and community resources. The project envisions empowering users with the knowledge to defend against phishing, scams, and identity theft, establishing itself as a leading resource for digital safety. The application is a full-stack TypeScript project with a React frontend and Express backend.
+GetCyberRight is a full-stack TypeScript project with a React frontend and Express backend, designed to empower families, seniors, and organizations with practical cybersecurity knowledge. It aims to be a leading resource for digital safety by providing accessible educational content, security guides, and community resources to protect users from modern cyber threats like phishing, scams, and identity theft. The platform focuses on practical guidance, business vision, and market potential, with ambitious plans for user empowerment.
 
 ## User Preferences
 
@@ -11,150 +11,64 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Brand Identity & Design
-- **Color Scheme**: Enterprise teal and orange, matching the padlock mascot logo. Specific colors for primary, accent, dark UI, and warnings.
-- **Design Principles**: Flat, minimal aesthetic with subtle shadows, professional appearance, no emoji usage. Audience hub pages (Kids, Seniors, Parents, Educators, Small Business) have distinct color themes while maintaining brand consistency.
-- **UI/UX**: Emphasis on accessibility (ARIA labels, screen reader support), SEO (meta tags, Open Graph, Twitter Cards), and print support for checklists.
-- **Kids Digital Safety Hub**: Features age-segmented lessons (8-11, 12-16) with interactive quizzes, progress tracking, and gamified elements. Designed with larger text, kid-friendly visuals, empowering language, and colorful gradient backgrounds.
-- **Audience Hub Pages**: Dedicated sections for Seniors, Parents, Educators, and Small Business, each with curated content, specific gradient themes, and consistent structural patterns (e.g., FloatingShapes component, card grids, detailed topic views).
+The platform uses an enterprise teal and orange color scheme, maintaining a flat, minimal aesthetic with subtle shadows and a professional appearance. UI/UX emphasizes accessibility (ARIA, screen reader support), SEO (meta tags, Open Graph), and print support. Audience-specific hubs (Kids, Seniors, Parents, Educators, Small Business) feature distinct color themes while ensuring brand consistency. The Kids Digital Safety Hub offers age-segmented, gamified lessons with interactive quizzes.
 
-### Frontend Architecture
+### Frontend
 - **Framework**: React 18 with TypeScript.
 - **Routing**: Wouter.
-- **State Management**: TanStack Query (React Query).
-- **Styling**: Tailwind CSS with CSS variables, shadcn/ui component library (Radix UI primitives).
+- **State Management**: TanStack Query.
+- **Styling**: Tailwind CSS with shadcn/ui.
 - **Animations**: Framer Motion.
 - **Forms**: React Hook Form with Zod validation.
 - **Build Tool**: Vite.
 
-### Backend Architecture
+### Backend
 - **Framework**: Express 5 on Node.js with TypeScript.
-- **API Design**: REST endpoints for contact form and newsletter subscriptions.
-- **Validation**: Zod schemas shared between frontend and backend.
-- **Authentication**: Custom authentication system with email/password, TOTP MFA, backup codes, account lockout, session management (PostgreSQL), email verification, and password reset.
+- **API Design**: REST endpoints.
+- **Validation**: Zod schemas shared across frontend and backend.
+- **Authentication**: Custom system with email/password, TOTP MFA, backup codes, session management (PostgreSQL), email verification, and password reset.
 
 ### Data Layer
-- **ORM**: Drizzle ORM configured for PostgreSQL.
-- **Schema**: `shared/schema.ts` for database table definitions, with `drizzle-zod` for automatic Zod schema generation.
-- **Tables**: `users`, `contact_messages`, `newsletter_subscribers`.
+- **ORM**: Drizzle ORM for PostgreSQL.
+- **Schema**: `shared/schema.ts` with `drizzle-zod` for automatic Zod schema generation.
+- **Key Tables**: `users`, `contact_messages`, `newsletter_subscribers`.
 
 ### Security Architecture
-- **Security Middleware**: Implemented via `server/security.ts` using Helmet.js for security headers (CSP, HSTS, X-Frame-Options, etc.).
-- **Rate Limiting**: Three tiers (strict, standard, relaxed) with IP-based tracking and automatic blocking.
-- **CSRF Protection**: Origin/Referer header validation for state-changing requests.
-- **Request Security**: JSON/form payload limits, suspicious pattern detection (XSS, SQLi), all security events logged.
-- **Cookie Security**: HttpOnly, Secure, SameSite=strict.
-- **API Anomaly Detection**: Monitors /api routes for suspicious patterns (high volume, endpoint scanning, rapid requests). Scores >75 trigger alerts, >90 flag critical incidents.
-- **Centralized Logging**: Winston file transports to `/logs/security.log` (all events) and `/logs/security-incidents.log` (warnings+) in JSON format for SIEM integration.
-- **Incident Response**: Comprehensive playbook in `INCIDENT_RESPONSE.md` with MITRE ATT&CK aligned procedures.
-- **Security Metrics**: `GET /api/security/metrics` endpoint for monitoring anomaly detection stats.
-- **Compliance**: Mapped controls to OWASP ASVS, CIS Control, ISO 27001, NIST 800-53, and MITRE ATT&CK.
-- **MITRE ATT&CK Score**: 87/100 (A-) with strong prevention (88/100), detection (85/100), and response (80/100) capabilities.
-- **Failed Login Protection**: IP-based brute force detection with auto-blocking after 5 failed attempts (15-minute blocks).
-- **Admin Security Dashboard**: Real-time monitoring at `/admin/security` with blocked IP management and MITRE score visualization.
+- **Middleware**: Helmet.js for security headers.
+- **Rate Limiting**: Three tiers with IP-based tracking and auto-blocking.
+- **CSRF Protection**: Origin/Referer header validation.
+- **Request Security**: Payload limits, XSS/SQLi detection, secure cookie settings.
+- **API Anomaly Detection**: Monitors `/api` routes for suspicious patterns, triggering alerts and critical incident flags.
+- **Centralized Logging**: Winston for security logs, integrated with SIEM.
+- **Compliance**: Mapped controls to OWASP ASVS, CIS Control, ISO 27001, NIST 800-53, MITRE ATT&CK, achieving an 87/100 MITRE ATT&CK score.
+- **Admin Dashboard**: Real-time security monitoring at `/admin/security`.
 
 ### Content & Tools
-- **Content Guidelines**: All educational content is based on verified data from sources like FTC Consumer Sentinel, FBI IC3, CISA, Medicare.gov, etc. Emphasis on empowering, non-fear-based language.
-- **Scam Checker**: Features Email Header Analysis (SPF/DKIM/DMARC), URL entropy/brand similarity, urgency scoring, Reply-To mismatch detection, and real-time URL reputation checking.
-- **Advanced Security Scanner** (NEW): Comprehensive threat analysis tool with:
-  - **Multi-Engine URL Scanning**: Google Safe Browsing API, VirusTotal integration, PhishTank, URLhaus
-  - **Domain Age Check**: RDAP/WHOIS lookup for domain registration age analysis
-  - **SSL Certificate Analysis**: Certificate validation, issuer verification, expiration check, EV detection
-  - **Trust Score Algorithm**: 0-100 website trustworthiness rating with A-F grades
-  - **Phone Number Lookup**: Risk analysis for phone numbers with scam area code detection
-  - **Screenshot OCR**: Image upload with Tesseract.js text extraction for analyzing suspicious messages
-  - **QR Code Scanner**: Upload QR code images to reveal and analyze their contents before scanning
-  - **Deepfake Education**: Interactive guide for identifying AI-generated video, audio, image, and text content
-- **AI & Cyber Safety Hub** (`/ai-safety`): Educational content about AI-powered threats including deepfakes, voice cloning, AI-enhanced phishing, AI chatbot scams, and synthetic identity fraud. Includes audience-specific impact sections (Seniors, Business, Parents), responsible AI usage guidelines, and "What NOT to Share with AI" guidance.
-- **Child Safety Conversation Scanner** (`/parents/child-safety-scanner`): Comprehensive grooming pattern detection tool for parents:
-  - **Pattern Detection**: 150+ research-based regex patterns detecting 12+ grooming categories (trust-building, isolation, boundary testing, manipulation, photo requests, meeting attempts, threats, platform switching)
-  - **Risk Scoring**: Four-tier risk levels (safe/caution/warning/danger) with 0-100 scoring and visual progress bar
-  - **Privacy-First**: Client-side pattern matching, conversations never stored on servers
-  - **Regional Resources**: Emergency reporting contacts for US (NCMEC, FBI IC3), UK (CEOP, NSPCC), Canada (Cybertip.ca), Australia (eSafety Commissioner), and international organizations (INHOPE, IWF)
-  - **Free Safety Tools Directory**: Professional-grade tools including Microsoft PhotoDNA, Meta PDQ, Google Content Safety API, Project Arachnid Shield
-  - **Educational Resources**: Links to NetSmartz, Internet Safety 101, ThinkUKnow
-  - **Comprehensive Test Coverage**: Exhaustive data-testid attributes on all interactive elements and meaningful display elements
-- **Dezi AI Assistant**: Available to all users with free tier (20 messages/day, 10 analyses/day). Premium users get unlimited access, password generation, and advanced scam analysis.
+- **Content Guidelines**: Educational content based on verified sources (FTC, FBI IC3, CISA), emphasizing empowering language.
+- **Scam Checker**: Email header analysis, URL reputation, urgency scoring.
+- **Advanced Security Scanner**: Multi-engine URL scanning (Google Safe Browsing, VirusTotal), domain age checks, SSL certificate analysis, phone number lookup, screenshot OCR, QR code scanner, and deepfake education.
+- **AI & Cyber Safety Hub**: Educational content on AI-powered threats like deepfakes and AI chatbot scams.
+- **Child Safety Conversation Scanner**: Client-side grooming pattern detection with risk scoring and regional emergency resources.
+- **Dezi AI Assistant**: Provides analysis and security assistance, with free and premium tiers.
 
-### NEW: Competitive Differentiator Features
-- **Family Safety Codeword Generator** (UNIQUE - No competitor has this):
-  - Generate secure, memorable codewords for family emergency verification
-  - Three styles: Simple (PurpleButterfly77), Phrase (Golden Eagle Dances), Extra Secure (multi-word)
-  - Memory tips and family sharing functionality
-  - Scenario-based guidance for grandparent scams, AI voice clones, fake authority figures
-  - Protection against $200M+ Q1 2025 voice cloning scam losses
-  
-- **Audio/Voice Deepfake Detector** (Industry Gap - Major 2025-2026 threat):
-  - Upload suspicious voicemails/recordings for AI analysis
-  - Educational simulation showing how detection works (demo mode for all users)
-  - Professional subscribers get backend-powered analysis via `/api/security/analyze-audio`
-  - Checks for: unnatural pauses, missing breathing, emotion mismatch, audio artifacts
-  - Confidence scoring with risk levels (low/medium/high/critical)
-  - Upgrade prompts for non-Professional users with "Try Demo" fallback
-
-- **Gamification & Achievement System** (Drives engagement):
-  - Points, badges, and leaderboards for security activities
-  - Real progress tracking via `/api/gamification/progress` and `/api/gamification/badges`
-  - Badge tiers: Bronze, Silver, Gold, Platinum
-  - Categories: Scanner, Education, Streak, Community
-  - User levels with titles (Cyber Rookie → Cyber Guardian)
-  - Demo mode for unauthenticated users with sign-in prompts
-
-- **Regional Content Personalization**:
-  - Auto-detection of user region via IP geolocation (ip-api.com)
-  - Manual region selection with localStorage persistence
-  - 7 supported regions: United States, United Kingdom, Canada, Australia, European Union, Africa, plus Global fallback
-  - Region-specific threat trends with severity levels and case counts
-  - Local reporting agencies and emergency contacts per region
-  - API endpoints: `/api/region/detect`, `/api/region/list`, `/api/region/:code`, `/api/region/:code/threats`
-  - RegionSelector component (compact/full modes) and RegionalThreatsCard
-  - Integrated into Dashboard and Emergency Help pages
-  - Data model in `shared/regions.ts` with country-to-region mappings for all African countries
-
-- **Tool Usage Analytics Dashboard** (Admin Feature):
-  - Tracks usage of all security tools across the platform
-  - Database table: `tool_usage` with tool name, user ID, session ID, country code, completion status
-  - Admin dashboard at `/admin/tool-analytics` with:
-    - Summary cards: Total Tool Uses, Unique Users, Unique Sessions
-    - Tool Popularity chart with usage bars
-    - Top Countries geographic distribution
-    - Daily Usage trend (last 30 days)
-    - Recent Activity table with latest tool events
-  - Rate-limited public tracking endpoint (30 req/min per IP)
-  - Validated tool names against allowlist
-  - Integrated tracking in: Scam Checker, Password Generator, Family Codeword
-
-- **Automated Threat Intelligence Feed Integration** (Enterprise Feature):
-  - 8 trusted data sources with tiered ingestion schedules:
-    - **High-frequency** (2-4hr): URLhaus (malware URLs), PhishTank (phishing URLs)
-    - **Medium-frequency** (6-12hr): CISA alerts, NVD CVE database
-    - **Low-frequency** (24hr-weekly): HIBP breaches, FBI IC3, FTC Sentinel, MITRE ATT&CK
-  - Database tables: `threat_feeds`, `feed_runs`, `threat_items`, `feed_health_alerts`, `content_refresh_mappings`
-  - Pluggable adapter pattern for easy source extension
-  - Data normalization with severity, confidence scores, affected audiences, regional tagging
-  - Health monitoring with automatic stale/failed feed alerting
-  - Admin dashboard at `/admin/threat-intelligence` with:
-    - Feed status and run history
-    - Item browser with severity filtering
-    - Manual feed triggering
-    - Health alert acknowledgment
-  - User-facing integration via `ThreatIntelCard` component on Dashboard
-  - API endpoints: `/api/threat-intel/feeds`, `/items`, `/stats`, `/alerts`, `/feeds/:id/runs`, `/feeds/:id/run`
-  - Content hash deduplication to prevent duplicate ingestion
+### Competitive Differentiator Features
+- **Family Safety Codeword Generator**: Unique tool for generating secure codewords for emergency verification, protecting against voice cloning scams.
+- **Audio/Voice Deepfake Detector**: Upload analysis for suspicious voicemails, checking for unnatural audio patterns.
+- **Gamification & Achievement System**: Points, badges, and leaderboards to drive engagement in security activities.
+- **Regional Content Personalization**: Auto-detection and manual selection of user region for tailored threat trends and local resources.
+- **Tool Usage Analytics Dashboard**: Admin feature to track usage of security tools across the platform.
+- **Automated Threat Intelligence Feed Integration**: Ingests data from 8 trusted sources (URLhaus, PhishTank, CISA, NVD, HIBP) for real-time threat updates.
+- **Automated Content Governance System**: Monitors educational content for freshness and relevance, linking topics to threat intelligence for automated flagging and review.
 
 ### Premium Subscription Tiers
-- **Tier Access Control**: `hasTierAccess()` function in `server/routes.ts` handles feature gating
-- **Essential ($9/mo)**: Advanced Scanner features, basic Dezi AI access
-- **Professional ($29/mo)**: Voice Clone Detection, unlimited Dezi AI, enhanced scam analysis
-- **Enterprise ($99/mo)**: API access, team management, priority support
-- **Free Tier**: Demo mode for most features, limited Dezi AI (20 messages/day)
-- **Feature Gating UI**: Components show upgrade prompts when tier access denied (403 response)
+The platform offers Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers, with feature gating implemented via `hasTierAccess()` and UI upgrade prompts.
 
 ## External Dependencies
 
-- **Database**: PostgreSQL, Drizzle Kit (for migrations).
+- **Database**: PostgreSQL, Drizzle Kit.
 - **UI Framework**: Radix UI, shadcn/ui, Lucide React, react-icons.
 - **Form & Validation**: Zod, React Hook Form, @hookform/resolvers.
 - **Styling**: Tailwind CSS, class-variance-authority, tailwind-merge.
-- **Authentication**: `connect-pg-simple` (for PostgreSQL sessions), `bcrypt` (password hashing), `speakeasy` (TOTP MFA), `qrcode`.
-- **Threat Intelligence**: PhishTank API, URLhaus API, Google Safe Browsing API (optional), VirusTotal API (optional), RDAP/WHOIS for domain age (all proxied via backend with rate limiting).
-- **Image Processing**: Tesseract.js (OCR text extraction), jsQR (QR code decoding).
+- **Authentication**: `connect-pg-simple`, `bcrypt`, `speakeasy`, `qrcode`.
+- **Threat Intelligence**: PhishTank API, URLhaus API, Google Safe Browsing API, VirusTotal API, RDAP/WHOIS (all proxied via backend).
+- **Image Processing**: Tesseract.js (OCR), jsQR (QR code decoding).
