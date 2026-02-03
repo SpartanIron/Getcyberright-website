@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -254,6 +255,35 @@ function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
             ))}
           </div>
 
+          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border-2 border-purple-200 dark:border-purple-800 mb-6">
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                    <Shield className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-xl font-semibold text-foreground">
+                      Child Safety Conversation Scanner
+                    </h3>
+                    <Badge className="bg-purple-500">NEW</Badge>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Analyze online conversations for grooming patterns and warning signs. Get instant risk assessment with emergency reporting resources.
+                  </p>
+                </div>
+                <Link href="/parents/child-safety-scanner">
+                  <Button className="bg-purple-600" data-testid="button-child-safety-scanner">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Open Scanner
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 border-2 border-teal-200 dark:border-teal-800">
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-center gap-6">
@@ -270,11 +300,11 @@ function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
                     Interactive lessons designed specifically for children ages 8 to 16. Learn together with your kids.
                   </p>
                 </div>
-                <Button variant="outline" className="border-teal-300 dark:border-teal-700" onClick={() => {
-                  window.location.href = '/kids';
-                }} data-testid="button-kids-hub">
-                  Visit Kids Hub
-                </Button>
+                <Link href="/kids">
+                  <Button variant="outline" className="border-teal-300 dark:border-teal-700" data-testid="button-kids-hub">
+                    Visit Kids Hub
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

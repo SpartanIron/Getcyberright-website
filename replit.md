@@ -65,6 +65,14 @@ Preferred communication style: Simple, everyday language.
   - **QR Code Scanner**: Upload QR code images to reveal and analyze their contents before scanning
   - **Deepfake Education**: Interactive guide for identifying AI-generated video, audio, image, and text content
 - **AI & Cyber Safety Hub** (`/ai-safety`): Educational content about AI-powered threats including deepfakes, voice cloning, AI-enhanced phishing, AI chatbot scams, and synthetic identity fraud. Includes audience-specific impact sections (Seniors, Business, Parents), responsible AI usage guidelines, and "What NOT to Share with AI" guidance.
+- **Child Safety Conversation Scanner** (`/parents/child-safety-scanner`): Comprehensive grooming pattern detection tool for parents:
+  - **Pattern Detection**: 150+ research-based regex patterns detecting 12+ grooming categories (trust-building, isolation, boundary testing, manipulation, photo requests, meeting attempts, threats, platform switching)
+  - **Risk Scoring**: Four-tier risk levels (safe/caution/warning/danger) with 0-100 scoring and visual progress bar
+  - **Privacy-First**: Client-side pattern matching, conversations never stored on servers
+  - **Regional Resources**: Emergency reporting contacts for US (NCMEC, FBI IC3), UK (CEOP, NSPCC), Canada (Cybertip.ca), Australia (eSafety Commissioner), and international organizations (INHOPE, IWF)
+  - **Free Safety Tools Directory**: Professional-grade tools including Microsoft PhotoDNA, Meta PDQ, Google Content Safety API, Project Arachnid Shield
+  - **Educational Resources**: Links to NetSmartz, Internet Safety 101, ThinkUKnow
+  - **Comprehensive Test Coverage**: Exhaustive data-testid attributes on all interactive elements and meaningful display elements
 - **Dezi AI Assistant**: Available to all users with free tier (20 messages/day, 10 analyses/day). Premium users get unlimited access, password generation, and advanced scam analysis.
 
 ### NEW: Competitive Differentiator Features

@@ -45,6 +45,12 @@ import {
   categorizeBreachSeverity,
   analyzePasswordExposure
 } from "./advancedThreatIntelligence";
+import {
+  scanConversation,
+  getEmergencyResources,
+  getAllEmergencyResources,
+  FREE_SAFETY_TOOLS
+} from "./childSafety";
 
 // URL reputation checking schemas with validation
 const urlCheckSchema = z.object({
@@ -1402,6 +1408,72 @@ export async function registerRoutes(
       success: true,
       regionCode: code,
       threats,
+    });
+  });
+
+  // ============================================
+  // CHILD SAFETY TOOLS
+  // ============================================
+
+  // Scan conversation for grooming patterns
+  const conversationScanSchema = z.object({
+    text: z.string().min(10, "Please provide at least 10 characters to analyze").max(50000, "Text too long"),
+    region: z.string().optional().default("US")
+  });
+
+  app.post("/api/child-safety/scan", strictRateLimit, async (req: Request, res: Response) => {
+    try {
+      const validated = conversationScanSchema.parse(req.body);
+      const result = scanConversation(validated.text, validated.region);
+      
+      securityLogger.info("Child safety scan performed", {
+        riskLevel: result.riskLevel,
+        riskScore: result.riskScore,
+        flagCount: result.flags.length,
+        ip: req.ip
+      });
+
+      res.json({
+        success: true,
+        ...result
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ success: false, error: "Invalid input", details: error.errors });
+        return;
+      }
+      console.error("Child safety scan error:", error);
+      res.status(500).json({ success: false, error: "Failed to analyze conversation" });
+    }
+  });
+
+  // Get emergency resources by region
+  app.get("/api/child-safety/resources", (req: Request, res: Response) => {
+    const region = (req.query.region as string) || "US";
+    const resources = getEmergencyResources(region);
+    
+    res.json({
+      success: true,
+      region,
+      resources
+    });
+  });
+
+  // Get all emergency resources (for educational display)
+  app.get("/api/child-safety/resources/all", (req: Request, res: Response) => {
+    const allResources = getAllEmergencyResources();
+    
+    res.json({
+      success: true,
+      resources: allResources
+    });
+  });
+
+  // Get free safety tools information
+  app.get("/api/child-safety/tools", (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      tools: FREE_SAFETY_TOOLS
     });
   });
 

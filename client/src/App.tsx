@@ -50,6 +50,7 @@ const AdminChangePassword = lazy(() => import("@/pages/admin/change-password"));
 const AdminToolAnalytics = lazy(() => import("@/pages/admin/tool-analytics"));
 const AdminSecurity = lazy(() => import("@/pages/admin-security"));
 const Login = lazy(() => import("@/pages/login"));
+const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
 
 // Loading fallback component
 function PageLoader() {
@@ -92,6 +93,7 @@ function Router() {
         <Route path="/kids" component={Kids} />
         <Route path="/seniors" component={Seniors} />
         <Route path="/parents" component={Parents} />
+        <Route path="/parents/child-safety-scanner" component={ChildSafetyScanner} />
         <Route path="/educators" component={Educators} />
         <Route path="/small-business" component={SmallBusiness} />
         <Route path="/support" component={Support} />
