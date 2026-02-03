@@ -1681,6 +1681,31 @@ export async function registerRoutes(
     }
   });
 
+  // Generate AI-powered content refresh recommendations
+  app.get("/api/content-governance/pages/:pageId/refresh", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const pageId = req.params.pageId as string;
+      const refreshData = await contentGovernanceService.generateContentRefresh(pageId);
+      res.json({ success: true, ...refreshData });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Apply content refresh
+  app.post("/api/content-governance/pages/:pageId/refresh", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const pageId = req.params.pageId as string;
+      const userId = (req as any).session?.userId || "admin";
+      const notes = req.body?.notes as string | undefined;
+      
+      await contentGovernanceService.applyContentRefresh(pageId, userId, notes || "Content refreshed");
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   // ============================================
   // NIST 800-53 COMPLIANCE ROUTES
   // ============================================

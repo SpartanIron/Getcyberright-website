@@ -1,6 +1,10 @@
 import { db } from "./db";
 import { contentPages, contentAuditLog, threatItems, ContentPage } from "@shared/schema";
 import { eq, desc, and, gte, sql, inArray } from "drizzle-orm";
+import OpenAI from "openai";
+
+// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Topic categories that map threat types to content topics
 const TOPIC_KEYWORDS: Record<string, string[]> = {
@@ -328,6 +332,150 @@ export class ContentGovernanceService {
     return db.select().from(contentAuditLog)
       .where(eq(contentAuditLog.pageId, pageId))
       .orderBy(desc(contentAuditLog.createdAt));
+  }
+
+  async generateContentRefresh(pageId: string): Promise<{
+    pageTitle: string;
+    currentTopics: string[];
+    relatedThreats: Array<{ title: string; description: string; source: string; severity: string }>;
+    recommendations: string[];
+    suggestedUpdates: string;
+    urgency: "low" | "medium" | "high" | "critical";
+  }> {
+    const pages = await db.select().from(contentPages).where(eq(contentPages.id, pageId));
+    if (pages.length === 0) {
+      throw new Error("Page not found");
+    }
+    
+    const page = pages[0];
+    
+    // Get related threats for this page's topics
+    const allThreats = await db.select().from(threatItems)
+      .orderBy(desc(threatItems.ingestedAt))
+      .limit(500);
+    
+    const pageTopics = page.topics || [];
+    const relatedThreats: Array<{ title: string; description: string; source: string; severity: string }> = [];
+    
+    for (const threat of allThreats) {
+      const threatText = `${threat.title} ${threat.summary || ""}`.toLowerCase();
+      
+      for (const topic of pageTopics) {
+        const keywords = TOPIC_KEYWORDS[topic] || [topic];
+        const matches = keywords.some(kw => threatText.includes(kw.toLowerCase()));
+        
+        if (matches) {
+          relatedThreats.push({
+            title: threat.title,
+            description: threat.summary || "",
+            source: threat.feedId,
+            severity: threat.severity || "medium",
+          });
+          break;
+        }
+      }
+      
+      if (relatedThreats.length >= 10) break;
+    }
+    
+    // Determine urgency based on threat count and severity
+    let urgency: "low" | "medium" | "high" | "critical" = "low";
+    const criticalCount = relatedThreats.filter(t => t.severity === "critical").length;
+    const highCount = relatedThreats.filter(t => t.severity === "high").length;
+    
+    if (criticalCount >= 3 || page.relatedThreatCount! >= 200) urgency = "critical";
+    else if (criticalCount >= 1 || highCount >= 3 || page.relatedThreatCount! >= 100) urgency = "high";
+    else if (highCount >= 1 || page.relatedThreatCount! >= 20) urgency = "medium";
+    
+    // Generate AI recommendations if OpenAI key is available
+    let recommendations: string[] = [];
+    let suggestedUpdates = "";
+    
+    if (process.env.OPENAI_API_KEY && relatedThreats.length > 0) {
+      try {
+        const threatSummary = relatedThreats.slice(0, 5).map(t => 
+          `- ${t.title}: ${t.description.substring(0, 150)}...`
+        ).join("\n");
+        
+        const prompt = `You are a cybersecurity education content specialist. Analyze these recent threats and provide content update recommendations for a page titled "${page.title}" that covers topics: ${pageTopics.join(", ")}.
+
+Recent threats affecting this page's topics:
+${threatSummary}
+
+Target audience: ${page.audience}
+
+Provide your response as JSON with this format:
+{
+  "recommendations": ["recommendation 1", "recommendation 2", ...],
+  "suggestedUpdates": "A brief paragraph describing what content sections should be updated and what new information to add"
+}
+
+Focus on practical, actionable updates that help the ${page.audience} audience protect themselves.`;
+
+        const response = await openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 1024,
+        });
+        
+        const result = JSON.parse(response.choices[0].message.content || "{}");
+        recommendations = result.recommendations || [];
+        suggestedUpdates = result.suggestedUpdates || "";
+      } catch (error: any) {
+        console.error("[content-governance] AI recommendation error:", error.message);
+        recommendations = [
+          `Review and update content based on ${relatedThreats.length} new related threats`,
+          `Ensure examples reflect current attack patterns`,
+          `Update protective measures section with latest guidance`,
+        ];
+        suggestedUpdates = `This page has ${page.relatedThreatCount} new threats matching its topics. Review the threat intelligence feed and update the educational content to address these new attack vectors.`;
+      }
+    } else {
+      recommendations = [
+        `Review and update content based on ${relatedThreats.length} new related threats`,
+        `Ensure examples reflect current attack patterns`,
+        `Update protective measures section with latest guidance`,
+      ];
+      suggestedUpdates = `This page has ${page.relatedThreatCount} new threats matching its topics. Review the threat intelligence feed and update the educational content to address these new attack vectors.`;
+    }
+    
+    return {
+      pageTitle: page.title,
+      currentTopics: pageTopics,
+      relatedThreats,
+      recommendations,
+      suggestedUpdates,
+      urgency,
+    };
+  }
+
+  async applyContentRefresh(pageId: string, adminId: string, notes: string): Promise<void> {
+    const pages = await db.select().from(contentPages).where(eq(contentPages.id, pageId));
+    if (pages.length === 0) return;
+    
+    const page = pages[0];
+    
+    await db.update(contentPages)
+      .set({
+        needsReview: false,
+        reviewReason: null,
+        freshnessScore: 100,
+        relatedThreatCount: 0,
+        lastManualUpdate: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(contentPages.id, pageId));
+    
+    await db.insert(contentAuditLog).values({
+      pageId,
+      action: "refreshed",
+      triggeredBy: "admin",
+      notes: notes || "Content refreshed with AI-generated recommendations",
+      previousScore: page.freshnessScore,
+      newScore: 100,
+      performedBy: adminId,
+    });
   }
 
   async runFullAudit(): Promise<{

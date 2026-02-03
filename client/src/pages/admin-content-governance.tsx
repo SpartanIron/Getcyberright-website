@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { ArrowLeft, FileText, AlertTriangle, CheckCircle, RefreshCw, ExternalLink, Clock, Shield, TrendingUp, Eye, XCircle } from "lucide-react";
+import { ArrowLeft, FileText, AlertTriangle, CheckCircle, RefreshCw, ExternalLink, Clock, Shield, TrendingUp, Eye, XCircle, Sparkles, Loader2, X } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -48,6 +51,15 @@ interface AuditLogEntry {
   newScore: number | null;
   performedBy: string | null;
   createdAt: string;
+}
+
+interface RefreshData {
+  pageTitle: string;
+  currentTopics: string[];
+  relatedThreats: Array<{ title: string; description: string; source: string; severity: string }>;
+  recommendations: string[];
+  suggestedUpdates: string;
+  urgency: "low" | "medium" | "high" | "critical";
 }
 
 function getPriorityColor(priority: string): string {
@@ -97,6 +109,11 @@ function getSectionLabel(section: string): string {
 
 export default function AdminContentGovernance() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [refreshModalOpen, setRefreshModalOpen] = useState(false);
+  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
+  const [refreshData, setRefreshData] = useState<RefreshData | null>(null);
+  const [refreshLoading, setRefreshLoading] = useState(false);
+  const [refreshNotes, setRefreshNotes] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -171,6 +188,53 @@ export default function AdminContentGovernance() {
       });
     },
   });
+
+  const applyRefreshMutation = useMutation({
+    mutationFn: ({ pageId, notes }: { pageId: string; notes: string }) => 
+      apiRequest("POST", `/api/content-governance/pages/${pageId}/refresh`, { notes }),
+    onSuccess: () => {
+      toast({ title: "Content Refreshed", description: "Page has been marked as updated with AI recommendations applied." });
+      invalidateAllGovernanceQueries();
+      setRefreshModalOpen(false);
+      setRefreshData(null);
+      setSelectedPageId(null);
+      setRefreshNotes("");
+    },
+    onError: (error: any) => {
+      const isUnauthorized = error?.message?.includes("401") || error?.status === 401;
+      toast({ 
+        title: isUnauthorized ? "Admin Access Required" : "Refresh Failed", 
+        description: isUnauthorized ? "You must be logged in as an admin to refresh content." : "Failed to apply content refresh.", 
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const openRefreshModal = async (pageId: string) => {
+    setSelectedPageId(pageId);
+    setRefreshModalOpen(true);
+    setRefreshLoading(true);
+    setRefreshData(null);
+    setRefreshNotes("");
+    
+    try {
+      const response = await fetch(`/api/content-governance/pages/${pageId}/refresh`, {
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (data.success) {
+        setRefreshData(data);
+      } else {
+        toast({ title: "Error", description: data.error || "Failed to load refresh data", variant: "destructive" });
+        setRefreshModalOpen(false);
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to load refresh recommendations", variant: "destructive" });
+      setRefreshModalOpen(false);
+    } finally {
+      setRefreshLoading(false);
+    }
+  };
 
   const stats = statsData?.stats;
   const pages = pagesData?.pages || [];
@@ -334,6 +398,15 @@ export default function AdminContentGovernance() {
                           <div className="flex gap-2">
                             <Button
                               size="sm"
+                              variant="default"
+                              onClick={() => openRefreshModal(page.id)}
+                              data-testid={`button-refresh-overview-${page.id}`}
+                            >
+                              <Sparkles className="h-3 w-3 mr-1" />
+                              Refresh
+                            </Button>
+                            <Button
+                              size="sm"
                               variant="outline"
                               onClick={() => markReviewedMutation.mutate(page.id)}
                               data-testid={`button-review-${page.id}`}
@@ -407,6 +480,15 @@ export default function AdminContentGovernance() {
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="default"
+                                onClick={() => openRefreshModal(page.id)}
+                                data-testid={`button-refresh-${page.id}`}
+                              >
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                Refresh
+                              </Button>
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -594,6 +676,133 @@ export default function AdminContentGovernance() {
           </Button>
         </div>
       </div>
+
+      <Dialog open={refreshModalOpen} onOpenChange={setRefreshModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh]" data-testid="dialog-content-refresh">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              AI Content Refresh
+            </DialogTitle>
+            <DialogDescription>
+              Review AI-generated recommendations based on recent threat intelligence
+            </DialogDescription>
+          </DialogHeader>
+          
+          {refreshLoading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+              <p className="text-muted-foreground">Analyzing threats and generating recommendations...</p>
+            </div>
+          ) : refreshData ? (
+            <ScrollArea className="max-h-[60vh] pr-4">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">{refreshData.pageTitle}</h3>
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {refreshData.currentTopics.map(topic => (
+                      <Badge key={topic} variant="secondary" className="text-xs">{topic}</Badge>
+                    ))}
+                  </div>
+                  <Badge 
+                    className={
+                      refreshData.urgency === "critical" ? "bg-red-100 text-red-800" :
+                      refreshData.urgency === "high" ? "bg-orange-100 text-orange-800" :
+                      refreshData.urgency === "medium" ? "bg-yellow-100 text-yellow-800" :
+                      "bg-green-100 text-green-800"
+                    }
+                  >
+                    {refreshData.urgency.toUpperCase()} Urgency
+                  </Badge>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                    Related Threats ({refreshData.relatedThreats.length})
+                  </h4>
+                  <div className="space-y-2">
+                    {refreshData.relatedThreats.map((threat, idx) => (
+                      <div key={idx} className="p-3 rounded-lg bg-muted/50 border">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-sm">{threat.title}</span>
+                          <Badge variant="outline" className="text-xs capitalize">{threat.severity}</Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-2">{threat.description}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Source: {threat.source}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    AI Recommendations
+                  </h4>
+                  <ul className="space-y-2">
+                    {refreshData.recommendations.map((rec, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm">
+                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2">Suggested Updates</h4>
+                  <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+                    {refreshData.suggestedUpdates}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2">Notes (optional)</h4>
+                  <Textarea
+                    placeholder="Add notes about what was updated..."
+                    value={refreshNotes}
+                    onChange={(e) => setRefreshNotes(e.target.value)}
+                    className="resize-none"
+                    rows={3}
+                    data-testid="textarea-refresh-notes"
+                  />
+                </div>
+              </div>
+            </ScrollArea>
+          ) : null}
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setRefreshModalOpen(false)}
+              data-testid="button-cancel-refresh"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => selectedPageId && applyRefreshMutation.mutate({ 
+                pageId: selectedPageId, 
+                notes: refreshNotes || `AI refresh applied: ${refreshData?.recommendations.length || 0} recommendations` 
+              })}
+              disabled={!refreshData || applyRefreshMutation.isPending}
+              data-testid="button-apply-refresh"
+            >
+              {applyRefreshMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Applying...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Mark as Refreshed
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
