@@ -56,6 +56,7 @@ const AdminNewsletter = lazy(() => import("@/pages/admin-newsletter"));
 const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
+const AdminSetup = lazy(() => import("@/pages/admin-setup"));
 const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
 
 // Loading fallback component
@@ -129,6 +130,7 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/forgot-password" component={ForgotPassword} />
+        <Route path="/admin-setup" component={AdminSetup} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

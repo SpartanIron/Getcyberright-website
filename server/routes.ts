@@ -168,6 +168,50 @@ export async function registerRoutes(
     }
   });
 
+  // One-time admin setup endpoint (only works if no admin exists)
+  app.post("/api/setup/admin", strictRateLimit, async (req: Request, res: Response) => {
+    try {
+      const { email, password, setupKey } = req.body;
+      
+      // Verify setup key matches a secret or is first-time setup
+      const expectedSetupKey = process.env.ADMIN_PASSWORD || "initial-setup";
+      if (setupKey !== expectedSetupKey) {
+        return res.status(403).json({ error: "Invalid setup key" });
+      }
+      
+      // Check if any admin already exists
+      const existingAdmins = await db.select().from(users).where(eq(users.isAdmin, true));
+      if (existingAdmins.length > 0) {
+        return res.status(400).json({ error: "Admin account already exists. Please log in." });
+      }
+      
+      // Validate email and password
+      if (!email || !password || password.length < 8) {
+        return res.status(400).json({ error: "Valid email and password (8+ chars) required" });
+      }
+      
+      // Create admin user
+      const bcrypt = await import("bcryptjs");
+      const passwordHash = await bcrypt.hash(password, 12);
+      
+      await db.insert(users).values({
+        email,
+        passwordHash,
+        firstName: "Admin",
+        lastName: "User",
+        isAdmin: true,
+        emailVerified: true,
+        subscriptionTier: "enterprise",
+      });
+      
+      console.log(`[setup] Admin account created: ${email}`);
+      res.json({ success: true, message: "Admin account created. You can now log in." });
+    } catch (error: any) {
+      console.error("[setup] Admin setup error:", error);
+      res.status(500).json({ error: "Setup failed" });
+    }
+  });
+
   // Register custom auth routes
   registerAuthRoutes(app);
   
