@@ -119,10 +119,11 @@ export function registerAuthRoutes(app: Express) {
     secret: sessionSecret || "dev-fallback-secret-change-me",
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
       secure: useSecureCookies,
       httpOnly: true,
-      sameSite: useSecureCookies ? "none" : "lax",
+      sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
     name: "gcr.sid",
