@@ -32,6 +32,11 @@ function generateToken(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
+// Generate 6-digit OTP code
+function generateOTP(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 // Authentication middleware
 export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.session?.userId) {
@@ -433,7 +438,7 @@ export function registerAuthRoutes(app: Express) {
     });
   });
   
-  // Request password reset
+  // Request password reset with OTP
   app.post("/api/auth/forgot-password", async (req, res) => {
     try {
       const { email } = passwordResetRequestSchema.parse(req.body);
@@ -442,27 +447,26 @@ export function registerAuthRoutes(app: Express) {
       
       // Always return success to prevent email enumeration
       if (!user) {
-        return res.json({ success: true, message: "If an account exists, a reset link has been sent" });
+        return res.json({ success: true, message: "If an account exists, a verification code has been sent" });
       }
       
-      const resetToken = generateToken();
+      // Generate 6-digit OTP
+      const otpCode = generateOTP();
       const resetExpires = new Date();
-      resetExpires.setHours(resetExpires.getHours() + PASSWORD_RESET_EXPIRY_HOURS);
+      resetExpires.setMinutes(resetExpires.getMinutes() + 15); // 15 minute expiry for OTP
       
       await db.update(users).set({
-        passwordResetToken: resetToken,
+        passwordResetToken: otpCode,
         passwordResetExpires: resetExpires
       }).where(eq(users.id, user.id));
       
-      securityLogger.info("Password reset requested", { userId: user.id });
+      securityLogger.info("Password reset OTP requested", { userId: user.id });
       
-      // In production, send reset email here
-      // For development, log the token
-      if (process.env.NODE_ENV !== "production") {
-        console.log(`Password reset token for ${email}: ${resetToken}`);
-      }
+      // TODO: Send OTP via email in production
+      // For development, log the OTP
+      console.log(`[OTP] Password reset code for ${email}: ${otpCode}`);
       
-      res.json({ success: true, message: "If an account exists, a reset link has been sent" });
+      res.json({ success: true, message: "If an account exists, a verification code has been sent to your email" });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Invalid email" });
@@ -472,7 +476,51 @@ export function registerAuthRoutes(app: Express) {
     }
   });
   
-  // Reset password with token
+  // Verify OTP code
+  app.post("/api/auth/verify-otp", async (req, res) => {
+    try {
+      const { email, code } = req.body;
+      
+      if (!email || !code) {
+        return res.status(400).json({ error: "Email and code are required" });
+      }
+      
+      const [user] = await db.select().from(users).where(eq(users.email, email.toLowerCase()));
+      
+      if (!user || !user.passwordResetToken || !user.passwordResetExpires) {
+        return res.status(400).json({ error: "Invalid or expired code" });
+      }
+      
+      // Check expiry
+      if (new Date(user.passwordResetExpires) < new Date()) {
+        return res.status(400).json({ error: "Code has expired. Please request a new one." });
+      }
+      
+      // Verify code
+      if (user.passwordResetToken !== code) {
+        return res.status(400).json({ error: "Invalid code" });
+      }
+      
+      // Generate a temporary reset token for the password reset step
+      const resetToken = generateToken();
+      const tokenExpires = new Date();
+      tokenExpires.setMinutes(tokenExpires.getMinutes() + 10); // 10 minutes to complete reset
+      
+      await db.update(users).set({
+        passwordResetToken: resetToken,
+        passwordResetExpires: tokenExpires
+      }).where(eq(users.id, user.id));
+      
+      securityLogger.info("OTP verified for password reset", { userId: user.id });
+      
+      res.json({ success: true, resetToken });
+    } catch (error) {
+      console.error("Verify OTP error:", error);
+      res.status(500).json({ error: "Verification failed" });
+    }
+  });
+  
+  // Reset password with token (after OTP verification)
   app.post("/api/auth/reset-password", async (req, res) => {
     try {
       const { token, password } = passwordResetSchema.parse(req.body);
@@ -480,7 +528,7 @@ export function registerAuthRoutes(app: Express) {
       const [user] = await db.select().from(users).where(eq(users.passwordResetToken, token));
       
       if (!user || !user.passwordResetExpires || new Date(user.passwordResetExpires) < new Date()) {
-        return res.status(400).json({ error: "Invalid or expired reset token" });
+        return res.status(400).json({ error: "Invalid or expired reset session. Please start over." });
       }
       
       const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);

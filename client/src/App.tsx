@@ -53,6 +53,7 @@ const AdminThreatIntelligence = lazy(() => import("@/pages/admin-threat-intellig
 const AdminContentGovernance = lazy(() => import("@/pages/admin-content-governance"));
 const AdminCompliance = lazy(() => import("@/pages/admin-compliance"));
 const Login = lazy(() => import("@/pages/login"));
+const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
 const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
 
 // Loading fallback component
@@ -123,6 +124,7 @@ function Router() {
         <Route path="/admin/compliance" component={AdminCompliance} />
         <Route path="/admin/change-password" component={AdminChangePassword} />
         <Route path="/login" component={Login} />
+        <Route path="/forgot-password" component={ForgotPassword} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

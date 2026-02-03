@@ -16,7 +16,7 @@ import {
   LogIn,
   AlertCircle
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { queryClient } from "@/lib/queryClient";
@@ -225,6 +225,17 @@ export default function Login() {
                   )}
                 </form>
 
+                {!requiresMfa && (
+                  <div className="mt-4 text-center">
+                    <Link 
+                      href="/forgot-password" 
+                      className="text-sm text-primary hover:underline"
+                      data-testid="link-forgot-password"
+                    >
+                      Forgot your password?
+                    </Link>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
