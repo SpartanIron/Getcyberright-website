@@ -168,59 +168,6 @@ export async function registerRoutes(
     }
   });
 
-  // One-time admin setup endpoint (only works if no admin exists, or resets password if email matches)
-  app.post("/api/setup/admin", strictRateLimit, async (req: Request, res: Response) => {
-    try {
-      const { email, password, setupKey } = req.body;
-      
-      // Verify setup key matches a secret
-      const expectedSetupKey = process.env.ADMIN_PASSWORD || "initial-setup";
-      if (setupKey !== expectedSetupKey) {
-        return res.status(403).json({ error: "Invalid setup key" });
-      }
-      
-      // Check if this specific admin email already exists
-      const existingUser = await db.select().from(users).where(eq(users.email, email));
-      if (existingUser.length > 0) {
-        // Update password for existing admin
-        const bcrypt = await import("bcryptjs");
-        const passwordHash = await bcrypt.hash(password, 12);
-        await db.update(users).set({ 
-          passwordHash, 
-          isAdmin: true,
-          emailVerified: true 
-        }).where(eq(users.email, email));
-        console.log(`[setup] Admin password reset for: ${email}`);
-        return res.json({ success: true, message: "Admin password updated. You can now log in." });
-      }
-      
-      // Validate email and password
-      if (!email || !password || password.length < 8) {
-        return res.status(400).json({ error: "Valid email and password (8+ chars) required" });
-      }
-      
-      // Create admin user
-      const bcrypt = await import("bcryptjs");
-      const passwordHash = await bcrypt.hash(password, 12);
-      
-      await db.insert(users).values({
-        email,
-        passwordHash,
-        firstName: "Admin",
-        lastName: "User",
-        isAdmin: true,
-        emailVerified: true,
-        subscriptionTier: "enterprise",
-      });
-      
-      console.log(`[setup] Admin account created: ${email}`);
-      res.json({ success: true, message: "Admin account created. You can now log in." });
-    } catch (error: any) {
-      console.error("[setup] Admin setup error:", error);
-      res.status(500).json({ error: "Setup failed" });
-    }
-  });
-
   // Register custom auth routes
   registerAuthRoutes(app);
   
