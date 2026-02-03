@@ -123,6 +123,24 @@ Preferred communication style: Simple, everyday language.
   - Validated tool names against allowlist
   - Integrated tracking in: Scam Checker, Password Generator, Family Codeword
 
+- **Automated Threat Intelligence Feed Integration** (Enterprise Feature):
+  - 8 trusted data sources with tiered ingestion schedules:
+    - **High-frequency** (2-4hr): URLhaus (malware URLs), PhishTank (phishing URLs)
+    - **Medium-frequency** (6-12hr): CISA alerts, NVD CVE database
+    - **Low-frequency** (24hr-weekly): HIBP breaches, FBI IC3, FTC Sentinel, MITRE ATT&CK
+  - Database tables: `threat_feeds`, `feed_runs`, `threat_items`, `feed_health_alerts`, `content_refresh_mappings`
+  - Pluggable adapter pattern for easy source extension
+  - Data normalization with severity, confidence scores, affected audiences, regional tagging
+  - Health monitoring with automatic stale/failed feed alerting
+  - Admin dashboard at `/admin/threat-intelligence` with:
+    - Feed status and run history
+    - Item browser with severity filtering
+    - Manual feed triggering
+    - Health alert acknowledgment
+  - User-facing integration via `ThreatIntelCard` component on Dashboard
+  - API endpoints: `/api/threat-intel/feeds`, `/items`, `/stats`, `/alerts`, `/feeds/:id/runs`, `/feeds/:id/run`
+  - Content hash deduplication to prevent duplicate ingestion
+
 ### Premium Subscription Tiers
 - **Tier Access Control**: `hasTierAccess()` function in `server/routes.ts` handles feature gating
 - **Essential ($9/mo)**: Advanced Scanner features, basic Dezi AI access

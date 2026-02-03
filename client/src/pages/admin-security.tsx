@@ -12,8 +12,11 @@ import {
   Users,
   AlertTriangle,
   RefreshCw,
-  Unlock
+  Unlock,
+  Database,
+  ChevronRight
 } from "lucide-react";
+import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -276,6 +279,34 @@ export default function AdminSecurity() {
                   <Badge className="mt-1">Grade: A-</Badge>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-teal-500/30 bg-gradient-to-br from-teal-50/50 to-background dark:from-teal-950/30" data-testid="card-threat-intel-link">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="w-5 h-5 text-teal-600" />
+              Threat Intelligence Feeds
+            </CardTitle>
+            <CardDescription>Automated data ingestion from trusted security sources</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">
+                  8 feeds configured: CISA, NVD, PhishTank, URLhaus, HIBP, FBI IC3, FTC Sentinel, MITRE ATT&CK
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Continuous ingestion with tiered schedules (2h - weekly)
+                </p>
+              </div>
+              <Link href="/admin/threat-intelligence">
+                <Button data-testid="button-view-threat-intel">
+                  Manage Feeds
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

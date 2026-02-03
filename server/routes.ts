@@ -45,6 +45,7 @@ import {
   categorizeBreachSeverity,
   analyzePasswordExposure
 } from "./advancedThreatIntelligence";
+import { threatIntelService } from "./threatIntelService";
 import {
   scanConversation,
   getEmergencyResources,
@@ -1475,6 +1476,112 @@ export async function registerRoutes(
       success: true,
       tools: FREE_SAFETY_TOOLS
     });
+  });
+
+  // ============================================
+  // THREAT INTELLIGENCE FEED INTEGRATION API
+  // ============================================
+
+  // Initialize and start threat intelligence service
+  threatIntelService.initialize().then(() => {
+    threatIntelService.startScheduler();
+  }).catch(err => console.error("Failed to initialize threat intel service:", err));
+
+  // Get all feeds with status
+  app.get("/api/threat-intel/feeds", async (req: Request, res: Response) => {
+    try {
+      const feeds = await threatIntelService.getAllFeeds();
+      res.json({ success: true, feeds });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get feed run history
+  app.get("/api/threat-intel/feeds/:feedId/runs", async (req: Request, res: Response) => {
+    try {
+      const feedId = req.params.feedId as string;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const runs = await threatIntelService.getFeedRuns(feedId, limit);
+      res.json({ success: true, runs });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Manually trigger a feed run (admin only)
+  app.post("/api/threat-intel/feeds/:feedId/run", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const feedId = req.params.feedId as string;
+      const run = await threatIntelService.runFeed(feedId);
+      if (run) {
+        res.json({ success: true, run });
+      } else {
+        res.status(400).json({ success: false, error: "Failed to run feed" });
+      }
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get recent threat items
+  app.get("/api/threat-intel/items", async (req: Request, res: Response) => {
+    try {
+      const { limit, feedId, itemType, severity, audience } = req.query;
+      const items = await threatIntelService.getRecentItems({
+        limit: limit ? parseInt(limit as string) : 50,
+        feedId: feedId as string,
+        itemType: itemType as string,
+        severity: severity as string,
+        audience: audience as string,
+      });
+      res.json({ success: true, items });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get threat intel statistics
+  app.get("/api/threat-intel/stats", async (req: Request, res: Response) => {
+    try {
+      const stats = await threatIntelService.getStats();
+      res.json({ success: true, stats });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get health alerts
+  app.get("/api/threat-intel/alerts", async (req: Request, res: Response) => {
+    try {
+      const includeResolved = req.query.resolved === "true";
+      const alerts = await threatIntelService.getHealthAlerts(includeResolved);
+      res.json({ success: true, alerts });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Acknowledge an alert
+  app.post("/api/threat-intel/alerts/:alertId/acknowledge", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const alertId = req.params.alertId as string;
+      await threatIntelService.acknowledgeAlert(alertId);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Resolve an alert
+  app.post("/api/threat-intel/alerts/:alertId/resolve", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const alertId = req.params.alertId as string;
+      await threatIntelService.resolveAlert(alertId);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
   });
 
   return httpServer;

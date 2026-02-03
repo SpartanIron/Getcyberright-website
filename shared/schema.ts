@@ -156,3 +156,102 @@ export const insertToolUsageSchema = createInsertSchema(toolUsage).pick({
 
 export type InsertToolUsage = z.infer<typeof insertToolUsageSchema>;
 export type ToolUsage = typeof toolUsage.$inferSelect;
+
+// ============================================
+// THREAT INTELLIGENCE FEED INTEGRATION SYSTEM
+// ============================================
+
+// Threat Feed Registry - Metadata about each data source
+export const threatFeeds = pgTable("threat_feeds", {
+  id: varchar("id").primaryKey(), // e.g., "cisa-alerts", "phishtank", "nvd-cve"
+  name: text("name").notNull(),
+  description: text("description"),
+  sourceUrl: text("source_url").notNull(),
+  sourceType: text("source_type").notNull(), // api, rss, json, html, pdf
+  category: text("category").notNull(), // government, security-research, industry, standards
+  priority: integer("priority").default(5), // 1-10, higher = more important
+  scheduleInterval: integer("schedule_interval").default(3600), // seconds between updates
+  isActive: boolean("is_active").default(true),
+  requiresAuth: boolean("requires_auth").default(false),
+  authConfig: text("auth_config"), // JSON with auth details (encrypted)
+  parserConfig: text("parser_config"), // JSON with parsing rules
+  lastSuccessfulRun: timestamp("last_successful_run"),
+  lastAttemptedRun: timestamp("last_attempted_run"),
+  lastError: text("last_error"),
+  itemCount: integer("item_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type ThreatFeed = typeof threatFeeds.$inferSelect;
+export type InsertThreatFeed = typeof threatFeeds.$inferInsert;
+
+// Feed Run History - Track each ingestion attempt
+export const feedRuns = pgTable("feed_runs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  feedId: varchar("feed_id").notNull(),
+  status: text("status").notNull(), // pending, running, success, failed, partial
+  startedAt: timestamp("started_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+  itemsIngested: integer("items_ingested").default(0),
+  itemsUpdated: integer("items_updated").default(0),
+  itemsSkipped: integer("items_skipped").default(0),
+  errorMessage: text("error_message"),
+  durationMs: integer("duration_ms"),
+  triggeredBy: text("triggered_by").default("scheduler"), // scheduler, manual, webhook
+});
+
+export type FeedRun = typeof feedRuns.$inferSelect;
+
+// Threat Items - Normalized intelligence from all sources
+export const threatItems = pgTable("threat_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  feedId: varchar("feed_id").notNull(),
+  externalId: text("external_id"), // ID from the source
+  contentHash: text("content_hash"), // For deduplication
+  itemType: text("item_type").notNull(), // alert, advisory, indicator, statistic, report, vulnerability
+  title: text("title").notNull(),
+  summary: text("summary"),
+  content: text("content"), // Full content or JSON
+  severity: text("severity"), // critical, high, medium, low, informational
+  confidence: integer("confidence"), // 0-100
+  regions: text("regions"), // JSON array of region codes
+  tags: text("tags"), // JSON array of tags
+  indicators: text("indicators"), // JSON array of IOCs (URLs, IPs, hashes)
+  affectedAudiences: text("affected_audiences"), // JSON array: seniors, kids, parents, business
+  sourceUrl: text("source_url"),
+  publishedAt: timestamp("published_at"),
+  expiresAt: timestamp("expires_at"),
+  ingestedAt: timestamp("ingested_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  isActive: boolean("is_active").default(true),
+});
+
+export type ThreatItem = typeof threatItems.$inferSelect;
+export type InsertThreatItem = typeof threatItems.$inferInsert;
+
+// Content Refresh Mappings - Link threat items to platform content
+export const contentRefreshMappings = pgTable("content_refresh_mappings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  threatItemId: varchar("threat_item_id").notNull(),
+  contentType: text("content_type").notNull(), // page, section, statistic, alert
+  contentPath: text("content_path").notNull(), // e.g., "/seniors", "dashboard.threatTrends"
+  lastRefreshed: timestamp("last_refreshed").defaultNow(),
+  autoUpdate: boolean("auto_update").default(true),
+});
+
+export type ContentRefreshMapping = typeof contentRefreshMappings.$inferSelect;
+
+// Feed Health Alerts - Track issues with feeds
+export const feedHealthAlerts = pgTable("feed_health_alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  feedId: varchar("feed_id").notNull(),
+  alertType: text("alert_type").notNull(), // stale, error, degraded, rate_limited
+  severity: text("severity").notNull(), // warning, critical
+  message: text("message").notNull(),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type FeedHealthAlert = typeof feedHealthAlerts.$inferSelect;

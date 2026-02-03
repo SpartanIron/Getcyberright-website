@@ -24,6 +24,7 @@ import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { NotificationSettings } from "@/components/notification-settings";
 import { RegionSelector, RegionalThreatsCard } from "@/components/region-selector";
+import { ThreatIntelCard } from "@/components/threat-intel-card";
 
 const premiumResources = [
   {
@@ -247,6 +248,15 @@ export default function Dashboard() {
               <RegionalThreatsCard className="h-full" />
             </motion.div>
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.55 }}
+            className="mb-6"
+          >
+            <ThreatIntelCard limit={4} />
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
