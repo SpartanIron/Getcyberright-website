@@ -8,7 +8,7 @@ import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
-import { registerAuthRoutes, isAuthenticated } from "./auth";
+import { registerAuthRoutes, isAuthenticated, isAdmin } from "./auth";
 import { registerAdminRoutes, registerToolTrackingRoutes } from "./admin";
 import { 
   checkGoogleSafeBrowsing, 
@@ -47,6 +47,7 @@ import {
 } from "./advancedThreatIntelligence";
 import { threatIntelService } from "./threatIntelService";
 import { contentGovernanceService } from "./contentGovernanceService";
+import { newsletterService } from "./newsletterService";
 import { complianceService } from "./complianceService";
 import {
   scanConversation,
@@ -1497,6 +1498,11 @@ export async function registerRoutes(
       .catch(err => console.error("[content-governance] Initial audit failed:", err));
   }).catch(err => console.error("Failed to initialize content governance service:", err));
 
+  // Initialize newsletter service for weekly automated emails
+  newsletterService.initialize().catch(err => 
+    console.error("Failed to initialize newsletter service:", err)
+  );
+
   // Get all feeds with status
   app.get("/api/threat-intel/feeds", async (req: Request, res: Response) => {
     try {
@@ -1796,6 +1802,76 @@ export async function registerRoutes(
     try {
       const assessments = await complianceService.getAssessmentHistory();
       res.json({ success: true, assessments });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // ============================================
+  // NEWSLETTER MANAGEMENT API (Admin Only)
+  // ============================================
+
+  // Get newsletter subscriber stats
+  app.get("/api/newsletter/stats", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const stats = await newsletterService.getSubscriberStats();
+      res.json({ success: true, stats });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get all newsletter issues
+  app.get("/api/newsletter/issues", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string || "20");
+      const issues = await newsletterService.getNewsletterIssues(limit);
+      res.json({ success: true, issues });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get single newsletter issue
+  app.get("/api/newsletter/issues/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const issueId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const issue = await newsletterService.getNewsletterIssue(issueId);
+      if (!issue) {
+        return res.status(404).json({ success: false, error: "Newsletter issue not found" });
+      }
+      res.json({ success: true, issue });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Preview a new newsletter (generates content without saving)
+  app.get("/api/newsletter/preview", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const content = await newsletterService.previewNewsletter();
+      res.json({ success: true, content });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Generate and schedule a new newsletter
+  app.post("/api/newsletter/generate", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const issueId = await newsletterService.generateAndScheduleNewsletter();
+      res.json({ success: true, issueId, message: "Newsletter generated and scheduled" });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Send a newsletter
+  app.post("/api/newsletter/send/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const issueId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const result = await newsletterService.sendNewsletter(issueId);
+      res.json(result);
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }

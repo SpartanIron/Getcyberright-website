@@ -792,3 +792,12 @@ export function registerAuthRoutes(app: Express) {
 }
 
 export { isAuthenticated as authMiddleware };
+
+// Admin-only middleware - must be used after isAuthenticated
+export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  const user = (req as any).user;
+  if (!user?.isAdmin) {
+    return res.status(403).json({ error: "Admin access required" });
+  }
+  next();
+};

@@ -100,6 +100,8 @@ export type ContactMessage = typeof contactMessages.$inferSelect;
 export const newsletterSubscribers = pgTable("newsletter_subscribers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: text("email").notNull().unique(),
+  isActive: boolean("is_active").default(true),
+  preferences: text("preferences").array(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -109,6 +111,34 @@ export const insertNewsletterSubscriberSchema = createInsertSchema(newsletterSub
 
 export type InsertNewsletterSubscriber = z.infer<typeof insertNewsletterSubscriberSchema>;
 export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+
+export const newsletterIssues = pgTable("newsletter_issues", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  subject: text("subject").notNull(),
+  contentHtml: text("content_html").notNull(),
+  contentText: text("content_text").notNull(),
+  threatSummary: text("threat_summary"),
+  protectionTip: text("protection_tip"),
+  familyTopic: text("family_topic"),
+  quickWins: text("quick_wins").array(),
+  status: text("status").notNull().default("draft"),
+  scheduledFor: timestamp("scheduled_for"),
+  sentAt: timestamp("sent_at"),
+  recipientCount: integer("recipient_count").default(0),
+  openCount: integer("open_count").default(0),
+  clickCount: integer("click_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertNewsletterIssueSchema = createInsertSchema(newsletterIssues).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertNewsletterIssue = z.infer<typeof insertNewsletterIssueSchema>;
+export type NewsletterIssue = typeof newsletterIssues.$inferSelect;
 
 export const scamReports = pgTable("scam_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

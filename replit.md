@@ -78,6 +78,14 @@ The platform enforces strict content integrity standards for all AI-generated co
   - Admin dashboard at `/admin/compliance` with Overview, Control Families, Gaps, and Assessment History tabs
   - API endpoints: `/api/compliance/stats`, `/families`, `/controls`, `/gaps`, `/assess`, `/assessments`
 
+### Automated Weekly Newsletter System
+- **Newsletter Service**: Located in `server/newsletterService.ts`
+- **Scheduling**: Automatically runs every Friday at 9 AM
+- **Content Generation**: AI-powered newsletter content using threat intelligence data
+- **Email Sending**: Requires email provider integration (Resend or SendGrid) - see note below
+- **Admin Dashboard**: Manage newsletters at `/admin/newsletter`
+- **Email Configuration Note**: Email sending is not yet configured. To enable newsletter delivery, set up Resend or SendGrid integration with `RESEND_API_KEY` or `SENDGRID_API_KEY` secret.
+
 ### Premium Subscription Tiers
 The platform offers Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers, with feature gating implemented via `hasTierAccess()` and UI upgrade prompts.
 
