@@ -1642,7 +1642,7 @@ export async function registerRoutes(
     try {
       const pageId = req.params.pageId as string;
       const userId = (req as any).session?.userId || "admin";
-      const notes = req.body.notes as string | undefined;
+      const notes = req.body?.notes as string | undefined;
       
       await contentGovernanceService.markPageReviewed(pageId, userId, notes);
       res.json({ success: true });
@@ -1656,7 +1656,7 @@ export async function registerRoutes(
     try {
       const pageId = req.params.pageId as string;
       const userId = (req as any).session?.userId || "admin";
-      const notes = req.body.notes as string | undefined;
+      const notes = req.body?.notes as string | undefined;
       
       await contentGovernanceService.dismissReviewFlag(pageId, userId, notes);
       res.json({ success: true });
