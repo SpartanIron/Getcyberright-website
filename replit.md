@@ -60,6 +60,14 @@ The platform uses an enterprise teal and orange color scheme, maintaining a flat
 - **Automated Threat Intelligence Feed Integration**: Ingests data from 8 trusted sources (URLhaus, PhishTank, CISA, NVD, HIBP) for real-time threat updates.
 - **Automated Content Governance System**: Monitors educational content for freshness and relevance, linking topics to threat intelligence for automated flagging and review.
 
+- **NIST 800-53 Compliance Dashboard** (Enterprise Feature):
+  - Maps platform security features to 20 NIST 800-53 control families (AC, AU, IA, SC, SI, etc.)
+  - 50+ security controls with implementation status, evidence, gaps, and recommendations
+  - Scoring algorithm: 0-100 compliance score per family and overall (current: 82%)
+  - Gap analysis with remediation recommendations
+  - Admin dashboard at `/admin/compliance` with Overview, Control Families, Gaps, and Assessment History tabs
+  - API endpoints: `/api/compliance/stats`, `/families`, `/controls`, `/gaps`, `/assess`, `/assessments`
+
 ### Premium Subscription Tiers
 The platform offers Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers, with feature gating implemented via `hasTierAccess()` and UI upgrade prompts.
 
