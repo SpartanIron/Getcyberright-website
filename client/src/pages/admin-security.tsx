@@ -339,6 +339,34 @@ export default function AdminSecurity() {
             </div>
           </CardContent>
         </Card>
+
+        <Card className="border-teal-500/30 bg-gradient-to-br from-teal-50/50 to-background dark:from-teal-950/30" data-testid="card-compliance-link">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-teal-600" />
+              NIST 800-53 Compliance
+            </CardTitle>
+            <CardDescription>Security and privacy controls assessment</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">
+                  Maps platform security features to NIST 800-53 control families
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Identifies gaps and provides recommendations for improved compliance
+                </p>
+              </div>
+              <Link href="/admin/compliance">
+                <Button data-testid="button-view-compliance">
+                  View Compliance
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );

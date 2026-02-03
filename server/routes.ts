@@ -47,6 +47,7 @@ import {
 } from "./advancedThreatIntelligence";
 import { threatIntelService } from "./threatIntelService";
 import { contentGovernanceService } from "./contentGovernanceService";
+import { complianceService } from "./complianceService";
 import {
   scanConversation,
   getEmergencyResources,
@@ -1675,6 +1676,101 @@ export async function registerRoutes(
         : await contentGovernanceService.getAuditLog(limit);
       
       res.json({ success: true, log });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // ============================================
+  // NIST 800-53 COMPLIANCE ROUTES
+  // ============================================
+
+  // Initialize compliance service
+  complianceService.initialize()
+    .then(() => console.log("[compliance] NIST 800-53 controls loaded"))
+    .catch(err => console.error("[compliance] Initialization failed:", err));
+
+  // Get compliance stats
+  app.get("/api/compliance/stats", async (req: Request, res: Response) => {
+    try {
+      const stats = await complianceService.getStats();
+      res.json({ success: true, stats });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get control families
+  app.get("/api/compliance/families", async (req: Request, res: Response) => {
+    try {
+      const families = await complianceService.getFamilies();
+      res.json({ success: true, families });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get controls (optionally filtered by family)
+  app.get("/api/compliance/controls", async (req: Request, res: Response) => {
+    try {
+      const familyId = req.query.familyId as string | undefined;
+      const controls = await complianceService.getControls(familyId);
+      
+      const parsed = controls.map(c => ({
+        ...c,
+        evidence: c.evidence ? JSON.parse(c.evidence) : [],
+        platformFeatures: c.platformFeatures ? JSON.parse(c.platformFeatures) : [],
+        gaps: c.gaps ? JSON.parse(c.gaps) : [],
+      }));
+      
+      res.json({ success: true, controls: parsed });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get gaps and recommendations
+  app.get("/api/compliance/gaps", async (req: Request, res: Response) => {
+    try {
+      const gaps = await complianceService.getGaps();
+      res.json({ success: true, gaps });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Run compliance assessment
+  app.post("/api/compliance/assess", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const stats = await complianceService.runAssessment();
+      res.json({ success: true, stats });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Update control status
+  app.patch("/api/compliance/controls/:controlId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const controlId = req.params.controlId as string;
+      const { status, notes } = req.body;
+      
+      if (!["implemented", "partial", "planned", "not_implemented", "not_applicable"].includes(status)) {
+        return res.status(400).json({ success: false, error: "Invalid status" });
+      }
+      
+      await complianceService.updateControlStatus(controlId, status, notes as string | undefined);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Get assessment history
+  app.get("/api/compliance/assessments", async (req: Request, res: Response) => {
+    try {
+      const assessments = await complianceService.getAssessmentHistory();
+      res.json({ success: true, assessments });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }

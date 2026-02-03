@@ -293,3 +293,58 @@ export const contentAuditLog = pgTable("content_audit_log", {
 });
 
 export type ContentAuditLog = typeof contentAuditLog.$inferSelect;
+
+// NIST 800-53 Compliance - Control Families
+export const complianceControlFamilies = pgTable("compliance_control_families", {
+  id: varchar("id").primaryKey(), // e.g., "AC", "AU", "SC"
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  totalControls: integer("total_controls").default(0),
+  implementedControls: integer("implemented_controls").default(0),
+  partialControls: integer("partial_controls").default(0),
+  notApplicableControls: integer("not_applicable_controls").default(0),
+  complianceScore: integer("compliance_score").default(0), // 0-100
+  priority: text("priority").default("medium"), // low, medium, high, critical
+  lastAssessment: timestamp("last_assessment"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type ComplianceControlFamily = typeof complianceControlFamilies.$inferSelect;
+
+// NIST 800-53 Compliance - Individual Controls
+export const complianceControls = pgTable("compliance_controls", {
+  id: varchar("id").primaryKey(), // e.g., "AC-1", "AC-2", "AU-1"
+  familyId: varchar("family_id").notNull(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  implementationStatus: text("implementation_status").default("not_implemented"), // implemented, partial, planned, not_implemented, not_applicable
+  priority: text("priority").default("moderate"), // low, moderate, high
+  evidence: text("evidence"), // JSON array of evidence items
+  platformFeatures: text("platform_features"), // JSON array of related platform features
+  gaps: text("gaps"), // JSON array of identified gaps
+  recommendations: text("recommendations"),
+  lastAssessment: timestamp("last_assessment"),
+  assessedBy: varchar("assessed_by"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type ComplianceControl = typeof complianceControls.$inferSelect;
+
+// Compliance Assessment History
+export const complianceAssessments = pgTable("compliance_assessments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  assessmentType: text("assessment_type").notNull(), // full, family, control
+  targetId: varchar("target_id"), // family or control ID if targeted
+  overallScore: integer("overall_score"),
+  implementedCount: integer("implemented_count").default(0),
+  partialCount: integer("partial_count").default(0),
+  gapsCount: integer("gaps_count").default(0),
+  summary: text("summary"),
+  performedBy: varchar("performed_by"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ComplianceAssessment = typeof complianceAssessments.$inferSelect;

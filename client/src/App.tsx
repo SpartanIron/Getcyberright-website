@@ -51,6 +51,7 @@ const AdminToolAnalytics = lazy(() => import("@/pages/admin/tool-analytics"));
 const AdminSecurity = lazy(() => import("@/pages/admin-security"));
 const AdminThreatIntelligence = lazy(() => import("@/pages/admin-threat-intelligence"));
 const AdminContentGovernance = lazy(() => import("@/pages/admin-content-governance"));
+const AdminCompliance = lazy(() => import("@/pages/admin-compliance"));
 const Login = lazy(() => import("@/pages/login"));
 const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
 
@@ -119,6 +120,7 @@ function Router() {
         <Route path="/admin/security" component={AdminSecurity} />
         <Route path="/admin/threat-intelligence" component={AdminThreatIntelligence} />
         <Route path="/admin/content-governance" component={AdminContentGovernance} />
+        <Route path="/admin/compliance" component={AdminCompliance} />
         <Route path="/admin/change-password" component={AdminChangePassword} />
         <Route path="/login" component={Login} />
         <Route component={NotFound} />
