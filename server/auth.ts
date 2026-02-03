@@ -122,7 +122,7 @@ export function registerAuthRoutes(app: Express) {
     cookie: {
       secure: useSecureCookies,
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: useSecureCookies ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
     name: "gcr.sid",
