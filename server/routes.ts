@@ -8,7 +8,7 @@ import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
-import { registerAuthRoutes, isAuthenticated, isAdmin } from "./auth";
+import { registerAuthRoutes, isAuthenticated, isAdmin, seedAdminUser } from "./auth";
 import { registerAdminRoutes, registerToolTrackingRoutes } from "./admin";
 import { 
   checkGoogleSafeBrowsing, 
@@ -1501,6 +1501,11 @@ export async function registerRoutes(
   // Initialize newsletter service for weekly automated emails
   newsletterService.initialize().catch(err => 
     console.error("Failed to initialize newsletter service:", err)
+  );
+
+  // Seed admin user from environment variables (for production deployment)
+  seedAdminUser().catch(err => 
+    console.error("Failed to seed admin user:", err)
   );
 
   // Get all feeds with status

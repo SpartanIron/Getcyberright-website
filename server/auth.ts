@@ -801,3 +801,45 @@ export const isAdmin = async (req: Request, res: Response, next: NextFunction) =
   }
   next();
 };
+
+// Seed admin user from environment variables on startup
+export async function seedAdminUser(): Promise<void> {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    console.log("[auth] No ADMIN_EMAIL/ADMIN_PASSWORD set, skipping admin seed");
+    return;
+  }
+
+  try {
+    // Check if admin already exists
+    const existing = await db.select().from(users).where(eq(users.email, adminEmail));
+    if (existing.length > 0) {
+      // Ensure existing user is admin
+      if (!existing[0].isAdmin) {
+        await db.update(users).set({ isAdmin: true }).where(eq(users.email, adminEmail));
+        console.log(`[auth] Promoted existing user ${adminEmail} to admin`);
+      } else {
+        console.log(`[auth] Admin user ${adminEmail} already exists`);
+      }
+      return;
+    }
+
+    // Create new admin user
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    await db.insert(users).values({
+      email: adminEmail,
+      passwordHash,
+      firstName: "Admin",
+      lastName: "User",
+      isAdmin: true,
+      emailVerified: true,
+      subscriptionTier: "enterprise",
+    });
+
+    console.log(`[auth] Created admin user: ${adminEmail}`);
+  } catch (error) {
+    console.error("[auth] Failed to seed admin user:", error);
+  }
+}
