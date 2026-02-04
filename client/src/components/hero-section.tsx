@@ -47,7 +47,7 @@ export function HeroSection() {
                 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 leading-[1.15]" 
                 data-testid="text-hero-heading-mobile"
               >
-                Protect Your Family From Scams — Simple Steps You Can Use Today
+                Protect Your Family From Scams. Simple Steps You Can Use Today.
               </h1>
 
               <p className="text-sm sm:text-base text-white/85 font-medium mb-6 leading-relaxed">
@@ -156,7 +156,7 @@ export function HeroSection() {
                 className="text-4xl xl:text-5xl font-bold tracking-tight text-white leading-[1.1] mb-6" 
                 data-testid="text-hero-heading"
               >
-                Protect Your Family From Scams — Simple Steps You Can Use Today
+                Protect Your Family From Scams. Simple Steps You Can Use Today.
               </h1>
 
               <p 
