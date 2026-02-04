@@ -41,6 +41,10 @@ const ThreatTrendsPage = lazy(() => import("@/pages/threat-trends"));
 const ReportScam = lazy(() => import("@/pages/report-scam"));
 const Checklists = lazy(() => import("@/pages/checklists"));
 const AISafety = lazy(() => import("@/pages/ai-safety"));
+const Training = lazy(() => import("@/pages/training"));
+const TrainingPath = lazy(() => import("@/pages/training-path"));
+const TrainingLesson = lazy(() => import("@/pages/training-lesson"));
+const TrainingQuiz = lazy(() => import("@/pages/training-quiz"));
 const AdminDashboard = lazy(() => import("@/pages/admin/index"));
 const AdminUsers = lazy(() => import("@/pages/admin/users"));
 const AdminMessages = lazy(() => import("@/pages/admin/messages"));
@@ -114,6 +118,10 @@ function Router() {
         <Route path="/report-scam" component={ReportScam} />
         <Route path="/checklists" component={Checklists} />
         <Route path="/ai-safety" component={AISafety} />
+        <Route path="/training" component={Training} />
+        <Route path="/training/path/:pathId" component={TrainingPath} />
+        <Route path="/training/lesson/:lessonId" component={TrainingLesson} />
+        <Route path="/training/quiz/:quizId" component={TrainingQuiz} />
         <Route path="/admin" component={AdminDashboard} />
         <Route path="/admin/users" component={AdminUsers} />
         <Route path="/admin/messages" component={AdminMessages} />

@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -49,6 +49,7 @@ import { threatIntelService } from "./threatIntelService";
 import { contentGovernanceService } from "./contentGovernanceService";
 import { newsletterService } from "./newsletterService";
 import { complianceService } from "./complianceService";
+import { seedCurriculum } from "./curriculumSeed";
 import {
   scanConversation,
   getEmergencyResources,
@@ -1508,6 +1509,11 @@ export async function registerRoutes(
     console.error("Failed to seed admin user:", err)
   );
 
+  // Seed initial curriculum content
+  seedCurriculum().catch(err => 
+    console.error("Failed to seed curriculum:", err)
+  );
+
   // Get all feeds with status
   app.get("/api/threat-intel/feeds", async (req: Request, res: Response) => {
     try {
@@ -1879,6 +1885,495 @@ export async function registerRoutes(
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // ============================================
+  // TRAINING API ROUTES
+  // ============================================
+
+  // Get all published learning paths (optionally filter by audience)
+  app.get("/api/training/paths", async (req: Request, res: Response) => {
+    try {
+      const { audience } = req.query;
+      let query = db.select().from(learningPaths).where(eq(learningPaths.isPublished, true));
+      
+      const paths = await query;
+      const filteredPaths = audience 
+        ? paths.filter(p => p.audience === audience)
+        : paths;
+      
+      res.json(filteredPaths.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)));
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get user's training progress summary
+  app.get("/api/training/user-progress", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user.id;
+      
+      // Get completed paths count
+      const completedProgress = await db.select()
+        .from(userLearningProgress)
+        .where(eq(userLearningProgress.userId, userId));
+      
+      const completedPaths = completedProgress.filter(p => p.pathId && p.status === "completed").length;
+      
+      // Get certificates count
+      const certs = await db.select()
+        .from(trainingCertificates)
+        .where(eq(trainingCertificates.userId, userId));
+      
+      // Get total points from user progress
+      const [progress] = await db.select()
+        .from(userProgress)
+        .where(eq(userProgress.userId, userId));
+      
+      res.json({
+        completedPaths,
+        totalPoints: progress?.totalPoints || 0,
+        certificates: certs.length
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get a specific learning path with modules
+  app.get("/api/training/paths/:pathId", async (req: Request, res: Response) => {
+    try {
+      const pathId = req.params.pathId as string;
+      
+      const [path] = await db.select()
+        .from(learningPaths)
+        .where(eq(learningPaths.id, pathId));
+      
+      if (!path) {
+        return res.status(404).json({ error: "Learning path not found" });
+      }
+      
+      const modules = await db.select()
+        .from(trainingModules)
+        .where(eq(trainingModules.pathId, pathId));
+      
+      res.json({
+        ...path,
+        modules: modules.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get module with lessons
+  app.get("/api/training/modules/:moduleId", async (req: Request, res: Response) => {
+    try {
+      const moduleId = req.params.moduleId as string;
+      
+      const [module] = await db.select()
+        .from(trainingModules)
+        .where(eq(trainingModules.id, moduleId));
+      
+      if (!module) {
+        return res.status(404).json({ error: "Module not found" });
+      }
+      
+      const lessons = await db.select()
+        .from(trainingLessons)
+        .where(eq(trainingLessons.moduleId, moduleId));
+      
+      const quizzes = await db.select()
+        .from(trainingQuizzes)
+        .where(eq(trainingQuizzes.moduleId, moduleId));
+      
+      res.json({
+        ...module,
+        lessons: lessons.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+        quizzes
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get lesson content
+  app.get("/api/training/lessons/:lessonId", async (req: Request, res: Response) => {
+    try {
+      const lessonId = req.params.lessonId as string;
+      
+      const [lesson] = await db.select()
+        .from(trainingLessons)
+        .where(eq(trainingLessons.id, lessonId));
+      
+      if (!lesson) {
+        return res.status(404).json({ error: "Lesson not found" });
+      }
+      
+      res.json(lesson);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Mark lesson as complete
+  app.post("/api/training/lessons/:lessonId/complete", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user.id;
+      const lessonId = req.params.lessonId as string;
+      const { timeSpent } = req.body;
+      
+      // Check for existing progress
+      const existing = await db.select()
+        .from(userLearningProgress)
+        .where(eq(userLearningProgress.lessonId, lessonId));
+      
+      const userExisting = existing.find(p => p.userId === userId);
+      
+      if (userExisting) {
+        await db.update(userLearningProgress)
+          .set({
+            status: "completed",
+            progressPercent: 100,
+            timeSpentMinutes: (userExisting.timeSpentMinutes || 0) + (timeSpent || 0),
+            completedAt: new Date(),
+            updatedAt: new Date()
+          })
+          .where(eq(userLearningProgress.id, userExisting.id));
+      } else {
+        await db.insert(userLearningProgress).values({
+          userId,
+          lessonId,
+          status: "completed",
+          progressPercent: 100,
+          timeSpentMinutes: timeSpent || 0,
+          startedAt: new Date(),
+          completedAt: new Date(),
+          lastAccessedAt: new Date()
+        });
+      }
+      
+      // Award points for completing lesson
+      const [progress] = await db.select()
+        .from(userProgress)
+        .where(eq(userProgress.userId, userId));
+      
+      if (progress) {
+        await db.update(userProgress)
+          .set({
+            lessonsCompleted: (progress.lessonsCompleted || 0) + 1,
+            totalPoints: (progress.totalPoints || 0) + 25,
+            lastActivityDate: new Date(),
+            updatedAt: new Date()
+          })
+          .where(eq(userProgress.userId, userId));
+      }
+      
+      res.json({ success: true, pointsEarned: 25 });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get quiz with questions
+  app.get("/api/training/quizzes/:quizId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const quizId = req.params.quizId as string;
+      
+      const [quiz] = await db.select()
+        .from(trainingQuizzes)
+        .where(eq(trainingQuizzes.id, quizId));
+      
+      if (!quiz) {
+        return res.status(404).json({ error: "Quiz not found" });
+      }
+      
+      const questions = await db.select()
+        .from(quizQuestions)
+        .where(eq(quizQuestions.quizId, quizId));
+      
+      // Don't send correct answers to client
+      const safeQuestions = questions.map(q => ({
+        id: q.id,
+        questionType: q.questionType,
+        questionText: q.questionText,
+        options: q.options,
+        scenarioContext: q.scenarioContext,
+        difficulty: q.difficulty,
+        points: q.points
+      }));
+      
+      res.json({
+        ...quiz,
+        questions: quiz.shuffleQuestions 
+          ? safeQuestions.sort(() => Math.random() - 0.5)
+          : safeQuestions.sort((a, b) => questions.findIndex(q => q.id === a.id) - questions.findIndex(q => q.id === b.id))
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Submit quiz answers
+  app.post("/api/training/quizzes/:quizId/submit", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user.id;
+      const quizId = req.params.quizId as string;
+      const { answers, timeSpentSeconds } = req.body;
+      
+      const [quiz] = await db.select()
+        .from(trainingQuizzes)
+        .where(eq(trainingQuizzes.id, quizId));
+      
+      if (!quiz) {
+        return res.status(404).json({ error: "Quiz not found" });
+      }
+      
+      // Get all questions with correct answers
+      const questions = await db.select()
+        .from(quizQuestions)
+        .where(eq(quizQuestions.quizId, quizId));
+      
+      // Calculate score
+      let score = 0;
+      let maxScore = 0;
+      const results: Record<string, { correct: boolean; correctAnswer?: string; explanation?: string }> = {};
+      
+      for (const question of questions) {
+        maxScore += question.points || 10;
+        const userAnswer = answers[question.id];
+        const isCorrect = userAnswer === question.correctAnswer;
+        
+        if (isCorrect) {
+          score += question.points || 10;
+        }
+        
+        results[question.id] = {
+          correct: isCorrect,
+          correctAnswer: quiz.showCorrectAnswers ? question.correctAnswer : undefined,
+          explanation: quiz.showCorrectAnswers ? question.explanation || undefined : undefined
+        };
+      }
+      
+      const percentScore = Math.round((score / maxScore) * 100);
+      const passed = percentScore >= (quiz.passingScore || 70);
+      
+      // Get attempt number
+      const previousAttempts = await db.select()
+        .from(quizAttempts)
+        .where(eq(quizAttempts.quizId, quizId));
+      
+      const userAttempts = previousAttempts.filter(a => a.userId === userId);
+      const attemptNumber = userAttempts.length + 1;
+      
+      // Save attempt
+      await db.insert(quizAttempts).values({
+        userId,
+        quizId,
+        score,
+        maxScore,
+        percentScore,
+        passed,
+        answers: JSON.stringify(answers),
+        timeSpentSeconds,
+        attemptNumber
+      });
+      
+      // Award points if passed
+      if (passed) {
+        const [progress] = await db.select()
+          .from(userProgress)
+          .where(eq(userProgress.userId, userId));
+        
+        if (progress) {
+          await db.update(userProgress)
+            .set({
+              totalPoints: (progress.totalPoints || 0) + 50,
+              lastActivityDate: new Date(),
+              updatedAt: new Date()
+            })
+            .where(eq(userProgress.userId, userId));
+        }
+      }
+      
+      res.json({
+        score,
+        maxScore,
+        percentScore,
+        passed,
+        results,
+        attemptNumber,
+        pointsEarned: passed ? 50 : 0
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get user's certificates
+  app.get("/api/training/certificates", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user.id;
+      
+      const certs = await db.select()
+        .from(trainingCertificates)
+        .where(eq(trainingCertificates.userId, userId));
+      
+      res.json(certs);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Generate certificate for completed path
+  app.post("/api/training/paths/:pathId/certificate", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user.id;
+      const pathId = req.params.pathId as string;
+      
+      // Check if path exists
+      const [path] = await db.select()
+        .from(learningPaths)
+        .where(eq(learningPaths.id, pathId));
+      
+      if (!path) {
+        return res.status(404).json({ error: "Learning path not found" });
+      }
+      
+      // Check if certificate already exists
+      const existingCerts = await db.select()
+        .from(trainingCertificates)
+        .where(eq(trainingCertificates.pathId, pathId));
+      
+      const userCert = existingCerts.find(c => c.userId === userId);
+      if (userCert) {
+        return res.json({ certificate: userCert, message: "Certificate already issued" });
+      }
+      
+      // Verify all modules are completed (at least 70% quiz score on each)
+      const modules = await db.select()
+        .from(trainingModules)
+        .where(eq(trainingModules.pathId, pathId));
+      
+      if (modules.length === 0) {
+        return res.status(400).json({ 
+          error: "This learning path has no modules yet" 
+        });
+      }
+      
+      let allPassed = true;
+      let totalScore = 0;
+      let quizCount = 0;
+      let requiredQuizzes = 0;
+      
+      for (const module of modules) {
+        const quizzes = await db.select()
+          .from(trainingQuizzes)
+          .where(eq(trainingQuizzes.moduleId, module.id));
+        
+        requiredQuizzes += quizzes.length;
+        
+        for (const quiz of quizzes) {
+          const attempts = await db.select()
+            .from(quizAttempts)
+            .where(eq(quizAttempts.quizId, quiz.id));
+          
+          const userAttempts = attempts.filter(a => a.userId === userId && a.passed);
+          if (userAttempts.length === 0) {
+            allPassed = false;
+          } else {
+            const bestAttempt = userAttempts.reduce((best, curr) => 
+              curr.percentScore > best.percentScore ? curr : best
+            );
+            totalScore += bestAttempt.percentScore;
+            quizCount++;
+          }
+        }
+      }
+      
+      if (requiredQuizzes === 0) {
+        return res.status(400).json({ 
+          error: "This learning path has no quizzes configured yet" 
+        });
+      }
+      
+      if (!allPassed) {
+        return res.status(400).json({ 
+          error: "Complete all module quizzes with a passing score to earn your certificate" 
+        });
+      }
+      
+      const averageScore = quizCount > 0 ? Math.round(totalScore / quizCount) : 0;
+      
+      // Generate certificate
+      const certificateNumber = `GCR-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      
+      const [certificate] = await db.insert(trainingCertificates).values({
+        userId,
+        pathId,
+        certificateName: path.certificateName || "Digital Safety Aware",
+        certificateNumber,
+        finalScore: averageScore,
+        verificationUrl: `/verify/${certificateNumber}`
+      }).returning();
+      
+      // Award bonus points for earning certificate
+      const [progress] = await db.select()
+        .from(userProgress)
+        .where(eq(userProgress.userId, userId));
+      
+      if (progress) {
+        await db.update(userProgress)
+          .set({
+            totalPoints: (progress.totalPoints || 0) + 200,
+            lastActivityDate: new Date(),
+            updatedAt: new Date()
+          })
+          .where(eq(userProgress.userId, userId));
+      }
+      
+      res.json({ 
+        success: true, 
+        certificate,
+        message: "Congratulations! Certificate issued successfully.",
+        pointsEarned: 200
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Verify a certificate (public endpoint)
+  app.get("/api/training/verify/:certificateNumber", async (req: Request, res: Response) => {
+    try {
+      const certificateNumber = req.params.certificateNumber as string;
+      
+      const certs = await db.select()
+        .from(trainingCertificates);
+      
+      const certificate = certs.find(c => c.certificateNumber === certificateNumber);
+      
+      if (!certificate) {
+        return res.status(404).json({ valid: false, error: "Certificate not found" });
+      }
+      
+      const [path] = await db.select()
+        .from(learningPaths)
+        .where(eq(learningPaths.id, certificate.pathId));
+      
+      res.json({
+        valid: true,
+        certificate: {
+          certificateName: certificate.certificateName,
+          certificateNumber: certificate.certificateNumber,
+          issueDate: certificate.issueDate,
+          courseName: path?.title,
+          courseLevel: path?.level
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 

@@ -378,3 +378,219 @@ export const complianceAssessments = pgTable("compliance_assessments", {
 });
 
 export type ComplianceAssessment = typeof complianceAssessments.$inferSelect;
+
+// ============================================
+// TRAINING SYSTEM - Cybersecurity Curriculum
+// ============================================
+
+// Training Audiences
+export const TRAINING_AUDIENCES = ["kids", "parents", "seniors", "educators", "small-business"] as const;
+export type TrainingAudience = typeof TRAINING_AUDIENCES[number];
+
+// Training Levels
+export const TRAINING_LEVELS = ["foundation", "intermediate", "advanced"] as const;
+export type TrainingLevel = typeof TRAINING_LEVELS[number];
+
+// Competency Domains (aligned with NIST NICE Framework)
+export const COMPETENCY_DOMAINS = [
+  "threat-recognition",
+  "password-security",
+  "privacy-protection",
+  "safe-online-behavior",
+  "device-security",
+  "social-engineering",
+  "incident-response"
+] as const;
+export type CompetencyDomain = typeof COMPETENCY_DOMAINS[number];
+
+// Learning Paths - Audience-specific curriculum tracks
+export const learningPaths = pgTable("learning_paths", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  audience: text("audience").notNull(), // kids, parents, seniors, educators, small-business
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  level: text("level").notNull(), // foundation, intermediate, advanced
+  estimatedHours: integer("estimated_hours").default(3),
+  prerequisites: text("prerequisites").array(),
+  learningOutcomes: text("learning_outcomes").array(),
+  certificateName: text("certificate_name"),
+  iconName: text("icon_name"),
+  color: text("color"),
+  sortOrder: integer("sort_order").default(0),
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type LearningPath = typeof learningPaths.$inferSelect;
+export const insertLearningPathSchema = createInsertSchema(learningPaths).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertLearningPath = z.infer<typeof insertLearningPathSchema>;
+
+// Training Modules - Groups of related lessons within a path
+export const trainingModules = pgTable("training_modules", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  pathId: varchar("path_id").notNull(),
+  domain: text("domain").notNull(), // competency domain
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  learningObjectives: text("learning_objectives").array(),
+  estimatedMinutes: integer("estimated_minutes").default(30),
+  sortOrder: integer("sort_order").default(0),
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type TrainingModule = typeof trainingModules.$inferSelect;
+export const insertTrainingModuleSchema = createInsertSchema(trainingModules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertTrainingModule = z.infer<typeof insertTrainingModuleSchema>;
+
+// Training Lessons - Individual learning units
+export const trainingLessons = pgTable("training_lessons", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  moduleId: varchar("module_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  contentType: text("content_type").notNull(), // text, video, interactive, scenario
+  contentHtml: text("content_html"), // Rich content
+  videoUrl: text("video_url"),
+  scenarioData: text("scenario_data"), // JSON for interactive scenarios
+  keyTakeaways: text("key_takeaways").array(),
+  estimatedMinutes: integer("estimated_minutes").default(10),
+  sortOrder: integer("sort_order").default(0),
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type TrainingLesson = typeof trainingLessons.$inferSelect;
+export const insertTrainingLessonSchema = createInsertSchema(trainingLessons).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertTrainingLesson = z.infer<typeof insertTrainingLessonSchema>;
+
+// Training Quizzes - Assessment tied to modules
+export const trainingQuizzes = pgTable("training_quizzes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  moduleId: varchar("module_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  passingScore: integer("passing_score").default(70), // percentage
+  maxAttempts: integer("max_attempts").default(3),
+  timeLimit: integer("time_limit"), // minutes, null = unlimited
+  shuffleQuestions: boolean("shuffle_questions").default(true),
+  showCorrectAnswers: boolean("show_correct_answers").default(true),
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type TrainingQuiz = typeof trainingQuizzes.$inferSelect;
+export const insertTrainingQuizSchema = createInsertSchema(trainingQuizzes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertTrainingQuiz = z.infer<typeof insertTrainingQuizSchema>;
+
+// Quiz Questions
+export const quizQuestions = pgTable("quiz_questions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  quizId: varchar("quiz_id").notNull(),
+  questionType: text("question_type").notNull(), // multiple-choice, true-false, scenario
+  questionText: text("question_text").notNull(),
+  options: text("options").array(), // JSON array of options
+  correctAnswer: text("correct_answer").notNull(), // answer or index
+  explanation: text("explanation"), // Shown after answering
+  scenarioContext: text("scenario_context"), // For scenario-based questions
+  difficulty: text("difficulty").default("medium"), // easy, medium, hard
+  points: integer("points").default(10),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type QuizQuestion = typeof quizQuestions.$inferSelect;
+export const insertQuizQuestionSchema = createInsertSchema(quizQuestions).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertQuizQuestion = z.infer<typeof insertQuizQuestionSchema>;
+
+// User Learning Progress - Tracks completion
+export const userLearningProgress = pgTable("user_learning_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  pathId: varchar("path_id"),
+  moduleId: varchar("module_id"),
+  lessonId: varchar("lesson_id"),
+  status: text("status").notNull().default("not_started"), // not_started, in_progress, completed
+  progressPercent: integer("progress_percent").default(0),
+  timeSpentMinutes: integer("time_spent_minutes").default(0),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  lastAccessedAt: timestamp("last_accessed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type UserLearningProgress = typeof userLearningProgress.$inferSelect;
+export const insertUserLearningProgressSchema = createInsertSchema(userLearningProgress).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertUserLearningProgress = z.infer<typeof insertUserLearningProgressSchema>;
+
+// Quiz Attempts - Tracks user quiz performance
+export const quizAttempts = pgTable("quiz_attempts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  quizId: varchar("quiz_id").notNull(),
+  score: integer("score").notNull(),
+  maxScore: integer("max_score").notNull(),
+  percentScore: integer("percent_score").notNull(),
+  passed: boolean("passed").notNull(),
+  answers: text("answers"), // JSON of question ID -> user answer
+  timeSpentSeconds: integer("time_spent_seconds"),
+  attemptNumber: integer("attempt_number").default(1),
+  completedAt: timestamp("completed_at").defaultNow(),
+});
+
+export type QuizAttempt = typeof quizAttempts.$inferSelect;
+export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).omit({
+  id: true,
+  completedAt: true,
+});
+export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
+
+// Training Certificates - Earned upon path completion
+export const trainingCertificates = pgTable("training_certificates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  pathId: varchar("path_id").notNull(),
+  certificateName: text("certificate_name").notNull(),
+  certificateNumber: text("certificate_number").notNull(),
+  issueDate: timestamp("issue_date").defaultNow(),
+  expiryDate: timestamp("expiry_date"), // null = no expiry
+  finalScore: integer("final_score"),
+  verificationUrl: text("verification_url"),
+  pdfUrl: text("pdf_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type TrainingCertificate = typeof trainingCertificates.$inferSelect;
+export const insertTrainingCertificateSchema = createInsertSchema(trainingCertificates).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertTrainingCertificate = z.infer<typeof insertTrainingCertificateSchema>;
