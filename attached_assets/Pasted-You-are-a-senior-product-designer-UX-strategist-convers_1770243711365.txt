@@ -1,0 +1,125 @@
+You are a senior product designer, UX strategist, conversion copywriter, and frontend engineer.
+
+Your task is to REBUILD and IMPROVE the existing website www.GetCyberRight.com for clarity, trust, accessibility, and conversion.
+
+CONTEXT
+- Brand: GetCyberRight
+- Mission: Cyber safety education and protection for families, seniors, and small organizations
+- Primary problem: Users do NOT quickly understand what the site offers, who it is for, or what to do next
+- Secondary problem: Weak trust signals for a cybersecurity-related brand
+- Audience includes non-technical users (parents, seniors), so simplicity and accessibility are mandatory
+
+GOAL
+Create a high-conversion, accessible, trust-first homepage and supporting pages that:
+1. Clearly state value in under 5 seconds
+2. Provide ONE obvious primary action
+3. Segment audiences cleanly without confusion
+4. Establish credibility immediately
+5. Are readable and usable by seniors
+
+OUTPUT REQUIREMENTS
+Produce ACTUAL IMPLEMENTATION CODE and CONTENT, not advice.
+
+Deliver the following:
+
+========================
+1. HOMEPAGE (FULL HTML + CSS)
+========================
+
+Hero Section (above the fold)
+- Headline: “Protect Your Family From Scams — Simple Steps You Can Use Today”
+- Subheadline: “Plain-language cyber safety guides, checklists, and live help for parents and seniors. No tech background required.”
+- Primary CTA Button (high contrast): “Get the Free Family Cyber Safety Checklist”
+- Secondary CTA (lower emphasis): “See Business & Organization Solutions”
+- Include trust bar placeholder:
+  - “Trusted by families, seniors, and small organizations”
+  - Placeholder logos or text badges
+
+Trust & Credibility Section
+- 3 testimonial cards with:
+  - Name
+  - Location
+  - Short outcome-based quote
+- Advisory / credibility section with:
+  - “Built using NIST-aligned best practices”
+  - “Designed for non-technical users”
+
+Audience Segmentation Section
+Create 3 clickable cards:
+- For Parents
+- For Seniors
+- For Businesses
+Each card must include:
+- One pain statement
+- One benefit statement
+- CTA button
+
+Free Resource Section
+- Highlight downloadable “Family Cyber Safety Checklist (PDF)”
+- Email capture form (single field)
+- Clear privacy reassurance text
+
+Accessibility Requirements
+- Base font size minimum 16px
+- High contrast buttons (WCAG AA)
+- Large clickable areas
+- Keyboard navigable
+- Clear focus states
+
+========================
+2. LANDING PAGES (STRUCTURE + COPY)
+========================
+
+Create three sections or pages with copy included:
+
+A. For Parents
+- Focus on scams, kids online safety, identity protection
+- Simple steps, checklist driven
+- CTA: “Download Parent Safety Checklist”
+
+B. For Seniors
+- Focus on fraud, phishing, tech intimidation
+- Large text, plain language
+- CTA: “Get Simple Protection Help”
+
+C. For Businesses & Nonprofits
+- Focus on training, awareness, compliance support
+- Mention NIST, phishing reduction, employee training
+- CTA: “Request a Demo”
+
+========================
+3. EMAIL CAPTURE MODAL (HTML + JS)
+========================
+- Triggered by checklist CTA
+- One field: email
+- Copy: “No spam. Practical protection only.”
+- Confirmation success message
+
+========================
+4. BASIC SEO SETUP
+========================
+- Proper meta title and description for homepage
+- H1, H2 hierarchy
+- Placeholder schema comments for Organization and FAQ
+
+========================
+5. FILE STRUCTURE
+========================
+Provide a clean file structure example:
+- index.html
+- styles.css
+- script.js
+
+========================
+RULES
+========================
+- No placeholder lorem ipsum
+- No marketing fluff
+- Write in plain, confident language
+- Prioritize clarity over cleverness
+- Build for REAL USERS, especially seniors
+
+FINAL OUTPUT
+- Provide copy-paste ready HTML, CSS, and JS
+- Content must be usable immediately without edits
+- Do not explain your decisions — just deliver the implementation
