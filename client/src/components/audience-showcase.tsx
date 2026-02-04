@@ -15,7 +15,7 @@ const audiences = [
     description: "From toddlers with tablets to teenagers on social media. Get age-appropriate guides for the whole family.",
     icon: Users,
     href: "/resources",
-    stats: "Free Family Resources",
+    stats: "Family Resources",
   },
   {
     id: "seniors",
@@ -32,10 +32,10 @@ const audiences = [
     image: businessImage,
     title: "For Small Businesses",
     subtitle: "Train Your Team",
-    description: "Free security awareness training for small businesses. Protect your company from phishing and social engineering.",
+    description: "Security awareness training for small businesses. Protect your company from phishing and social engineering.",
     icon: Briefcase,
     href: "/resources",
-    stats: "Free Training Materials",
+    stats: "Training Materials",
   },
 ];
 
@@ -58,7 +58,7 @@ export function AudienceShowcase() {
           </h2>
           <p className="text-lg text-muted-foreground">
             Whether you're protecting your kids online or training your team, 
-            we have free resources designed just for you.
+            we have resources designed just for you.
           </p>
         </motion.div>
 

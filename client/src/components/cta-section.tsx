@@ -29,7 +29,7 @@ export function CTASection() {
 
           <p className="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed">
             Join thousands of families, seniors, and organizations who have
-            already strengthened their cybersecurity with our free resources.
+            already strengthened their cybersecurity with our practical guides.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -40,7 +40,7 @@ export function CTASection() {
                 className="text-base w-full sm:w-auto"
                 data-testid="button-cta-primary"
               >
-                Get Free Protection Resources
+                Get Protection Resources
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>

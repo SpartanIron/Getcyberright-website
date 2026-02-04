@@ -3,8 +3,8 @@ import { Shield, Lock, FileCheck, HeartHandshake } from "lucide-react";
 const trustIndicators = [
   { 
     icon: FileCheck,
-    label: "100% Free", 
-    sublabel: "No hidden costs ever" 
+    label: "Free to Start", 
+    sublabel: "No credit card required" 
   },
   { 
     icon: Lock,

@@ -62,7 +62,7 @@ export function TestimonialsSection() {
             People Like You Are Staying Safe
           </h2>
           <p className="text-lg text-muted-foreground">
-            See how everyday families and seniors are using our free resources to protect themselves online.
+            See how everyday families and seniors are using our tools and guides to protect themselves online.
           </p>
         </motion.div>
 
