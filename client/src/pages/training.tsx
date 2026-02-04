@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import bannerImage from "@/assets/banners/training-banner.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -111,11 +112,17 @@ export default function Training() {
       
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <section className="relative py-16 md:py-24 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent" />
+          <div className="absolute inset-0">
+            <img 
+              src={bannerImage} 
+              alt="Cybersecurity Training Academy - diverse people learning together" 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/70" />
+          </div>
           
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <div className="text-center max-w-3xl mx-auto">
+            <div className="max-w-2xl">
               <Badge variant="secondary" className="mb-4" data-testid="badge-training-header">
                 <GraduationCap className="w-3 h-3 mr-1" />
                 AI-Powered Curriculum
@@ -127,7 +134,7 @@ export default function Training() {
                 Master digital safety with structured learning paths, interactive lessons, 
                 and industry-recognized certifications tailored to your needs.
               </p>
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="flex flex-wrap gap-4">
                 <Button size="lg" data-testid="button-start-learning">
                   <BookOpen className="w-4 h-4 mr-2" />
                   Start Learning

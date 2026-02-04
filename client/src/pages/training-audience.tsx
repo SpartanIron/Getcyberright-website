@@ -26,6 +26,20 @@ import {
 } from "lucide-react";
 import type { LearningPath } from "@shared/schema";
 
+import kidsBanner from "@/assets/banners/training-kids-banner.png";
+import parentsBanner from "@/assets/banners/training-parents-banner.png";
+import seniorsBanner from "@/assets/banners/training-seniors-banner.png";
+import educatorsBanner from "@/assets/banners/training-educators-banner.png";
+import businessBanner from "@/assets/banners/training-business-banner.png";
+
+const audienceBanners: Record<string, string> = {
+  kids: kidsBanner,
+  parents: parentsBanner,
+  seniors: seniorsBanner,
+  educators: educatorsBanner,
+  business: businessBanner
+};
+
 const audienceConfigs: Record<string, {
   key: string;
   title: string;
@@ -159,8 +173,17 @@ export default function TrainingAudience() {
       <Navigation />
       
       <main id="main-content" tabIndex={-1} className="flex-1">
-        <section className={`relative py-16 lg:py-24 ${config.bgPattern}`}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="relative py-16 lg:py-24 overflow-hidden">
+          <div className="absolute inset-0">
+            <img 
+              src={audienceBanners[audienceKey]} 
+              alt={`${config.title} - training course hero`}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/60" />
+          </div>
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="flex items-center gap-2 mb-4">
@@ -207,7 +230,7 @@ export default function TrainingAudience() {
               </div>
               
               <div className="hidden lg:block">
-                <Card className="border-2">
+                <Card className="border-2 bg-background/80 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
