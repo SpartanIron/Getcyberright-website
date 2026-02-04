@@ -15,11 +15,11 @@ import {
 } from "@/components/ui/navigation-menu";
 
 const whoWeHelp = [
-  { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/parents", icon: Users, featured: true },
-  { title: "Kids Safety Hub", description: "Fun, interactive lessons for ages 8 to 16", href: "/kids", icon: Sparkles, featured: true },
-  { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/seniors", icon: Heart, featured: true },
-  { title: "Educators Hub", description: "Classroom resources for teaching digital citizenship", href: "/educators", icon: GraduationCap, featured: true },
-  { title: "Small Business", description: "Enterprise-grade protection made accessible", href: "/small-business", icon: Briefcase, featured: true },
+  { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/parents", icon: Users, featured: true, color: "text-blue-500", trainingHref: "/training/parents" },
+  { title: "Kids Safety Hub", description: "Fun, interactive lessons for ages 8 to 16", href: "/kids", icon: Sparkles, featured: true, color: "text-purple-500", trainingHref: "/training/kids" },
+  { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/seniors", icon: Heart, featured: true, color: "text-rose-500", trainingHref: "/training/seniors" },
+  { title: "Educators Hub", description: "Classroom resources for teaching digital citizenship", href: "/educators", icon: GraduationCap, featured: true, color: "text-emerald-500", trainingHref: "/training/educators" },
+  { title: "Small Business", description: "Enterprise-grade protection made accessible", href: "/small-business", icon: Briefcase, featured: true, color: "text-amber-500", trainingHref: "/training/business" },
 ];
 
 const freeTools = [
@@ -346,25 +346,43 @@ export function Navigation() {
             <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto" aria-label="Mobile navigation menu">
               <nav className="flex flex-col gap-4 mt-8" aria-label="Mobile navigation">
                 <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Who We Help</h4>
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-muted-foreground" />
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Who We Help</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground -mt-1 ml-6">Guides, resources & training</p>
                   {whoWeHelp.map((item) => (
-                    <Link
-                      key={item.title}
-                      href={item.href}
-                      className="flex items-center gap-3 py-2 text-foreground transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
-                      data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                    >
-                      <item.icon className="w-4 h-4 text-primary" />
-                      {item.title}
-                    </Link>
+                    <div key={item.title} className="space-y-1">
+                      <Link
+                        href={item.href}
+                        className="flex items-center gap-3 py-2 text-foreground transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                        data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                      >
+                        <item.icon className={`w-4 h-4 ${item.color}`} />
+                        <span className="font-medium">{item.title}</span>
+                      </Link>
+                      <Link
+                        href={item.trainingHref}
+                        className="flex items-center gap-2 py-1.5 pl-7 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        onClick={() => setMobileMenuOpen(false)}
+                        data-testid={`mobile-link-training-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                      >
+                        <GraduationCap className="w-3.5 h-3.5" />
+                        <span>Take the Course</span>
+                      </Link>
+                    </div>
                   ))}
                 </div>
 
                 <div className="h-px bg-border" />
 
                 <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Free Tools</h4>
+                  <div className="flex items-center gap-2">
+                    <Search className="w-4 h-4 text-muted-foreground" />
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Free Tools</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground -mt-1 ml-6">No signup required</p>
                   {freeTools.map((item) => (
                     <Link
                       key={item.title}
@@ -375,6 +393,11 @@ export function Navigation() {
                     >
                       <item.icon className="w-4 h-4 text-accent" />
                       {item.title}
+                      {item.badge && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-white font-medium">
+                          {item.badge}
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>
@@ -382,34 +405,11 @@ export function Navigation() {
                 <div className="h-px bg-border" />
 
                 <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Training</h4>
-                  <Link
-                    href="/training"
-                    className="flex items-center gap-3 py-2 text-foreground transition-colors font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                    data-testid="mobile-link-training-hub"
-                  >
-                    <GraduationCap className="w-4 h-4 text-primary" />
-                    Training Academy
-                  </Link>
-                  {trainingOptions.map((item) => (
-                    <Link
-                      key={item.title}
-                      href={item.href}
-                      className="flex items-center gap-3 py-2 text-foreground transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
-                      data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                    >
-                      <item.icon className={`w-4 h-4 ${item.color}`} />
-                      {item.title}
-                    </Link>
-                  ))}
-                </div>
-
-                <div className="h-px bg-border" />
-
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Learn</h4>
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-muted-foreground" />
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Learn</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground -mt-1 ml-6">Articles & resources</p>
                   {learnTopics.map((item) => (
                     <Link
                       key={item.title}
@@ -441,31 +441,48 @@ export function Navigation() {
                 <div className="h-px bg-border" />
 
                 <Link
-                  href="/about"
-                  className="py-2 text-foreground transition-colors font-medium"
+                  href="/training"
+                  className="flex items-center gap-3 py-3 px-3 -mx-3 rounded-lg bg-primary/10 text-foreground transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
-                  data-testid="mobile-link-about"
+                  data-testid="mobile-link-training-academy"
                 >
-                  About Us
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <GraduationCap className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <span className="font-semibold">Training Academy</span>
+                    <p className="text-xs text-muted-foreground">All courses & certificates</p>
+                  </div>
                 </Link>
 
-                <Link
-                  href="/events"
-                  className="py-2 text-foreground transition-colors font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                  data-testid="mobile-link-events"
-                >
-                  Events
-                </Link>
+                <div className="h-px bg-border" />
 
-                <Link
-                  href="/contact"
-                  className="py-2 text-foreground transition-colors font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                  data-testid="mobile-link-contact"
-                >
-                  Contact
-                </Link>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href="/about"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                    data-testid="mobile-link-about"
+                  >
+                    About Us
+                  </Link>
+                  <Link
+                    href="/events"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                    data-testid="mobile-link-events"
+                  >
+                    Events
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                    data-testid="mobile-link-contact"
+                  >
+                    Contact
+                  </Link>
+                </div>
 
                 <div className="h-px bg-border" />
 
