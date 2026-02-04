@@ -41,6 +41,14 @@ const quickLinks = [
   { title: "Checklists", description: "Printable security checklists", href: "/checklists", icon: ClipboardCheck },
 ];
 
+const trainingOptions = [
+  { title: "Training for Kids", description: "Fun games and lessons about staying safe online", href: "/training/kids", icon: Sparkles, color: "text-purple-500" },
+  { title: "Training for Parents", description: "Learn how to protect your family online", href: "/training/parents", icon: Users, color: "text-blue-500" },
+  { title: "Training for Seniors", description: "Simple steps to avoid scams and stay safe", href: "/training/seniors", icon: Heart, color: "text-rose-500" },
+  { title: "Training for Educators", description: "Classroom lessons and teaching materials", href: "/training/educators", icon: GraduationCap, color: "text-emerald-500" },
+  { title: "Training for Businesses", description: "Employee security awareness programs", href: "/training/business", icon: Briefcase, color: "text-amber-500" },
+];
+
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -182,15 +190,47 @@ export function Navigation() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link
-                    href="/training"
-                    className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
-                    data-testid="nav-training"
-                  >
-                    Training
-                  </Link>
-                </NavigationMenuLink>
+                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-training">
+                  Training
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-[500px] p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Training Academy</h3>
+                      <Link href="/training" className="text-sm text-primary flex items-center gap-1 hover:underline">
+                        View all courses <ChevronRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                    <div className="space-y-2">
+                      {trainingOptions.map((item) => (
+                        <NavigationMenuLink asChild key={item.title}>
+                          <Link
+                            href={item.href}
+                            className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
+                            data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                          >
+                            <div className={`flex-shrink-0 w-10 h-10 rounded-lg bg-muted flex items-center justify-center`}>
+                              <item.icon className={`w-5 h-5 ${item.color}`} />
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-foreground mb-0.5">
+                                {item.title}
+                              </div>
+                              <p className="text-xs text-muted-foreground leading-snug">
+                                {item.description}
+                              </p>
+                            </div>
+                          </Link>
+                        </NavigationMenuLink>
+                      ))}
+                    </div>
+                    <div className="mt-4 pt-4 border-t">
+                      <p className="text-xs text-muted-foreground">
+                        Earn certificates and track your progress. Free to start.
+                      </p>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
               </NavigationMenuItem>
 
               <NavigationMenuItem>

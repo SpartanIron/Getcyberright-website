@@ -86,6 +86,20 @@ The platform enforces strict content integrity standards for all AI-generated co
 - **Admin Dashboard**: Manage newsletters at `/admin/newsletter`
 - **Email Configuration Note**: Email sending is not yet configured. To enable newsletter delivery, set up Resend or SendGrid integration with `RESEND_API_KEY` or `SENDGRID_API_KEY` secret.
 
+### Training Academy
+- **Architecture**: Audience-specific training paths with learning modules, lessons, quizzes, and certificates
+- **Audiences**: Kids, Parents, Seniors, Educators, Small Business (each with tailored content and language)
+- **Routes**:
+  - `/training` - Main training hub showing all learning paths
+  - `/training/kids`, `/training/parents`, `/training/seniors`, `/training/educators`, `/training/business` - Audience landing pages
+  - `/training/:pathId` - Learning path detail with modules
+  - `/training/lesson/:lessonId` - Lesson viewer
+  - `/training/quiz/:quizId` - Quiz assessment
+- **Database Tables**: `learning_paths`, `training_modules`, `training_lessons`, `training_quizzes`, `quiz_questions`, `quiz_attempts`, `training_certificates`
+- **Gamification Integration**: Lessons +25 points, Quizzes +50 points, Certificates +200 points
+- **Certificate Requirements**: Pass all module quizzes with 70%+ score
+- **Content Seeding Note**: Curriculum seeds automatically on first server start. To update existing curriculum with new content, delete existing learning paths from the database and restart the server.
+
 ### Premium Subscription Tiers
 The platform offers Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers, with feature gating implemented via `hasTierAccess()` and UI upgrade prompts.
 
