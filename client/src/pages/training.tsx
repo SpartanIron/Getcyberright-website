@@ -263,7 +263,7 @@ export default function Training() {
                                 {path.certificateName}
                               </span>
                             </div>
-                            <Link href={`/training/path/${path.id}`}>
+                            <Link href={`/training/${path.id}`}>
                               <Button className="w-full" data-testid={`button-start-path-${path.id}`}>
                                 Start Path
                                 <ChevronRight className="w-4 h-4 ml-1" />

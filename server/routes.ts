@@ -1941,7 +1941,113 @@ export async function registerRoutes(
     }
   });
 
-  // Get a specific learning path with modules
+  // Get user's detailed progress for all paths
+  app.get("/api/training/user-progress/detailed", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user.id;
+      
+      const allPaths = await db.select().from(learningPaths);
+      const allProgress = await db.select()
+        .from(userLearningProgress)
+        .where(eq(userLearningProgress.userId, userId));
+      const allQuizAttempts = await db.select()
+        .from(quizAttempts)
+        .where(eq(quizAttempts.userId, userId));
+      const allCerts = await db.select()
+        .from(trainingCertificates)
+        .where(eq(trainingCertificates.userId, userId));
+      
+      const pathProgress = await Promise.all(allPaths.map(async (path) => {
+        const modules = await db.select()
+          .from(trainingModules)
+          .where(eq(trainingModules.pathId, path.id));
+        
+        let totalLessons = 0;
+        let completedLessons = 0;
+        let totalQuizzes = 0;
+        let passedQuizzes = 0;
+        
+        for (const module of modules) {
+          const lessons = await db.select()
+            .from(trainingLessons)
+            .where(eq(trainingLessons.moduleId, module.id));
+          const quizzes = await db.select()
+            .from(trainingQuizzes)
+            .where(eq(trainingQuizzes.moduleId, module.id));
+          
+          totalLessons += lessons.length;
+          totalQuizzes += quizzes.length;
+          
+          for (const lesson of lessons) {
+            if (allProgress.find(p => p.lessonId === lesson.id && p.status === "completed")) {
+              completedLessons++;
+            }
+          }
+          for (const quiz of quizzes) {
+            if (allQuizAttempts.find(a => a.quizId === quiz.id && a.passed)) {
+              passedQuizzes++;
+            }
+          }
+        }
+        
+        const hasCertificate = allCerts.some(c => c.pathId === path.id);
+        const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+        
+        return {
+          pathId: path.id,
+          pathTitle: path.title,
+          audience: path.audience,
+          totalLessons,
+          completedLessons,
+          totalQuizzes,
+          passedQuizzes,
+          progressPercent,
+          hasCertificate,
+          status: progressPercent === 100 && passedQuizzes === totalQuizzes ? "completed" : 
+                  progressPercent > 0 ? "in_progress" : "not_started"
+        };
+      }));
+      
+      res.json({ pathProgress });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get user's progress for a specific path
+  app.get("/api/training/user-progress/path/:pathId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user.id;
+      const pathId = req.params.pathId as string;
+      
+      const modules = await db.select()
+        .from(trainingModules)
+        .where(eq(trainingModules.pathId, pathId));
+      
+      const completedLessons: string[] = [];
+      for (const module of modules) {
+        const lessons = await db.select()
+          .from(trainingLessons)
+          .where(eq(trainingLessons.moduleId, module.id));
+        
+        for (const lesson of lessons) {
+          const progress = await db.select()
+            .from(userLearningProgress)
+            .where(eq(userLearningProgress.userId, userId));
+          
+          if (progress.find(p => p.lessonId === lesson.id && p.status === "completed")) {
+            completedLessons.push(lesson.id);
+          }
+        }
+      }
+      
+      res.json({ completedLessons });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get a specific learning path with modules and lessons
   app.get("/api/training/paths/:pathId", async (req: Request, res: Response) => {
     try {
       const pathId = req.params.pathId as string;
@@ -1958,9 +2064,23 @@ export async function registerRoutes(
         .from(trainingModules)
         .where(eq(trainingModules.pathId, pathId));
       
+      // Get lessons for each module
+      const modulesWithLessons = await Promise.all(
+        modules.map(async (module) => {
+          const lessons = await db.select()
+            .from(trainingLessons)
+            .where(eq(trainingLessons.moduleId, module.id));
+          
+          return {
+            ...module,
+            lessons: lessons.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+          };
+        })
+      );
+      
       res.json({
         ...path,
-        modules: modules.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        modules: modulesWithLessons.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
