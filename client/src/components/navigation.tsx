@@ -382,6 +382,33 @@ export function Navigation() {
                 <div className="h-px bg-border" />
 
                 <div className="space-y-3">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Training</h4>
+                  <Link
+                    href="/training"
+                    className="flex items-center gap-3 py-2 text-foreground transition-colors font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                    data-testid="mobile-link-training-hub"
+                  >
+                    <GraduationCap className="w-4 h-4 text-primary" />
+                    Training Academy
+                  </Link>
+                  {trainingOptions.map((item) => (
+                    <Link
+                      key={item.title}
+                      href={item.href}
+                      className="flex items-center gap-3 py-2 text-foreground transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                      data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                    >
+                      <item.icon className={`w-4 h-4 ${item.color}`} />
+                      {item.title}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="h-px bg-border" />
+
+                <div className="space-y-3">
                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Learn</h4>
                   {learnTopics.map((item) => (
                     <Link
