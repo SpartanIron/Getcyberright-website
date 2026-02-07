@@ -1,10 +1,12 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
 import { LogoCarousel } from "@/components/logo-carousel";
-import { TestimonialsSection } from "@/components/testimonials-section";
-import { AudienceCards } from "@/components/audience-cards";
-import { FreeResourceSection } from "@/components/free-resource-section";
+import { ValueProposition } from "@/components/value-proposition";
+import { FeaturesGrid } from "@/components/features-grid";
+import { MissionBanner } from "@/components/mission-banner";
 import { TrustStrip } from "@/components/trust-strip";
+import { AudienceShowcase } from "@/components/audience-showcase";
+import { SocialProof } from "@/components/social-proof";
 import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
@@ -17,10 +19,12 @@ export default function Home() {
       <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
         <HeroSection />
         <LogoCarousel />
+        <ValueProposition />
+        <FeaturesGrid />
+        <MissionBanner />
         <TrustStrip />
-        <AudienceCards />
-        <TestimonialsSection />
-        <FreeResourceSection />
+        <AudienceShowcase />
+        <SocialProof />
         <CTAFooter />
       </main>
       <Footer />
