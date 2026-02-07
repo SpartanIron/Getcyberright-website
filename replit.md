@@ -45,6 +45,7 @@ The platform uses an enterprise teal and orange color scheme, maintaining a flat
 
 ### Content & Tools
 - **Content Guidelines**: Educational content based on verified sources (FTC, FBI IC3, CISA), emphasizing empowering language.
+- **AI Scam Analyzer**: OpenAI-powered threat analysis tool with auto-detection of content type (messages, emails, headers, URLs). Returns structured risk assessment with red flags, technical observations, and recommended actions. API endpoint: `POST /api/security/ai-scam-analyze`. Frontend component: `client/src/components/ai-scam-analyzer.tsx`.
 - **Scam Checker**: Email header analysis, URL reputation, urgency scoring.
 - **Advanced Security Scanner**: Multi-engine URL scanning (Google Safe Browsing, VirusTotal), domain age checks, SSL certificate analysis, phone number lookup, screenshot OCR, QR code scanner, and deepfake education.
 - **AI & Cyber Safety Hub**: Educational content on AI-powered threats like deepfakes and AI chatbot scams.

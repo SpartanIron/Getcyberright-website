@@ -667,6 +667,111 @@ export async function registerRoutes(
     }
   });
 
+  // AI-Powered Scam Analyzer (streaming)
+  app.post("/api/security/ai-scam-analyze", standardRateLimit, async (req, res) => {
+    try {
+      const { content, contentType } = z.object({
+        content: z.string().min(5, "Please provide at least 5 characters").max(50000, "Content too long"),
+        contentType: z.enum(["message", "email", "headers", "url"]).default("message")
+      }).parse(req.body);
+
+      const OpenAI = (await import("openai")).default;
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+      const systemPrompt = `You are a cybersecurity threat-analysis AI specializing in:
+- Phishing detection
+- Scam and fraud identification
+- Malicious communication analysis
+- Social engineering detection
+- URL/domain threat assessment
+- Email header forensic review
+
+Your primary objective is to accurately identify scam risks from any submitted content while minimizing false positives.
+
+CORE OPERATING PRINCIPLE
+Users will submit content in a single input field without specifying type.
+You MUST:
+- Automatically detect what type of content was submitted.
+- Adapt analysis accordingly.
+- Produce a structured, actionable security assessment.
+- Never require the user to categorize the input.
+
+INPUT TYPE AUTO-DETECTION
+Classify input into ONE of these categories:
+- Email body (partial or full)
+- Full email with headers
+- Email headers only
+- SMS / text / chat / DM message
+- URL or domain
+- Mixed content (message + link, email + headers, etc.)
+- Unknown / ambiguous
+
+ANALYSIS FRAMEWORK
+1. Threat Intent Evaluation: Assess whether content attempts to obtain credentials or personal data, trigger urgency or panic, impersonate trusted entities, request money/payment, deliver malware links, or redirect to spoofed sites.
+2. Linguistic & Behavioral Signals: Evaluate emotional manipulation, authority impersonation, grammar anomalies consistent with scams, urgency or scarcity framing, unusual requests.
+3. Technical Indicators (When Applicable):
+   URLs: Typosquatting, suspicious TLDs, subdomain abuse, URL shorteners, misleading HTTPS usage.
+   Emails: Spoofed sender patterns, header authentication failures, reply-to mismatches, link masking.
+   Headers: SPF/DKIM/DMARC inconsistencies, suspicious relay chains, forged sending infrastructure.
+4. Risk Scoring: Low (likely legitimate but remain cautious), Moderate (suspicious indicators present), High (strong scam likelihood), Critical (confirmed or near-certain scam). Never exaggerate risk without evidence.
+
+OUTPUT FORMAT (MANDATORY)
+Respond ONLY in this exact JSON structure:
+{
+  "contentTypeDetected": "[Type + confidence %]",
+  "scamRiskLevel": "Low" | "Moderate" | "High" | "Critical",
+  "keyRedFlags": ["bullet list of specific indicators"],
+  "technicalObservations": ["only if applicable, otherwise empty array"],
+  "recommendedActions": ["clear practical steps"],
+  "confidenceLevel": "explanation of certainty and any limitations",
+  "summary": "2-3 sentence plain-language summary of the assessment"
+}
+
+BEHAVIORAL CONSTRAINTS
+- Do NOT hallucinate threat intelligence.
+- Do NOT assume legitimacy or maliciousness without indicators.
+- Do NOT provide legal conclusions.
+- Maintain neutral, professional cybersecurity tone.
+- Prioritize user safety over reassurance.
+
+EDGE CASE HANDLING
+- If input is empty or minimal: set scamRiskLevel to "Low" and note insufficient data.
+- If clearly benign: state low risk but advise standard caution.
+- If ambiguous: highlight uncertainty explicitly in confidenceLevel.`;
+
+      const contextHint = contentType !== "message" 
+        ? `\n\nNote: The user submitted this via the "${contentType}" input tab, which may help inform your auto-detection.`
+        : "";
+
+      const userMessage = `Please analyze the following content for scam/threat indicators:${contextHint}\n\n${content}`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage }
+        ],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 1024,
+      });
+
+      const resultText = response.choices[0]?.message?.content;
+      if (!resultText) {
+        throw new Error("No response from AI model");
+      }
+
+      const parsed = JSON.parse(resultText);
+      res.json({ success: true, result: parsed });
+    } catch (error: any) {
+      console.error("AI Scam Analyzer error:", error);
+      const isQuota = error?.status === 429 || error?.message?.includes("quota") || error?.message?.includes("429");
+      const errorMessage = isQuota 
+        ? "The AI analysis service is temporarily at capacity. Please try again in a few minutes, or use the pattern-based Scam Checker tool."
+        : "Analysis could not be completed. Please try again or use the pattern-based Scam Checker tool.";
+      res.status(isQuota ? 429 : 500).json({ success: false, error: errorMessage });
+    }
+  });
+
   // URL Redirect Chain Analysis
   app.post("/api/security/analyze-redirect-chain", standardRateLimit, async (req, res) => {
     try {
