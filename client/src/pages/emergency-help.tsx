@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -13,9 +14,7 @@ import {
   ExternalLink, 
   AlertTriangle,
   Shield,
-  ChevronDown,
-  ChevronUp,
-  MapPin,
+  Search,
   Clock,
   CreditCard,
   Lock,
@@ -48,7 +47,7 @@ const emergencyData: Region[] = [
     countries: [
       {
         name: "United States",
-        flag: "🇺🇸",
+        flag: "US",
         contacts: [
           {
             name: "Federal Trade Commission (FTC)",
@@ -76,7 +75,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Canada",
-        flag: "🇨🇦",
+        flag: "CA",
         contacts: [
           {
             name: "Canadian Anti-Fraud Centre",
@@ -98,7 +97,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Mexico",
-        flag: "🇲🇽",
+        flag: "MX",
         contacts: [
           {
             name: "Policía Cibernética",
@@ -121,7 +120,7 @@ const emergencyData: Region[] = [
     countries: [
       {
         name: "United Kingdom",
-        flag: "🇬🇧",
+        flag: "GB",
         contacts: [
           {
             name: "Action Fraud",
@@ -143,7 +142,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Germany",
-        flag: "🇩🇪",
+        flag: "DE",
         contacts: [
           {
             name: "Bundeskriminalamt (BKA)",
@@ -164,7 +163,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "France",
-        flag: "🇫🇷",
+        flag: "FR",
         contacts: [
           {
             name: "Cybermalveillance.gouv.fr",
@@ -185,7 +184,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Netherlands",
-        flag: "🇳🇱",
+        flag: "NL",
         contacts: [
           {
             name: "Fraudehelpdesk",
@@ -202,7 +201,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Ireland",
-        flag: "🇮🇪",
+        flag: "IE",
         contacts: [
           {
             name: "An Garda Síochána",
@@ -218,7 +217,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Spain",
-        flag: "🇪🇸",
+        flag: "ES",
         contacts: [
           {
             name: "Policía Nacional - Ciberdelincuencia",
@@ -236,7 +235,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Italy",
-        flag: "🇮🇹",
+        flag: "IT",
         contacts: [
           {
             name: "Polizia Postale",
@@ -257,7 +256,7 @@ const emergencyData: Region[] = [
     countries: [
       {
         name: "Australia",
-        flag: "🇦🇺",
+        flag: "AU",
         contacts: [
           {
             name: "Scamwatch (ACCC)",
@@ -279,7 +278,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "New Zealand",
-        flag: "🇳🇿",
+        flag: "NZ",
         contacts: [
           {
             name: "CERT NZ",
@@ -296,7 +295,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Singapore",
-        flag: "🇸🇬",
+        flag: "SG",
         contacts: [
           {
             name: "Singapore Police Force",
@@ -318,7 +317,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Japan",
-        flag: "🇯🇵",
+        flag: "JP",
         contacts: [
           {
             name: "National Police Agency Cybercrime",
@@ -335,7 +334,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "South Korea",
-        flag: "🇰🇷",
+        flag: "KR",
         contacts: [
           {
             name: "Korean National Police Agency",
@@ -352,7 +351,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "India",
-        flag: "🇮🇳",
+        flag: "IN",
         contacts: [
           {
             name: "National Cyber Crime Reporting Portal",
@@ -373,7 +372,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Philippines",
-        flag: "🇵🇭",
+        flag: "PH",
         contacts: [
           {
             name: "PNP Anti-Cybercrime Group",
@@ -390,7 +389,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Malaysia",
-        flag: "🇲🇾",
+        flag: "MY",
         contacts: [
           {
             name: "Royal Malaysia Police (PDRM)",
@@ -407,7 +406,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Thailand",
-        flag: "🇹🇭",
+        flag: "TH",
         contacts: [
           {
             name: "Technology Crime Suppression Division",
@@ -419,7 +418,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Indonesia",
-        flag: "🇮🇩",
+        flag: "ID",
         contacts: [
           {
             name: "Patrolisiber",
@@ -440,7 +439,7 @@ const emergencyData: Region[] = [
     countries: [
       {
         name: "South Africa",
-        flag: "🇿🇦",
+        flag: "ZA",
         contacts: [
           {
             name: "South African Banking Risk Centre (SABRIC)",
@@ -457,7 +456,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Nigeria",
-        flag: "🇳🇬",
+        flag: "NG",
         contacts: [
           {
             name: "Economic and Financial Crimes Commission (EFCC)",
@@ -473,7 +472,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Kenya",
-        flag: "🇰🇪",
+        flag: "KE",
         contacts: [
           {
             name: "Directorate of Criminal Investigations",
@@ -490,7 +489,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Ghana",
-        flag: "🇬🇭",
+        flag: "GH",
         contacts: [
           {
             name: "Ghana Police Cybercrime Unit",
@@ -507,7 +506,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Egypt",
-        flag: "🇪🇬",
+        flag: "EG",
         contacts: [
           {
             name: "Ministry of Interior Cybercrime Unit",
@@ -524,7 +523,7 @@ const emergencyData: Region[] = [
     countries: [
       {
         name: "Brazil",
-        flag: "🇧🇷",
+        flag: "BR",
         contacts: [
           {
             name: "SaferNet Brasil",
@@ -540,7 +539,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Argentina",
-        flag: "🇦🇷",
+        flag: "AR",
         contacts: [
           {
             name: "Unidad Fiscal Especializada en Ciberdelincuencia",
@@ -556,7 +555,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Colombia",
-        flag: "🇨🇴",
+        flag: "CO",
         contacts: [
           {
             name: "CAI Virtual",
@@ -572,7 +571,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Chile",
-        flag: "🇨🇱",
+        flag: "CL",
         contacts: [
           {
             name: "PDI Cibercrimen",
@@ -589,7 +588,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Peru",
-        flag: "🇵🇪",
+        flag: "PE",
         contacts: [
           {
             name: "División de Investigación de Delitos de Alta Tecnología",
@@ -606,7 +605,7 @@ const emergencyData: Region[] = [
     countries: [
       {
         name: "United Arab Emirates",
-        flag: "🇦🇪",
+        flag: "AE",
         contacts: [
           {
             name: "Dubai Police eCrime",
@@ -624,7 +623,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Saudi Arabia",
-        flag: "🇸🇦",
+        flag: "SA",
         contacts: [
           {
             name: "Saudi Anti-Fraud Committee",
@@ -640,7 +639,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Israel",
-        flag: "🇮🇱",
+        flag: "IL",
         contacts: [
           {
             name: "Israel Police Cyber Unit",
@@ -657,7 +656,7 @@ const emergencyData: Region[] = [
       },
       {
         name: "Qatar",
-        flag: "🇶🇦",
+        flag: "QA",
         contacts: [
           {
             name: "Ministry of Interior Cybercrime",
@@ -733,25 +732,34 @@ const scamSpecificActions = [
   },
 ];
 
+const allCountries = emergencyData.flatMap(region =>
+  region.countries.map(country => ({
+    ...country,
+    region: region.name
+  }))
+).sort((a, b) => a.name.localeCompare(b.name));
+
 export default function EmergencyHelp() {
-  const [expandedRegions, setExpandedRegions] = useState<string[]>(["North America"]);
-  const [expandedCountries, setExpandedCountries] = useState<string[]>(["United States"]);
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const toggleRegion = (regionName: string) => {
-    setExpandedRegions(prev => 
-      prev.includes(regionName) 
-        ? prev.filter(r => r !== regionName)
-        : [...prev, regionName]
-    );
-  };
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const toggleCountry = (countryName: string) => {
-    setExpandedCountries(prev => 
-      prev.includes(countryName) 
-        ? prev.filter(c => c !== countryName)
-        : [...prev, countryName]
-    );
-  };
+  const filteredCountries = allCountries.filter(country =>
+    country.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const selectedCountryData = allCountries.find(c => c.name === selectedCountry);
 
   return (
     <div className="min-h-screen bg-background">
@@ -801,7 +809,7 @@ export default function EmergencyHelp() {
         </section>
 
         <section className="py-16 sm:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -813,115 +821,122 @@ export default function EmergencyHelp() {
                 Report to Authorities in Your Country
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Click on your region, then select your country to see official fraud reporting 
-                agencies and emergency contacts.
+                Select your country to see official fraud reporting agencies and emergency contacts.
               </p>
             </motion.div>
 
-            <div className="space-y-4">
-              {emergencyData.map((region) => (
-                <motion.div
-                  key={region.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Card className="overflow-hidden">
-                    <button
-                      onClick={() => toggleRegion(region.name)}
-                      className="w-full"
-                      data-testid={`region-${region.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    >
-                      <CardHeader className="flex flex-row items-center justify-between gap-4 hover-elevate cursor-pointer">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <MapPin className="w-5 h-5 text-primary" />
-                          </div>
-                          <CardTitle className="text-xl">{region.name}</CardTitle>
-                          <span className="text-sm text-muted-foreground">
-                            ({region.countries.length} {region.countries.length === 1 ? 'country' : 'countries'})
-                          </span>
-                        </div>
-                        {expandedRegions.includes(region.name) ? (
-                          <ChevronUp className="w-5 h-5 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                        )}
-                      </CardHeader>
-                    </button>
+            <div className="relative max-w-lg mx-auto mb-8" ref={dropdownRef}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  data-testid="input-country-search"
+                  placeholder="Search for your country..."
+                  value={isDropdownOpen ? searchQuery : (selectedCountry || searchQuery)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsDropdownOpen(true);
+                    if (!e.target.value) {
+                      setSelectedCountry("");
+                    }
+                  }}
+                  onFocus={() => {
+                    setIsDropdownOpen(true);
+                    if (selectedCountry) {
+                      setSearchQuery("");
+                    }
+                  }}
+                  className="pl-9"
+                />
+              </div>
 
-                    {expandedRegions.includes(region.name) && (
-                      <CardContent className="pt-0 pb-6">
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {region.countries.map((country) => (
-                            <div key={country.name} className="border rounded-lg overflow-hidden">
-                              <button
-                                onClick={() => toggleCountry(country.name)}
-                                className="w-full p-4 flex items-center justify-between hover-elevate cursor-pointer bg-card"
-                                data-testid={`country-${country.name.toLowerCase().replace(/\s+/g, '-')}`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <span className="text-2xl">{country.flag}</span>
-                                  <span className="font-medium text-foreground">{country.name}</span>
-                                </div>
-                                {expandedCountries.includes(country.name) ? (
-                                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                                ) : (
-                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                                )}
-                              </button>
-
-                              {expandedCountries.includes(country.name) && (
-                                <div className="p-4 pt-0 space-y-3 bg-muted/30">
-                                  {country.contacts.map((contact, idx) => (
-                                    <div 
-                                      key={idx} 
-                                      className="p-3 bg-background rounded-lg border"
-                                      data-testid={`contact-${country.name.toLowerCase().replace(/\s+/g, '-')}-${idx}`}
-                                    >
-                                      <h4 className="font-medium text-foreground text-sm mb-1">
-                                        {contact.name}
-                                      </h4>
-                                      <p className="text-xs text-muted-foreground mb-2">
-                                        {contact.description}
-                                      </p>
-                                      <div className="flex flex-wrap gap-2">
-                                        {contact.phone && (
-                                          <a 
-                                            href={`tel:${contact.phone.replace(/\s/g, '')}`}
-                                            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                                          >
-                                            <Phone className="w-3 h-3" />
-                                            {contact.phone}
-                                          </a>
-                                        )}
-                                        {contact.website && (
-                                          <a 
-                                            href={contact.website}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                                          >
-                                            <Globe className="w-3 h-3" />
-                                            Website
-                                            <ExternalLink className="w-2.5 h-2.5" />
-                                          </a>
-                                        )}
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
+              {isDropdownOpen && (
+                <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-72 overflow-y-auto">
+                  {filteredCountries.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      No countries found
+                    </div>
+                  ) : (
+                    filteredCountries.map((country) => (
+                      <button
+                        key={country.name}
+                        data-testid={`country-option-${country.name.toLowerCase().replace(/\s+/g, '-')}`}
+                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover-elevate cursor-pointer"
+                        onClick={() => {
+                          setSelectedCountry(country.name);
+                          setSearchQuery("");
+                          setIsDropdownOpen(false);
+                        }}
+                      >
+                        <span className="w-8 h-6 rounded bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0">{country.flag}</span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-medium text-foreground text-sm">{country.name}</span>
+                          <span className="text-xs text-muted-foreground">{country.region}</span>
                         </div>
-                      </CardContent>
-                    )}
-                  </Card>
-                </motion.div>
-              ))}
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
+
+            {selectedCountryData && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card data-testid="card-selected-country-contacts">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 flex-wrap">
+                      <span className="w-10 h-7 rounded bg-primary/10 text-primary text-sm font-bold flex items-center justify-center">{selectedCountryData.flag}</span>
+                      <span>{selectedCountryData.name}</span>
+                      <span className="text-sm font-normal text-muted-foreground">
+                        {selectedCountryData.region}
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {selectedCountryData.contacts.map((contact, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 bg-muted/30 rounded-lg border"
+                        data-testid={`contact-${selectedCountryData.name.toLowerCase().replace(/\s+/g, '-')}-${idx}`}
+                      >
+                        <h4 className="font-medium text-foreground mb-1">
+                          {contact.name}
+                        </h4>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {contact.description}
+                        </p>
+                        <div className="flex flex-wrap gap-3">
+                          {contact.phone && (
+                            <a
+                              href={`tel:${contact.phone.replace(/\s/g, '')}`}
+                              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                            >
+                              <Phone className="w-3.5 h-3.5" />
+                              {contact.phone}
+                            </a>
+                          )}
+                          {contact.website && (
+                            <a
+                              href={contact.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                            >
+                              <Globe className="w-3.5 h-3.5" />
+                              Website
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
           </div>
         </section>
 
