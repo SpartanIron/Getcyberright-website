@@ -670,9 +670,9 @@ export async function registerRoutes(
   // AI-Powered Scam Analyzer (streaming)
   app.post("/api/security/ai-scam-analyze", standardRateLimit, async (req, res) => {
     try {
-      const { content, contentType } = z.object({
+      const { content } = z.object({
         content: z.string().min(5, "Please provide at least 5 characters").max(50000, "Content too long"),
-        contentType: z.enum(["message", "email", "headers", "url"]).default("message")
+        contentType: z.string().optional()
       }).parse(req.body);
 
       const OpenAI = (await import("openai")).default;
@@ -739,11 +739,7 @@ EDGE CASE HANDLING
 - If clearly benign: state low risk but advise standard caution.
 - If ambiguous: highlight uncertainty explicitly in confidenceLevel.`;
 
-      const contextHint = contentType !== "message" 
-        ? `\n\nNote: The user submitted this via the "${contentType}" input tab, which may help inform your auto-detection.`
-        : "";
-
-      const userMessage = `Please analyze the following content for scam/threat indicators:${contextHint}\n\n${content}`;
+      const userMessage = `Please analyze the following content for scam/threat indicators:\n\n${content}`;
 
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",

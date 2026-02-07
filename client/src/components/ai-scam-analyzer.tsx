@@ -3,13 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Search,
-  MessageSquare,
-  Mail,
-  Server,
-  LinkIcon,
   AlertTriangle,
   CheckCircle2,
   XCircle,
@@ -25,8 +20,6 @@ import {
 } from "lucide-react";
 import { trackToolUsage } from "@/lib/analytics";
 
-type ContentType = "message" | "email" | "headers" | "url";
-
 interface AnalysisResult {
   contentTypeDetected: string;
   scamRiskLevel: "Low" | "Moderate" | "High" | "Critical";
@@ -36,37 +29,6 @@ interface AnalysisResult {
   confidenceLevel: string;
   summary: string;
 }
-
-const tabConfig: { value: ContentType; label: string; icon: typeof MessageSquare; placeholder: string; example: string }[] = [
-  {
-    value: "message",
-    label: "Message",
-    icon: MessageSquare,
-    placeholder: "Paste the suspicious text message here...",
-    example: "Example: 'URGENT: Your bank account has been compromised! Click here immediately to secure your account: bit.ly/secure-now'"
-  },
-  {
-    value: "email",
-    label: "Email",
-    icon: Mail,
-    placeholder: "Paste the suspicious email content here...",
-    example: "Example: 'Dear valued customer, We noticed unusual activity on your PayPal account. Please verify your identity by clicking the link below...'"
-  },
-  {
-    value: "headers",
-    label: "Headers",
-    icon: Server,
-    placeholder: "Paste email headers here (From, Reply-To, Received, SPF, DKIM, etc.)...",
-    example: "Example: 'From: support@paypa1.com\\nReply-To: scammer@gmail.com\\nReceived: from mail.suspicious-domain.xyz'"
-  },
-  {
-    value: "url",
-    label: "URL",
-    icon: LinkIcon,
-    placeholder: "Paste the suspicious URL or domain here...",
-    example: "Example: 'https://amaz0n-security.com/verify-account?id=12345'"
-  }
-];
 
 function getRiskColor(level: string) {
   switch (level) {
@@ -99,22 +61,10 @@ function getRiskIcon(level: string) {
 }
 
 export function AIScamAnalyzer() {
-  const [contentType, setContentType] = useState<ContentType>("message");
-  const [tabInputs, setTabInputs] = useState<Record<ContentType, string>>({
-    message: "",
-    email: "",
-    headers: "",
-    url: "",
-  });
+  const [inputContent, setInputContent] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const inputContent = tabInputs[contentType];
-
-  const setInputContent = (value: string) => {
-    setTabInputs(prev => ({ ...prev, [contentType]: value }));
-  };
 
   const handleAnalyze = async () => {
     if (!inputContent.trim() || inputContent.trim().length < 5) return;
@@ -129,7 +79,7 @@ export function AIScamAnalyzer() {
       const response = await fetch("/api/security/ai-scam-analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: inputContent, contentType }),
+        body: JSON.stringify({ content: inputContent, contentType: "auto" }),
       });
 
       if (!response.ok) {
@@ -151,7 +101,7 @@ export function AIScamAnalyzer() {
   };
 
   const handleClear = () => {
-    setTabInputs(prev => ({ ...prev, [contentType]: "" }));
+    setInputContent("");
     setResult(null);
     setError(null);
   };
@@ -167,41 +117,19 @@ export function AIScamAnalyzer() {
             <div>
               <CardTitle className="text-xl" data-testid="text-ai-analyzer-title">Advanced Scam Analyzer</CardTitle>
               <p className="text-sm text-muted-foreground">
-                AI-powered analysis of suspicious messages, emails, and links
+                AI-powered analysis of suspicious messages, emails, headers, and links
               </p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Tabs value={contentType} onValueChange={(v) => setContentType(v as ContentType)}>
-            <TabsList className="grid grid-cols-4 w-full">
-              {tabConfig.map((tab) => (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className="gap-1.5"
-                  data-testid={`tab-analyzer-${tab.value}`}
-                >
-                  <tab.icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            {tabConfig.map((tab) => (
-              <TabsContent key={tab.value} value={tab.value} className="mt-4">
-                <div className="space-y-2">
-                  <Textarea
-                    placeholder={`${tab.placeholder}\n\n${tab.example}`}
-                    value={inputContent}
-                    onChange={(e) => setInputContent(e.target.value)}
-                    className="min-h-[160px] resize-none text-sm"
-                    data-testid={`input-analyzer-${tab.value}`}
-                  />
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+          <Textarea
+            placeholder={"Paste anything suspicious here \u2014 a text message, email, email headers, URL, or any combination.\n\nThe AI will automatically detect the content type and analyze it for threats.\n\nExamples:\n\u2022 'URGENT: Your bank account has been compromised! Click bit.ly/secure-now'\n\u2022 A full email with headers and body\n\u2022 https://amaz0n-security.com/verify-account"}
+            value={inputContent}
+            onChange={(e) => setInputContent(e.target.value)}
+            className="min-h-[180px] resize-none text-sm"
+            data-testid="input-analyzer-content"
+          />
 
           <div className="flex gap-3">
             <Button
@@ -236,7 +164,7 @@ export function AIScamAnalyzer() {
           <div className="flex items-start gap-2 text-xs text-muted-foreground">
             <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <p>
-              This tool uses advanced AI pattern matching to detect scam indicators. While highly accurate, no automated tool is 100% reliable. When in doubt, don't engage and verify through official channels.
+              This tool uses advanced AI to detect scam indicators in any content you paste. It automatically identifies whether you've submitted a message, email, headers, URL, or a mix. No automated tool is 100% reliable. When in doubt, don't engage and verify through official channels.
             </p>
           </div>
 
