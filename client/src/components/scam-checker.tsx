@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { trackToolUsage } from "@/lib/analytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Search, 
   AlertTriangle, 
@@ -13,14 +12,13 @@ import {
   Info, 
   ExternalLink,
   Link as LinkIcon,
-  Mail,
-  MessageSquare,
   Shield,
   Eye,
   Zap,
   FileText,
-  Server,
-  Lock
+  Lock,
+  Bot,
+  Loader2
 } from "lucide-react";
 
 type ThreatCategory = {
@@ -1480,63 +1478,165 @@ function analyzeContent(content: string): AnalysisResult {
   };
 }
 
+interface AIAnalysisResult {
+  contentTypeDetected: string;
+  scamRiskLevel: "Low" | "Moderate" | "High" | "Critical";
+  keyRedFlags: string[];
+  technicalObservations: string[];
+  recommendedActions: string[];
+  confidenceLevel: string;
+  summary: string;
+}
+
+function detectEmailHeaders(content: string): boolean {
+  const headerPatterns = [
+    /^Received:/m,
+    /^From:/m,
+    /^Reply-To:/m,
+    /^Return-Path:/m,
+    /^Authentication-Results:/m,
+    /^DKIM-Signature:/m,
+    /^X-Mailer:/m,
+    /^X-Originating-IP:/m,
+    /^Content-Type:/m,
+    /^MIME-Version:/m,
+    /^Message-ID:/m,
+    /^Date:/m,
+    /^Subject:/m,
+    /^To:/m,
+  ];
+  let matchCount = 0;
+  for (const p of headerPatterns) {
+    if (p.test(content)) matchCount++;
+    if (matchCount >= 2) return true;
+  }
+  return false;
+}
+
+function getAIRiskColor(level: string) {
+  switch (level) {
+    case "Low": return "text-green-600 dark:text-green-400";
+    case "Moderate": return "text-amber-600 dark:text-amber-400";
+    case "High": return "text-orange-600 dark:text-orange-400";
+    case "Critical": return "text-red-600 dark:text-red-400";
+    default: return "text-muted-foreground";
+  }
+}
+
+function getAIRiskBg(level: string) {
+  switch (level) {
+    case "Low": return "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800";
+    case "Moderate": return "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800";
+    case "High": return "bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800";
+    case "Critical": return "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800";
+    default: return "bg-muted";
+  }
+}
+
+function getAIRiskIcon(level: string) {
+  switch (level) {
+    case "Low": return <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />;
+    case "Moderate": return <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-400" />;
+    case "High": return <AlertTriangle className="w-6 h-6 text-orange-600 dark:text-orange-400" />;
+    case "Critical": return <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />;
+    default: return <Shield className="w-6 h-6 text-muted-foreground" />;
+  }
+}
+
 export function ScamChecker() {
   const [content, setContent] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isChecking, setIsChecking] = useState(false);
-  const [activeTab, setActiveTab] = useState("text");
-  
-  // Email header analysis state
-  const [headerContent, setHeaderContent] = useState("");
+
   const [headerResult, setHeaderResult] = useState<EmailHeaderAnalysis | null>(null);
-  const [isCheckingHeaders, setIsCheckingHeaders] = useState(false);
-  
-  // URL reputation checking state
+
+  const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
+  const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
   const [urlReputations, setUrlReputations] = useState<Record<string, URLReputationResult>>({});
   const [isCheckingReputation, setIsCheckingReputation] = useState<Record<string, boolean>>({});
-  
-  // SSL checking state
+
   const [sslResults, setSslResults] = useState<Record<string, SSLCheckResult>>({});
   const [isCheckingSSL, setIsCheckingSSL] = useState<Record<string, boolean>>({});
 
-  const handleCheck = () => {
+  const handleScan = () => {
+    if (!content.trim()) return;
+
     setIsChecking(true);
+    setResult(null);
+    setHeaderResult(null);
+    setAiResult(null);
+    setAiError(null);
+    setUrlReputations({});
+    setSslResults({});
+
     setTimeout(() => {
-      setResult(analyzeContent(content));
+      const patternResult = analyzeContent(content);
+      setResult(patternResult);
       setIsChecking(false);
       trackToolUsage('scam-checker', true, { type: 'content-analysis' });
     }, 1200);
+
+    if (detectEmailHeaders(content)) {
+      setTimeout(() => {
+        setHeaderResult(analyzeEmailHeaders(content));
+      }, 800);
+    }
+
+    setIsAiAnalyzing(true);
+    fetch("/api/security/ai-scam-analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, contentType: "auto" }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("AI analysis failed");
+        }
+        const data = await response.json();
+        if (data.success && data.result) {
+          setAiResult(data.result);
+        } else {
+          throw new Error("AI analysis returned no results");
+        }
+      })
+      .catch(() => {
+        setAiError("AI analysis is currently unavailable. Pattern-based results are shown above.");
+      })
+      .finally(() => {
+        setIsAiAnalyzing(false);
+      });
   };
-  
-  const handleHeaderCheck = () => {
-    setIsCheckingHeaders(true);
-    setTimeout(() => {
-      setHeaderResult(analyzeEmailHeaders(headerContent));
-      setIsCheckingHeaders(false);
-    }, 800);
+
+  const handleClear = () => {
+    setContent("");
+    setResult(null);
+    setHeaderResult(null);
+    setAiResult(null);
+    setAiError(null);
+    setIsChecking(false);
+    setIsAiAnalyzing(false);
+    setUrlReputations({});
+    setSslResults({});
+    setIsCheckingReputation({});
+    setIsCheckingSSL({});
   };
-  
-  // Check URL reputation against phishing/malware databases
+
   const checkUrlReputation = async (url: string) => {
     setIsCheckingReputation(prev => ({ ...prev, [url]: true }));
-    
     try {
       const response = await fetch('/api/security/check-url-reputation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to check URL reputation');
-      }
-      
+      if (!response.ok) throw new Error('Failed to check URL reputation');
       const data = await response.json();
       setUrlReputations(prev => ({ ...prev, [url]: data }));
-    } catch (error) {
-      console.error('URL reputation check failed:', error);
-      setUrlReputations(prev => ({ 
-        ...prev, 
+    } catch {
+      setUrlReputations(prev => ({
+        ...prev,
         [url]: {
           url,
           threatLevel: 'unknown',
@@ -1549,65 +1649,43 @@ export function ScamChecker() {
       setIsCheckingReputation(prev => ({ ...prev, [url]: false }));
     }
   };
-  
-  // Check SSL certificate for a URL
+
   const checkSSL = async (url: string) => {
-    // Only check https URLs - skip http and bare domains
     if (!url.startsWith('https://')) {
       setSslResults(prev => ({
         ...prev,
         [url]: {
-          success: false,
-          url,
-          checked: true,
-          valid: false,
-          isExpired: false,
-          isEV: false,
-          isSelfSigned: false,
-          riskLevel: 'high',
-          error: 'Site does not use HTTPS'
+          success: false, url, checked: true, valid: false,
+          isExpired: false, isEV: false, isSelfSigned: false,
+          riskLevel: 'high', error: 'Site does not use HTTPS'
         }
       }));
       return;
     }
-    
     setIsCheckingSSL(prev => ({ ...prev, [url]: true }));
-    
     try {
       const response = await fetch('/api/security/check-ssl', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to check SSL');
-      }
-      
+      if (!response.ok) throw new Error('Failed to check SSL');
       const data = await response.json();
       setSslResults(prev => ({ ...prev, [url]: data }));
-    } catch (error) {
-      console.error('SSL check failed:', error);
+    } catch {
       setSslResults(prev => ({
         ...prev,
         [url]: {
-          success: false,
-          url,
-          checked: false,
-          valid: false,
-          isExpired: false,
-          isEV: false,
-          isSelfSigned: false,
-          riskLevel: 'high',
-          error: 'Check failed'
+          success: false, url, checked: false, valid: false,
+          isExpired: false, isEV: false, isSelfSigned: false,
+          riskLevel: 'high', error: 'Check failed'
         }
       }));
     } finally {
       setIsCheckingSSL(prev => ({ ...prev, [url]: false }));
     }
   };
-  
-  // Auto-check all URLs when results are available
+
   const checkAllUrlReputations = async (urls: URLAnalysis[]) => {
     const urlsToCheck = urls.filter(u => !urlReputations[u.url] && !isCheckingReputation[u.url]);
     const sslToCheck = urls.filter(u => !sslResults[u.url] && !isCheckingSSL[u.url]);
@@ -1657,297 +1735,57 @@ export function ScamChecker() {
             <Search className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-xl">Advanced Scam Analyzer</CardTitle>
-            <p className="text-sm text-muted-foreground">AI-powered analysis of suspicious messages, emails, and links</p>
+            <CardTitle className="text-xl">Scam Scanner</CardTitle>
+            <p className="text-sm text-muted-foreground">Paste anything suspicious and we'll analyze it instantly with pattern matching and AI</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-4">
-            <TabsTrigger value="text" className="gap-1.5" data-testid="tab-message">
-              <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">Message</span>
-            </TabsTrigger>
-            <TabsTrigger value="email" className="gap-1.5" data-testid="tab-email">
-              <Mail className="w-4 h-4" />
-              <span className="hidden sm:inline">Email</span>
-            </TabsTrigger>
-            <TabsTrigger value="headers" className="gap-1.5" data-testid="tab-headers">
-              <Server className="w-4 h-4" />
-              <span className="hidden sm:inline">Headers</span>
-            </TabsTrigger>
-            <TabsTrigger value="url" className="gap-1.5" data-testid="tab-url">
-              <LinkIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">URL</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="text" className="space-y-4">
-            <Textarea
-              placeholder="Paste the suspicious text message here...
+        <Textarea
+          placeholder={"Paste anything suspicious here \u2014 a text message, email, email headers, URL, or any combination.\n\nWe'll automatically detect the content type and analyze it for threats using pattern matching and AI.\n\nExamples:\n\u2022 'URGENT: Your bank account has been compromised! Click bit.ly/secure-now'\n\u2022 A full email with headers and body\n\u2022 https://amaz0n-security.com/verify-account"}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="min-h-[180px] resize-none text-sm"
+          aria-label="Enter suspicious content to analyze"
+          data-testid="input-scan-content"
+        />
 
-Example: 'URGENT: Your bank account has been compromised! Click here immediately to secure your account: bit.ly/secure-now'"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="min-h-[140px] resize-none"
-              aria-label="Enter suspicious text message to analyze"
-              data-testid="input-scam-content"
-            />
-          </TabsContent>
-          
-          <TabsContent value="email" className="space-y-4">
-            <Textarea
-              placeholder="Paste the full email content here, including subject line if possible...
-
-Example:
-Subject: Your Amazon order #12345 has been delayed
-From: amazon-support@mail-amazonn.com
-
-Dear Customer, Your recent order cannot be delivered. Please verify your payment information immediately..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="min-h-[140px] resize-none"
-              aria-label="Enter suspicious email content to analyze"
-              data-testid="input-scam-email"
-            />
-          </TabsContent>
-          
-          <TabsContent value="url" className="space-y-4">
-            <Textarea
-              placeholder="Paste suspicious URLs or links here (one per line)...
-
-Example:
-https://amaz0n-secure.xyz/verify-account
-http://192.168.1.1/login/paypal"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="min-h-[140px] resize-none"
-              aria-label="Enter suspicious URLs to analyze"
-              data-testid="input-scam-url"
-            />
-          </TabsContent>
-          
-          <TabsContent value="headers" className="space-y-4">
-            <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800 mb-2">
-              <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-blue-700 dark:text-blue-300">
-                To view email headers: In Gmail, open the email and click the three dots menu, then "Show original". 
-                In Outlook, open the email properties. Copy all the header text and paste it below.
-              </p>
-            </div>
-            <Textarea
-              placeholder="Paste email headers here...
-
-Example:
-Received: from mail-server.example.com
-From: support@company.com
-Reply-To: scammer@evil.com
-Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
-              value={headerContent}
-              onChange={(e) => setHeaderContent(e.target.value)}
-              className="min-h-[140px] resize-none font-mono text-xs"
-              aria-label="Enter email headers to analyze"
-              data-testid="input-email-headers"
-            />
-            
-            <Button 
-              className="w-full" 
-              onClick={handleHeaderCheck}
-              disabled={!headerContent.trim() || isCheckingHeaders}
+        <div className="flex gap-3">
+          <Button
+            className="flex-1 gap-2"
+            onClick={handleScan}
+            disabled={!content.trim() || isChecking}
+            size="lg"
+            aria-label={isChecking ? "Scanning content for threats" : "Scan content for threats"}
+            aria-busy={isChecking}
+            data-testid="button-scan-threats"
+          >
+            {isChecking ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" role="status" aria-label="Scanning" />
+                Scanning...
+              </>
+            ) : (
+              <>
+                <Zap className="w-4 h-4" aria-hidden="true" />
+                Scan for Threats
+              </>
+            )}
+          </Button>
+          {(content || result || aiResult) && (
+            <Button
+              variant="outline"
+              onClick={handleClear}
               size="lg"
-              data-testid="button-check-headers"
+              data-testid="button-clear-scan"
             >
-              {isCheckingHeaders ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                  Analyzing Headers...
-                </>
-              ) : (
-                <>
-                  <Server className="w-4 h-4 mr-2" />
-                  Analyze Email Headers
-                </>
-              )}
+              Clear
             </Button>
-            
-            {headerResult && (
-              <div className="space-y-4" data-testid="result-header-analysis">
-                <div className={`p-4 rounded-xl border-2 ${getRiskColor(headerResult.overallRisk)}`}>
-                  <div className="flex items-center gap-3">
-                    {getRiskIcon(headerResult.overallRisk)}
-                    <div>
-                      <h3 className="font-bold text-lg">
-                        {headerResult.overallRisk === "safe" ? "Headers Look Legitimate" :
-                         headerResult.overallRisk === "low" ? "Minor Concerns Found" :
-                         headerResult.overallRisk === "medium" ? "Some Issues Detected" :
-                         headerResult.overallRisk === "high" ? "Significant Issues Found" :
-                         "Critical Authentication Failures"}
-                      </h3>
-                      <p className="text-sm opacity-90">
-                        {headerResult.findings.length} finding(s) from email header analysis
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Authentication Summary */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div className={`p-3 rounded-lg text-center ${
-                    headerResult.parsedHeaders.spf === "pass" ? "bg-green-50 dark:bg-green-950/30" :
-                    headerResult.parsedHeaders.spf === "fail" ? "bg-red-50 dark:bg-red-950/30" :
-                    "bg-muted/50"
-                  }`}>
-                    <p className="text-xs text-muted-foreground mb-1">SPF</p>
-                    <Badge variant={headerResult.parsedHeaders.spf === "pass" ? "default" : headerResult.parsedHeaders.spf === "fail" ? "destructive" : "secondary"}>
-                      {headerResult.parsedHeaders.spf || "N/A"}
-                    </Badge>
-                  </div>
-                  <div className={`p-3 rounded-lg text-center ${
-                    headerResult.parsedHeaders.dkim === "pass" ? "bg-green-50 dark:bg-green-950/30" :
-                    headerResult.parsedHeaders.dkim === "fail" ? "bg-red-50 dark:bg-red-950/30" :
-                    "bg-muted/50"
-                  }`}>
-                    <p className="text-xs text-muted-foreground mb-1">DKIM</p>
-                    <Badge variant={headerResult.parsedHeaders.dkim === "pass" ? "default" : headerResult.parsedHeaders.dkim === "fail" ? "destructive" : "secondary"}>
-                      {headerResult.parsedHeaders.dkim || "N/A"}
-                    </Badge>
-                  </div>
-                  <div className={`p-3 rounded-lg text-center ${
-                    headerResult.parsedHeaders.dmarc === "pass" ? "bg-green-50 dark:bg-green-950/30" :
-                    headerResult.parsedHeaders.dmarc === "fail" ? "bg-red-50 dark:bg-red-950/30" :
-                    "bg-muted/50"
-                  }`}>
-                    <p className="text-xs text-muted-foreground mb-1">DMARC</p>
-                    <Badge variant={headerResult.parsedHeaders.dmarc === "pass" ? "default" : headerResult.parsedHeaders.dmarc === "fail" ? "destructive" : "secondary"}>
-                      {headerResult.parsedHeaders.dmarc || "N/A"}
-                    </Badge>
-                  </div>
-                </div>
-                
-                {/* Findings */}
-                <div className="space-y-2">
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    Analysis Findings
-                  </h4>
-                  {headerResult.findings.map((finding, idx) => (
-                    <div 
-                      key={idx} 
-                      className={`p-3 rounded-lg border ${
-                        finding.status === "pass" ? "bg-green-50/50 dark:bg-green-950/20 border-green-200 dark:border-green-800" :
-                        finding.status === "fail" ? "bg-red-50/50 dark:bg-red-950/20 border-red-200 dark:border-red-800" :
-                        finding.status === "warning" ? "bg-yellow-50/50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800" :
-                        "bg-muted/30 border-muted"
-                      }`}
-                    >
-                      <div className="flex items-start gap-2">
-                        {finding.status === "pass" && <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />}
-                        {finding.status === "fail" && <XCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />}
-                        {finding.status === "warning" && <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />}
-                        {finding.status === "info" && <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />}
-                        <div>
-                          <p className="font-medium text-sm">{finding.category}</p>
-                          <p className="text-sm text-muted-foreground">{finding.detail}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{finding.explanation}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Recommendations */}
-                {headerResult.recommendations.length > 0 && (
-                  <div className="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
-                    <h4 className="font-semibold text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4" />
-                      Recommendations
-                    </h4>
-                    <ul className="space-y-1">
-                      {headerResult.recommendations.map((rec, idx) => (
-                        <li key={idx} className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
-                          <span className="mt-1">•</span>
-                          <span>{rec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                
-                {/* Parsed Header Info */}
-                {headerResult.parsedHeaders.from && (
-                  <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="text-xs text-muted-foreground mb-2">Extracted Information</p>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="text-muted-foreground">From:</span> {headerResult.parsedHeaders.from}</p>
-                      {headerResult.parsedHeaders.replyTo && (
-                        <p><span className="text-muted-foreground">Reply-To:</span> {headerResult.parsedHeaders.replyTo}</p>
-                      )}
-                      {headerResult.parsedHeaders.xMailer && (
-                        <p><span className="text-muted-foreground">Mailer:</span> {headerResult.parsedHeaders.xMailer}</p>
-                      )}
-                      <p><span className="text-muted-foreground">Hops:</span> {headerResult.parsedHeaders.receivedChain.length} server(s)</p>
-                    </div>
-                  </div>
-                )}
-                
-                <Button 
-                  variant="outline" 
-                  onClick={() => { setHeaderResult(null); setHeaderContent(""); }}
-                  className="w-full"
-                  data-testid="button-reset-headers"
-                >
-                  Check Another Email
-                </Button>
-              </div>
-            )}
-            
-            {!headerResult && !isCheckingHeaders && (
-              <div className="grid sm:grid-cols-3 gap-3 text-center">
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <Shield className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <p className="font-medium text-xs">SPF/DKIM/DMARC</p>
-                  <p className="text-xs text-muted-foreground">Email authentication</p>
-                </div>
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <Mail className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <p className="font-medium text-xs">Sender Verification</p>
-                  <p className="text-xs text-muted-foreground">From vs Reply-To</p>
-                </div>
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <Server className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <p className="font-medium text-xs">Routing Analysis</p>
-                  <p className="text-xs text-muted-foreground">Server path check</p>
-                </div>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-
-        <Button 
-          className="w-full" 
-          onClick={handleCheck}
-          disabled={!content.trim() || isChecking}
-          size="lg"
-          aria-label={isChecking ? "Analyzing content for threats" : "Analyze content for threats"}
-          aria-busy={isChecking}
-          data-testid="button-check-scam"
-        >
-          {isChecking ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" role="status" aria-label="Analyzing" />
-              Analyzing Content...
-            </>
-          ) : (
-            <>
-              <Zap className="w-4 h-4 mr-2" aria-hidden="true" />
-              Analyze for Threats
-            </>
           )}
-        </Button>
+        </div>
 
         {result && result.overallRisk && (
-          <div className="space-y-4" role="region" aria-label="Scam analysis results" aria-live="polite" data-testid="result-scam-check">
+          <div className="space-y-4" role="region" aria-label="Pattern analysis results" aria-live="polite" data-testid="result-pattern-analysis">
             <div className={`p-6 rounded-xl border-2 ${getRiskColor(result.overallRisk)}`} role="alert">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
@@ -1965,7 +1803,6 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
               </div>
             </div>
 
-            {/* Urgency/Manipulation Score Meter */}
             {result.urgencyAnalysis && result.urgencyAnalysis.score > 0 && (
               <div className="p-4 bg-muted/50 rounded-lg border">
                 <div className="flex items-center justify-between mb-2">
@@ -1982,15 +1819,14 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                     {result.urgencyAnalysis.level}
                   </Badge>
                 </div>
-                
-                {/* Pressure Meter */}
+
                 <div className="mb-3">
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-muted-foreground">Manipulation Level</span>
                     <span className="font-medium">{result.urgencyAnalysis.score}/100</span>
                   </div>
                   <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className={`h-full rounded-full transition-all ${
                         result.urgencyAnalysis.score >= 70 ? "bg-red-500" :
                         result.urgencyAnalysis.score >= 50 ? "bg-orange-500" :
@@ -2001,7 +1837,7 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                     />
                   </div>
                 </div>
-                
+
                 {result.urgencyAnalysis.triggers.length > 0 && (
                   <div>
                     <p className="text-sm text-muted-foreground mb-2">Detected manipulation tactics:</p>
@@ -2070,10 +1906,10 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                 <div className="space-y-2">
                   {result.urls.map((urlAnalysis, idx) => {
                     const reputation = urlReputations[urlAnalysis.url];
-                    const isChecking = isCheckingReputation[urlAnalysis.url];
+                    const isUrlChecking = isCheckingReputation[urlAnalysis.url];
                     const sslResult = sslResults[urlAnalysis.url];
                     const isSslChecking = isCheckingSSL[urlAnalysis.url];
-                    
+
                     return (
                       <div key={idx} className={`p-3 rounded-lg border ${urlAnalysis.isSuspicious ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800' : 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'}`}>
                         <div className="flex items-start gap-2">
@@ -2093,16 +1929,15 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                 ))}
                               </div>
                             )}
-                            
-                            {/* Real-time reputation check results */}
-                            {isChecking && (
+
+                            {isUrlChecking && (
                               <div className="mt-2 p-2 bg-muted/50 rounded border flex items-center gap-2">
                                 <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                                 <span className="text-xs text-muted-foreground">Checking threat databases...</span>
                               </div>
                             )}
-                            
-                            {reputation && !isChecking && (
+
+                            {reputation && !isUrlChecking && (
                               <div className="mt-2 p-2 bg-muted/30 rounded border space-y-2">
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs font-medium">Threat Database Check:</span>
@@ -2116,14 +1951,13 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                     <Badge variant="secondary" className="text-xs">Check failed</Badge>
                                   )}
                                 </div>
-                                
+
                                 <div className="grid grid-cols-3 gap-2 text-xs">
-                                  {/* Phishing Check result */}
                                   <div className={`p-1.5 rounded ${
-                                    reputation.phishTank.isPhishing 
-                                      ? 'bg-red-100 dark:bg-red-950/50' 
-                                      : reputation.phishTank.checked 
-                                        ? 'bg-green-100 dark:bg-green-950/50' 
+                                    reputation.phishTank.isPhishing
+                                      ? 'bg-red-100 dark:bg-red-950/50'
+                                      : reputation.phishTank.checked
+                                        ? 'bg-green-100 dark:bg-green-950/50'
                                         : 'bg-gray-100 dark:bg-gray-800'
                                   }`}>
                                     <div className="font-medium flex items-center gap-1">
@@ -2137,20 +1971,19 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                       Phishing
                                     </div>
                                     <div className="text-muted-foreground">
-                                      {reputation.phishTank.isPhishing 
-                                        ? 'DANGER - Fake site' 
-                                        : reputation.phishTank.checked 
-                                          ? 'Not flagged' 
+                                      {reputation.phishTank.isPhishing
+                                        ? 'DANGER - Fake site'
+                                        : reputation.phishTank.checked
+                                          ? 'Not flagged'
                                           : 'Pending'}
                                     </div>
                                   </div>
-                                  
-                                  {/* Malware Check result */}
+
                                   <div className={`p-1.5 rounded ${
-                                    reputation.urlhaus.isMalware 
-                                      ? 'bg-red-100 dark:bg-red-950/50' 
-                                      : reputation.urlhaus.checked 
-                                        ? 'bg-green-100 dark:bg-green-950/50' 
+                                    reputation.urlhaus.isMalware
+                                      ? 'bg-red-100 dark:bg-red-950/50'
+                                      : reputation.urlhaus.checked
+                                        ? 'bg-green-100 dark:bg-green-950/50'
                                         : 'bg-gray-100 dark:bg-gray-800'
                                   }`}>
                                     <div className="font-medium flex items-center gap-1">
@@ -2164,20 +1997,19 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                       Malware
                                     </div>
                                     <div className="text-muted-foreground">
-                                      {reputation.urlhaus.isMalware 
-                                        ? `DANGER - ${reputation.urlhaus.threat || 'Harmful'}` 
-                                        : reputation.urlhaus.checked 
-                                          ? 'Not flagged' 
+                                      {reputation.urlhaus.isMalware
+                                        ? `DANGER - ${reputation.urlhaus.threat || 'Harmful'}`
+                                        : reputation.urlhaus.checked
+                                          ? 'Not flagged'
                                           : 'Pending'}
                                     </div>
                                   </div>
-                                  
-                                  {/* Connection Security result */}
+
                                   <div className={`p-1.5 rounded ${
                                     sslResult?.valid === false
-                                      ? 'bg-red-100 dark:bg-red-950/50' 
+                                      ? 'bg-red-100 dark:bg-red-950/50'
                                       : sslResult?.valid
-                                        ? 'bg-green-100 dark:bg-green-950/50' 
+                                        ? 'bg-green-100 dark:bg-green-950/50'
                                         : isSslChecking
                                           ? 'bg-blue-50 dark:bg-blue-950/50'
                                           : 'bg-gray-100 dark:bg-gray-800'
@@ -2195,7 +2027,7 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                       Secure
                                     </div>
                                     <div className="text-muted-foreground">
-                                      {isSslChecking 
+                                      {isSslChecking
                                         ? 'Checking...'
                                         : sslResult?.error?.includes('HTTPS')
                                           ? 'Not secure'
@@ -2209,7 +2041,7 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                                     </div>
                                   </div>
                                 </div>
-                                
+
                                 {(reputation.phishTank.isPhishing || reputation.urlhaus.isMalware) && (
                                   <div className="text-xs text-red-600 dark:text-red-400 font-medium p-1 bg-red-100/50 dark:bg-red-900/30 rounded">
                                     This URL is in known threat databases. Do NOT visit this link.
@@ -2223,12 +2055,11 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
                     );
                   })}
                 </div>
-                
-                {/* Threat database info */}
+
                 <div className="text-xs text-muted-foreground p-2 bg-muted/30 rounded flex items-start gap-2">
                   <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
                   <span>
-                    Links are checked against security databases for phishing, malware, and connection safety. 
+                    Links are checked against security databases for phishing, malware, and connection safety.
                     Note: New threats take time to be reported. Always exercise caution with unfamiliar links.
                   </span>
                 </div>
@@ -2252,25 +2083,262 @@ Authentication-Results: spf=fail; dkim=fail; dmarc=fail"
           </div>
         )}
 
+        {(isAiAnalyzing || aiResult || aiError) && (
+          <div data-testid="result-ai-analysis">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Bot className="w-5 h-5 text-primary" />
+                  AI Deep Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isAiAnalyzing && (
+                  <div className="flex items-center gap-3 py-2">
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">AI is analyzing your content...</p>
+                      <p className="text-xs text-muted-foreground">This typically takes a few seconds</p>
+                    </div>
+                  </div>
+                )}
+
+                {aiError && !isAiAnalyzing && (
+                  <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <p>{aiError}</p>
+                  </div>
+                )}
+
+                {aiResult && !isAiAnalyzing && (
+                  <div className="space-y-4">
+                    <div className={`p-4 rounded-lg border ${getAIRiskBg(aiResult.scamRiskLevel)}`}>
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 mt-0.5">
+                          {getAIRiskIcon(aiResult.scamRiskLevel)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <h3 className={`text-lg font-bold ${getAIRiskColor(aiResult.scamRiskLevel)}`}>
+                              {aiResult.scamRiskLevel} Risk
+                            </h3>
+                            <Badge variant="outline" className="text-xs">
+                              {aiResult.contentTypeDetected}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-foreground">{aiResult.summary}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {aiResult.keyRedFlags.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
+                          <AlertTriangle className="w-4 h-4 text-amber-500" />
+                          Key Red Flags
+                        </h4>
+                        <ul className="space-y-1.5">
+                          {aiResult.keyRedFlags.map((flag, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm">
+                              <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                              <span className="text-foreground">{flag}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {aiResult.technicalObservations.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
+                          <Eye className="w-4 h-4 text-blue-500" />
+                          Technical Observations
+                        </h4>
+                        <ul className="space-y-1.5">
+                          {aiResult.technicalObservations.map((obs, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm">
+                              <FileText className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                              <span className="text-foreground">{obs}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {aiResult.recommendedActions.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
+                          <Shield className="w-4 h-4 text-primary" />
+                          Recommended Actions
+                        </h4>
+                        <ul className="space-y-1.5">
+                          {aiResult.recommendedActions.map((action, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm">
+                              <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                              <span className="text-foreground">{action}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    <div className="text-xs text-muted-foreground">
+                      <span className="font-medium">Confidence:</span> {aiResult.confidenceLevel}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {headerResult && (
+          <div className="space-y-4" data-testid="result-header-analysis">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-primary" />
+                  Email Header Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className={`p-4 rounded-xl border-2 ${getRiskColor(headerResult.overallRisk)}`}>
+                  <div className="flex items-center gap-3">
+                    {getRiskIcon(headerResult.overallRisk)}
+                    <div>
+                      <h3 className="font-bold text-lg">
+                        {headerResult.overallRisk === "safe" ? "Headers Look Legitimate" :
+                         headerResult.overallRisk === "low" ? "Minor Concerns Found" :
+                         headerResult.overallRisk === "medium" ? "Some Issues Detected" :
+                         headerResult.overallRisk === "high" ? "Significant Issues Found" :
+                         "Critical Authentication Failures"}
+                      </h3>
+                      <p className="text-sm opacity-90">
+                        {headerResult.findings.length} finding(s) from email header analysis
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div className={`p-3 rounded-lg text-center ${
+                    headerResult.parsedHeaders.spf === "pass" ? "bg-green-50 dark:bg-green-950/30" :
+                    headerResult.parsedHeaders.spf === "fail" ? "bg-red-50 dark:bg-red-950/30" :
+                    "bg-muted/50"
+                  }`}>
+                    <p className="text-xs text-muted-foreground mb-1">SPF</p>
+                    <Badge variant={headerResult.parsedHeaders.spf === "pass" ? "default" : headerResult.parsedHeaders.spf === "fail" ? "destructive" : "secondary"}>
+                      {headerResult.parsedHeaders.spf || "N/A"}
+                    </Badge>
+                  </div>
+                  <div className={`p-3 rounded-lg text-center ${
+                    headerResult.parsedHeaders.dkim === "pass" ? "bg-green-50 dark:bg-green-950/30" :
+                    headerResult.parsedHeaders.dkim === "fail" ? "bg-red-50 dark:bg-red-950/30" :
+                    "bg-muted/50"
+                  }`}>
+                    <p className="text-xs text-muted-foreground mb-1">DKIM</p>
+                    <Badge variant={headerResult.parsedHeaders.dkim === "pass" ? "default" : headerResult.parsedHeaders.dkim === "fail" ? "destructive" : "secondary"}>
+                      {headerResult.parsedHeaders.dkim || "N/A"}
+                    </Badge>
+                  </div>
+                  <div className={`p-3 rounded-lg text-center ${
+                    headerResult.parsedHeaders.dmarc === "pass" ? "bg-green-50 dark:bg-green-950/30" :
+                    headerResult.parsedHeaders.dmarc === "fail" ? "bg-red-50 dark:bg-red-950/30" :
+                    "bg-muted/50"
+                  }`}>
+                    <p className="text-xs text-muted-foreground mb-1">DMARC</p>
+                    <Badge variant={headerResult.parsedHeaders.dmarc === "pass" ? "default" : headerResult.parsedHeaders.dmarc === "fail" ? "destructive" : "secondary"}>
+                      {headerResult.parsedHeaders.dmarc || "N/A"}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Analysis Findings
+                  </h4>
+                  {headerResult.findings.map((finding, idx) => (
+                    <div
+                      key={idx}
+                      className={`p-3 rounded-lg border ${
+                        finding.status === "pass" ? "bg-green-50/50 dark:bg-green-950/20 border-green-200 dark:border-green-800" :
+                        finding.status === "fail" ? "bg-red-50/50 dark:bg-red-950/20 border-red-200 dark:border-red-800" :
+                        finding.status === "warning" ? "bg-yellow-50/50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800" :
+                        "bg-muted/30 border-muted"
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        {finding.status === "pass" && <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />}
+                        {finding.status === "fail" && <XCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />}
+                        {finding.status === "warning" && <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />}
+                        {finding.status === "info" && <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />}
+                        <div>
+                          <p className="font-medium text-sm">{finding.category}</p>
+                          <p className="text-sm text-muted-foreground">{finding.detail}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{finding.explanation}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {headerResult.recommendations.length > 0 && (
+                  <div className="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
+                    <h4 className="font-semibold text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      Recommendations
+                    </h4>
+                    <ul className="space-y-1">
+                      {headerResult.recommendations.map((rec, idx) => (
+                        <li key={idx} className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
+                          <span className="mt-1">&bull;</span>
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {headerResult.parsedHeaders.from && (
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-2">Extracted Information</p>
+                    <div className="space-y-1 text-sm">
+                      <p><span className="text-muted-foreground">From:</span> {headerResult.parsedHeaders.from}</p>
+                      {headerResult.parsedHeaders.replyTo && (
+                        <p><span className="text-muted-foreground">Reply-To:</span> {headerResult.parsedHeaders.replyTo}</p>
+                      )}
+                      {headerResult.parsedHeaders.xMailer && (
+                        <p><span className="text-muted-foreground">Mailer:</span> {headerResult.parsedHeaders.xMailer}</p>
+                      )}
+                      <p><span className="text-muted-foreground">Hops:</span> {headerResult.parsedHeaders.receivedChain.length} server(s)</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
           <Info className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
           <div className="text-sm text-muted-foreground">
             <p className="mb-2">
-              This tool uses advanced pattern matching to detect scam indicators. While highly accurate, 
+              This tool uses advanced pattern matching and AI to detect scam indicators. While highly accurate,
               no automated tool is 100% reliable. When in doubt, don't engage and verify through official channels.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a 
-                href="https://reportfraud.ftc.gov/" 
-                target="_blank" 
+              <a
+                href="https://reportfraud.ftc.gov/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary flex items-center gap-1 hover:underline"
               >
                 Report to FTC <ExternalLink className="w-3 h-3" />
               </a>
-              <a 
-                href="https://www.ic3.gov/" 
-                target="_blank" 
+              <a
+                href="https://www.ic3.gov/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary flex items-center gap-1 hover:underline"
               >

@@ -16,7 +16,6 @@ import { AdvancedScan } from "@/components/advanced-scan";
 import { FamilyCodeword } from "@/components/family-codeword";
 import { AudioDeepfakeDetector } from "@/components/audio-deepfake-detector";
 import { GamificationBadges } from "@/components/gamification-badges";
-import { AIScamAnalyzer } from "@/components/ai-scam-analyzer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { 
   Shield, 
@@ -33,7 +32,6 @@ import {
   Users,
   Radio,
   Trophy,
-  Bot,
 } from "lucide-react";
 import bannerImage from "@/assets/banners/tools-banner.png";
 
@@ -74,7 +72,7 @@ const guides = [
 ];
 
 export default function Tools() {
-  const [activeTab, setActiveTab] = useState("ai-analyzer");
+  const [activeTab, setActiveTab] = useState("scam-checker");
 
   return (
     <div className="min-h-screen bg-background">
@@ -94,14 +92,10 @@ export default function Tools() {
         <section className="py-16 sm:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full max-w-5xl mx-auto grid-cols-5 sm:grid-cols-9 mb-8 h-auto gap-1">
-                <TabsTrigger value="ai-analyzer" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-ai-analyzer">
-                  <Bot className="w-4 h-4" />
-                  <span className="text-xs sm:text-sm">AI Scan</span>
-                </TabsTrigger>
+              <TabsList className="grid w-full max-w-5xl mx-auto grid-cols-4 sm:grid-cols-8 mb-8 h-auto gap-1">
                 <TabsTrigger value="scam-checker" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-scam-checker">
                   <Search className="w-4 h-4" />
-                  <span className="text-xs sm:text-sm">Scam</span>
+                  <span className="text-xs sm:text-sm">Scan</span>
                 </TabsTrigger>
                 <TabsTrigger value="advanced" className="gap-1 flex-col sm:flex-row py-2" data-testid="tab-advanced">
                   <ShieldAlert className="w-4 h-4" />
@@ -134,10 +128,6 @@ export default function Tools() {
               </TabsList>
 
               <div className="max-w-4xl mx-auto">
-                <TabsContent value="ai-analyzer">
-                  <AIScamAnalyzer />
-                </TabsContent>
-
                 <TabsContent value="scam-checker">
                   <ScamChecker />
                 </TabsContent>
