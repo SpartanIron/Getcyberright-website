@@ -30,22 +30,51 @@ const RISK_WEIGHTS: Record<string, number> = {
 };
 
 const CATEGORY_DATA_MAP: Record<string, string[]> = {
-  "people-search": ["name", "address", "phone"],
-  "marketing": ["email"],
-  "advertising": ["email"],
-  "social-media-aggregator": ["email"],
-  "financial": ["name", "address"],
-  "location": ["address"],
-  "recruitment": ["employment"],
-  "background-check": ["name", "address", "phone"],
+  "people-search": ["name", "address", "phone", "email"],
+  "marketing": ["email", "name"],
+  "marketing-data": ["email", "name", "address"],
+  "advertising": ["email", "name"],
+  "social-media-aggregator": ["email", "name"],
+  "social-media": ["email", "name"],
+  "financial": ["name", "address", "email"],
+  "location": ["address", "name"],
+  "recruitment": ["employment", "name", "email"],
+  "background-check": ["name", "address", "phone", "email"],
   "public-records": ["name", "address"],
-  "health": ["name"],
+  "health": ["name", "email"],
+  "health-medical": ["name", "email"],
+  "identity-verification": ["name", "email", "phone", "address"],
+  "insurance-data": ["name", "address", "email"],
+  "insurance": ["name", "address"],
+  "court-legal-records": ["name", "address"],
+  "education-records": ["name", "email"],
+  "iot-smart-device": ["email", "name"],
+  "iot": ["email", "name"],
+  "telecom-communication": ["phone", "name", "email"],
+  "telecom": ["phone", "name"],
+  "vehicle-auto-records": ["name", "address"],
+  "vehicle-auto": ["name", "address"],
+  "real-estate-property": ["name", "address"],
+  "real-estate": ["name", "address"],
+  "voter-political": ["name", "address"],
+  "data-aggregator": ["name", "email", "address", "phone"],
+  "data-aggregator-enrichment": ["name", "email", "address", "phone"],
+  "business-professional": ["name", "email", "employment"],
+  "retail-consumer": ["email", "name"],
+  "government-records": ["name", "address"],
+  "travel-hospitality": ["name", "email"],
+  "tech-analytics": ["email", "name"],
+  "risk-fraud": ["name", "email", "phone"],
+  "credit-reporting": ["name", "address", "email"],
 };
+
+type EvidenceTier = "confirmed" | "verified_broker" | "potential";
 
 interface VerifiedFinding {
   broker: DataBroker;
   dataTypesExposed: string[];
   exposureLevel: string;
+  evidenceTier: EvidenceTier;
   verificationMethod: string;
   verificationDetails: string;
   confidenceScore: number;
@@ -177,7 +206,6 @@ async function runRealVerification(
   userDataTypes: Set<string>,
   emails: string[],
   fullName?: string,
-  isGuestScan: boolean = false,
 ): Promise<{ findings: VerifiedFinding[]; brokersChecked: number }> {
   const findings: VerifiedFinding[] = [];
 
@@ -194,25 +222,15 @@ async function runRealVerification(
 
   const breachDomains = new Set(breachResults.map(b => b.domain.toLowerCase()).filter(Boolean));
 
-  const brokersToCheck = allBrokers
-    .filter(broker => {
-      const categoryTypes = CATEGORY_DATA_MAP[broker.category];
-      if (!categoryTypes) return userDataTypes.has("name");
-      return categoryTypes.some((t) => userDataTypes.has(t));
-    })
-    .sort((a, b) => {
-      const riskOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
-      const aOverlap = analyzeBrokerDataOverlap(a, userDataTypes).coveragePercent;
-      const bOverlap = analyzeBrokerDataOverlap(b, userDataTypes).coveragePercent;
-      const aScore = (riskOrder[a.riskLevel ?? "medium"] ?? 2) * 10 + aOverlap;
-      const bScore = (riskOrder[b.riskLevel ?? "medium"] ?? 2) * 10 + bOverlap;
-      return bScore - aScore;
-    })
-    .slice(0, isGuestScan ? 100 : 250);
+  const brokersToCheck = allBrokers.filter(broker => {
+    const categoryTypes = CATEGORY_DATA_MAP[broker.category];
+    if (!categoryTypes) return userDataTypes.has("name");
+    return categoryTypes.some((t) => userDataTypes.has(t));
+  });
 
-  console.log(`[scan] Pre-filtered to ${brokersToCheck.length} relevant brokers (from ${allBrokers.length})`);
+  console.log(`[scan] Scanning ${brokersToCheck.length} relevant brokers (from ${allBrokers.length} total)`);
 
-  const BATCH_SIZE = 25;
+  const BATCH_SIZE = 50;
   for (let i = 0; i < brokersToCheck.length; i += BATCH_SIZE) {
     const batch = brokersToCheck.slice(i, i + BATCH_SIZE);
 
@@ -228,7 +246,11 @@ async function runRealVerification(
         const { overlap, coveragePercent } = analyzeBrokerDataOverlap(broker, userDataTypes);
         const breachMatch = domain ? breachDomains.has(domain.toLowerCase()) : false;
 
-        const isKnownCollector = ["people-search", "background-check", "public-records"].includes(broker.category);
+        const isKnownCollector = [
+          "people-search", "background-check", "public-records",
+          "data-aggregator", "data-aggregator-enrichment",
+          "marketing-data", "identity-verification",
+        ].includes(broker.category);
 
         const confidence = computeConfidenceScore({
           siteReachable: siteCheck.reachable,
@@ -239,41 +261,65 @@ async function runRealVerification(
           isKnownCollector,
         });
 
-        if (confidence < 30) return null;
+        if (confidence < 25) return null;
 
+        let evidenceTier: EvidenceTier = "potential";
+        let verificationMethod = "data_profile_analysis";
         const evidenceParts: string[] = [];
-        if (siteCheck.reachable) evidenceParts.push(`Site verified active (${siteCheck.responseTime}ms response)`);
-        if (optOutCheck.exists) evidenceParts.push(`Opt-out page confirmed at ${optOutCheck.url}`);
-        if (breachMatch) evidenceParts.push(`Email found in data breach associated with ${domain}`);
-        if (coveragePercent > 0) evidenceParts.push(`${coveragePercent}% of your data types match what this broker collects`);
-        if (isKnownCollector) evidenceParts.push(`Known ${broker.category} site that actively collects personal data`);
-
-        let verificationMethod = "broker_analysis";
         const detailParts: string[] = [];
 
         if (breachMatch) {
-          verificationMethod = "breach_verified";
-          detailParts.push("Your email was found in a confirmed data breach linked to this broker");
+          evidenceTier = "confirmed";
+          verificationMethod = "breach_confirmed";
+          detailParts.push("Your email was confirmed in a data breach linked to this broker via Have I Been Pwned");
+          evidenceParts.push(`Breach confirmed via HIBP for ${domain}`);
         }
-        if (siteCheck.reachable && optOutCheck.exists) {
-          verificationMethod = breachMatch ? "breach_verified" : "site_verified";
-          detailParts.push("Broker site is active and has a working opt-out page");
+
+        if (siteCheck.reachable) {
+          evidenceParts.push(`Broker site verified active (${siteCheck.responseTime}ms)`);
+          if (evidenceTier !== "confirmed") {
+            evidenceTier = "verified_broker";
+            verificationMethod = "broker_verified_active";
+          }
         }
-        if (coveragePercent >= 50 && isKnownCollector) {
-          if (!breachMatch && !siteCheck.reachable) verificationMethod = "data_profile_match";
-          detailParts.push(`This ${broker.category} broker collects the types of data you provided`);
+
+        if (optOutCheck.exists) {
+          evidenceParts.push(`Opt-out page accessible at ${optOutCheck.url}`);
+          if (evidenceTier !== "confirmed") {
+            evidenceTier = "verified_broker";
+            verificationMethod = "broker_verified_active";
+          }
+        }
+
+        if (coveragePercent > 0) {
+          evidenceParts.push(`${coveragePercent}% of your data types match this broker's known collection practices`);
+        }
+
+        if (isKnownCollector) {
+          evidenceParts.push(`Known ${broker.category} site that actively collects personal data`);
+        }
+
+        if (evidenceTier === "confirmed") {
+          detailParts.push("Your personal data was confirmed in a breach associated with this broker.");
+        } else if (evidenceTier === "verified_broker") {
+          detailParts.push("This broker is verified active and collects data matching your profile. Your data is likely held by this broker based on their collection practices.");
+          if (optOutCheck.exists) detailParts.push("A working opt-out page was confirmed.");
+        } else {
+          detailParts.push("Based on this broker's known data collection practices, your personal information may be held by them. We recommend opting out as a precaution.");
         }
 
         let exposureLevel = "low";
-        if (confidence >= 75) exposureLevel = "high";
-        else if (confidence >= 50) exposureLevel = "medium";
+        if (evidenceTier === "confirmed") exposureLevel = "high";
+        else if (evidenceTier === "verified_broker" && confidence >= 50) exposureLevel = "medium";
+        else if (confidence >= 70) exposureLevel = "medium";
 
         return {
           broker,
           dataTypesExposed: overlap.length > 0 ? overlap : ["name"],
           exposureLevel,
+          evidenceTier,
           verificationMethod,
-          verificationDetails: detailParts.join(". "),
+          verificationDetails: detailParts.join(" "),
           confidenceScore: confidence,
           sourceEvidence: evidenceParts.join(" | "),
         } as VerifiedFinding;
@@ -315,16 +361,22 @@ async function runRealVerification(
           broker: matchingBroker,
           dataTypesExposed: breachDataTypes.filter(dt => userDataTypes.has(dt)),
           exposureLevel: breach.isVerified ? "high" : "medium",
-          verificationMethod: "breach_verified",
-          verificationDetails: `Your email was found in the ${breach.name} data breach (${breach.breachDate}). ${breach.pwnCount.toLocaleString()} accounts affected.`,
-          confidenceScore: breach.isVerified ? 95 : 70,
-          sourceEvidence: `Have I Been Pwned verified breach: ${breach.name} | Date: ${breach.breachDate} | Verified: ${breach.isVerified} | Data exposed: ${breach.dataClasses.join(", ")}`,
+          evidenceTier: "confirmed",
+          verificationMethod: "breach_confirmed",
+          verificationDetails: `Your email was confirmed in the "${breach.name}" data breach (${breach.breachDate}). ${breach.pwnCount.toLocaleString()} accounts were affected. This is a verified exposure from Have I Been Pwned.`,
+          confidenceScore: breach.isVerified ? 95 : 75,
+          sourceEvidence: `Have I Been Pwned: ${breach.name} | Breach date: ${breach.breachDate} | Verified: ${breach.isVerified} | ${breach.pwnCount.toLocaleString()} accounts | Data: ${breach.dataClasses.join(", ")}`,
         });
       }
     }
   }
 
-  findings.sort((a, b) => b.confidenceScore - a.confidenceScore);
+  findings.sort((a, b) => {
+    const tierOrder: Record<EvidenceTier, number> = { confirmed: 3, verified_broker: 2, potential: 1 };
+    const tierDiff = (tierOrder[b.evidenceTier] ?? 0) - (tierOrder[a.evidenceTier] ?? 0);
+    if (tierDiff !== 0) return tierDiff;
+    return b.confidenceScore - a.confidenceScore;
+  });
 
   return { findings, brokersChecked: brokersToCheck.length };
 }
@@ -509,7 +561,6 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
       userDataTypes,
       emails,
       profile.fullName ?? undefined,
-      false,
     );
 
     const findingsToInsert = verificationResult.findings.map((match) => ({
@@ -529,15 +580,16 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
       findings = await db.insert(exposureFindings).values(findingsToInsert).returning();
     }
 
-    const highConfidenceCount = verificationResult.findings.filter(f => f.confidenceScore >= 70).length;
+    const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
+    const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
     const weightedExposure = verificationResult.findings.reduce((sum, f) => sum + (f.confidenceScore / 100), 0);
     const privacyScore = Math.max(0, Math.round(100 - (weightedExposure / Math.max(allBrokers.length, 1)) * 100 * 2));
     const riskLevel =
-      highConfidenceCount >= 20 ? "critical" :
-      highConfidenceCount >= 10 ? "high" :
-      highConfidenceCount >= 5 ? "medium" : "low";
+      confirmedCount >= 10 ? "critical" :
+      confirmedCount >= 5 || verifiedBrokerCount >= 30 ? "high" :
+      verifiedBrokerCount >= 15 ? "medium" : "low";
 
-    console.log(`[scan] Scan complete: ${findings.length} verified exposures found (${highConfidenceCount} high-confidence) from ${verificationResult.brokersChecked} brokers checked`);
+    console.log(`[scan] Scan complete: ${findings.length} findings (${confirmedCount} confirmed, ${verifiedBrokerCount} verified brokers) from ${verificationResult.brokersChecked} brokers checked`);
 
     const [updatedScan] = await db
       .update(exposureScans)
@@ -595,38 +647,40 @@ export async function runGuestExposureScan(guestData: {
     types,
     guestData.emails ?? [],
     guestData.fullName,
-    true,
   );
 
   const findings = verificationResult.findings.map((match) => ({
     broker: match.broker,
     dataTypesExposed: match.dataTypesExposed,
     exposureLevel: match.exposureLevel,
+    evidenceTier: match.evidenceTier,
     verificationMethod: match.verificationMethod,
     verificationDetails: match.verificationDetails,
     confidenceScore: match.confidenceScore,
     sourceEvidence: match.sourceEvidence,
   }));
 
-  const highConfidenceCount = verificationResult.findings.filter(f => f.confidenceScore >= 70).length;
+  const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
+  const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
+  const potentialCount = verificationResult.findings.filter(f => f.evidenceTier === "potential").length;
   const weightedExposure = verificationResult.findings.reduce((sum, f) => sum + (f.confidenceScore / 100), 0);
   const privacyScore = Math.max(0, Math.round(100 - (weightedExposure / Math.max(allBrokers.length, 1)) * 100 * 2));
   const riskLevel =
-    highConfidenceCount >= 20 ? "critical" :
-    highConfidenceCount >= 10 ? "high" :
-    highConfidenceCount >= 5 ? "medium" : "low";
+    confirmedCount >= 10 ? "critical" :
+    confirmedCount >= 5 || verifiedBrokerCount >= 30 ? "high" :
+    verifiedBrokerCount >= 15 ? "medium" : "low";
 
   return {
     totalBrokersScanned: verificationResult.brokersChecked,
     totalBrokersInCatalog: allBrokers.length,
     totalExposuresFound: findings.length,
+    confirmedExposures: confirmedCount,
+    verifiedBrokers: verifiedBrokerCount,
+    potentialExposures: potentialCount,
     privacyScore,
     riskLevel,
     findings,
     scanMethod: "verified",
-    scanNote: verificationResult.brokersChecked < allBrokers.length
-      ? `Quick scan checked the top ${verificationResult.brokersChecked} highest-priority brokers from our catalog of ${allBrokers.length}. Sign up for a full scan.`
-      : undefined,
   };
 }
 
