@@ -1679,3 +1679,171 @@ export async function getBrokerMetrics(brokerId: string) {
     automationFeasibility: broker.automationFeasibility,
   };
 }
+
+class DataBrokerScheduler {
+  private schedulerInterval: NodeJS.Timeout | null = null;
+  private isRunning = false;
+
+  async start() {
+    if (this.isRunning) return;
+    this.isRunning = true;
+    console.log("[data-broker-scheduler] Starting data broker monitoring scheduler...");
+
+    await this.runDueMonitoringScans();
+    await this.runDueVerificationChecks();
+
+    this.schedulerInterval = setInterval(async () => {
+      try {
+        await this.runDueMonitoringScans();
+        await this.runDueVerificationChecks();
+      } catch (err) {
+        console.error("[data-broker-scheduler] Scheduler error:", err);
+      }
+    }, 15 * 60 * 1000);
+  }
+
+  stop() {
+    if (this.schedulerInterval) {
+      clearInterval(this.schedulerInterval);
+      this.schedulerInterval = null;
+    }
+    this.isRunning = false;
+    console.log("[data-broker-scheduler] Scheduler stopped");
+  }
+
+  private async runDueMonitoringScans() {
+    try {
+      const dueSchedules = await db
+        .select()
+        .from(monitoringSchedules)
+        .where(
+          and(
+            eq(monitoringSchedules.isActive, true),
+            lte(monitoringSchedules.nextScanDate, new Date())
+          )
+        );
+
+      if (dueSchedules.length === 0) return;
+
+      console.log(`[data-broker-scheduler] Found ${dueSchedules.length} due monitoring scans`);
+
+      for (const schedule of dueSchedules) {
+        if ((schedule.consecutiveFailures ?? 0) >= 5) {
+          console.log(`[data-broker-scheduler] Skipping schedule ${schedule.id} - too many consecutive failures`);
+          continue;
+        }
+
+        try {
+          await runMonitoringScan(schedule.userId);
+          console.log(`[data-broker-scheduler] Completed monitoring scan for user ${schedule.userId}`);
+        } catch (err: any) {
+          console.error(`[data-broker-scheduler] Monitoring scan failed for user ${schedule.userId}:`, err.message);
+        }
+      }
+    } catch (err) {
+      console.error("[data-broker-scheduler] Error checking due monitoring scans:", err);
+    }
+  }
+
+  private async runDueVerificationChecks() {
+    try {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const pendingVerifications = await db
+        .select()
+        .from(removalVerifications)
+        .where(
+          and(
+            eq(removalVerifications.status, "pending"),
+            lte(removalVerifications.scheduledFor, new Date())
+          )
+        );
+
+      if (pendingVerifications.length === 0) return;
+
+      console.log(`[data-broker-scheduler] Found ${pendingVerifications.length} pending verifications to check`);
+
+      for (const verification of pendingVerifications) {
+        try {
+          const [request] = await db
+            .select()
+            .from(removalRequests)
+            .where(eq(removalRequests.id, verification.removalRequestId));
+
+          if (!request) continue;
+
+          const [scan] = await db
+            .select()
+            .from(exposureScans)
+            .where(eq(exposureScans.userId, request.userId))
+            .orderBy(desc(exposureScans.createdAt))
+            .limit(1);
+
+          if (scan) {
+            const stillExposed = await db
+              .select()
+              .from(exposureFindings)
+              .where(
+                and(
+                  eq(exposureFindings.scanId, scan.id),
+                  eq(exposureFindings.brokerId, request.brokerId)
+                )
+              );
+
+            const isRemoved = stillExposed.length === 0;
+
+            await db
+              .update(removalVerifications)
+              .set({
+                status: isRemoved ? "confirmed" : "failed",
+                completedAt: new Date(),
+                dataStillPresent: !isRemoved,
+                notes: isRemoved
+                  ? "Automated rescan confirmed data removed"
+                  : "Automated rescan found data still present",
+              })
+              .where(eq(removalVerifications.id, verification.id));
+
+            if (isRemoved) {
+              await db
+                .update(removalRequests)
+                .set({ status: "verified_removed", updatedAt: new Date() })
+                .where(eq(removalRequests.id, request.id));
+            }
+
+            await logAuditEvent(
+              request.userId,
+              isRemoved ? "verification_confirmed" : "verification_failed",
+              "removal_verification",
+              verification.id,
+              "pending",
+              isRemoved ? "confirmed" : "failed",
+              { brokerId: request.brokerId, automated: true }
+            );
+          }
+        } catch (err: any) {
+          console.error(`[data-broker-scheduler] Verification check failed for ${verification.id}:`, err.message);
+        }
+      }
+    } catch (err) {
+      console.error("[data-broker-scheduler] Error checking due verifications:", err);
+    }
+  }
+
+  getStatus() {
+    return {
+      isRunning: this.isRunning,
+      checkIntervalMinutes: 15,
+      capabilities: [
+        "Automatic monitoring re-scans when next scan date is due",
+        "Verification checks for removal requests after 30 days",
+        "Re-appearance detection when removed data shows up again",
+        "Auto re-removal triggers for re-appeared data",
+        "Consecutive failure tracking with skip-after-5-failures safety",
+      ],
+    };
+  }
+}
+
+export const dataBrokerScheduler = new DataBrokerScheduler();

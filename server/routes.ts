@@ -90,6 +90,7 @@ import {
   getPendingVerifications,
   generateProgressReport,
   getBrokerMetrics,
+  dataBrokerScheduler,
 } from "./dataBrokerService";
 
 // URL reputation checking schemas with validation
@@ -1650,8 +1651,12 @@ EDGE CASE HANDLING
     console.error("Failed to seed curriculum:", err)
   );
 
-  // Seed data broker catalog
-  seedDataBrokers(db).catch(err =>
+  // Seed data broker catalog and start monitoring scheduler
+  seedDataBrokers(db).then(() => {
+    dataBrokerScheduler.start().catch(err =>
+      console.error("Failed to start data broker scheduler:", err)
+    );
+  }).catch(err =>
     console.error("Failed to seed data brokers:", err)
   );
 

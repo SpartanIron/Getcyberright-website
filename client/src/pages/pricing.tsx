@@ -11,20 +11,23 @@ import {
   Check, 
   Shield, 
   Users, 
-  Briefcase,
+  Crown,
   Building2,
   ArrowRight,
-  Loader2
+  Loader2,
+  HelpCircle,
+  Zap
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import bannerImage from "@/assets/banners/resources-banner.png";
+import bannerImage from "@/assets/banners/pricing-banner.png";
 
 interface PricingTier {
   id: string;
   name: string;
+  audience: string;
   description: string;
   price: string;
   period: string;
@@ -40,68 +43,75 @@ const pricingTiers: PricingTier[] = [
   {
     id: "free",
     name: "Free",
-    description: "Essential tools for personal protection",
+    audience: "For everyone",
+    description: "Get started with essential security tools at no cost.",
     price: "$0",
     period: "forever",
     icon: Shield,
     features: [
-      "Scam Checker tool",
-      "Password Generator",
-      "Breach Checker",
-      "Basic security guides",
-      "Email newsletter"
+      "Scam Checker (check suspicious messages)",
+      "Password Strength Tester",
+      "Data Breach Lookup",
+      "Security guides and articles",
+      "Weekly safety newsletter"
     ],
     buttonText: "Get Started"
   },
   {
     id: "essential",
     name: "Essential",
-    description: "Enhanced protection for families",
+    audience: "For individuals and families",
+    description: "Deeper protection with AI-powered analysis and training courses.",
     price: "$9",
-    period: "per month",
+    period: "mo",
     icon: Users,
     features: [
       "Everything in Free, plus:",
-      "Priority scam analysis",
-      "Extended threat reports",
+      "AI Scam Analyzer (detailed threat reports)",
+      "Data broker exposure scan",
+      "Full Training Academy access",
       "Family safety toolkit",
       "Monthly security webinars",
       "Email support"
     ],
-    buttonText: "Subscribe Now"
+    highlighted: true,
+    buttonText: "Start 14-Day Free Trial",
+    badge: "Best for Families"
   },
   {
     id: "professional",
     name: "Professional",
-    description: "Comprehensive security for small teams",
+    audience: "For power users and small businesses",
+    description: "Full protection suite with automated data removal and monitoring.",
     price: "$29",
-    period: "per month",
-    icon: Briefcase,
+    period: "mo",
+    icon: Crown,
     features: [
       "Everything in Essential, plus:",
-      "Up to 5 team members",
-      "Business email protection",
-      "Employee training resources",
-      "Quarterly security reviews",
-      "Priority support"
+      "Automated data broker removal requests",
+      "Continuous monitoring and re-scanning",
+      "Up to 6 family member profiles",
+      "Advanced URL and domain scanner",
+      "Priority support",
+      "Quarterly security review"
     ],
-    highlighted: true,
-    buttonText: "Subscribe Now",
-    badge: "Most Popular"
+    buttonText: "Start 14-Day Free Trial"
   },
   {
     id: "enterprise",
     name: "Enterprise",
-    description: "Custom solutions for organizations",
+    audience: "For organizations and teams",
+    description: "Custom training programs with dedicated support for your team.",
     price: "Custom",
-    period: "contact us",
+    period: "plan",
     icon: Building2,
     features: [
       "Everything in Professional, plus:",
-      "Unlimited team members",
-      "Custom training programs",
+      "Unlimited team member accounts",
+      "Custom employee training programs",
       "Dedicated account manager",
-      "API access",
+      "NIST compliance dashboard",
+      "API access and integrations",
       "SLA guarantee"
     ],
     buttonText: "Contact Sales"
@@ -215,9 +225,9 @@ export default function Pricing() {
           title="Pricing Plans"
           subtitle="Choose the protection level that fits your needs. All plans include our core security tools."
           imageSrc={bannerImage}
-          imageAlt="Cybersecurity protection plans"
+          imageAlt="Cybersecurity shield with layered protection tiers"
           imagePosition="right"
-          colorVariant="blue"
+          colorVariant="teal"
         />
 
         <section className="py-16 px-4 sm:px-6 lg:px-8">
@@ -229,9 +239,9 @@ export default function Pricing() {
               transition={{ duration: 0.5 }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl font-bold text-foreground mb-4">Simple, Transparent Pricing</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-4" data-testid="text-pricing-heading">Simple, Transparent Pricing</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                No hidden fees. Cancel anytime. All premium plans include a 14-day free trial.
+                No hidden fees. Cancel anytime. All paid plans include a 14-day free trial.
               </p>
             </motion.div>
 
@@ -250,13 +260,14 @@ export default function Pricing() {
                   >
                     <CardHeader>
                       {tier.badge && (
-                        <Badge className="w-fit mb-2 bg-accent text-white">{tier.badge}</Badge>
+                        <Badge className="w-fit mb-2 bg-primary text-primary-foreground">{tier.badge}</Badge>
                       )}
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${tier.highlighted ? 'bg-accent/10' : 'bg-primary/10'}`}>
-                        <tier.icon className={`w-5 h-5 ${tier.highlighted ? 'text-accent' : 'text-primary'}`} />
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${tier.highlighted ? 'bg-primary/10' : 'bg-muted'}`}>
+                        <tier.icon className={`w-5 h-5 ${tier.highlighted ? 'text-primary' : 'text-muted-foreground'}`} />
                       </div>
                       <CardTitle className="text-xl">{tier.name}</CardTitle>
-                      <CardDescription>{tier.description}</CardDescription>
+                      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{tier.audience}</p>
+                      <CardDescription className="mt-1">{tier.description}</CardDescription>
                       <div className="pt-4">
                         <span className="text-3xl font-bold text-foreground">{tier.price}</span>
                         <span className="text-muted-foreground ml-1">/{tier.period}</span>
@@ -275,11 +286,11 @@ export default function Pricing() {
                     <CardFooter>
                       {tier.id === "free" ? (
                         isAuthenticated ? (
-                          <Button className="w-full" variant="outline" disabled>
+                          <Button className="w-full" variant="outline" disabled data-testid="button-current-plan">
                             Current Plan
                           </Button>
                         ) : (
-                          <Button className="w-full" variant="outline" asChild>
+                          <Button className="w-full" variant="outline" asChild data-testid="button-get-started-free">
                             <a href="/api/login">
                               {tier.buttonText}
                               <ArrowRight className="w-4 h-4 ml-2" />
@@ -287,7 +298,7 @@ export default function Pricing() {
                           </Button>
                         )
                       ) : tier.id === "enterprise" ? (
-                        <Button className="w-full" variant="outline" asChild>
+                        <Button className="w-full" variant="outline" asChild data-testid="button-contact-sales">
                           <a href="mailto:sales@getcyberright.com">
                             {tier.buttonText}
                           </a>
@@ -314,6 +325,29 @@ export default function Pricing() {
                 </motion.div>
               ))}
             </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mt-12"
+            >
+              <Card className="bg-muted/30">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-3">
+                    <HelpCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-foreground text-sm mb-1">What happens after the free trial?</h3>
+                      <p className="text-muted-foreground text-sm">
+                        You will not be charged during the 14-day trial. If you decide the plan is not for you, 
+                        cancel anytime before the trial ends. Your free tools will always remain available.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         </section>
 
