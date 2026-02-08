@@ -9,20 +9,12 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-<<<<<<< HEAD
       "shadcn-card rounded-xl border bg-card border-card-border text-card-foreground shadow-sm",
-=======
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
->>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
       className
     )}
     {...props}
   />
-<<<<<<< HEAD
 ));
-=======
-))
->>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
 Card.displayName = "Card"
 
 const CardHeader = React.forwardRef<
@@ -34,11 +26,7 @@ const CardHeader = React.forwardRef<
     className={cn("flex flex-col space-y-1.5 p-6", className)}
     {...props}
   />
-<<<<<<< HEAD
 ));
-=======
-))
->>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
 CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<
@@ -65,11 +53,7 @@ const CardDescription = React.forwardRef<
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
-<<<<<<< HEAD
 ));
-=======
-))
->>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
 CardDescription.displayName = "CardDescription"
 
 const CardContent = React.forwardRef<
@@ -91,7 +75,6 @@ const CardFooter = React.forwardRef<
   />
 ))
 CardFooter.displayName = "CardFooter"
-<<<<<<< HEAD
 export {
   Card,
   CardHeader,
@@ -100,7 +83,3 @@ export {
   CardDescription,
   CardContent,
 }
-=======
-
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
->>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e

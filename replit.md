@@ -1,220 +1,85 @@
-<<<<<<< HEAD
 # GetCyberRight - Cybersecurity Education Platform
 
 ## Overview
-
-GetCyberRight is a full-stack TypeScript project with a React frontend and Express backend, designed to empower families, seniors, and organizations with practical cybersecurity knowledge. It aims to be a leading resource for digital safety by providing accessible educational content, security guides, and community resources to protect users from modern cyber threats like phishing, scams, and identity theft. The platform focuses on practical guidance, business vision, and market potential, with ambitious plans for user empowerment.
-=======
-# GetCyberRight.com
-
-## Overview
-
-GetCyberRight is a mission-driven service platform providing free global resources for family cyber safety. It aims to simplify complex cybersecurity information for everyday users, from children to seniors, offering interactive safety assessments, real-time threat intelligence, and audience-specific educational content. The platform's long-term vision includes mobile applications with tiered features to ensure "always-on protection" and expand its reach across six continents.
->>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
+GetCyberRight is a full-stack TypeScript project empowering families, seniors, and organizations with practical cybersecurity knowledge. It aims to be a leading resource for digital safety by providing accessible educational content, security guides, and community resources to protect users from modern cyber threats. The platform simplifies complex cybersecurity information for everyday users, offering interactive safety assessments, real-time threat intelligence, and audience-specific educational content. Its long-term vision includes expanding its reach globally with mobile applications and tiered features for "always-on protection."
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-<<<<<<< HEAD
 ### Brand Identity & Design
-The platform uses an enterprise teal and orange color scheme, maintaining a flat, minimal aesthetic with subtle shadows and a professional appearance. UI/UX emphasizes accessibility (ARIA, screen reader support), SEO (meta tags, Open Graph), and print support. Audience-specific hubs (Kids, Seniors, Parents, Educators, Small Business) feature distinct color themes while ensuring brand consistency. The Kids Digital Safety Hub offers age-segmented, gamified lessons with interactive quizzes.
+The platform uses an enterprise teal and orange color scheme with a flat, minimal aesthetic. UI/UX prioritizes accessibility, SEO, and print support. Audience-specific hubs (Kids, Seniors, Parents, Educators, Small Business) feature distinct color themes while maintaining brand consistency. The Kids Digital Safety Hub offers age-segmented, gamified lessons.
 
 ### Frontend
-- **Framework**: React 18 with TypeScript.
+- **Framework**: React 18 with TypeScript and Vite.
 - **Routing**: Wouter.
 - **State Management**: TanStack Query.
 - **Styling**: Tailwind CSS with shadcn/ui.
 - **Animations**: Framer Motion.
 - **Forms**: React Hook Form with Zod validation.
-- **Build Tool**: Vite.
+- **UI/UX**: Mobile-first design with enhanced typography, section padding, and card hover effects.
+- **SEO**: Dynamic meta tags, Open Graph, and keywords managed by a custom `useSEO` hook.
 
 ### Backend
-- **Framework**: Express 5 on Node.js with TypeScript.
-- **API Design**: REST endpoints.
+- **Framework**: Express 5 on Node.js with TypeScript (ES modules).
+- **API Design**: REST endpoints with robust input validation.
 - **Validation**: Zod schemas shared across frontend and backend.
-- **Authentication**: Custom system with email/password, TOTP MFA, backup codes, session management (PostgreSQL), email verification, and password reset.
+- **Authentication**: Custom system with email/password, TOTP MFA, backup codes, session management, email verification, password reset, and Passkeys (WebAuthn) for passwordless authentication. Token versioning for session invalidation on password change.
+- **Build**: esbuild.
 
 ### Data Layer
-- **ORM**: Drizzle ORM for PostgreSQL.
+- **ORM**: Drizzle ORM for PostgreSQL (serverless via Neon).
 - **Schema**: `shared/schema.ts` with `drizzle-zod` for automatic Zod schema generation.
-- **Key Tables**: `users`, `contact_messages`, `newsletter_subscribers`.
+- **Key Tables**: `users`, `contact_messages`, `newsletter_subscribers`, `articles`, `resources`, `newsletters`, `cyberAssessments`, `threat_stats`, `securityAlerts`, `auditLogs`, `learning_paths`, `training_modules`, `training_lessons`, `training_quizzes`, `quiz_questions`, `quiz_attempts`, `training_certificates`, `data_brokers`, `user_vault_profiles`, `exposure_scans`, `exposure_findings`, `removal_requests`, `opt_out_content`, `monitoring_schedules`, `removal_audit_log`, `removal_verifications`.
 
 ### Security Architecture
-- **Middleware**: Helmet.js for security headers.
-- **Rate Limiting**: Three tiers with IP-based tracking and auto-blocking.
-- **CSRF Protection**: Origin/Referer header validation.
-- **Request Security**: Payload limits, XSS/SQLi detection, secure cookie settings.
-- **API Anomaly Detection**: Monitors `/api` routes for suspicious patterns, triggering alerts and critical incident flags.
-- **Centralized Logging**: Winston for security logs, integrated with SIEM.
-- **Compliance**: Mapped controls to OWASP ASVS, CIS Control, ISO 27001, NIST 800-53, MITRE ATT&CK, achieving an 87/100 MITRE ATT&CK score.
+- **Middleware**: Helmet.js for security headers, comprehensive security headers (CSP, HSTS, XSS).
+- **Rate Limiting**: Multi-tier with IP-based tracking and auto-blocking (`express-rate-limit`, `express-slow-down`).
+- **CSRF Protection**: Origin/Referer header validation, double-submit cookie pattern.
+- **Request Security**: Payload limits, XSS/SQLi detection, secure cookie settings, input sanitization (`express-mongo-sanitize`, `hpp`, `DOMPurify`).
+- **API Anomaly Detection**: Monitors `/api` routes for suspicious patterns.
+- **Centralized Logging**: Winston for security logs, integrated with SIEM. Audit logging for critical admin actions and security events.
+- **Compliance**: Mapped controls to OWASP ASVS, CIS Control, ISO 27001, NIST 800-53, MITRE ATT&CK. NIST 800-53 Compliance Dashboard for Enterprise.
 - **Admin Dashboard**: Real-time security monitoring at `/admin/security`.
+- **Security Monitoring**: Real-time threat detection tracking failed logins, rate limit exceeded events, and CSRF violations with automatic security alert generation.
+- **Privacy Commitment**: No behavioral tracking, minimal data collection, no data sales, GDPR-conscious design.
 
 ### Content & Tools
 - **Content Guidelines**: Educational content based on verified sources (FTC, FBI IC3, CISA), emphasizing empowering language.
-- **AI Scam Analyzer**: OpenAI-powered threat analysis tool with auto-detection of content type (messages, emails, headers, URLs). Returns structured risk assessment with red flags, technical observations, and recommended actions. API endpoint: `POST /api/security/ai-scam-analyze`. Frontend component: `client/src/components/ai-scam-analyzer.tsx`.
-- **Scam Checker**: Email header analysis, URL reputation, urgency scoring.
-- **Advanced Security Scanner**: Multi-engine URL scanning (Google Safe Browsing, VirusTotal), domain age checks, SSL certificate analysis, phone number lookup, screenshot OCR, QR code scanner, and deepfake education.
-- **AI & Cyber Safety Hub**: Educational content on AI-powered threats like deepfakes and AI chatbot scams.
-- **Child Safety Conversation Scanner**: Client-side grooming pattern detection with risk scoring and regional emergency resources.
-- **Dezi AI Assistant**: Provides analysis and security assistance, with free and premium tiers.
-- **AI Content Refresh**: Automated content update recommendations based on threat intelligence with one click application.
-- **Data Broker Removal System**: Enterprise-grade personal data removal from 501 data broker sites across 22 categories (people search, marketing, background check, financial, recruitment, public records, social media, location, vehicle/auto, court/legal, real estate, identity verification, insurance, telecom, voter/political, business/professional, health/medical, education, data aggregators, IoT/smart device, advertising). Features include encrypted personal data vault, exposure scanning with risk-weighted matching, automated opt-out content generation (CCPA/GDPR templates), removal request tracking with status management, monitoring schedules, and full usage analytics tracking. **Automation**: `DataBrokerScheduler` runs every 15 minutes checking for: (1) due monitoring re-scans based on user-configured frequency, (2) pending verification checks on removal requests, (3) re-appearance detection for previously removed data with auto-escalation. Scheduler starts automatically on server boot after broker catalog seeding. Safety: skips schedules with 5+ consecutive failures. Frontend dashboard at `/data-removal` with 6 tabs (Overview, Vault, Scan, Tracker, Broker Database, Reports). Backend: `server/dataBrokerService.ts`, `server/dataBrokerSeed.ts`. Database tables: `data_brokers`, `user_vault_profiles`, `exposure_scans`, `exposure_findings`, `removal_requests`, `opt_out_content`, `monitoring_schedules`, `removal_audit_log`, `removal_verifications`. API: 20+ endpoints under `/api/data-removal/`. New: Removal verification system (re-scans after 30 days to confirm data actually removed), downloadable progress reports with category breakdown and broker details, broker performance metrics (avgResponseDays, difficultyRating, successRate). New statuses: "verifying", "verified_removed". Tier-gated: Free (browse brokers, limited scan), Essential (full scan, family profiles), Professional+ (removal requests, opt-out generation, monitoring). Tool usage tracked via `tool_usage` table for: guest-scan, vault-save, exposure-scan, removal-request, optout-generate, monitoring-setup, monitoring-run. Industry-leading features: competitive comparison vs 6 competitors, continuous monitoring with auto re-removal triggers, regulatory compliance dashboard (CCPA/GDPR/CPRA/VCDPA/CPA/CTDPA/UCPA/PIPEDA/LGPD - 9 frameworks), transparency audit trail with proof-of-removal tracking, dark web monitoring capability. Broker Intelligence Registry: Each broker has automationFeasibility (full/partial/semi-automated/manual), verificationMethod (government-id/email-confirmation/email-reply/account-login/none), privacyPolicyUrl, dataRetentionPolicy, legalBasis, countriesApplicable, and related broker mappings. Jurisdiction detection: Auto-detects applicable regulatory framework based on user location and broker jurisdiction (supports US state-level detection for CA/VA/CO/CT/UT, international for EU/UK/Canada/Brazil). Family Protection Plan: Multi-profile vault (up to 6 family members per account), with per-profile scanning and removal tracking. Compliance Automation: Deadline enforcement per framework (CCPA 45d, GDPR 30d, LGPD 15d, etc.), overdue flagging, non-compliance reporting, and escalation triggers. Auto-Removal System: Automated email-based removal request sending via Resend API to broker privacy contacts, with smart method detection (email/web-form/phone), opt-out content generation, status tracking, and full audit logging. Supports individual auto-send (`POST /api/data-removal/requests/:id/auto-send`), bulk auto-send (`POST /api/data-removal/requests/bulk-auto-send`) for up to 50 requests per batch, and bulk create-and-send from scan findings (`POST /api/data-removal/requests/bulk-create-and-send`) with server-side ownership validation. Frontend features: ScanTab has per-finding checkboxes with "Select All" toggle and "Auto-Send Selected" bulk action bar; TrackerTab has per-request auto-send and "Auto-Send All Pending" bulk button.
-
-### AI Content Guardrails (shared/contentGuardrails.ts)
-The platform enforces strict content integrity standards for all AI-generated content:
-- **Truthfulness**: All recommendations must be factually accurate and traceable to provided threat data.
-- **Verifiability**: No fabrication of statistics, dates, CVE numbers, or incident details.
-- **Anti-Hallucination**: Automated detection of potential hallucination patterns with disclaimers.
-- **Writing Quality**: Proper sentence structure, punctuation, and no dashes as clause separators.
-- **Audience Adaptation**: Content complexity adjusted for kids, seniors, parents, educators, and businesses.
-- **Source Attribution**: All threat-based recommendations cite the original intelligence feed source.
+- **AI Scam Analyzer**: OpenAI-powered threat analysis tool for messages, emails, headers, URLs, returning structured risk assessment.
+- **Scam Checker**: Email header analysis, URL reputation, urgency scoring, multi-engine URL scanning (Google Safe Browsing, VirusTotal), domain age checks, SSL certificate analysis, phone number lookup, screenshot OCR, QR code scanner. Provides six analysis types: URL, QR Code, Image/Screenshot, Phone, Email Header, Situation Analysis (AI-powered with critical rules and authoritative sources).
+- **AI & Cyber Safety Hub**: Educational content on AI-powered threats.
+- **Child Safety Conversation Scanner**: Client-side grooming pattern detection.
+- **Dezi AI Assistant**: Provides analysis and security assistance.
+- **Data Broker Removal System**: Enterprise-grade personal data removal from 501 data broker sites. Features include encrypted personal data vault, exposure scanning, automated opt-out content generation (CCPA/GDPR templates), removal request tracking, and monitoring schedules. Automated email-based removal request sending via Resend API. Tier-gated features (Free, Essential, Professional+).
+- **AI Content Guardrails**: Enforces truthfulness, verifiability, anti-hallucination, writing quality, audience adaptation, and source attribution for all AI-generated content.
+- **Automated Weekly Newsletter System**: AI-powered content generation and scheduled sending.
+- **Training Academy**: Audience-specific training paths with learning modules, lessons, quizzes, and certificates. Integrated with gamification.
+- **Digital Safety Tips Automation**: AI-powered system for generating and sending personalized safety tips.
+- **Unified Subscription System**: Manages all email subscriptions through a single `newsletters` table.
 
 ### Competitive Differentiator Features
-- **Family Safety Codeword Generator**: Unique tool for generating secure codewords for emergency verification, protecting against voice cloning scams.
-- **Audio/Voice Deepfake Detector**: Upload analysis for suspicious voicemails, checking for unnatural audio patterns.
-- **Gamification & Achievement System**: Points, badges, and leaderboards to drive engagement in security activities.
-- **Regional Content Personalization**: Auto-detection and manual selection of user region for tailored threat trends and local resources.
-- **Tool Usage Analytics Dashboard**: Admin feature to track usage of security tools across the platform.
-- **Automated Threat Intelligence Feed Integration**: Ingests data from 8 trusted sources (URLhaus, PhishTank, CISA, NVD, HIBP) for real-time threat updates.
-- **Automated Content Governance System**: Monitors educational content for freshness and relevance, linking topics to threat intelligence for automated flagging and review.
-
-- **NIST 800-53 Compliance Dashboard** (Enterprise Feature):
-  - Maps platform security features to 20 NIST 800-53 control families (AC, AU, IA, SC, SI, etc.)
-  - 50+ security controls with implementation status, evidence, gaps, and recommendations
-  - Scoring algorithm: 0-100 compliance score per family and overall (current: 82%)
-  - Gap analysis with remediation recommendations
-  - Admin dashboard at `/admin/compliance` with Overview, Control Families, Gaps, and Assessment History tabs
-  - API endpoints: `/api/compliance/stats`, `/families`, `/controls`, `/gaps`, `/assess`, `/assessments`
-
-### Automated Weekly Newsletter System
-- **Newsletter Service**: Located in `server/newsletterService.ts`
-- **Scheduling**: Automatically runs every Friday at 9 AM
-- **Content Generation**: AI-powered newsletter content using threat intelligence data
-- **Email Sending**: Requires email provider integration (Resend or SendGrid) - see note below
-- **Admin Dashboard**: Manage newsletters at `/admin/newsletter`
-- **Email Configuration Note**: Email sending is not yet configured. To enable newsletter delivery, set up Resend or SendGrid integration with `RESEND_API_KEY` or `SENDGRID_API_KEY` secret.
-
-### Training Academy
-- **Architecture**: Audience-specific training paths with learning modules, lessons, quizzes, and certificates
-- **Audiences**: Kids, Parents, Seniors, Educators, Small Business (each with tailored content and language)
-- **Routes**:
-  - `/training` - Main training hub showing all learning paths
-  - `/training/kids`, `/training/parents`, `/training/seniors`, `/training/educators`, `/training/business` - Audience landing pages
-  - `/training/:pathId` - Learning path detail with modules
-  - `/training/lesson/:lessonId` - Lesson viewer
-  - `/training/quiz/:quizId` - Quiz assessment
-- **Database Tables**: `learning_paths`, `training_modules`, `training_lessons`, `training_quizzes`, `quiz_questions`, `quiz_attempts`, `training_certificates`
-- **Gamification Integration**: Lessons +25 points, Quizzes +50 points, Certificates +200 points
-- **Certificate Requirements**: Pass all module quizzes with 70%+ score
-- **Content Seeding Note**: Curriculum seeds automatically on first server start. To update existing curriculum with new content, delete existing learning paths from the database and restart the server.
+- **Family Safety Codeword Generator**.
+- **Audio/Voice Deepfake Detector**.
+- **Gamification & Achievement System**.
+- **Regional Content Personalization**.
+- **Tool Usage Analytics Dashboard**.
+- **Automated Threat Intelligence Feed Integration**: Ingests data from 8 trusted sources (URLhaus, PhishTank, CISA, NVD, HIBP).
+- **Automated Content Governance System**: Monitors educational content for freshness and relevance.
+- **Marketing & Growth Features**: Social sharing, embeddable widgets, success stories, referral tracking.
 
 ### Premium Subscription Tiers
-The platform offers Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers, with feature gating implemented via `hasTierAccess()` and UI upgrade prompts.
+Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers with feature gating.
 
 ## External Dependencies
 
-- **Database**: PostgreSQL, Drizzle Kit.
-- **UI Framework**: Radix UI, shadcn/ui, Lucide React, react-icons.
+- **Database**: PostgreSQL (serverless via Neon), Drizzle Kit.
+- **UI Frameworks**: Radix UI, shadcn/ui, Lucide React, react-icons.
 - **Form & Validation**: Zod, React Hook Form, @hookform/resolvers.
 - **Styling**: Tailwind CSS, class-variance-authority, tailwind-merge.
-- **Authentication**: `connect-pg-simple`, `bcrypt`, `speakeasy`, `qrcode`.
-- **Threat Intelligence**: PhishTank API, URLhaus API, Google Safe Browsing API, VirusTotal API, RDAP/WHOIS (all proxied via backend).
+- **Authentication**: `connect-pg-simple`, `bcrypt`, `speakeasy`, `qrcode`, `jsonwebtoken`, `otplib`, `@simplewebauthn/server`, `@simplewebauthn/browser`.
+- **Threat Intelligence**: PhishTank API, URLhaus API, Google Safe Browsing API, VirusTotal API, RDAP/WHOIS (all proxied via backend), FBI IC3, INTERPOL, CISA, The Hacker News, Krebs on Security.
+- **AI Features**: Anthropic API (Claude), OpenAI.
+- **Email Service**: Brevo (primary), MailerSend, SMTP2GO (fallbacks), Resend (for data removal automation).
 - **Image Processing**: Tesseract.js (OCR), jsQR (QR code decoding).
-=======
-GetCyberRight utilizes a modern web stack designed for performance, security, and scalability.
-
-### Frontend
-- **Framework**: React with TypeScript and Vite
-- **Routing**: Wouter
-- **State Management**: TanStack React Query
-- **UI Components**: shadcn/ui (built on Radix UI)
-- **Styling**: Tailwind CSS with custom CSS variables (light/dark mode)
-- **SEO**: Dynamic meta tags, Open Graph, and keywords managed by a custom `useSEO` hook.
-- **UI/UX**: Mobile-first design with enhanced typography scaling, section padding, and card hover effects for desktop.
-
-### Backend
-- **Runtime**: Node.js with Express
-- **Language**: TypeScript (ES modules)
-- **API Design**: RESTful with robust input validation
-- **Build**: esbuild
-
-### Database
-- **Type**: PostgreSQL (serverless via Neon)
-- **ORM**: Drizzle ORM (with push-based migrations)
-- **Key Tables**: `users`, `articles`, `resources`, `newsletters`, `cyberAssessments`, `threat_stats`, `securityAlerts`, `auditLogs`.
-
-### Security Stack
-- Comprehensive security headers (`helmet`, CSP, HSTS, XSS)
-- Multi-tier rate limiting (`express-rate-limit`, `express-slow-down`)
-- Input sanitization (`express-mongo-sanitize`, `hpp`, `DOMPurify`)
-- Authentication: `bcryptjs` for hashing, `jsonwebtoken` for JWT, `otplib` for TOTP 2FA.
-- Passkeys (WebAuthn) for passwordless authentication using `@simplewebauthn/server` and `@simplewebauthn/browser`.
-- Custom honeypot middleware and audit logging for administrative actions and security events.
-- **Token Versioning**: Session invalidation on password change via `tokenVersion` in JWT access and refresh tokens, checked in `authenticateToken` and `optionalAuth` middleware.
-- **CSRF Protection**: Double-submit cookie pattern protecting admin, passkey, 2FA, articles, resources, security alerts, and user endpoints.
-- **Security Monitoring**: Real-time threat detection tracking failed logins, rate limit exceeded events, and CSRF violations with automatic security alert generation.
-
-### Key Features and Implementations
-- **Two-Factor Authentication (2FA)**: TOTP for admin accounts with secure setup and login flows, including rate limiting and audit trails.
-- **Passkeys (WebAuthn)**: Admin accounts can use hardware-backed, phishing-resistant passkeys for authentication, with server-side challenge verification and counter validation.
-- **Audit Logging**: Tracks critical admin actions, security events, and 2FA activities with detailed records.
-- **Scam Checker Usage Tracking**: Logs all scam checker analyses for metrics, categorizing by type and risk.
-- **Security Alerts System**: Manages breach/vulnerability notifications for admins, with severity categorization and acknowledgment features.
-- **SEO Implementation**: Dynamic sitemap, `robots.txt`, JSON-LD structured data, Open Graph, and Twitter Card meta tags.
-- **Digital Safety Tips Automation**: AI-powered (Claude) system for generating and sending personalized safety tips to subscribers, based on audience and region, with evidence-based prompting and anti-hallucination guardrails.
-- **Unified Subscription System**: Manages all email subscriptions (`weeklyDigest`, `digitalSafetyTips`) through a single `newsletters` table with configurable frequency, audience, region, and alert priority.
-- **Scam Checker Feature**: Provides six analysis types:
-    - **URL Analysis**: Rule-based detection (typosquatting, TLDs, IP-based, keywords) integrated with Google Safe Browsing and PhishTank APIs.
-    - **QR Code Scanner**: Extracts and analyzes URLs from QR codes in images.
-    - **Image/Screenshot Analysis**: OCR for text extraction, AI analysis, and URL/phone number identification.
-    - **Phone Analysis**: Rule-based country code, premium number, and suspicious pattern detection.
-    - **Email Header Analysis**: Enhanced with AI and external lookups (SPF, DKIM, DMARC, domain reputation via DNS blocklists, RDAP/WHOIS for domain age, phishing pattern matching) for comprehensive risk assessment.
-    - **Situation Analysis**: AI-powered (Claude) with critical rules for evidence-based responses, confidence calibration, and referencing authoritative sources (FBI IC3, CISA, INTERPOL).
-- **Core Content Pillars**: Youth Protection Hub, Senior Safety Center, Real-Time News Aggregation, Interactive Tools, Threat Intelligence Dashboard.
-- **Platform Security**: Enterprise-grade headers, rate limiting, bot protection, input sanitization, `security.txt`.
-- **Privacy Commitment**: No behavioral tracking, minimal data collection, no data sales, GDPR-conscious design.
-- **Marketing & Growth Features**:
-    - **Share Your Result**: Social sharing buttons (Twitter, Facebook, WhatsApp) after scam checks with risk-based messaging.
-    - **Embeddable Widget**: `/embed/url-checker` route for partner websites to embed the URL checker via iframe.
-    - **Success Stories**: `/success-stories` page showcasing user testimonials with submission form.
-    - **Referral Tracking**: URL parameter capture (`?ref=`), localStorage storage (30-day expiry), conversion tracking, and InviteFriends component.
-
-## External Dependencies
-
-- **Database**: Neon (PostgreSQL serverless driver)
-- **Email Service**: Brevo (primary), MailerSend, SMTP2GO (fallbacks)
-- **AI Features**: Anthropic API (Claude)
-- **News Sources**: FBI IC3, INTERPOL, CISA, The Hacker News, Krebs on Security, regional cybercrime agencies.
-- **UI Libraries**: Radix UI
-- **Scam Checker APIs**: Google Safe Browsing API, PhishTank API.
-
-## Project Structure
-
-```
-├── client/src/          # React frontend
-├── server/              # Express backend
-├── shared/              # Shared types and schemas
-├── public/              # Static assets
-├── attached_assets/     # Media assets (hero images, etc.)
-├── docs/                # Documentation
-└── scripts/             # Utility scripts
-```
-
-## Required Environment Variables
-
-Critical secrets that must be set (no fallback values):
-- `JWT_SECRET` - Required for authentication (app will not start without it)
-- `DATABASE_URL` - PostgreSQL connection string
-- `AI_INTEGRATIONS_ANTHROPIC_API_KEY` - For AI-powered features
-
-See `README.md` for complete environment variable documentation.
-
-## Recent Updates
-
-- **Rotating Testimonials**: Homepage displays 6 rotating testimonials with 8-second intervals
-- **CSRF Protection**: All admin endpoints protected with double-submit cookie pattern
-- **Security Hardening**: Removed all hardcoded fallback values for sensitive secrets
->>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
