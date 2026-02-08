@@ -51,6 +51,8 @@ import {
   Download,
   ClipboardCheck,
   TrendingUp,
+  Info,
+  CheckCircle,
 } from "lucide-react";
 
 interface DataBroker {
@@ -1286,7 +1288,11 @@ function GuestScanForm() {
 
   const result = guestScanMutation.data as {
     totalBrokersScanned: number;
+    totalBrokersInCatalog: number;
     totalExposuresFound: number;
+    confirmedExposures: number;
+    verifiedBrokers: number;
+    potentialExposures: number;
     privacyScore: number;
     riskLevel: string;
     scanMethod?: string;
@@ -1294,6 +1300,7 @@ function GuestScanForm() {
       broker: DataBroker;
       dataTypesExposed: string[];
       exposureLevel: string;
+      evidenceTier?: string;
       verificationMethod?: string;
       verificationDetails?: string;
       confidenceScore?: number;
@@ -1373,7 +1380,7 @@ function GuestScanForm() {
 
       {result && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="pt-6 text-center">
                 <div className="mx-auto w-24 h-24 relative mb-3">
@@ -1395,74 +1402,102 @@ function GuestScanForm() {
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
-                <div className="text-3xl font-bold text-destructive" data-testid="text-guest-exposures">{result.totalExposuresFound}</div>
-                <p className="text-sm text-muted-foreground mt-1">Exposures Found</p>
+                <div className="text-3xl font-bold text-red-600 dark:text-red-400" data-testid="text-guest-confirmed">{result.confirmedExposures || 0}</div>
+                <p className="text-sm font-medium mt-1">Confirmed Exposures</p>
+                <p className="text-xs text-muted-foreground">Verified in known breaches</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
-                <div className="text-3xl font-bold">{result.totalBrokersScanned}</div>
-                <p className="text-sm text-muted-foreground mt-1">Brokers Scanned</p>
+                <div className="text-3xl font-bold text-orange-600 dark:text-orange-400" data-testid="text-guest-verified">{result.verifiedBrokers || 0}</div>
+                <p className="text-sm font-medium mt-1">Active Brokers</p>
+                <p className="text-xs text-muted-foreground">Verified sites collecting your data type</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <div className="text-3xl font-bold text-muted-foreground" data-testid="text-guest-potential">{result.potentialExposures || 0}</div>
+                <p className="text-sm font-medium mt-1">Potential Exposures</p>
+                <p className="text-xs text-muted-foreground">Based on data collection practices</p>
               </CardContent>
             </Card>
           </div>
 
-          {result.scanMethod === "verified" && (
-            <Card>
-              <CardContent className="pt-4 space-y-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <Shield className="h-4 w-4 text-green-600" />
-                  <span className="font-medium text-green-700 dark:text-green-400">Verified Scan</span>
-                  <span className="text-muted-foreground">
-                    Each result was checked against live broker sites, breach databases, and opt-out page verification.
-                  </span>
+          <Card>
+            <CardContent className="pt-4 space-y-3">
+              <div className="flex items-center gap-2 text-sm">
+                <Shield className="h-4 w-4 text-primary" />
+                <span className="font-medium">How We Verify Results</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div className="flex items-start gap-2 p-2 rounded-md bg-red-50 dark:bg-red-950/30">
+                  <AlertTriangle className="h-3.5 w-3.5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-medium text-red-700 dark:text-red-400">Confirmed</span>
+                    <p className="text-muted-foreground mt-0.5">Your data was found in known data breaches (HIBP-verified).</p>
+                  </div>
                 </div>
-                {result.scanNote && (
-                  <p className="text-xs text-muted-foreground pl-6">
-                    {result.scanNote}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                <div className="flex items-start gap-2 p-2 rounded-md bg-orange-50 dark:bg-orange-950/30">
+                  <CheckCircle className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-medium text-orange-700 dark:text-orange-400">Verified Broker</span>
+                    <p className="text-muted-foreground mt-0.5">Broker site is active and collects the data types you provided.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-2 rounded-md bg-muted/50">
+                  <Info className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-medium">Potential</span>
+                    <p className="text-muted-foreground mt-0.5">Broker likely has your data based on their collection practices.</p>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Scanned {result.totalBrokersScanned.toLocaleString()} brokers from our catalog of {(result.totalBrokersInCatalog || result.totalBrokersScanned).toLocaleString()} worldwide.
+              </p>
+            </CardContent>
+          </Card>
 
           {result.findings.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-destructive" />
-                  Data Brokers With Your Information
+                  Scan Results
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Results sorted by confidence level. Higher confidence means stronger evidence of your data being held.
+                  Results grouped by evidence strength. We only report what we can verify.
                 </p>
               </CardHeader>
               <CardContent className="space-y-3">
-                {result.findings.map((finding, idx) => (
+                {result.findings
+                  .sort((a, b) => {
+                    const tierOrder: Record<string, number> = { confirmed: 0, verified_broker: 1, potential: 2 };
+                    return (tierOrder[a.evidenceTier || "potential"] ?? 2) - (tierOrder[b.evidenceTier || "potential"] ?? 2);
+                  })
+                  .map((finding, idx) => (
                   <div key={idx} className="p-4 border rounded-md space-y-2" data-testid={`finding-${idx}`}>
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium">{finding.broker.name}</span>
-                        <Badge variant={finding.exposureLevel === "high" ? "destructive" : "secondary"}>
+                        {finding.evidenceTier === "confirmed" && (
+                          <Badge variant="destructive">
+                            Confirmed Exposure
+                          </Badge>
+                        )}
+                        {finding.evidenceTier === "verified_broker" && (
+                          <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800 no-default-hover-elevate no-default-active-elevate">
+                            Verified Broker
+                          </Badge>
+                        )}
+                        {(!finding.evidenceTier || finding.evidenceTier === "potential") && (
+                          <Badge variant="secondary">
+                            Potential
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="text-xs">
                           {finding.exposureLevel} risk
                         </Badge>
-                        {finding.confidenceScore != null && (
-                          <Badge variant="outline" className={
-                            finding.confidenceScore >= 70 ? "border-green-500 text-green-700 dark:text-green-400" :
-                            finding.confidenceScore >= 40 ? "border-yellow-500 text-yellow-700 dark:text-yellow-400" :
-                            "border-muted-foreground"
-                          }>
-                            {finding.confidenceScore}% confidence
-                          </Badge>
-                        )}
-                        {finding.verificationMethod && (
-                          <Badge variant="outline" className="text-xs">
-                            {finding.verificationMethod === "breach_verified" && "Breach Confirmed"}
-                            {finding.verificationMethod === "site_verified" && "Site Verified"}
-                            {finding.verificationMethod === "data_profile_match" && "Data Match"}
-                            {finding.verificationMethod === "broker_analysis" && "Analysis"}
-                          </Badge>
-                        )}
                       </div>
                       <Button variant="outline" size="sm" asChild>
                         <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
@@ -1778,25 +1813,18 @@ function ScanTab() {
                       <div className="flex-1 space-y-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-medium">{finding.broker?.name || "Unknown Broker"}</p>
-                          <Badge variant={getRiskVariant(finding.exposureLevel || finding.riskLevel)}>
-                            {finding.exposureLevel || finding.riskLevel || "Unknown"} Risk
+                          {finding.verificationMethod === "breach_confirmed" ? (
+                            <Badge variant="destructive">Confirmed Exposure</Badge>
+                          ) : finding.verificationMethod === "broker_verified_active" ? (
+                            <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800 no-default-hover-elevate no-default-active-elevate">
+                              Verified Broker
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary">Potential</Badge>
+                          )}
+                          <Badge variant="outline" className="text-xs">
+                            {finding.exposureLevel || finding.riskLevel || "unknown"} risk
                           </Badge>
-                          {finding.confidenceScore != null && (
-                            <Badge variant="outline" className={
-                              finding.confidenceScore >= 70 ? "border-green-500 text-green-700 dark:text-green-400" :
-                              finding.confidenceScore >= 40 ? "border-yellow-500 text-yellow-700 dark:text-yellow-400" :
-                              "border-muted-foreground"
-                            }>
-                              {finding.confidenceScore}% confidence
-                            </Badge>
-                          )}
-                          {finding.verificationMethod && (
-                            <Badge variant="outline" className="text-xs">
-                              {finding.verificationMethod === "breach_verified" ? "Breach Confirmed" :
-                               finding.verificationMethod === "site_verified" ? "Site Verified" :
-                               finding.verificationMethod === "data_profile_match" ? "Data Match" : "Analysis"}
-                            </Badge>
-                          )}
                           {finding.broker?.category && (
                             <Badge variant="secondary">{finding.broker.category}</Badge>
                           )}

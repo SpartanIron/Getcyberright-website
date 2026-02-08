@@ -1,11 +1,16 @@
 import { dataBrokers } from "@shared/schema";
 import { count } from "drizzle-orm";
+import { getGlobalBrokers } from "./dataBrokerSeedGlobal";
 
 export async function seedDataBrokers(db: any) {
   const existing = await db.select({ count: count() }).from(dataBrokers);
-  if (existing[0].count > 0) {
-    console.log("[data-brokers] Data broker catalog already seeded");
+  const existingCount = existing[0].count;
+  if (existingCount >= 900) {
+    console.log(`[data-brokers] Data broker catalog already seeded (${existingCount} brokers)`);
     return;
+  }
+  if (existingCount > 0) {
+    console.log(`[data-brokers] Found ${existingCount} brokers, expanding catalog with global brokers...`);
   }
 
   const brokers = [
@@ -12764,7 +12769,10 @@ export async function seedDataBrokers(db: any) {
     },
   ];
 
-  const enrichedBrokers = brokers.map((broker) => {
+  const globalBrokers = getGlobalBrokers();
+  const allBrokers = [...brokers, ...globalBrokers];
+
+  const enrichedBrokers = allBrokers.map((broker) => {
     const af = deriveAutomationFeasibility(broker);
     const vm = deriveVerificationMethod(broker);
     const pp = `https://${broker.domain}/privacy`;
@@ -12778,7 +12786,7 @@ export async function seedDataBrokers(db: any) {
     await db.insert(dataBrokers).values(batch).onConflictDoNothing();
   }
 
-  console.log(`[data-brokers] Seeded ${enrichedBrokers.length} data brokers with metadata enrichment`);
+  console.log(`[data-brokers] Seeded ${enrichedBrokers.length} data brokers (${brokers.length} US + ${globalBrokers.length} global) with metadata enrichment`);
 }
 
 function deriveAutomationFeasibility(broker: any): string {
