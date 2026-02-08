@@ -12,7 +12,7 @@ export function ExpertBanner() {
           src={expertImage}
           alt="Cybersecurity expert"
           className="w-full h-full object-cover object-top"
-          loading="lazy"
+          loading="eager"
           decoding="async"
           data-testid="img-expert-banner"
         />

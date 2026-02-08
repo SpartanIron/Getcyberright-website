@@ -1723,7 +1723,7 @@ export function ScamChecker() {
       case "medium": return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300";
       case "high": return "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300";
       case "critical": return "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300";
-      default: return "bg-gray-100 text-gray-700";
+      default: return "bg-gray-100 text-gray-700 dark:bg-gray-900/50 dark:text-gray-300";
     }
   };
 

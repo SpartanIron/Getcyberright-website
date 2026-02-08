@@ -1138,7 +1138,7 @@ export default function Kids() {
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.kids} />
       <Navigation />
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Kids Digital Safety Hub"
           subtitle="Fun, interactive lessons to help young people stay safe online. Choose your age group and start learning today."

@@ -172,19 +172,19 @@ export default function AdminThreatIntelligence() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: statsData, isLoading: statsLoading } = useQuery<{ success: boolean; stats: ThreatStats }>({
+  const { data: statsData, isLoading: statsLoading, isError: statsError } = useQuery<{ success: boolean; stats: ThreatStats }>({
     queryKey: ["/api/threat-intel/stats"],
   });
 
-  const { data: feedsData, isLoading: feedsLoading } = useQuery<{ success: boolean; feeds: ThreatFeed[] }>({
+  const { data: feedsData, isLoading: feedsLoading, isError: feedsError } = useQuery<{ success: boolean; feeds: ThreatFeed[] }>({
     queryKey: ["/api/threat-intel/feeds"],
   });
 
-  const { data: itemsData, isLoading: itemsLoading } = useQuery<{ success: boolean; items: ThreatItem[] }>({
+  const { data: itemsData, isLoading: itemsLoading, isError: itemsError } = useQuery<{ success: boolean; items: ThreatItem[] }>({
     queryKey: ["/api/threat-intel/items"],
   });
 
-  const { data: alertsData, isLoading: alertsLoading } = useQuery<{ success: boolean; alerts: HealthAlert[] }>({
+  const { data: alertsData, isLoading: alertsLoading, isError: alertsError } = useQuery<{ success: boolean; alerts: HealthAlert[] }>({
     queryKey: ["/api/threat-intel/alerts"],
   });
 
@@ -216,11 +216,46 @@ export default function AdminThreatIntelligence() {
     },
   });
 
+  const isInitialLoading = statsLoading || feedsLoading || itemsLoading || alertsLoading;
+  const hasError = statsError || feedsError || itemsError || alertsError;
+
   const stats = statsData?.stats;
   const feeds = feedsData?.feeds || [];
   const items = itemsData?.items || [];
   const alerts = alertsData?.alerts || [];
   const feedRuns = feedRunsData?.runs || [];
+
+  if (isInitialLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-muted-foreground text-sm">Loading threat intelligence data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <AlertTriangle className="w-8 h-8 text-destructive" />
+            <p className="text-muted-foreground text-sm">Failed to load threat intelligence data</p>
+            <Button variant="outline" onClick={() => {
+              queryClient.invalidateQueries({ queryKey: ["/api/threat-intel"] });
+            }} data-testid="button-retry">
+              <RefreshCcw className="w-4 h-4 mr-2" />
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

@@ -285,26 +285,16 @@ export function Navigation() {
                   </div>
                   <p className="text-xs text-muted-foreground -mt-1 ml-6">Guides, resources & training</p>
                   {whoWeHelp.map((item) => (
-                    <div key={item.title} className="space-y-1">
-                      <Link
-                        href={item.href}
-                        className="flex items-center gap-3 py-2 text-foreground transition-colors"
-                        onClick={() => setMobileMenuOpen(false)}
-                        data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                      >
-                        <item.icon className={`w-4 h-4 ${item.color}`} />
-                        <span className="font-medium">{item.title}</span>
-                      </Link>
-                      <Link
-                        href={item.trainingHref}
-                        className="flex items-center gap-2 py-1.5 pl-7 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                        onClick={() => setMobileMenuOpen(false)}
-                        data-testid={`mobile-link-training-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                      >
-                        <GraduationCap className="w-3.5 h-3.5" />
-                        <span>Take the Course</span>
-                      </Link>
-                    </div>
+                    <Link
+                      key={item.title}
+                      href={item.href}
+                      className="flex items-center gap-3 py-2 text-foreground transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                      data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                    >
+                      <item.icon className={`w-4 h-4 ${item.color}`} />
+                      <span className="font-medium">{item.title}</span>
+                    </Link>
                   ))}
                 </div>
 
@@ -354,20 +344,6 @@ export function Navigation() {
                       <span className="font-medium">{item.title}</span>
                     </Link>
                   ))}
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {learnTopics.map((item) => (
-                      <Link
-                        key={item.title}
-                        href={item.href}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs bg-muted/50 text-foreground"
-                        onClick={() => setMobileMenuOpen(false)}
-                        data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                      >
-                        <item.icon className="w-3 h-3" />
-                        {item.title}
-                      </Link>
-                    ))}
-                  </div>
                 </div>
 
                 <div className="h-px bg-border" />

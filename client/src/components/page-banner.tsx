@@ -109,6 +109,7 @@ export function PageBanner({
               className="w-full h-56 md:h-full object-cover"
               loading="eager"
               decoding="async"
+              sizes="(max-width: 768px) 100vw, 50vw"
               data-testid="img-banner"
             />
           </div>

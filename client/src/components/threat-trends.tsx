@@ -182,7 +182,7 @@ export function ThreatTrends() {
       case "critical": return "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 border-red-200 dark:border-red-800";
       case "high": return "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300 border-orange-200 dark:border-orange-800";
       case "medium": return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800";
-      default: return "bg-gray-100 text-gray-700";
+      default: return "bg-gray-100 text-gray-700 dark:bg-gray-900/50 dark:text-gray-300";
     }
   };
 
@@ -380,9 +380,9 @@ export function ThreatTrends() {
                     <Badge 
                       variant="secondary"
                       className={
-                        group.risk === "Very High" ? "bg-red-100 text-red-700" :
-                        group.risk === "High" ? "bg-orange-100 text-orange-700" :
-                        "bg-yellow-100 text-yellow-700"
+                        group.risk === "Very High" ? "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300" :
+                        group.risk === "High" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300" :
+                        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300"
                       }
                     >
                       {group.risk} Risk

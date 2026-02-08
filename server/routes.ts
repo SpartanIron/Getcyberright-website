@@ -1656,7 +1656,7 @@ EDGE CASE HANDLING
   );
 
   // Get all feeds with status
-  app.get("/api/threat-intel/feeds", async (req: Request, res: Response) => {
+  app.get("/api/threat-intel/feeds", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const feeds = await threatIntelService.getAllFeeds();
       res.json({ success: true, feeds });
@@ -1666,7 +1666,7 @@ EDGE CASE HANDLING
   });
 
   // Get feed run history
-  app.get("/api/threat-intel/feeds/:feedId/runs", async (req: Request, res: Response) => {
+  app.get("/api/threat-intel/feeds/:feedId/runs", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const feedId = req.params.feedId as string;
       const limit = parseInt(req.query.limit as string) || 10;
@@ -1678,7 +1678,7 @@ EDGE CASE HANDLING
   });
 
   // Manually trigger a feed run (admin only)
-  app.post("/api/threat-intel/feeds/:feedId/run", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/threat-intel/feeds/:feedId/run", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const feedId = req.params.feedId as string;
       const run = await threatIntelService.runFeed(feedId);
@@ -1693,7 +1693,7 @@ EDGE CASE HANDLING
   });
 
   // Get recent threat items
-  app.get("/api/threat-intel/items", async (req: Request, res: Response) => {
+  app.get("/api/threat-intel/items", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const { limit, feedId, itemType, severity, audience } = req.query;
       const items = await threatIntelService.getRecentItems({
@@ -1710,7 +1710,7 @@ EDGE CASE HANDLING
   });
 
   // Get threat intel statistics
-  app.get("/api/threat-intel/stats", async (req: Request, res: Response) => {
+  app.get("/api/threat-intel/stats", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const stats = await threatIntelService.getStats();
       res.json({ success: true, stats });
@@ -1720,7 +1720,7 @@ EDGE CASE HANDLING
   });
 
   // Get health alerts
-  app.get("/api/threat-intel/alerts", async (req: Request, res: Response) => {
+  app.get("/api/threat-intel/alerts", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const includeResolved = req.query.resolved === "true";
       const alerts = await threatIntelService.getHealthAlerts(includeResolved);
@@ -1731,7 +1731,7 @@ EDGE CASE HANDLING
   });
 
   // Acknowledge an alert
-  app.post("/api/threat-intel/alerts/:alertId/acknowledge", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/threat-intel/alerts/:alertId/acknowledge", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const alertId = req.params.alertId as string;
       await threatIntelService.acknowledgeAlert(alertId);
@@ -1742,7 +1742,7 @@ EDGE CASE HANDLING
   });
 
   // Resolve an alert
-  app.post("/api/threat-intel/alerts/:alertId/resolve", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/threat-intel/alerts/:alertId/resolve", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const alertId = req.params.alertId as string;
       await threatIntelService.resolveAlert(alertId);
@@ -1755,7 +1755,7 @@ EDGE CASE HANDLING
   // ============== CONTENT GOVERNANCE API ==============
 
   // Get content governance stats
-  app.get("/api/content-governance/stats", async (req: Request, res: Response) => {
+  app.get("/api/content-governance/stats", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const stats = await contentGovernanceService.getGovernanceStats();
       res.json({ success: true, stats });
@@ -1765,7 +1765,7 @@ EDGE CASE HANDLING
   });
 
   // Get all content pages
-  app.get("/api/content-governance/pages", async (req: Request, res: Response) => {
+  app.get("/api/content-governance/pages", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const section = req.query.section as string | undefined;
       const needsReview = req.query.needsReview === "true";
@@ -1786,7 +1786,7 @@ EDGE CASE HANDLING
   });
 
   // Run full content audit
-  app.post("/api/content-governance/audit", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/content-governance/audit", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const result = await contentGovernanceService.runFullAudit();
       res.json({ success: true, ...result });
@@ -1796,7 +1796,7 @@ EDGE CASE HANDLING
   });
 
   // Mark a page as reviewed
-  app.post("/api/content-governance/pages/:pageId/review", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/content-governance/pages/:pageId/review", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const pageId = req.params.pageId as string;
       const userId = (req as any).session?.userId || "admin";
@@ -1810,7 +1810,7 @@ EDGE CASE HANDLING
   });
 
   // Dismiss review flag for a page
-  app.post("/api/content-governance/pages/:pageId/dismiss", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/content-governance/pages/:pageId/dismiss", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const pageId = req.params.pageId as string;
       const userId = (req as any).session?.userId || "admin";
@@ -1824,7 +1824,7 @@ EDGE CASE HANDLING
   });
 
   // Get audit log
-  app.get("/api/content-governance/audit-log", async (req: Request, res: Response) => {
+  app.get("/api/content-governance/audit-log", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const limit = parseInt(req.query.limit as string) || 50;
       const pageId = req.query.pageId as string | undefined;
@@ -1840,7 +1840,7 @@ EDGE CASE HANDLING
   });
 
   // Generate AI-powered content refresh recommendations
-  app.get("/api/content-governance/pages/:pageId/refresh", isAuthenticated, async (req: Request, res: Response) => {
+  app.get("/api/content-governance/pages/:pageId/refresh", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const pageId = req.params.pageId as string;
       const refreshData = await contentGovernanceService.generateContentRefresh(pageId);
@@ -1851,7 +1851,7 @@ EDGE CASE HANDLING
   });
 
   // Apply content refresh
-  app.post("/api/content-governance/pages/:pageId/refresh", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/content-governance/pages/:pageId/refresh", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const pageId = req.params.pageId as string;
       const userId = (req as any).session?.userId || "admin";
@@ -1874,7 +1874,7 @@ EDGE CASE HANDLING
     .catch(err => console.error("[compliance] Initialization failed:", err));
 
   // Get compliance stats
-  app.get("/api/compliance/stats", async (req: Request, res: Response) => {
+  app.get("/api/compliance/stats", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const stats = await complianceService.getStats();
       res.json({ success: true, stats });
@@ -1884,7 +1884,7 @@ EDGE CASE HANDLING
   });
 
   // Get control families
-  app.get("/api/compliance/families", async (req: Request, res: Response) => {
+  app.get("/api/compliance/families", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const families = await complianceService.getFamilies();
       res.json({ success: true, families });
@@ -1894,7 +1894,7 @@ EDGE CASE HANDLING
   });
 
   // Get controls (optionally filtered by family)
-  app.get("/api/compliance/controls", async (req: Request, res: Response) => {
+  app.get("/api/compliance/controls", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const familyId = req.query.familyId as string | undefined;
       const controls = await complianceService.getControls(familyId);
@@ -1913,7 +1913,7 @@ EDGE CASE HANDLING
   });
 
   // Get gaps and recommendations
-  app.get("/api/compliance/gaps", async (req: Request, res: Response) => {
+  app.get("/api/compliance/gaps", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const gaps = await complianceService.getGaps();
       res.json({ success: true, gaps });
@@ -1923,7 +1923,7 @@ EDGE CASE HANDLING
   });
 
   // Run compliance assessment
-  app.post("/api/compliance/assess", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/compliance/assess", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const stats = await complianceService.runAssessment();
       res.json({ success: true, stats });
@@ -1933,7 +1933,7 @@ EDGE CASE HANDLING
   });
 
   // Update control status
-  app.patch("/api/compliance/controls/:controlId", isAuthenticated, async (req: Request, res: Response) => {
+  app.patch("/api/compliance/controls/:controlId", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const controlId = req.params.controlId as string;
       const { status, notes } = req.body;
@@ -1950,7 +1950,7 @@ EDGE CASE HANDLING
   });
 
   // Get assessment history
-  app.get("/api/compliance/assessments", async (req: Request, res: Response) => {
+  app.get("/api/compliance/assessments", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const assessments = await complianceService.getAssessmentHistory();
       res.json({ success: true, assessments });

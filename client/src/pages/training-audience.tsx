@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useRoute } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -170,6 +171,7 @@ export default function TrainingAudience() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead title="Training Path" description="Explore cybersecurity training courses tailored to your needs." />
       <Navigation />
       
       <main id="main-content" tabIndex={-1} className="flex-1">
@@ -179,6 +181,8 @@ export default function TrainingAudience() {
               src={audienceBanners[audienceKey]} 
               alt={`${config.title} - training course hero`}
               className="w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/60" />
           </div>

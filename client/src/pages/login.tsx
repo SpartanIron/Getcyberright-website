@@ -6,7 +6,14 @@ import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { 
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { 
   Shield, 
   Mail, 
@@ -20,21 +27,47 @@ import { useLocation, Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { queryClient } from "@/lib/queryClient";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+const mfaSchema = z.object({
+  mfaCode: z.string().length(6, "Enter the 6-digit code from your authenticator"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+type MfaFormData = z.infer<typeof mfaSchema>;
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [mfaCode, setMfaCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [requiresMfa, setRequiresMfa] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const loginForm = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const mfaForm = useForm<MfaFormData>({
+    resolver: zodResolver(mfaSchema),
+    defaultValues: {
+      mfaCode: "",
+    },
+  });
+
+  const handleLogin = async (data: LoginFormData) => {
     setError("");
     setIsLoading(true);
 
@@ -43,21 +76,17 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ 
-          email, 
-          password,
-          ...(requiresMfa && { mfaCode })
-        }),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        if (data.requiresMfa) {
+        if (result.requiresMfa) {
           setRequiresMfa(true);
           setError("");
         } else {
-          setError(data.error || "Login failed");
+          setError(result.error || "Login failed");
         }
         setIsLoading(false);
         return;
@@ -68,12 +97,54 @@ export default function Login() {
         description: "You have been successfully logged in.",
       });
 
-      // Wait for auth query to refetch before navigating
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
       
-      // Redirect to change password if required, otherwise to admin
-      if (data.user?.mustChangePassword) {
+      if (result.user?.mustChangePassword) {
+        setLocation("/admin/change-password");
+      } else {
+        setLocation("/admin");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMfa = async (data: MfaFormData) => {
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: loginForm.getValues("email"),
+          password: loginForm.getValues("password"),
+          mfaCode: data.mfaCode,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || "Verification failed");
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Welcome back",
+        description: "You have been successfully logged in.",
+      });
+
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
+      
+      if (result.user?.mustChangePassword) {
         setLocation("/admin/change-password");
       } else {
         setLocation("/admin");
@@ -90,7 +161,7 @@ export default function Login() {
       <SEOHead {...pageSEO.login} />
       <Navigation />
       
-      <main tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
+      <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -120,110 +191,146 @@ export default function Login() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
+                {error && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-                  {!requiresMfa ? (
-                    <>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="email"
-                            type="email"
-                            placeholder="you@example.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="pl-10"
-                            required
-                            data-testid="input-email"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Enter your password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="pl-10 pr-10"
-                            required
-                            data-testid="input-password"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            data-testid="button-toggle-password"
-                          >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </button>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="space-y-2">
-                      <Label htmlFor="mfaCode">Authentication Code</Label>
-                      <Input
-                        id="mfaCode"
-                        type="text"
-                        placeholder="000000"
-                        value={mfaCode}
-                        onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                        className="text-center text-2xl tracking-widest"
-                        maxLength={6}
-                        required
-                        autoFocus
-                        data-testid="input-mfa-code"
+                {!requiresMfa ? (
+                  <Form {...loginForm}>
+                    <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                      <FormField
+                        control={loginForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                  type="email"
+                                  placeholder="you@example.com"
+                                  className="pl-10"
+                                  data-testid="input-email"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                      <p className="text-sm text-muted-foreground">
-                        Open your authenticator app to view your code
-                      </p>
-                    </div>
-                  )}
 
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={isLoading}
-                    data-testid="button-login"
-                  >
-                    {isLoading ? (
-                      "Signing in..."
-                    ) : (
-                      <>
-                        <LogIn className="w-4 h-4 mr-2" />
-                        {requiresMfa ? "Verify" : "Sign In"}
-                      </>
-                    )}
-                  </Button>
+                      <FormField
+                        control={loginForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                  type={showPassword ? "text" : "password"}
+                                  placeholder="Enter your password"
+                                  className="pl-10 pr-10"
+                                  data-testid="input-password"
+                                  {...field}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                  aria-label={showPassword ? "Hide password" : "Show password"}
+                                  data-testid="button-toggle-password"
+                                >
+                                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  {requiresMfa && (
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => {
-                        setRequiresMfa(false);
-                        setMfaCode("");
-                      }}
-                      data-testid="button-back-to-login"
-                    >
-                      Back to login
-                    </Button>
-                  )}
-                </form>
+                      <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isLoading}
+                        data-testid="button-login"
+                      >
+                        {isLoading ? (
+                          "Signing in..."
+                        ) : (
+                          <>
+                            <LogIn className="w-4 h-4 mr-2" />
+                            Sign In
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </Form>
+                ) : (
+                  <Form {...mfaForm}>
+                    <form onSubmit={mfaForm.handleSubmit(handleMfa)} className="space-y-4">
+                      <FormField
+                        control={mfaForm.control}
+                        name="mfaCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Authentication Code</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="000000"
+                                className="text-center text-2xl tracking-widest"
+                                maxLength={6}
+                                autoFocus
+                                data-testid="input-mfa-code"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                            <p className="text-sm text-muted-foreground">
+                              Open your authenticator app to view your code
+                            </p>
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isLoading}
+                        data-testid="button-login"
+                      >
+                        {isLoading ? "Verifying..." : (
+                          <>
+                            <LogIn className="w-4 h-4 mr-2" />
+                            Verify
+                          </>
+                        )}
+                      </Button>
+
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => {
+                          setRequiresMfa(false);
+                          mfaForm.reset();
+                        }}
+                        data-testid="button-back-to-login"
+                      >
+                        Back to login
+                      </Button>
+                    </form>
+                  </Form>
+                )}
 
                 {!requiresMfa && (
                   <div className="mt-4 text-center">

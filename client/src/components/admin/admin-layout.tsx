@@ -57,7 +57,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       </header>
 
       <div className="flex">
-        <nav className="w-64 min-h-[calc(100vh-4rem)] bg-background border-r border-border p-4 hidden md:block">
+        <nav aria-label="Admin navigation" className="w-64 min-h-[calc(100vh-4rem)] bg-background border-r border-border p-4 hidden md:block">
           <div className="space-y-1">
             {navItems.map((item) => {
               const isActive = location === item.href || 
@@ -78,7 +78,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </div>
         </nav>
 
-        <main className="flex-1 p-6 md:p-8">
+        <main id="main-content" tabIndex={-1} className="flex-1 p-6 md:p-8">
           <div className="max-w-6xl mx-auto">
             {children}
           </div>

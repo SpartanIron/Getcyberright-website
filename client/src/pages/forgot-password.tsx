@@ -402,7 +402,7 @@ export default function ForgotPassword() {
       />
       <Navigation />
       
-      <main tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
+      <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

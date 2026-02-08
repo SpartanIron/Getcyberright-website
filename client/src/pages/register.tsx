@@ -6,7 +6,14 @@ import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { 
   Shield, 
   Mail, 
@@ -24,6 +31,9 @@ import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { queryClient } from "@/lib/queryClient";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 const passwordRequirements = [
   { label: "At least 12 characters", test: (p: string) => p.length >= 12 },
@@ -33,44 +43,51 @@ const passwordRequirements = [
   { label: "One special character", test: (p: string) => /[^A-Za-z0-9]/.test(p) },
 ];
 
+const registerSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string()
+    .min(12, "Password must be at least 12 characters")
+    .regex(/[A-Z]/, "Must contain an uppercase letter")
+    .regex(/[a-z]/, "Must contain a lowercase letter")
+    .regex(/[0-9]/, "Must contain a number")
+    .regex(/[^A-Za-z0-9]/, "Must contain a special character"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+type RegisterFormData = z.infer<typeof registerSchema>;
+
 export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const form = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    mode: "onChange",
+  });
+
+  const watchPassword = form.watch("password");
+  const watchConfirmPassword = form.watch("confirmPassword");
+  const passwordsMatch = watchPassword === watchConfirmPassword && watchConfirmPassword.length > 0;
+
+  const handleSubmit = async (data: RegisterFormData) => {
     setError("");
-  };
-
-  const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword.length > 0;
-  const allRequirementsMet = passwordRequirements.every(req => req.test(formData.password));
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (!allRequirementsMet) {
-      setError("Please meet all password requirements");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -79,17 +96,17 @@ export default function Register() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
+          email: data.email,
+          password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
         }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Registration failed");
+        setError(result.error || "Registration failed");
         setIsLoading(false);
         return;
       }
@@ -116,7 +133,7 @@ export default function Register() {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
+        <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -149,7 +166,7 @@ export default function Register() {
       <SEOHead {...pageSEO.register} />
       <Navigation />
       
-      <main tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
+      <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -174,171 +191,197 @@ export default function Register() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
+                {error && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="firstName"
-                          name="firstName"
-                          type="text"
-                          placeholder="John"
-                          value={formData.firstName}
-                          onChange={handleChange}
-                          className="pl-10"
-                          required
-                          data-testid="input-first-name"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        type="text"
-                        placeholder="Doe"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        required
-                        data-testid="input-last-name"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="pl-10"
-                        required
-                        data-testid="input-email"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="password"
-                        name="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Create a strong password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="pl-10 pr-10"
-                        required
-                        data-testid="input-password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        data-testid="button-toggle-password"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                    
-                    <div className="space-y-1 mt-2">
-                      {passwordRequirements.map((req, index) => (
-                        <div 
-                          key={index} 
-                          className={`flex items-center gap-2 text-sm ${
-                            req.test(formData.password) 
-                              ? "text-green-600 dark:text-green-400" 
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {req.test(formData.password) ? (
-                            <Check className="w-3 h-3" />
-                          ) : (
-                            <X className="w-3 h-3" />
-                          )}
-                          <span>{req.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Confirm your password"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        className="pl-10"
-                        required
-                        data-testid="input-confirm-password"
-                      />
-                    </div>
-                    {formData.confirmPassword && (
-                      <p className={`text-sm flex items-center gap-1 ${
-                        passwordsMatch 
-                          ? "text-green-600 dark:text-green-400" 
-                          : "text-destructive"
-                      }`}>
-                        {passwordsMatch ? (
-                          <>
-                            <Check className="w-3 h-3" />
-                            Passwords match
-                          </>
-                        ) : (
-                          <>
-                            <X className="w-3 h-3" />
-                            Passwords do not match
-                          </>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                  type="text"
+                                  placeholder="John"
+                                  className="pl-10"
+                                  data-testid="input-first-name"
+                                  {...field}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
                         )}
-                      </p>
-                    )}
-                  </div>
+                      />
+                      <FormField
+                        control={form.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Doe"
+                                data-testid="input-last-name"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={isLoading || !allRequirementsMet || !passwordsMatch}
-                    data-testid="button-register"
-                  >
-                    {isLoading ? (
-                      "Creating account..."
-                    ) : (
-                      <>
-                        <UserPlus className="w-4 h-4 mr-2" />
-                        Create Account
-                      </>
-                    )}
-                  </Button>
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                type="email"
+                                placeholder="you@example.com"
+                                className="pl-10"
+                                data-testid="input-email"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <p className="text-xs text-muted-foreground text-center">
-                    By creating an account, you agree to our{" "}
-                    <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>
-                    {" "}and{" "}
-                    <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-                  </p>
-                </form>
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Create a strong password"
+                                className="pl-10 pr-10"
+                                data-testid="input-password"
+                                {...field}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                                data-testid="button-toggle-password"
+                              >
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </button>
+                            </div>
+                          </FormControl>
+                          <div className="space-y-1 mt-2">
+                            {passwordRequirements.map((req, index) => (
+                              <div 
+                                key={index} 
+                                className={`flex items-center gap-2 text-sm ${
+                                  req.test(watchPassword) 
+                                    ? "text-green-600 dark:text-green-400" 
+                                    : "text-muted-foreground"
+                                }`}
+                              >
+                                {req.test(watchPassword) ? (
+                                  <Check className="w-3 h-3" aria-hidden="true" />
+                                ) : (
+                                  <X className="w-3 h-3" aria-hidden="true" />
+                                )}
+                                <span>{req.label}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm Password</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Confirm your password"
+                                className="pl-10"
+                                data-testid="input-confirm-password"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          {watchConfirmPassword && (
+                            <p className={`text-sm flex items-center gap-1 ${
+                              passwordsMatch 
+                                ? "text-green-600 dark:text-green-400" 
+                                : "text-destructive"
+                            }`}>
+                              {passwordsMatch ? (
+                                <>
+                                  <Check className="w-3 h-3" aria-hidden="true" />
+                                  Passwords match
+                                </>
+                              ) : (
+                                <>
+                                  <X className="w-3 h-3" aria-hidden="true" />
+                                  Passwords do not match
+                                </>
+                              )}
+                            </p>
+                          )}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      disabled={isLoading}
+                      data-testid="button-register"
+                    >
+                      {isLoading ? (
+                        "Creating account..."
+                      ) : (
+                        <>
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Create Account
+                        </>
+                      )}
+                    </Button>
+
+                    <p className="text-xs text-muted-foreground text-center">
+                      By creating an account, you agree to our{" "}
+                      <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>
+                      {" "}and{" "}
+                      <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                    </p>
+                  </form>
+                </Form>
 
                 <div className="mt-6 pt-6 border-t">
                   <p className="text-center text-sm text-muted-foreground">

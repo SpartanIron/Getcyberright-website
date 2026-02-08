@@ -88,6 +88,7 @@ export default function Partnerships() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.partnerships} />
+      <main id="main-content" tabIndex={-1}>
       <PageBanner
         title="Partner With Us"
         subtitle="Join our mission to protect families from cyber threats. Together, we can make the internet safer for everyone."
@@ -171,6 +172,7 @@ export default function Partnerships() {
           <p className="text-sm text-muted-foreground mt-4">partnerships@getcyberright.com</p>
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

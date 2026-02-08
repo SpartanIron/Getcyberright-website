@@ -18,7 +18,7 @@ export default function Terms() {
       />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Terms of Service"
           subtitle="Please read these terms carefully before using our services. They govern your relationship with GetCyberRight."

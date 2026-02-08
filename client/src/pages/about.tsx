@@ -25,7 +25,7 @@ export default function About() {
       <SEOHead {...pageSEO.about} />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Our Story: Why We Built GetCyberRight"
           subtitle="Making cybersecurity accessible, practical, and people-centered. Everyone deserves protection they can understand and trust."
@@ -79,6 +79,7 @@ export default function About() {
                     src={familySecurityImage} 
                     alt="Family learning together about online safety"
                     className="w-full h-auto object-cover"
+                    loading="lazy"
                     data-testid="img-about-family-security"
                   />
                 </div>
@@ -117,6 +118,7 @@ export default function About() {
                     src={seniorsLearningImage} 
                     alt="Senior learning technology with family support"
                     className="w-full h-auto object-cover"
+                    loading="lazy"
                     data-testid="img-about-seniors-learning"
                   />
                 </div>

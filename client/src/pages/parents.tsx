@@ -437,7 +437,7 @@ export default function Parents() {
       <SEOHead {...pageSEO.parents} />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         {currentTopic ? (
           <TopicContent 
             topic={currentTopic}

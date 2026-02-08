@@ -103,6 +103,7 @@ export default function Support() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.support} />
+      <main id="main-content" tabIndex={-1}>
       <PageBanner
         title="How Can We Help?"
         subtitle="Get the support you need. We're here to help you stay safe online."
@@ -202,6 +203,7 @@ export default function Support() {
           <p className="text-sm text-muted-foreground mt-4">info@getcyberright.com</p>
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

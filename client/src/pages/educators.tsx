@@ -442,7 +442,7 @@ export default function Educators() {
       <SEOHead {...pageSEO.educators} />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         {currentResource ? (
           <ResourceContent 
             resource={currentResource}

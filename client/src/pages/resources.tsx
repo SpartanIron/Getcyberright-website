@@ -657,7 +657,7 @@ export default function Resources() {
       <SEOHead {...pageSEO.resources} />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Your Security Education Library"
           subtitle="Practical guides and articles written in everyday language. Learn at your own pace, with content you can actually understand and apply."

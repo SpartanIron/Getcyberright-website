@@ -436,7 +436,7 @@ export default function SmallBusiness() {
       <SEOHead {...pageSEO.smallBusiness} />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         {currentTopic ? (
           <TopicContent 
             topic={currentTopic}

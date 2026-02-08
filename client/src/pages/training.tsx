@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead } from "@/components/seo-head";
 import bannerImage from "@/assets/banners/training-banner.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -108,6 +109,7 @@ export default function Training() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Training Academy" description="Learn cybersecurity through structured courses with quizzes and certificates. Training paths for kids, parents, seniors, educators, and businesses." />
       <Navigation />
       
       <main id="main-content" className="flex-1" tabIndex={-1}>
@@ -117,6 +119,8 @@ export default function Training() {
               src={bannerImage} 
               alt="Cybersecurity Training Academy - diverse people learning together" 
               className="w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/70" />
           </div>

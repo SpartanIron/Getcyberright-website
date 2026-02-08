@@ -84,7 +84,7 @@ export default function SecurityPage() {
       <SEOHead {...pageSEO.security} />
       <Navigation />
       
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1">
         <section className="py-16 px-4 bg-gradient-to-b from-slate-900 to-slate-800">
           <div className="container mx-auto max-w-4xl text-center">
             <Shield className="w-16 h-16 mx-auto mb-6 text-primary" />

@@ -136,6 +136,7 @@ export function WelcomeOverlay() {
                 src={logo}
                 alt="GetCyberRight"
                 className="w-20 h-20 mx-auto mb-6"
+                loading="lazy"
                 data-testid="img-welcome-logo"
               />
               <h2

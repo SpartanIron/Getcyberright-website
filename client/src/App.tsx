@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { DeziAssistant } from "@/components/dezi-assistant";
 import { WelcomeOverlay } from "@/components/welcome-overlay";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { Loader2 } from "lucide-react";
@@ -166,7 +167,9 @@ function App() {
           <ScrollToTop />
           <Toaster />
           <WelcomeOverlay />
-          <Router />
+          <ErrorBoundary>
+            <Router />
+          </ErrorBoundary>
           <DeziAssistant />
         </TooltipProvider>
       </ThemeProvider>

@@ -92,7 +92,7 @@ export default function Tools() {
       <SEOHead {...pageSEO.tools} />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Your Cyber Protection Arsenal"
           subtitle="Powerful security tools and utilities designed to protect you and your family. No account required."

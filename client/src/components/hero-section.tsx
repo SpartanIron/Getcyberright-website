@@ -13,6 +13,8 @@ export function HeroSection() {
             src={professionalImage}
             alt="Professional cybersecurity protection"
             className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
+            loading="eager"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-900/40" />
         </div>
@@ -74,6 +76,8 @@ export function HeroSection() {
               src={professionalImage}
               alt="Professional cybersecurity protection"
               className="absolute inset-0 w-full h-full object-cover object-[center_30%]"
+              loading="eager"
+              decoding="async"
               data-testid="img-hero-main"
             />
           </div>

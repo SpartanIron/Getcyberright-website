@@ -133,7 +133,7 @@ export default function Events() {
       <SEOHead {...pageSEO.events} />
       <Navigation />
       
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Events and Webinars"
           subtitle="Join our live events to learn practical cybersecurity skills, connect with experts, and protect what matters most."

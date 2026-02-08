@@ -161,6 +161,7 @@ export default function AdminUsers() {
                               src={u.profileImageUrl}
                               alt=""
                               className="w-8 h-8 rounded-full"
+                              loading="lazy"
                             />
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">

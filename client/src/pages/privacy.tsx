@@ -18,7 +18,7 @@ export default function Privacy() {
       />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Privacy Policy"
           subtitle="Your privacy matters. This policy explains how we handle your information with transparency and care."

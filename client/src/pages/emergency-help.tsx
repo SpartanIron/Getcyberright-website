@@ -766,7 +766,7 @@ export default function EmergencyHelp() {
       <SEOHead {...pageSEO.emergencyHelp} />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Emergency Help"
           subtitle="Find the right authorities to contact when you or someone you know has been targeted by a scam. Select your region and country below."

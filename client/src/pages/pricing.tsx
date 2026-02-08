@@ -210,7 +210,7 @@ export default function Pricing() {
       <SEOHead {...pageSEO.pricing} />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Pricing Plans"
           subtitle="Choose the protection level that fits your needs. All plans include our core security tools."

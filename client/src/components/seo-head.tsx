@@ -178,4 +178,16 @@ export const pageSEO = {
     title: "Page Not Found",
     description: "The page you're looking for doesn't exist. Return to GetCyberRight homepage.",
   },
+  training: {
+    title: "Training Academy",
+    description: "Learn cybersecurity through structured courses with quizzes and certificates. Paths for kids, parents, seniors, educators, and businesses.",
+  },
+  dataRemoval: {
+    title: "Data Broker Removal",
+    description: "Remove your personal information from 500+ data brokers. Scan, track, and automate data removal requests.",
+  },
+  childSafetyScanner: {
+    title: "Child Safety Conversation Scanner",
+    description: "Scan conversations for grooming patterns and protect children from online predatory behavior.",
+  },
 };

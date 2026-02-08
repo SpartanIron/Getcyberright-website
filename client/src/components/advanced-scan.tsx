@@ -20,8 +20,6 @@ import {
   FileText,
   Eye,
 } from "lucide-react";
-import { createWorker } from "tesseract.js";
-import jsQR from "jsqr";
 import { apiRequest } from "@/lib/queryClient";
 
 type PhoneCheckResult = {
@@ -118,6 +116,7 @@ export function AdvancedScan() {
     setExtractedText("");
     
     try {
+      const { createWorker } = await import("tesseract.js");
       const worker = await createWorker("eng", 1, {
         logger: (m) => {
           if (m.status === "recognizing text") {
@@ -167,6 +166,8 @@ export function AdvancedScan() {
       ctx.drawImage(img, 0, 0);
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       
+      const jsQRModule = await import("jsqr");
+      const jsQR = jsQRModule.default;
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       URL.revokeObjectURL(imageUrl);
       

@@ -11,7 +11,7 @@ export default function ThreatTrendsPage() {
       <SEOHead {...pageSEO.threatTrends} />
       <Navigation />
       
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Threat Trends Dashboard"
           subtitle="Stay informed about the latest cybersecurity threats, scam statistics, and emerging attack patterns based on official government data."

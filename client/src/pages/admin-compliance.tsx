@@ -23,7 +23,8 @@ import {
   Clock,
   Lightbulb,
   CheckCheck,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from "lucide-react";
 
 interface ComplianceStats {
@@ -127,24 +128,24 @@ export default function AdminCompliance() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: statsData, isLoading: statsLoading } = useQuery<{ success: boolean; stats: ComplianceStats }>({
+  const { data: statsData, isLoading: statsLoading, isError: statsError } = useQuery<{ success: boolean; stats: ComplianceStats }>({
     queryKey: ["/api/compliance/stats"],
   });
 
-  const { data: familiesData, isLoading: familiesLoading } = useQuery<{ success: boolean; families: ControlFamily[] }>({
+  const { data: familiesData, isLoading: familiesLoading, isError: familiesError } = useQuery<{ success: boolean; families: ControlFamily[] }>({
     queryKey: ["/api/compliance/families"],
   });
 
-  const { data: controlsData } = useQuery<{ success: boolean; controls: Control[] }>({
+  const { data: controlsData, isLoading: controlsLoading, isError: controlsError } = useQuery<{ success: boolean; controls: Control[] }>({
     queryKey: ["/api/compliance/controls", { familyId: selectedFamily }],
     queryFn: () => fetch(`/api/compliance/controls${selectedFamily ? `?familyId=${selectedFamily}` : ""}`).then(r => r.json()),
   });
 
-  const { data: gapsData } = useQuery<{ success: boolean; gaps: Control[] }>({
+  const { data: gapsData, isLoading: gapsLoading, isError: gapsError } = useQuery<{ success: boolean; gaps: Control[] }>({
     queryKey: ["/api/compliance/gaps"],
   });
 
-  const { data: assessmentsData } = useQuery<{ success: boolean; assessments: Assessment[] }>({
+  const { data: assessmentsData, isLoading: assessmentsLoading, isError: assessmentsError } = useQuery<{ success: boolean; assessments: Assessment[] }>({
     queryKey: ["/api/compliance/assessments"],
   });
 
@@ -172,6 +173,9 @@ export default function AdminCompliance() {
     },
   });
 
+  const isInitialLoading = statsLoading || familiesLoading || controlsLoading || gapsLoading || assessmentsLoading;
+  const hasError = statsError || familiesError || controlsError || gapsError || assessmentsError;
+
   const stats = statsData?.stats;
   const families = familiesData?.families || [];
   const controls = controlsData?.controls || [];
@@ -182,6 +186,36 @@ export default function AdminCompliance() {
     const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
     return (priorityOrder[a.priority as keyof typeof priorityOrder] || 3) - (priorityOrder[b.priority as keyof typeof priorityOrder] || 3);
   });
+
+  if (isInitialLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-muted-foreground text-sm">Loading compliance data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <AlertCircle className="w-8 h-8 text-destructive" />
+            <p className="text-muted-foreground text-sm">Failed to load compliance data</p>
+            <Button variant="outline" onClick={() => invalidateAllQueries()} data-testid="button-retry">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

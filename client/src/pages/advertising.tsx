@@ -68,6 +68,7 @@ export default function Advertising() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.advertising} />
+      <main id="main-content" tabIndex={-1}>
       <PageBanner
         title="Advertising Opportunities"
         subtitle="Reach security-conscious families and businesses through ethical, value-driven advertising."
@@ -181,6 +182,7 @@ export default function Advertising() {
           <p className="text-sm text-muted-foreground mt-4">advertising@getcyberright.com</p>
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

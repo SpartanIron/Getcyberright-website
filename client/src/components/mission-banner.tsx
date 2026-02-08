@@ -11,7 +11,7 @@ export function MissionBanner() {
           src={professionalImage}
           alt="Professional staying safe online"
           className="absolute inset-0 w-full h-full object-cover"
-          loading="lazy"
+          loading="eager"
           decoding="async"
           data-testid="img-mission-banner"
         />

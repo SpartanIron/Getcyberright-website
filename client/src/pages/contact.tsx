@@ -108,7 +108,7 @@ export default function Contact() {
       <SEOHead {...pageSEO.contact} />
       <Navigation />
       
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Questions? We Answer Them."
           subtitle="Whether you're unsure where to start or need specific guidance, our team is here. No question is too simple, and we respond to every message."

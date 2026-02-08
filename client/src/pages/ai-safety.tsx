@@ -269,6 +269,7 @@ export default function AISafety() {
       <SEOHead {...pageSEO.aiSafety} />
       <Navigation />
       
+      <main id="main-content" tabIndex={-1}>
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 overflow-hidden">
         <FloatingShapes />
@@ -675,6 +676,7 @@ export default function AISafety() {
         </div>
       </section>
 
+      </main>
       <Footer />
     </div>
   );

@@ -24,7 +24,7 @@ export default function Checklists() {
         <Navigation />
       </div>
 
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <div className="print:hidden">
           <PageBanner
             title="Security Checklists"

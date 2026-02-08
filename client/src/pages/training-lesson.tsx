@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, Link, useLocation } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { SEOHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -261,6 +262,7 @@ export default function TrainingLesson() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Training Lesson" description="Interactive cybersecurity lesson with practical knowledge and real-world examples." />
       <Navigation />
       
       <main id="main-content" className="flex-1" tabIndex={-1}>

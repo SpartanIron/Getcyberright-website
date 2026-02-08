@@ -125,20 +125,20 @@ export default function AdminContentGovernance() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: statsData, isLoading: statsLoading } = useQuery<{ success: boolean; stats: GovernanceStats }>({
+  const { data: statsData, isLoading: statsLoading, isError: statsError } = useQuery<{ success: boolean; stats: GovernanceStats }>({
     queryKey: ["/api/content-governance/stats"],
   });
 
-  const { data: pagesData, isLoading: pagesLoading } = useQuery<{ success: boolean; pages: ContentPage[] }>({
+  const { data: pagesData, isLoading: pagesLoading, isError: pagesError } = useQuery<{ success: boolean; pages: ContentPage[] }>({
     queryKey: ["/api/content-governance/pages"],
   });
 
-  const { data: reviewPagesData } = useQuery<{ success: boolean; pages: ContentPage[] }>({
+  const { data: reviewPagesData, isLoading: reviewPagesLoading, isError: reviewPagesError } = useQuery<{ success: boolean; pages: ContentPage[] }>({
     queryKey: ["/api/content-governance/pages", { needsReview: true }],
     queryFn: () => fetch("/api/content-governance/pages?needsReview=true").then(r => r.json()),
   });
 
-  const { data: auditLogData } = useQuery<{ success: boolean; log: AuditLogEntry[] }>({
+  const { data: auditLogData, isLoading: auditLogLoading, isError: auditLogError } = useQuery<{ success: boolean; log: AuditLogEntry[] }>({
     queryKey: ["/api/content-governance/audit-log"],
   });
 
@@ -244,10 +244,43 @@ export default function AdminContentGovernance() {
     }
   };
 
+  const isInitialLoading = statsLoading || pagesLoading || reviewPagesLoading || auditLogLoading;
+  const hasError = statsError || pagesError || reviewPagesError || auditLogError;
+
   const stats = statsData?.stats;
   const pages = pagesData?.pages || [];
   const reviewPages = reviewPagesData?.pages || [];
   const auditLog = auditLogData?.log || [];
+
+  if (isInitialLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-muted-foreground text-sm">Loading content governance data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <AlertTriangle className="w-8 h-8 text-destructive" />
+            <p className="text-muted-foreground text-sm">Failed to load content governance data</p>
+            <Button variant="outline" onClick={() => invalidateAllGovernanceQueries()} data-testid="button-retry">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -714,10 +747,10 @@ export default function AdminContentGovernance() {
                   </div>
                   <Badge 
                     className={
-                      refreshData.urgency === "critical" ? "bg-red-100 text-red-800" :
-                      refreshData.urgency === "high" ? "bg-orange-100 text-orange-800" :
-                      refreshData.urgency === "medium" ? "bg-yellow-100 text-yellow-800" :
-                      "bg-green-100 text-green-800"
+                      refreshData.urgency === "critical" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" :
+                      refreshData.urgency === "high" ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400" :
+                      refreshData.urgency === "medium" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" :
+                      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                     }
                   >
                     {refreshData.urgency.toUpperCase()} Urgency

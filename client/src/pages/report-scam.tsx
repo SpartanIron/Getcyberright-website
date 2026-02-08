@@ -121,7 +121,7 @@ export default function ReportScam() {
       <SEOHead {...pageSEO.reportScam} />
       <Navigation />
 
-      <main tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Report a Scam"
           subtitle="Help protect others by reporting scams you've encountered. Your report helps us track emerging threats and warn the community."

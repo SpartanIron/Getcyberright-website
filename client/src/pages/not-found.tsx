@@ -40,13 +40,14 @@ export default function NotFound() {
       <SEOHead title="Page Not Found" description="The page you're looking for doesn't exist." />
       <Navigation />
       
-      <main tabIndex={-1} className="flex-1 flex items-center justify-center py-16 px-4">
+      <main id="main-content" tabIndex={-1} className="flex-1 flex items-center justify-center py-16 px-4">
         <div className="max-w-2xl w-full text-center">
           <div className="mb-8">
             <img 
               src={logoImage} 
               alt="GetCyberRight" 
               className="w-24 h-24 mx-auto mb-6 opacity-50"
+              loading="lazy"
               data-testid="img-404-logo"
             />
             <h1 className="text-6xl font-bold text-primary mb-4" data-testid="text-404-heading">
