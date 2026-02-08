@@ -30,7 +30,7 @@ export function HeroTools() {
             transition={{ duration: 0.4 }}
           >
             <Link href="/data-removal">
-              <Card className="h-full hover-elevate cursor-pointer group bg-red-500 border-red-600 dark:bg-red-600 dark:border-red-700" data-testid="card-hero-data-scan">
+              <Card className="h-full hover-elevate cursor-pointer group bg-orange-500 border-orange-600 dark:bg-orange-600 dark:border-orange-700" data-testid="card-hero-data-scan">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
@@ -61,7 +61,7 @@ export function HeroTools() {
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             <Link href="/tools">
-              <Card className="h-full hover-elevate cursor-pointer group bg-teal-600 border-teal-700 dark:bg-teal-700 dark:border-teal-800" data-testid="card-hero-security-scanner">
+              <Card className="h-full hover-elevate cursor-pointer group bg-green-600 border-green-700 dark:bg-green-700 dark:border-green-800" data-testid="card-hero-security-scanner">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
