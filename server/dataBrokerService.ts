@@ -8,6 +8,8 @@ import {
   removalRequests,
   monitoringSchedules,
   privacyReports,
+  removalAuditLog,
+  VALID_STATUS_TRANSITIONS,
   type DataBroker,
   type UserVaultProfile,
   type ExposureScan,
@@ -16,7 +18,7 @@ import {
   type MonitoringSchedule,
   type PrivacyReport,
 } from "@shared/schema";
-import { eq, and, ilike, sql, desc, count } from "drizzle-orm";
+import { eq, and, ilike, sql, desc, count, gte, lte } from "drizzle-orm";
 
 const RISK_WEIGHTS: Record<string, number> = {
   critical: 4,
@@ -408,11 +410,84 @@ export async function getExposureFindings(userId: string, scanId?: string) {
   }));
 }
 
+async function logAuditEvent(
+  userId: string | null,
+  action: string,
+  entityType: string,
+  entityId: string | null,
+  previousState?: string | null,
+  newState?: string | null,
+  metadata?: Record<string, any>,
+  ipAddress?: string,
+  userAgent?: string
+) {
+  try {
+    await db.insert(removalAuditLog).values({
+      userId,
+      action,
+      entityType,
+      entityId,
+      previousState: previousState ?? null,
+      newState: newState ?? null,
+      metadata: metadata ?? null,
+      ipAddress: ipAddress ?? null,
+      userAgent: userAgent ?? null,
+    });
+  } catch (err) {
+    console.error("[audit] Failed to write audit log:", err);
+  }
+}
+
+function determineJurisdiction(broker: DataBroker, userAddress?: string | null): { jurisdiction: string; legalBasis: string } {
+  const legalBases = broker.legalBasis ?? [];
+  const countries = broker.countriesApplicable ?? [];
+  const address = (userAddress ?? "").toLowerCase();
+
+  const isEU = countries.some(c => ["EU", "UK", "DE", "FR", "IT", "ES", "NL"].includes(c));
+  const isUS = countries.includes("US");
+
+  const caStates = ["california", "ca", "los angeles", "san francisco", "san diego", "sacramento"];
+  const isCaliforniaResident = caStates.some(s => address.includes(s));
+
+  if (isCaliforniaResident && legalBases.includes("CCPA")) {
+    return { jurisdiction: "CCPA", legalBasis: "California Consumer Privacy Act - Cal. Civ. Code §1798.105" };
+  }
+  if (legalBases.includes("GDPR") && isEU) {
+    return { jurisdiction: "GDPR", legalBasis: "General Data Protection Regulation - Article 17 (Right to Erasure)" };
+  }
+  if (legalBases.includes("CCPA")) {
+    return { jurisdiction: "CCPA", legalBasis: "California Consumer Privacy Act - Cal. Civ. Code §1798.105" };
+  }
+  if (legalBases.includes("GDPR")) {
+    return { jurisdiction: "GDPR", legalBasis: "General Data Protection Regulation - Article 17 (Right to Erasure)" };
+  }
+  if (isUS) {
+    return { jurisdiction: "US_GENERAL", legalBasis: "Direct consumer opt-out request under applicable US privacy laws" };
+  }
+  return { jurisdiction: "GENERAL", legalBasis: "Direct consumer opt-out request" };
+}
+
+function calculateComplianceDeadline(jurisdiction: string): Date {
+  const deadline = new Date();
+  switch (jurisdiction) {
+    case "GDPR":
+      deadline.setDate(deadline.getDate() + 30);
+      break;
+    case "CCPA":
+      deadline.setDate(deadline.getDate() + 45);
+      break;
+    default:
+      deadline.setDate(deadline.getDate() + 60);
+  }
+  return deadline;
+}
+
 export async function createRemovalRequest(
   userId: string,
   brokerId: string,
   vaultProfileId: string,
-  findingId?: string
+  findingId?: string,
+  ipAddress?: string
 ) {
   const [broker] = await db.select().from(dataBrokers).where(eq(dataBrokers.id, brokerId));
   if (!broker) throw new Error("Broker not found");
@@ -423,6 +498,9 @@ export async function createRemovalRequest(
     .where(and(eq(userVaultProfiles.id, vaultProfileId), eq(userVaultProfiles.userId, userId)));
   if (!profile) throw new Error("Vault profile not found");
 
+  const { jurisdiction, legalBasis } = determineJurisdiction(broker, profile.currentAddress);
+  const complianceDeadline = calculateComplianceDeadline(jurisdiction);
+
   const [request] = await db
     .insert(removalRequests)
     .values({
@@ -432,8 +510,23 @@ export async function createRemovalRequest(
       findingId: findingId ?? null,
       status: "not_started",
       requestMethod: broker.optOutMethod,
+      jurisdictionApplied: jurisdiction,
+      legalBasisUsed: legalBasis,
+      complianceDeadline,
+      verificationRequired: broker.requiresIdVerification ?? false,
     })
     .returning();
+
+  await logAuditEvent(
+    userId,
+    "removal_request_created",
+    "removal_request",
+    request.id,
+    null,
+    "not_started",
+    { brokerId, brokerName: broker.name, jurisdiction, legalBasis },
+    ipAddress
+  );
 
   return request;
 }
@@ -536,26 +629,126 @@ export async function updateRemovalStatus(
   userId: string,
   requestId: string,
   status: string,
-  notes?: string
+  notes?: string,
+  ipAddress?: string
 ) {
+  const [existing] = await db
+    .select()
+    .from(removalRequests)
+    .where(and(eq(removalRequests.id, requestId), eq(removalRequests.userId, userId)));
+
+  if (!existing) throw new Error("Removal request not found");
+
+  const validTransitions = VALID_STATUS_TRANSITIONS[existing.status] ?? [];
+  if (!validTransitions.includes(status)) {
+    throw new Error(
+      `Invalid status transition: "${existing.status}" cannot move to "${status}". Valid transitions: ${validTransitions.join(", ") || "none"}`
+    );
+  }
+
   const updateData: any = {
     status,
     updatedAt: new Date(),
+    lastCheckedAt: new Date(),
   };
 
   if (notes) updateData.notes = notes;
   if (status === "request_sent") updateData.requestSentAt = new Date();
   if (status === "confirmed_removed") updateData.confirmedRemovedAt = new Date();
-  if (status === "re_appeared") updateData.reAppearedAt = new Date();
+  if (status === "re_appeared") {
+    updateData.reAppearedAt = new Date();
+    updateData.escalationLevel = (existing.escalationLevel ?? 0) + 1;
+  }
+  if (status === "failed") {
+    const retryCount = (existing.retryCount ?? 0) + 1;
+    const maxRetries = existing.maxRetries ?? 3;
+    updateData.retryCount = retryCount;
+    updateData.lastError = notes || "Request failed";
+    if (retryCount < maxRetries) {
+      const nextRetry = new Date();
+      nextRetry.setDate(nextRetry.getDate() + Math.pow(2, retryCount));
+      updateData.nextRetryAt = nextRetry;
+    }
+  }
 
   const [updated] = await db
     .update(removalRequests)
     .set(updateData)
-    .where(and(eq(removalRequests.id, requestId), eq(removalRequests.userId, userId)))
+    .where(eq(removalRequests.id, requestId))
     .returning();
 
-  if (!updated) throw new Error("Removal request not found");
+  await logAuditEvent(
+    userId,
+    "removal_status_updated",
+    "removal_request",
+    requestId,
+    existing.status,
+    status,
+    { notes, retryCount: updated.retryCount, escalationLevel: updated.escalationLevel },
+    ipAddress
+  );
+
   return updated;
+}
+
+export async function getRetryableRequests(userId?: string) {
+  const now = new Date();
+  const conditions = [
+    eq(removalRequests.status, "failed"),
+    lte(removalRequests.nextRetryAt, now),
+  ];
+  if (userId) {
+    conditions.push(eq(removalRequests.userId, userId));
+  }
+
+  return db
+    .select()
+    .from(removalRequests)
+    .where(and(...conditions))
+    .orderBy(removalRequests.nextRetryAt);
+}
+
+export async function getEscalatedRequests(userId?: string) {
+  const conditions: any[] = [gte(removalRequests.escalationLevel, 1)];
+  if (userId) {
+    conditions.push(eq(removalRequests.userId, userId));
+  }
+  return db
+    .select()
+    .from(removalRequests)
+    .where(and(...conditions))
+    .orderBy(desc(removalRequests.escalationLevel));
+}
+
+export async function getOverdueRequests(userId?: string) {
+  const now = new Date();
+  const conditions: any[] = [
+    lte(removalRequests.complianceDeadline, now),
+  ];
+  const activeStatuses = ["request_sent", "in_progress"];
+  if (userId) {
+    conditions.push(eq(removalRequests.userId, userId));
+  }
+
+  const results = await db
+    .select()
+    .from(removalRequests)
+    .where(and(...conditions));
+
+  return results.filter(r => activeStatuses.includes(r.status));
+}
+
+export async function getAuditLog(userId?: string, limit = 50) {
+  const conditions: any[] = [];
+  if (userId) {
+    conditions.push(eq(removalAuditLog.userId, userId));
+  }
+  return db
+    .select()
+    .from(removalAuditLog)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(desc(removalAuditLog.createdAt))
+    .limit(limit);
 }
 
 export async function getUserRemovalRequests(userId: string, status?: string) {
@@ -584,7 +777,7 @@ export async function getUserRemovalRequests(userId: string, status?: string) {
 }
 
 export async function getRemovalDashboardStats(userId: string) {
-  const [allRequests, scans] = await Promise.all([
+  const [allRequests, scans, overdueList, escalatedList] = await Promise.all([
     db.select().from(removalRequests).where(eq(removalRequests.userId, userId)),
     db
       .select()
@@ -592,6 +785,8 @@ export async function getRemovalDashboardStats(userId: string) {
       .where(eq(exposureScans.userId, userId))
       .orderBy(desc(exposureScans.createdAt))
       .limit(10),
+    getOverdueRequests(userId),
+    getEscalatedRequests(userId),
   ]);
 
   const totalExposures = allRequests.length;
@@ -601,6 +796,34 @@ export async function getRemovalDashboardStats(userId: string) {
   const completed = allRequests.filter((r) => r.status === "confirmed_removed").length;
   const failed = allRequests.filter((r) => r.status === "failed").length;
   const reAppeared = allRequests.filter((r) => r.status === "re_appeared").length;
+  const pending = allRequests.filter((r) =>
+    ["not_started", "scan_found"].includes(r.status)
+  ).length;
+
+  const successRate = totalExposures > 0
+    ? Math.round((completed / totalExposures) * 100)
+    : 0;
+
+  const completedRequests = allRequests.filter(r => r.status === "confirmed_removed" && r.confirmedRemovedAt && r.createdAt);
+  let avgProcessingDays = 0;
+  if (completedRequests.length > 0) {
+    const totalDays = completedRequests.reduce((sum, r) => {
+      const start = new Date(r.createdAt!).getTime();
+      const end = new Date(r.confirmedRemovedAt!).getTime();
+      return sum + (end - start) / (1000 * 60 * 60 * 24);
+    }, 0);
+    avgProcessingDays = Math.round(totalDays / completedRequests.length);
+  }
+
+  const retryable = allRequests.filter(r =>
+    r.status === "failed" && r.nextRetryAt && new Date(r.nextRetryAt) <= new Date()
+  ).length;
+
+  const jurisdictionBreakdown: Record<string, number> = {};
+  allRequests.forEach(r => {
+    const j = r.jurisdictionApplied || "GENERAL";
+    jurisdictionBreakdown[j] = (jurisdictionBreakdown[j] ?? 0) + 1;
+  });
 
   const privacyScoreTrend = scans
     .filter((s) => s.privacyScore != null)
@@ -611,6 +834,10 @@ export async function getRemovalDashboardStats(userId: string) {
     .reverse();
 
   const latestScore = scans[0]?.privacyScore ?? null;
+  const previousScore = scans[1]?.privacyScore ?? null;
+  const scoreDelta = latestScore !== null && previousScore !== null
+    ? latestScore - previousScore
+    : null;
 
   return {
     totalExposures,
@@ -618,7 +845,16 @@ export async function getRemovalDashboardStats(userId: string) {
     completed,
     failed,
     reAppeared,
+    pending,
+    successRate,
+    avgProcessingDays,
+    retryable,
+    overdue: overdueList.length,
+    escalated: escalatedList.length,
+    jurisdictionBreakdown,
     latestPrivacyScore: latestScore,
+    previousPrivacyScore: previousScore,
+    scoreDelta,
     privacyScoreTrend,
     totalScans: scans.length,
   };
@@ -671,6 +907,112 @@ export async function getMonitoringSchedule(userId: string): Promise<MonitoringS
     .from(monitoringSchedules)
     .where(and(eq(monitoringSchedules.userId, userId), eq(monitoringSchedules.isActive, true)));
   return schedule ?? null;
+}
+
+export async function runMonitoringScan(userId: string) {
+  const schedule = await getMonitoringSchedule(userId);
+  if (!schedule) throw new Error("No active monitoring schedule found");
+
+  const [profile] = await db
+    .select()
+    .from(userVaultProfiles)
+    .where(and(eq(userVaultProfiles.id, schedule.vaultProfileId), eq(userVaultProfiles.userId, userId)));
+
+  if (!profile) throw new Error("Vault profile not found for monitoring");
+
+  try {
+    const scanResult = await runExposureScan(userId, schedule.vaultProfileId);
+
+    const previouslyRemoved = await db
+      .select()
+      .from(removalRequests)
+      .where(and(
+        eq(removalRequests.userId, userId),
+        eq(removalRequests.status, "confirmed_removed")
+      ));
+
+    const removedBrokerIds = new Set(previouslyRemoved.map(r => r.brokerId));
+    const currentFindings = scanResult.findings;
+    let reappearanceCount = 0;
+
+    for (const finding of currentFindings) {
+      const findingBrokerId = typeof finding === 'object' && 'brokerId' in finding ? finding.brokerId : null;
+      if (findingBrokerId && removedBrokerIds.has(findingBrokerId)) {
+        reappearanceCount++;
+        const matchingRequest = previouslyRemoved.find(r => r.brokerId === findingBrokerId);
+        if (matchingRequest) {
+          await db
+            .update(removalRequests)
+            .set({
+              status: "re_appeared",
+              reAppearedAt: new Date(),
+              escalationLevel: (matchingRequest.escalationLevel ?? 0) + 1,
+              updatedAt: new Date(),
+            })
+            .where(eq(removalRequests.id, matchingRequest.id));
+
+          await logAuditEvent(
+            userId,
+            "data_reappearance_detected",
+            "removal_request",
+            matchingRequest.id,
+            "confirmed_removed",
+            "re_appeared",
+            { brokerId: findingBrokerId, monitoringScheduleId: schedule.id }
+          );
+        }
+      }
+    }
+
+    const nextScanDate = new Date();
+    nextScanDate.setDate(nextScanDate.getDate() + (schedule.frequencyDays ?? 90));
+
+    await db
+      .update(monitoringSchedules)
+      .set({
+        lastScanDate: new Date(),
+        nextScanDate,
+        lastRunStatus: "success",
+        lastRunError: null,
+        totalScansCompleted: (schedule.totalScansCompleted ?? 0) + 1,
+        totalReappearances: (schedule.totalReappearances ?? 0) + reappearanceCount,
+        consecutiveFailures: 0,
+        updatedAt: new Date(),
+      })
+      .where(eq(monitoringSchedules.id, schedule.id));
+
+    await logAuditEvent(
+      userId,
+      "monitoring_scan_completed",
+      "monitoring_schedule",
+      schedule.id,
+      null,
+      null,
+      {
+        totalExposures: scanResult.totalExposuresFound,
+        reappearances: reappearanceCount,
+        privacyScore: scanResult.privacyScore,
+      }
+    );
+
+    return {
+      scanResult,
+      reappearanceCount,
+      nextScanDate,
+    };
+  } catch (error: any) {
+    await db
+      .update(monitoringSchedules)
+      .set({
+        lastRunStatus: "failed",
+        lastRunError: error.message,
+        consecutiveFailures: (schedule.consecutiveFailures ?? 0) + 1,
+        updatedAt: new Date(),
+      })
+      .where(eq(monitoringSchedules.id, schedule.id));
+
+    throw error;
+  }
 }
 
 export async function generatePrivacyReport(userId: string) {

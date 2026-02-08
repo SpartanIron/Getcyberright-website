@@ -111,17 +111,34 @@ interface RemovalRequest {
   status: string;
   optOutContent: string | null;
   notes: string | null;
+  jurisdictionApplied: string | null;
+  legalBasisUsed: string | null;
+  complianceDeadline: string | null;
+  retryCount: number | null;
+  escalationLevel: number | null;
+  lastError: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 interface DashboardStats {
-  privacyScore: number;
   totalExposures: number;
-  removalsInProgress: number;
-  confirmedRemoved: number;
+  inProgress: number;
+  completed: number;
+  failed: number;
+  reAppeared: number;
   pending: number;
-  recentActivity: { date: string; action: string; detail: string }[];
+  successRate: number;
+  avgProcessingDays: number;
+  retryable: number;
+  overdue: number;
+  escalated: number;
+  jurisdictionBreakdown: Record<string, number>;
+  latestPrivacyScore: number | null;
+  previousPrivacyScore: number | null;
+  scoreDelta: number | null;
+  privacyScoreTrend: { date: string; score: number }[];
+  totalScans: number;
 }
 
 function PrivacyScoreCircle({ score, size = 160 }: { score: number; size?: number }) {
@@ -205,10 +222,15 @@ function getStatusVariant(status: string): "default" | "secondary" | "destructiv
   switch (status.toLowerCase()) {
     case "completed": return "default";
     case "confirmed": return "default";
+    case "confirmed_removed": return "default";
     case "in_progress": return "secondary";
+    case "request_sent": return "secondary";
+    case "submitted": return "secondary";
+    case "awaiting_verification": return "secondary";
     case "pending": return "outline";
     case "failed": return "destructive";
     case "rejected": return "destructive";
+    case "re_appeared": return "destructive";
     default: return "outline";
   }
 }
@@ -281,13 +303,26 @@ function OverviewTab() {
   }
 
   const stats = dashboardData || {
-    privacyScore: 0,
     totalExposures: 0,
-    removalsInProgress: 0,
-    confirmedRemoved: 0,
+    inProgress: 0,
+    completed: 0,
+    failed: 0,
+    reAppeared: 0,
     pending: 0,
-    recentActivity: [],
+    successRate: 0,
+    avgProcessingDays: 0,
+    retryable: 0,
+    overdue: 0,
+    escalated: 0,
+    jurisdictionBreakdown: {},
+    latestPrivacyScore: null,
+    previousPrivacyScore: null,
+    scoreDelta: null,
+    privacyScoreTrend: [],
+    totalScans: 0,
   };
+
+  const privacyScore = stats.latestPrivacyScore ?? 0;
 
   return (
     <div className="space-y-6">
@@ -302,11 +337,19 @@ function OverviewTab() {
               <CardDescription>Your overall data exposure rating</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
-              <PrivacyScoreCircle score={stats.privacyScore} size={180} />
+              <PrivacyScoreCircle score={privacyScore} size={180} />
+              {stats.scoreDelta !== null && (
+                <div className="flex items-center gap-1 text-sm">
+                  <span className={stats.scoreDelta > 0 ? "text-green-600 dark:text-green-400" : stats.scoreDelta < 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground"}>
+                    {stats.scoreDelta > 0 ? "+" : ""}{stats.scoreDelta} pts
+                  </span>
+                  <span className="text-muted-foreground">since last scan</span>
+                </div>
+              )}
               <p className="text-sm text-muted-foreground text-center max-w-xs">
-                {stats.privacyScore > 70
+                {privacyScore > 70
                   ? "Your personal data is well protected across most data broker sites."
-                  : stats.privacyScore >= 40
+                  : privacyScore >= 40
                     ? "Some of your data is still exposed. Continue submitting removal requests."
                     : "Your data is widely exposed. We recommend running a scan and starting removals immediately."}
               </p>
@@ -333,7 +376,7 @@ function OverviewTab() {
                 <RefreshCw className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{stats.removalsInProgress}</div>
+                <div className="text-3xl font-bold">{stats.inProgress}</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -344,7 +387,7 @@ function OverviewTab() {
                 <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold" data-testid="text-total-removed">{stats.confirmedRemoved}</div>
+                <div className="text-3xl font-bold" data-testid="text-total-removed">{stats.completed}</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -362,38 +405,163 @@ function OverviewTab() {
         </div>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Recent Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {stats.recentActivity && stats.recentActivity.length > 0 ? (
-              <div className="space-y-4">
-                {stats.recentActivity.map((activity, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className="mt-1 p-1.5 rounded-full bg-primary/10">
-                      <Clock className="h-3 w-3 text-primary" />
-                    </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Success Rate</CardTitle>
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold" data-testid="text-success-rate">{stats.successRate}%</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stats.completed} of {stats.totalExposures} removals confirmed
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Avg. Processing</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stats.avgProcessingDays || "--"}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stats.avgProcessingDays > 0 ? "days to removal" : "No completions yet"}
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Scans</CardTitle>
+              <Search className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stats.totalScans}</div>
+              <p className="text-xs text-muted-foreground mt-1">exposure scans run</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {(stats.reAppeared > 0 || stats.overdue > 0 || stats.escalated > 0 || stats.failed > 0) && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                Alerts
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {stats.reAppeared > 0 && (
+                  <div className="flex items-center gap-3 p-3 rounded-md bg-destructive/10 dark:bg-destructive/20" data-testid="alert-reappearances">
+                    <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium">{activity.action}</p>
-                      <p className="text-xs text-muted-foreground">{activity.detail}</p>
+                      <p className="text-sm font-medium">{stats.reAppeared} Data Re-appearance{stats.reAppeared > 1 ? "s" : ""}</p>
+                      <p className="text-xs text-muted-foreground">Previously removed data has been re-listed by brokers</p>
                     </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">{formatDate(activity.date)}</span>
+                    <Badge variant="destructive">{stats.reAppeared}</Badge>
+                  </div>
+                )}
+                {stats.overdue > 0 && (
+                  <div className="flex items-center gap-3 p-3 rounded-md bg-destructive/10 dark:bg-destructive/20" data-testid="alert-overdue">
+                    <Clock className="h-4 w-4 text-destructive flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{stats.overdue} Overdue Request{stats.overdue > 1 ? "s" : ""}</p>
+                      <p className="text-xs text-muted-foreground">Brokers have exceeded their legal compliance deadline</p>
+                    </div>
+                    <Badge variant="destructive">{stats.overdue}</Badge>
+                  </div>
+                )}
+                {stats.escalated > 0 && (
+                  <div className="flex items-center gap-3 p-3 rounded-md bg-muted" data-testid="alert-escalated">
+                    <AlertTriangle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{stats.escalated} Escalated Request{stats.escalated > 1 ? "s" : ""}</p>
+                      <p className="text-xs text-muted-foreground">Requests that required additional follow-up or re-submission</p>
+                    </div>
+                    <Badge variant="outline">{stats.escalated}</Badge>
+                  </div>
+                )}
+                {stats.failed > 0 && (
+                  <div className="flex items-center gap-3 p-3 rounded-md bg-muted" data-testid="alert-failed">
+                    <AlertTriangle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{stats.failed} Failed Request{stats.failed > 1 ? "s" : ""}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {stats.retryable > 0 ? `${stats.retryable} can be automatically retried` : "Manual intervention may be required"}
+                      </p>
+                    </div>
+                    <Badge variant="outline">{stats.failed}</Badge>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {stats.privacyScoreTrend.length > 1 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Privacy Score Trend
+              </CardTitle>
+              <CardDescription>How your privacy score has changed over time</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-end gap-2 h-32">
+                {stats.privacyScoreTrend.map((point, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-xs font-medium">{point.score}</span>
+                    <div
+                      className="w-full rounded-t-sm"
+                      style={{
+                        height: `${Math.max(point.score, 5)}%`,
+                        backgroundColor: point.score > 70 ? "hsl(142, 71%, 45%)" : point.score >= 40 ? "hsl(48, 96%, 53%)" : "hsl(0, 84%, 60%)",
+                      }}
+                      data-testid={`bar-trend-${i}`}
+                    />
+                    <span className="text-[10px] text-muted-foreground">{formatDate(point.date)}</span>
                   </div>
                 ))}
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-6">
-                No recent activity. Run a scan to get started.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {Object.keys(stats.jurisdictionBreakdown).length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                Compliance Coverage
+              </CardTitle>
+              <CardDescription>Legal frameworks applied to your removal requests</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-3">
+                {Object.entries(stats.jurisdictionBreakdown).map(([jurisdiction, count]) => (
+                  <div key={jurisdiction} className="flex items-center gap-2 p-2 rounded-md bg-muted" data-testid={`badge-jurisdiction-${jurisdiction}`}>
+                    <Badge variant="outline">{jurisdiction}</Badge>
+                    <span className="text-sm text-muted-foreground">{count} request{count > 1 ? "s" : ""}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
     </div>
   );
 }
@@ -1144,7 +1312,7 @@ function TrackerTab() {
   const completed = requests.filter((r) => r.status === "completed").length;
   const progressPercent = requests.length > 0 ? Math.round((completed / requests.length) * 100) : 0;
 
-  const statusOptions = ["all", "pending", "in_progress", "completed", "failed"];
+  const statusOptions = ["all", "pending", "request_sent", "in_progress", "submitted", "awaiting_verification", "confirmed_removed", "completed", "failed", "re_appeared"];
 
   return (
     <div className="space-y-6">
@@ -1182,8 +1350,9 @@ function TrackerTab() {
                     variant={statusFilter === s ? "default" : "outline"}
                     onClick={() => setStatusFilter(s)}
                     className="capitalize"
+                    data-testid={`filter-status-${s}`}
                   >
-                    {s === "in_progress" ? "In Progress" : s}
+                    {s.replace(/_/g, " ")}
                   </Button>
                 ))}
               </div>
@@ -1251,21 +1420,51 @@ function TrackerTab() {
                           value={req.status}
                           onValueChange={(value) => statusMutation.mutate({ id: req.id, status: value })}
                         >
-                          <SelectTrigger className="w-[140px]">
+                          <SelectTrigger className="w-[160px]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="request_sent">Request Sent</SelectItem>
                             <SelectItem value="in_progress">In Progress</SelectItem>
                             <SelectItem value="submitted">Submitted</SelectItem>
+                            <SelectItem value="awaiting_verification">Awaiting Verification</SelectItem>
+                            <SelectItem value="confirmed_removed">Confirmed Removed</SelectItem>
                             <SelectItem value="completed">Completed</SelectItem>
                             <SelectItem value="failed">Failed</SelectItem>
+                            <SelectItem value="re_appeared">Re-appeared</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
                     {expandedId === req.id && (
-                      <div className="px-4 pb-4 border-t pt-3">
+                      <div className="px-4 pb-4 border-t pt-3 space-y-3">
+                        {(req.jurisdictionApplied || req.complianceDeadline || req.retryCount) && (
+                          <div className="flex flex-wrap gap-2">
+                            {req.jurisdictionApplied && (
+                              <Badge variant="outline" data-testid={`badge-jurisdiction-${req.id}`}>
+                                {req.jurisdictionApplied}
+                              </Badge>
+                            )}
+                            {req.complianceDeadline && (
+                              <Badge variant="outline" data-testid={`badge-deadline-${req.id}`}>
+                                <Calendar className="h-3 w-3 mr-1" />
+                                Due: {formatDate(req.complianceDeadline)}
+                              </Badge>
+                            )}
+                            {(req.retryCount ?? 0) > 0 && (
+                              <Badge variant="outline">
+                                <RefreshCw className="h-3 w-3 mr-1" />
+                                {req.retryCount} retries
+                              </Badge>
+                            )}
+                            {(req.escalationLevel ?? 0) > 0 && (
+                              <Badge variant="destructive">
+                                Escalation Level {req.escalationLevel}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
                         {req.optOutContent ? (
                           <div className="text-sm whitespace-pre-wrap bg-muted/30 rounded-md p-3">
                             {req.optOutContent}
@@ -1274,6 +1473,11 @@ function TrackerTab() {
                           <p className="text-sm text-muted-foreground">
                             No opt-out instructions available. Click "Opt-Out Letter" to generate one.
                           </p>
+                        )}
+                        {req.lastError && (
+                          <div className="text-sm p-2 rounded-md bg-destructive/10 text-destructive">
+                            Last error: {req.lastError}
+                          </div>
                         )}
                         {req.notes && (
                           <p className="text-sm mt-2 text-muted-foreground">

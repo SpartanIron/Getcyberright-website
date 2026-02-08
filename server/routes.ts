@@ -74,6 +74,11 @@ import {
   getMonitoringSchedule,
   generatePrivacyReport,
   runGuestExposureScan,
+  getRetryableRequests,
+  getEscalatedRequests,
+  getOverdueRequests,
+  getAuditLog,
+  runMonitoringScan,
 } from "./dataBrokerService";
 
 // URL reputation checking schemas with validation
@@ -2657,7 +2662,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/guest-scan", async (req: Request, res: Response) => {
+  app.post("/api/data-removal/guest-scan", strictRateLimit, async (req: Request, res: Response) => {
     try {
       const { fullName, emails, phoneNumbers, currentAddress } = req.body;
       if (!fullName) {
@@ -2690,7 +2695,29 @@ EDGE CASE HANDLING
   app.post("/api/data-removal/vault", isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
-      const profile = await upsertVaultProfile(user.id, req.body);
+      const sanitized = { ...req.body };
+      const arrayFields = ["previousNames", "emails", "phoneNumbers", "previousAddresses", "relativeNames", "employerNames"];
+      for (const field of arrayFields) {
+        if (sanitized[field]) {
+          sanitized[field] = sanitized[field].filter((v: string) => v && v.trim().length > 0);
+          if (sanitized[field].length === 0) delete sanitized[field];
+        }
+      }
+      const stringFields = ["fullName", "currentAddress", "dateOfBirth"];
+      for (const field of stringFields) {
+        if (sanitized[field] && typeof sanitized[field] === "string") {
+          sanitized[field] = sanitized[field].trim();
+          if (sanitized[field].length === 0) delete sanitized[field];
+        }
+      }
+      const retentionDays = 365;
+      const retentionExpiresAt = new Date();
+      retentionExpiresAt.setDate(retentionExpiresAt.getDate() + retentionDays);
+      sanitized.retentionExpiresAt = retentionExpiresAt;
+      sanitized.lastAccessedAt = new Date();
+      sanitized.dataMinimized = true;
+
+      const profile = await upsertVaultProfile(user.id, sanitized);
       res.json(profile);
     } catch (error: any) {
       console.error("Error upserting vault profile:", error);
@@ -2744,7 +2771,8 @@ EDGE CASE HANDLING
       if (!brokerId || !vaultProfileId) {
         return res.status(400).json({ error: "brokerId and vaultProfileId are required" });
       }
-      const request = await createRemovalRequest(user.id, brokerId, vaultProfileId, findingId);
+      const ipAddress = req.ip || req.connection?.remoteAddress;
+      const request = await createRemovalRequest(user.id, brokerId, vaultProfileId, findingId, ipAddress);
       res.json(request);
     } catch (error: any) {
       console.error("Error creating removal request:", error);
@@ -2771,11 +2799,12 @@ EDGE CASE HANDLING
       if (!status) {
         return res.status(400).json({ error: "status is required" });
       }
-      const updated = await updateRemovalStatus(user.id, req.params.id, status, notes);
+      const ipAddress = req.ip || req.connection?.remoteAddress;
+      const updated = await updateRemovalStatus(user.id, req.params.id, status, notes, ipAddress);
       res.json(updated);
     } catch (error: any) {
       console.error("Error updating removal status:", error);
-      res.status(500).json({ error: error.message || "Failed to update removal status" });
+      res.status(400).json({ error: error.message || "Failed to update removal status" });
     }
   });
 
@@ -2832,6 +2861,16 @@ EDGE CASE HANDLING
     }
   });
 
+  app.post("/api/data-removal/monitoring/run", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+    try {
+      const result = await runMonitoringScan(req.user.id);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error running monitoring scan:", error);
+      res.status(500).json({ error: error.message || "Failed to run monitoring scan" });
+    }
+  });
+
   app.post("/api/data-removal/report", isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
@@ -2840,6 +2879,43 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("Error generating privacy report:", error);
       res.status(500).json({ error: "Failed to generate privacy report" });
+    }
+  });
+
+  app.get("/api/data-removal/requests/retryable", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const requests = await getRetryableRequests(req.user.id);
+      res.json(requests);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch retryable requests" });
+    }
+  });
+
+  app.get("/api/data-removal/requests/escalated", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const requests = await getEscalatedRequests(req.user.id);
+      res.json(requests);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch escalated requests" });
+    }
+  });
+
+  app.get("/api/data-removal/requests/overdue", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const requests = await getOverdueRequests(req.user.id);
+      res.json(requests);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch overdue requests" });
+    }
+  });
+
+  app.get("/api/data-removal/audit-log", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const logs = await getAuditLog(req.user.id, Math.min(limit, 200));
+      res.json(logs);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch audit log" });
     }
   });
 

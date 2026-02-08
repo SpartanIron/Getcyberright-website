@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -652,8 +652,15 @@ export const dataBrokers = pgTable("data_brokers", {
   monthlyVisitors: text("monthly_visitors"),
   parentCompany: text("parent_company"),
   relatedBrokers: text("related_brokers").array(),
+  automationFeasibility: text("automation_feasibility").default("manual"),
+  privacyPolicyUrl: text("privacy_policy_url"),
+  dataRetentionPolicy: text("data_retention_policy"),
+  verificationMethod: text("verification_method"),
+  lastVerifiedBy: text("last_verified_by"),
+  sourceVersion: integer("source_version").default(1),
   isActive: boolean("is_active").default(true),
   lastVerified: timestamp("last_verified"),
+  lastProcessChange: timestamp("last_process_change"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -678,6 +685,9 @@ export const userVaultProfiles = pgTable("user_vault_profiles", {
   dateOfBirth: text("date_of_birth"),
   relativeNames: text("relative_names").array(),
   employerNames: text("employer_names").array(),
+  dataMinimized: boolean("data_minimized").default(false),
+  retentionExpiresAt: timestamp("retention_expires_at"),
+  lastAccessedAt: timestamp("last_accessed_at"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -734,9 +744,22 @@ export const removalRequests = pgTable("removal_requests", {
   requestContent: text("request_content"),
   requestSentAt: timestamp("request_sent_at"),
   followUpCount: integer("follow_up_count").default(0),
+  maxFollowUps: integer("max_follow_ups").default(3),
   lastFollowUpAt: timestamp("last_follow_up_at"),
   confirmedRemovedAt: timestamp("confirmed_removed_at"),
   reAppearedAt: timestamp("re_appeared_at"),
+  retryCount: integer("retry_count").default(0),
+  maxRetries: integer("max_retries").default(3),
+  lastError: text("last_error"),
+  nextRetryAt: timestamp("next_retry_at"),
+  escalationLevel: integer("escalation_level").default(0),
+  jurisdictionApplied: text("jurisdiction_applied"),
+  legalBasisUsed: text("legal_basis_used"),
+  complianceDeadline: timestamp("compliance_deadline"),
+  verificationRequired: boolean("verification_required").default(false),
+  verificationCompletedAt: timestamp("verification_completed_at"),
+  changeDetectedAt: timestamp("change_detected_at"),
+  lastCheckedAt: timestamp("last_checked_at"),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -757,6 +780,10 @@ export const monitoringSchedules = pgTable("monitoring_schedules", {
   frequencyDays: integer("frequency_days").default(90),
   nextScanDate: timestamp("next_scan_date"),
   lastScanDate: timestamp("last_scan_date"),
+  lastRunStatus: text("last_run_status"),
+  lastRunError: text("last_run_error"),
+  totalReappearances: integer("total_reappearances").default(0),
+  consecutiveFailures: integer("consecutive_failures").default(0),
   isActive: boolean("is_active").default(true),
   totalScansCompleted: integer("total_scans_completed").default(0),
   createdAt: timestamp("created_at").defaultNow(),
@@ -782,3 +809,31 @@ export const privacyReports = pgTable("privacy_reports", {
 });
 
 export type PrivacyReport = typeof privacyReports.$inferSelect;
+
+export const removalAuditLog = pgTable("removal_audit_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id"),
+  action: text("action").notNull(),
+  entityType: text("entity_type").notNull(),
+  entityId: varchar("entity_id"),
+  previousState: text("previous_state"),
+  newState: text("new_state"),
+  metadata: jsonb("metadata"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type RemovalAuditLog = typeof removalAuditLog.$inferSelect;
+
+export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
+  not_started: ["scan_found", "request_generated"],
+  scan_found: ["request_generated", "not_found"],
+  request_generated: ["request_sent", "failed"],
+  request_sent: ["in_progress", "confirmed_removed", "failed"],
+  in_progress: ["confirmed_removed", "failed"],
+  confirmed_removed: ["re_appeared"],
+  failed: ["request_generated", "not_started"],
+  re_appeared: ["request_generated", "in_progress"],
+  not_found: ["scan_found"],
+};
