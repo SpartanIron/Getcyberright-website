@@ -256,9 +256,9 @@ export async function runBreachMonitoringCheck(): Promise<{
 
     if (allNewBreaches.size > 0) {
       const allBreachesFlat: BreachInfo[] = [];
-      for (const breaches of allNewBreaches.values()) {
+      allNewBreaches.forEach((breaches) => {
         allBreachesFlat.push(...breaches);
-      }
+      });
 
       const { subject, htmlBody, textBody } = generateBreachAlertEmail(
         subscription.email,

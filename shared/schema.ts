@@ -733,6 +733,10 @@ export const exposureFindings = pgTable("exposure_findings", {
   brokerId: varchar("broker_id").notNull(),
   dataTypesExposed: text("data_types_exposed").array(),
   exposureLevel: text("exposure_level").default("medium"),
+  verificationMethod: text("verification_method").default("broker_analysis"),
+  verificationDetails: text("verification_details"),
+  confidenceScore: integer("confidence_score").default(0),
+  sourceEvidence: text("source_evidence"),
   detectedAt: timestamp("detected_at").defaultNow(),
 });
 
@@ -897,6 +901,49 @@ export const insertRemovalVerificationSchema = createInsertSchema(removalVerific
   createdAt: true,
 });
 export type InsertRemovalVerification = z.infer<typeof insertRemovalVerificationSchema>;
+
+export const securityAlerts = pgTable("security_alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  severity: varchar("severity", { length: 20 }).notNull().default("medium"),
+  category: varchar("category", { length: 50 }).notNull().default("advisory"),
+  source: varchar("source", { length: 100 }).notNull(),
+  sourceUrl: text("source_url").notNull(),
+  affectedSystems: text("affected_systems"),
+  recommendations: text("recommendations"),
+  isRead: boolean("is_read").default(false),
+  publishedAt: timestamp("published_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+export type SecurityAlert = typeof securityAlerts.$inferSelect;
+
+export const breachMonitoringSubscriptions = pgTable("breach_monitoring_subscriptions", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  email: varchar("email", { length: 255 }).notNull(),
+  monitoredEmails: text("monitored_emails").array(),
+  isActive: boolean("is_active").default(true),
+  unsubscribeToken: varchar("unsubscribe_token", { length: 100 }),
+  lastCheckedAt: timestamp("last_checked_at"),
+  totalBreachesFound: integer("total_breaches_found").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+export type BreachMonitoringSubscription = typeof breachMonitoringSubscriptions.$inferSelect;
+
+export const breachCheckResults = pgTable("breach_check_results", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  email: varchar("email", { length: 255 }).notNull(),
+  subscriptionId: integer("subscription_id"),
+  breachName: varchar("breach_name", { length: 255 }).notNull(),
+  breachDomain: varchar("breach_domain", { length: 255 }),
+  breachDate: timestamp("breach_date"),
+  exposedDataTypes: text("exposed_data_types").array(),
+  severity: varchar("severity", { length: 20 }).default("medium"),
+  isPasswordExposed: boolean("is_password_exposed").default(false),
+  isNotified: boolean("is_notified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+export type BreachCheckResult = typeof breachCheckResults.$inferSelect;
 
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],

@@ -95,7 +95,6 @@ export default function ReportScam() {
         throw new Error("Failed to submit report");
       }
       return response.json();
-      });
     },
     onError: () => {
       toast({

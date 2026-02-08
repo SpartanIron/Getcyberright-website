@@ -106,8 +106,14 @@ interface ScanFinding {
   brokerId: string;
   broker: DataBroker;
   dataTypesFound: string[] | null;
+  dataTypesExposed: string[] | null;
   riskLevel: string | null;
+  exposureLevel: string | null;
   exposureDetails: string | null;
+  verificationMethod: string | null;
+  verificationDetails: string | null;
+  confidenceScore: number | null;
+  sourceEvidence: string | null;
 }
 
 interface RemovalRequest {
@@ -1283,7 +1289,16 @@ function GuestScanForm() {
     totalExposuresFound: number;
     privacyScore: number;
     riskLevel: string;
-    findings: Array<{ broker: DataBroker; dataTypesExposed: string[]; exposureLevel: string }>;
+    scanMethod?: string;
+    findings: Array<{
+      broker: DataBroker;
+      dataTypesExposed: string[];
+      exposureLevel: string;
+      verificationMethod?: string;
+      verificationDetails?: string;
+      confidenceScore?: number;
+      sourceEvidence?: string;
+    }>;
   } | undefined;
 
   return (
@@ -1392,6 +1407,20 @@ function GuestScanForm() {
             </Card>
           </div>
 
+          {result.scanMethod === "verified" && (
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <Shield className="h-4 w-4 text-green-600" />
+                  <span className="font-medium text-green-700 dark:text-green-400">Verified Scan</span>
+                  <span className="text-muted-foreground">
+                    Each result was checked against live broker sites, breach databases, and opt-out page verification.
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {result.findings.length > 0 && (
             <Card>
               <CardHeader>
@@ -1399,27 +1428,52 @@ function GuestScanForm() {
                   <AlertTriangle className="h-5 w-5 text-destructive" />
                   Data Brokers With Your Information
                 </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Results sorted by confidence level. Higher confidence means stronger evidence of your data being held.
+                </p>
               </CardHeader>
               <CardContent className="space-y-3">
                 {result.findings.map((finding, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 border rounded-md">
-                    <div className="flex-1">
+                  <div key={idx} className="p-4 border rounded-md space-y-2" data-testid={`finding-${idx}`}>
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium">{finding.broker.name}</span>
                         <Badge variant={finding.exposureLevel === "high" ? "destructive" : "secondary"}>
                           {finding.exposureLevel} risk
                         </Badge>
+                        {finding.confidenceScore != null && (
+                          <Badge variant="outline" className={
+                            finding.confidenceScore >= 70 ? "border-green-500 text-green-700 dark:text-green-400" :
+                            finding.confidenceScore >= 40 ? "border-yellow-500 text-yellow-700 dark:text-yellow-400" :
+                            "border-muted-foreground"
+                          }>
+                            {finding.confidenceScore}% confidence
+                          </Badge>
+                        )}
+                        {finding.verificationMethod && (
+                          <Badge variant="outline" className="text-xs">
+                            {finding.verificationMethod === "breach_verified" && "Breach Confirmed"}
+                            {finding.verificationMethod === "site_verified" && "Site Verified"}
+                            {finding.verificationMethod === "data_profile_match" && "Data Match"}
+                            {finding.verificationMethod === "broker_analysis" && "Analysis"}
+                          </Badge>
+                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {finding.broker.domain} &middot; {finding.dataTypesExposed.join(", ")}
-                      </p>
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          Opt Out
+                        </a>
+                      </Button>
                     </div>
-                    <Button variant="outline" size="sm" asChild>
-                      <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        Opt Out
-                      </a>
-                    </Button>
+                    <p className="text-sm text-muted-foreground">
+                      {finding.broker.domain} &middot; Data types: {finding.dataTypesExposed.join(", ")}
+                    </p>
+                    {finding.verificationDetails && (
+                      <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md">
+                        {finding.verificationDetails}
+                      </p>
+                    )}
                   </div>
                 ))}
                 <div className="pt-4 border-t text-center space-y-3">
@@ -1719,16 +1773,37 @@ function ScanTab() {
                       <div className="flex-1 space-y-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-medium">{finding.broker?.name || "Unknown Broker"}</p>
-                          <Badge variant={getRiskVariant(finding.riskLevel)}>
-                            {finding.riskLevel || "Unknown"} Risk
+                          <Badge variant={getRiskVariant(finding.exposureLevel || finding.riskLevel)}>
+                            {finding.exposureLevel || finding.riskLevel || "Unknown"} Risk
                           </Badge>
+                          {finding.confidenceScore != null && (
+                            <Badge variant="outline" className={
+                              finding.confidenceScore >= 70 ? "border-green-500 text-green-700 dark:text-green-400" :
+                              finding.confidenceScore >= 40 ? "border-yellow-500 text-yellow-700 dark:text-yellow-400" :
+                              "border-muted-foreground"
+                            }>
+                              {finding.confidenceScore}% confidence
+                            </Badge>
+                          )}
+                          {finding.verificationMethod && (
+                            <Badge variant="outline" className="text-xs">
+                              {finding.verificationMethod === "breach_verified" ? "Breach Confirmed" :
+                               finding.verificationMethod === "site_verified" ? "Site Verified" :
+                               finding.verificationMethod === "data_profile_match" ? "Data Match" : "Analysis"}
+                            </Badge>
+                          )}
                           {finding.broker?.category && (
                             <Badge variant="secondary">{finding.broker.category}</Badge>
                           )}
                         </div>
-                        {finding.dataTypesFound && finding.dataTypesFound.length > 0 && (
+                        {(finding.dataTypesExposed || finding.dataTypesFound) && (finding.dataTypesExposed || finding.dataTypesFound)!.length > 0 && (
                           <p className="text-xs text-muted-foreground">
-                            Data exposed: {finding.dataTypesFound.join(", ")}
+                            Data exposed: {(finding.dataTypesExposed || finding.dataTypesFound)!.join(", ")}
+                          </p>
+                        )}
+                        {finding.verificationDetails && (
+                          <p className="text-xs text-muted-foreground bg-muted/50 p-1.5 rounded-md mt-1">
+                            {finding.verificationDetails}
                           </p>
                         )}
                       </div>

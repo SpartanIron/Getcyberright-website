@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { DeziAssistant } from "@/components/dezi-assistant";
 import { WelcomeOverlay } from "@/components/welcome-overlay";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { initGA } from "./lib/analytics";
+import { initGA, trackPageView } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { Loader2 } from "lucide-react";
 
@@ -81,7 +81,7 @@ function ScrollToTop() {
   
   useEffect(() => {
     window.scrollTo(0, 0);
-    pageview(location);
+    trackPageView(location);
   }, [location]);
   
   return null;
