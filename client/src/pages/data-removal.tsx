@@ -1514,10 +1514,9 @@ function GuestScanForm() {
                 <Button asChild>
                   <Link href="/register">Create Free Account</Link>
                 </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
       )}
     </motion.div>
