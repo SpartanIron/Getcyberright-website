@@ -96,8 +96,8 @@ interface ScanResult {
   id: string;
   vaultProfileId: string;
   status: string;
-  privacyScore: number | null;
   totalExposures: number | null;
+  totalBrokersScanned: number | null;
   completedAt: string | null;
   createdAt: string;
 }
@@ -114,7 +114,6 @@ interface ScanFinding {
   exposureDetails: string | null;
   verificationMethod: string | null;
   verificationDetails: string | null;
-  confidenceScore: number | null;
   sourceEvidence: string | null;
 }
 
@@ -150,70 +149,9 @@ interface DashboardStats {
   overdue: number;
   escalated: number;
   jurisdictionBreakdown: Record<string, number>;
-  latestPrivacyScore: number | null;
-  previousPrivacyScore: number | null;
-  scoreDelta: number | null;
-  privacyScoreTrend: { date: string; score: number }[];
   totalScans: number;
 }
 
-function PrivacyScoreCircle({ score, size = 160 }: { score: number; size?: number }) {
-  const radius = (size - 16) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const progress = (score / 100) * circumference;
-  const strokeDashoffset = circumference - progress;
-
-  const getColor = (s: number) => {
-    if (s > 70) return "hsl(142, 71%, 45%)";
-    if (s >= 40) return "hsl(48, 96%, 53%)";
-    return "hsl(0, 84%, 60%)";
-  };
-
-  const getLabel = (s: number) => {
-    if (s > 70) return "Good";
-    if (s >= 40) return "Fair";
-    return "At Risk";
-  };
-
-  return (
-    <div className="relative inline-flex items-center justify-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="8"
-          className="text-muted/30"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={getColor(score)}
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: "stroke-dashoffset 1s ease-in-out" }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span
-          className="text-4xl font-bold"
-          data-testid="text-privacy-score-value"
-          style={{ color: getColor(score) }}
-        >
-          {score}
-        </span>
-        <span className="text-xs text-muted-foreground">{getLabel(score)}</span>
-      </div>
-    </div>
-  );
-}
 
 function getDifficultyVariant(difficulty: string): "default" | "secondary" | "destructive" | "outline" {
   switch (difficulty.toLowerCase()) {
@@ -331,43 +269,44 @@ function OverviewTab() {
     overdue: 0,
     escalated: 0,
     jurisdictionBreakdown: {},
-    latestPrivacyScore: null,
-    previousPrivacyScore: null,
-    scoreDelta: null,
-    privacyScoreTrend: [],
     totalScans: 0,
   };
-
-  const privacyScore = stats.latestPrivacyScore ?? 0;
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <Card data-testid="card-privacy-score" className="lg:row-span-2">
+          <Card data-testid="card-exposure-summary" className="lg:row-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5" />
-                Privacy Score
+                Exposure Summary
               </CardTitle>
-              <CardDescription>Your overall data exposure rating</CardDescription>
+              <CardDescription>What our scans have verified so far</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
-              <PrivacyScoreCircle score={privacyScore} size={180} />
-              {stats.scoreDelta !== null && (
-                <div className="flex items-center gap-1 text-sm">
-                  <span className={stats.scoreDelta > 0 ? "text-green-600 dark:text-green-400" : stats.scoreDelta < 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground"}>
-                    {stats.scoreDelta > 0 ? "+" : ""}{stats.scoreDelta} pts
-                  </span>
-                  <span className="text-muted-foreground">since last scan</span>
+              <div className="text-center space-y-3">
+                <div>
+                  <div className="text-4xl font-bold text-red-600 dark:text-red-400" data-testid="text-confirmed-breaches">{stats.totalExposures}</div>
+                  <p className="text-sm font-medium mt-1">Total Findings</p>
                 </div>
-              )}
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <div className="text-xl font-bold">{stats.pending + stats.inProgress}</div>
+                    <p className="text-xs text-muted-foreground">Pending Removal</p>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-green-600 dark:text-green-400">{stats.completed}</div>
+                    <p className="text-xs text-muted-foreground">Removed</p>
+                  </div>
+                </div>
+              </div>
               <p className="text-sm text-muted-foreground text-center max-w-xs">
-                {privacyScore > 70
-                  ? "Your personal data is well protected across most data broker sites."
-                  : privacyScore >= 40
-                    ? "Some of your data is still exposed. Continue submitting removal requests."
-                    : "Your data is widely exposed. We recommend running a scan and starting removals immediately."}
+                {stats.totalExposures === 0
+                  ? "No exposures found yet. Run a scan to check your data across our broker catalog."
+                  : stats.completed > 0
+                    ? `You've removed your data from ${stats.completed} broker${stats.completed !== 1 ? "s" : ""}. ${stats.pending > 0 ? `${stats.pending} removal${stats.pending !== 1 ? "s" : ""} still in progress.` : "All removals complete."}`
+                    : `${stats.totalExposures} finding${stats.totalExposures !== 1 ? "s" : ""} across data brokers. Start sending removal requests to protect your data.`}
               </p>
             </CardContent>
           </Card>
@@ -523,37 +462,6 @@ function OverviewTab() {
         </motion.div>
       )}
 
-      {stats.privacyScoreTrend.length > 1 && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Privacy Score Trend
-              </CardTitle>
-              <CardDescription>How your privacy score has changed over time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end gap-2 h-32">
-                {stats.privacyScoreTrend.map((point, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-xs font-medium">{point.score}</span>
-                    <div
-                      className="w-full rounded-t-sm"
-                      style={{
-                        height: `${Math.max(point.score, 5)}%`,
-                        backgroundColor: point.score > 70 ? "hsl(142, 71%, 45%)" : point.score >= 40 ? "hsl(48, 96%, 53%)" : "hsl(0, 84%, 60%)",
-                      }}
-                      data-testid={`bar-trend-${i}`}
-                    />
-                    <span className="text-[10px] text-muted-foreground">{formatDate(point.date)}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
 
       {Object.keys(stats.jurisdictionBreakdown).length > 0 && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
@@ -1293,7 +1201,6 @@ function GuestScanForm() {
     confirmedExposures: number;
     verifiedBrokers: number;
     potentialExposures: number;
-    privacyScore: number;
     riskLevel: string;
     scanMethod?: string;
     findings: Array<{
@@ -1303,8 +1210,8 @@ function GuestScanForm() {
       evidenceTier?: string;
       verificationMethod?: string;
       verificationDetails?: string;
-      confidenceScore?: number;
       sourceEvidence?: string;
+      evidenceSummary?: string;
     }>;
   } | undefined;
 
@@ -1380,45 +1287,26 @@ function GuestScanForm() {
 
       {result && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="mx-auto w-24 h-24 relative mb-3">
-                  <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted/20" />
-                    <circle
-                      cx="50" cy="50" r="45" fill="none" strokeWidth="8"
-                      strokeDasharray={`${(result.privacyScore / 100) * 283} 283`}
-                      strokeLinecap="round"
-                      className={result.privacyScore >= 70 ? "text-green-500" : result.privacyScore >= 40 ? "text-yellow-500" : "text-red-500"}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold" data-testid="text-guest-privacy-score">{result.privacyScore}</span>
-                  </div>
-                </div>
-                <p className="text-sm font-medium">Privacy Score</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardContent className="pt-6 text-center">
                 <div className="text-3xl font-bold text-red-600 dark:text-red-400" data-testid="text-guest-confirmed">{result.confirmedExposures || 0}</div>
-                <p className="text-sm font-medium mt-1">Confirmed Exposures</p>
-                <p className="text-xs text-muted-foreground">Verified in known breaches</p>
+                <p className="text-sm font-medium mt-1">Confirmed Breaches</p>
+                <p className="text-xs text-muted-foreground">Your email was found in verified data breaches</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <div className="text-3xl font-bold text-orange-600 dark:text-orange-400" data-testid="text-guest-verified">{result.verifiedBrokers || 0}</div>
-                <p className="text-sm font-medium mt-1">Active Brokers</p>
-                <p className="text-xs text-muted-foreground">Verified sites collecting your data type</p>
+                <p className="text-sm font-medium mt-1">Active Brokers Found</p>
+                <p className="text-xs text-muted-foreground">Sites verified active that collect your data types</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
-                <div className="text-3xl font-bold text-muted-foreground" data-testid="text-guest-potential">{result.potentialExposures || 0}</div>
-                <p className="text-sm font-medium mt-1">Potential Exposures</p>
-                <p className="text-xs text-muted-foreground">Based on data collection practices</p>
+                <div className="text-3xl font-bold" data-testid="text-guest-scanned">{result.totalBrokersScanned.toLocaleString()}</div>
+                <p className="text-sm font-medium mt-1">Brokers Checked</p>
+                <p className="text-xs text-muted-foreground">From our catalog of {(result.totalBrokersInCatalog || result.totalBrokersScanned).toLocaleString()}</p>
               </CardContent>
             </Card>
           </div>
@@ -1427,34 +1315,31 @@ function GuestScanForm() {
             <CardContent className="pt-4 space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Shield className="h-4 w-4 text-primary" />
-                <span className="font-medium">How We Verify Results</span>
+                <span className="font-medium">What This Scan Actually Does</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                 <div className="flex items-start gap-2 p-2 rounded-md bg-red-50 dark:bg-red-950/30">
                   <AlertTriangle className="h-3.5 w-3.5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
                   <div>
-                    <span className="font-medium text-red-700 dark:text-red-400">Confirmed</span>
-                    <p className="text-muted-foreground mt-0.5">Your data was found in known data breaches (HIBP-verified).</p>
+                    <span className="font-medium text-red-700 dark:text-red-400">Confirmed Breach</span>
+                    <p className="text-muted-foreground mt-0.5">Your email was found in a real data breach verified by Have I Been Pwned. This is a fact, not an estimate.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-2 rounded-md bg-orange-50 dark:bg-orange-950/30">
                   <CheckCircle className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
                   <div>
-                    <span className="font-medium text-orange-700 dark:text-orange-400">Verified Broker</span>
-                    <p className="text-muted-foreground mt-0.5">Broker site is active and collects the data types you provided.</p>
+                    <span className="font-medium text-orange-700 dark:text-orange-400">Verified Active Broker</span>
+                    <p className="text-muted-foreground mt-0.5">We pinged this broker's website and confirmed it is active and accepts opt-out requests. We did NOT search their database for your records.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-2 rounded-md bg-muted/50">
                   <Info className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
                   <div>
-                    <span className="font-medium">Potential</span>
-                    <p className="text-muted-foreground mt-0.5">Broker likely has your data based on their collection practices.</p>
+                    <span className="font-medium">What We Cannot Do</span>
+                    <p className="text-muted-foreground mt-0.5">We cannot search inside a broker's private database. Only breach databases give us confirmed proof. Opt-out is still recommended for verified brokers.</p>
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Scanned {result.totalBrokersScanned.toLocaleString()} brokers from our catalog of {(result.totalBrokersInCatalog || result.totalBrokersScanned).toLocaleString()} worldwide.
-              </p>
             </CardContent>
           </Card>
 
@@ -1482,22 +1367,19 @@ function GuestScanForm() {
                         <span className="font-medium">{finding.broker.name}</span>
                         {finding.evidenceTier === "confirmed" && (
                           <Badge variant="destructive">
-                            Confirmed Exposure
+                            Breach Confirmed
                           </Badge>
                         )}
                         {finding.evidenceTier === "verified_broker" && (
                           <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800 no-default-hover-elevate no-default-active-elevate">
-                            Verified Broker
+                            Active Broker
                           </Badge>
                         )}
                         {(!finding.evidenceTier || finding.evidenceTier === "potential") && (
                           <Badge variant="secondary">
-                            Potential
+                            Unverified
                           </Badge>
                         )}
-                        <Badge variant="outline" className="text-xs">
-                          {finding.exposureLevel} risk
-                        </Badge>
                       </div>
                       <Button variant="outline" size="sm" asChild>
                         <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
@@ -1709,13 +1591,16 @@ function ScanTab() {
               Run New Scan
             </Button>
 
-            {latestScan && latestScan.privacyScore !== null && (
+            {latestScan && (
               <div className="flex items-center gap-6 p-4 rounded-md bg-muted/30">
-                <PrivacyScoreCircle score={latestScan.privacyScore} size={100} />
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{latestScan.totalExposures}</div>
+                  <p className="text-xs text-muted-foreground">findings</p>
+                </div>
                 <div>
                   <p className="font-medium">Latest Scan Results</p>
                   <p className="text-sm text-muted-foreground">
-                    {latestScan.totalExposures} exposure{latestScan.totalExposures !== 1 ? "s" : ""} found
+                    {latestScan.totalExposures} finding{latestScan.totalExposures !== 1 ? "s" : ""} across {latestScan.totalBrokersScanned} brokers checked
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {latestScan.completedAt ? formatDate(latestScan.completedAt) : formatDate(latestScan.createdAt)}
@@ -1814,17 +1699,14 @@ function ScanTab() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-medium">{finding.broker?.name || "Unknown Broker"}</p>
                           {finding.verificationMethod === "breach_confirmed" ? (
-                            <Badge variant="destructive">Confirmed Exposure</Badge>
+                            <Badge variant="destructive">Breach Confirmed</Badge>
                           ) : finding.verificationMethod === "broker_verified_active" ? (
                             <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800 no-default-hover-elevate no-default-active-elevate">
-                              Verified Broker
+                              Active Broker
                             </Badge>
                           ) : (
-                            <Badge variant="secondary">Potential</Badge>
+                            <Badge variant="secondary">Unverified</Badge>
                           )}
-                          <Badge variant="outline" className="text-xs">
-                            {finding.exposureLevel || finding.riskLevel || "unknown"} risk
-                          </Badge>
                           {finding.broker?.category && (
                             <Badge variant="secondary">{finding.broker.category}</Badge>
                           )}
@@ -1930,9 +1812,9 @@ function ScanTab() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {scan.privacyScore !== null && (
-                        <Badge variant={scan.privacyScore > 70 ? "default" : scan.privacyScore >= 40 ? "outline" : "destructive"}>
-                          Score: {scan.privacyScore}
+                      {scan.totalExposures != null && (
+                        <Badge variant={scan.totalExposures === 0 ? "default" : scan.totalExposures > 10 ? "destructive" : "outline"}>
+                          {scan.totalExposures} finding{scan.totalExposures !== 1 ? "s" : ""}
                         </Badge>
                       )}
                       <Badge variant={scan.status === "completed" ? "default" : "secondary"}>

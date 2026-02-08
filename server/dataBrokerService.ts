@@ -77,8 +77,8 @@ interface VerifiedFinding {
   evidenceTier: EvidenceTier;
   verificationMethod: string;
   verificationDetails: string;
-  confidenceScore: number;
   sourceEvidence: string;
+  evidenceSummary: string;
 }
 
 interface BreachResult {
@@ -175,32 +175,6 @@ function analyzeBrokerDataOverlap(
   return { overlap, coveragePercent };
 }
 
-function computeConfidenceScore(factors: {
-  siteReachable: boolean;
-  optOutExists: boolean;
-  dataOverlapPercent: number;
-  brokerRiskLevel: string;
-  breachDataMatch: boolean;
-  isKnownCollector: boolean;
-}): number {
-  let score = 0;
-
-  if (factors.siteReachable) score += 20;
-  if (factors.optOutExists) score += 15;
-
-  if (factors.dataOverlapPercent >= 80) score += 25;
-  else if (factors.dataOverlapPercent >= 50) score += 15;
-  else if (factors.dataOverlapPercent >= 25) score += 8;
-
-  const riskBonus: Record<string, number> = { critical: 20, high: 15, medium: 10, low: 5 };
-  score += riskBonus[factors.brokerRiskLevel] ?? 10;
-
-  if (factors.breachDataMatch) score += 15;
-  if (factors.isKnownCollector) score += 5;
-
-  return Math.min(100, score);
-}
-
 async function runRealVerification(
   allBrokers: DataBroker[],
   userDataTypes: Set<string>,
@@ -246,72 +220,60 @@ async function runRealVerification(
         const { overlap, coveragePercent } = analyzeBrokerDataOverlap(broker, userDataTypes);
         const breachMatch = domain ? breachDomains.has(domain.toLowerCase()) : false;
 
-        const isKnownCollector = [
-          "people-search", "background-check", "public-records",
-          "data-aggregator", "data-aggregator-enrichment",
-          "marketing-data", "identity-verification",
-        ].includes(broker.category);
-
-        const confidence = computeConfidenceScore({
-          siteReachable: siteCheck.reachable,
-          optOutExists: optOutCheck.exists,
-          dataOverlapPercent: coveragePercent,
-          brokerRiskLevel: broker.riskLevel ?? "medium",
-          breachDataMatch: breachMatch,
-          isKnownCollector,
-        });
-
-        if (confidence < 25) return null;
-
         let evidenceTier: EvidenceTier = "potential";
         let verificationMethod = "data_profile_analysis";
-        const evidenceParts: string[] = [];
-        const detailParts: string[] = [];
+        const facts: string[] = [];
 
         if (breachMatch) {
           evidenceTier = "confirmed";
           verificationMethod = "breach_confirmed";
-          detailParts.push("Your email was confirmed in a data breach linked to this broker via Have I Been Pwned");
-          evidenceParts.push(`Breach confirmed via HIBP for ${domain}`);
+          facts.push(`VERIFIED: Your email appeared in a data breach linked to ${domain} (source: Have I Been Pwned)`);
         }
 
         if (siteCheck.reachable) {
-          evidenceParts.push(`Broker site verified active (${siteCheck.responseTime}ms)`);
+          facts.push(`VERIFIED: ${domain} is an active website (responded in ${siteCheck.responseTime}ms)`);
           if (evidenceTier !== "confirmed") {
             evidenceTier = "verified_broker";
             verificationMethod = "broker_verified_active";
           }
+        } else {
+          facts.push(`${domain} did not respond to our check — site may be down or blocking automated requests`);
         }
 
         if (optOutCheck.exists) {
-          evidenceParts.push(`Opt-out page accessible at ${optOutCheck.url}`);
+          facts.push(`VERIFIED: Opt-out page is accessible at ${optOutCheck.url}`);
           if (evidenceTier !== "confirmed") {
             evidenceTier = "verified_broker";
             verificationMethod = "broker_verified_active";
           }
         }
 
-        if (coveragePercent > 0) {
-          evidenceParts.push(`${coveragePercent}% of your data types match this broker's known collection practices`);
+        if (overlap.length > 0) {
+          facts.push(`This broker's published collection practices include: ${overlap.join(", ")} — which match data types you provided`);
         }
 
-        if (isKnownCollector) {
-          evidenceParts.push(`Known ${broker.category} site that actively collects personal data`);
+        if (!breachMatch && !siteCheck.reachable && !optOutCheck.exists) {
+          return null;
         }
+
+        let verificationDetails = "";
+        let evidenceSummary = "";
 
         if (evidenceTier === "confirmed") {
-          detailParts.push("Your personal data was confirmed in a breach associated with this broker.");
+          verificationDetails = `Your email was found in a verified data breach connected to this broker. This is confirmed by Have I Been Pwned, an independent breach notification service.`;
+          evidenceSummary = "Breach-confirmed exposure";
         } else if (evidenceTier === "verified_broker") {
-          detailParts.push("This broker is verified active and collects data matching your profile. Your data is likely held by this broker based on their collection practices.");
-          if (optOutCheck.exists) detailParts.push("A working opt-out page was confirmed.");
+          verificationDetails = `We verified that ${broker.name} (${domain}) is an active data broker that collects ${overlap.length > 0 ? overlap.join(", ") : "personal data"}. We did NOT search their database for your specific records — we confirmed the broker is operational and accepts opt-out requests.`;
+          evidenceSummary = "Active broker verified — opt-out recommended";
         } else {
-          detailParts.push("Based on this broker's known data collection practices, your personal information may be held by them. We recommend opting out as a precaution.");
+          verificationDetails = `${broker.name} is a known data broker in the "${broker.category}" category. We could not verify their site status during this scan. Based on their published practices, they collect data types matching what you provided.`;
+          evidenceSummary = "Known broker — could not verify site status";
         }
 
         let exposureLevel = "low";
-        if (evidenceTier === "confirmed") exposureLevel = "high";
-        else if (evidenceTier === "verified_broker" && confidence >= 50) exposureLevel = "medium";
-        else if (confidence >= 70) exposureLevel = "medium";
+        if (evidenceTier === "confirmed") exposureLevel = "critical";
+        else if (evidenceTier === "verified_broker" && overlap.length >= 3) exposureLevel = "high";
+        else if (evidenceTier === "verified_broker") exposureLevel = "medium";
 
         return {
           broker,
@@ -319,9 +281,9 @@ async function runRealVerification(
           exposureLevel,
           evidenceTier,
           verificationMethod,
-          verificationDetails: detailParts.join(" "),
-          confidenceScore: confidence,
-          sourceEvidence: evidenceParts.join(" | "),
+          verificationDetails,
+          sourceEvidence: facts.join(" | "),
+          evidenceSummary,
         } as VerifiedFinding;
       })
     );
@@ -360,12 +322,12 @@ async function runRealVerification(
         findings.push({
           broker: matchingBroker,
           dataTypesExposed: breachDataTypes.filter(dt => userDataTypes.has(dt)),
-          exposureLevel: breach.isVerified ? "high" : "medium",
+          exposureLevel: "critical",
           evidenceTier: "confirmed",
           verificationMethod: "breach_confirmed",
-          verificationDetails: `Your email was confirmed in the "${breach.name}" data breach (${breach.breachDate}). ${breach.pwnCount.toLocaleString()} accounts were affected. This is a verified exposure from Have I Been Pwned.`,
-          confidenceScore: breach.isVerified ? 95 : 75,
+          verificationDetails: `Your email was found in the "${breach.name}" data breach (${breach.breachDate}). ${breach.pwnCount.toLocaleString()} accounts were affected. This is independently verified by Have I Been Pwned.`,
           sourceEvidence: `Have I Been Pwned: ${breach.name} | Breach date: ${breach.breachDate} | Verified: ${breach.isVerified} | ${breach.pwnCount.toLocaleString()} accounts | Data: ${breach.dataClasses.join(", ")}`,
+          evidenceSummary: "Breach-confirmed exposure",
         });
       }
     }
@@ -373,9 +335,7 @@ async function runRealVerification(
 
   findings.sort((a, b) => {
     const tierOrder: Record<EvidenceTier, number> = { confirmed: 3, verified_broker: 2, potential: 1 };
-    const tierDiff = (tierOrder[b.evidenceTier] ?? 0) - (tierOrder[a.evidenceTier] ?? 0);
-    if (tierDiff !== 0) return tierDiff;
-    return b.confidenceScore - a.confidenceScore;
+    return (tierOrder[b.evidenceTier] ?? 0) - (tierOrder[a.evidenceTier] ?? 0);
   });
 
   return { findings, brokersChecked: brokersToCheck.length };
@@ -571,7 +531,7 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
       exposureLevel: match.exposureLevel,
       verificationMethod: match.verificationMethod,
       verificationDetails: match.verificationDetails,
-      confidenceScore: match.confidenceScore,
+      confidenceScore: 0,
       sourceEvidence: match.sourceEvidence,
     }));
 
@@ -582,8 +542,6 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
 
     const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
     const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
-    const weightedExposure = verificationResult.findings.reduce((sum, f) => sum + (f.confidenceScore / 100), 0);
-    const privacyScore = Math.max(0, Math.round(100 - (weightedExposure / Math.max(allBrokers.length, 1)) * 100 * 2));
     const riskLevel =
       confirmedCount >= 10 ? "critical" :
       confirmedCount >= 5 || verifiedBrokerCount >= 30 ? "high" :
@@ -597,7 +555,7 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
         status: "completed",
         totalBrokersScanned: verificationResult.brokersChecked,
         totalExposuresFound: findings.length,
-        privacyScore,
+        privacyScore: 0,
         riskLevel,
         completedAt: new Date(),
       })
@@ -609,7 +567,6 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
       findings,
       totalBrokersScanned: verificationResult.brokersChecked,
       totalExposuresFound: findings.length,
-      privacyScore,
       riskLevel,
       scanMethod: "verified",
     };
@@ -656,15 +613,12 @@ export async function runGuestExposureScan(guestData: {
     evidenceTier: match.evidenceTier,
     verificationMethod: match.verificationMethod,
     verificationDetails: match.verificationDetails,
-    confidenceScore: match.confidenceScore,
     sourceEvidence: match.sourceEvidence,
   }));
 
   const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
   const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
   const potentialCount = verificationResult.findings.filter(f => f.evidenceTier === "potential").length;
-  const weightedExposure = verificationResult.findings.reduce((sum, f) => sum + (f.confidenceScore / 100), 0);
-  const privacyScore = Math.max(0, Math.round(100 - (weightedExposure / Math.max(allBrokers.length, 1)) * 100 * 2));
   const riskLevel =
     confirmedCount >= 10 ? "critical" :
     confirmedCount >= 5 || verifiedBrokerCount >= 30 ? "high" :
@@ -677,7 +631,6 @@ export async function runGuestExposureScan(guestData: {
     confirmedExposures: confirmedCount,
     verifiedBrokers: verifiedBrokerCount,
     potentialExposures: potentialCount,
-    privacyScore,
     riskLevel,
     findings,
     scanMethod: "verified",
@@ -1303,20 +1256,6 @@ export async function getRemovalDashboardStats(userId: string) {
     jurisdictionBreakdown[j] = (jurisdictionBreakdown[j] ?? 0) + 1;
   });
 
-  const privacyScoreTrend = scans
-    .filter((s) => s.privacyScore != null)
-    .map((s) => ({
-      date: s.createdAt,
-      score: s.privacyScore!,
-    }))
-    .reverse();
-
-  const latestScore = scans[0]?.privacyScore ?? null;
-  const previousScore = scans[1]?.privacyScore ?? null;
-  const scoreDelta = latestScore !== null && previousScore !== null
-    ? latestScore - previousScore
-    : null;
-
   return {
     totalExposures,
     inProgress,
@@ -1330,10 +1269,6 @@ export async function getRemovalDashboardStats(userId: string) {
     overdue: overdueList.length,
     escalated: escalatedList.length,
     jurisdictionBreakdown,
-    latestPrivacyScore: latestScore,
-    previousPrivacyScore: previousScore,
-    scoreDelta,
-    privacyScoreTrend,
     totalScans: scans.length,
   };
 }
@@ -1482,7 +1417,6 @@ export async function runMonitoringScan(userId: string) {
       {
         totalExposures: scanResult.totalExposuresFound,
         reappearances: reappearanceCount,
-        privacyScore: scanResult.privacyScore,
       }
     );
 
@@ -1527,7 +1461,6 @@ export async function generatePrivacyReport(userId: string) {
     ["not_started", "scan_found"].includes(r.status)
   ).length;
 
-  const privacyScore = latestScan?.privacyScore ?? 50;
   const totalExposures = latestScan?.totalExposuresFound ?? 0;
   const totalBrokersChecked = latestScan?.totalBrokersScanned ?? 0;
 
@@ -1549,10 +1482,11 @@ export async function generatePrivacyReport(userId: string) {
     }
   });
 
+  const confirmedFindings = findings.filter(f => f.verificationMethod === "breach_confirmed").length;
   let riskAssessment = "Low Risk";
-  if (privacyScore < 25) riskAssessment = "Critical Risk - Immediate action recommended";
-  else if (privacyScore < 50) riskAssessment = "High Risk - Multiple exposures detected";
-  else if (privacyScore < 80) riskAssessment = "Medium Risk - Some exposures found";
+  if (confirmedFindings >= 10 || totalExposures >= 50) riskAssessment = "Critical Risk - Immediate action recommended";
+  else if (confirmedFindings >= 5 || totalExposures >= 20) riskAssessment = "High Risk - Multiple exposures detected";
+  else if (totalExposures >= 5) riskAssessment = "Medium Risk - Some exposures found";
 
   const recommendations: string[] = [];
   if (totalExposures > 0 && totalPending > 0) {
@@ -1576,7 +1510,7 @@ export async function generatePrivacyReport(userId: string) {
     .values({
       userId,
       scanId: latestScan?.id ?? null,
-      privacyScore,
+      privacyScore: 0,
       totalBrokersChecked,
       totalExposures,
       totalRemoved,
