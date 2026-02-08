@@ -140,9 +140,9 @@ function getUserDataTypes(profile: UserVaultProfile): Set<string> {
 }
 
 function doesBrokerMatch(broker: DataBroker, userDataTypes: Set<string>): boolean {
-  const requiredTypes = CATEGORY_DATA_MAP[broker.category];
-  if (!requiredTypes) return false;
-  return requiredTypes.every((t) => userDataTypes.has(t));
+  const categoryTypes = CATEGORY_DATA_MAP[broker.category];
+  if (!categoryTypes) return userDataTypes.has("name");
+  return categoryTypes.some((t) => userDataTypes.has(t));
 }
 
 export async function runExposureScan(userId: string, vaultProfileId: string) {
@@ -169,13 +169,10 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
 
   const matchedBrokers = allBrokers.filter((b) => doesBrokerMatch(b, userDataTypes));
 
-  const riskWeightedMatches = matchedBrokers.map((broker) => {
+  const exposedBrokers = matchedBrokers.map((broker) => {
     const weight = RISK_WEIGHTS[broker.riskLevel ?? "medium"] ?? 2;
-    const matchProbability = Math.min(0.3 + weight * 0.15 + Math.random() * 0.2, 1.0);
-    return { broker, weight, matched: matchProbability > 0.4 };
+    return { broker, weight };
   });
-
-  const exposedBrokers = riskWeightedMatches.filter((m) => m.matched);
 
   const findingsToInsert = exposedBrokers.map((match) => {
     const brokerDataTypes = match.broker.dataTypesCollected ?? [];
@@ -197,8 +194,8 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
     findings = await db.insert(exposureFindings).values(findingsToInsert).returning();
   }
 
-  const totalWeightedRisk = exposedBrokers.reduce((sum, m) => sum + m.weight, 0);
-  const privacyScore = Math.max(0, Math.round(100 - totalWeightedRisk * 2.5));
+  const exposureRatio = exposedBrokers.length / Math.max(allBrokers.length, 1);
+  const privacyScore = Math.max(0, Math.round(100 * (1 - exposureRatio)));
   const riskLevel =
     privacyScore >= 80 ? "low" : privacyScore >= 50 ? "medium" : privacyScore >= 25 ? "high" : "critical";
 
@@ -244,13 +241,10 @@ export async function runGuestExposureScan(guestData: {
   const allBrokers = await db.select().from(dataBrokers).where(eq(dataBrokers.isActive, true));
   const matchedBrokers = allBrokers.filter((b) => doesBrokerMatch(b, types));
 
-  const riskWeightedMatches = matchedBrokers.map((broker) => {
+  const exposedBrokers = matchedBrokers.map((broker) => {
     const weight = RISK_WEIGHTS[broker.riskLevel ?? "medium"] ?? 2;
-    const matchProbability = Math.min(0.3 + weight * 0.15 + Math.random() * 0.2, 1.0);
-    return { broker, weight, matched: matchProbability > 0.4 };
+    return { broker, weight };
   });
-
-  const exposedBrokers = riskWeightedMatches.filter((m) => m.matched);
 
   const findings = exposedBrokers.map((match) => {
     const brokerDataTypes = match.broker.dataTypesCollected ?? [];
@@ -264,8 +258,8 @@ export async function runGuestExposureScan(guestData: {
     };
   });
 
-  const totalWeightedRisk = exposedBrokers.reduce((sum, m) => sum + m.weight, 0);
-  const privacyScore = Math.max(0, Math.round(100 - totalWeightedRisk * 2.5));
+  const exposureRatio = exposedBrokers.length / Math.max(allBrokers.length, 1);
+  const privacyScore = Math.max(0, Math.round(100 * (1 - exposureRatio)));
   const riskLevel =
     privacyScore >= 80 ? "low" : privacyScore >= 50 ? "medium" : privacyScore >= 25 ? "high" : "critical";
 
