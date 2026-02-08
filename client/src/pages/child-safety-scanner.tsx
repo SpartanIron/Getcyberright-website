@@ -651,6 +651,7 @@ export default function ChildSafetyScannerPage() {
           </TabsContent>
         </Tabs>
       </div>
+    </main>
     </div>
   );
 }
@@ -694,7 +695,6 @@ function ReportingCard({
           </Button>
         )}
       </div>
-      </main>
     </div>
   );
 }
