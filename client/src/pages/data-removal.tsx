@@ -245,7 +245,7 @@ function OverviewTab() {
             </div>
             <h3 className="text-xl font-semibold">Set Up Your Privacy Vault</h3>
             <p className="text-muted-foreground text-center max-w-md">
-              Start by adding your personal information to the secure vault. We use this to check for breaches and identify active data broker sites.
+              Start by adding your personal information to the secure vault. We use this to search people-search sites for your public profiles and help you get them removed.
             </p>
             <Button asChild>
               <span className="cursor-pointer">Go to Personal Vault</span>
@@ -287,7 +287,7 @@ function OverviewTab() {
             <CardContent className="flex flex-col items-center gap-4">
               <div className="text-center space-y-3">
                 <div>
-                  <div className="text-4xl font-bold text-red-600 dark:text-red-400" data-testid="text-confirmed-breaches">{stats.totalExposures}</div>
+                  <div className="text-4xl font-bold text-red-600 dark:text-red-400" data-testid="text-total-exposures">{stats.totalExposures}</div>
                   <p className="text-sm font-medium mt-1">Total Findings</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-center">
@@ -303,10 +303,10 @@ function OverviewTab() {
               </div>
               <p className="text-sm text-muted-foreground text-center max-w-xs">
                 {stats.totalExposures === 0
-                  ? "No findings yet. Run a scan to check for breaches and active broker sites."
+                  ? "No findings yet. Run a scan to search people-search sites for your profiles."
                   : stats.completed > 0
                     ? `You've sent removal requests to ${stats.completed} broker${stats.completed !== 1 ? "s" : ""}. ${stats.pending > 0 ? `${stats.pending} request${stats.pending !== 1 ? "s" : ""} still in progress.` : "All requests sent."}`
-                    : `${stats.totalExposures} finding${stats.totalExposures !== 1 ? "s" : ""} from verified breaches and active brokers. Send removal requests to opt out.`}
+                    : `${stats.totalExposures} profile${stats.totalExposures !== 1 ? "s" : ""} found on data broker sites. Send removal requests to opt out.`}
               </p>
             </CardContent>
           </Card>
@@ -1203,6 +1203,23 @@ function GuestScanForm() {
     verifiedBrokers: number;
     riskLevel: string;
     scanMethod?: string;
+    searchTransparency?: {
+      sitesSearched: number;
+      profilesFound: number;
+      notFound: number;
+      blocked: number;
+      failed: number;
+      totalSearchable: number;
+      notSearchable: number;
+    } | null;
+    breachSummary?: Array<{
+      name: string;
+      domain: string;
+      breachDate: string;
+      dataClasses: string[];
+      pwnCount: number;
+      isVerified: boolean;
+    }>;
     findings: Array<{
       broker: DataBroker;
       dataTypesExposed: string[];
@@ -1214,6 +1231,15 @@ function GuestScanForm() {
       evidenceSummary?: string;
       profileUrl?: string | null;
       matchScore?: number;
+      breachDetails?: {
+        breachName: string;
+        breachDate: string;
+        dataClasses: string[];
+        pwnCount: number;
+        isVerified: boolean;
+        description?: string;
+      } | null;
+      searchStatus?: string | null;
     }>;
   } | undefined;
 
@@ -1223,13 +1249,19 @@ function GuestScanForm() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="h-5 w-5 text-primary" />
-            Quick Privacy Check
+            Find Your Profiles on Data Broker Sites
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            Enter your details to check for verified data breaches and active data broker sites. No account needed.
+            We search people-search websites (like Whitepages, Spokeo, BeenVerified) for public profiles listing your name, address, and phone number. If we find you listed, we can help you request removal. All results are from real searches — no estimates or fake scores.
           </p>
+          <div className="flex items-start gap-2 p-2.5 rounded-md bg-primary/5 text-xs">
+            <Info className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+            <p className="text-muted-foreground">
+              <span className="font-medium">Different from breach checking:</span> Our <Link href="/breach-dashboard" className="text-primary underline underline-offset-2">Breach Dashboard</Link> checks if your email was in data breaches. This tool finds your <span className="font-medium">public profiles</span> on people-search sites and helps you get them removed.
+            </p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Full Name *</label>
@@ -1282,163 +1314,206 @@ function GuestScanForm() {
             ) : (
               <Search className="h-4 w-4 mr-2" />
             )}
-            Check My Exposure
+            Search for My Profiles
           </Button>
         </CardContent>
       </Card>
 
       {result && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="text-3xl font-bold text-red-600 dark:text-red-400" data-testid="text-guest-confirmed">{result.confirmedExposures || 0}</div>
-                <p className="text-sm font-medium mt-1">Breaches</p>
-                <p className="text-xs text-muted-foreground">Email found in verified data breaches</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="text-3xl font-bold text-red-500 dark:text-red-400" data-testid="text-guest-profiles">{result.profilesFound || 0}</div>
-                <p className="text-sm font-medium mt-1">Profiles Found</p>
-                <p className="text-xs text-muted-foreground">Your listing found on broker sites</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="text-3xl font-bold text-orange-600 dark:text-orange-400" data-testid="text-guest-verified">{result.verifiedBrokers || 0}</div>
-                <p className="text-sm font-medium mt-1">Active Brokers</p>
-                <p className="text-xs text-muted-foreground">Active sites we could not search</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <div className="text-3xl font-bold" data-testid="text-guest-scanned">{result.totalBrokersScanned.toLocaleString()}</div>
-                <p className="text-sm font-medium mt-1">Total Checked</p>
-                <p className="text-xs text-muted-foreground">Out of {(result.totalBrokersInCatalog || result.totalBrokersScanned).toLocaleString()} in catalog</p>
-              </CardContent>
-            </Card>
-          </div>
-
           <Card>
-            <CardContent className="pt-4 space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Shield className="h-4 w-4 text-primary" />
-                <span className="font-medium">What This Scan Actually Does</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="flex items-start gap-2 p-2 rounded-md bg-red-50 dark:bg-red-950/30">
-                  <AlertTriangle className="h-3.5 w-3.5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
-                  <div>
-                    <span className="font-medium text-red-700 dark:text-red-400">Confirmed Breach</span>
-                    <p className="text-muted-foreground mt-0.5">Your email was found in a real data breach verified by Have I Been Pwned.</p>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Search className="h-5 w-5 text-primary" />
+                People-Search Site Results
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {result.searchTransparency
+                  ? `We searched ${result.searchTransparency.totalSearchable} people-search websites for your name and location. Here's exactly what happened with each search:`
+                  : `We scanned ${result.totalBrokersScanned.toLocaleString()} data brokers for your information.`}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {result.searchTransparency ? (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="p-3 rounded-md bg-red-50 dark:bg-red-950/30 text-center">
+                      <div className="text-2xl font-bold text-red-600 dark:text-red-400" data-testid="text-search-found">{result.searchTransparency.profilesFound}</div>
+                      <p className="text-xs font-medium mt-1">Profiles Found</p>
+                      <p className="text-xs text-muted-foreground">Your info is listed</p>
+                    </div>
+                    <div className="p-3 rounded-md bg-green-50 dark:bg-green-950/30 text-center">
+                      <div className="text-2xl font-bold text-green-600 dark:text-green-400" data-testid="text-search-clean">{result.searchTransparency.notFound}</div>
+                      <p className="text-xs font-medium mt-1">Clean</p>
+                      <p className="text-xs text-muted-foreground">Searched, not found</p>
+                    </div>
+                    <div className="p-3 rounded-md bg-orange-50 dark:bg-orange-950/30 text-center">
+                      <div className="text-2xl font-bold text-orange-600 dark:text-orange-400" data-testid="text-search-blocked">{result.searchTransparency.blocked + result.searchTransparency.failed}</div>
+                      <p className="text-xs font-medium mt-1">Blocked</p>
+                      <p className="text-xs text-muted-foreground">Site rejected our search</p>
+                    </div>
+                    <div className="p-3 rounded-md bg-muted/50 text-center">
+                      <div className="text-2xl font-bold" data-testid="text-search-unsearchable">{result.searchTransparency.notSearchable}</div>
+                      <p className="text-xs font-medium mt-1">Not Searchable</p>
+                      <p className="text-xs text-muted-foreground">Require paid API access</p>
+                    </div>
+                  </div>
+                  {(result.searchTransparency.blocked + result.searchTransparency.failed) > 0 && (
+                    <div className="flex items-start gap-2 p-2.5 rounded-md bg-muted/30 text-xs">
+                      <Info className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                      <p className="text-muted-foreground">
+                        <span className="font-medium">{result.searchTransparency.blocked + result.searchTransparency.failed} sites blocked</span> our automated search (CAPTCHAs, JavaScript rendering, or bot detection). Your profile may still exist on those sites — you can check them manually, or paid services like DeleteMe ($129/year) use human researchers to access these.
+                      </p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="p-3 rounded-md bg-red-50 dark:bg-red-950/30 text-center">
+                    <div className="text-2xl font-bold text-red-600 dark:text-red-400" data-testid="text-profiles-found">{result.profilesFound || 0}</div>
+                    <p className="text-xs font-medium mt-1">Profiles Found</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <div className="text-2xl font-bold" data-testid="text-brokers-scanned">{result.totalBrokersScanned.toLocaleString()}</div>
+                    <p className="text-xs font-medium mt-1">Brokers Checked</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-muted/50 text-center">
+                    <div className="text-2xl font-bold" data-testid="text-total-findings">{result.totalExposuresFound}</div>
+                    <p className="text-xs font-medium mt-1">Total Findings</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-2 p-2 rounded-md bg-red-50/60 dark:bg-red-950/20">
-                  <Search className="h-3.5 w-3.5 text-red-500 dark:text-red-400 mt-0.5 shrink-0" />
-                  <div>
-                    <span className="font-medium text-red-600 dark:text-red-400">Profile Found</span>
-                    <p className="text-muted-foreground mt-0.5">We searched this broker's website and found a profile matching your name and location.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2 p-2 rounded-md bg-orange-50 dark:bg-orange-950/30">
-                  <CheckCircle className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
-                  <div>
-                    <span className="font-medium text-orange-700 dark:text-orange-400">Active Broker</span>
-                    <p className="text-muted-foreground mt-0.5">Broker is active but we could not search it for your profile (some sites block automated lookups).</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2 p-2 rounded-md bg-muted/50">
-                  <Info className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
-                  <div>
-                    <span className="font-medium">Transparency</span>
-                    <p className="text-muted-foreground mt-0.5">We only report what we can verify. Match scores show how closely a found profile matches your provided details.</p>
-                  </div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 
-          {result.findings.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-destructive" />
-                  Scan Results
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Results grouped by evidence strength. We only report what we can verify.
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {result.findings
-                  .sort((a, b) => {
-                    const tierOrder: Record<string, number> = { confirmed: 0, profile_found: 1, verified_broker: 2 };
-                    return (tierOrder[a.evidenceTier || ""] ?? 3) - (tierOrder[b.evidenceTier || ""] ?? 3);
-                  })
-                  .map((finding, idx) => (
-                  <div key={idx} className="p-4 border rounded-md space-y-2" data-testid={`finding-${idx}`}>
-                    <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium">{finding.broker.name}</span>
-                        {finding.evidenceTier === "confirmed" && (
-                          <Badge variant="destructive" data-testid={`badge-confirmed-${idx}`}>
-                            Breach Confirmed
-                          </Badge>
-                        )}
-                        {finding.evidenceTier === "profile_found" && (
-                          <Badge className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800 no-default-hover-elevate no-default-active-elevate" data-testid={`badge-profile-found-${idx}`}>
-                            Profile Found
-                          </Badge>
-                        )}
-                        {finding.evidenceTier === "verified_broker" && (
-                          <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800 no-default-hover-elevate no-default-active-elevate">
-                            Active Broker
-                          </Badge>
-                        )}
-                        {finding.matchScore != null && finding.matchScore > 0 && (
-                          <Badge variant="outline" className="text-xs">
-                            {finding.matchScore}% match
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {finding.profileUrl && (
+          {(() => {
+            const profileFindings = result.findings.filter(f => f.evidenceTier === "profile_found");
+            const brokerFindings = result.findings.filter(f => f.evidenceTier === "verified_broker");
+            return (
+              <>
+                {profileFindings.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                        <AlertTriangle className="h-5 w-5" />
+                        {profileFindings.length} Profile{profileFindings.length !== 1 ? "s" : ""} Found on Broker Sites
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        We searched these sites and found listings that match your name and location. You can view each profile and request removal.
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {profileFindings.map((finding, idx) => (
+                        <div key={idx} className="p-4 border border-red-200 dark:border-red-900 rounded-md bg-red-50/30 dark:bg-red-950/10 space-y-2" data-testid={`profile-finding-${idx}`}>
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium">{finding.broker.name}</span>
+                              <Badge className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800 no-default-hover-elevate no-default-active-elevate">
+                                Profile Found
+                              </Badge>
+                              {finding.matchScore != null && finding.matchScore > 0 && (
+                                <Badge variant="outline" className="text-xs">
+                                  {finding.matchScore}% match
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {finding.profileUrl && (
+                                <Button variant="outline" size="sm" asChild>
+                                  <a href={finding.profileUrl} target="_blank" rel="noopener noreferrer" data-testid={`link-view-profile-${idx}`}>
+                                    <ExternalLink className="h-3 w-3 mr-1" />
+                                    View Profile
+                                  </a>
+                                </Button>
+                              )}
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  Request Removal
+                                </a>
+                              </Button>
+                            </div>
+                          </div>
+                          {finding.verificationDetails && (
+                            <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md">
+                              {finding.verificationDetails}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {brokerFindings.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2">
+                        <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                        {brokerFindings.length} Active Broker{brokerFindings.length !== 1 ? "s" : ""} We Could Not Search
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        These data broker sites are active but blocked our automated search. Your profile may exist on these sites.
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {brokerFindings.slice(0, 10).map((finding, idx) => (
+                        <div key={idx} className="flex items-center justify-between gap-2 p-3 border rounded-md">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium">{finding.broker.name}</span>
+                            <span className="text-xs text-muted-foreground">{finding.broker.domain}</span>
+                          </div>
                           <Button variant="outline" size="sm" asChild>
-                            <a href={finding.profileUrl} target="_blank" rel="noopener noreferrer" data-testid={`link-view-profile-${idx}`}>
+                            <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-3 w-3 mr-1" />
-                              View Profile
+                              Check Manually
                             </a>
                           </Button>
-                        )}
+                        </div>
+                      ))}
+                      {brokerFindings.length > 10 && (
+                        <p className="text-xs text-muted-foreground text-center pt-2">
+                          + {brokerFindings.length - 10} more active brokers. Create an account to see all.
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {result.breachSummary && result.breachSummary.length > 0 && (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between gap-4 flex-wrap">
+                        <div className="flex items-center gap-3">
+                          <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0" />
+                          <div>
+                            <p className="font-medium">Your email also appeared in {result.breachSummary.length} data breach{result.breachSummary.length !== 1 ? "es" : ""}</p>
+                            <p className="text-sm text-muted-foreground">Use our Breach Dashboard for full details, monitoring, and alerts.</p>
+                          </div>
+                        </div>
                         <Button variant="outline" size="sm" asChild>
-                          <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
+                          <Link href="/breach-dashboard">
                             <ExternalLink className="h-3 w-3 mr-1" />
-                            Opt Out
-                          </a>
+                            View Breach Dashboard
+                          </Link>
                         </Button>
                       </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {finding.broker.domain}
-                      {finding.dataTypesExposed.length > 0 && (
-                        <span> &middot; {finding.evidenceTier === "confirmed" ? "Data in breach:" : "Broker collects:"} {finding.dataTypesExposed.join(", ")}</span>
-                      )}
-                    </p>
-                    {finding.verificationDetails && (
-                      <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md">
-                        {finding.verificationDetails}
-                      </p>
-                    )}
-                  </div>
-                ))}
-                <div className="pt-4 border-t text-center space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Sign up to see all exposures, track removal requests, and get automated opt-out letters.
-                  </p>
-                  <Button asChild>
-                    <Link href="/register">Create Free Account</Link>
-                  </Button>
+                    </CardContent>
+                  </Card>
+                )}
+              </>
+            );
+          })()}
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Create an account to automatically send removal requests, track progress, and get re-scan alerts when your data reappears.
+                </p>
+                <Button asChild>
+                  <Link href="/register">Create Free Account</Link>
+                </Button>
                 </div>
               </CardContent>
             </Card>
@@ -3041,7 +3116,7 @@ export default function DataRemoval() {
                   Data Broker Removal
                 </h1>
                 <p className="text-white/70 mt-1 max-w-2xl">
-                  Check for confirmed breaches, identify active data brokers, and send opt-out requests to 500+ sites.
+                  Find your public profiles on people-search sites, send opt-out requests, and track removal progress across 500+ data brokers.
                 </p>
               </div>
             </div>

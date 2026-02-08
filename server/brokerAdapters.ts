@@ -1204,13 +1204,32 @@ export async function searchBrokerForProfile(
   }
 }
 
+export interface SearchStats {
+  totalSearchable: number;
+  searched: number;
+  found: number;
+  notFound: number;
+  blocked: number;
+  failed: number;
+  brokerStatuses: Map<string, "searched_found" | "searched_not_found" | "search_blocked" | "search_failed">;
+}
+
 export async function searchAllBrokersForProfile(
   params: SearchParams,
   batchSize = 5,
   delayBetweenBatchesMs = 2000,
-): Promise<Map<string, ProfileSearchResult>> {
+): Promise<{ results: Map<string, ProfileSearchResult>; stats: SearchStats }> {
   const results = new Map<string, ProfileSearchResult>();
   const searchable = getSearchableAdapters();
+  const stats: SearchStats = {
+    totalSearchable: searchable.length,
+    searched: 0,
+    found: 0,
+    notFound: 0,
+    blocked: 0,
+    failed: 0,
+    brokerStatuses: new Map(),
+  };
 
   console.log(`[broker-adapter] Starting real profile search across ${searchable.length} broker sites for "${params.firstName} ${params.lastName}"`);
 
@@ -1220,15 +1239,33 @@ export async function searchAllBrokersForProfile(
     const batchResults = await Promise.allSettled(
       batch.map(async (adapter) => {
         const result = await adapter.searchProfile(params);
-        return { brokerId: adapter.brokerId, result };
+        return { brokerId: adapter.brokerId, brokerName: adapter.brokerName, result };
       })
     );
 
     for (const batchResult of batchResults) {
       if (batchResult.status === "fulfilled") {
-        results.set(batchResult.value.brokerId, batchResult.value.result);
-        if (batchResult.value.result.found) {
-          console.log(`[broker-adapter] PROFILE FOUND on ${batchResult.value.brokerId} (score: ${batchResult.value.result.matchScore}, method: ${batchResult.value.result.searchMethod})`);
+        const { brokerId, result } = batchResult.value;
+        results.set(brokerId, result);
+        stats.searched++;
+
+        if (result.responseTimeMs === 0 && !result.found && !result.nameMatch) {
+          stats.blocked++;
+          stats.brokerStatuses.set(brokerId, "search_blocked");
+          console.log(`[broker-adapter] BLOCKED by ${brokerId} (request failed or timed out)`);
+        } else if (result.found && result.matchScore >= 40) {
+          stats.found++;
+          stats.brokerStatuses.set(brokerId, "searched_found");
+          console.log(`[broker-adapter] PROFILE FOUND on ${brokerId} (score: ${result.matchScore}, method: ${result.searchMethod})`);
+        } else {
+          stats.notFound++;
+          stats.brokerStatuses.set(brokerId, "searched_not_found");
+        }
+      } else {
+        stats.failed++;
+        const adapter = batch[batchResults.indexOf(batchResult)];
+        if (adapter) {
+          stats.brokerStatuses.set(adapter.brokerId, "search_failed");
         }
       }
     }
@@ -1238,9 +1275,8 @@ export async function searchAllBrokersForProfile(
     }
   }
 
-  const found = Array.from(results.values()).filter(r => r.found).length;
-  console.log(`[broker-adapter] Profile search complete: ${found} profiles found across ${searchable.length} broker sites`);
+  console.log(`[broker-adapter] Profile search complete: ${stats.found} found, ${stats.notFound} not found, ${stats.blocked} blocked, ${stats.failed} failed across ${searchable.length} sites`);
 
-  return results;
+  return { results, stats };
 }
 

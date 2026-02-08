@@ -22,7 +22,7 @@ import {
   type PrivacyReport,
 } from "@shared/schema";
 import { eq, and, ilike, sql, desc, count, gte, lte, inArray } from "drizzle-orm";
-import { searchAllBrokersForProfile, getSearchableAdapters, type ProfileSearchResult, type SearchParams } from "./brokerAdapters";
+import { searchAllBrokersForProfile, getSearchableAdapters, type ProfileSearchResult, type SearchParams, type SearchStats } from "./brokerAdapters";
 
 const RISK_WEIGHTS: Record<string, number> = {
   critical: 4,
@@ -84,6 +84,17 @@ interface VerifiedFinding {
   profileUrl?: string | null;
   matchScore?: number;
   profileDiscovery?: ProfileSearchResult | null;
+  breachDetails?: BreachDetail | null;
+  searchStatus?: "searched_found" | "searched_not_found" | "search_blocked" | "not_searchable" | null;
+}
+
+interface BreachDetail {
+  breachName: string;
+  breachDate: string;
+  dataClasses: string[];
+  pwnCount: number;
+  isVerified: boolean;
+  description?: string;
 }
 
 interface BreachResult {
@@ -93,6 +104,7 @@ interface BreachResult {
   dataClasses: string[];
   isVerified: boolean;
   pwnCount: number;
+  description?: string;
 }
 
 async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
@@ -122,6 +134,7 @@ async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
       dataClasses: breach.DataClasses || [],
       isVerified: breach.IsVerified ?? true,
       pwnCount: breach.PwnCount || 0,
+      description: breach.Description || "",
     }));
   } catch (error) {
     console.error("[scan] HIBP check failed:", error);
@@ -209,9 +222,10 @@ async function runRealVerification(
   dateOfBirth?: string,
   scanId?: string,
   userId?: string,
-): Promise<{ findings: VerifiedFinding[]; brokersChecked: number; profilesFound: number }> {
+): Promise<{ findings: VerifiedFinding[]; brokersChecked: number; profilesFound: number; searchStats: SearchStats | null; breachResults: BreachResult[] }> {
   const findings: VerifiedFinding[] = [];
   let profilesFoundCount = 0;
+  let searchStats: SearchStats | null = null;
 
   let breachResults: BreachResult[] = [];
   if (emails.length > 0) {
@@ -250,7 +264,9 @@ async function runRealVerification(
       };
 
       console.log(`[scan] Starting REAL profile discovery for "${firstName} ${lastName}" across ${getSearchableAdapters().length} broker sites`);
-      profileSearchResults = await searchAllBrokersForProfile(searchParams, 4, 2500);
+      const searchOutput = await searchAllBrokersForProfile(searchParams, 4, 2500);
+      profileSearchResults = searchOutput.results;
+      searchStats = searchOutput.stats;
 
       for (const [brokerId, result] of Array.from(profileSearchResults.entries())) {
         if (result.found && result.matchScore >= 40) {
@@ -318,6 +334,10 @@ async function runRealVerification(
         let evidenceTier: EvidenceTier | null = null;
         let verificationMethod = "";
 
+        const matchingBreach = breachMatch
+          ? breachResults.find(b => b.domain.toLowerCase() === domain.toLowerCase())
+          : null;
+
         if (breachMatch) {
           evidenceTier = "confirmed";
           verificationMethod = "breach_confirmed";
@@ -364,8 +384,11 @@ async function runRealVerification(
         let verificationDetails = "";
         let evidenceSummary = "";
 
-        if (evidenceTier === "confirmed") {
-          verificationDetails = `Your email was found in a verified data breach connected to this broker. This is confirmed by Have I Been Pwned, an independent breach notification service.`;
+        if (evidenceTier === "confirmed" && matchingBreach) {
+          verificationDetails = `Your email was found in the "${matchingBreach.name}" data breach (${matchingBreach.breachDate}). ${matchingBreach.pwnCount.toLocaleString()} accounts were affected. Compromised data: ${matchingBreach.dataClasses.join(", ")}. Verified by Have I Been Pwned.`;
+          evidenceSummary = `Breach: ${matchingBreach.name} (${matchingBreach.breachDate})`;
+        } else if (evidenceTier === "confirmed") {
+          verificationDetails = `Your email was found in a verified data breach connected to this broker. Confirmed by Have I Been Pwned.`;
           evidenceSummary = "Breach-confirmed exposure";
         } else if (evidenceTier === "profile_found" && profileResult) {
           const matchParts = [
@@ -389,6 +412,14 @@ async function runRealVerification(
         if (evidenceTier === "confirmed") exposureLevel = "critical";
         else if (evidenceTier === "profile_found") exposureLevel = "high";
 
+        let findingSearchStatus: VerifiedFinding["searchStatus"] = "not_searchable";
+        if (searchStats) {
+          const brokerSearchStatus = searchStats.brokerStatuses.get(broker.id);
+          if (brokerSearchStatus === "searched_found") findingSearchStatus = "searched_found";
+          else if (brokerSearchStatus === "searched_not_found") findingSearchStatus = "searched_not_found";
+          else if (brokerSearchStatus === "search_blocked" || brokerSearchStatus === "search_failed") findingSearchStatus = "search_blocked";
+        }
+
         return {
           broker,
           dataTypesExposed: overlap.length > 0 ? overlap : [],
@@ -401,6 +432,15 @@ async function runRealVerification(
           profileUrl: profileResult?.profileUrl ?? null,
           matchScore: profileResult?.matchScore ?? 0,
           profileDiscovery: profileResult ?? null,
+          breachDetails: matchingBreach ? {
+            breachName: matchingBreach.name,
+            breachDate: matchingBreach.breachDate,
+            dataClasses: matchingBreach.dataClasses,
+            pwnCount: matchingBreach.pwnCount,
+            isVerified: matchingBreach.isVerified,
+            description: matchingBreach.description,
+          } : null,
+          searchStatus: findingSearchStatus,
         } as VerifiedFinding;
       })
     );
@@ -442,9 +482,18 @@ async function runRealVerification(
           exposureLevel: "critical",
           evidenceTier: "confirmed",
           verificationMethod: "breach_confirmed",
-          verificationDetails: `Your email was found in the "${breach.name}" data breach (${breach.breachDate}). ${breach.pwnCount.toLocaleString()} accounts were affected. This is independently verified by Have I Been Pwned.`,
+          verificationDetails: `Your email was found in the "${breach.name}" data breach (${breach.breachDate}). ${breach.pwnCount.toLocaleString()} accounts were affected. Compromised data: ${breach.dataClasses.join(", ")}. Verified by Have I Been Pwned.`,
           sourceEvidence: `Have I Been Pwned: ${breach.name} | Breach date: ${breach.breachDate} | Verified: ${breach.isVerified} | ${breach.pwnCount.toLocaleString()} accounts | Data: ${breach.dataClasses.join(", ")}`,
-          evidenceSummary: "Breach-confirmed exposure",
+          evidenceSummary: `Breach: ${breach.name} (${breach.breachDate})`,
+          breachDetails: {
+            breachName: breach.name,
+            breachDate: breach.breachDate,
+            dataClasses: breach.dataClasses,
+            pwnCount: breach.pwnCount,
+            isVerified: breach.isVerified,
+            description: breach.description,
+          },
+          searchStatus: null,
         });
       }
     }
@@ -455,7 +504,7 @@ async function runRealVerification(
     return (tierOrder[b.evidenceTier] ?? 0) - (tierOrder[a.evidenceTier] ?? 0);
   });
 
-  return { findings, brokersChecked: brokersToCheck.length, profilesFound: profilesFoundCount };
+  return { findings, brokersChecked: brokersToCheck.length, profilesFound: profilesFoundCount, searchStats, breachResults };
 }
 
 interface BrokerCatalogFilters {
@@ -684,6 +733,17 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
       .where(eq(exposureScans.id, scan.id))
       .returning();
 
+    const ss = verificationResult.searchStats;
+    const searchTransparency = ss ? {
+      sitesSearched: ss.searched,
+      profilesFound: ss.found,
+      notFound: ss.notFound,
+      blocked: ss.blocked,
+      failed: ss.failed,
+      totalSearchable: ss.totalSearchable,
+      notSearchable: allBrokers.length - ss.totalSearchable,
+    } : null;
+
     return {
       scan: updatedScan,
       findings,
@@ -691,6 +751,9 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
       totalExposuresFound: findings.length,
       riskLevel,
       scanMethod: "verified",
+      searchTransparency,
+      confirmedExposures: confirmedCount,
+      profilesFound: profileFoundCount,
     };
   } catch (error) {
     await db
@@ -739,11 +802,33 @@ export async function runGuestExposureScan(guestData: {
     sourceEvidence: match.sourceEvidence,
     profileUrl: match.profileUrl ?? null,
     matchScore: match.matchScore ?? 0,
+    breachDetails: match.breachDetails ?? null,
+    searchStatus: match.searchStatus ?? null,
   }));
 
   const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
   const profileFoundCount = verificationResult.findings.filter(f => f.evidenceTier === "profile_found").length;
   const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
+
+  const ss = verificationResult.searchStats;
+  const searchTransparency = ss ? {
+    sitesSearched: ss.searched,
+    profilesFound: ss.found,
+    notFound: ss.notFound,
+    blocked: ss.blocked,
+    failed: ss.failed,
+    totalSearchable: ss.totalSearchable,
+    notSearchable: allBrokers.length - ss.totalSearchable,
+  } : null;
+
+  const breachSummary = verificationResult.breachResults.map(b => ({
+    name: b.name,
+    domain: b.domain,
+    breachDate: b.breachDate,
+    dataClasses: b.dataClasses,
+    pwnCount: b.pwnCount,
+    isVerified: b.isVerified,
+  }));
 
   return {
     totalBrokersScanned: verificationResult.brokersChecked,
@@ -754,6 +839,8 @@ export async function runGuestExposureScan(guestData: {
     verifiedBrokers: verifiedBrokerCount,
     findings,
     scanMethod: "verified",
+    searchTransparency,
+    breachSummary,
   };
 }
 
