@@ -45,6 +45,7 @@ import {
   Briefcase,
   Users,
   ShieldCheck,
+  Plus,
 } from "lucide-react";
 
 interface DataBroker {
@@ -1082,7 +1083,166 @@ function VaultTab() {
           </Button>
         </CardContent>
       </Card>
+
+      <FamilyProfilesSection />
     </motion.div>
+  );
+}
+
+function FamilyProfilesSection() {
+  const { toast } = useToast();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newProfileName, setNewProfileName] = useState("");
+  const [newFullName, setNewFullName] = useState("");
+  const [newEmails, setNewEmails] = useState("");
+
+  const { data: profiles, isLoading } = useQuery<VaultProfile[]>({
+    queryKey: ["/api/data-removal/vault/profiles"],
+  });
+
+  const addMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        profileName: newProfileName,
+        fullName: newFullName || undefined,
+        emails: newEmails ? newEmails.split(",").map((s) => s.trim()).filter(Boolean) : undefined,
+      };
+      const res = await apiRequest("POST", "/api/data-removal/vault/family", payload);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/vault/profiles"] });
+      toast({ title: "Family Member Added", description: `${newProfileName} has been added to your protection plan.` });
+      setShowAddForm(false);
+      setNewProfileName("");
+      setNewFullName("");
+      setNewEmails("");
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (profileId: string) => {
+      const res = await apiRequest("DELETE", `/api/data-removal/vault/family/${profileId}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/vault/profiles"] });
+      toast({ title: "Profile Removed", description: "Family member profile has been removed." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  if (isLoading) return null;
+
+  return (
+    <Card data-testid="card-family-profiles">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          Family Protection Plan
+        </CardTitle>
+        <CardDescription>
+          Protect your entire family. Add up to 6 profiles to monitor and remove their data from broker sites.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {profiles && profiles.length > 0 && (
+          <div className="space-y-2">
+            {profiles.map((profile) => (
+              <div key={profile.id} className="flex items-center justify-between gap-3 p-3 rounded-md border" data-testid={`card-family-profile-${profile.id}`}>
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <User className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">{profile.profileName}</p>
+                    <p className="text-xs text-muted-foreground">{profile.fullName || "No name set"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">{profile.emails?.length || 0} emails</Badge>
+                  {profiles.length > 1 && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      data-testid={`button-delete-profile-${profile.id}`}
+                      onClick={() => deleteMutation.mutate(profile.id)}
+                      disabled={deleteMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {profiles && profiles.length < 6 && !showAddForm && (
+          <Button
+            variant="outline"
+            onClick={() => setShowAddForm(true)}
+            data-testid="button-add-family-member"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Family Member
+          </Button>
+        )}
+
+        {showAddForm && (
+          <div className="space-y-3 p-4 rounded-md border">
+            <p className="text-sm font-medium">Add Family Member</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground">Profile Name *</label>
+                <Input
+                  data-testid="input-family-profile-name"
+                  placeholder='e.g. "Mom", "Dad", "Kid"'
+                  value={newProfileName}
+                  onChange={(e) => setNewProfileName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground">Full Name</label>
+                <Input
+                  data-testid="input-family-full-name"
+                  placeholder="Jane Doe"
+                  value={newFullName}
+                  onChange={(e) => setNewFullName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground">Email Addresses</label>
+                <Input
+                  data-testid="input-family-emails"
+                  placeholder="email@example.com"
+                  value={newEmails}
+                  onChange={(e) => setNewEmails(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                data-testid="button-save-family-member"
+                onClick={() => addMutation.mutate()}
+                disabled={addMutation.isPending || !newProfileName.trim()}
+              >
+                {addMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Save Member
+              </Button>
+              <Button variant="outline" onClick={() => setShowAddForm(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

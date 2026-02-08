@@ -61,6 +61,9 @@ import {
   getBrokerCatalog,
   getBrokerById,
   getUserVaultProfile,
+  getAllVaultProfiles,
+  createFamilyProfile,
+  deleteFamilyProfile,
   upsertVaultProfile,
   runExposureScan,
   getUserScanHistory,
@@ -2725,7 +2728,48 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/scan", isAuthenticated, async (req: any, res: Response) => {
+  app.get("/api/data-removal/vault/profiles", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+    try {
+      const profiles = await getAllVaultProfiles(req.user.id);
+      res.json(profiles);
+    } catch (error: any) {
+      console.error("Error fetching vault profiles:", error);
+      res.status(500).json({ error: "Failed to fetch vault profiles" });
+    }
+  });
+
+  app.post("/api/data-removal/vault/family", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+    try {
+      const { profileName, fullName, emails, phoneNumbers, currentAddress } = req.body;
+      if (!profileName) {
+        return res.status(400).json({ error: "Profile name is required" });
+      }
+      const profile = await createFamilyProfile(req.user.id, {
+        profileName,
+        fullName,
+        emails,
+        phoneNumbers,
+        currentAddress,
+      });
+      res.json(profile);
+    } catch (error: any) {
+      console.error("Error creating family profile:", error);
+      res.status(400).json({ error: error.message || "Failed to create family profile" });
+    }
+  });
+
+  app.delete("/api/data-removal/vault/family/:id", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+    try {
+      const profileId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const result = await deleteFamilyProfile(req.user.id, profileId);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error deleting family profile:", error);
+      res.status(400).json({ error: error.message || "Failed to delete family profile" });
+    }
+  });
+
+  app.post("/api/data-removal/scan", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { vaultProfileId } = req.body;

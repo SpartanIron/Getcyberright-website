@@ -9,6 +9,7 @@ import {
   monitoringSchedules,
   privacyReports,
   removalAuditLog,
+  optOutContent,
   VALID_STATUS_TRANSITIONS,
   type DataBroker,
   type UserVaultProfile,
@@ -176,6 +177,53 @@ export async function getUserVaultProfile(userId: string): Promise<UserVaultProf
     .from(userVaultProfiles)
     .where(and(eq(userVaultProfiles.userId, userId), eq(userVaultProfiles.isActive, true)));
   return profile ?? null;
+}
+
+export async function getAllVaultProfiles(userId: string): Promise<UserVaultProfile[]> {
+  return db
+    .select()
+    .from(userVaultProfiles)
+    .where(and(eq(userVaultProfiles.userId, userId), eq(userVaultProfiles.isActive, true)));
+}
+
+export async function createFamilyProfile(
+  userId: string,
+  data: {
+    profileName: string;
+    fullName?: string;
+    emails?: string[];
+    phoneNumbers?: string[];
+    currentAddress?: string;
+    relativeNames?: string[];
+  }
+) {
+  const existingProfiles = await getAllVaultProfiles(userId);
+  if (existingProfiles.length >= 6) {
+    throw new Error("Maximum of 6 family member profiles allowed");
+  }
+
+  const [created] = await db
+    .insert(userVaultProfiles)
+    .values({ userId, ...data })
+    .returning();
+  return created;
+}
+
+export async function deleteFamilyProfile(userId: string, profileId: string) {
+  const [profile] = await db
+    .select()
+    .from(userVaultProfiles)
+    .where(and(eq(userVaultProfiles.id, profileId), eq(userVaultProfiles.userId, userId)));
+  if (!profile) throw new Error("Profile not found");
+
+  const allProfiles = await getAllVaultProfiles(userId);
+  if (allProfiles.length <= 1) throw new Error("Cannot delete your only profile");
+
+  await db
+    .update(userVaultProfiles)
+    .set({ isActive: false })
+    .where(eq(userVaultProfiles.id, profileId));
+  return { success: true };
 }
 
 export async function upsertVaultProfile(
@@ -438,42 +486,68 @@ async function logAuditEvent(
   }
 }
 
+const JURISDICTION_LEGAL_BASIS: Record<string, string> = {
+  "CCPA": "California Consumer Privacy Act - Cal. Civ. Code \u00A71798.105",
+  "CPRA": "California Privacy Rights Act - Cal. Civ. Code \u00A71798.105 (amended)",
+  "GDPR": "General Data Protection Regulation - Article 17 (Right to Erasure)",
+  "VCDPA": "Virginia Consumer Data Protection Act - Va. Code \u00A759.1-580",
+  "CPA": "Colorado Privacy Act - C.R.S. \u00A76-1-1306",
+  "CTDPA": "Connecticut Data Privacy Act - Conn. Gen. Stat. \u00A742-520",
+  "UCPA": "Utah Consumer Privacy Act - Utah Code \u00A713-61-201",
+  "PIPEDA": "Personal Information Protection and Electronic Documents Act - S.C. 2000, c. 5",
+  "LGPD": "Lei Geral de Prote\u00E7\u00E3o de Dados - Art. 18(VI)",
+};
+
 function determineJurisdiction(broker: DataBroker, userAddress?: string | null): { jurisdiction: string; legalBasis: string } {
   const legalBases = broker.legalBasis ?? [];
   const countries = broker.countriesApplicable ?? [];
   const address = (userAddress ?? "").toLowerCase();
 
-  const isEU = countries.some(c => ["EU", "UK", "DE", "FR", "IT", "ES", "NL"].includes(c));
-  const isUS = countries.includes("US");
+  const detected = detectJurisdiction(address, countries);
 
-  const caStates = ["california", "ca", "los angeles", "san francisco", "san diego", "sacramento"];
-  const isCaliforniaResident = caStates.some(s => address.includes(s));
+  if (legalBases.includes(detected)) {
+    return { jurisdiction: detected, legalBasis: JURISDICTION_LEGAL_BASIS[detected] ?? `${detected} compliance request` };
+  }
 
-  if (isCaliforniaResident && legalBases.includes("CCPA")) {
-    return { jurisdiction: "CCPA", legalBasis: "California Consumer Privacy Act - Cal. Civ. Code §1798.105" };
+  for (const basis of legalBases) {
+    if (JURISDICTION_LEGAL_BASIS[basis]) {
+      return { jurisdiction: basis, legalBasis: JURISDICTION_LEGAL_BASIS[basis] };
+    }
   }
-  if (legalBases.includes("GDPR") && isEU) {
-    return { jurisdiction: "GDPR", legalBasis: "General Data Protection Regulation - Article 17 (Right to Erasure)" };
+
+  const isEU = countries.some(c => ["EU", "UK", "DE", "FR", "IT", "ES", "NL", "BE", "AT", "IE", "PT", "SE", "PL"].includes(c));
+  if (isEU) {
+    return { jurisdiction: "GDPR", legalBasis: JURISDICTION_LEGAL_BASIS["GDPR"] };
   }
-  if (legalBases.includes("CCPA")) {
-    return { jurisdiction: "CCPA", legalBasis: "California Consumer Privacy Act - Cal. Civ. Code §1798.105" };
+  if (countries.includes("US")) {
+    return { jurisdiction: "CCPA", legalBasis: JURISDICTION_LEGAL_BASIS["CCPA"] };
   }
-  if (legalBases.includes("GDPR")) {
-    return { jurisdiction: "GDPR", legalBasis: "General Data Protection Regulation - Article 17 (Right to Erasure)" };
+  if (countries.includes("CA") || countries.includes("Canada")) {
+    return { jurisdiction: "PIPEDA", legalBasis: JURISDICTION_LEGAL_BASIS["PIPEDA"] };
   }
-  if (isUS) {
-    return { jurisdiction: "US_GENERAL", legalBasis: "Direct consumer opt-out request under applicable US privacy laws" };
+  if (countries.includes("BR") || countries.includes("Brazil")) {
+    return { jurisdiction: "LGPD", legalBasis: JURISDICTION_LEGAL_BASIS["LGPD"] };
   }
-  return { jurisdiction: "GENERAL", legalBasis: "Direct consumer opt-out request" };
+
+  return { jurisdiction: "CCPA", legalBasis: JURISDICTION_LEGAL_BASIS["CCPA"] };
 }
 
 function calculateComplianceDeadline(jurisdiction: string): Date {
   const deadline = new Date();
   switch (jurisdiction) {
     case "GDPR":
+    case "PIPEDA":
       deadline.setDate(deadline.getDate() + 30);
       break;
+    case "LGPD":
+      deadline.setDate(deadline.getDate() + 15);
+      break;
     case "CCPA":
+    case "CPRA":
+    case "VCDPA":
+    case "CPA":
+    case "CTDPA":
+    case "UCPA":
       deadline.setDate(deadline.getDate() + 45);
       break;
     default:
@@ -607,9 +681,28 @@ Sincerely,
 
 ${fullName}`;
 
+  const legalCitations: string[] = [];
+  if (hasCCPA) legalCitations.push("CCPA Cal. Civ. Code \u00A71798.105");
+  if (hasGDPR) legalCitations.push("GDPR Article 17 (Right to Erasure)");
+  const framework = hasGDPR ? "GDPR" : hasCCPA ? "CCPA" : "General";
+
+  await db.insert(optOutContent).values({
+    userId,
+    brokerId,
+    regulatoryFramework: framework,
+    templateType: "deletion_request",
+    subject: `Data Deletion and Opt-Out Request - ${fullName}`,
+    body: emailContent,
+    legalCitations,
+    deliveryMethod: broker.optOutMethod === "email" ? "email" : broker.optOutMethod === "mail" ? "postal" : "web-form",
+    status: "draft",
+  });
+
   return {
     emailContent,
     letterContent,
+    regulatoryFramework: framework,
+    legalCitations,
     broker: {
       name: broker.name,
       domain: broker.domain,
@@ -1116,6 +1209,55 @@ export async function generatePrivacyReport(userId: string) {
   };
 }
 
+const US_STATE_JURISDICTIONS: Record<string, string> = {
+  "california": "CCPA", "ca": "CCPA",
+  "virginia": "VCDPA", "va": "VCDPA",
+  "colorado": "CPA", "co": "CPA",
+  "connecticut": "CTDPA", "ct": "CTDPA",
+  "utah": "UCPA", "ut": "UCPA",
+};
+
+const COUNTRY_JURISDICTIONS: Record<string, string> = {
+  "us": "CCPA", "united states": "CCPA",
+  "uk": "GDPR", "united kingdom": "GDPR", "gb": "GDPR",
+  "ca": "PIPEDA", "canada": "PIPEDA",
+  "br": "LGPD", "brazil": "LGPD",
+  "de": "GDPR", "germany": "GDPR",
+  "fr": "GDPR", "france": "GDPR",
+  "it": "GDPR", "italy": "GDPR",
+  "es": "GDPR", "spain": "GDPR",
+  "nl": "GDPR", "netherlands": "GDPR",
+  "be": "GDPR", "belgium": "GDPR",
+  "at": "GDPR", "austria": "GDPR",
+  "ie": "GDPR", "ireland": "GDPR",
+  "pt": "GDPR", "portugal": "GDPR",
+  "se": "GDPR", "sweden": "GDPR",
+  "pl": "GDPR", "poland": "GDPR",
+};
+
+export function detectJurisdiction(userLocation?: string, brokerCountries?: string[]): string {
+  if (!userLocation) {
+    const hasBrokerEU = brokerCountries?.some((c) => ["EU", "UK", "GB"].includes(c.toUpperCase()));
+    if (hasBrokerEU) return "GDPR";
+    return "CCPA";
+  }
+
+  const loc = userLocation.toLowerCase().trim();
+
+  for (const [key, jurisdiction] of Object.entries(US_STATE_JURISDICTIONS)) {
+    if (loc.includes(key)) return jurisdiction;
+  }
+
+  for (const [key, jurisdiction] of Object.entries(COUNTRY_JURISDICTIONS)) {
+    if (loc.includes(key)) return jurisdiction;
+  }
+
+  const hasBrokerEU = brokerCountries?.some((c) => ["EU", "UK", "GB"].includes(c.toUpperCase()));
+  if (hasBrokerEU) return "GDPR";
+
+  return "CCPA";
+}
+
 export async function getComplianceDashboard(userId: string) {
   const requests = await db
     .select()
@@ -1123,6 +1265,17 @@ export async function getComplianceDashboard(userId: string) {
     .where(eq(removalRequests.userId, userId));
 
   const now = new Date();
+  const REGULATORY_DEADLINES: Record<string, number> = {
+    "CCPA": 45,
+    "CPRA": 45,
+    "GDPR": 30,
+    "VCDPA": 45,
+    "CPA": 45,
+    "CTDPA": 45,
+    "UCPA": 45,
+    "PIPEDA": 30,
+    "LGPD": 15,
+  };
   const ccpaDeadlineDays = 45;
   const gdprDeadlineDays = 30;
 
@@ -1154,7 +1307,7 @@ export async function getComplianceDashboard(userId: string) {
         responseCount++;
       }
     } else if (req.requestSentAt) {
-      const deadlineDays = jurisdiction === "GDPR" ? gdprDeadlineDays : ccpaDeadlineDays;
+      const deadlineDays = REGULATORY_DEADLINES[jurisdiction] ?? ccpaDeadlineDays;
       const deadline = new Date(req.requestSentAt);
       deadline.setDate(deadline.getDate() + deadlineDays);
 
@@ -1198,12 +1351,15 @@ export async function getComplianceDashboard(userId: string) {
     jurisdictionStats,
     overdueRequests: overdueRequests.sort((a, b) => b.daysPastDeadline - a.daysPastDeadline).slice(0, 20),
     regulatoryFrameworks: [
-      { name: "CCPA", deadlineDays: ccpaDeadlineDays, description: "California Consumer Privacy Act", region: "California, US" },
-      { name: "GDPR", deadlineDays: gdprDeadlineDays, description: "General Data Protection Regulation", region: "EU/EEA" },
-      { name: "CPRA", deadlineDays: ccpaDeadlineDays, description: "California Privacy Rights Act", region: "California, US" },
+      { name: "CCPA", deadlineDays: 45, description: "California Consumer Privacy Act", region: "California, US" },
+      { name: "GDPR", deadlineDays: 30, description: "General Data Protection Regulation", region: "EU/EEA/UK" },
+      { name: "CPRA", deadlineDays: 45, description: "California Privacy Rights Act", region: "California, US" },
       { name: "VCDPA", deadlineDays: 45, description: "Virginia Consumer Data Protection Act", region: "Virginia, US" },
       { name: "CPA", deadlineDays: 45, description: "Colorado Privacy Act", region: "Colorado, US" },
       { name: "CTDPA", deadlineDays: 45, description: "Connecticut Data Privacy Act", region: "Connecticut, US" },
+      { name: "UCPA", deadlineDays: 45, description: "Utah Consumer Privacy Act", region: "Utah, US" },
+      { name: "PIPEDA", deadlineDays: 30, description: "Personal Information Protection and Electronic Documents Act", region: "Canada" },
+      { name: "LGPD", deadlineDays: 15, description: "Lei Geral de Prote\u00E7\u00E3o de Dados", region: "Brazil" },
     ],
   };
 }

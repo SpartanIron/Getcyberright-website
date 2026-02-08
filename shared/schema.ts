@@ -825,6 +825,34 @@ export const privacyReports = pgTable("privacy_reports", {
 
 export type PrivacyReport = typeof privacyReports.$inferSelect;
 
+export const optOutContent = pgTable("opt_out_content", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  brokerId: varchar("broker_id").notNull(),
+  removalRequestId: varchar("removal_request_id"),
+  regulatoryFramework: text("regulatory_framework").notNull().default("CCPA"),
+  templateType: text("template_type").notNull().default("deletion_request"),
+  subject: text("subject"),
+  body: text("body").notNull(),
+  legalCitations: text("legal_citations").array(),
+  attachmentDescriptions: text("attachment_descriptions").array(),
+  deliveryMethod: text("delivery_method").default("email"),
+  sentAt: timestamp("sent_at"),
+  responseReceivedAt: timestamp("response_received_at"),
+  responseContent: text("response_content"),
+  status: text("status").notNull().default("draft"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type OptOutContent = typeof optOutContent.$inferSelect;
+export const insertOptOutContentSchema = createInsertSchema(optOutContent).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertOptOutContent = z.infer<typeof insertOptOutContentSchema>;
+
 export const removalAuditLog = pgTable("removal_audit_log", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id"),

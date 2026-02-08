@@ -12764,11 +12764,57 @@ export async function seedDataBrokers(db: any) {
     },
   ];
 
+  const enrichedBrokers = brokers.map((broker) => {
+    const af = deriveAutomationFeasibility(broker);
+    const vm = deriveVerificationMethod(broker);
+    const pp = `https://${broker.domain}/privacy`;
+    const drp = deriveRetentionPolicy(broker);
+    return { ...broker, automationFeasibility: af, verificationMethod: vm, privacyPolicyUrl: pp, dataRetentionPolicy: drp };
+  });
+
   const BATCH_SIZE = 25;
-  for (let i = 0; i < brokers.length; i += BATCH_SIZE) {
-    const batch = brokers.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < enrichedBrokers.length; i += BATCH_SIZE) {
+    const batch = enrichedBrokers.slice(i, i + BATCH_SIZE);
     await db.insert(dataBrokers).values(batch).onConflictDoNothing();
   }
 
-  console.log(`[data-brokers] Seeded ${brokers.length} data brokers`);
+  console.log(`[data-brokers] Seeded ${enrichedBrokers.length} data brokers with metadata enrichment`);
+}
+
+function deriveAutomationFeasibility(broker: any): string {
+  if (broker.optOutMethod === "web-form" && broker.optOutUrl && !broker.requiresIdVerification) return "full";
+  if (broker.optOutMethod === "web-form" && broker.optOutUrl) return "partial";
+  if (broker.optOutMethod === "email") return "semi-automated";
+  if (broker.optOutMethod === "mail" || broker.optOutMethod === "phone") return "manual";
+  if (broker.difficulty === "easy") return "partial";
+  return "manual";
+}
+
+function deriveVerificationMethod(broker: any): string {
+  if (broker.requiresIdVerification) return "government-id";
+  if (broker.optOutMethod === "web-form") return "email-confirmation";
+  if (broker.optOutMethod === "email") return "email-reply";
+  if (broker.requiresAccountCreation) return "account-login";
+  return "none";
+}
+
+function deriveRetentionPolicy(broker: any): string {
+  const cat = broker.category;
+  if (cat === "people-search" || cat === "public-records") return "Indefinite unless removal requested; re-ingestion possible from public records";
+  if (cat === "marketing" || cat === "marketing-data" || cat === "advertising") return "Data retained for campaign lifecycle; opt-out honored within 30 days per CAN-SPAM/CCPA";
+  if (cat === "background-check") return "7-year retention per FCRA; removal upon dispute resolution";
+  if (cat === "financial" || cat === "insurance" || cat === "insurance-data") return "Retained per financial regulation requirements; minimum 5-year retention typical";
+  if (cat === "health" || cat === "health-medical") return "Retained per HIPAA guidelines; de-identification available upon request";
+  if (cat === "court-legal" || cat === "court-legal-records") return "Public record data retained indefinitely; suppression available in some jurisdictions";
+  if (cat === "recruitment" || cat === "business-professional") return "Data retained until opt-out; typically 2-3 year refresh cycle";
+  if (cat === "social-media" || cat === "social-media-aggregator") return "Cached data refreshed periodically; removal honored within 30 days";
+  if (cat === "location" || cat === "iot" || cat === "iot-smart-device") return "Location data retained 18-24 months; anonymized after retention period";
+  if (cat === "data-aggregator" || cat === "data-aggregator-enrichment") return "Aggregated data retained indefinitely; individual opt-out honored within 45 days";
+  if (cat === "vehicle-auto" || cat === "vehicle-auto-records") return "Vehicle records retained per state DMV regulations; typically 5-7 years";
+  if (cat === "real-estate" || cat === "real-estate-property") return "Property records retained indefinitely as public record; suppression available";
+  if (cat === "voter-political") return "Voter data retained per state election law; opt-out from commercial use available";
+  if (cat === "identity-verification") return "Verification data retained for compliance audit trail; minimum 5 years";
+  if (cat === "telecom" || cat === "telecom-communication") return "Communication metadata retained 18 months per FCC guidelines; content data shorter";
+  if (cat === "education" || cat === "education-records") return "Educational records retained per FERPA; opt-out from directory information available";
+  return "Data retained until removal requested; processing within regulatory deadline";
 }
