@@ -82,6 +82,8 @@ import {
   getOverdueRequests,
   getAuditLog,
   runMonitoringScan,
+  sendAutoRemovalRequest,
+  bulkAutoRemoval,
 } from "./dataBrokerService";
 
 // URL reputation checking schemas with validation
@@ -2865,6 +2867,39 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("Error generating opt-out content:", error);
       res.status(500).json({ error: error.message || "Failed to generate opt-out content" });
+    }
+  });
+
+  app.post("/api/data-removal/requests/:id/auto-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const requestId = req.params.id;
+      const ipAddress = req.ip || req.connection?.remoteAddress;
+      const result = await sendAutoRemovalRequest(user.id, requestId, ipAddress);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error auto-sending removal request:", error);
+      res.status(500).json({ error: error.message || "Failed to auto-send removal request" });
+    }
+  });
+
+  app.post("/api/data-removal/requests/bulk-auto-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const { requestIds } = req.body;
+      if (!requestIds || !Array.isArray(requestIds) || requestIds.length === 0) {
+        return res.status(400).json({ error: "requestIds array is required" });
+      }
+      if (requestIds.length > 50) {
+        return res.status(400).json({ error: "Maximum 50 requests per batch" });
+      }
+      const uniqueIds = Array.from(new Set(requestIds as string[]));
+      const ipAddress = req.ip || req.connection?.remoteAddress;
+      const result = await bulkAutoRemoval(user.id, uniqueIds, ipAddress);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error bulk auto-sending removal requests:", error);
+      res.status(500).json({ error: error.message || "Failed to bulk auto-send removal requests" });
     }
   });
 

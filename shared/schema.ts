@@ -838,6 +838,7 @@ export const optOutContent = pgTable("opt_out_content", {
   attachmentDescriptions: text("attachment_descriptions").array(),
   deliveryMethod: text("delivery_method").default("email"),
   sentAt: timestamp("sent_at"),
+  sentTo: text("sent_to"),
   responseReceivedAt: timestamp("response_received_at"),
   responseContent: text("response_content"),
   status: text("status").notNull().default("draft"),
@@ -870,9 +871,10 @@ export const removalAuditLog = pgTable("removal_audit_log", {
 export type RemovalAuditLog = typeof removalAuditLog.$inferSelect;
 
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
-  not_started: ["scan_found", "request_generated"],
+  not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],
   scan_found: ["request_generated", "not_found"],
-  request_generated: ["request_sent", "failed"],
+  request_generated: ["request_sent", "pending", "failed"],
+  pending: ["request_sent", "failed", "request_generated"],
   request_sent: ["in_progress", "confirmed_removed", "failed"],
   in_progress: ["confirmed_removed", "failed"],
   confirmed_removed: ["re_appeared"],

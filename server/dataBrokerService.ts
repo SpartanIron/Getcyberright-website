@@ -784,6 +784,134 @@ export async function updateRemovalStatus(
   return updated;
 }
 
+export async function sendAutoRemovalRequest(
+  userId: string,
+  requestId: string,
+  ipAddress?: string
+): Promise<{ success: boolean; method: string; message: string; sentTo?: string }> {
+  const [request] = await db
+    .select()
+    .from(removalRequests)
+    .where(and(eq(removalRequests.id, requestId), eq(removalRequests.userId, userId)));
+  if (!request) throw new Error("Removal request not found");
+
+  const [broker] = await db.select().from(dataBrokers).where(eq(dataBrokers.id, request.brokerId));
+  if (!broker) throw new Error("Broker not found");
+
+  const optOutResult = await generateOptOutContent(userId, request.brokerId);
+
+  const method = broker.optOutMethod || "email";
+
+  if (!broker.optOutEmail && (method === "email" || method === "mail")) {
+    await updateRemovalStatus(userId, requestId, "pending", `Auto-removal: No verified opt-out email on file for ${broker.name}. Please use the opt-out letter manually via ${broker.optOutUrl || broker.domain}.`, ipAddress);
+    await logAuditEvent(userId, "auto_removal_blocked", "removal_request", requestId, request.status, "pending", { reason: "no_verified_email", brokerName: broker.name }, ipAddress);
+    return {
+      success: false,
+      method: "manual",
+      message: `${broker.name} does not have a verified opt-out email address. We prepared your opt-out letter. You can send it manually or use their website at ${broker.optOutUrl || broker.domain}.`,
+    };
+  }
+
+  const brokerEmail = broker.optOutEmail!;
+
+  if (method === "online" || method === "form") {
+    await updateRemovalStatus(userId, requestId, "pending", `Auto-removal: Broker requires web form submission at ${broker.optOutUrl || broker.domain}. Please visit the link to complete removal manually.`, ipAddress);
+    await logAuditEvent(userId, "auto_removal_attempted", "removal_request", requestId, request.status, "pending", { method: "web-form", brokerName: broker.name, optOutUrl: broker.optOutUrl }, ipAddress);
+    return {
+      success: true,
+      method: "web-form",
+      message: `${broker.name} requires web form submission. We have prepared your opt-out letter. Visit ${broker.optOutUrl || broker.domain} to submit it.`,
+    };
+  }
+
+  if (method === "phone") {
+    await updateRemovalStatus(userId, requestId, "pending", `Auto-removal: Broker requires phone call to ${broker.optOutPhone || "their listed number"}. Use the opt-out script we prepared.`, ipAddress);
+    await logAuditEvent(userId, "auto_removal_attempted", "removal_request", requestId, request.status, "pending", { method: "phone", brokerName: broker.name, optOutPhone: broker.optOutPhone }, ipAddress);
+    return {
+      success: true,
+      method: "phone",
+      message: `${broker.name} requires a phone call for removal. We prepared a script for you to use when calling ${broker.optOutPhone || "their privacy line"}.`,
+    };
+  }
+
+  try {
+    const { Resend } = await import("resend");
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
+      throw new Error("Email service not configured. RESEND_API_KEY is required.");
+    }
+    const resend = new Resend(resendApiKey);
+
+    await resend.emails.send({
+      from: "GetCyberRight Data Removal <privacy@getcyberright.com>",
+      to: brokerEmail,
+      subject: optOutResult.emailContent.split("\n")[0].replace("Subject: ", ""),
+      text: optOutResult.emailContent,
+    });
+
+    await updateRemovalStatus(userId, requestId, "request_sent", `Auto-sent removal request via email to ${brokerEmail}`, ipAddress);
+
+    await db
+      .update(optOutContent)
+      .set({ status: "sent", sentAt: new Date(), sentTo: brokerEmail, deliveryMethod: "email" })
+      .where(and(eq(optOutContent.userId, userId), eq(optOutContent.brokerId, request.brokerId)));
+
+    await logAuditEvent(userId, "auto_removal_sent", "removal_request", requestId, request.status, "request_sent", {
+      method: "email",
+      sentTo: brokerEmail,
+      brokerName: broker.name,
+      jurisdiction: request.jurisdictionApplied,
+    }, ipAddress);
+
+    return {
+      success: true,
+      method: "email",
+      message: `Removal request automatically sent to ${broker.name} at ${brokerEmail}. Expected response within ${broker.estimatedProcessingDays || 30} days.`,
+      sentTo: brokerEmail,
+    };
+  } catch (error: any) {
+    const errorMsg = error.message || "Unknown email send error";
+
+    await updateRemovalStatus(userId, requestId, "failed", `Auto-send failed: ${errorMsg}`, ipAddress);
+    await logAuditEvent(userId, "auto_removal_failed", "removal_request", requestId, request.status, "failed", {
+      method: "email",
+      error: errorMsg,
+      brokerName: broker.name,
+    }, ipAddress);
+
+    return {
+      success: false,
+      method: "email",
+      message: `Failed to auto-send to ${broker.name}: ${errorMsg}. You can manually send the opt-out letter instead.`,
+    };
+  }
+}
+
+export async function bulkAutoRemoval(
+  userId: string,
+  requestIds: string[],
+  ipAddress?: string
+): Promise<{ results: Array<{ requestId: string; success: boolean; message: string }> }> {
+  const results: Array<{ requestId: string; success: boolean; message: string }> = [];
+
+  for (const requestId of requestIds) {
+    try {
+      const result = await sendAutoRemovalRequest(userId, requestId, ipAddress);
+      results.push({ requestId, success: result.success, message: result.message });
+    } catch (error: any) {
+      results.push({ requestId, success: false, message: error.message || "Unknown error" });
+    }
+  }
+
+  await logAuditEvent(userId, "bulk_auto_removal", "removal_request", null, null, null, {
+    totalRequests: requestIds.length,
+    successful: results.filter((r) => r.success).length,
+    failed: results.filter((r) => !r.success).length,
+  }, ipAddress);
+
+  return { results };
+}
+
 export async function getRetryableRequests(userId?: string) {
   const now = new Date();
   const conditions = [

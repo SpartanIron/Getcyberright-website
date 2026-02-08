@@ -46,6 +46,8 @@ import {
   Users,
   ShieldCheck,
   Plus,
+  Send,
+  Zap,
 } from "lucide-react";
 
 interface DataBroker {
@@ -74,6 +76,7 @@ interface DataBroker {
 interface VaultProfile {
   id: string;
   fullName: string;
+  profileName?: string | null;
   previousNames: string[] | null;
   emails: string[] | null;
   phoneNumbers: string[] | null;
@@ -1474,18 +1477,30 @@ function ScanTab() {
   });
 
   const removalMutation = useMutation({
-    mutationFn: async ({ brokerId, findingId }: { brokerId: string; findingId?: string }) => {
+    mutationFn: async ({ brokerId, findingId, autoSend }: { brokerId: string; findingId?: string; autoSend?: boolean }) => {
       const res = await apiRequest("POST", "/api/data-removal/requests", {
         brokerId,
         vaultProfileId: vaultData?.id,
         findingId,
       });
-      return res.json();
+      const request = await res.json();
+      if (autoSend && request.id) {
+        const sendRes = await apiRequest("POST", `/api/data-removal/requests/${request.id}/auto-send`);
+        return sendRes.json();
+      }
+      return request;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/data-removal/requests"] });
       queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
-      toast({ title: "Removal Requested", description: "A data removal request has been submitted." });
+      if (data.method) {
+        toast({
+          title: data.success ? "Removal Request Sent" : "Action Required",
+          description: data.message,
+        });
+      } else {
+        toast({ title: "Removal Requested", description: "A data removal request has been submitted." });
+      }
       trackToolUsage("data-broker-removal-request", true);
     },
     onError: (error: Error) => {
@@ -1609,24 +1624,46 @@ function ScanTab() {
                           </p>
                         )}
                       </div>
-                      <Button
-                        size="sm"
-                        data-testid={`button-request-removal-${finding.brokerId}`}
-                        onClick={() =>
-                          removalMutation.mutate({
-                            brokerId: finding.brokerId,
-                            findingId: finding.id,
-                          })
-                        }
-                        disabled={removalMutation.isPending}
-                      >
-                        {removalMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4 mr-1" />
-                        )}
-                        Request Removal
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          data-testid={`button-request-removal-${finding.brokerId}`}
+                          onClick={() =>
+                            removalMutation.mutate({
+                              brokerId: finding.brokerId,
+                              findingId: finding.id,
+                            })
+                          }
+                          disabled={removalMutation.isPending}
+                        >
+                          {removalMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4 mr-1" />
+                          )}
+                          Request
+                        </Button>
+                        <Button
+                          size="sm"
+                          data-testid={`button-auto-send-removal-${finding.brokerId}`}
+                          onClick={() =>
+                            removalMutation.mutate({
+                              brokerId: finding.brokerId,
+                              findingId: finding.id,
+                              autoSend: true,
+                            })
+                          }
+                          disabled={removalMutation.isPending}
+                        >
+                          {removalMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          ) : (
+                            <Send className="h-4 w-4 mr-1" />
+                          )}
+                          Auto-Send
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1724,6 +1761,48 @@ function TrackerTab() {
     },
   });
 
+  const autoSendMutation = useMutation({
+    mutationFn: async (requestId: string) => {
+      const res = await apiRequest("POST", `/api/data-removal/requests/${requestId}/auto-send`);
+      return res.json();
+    },
+    onSuccess: (data: { success: boolean; method: string; message: string }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/requests"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
+      toast({
+        title: data.success ? "Removal Request Sent" : "Action Required",
+        description: data.message,
+        variant: data.success ? "default" : "destructive",
+      });
+      trackToolUsage("data-broker-auto-send", data.success, { method: data.method });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Auto-Send Failed", description: error.message, variant: "destructive" });
+      trackToolUsage("data-broker-auto-send", false, { error: error.message });
+    },
+  });
+
+  const bulkAutoSendMutation = useMutation({
+    mutationFn: async (requestIds: string[]) => {
+      const res = await apiRequest("POST", `/api/data-removal/requests/bulk-auto-send`, { requestIds });
+      return res.json();
+    },
+    onSuccess: (data: { results: Array<{ requestId: string; success: boolean; message: string }> }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/requests"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
+      const succeeded = data.results.filter((r) => r.success).length;
+      const failed = data.results.filter((r) => !r.success).length;
+      toast({
+        title: "Bulk Auto-Send Complete",
+        description: `${succeeded} sent successfully${failed > 0 ? `, ${failed} need manual action` : ""}`,
+      });
+      trackToolUsage("data-broker-bulk-auto-send", true, { succeeded, failed, total: data.results.length });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Bulk Send Failed", description: error.message, variant: "destructive" });
+    },
+  });
+
   const statusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const res = await apiRequest("PATCH", `/api/data-removal/requests/${id}/status`, { status });
@@ -1809,6 +1888,31 @@ function TrackerTab() {
                 ))}
               </div>
             </div>
+            {requests.filter((r) => ["not_started", "pending", "request_generated"].includes(r.status)).length > 0 && (
+              <div className="flex items-center justify-between gap-3 mt-2 pt-2 border-t flex-wrap">
+                <p className="text-sm text-muted-foreground">
+                  {requests.filter((r) => ["not_started", "pending", "request_generated"].includes(r.status)).length} requests ready to send
+                </p>
+                <Button
+                  size="sm"
+                  data-testid="button-bulk-auto-send"
+                  onClick={() => {
+                    const sendable = requests
+                      .filter((r) => ["not_started", "pending", "request_generated"].includes(r.status))
+                      .map((r) => r.id);
+                    bulkAutoSendMutation.mutate(sendable);
+                  }}
+                  disabled={bulkAutoSendMutation.isPending}
+                >
+                  {bulkAutoSendMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                  ) : (
+                    <Zap className="h-4 w-4 mr-1" />
+                  )}
+                  Auto-Send All Pending
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -1868,6 +1972,21 @@ function TrackerTab() {
                           )}
                           Opt-Out Letter
                         </Button>
+                        {["not_started", "pending", "request_generated", "failed"].includes(req.status) && (
+                          <Button
+                            size="sm"
+                            data-testid={`button-auto-send-${req.id}`}
+                            onClick={() => autoSendMutation.mutate(req.id)}
+                            disabled={autoSendMutation.isPending}
+                          >
+                            {autoSendMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                            ) : (
+                              <Send className="h-4 w-4 mr-1" />
+                            )}
+                            Auto-Send
+                          </Button>
+                        )}
                         <Select
                           value={req.status}
                           onValueChange={(value) => statusMutation.mutate({ id: req.id, status: value })}
