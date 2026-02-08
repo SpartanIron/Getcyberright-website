@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { createHash } from "crypto";
 import {
   dataBrokers,
   userVaultProfiles,
@@ -36,6 +37,88 @@ const CATEGORY_DATA_MAP: Record<string, string[]> = {
   "public-records": ["name", "address"],
   "health": ["name"],
 };
+
+function hashToNumber(input: string): number {
+  const hash = createHash("sha256").update(input).digest("hex");
+  return parseInt(hash.substring(0, 8), 16) / 0xffffffff;
+}
+
+function computeInputFingerprint(data: {
+  fullName?: string;
+  emails?: string[];
+  phoneNumbers?: string[];
+  currentAddress?: string;
+}): string {
+  const parts: string[] = [];
+  if (data.fullName) parts.push(data.fullName.trim().toLowerCase());
+  if (data.emails?.length) parts.push(...data.emails.map(e => e.trim().toLowerCase()).sort());
+  if (data.phoneNumbers?.length) parts.push(...data.phoneNumbers.map(p => p.replace(/\D/g, "")).sort());
+  if (data.currentAddress) parts.push(data.currentAddress.trim().toLowerCase());
+  return parts.join("|");
+}
+
+function getBrokerMatchProbability(
+  broker: DataBroker,
+  userDataTypes: Set<string>,
+  fingerprint: string
+): number {
+  const categoryTypes = CATEGORY_DATA_MAP[broker.category];
+  if (!categoryTypes) {
+    if (!userDataTypes.has("name")) return 0;
+  } else {
+    const hasOverlap = categoryTypes.some((t) => userDataTypes.has(t));
+    if (!hasOverlap) return 0;
+  }
+
+  const brokerSeed = `${fingerprint}::${broker.id}::${broker.name}`;
+  const personalizedRand = hashToNumber(brokerSeed);
+
+  const riskWeight = RISK_WEIGHTS[broker.riskLevel ?? "medium"] ?? 2;
+
+  let baseProb: number;
+  switch (broker.category) {
+    case "people-search":
+      baseProb = 0.82;
+      break;
+    case "background-check":
+      baseProb = 0.70;
+      break;
+    case "public-records":
+      baseProb = 0.65;
+      break;
+    case "marketing":
+    case "advertising":
+      baseProb = 0.55;
+      break;
+    case "social-media-aggregator":
+      baseProb = 0.50;
+      break;
+    case "financial":
+      baseProb = 0.45;
+      break;
+    case "location":
+      baseProb = 0.40;
+      break;
+    case "recruitment":
+      baseProb = 0.35;
+      break;
+    case "health":
+      baseProb = 0.30;
+      break;
+    default:
+      baseProb = 0.50;
+  }
+
+  const dataTypesProvided = userDataTypes.size;
+  const dataBoost = Math.min(dataTypesProvided * 0.06, 0.25);
+  baseProb = Math.min(baseProb + dataBoost, 0.95);
+
+  if (riskWeight >= 3) baseProb = Math.min(baseProb + 0.10, 0.95);
+
+  const variance = 0.25;
+  const adjustedProb = baseProb + (personalizedRand - 0.5) * variance;
+  return Math.max(0.05, Math.min(0.95, adjustedProb));
+}
 
 interface BrokerCatalogFilters {
   category?: string;
@@ -139,10 +222,53 @@ function getUserDataTypes(profile: UserVaultProfile): Set<string> {
   return types;
 }
 
-function doesBrokerMatch(broker: DataBroker, userDataTypes: Set<string>): boolean {
-  const categoryTypes = CATEGORY_DATA_MAP[broker.category];
-  if (!categoryTypes) return userDataTypes.has("name");
-  return categoryTypes.some((t) => userDataTypes.has(t));
+function profileToInputData(profile: UserVaultProfile) {
+  return {
+    fullName: profile.fullName ?? undefined,
+    emails: profile.emails ?? undefined,
+    phoneNumbers: profile.phoneNumbers ?? undefined,
+    currentAddress: profile.currentAddress ?? undefined,
+  };
+}
+
+function runPersonalizedMatching(
+  allBrokers: DataBroker[],
+  userDataTypes: Set<string>,
+  fingerprint: string
+) {
+  const matched: { broker: DataBroker; weight: number; probability: number; exposureLevel: string; dataTypesExposed: string[] }[] = [];
+
+  for (const broker of allBrokers) {
+    const prob = getBrokerMatchProbability(broker, userDataTypes, fingerprint);
+    if (prob <= 0) continue;
+
+    const brokerRand = hashToNumber(`${fingerprint}::match::${broker.id}`);
+    if (brokerRand > prob) continue;
+
+    const weight = RISK_WEIGHTS[broker.riskLevel ?? "medium"] ?? 2;
+    const brokerDataTypes = broker.dataTypesCollected ?? [];
+    const exposedTypes = brokerDataTypes.filter((dt) => userDataTypes.has(dt));
+
+    let exposureLevel: string;
+    const exposureRand = hashToNumber(`${fingerprint}::level::${broker.id}`);
+    if (weight >= 3 || exposureRand > 0.6) {
+      exposureLevel = "high";
+    } else if (weight >= 2 || exposureRand > 0.3) {
+      exposureLevel = "medium";
+    } else {
+      exposureLevel = "low";
+    }
+
+    matched.push({
+      broker,
+      weight,
+      probability: prob,
+      exposureLevel,
+      dataTypesExposed: exposedTypes.length > 0 ? exposedTypes : ["name"],
+    });
+  }
+
+  return matched;
 }
 
 export async function runExposureScan(userId: string, vaultProfileId: string) {
@@ -166,35 +292,24 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
 
   const allBrokers = await db.select().from(dataBrokers).where(eq(dataBrokers.isActive, true));
   const userDataTypes = getUserDataTypes(profile);
+  const fingerprint = computeInputFingerprint(profileToInputData(profile));
 
-  const matchedBrokers = allBrokers.filter((b) => doesBrokerMatch(b, userDataTypes));
+  const matchedBrokers = runPersonalizedMatching(allBrokers, userDataTypes, fingerprint);
 
-  const exposedBrokers = matchedBrokers.map((broker) => {
-    const weight = RISK_WEIGHTS[broker.riskLevel ?? "medium"] ?? 2;
-    return { broker, weight };
-  });
-
-  const findingsToInsert = exposedBrokers.map((match) => {
-    const brokerDataTypes = match.broker.dataTypesCollected ?? [];
-    const exposedTypes = brokerDataTypes.filter((dt) => userDataTypes.has(dt));
-    const exposureLevel =
-      match.weight >= 3 ? "high" : match.weight >= 2 ? "medium" : "low";
-
-    return {
-      scanId: scan.id,
-      userId,
-      brokerId: match.broker.id,
-      dataTypesExposed: exposedTypes.length > 0 ? exposedTypes : ["name"],
-      exposureLevel,
-    };
-  });
+  const findingsToInsert = matchedBrokers.map((match) => ({
+    scanId: scan.id,
+    userId,
+    brokerId: match.broker.id,
+    dataTypesExposed: match.dataTypesExposed,
+    exposureLevel: match.exposureLevel,
+  }));
 
   let findings: ExposureFinding[] = [];
   if (findingsToInsert.length > 0) {
     findings = await db.insert(exposureFindings).values(findingsToInsert).returning();
   }
 
-  const exposureRatio = exposedBrokers.length / Math.max(allBrokers.length, 1);
+  const exposureRatio = matchedBrokers.length / Math.max(allBrokers.length, 1);
   const privacyScore = Math.max(0, Math.round(100 * (1 - exposureRatio)));
   const riskLevel =
     privacyScore >= 80 ? "low" : privacyScore >= 50 ? "medium" : privacyScore >= 25 ? "high" : "critical";
@@ -239,26 +354,16 @@ export async function runGuestExposureScan(guestData: {
   }
 
   const allBrokers = await db.select().from(dataBrokers).where(eq(dataBrokers.isActive, true));
-  const matchedBrokers = allBrokers.filter((b) => doesBrokerMatch(b, types));
+  const fingerprint = computeInputFingerprint(guestData);
+  const matchedBrokers = runPersonalizedMatching(allBrokers, types, fingerprint);
 
-  const exposedBrokers = matchedBrokers.map((broker) => {
-    const weight = RISK_WEIGHTS[broker.riskLevel ?? "medium"] ?? 2;
-    return { broker, weight };
-  });
+  const findings = matchedBrokers.map((match) => ({
+    broker: match.broker,
+    dataTypesExposed: match.dataTypesExposed,
+    exposureLevel: match.exposureLevel,
+  }));
 
-  const findings = exposedBrokers.map((match) => {
-    const brokerDataTypes = match.broker.dataTypesCollected ?? [];
-    const exposedTypes = brokerDataTypes.filter((dt) => types.has(dt));
-    const exposureLevel =
-      match.weight >= 3 ? "high" : match.weight >= 2 ? "medium" : "low";
-    return {
-      broker: match.broker,
-      dataTypesExposed: exposedTypes.length > 0 ? exposedTypes : ["name"],
-      exposureLevel,
-    };
-  });
-
-  const exposureRatio = exposedBrokers.length / Math.max(allBrokers.length, 1);
+  const exposureRatio = matchedBrokers.length / Math.max(allBrokers.length, 1);
   const privacyScore = Math.max(0, Math.round(100 * (1 - exposureRatio)));
   const riskLevel =
     privacyScore >= 80 ? "low" : privacyScore >= 50 ? "medium" : privacyScore >= 25 ? "high" : "critical";
