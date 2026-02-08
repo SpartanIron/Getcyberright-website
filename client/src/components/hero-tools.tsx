@@ -30,10 +30,10 @@ export function HeroTools() {
             transition={{ duration: 0.4 }}
           >
             <Link href="/data-removal">
-              <Card className="h-full hover-elevate cursor-pointer group" data-testid="card-hero-data-scan">
+              <Card className="h-full hover-elevate cursor-pointer group bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/40" data-testid="card-hero-data-scan">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-14 h-14 rounded-lg bg-red-500/15 flex items-center justify-center flex-shrink-0">
                       <Trash2 className="w-7 h-7 text-red-500" />
                     </div>
                     <div className="flex-1">
@@ -61,10 +61,10 @@ export function HeroTools() {
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             <Link href="/tools">
-              <Card className="h-full hover-elevate cursor-pointer group" data-testid="card-hero-security-scanner">
+              <Card className="h-full hover-elevate cursor-pointer group bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-900/40" data-testid="card-hero-security-scanner">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-14 h-14 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
                       <Search className="w-7 h-7 text-primary" />
                     </div>
                     <div className="flex-1">
