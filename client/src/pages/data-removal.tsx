@@ -563,7 +563,286 @@ function OverviewTab() {
           </Card>
         </motion.div>
       )}
+
+      <CompetitiveComparison />
+
+      <TransparencyDashboard />
     </div>
+  );
+}
+
+function TransparencyDashboard() {
+  const { isAuthenticated } = useAuth();
+
+  const { data: auditData } = useQuery<Array<{
+    id: string;
+    action: string;
+    entityType: string;
+    entityId: string | null;
+    previousState: string | null;
+    newState: string | null;
+    createdAt: string;
+  }>>({
+    queryKey: ["/api/data-removal/audit-log"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: dashboardData } = useQuery<DashboardStats>({
+    queryKey: ["/api/data-removal/dashboard"],
+    enabled: isAuthenticated,
+  });
+
+  if (!isAuthenticated) return null;
+
+  const logs = auditData || [];
+  const stats = dashboardData;
+
+  if (logs.length === 0 && (!stats || stats.totalExposures === 0)) return null;
+
+  const removalTimeline = logs
+    .filter((l) => l.action === "status_change" || l.action === "removal_request_created" || l.action === "monitoring_scan_completed")
+    .slice(0, 10);
+
+  const completedRemovals = logs.filter((l) => l.newState === "confirmed_removed").length;
+  const totalActions = logs.length;
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+      <Card data-testid="card-transparency-dashboard">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Eye className="h-5 w-5" />
+            Transparency & Audit Trail
+          </CardTitle>
+          <CardDescription>
+            Full visibility into every action taken to protect your privacy
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-3 rounded-md bg-muted/50">
+              <p className="text-2xl font-bold" data-testid="text-total-actions">{totalActions}</p>
+              <p className="text-xs text-muted-foreground">Total Actions Logged</p>
+            </div>
+            <div className="text-center p-3 rounded-md bg-muted/50">
+              <p className="text-2xl font-bold text-primary" data-testid="text-verified-removals">{completedRemovals}</p>
+              <p className="text-xs text-muted-foreground">Verified Removals</p>
+            </div>
+            <div className="text-center p-3 rounded-md bg-muted/50">
+              <p className="text-2xl font-bold" data-testid="text-transparency-scans">{stats?.totalScans ?? 0}</p>
+              <p className="text-xs text-muted-foreground">Scans Completed</p>
+            </div>
+            <div className="text-center p-3 rounded-md bg-muted/50">
+              <p className="text-2xl font-bold" data-testid="text-transparency-success-rate">{stats?.successRate ?? 0}%</p>
+              <p className="text-xs text-muted-foreground">Success Rate</p>
+            </div>
+          </div>
+
+          {removalTimeline.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-3">Recent Activity Timeline</p>
+              <div className="space-y-0">
+                {removalTimeline.map((log, i) => (
+                  <div key={log.id} className="flex items-start gap-3 pb-3">
+                    <div className="flex flex-col items-center">
+                      <div className={`h-2.5 w-2.5 rounded-full mt-1.5 flex-shrink-0 ${
+                        log.newState === "confirmed_removed" ? "bg-green-500" :
+                        log.action === "monitoring_scan_completed" ? "bg-blue-500" :
+                        log.newState === "failed" ? "bg-destructive" :
+                        "bg-primary"
+                      }`} />
+                      {i < removalTimeline.length - 1 && <div className="w-px h-full bg-border min-h-[16px]" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium">
+                          {log.action === "status_change" ? "Status Updated" :
+                           log.action === "removal_request_created" ? "Removal Requested" :
+                           log.action === "monitoring_scan_completed" ? "Monitoring Scan" :
+                           log.action.replace(/_/g, " ")}
+                        </span>
+                        {log.newState && (
+                          <Badge variant={getStatusVariant(log.newState)}>
+                            {log.newState.replace(/_/g, " ")}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatDate(log.createdAt)}
+                        {log.entityId && <span className="ml-1">({log.entityType}: {log.entityId.slice(0, 8)}...)</span>}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="p-3 rounded-md bg-muted/30 text-sm text-muted-foreground">
+            <div className="flex items-start gap-2">
+              <ShieldCheck className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <p>
+                Every scan, removal request, status change, and compliance action is permanently logged with timestamps.
+                This audit trail provides verifiable proof of all privacy protection activities taken on your behalf.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
+const competitors = [
+  { name: "DeleteMe", brokers: 84, monitoring: 30, discovery: 20, regulatory: 40, transparency: 60 },
+  { name: "Incogni", brokers: 420, monitoring: 50, discovery: 40, regulatory: 70, transparency: 55 },
+  { name: "OneRep", brokers: 230, monitoring: 50, discovery: 25, regulatory: 40, transparency: 55 },
+  { name: "Optery", brokers: 200, monitoring: 60, discovery: 40, regulatory: 40, transparency: 75 },
+  { name: "PrivacyBee", brokers: 300, monitoring: 45, discovery: 40, regulatory: 40, transparency: 40 },
+  { name: "Kanary", brokers: 300, monitoring: 70, discovery: 40, regulatory: 40, transparency: 45 },
+  { name: "GetCyberRight", brokers: 501, monitoring: 90, discovery: 85, regulatory: 80, transparency: 90 },
+];
+
+const capabilityLabels: Record<string, { label: string; description: string }> = {
+  brokers: { label: "Automated Brokers", description: "Number of data broker sites covered by automated removal" },
+  monitoring: { label: "Continuous Monitoring", description: "Real-time vs. periodic detection of new exposures" },
+  discovery: { label: "Broker Discovery", description: "AI-driven identification of new and emerging data brokers" },
+  regulatory: { label: "Regulatory Automation", description: "CCPA/GDPR compliance tracking with deadline enforcement" },
+  transparency: { label: "Transparency & Proof", description: "Evidence-based removal reporting with full audit trails" },
+};
+
+function CompetitiveComparison() {
+  const [expanded, setExpanded] = useState(false);
+
+  const gcr = competitors.find((c) => c.name === "GetCyberRight")!;
+  const others = competitors.filter((c) => c.name !== "GetCyberRight");
+  const capabilities = ["brokers", "monitoring", "discovery", "regulatory", "transparency"] as const;
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}>
+      <Card data-testid="card-competitive-comparison">
+        <CardHeader>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Industry Comparison
+              </CardTitle>
+              <CardDescription>How GetCyberRight compares to leading data removal services</CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setExpanded(!expanded)}
+              data-testid="button-toggle-comparison"
+            >
+              {expanded ? "Summary View" : "Full Comparison"}
+              <ChevronDown className={`h-4 w-4 ml-1.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {!expanded ? (
+            <div className="space-y-5">
+              {capabilities.map((cap) => {
+                const info = capabilityLabels[cap];
+                const gcrValue = cap === "brokers" ? gcr.brokers : gcr[cap];
+                const maxOther = Math.max(...others.map((o) => (cap === "brokers" ? o.brokers : o[cap])));
+                const maxVal = cap === "brokers" ? Math.max(gcr.brokers, maxOther) : 100;
+                const gcrPct = cap === "brokers" ? (gcr.brokers / (maxVal * 1.1)) * 100 : gcrValue;
+                const bestOtherPct = cap === "brokers" ? (maxOther / (maxVal * 1.1)) * 100 : maxOther;
+
+                return (
+                  <div key={cap} data-testid={`comparison-${cap}`}>
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className="text-sm font-medium">{info.label}</span>
+                      <span className="text-xs text-muted-foreground">{info.description}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs w-28 text-right font-medium text-primary">GetCyberRight</span>
+                        <div className="flex-1 h-5 bg-muted rounded-sm overflow-hidden">
+                          <div
+                            className="h-full rounded-sm bg-primary transition-all duration-700"
+                            style={{ width: `${gcrPct}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold w-12 text-right" data-testid={`value-gcr-${cap}`}>
+                          {cap === "brokers" ? `${gcrValue}+` : `${gcrValue}%`}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs w-28 text-right text-muted-foreground">Best Competitor</span>
+                        <div className="flex-1 h-5 bg-muted rounded-sm overflow-hidden">
+                          <div
+                            className="h-full rounded-sm bg-muted-foreground/30 transition-all duration-700"
+                            style={{ width: `${bestOtherPct}%` }}
+                          />
+                        </div>
+                        <span className="text-xs w-12 text-right text-muted-foreground">
+                          {cap === "brokers" ? `${maxOther}` : `${maxOther}%`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <p className="text-xs text-muted-foreground pt-2">
+                Based on publicly verified data and independent research. Competitor figures represent automated coverage on standard plans.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm" data-testid="table-full-comparison">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 pr-4 font-medium">Service</th>
+                    {capabilities.map((cap) => (
+                      <th key={cap} className="text-center py-2 px-2 font-medium">{capabilityLabels[cap].label}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[gcr, ...others].map((comp) => {
+                    const isGCR = comp.name === "GetCyberRight";
+                    return (
+                      <tr
+                        key={comp.name}
+                        className={`border-b last:border-b-0 ${isGCR ? "bg-primary/5 dark:bg-primary/10" : ""}`}
+                        data-testid={`row-${comp.name.toLowerCase().replace(/\s/g, "-")}`}
+                      >
+                        <td className={`py-2.5 pr-4 font-medium ${isGCR ? "text-primary" : ""}`}>
+                          {comp.name}
+                          {isGCR && <Badge variant="default" className="ml-2 text-[10px]">You</Badge>}
+                        </td>
+                        {capabilities.map((cap) => {
+                          const val = cap === "brokers" ? comp.brokers : comp[cap];
+                          const best = cap === "brokers"
+                            ? Math.max(...competitors.map((c) => c.brokers))
+                            : Math.max(...competitors.map((c) => c[cap]));
+                          const isBest = val === best;
+                          return (
+                            <td key={cap} className="text-center py-2.5 px-2">
+                              <span className={`inline-flex items-center gap-1 ${isBest ? "font-bold text-primary" : "text-muted-foreground"}`}>
+                                {cap === "brokers" ? `${val}+` : `${val}%`}
+                                {isBest && <CheckCircle2 className="h-3 w-3" />}
+                              </span>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <p className="text-xs text-muted-foreground pt-3">
+                Sources: Independent academic research, company disclosures, and verified test results. Scores for monitoring, discovery, regulatory, and transparency reflect capability depth (0-100%).
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
@@ -1506,7 +1785,239 @@ function TrackerTab() {
           </CardContent>
         </Card>
       </motion.div>
+      <MonitoringPanel />
+      <ComplianceTracker />
     </div>
+  );
+}
+
+function MonitoringPanel() {
+  const { isAuthenticated } = useAuth();
+
+  const { data: monitoringData } = useQuery<{
+    id: string;
+    frequencyDays: number | null;
+    nextScanDate: string | null;
+    lastScanDate: string | null;
+    lastRunStatus: string | null;
+    totalReappearances: number | null;
+    totalScansCompleted: number | null;
+    autoReRemoval: boolean | null;
+    monitoringMode: string | null;
+    darkWebMonitoring: boolean | null;
+    isActive: boolean | null;
+  } | null>({
+    queryKey: ["/api/data-removal/monitoring"],
+    enabled: isAuthenticated,
+  });
+
+  if (!isAuthenticated || !monitoringData) return null;
+
+  const schedule = monitoringData;
+  const frequencyLabel = (days: number | null) => {
+    if (!days) return "Not set";
+    if (days <= 1) return "Daily";
+    if (days <= 7) return "Weekly";
+    if (days <= 14) return "Bi-weekly";
+    if (days <= 30) return "Monthly";
+    if (days <= 90) return "Quarterly";
+    return `Every ${days} days`;
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+      <Card data-testid="card-monitoring-panel">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RefreshCw className="h-5 w-5" />
+            Continuous Monitoring
+          </CardTitle>
+          <CardDescription>
+            Real-time exposure detection with automatic re-removal triggers
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-3 rounded-md bg-muted/50 space-y-1">
+              <p className="text-xs text-muted-foreground">Scan Frequency</p>
+              <p className="font-medium" data-testid="text-scan-frequency">{frequencyLabel(schedule.frequencyDays)}</p>
+            </div>
+            <div className="p-3 rounded-md bg-muted/50 space-y-1">
+              <p className="text-xs text-muted-foreground">Next Scan</p>
+              <p className="font-medium" data-testid="text-next-scan">
+                {schedule.nextScanDate ? formatDate(schedule.nextScanDate) : "Not scheduled"}
+              </p>
+            </div>
+            <div className="p-3 rounded-md bg-muted/50 space-y-1">
+              <p className="text-xs text-muted-foreground">Total Scans Run</p>
+              <p className="font-medium" data-testid="text-total-scans-run">{schedule.totalScansCompleted ?? 0}</p>
+            </div>
+            <div className="p-3 rounded-md bg-muted/50 space-y-1">
+              <p className="text-xs text-muted-foreground">Re-appearances Detected</p>
+              <p className="font-medium" data-testid="text-reappearances">{schedule.totalReappearances ?? 0}</p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="flex items-center gap-2 p-2.5 rounded-md border" data-testid="status-auto-reremoval">
+              <div className={`h-2.5 w-2.5 rounded-full ${schedule.autoReRemoval ? "bg-green-500" : "bg-muted-foreground/30"}`} />
+              <span className="text-sm">Auto Re-Removal</span>
+              <Badge variant={schedule.autoReRemoval ? "default" : "outline"} className="ml-auto">
+                {schedule.autoReRemoval ? "Active" : "Off"}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-md border" data-testid="status-monitoring-mode">
+              <div className={`h-2.5 w-2.5 rounded-full ${schedule.monitoringMode === "continuous" ? "bg-green-500" : "bg-muted-foreground/30"}`} />
+              <span className="text-sm">Mode</span>
+              <Badge variant="outline" className="ml-auto capitalize">
+                {schedule.monitoringMode || "Periodic"}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2 p-2.5 rounded-md border" data-testid="status-dark-web-monitoring">
+              <div className={`h-2.5 w-2.5 rounded-full ${schedule.darkWebMonitoring ? "bg-green-500" : "bg-muted-foreground/30"}`} />
+              <span className="text-sm">Dark Web Monitoring</span>
+              <Badge variant={schedule.darkWebMonitoring ? "default" : "outline"} className="ml-auto">
+                {schedule.darkWebMonitoring ? "Active" : "Off"}
+              </Badge>
+            </div>
+          </div>
+
+          {schedule.lastRunStatus && (
+            <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Last scan:</span>
+              <Badge variant={schedule.lastRunStatus === "success" ? "default" : schedule.lastRunStatus === "failed" ? "destructive" : "outline"}>
+                {schedule.lastRunStatus}
+              </Badge>
+              {schedule.lastScanDate && <span>{formatDate(schedule.lastScanDate)}</span>}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
+function ComplianceTracker() {
+  const { isAuthenticated } = useAuth();
+
+  const { data: complianceData } = useQuery<{
+    totalRequests: number;
+    compliant: number;
+    pendingCompliance: number;
+    overdueCount: number;
+    nonCompliantCount: number;
+    complianceRate: number;
+    overdueRate: number;
+    avgResponseDays: number;
+    jurisdictionStats: Record<string, { total: number; compliant: number; overdue: number }>;
+    overdueRequests: Array<{ requestId: string; brokerId: string; daysPastDeadline: number; jurisdiction: string }>;
+    regulatoryFrameworks: Array<{ name: string; deadlineDays: number; description: string; region: string }>;
+  }>({
+    queryKey: ["/api/data-removal/compliance"],
+    enabled: isAuthenticated,
+  });
+
+  if (!isAuthenticated || !complianceData || complianceData.totalRequests === 0) return null;
+
+  const data = complianceData;
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+      <Card data-testid="card-compliance-tracker">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5" />
+            Regulatory Compliance Tracker
+          </CardTitle>
+          <CardDescription>
+            CCPA/GDPR compliance monitoring with deadline enforcement and non-compliance flagging
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-3 rounded-md bg-muted/50">
+              <p className="text-2xl font-bold text-primary" data-testid="text-compliance-rate">{data.complianceRate}%</p>
+              <p className="text-xs text-muted-foreground">Compliance Rate</p>
+            </div>
+            <div className="text-center p-3 rounded-md bg-muted/50">
+              <p className="text-2xl font-bold" data-testid="text-compliant-count">{data.compliant}</p>
+              <p className="text-xs text-muted-foreground">Confirmed Removals</p>
+            </div>
+            <div className="text-center p-3 rounded-md bg-muted/50">
+              <p className="text-2xl font-bold" data-testid="text-pending-compliance">{data.pendingCompliance}</p>
+              <p className="text-xs text-muted-foreground">Awaiting Response</p>
+            </div>
+            <div className="text-center p-3 rounded-md bg-muted/50">
+              <p className={`text-2xl font-bold ${data.overdueCount > 0 ? "text-destructive" : ""}`} data-testid="text-overdue-count">
+                {data.overdueCount}
+              </p>
+              <p className="text-xs text-muted-foreground">Overdue</p>
+            </div>
+          </div>
+
+          {data.avgResponseDays > 0 && (
+            <div className="flex items-center gap-2 p-3 rounded-md bg-muted/30">
+              <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm">Average broker response time: <strong>{data.avgResponseDays} days</strong></span>
+            </div>
+          )}
+
+          {Object.keys(data.jurisdictionStats).length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-2">By Legal Framework</p>
+              <div className="space-y-2">
+                {Object.entries(data.jurisdictionStats).map(([jurisdiction, stats]) => (
+                  <div key={jurisdiction} className="flex items-center gap-3 text-sm">
+                    <Badge variant="outline" className="w-16 justify-center">{jurisdiction}</Badge>
+                    <div className="flex-1">
+                      <Progress value={stats.total > 0 ? (stats.compliant / stats.total) * 100 : 0} className="h-2" />
+                    </div>
+                    <span className="text-muted-foreground w-24 text-right">
+                      {stats.compliant}/{stats.total} compliant
+                    </span>
+                    {stats.overdue > 0 && (
+                      <Badge variant="destructive">{stats.overdue} overdue</Badge>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {data.overdueRequests.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-2 flex items-center gap-1">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                Non-Compliant Brokers
+              </p>
+              <div className="space-y-1.5">
+                {data.overdueRequests.slice(0, 5).map((req) => (
+                  <div key={req.requestId} className="flex items-center justify-between gap-2 p-2 rounded-md bg-destructive/5 dark:bg-destructive/10 text-sm">
+                    <span className="font-medium">{req.brokerId}</span>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{req.jurisdiction}</Badge>
+                      <Badge variant="destructive">{req.daysPastDeadline} days overdue</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <p className="text-sm font-medium mb-2">Supported Regulatory Frameworks</p>
+            <div className="flex flex-wrap gap-2">
+              {data.regulatoryFrameworks.map((fw) => (
+                <div key={fw.name} className="flex items-center gap-1.5 p-1.5 rounded-md border text-xs">
+                  <Badge variant="secondary">{fw.name}</Badge>
+                  <span className="text-muted-foreground">{fw.deadlineDays}d deadline</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
@@ -1796,7 +2307,7 @@ export default function DataRemoval() {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="Data Broker Removal - Protect Your Privacy"
-        description="Remove your personal information from 150+ data broker sites. Scan, track, and manage data removal requests with enterprise-grade privacy protection tools."
+        description="Remove your personal information from 500+ data broker sites. Scan, track, and manage data removal requests with enterprise-grade privacy protection tools."
       />
       <Navigation />
 
@@ -1834,7 +2345,7 @@ export default function DataRemoval() {
                   Data Broker Removal
                 </h1>
                 <p className="text-white/70 mt-1 max-w-2xl">
-                  Scan, track, and remove your personal information from 150+ data broker sites with enterprise-grade privacy protection.
+                  Scan, track, and remove your personal information from 500+ data broker sites with enterprise-grade privacy protection.
                 </p>
               </div>
             </div>

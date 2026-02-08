@@ -2838,11 +2838,18 @@ EDGE CASE HANDLING
   app.post("/api/data-removal/monitoring", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
     try {
       const user = req.user;
-      const { vaultProfileId, frequencyDays } = req.body;
+      const { vaultProfileId, frequencyDays, autoReRemoval, notifyOnNewExposure, notifyOnReAppearance, notifyOnComplianceDeadline, monitoringMode, darkWebMonitoring } = req.body;
       if (!vaultProfileId || !frequencyDays) {
         return res.status(400).json({ error: "vaultProfileId and frequencyDays are required" });
       }
-      const schedule = await setupMonitoring(user.id, vaultProfileId, frequencyDays);
+      const schedule = await setupMonitoring(user.id, vaultProfileId, frequencyDays, {
+        autoReRemoval,
+        notifyOnNewExposure,
+        notifyOnReAppearance,
+        notifyOnComplianceDeadline,
+        monitoringMode,
+        darkWebMonitoring,
+      });
       res.json(schedule);
     } catch (error: any) {
       console.error("Error setting up monitoring:", error);
@@ -2906,6 +2913,17 @@ EDGE CASE HANDLING
       res.json(requests);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to fetch overdue requests" });
+    }
+  });
+
+  app.get("/api/data-removal/compliance", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const { getComplianceDashboard } = await import("./dataBrokerService");
+      const dashboard = await getComplianceDashboard(req.user.id);
+      res.json(dashboard);
+    } catch (error: any) {
+      console.error("Error fetching compliance dashboard:", error);
+      res.status(500).json({ error: "Failed to fetch compliance data" });
     }
   });
 

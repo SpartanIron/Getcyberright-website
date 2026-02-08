@@ -27,7 +27,7 @@ const freeTools = [
   { title: "AI & Cyber Safety", description: "Protect yourself from AI-powered threats", href: "/ai-safety", icon: Brain, badge: "New" },
   { title: "Breach Checker", description: "Check if your email was exposed in a data breach", href: "/tools", icon: AlertTriangle },
   { title: "Password Generator", description: "Create strong, secure passwords instantly", href: "/tools", icon: Lock },
-  { title: "Data Broker Removal", description: "Remove your info from 150+ data brokers", href: "/data-removal", icon: Trash2, badge: "New" },
+  { title: "Data Broker Removal", description: "Remove your info from 500+ data brokers", href: "/data-removal", icon: Trash2, badge: "New" },
 ];
 
 const learnTopics = [

@@ -863,7 +863,15 @@ export async function getRemovalDashboardStats(userId: string) {
 export async function setupMonitoring(
   userId: string,
   vaultProfileId: string,
-  frequencyDays: number
+  frequencyDays: number,
+  options?: {
+    autoReRemoval?: boolean;
+    notifyOnNewExposure?: boolean;
+    notifyOnReAppearance?: boolean;
+    notifyOnComplianceDeadline?: boolean;
+    monitoringMode?: string;
+    darkWebMonitoring?: boolean;
+  }
 ) {
   const [existing] = await db
     .select()
@@ -873,16 +881,24 @@ export async function setupMonitoring(
   const nextScanDate = new Date();
   nextScanDate.setDate(nextScanDate.getDate() + frequencyDays);
 
+  const monitoringValues = {
+    vaultProfileId,
+    frequencyDays,
+    nextScanDate,
+    isActive: true,
+    autoReRemoval: options?.autoReRemoval ?? false,
+    notifyOnNewExposure: options?.notifyOnNewExposure ?? true,
+    notifyOnReAppearance: options?.notifyOnReAppearance ?? true,
+    notifyOnComplianceDeadline: options?.notifyOnComplianceDeadline ?? true,
+    monitoringMode: options?.monitoringMode ?? "periodic",
+    darkWebMonitoring: options?.darkWebMonitoring ?? false,
+    updatedAt: new Date(),
+  };
+
   if (existing) {
     const [updated] = await db
       .update(monitoringSchedules)
-      .set({
-        vaultProfileId,
-        frequencyDays,
-        nextScanDate,
-        isActive: true,
-        updatedAt: new Date(),
-      })
+      .set(monitoringValues)
       .where(eq(monitoringSchedules.id, existing.id))
       .returning();
     return updated;
@@ -892,10 +908,7 @@ export async function setupMonitoring(
     .insert(monitoringSchedules)
     .values({
       userId,
-      vaultProfileId,
-      frequencyDays,
-      nextScanDate,
-      isActive: true,
+      ...monitoringValues,
     })
     .returning();
   return created;
@@ -1100,5 +1113,97 @@ export async function generatePrivacyReport(userId: string) {
   return {
     ...report,
     categoryBreakdown,
+  };
+}
+
+export async function getComplianceDashboard(userId: string) {
+  const requests = await db
+    .select()
+    .from(removalRequests)
+    .where(eq(removalRequests.userId, userId));
+
+  const now = new Date();
+  const ccpaDeadlineDays = 45;
+  const gdprDeadlineDays = 30;
+
+  let totalRequests = requests.length;
+  let pendingCompliance = 0;
+  let compliant = 0;
+  let overdueCount = 0;
+  let nonCompliantCount = 0;
+  let avgResponseDays = 0;
+  let responseTimesSum = 0;
+  let responseCount = 0;
+
+  const jurisdictionStats: Record<string, { total: number; compliant: number; overdue: number; avgDays: number }> = {};
+  const overdueRequests: Array<{ requestId: string; brokerId: string; daysPastDeadline: number; jurisdiction: string }> = [];
+
+  for (const req of requests) {
+    const jurisdiction = req.jurisdictionApplied || "CCPA";
+    if (!jurisdictionStats[jurisdiction]) {
+      jurisdictionStats[jurisdiction] = { total: 0, compliant: 0, overdue: 0, avgDays: 0 };
+    }
+    jurisdictionStats[jurisdiction].total++;
+
+    if (req.confirmedRemovedAt) {
+      compliant++;
+      jurisdictionStats[jurisdiction].compliant++;
+      if (req.requestSentAt) {
+        const days = Math.floor((req.confirmedRemovedAt.getTime() - req.requestSentAt.getTime()) / (1000 * 60 * 60 * 24));
+        responseTimesSum += days;
+        responseCount++;
+      }
+    } else if (req.requestSentAt) {
+      const deadlineDays = jurisdiction === "GDPR" ? gdprDeadlineDays : ccpaDeadlineDays;
+      const deadline = new Date(req.requestSentAt);
+      deadline.setDate(deadline.getDate() + deadlineDays);
+
+      if (now > deadline) {
+        overdueCount++;
+        jurisdictionStats[jurisdiction].overdue++;
+        const daysPast = Math.floor((now.getTime() - deadline.getTime()) / (1000 * 60 * 60 * 24));
+        overdueRequests.push({
+          requestId: req.id,
+          brokerId: req.brokerId,
+          daysPastDeadline: daysPast,
+          jurisdiction,
+        });
+        if (req.nonComplianceReported) {
+          nonCompliantCount++;
+        }
+      } else {
+        pendingCompliance++;
+      }
+    } else {
+      pendingCompliance++;
+    }
+  }
+
+  if (responseCount > 0) {
+    avgResponseDays = Math.round(responseTimesSum / responseCount);
+  }
+
+  const complianceRate = totalRequests > 0 ? Math.round((compliant / totalRequests) * 100) : 0;
+  const overdueRate = totalRequests > 0 ? Math.round((overdueCount / totalRequests) * 100) : 0;
+
+  return {
+    totalRequests,
+    compliant,
+    pendingCompliance,
+    overdueCount,
+    nonCompliantCount,
+    complianceRate,
+    overdueRate,
+    avgResponseDays,
+    jurisdictionStats,
+    overdueRequests: overdueRequests.sort((a, b) => b.daysPastDeadline - a.daysPastDeadline).slice(0, 20),
+    regulatoryFrameworks: [
+      { name: "CCPA", deadlineDays: ccpaDeadlineDays, description: "California Consumer Privacy Act", region: "California, US" },
+      { name: "GDPR", deadlineDays: gdprDeadlineDays, description: "General Data Protection Regulation", region: "EU/EEA" },
+      { name: "CPRA", deadlineDays: ccpaDeadlineDays, description: "California Privacy Rights Act", region: "California, US" },
+      { name: "VCDPA", deadlineDays: 45, description: "Virginia Consumer Data Protection Act", region: "Virginia, US" },
+      { name: "CPA", deadlineDays: 45, description: "Colorado Privacy Act", region: "Colorado, US" },
+      { name: "CTDPA", deadlineDays: 45, description: "Connecticut Data Privacy Act", region: "Connecticut, US" },
+    ],
   };
 }
