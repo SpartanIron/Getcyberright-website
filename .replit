@@ -4,11 +4,21 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
+<<<<<<< HEAD
+=======
+packages = ["trivy"]
+
+[deployment]
+deploymentTarget = "autoscale"
+build = ["npm", "run", "build"]
+run = ["npm", "run", "start"]
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
 
 [[ports]]
 localPort = 5000
 externalPort = 80
 
+<<<<<<< HEAD
 [env]
 PORT = "5000"
 
@@ -17,6 +27,8 @@ deploymentTarget = "autoscale"
 run = ["node", "./dist/index.cjs"]
 build = ["npm", "run", "build"]
 
+=======
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
 [workflows]
 runButton = "Project"
 
@@ -38,5 +50,20 @@ task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
 
+<<<<<<< HEAD
 [agent]
 integrations = ["javascript_log_in_with_replit:2.0.0", "stripe:2.0.0", "javascript_openai:1.0.0", "javascript_google_analytics:1.0.0"]
+=======
+[userenv]
+
+[userenv.production]
+ALLOWED_ORIGINS = ""
+
+[userenv.shared]
+VITE_RECAPTCHA_SITE_KEY = "6Lcy8UksAAAAACOcToKZXSP_d8xUAiJhSha7bdFD"
+EMAIL_FROM_ADDRESS = "tips@getcyberright.com"
+EMAIL_FROM_NAME = "GetCyberRight"
+
+[agent]
+integrations = ["javascript_anthropic_ai_integrations:2.0.0", "javascript_log_in_with_replit:2.0.0"]
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e

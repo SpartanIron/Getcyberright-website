@@ -1,0 +1,225 @@
+{
+  "nav": {
+    "familyProtection": "Protección Familiar",
+    "youthSafety": "Seguridad Juvenil",
+    "parentGuide": "Guía para Padres",
+    "seniorProtection": "Protección de Mayores",
+    "dailyTips": "Consejos Diarios",
+    "news": "Noticias",
+    "resources": "Recursos",
+    "learn": "Aprender",
+    "about": "Acerca de",
+    "threatIntelligence": "Amenazas",
+    "scamChecker": "Verificar Estafa",
+    "breachChecker": "Verificar Filtración",
+    "passwordGenerator": "Generador de Claves",
+    "threatTrends": "Tendencias de Amenazas",
+    "tools": "Herramientas",
+    "skillCheck": "Test de Habilidades",
+    "feedback": "Comentarios",
+    "impact": "Impacto"
+  },
+  "home": {
+    "badge": "Protegiendo Familias en Línea",
+    "subtitle": "Con una misión global de servir a familias en todo el mundo.",
+    "headline": "Protegiendo a Tu",
+    "headlineHighlight": "Familia",
+    "headlineSuffix": "A Través de Generaciones",
+    "description": "Desde abuelos atacados por estafas telefónicas hasta niños navegando en redes sociales, ayudamos a las familias a mantenerse seguras juntas. Alertas de amenazas en tiempo real, guías de seguridad prácticas y ayuda de emergencia cuando más la necesitas.",
+    "dailySafetyTips": "Consejos de Seguridad",
+    "latestCyberNews": "Últimas Noticias",
+    "trustedBy": "Confiado por profesionales de seguridad en todo el mundo",
+    "freeResources": "Recursos de Seguridad Cibernética para Cada Familia"
+  },
+  "footer": {
+    "tagline": "Con sede en Estados Unidos. Sirviendo a familias en las Américas, África, Europa, Asia y más allá.",
+    "content": "Contenido",
+    "latestNews": "Últimas Noticias",
+    "tutorials": "Tutoriales",
+    "interviews": "Entrevistas",
+    "analysis": "Análisis",
+    "career": "Carrera",
+    "careerPaths": "Rutas de Carrera",
+    "certifications": "Certificaciones",
+    "jobBoard": "Bolsa de Trabajo",
+    "salaryGuide": "Guía Salarial",
+    "safetyGuides": "Guías de Seguridad",
+    "youthSafety": "Seguridad Juvenil",
+    "seniorProtection": "Protección de Mayores",
+    "allResources": "Todos los Recursos",
+    "skillCheck": "Test de Habilidades",
+    "copyright": "© 2025 GetCyberRight.com. Todos los derechos reservados.",
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfService": "Términos de Servicio",
+    "contact": "Contacto"
+  },
+  "resources": {
+    "title": "Recursos de Ciberseguridad",
+    "subtitle": "Recursos Confiables para Familias en Todo el Mundo",
+    "description": "Herramientas y guías gratuitas que realmente puedes usar. Todo funciona en móvil, es fácil de entender y fue diseñado pensando en familias.",
+    "emergency": {
+      "title": "¿Te Estafaron? ¡Actúa Ahora!",
+      "subtitle": "Reporta en 24 horas para mejor oportunidad de recuperación",
+      "button": "Obtener Ayuda de Emergencia"
+    },
+    "youthToolkit": "Kit de Seguridad Juvenil",
+    "youthDescription": "Ayuda a mantener a tus hijos seguros en línea",
+    "seniorCenter": "Centro de Protección de Mayores",
+    "seniorDescription": "Mantente seguro de estafas",
+    "securityTools": "Herramientas de Seguridad Gratuitas",
+    "toolsDescription": "Protege tus dispositivos sin gastar",
+    "emergencyContacts": "Contactos de Emergencia por País",
+    "emergencyDescription": "Selecciona tu país para ver a quién llamar",
+    "selectCountry": "Selecciona tu país...",
+    "internationalOrgs": "Organizaciones Internacionales"
+  },
+  "common": {
+    "learnMore": "Saber Más",
+    "visitWebsite": "Visitar Sitio",
+    "selectYourCountry": "Selecciona Tu País",
+    "countriesAvailable": "Cubrimos {{count}} países en {{regions}} regiones"
+  },
+  "impact": {
+    "seo": {
+      "title": "Nuestro Impacto - Historias de Éxito GetCyberRight",
+      "description": "Descubre cómo GetCyberRight está protegiendo familias en África y más allá.",
+      "keywords": "impacto getcyberright, historias de éxito ciberseguridad, seguridad digital áfrica"
+    },
+    "hero": {
+      "badge": "Haciendo la Diferencia Juntos",
+      "title": "Nuestro Impacto",
+      "description": "Historias reales de familias reales. Descubre cómo estamos ayudando a proteger comunidades en África y alrededor del mundo.",
+      "shareTitle": "Mira cómo GetCyberRight está protegiendo familias",
+      "shareDescription": "Historias de éxito reales y estadísticas de impacto de nuestra plataforma de seguridad digital"
+    },
+    "stats": {
+      "title": "Impacto en Números",
+      "description": "Cada número representa una familia mejor protegida de amenazas en línea",
+      "familiesReached": "Familias Alcanzadas",
+      "countriesWithContacts": "Países con Contactos de Emergencia",
+      "tipsDelivered": "Consejos de Seguridad Entregados",
+      "regionsGlobal": "Regiones Globales Cubiertas",
+      "freeResources": "Recursos Gratuitos",
+      "updatedIntel": "Inteligencia de Amenazas Actualizada"
+    },
+    "stories": {
+      "badge": "Historias Reales, Impacto Real",
+      "title": "Historias de Éxito",
+      "description": "Escucha a las familias que usaron GetCyberRight para proteger a sus seres queridos. Estas historias nos inspiran a seguir construyendo y mejorando.",
+      "shareCta": {
+        "title": "Comparte Tu Historia",
+        "description": "¿GetCyberRight te ayudó a ti o a tu familia? Nos encantaría saber de ti. Tu historia podría inspirar a otros a proteger a sus seres queridos.",
+        "button": "Enviar Tu Historia"
+      },
+      "grace": {
+        "quote": "Después de que mi madre casi pierde sus ahorros por una estafa de dinero móvil, la guía de Protección de Mayores de GetCyberRight ayudó a toda nuestra familia a entender las señales de advertencia. Ahora usa su teléfono con confianza.",
+        "role": "Hija",
+        "category": "Protección de Mayores"
+      },
+      "david": {
+        "quote": "Mi hijo adolescente estaba siendo acosado en línea en una plataforma de juegos. Los recursos de Seguridad Juvenil nos dieron las palabras para tener una conversación real y los pasos para proteger sus cuentas.",
+        "role": "Padre",
+        "category": "Seguridad Juvenil"
+      },
+      "margaret": {
+        "quote": "Recibí un mensaje sospechoso de WhatsApp que decía ser de mi banco. Gracias a la herramienta de verificación de estafas, verifiqué que era fraude antes de hacer clic en cualquier enlace.",
+        "role": "Abuela",
+        "category": "Prevención de Estafas"
+      },
+      "samuel": {
+        "quote": "Como profesor, uso las guías imprimibles en mi clase. Los estudiantes ahora entienden por qué no deben compartir contraseñas o fotos personales en línea.",
+        "role": "Profesor de Secundaria",
+        "category": "Educación"
+      },
+      "faith": {
+        "quote": "Mi padre anciano cayó en una estafa de SIM swap. Después de usar la página de Ayuda de Emergencia, reportamos en horas y recuperamos el 60% de los fondos robados.",
+        "role": "Hija",
+        "category": "Recuperación de Emergencia"
+      },
+      "james": {
+        "quote": "Soy trabajador de salud comunitaria y comparto recursos de GetCyberRight durante visitas a domicilio. Las familias confían en el lenguaje simple y los consejos prácticos.",
+        "role": "Trabajador de Salud Comunitaria",
+        "category": "Impacto Comunitario"
+      }
+    },
+    "partners": {
+      "badge": "Construyendo Juntos",
+      "title": "Nuestros Socios",
+      "description": "Estamos construyendo una red de escuelas, organizaciones y empresas comprometidas con la seguridad digital. Únete a nosotros para proteger familias.",
+      "comingSoon": "Próximamente",
+      "schools": {
+        "name": "Escuelas Asociadas",
+        "description": "Instituciones educativas usando nuestro currículo y recursos"
+      },
+      "community": {
+        "name": "Organizaciones Comunitarias",
+        "description": "ONGs y grupos comunitarios distribuyendo nuestros materiales de seguridad"
+      },
+      "business": {
+        "name": "Empresas Locales",
+        "description": "Empresas patrocinando talleres de seguridad digital"
+      },
+      "government": {
+        "name": "Agencias Gubernamentales",
+        "description": "Asociaciones oficiales para campañas de concientización pública"
+      },
+      "cta": {
+        "title": "Conviértete en Socio",
+        "description": "Únete a nuestra misión de proteger familias de amenazas en línea. Ya seas una escuela, ONG o empresa, tenemos oportunidades de asociación para ti.",
+        "button": "Contáctanos"
+      },
+      "benefits": {
+        "title": "Beneficios para Socios"
+      }
+    },
+    "benefits": {
+      "brandedMaterials": "Acceso a materiales de seguridad personalizados para tu organización",
+      "recognition": "Reconocimiento en nuestra página de Impacto y redes sociales",
+      "workshops": "Talleres y sesiones de capacitación co-branded",
+      "priorityAccess": "Acceso prioritario a nuevos recursos y guías",
+      "quarterlyReports": "Informes de impacto trimestrales para tu comunidad",
+      "directSupport": "Soporte directo de nuestro equipo"
+    },
+    "cta": {
+      "title": "Sé Parte de Nuestra Historia",
+      "description": "Cada familia protegida, cada estafa prevenida, cada niño mantenido seguro en línea es una victoria que celebramos juntos.",
+      "primaryButton": "Comienza a Proteger Tu Familia",
+      "secondaryButton": "Conoce Nuestra Historia"
+    }
+  },
+  "carousel": {
+    "slide1": {
+      "headline": "Mantén a Tu Familia Segura en Línea",
+      "subtext": "Herramientas gratuitas y guías en lenguaje sencillo para proteger a toda tu familia, desde niños en redes sociales hasta adultos mayores atacados por estafadores."
+    },
+    "slide2": {
+      "headline": "Uniendo Generaciones a Través de la Seguridad Digital",
+      "subtext": "Ayudando a abuelos y nietos a navegar juntos el mundo en línea, de forma segura y con confianza."
+    },
+    "slide3": {
+      "headline": "Seguridad de Adolescentes en la Era Digital",
+      "subtext": "Guía práctica para ayudar a los jóvenes a reconocer estafas, proteger su privacidad y mantenerse seguros en línea."
+    },
+    "slide4": {
+      "headline": "Protegiendo a los Adultos Mayores de Amenazas en Línea",
+      "subtext": "Recursos simples y claros para ayudar a los adultos mayores a evitar estafas y usar la tecnología con confianza."
+    },
+    "slide5": {
+      "headline": "Tiempo de Pantalla Seguro para Niños",
+      "subtext": "Guía apropiada para cada edad para que los padres creen límites digitales saludables para sus hijos."
+    },
+    "slide6": {
+      "headline": "Familias Conectadas, Vidas Protegidas",
+      "subtext": "Aprendan juntos como familia cómo mantenerse seguros en el mundo digital."
+    }
+  },
+  "scamChecker": {
+    "title": "Verificador de Estafas",
+    "subtitle": "Verifica si algo es una estafa",
+    "checkButton": "Verificar Si Es Estafa",
+    "passwordButton": "Crear Contraseñas Seguras",
+    "alwaysFree": "Siempre Gratis",
+    "noSignup": "Sin Registro",
+    "expertSources": "Fuentes Expertas"
+  }
+}

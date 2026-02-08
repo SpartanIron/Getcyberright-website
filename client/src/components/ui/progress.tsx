@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 "use client"
 
+=======
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
 import * as React from "react"
 import * as ProgressPrimitive from "@radix-ui/react-progress"
 
@@ -25,4 +28,8 @@ const Progress = React.forwardRef<
 ))
 Progress.displayName = ProgressPrimitive.Root.displayName
 
+<<<<<<< HEAD
 export { Progress }
+=======
+export { Progress }
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e

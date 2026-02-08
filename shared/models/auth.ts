@@ -1,9 +1,16 @@
 import { sql } from "drizzle-orm";
+<<<<<<< HEAD
 import { index, jsonb, pgTable, timestamp, varchar, boolean, text } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Session storage table for express-session
+=======
+import { index, jsonb, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+
+// Session storage table.
+// (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
 export const sessions = pgTable(
   "sessions",
   {
@@ -14,6 +21,7 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)]
 );
 
+<<<<<<< HEAD
 // Subscription tiers with hierarchy ranking
 export const SUBSCRIPTION_TIERS = {
   FREE: "free",
@@ -82,10 +90,21 @@ export const users = pgTable("users", {
   // Admin
   isAdmin: boolean("is_admin").default(false),
   
+=======
+// User storage table for Replit Auth (visitor/public users).
+// Separate from admin users table to avoid conflicts.
+export const authUsers = pgTable("auth_users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+<<<<<<< HEAD
 // Registration schema
 export const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -147,3 +166,7 @@ export type MfaVerifyInput = z.infer<typeof mfaVerifySchema>;
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+=======
+export type UpsertUser = typeof authUsers.$inferInsert;
+export type User = typeof authUsers.$inferSelect;
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e

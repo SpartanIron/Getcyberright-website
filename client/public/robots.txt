@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
 
+<<<<<<< HEAD
+=======
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
 Sitemap: https://www.getcyberright.com/sitemap.xml

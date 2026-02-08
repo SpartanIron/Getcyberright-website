@@ -1,6 +1,33 @@
+<<<<<<< HEAD
 node_modules
 dist
 .DS_Store
 server/public
 vite.config.ts.*
 *.tar.gz
+=======
+# Dependencies
+node_modules
+
+# Build output
+dist
+
+# Environment variables
+.env
+
+# Replit-specific
+.replit
+.upm
+
+# OS junk
+.DS_Store
+
+# Generated assets
+server/public
+
+# Vite artifacts
+vite.config.ts.*
+
+# Archives
+*.tar.gz
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e

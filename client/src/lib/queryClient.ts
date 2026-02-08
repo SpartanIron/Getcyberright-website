@@ -7,6 +7,7 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+<<<<<<< HEAD
 export async function apiRequest(
   method: string,
   url: string,
@@ -21,6 +22,17 @@ export async function apiRequest(
 
   await throwIfResNotOk(res);
   return res;
+=======
+// Unified apiRequest function for both queries and mutations
+export async function apiRequest(url: string, options?: RequestInit): Promise<any> {
+  const res = await fetch(url, {
+    credentials: "include",
+    ...options,
+  });
+
+  await throwIfResNotOk(res);
+  return await res.json();
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -29,7 +41,11 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+<<<<<<< HEAD
     const res = await fetch(queryKey.join("/") as string, {
+=======
+    const res = await fetch(queryKey[0] as string, {
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e
       credentials: "include",
     });
 
@@ -54,4 +70,8 @@ export const queryClient = new QueryClient({
       retry: false,
     },
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 156a695b986f8c5988d46e759385fa11907cfe5e

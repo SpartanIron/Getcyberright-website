@@ -1,0 +1,20 @@
+# GetCyberRight Security Policy
+# This file follows the security.txt standard (RFC 9116)
+# https://securitytxt.org/
+
+Contact: mailto:security@getcyberright.com
+Contact: mailto:hello@getcyberright.com
+Expires: 2027-01-11T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://getcyberright.com/.well-known/security.txt
+
+# Policy
+Policy: https://getcyberright.com/security-policy
+
+# Acknowledgments
+# We appreciate responsible disclosure of security vulnerabilities.
+# Researchers who report valid security issues will be acknowledged.
+
+# Scope
+# In scope: *.getcyberright.com
+# Out of scope: Third-party services and integrations
