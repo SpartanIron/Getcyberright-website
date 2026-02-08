@@ -73,6 +73,7 @@ import {
   setupMonitoring,
   getMonitoringSchedule,
   generatePrivacyReport,
+  runGuestExposureScan,
 } from "./dataBrokerService";
 
 // URL reputation checking schemas with validation
@@ -2653,6 +2654,25 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("Error fetching broker:", error);
       res.status(500).json({ error: "Failed to fetch broker details" });
+    }
+  });
+
+  app.post("/api/data-removal/guest-scan", async (req: Request, res: Response) => {
+    try {
+      const { fullName, emails, phoneNumbers, currentAddress } = req.body;
+      if (!fullName) {
+        return res.status(400).json({ error: "Please provide at least your name" });
+      }
+      const result = await runGuestExposureScan({
+        fullName,
+        emails: emails || [],
+        phoneNumbers: phoneNumbers || [],
+        currentAddress: currentAddress || "",
+      });
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error running guest scan:", error);
+      res.status(500).json({ error: error.message || "Failed to run scan" });
     }
   });
 

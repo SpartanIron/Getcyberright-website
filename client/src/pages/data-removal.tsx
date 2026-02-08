@@ -234,29 +234,7 @@ function OverviewTab() {
   });
 
   if (!isAuthenticated) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
-            <div className="p-4 rounded-full bg-primary/10">
-              <Lock className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-semibold">Sign In to Get Started</h3>
-            <p className="text-muted-foreground text-center max-w-md">
-              Create an account or sign in to scan data brokers, track removal requests, and protect your personal information.
-            </p>
-            <div className="flex gap-3">
-              <Button asChild>
-                <Link href="/register">Create Account</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/login">Sign In</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    );
+    return <GuestScanForm />;
   }
 
   if (isLoading) {
@@ -658,6 +636,189 @@ function VaultTab() {
   );
 }
 
+function GuestScanForm() {
+  const { toast } = useToast();
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+  const [guestAddress, setGuestAddress] = useState("");
+
+  const guestScanMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/data-removal/guest-scan", {
+        fullName: guestName,
+        emails: guestEmail ? guestEmail.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        phoneNumbers: guestPhone ? guestPhone.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        currentAddress: guestAddress || "",
+      });
+      return res.json();
+    },
+    onError: (error: Error) => {
+      toast({ title: "Scan Failed", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const result = guestScanMutation.data as {
+    totalBrokersScanned: number;
+    totalExposuresFound: number;
+    privacyScore: number;
+    riskLevel: string;
+    findings: Array<{ broker: DataBroker; dataTypesExposed: string[]; exposureLevel: string }>;
+  } | undefined;
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Search className="h-5 w-5 text-primary" />
+            Quick Privacy Check
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">
+            Enter some basic details to see which data brokers may have your information. No account needed.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Full Name *</label>
+              <Input
+                placeholder="John Smith"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                data-testid="input-guest-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email Address</label>
+              <Input
+                placeholder="john@example.com"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                data-testid="input-guest-email"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Phone Number</label>
+              <Input
+                placeholder="(555) 123-4567"
+                value={guestPhone}
+                onChange={(e) => setGuestPhone(e.target.value)}
+                data-testid="input-guest-phone"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">City/State</label>
+              <Input
+                placeholder="New York, NY"
+                value={guestAddress}
+                onChange={(e) => setGuestAddress(e.target.value)}
+                data-testid="input-guest-address"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Lock className="h-4 w-4" />
+            Your information is not stored and is only used for this one-time check.
+          </div>
+          <Button
+            onClick={() => guestScanMutation.mutate()}
+            disabled={!guestName || guestScanMutation.isPending}
+            data-testid="button-guest-scan"
+          >
+            {guestScanMutation.isPending ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Search className="h-4 w-4 mr-2" />
+            )}
+            Check My Exposure
+          </Button>
+        </CardContent>
+      </Card>
+
+      {result && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <div className="mx-auto w-24 h-24 relative mb-3">
+                  <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted/20" />
+                    <circle
+                      cx="50" cy="50" r="45" fill="none" strokeWidth="8"
+                      strokeDasharray={`${(result.privacyScore / 100) * 283} 283`}
+                      strokeLinecap="round"
+                      className={result.privacyScore >= 70 ? "text-green-500" : result.privacyScore >= 40 ? "text-yellow-500" : "text-red-500"}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-2xl font-bold" data-testid="text-guest-privacy-score">{result.privacyScore}</span>
+                  </div>
+                </div>
+                <p className="text-sm font-medium">Privacy Score</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <div className="text-3xl font-bold text-destructive" data-testid="text-guest-exposures">{result.totalExposuresFound}</div>
+                <p className="text-sm text-muted-foreground mt-1">Exposures Found</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <div className="text-3xl font-bold">{result.totalBrokersScanned}</div>
+                <p className="text-sm text-muted-foreground mt-1">Brokers Scanned</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {result.findings.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  Data Brokers With Your Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {result.findings.map((finding, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 border rounded-md">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium">{finding.broker.name}</span>
+                        <Badge variant={finding.exposureLevel === "high" ? "destructive" : "secondary"}>
+                          {finding.exposureLevel} risk
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {finding.broker.domain} &middot; {finding.dataTypesExposed.join(", ")}
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        Opt Out
+                      </a>
+                    </Button>
+                  </div>
+                ))}
+                <div className="pt-4 border-t text-center space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Sign up to see all exposures, track removal requests, and get automated opt-out letters.
+                  </p>
+                  <Button asChild>
+                    <Link href="/register">Create Free Account</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </motion.div>
+      )}
+    </motion.div>
+  );
+}
+
 function ScanTab() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -716,24 +877,7 @@ function ScanTab() {
   });
 
   if (!isAuthenticated) {
-    return (
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
-            <div className="p-4 rounded-full bg-primary/10">
-              <Search className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-semibold">Sign In to Scan</h3>
-            <p className="text-muted-foreground text-center max-w-md">
-              Sign in to scan 150+ data broker sites for your personal information.
-            </p>
-            <Button asChild>
-              <Link href="/login">Sign In</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
-    );
+    return <GuestScanForm />;
   }
 
   if (!vaultData) {

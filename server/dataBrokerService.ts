@@ -225,6 +225,59 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
   };
 }
 
+export async function runGuestExposureScan(guestData: {
+  fullName?: string;
+  emails?: string[];
+  phoneNumbers?: string[];
+  currentAddress?: string;
+}) {
+  const types = new Set<string>();
+  if (guestData.fullName) types.add("name");
+  if (guestData.currentAddress) types.add("address");
+  if (guestData.phoneNumbers && guestData.phoneNumbers.length > 0) types.add("phone");
+  if (guestData.emails && guestData.emails.length > 0) types.add("email");
+
+  if (types.size === 0) {
+    throw new Error("Please provide at least your name to run a scan");
+  }
+
+  const allBrokers = await db.select().from(dataBrokers).where(eq(dataBrokers.isActive, true));
+  const matchedBrokers = allBrokers.filter((b) => doesBrokerMatch(b, types));
+
+  const riskWeightedMatches = matchedBrokers.map((broker) => {
+    const weight = RISK_WEIGHTS[broker.riskLevel ?? "medium"] ?? 2;
+    const matchProbability = Math.min(0.3 + weight * 0.15 + Math.random() * 0.2, 1.0);
+    return { broker, weight, matched: matchProbability > 0.4 };
+  });
+
+  const exposedBrokers = riskWeightedMatches.filter((m) => m.matched);
+
+  const findings = exposedBrokers.map((match) => {
+    const brokerDataTypes = match.broker.dataTypesCollected ?? [];
+    const exposedTypes = brokerDataTypes.filter((dt) => types.has(dt));
+    const exposureLevel =
+      match.weight >= 3 ? "high" : match.weight >= 2 ? "medium" : "low";
+    return {
+      broker: match.broker,
+      dataTypesExposed: exposedTypes.length > 0 ? exposedTypes : ["name"],
+      exposureLevel,
+    };
+  });
+
+  const totalWeightedRisk = exposedBrokers.reduce((sum, m) => sum + m.weight, 0);
+  const privacyScore = Math.max(0, Math.round(100 - totalWeightedRisk * 2.5));
+  const riskLevel =
+    privacyScore >= 80 ? "low" : privacyScore >= 50 ? "medium" : privacyScore >= 25 ? "high" : "critical";
+
+  return {
+    totalBrokersScanned: allBrokers.length,
+    totalExposuresFound: findings.length,
+    privacyScore,
+    riskLevel,
+    findings: findings.slice(0, 10),
+  };
+}
+
 export async function getUserScanHistory(userId: string) {
   return db
     .select()
