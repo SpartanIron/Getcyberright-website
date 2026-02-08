@@ -945,6 +945,37 @@ export const breachCheckResults = pgTable("breach_check_results", {
 });
 export type BreachCheckResult = typeof breachCheckResults.$inferSelect;
 
+export const profileDiscoveries = pgTable("profile_discoveries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id"),
+  scanId: varchar("scan_id"),
+  brokerId: varchar("broker_id").notNull(),
+  profileUrl: text("profile_url"),
+  searchMethod: text("search_method").notNull(),
+  nameMatch: boolean("name_match").default(false),
+  cityMatch: boolean("city_match").default(false),
+  stateMatch: boolean("state_match").default(false),
+  ageMatch: boolean("age_match").default(false),
+  matchScore: integer("match_score").default(0),
+  extractedName: text("extracted_name"),
+  extractedCity: text("extracted_city"),
+  extractedState: text("extracted_state"),
+  extractedAge: text("extracted_age"),
+  extractedRelatives: text("extracted_relatives").array(),
+  rawSnippet: text("raw_snippet"),
+  responseTimeMs: integer("response_time_ms"),
+  isConfirmedMatch: boolean("is_confirmed_match").default(false),
+  status: text("status").notNull().default("found"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ProfileDiscovery = typeof profileDiscoveries.$inferSelect;
+export const insertProfileDiscoverySchema = createInsertSchema(profileDiscoveries).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertProfileDiscovery = z.infer<typeof insertProfileDiscoverySchema>;
+
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],
   scan_found: ["request_generated", "not_found"],

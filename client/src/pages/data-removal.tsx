@@ -1199,6 +1199,7 @@ function GuestScanForm() {
     totalBrokersInCatalog: number;
     totalExposuresFound: number;
     confirmedExposures: number;
+    profilesFound: number;
     verifiedBrokers: number;
     riskLevel: string;
     scanMethod?: string;
@@ -1211,6 +1212,8 @@ function GuestScanForm() {
       verificationDetails?: string;
       sourceEvidence?: string;
       evidenceSummary?: string;
+      profileUrl?: string | null;
+      matchScore?: number;
     }>;
   } | undefined;
 
@@ -1286,26 +1289,33 @@ function GuestScanForm() {
 
       {result && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="pt-6 text-center">
                 <div className="text-3xl font-bold text-red-600 dark:text-red-400" data-testid="text-guest-confirmed">{result.confirmedExposures || 0}</div>
-                <p className="text-sm font-medium mt-1">Confirmed Breaches</p>
-                <p className="text-xs text-muted-foreground">Your email was found in verified data breaches</p>
+                <p className="text-sm font-medium mt-1">Breaches</p>
+                <p className="text-xs text-muted-foreground">Email found in verified data breaches</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <div className="text-3xl font-bold text-red-500 dark:text-red-400" data-testid="text-guest-profiles">{result.profilesFound || 0}</div>
+                <p className="text-sm font-medium mt-1">Profiles Found</p>
+                <p className="text-xs text-muted-foreground">Your listing found on broker sites</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <div className="text-3xl font-bold text-orange-600 dark:text-orange-400" data-testid="text-guest-verified">{result.verifiedBrokers || 0}</div>
-                <p className="text-sm font-medium mt-1">Active Brokers Found</p>
-                <p className="text-xs text-muted-foreground">Verified active sites with opt-out options</p>
+                <p className="text-sm font-medium mt-1">Active Brokers</p>
+                <p className="text-xs text-muted-foreground">Active sites we could not search</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
                 <div className="text-3xl font-bold" data-testid="text-guest-scanned">{result.totalBrokersScanned.toLocaleString()}</div>
-                <p className="text-sm font-medium mt-1">Brokers Checked</p>
-                <p className="text-xs text-muted-foreground">From our catalog of {(result.totalBrokersInCatalog || result.totalBrokersScanned).toLocaleString()}</p>
+                <p className="text-sm font-medium mt-1">Total Checked</p>
+                <p className="text-xs text-muted-foreground">Out of {(result.totalBrokersInCatalog || result.totalBrokersScanned).toLocaleString()} in catalog</p>
               </CardContent>
             </Card>
           </div>
@@ -1316,26 +1326,33 @@ function GuestScanForm() {
                 <Shield className="h-4 w-4 text-primary" />
                 <span className="font-medium">What This Scan Actually Does</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div className="flex items-start gap-2 p-2 rounded-md bg-red-50 dark:bg-red-950/30">
                   <AlertTriangle className="h-3.5 w-3.5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
                   <div>
                     <span className="font-medium text-red-700 dark:text-red-400">Confirmed Breach</span>
-                    <p className="text-muted-foreground mt-0.5">Your email was found in a real data breach verified by Have I Been Pwned. This is a fact, not an estimate.</p>
+                    <p className="text-muted-foreground mt-0.5">Your email was found in a real data breach verified by Have I Been Pwned.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 p-2 rounded-md bg-red-50/60 dark:bg-red-950/20">
+                  <Search className="h-3.5 w-3.5 text-red-500 dark:text-red-400 mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-medium text-red-600 dark:text-red-400">Profile Found</span>
+                    <p className="text-muted-foreground mt-0.5">We searched this broker's website and found a profile matching your name and location.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-2 rounded-md bg-orange-50 dark:bg-orange-950/30">
                   <CheckCircle className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
                   <div>
-                    <span className="font-medium text-orange-700 dark:text-orange-400">Verified Active Broker</span>
-                    <p className="text-muted-foreground mt-0.5">We pinged this broker's website and confirmed it is active and accepts opt-out requests. We did NOT search their database for your records.</p>
+                    <span className="font-medium text-orange-700 dark:text-orange-400">Active Broker</span>
+                    <p className="text-muted-foreground mt-0.5">Broker is active but we could not search it for your profile (some sites block automated lookups).</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-2 rounded-md bg-muted/50">
                   <Info className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
                   <div>
-                    <span className="font-medium">What We Cannot Do</span>
-                    <p className="text-muted-foreground mt-0.5">We cannot search inside a broker's private database. Only breach databases give us confirmed proof. Opt-out is still recommended for verified brokers.</p>
+                    <span className="font-medium">Transparency</span>
+                    <p className="text-muted-foreground mt-0.5">We only report what we can verify. Match scores show how closely a found profile matches your provided details.</p>
                   </div>
                 </div>
               </div>
@@ -1356,8 +1373,8 @@ function GuestScanForm() {
               <CardContent className="space-y-3">
                 {result.findings
                   .sort((a, b) => {
-                    const tierOrder: Record<string, number> = { confirmed: 0, verified_broker: 1 };
-                    return (tierOrder[a.evidenceTier || ""] ?? 2) - (tierOrder[b.evidenceTier || ""] ?? 2);
+                    const tierOrder: Record<string, number> = { confirmed: 0, profile_found: 1, verified_broker: 2 };
+                    return (tierOrder[a.evidenceTier || ""] ?? 3) - (tierOrder[b.evidenceTier || ""] ?? 3);
                   })
                   .map((finding, idx) => (
                   <div key={idx} className="p-4 border rounded-md space-y-2" data-testid={`finding-${idx}`}>
@@ -1365,8 +1382,13 @@ function GuestScanForm() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium">{finding.broker.name}</span>
                         {finding.evidenceTier === "confirmed" && (
-                          <Badge variant="destructive">
+                          <Badge variant="destructive" data-testid={`badge-confirmed-${idx}`}>
                             Breach Confirmed
+                          </Badge>
+                        )}
+                        {finding.evidenceTier === "profile_found" && (
+                          <Badge className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800 no-default-hover-elevate no-default-active-elevate" data-testid={`badge-profile-found-${idx}`}>
+                            Profile Found
                           </Badge>
                         )}
                         {finding.evidenceTier === "verified_broker" && (
@@ -1374,18 +1396,33 @@ function GuestScanForm() {
                             Active Broker
                           </Badge>
                         )}
+                        {finding.matchScore != null && finding.matchScore > 0 && (
+                          <Badge variant="outline" className="text-xs">
+                            {finding.matchScore}% match
+                          </Badge>
+                        )}
                       </div>
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          Opt Out
-                        </a>
-                      </Button>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {finding.profileUrl && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={finding.profileUrl} target="_blank" rel="noopener noreferrer" data-testid={`link-view-profile-${idx}`}>
+                              <ExternalLink className="h-3 w-3 mr-1" />
+                              View Profile
+                            </a>
+                          </Button>
+                        )}
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Opt Out
+                          </a>
+                        </Button>
+                      </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       {finding.broker.domain}
                       {finding.dataTypesExposed.length > 0 && (
-                        <span> &middot; Broker collects: {finding.dataTypesExposed.join(", ")}</span>
+                        <span> &middot; {finding.evidenceTier === "confirmed" ? "Data in breach:" : "Broker collects:"} {finding.dataTypesExposed.join(", ")}</span>
                       )}
                     </p>
                     {finding.verificationDetails && (
@@ -1697,6 +1734,10 @@ function ScanTab() {
                           <p className="font-medium">{finding.broker?.name || "Unknown Broker"}</p>
                           {finding.verificationMethod === "breach_confirmed" ? (
                             <Badge variant="destructive">Breach Confirmed</Badge>
+                          ) : finding.verificationMethod === "profile_discovered" ? (
+                            <Badge className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800 no-default-hover-elevate no-default-active-elevate">
+                              Profile Found
+                            </Badge>
                           ) : finding.verificationMethod === "broker_verified_active" ? (
                             <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800 no-default-hover-elevate no-default-active-elevate">
                               Active Broker

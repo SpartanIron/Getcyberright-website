@@ -11,6 +11,7 @@ import {
   removalAuditLog,
   removalVerifications,
   optOutContent,
+  profileDiscoveries,
   VALID_STATUS_TRANSITIONS,
   type DataBroker,
   type UserVaultProfile,
@@ -21,6 +22,7 @@ import {
   type PrivacyReport,
 } from "@shared/schema";
 import { eq, and, ilike, sql, desc, count, gte, lte, inArray } from "drizzle-orm";
+import { searchAllBrokersForProfile, getSearchableAdapters, type ProfileSearchResult, type SearchParams } from "./brokerAdapters";
 
 const RISK_WEIGHTS: Record<string, number> = {
   critical: 4,
@@ -68,7 +70,7 @@ const CATEGORY_DATA_MAP: Record<string, string[]> = {
   "credit-reporting": ["name", "address", "email"],
 };
 
-type EvidenceTier = "confirmed" | "verified_broker";
+type EvidenceTier = "confirmed" | "profile_found" | "verified_broker";
 
 interface VerifiedFinding {
   broker: DataBroker;
@@ -79,6 +81,9 @@ interface VerifiedFinding {
   verificationDetails: string;
   sourceEvidence: string;
   evidenceSummary: string;
+  profileUrl?: string | null;
+  matchScore?: number;
+  profileDiscovery?: ProfileSearchResult | null;
 }
 
 interface BreachResult {
@@ -175,13 +180,38 @@ function analyzeBrokerDataOverlap(
   return { overlap, coveragePercent };
 }
 
+function parseNameParts(fullName: string): { firstName: string; lastName: string; middleName?: string } {
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length === 1) return { firstName: parts[0], lastName: "" };
+  if (parts.length === 2) return { firstName: parts[0], lastName: parts[1] };
+  return { firstName: parts[0], lastName: parts[parts.length - 1], middleName: parts.slice(1, -1).join(" ") };
+}
+
+function parseAddressParts(address: string): { city?: string; state?: string } {
+  if (!address) return {};
+  const parts = address.split(",").map(p => p.trim());
+  if (parts.length >= 2) {
+    const city = parts[0];
+    const stateZipPart = parts[parts.length - 1];
+    const stateMatch = stateZipPart.match(/^([A-Za-z\s]+)/);
+    const state = stateMatch ? stateMatch[1].trim() : undefined;
+    return { city, state };
+  }
+  return { city: parts[0] };
+}
+
 async function runRealVerification(
   allBrokers: DataBroker[],
   userDataTypes: Set<string>,
   emails: string[],
   fullName?: string,
-): Promise<{ findings: VerifiedFinding[]; brokersChecked: number }> {
+  currentAddress?: string,
+  dateOfBirth?: string,
+  scanId?: string,
+  userId?: string,
+): Promise<{ findings: VerifiedFinding[]; brokersChecked: number; profilesFound: number }> {
   const findings: VerifiedFinding[] = [];
+  let profilesFoundCount = 0;
 
   let breachResults: BreachResult[] = [];
   if (emails.length > 0) {
@@ -196,13 +226,75 @@ async function runRealVerification(
 
   const breachDomains = new Set(breachResults.map(b => b.domain.toLowerCase()).filter(Boolean));
 
+  let profileSearchResults = new Map<string, ProfileSearchResult>();
+  if (fullName) {
+    const { firstName, lastName, middleName } = parseNameParts(fullName);
+    const addressParts = currentAddress ? parseAddressParts(currentAddress) : {};
+
+    let age: string | undefined;
+    if (dateOfBirth) {
+      const birthYear = parseInt(dateOfBirth.substring(0, 4), 10);
+      if (!isNaN(birthYear)) {
+        age = String(new Date().getFullYear() - birthYear);
+      }
+    }
+
+    if (firstName && lastName) {
+      const searchParams: SearchParams = {
+        firstName,
+        lastName,
+        middleName,
+        city: addressParts.city,
+        state: addressParts.state,
+        age,
+      };
+
+      console.log(`[scan] Starting REAL profile discovery for "${firstName} ${lastName}" across ${getSearchableAdapters().length} broker sites`);
+      profileSearchResults = await searchAllBrokersForProfile(searchParams, 4, 2500);
+
+      for (const [brokerId, result] of Array.from(profileSearchResults.entries())) {
+        if (result.found && result.matchScore >= 40) {
+          profilesFoundCount++;
+
+          if (scanId && userId) {
+            try {
+              await db.insert(profileDiscoveries).values({
+                userId,
+                scanId,
+                brokerId,
+                profileUrl: result.profileUrl,
+                searchMethod: result.searchMethod,
+                nameMatch: result.nameMatch,
+                cityMatch: result.cityMatch,
+                stateMatch: result.stateMatch,
+                ageMatch: result.ageMatch,
+                matchScore: result.matchScore,
+                extractedName: result.extractedName,
+                extractedCity: result.extractedCity,
+                extractedState: result.extractedState,
+                extractedAge: result.extractedAge,
+                extractedRelatives: result.extractedRelatives,
+                rawSnippet: result.rawSnippet?.substring(0, 500),
+                responseTimeMs: result.responseTimeMs,
+                isConfirmedMatch: result.matchScore >= 60,
+                status: "found",
+              });
+            } catch (err) {
+              console.error(`[scan] Error saving profile discovery for ${brokerId}:`, err);
+            }
+          }
+        }
+      }
+    }
+  }
+
   const brokersToCheck = allBrokers.filter(broker => {
     const categoryTypes = CATEGORY_DATA_MAP[broker.category];
     if (!categoryTypes) return userDataTypes.has("name");
     return categoryTypes.some((t) => userDataTypes.has(t));
   });
 
-  console.log(`[scan] Scanning ${brokersToCheck.length} relevant brokers (from ${allBrokers.length} total)`);
+  console.log(`[scan] Processing ${brokersToCheck.length} relevant brokers (from ${allBrokers.length} total), ${profilesFoundCount} profiles already discovered`);
 
   const BATCH_SIZE = 50;
   for (let i = 0; i < brokersToCheck.length; i += BATCH_SIZE) {
@@ -211,14 +303,16 @@ async function runRealVerification(
     const batchResults = await Promise.allSettled(
       batch.map(async (broker) => {
         const domain = broker.domain?.replace(/^https?:\/\//, "").replace(/\/.*$/, "") || "";
+        const breachMatch = domain ? breachDomains.has(domain.toLowerCase()) : false;
+        const profileResult = profileSearchResults.get(broker.id);
+        const profileFound = profileResult?.found && (profileResult?.matchScore ?? 0) >= 40;
 
         const [siteCheck, optOutCheck] = await Promise.all([
-          domain ? checkBrokerSiteReachable(domain) : Promise.resolve({ reachable: false, hasOptOut: false, responseTime: 0 }),
-          checkBrokerOptOutPage(broker),
+          (!breachMatch && !profileFound && domain) ? checkBrokerSiteReachable(domain) : Promise.resolve({ reachable: false, hasOptOut: false, responseTime: 0 }),
+          (!breachMatch && !profileFound) ? checkBrokerOptOutPage(broker) : Promise.resolve({ exists: false, url: null }),
         ]);
 
-        const { overlap, coveragePercent } = analyzeBrokerDataOverlap(broker, userDataTypes);
-        const breachMatch = domain ? breachDomains.has(domain.toLowerCase()) : false;
+        const { overlap } = analyzeBrokerDataOverlap(broker, userDataTypes);
 
         const facts: string[] = [];
         let evidenceTier: EvidenceTier | null = null;
@@ -230,20 +324,33 @@ async function runRealVerification(
           facts.push(`VERIFIED: Your email appeared in a data breach linked to ${domain} (source: Have I Been Pwned)`);
         }
 
-        if (siteCheck.reachable) {
-          facts.push(`VERIFIED: ${domain} responded to our check (${siteCheck.responseTime}ms)`);
-          if (!evidenceTier) {
-            evidenceTier = "verified_broker";
-            verificationMethod = "broker_verified_active";
+        if (profileFound && profileResult) {
+          if (!evidenceTier || (evidenceTier as string) !== "confirmed") {
+            evidenceTier = "profile_found";
+            verificationMethod = "profile_discovered";
+          }
+          const matchDetails = [
+            profileResult.nameMatch ? "name matches" : null,
+            profileResult.cityMatch ? "city matches" : null,
+            profileResult.stateMatch ? "state matches" : null,
+            profileResult.ageMatch ? "age matches" : null,
+          ].filter(Boolean).join(", ");
+          facts.push(`PROFILE FOUND: We searched ${broker.name} and found a profile matching your information (${matchDetails}, score: ${profileResult.matchScore}/100)`);
+          if (profileResult.profileUrl) {
+            facts.push(`Profile URL: ${profileResult.profileUrl}`);
           }
         }
 
-        if (optOutCheck.exists) {
+        if (!evidenceTier && siteCheck.reachable) {
+          facts.push(`VERIFIED: ${domain} responded to our check (${siteCheck.responseTime}ms)`);
+          evidenceTier = "verified_broker";
+          verificationMethod = "broker_verified_active";
+        }
+
+        if (!evidenceTier && optOutCheck.exists) {
           facts.push(`VERIFIED: Opt-out page accessible at ${optOutCheck.url}`);
-          if (!evidenceTier) {
-            evidenceTier = "verified_broker";
-            verificationMethod = "broker_verified_active";
-          }
+          evidenceTier = "verified_broker";
+          verificationMethod = "broker_verified_active";
         }
 
         if (!evidenceTier) {
@@ -260,24 +367,40 @@ async function runRealVerification(
         if (evidenceTier === "confirmed") {
           verificationDetails = `Your email was found in a verified data breach connected to this broker. This is confirmed by Have I Been Pwned, an independent breach notification service.`;
           evidenceSummary = "Breach-confirmed exposure";
+        } else if (evidenceTier === "profile_found" && profileResult) {
+          const matchParts = [
+            profileResult.nameMatch ? "name" : null,
+            profileResult.cityMatch ? "city" : null,
+            profileResult.stateMatch ? "state" : null,
+            profileResult.ageMatch ? "age" : null,
+          ].filter(Boolean);
+          verificationDetails = `We searched ${broker.name} for your name and found a matching profile. Match details: ${matchParts.join(", ")} confirmed (score: ${profileResult.matchScore}/100).${profileResult.profileUrl ? ` Profile URL: ${profileResult.profileUrl}` : ""}`;
+          evidenceSummary = `Profile found — ${matchParts.length} detail${matchParts.length !== 1 ? "s" : ""} matched`;
         } else {
           const activeDetails = [
             siteCheck.reachable ? `site is active` : null,
             optOutCheck.exists ? `opt-out page is accessible` : null,
           ].filter(Boolean).join(" and ");
-          verificationDetails = `We verified that ${broker.name} (${domain}) is an active data broker — ${activeDetails}. We did NOT search their database for your records.`;
-          evidenceSummary = "Active broker — opt-out available";
+          verificationDetails = `We verified that ${broker.name} (${domain}) is an active data broker — ${activeDetails}. We did NOT find your specific profile on this site.`;
+          evidenceSummary = "Active broker — no profile found";
         }
+
+        let exposureLevel = "info";
+        if (evidenceTier === "confirmed") exposureLevel = "critical";
+        else if (evidenceTier === "profile_found") exposureLevel = "high";
 
         return {
           broker,
           dataTypesExposed: overlap.length > 0 ? overlap : [],
-          exposureLevel: evidenceTier === "confirmed" ? "critical" : "info",
+          exposureLevel,
           evidenceTier,
           verificationMethod,
           verificationDetails,
           sourceEvidence: facts.join(" | "),
           evidenceSummary,
+          profileUrl: profileResult?.profileUrl ?? null,
+          matchScore: profileResult?.matchScore ?? 0,
+          profileDiscovery: profileResult ?? null,
         } as VerifiedFinding;
       })
     );
@@ -328,11 +451,11 @@ async function runRealVerification(
   }
 
   findings.sort((a, b) => {
-    const tierOrder: Record<EvidenceTier, number> = { confirmed: 3, verified_broker: 2 };
+    const tierOrder: Record<EvidenceTier, number> = { confirmed: 3, profile_found: 2, verified_broker: 1 };
     return (tierOrder[b.evidenceTier] ?? 0) - (tierOrder[a.evidenceTier] ?? 0);
   });
 
-  return { findings, brokersChecked: brokersToCheck.length };
+  return { findings, brokersChecked: brokersToCheck.length, profilesFound: profilesFoundCount };
 }
 
 interface BrokerCatalogFilters {
@@ -515,6 +638,10 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
       userDataTypes,
       emails,
       profile.fullName ?? undefined,
+      profile.currentAddress ?? undefined,
+      profile.dateOfBirth ?? undefined,
+      scan.id,
+      userId,
     );
 
     const findingsToInsert = verificationResult.findings.map((match) => ({
@@ -535,13 +662,14 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
     }
 
     const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
+    const profileFoundCount = verificationResult.findings.filter(f => f.evidenceTier === "profile_found").length;
     const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
     const riskLevel =
-      confirmedCount >= 10 ? "critical" :
-      confirmedCount >= 5 || verifiedBrokerCount >= 30 ? "high" :
-      verifiedBrokerCount >= 15 ? "medium" : "low";
+      confirmedCount >= 10 || profileFoundCount >= 8 ? "critical" :
+      confirmedCount >= 5 || profileFoundCount >= 4 || verifiedBrokerCount >= 30 ? "high" :
+      verifiedBrokerCount >= 15 || profileFoundCount >= 2 ? "medium" : "low";
 
-    console.log(`[scan] Scan complete: ${findings.length} findings (${confirmedCount} confirmed, ${verifiedBrokerCount} verified brokers) from ${verificationResult.brokersChecked} brokers checked`);
+    console.log(`[scan] Scan complete: ${findings.length} findings (${confirmedCount} breaches confirmed, ${profileFoundCount} profiles found, ${verifiedBrokerCount} active brokers) from ${verificationResult.brokersChecked} brokers checked`);
 
     const [updatedScan] = await db
       .update(exposureScans)
@@ -598,6 +726,7 @@ export async function runGuestExposureScan(guestData: {
     types,
     guestData.emails ?? [],
     guestData.fullName,
+    guestData.currentAddress,
   );
 
   const findings = verificationResult.findings.map((match) => ({
@@ -608,9 +737,12 @@ export async function runGuestExposureScan(guestData: {
     verificationMethod: match.verificationMethod,
     verificationDetails: match.verificationDetails,
     sourceEvidence: match.sourceEvidence,
+    profileUrl: match.profileUrl ?? null,
+    matchScore: match.matchScore ?? 0,
   }));
 
   const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
+  const profileFoundCount = verificationResult.findings.filter(f => f.evidenceTier === "profile_found").length;
   const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
 
   return {
@@ -618,6 +750,7 @@ export async function runGuestExposureScan(guestData: {
     totalBrokersInCatalog: allBrokers.length,
     totalExposuresFound: findings.length,
     confirmedExposures: confirmedCount,
+    profilesFound: profileFoundCount,
     verifiedBrokers: verifiedBrokerCount,
     findings,
     scanMethod: "verified",
