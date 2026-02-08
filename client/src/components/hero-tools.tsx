@@ -30,21 +30,21 @@ export function HeroTools() {
             transition={{ duration: 0.4 }}
           >
             <Link href="/data-removal">
-              <Card className="h-full hover-elevate cursor-pointer group bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/40" data-testid="card-hero-data-scan">
+              <Card className="h-full hover-elevate cursor-pointer group bg-red-500 border-red-600 dark:bg-red-600 dark:border-red-700" data-testid="card-hero-data-scan">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-lg bg-red-500/15 flex items-center justify-center flex-shrink-0">
-                      <Trash2 className="w-7 h-7 text-red-500" />
+                    <div className="w-14 h-14 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                      <Trash2 className="w-7 h-7 text-white" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="text-lg font-semibold text-foreground">Scan for Your Exposed Data</h3>
-                        <Badge variant="secondary" className="text-[10px]">Free Scan</Badge>
+                        <h3 className="text-lg font-semibold text-white">Scan for Your Exposed Data</h3>
+                        <Badge className="text-[10px] bg-white/20 text-white border-white/30">Free Scan</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-4">
+                      <p className="text-sm text-white/80 mb-4">
                         Discover which of 500+ data brokers are selling your personal information. See exactly what's exposed and take action to remove it.
                       </p>
-                      <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                      <div className="flex items-center gap-2 text-sm font-medium text-white">
                         Start Free Scan <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
@@ -61,21 +61,21 @@ export function HeroTools() {
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             <Link href="/tools">
-              <Card className="h-full hover-elevate cursor-pointer group bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-900/40" data-testid="card-hero-security-scanner">
+              <Card className="h-full hover-elevate cursor-pointer group bg-teal-600 border-teal-700 dark:bg-teal-700 dark:border-teal-800" data-testid="card-hero-security-scanner">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
-                      <Search className="w-7 h-7 text-primary" />
+                    <div className="w-14 h-14 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                      <Search className="w-7 h-7 text-white" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="text-lg font-semibold text-foreground">Check Something Suspicious</h3>
-                        <Badge variant="secondary" className="text-[10px]">Free</Badge>
+                        <h3 className="text-lg font-semibold text-white">Check Something Suspicious</h3>
+                        <Badge className="text-[10px] bg-white/20 text-white border-white/30">Free</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-4">
+                      <p className="text-sm text-white/80 mb-4">
                         Got a sketchy link, email, or phone call? Paste it in and get an instant risk assessment with detailed analysis.
                       </p>
-                      <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                      <div className="flex items-center gap-2 text-sm font-medium text-white">
                         Open Security Scanner <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
