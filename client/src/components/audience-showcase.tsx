@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { ArrowRight, Users, Heart, Briefcase } from "lucide-react";
 import familyImage from "@/assets/images/hero-family.jpg";
 import seniorsImage from "@/assets/images/seniors-learning.png";
-import businessImage from "@/assets/images/business-team-new.png";
+import businessImage from "@/assets/images/business-team-stock_2.png";
 
 const audiences = [
   {
