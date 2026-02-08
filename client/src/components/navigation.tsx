@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck, Sparkles, Brain, Trash2 } from "lucide-react";
+import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Brain, Trash2, BookOpen, ClipboardCheck, Radio } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -22,32 +22,23 @@ const whoWeHelp = [
   { title: "Small Business", description: "Enterprise-grade protection made accessible", href: "/small-business", icon: Briefcase, featured: true, color: "text-amber-500", trainingHref: "/training/business" },
 ];
 
-const freeTools = [
-  { title: "Scam Checker", description: "Check URLs, emails, phone numbers, and SSL certificates", href: "/tools", icon: Search, badge: "Popular" },
-  { title: "AI & Cyber Safety", description: "Protect yourself from AI-powered threats", href: "/ai-safety", icon: Brain, badge: "New" },
-  { title: "Breach Checker", description: "Check if your email was exposed in a data breach", href: "/tools", icon: AlertTriangle },
-  { title: "Password Generator", description: "Create strong, secure passwords instantly", href: "/tools", icon: Lock },
-  { title: "Data Broker Removal", description: "Remove your info from 500+ data brokers", href: "/data-removal", icon: Trash2, badge: "New" },
+const toolsNav = [
+  { title: "Security Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
+  { title: "Data Broker Removal", description: "Remove your info from 500+ data brokers", href: "/data-removal", icon: Trash2, badge: "Premium" },
+  { title: "Safety Toolkit", description: "Password generator, family codewords & voice detector", href: "/tools?tab=safety-toolkit", icon: Shield },
+];
+
+const learnItems = [
+  { title: "Training Academy", description: "Structured courses with quizzes & certificates", href: "/training", icon: GraduationCap, color: "text-primary", featured: true },
+  { title: "Resource Library", description: "Guides, articles, checklists & videos", href: "/resources", icon: BookOpen, color: "text-accent", featured: true },
+  { title: "Emergency Help", description: "What to do if you've been scammed", href: "/emergency-help", icon: AlertTriangle, color: "text-red-500", featured: true },
 ];
 
 const learnTopics = [
-  { title: "Phishing & Email Scams", description: "Recognize and avoid phishing attacks", href: "/resources?category=phishing", icon: AlertTriangle },
-  { title: "Online Privacy", description: "Protect your personal information", href: "/resources?category=privacy", icon: Lock },
-  { title: "Password Security", description: "Best practices for strong passwords", href: "/resources?category=passwords", icon: Shield },
-];
-
-const quickLinks = [
-  { title: "All Resources", description: "Browse our complete library", href: "/resources", icon: FileText },
-  { title: "Emergency Help", description: "What to do if you've been scammed", href: "/emergency-help", icon: Shield },
-  { title: "Checklists", description: "Printable security checklists", href: "/checklists", icon: ClipboardCheck },
-];
-
-const trainingOptions = [
-  { title: "Training for Kids", description: "Fun games and lessons about staying safe online", href: "/training/kids", icon: Sparkles, color: "text-purple-500" },
-  { title: "Training for Parents", description: "Learn how to protect your family online", href: "/training/parents", icon: Users, color: "text-blue-500" },
-  { title: "Training for Seniors", description: "Simple steps to avoid scams and stay safe", href: "/training/seniors", icon: Heart, color: "text-rose-500" },
-  { title: "Training for Educators", description: "Classroom lessons and teaching materials", href: "/training/educators", icon: GraduationCap, color: "text-emerald-500" },
-  { title: "Training for Businesses", description: "Employee security awareness programs", href: "/training/business", icon: Briefcase, color: "text-amber-500" },
+  { title: "Phishing & Email Scams", href: "/resources?category=phishing", icon: AlertTriangle },
+  { title: "Online Privacy", href: "/resources?category=privacy", icon: Lock },
+  { title: "Password Security", href: "/resources?category=passwords", icon: Shield },
+  { title: "AI & Cyber Safety", href: "/ai-safety", icon: Brain },
 ];
 
 export function Navigation() {
@@ -140,8 +131,8 @@ export function Navigation() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-free-tools">
-                  Free Tools
+                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-tools">
+                  Tools
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="w-[500px] p-6">
@@ -151,8 +142,8 @@ export function Navigation() {
                         View all tools <ChevronRight className="w-3 h-3" />
                       </Link>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      {freeTools.map((item) => (
+                    <div className="space-y-2">
+                      {toolsNav.map((item) => (
                         <NavigationMenuLink asChild key={item.title}>
                           <Link
                             href={item.href}
@@ -191,77 +182,30 @@ export function Navigation() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-training">
-                  Training
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="w-[500px] p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Training Academy</h3>
-                      <Link href="/training" className="text-sm text-primary flex items-center gap-1 hover:underline">
-                        View all courses <ChevronRight className="w-3 h-3" />
-                      </Link>
-                    </div>
-                    <div className="space-y-2">
-                      {trainingOptions.map((item) => (
-                        <NavigationMenuLink asChild key={item.title}>
-                          <Link
-                            href={item.href}
-                            className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
-                            data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                          >
-                            <div className={`flex-shrink-0 w-10 h-10 rounded-lg bg-muted flex items-center justify-center`}>
-                              <item.icon className={`w-5 h-5 ${item.color}`} />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-foreground mb-0.5">
-                                {item.title}
-                              </div>
-                              <p className="text-xs text-muted-foreground leading-snug">
-                                {item.description}
-                              </p>
-                            </div>
-                          </Link>
-                        </NavigationMenuLink>
-                      ))}
-                    </div>
-                    <div className="mt-4 pt-4 border-t">
-                      <p className="text-xs text-muted-foreground">
-                        Earn certificates and track your progress. Free to start.
-                      </p>
-                    </div>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent" data-testid="nav-learn">
                   Learn
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-[500px] p-6">
+                  <div className="w-[550px] p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Learn & Resources</h3>
-                      <Link href="/resources" className="text-sm text-primary flex items-center gap-1 hover:underline">
-                        Browse all <ChevronRight className="w-3 h-3" />
-                      </Link>
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Learn & Train</h3>
                     </div>
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      {learnTopics.map((item) => (
+                    <div className="grid grid-cols-3 gap-3 mb-5">
+                      {learnItems.map((item) => (
                         <NavigationMenuLink asChild key={item.title}>
                           <Link
                             href={item.href}
-                            className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
+                            className="flex flex-col items-center gap-2 rounded-lg p-4 text-center transition-colors hover-elevate"
                             data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
                           >
-                            <div className="flex-shrink-0 w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
-                              <item.icon className="w-4 h-4 text-primary" />
+                            <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                              <item.icon className={`w-6 h-6 ${item.color}`} />
                             </div>
                             <div>
                               <div className="text-sm font-medium text-foreground">
                                 {item.title}
                               </div>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-xs text-muted-foreground leading-snug mt-0.5">
                                 {item.description}
                               </p>
                             </div>
@@ -270,9 +214,9 @@ export function Navigation() {
                       ))}
                     </div>
                     <div className="pt-4 border-t">
-                      <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Quick Links</h4>
+                      <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Browse by Topic</h4>
                       <div className="flex flex-wrap gap-2">
-                        {quickLinks.map((item) => (
+                        {learnTopics.map((item) => (
                           <NavigationMenuLink asChild key={item.title}>
                             <Link
                               href={item.href}
@@ -298,18 +242,6 @@ export function Navigation() {
                     data-testid="nav-about"
                   >
                     About Us
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link
-                    href="/events"
-                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate ${location === '/events' ? 'text-primary' : ''}`}
-                    data-testid="nav-events"
-                  >
-                    Events
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -381,10 +313,10 @@ export function Navigation() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Search className="w-4 h-4 text-muted-foreground" />
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Free Tools</h4>
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Tools</h4>
                   </div>
                   <p className="text-xs text-muted-foreground -mt-1 ml-6">No signup required</p>
-                  {freeTools.map((item) => (
+                  {toolsNav.map((item) => (
                     <Link
                       key={item.title}
                       href={item.href}
@@ -407,11 +339,10 @@ export function Navigation() {
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-muted-foreground" />
+                    <BookOpen className="w-4 h-4 text-muted-foreground" />
                     <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Learn</h4>
                   </div>
-                  <p className="text-xs text-muted-foreground -mt-1 ml-6">Articles & resources</p>
-                  {learnTopics.map((item) => (
+                  {learnItems.map((item) => (
                     <Link
                       key={item.title}
                       href={item.href}
@@ -419,12 +350,12 @@ export function Navigation() {
                       onClick={() => setMobileMenuOpen(false)}
                       data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
                     >
-                      <item.icon className="w-4 h-4 text-primary" />
-                      {item.title}
+                      <item.icon className={`w-4 h-4 ${item.color}`} />
+                      <span className="font-medium">{item.title}</span>
                     </Link>
                   ))}
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {quickLinks.map((item) => (
+                    {learnTopics.map((item) => (
                       <Link
                         key={item.title}
                         href={item.href}
@@ -441,23 +372,6 @@ export function Navigation() {
 
                 <div className="h-px bg-border" />
 
-                <Link
-                  href="/training"
-                  className="flex items-center gap-3 py-3 px-3 -mx-3 rounded-lg bg-primary/10 text-foreground transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                  data-testid="mobile-link-training-academy"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                    <GraduationCap className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <span className="font-semibold">Training Academy</span>
-                    <p className="text-xs text-muted-foreground">All courses & certificates</p>
-                  </div>
-                </Link>
-
-                <div className="h-px bg-border" />
-
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href="/about"
@@ -466,14 +380,6 @@ export function Navigation() {
                     data-testid="mobile-link-about"
                   >
                     About Us
-                  </Link>
-                  <Link
-                    href="/events"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                    data-testid="mobile-link-events"
-                  >
-                    Events
                   </Link>
                   <Link
                     href="/contact"

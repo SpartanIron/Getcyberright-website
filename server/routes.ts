@@ -84,6 +84,12 @@ import {
   runMonitoringScan,
   sendAutoRemovalRequest,
   bulkAutoRemoval,
+  createVerification,
+  completeVerification,
+  getUserVerifications,
+  getPendingVerifications,
+  generateProgressReport,
+  getBrokerMetrics,
 } from "./dataBrokerService";
 
 // URL reputation checking schemas with validation
@@ -3068,6 +3074,77 @@ EDGE CASE HANDLING
       res.json(logs);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to fetch audit log" });
+    }
+  });
+
+  // Removal Verification Routes
+  app.post("/api/data-removal/verifications", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+    try {
+      const { removalRequestId, brokerId, scheduledFor } = req.body;
+      if (!removalRequestId || !brokerId) {
+        return res.status(400).json({ error: "removalRequestId and brokerId are required" });
+      }
+      const verification = await createVerification(
+        req.user.id,
+        removalRequestId,
+        brokerId,
+        scheduledFor ? new Date(scheduledFor) : undefined
+      );
+      res.json(verification);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to create verification" });
+    }
+  });
+
+  app.post("/api/data-removal/verifications/:id/complete", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+    try {
+      const { dataStillPresent, evidenceUrl, notes } = req.body;
+      if (typeof dataStillPresent !== "boolean") {
+        return res.status(400).json({ error: "dataStillPresent (boolean) is required" });
+      }
+      const result = await completeVerification(req.user.id, req.params.id, dataStillPresent, evidenceUrl, notes);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to complete verification" });
+    }
+  });
+
+  app.get("/api/data-removal/verifications", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const verifications = await getUserVerifications(req.user.id);
+      res.json(verifications);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch verifications" });
+    }
+  });
+
+  app.get("/api/data-removal/verifications/pending", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const verifications = await getPendingVerifications(req.user.id);
+      res.json(verifications);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch pending verifications" });
+    }
+  });
+
+  // Progress Report (downloadable)
+  app.get("/api/data-removal/progress-report", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const report = await generateProgressReport(req.user.id);
+      res.json(report);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to generate progress report" });
+    }
+  });
+
+  // Broker Metrics
+  app.get("/api/data-removal/brokers/:id/metrics", standardRateLimit, async (req: Request, res: Response) => {
+    try {
+      const metrics = await getBrokerMetrics(req.params.id as string);
+      if (!metrics) return res.status(404).json({ error: "Broker not found" });
+      res.json(metrics);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch broker metrics" });
     }
   });
 

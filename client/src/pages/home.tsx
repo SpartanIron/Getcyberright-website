@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
+import { HeroTools } from "@/components/hero-tools";
 import { LogoCarousel } from "@/components/logo-carousel";
 import { ValueProposition } from "@/components/value-proposition";
 import { FeaturesGrid } from "@/components/features-grid";
@@ -18,6 +19,7 @@ export default function Home() {
       <Navigation />
       <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
         <HeroSection />
+        <HeroTools />
         <LogoCarousel />
         <ValueProposition />
         <FeaturesGrid />

@@ -12,14 +12,14 @@ const footerLinks = {
     { name: "Small Business", href: "/small-business" },
   ],
   tools: [
-    { name: "Scam Checker", href: "/tools" },
-    { name: "Password Generator", href: "/tools" },
-    { name: "Breach Checker", href: "/tools" },
-    { name: "Threat Trends", href: "/threat-trends" },
+    { name: "Security Scanner", href: "/tools" },
+    { name: "Data Broker Removal", href: "/data-removal" },
+    { name: "Safety Toolkit", href: "/tools?tab=safety-toolkit" },
+    { name: "Training Academy", href: "/training" },
+    { name: "Resource Library", href: "/resources" },
   ],
   company: [
     { name: "About", href: "/about" },
-    { name: "Resources", href: "/resources" },
     { name: "Events", href: "/events" },
     { name: "Pricing", href: "/pricing" },
     { name: "Emergency Help", href: "/emergency-help" },
@@ -81,7 +81,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">Tools</h4>
+            <h4 className="font-semibold text-white text-sm mb-3">Tools & Learning</h4>
             <ul className="space-y-2">
               {footerLinks.tools.map((link) => (
                 <li key={link.name}>

@@ -661,6 +661,11 @@ export const dataBrokers = pgTable("data_brokers", {
   isActive: boolean("is_active").default(true),
   lastVerified: timestamp("last_verified"),
   lastProcessChange: timestamp("last_process_change"),
+  avgResponseDays: integer("avg_response_days"),
+  difficultyRating: integer("difficulty_rating").default(5),
+  successRate: integer("success_rate"),
+  totalRemovalRequests: integer("total_removal_requests").default(0),
+  totalSuccessfulRemovals: integer("total_successful_removals").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -870,14 +875,39 @@ export const removalAuditLog = pgTable("removal_audit_log", {
 
 export type RemovalAuditLog = typeof removalAuditLog.$inferSelect;
 
+export const removalVerifications = pgTable("removal_verifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  removalRequestId: varchar("removal_request_id").notNull(),
+  brokerId: varchar("broker_id").notNull(),
+  verificationType: text("verification_type").notNull().default("re_scan"),
+  status: text("status").notNull().default("pending"),
+  dataStillPresent: boolean("data_still_present"),
+  evidenceUrl: text("evidence_url"),
+  evidenceScreenshot: text("evidence_screenshot"),
+  notes: text("notes"),
+  scheduledFor: timestamp("scheduled_for"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type RemovalVerification = typeof removalVerifications.$inferSelect;
+export const insertRemovalVerificationSchema = createInsertSchema(removalVerifications).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertRemovalVerification = z.infer<typeof insertRemovalVerificationSchema>;
+
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],
   scan_found: ["request_generated", "not_found"],
   request_generated: ["request_sent", "pending", "failed"],
   pending: ["request_sent", "failed", "request_generated"],
   request_sent: ["in_progress", "confirmed_removed", "failed"],
-  in_progress: ["confirmed_removed", "failed"],
-  confirmed_removed: ["re_appeared"],
+  in_progress: ["confirmed_removed", "failed", "verifying"],
+  verifying: ["confirmed_removed", "re_appeared", "failed"],
+  confirmed_removed: ["re_appeared", "verified_removed"],
+  verified_removed: ["re_appeared"],
   failed: ["request_generated", "not_started"],
   re_appeared: ["request_generated", "in_progress"],
   not_found: ["scan_found"],

@@ -9,6 +9,7 @@ import {
   monitoringSchedules,
   privacyReports,
   removalAuditLog,
+  removalVerifications,
   optOutContent,
   VALID_STATUS_TRANSITIONS,
   type DataBroker,
@@ -19,7 +20,7 @@ import {
   type MonitoringSchedule,
   type PrivacyReport,
 } from "@shared/schema";
-import { eq, and, ilike, sql, desc, count, gte, lte } from "drizzle-orm";
+import { eq, and, ilike, sql, desc, count, gte, lte, inArray } from "drizzle-orm";
 
 const RISK_WEIGHTS: Record<string, number> = {
   critical: 4,
@@ -1489,5 +1490,192 @@ export async function getComplianceDashboard(userId: string) {
       { name: "PIPEDA", deadlineDays: 30, description: "Personal Information Protection and Electronic Documents Act", region: "Canada" },
       { name: "LGPD", deadlineDays: 15, description: "Lei Geral de Prote\u00E7\u00E3o de Dados", region: "Brazil" },
     ],
+  };
+}
+
+export async function createVerification(userId: string, removalRequestId: string, brokerId: string, scheduledFor?: Date) {
+  const [verification] = await db.insert(removalVerifications).values({
+    userId,
+    removalRequestId,
+    brokerId,
+    verificationType: "re_scan",
+    status: "pending",
+    scheduledFor: scheduledFor || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  }).returning();
+  
+  await db.insert(removalAuditLog).values({
+    userId,
+    action: "verification_scheduled",
+    entityType: "removal_verification",
+    entityId: verification.id,
+    metadata: { removalRequestId, brokerId, scheduledFor: verification.scheduledFor },
+  });
+  
+  return verification;
+}
+
+export async function completeVerification(userId: string, verificationId: string, dataStillPresent: boolean, evidenceUrl?: string, notes?: string) {
+  const [existing] = await db.select().from(removalVerifications)
+    .where(and(eq(removalVerifications.id, verificationId), eq(removalVerifications.userId, userId)));
+  
+  if (!existing) throw new Error("Verification not found");
+  
+  const [updated] = await db.update(removalVerifications)
+    .set({
+      status: dataStillPresent ? "failed" : "confirmed",
+      dataStillPresent,
+      evidenceUrl,
+      notes,
+      completedAt: new Date(),
+    })
+    .where(eq(removalVerifications.id, verificationId))
+    .returning();
+  
+  if (dataStillPresent) {
+    await db.update(removalRequests)
+      .set({ status: "re_appeared", reAppearedAt: new Date(), updatedAt: new Date() })
+      .where(eq(removalRequests.id, existing.removalRequestId));
+      
+    await db.update(dataBrokers)
+      .set({ totalRemovalRequests: sql`COALESCE(total_removal_requests, 0)` })
+      .where(eq(dataBrokers.id, existing.brokerId));
+  } else {
+    await db.update(removalRequests)
+      .set({ 
+        status: "verified_removed", 
+        verificationCompletedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(removalRequests.id, existing.removalRequestId));
+    
+    await db.update(dataBrokers)
+      .set({ 
+        totalSuccessfulRemovals: sql`COALESCE(total_successful_removals, 0) + 1`,
+        successRate: sql`CASE WHEN COALESCE(total_removal_requests, 0) > 0 THEN ((COALESCE(total_successful_removals, 0) + 1) * 100) / total_removal_requests ELSE 100 END`,
+      })
+      .where(eq(dataBrokers.id, existing.brokerId));
+  }
+  
+  await db.insert(removalAuditLog).values({
+    userId,
+    action: dataStillPresent ? "verification_failed" : "verification_confirmed",
+    entityType: "removal_verification",
+    entityId: verificationId,
+    metadata: { dataStillPresent, evidenceUrl },
+  });
+  
+  return updated;
+}
+
+export async function getUserVerifications(userId: string) {
+  return db.select().from(removalVerifications)
+    .where(eq(removalVerifications.userId, userId))
+    .orderBy(desc(removalVerifications.createdAt));
+}
+
+export async function getPendingVerifications(userId: string) {
+  return db.select().from(removalVerifications)
+    .where(and(
+      eq(removalVerifications.userId, userId),
+      eq(removalVerifications.status, "pending"),
+    ))
+    .orderBy(removalVerifications.scheduledFor);
+}
+
+export async function generateProgressReport(userId: string) {
+  const requests = await db.select().from(removalRequests)
+    .where(eq(removalRequests.userId, userId));
+  
+  const verifications = await db.select().from(removalVerifications)
+    .where(eq(removalVerifications.userId, userId));
+  
+  const brokerIds = Array.from(new Set(requests.map(r => r.brokerId)));
+  const brokers = brokerIds.length > 0 
+    ? await db.select().from(dataBrokers).where(inArray(dataBrokers.id, brokerIds))
+    : [];
+  const brokerMap = new Map(brokers.map(b => [b.id, b]));
+  
+  const totalRequests = requests.length;
+  const confirmed = requests.filter(r => r.status === "confirmed_removed" || r.status === "verified_removed").length;
+  const verified = requests.filter(r => r.status === "verified_removed").length;
+  const inProgress = requests.filter(r => ["request_sent", "in_progress", "verifying"].includes(r.status)).length;
+  const failed = requests.filter(r => r.status === "failed").length;
+  const reAppeared = requests.filter(r => r.status === "re_appeared").length;
+  
+  const avgDaysToRemoval = requests
+    .filter(r => r.confirmedRemovedAt && r.requestSentAt)
+    .map(r => Math.round((r.confirmedRemovedAt!.getTime() - r.requestSentAt!.getTime()) / (1000 * 60 * 60 * 24)));
+  
+  const avgRemovalDays = avgDaysToRemoval.length > 0 
+    ? Math.round(avgDaysToRemoval.reduce((a, b) => a + b, 0) / avgDaysToRemoval.length)
+    : null;
+  
+  const categoryBreakdown: Record<string, { total: number; removed: number; pending: number }> = {};
+  for (const req of requests) {
+    const broker = brokerMap.get(req.brokerId);
+    const cat = broker?.category || "Unknown";
+    if (!categoryBreakdown[cat]) categoryBreakdown[cat] = { total: 0, removed: 0, pending: 0 };
+    categoryBreakdown[cat].total++;
+    if (["confirmed_removed", "verified_removed"].includes(req.status)) categoryBreakdown[cat].removed++;
+    else categoryBreakdown[cat].pending++;
+  }
+  
+  const brokerDetails = requests.map(req => {
+    const broker = brokerMap.get(req.brokerId);
+    return {
+      brokerName: broker?.name || req.brokerId,
+      brokerDomain: broker?.domain || "",
+      category: broker?.category || "Unknown",
+      difficulty: broker?.difficulty || "unknown",
+      difficultyRating: broker?.difficultyRating || 5,
+      status: req.status,
+      requestSentAt: req.requestSentAt,
+      confirmedRemovedAt: req.confirmedRemovedAt,
+      verificationCompletedAt: req.verificationCompletedAt,
+      reAppearedAt: req.reAppearedAt,
+      daysToRemoval: req.confirmedRemovedAt && req.requestSentAt
+        ? Math.round((req.confirmedRemovedAt.getTime() - req.requestSentAt.getTime()) / (1000 * 60 * 60 * 24))
+        : null,
+    };
+  });
+  
+  return {
+    generatedAt: new Date().toISOString(),
+    summary: {
+      totalRequests,
+      confirmed,
+      verified,
+      inProgress,
+      failed,
+      reAppeared,
+      removalRate: totalRequests > 0 ? Math.round((confirmed / totalRequests) * 100) : 0,
+      avgRemovalDays,
+    },
+    categoryBreakdown,
+    brokerDetails,
+    verificationStats: {
+      total: verifications.length,
+      pending: verifications.filter(v => v.status === "pending").length,
+      confirmed: verifications.filter(v => v.status === "confirmed").length,
+      failed: verifications.filter(v => v.status === "failed").length,
+    },
+  };
+}
+
+export async function getBrokerMetrics(brokerId: string) {
+  const [broker] = await db.select().from(dataBrokers).where(eq(dataBrokers.id, brokerId));
+  if (!broker) return null;
+  
+  return {
+    id: broker.id,
+    name: broker.name,
+    difficulty: broker.difficulty,
+    difficultyRating: broker.difficultyRating,
+    avgResponseDays: broker.avgResponseDays,
+    successRate: broker.successRate,
+    totalRemovalRequests: broker.totalRemovalRequests,
+    totalSuccessfulRemovals: broker.totalSuccessfulRemovals,
+    estimatedProcessingDays: broker.estimatedProcessingDays,
+    automationFeasibility: broker.automationFeasibility,
   };
 }
