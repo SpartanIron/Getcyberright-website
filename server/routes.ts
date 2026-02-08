@@ -2708,16 +2708,6 @@ EDGE CASE HANDLING
 
       const result = await runExposureScan(user.id, vaultProfileId);
 
-      const now = new Date();
-      const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
-      const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
-
-      if (!hasTierAccess(effectiveTier, "essential")) {
-        result.findings = result.findings.slice(0, 10);
-        (result as any).limitedResults = true;
-        (result as any).totalAvailable = result.totalExposuresFound;
-      }
-
       res.json(result);
     } catch (error: any) {
       console.error("Error running exposure scan:", error);

@@ -274,7 +274,7 @@ export async function runGuestExposureScan(guestData: {
     totalExposuresFound: findings.length,
     privacyScore,
     riskLevel,
-    findings: findings.slice(0, 10),
+    findings,
   };
 }
 
