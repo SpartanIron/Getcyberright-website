@@ -178,7 +178,7 @@ async function runRealVerification(
   emails: string[],
   fullName?: string,
   isGuestScan: boolean = false,
-): Promise<VerifiedFinding[]> {
+): Promise<{ findings: VerifiedFinding[]; brokersChecked: number }> {
   const findings: VerifiedFinding[] = [];
 
   let breachResults: BreachResult[] = [];
@@ -326,7 +326,7 @@ async function runRealVerification(
 
   findings.sort((a, b) => b.confidenceScore - a.confidenceScore);
 
-  return findings;
+  return { findings, brokersChecked: brokersToCheck.length };
 }
 
 interface BrokerCatalogFilters {
@@ -504,14 +504,15 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
 
     console.log(`[scan] Starting verified scan for user ${userId} - checking ${allBrokers.length} brokers with real verification`);
 
-    const verifiedFindings = await runRealVerification(
+    const verificationResult = await runRealVerification(
       allBrokers,
       userDataTypes,
       emails,
       profile.fullName ?? undefined,
+      false,
     );
 
-    const findingsToInsert = verifiedFindings.map((match) => ({
+    const findingsToInsert = verificationResult.findings.map((match) => ({
       scanId: scan.id,
       userId,
       brokerId: match.broker.id,
@@ -528,21 +529,21 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
       findings = await db.insert(exposureFindings).values(findingsToInsert).returning();
     }
 
-    const highConfidenceCount = verifiedFindings.filter(f => f.confidenceScore >= 70).length;
-    const weightedExposure = verifiedFindings.reduce((sum, f) => sum + (f.confidenceScore / 100), 0);
-    const privacyScore = Math.max(0, Math.round(100 - (weightedExposure / Math.max(allBrokers.length, 1)) * 100 * 3));
+    const highConfidenceCount = verificationResult.findings.filter(f => f.confidenceScore >= 70).length;
+    const weightedExposure = verificationResult.findings.reduce((sum, f) => sum + (f.confidenceScore / 100), 0);
+    const privacyScore = Math.max(0, Math.round(100 - (weightedExposure / Math.max(allBrokers.length, 1)) * 100 * 2));
     const riskLevel =
       highConfidenceCount >= 20 ? "critical" :
       highConfidenceCount >= 10 ? "high" :
       highConfidenceCount >= 5 ? "medium" : "low";
 
-    console.log(`[scan] Scan complete: ${findings.length} verified exposures found (${highConfidenceCount} high-confidence)`);
+    console.log(`[scan] Scan complete: ${findings.length} verified exposures found (${highConfidenceCount} high-confidence) from ${verificationResult.brokersChecked} brokers checked`);
 
     const [updatedScan] = await db
       .update(exposureScans)
       .set({
         status: "completed",
-        totalBrokersScanned: allBrokers.length,
+        totalBrokersScanned: verificationResult.brokersChecked,
         totalExposuresFound: findings.length,
         privacyScore,
         riskLevel,
@@ -554,7 +555,7 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
     return {
       scan: updatedScan,
       findings,
-      totalBrokersScanned: allBrokers.length,
+      totalBrokersScanned: verificationResult.brokersChecked,
       totalExposuresFound: findings.length,
       privacyScore,
       riskLevel,
@@ -589,7 +590,7 @@ export async function runGuestExposureScan(guestData: {
 
   console.log(`[scan] Starting verified guest scan - ${allBrokers.length} brokers in catalog`);
 
-  const verifiedFindings = await runRealVerification(
+  const verificationResult = await runRealVerification(
     allBrokers,
     types,
     guestData.emails ?? [],
@@ -597,7 +598,7 @@ export async function runGuestExposureScan(guestData: {
     true,
   );
 
-  const findings = verifiedFindings.map((match) => ({
+  const findings = verificationResult.findings.map((match) => ({
     broker: match.broker,
     dataTypesExposed: match.dataTypesExposed,
     exposureLevel: match.exposureLevel,
@@ -607,21 +608,25 @@ export async function runGuestExposureScan(guestData: {
     sourceEvidence: match.sourceEvidence,
   }));
 
-  const highConfidenceCount = verifiedFindings.filter(f => f.confidenceScore >= 70).length;
-  const weightedExposure = verifiedFindings.reduce((sum, f) => sum + (f.confidenceScore / 100), 0);
-  const privacyScore = Math.max(0, Math.round(100 - (weightedExposure / Math.max(allBrokers.length, 1)) * 100 * 3));
+  const highConfidenceCount = verificationResult.findings.filter(f => f.confidenceScore >= 70).length;
+  const weightedExposure = verificationResult.findings.reduce((sum, f) => sum + (f.confidenceScore / 100), 0);
+  const privacyScore = Math.max(0, Math.round(100 - (weightedExposure / Math.max(allBrokers.length, 1)) * 100 * 2));
   const riskLevel =
     highConfidenceCount >= 20 ? "critical" :
     highConfidenceCount >= 10 ? "high" :
     highConfidenceCount >= 5 ? "medium" : "low";
 
   return {
-    totalBrokersScanned: allBrokers.length,
+    totalBrokersScanned: verificationResult.brokersChecked,
+    totalBrokersInCatalog: allBrokers.length,
     totalExposuresFound: findings.length,
     privacyScore,
     riskLevel,
     findings,
     scanMethod: "verified",
+    scanNote: verificationResult.brokersChecked < allBrokers.length
+      ? `Quick scan checked the top ${verificationResult.brokersChecked} highest-priority brokers from our catalog of ${allBrokers.length}. Sign up for a full scan.`
+      : undefined,
   };
 }
 

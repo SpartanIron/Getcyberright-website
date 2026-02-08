@@ -1409,7 +1409,7 @@ function GuestScanForm() {
 
           {result.scanMethod === "verified" && (
             <Card>
-              <CardContent className="pt-4">
+              <CardContent className="pt-4 space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Shield className="h-4 w-4 text-green-600" />
                   <span className="font-medium text-green-700 dark:text-green-400">Verified Scan</span>
@@ -1417,6 +1417,11 @@ function GuestScanForm() {
                     Each result was checked against live broker sites, breach databases, and opt-out page verification.
                   </span>
                 </div>
+                {result.scanNote && (
+                  <p className="text-xs text-muted-foreground pl-6">
+                    {result.scanNote}
+                  </p>
+                )}
               </CardContent>
             </Card>
           )}
