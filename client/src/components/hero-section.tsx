@@ -58,7 +58,7 @@ export function HeroSection() {
                 className="rounded-full px-6 bg-accent text-accent-foreground border-accent-border shadow-lg" 
                 data-testid="button-hero-primary-cta-mobile"
               >
-                Begin Your Protected Experience
+                Check If It's a Scam
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
@@ -199,7 +199,7 @@ export function HeroSection() {
                 className="rounded-full px-8 py-6 text-base bg-accent text-accent-foreground border-accent-border shadow-lg" 
                 data-testid="button-hero-primary-cta"
               >
-                Begin Your Protected Experience
+                Check If It's a Scam
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>

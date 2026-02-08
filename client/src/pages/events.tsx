@@ -6,7 +6,6 @@ import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Newsletter } from "@/components/newsletter";
 import { 
   Calendar, 
   Video, 
@@ -331,7 +330,6 @@ export default function Events() {
           </div>
         </section>
 
-        <Newsletter />
       </main>
       
       <Footer />

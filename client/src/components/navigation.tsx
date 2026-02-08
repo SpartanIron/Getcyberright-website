@@ -99,8 +99,8 @@ export function Navigation() {
                   <div className="w-[600px] p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Find Your Path</h3>
-                      <Link href="/solutions" className="text-sm text-primary flex items-center gap-1 hover:underline">
-                        View all solutions <ChevronRight className="w-3 h-3" />
+                      <Link href="/training" className="text-sm text-primary flex items-center gap-1 hover:underline">
+                        View all training paths <ChevronRight className="w-3 h-3" />
                       </Link>
                     </div>
                     <div className="grid grid-cols-2 gap-3">

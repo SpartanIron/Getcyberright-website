@@ -47,10 +47,6 @@ export function MissionBanner() {
                 Our commitment is simple and unwavering. Whether you are navigating everyday digital activity or responding to a serious cyber incident, GetCyberRight stands between you and the risks you should not have to face alone.
               </p>
               
-              <p className="text-white/70 text-sm sm:text-base leading-relaxed mb-8">
-                Enter the GetCyberRight platform with confidence, clarity, and protection.
-              </p>
-              
               <Link href="/about">
                 <Button className="rounded-full px-6" data-testid="button-mission-cta">
                   Learn About Our Mission

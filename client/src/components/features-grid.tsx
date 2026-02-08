@@ -28,7 +28,7 @@ const features = [
     headline: "Keep your whole family safe.",
     description: "Age-appropriate resources for kids, teens, parents, and grandparents. Everyone deserves to feel confident online.",
     cta: "Family Resources",
-    href: "/solutions",
+    href: "/training",
     variant: "medium" as const,
   },
   {

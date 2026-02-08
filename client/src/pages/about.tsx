@@ -7,33 +7,10 @@ import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Link } from "wouter";
-import { Shield, Heart, Users, Globe, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import bannerImage from "@/assets/banners/about-banner.png";
 import familySecurityImage from "@/assets/images/about-family-security.jpg";
 import seniorsLearningImage from "@/assets/images/professional-black-woman.png";
-
-const values = [
-  {
-    icon: Shield,
-    title: "People First Protection",
-    description: "We protect what matters most: you. Security that follows you beyond the devices you use."
-  },
-  {
-    icon: Heart,
-    title: "Family Safety for Every Generation",
-    description: "Cyber threats affect everyone. We prioritize protecting your entire family from digital risks."
-  },
-  {
-    icon: Users,
-    title: "Clarity Over Confusion",
-    description: "Trusted guidance through plain language education. No technical jargon, just clear knowledge you can act on."
-  },
-  {
-    icon: Globe,
-    title: "Real World Protection",
-    description: "Practical security for real lives. Not theoretical concepts, but actionable protection you can use today."
-  }
-];
 
 const stats = [
   { value: "Global", label: "Reach" },
@@ -50,8 +27,8 @@ export default function About() {
       
       <main tabIndex={-1}>
         <PageBanner
-          title="A Cyber Protection Powerhouse Built to Protect People"
-          subtitle="GetCyberRight was built with one mission: to make cybersecurity accessible, practical, and people-centered. Everyone deserves protection they can understand and trust."
+          title="Our Story: Why We Built GetCyberRight"
+          subtitle="Making cybersecurity accessible, practical, and people-centered. Everyone deserves protection they can understand and trust."
           imageSrc={bannerImage}
           imageAlt="Diverse GetCyberRight team with African woman leader in the center, all wearing branded red shirts in a modern office"
           imagePosition="left"
@@ -97,7 +74,6 @@ export default function About() {
                   encounter online keeps me up at night.
                 </p>
 
-                {/* Visual break - family security image */}
                 <div className="my-8 rounded-lg overflow-hidden shadow-lg">
                   <img 
                     src={familySecurityImage} 
@@ -136,7 +112,6 @@ export default function About() {
                   My hope is that no family or business has to learn these lessons the hard way.
                 </p>
 
-                {/* Visual break - seniors learning image */}
                 <div className="my-8 rounded-lg overflow-hidden shadow-lg">
                   <img 
                     src={seniorsLearningImage} 
@@ -157,46 +132,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-24 bg-card border-y">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-3xl font-bold text-foreground mb-4">Our Values</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                These principles guide everything we create at GetCyberRight.
-              </p>
-            </motion.div>
-            
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {values.map((value, index) => (
-                <motion.div
-                  key={value.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card className="h-full hover-elevate" data-testid={`value-${index}`}>
-                    <CardContent className="p-6 text-center">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                        <value.icon className="w-6 h-6 text-primary" />
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-2">{value.title}</h3>
-                      <p className="text-sm text-muted-foreground">{value.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 sm:py-24">
+        <section className="py-16 sm:py-24 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
@@ -216,7 +152,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-24 bg-muted/30">
+        <section className="py-16 sm:py-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -278,13 +214,12 @@ export default function About() {
                 Ready to Get Started?
               </h2>
               <p className="text-white/80 max-w-2xl mx-auto mb-8">
-                Explore our tools and resources. No signup required, 
-                no technical knowledge needed.
+                Explore our tools and resources designed for your family and business.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/tools">
                   <Button size="lg" variant="secondary" data-testid="button-about-cta">
-                    Get Free Protection Tools
+                    Explore Our Tools
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>

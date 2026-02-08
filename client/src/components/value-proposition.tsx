@@ -220,14 +220,6 @@ export function ValueProposition() {
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                  <span className="text-muted-foreground">No technical jargon. Plain language you understand</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                  <span className="text-muted-foreground">Free tools available. No signup required</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <span className="text-muted-foreground">Tailored for families, seniors, and small businesses</span>
                 </li>
               </ul>
@@ -248,18 +240,6 @@ export function ValueProposition() {
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-12 text-center"
-        >
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <Users className="w-4 h-4" aria-hidden="true" />
-            <span>Join thousands of families and businesses staying safe online</span>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

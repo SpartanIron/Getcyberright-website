@@ -5,9 +5,7 @@ import { LogoCarousel } from "@/components/logo-carousel";
 import { ValueProposition } from "@/components/value-proposition";
 import { FeaturesGrid } from "@/components/features-grid";
 import { MissionBanner } from "@/components/mission-banner";
-import { TrustStrip } from "@/components/trust-strip";
 import { AudienceShowcase } from "@/components/audience-showcase";
-import { SocialProof } from "@/components/social-proof";
 import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
@@ -23,10 +21,8 @@ export default function Home() {
         <LogoCarousel />
         <ValueProposition />
         <FeaturesGrid />
-        <MissionBanner />
-        <TrustStrip />
         <AudienceShowcase />
-        <SocialProof />
+        <MissionBanner />
         <CTAFooter />
       </main>
       <Footer />

@@ -134,10 +134,6 @@ export const pageSEO = {
     title: "AI & Cyber Safety",
     description: "Learn about AI-powered threats including deepfakes, voice cloning, and how to protect yourself.",
   },
-  solutions: {
-    title: "Solutions",
-    description: "Tailored cybersecurity solutions for families, seniors, educators, and small businesses.",
-  },
   terms: {
     title: "Terms of Service",
     description: "Read GetCyberRight's terms of service. Learn about our policies and your rights when using our platform.",

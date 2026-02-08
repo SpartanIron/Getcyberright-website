@@ -16,7 +16,6 @@ import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
 
 // Lazy-loaded pages for better initial bundle size
-const Solutions = lazy(() => import("@/pages/solutions"));
 const Tools = lazy(() => import("@/pages/tools"));
 const Resources = lazy(() => import("@/pages/resources"));
 const About = lazy(() => import("@/pages/about"));
@@ -94,7 +93,6 @@ function Router() {
     <Suspense fallback={<PageLoader />}>
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/solutions" component={Solutions} />
         <Route path="/tools" component={Tools} />
         <Route path="/resources" component={Resources} />
         <Route path="/about" component={About} />
