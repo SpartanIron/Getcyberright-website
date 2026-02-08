@@ -3,9 +3,9 @@ import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
 import { registerAuthRoutes, isAuthenticated, isAdmin, seedAdminUser } from "./auth";
@@ -50,12 +50,30 @@ import { contentGovernanceService } from "./contentGovernanceService";
 import { newsletterService } from "./newsletterService";
 import { complianceService } from "./complianceService";
 import { seedCurriculum } from "./curriculumSeed";
+import { seedDataBrokers } from "./dataBrokerSeed";
 import {
   scanConversation,
   getEmergencyResources,
   getAllEmergencyResources,
   FREE_SAFETY_TOOLS
 } from "./childSafety";
+import {
+  getBrokerCatalog,
+  getBrokerById,
+  getUserVaultProfile,
+  upsertVaultProfile,
+  runExposureScan,
+  getUserScanHistory,
+  getExposureFindings,
+  createRemovalRequest,
+  generateOptOutContent,
+  updateRemovalStatus,
+  getUserRemovalRequests,
+  getRemovalDashboardStats,
+  setupMonitoring,
+  getMonitoringSchedule,
+  generatePrivacyReport,
+} from "./dataBrokerService";
 
 // URL reputation checking schemas with validation
 const urlCheckSchema = z.object({
@@ -1615,6 +1633,11 @@ EDGE CASE HANDLING
     console.error("Failed to seed curriculum:", err)
   );
 
+  // Seed data broker catalog
+  seedDataBrokers(db).catch(err =>
+    console.error("Failed to seed data brokers:", err)
+  );
+
   // Get all feeds with status
   app.get("/api/threat-intel/feeds", async (req: Request, res: Response) => {
     try {
@@ -2595,6 +2618,218 @@ EDGE CASE HANDLING
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ============================================
+  // DATA BROKER REMOVAL SYSTEM ROUTES
+  // ============================================
+
+  app.get("/api/data-removal/brokers", standardRateLimit, async (req: Request, res: Response) => {
+    try {
+      const filters = {
+        category: req.query.category as string | undefined,
+        difficulty: req.query.difficulty as string | undefined,
+        search: req.query.search as string | undefined,
+        page: req.query.page ? parseInt(req.query.page as string) : undefined,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+      };
+      const result = await getBrokerCatalog(filters);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error fetching broker catalog:", error);
+      res.status(500).json({ error: "Failed to fetch broker catalog" });
+    }
+  });
+
+  app.get("/api/data-removal/brokers/:id", standardRateLimit, async (req: Request, res: Response) => {
+    try {
+      const brokerId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const broker = await getBrokerById(brokerId);
+      if (!broker) {
+        return res.status(404).json({ error: "Broker not found" });
+      }
+      res.json(broker);
+    } catch (error: any) {
+      console.error("Error fetching broker:", error);
+      res.status(500).json({ error: "Failed to fetch broker details" });
+    }
+  });
+
+  app.get("/api/data-removal/vault", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const profile = await getUserVaultProfile(user.id);
+      res.json(profile);
+    } catch (error: any) {
+      console.error("Error fetching vault profile:", error);
+      res.status(500).json({ error: "Failed to fetch vault profile" });
+    }
+  });
+
+  app.post("/api/data-removal/vault", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const profile = await upsertVaultProfile(user.id, req.body);
+      res.json(profile);
+    } catch (error: any) {
+      console.error("Error upserting vault profile:", error);
+      res.status(500).json({ error: "Failed to save vault profile" });
+    }
+  });
+
+  app.post("/api/data-removal/scan", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const { vaultProfileId } = req.body;
+      if (!vaultProfileId) {
+        return res.status(400).json({ error: "vaultProfileId is required" });
+      }
+
+      const result = await runExposureScan(user.id, vaultProfileId);
+
+      const now = new Date();
+      const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
+      const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
+
+      if (!hasTierAccess(effectiveTier, "essential")) {
+        result.findings = result.findings.slice(0, 10);
+        (result as any).limitedResults = true;
+        (result as any).totalAvailable = result.totalExposuresFound;
+      }
+
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error running exposure scan:", error);
+      res.status(500).json({ error: error.message || "Failed to run exposure scan" });
+    }
+  });
+
+  app.get("/api/data-removal/scans", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const scans = await getUserScanHistory(user.id);
+      res.json(scans);
+    } catch (error: any) {
+      console.error("Error fetching scan history:", error);
+      res.status(500).json({ error: "Failed to fetch scan history" });
+    }
+  });
+
+  app.get("/api/data-removal/findings/:scanId", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const findings = await getExposureFindings(user.id, req.params.scanId);
+      res.json(findings);
+    } catch (error: any) {
+      console.error("Error fetching findings:", error);
+      res.status(500).json({ error: "Failed to fetch exposure findings" });
+    }
+  });
+
+  app.post("/api/data-removal/requests", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const { brokerId, vaultProfileId, findingId } = req.body;
+      if (!brokerId || !vaultProfileId) {
+        return res.status(400).json({ error: "brokerId and vaultProfileId are required" });
+      }
+      const request = await createRemovalRequest(user.id, brokerId, vaultProfileId, findingId);
+      res.json(request);
+    } catch (error: any) {
+      console.error("Error creating removal request:", error);
+      res.status(500).json({ error: error.message || "Failed to create removal request" });
+    }
+  });
+
+  app.get("/api/data-removal/requests", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const status = req.query.status as string | undefined;
+      const requests = await getUserRemovalRequests(user.id, status);
+      res.json(requests);
+    } catch (error: any) {
+      console.error("Error fetching removal requests:", error);
+      res.status(500).json({ error: "Failed to fetch removal requests" });
+    }
+  });
+
+  app.patch("/api/data-removal/requests/:id/status", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const { status, notes } = req.body;
+      if (!status) {
+        return res.status(400).json({ error: "status is required" });
+      }
+      const updated = await updateRemovalStatus(user.id, req.params.id, status, notes);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating removal status:", error);
+      res.status(500).json({ error: error.message || "Failed to update removal status" });
+    }
+  });
+
+  app.post("/api/data-removal/requests/:id/generate", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const requestId = req.params.id;
+      const [removalReq] = await db.select().from(removalRequests).where(and(eq(removalRequests.id, requestId), eq(removalRequests.userId, user.id)));
+      if (!removalReq) {
+        return res.status(404).json({ error: "Removal request not found" });
+      }
+      const content = await generateOptOutContent(user.id, removalReq.brokerId);
+      res.json(content);
+    } catch (error: any) {
+      console.error("Error generating opt-out content:", error);
+      res.status(500).json({ error: error.message || "Failed to generate opt-out content" });
+    }
+  });
+
+  app.get("/api/data-removal/dashboard", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const stats = await getRemovalDashboardStats(user.id);
+      res.json(stats);
+    } catch (error: any) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  app.post("/api/data-removal/monitoring", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const { vaultProfileId, frequencyDays } = req.body;
+      if (!vaultProfileId || !frequencyDays) {
+        return res.status(400).json({ error: "vaultProfileId and frequencyDays are required" });
+      }
+      const schedule = await setupMonitoring(user.id, vaultProfileId, frequencyDays);
+      res.json(schedule);
+    } catch (error: any) {
+      console.error("Error setting up monitoring:", error);
+      res.status(500).json({ error: "Failed to setup monitoring" });
+    }
+  });
+
+  app.get("/api/data-removal/monitoring", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const schedule = await getMonitoringSchedule(user.id);
+      res.json(schedule);
+    } catch (error: any) {
+      console.error("Error fetching monitoring schedule:", error);
+      res.status(500).json({ error: "Failed to fetch monitoring schedule" });
+    }
+  });
+
+  app.post("/api/data-removal/report", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const report = await generatePrivacyReport(user.id);
+      res.json(report);
+    } catch (error: any) {
+      console.error("Error generating privacy report:", error);
+      res.status(500).json({ error: "Failed to generate privacy report" });
     }
   });
 

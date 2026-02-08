@@ -52,6 +52,7 @@ The platform uses an enterprise teal and orange color scheme, maintaining a flat
 - **Child Safety Conversation Scanner**: Client-side grooming pattern detection with risk scoring and regional emergency resources.
 - **Dezi AI Assistant**: Provides analysis and security assistance, with free and premium tiers.
 - **AI Content Refresh**: Automated content update recommendations based on threat intelligence with one click application.
+- **Data Broker Removal System**: Enterprise-grade personal data removal from 150+ data broker sites. Features include encrypted personal data vault, exposure scanning with risk-weighted matching, automated opt-out content generation (CCPA/GDPR templates), removal request tracking with status management, and monitoring schedules. Frontend dashboard at `/data-removal` with 5 tabs (Overview, Vault, Scan, Tracker, Broker Database). Backend: `server/dataBrokerService.ts`, `server/dataBrokerSeed.ts`. Database tables: `data_brokers`, `user_vault_profiles`, `exposure_scans`, `exposure_findings`, `removal_requests`, `opt_out_content`, `monitoring_schedules`. API: 15 endpoints under `/api/data-removal/`. Tier-gated: Free (browse brokers, limited scan), Essential (full scan results), Professional+ (removal requests, opt-out generation, monitoring).
 
 ### AI Content Guardrails (shared/contentGuardrails.ts)
 The platform enforces strict content integrity standards for all AI-generated content:

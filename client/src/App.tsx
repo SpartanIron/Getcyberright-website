@@ -62,6 +62,7 @@ const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
 const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
+const DataRemoval = lazy(() => import("@/pages/data-removal"));
 
 // Loading fallback component
 function PageLoader() {
@@ -119,6 +120,7 @@ function Router() {
         <Route path="/report-scam" component={ReportScam} />
         <Route path="/checklists" component={Checklists} />
         <Route path="/ai-safety" component={AISafety} />
+        <Route path="/data-removal" component={DataRemoval} />
         <Route path="/training" component={Training} />
         <Route path="/training/kids" component={TrainingAudience} />
         <Route path="/training/parents" component={TrainingAudience} />

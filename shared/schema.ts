@@ -594,3 +594,191 @@ export const insertTrainingCertificateSchema = createInsertSchema(trainingCertif
   createdAt: true,
 });
 export type InsertTrainingCertificate = z.infer<typeof insertTrainingCertificateSchema>;
+
+// ============================================
+// DATA BROKER REMOVAL SYSTEM
+// ============================================
+
+export const DATA_BROKER_CATEGORIES = [
+  "people-search",
+  "marketing",
+  "financial",
+  "location",
+  "recruitment",
+  "background-check",
+  "social-media-aggregator",
+  "public-records",
+  "health",
+  "advertising",
+] as const;
+export type DataBrokerCategory = typeof DATA_BROKER_CATEGORIES[number];
+
+export const OPT_OUT_METHODS = ["web-form", "email", "mail", "phone", "api", "account-deletion", "mixed"] as const;
+export type OptOutMethod = typeof OPT_OUT_METHODS[number];
+
+export const REMOVAL_STATUS = [
+  "not_started",
+  "scan_found",
+  "request_generated",
+  "request_sent",
+  "in_progress",
+  "confirmed_removed",
+  "re_appeared",
+  "failed",
+  "not_found",
+] as const;
+export type RemovalStatus = typeof REMOVAL_STATUS[number];
+
+export const dataBrokers = pgTable("data_brokers", {
+  id: varchar("id").primaryKey(),
+  name: text("name").notNull(),
+  domain: text("domain").notNull(),
+  description: text("description"),
+  category: text("category").notNull(),
+  dataTypesCollected: text("data_types_collected").array(),
+  optOutMethod: text("opt_out_method").notNull(),
+  optOutUrl: text("opt_out_url"),
+  optOutEmail: text("opt_out_email"),
+  optOutMailAddress: text("opt_out_mail_address"),
+  optOutPhone: text("opt_out_phone"),
+  optOutInstructions: text("opt_out_instructions"),
+  difficulty: text("difficulty").notNull().default("medium"),
+  estimatedProcessingDays: integer("estimated_processing_days").default(30),
+  requiresIdVerification: boolean("requires_id_verification").default(false),
+  requiresAccountCreation: boolean("requires_account_creation").default(false),
+  legalBasis: text("legal_basis").array(),
+  countriesApplicable: text("countries_applicable").array(),
+  riskLevel: text("risk_level").default("medium"),
+  monthlyVisitors: text("monthly_visitors"),
+  parentCompany: text("parent_company"),
+  relatedBrokers: text("related_brokers").array(),
+  isActive: boolean("is_active").default(true),
+  lastVerified: timestamp("last_verified"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type DataBroker = typeof dataBrokers.$inferSelect;
+export const insertDataBrokerSchema = createInsertSchema(dataBrokers).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertDataBroker = z.infer<typeof insertDataBrokerSchema>;
+
+export const userVaultProfiles = pgTable("user_vault_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  profileName: text("profile_name").notNull().default("Primary"),
+  fullName: text("full_name"),
+  previousNames: text("previous_names").array(),
+  emails: text("emails").array(),
+  phoneNumbers: text("phone_numbers").array(),
+  currentAddress: text("current_address"),
+  previousAddresses: text("previous_addresses").array(),
+  dateOfBirth: text("date_of_birth"),
+  relativeNames: text("relative_names").array(),
+  employerNames: text("employer_names").array(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type UserVaultProfile = typeof userVaultProfiles.$inferSelect;
+export const insertUserVaultProfileSchema = createInsertSchema(userVaultProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertUserVaultProfile = z.infer<typeof insertUserVaultProfileSchema>;
+
+export const exposureScans = pgTable("exposure_scans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  vaultProfileId: varchar("vault_profile_id").notNull(),
+  status: text("status").notNull().default("pending"),
+  totalBrokersScanned: integer("total_brokers_scanned").default(0),
+  totalExposuresFound: integer("total_exposures_found").default(0),
+  privacyScore: integer("privacy_score"),
+  riskLevel: text("risk_level"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ExposureScan = typeof exposureScans.$inferSelect;
+export const insertExposureScanSchema = createInsertSchema(exposureScans).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertExposureScan = z.infer<typeof insertExposureScanSchema>;
+
+export const exposureFindings = pgTable("exposure_findings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  scanId: varchar("scan_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  brokerId: varchar("broker_id").notNull(),
+  dataTypesExposed: text("data_types_exposed").array(),
+  exposureLevel: text("exposure_level").default("medium"),
+  detectedAt: timestamp("detected_at").defaultNow(),
+});
+
+export type ExposureFinding = typeof exposureFindings.$inferSelect;
+
+export const removalRequests = pgTable("removal_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  brokerId: varchar("broker_id").notNull(),
+  vaultProfileId: varchar("vault_profile_id").notNull(),
+  findingId: varchar("finding_id"),
+  status: text("status").notNull().default("not_started"),
+  requestMethod: text("request_method"),
+  requestContent: text("request_content"),
+  requestSentAt: timestamp("request_sent_at"),
+  followUpCount: integer("follow_up_count").default(0),
+  lastFollowUpAt: timestamp("last_follow_up_at"),
+  confirmedRemovedAt: timestamp("confirmed_removed_at"),
+  reAppearedAt: timestamp("re_appeared_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type RemovalRequest = typeof removalRequests.$inferSelect;
+export const insertRemovalRequestSchema = createInsertSchema(removalRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertRemovalRequest = z.infer<typeof insertRemovalRequestSchema>;
+
+export const monitoringSchedules = pgTable("monitoring_schedules", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  vaultProfileId: varchar("vault_profile_id").notNull(),
+  frequencyDays: integer("frequency_days").default(90),
+  nextScanDate: timestamp("next_scan_date"),
+  lastScanDate: timestamp("last_scan_date"),
+  isActive: boolean("is_active").default(true),
+  totalScansCompleted: integer("total_scans_completed").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type MonitoringSchedule = typeof monitoringSchedules.$inferSelect;
+
+export const privacyReports = pgTable("privacy_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  scanId: varchar("scan_id"),
+  privacyScore: integer("privacy_score").notNull(),
+  totalBrokersChecked: integer("total_brokers_checked").default(0),
+  totalExposures: integer("total_exposures").default(0),
+  totalRemoved: integer("total_removed").default(0),
+  totalInProgress: integer("total_in_progress").default(0),
+  totalPending: integer("total_pending").default(0),
+  categoryBreakdown: text("category_breakdown"),
+  riskAssessment: text("risk_assessment"),
+  recommendations: text("recommendations").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type PrivacyReport = typeof privacyReports.$inferSelect;

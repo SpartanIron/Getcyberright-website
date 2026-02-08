@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck, Sparkles, Brain } from "lucide-react";
+import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, ExternalLink, Video, ClipboardCheck, Sparkles, Brain, Trash2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -27,6 +27,7 @@ const freeTools = [
   { title: "AI & Cyber Safety", description: "Protect yourself from AI-powered threats", href: "/ai-safety", icon: Brain, badge: "New" },
   { title: "Breach Checker", description: "Check if your email was exposed in a data breach", href: "/tools", icon: AlertTriangle },
   { title: "Password Generator", description: "Create strong, secure passwords instantly", href: "/tools", icon: Lock },
+  { title: "Data Broker Removal", description: "Remove your info from 150+ data brokers", href: "/data-removal", icon: Trash2, badge: "New" },
 ];
 
 const learnTopics = [
