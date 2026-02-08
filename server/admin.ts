@@ -327,7 +327,14 @@ const ALLOWED_TOOLS = [
   'dezi-ai',
   'voice-detector',
   'security-scanner',
-  'email-header-check'
+  'email-header-check',
+  'data-broker-guest-scan',
+  'data-broker-vault-save',
+  'data-broker-exposure-scan',
+  'data-broker-removal-request',
+  'data-broker-optout-generate',
+  'data-broker-monitoring-setup',
+  'data-broker-monitoring-run',
 ];
 
 // Simple in-memory rate limiter for tracking endpoint

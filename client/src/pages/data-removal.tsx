@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { trackToolUsage } from "@/lib/analytics";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -618,9 +619,11 @@ function VaultTab() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/data-removal/vault"] });
       toast({ title: "Vault Saved", description: "Your personal information has been securely saved." });
+      trackToolUsage("data-broker-vault-save", true);
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
+      trackToolUsage("data-broker-vault-save", false, { error: error.message });
     },
   });
 
@@ -821,8 +824,12 @@ function GuestScanForm() {
       });
       return res.json();
     },
+    onSuccess: () => {
+      trackToolUsage("data-broker-guest-scan", true);
+    },
     onError: (error: Error) => {
       toast({ title: "Scan Failed", description: error.message, variant: "destructive" });
+      trackToolUsage("data-broker-guest-scan", false, { error: error.message });
     },
   });
 
@@ -1019,9 +1026,11 @@ function ScanTab() {
       queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
       if (data.scan?.id) setSelectedScanId(data.scan.id);
       toast({ title: "Scan Started", description: "Your privacy scan is now running." });
+      trackToolUsage("data-broker-exposure-scan", true, { scanId: data.scan?.id });
     },
     onError: (error: Error) => {
       toast({ title: "Scan Failed", description: error.message, variant: "destructive" });
+      trackToolUsage("data-broker-exposure-scan", false, { error: error.message });
     },
   });
 
@@ -1038,9 +1047,11 @@ function ScanTab() {
       queryClient.invalidateQueries({ queryKey: ["/api/data-removal/requests"] });
       queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
       toast({ title: "Removal Requested", description: "A data removal request has been submitted." });
+      trackToolUsage("data-broker-removal-request", true);
     },
     onError: (error: Error) => {
       toast({ title: "Request Failed", description: error.message, variant: "destructive" });
+      trackToolUsage("data-broker-removal-request", false, { error: error.message });
     },
   });
 
@@ -1266,9 +1277,11 @@ function TrackerTab() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/data-removal/requests"] });
       toast({ title: "Opt-Out Letter Generated", description: "Your opt-out letter has been prepared." });
+      trackToolUsage("data-broker-optout-generate", true);
     },
     onError: (error: Error) => {
       toast({ title: "Generation Failed", description: error.message, variant: "destructive" });
+      trackToolUsage("data-broker-optout-generate", false, { error: error.message });
     },
   });
 
