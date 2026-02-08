@@ -37,10 +37,6 @@ export function HeroSection() {
               You have not simply accessed a website. You have entered a cyber protection powerhouse built to protect people.
             </p>
 
-            <p className="text-xs sm:text-sm text-white/70 mb-6 leading-relaxed">
-              We go beyond securing devices, accounts, and data. We focus on protecting individuals, families, and digital identities in a world where cyber risk is personal and constantly evolving.
-            </p>
-
             <ul className="space-y-2 mb-6 text-xs sm:text-sm font-medium text-left max-w-xs mx-auto">
               <li className="flex items-start gap-3 text-white/80">
                 <Globe className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
@@ -174,10 +170,6 @@ export function HeroSection() {
               data-testid="text-hero-subtext"
             >
               You have not simply accessed a website. You have entered a cyber protection powerhouse built to protect people.
-            </p>
-
-            <p className="text-base text-white/75 leading-relaxed mb-8">
-              At GetCyberRight, we go beyond securing devices, accounts, and data. We focus on protecting individuals, families, and digital identities in a world where cyber risk is personal and constantly evolving.
             </p>
 
             <ul className="space-y-3 mb-10 text-sm font-medium">
