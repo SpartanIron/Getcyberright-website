@@ -245,7 +245,7 @@ function OverviewTab() {
             </div>
             <h3 className="text-xl font-semibold">Set Up Your Privacy Vault</h3>
             <p className="text-muted-foreground text-center max-w-md">
-              Start by adding your personal information to the secure vault. This helps us scan data broker sites and find where your data is exposed.
+              Start by adding your personal information to the secure vault. We use this to check for breaches and identify active data broker sites.
             </p>
             <Button asChild>
               <span className="cursor-pointer">Go to Personal Vault</span>
@@ -303,10 +303,10 @@ function OverviewTab() {
               </div>
               <p className="text-sm text-muted-foreground text-center max-w-xs">
                 {stats.totalExposures === 0
-                  ? "No exposures found yet. Run a scan to check your data across our broker catalog."
+                  ? "No findings yet. Run a scan to check for breaches and active broker sites."
                   : stats.completed > 0
-                    ? `You've removed your data from ${stats.completed} broker${stats.completed !== 1 ? "s" : ""}. ${stats.pending > 0 ? `${stats.pending} removal${stats.pending !== 1 ? "s" : ""} still in progress.` : "All removals complete."}`
-                    : `${stats.totalExposures} finding${stats.totalExposures !== 1 ? "s" : ""} across data brokers. Start sending removal requests to protect your data.`}
+                    ? `You've sent removal requests to ${stats.completed} broker${stats.completed !== 1 ? "s" : ""}. ${stats.pending > 0 ? `${stats.pending} request${stats.pending !== 1 ? "s" : ""} still in progress.` : "All requests sent."}`
+                    : `${stats.totalExposures} finding${stats.totalExposures !== 1 ? "s" : ""} from verified breaches and active brokers. Send removal requests to opt out.`}
               </p>
             </CardContent>
           </Card>
@@ -316,7 +316,7 @@ function OverviewTab() {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Exposures</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Findings</CardTitle>
                 <AlertTriangle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -370,7 +370,7 @@ function OverviewTab() {
             <CardContent>
               <div className="text-3xl font-bold" data-testid="text-success-rate">{stats.successRate}%</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.completed} of {stats.totalExposures} removals confirmed
+                {stats.completed} of {stats.totalExposures} requests completed
               </p>
             </CardContent>
           </Card>
@@ -874,7 +874,7 @@ function VaultTab() {
             Personal Information Vault
           </CardTitle>
           <CardDescription>
-            Enter the personal information you want to protect. This data is used to scan data broker sites for your records.
+            Enter your personal information below. We use your email to check for confirmed breaches and verify which data broker sites are active.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -1200,7 +1200,6 @@ function GuestScanForm() {
     totalExposuresFound: number;
     confirmedExposures: number;
     verifiedBrokers: number;
-    potentialExposures: number;
     riskLevel: string;
     scanMethod?: string;
     findings: Array<{
@@ -1226,7 +1225,7 @@ function GuestScanForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            Enter some basic details to see which data brokers may have your information. No account needed.
+            Enter your details to check for verified data breaches and active data broker sites. No account needed.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -1299,7 +1298,7 @@ function GuestScanForm() {
               <CardContent className="pt-6 text-center">
                 <div className="text-3xl font-bold text-orange-600 dark:text-orange-400" data-testid="text-guest-verified">{result.verifiedBrokers || 0}</div>
                 <p className="text-sm font-medium mt-1">Active Brokers Found</p>
-                <p className="text-xs text-muted-foreground">Sites verified active that collect your data types</p>
+                <p className="text-xs text-muted-foreground">Verified active sites with opt-out options</p>
               </CardContent>
             </Card>
             <Card>
@@ -1357,8 +1356,8 @@ function GuestScanForm() {
               <CardContent className="space-y-3">
                 {result.findings
                   .sort((a, b) => {
-                    const tierOrder: Record<string, number> = { confirmed: 0, verified_broker: 1, potential: 2 };
-                    return (tierOrder[a.evidenceTier || "potential"] ?? 2) - (tierOrder[b.evidenceTier || "potential"] ?? 2);
+                    const tierOrder: Record<string, number> = { confirmed: 0, verified_broker: 1 };
+                    return (tierOrder[a.evidenceTier || ""] ?? 2) - (tierOrder[b.evidenceTier || ""] ?? 2);
                   })
                   .map((finding, idx) => (
                   <div key={idx} className="p-4 border rounded-md space-y-2" data-testid={`finding-${idx}`}>
@@ -1375,11 +1374,6 @@ function GuestScanForm() {
                             Active Broker
                           </Badge>
                         )}
-                        {(!finding.evidenceTier || finding.evidenceTier === "potential") && (
-                          <Badge variant="secondary">
-                            Unverified
-                          </Badge>
-                        )}
                       </div>
                       <Button variant="outline" size="sm" asChild>
                         <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
@@ -1389,7 +1383,10 @@ function GuestScanForm() {
                       </Button>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {finding.broker.domain} &middot; Data types: {finding.dataTypesExposed.join(", ")}
+                      {finding.broker.domain}
+                      {finding.dataTypesExposed.length > 0 && (
+                        <span> &middot; Broker collects: {finding.dataTypesExposed.join(", ")}</span>
+                      )}
                     </p>
                     {finding.verificationDetails && (
                       <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md">
@@ -1552,7 +1549,7 @@ function ScanTab() {
             </div>
             <h3 className="text-xl font-semibold">Set Up Your Vault First</h3>
             <p className="text-muted-foreground text-center max-w-md">
-              Add your personal information to the vault before running a scan. This tells us what to look for.
+              Add your personal information to the vault before running a scan. We use your email to check for breaches.
             </p>
           </CardContent>
         </Card>
@@ -1574,7 +1571,7 @@ function ScanTab() {
               Exposure Scan
             </CardTitle>
             <CardDescription>
-              Scan data broker sites to find where your personal information is being sold or exposed.
+              Check for confirmed breaches and verify which data broker sites are currently active.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -1636,7 +1633,7 @@ function ScanTab() {
               ) : findings.length === 0 ? (
                 <div className="text-center py-8">
                   <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-500 opacity-70" />
-                  <p className="text-muted-foreground">No exposures found in this scan.</p>
+                  <p className="text-muted-foreground">No findings in this scan.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -1704,16 +1701,14 @@ function ScanTab() {
                             <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800 no-default-hover-elevate no-default-active-elevate">
                               Active Broker
                             </Badge>
-                          ) : (
-                            <Badge variant="secondary">Unverified</Badge>
-                          )}
+                          ) : null}
                           {finding.broker?.category && (
                             <Badge variant="secondary">{finding.broker.category}</Badge>
                           )}
                         </div>
                         {(finding.dataTypesExposed || finding.dataTypesFound) && (finding.dataTypesExposed || finding.dataTypesFound)!.length > 0 && (
                           <p className="text-xs text-muted-foreground">
-                            Data exposed: {(finding.dataTypesExposed || finding.dataTypesFound)!.join(", ")}
+                            {finding.verificationMethod === "breach_confirmed" ? "Data in breach:" : "Broker collects:"} {(finding.dataTypesExposed || finding.dataTypesFound)!.join(", ")}
                           </p>
                         )}
                         {finding.verificationDetails && (
@@ -1807,7 +1802,7 @@ function ScanTab() {
                           Scan - {formatDate(scan.createdAt)}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {scan.totalExposures ?? 0} exposures found
+                          {scan.totalExposures ?? 0} finding{(scan.totalExposures ?? 0) !== 1 ? "s" : ""}
                         </p>
                       </div>
                     </div>
@@ -2023,7 +2018,7 @@ function TrackerTab() {
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 mx-auto mb-3 opacity-30" />
                 <p className="text-muted-foreground">No removal requests yet.</p>
-                <p className="text-sm text-muted-foreground">Run a scan and request removals from the Exposure Scan tab.</p>
+                <p className="text-sm text-muted-foreground">Run a scan and send removal requests from the Exposure Scan tab.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -2920,7 +2915,7 @@ function ReportsTab() {
       <div>
         <h3 className="text-lg font-semibold text-foreground mb-3">Removal Verifications</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          After a broker confirms removal, we re-check to verify your data is actually gone.
+          After sending a removal request, we re-check the broker site to verify the opt-out was processed.
         </p>
         {verificationsLoading ? (
           <Skeleton className="h-24 w-full" />
@@ -2967,7 +2962,7 @@ export default function DataRemoval() {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="Data Broker Removal - Protect Your Privacy"
-        description="Remove your personal information from 500+ data broker sites. Scan, track, and manage data removal requests with enterprise-grade privacy protection tools."
+        description="Check for confirmed data breaches and send opt-out requests to 500+ data broker sites. Honest, fact-based privacy protection tools."
       />
       <Navigation />
 
@@ -3005,7 +3000,7 @@ export default function DataRemoval() {
                   Data Broker Removal
                 </h1>
                 <p className="text-white/70 mt-1 max-w-2xl">
-                  Scan, track, and remove your personal information from 500+ data broker sites with enterprise-grade privacy protection.
+                  Check for confirmed breaches, identify active data brokers, and send opt-out requests to 500+ sites.
                 </p>
               </div>
             </div>

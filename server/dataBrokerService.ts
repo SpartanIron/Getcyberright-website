@@ -68,7 +68,7 @@ const CATEGORY_DATA_MAP: Record<string, string[]> = {
   "credit-reporting": ["name", "address", "email"],
 };
 
-type EvidenceTier = "confirmed" | "verified_broker" | "potential";
+type EvidenceTier = "confirmed" | "verified_broker";
 
 interface VerifiedFinding {
   broker: DataBroker;
@@ -220,9 +220,9 @@ async function runRealVerification(
         const { overlap, coveragePercent } = analyzeBrokerDataOverlap(broker, userDataTypes);
         const breachMatch = domain ? breachDomains.has(domain.toLowerCase()) : false;
 
-        let evidenceTier: EvidenceTier = "potential";
-        let verificationMethod = "data_profile_analysis";
         const facts: string[] = [];
+        let evidenceTier: EvidenceTier | null = null;
+        let verificationMethod = "";
 
         if (breachMatch) {
           evidenceTier = "confirmed";
@@ -231,29 +231,27 @@ async function runRealVerification(
         }
 
         if (siteCheck.reachable) {
-          facts.push(`VERIFIED: ${domain} is an active website (responded in ${siteCheck.responseTime}ms)`);
-          if (evidenceTier !== "confirmed") {
+          facts.push(`VERIFIED: ${domain} responded to our check (${siteCheck.responseTime}ms)`);
+          if (!evidenceTier) {
             evidenceTier = "verified_broker";
             verificationMethod = "broker_verified_active";
           }
-        } else {
-          facts.push(`${domain} did not respond to our check — site may be down or blocking automated requests`);
         }
 
         if (optOutCheck.exists) {
-          facts.push(`VERIFIED: Opt-out page is accessible at ${optOutCheck.url}`);
-          if (evidenceTier !== "confirmed") {
+          facts.push(`VERIFIED: Opt-out page accessible at ${optOutCheck.url}`);
+          if (!evidenceTier) {
             evidenceTier = "verified_broker";
             verificationMethod = "broker_verified_active";
           }
         }
 
-        if (overlap.length > 0) {
-          facts.push(`This broker's published collection practices include: ${overlap.join(", ")} — which match data types you provided`);
+        if (!evidenceTier) {
+          return null;
         }
 
-        if (!breachMatch && !siteCheck.reachable && !optOutCheck.exists) {
-          return null;
+        if (overlap.length > 0) {
+          facts.push(`Broker's published data collection categories: ${overlap.join(", ")}`);
         }
 
         let verificationDetails = "";
@@ -262,23 +260,19 @@ async function runRealVerification(
         if (evidenceTier === "confirmed") {
           verificationDetails = `Your email was found in a verified data breach connected to this broker. This is confirmed by Have I Been Pwned, an independent breach notification service.`;
           evidenceSummary = "Breach-confirmed exposure";
-        } else if (evidenceTier === "verified_broker") {
-          verificationDetails = `We verified that ${broker.name} (${domain}) is an active data broker that collects ${overlap.length > 0 ? overlap.join(", ") : "personal data"}. We did NOT search their database for your specific records — we confirmed the broker is operational and accepts opt-out requests.`;
-          evidenceSummary = "Active broker verified — opt-out recommended";
         } else {
-          verificationDetails = `${broker.name} is a known data broker in the "${broker.category}" category. We could not verify their site status during this scan. Based on their published practices, they collect data types matching what you provided.`;
-          evidenceSummary = "Known broker — could not verify site status";
+          const activeDetails = [
+            siteCheck.reachable ? `site is active` : null,
+            optOutCheck.exists ? `opt-out page is accessible` : null,
+          ].filter(Boolean).join(" and ");
+          verificationDetails = `We verified that ${broker.name} (${domain}) is an active data broker — ${activeDetails}. We did NOT search their database for your records.`;
+          evidenceSummary = "Active broker — opt-out available";
         }
-
-        let exposureLevel = "low";
-        if (evidenceTier === "confirmed") exposureLevel = "critical";
-        else if (evidenceTier === "verified_broker" && overlap.length >= 3) exposureLevel = "high";
-        else if (evidenceTier === "verified_broker") exposureLevel = "medium";
 
         return {
           broker,
-          dataTypesExposed: overlap.length > 0 ? overlap : ["name"],
-          exposureLevel,
+          dataTypesExposed: overlap.length > 0 ? overlap : [],
+          exposureLevel: evidenceTier === "confirmed" ? "critical" : "info",
           evidenceTier,
           verificationMethod,
           verificationDetails,
@@ -334,7 +328,7 @@ async function runRealVerification(
   }
 
   findings.sort((a, b) => {
-    const tierOrder: Record<EvidenceTier, number> = { confirmed: 3, verified_broker: 2, potential: 1 };
+    const tierOrder: Record<EvidenceTier, number> = { confirmed: 3, verified_broker: 2 };
     return (tierOrder[b.evidenceTier] ?? 0) - (tierOrder[a.evidenceTier] ?? 0);
   });
 
@@ -618,11 +612,6 @@ export async function runGuestExposureScan(guestData: {
 
   const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
   const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
-  const potentialCount = verificationResult.findings.filter(f => f.evidenceTier === "potential").length;
-  const riskLevel =
-    confirmedCount >= 10 ? "critical" :
-    confirmedCount >= 5 || verifiedBrokerCount >= 30 ? "high" :
-    verifiedBrokerCount >= 15 ? "medium" : "low";
 
   return {
     totalBrokersScanned: verificationResult.brokersChecked,
@@ -630,8 +619,6 @@ export async function runGuestExposureScan(guestData: {
     totalExposuresFound: findings.length,
     confirmedExposures: confirmedCount,
     verifiedBrokers: verifiedBrokerCount,
-    potentialExposures: potentialCount,
-    riskLevel,
     findings,
     scanMethod: "verified",
   };
