@@ -1440,6 +1440,12 @@ function ScanTab() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [selectedScanId, setSelectedScanId] = useState<string | null>(null);
+  const [selectedFindings, setSelectedFindings] = useState<Set<string>>(new Set());
+
+  const handleSelectScan = (scanId: string) => {
+    setSelectedScanId(scanId);
+    setSelectedFindings(new Set());
+  };
 
   const { data: vaultData } = useQuery<VaultProfile | null>({
     queryKey: ["/api/data-removal/vault"],
@@ -1466,7 +1472,7 @@ function ScanTab() {
     onSuccess: (data: { scan?: ScanResult }) => {
       queryClient.invalidateQueries({ queryKey: ["/api/data-removal/scans"] });
       queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
-      if (data.scan?.id) setSelectedScanId(data.scan.id);
+      if (data.scan?.id) handleSelectScan(data.scan.id);
       toast({ title: "Scan Started", description: "Your privacy scan is now running." });
       trackToolUsage("data-broker-exposure-scan", true, { scanId: data.scan?.id });
     },
@@ -1508,6 +1514,50 @@ function ScanTab() {
       trackToolUsage("data-broker-removal-request", false, { error: error.message });
     },
   });
+
+  const bulkCreateAndSendMutation = useMutation({
+    mutationFn: async (findingsList: Array<{ brokerId: string; findingId: string }>) => {
+      const res = await apiRequest("POST", "/api/data-removal/requests/bulk-create-and-send", {
+        findings: findingsList,
+        vaultProfileId: vaultData?.id,
+      });
+      return res.json();
+    },
+    onSuccess: (data: { results: Array<{ brokerId: string; success: boolean; message: string }> }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/requests"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/findings", selectedScanId] });
+      const succeeded = data.results.filter((r) => r.success).length;
+      const failed = data.results.filter((r) => !r.success).length;
+      toast({
+        title: "Bulk Removal Complete",
+        description: `${succeeded} sent successfully${failed > 0 ? `, ${failed} need manual action` : ""}`,
+      });
+      setSelectedFindings(new Set());
+      trackToolUsage("data-broker-bulk-create-send", true, { succeeded, failed, total: data.results.length });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Bulk Removal Failed", description: error.message, variant: "destructive" });
+      trackToolUsage("data-broker-bulk-create-send", false, { error: error.message });
+    },
+  });
+
+  const toggleFinding = (findingId: string) => {
+    setSelectedFindings((prev) => {
+      const next = new Set(prev);
+      if (next.has(findingId)) next.delete(findingId);
+      else next.add(findingId);
+      return next;
+    });
+  };
+
+  const toggleAllFindings = () => {
+    if (selectedFindings.size === findings.length) {
+      setSelectedFindings(new Set());
+    } else {
+      setSelectedFindings(new Set(findings.map((f) => f.id)));
+    }
+  };
 
   if (!isAuthenticated) {
     return <GuestScanForm />;
@@ -1588,6 +1638,11 @@ function ScanTab() {
                 <Eye className="h-5 w-5" />
                 Scan Findings
               </CardTitle>
+              {findings.length > 0 && (
+                <CardDescription>
+                  Select findings to submit removal requests in bulk, or handle them individually.
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent>
               {findingsLoading ? (
@@ -1603,12 +1658,62 @@ function ScanTab() {
                 </div>
               ) : (
                 <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2 p-3 rounded-md bg-muted/30 flex-wrap">
+                    <label
+                      className="flex items-center gap-2 cursor-pointer select-none"
+                      data-testid="checkbox-select-all-findings"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedFindings.size === findings.length && findings.length > 0}
+                        onChange={toggleAllFindings}
+                        className="h-4 w-4 rounded border-border accent-primary"
+                      />
+                      <span className="text-sm font-medium">
+                        {selectedFindings.size === findings.length ? "Deselect All" : "Select All"} ({findings.length} finding{findings.length !== 1 ? "s" : ""})
+                      </span>
+                    </label>
+                    {selectedFindings.size > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                          {selectedFindings.size} selected
+                        </span>
+                        <Button
+                          size="sm"
+                          data-testid="button-bulk-auto-send-findings"
+                          onClick={() => {
+                            const selected = findings
+                              .filter((f) => selectedFindings.has(f.id))
+                              .map((f) => ({ brokerId: f.brokerId, findingId: f.id }));
+                            bulkCreateAndSendMutation.mutate(selected);
+                          }}
+                          disabled={bulkCreateAndSendMutation.isPending}
+                        >
+                          {bulkCreateAndSendMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          ) : (
+                            <Send className="h-4 w-4 mr-1" />
+                          )}
+                          Auto-Send {selectedFindings.size} Selected
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                   {findings.map((finding) => (
                     <div
                       key={finding.id}
-                      className="flex items-start justify-between gap-4 p-4 rounded-md border"
+                      className={`flex items-start gap-3 p-4 rounded-md border ${selectedFindings.has(finding.id) ? "border-primary/50 bg-primary/5" : ""}`}
                     >
-                      <div className="flex-1 space-y-1">
+                      <label className="flex items-center pt-1 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedFindings.has(finding.id)}
+                          onChange={() => toggleFinding(finding.id)}
+                          data-testid={`checkbox-finding-${finding.id}`}
+                          className="h-4 w-4 rounded border-border accent-primary"
+                        />
+                      </label>
+                      <div className="flex-1 space-y-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-medium">{finding.broker?.name || "Unknown Broker"}</p>
                           <Badge variant={getRiskVariant(finding.riskLevel)}>
@@ -1624,7 +1729,7 @@ function ScanTab() {
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <Button
                           size="sm"
                           variant="outline"
@@ -1698,7 +1803,7 @@ function ScanTab() {
                   <div
                     key={scan.id}
                     className="flex items-center justify-between gap-4 p-3 rounded-md hover-elevate cursor-pointer"
-                    onClick={() => setSelectedScanId(scan.id)}
+                    onClick={() => handleSelectScan(scan.id)}
                   >
                     <div className="flex items-center gap-3">
                       <div className="p-1.5 rounded-full bg-primary/10">

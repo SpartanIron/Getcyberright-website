@@ -3,9 +3,9 @@ import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
 import { registerAuthRoutes, isAuthenticated, isAdmin, seedAdminUser } from "./auth";
@@ -2900,6 +2900,61 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("Error bulk auto-sending removal requests:", error);
       res.status(500).json({ error: error.message || "Failed to bulk auto-send removal requests" });
+    }
+  });
+
+  app.post("/api/data-removal/requests/bulk-create-and-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const { findings, vaultProfileId } = req.body;
+      if (!findings || !Array.isArray(findings) || findings.length === 0) {
+        return res.status(400).json({ error: "findings array is required" });
+      }
+      if (!vaultProfileId) {
+        return res.status(400).json({ error: "vaultProfileId is required" });
+      }
+      if (findings.length > 50) {
+        return res.status(400).json({ error: "Maximum 50 findings per batch" });
+      }
+      const vaultCheck = await db.select({ id: userVaultProfiles.id }).from(userVaultProfiles)
+        .where(and(eq(userVaultProfiles.id, vaultProfileId), eq(userVaultProfiles.userId, user.id)));
+      if (vaultCheck.length === 0) {
+        return res.status(403).json({ error: "Vault profile not found or access denied" });
+      }
+      const seenFindingIds = new Set<string>();
+      const uniqueFindings = findings.filter((f: any) => {
+        if (!f.findingId || !f.brokerId || seenFindingIds.has(f.findingId)) return false;
+        seenFindingIds.add(f.findingId);
+        return true;
+      });
+      const findingIds = uniqueFindings.map((f: any) => f.findingId);
+      const validFindings = findingIds.length > 0 ? await db.select({ id: exposureFindings.id, brokerId: exposureFindings.brokerId })
+        .from(exposureFindings)
+        .where(and(eq(exposureFindings.userId, user.id), inArray(exposureFindings.id, findingIds))) : [];
+      const validFindingMap = new Map(validFindings.map((f) => [f.id, f.brokerId]));
+      const ipAddress = req.ip || req.connection?.remoteAddress;
+      const results: Array<{ brokerId: string; success: boolean; message: string; method?: string }> = [];
+      for (const finding of uniqueFindings) {
+        if (!validFindingMap.has(finding.findingId)) {
+          results.push({ brokerId: finding.brokerId, success: false, message: "Finding not found or access denied" });
+          continue;
+        }
+        try {
+          const request = await createRemovalRequest(user.id, finding.brokerId, vaultProfileId, finding.findingId, ipAddress);
+          if (request?.id) {
+            const sendResult = await sendAutoRemovalRequest(user.id, request.id, ipAddress);
+            results.push({ brokerId: finding.brokerId, success: sendResult.success, message: sendResult.message, method: sendResult.method });
+          } else {
+            results.push({ brokerId: finding.brokerId, success: false, message: "Failed to create removal request" });
+          }
+        } catch (err: any) {
+          results.push({ brokerId: finding.brokerId, success: false, message: err.message || "Failed" });
+        }
+      }
+      res.json({ results });
+    } catch (error: any) {
+      console.error("Error bulk create-and-send:", error);
+      res.status(500).json({ error: error.message || "Failed to process bulk removal requests" });
     }
   });
 
