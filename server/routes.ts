@@ -234,7 +234,7 @@ export async function registerRoutes(
       res.json({ success: true, message });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid form data", details: error.errors });
+        res.status(400).json({ error: "Invalid form data", details: (error as any).issues });
       } else {
         res.status(500).json({ error: "Failed to submit contact form" });
       }
@@ -257,7 +257,7 @@ export async function registerRoutes(
       res.json({ success: true, subscriber });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid email address", details: error.errors });
+        res.status(400).json({ error: "Invalid email address", details: (error as any).issues });
       } else {
         res.status(500).json({ error: "Failed to subscribe" });
       }
@@ -285,7 +285,7 @@ export async function registerRoutes(
       res.json({ success: true, reportId: report.id });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid report data", details: error.errors });
+        res.status(400).json({ error: "Invalid report data", details: (error as any).issues });
       } else {
         console.error("Scam report error:", error);
         res.status(500).json({ error: "Failed to submit report" });
@@ -330,7 +330,7 @@ export async function registerRoutes(
     } catch (error) {
       console.error('PhishTank check error:', error);
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: 'Invalid URL provided', details: error.errors });
+        res.status(400).json({ error: 'Invalid URL provided', details: (error as any).issues });
         return;
       }
       res.status(503).json({ 
@@ -379,7 +379,7 @@ export async function registerRoutes(
     } catch (error) {
       console.error('URLhaus check error:', error);
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: 'Invalid URL provided', details: error.errors });
+        res.status(400).json({ error: 'Invalid URL provided', details: (error as any).issues });
         return;
       }
       res.status(503).json({ 
@@ -465,7 +465,7 @@ export async function registerRoutes(
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid URL", details: error.errors });
+        res.status(400).json({ error: "Invalid URL", details: (error as any).issues });
       } else {
         console.error('URL reputation check error:', error);
         res.status(500).json({ error: "Failed to check URL reputation" });
@@ -481,7 +481,7 @@ export async function registerRoutes(
       res.json({ success: true, url, ...result });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid URL", details: error.errors });
+        res.status(400).json({ error: "Invalid URL", details: (error as any).issues });
       } else {
         console.error('Google Safe Browsing error:', error);
         res.status(500).json({ success: false, error: "Service temporarily unavailable" });
@@ -497,7 +497,7 @@ export async function registerRoutes(
       res.json({ success: true, url, ...result });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid URL", details: error.errors });
+        res.status(400).json({ error: "Invalid URL", details: (error as any).issues });
       } else {
         console.error('VirusTotal error:', error);
         res.status(500).json({ success: false, error: "Service temporarily unavailable" });
@@ -513,7 +513,7 @@ export async function registerRoutes(
       res.json({ success: true, ...result });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid domain", details: error.errors });
+        res.status(400).json({ error: "Invalid domain", details: (error as any).issues });
       } else {
         console.error('Domain age check error:', error);
         res.status(500).json({ success: false, error: "Service temporarily unavailable" });
@@ -531,7 +531,7 @@ export async function registerRoutes(
       res.json({ success: true, url, ...result });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid URL", details: error.errors });
+        res.status(400).json({ error: "Invalid URL", details: (error as any).issues });
       } else {
         console.error('SSL check error:', error);
         res.status(500).json({ success: false, error: "Service temporarily unavailable" });
@@ -547,7 +547,7 @@ export async function registerRoutes(
       res.json({ success: true, ...result });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid phone number", details: error.errors });
+        res.status(400).json({ error: "Invalid phone number", details: (error as any).issues });
       } else {
         console.error('Phone check error:', error);
         res.status(500).json({ success: false, error: "Service temporarily unavailable" });
@@ -564,7 +564,7 @@ export async function registerRoutes(
       res.json({ success: true, ...result });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid QR content", details: error.errors });
+        res.status(400).json({ error: "Invalid QR content", details: (error as any).issues });
       } else {
         console.error('QR analysis error:', error);
         res.status(500).json({ success: false, error: "Analysis failed" });
@@ -831,7 +831,7 @@ EDGE CASE HANDLING
   app.post("/api/security/analyze-ip-geolocation", standardRateLimit, async (req, res) => {
     try {
       const { ip } = z.object({
-        ip: z.string().ip()
+        ip: z.string().min(1)
       }).parse(req.body);
       
       const result = await analyzeIPGeolocation(ip);
@@ -1096,7 +1096,7 @@ EDGE CASE HANDLING
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid URL", details: error.errors });
+        res.status(400).json({ error: "Invalid URL", details: (error as any).issues });
       } else {
         console.error('Comprehensive scan error:', error);
         res.status(500).json({ success: false, error: "Scan failed" });
@@ -1592,7 +1592,7 @@ EDGE CASE HANDLING
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ success: false, error: "Invalid input", details: error.errors });
+        res.status(400).json({ success: false, error: "Invalid input", details: (error as any).issues });
         return;
       }
       console.error("Child safety scan error:", error);
@@ -1672,7 +1672,7 @@ EDGE CASE HANDLING
         category: dataBrokers.category,
         isActive: dataBrokers.isActive,
       }).from(dataBrokers);
-      registerUniversalAdapters(allBrokers);
+      registerUniversalAdapters(allBrokers.map(b => ({ ...b, isActive: b.isActive ?? true })));
     } catch (err) {
       console.error("[broker-adapter] Failed to register universal adapters:", err);
     }
