@@ -425,6 +425,72 @@ function SmartRemovalQueue() {
   );
 }
 
+function RemovalTimeline() {
+  const { isAuthenticated } = useAuth();
+  const { data: auditData } = useQuery<Array<{
+    id: string;
+    action: string;
+    entityType: string;
+    entityId: string | null;
+    previousState: string | null;
+    newState: string | null;
+    createdAt: string;
+  }>>({
+    queryKey: ["/api/data-removal/audit-log"],
+    enabled: isAuthenticated,
+  });
+
+  if (!isAuthenticated || !auditData || auditData.length === 0) return null;
+
+  const recentEvents = auditData.slice(0, 8);
+  const actionIcon = (action: string) => {
+    if (action.includes("sent") || action.includes("submit")) return <Send className="h-3.5 w-3.5" />;
+    if (action.includes("removed") || action.includes("confirmed") || action.includes("completed")) return <CheckCircle className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />;
+    if (action.includes("failed") || action.includes("error")) return <AlertTriangle className="h-3.5 w-3.5 text-destructive" />;
+    if (action.includes("scan") || action.includes("search")) return <Search className="h-3.5 w-3.5" />;
+    if (action.includes("created") || action.includes("request")) return <FileText className="h-3.5 w-3.5" />;
+    if (action.includes("re_appeared") || action.includes("reappear")) return <RefreshCw className="h-3.5 w-3.5 text-destructive" />;
+    return <Activity className="h-3.5 w-3.5" />;
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}>
+      <Card data-testid="card-removal-timeline">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Recent Activity
+          </CardTitle>
+          <CardDescription>Timeline of your data removal actions</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="relative">
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
+            <div className="space-y-4">
+              {recentEvents.map((event) => (
+                <div key={event.id} className="flex items-start gap-3 relative pl-9" data-testid={`timeline-event-${event.id}`}>
+                  <div className="absolute left-2 top-1 p-1 rounded-full bg-background border">
+                    {actionIcon(event.action)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium capitalize">{event.action.replace(/_/g, " ")}</p>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      {event.newState && (
+                        <Badge variant="outline" className="text-[10px]">{event.newState.replace(/_/g, " ")}</Badge>
+                      )}
+                      <span className="text-xs text-muted-foreground">{formatDate(event.createdAt)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
 function OverviewTab() {
   const { isAuthenticated } = useAuth();
   const { data: dashboardData, isLoading } = useQuery<DashboardStats>({
@@ -725,6 +791,8 @@ function OverviewTab() {
       )}
 
       <SmartRemovalQueue />
+
+      <RemovalTimeline />
 
       <CompetitiveComparison />
 
@@ -2627,6 +2695,16 @@ function TrackerTab() {
 
 function MonitoringPanel() {
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const [showSetup, setShowSetup] = useState(false);
+  const [frequency, setFrequency] = useState("30");
+  const [autoReRemoval, setAutoReRemoval] = useState(true);
+  const [darkWebMonitoring, setDarkWebMonitoring] = useState(false);
+
+  const { data: vaultData } = useQuery<VaultProfile | null>({
+    queryKey: ["/api/data-removal/vault"],
+    enabled: isAuthenticated,
+  });
 
   const { data: monitoringData } = useQuery<{
     id: string;
@@ -2645,7 +2723,123 @@ function MonitoringPanel() {
     enabled: isAuthenticated,
   });
 
-  if (!isAuthenticated || !monitoringData) return null;
+  const setupMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/data-removal/monitoring", {
+        vaultProfileId: vaultData?.id,
+        frequencyDays: parseInt(frequency),
+        autoReRemoval,
+        notifyOnNewExposure: true,
+        notifyOnReAppearance: true,
+        notifyOnComplianceDeadline: true,
+        monitoringMode: "periodic",
+        darkWebMonitoring,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/monitoring"] });
+      toast({ title: "Monitoring Activated", description: "Continuous monitoring has been set up for your profile." });
+      setShowSetup(false);
+    },
+    onError: (error: Error) => {
+      toast({ title: "Setup Failed", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const runScanMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/data-removal/monitoring/run");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/monitoring"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
+      toast({ title: "Monitoring Scan Complete", description: "Re-scan completed successfully." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Scan Failed", description: error.message, variant: "destructive" });
+    },
+  });
+
+  if (!isAuthenticated) return null;
+
+  if (!monitoringData) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+        <Card data-testid="card-monitoring-setup">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Continuous Monitoring
+            </CardTitle>
+            <CardDescription>
+              Set up automatic re-scanning to detect when removed data reappears on broker sites
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!showSetup ? (
+              <div className="flex flex-col items-center gap-4 py-6">
+                <div className="p-4 rounded-full bg-primary/10">
+                  <RefreshCw className="h-8 w-8 text-primary" />
+                </div>
+                <p className="text-sm text-muted-foreground text-center max-w-md">
+                  Enable continuous monitoring to automatically detect when data brokers re-list your personal information after removal.
+                </p>
+                <Button onClick={() => setShowSetup(true)} disabled={!vaultData} data-testid="button-setup-monitoring">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Set Up Monitoring
+                </Button>
+                {!vaultData && (
+                  <p className="text-xs text-muted-foreground">Set up your privacy vault first to enable monitoring.</p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Scan Frequency</label>
+                  <Select value={frequency} onValueChange={setFrequency}>
+                    <SelectTrigger data-testid="select-monitoring-frequency">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="7">Weekly (every 7 days)</SelectItem>
+                      <SelectItem value="14">Bi-weekly (every 14 days)</SelectItem>
+                      <SelectItem value="30">Monthly (every 30 days)</SelectItem>
+                      <SelectItem value="90">Quarterly (every 90 days)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-3 cursor-pointer" data-testid="toggle-auto-reremoval">
+                    <input type="checkbox" checked={autoReRemoval} onChange={(e) => setAutoReRemoval(e.target.checked)} className="h-4 w-4 rounded border-border accent-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Auto Re-Removal</p>
+                      <p className="text-xs text-muted-foreground">Automatically send removal requests when re-appearances are detected</p>
+                    </div>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer" data-testid="toggle-dark-web-monitoring">
+                    <input type="checkbox" checked={darkWebMonitoring} onChange={(e) => setDarkWebMonitoring(e.target.checked)} className="h-4 w-4 rounded border-border accent-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Dark Web Monitoring</p>
+                      <p className="text-xs text-muted-foreground">Check if your data appears on dark web marketplaces</p>
+                    </div>
+                  </label>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button onClick={() => setupMutation.mutate()} disabled={setupMutation.isPending} data-testid="button-activate-monitoring">
+                    {setupMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                    Activate Monitoring
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowSetup(false)}>Cancel</Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
 
   const schedule = monitoringData;
   const frequencyLabel = (days: number | null) => {
@@ -2725,6 +2919,12 @@ function MonitoringPanel() {
               {schedule.lastScanDate && <span>{formatDate(schedule.lastScanDate)}</span>}
             </div>
           )}
+          <div className="mt-4 flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => runScanMutation.mutate()} disabled={runScanMutation.isPending} data-testid="button-run-monitoring-scan">
+              {runScanMutation.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
+              Run Scan Now
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </motion.div>
@@ -3134,6 +3334,61 @@ function BrokersTab() {
   );
 }
 
+function ExposureTrendChart() {
+  const { isAuthenticated } = useAuth();
+  const { data: scansData } = useQuery<{ scans: Array<{ id: string; totalExposures: number | null; totalBrokersScanned: number | null; createdAt: string; status: string }> }>({
+    queryKey: ["/api/data-removal/scans"],
+    enabled: isAuthenticated,
+  });
+
+  if (!isAuthenticated || !scansData?.scans || scansData.scans.length < 2) return null;
+
+  const sortedScans = [...scansData.scans].reverse().slice(-10);
+  const maxExposures = Math.max(...sortedScans.map(s => s.totalExposures ?? 0), 1);
+
+  return (
+    <Card data-testid="card-exposure-trend">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <TrendingUp className="h-5 w-5" />
+          Exposure Trend
+        </CardTitle>
+        <CardDescription>How your data exposure has changed over time</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-end gap-2 h-40">
+          {sortedScans.map((scan, idx) => {
+            const exposures = scan.totalExposures ?? 0;
+            const height = Math.max((exposures / maxExposures) * 100, 4);
+            const barColor = exposures === 0 ? "bg-green-500" : exposures > 10 ? "bg-red-500" : "bg-orange-500";
+            return (
+              <div key={scan.id} className="flex-1 flex flex-col items-center gap-1 min-w-0" data-testid={`trend-bar-${idx}`}>
+                <span className="text-xs font-medium">{exposures}</span>
+                <div className={`w-full rounded-t-md ${barColor} transition-all`} style={{ height: `${height}%`, minHeight: "4px" }} />
+                <span className="text-[9px] text-muted-foreground truncate w-full text-center">
+                  {new Date(scan.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        {sortedScans.length >= 2 && (
+          <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+            {(() => {
+              const first = sortedScans[0]?.totalExposures ?? 0;
+              const last = sortedScans[sortedScans.length - 1]?.totalExposures ?? 0;
+              const diff = last - first;
+              if (diff < 0) return <><CheckCircle className="h-4 w-4 text-green-600" /><span>Exposure decreased by {Math.abs(diff)} findings</span></>;
+              if (diff > 0) return <><AlertTriangle className="h-4 w-4 text-destructive" /><span>Exposure increased by {diff} findings</span></>;
+              return <><Info className="h-4 w-4" /><span>Exposure unchanged across scans</span></>;
+            })()}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function ReportsTab() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -3235,6 +3490,15 @@ function ReportsTab() {
     lines.push(`Confirmed: ${report.verificationStats.confirmed}`);
     lines.push(`Failed: ${report.verificationStats.failed}`);
 
+    lines.push("");
+    lines.push("=== COMPLIANCE EVIDENCE ===");
+    lines.push("This report serves as evidence of compliance with data privacy regulations.");
+    lines.push("Applicable frameworks: CCPA (California), GDPR (EU), CPRA (California)");
+    lines.push(`Report generated by: GetCyberRight Privacy Automation System`);
+    lines.push(`Total removal requests submitted: ${report.summary.totalRequests}`);
+    lines.push(`Successful removals verified: ${report.summary.verified}`);
+    lines.push(`Active compliance rate: ${report.summary.removalRate}%`);
+
     const blob = new Blob([lines.join("\n")], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -3275,6 +3539,8 @@ function ReportsTab() {
           </Button>
         )}
       </div>
+
+      <ExposureTrendChart />
 
       {report && report.summary.totalRequests > 0 ? (
         <>
