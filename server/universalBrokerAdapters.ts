@@ -412,80 +412,76 @@ export function createUniversalAdapter(
         urls = templateFn(params, domain);
       }
 
-      const urlToTry = urls[0];
-      if (!urlToTry) {
+      if (urls.length === 0) {
         return createEmptyResult(searchMethod, Date.now() - startTime);
       }
 
-      try {
-        const response = await safeFetchUniversal(urlToTry, 2500);
-        const responseTime = Date.now() - startTime;
+      const isProfileCategory = PROFILE_SEARCH_CATEGORIES.has(category);
+      if (!isProfileCategory) {
+        return createEmptyResult(searchMethod, Date.now() - startTime);
+      }
 
-        if (!response) {
-          return createEmptyResult(searchMethod, 0);
-        }
+      const urlsToTry = urls.slice(0, 1);
 
-        if (!response.ok) {
-          return createEmptyResult(searchMethod, responseTime);
-        }
+      for (const urlToTry of urlsToTry) {
+        try {
+          const response = await safeFetchUniversal(urlToTry, 2500);
+          const responseTime = Date.now() - startTime;
 
-        const contentType = response.headers.get("content-type") || "";
-        if (!contentType.includes("text/html") && !contentType.includes("application/xhtml") && !contentType.includes("text/plain") && !contentType.includes("application/json")) {
-          return createEmptyResult(searchMethod, responseTime);
-        }
+          if (!response) continue;
+          if (!response.ok) continue;
 
-        const html = await response.text();
-
-        if (html.length < 100) {
-          return createEmptyResult(searchMethod, responseTime);
-        }
-
-        const isProfileCategory = PROFILE_SEARCH_CATEGORIES.has(category);
-
-        if (!isProfileCategory) {
-          return createEmptyResult(searchMethod, responseTime);
-        }
-
-        const nameCheck = checkNameInHtml(html, firstName, lastName);
-
-        if (nameCheck.found) {
-          const locCheck = extractLocationFromHtml(html, city, state);
-          const ageMatch = false;
-
-          const score = calculateMatchScore(
-            nameCheck.found,
-            locCheck.cityMatch,
-            locCheck.stateMatch,
-            ageMatch,
-          );
-
-          if (score < 60) {
-            return createEmptyResult(searchMethod, responseTime);
+          const contentType = response.headers.get("content-type") || "";
+          if (!contentType.includes("text/html") && !contentType.includes("application/xhtml") && !contentType.includes("text/plain") && !contentType.includes("application/json")) {
+            continue;
           }
 
-          return {
-            found: true,
-            profileUrl: urlToTry,
-            nameMatch: true,
-            cityMatch: locCheck.cityMatch,
-            stateMatch: locCheck.stateMatch,
-            ageMatch,
-            matchScore: score,
-            extractedName: nameCheck.extractedName,
-            extractedCity: city && locCheck.cityMatch ? city : null,
-            extractedState: state && locCheck.stateMatch ? state : null,
-            extractedAge: null,
-            extractedRelatives: [],
-            rawSnippet: nameCheck.snippet,
-            searchMethod,
-            responseTimeMs: responseTime,
-          };
-        }
+          const html = await response.text();
+          if (html.length < 100) continue;
 
-        return createEmptyResult(searchMethod, responseTime);
-      } catch {
-        return createEmptyResult(searchMethod, Date.now() - startTime);
+          const nameCheck = checkNameInHtml(html, firstName, lastName);
+
+          if (nameCheck.found) {
+            const locCheck = extractLocationFromHtml(html, city, state);
+            const ageMatch = false;
+
+            const score = calculateMatchScore(
+              nameCheck.found,
+              locCheck.cityMatch,
+              locCheck.stateMatch,
+              ageMatch,
+            );
+
+            const minScore = nameCheck.occurrences >= 3 ? 40 : 40;
+
+            if (score < minScore) {
+              continue;
+            }
+
+            return {
+              found: true,
+              profileUrl: urlToTry,
+              nameMatch: true,
+              cityMatch: locCheck.cityMatch,
+              stateMatch: locCheck.stateMatch,
+              ageMatch,
+              matchScore: score,
+              extractedName: nameCheck.extractedName,
+              extractedCity: city && locCheck.cityMatch ? city : null,
+              extractedState: state && locCheck.stateMatch ? state : null,
+              extractedAge: null,
+              extractedRelatives: [],
+              rawSnippet: nameCheck.snippet,
+              searchMethod,
+              responseTimeMs: responseTime,
+            };
+          }
+        } catch {
+          continue;
+        }
       }
+
+      return createEmptyResult(searchMethod, Date.now() - startTime);
     },
   };
 }

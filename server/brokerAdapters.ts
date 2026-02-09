@@ -1302,7 +1302,7 @@ export async function searchAllBrokersForProfile(
         if (result.responseTimeMs === 0 && !result.found && !result.nameMatch) {
           stats.blocked++;
           stats.brokerStatuses.set(brokerId, "search_blocked");
-        } else if (result.found && result.matchScore >= 60) {
+        } else if (result.found && result.nameMatch && result.matchScore >= 40) {
           stats.found++;
           stats.brokerStatuses.set(brokerId, "searched_found");
           console.log(`[broker-adapter] PROFILE FOUND on ${brokerId} (score: ${result.matchScore}, method: ${result.searchMethod})`);
