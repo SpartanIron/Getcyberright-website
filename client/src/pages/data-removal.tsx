@@ -1636,12 +1636,6 @@ function GuestScanForm() {
           <p className="text-muted-foreground">
             We search people-search websites (like Whitepages, Spokeo, BeenVerified) for public profiles listing your name, address, and phone number. If we find you listed, we can help you request removal. All results are from real searches — no estimates or fake scores.
           </p>
-          <div className="flex items-start gap-2 p-2.5 rounded-md bg-primary/5 text-xs">
-            <Info className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
-            <p className="text-muted-foreground">
-              <span className="font-medium">Different from breach checking:</span> Our <Link href="/breach-dashboard" className="text-primary underline underline-offset-2">Breach Dashboard</Link> checks if your email was in data breaches. This tool finds your <span className="font-medium">public profiles</span> on people-search sites and helps you get them removed.
-            </p>
-          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Full Name *</label>
