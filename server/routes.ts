@@ -51,6 +51,7 @@ import { newsletterService } from "./newsletterService";
 import { complianceService } from "./complianceService";
 import { seedCurriculum } from "./curriculumSeed";
 import { seedDataBrokers } from "./dataBrokerSeed";
+import { registerUniversalAdapters } from "./brokerAdapters";
 import {
   scanConversation,
   getEmergencyResources,
@@ -1661,14 +1662,25 @@ EDGE CASE HANDLING
     console.error("Failed to seed curriculum:", err)
   );
 
-  // Seed data broker catalog and start monitoring scheduler
-  seedDataBrokers(db).then(() => {
+  (async () => {
+    try {
+      await seedDataBrokers(db);
+      const allBrokers = await db.select({
+        id: dataBrokers.id,
+        name: dataBrokers.name,
+        domain: dataBrokers.domain,
+        category: dataBrokers.category,
+        isActive: dataBrokers.isActive,
+      }).from(dataBrokers);
+      registerUniversalAdapters(allBrokers);
+    } catch (err) {
+      console.error("[broker-adapter] Failed to register universal adapters:", err);
+    }
+
     dataBrokerScheduler.start().catch(err =>
       console.error("Failed to start data broker scheduler:", err)
     );
-  }).catch(err =>
-    console.error("Failed to seed data brokers:", err)
-  );
+  })();
 
   // Get all feeds with status
   app.get("/api/threat-intel/feeds", isAuthenticated, isAdmin, async (req: Request, res: Response) => {

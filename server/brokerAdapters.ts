@@ -1,4 +1,5 @@
 import { type DataBroker } from "@shared/schema";
+import { createUniversalAdapter } from "./universalBrokerAdapters";
 
 export interface ProfileSearchResult {
   found: boolean;
@@ -1146,7 +1147,7 @@ function createCoclSearchAdapter(): BrokerAdapter {
   };
 }
 
-const allAdapters: BrokerAdapter[] = [
+const coreAdapters: BrokerAdapter[] = [
   createTruePeopleSearchAdapter(),
   createFastPeopleSearchAdapter(),
   createSpokeoAdapter(),
@@ -1162,9 +1163,33 @@ const allAdapters: BrokerAdapter[] = [
   createCoclSearchAdapter(),
 ];
 
+const coreAdapterIds = new Set(coreAdapters.map(a => a.brokerId));
+
+const allAdapters: BrokerAdapter[] = [...coreAdapters];
+
 const adapterMap = new Map<string, BrokerAdapter>();
-for (const adapter of allAdapters) {
+for (const adapter of coreAdapters) {
   adapterMap.set(adapter.brokerId, adapter);
+}
+
+let universalAdaptersRegistered = false;
+
+export function registerUniversalAdapters(brokerEntries: Array<{ id: string; name: string; domain: string; category: string; isActive: boolean }>) {
+  if (universalAdaptersRegistered) return;
+  universalAdaptersRegistered = true;
+
+  let count = 0;
+  for (const entry of brokerEntries) {
+    if (!entry.isActive) continue;
+    if (coreAdapterIds.has(entry.id)) continue;
+    if (adapterMap.has(entry.id)) continue;
+
+    const adapter = createUniversalAdapter(entry.id, entry.name, entry.domain, entry.category);
+    allAdapters.push(adapter);
+    adapterMap.set(entry.id, adapter);
+    count++;
+  }
+  console.log(`[broker-adapter] Registered ${count} universal search adapters (${allAdapters.length} total searchable)`);
 }
 
 export function getAdapter(brokerId: string): BrokerAdapter | null {
@@ -1216,8 +1241,8 @@ export interface SearchStats {
 
 export async function searchAllBrokersForProfile(
   params: SearchParams,
-  batchSize = 5,
-  delayBetweenBatchesMs = 2000,
+  batchSize = 15,
+  delayBetweenBatchesMs = 800,
 ): Promise<{ results: Map<string, ProfileSearchResult>; stats: SearchStats }> {
   const results = new Map<string, ProfileSearchResult>();
   const searchable = getSearchableAdapters();
@@ -1233,8 +1258,17 @@ export async function searchAllBrokersForProfile(
 
   console.log(`[broker-adapter] Starting real profile search across ${searchable.length} broker sites for "${params.firstName} ${params.lastName}"`);
 
-  for (let i = 0; i < searchable.length; i += batchSize) {
-    const batch = searchable.slice(i, i + batchSize);
+  const coreBrokerIds = new Set(coreAdapters.map(a => a.brokerId));
+  const coreBrokers = searchable.filter(a => coreBrokerIds.has(a.brokerId));
+  const universalBrokers = searchable.filter(a => !coreBrokerIds.has(a.brokerId));
+  const orderedSearchable = [...coreBrokers, ...universalBrokers];
+
+  const coreBatchSize = Math.min(batchSize, 5);
+  const universalBatchSize = batchSize;
+
+  for (let i = 0; i < orderedSearchable.length; i += (i < coreBrokers.length ? coreBatchSize : universalBatchSize)) {
+    const currentBatchSize = i < coreBrokers.length ? coreBatchSize : universalBatchSize;
+    const batch = orderedSearchable.slice(i, i + currentBatchSize);
 
     const batchResults = await Promise.allSettled(
       batch.map(async (adapter) => {
@@ -1252,7 +1286,6 @@ export async function searchAllBrokersForProfile(
         if (result.responseTimeMs === 0 && !result.found && !result.nameMatch) {
           stats.blocked++;
           stats.brokerStatuses.set(brokerId, "search_blocked");
-          console.log(`[broker-adapter] BLOCKED by ${brokerId} (request failed or timed out)`);
         } else if (result.found && result.matchScore >= 40) {
           stats.found++;
           stats.brokerStatuses.set(brokerId, "searched_found");
@@ -1270,12 +1303,17 @@ export async function searchAllBrokersForProfile(
       }
     }
 
-    if (i + batchSize < searchable.length) {
-      await new Promise(r => setTimeout(r, delayBetweenBatchesMs));
+    const delay = i < coreBrokers.length ? delayBetweenBatchesMs : Math.max(delayBetweenBatchesMs, 500);
+    if (i + currentBatchSize < orderedSearchable.length) {
+      await new Promise(r => setTimeout(r, delay));
+    }
+
+    if (stats.searched % 50 === 0 && stats.searched > 0) {
+      console.log(`[broker-adapter] Progress: ${stats.searched}/${orderedSearchable.length} searched, ${stats.found} found so far`);
     }
   }
 
-  console.log(`[broker-adapter] Profile search complete: ${stats.found} found, ${stats.notFound} not found, ${stats.blocked} blocked, ${stats.failed} failed across ${searchable.length} sites`);
+  console.log(`[broker-adapter] Profile search complete: ${stats.found} found, ${stats.notFound} not found, ${stats.blocked} blocked, ${stats.failed} failed across ${stats.searched}/${searchable.length} sites`);
 
   return { results, stats };
 }

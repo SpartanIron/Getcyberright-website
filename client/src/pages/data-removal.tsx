@@ -1761,10 +1761,10 @@ function GuestScanForm() {
                     <CardHeader className="pb-3">
                       <CardTitle className="flex items-center gap-2">
                         <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                        {brokerFindings.length} Active Broker{brokerFindings.length !== 1 ? "s" : ""} We Could Not Search
+                        {brokerFindings.length} Broker{brokerFindings.length !== 1 ? "s" : ""} That Blocked Our Search
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        These data broker sites are active but blocked our automated search. Your profile may exist on these sites.
+                        These sites blocked or restricted our automated scan. They are known data brokers where your information may still appear.
                       </p>
                     </CardHeader>
                     <CardContent className="space-y-2">
@@ -1773,9 +1773,15 @@ function GuestScanForm() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-sm font-medium">{finding.broker.name}</span>
                             <span className="text-xs text-muted-foreground">{finding.broker.domain}</span>
+                            {finding.verificationMethod === "search_blocked" && (
+                              <Badge variant="outline" className="text-xs">Blocked</Badge>
+                            )}
+                            {finding.verificationMethod === "search_failed" && (
+                              <Badge variant="outline" className="text-xs">Unreachable</Badge>
+                            )}
                           </div>
                           <Button variant="outline" size="sm" asChild>
-                            <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
+                            <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer" data-testid={`link-check-broker-${finding.broker.id}`}>
                               <ExternalLink className="h-3 w-3 mr-1" />
                               Check Manually
                             </a>
@@ -1784,7 +1790,7 @@ function GuestScanForm() {
                       ))}
                       {brokerFindings.length > 10 && (
                         <p className="text-xs text-muted-foreground text-center pt-2">
-                          + {brokerFindings.length - 10} more active brokers. Create an account to see all.
+                          + {brokerFindings.length - 10} more brokers. Create an account to see all.
                         </p>
                       )}
                     </CardContent>

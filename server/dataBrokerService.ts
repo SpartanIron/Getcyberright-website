@@ -228,7 +228,7 @@ async function runRealVerification(
       };
 
       console.log(`[scan] Starting REAL profile discovery for "${firstName} ${lastName}" across ${getSearchableAdapters().length} broker sites`);
-      const searchOutput = await searchAllBrokersForProfile(searchParams, 4, 2500);
+      const searchOutput = await searchAllBrokersForProfile(searchParams, 15, 800);
       profileSearchResults = searchOutput.results;
       searchStats = searchOutput.stats;
 
@@ -321,9 +321,21 @@ async function runRealVerification(
         }
 
         if (!evidenceTier && broker.isActive && broker.optOutUrl && domain) {
-          facts.push(`ACTIVE BROKER: ${broker.name} is a known active data broker with an opt-out process available`);
-          evidenceTier = "verified_broker";
-          verificationMethod = "catalog_verified_active";
+          const searchStatus = searchStats?.brokerStatuses?.get(broker.id);
+          const wasSuccessfullySearchedAndClear = searchStatus === "searched_not_found";
+          if (!wasSuccessfullySearchedAndClear) {
+            if (searchStatus === "search_blocked") {
+              facts.push(`BLOCKED: ${broker.name} blocked our automated search attempt. Your data may still be listed.`);
+              verificationMethod = "search_blocked";
+            } else if (searchStatus === "search_failed") {
+              facts.push(`UNREACHABLE: ${broker.name} could not be reached during scanning. Your data may still be listed.`);
+              verificationMethod = "search_failed";
+            } else {
+              facts.push(`ACTIVE BROKER: ${broker.name} is a known active data broker with an opt-out process available`);
+              verificationMethod = "catalog_verified_active";
+            }
+            evidenceTier = "verified_broker";
+          }
         }
 
         if (!evidenceTier) {
