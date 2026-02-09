@@ -1826,11 +1826,6 @@ function GuestScanForm() {
                               </Button>
                             </div>
                           </div>
-                          {finding.verificationDetails && (
-                            <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md">
-                              {finding.verificationDetails}
-                            </p>
-                          )}
                         </div>
                       ))}
                     </CardContent>
