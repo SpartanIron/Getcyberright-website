@@ -312,6 +312,8 @@ async function runRealVerification(
 
   console.log(`[scan] Processing ${brokersToCheck.length} relevant brokers (from ${allBrokers.length} total), ${profilesFoundCount} profiles already discovered`);
 
+  const MAX_SITE_CHECKS = 30;
+  let siteChecksPerformed = 0;
   const BATCH_SIZE = 50;
   for (let i = 0; i < brokersToCheck.length; i += BATCH_SIZE) {
     const batch = brokersToCheck.slice(i, i + BATCH_SIZE);
@@ -323,9 +325,12 @@ async function runRealVerification(
         const profileResult = profileSearchResults.get(broker.id);
         const profileFound = profileResult?.found && (profileResult?.matchScore ?? 0) >= 40;
 
+        const shouldCheckSite = !breachMatch && !profileFound && domain && siteChecksPerformed < MAX_SITE_CHECKS;
+        if (shouldCheckSite) siteChecksPerformed++;
+
         const [siteCheck, optOutCheck] = await Promise.all([
-          (!breachMatch && !profileFound && domain) ? checkBrokerSiteReachable(domain) : Promise.resolve({ reachable: false, hasOptOut: false, responseTime: 0 }),
-          (!breachMatch && !profileFound) ? checkBrokerOptOutPage(broker) : Promise.resolve({ exists: false, url: null }),
+          shouldCheckSite ? checkBrokerSiteReachable(domain) : Promise.resolve({ reachable: false, hasOptOut: false, responseTime: 0 }),
+          shouldCheckSite ? checkBrokerOptOutPage(broker) : Promise.resolve({ exists: false, url: null }),
         ]);
 
         const { overlap } = analyzeBrokerDataOverlap(broker, userDataTypes);
