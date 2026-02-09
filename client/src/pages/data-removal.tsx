@@ -1633,9 +1633,6 @@ function GuestScanForm() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            We search people-search websites (like Whitepages, Spokeo, BeenVerified) for public profiles listing your name, address, and phone number. If we find you listed, we can help you request removal. All results are from real searches — no estimates or fake scores.
-          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Full Name *</label>
