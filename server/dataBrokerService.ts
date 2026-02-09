@@ -233,7 +233,7 @@ async function runRealVerification(
       searchStats = searchOutput.stats;
 
       for (const [brokerId, result] of Array.from(profileSearchResults.entries())) {
-        if (result.found && result.matchScore >= 40) {
+        if (result.found && result.matchScore >= 60) {
           profilesFoundCount++;
 
           if (scanId && userId) {
@@ -285,7 +285,7 @@ async function runRealVerification(
         const domain = broker.domain?.replace(/^https?:\/\//, "").replace(/\/.*$/, "") || "";
         const breachMatch = domain ? breachDomains.has(domain.toLowerCase()) : false;
         const profileResult = profileSearchResults.get(broker.id);
-        const profileFound = profileResult?.found && (profileResult?.matchScore ?? 0) >= 40;
+        const profileFound = profileResult?.found && (profileResult?.matchScore ?? 0) >= 60;
 
         const { overlap } = analyzeBrokerDataOverlap(broker, userDataTypes);
 

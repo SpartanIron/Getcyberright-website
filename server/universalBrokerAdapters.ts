@@ -6,30 +6,47 @@ function normalizeText(text: string): string {
   return text.toLowerCase().trim().replace(/[^a-z0-9\s]/g, "");
 }
 
-function checkNameInHtml(html: string, firstName: string, lastName: string): { found: boolean; extractedName: string | null; snippet: string | null } {
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function checkNameInHtml(html: string, firstName: string, lastName: string): { found: boolean; extractedName: string | null; snippet: string | null; occurrences: number } {
   const normFirst = firstName.toLowerCase();
   const normLast = lastName.toLowerCase();
   const lowerHtml = html.toLowerCase();
 
   const fullNameIdx = lowerHtml.indexOf(`${normFirst} ${normLast}`);
   if (fullNameIdx === -1) {
-    const lastIdx = lowerHtml.indexOf(normLast);
-    const firstIdx = lowerHtml.indexOf(normFirst);
-    if (lastIdx === -1 || firstIdx === -1) {
-      return { found: false, extractedName: null, snippet: null };
-    }
-    if (Math.abs(lastIdx - firstIdx) > 100) {
-      return { found: false, extractedName: null, snippet: null };
-    }
+    return { found: false, extractedName: null, snippet: null, occurrences: 0 };
   }
 
-  const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+  const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
   const nameMatches = html.match(namePattern);
-  const found = nameMatches !== null && nameMatches.length > 0;
+  const occurrences = nameMatches?.length ?? 0;
+
+  if (occurrences === 0) {
+    return { found: false, extractedName: null, snippet: null, occurrences: 0 };
+  }
+
+  const profileIndicators = [
+    /age\s*:?\s*\d{2}/i,
+    /\b(address|phone|email|relatives|associates|neighbors)\b/i,
+    /\b(background\s*(check|report)|public\s*records?|court\s*records?)\b/i,
+    /\b(view\s*(full\s*)?report|see\s*results|view\s*details|view\s*profile)\b/i,
+    /\b(people\s*search|person\s*search|find\s*people|lookup)\b/i,
+  ];
+
+  const contextStart = Math.max(0, fullNameIdx - 200);
+  const contextEnd = Math.min(lowerHtml.length, fullNameIdx + normFirst.length + normLast.length + 500);
+  const surroundingContext = lowerHtml.substring(contextStart, contextEnd);
+
+  const hasProfileContext = profileIndicators.some(p => p.test(surroundingContext));
+
+  const found = occurrences >= 2 || hasProfileContext;
 
   let snippet: string | null = null;
   if (found) {
-    const snippetMatch = html.match(new RegExp(`[^<]{0,80}${firstName}[^<]{0,150}`, "i"));
+    const snippetMatch = html.match(new RegExp(`[^<]{0,80}${escapeRegex(firstName)}[^<]{0,150}`, "i"));
     snippet = snippetMatch ? snippetMatch[0].substring(0, 250) : null;
   }
 
@@ -37,6 +54,7 @@ function checkNameInHtml(html: string, firstName: string, lastName: string): { f
     found,
     extractedName: nameMatches ? nameMatches[0] : `${firstName} ${lastName}`,
     snippet,
+    occurrences,
   };
 }
 
@@ -351,6 +369,17 @@ function createEmptyResult(searchMethod: string, responseTimeMs: number): Profil
   };
 }
 
+const PROFILE_SEARCH_CATEGORIES = new Set([
+  "people-search",
+  "background-check",
+  "public-records",
+  "court-legal-records",
+  "court-legal",
+  "social-media-aggregator",
+  "social-media",
+  "data-aggregator",
+]);
+
 export function createUniversalAdapter(
   brokerId: string,
   brokerName: string,
@@ -411,6 +440,12 @@ export function createUniversalAdapter(
           return createEmptyResult(searchMethod, responseTime);
         }
 
+        const isProfileCategory = PROFILE_SEARCH_CATEGORIES.has(category);
+
+        if (!isProfileCategory) {
+          return createEmptyResult(searchMethod, responseTime);
+        }
+
         const nameCheck = checkNameInHtml(html, firstName, lastName);
 
         if (nameCheck.found) {
@@ -423,6 +458,10 @@ export function createUniversalAdapter(
             locCheck.stateMatch,
             ageMatch,
           );
+
+          if (score < 60) {
+            return createEmptyResult(searchMethod, responseTime);
+          }
 
           return {
             found: true,

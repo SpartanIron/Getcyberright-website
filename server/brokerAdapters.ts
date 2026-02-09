@@ -533,8 +533,9 @@ function createRadarisAdapter(): BrokerAdapter {
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
-      const profileUrlMatch = html.match(/href="(\/p\/[^"]+\/[^"]+)"/);
-      const profileUrl = profileUrlMatch ? `https://radaris.com${profileUrlMatch[1]}` : null;
+      const profileUrlPattern = new RegExp(`href="(/p/${firstName}/${lastName}[^"]*)"`, "i");
+      const profileUrlMatch = html.match(profileUrlPattern);
+      const profileUrl = profileUrlMatch ? `https://radaris.com${profileUrlMatch[1]}` : (found ? searchUrl : null);
 
       const ageMatch = html.match(/(?:age|Age)[:\s]*(\d+)/);
       const extractedAge = ageMatch ? ageMatch[1] : null;
@@ -548,7 +549,8 @@ function createRadarisAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const escapedFirst = firstName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapedFirst}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -1300,7 +1302,7 @@ export async function searchAllBrokersForProfile(
         if (result.responseTimeMs === 0 && !result.found && !result.nameMatch) {
           stats.blocked++;
           stats.brokerStatuses.set(brokerId, "search_blocked");
-        } else if (result.found && result.matchScore >= 40) {
+        } else if (result.found && result.matchScore >= 60) {
           stats.found++;
           stats.brokerStatuses.set(brokerId, "searched_found");
           console.log(`[broker-adapter] PROFILE FOUND on ${brokerId} (score: ${result.matchScore}, method: ${result.searchMethod})`);
