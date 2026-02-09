@@ -1241,8 +1241,8 @@ export interface SearchStats {
 
 export async function searchAllBrokersForProfile(
   params: SearchParams,
-  batchSize = 15,
-  delayBetweenBatchesMs = 800,
+  batchSize = 75,
+  delayBetweenBatchesMs = 150,
 ): Promise<{ results: Map<string, ProfileSearchResult>; stats: SearchStats }> {
   const results = new Map<string, ProfileSearchResult>();
   const searchable = getSearchableAdapters();
@@ -1263,10 +1263,24 @@ export async function searchAllBrokersForProfile(
   const universalBrokers = searchable.filter(a => !coreBrokerIds.has(a.brokerId));
   const orderedSearchable = [...coreBrokers, ...universalBrokers];
 
+  const OVERALL_TIMEOUT_MS = 45_000;
+  const scanStart = Date.now();
+  let timedOut = false;
+
   const coreBatchSize = Math.min(batchSize, 5);
   const universalBatchSize = batchSize;
 
   for (let i = 0; i < orderedSearchable.length; i += (i < coreBrokers.length ? coreBatchSize : universalBatchSize)) {
+    if (Date.now() - scanStart > OVERALL_TIMEOUT_MS) {
+      timedOut = true;
+      console.log(`[broker-adapter] Overall scan timeout reached after ${stats.searched} brokers searched. Returning partial results.`);
+      for (let j = i; j < orderedSearchable.length; j++) {
+        stats.brokerStatuses.set(orderedSearchable[j].brokerId, "search_failed");
+        stats.failed++;
+      }
+      break;
+    }
+
     const currentBatchSize = i < coreBrokers.length ? coreBatchSize : universalBatchSize;
     const batch = orderedSearchable.slice(i, i + currentBatchSize);
 
@@ -1303,17 +1317,19 @@ export async function searchAllBrokersForProfile(
       }
     }
 
-    const delay = i < coreBrokers.length ? delayBetweenBatchesMs : Math.max(delayBetweenBatchesMs, 500);
+    const delay = i < coreBrokers.length ? delayBetweenBatchesMs * 2 : delayBetweenBatchesMs;
     if (i + currentBatchSize < orderedSearchable.length) {
       await new Promise(r => setTimeout(r, delay));
     }
 
-    if (stats.searched % 50 === 0 && stats.searched > 0) {
-      console.log(`[broker-adapter] Progress: ${stats.searched}/${orderedSearchable.length} searched, ${stats.found} found so far`);
+    if (stats.searched % 100 === 0 && stats.searched > 0) {
+      const elapsed = ((Date.now() - scanStart) / 1000).toFixed(1);
+      console.log(`[broker-adapter] Progress: ${stats.searched}/${orderedSearchable.length} searched, ${stats.found} found (${elapsed}s elapsed)`);
     }
   }
 
-  console.log(`[broker-adapter] Profile search complete: ${stats.found} found, ${stats.notFound} not found, ${stats.blocked} blocked, ${stats.failed} failed across ${stats.searched}/${searchable.length} sites`);
+  const totalTime = ((Date.now() - scanStart) / 1000).toFixed(1);
+  console.log(`[broker-adapter] Profile search ${timedOut ? "timed out" : "complete"} in ${totalTime}s: ${stats.found} found, ${stats.notFound} not found, ${stats.blocked} blocked, ${stats.failed} failed across ${stats.searched}/${searchable.length} sites`);
 
   return { results, stats };
 }

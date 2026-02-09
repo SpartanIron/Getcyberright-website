@@ -228,7 +228,7 @@ async function runRealVerification(
       };
 
       console.log(`[scan] Starting REAL profile discovery for "${firstName} ${lastName}" across ${getSearchableAdapters().length} broker sites`);
-      const searchOutput = await searchAllBrokersForProfile(searchParams, 15, 800);
+      const searchOutput = await searchAllBrokersForProfile(searchParams);
       profileSearchResults = searchOutput.results;
       searchStats = searchOutput.stats;
 

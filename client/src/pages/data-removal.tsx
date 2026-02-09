@@ -1625,8 +1625,23 @@ function GuestScanForm() {
             ) : (
               <Search className="h-4 w-4 mr-2" />
             )}
-            Search for My Profiles
+            {guestScanMutation.isPending ? "Scanning..." : "Search for My Profiles"}
           </Button>
+
+          {guestScanMutation.isPending && (
+            <div className="p-4 rounded-md bg-muted/50 space-y-3">
+              <div className="flex items-center gap-3">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                <div>
+                  <p className="text-sm font-medium">Scanning 500+ data broker sites...</p>
+                  <p className="text-xs text-muted-foreground">This typically takes 15-25 seconds. We're checking people-search sites, background check databases, and data aggregators for your information.</p>
+                </div>
+              </div>
+              <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                <div className="bg-primary h-1.5 rounded-full animate-pulse" style={{ width: "60%" }} />
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -2013,8 +2028,23 @@ function ScanTab() {
               ) : (
                 <Search className="h-4 w-4 mr-2" />
               )}
-              Run New Scan
+              {scanMutation.isPending ? "Scanning..." : "Run New Scan"}
             </Button>
+
+            {scanMutation.isPending && (
+              <div className="p-4 rounded-md bg-muted/50 space-y-3">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                  <div>
+                    <p className="text-sm font-medium">Scanning 500+ data broker sites...</p>
+                    <p className="text-xs text-muted-foreground">This typically takes 15-25 seconds. We're checking people-search sites, background check databases, and data aggregators for your information.</p>
+                  </div>
+                </div>
+                <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                  <div className="bg-primary h-1.5 rounded-full animate-pulse" style={{ width: "60%" }} />
+                </div>
+              </div>
+            )}
 
             {latestScan && (
               <div className="flex items-center gap-6 p-4 rounded-md bg-muted/30">
