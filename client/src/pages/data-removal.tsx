@@ -1803,20 +1803,17 @@ function GuestScanForm() {
                           <div className="flex items-center justify-between gap-2 flex-wrap">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-medium">{finding.broker.name}</span>
-                              <Badge className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800 no-default-hover-elevate no-default-active-elevate">
-                                Profile Found
-                              </Badge>
                               {(() => {
-                                const rawLabel = finding.confidenceLabel || (finding.evidenceTier === "confirmed" ? "Confirmed" : "Likely");
-                                const label = rawLabel === "Likely" ? "Likely Match" : rawLabel;
-                                const colorClass = label === "Very High" || label === "Confirmed"
-                                  ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-red-300 dark:border-red-700"
-                                  : label === "High"
-                                  ? "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 border-orange-300 dark:border-orange-700"
-                                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700";
+                                const cl = finding.confidenceLabel || (finding.evidenceTier === "confirmed" ? "Confirmed" : "Likely");
+                                const badgeText = cl === "Very High" || cl === "Confirmed" ? "Data Exposed" : cl === "High" ? "Profile Detected" : "Name Found";
+                                const colorClass = cl === "Very High" || cl === "Confirmed"
+                                  ? "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800"
+                                  : cl === "High"
+                                  ? "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800"
+                                  : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border-amber-200 dark:border-amber-800";
                                 return (
-                                  <Badge variant="outline" className={`text-xs ${colorClass} no-default-hover-elevate no-default-active-elevate`}>
-                                    {label}
+                                  <Badge className={`${colorClass} no-default-hover-elevate no-default-active-elevate`}>
+                                    {badgeText}
                                   </Badge>
                                 );
                               })()}

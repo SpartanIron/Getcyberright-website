@@ -368,7 +368,7 @@ async function runRealVerification(
           const matchCount = matchParts.length;
           const confidenceLabel = matchCount >= 3 ? "Very High" : matchCount >= 2 ? "High" : "Likely";
           const matchDescription = matchParts.join(", ");
-          verificationDetails = `A public profile matching your ${matchDescription} was found on ${broker.name}.${profileResult.profileUrl ? ` You can verify this listing at: ${profileResult.profileUrl}` : ""} Confidence: ${confidenceLabel}.`;
+          verificationDetails = `A public profile matching your ${matchDescription} was found on ${broker.name}.${profileResult.profileUrl ? ` You can verify this listing at: ${profileResult.profileUrl}` : ""}`;
           evidenceSummary = `Profile found — ${confidenceLabel} confidence (${matchCount} detail${matchCount !== 1 ? "s" : ""} matched)`;
         } else {
           verificationDetails = `${broker.name} (${domain}) is a known active data broker with an opt-out process. Your data may be listed — we recommend sending a removal request.`;
