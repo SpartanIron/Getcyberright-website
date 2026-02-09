@@ -1610,6 +1610,7 @@ function GuestScanForm() {
       evidenceSummary?: string;
       profileUrl?: string | null;
       matchScore?: number;
+      confidenceLabel?: string | null;
       breachDetails?: {
         breachName: string;
         breachDate: string;
@@ -1805,11 +1806,20 @@ function GuestScanForm() {
                               <Badge className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800 no-default-hover-elevate no-default-active-elevate">
                                 Profile Found
                               </Badge>
-                              {finding.matchScore != null && finding.matchScore > 0 && (
-                                <Badge variant="outline" className="text-xs">
-                                  {finding.matchScore}% match
-                                </Badge>
-                              )}
+                              {(() => {
+                                const rawLabel = finding.confidenceLabel || (finding.evidenceTier === "confirmed" ? "Confirmed" : "Likely");
+                                const label = rawLabel === "Likely" ? "Likely Match" : rawLabel;
+                                const colorClass = label === "Very High" || label === "Confirmed"
+                                  ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 border-red-300 dark:border-red-700"
+                                  : label === "High"
+                                  ? "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 border-orange-300 dark:border-orange-700"
+                                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700";
+                                return (
+                                  <Badge variant="outline" className={`text-xs ${colorClass} no-default-hover-elevate no-default-active-elevate`}>
+                                    {label}
+                                  </Badge>
+                                );
+                              })()}
                             </div>
                             <div className="flex items-center gap-2 flex-wrap">
                               {finding.profileUrl && (

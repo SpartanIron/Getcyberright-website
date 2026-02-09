@@ -85,6 +85,7 @@ interface VerifiedFinding {
   evidenceSummary: string;
   profileUrl?: string | null;
   matchScore?: number;
+  confidenceLabel?: string;
   profileDiscovery?: ProfileSearchResult | null;
   breachDetails?: BreachDetail | null;
   searchStatus?: "searched_found" | "searched_not_found" | "search_blocked" | "not_searchable" | null;
@@ -314,7 +315,9 @@ async function runRealVerification(
             profileResult.stateMatch ? "state matches" : null,
             profileResult.ageMatch ? "age matches" : null,
           ].filter(Boolean).join(", ");
-          facts.push(`PROFILE FOUND: We searched ${broker.name} and found a profile matching your information (${matchDetails}, score: ${profileResult.matchScore}/100)`);
+          const detailCount = [profileResult.nameMatch, profileResult.cityMatch, profileResult.stateMatch, profileResult.ageMatch].filter(Boolean).length;
+          const confLabel = detailCount >= 3 ? "Very High" : detailCount >= 2 ? "High" : "Likely";
+          facts.push(`PROFILE FOUND: We searched ${broker.name} and found a profile matching your information (${matchDetails}). Confidence: ${confLabel}.`);
           if (profileResult.profileUrl) {
             facts.push(`Profile URL: ${profileResult.profileUrl}`);
           }
@@ -362,8 +365,11 @@ async function runRealVerification(
             profileResult.stateMatch ? "state" : null,
             profileResult.ageMatch ? "age" : null,
           ].filter(Boolean);
-          verificationDetails = `We searched ${broker.name} for your name and found a matching profile. Match details: ${matchParts.join(", ")} confirmed (score: ${profileResult.matchScore}/100).${profileResult.profileUrl ? ` Profile URL: ${profileResult.profileUrl}` : ""}`;
-          evidenceSummary = `Profile found — ${matchParts.length} detail${matchParts.length !== 1 ? "s" : ""} matched`;
+          const matchCount = matchParts.length;
+          const confidenceLabel = matchCount >= 3 ? "Very High" : matchCount >= 2 ? "High" : "Likely";
+          const matchDescription = matchParts.join(", ");
+          verificationDetails = `A public profile matching your ${matchDescription} was found on ${broker.name}.${profileResult.profileUrl ? ` You can verify this listing at: ${profileResult.profileUrl}` : ""} Confidence: ${confidenceLabel}.`;
+          evidenceSummary = `Profile found — ${confidenceLabel} confidence (${matchCount} detail${matchCount !== 1 ? "s" : ""} matched)`;
         } else {
           verificationDetails = `${broker.name} (${domain}) is a known active data broker with an opt-out process. Your data may be listed — we recommend sending a removal request.`;
           evidenceSummary = "Active broker — removal recommended";
@@ -392,6 +398,10 @@ async function runRealVerification(
           evidenceSummary,
           profileUrl: profileResult?.profileUrl ?? null,
           matchScore: profileResult?.matchScore ?? 0,
+          confidenceLabel: profileResult ? (() => {
+            const dc = [profileResult.nameMatch, profileResult.cityMatch, profileResult.stateMatch, profileResult.ageMatch].filter(Boolean).length;
+            return dc >= 3 ? "Very High" : dc >= 2 ? "High" : "Likely";
+          })() : evidenceTier === "confirmed" ? "Confirmed" : undefined,
           profileDiscovery: profileResult ?? null,
           breachDetails: matchingBreach ? {
             breachName: matchingBreach.name,
@@ -763,6 +773,7 @@ export async function runGuestExposureScan(guestData: {
     sourceEvidence: match.sourceEvidence,
     profileUrl: match.profileUrl ?? null,
     matchScore: match.matchScore ?? 0,
+    confidenceLabel: match.confidenceLabel ?? null,
     breachDetails: match.breachDetails ?? null,
     searchStatus: match.searchStatus ?? null,
   }));
