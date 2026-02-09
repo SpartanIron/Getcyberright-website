@@ -142,44 +142,6 @@ async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
   }
 }
 
-async function checkBrokerSiteReachable(domain: string): Promise<{ reachable: boolean; hasOptOut: boolean; responseTime: number }> {
-  const startTime = Date.now();
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    const response = await fetch(`https://${domain}`, {
-      method: "HEAD",
-      signal: controller.signal,
-      redirect: "follow",
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; GetCyberRight/1.0)" },
-    });
-    clearTimeout(timeout);
-    const responseTime = Date.now() - startTime;
-    return { reachable: response.ok || response.status === 403, hasOptOut: false, responseTime };
-  } catch {
-    return { reachable: false, hasOptOut: false, responseTime: Date.now() - startTime };
-  }
-}
-
-async function checkBrokerOptOutPage(broker: DataBroker): Promise<{ exists: boolean; url: string | null }> {
-  const optOutUrl = broker.optOutUrl;
-  if (!optOutUrl) return { exists: false, url: null };
-
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    const response = await fetch(optOutUrl, {
-      method: "HEAD",
-      signal: controller.signal,
-      redirect: "follow",
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; GetCyberRight/1.0)" },
-    });
-    clearTimeout(timeout);
-    return { exists: response.ok || response.status === 403, url: optOutUrl };
-  } catch {
-    return { exists: false, url: optOutUrl };
-  }
-}
 
 function analyzeBrokerDataOverlap(
   broker: DataBroker,
@@ -312,9 +274,7 @@ async function runRealVerification(
 
   console.log(`[scan] Processing ${brokersToCheck.length} relevant brokers (from ${allBrokers.length} total), ${profilesFoundCount} profiles already discovered`);
 
-  const MAX_SITE_CHECKS = 30;
-  let siteChecksPerformed = 0;
-  const BATCH_SIZE = 50;
+  const BATCH_SIZE = 100;
   for (let i = 0; i < brokersToCheck.length; i += BATCH_SIZE) {
     const batch = brokersToCheck.slice(i, i + BATCH_SIZE);
 
@@ -324,14 +284,6 @@ async function runRealVerification(
         const breachMatch = domain ? breachDomains.has(domain.toLowerCase()) : false;
         const profileResult = profileSearchResults.get(broker.id);
         const profileFound = profileResult?.found && (profileResult?.matchScore ?? 0) >= 40;
-
-        const shouldCheckSite = !breachMatch && !profileFound && domain && siteChecksPerformed < MAX_SITE_CHECKS;
-        if (shouldCheckSite) siteChecksPerformed++;
-
-        const [siteCheck, optOutCheck] = await Promise.all([
-          shouldCheckSite ? checkBrokerSiteReachable(domain) : Promise.resolve({ reachable: false, hasOptOut: false, responseTime: 0 }),
-          shouldCheckSite ? checkBrokerOptOutPage(broker) : Promise.resolve({ exists: false, url: null }),
-        ]);
 
         const { overlap } = analyzeBrokerDataOverlap(broker, userDataTypes);
 
@@ -366,16 +318,10 @@ async function runRealVerification(
           }
         }
 
-        if (!evidenceTier && siteCheck.reachable) {
-          facts.push(`VERIFIED: ${domain} responded to our check (${siteCheck.responseTime}ms)`);
+        if (!evidenceTier && broker.isActive && broker.optOutUrl && domain) {
+          facts.push(`ACTIVE BROKER: ${broker.name} is a known active data broker with an opt-out process available`);
           evidenceTier = "verified_broker";
-          verificationMethod = "broker_verified_active";
-        }
-
-        if (!evidenceTier && optOutCheck.exists) {
-          facts.push(`VERIFIED: Opt-out page accessible at ${optOutCheck.url}`);
-          evidenceTier = "verified_broker";
-          verificationMethod = "broker_verified_active";
+          verificationMethod = "catalog_verified_active";
         }
 
         if (!evidenceTier) {
@@ -405,12 +351,8 @@ async function runRealVerification(
           verificationDetails = `We searched ${broker.name} for your name and found a matching profile. Match details: ${matchParts.join(", ")} confirmed (score: ${profileResult.matchScore}/100).${profileResult.profileUrl ? ` Profile URL: ${profileResult.profileUrl}` : ""}`;
           evidenceSummary = `Profile found — ${matchParts.length} detail${matchParts.length !== 1 ? "s" : ""} matched`;
         } else {
-          const activeDetails = [
-            siteCheck.reachable ? `site is active` : null,
-            optOutCheck.exists ? `opt-out page is accessible` : null,
-          ].filter(Boolean).join(" and ");
-          verificationDetails = `We verified that ${broker.name} (${domain}) is an active data broker — ${activeDetails}. We did NOT find your specific profile on this site.`;
-          evidenceSummary = "Active broker — no profile found";
+          verificationDetails = `${broker.name} (${domain}) is a known active data broker with an opt-out process. Your data may be listed — we recommend sending a removal request.`;
+          evidenceSummary = "Active broker — removal recommended";
         }
 
         let exposureLevel = "info";
