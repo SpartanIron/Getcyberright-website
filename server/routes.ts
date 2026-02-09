@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -91,6 +91,16 @@ import {
   generateProgressReport,
   getBrokerMetrics,
   dataBrokerScheduler,
+  getAutomationOutput,
+  computeIdentityRiskScore,
+  getSmartRemovalQueue,
+  setPrivacyMode,
+  generateExecutiveComplianceTemplate,
+  updateMonitoringThresholds,
+  updateBrokerPerformanceMetrics,
+  getBrokerVerificationRequirements,
+  getBrokerTosRiskFlags,
+  computeExposureLikelihood,
 } from "./dataBrokerService";
 
 // URL reputation checking schemas with validation
@@ -3150,6 +3160,90 @@ EDGE CASE HANDLING
       res.json(metrics);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to fetch broker metrics" });
+    }
+  });
+
+  // ============================================
+  // PRIVACY AUTOMATION AI ENDPOINTS
+  // ============================================
+
+  app.get("/api/data-removal/automation/:scanId", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const result = await getAutomationOutput(req.params.scanId, req.user.id);
+      res.json(result);
+    } catch (error: any) {
+      if (error.message === "Scan not found") return res.status(404).json({ error: "Scan not found" });
+      res.status(500).json({ error: "Failed to generate automation output" });
+    }
+  });
+
+  app.get("/api/data-removal/smart-queue", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const queue = await getSmartRemovalQueue(req.user.id);
+      res.json({ queue, total: queue.length });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to generate smart removal queue" });
+    }
+  });
+
+  app.post("/api/data-removal/privacy-mode", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const { vaultProfileId, mode, frameworks } = req.body;
+      if (!vaultProfileId || !mode) return res.status(400).json({ error: "vaultProfileId and mode are required" });
+      const result = await setPrivacyMode(req.user.id, vaultProfileId, mode, frameworks);
+      res.json(result);
+    } catch (error: any) {
+      if (error.message === "Invalid privacy mode") return res.status(400).json({ error: error.message });
+      res.status(500).json({ error: "Failed to set privacy mode" });
+    }
+  });
+
+  app.post("/api/data-removal/compliance-template", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const { brokerId, vaultProfileId, framework } = req.body;
+      if (!brokerId || !vaultProfileId) return res.status(400).json({ error: "brokerId and vaultProfileId are required" });
+
+      const [broker] = await db.select().from(dataBrokers).where(eq(dataBrokers.id, brokerId));
+      if (!broker) return res.status(404).json({ error: "Broker not found" });
+
+      const [profile] = await db.select().from(userVaultProfiles).where(and(eq(userVaultProfiles.id, vaultProfileId), eq(userVaultProfiles.userId, req.user.id)));
+      if (!profile) return res.status(404).json({ error: "Vault profile not found" });
+
+      const template = generateExecutiveComplianceTemplate(broker, profile, framework || "CCPA");
+      res.json({ template, framework: framework || "CCPA", broker: broker.name });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to generate compliance template" });
+    }
+  });
+
+  app.patch("/api/data-removal/monitoring/:scheduleId/thresholds", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const result = await updateMonitoringThresholds(req.user.id, req.params.scheduleId, req.body);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to update monitoring thresholds" });
+    }
+  });
+
+  app.get("/api/data-removal/brokers/:id/risk-info", standardRateLimit, async (req: Request, res: Response) => {
+    try {
+      const [broker] = await db.select().from(dataBrokers).where(eq(dataBrokers.id, req.params.id as string));
+      if (!broker) return res.status(404).json({ error: "Broker not found" });
+
+      const verificationReqs = getBrokerVerificationRequirements(broker);
+      const tosRisk = getBrokerTosRiskFlags(broker);
+      const exposureLikelihood = computeExposureLikelihood(broker, new Set(["name", "email", "phone", "address"]));
+
+      res.json({
+        broker: broker.name,
+        verificationRequirements: verificationReqs,
+        tosRisk,
+        exposureLikelihood,
+        difficulty: broker.difficulty,
+        estimatedProcessingDays: broker.estimatedProcessingDays,
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch broker risk info" });
     }
   });
 

@@ -53,6 +53,13 @@ import {
   TrendingUp,
   Info,
   CheckCircle,
+  ShieldAlert,
+  Activity,
+  Target,
+  Gauge,
+  Crown,
+  Fingerprint,
+  Bell,
 } from "lucide-react";
 
 interface DataBroker {
@@ -90,6 +97,9 @@ interface VaultProfile {
   dateOfBirth: string | null;
   relativeNames: string[] | null;
   employerNames: string[] | null;
+  privacyMode?: string | null;
+  priorityLevel?: string | null;
+  complianceFrameworks?: string[] | null;
 }
 
 interface ScanResult {
@@ -197,6 +207,224 @@ function formatDate(dateStr: string) {
   });
 }
 
+interface SmartQueueItem {
+  broker: DataBroker;
+  finding: any;
+  priorityScore: number;
+  priorityReason: string;
+  estimatedSuccessRate: number;
+  recommendedMethod: string;
+}
+
+function IdentityRiskScoreCard({ scanId }: { scanId?: string }) {
+  const { isAuthenticated } = useAuth();
+
+  const { data: automationData, isLoading, isError } = useQuery<{
+    scan_id: string;
+    identity_risk_score: number | null;
+    total_brokers: number;
+    total_findings: number;
+    brokers: Array<{
+      broker: string;
+      brokerId: string;
+      domain: string;
+      category: string;
+      opt_out_url: string | null;
+      method: string;
+      verification_needed: string[];
+      removal_eta_days: number;
+      reappearance_risk: string;
+      reappearance_risk_percentage: number;
+      compliance_notes: string;
+      exposure_likelihood: number;
+      tos_risk: { level: string; flags: string[] };
+    }>;
+  }>({
+    queryKey: [`/api/data-removal/automation/${scanId}`],
+    enabled: isAuthenticated && !!scanId,
+  });
+
+  if (!scanId) return null;
+
+  if (isLoading) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+        <Card data-testid="card-identity-risk-score-loading">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Gauge className="h-5 w-5" />
+              Identity Risk Score
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex items-center gap-6">
+            <Skeleton className="w-24 h-24 rounded-full" />
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
+
+  if (isError || !automationData) return null;
+
+  const riskScore = automationData.identity_risk_score ?? 0;
+  const riskColor = riskScore >= 70 ? "text-red-600 dark:text-red-400" : riskScore >= 40 ? "text-orange-600 dark:text-orange-400" : "text-green-600 dark:text-green-400";
+  const riskLabel = riskScore >= 70 ? "High Risk" : riskScore >= 40 ? "Moderate Risk" : "Low Risk";
+  const riskBg = riskScore >= 70 ? "bg-red-500" : riskScore >= 40 ? "bg-orange-500" : "bg-green-500";
+
+  const highRiskBrokers = automationData.brokers.filter(b => b.exposure_likelihood >= 60);
+  const needsIdVerification = automationData.brokers.filter(b => b.verification_needed.some(v => v.includes("photo ID")));
+  const highReappearance = automationData.brokers.filter(b => b.reappearance_risk === "high");
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+      <Card data-testid="card-identity-risk-score">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Gauge className="h-5 w-5" />
+            Identity Risk Score
+          </CardTitle>
+          <CardDescription>Unified risk assessment combining breach data, broker listings, and data sensitivity</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center gap-6">
+            <div className="relative w-24 h-24 flex items-center justify-center">
+              <svg viewBox="0 0 100 100" className="w-24 h-24 -rotate-90">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" strokeWidth="6" className="text-muted/30" />
+                <circle cx="50" cy="50" r="42" fill="none" strokeWidth="6" strokeLinecap="round" className={riskBg} style={{ strokeDasharray: `${(riskScore / 100) * 264} 264`, opacity: 0.9 }} stroke="currentColor" />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className={`text-2xl font-bold ${riskColor}`} data-testid="text-risk-score">{riskScore}</span>
+                <span className="text-xs text-muted-foreground">/100</span>
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className={`text-lg font-semibold ${riskColor}`} data-testid="text-risk-label">{riskLabel}</div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Based on {automationData.total_findings} finding{automationData.total_findings !== 1 ? "s" : ""} across {automationData.total_brokers} broker{automationData.total_brokers !== 1 ? "s" : ""}
+              </p>
+            </div>
+          </div>
+
+          {(highRiskBrokers.length > 0 || needsIdVerification.length > 0 || highReappearance.length > 0) && (
+            <div className="space-y-2">
+              {highRiskBrokers.length > 0 && (
+                <div className="flex items-center gap-2 p-2 rounded-md bg-destructive/10 dark:bg-destructive/20" data-testid="alert-high-risk-brokers">
+                  <Target className="h-4 w-4 text-destructive flex-shrink-0" />
+                  <span className="text-sm">{highRiskBrokers.length} broker{highRiskBrokers.length !== 1 ? "s" : ""} with high exposure likelihood</span>
+                </div>
+              )}
+              {needsIdVerification.length > 0 && (
+                <div className="flex items-center gap-2 p-2 rounded-md bg-muted" data-testid="alert-id-verification">
+                  <Fingerprint className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <span className="text-sm">{needsIdVerification.length} broker{needsIdVerification.length !== 1 ? "s" : ""} require ID verification (review ToS risk flags)</span>
+                </div>
+              )}
+              {highReappearance.length > 0 && (
+                <div className="flex items-center gap-2 p-2 rounded-md bg-muted" data-testid="alert-high-reappearance">
+                  <RefreshCw className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <span className="text-sm">{highReappearance.length} broker{highReappearance.length !== 1 ? "s" : ""} with high re-listing risk</span>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
+function SmartRemovalQueue() {
+  const { isAuthenticated } = useAuth();
+
+  const { data: queueData, isLoading } = useQuery<{ queue: SmartQueueItem[]; total: number }>({
+    queryKey: ["/api/data-removal/smart-queue"],
+    enabled: isAuthenticated,
+  });
+
+  if (!isAuthenticated) return null;
+
+  if (isLoading) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+        <Card data-testid="card-smart-queue-loading">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Smart Removal Queue
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-md bg-muted/50">
+                <Skeleton className="w-8 h-8 rounded-full" />
+                <div className="flex-1 space-y-1">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-56" />
+                </div>
+                <Skeleton className="h-6 w-12" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
+
+  if (!queueData || queueData.total === 0) return null;
+
+  const topItems = queueData.queue.slice(0, 5);
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+      <Card data-testid="card-smart-removal-queue">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            Smart Removal Queue
+          </CardTitle>
+          <CardDescription>AI-prioritized removal recommendations based on risk level, success rate, and automation feasibility</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {topItems.map((item, idx) => (
+              <div key={item.broker.id} className="flex items-center gap-3 p-3 rounded-md bg-muted/50" data-testid={`queue-item-${item.broker.id}`}>
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm flex-shrink-0">
+                  {idx + 1}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-sm truncate">{item.broker.name}</span>
+                    <Badge variant={getRiskVariant(item.broker.riskLevel)}>{item.broker.riskLevel || "medium"}</Badge>
+                    <Badge variant="outline">{item.recommendedMethod}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">{item.priorityReason}</p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <div className="text-sm font-bold">{item.priorityScore}</div>
+                  <div className="text-xs text-muted-foreground">priority</div>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <div className="text-sm">{item.estimatedSuccessRate}%</div>
+                  <div className="text-xs text-muted-foreground">success</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {queueData.total > 5 && (
+            <p className="text-xs text-muted-foreground text-center mt-3">
+              Showing top 5 of {queueData.total} pending removals
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
 function OverviewTab() {
   const { isAuthenticated } = useAuth();
   const { data: dashboardData, isLoading } = useQuery<DashboardStats>({
@@ -206,6 +434,11 @@ function OverviewTab() {
 
   const { data: vaultData } = useQuery<VaultProfile | null>({
     queryKey: ["/api/data-removal/vault"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: scansData } = useQuery<any[]>({
+    queryKey: ["/api/data-removal/scans"],
     enabled: isAuthenticated,
   });
 
@@ -486,6 +719,12 @@ function OverviewTab() {
           </Card>
         </motion.div>
       )}
+
+      {scansData && scansData.length > 0 && (
+        <IdentityRiskScoreCard scanId={scansData[0]?.id} />
+      )}
+
+      <SmartRemovalQueue />
 
       <CompetitiveComparison />
 
@@ -1006,8 +1245,80 @@ function VaultTab() {
         </CardContent>
       </Card>
 
+      {vaultData && <PrivacyModeSection vaultProfileId={vaultData.id} currentMode={vaultData.privacyMode ?? "standard"} />}
+
       <FamilyProfilesSection />
     </motion.div>
+  );
+}
+
+function PrivacyModeSection({ vaultProfileId, currentMode }: { vaultProfileId: string; currentMode: string }) {
+  const { toast } = useToast();
+  const [selectedMode, setSelectedMode] = useState(currentMode);
+
+  const modeMutation = useMutation({
+    mutationFn: async (mode: string) => {
+      const res = await apiRequest("POST", "/api/data-removal/privacy-mode", { vaultProfileId, mode });
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/data-removal/vault"] });
+      toast({ title: "Privacy Mode Updated", description: `Switched to ${data.mode} mode with ${data.frameworks?.join(", ")} compliance.` });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const privacyModes = [
+    { value: "standard", label: "Standard", description: "Basic privacy protection with CCPA compliance", icon: Shield },
+    { value: "executive", label: "Executive", description: "Enhanced protection for high-profile individuals", icon: Crown },
+    { value: "military", label: "Military/Defense", description: "OPSEC-compliant removal with maximum urgency", icon: ShieldAlert },
+    { value: "government", label: "Government", description: "Federal employee protection with Privacy Act compliance", icon: Fingerprint },
+    { value: "high-risk", label: "High Risk", description: "Multi-framework protection for at-risk individuals", icon: Target },
+  ];
+
+  return (
+    <Card data-testid="card-privacy-mode">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Crown className="h-5 w-5" />
+          Privacy Mode
+        </CardTitle>
+        <CardDescription>Select the protection level that matches your needs. Higher modes use stronger legal language and priority processing.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {privacyModes.map((mode) => {
+            const Icon = mode.icon;
+            const isSelected = selectedMode === mode.value;
+            return (
+              <button
+                key={mode.value}
+                data-testid={`button-privacy-mode-${mode.value}`}
+                onClick={() => {
+                  setSelectedMode(mode.value);
+                  modeMutation.mutate(mode.value);
+                }}
+                disabled={modeMutation.isPending}
+                className={`p-3 rounded-md text-left transition-colors border ${
+                  isSelected
+                    ? "border-primary bg-primary/5 dark:bg-primary/10"
+                    : "border-border hover-elevate"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Icon className={`h-4 w-4 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={`text-sm font-medium ${isSelected ? "text-primary" : ""}`}>{mode.label}</span>
+                  {isSelected && <Badge variant="default">Active</Badge>}
+                </div>
+                <p className="text-xs text-muted-foreground">{mode.description}</p>
+              </button>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

@@ -12,6 +12,7 @@ import {
   removalVerifications,
   optOutContent,
   profileDiscoveries,
+  brokerPerformance,
   VALID_STATUS_TRANSITIONS,
   type DataBroker,
   type UserVaultProfile,
@@ -20,6 +21,7 @@ import {
   type RemovalRequest,
   type MonitoringSchedule,
   type PrivacyReport,
+  type BrokerPerformance,
 } from "@shared/schema";
 import { eq, and, ilike, sql, desc, count, gte, lte, inArray } from "drizzle-orm";
 import { searchAllBrokersForProfile, getSearchableAdapters, type ProfileSearchResult, type SearchParams, type SearchStats } from "./brokerAdapters";
@@ -2191,3 +2193,554 @@ class DataBrokerScheduler {
 }
 
 export const dataBrokerScheduler = new DataBrokerScheduler();
+
+// ============================================
+// IDENTITY RISK SCORING
+// ============================================
+
+const DATA_TYPE_SENSITIVITY: Record<string, number> = {
+  "ssn": 10, "social-security": 10, "financial": 9, "bank-account": 9,
+  "credit-card": 9, "password": 8, "medical": 8, "health": 8,
+  "date-of-birth": 7, "driver-license": 7, "passport": 7,
+  "phone": 5, "email": 4, "address": 5, "name": 3,
+  "employer": 4, "education": 3, "relatives": 5, "property-records": 5,
+  "court-records": 6, "criminal-records": 7, "voting-records": 4,
+  "vehicle-records": 4, "income": 7, "age": 3, "photos": 4,
+};
+
+export function computeIdentityRiskScore(params: {
+  breachCount: number;
+  profilesDiscovered: number;
+  activeBrokersFound: number;
+  totalBrokersScanned: number;
+  dataTypesExposed: string[];
+  hasHighSensitivityData: boolean;
+}): number {
+  let score = 0;
+
+  score += Math.min(params.breachCount * 8, 30);
+  score += Math.min(params.profilesDiscovered * 12, 25);
+  score += Math.min(Math.floor(params.activeBrokersFound / 10) * 3, 15);
+
+  const sensitivitySum = params.dataTypesExposed.reduce((sum, dt) => {
+    const key = dt.toLowerCase().replace(/[_\s]+/g, "-");
+    return sum + (DATA_TYPE_SENSITIVITY[key] || 2);
+  }, 0);
+  score += Math.min(Math.floor(sensitivitySum / 3), 20);
+
+  if (params.hasHighSensitivityData) score += 10;
+
+  return Math.min(Math.max(score, 0), 100);
+}
+
+export function computeExposureLikelihood(broker: DataBroker, userDataTypes: Set<string>): number {
+  let score = 0;
+
+  const brokerCollects = broker.dataTypesCollected ?? [];
+  const overlap = brokerCollects.filter((dt) => userDataTypes.has(dt));
+  score += Math.min(overlap.length * 10, 30);
+
+  const riskMap: Record<string, number> = { critical: 25, high: 20, medium: 15, low: 10 };
+  score += riskMap[broker.riskLevel ?? "medium"] || 15;
+
+  const diffMap: Record<string, number> = { hard: 20, medium: 15, easy: 10 };
+  score += diffMap[broker.difficulty ?? "medium"] || 15;
+
+  const visitors = broker.monthlyVisitors ?? "";
+  if (visitors.includes("B") || visitors.includes("billion")) score += 15;
+  else if (visitors.includes("M") || parseInt(visitors) > 1000) score += 10;
+  else score += 5;
+
+  if (broker.category === "people-search" || broker.category === "public-records") score += 10;
+
+  return Math.min(score, 100);
+}
+
+export function computeReappearanceRisk(broker: DataBroker, performance?: BrokerPerformance | null): { risk: string; percentage: number; factors: string[] } {
+  const factors: string[] = [];
+  let riskScore = 0;
+
+  if (broker.category === "people-search" || broker.category === "public-records") {
+    riskScore += 30;
+    factors.push("Public records source — data may be re-ingested from government databases");
+  }
+  if (broker.category === "data-aggregator" || broker.category === "data-aggregator-enrichment") {
+    riskScore += 25;
+    factors.push("Data aggregator — sources data from multiple third parties");
+  }
+  if (broker.relatedBrokers && broker.relatedBrokers.length > 0) {
+    riskScore += 15;
+    factors.push(`Shares data with ${broker.relatedBrokers.length} related broker(s)`);
+  }
+  if (broker.parentCompany) {
+    riskScore += 10;
+    factors.push(`Part of ${broker.parentCompany} — data may be shared across subsidiaries`);
+  }
+
+  if (performance) {
+    if (performance.reappearanceRate && performance.reappearanceRate > 50) {
+      riskScore += 20;
+      factors.push(`Historical reappearance rate: ${performance.reappearanceRate}%`);
+    } else if (performance.reappearanceRate && performance.reappearanceRate > 20) {
+      riskScore += 10;
+      factors.push(`Moderate reappearance rate: ${performance.reappearanceRate}%`);
+    }
+  }
+
+  const percentage = Math.min(riskScore, 100);
+  const risk = percentage >= 60 ? "high" : percentage >= 30 ? "medium" : "low";
+  return { risk, percentage, factors };
+}
+
+export function getBrokerVerificationRequirements(broker: DataBroker): string[] {
+  const reqs: string[] = [];
+  if (broker.requiresIdVerification) reqs.push("Government-issued photo ID");
+  if (broker.requiresAccountCreation) reqs.push("Account creation on broker site");
+  if (broker.optOutMethod === "email") reqs.push("Email from the address being removed");
+  if (broker.optOutMethod === "mail") reqs.push("Physical letter with signature");
+  if (broker.optOutMethod === "phone") reqs.push("Phone call to broker hotline");
+  if (broker.optOutMethod === "web-form") reqs.push("Online form submission");
+  if (broker.verificationMethod === "email-confirmation") reqs.push("Email verification link");
+  if (broker.verificationMethod === "email-reply") reqs.push("Reply to confirmation email");
+  return reqs.length > 0 ? reqs : ["No specific verification required"];
+}
+
+export function getBrokerTosRiskFlags(broker: DataBroker): { level: string; flags: string[] } {
+  const flags: string[] = [];
+  let level = "low";
+
+  if (broker.requiresAccountCreation) {
+    flags.push("Requires account creation — exposes additional data to broker");
+    level = "medium";
+  }
+  if (broker.requiresIdVerification) {
+    flags.push("Requires government ID — identity theft risk if broker is compromised");
+    level = "high";
+  }
+  if (broker.optOutMethod === "mail") {
+    flags.push("Requires physical mail — exposes your mailing address");
+    level = level === "low" ? "medium" : level;
+  }
+  if (broker.difficulty === "hard") {
+    flags.push("Complex removal process — may require multiple attempts");
+    level = level === "low" ? "medium" : level;
+  }
+  if (!broker.optOutUrl && broker.optOutMethod === "web-form") {
+    flags.push("No documented opt-out URL — process may have changed");
+    level = level === "low" ? "medium" : level;
+  }
+
+  return { level, flags: flags.length > 0 ? flags : ["No significant risks identified"] };
+}
+
+// ============================================
+// STRUCTURED AUTOMATION JSON API
+// ============================================
+
+export interface AutomationBrokerEntry {
+  broker: string;
+  brokerId: string;
+  domain: string;
+  category: string;
+  opt_out_url: string | null;
+  method: "manual" | "automated" | "semi-automated" | "email" | "api" | "phone" | "mail";
+  verification_needed: string[];
+  removal_eta_days: number;
+  reappearance_risk: string;
+  reappearance_risk_percentage: number;
+  compliance_notes: string;
+  exposure_likelihood: number;
+  tos_risk: { level: string; flags: string[] };
+  evidence_tier: string;
+  match_score: number | null;
+  profile_url: string | null;
+}
+
+export async function getAutomationOutput(scanId: string, userId: string): Promise<{
+  scan_id: string;
+  identity_risk_score: number | null;
+  total_brokers: number;
+  total_findings: number;
+  brokers: AutomationBrokerEntry[];
+}> {
+  const [scan] = await db.select().from(exposureScans).where(and(eq(exposureScans.id, scanId), eq(exposureScans.userId, userId)));
+  if (!scan) throw new Error("Scan not found");
+
+  const findings = await db.select().from(exposureFindings).where(and(eq(exposureFindings.scanId, scanId), eq(exposureFindings.userId, userId)));
+
+  const brokerIds = Array.from(new Set(findings.map(f => f.brokerId)));
+  const brokers = brokerIds.length > 0
+    ? await db.select().from(dataBrokers).where(inArray(dataBrokers.id, brokerIds))
+    : [];
+  const brokerMap = new Map(brokers.map(b => [b.id, b]));
+
+  const perfRecords = brokerIds.length > 0
+    ? await db.select().from(brokerPerformance).where(inArray(brokerPerformance.brokerId, brokerIds))
+    : [];
+  const perfMap = new Map(perfRecords.map(p => [p.brokerId, p]));
+
+  const discoveries = await db.select().from(profileDiscoveries).where(eq(profileDiscoveries.scanId, scanId));
+  const discoveryMap = new Map(discoveries.map(d => [d.brokerId, d]));
+
+  const automationBrokers: AutomationBrokerEntry[] = findings.map(finding => {
+    const broker = brokerMap.get(finding.brokerId);
+    if (!broker) return null;
+
+    const perf = perfMap.get(broker.id);
+    const discovery = discoveryMap.get(broker.id);
+    const reappearance = computeReappearanceRisk(broker, perf);
+    const userDataTypes = new Set(finding.dataTypesExposed ?? []);
+
+    const methodMap: Record<string, AutomationBrokerEntry["method"]> = {
+      "web-form": "automated", "email": "email", "phone": "phone",
+      "mail": "mail", "api": "api",
+    };
+
+    const complianceNotes = [
+      ...(broker.legalBasis ?? []).map(l => `${l} rights applicable`),
+      broker.estimatedProcessingDays ? `Regulatory deadline: ${broker.estimatedProcessingDays} days` : null,
+      broker.dataRetentionPolicy || null,
+    ].filter(Boolean).join(". ");
+
+    return {
+      broker: broker.name,
+      brokerId: broker.id,
+      domain: broker.domain,
+      category: broker.category,
+      opt_out_url: broker.optOutUrl,
+      method: methodMap[broker.optOutMethod] || "manual",
+      verification_needed: getBrokerVerificationRequirements(broker),
+      removal_eta_days: broker.estimatedProcessingDays ?? 30,
+      reappearance_risk: reappearance.risk,
+      reappearance_risk_percentage: reappearance.percentage,
+      compliance_notes: complianceNotes,
+      exposure_likelihood: computeExposureLikelihood(broker, userDataTypes),
+      tos_risk: getBrokerTosRiskFlags(broker),
+      evidence_tier: finding.verificationMethod ?? "unknown",
+      match_score: discovery?.matchScore ?? null,
+      profile_url: discovery?.profileUrl ?? null,
+    };
+  }).filter(Boolean) as AutomationBrokerEntry[];
+
+  return {
+    scan_id: scanId,
+    identity_risk_score: scan.identityRiskScore,
+    total_brokers: automationBrokers.length,
+    total_findings: findings.length,
+    brokers: automationBrokers,
+  };
+}
+
+// ============================================
+// AI-DRIVEN REMOVAL INTELLIGENCE
+// ============================================
+
+export function fingerPrintBroker(broker: DataBroker): string {
+  const parts: string[] = [];
+
+  const difficultyTier = broker.difficulty === "hard" ? "resistant" : broker.difficulty === "easy" ? "cooperative" : "standard";
+  parts.push(`difficulty:${difficultyTier}`);
+
+  const autoFeas = broker.automationFeasibility ?? "manual";
+  parts.push(`automation:${autoFeas}`);
+
+  parts.push(`method:${broker.optOutMethod}`);
+
+  if (broker.requiresIdVerification) parts.push("id-required");
+  if (broker.requiresAccountCreation) parts.push("account-required");
+
+  const cat = broker.category;
+  if (cat.includes("people-search")) parts.push("type:people-search");
+  else if (cat.includes("marketing")) parts.push("type:marketing");
+  else if (cat.includes("background")) parts.push("type:background-check");
+  else if (cat.includes("financial")) parts.push("type:financial");
+  else parts.push(`type:${cat}`);
+
+  return parts.join("|");
+}
+
+export async function updateBrokerPerformanceMetrics(brokerId: string, outcome: "success" | "failure" | "reappearance", responseDays?: number, failureReason?: string) {
+  const [existing] = await db.select().from(brokerPerformance).where(eq(brokerPerformance.brokerId, brokerId));
+
+  if (!existing) {
+    const [broker] = await db.select().from(dataBrokers).where(eq(dataBrokers.id, brokerId));
+    await db.insert(brokerPerformance).values({
+      brokerId,
+      totalRequests: 1,
+      successfulRemovals: outcome === "success" ? 1 : 0,
+      failedRemovals: outcome === "failure" ? 1 : 0,
+      reappearanceCount: outcome === "reappearance" ? 1 : 0,
+      averageRemovalDays: responseDays ?? null,
+      lastSuccessAt: outcome === "success" ? new Date() : null,
+      lastFailureAt: outcome === "failure" ? new Date() : null,
+      fingerprint: broker ? fingerPrintBroker(broker) : null,
+      bestMethod: broker?.optOutMethod ?? null,
+      commonFailureReasons: failureReason ? [failureReason] : [],
+      avgResponseTimeDays: responseDays ?? null,
+      complianceRate: outcome === "success" ? 100 : 0,
+      reappearanceRate: outcome === "reappearance" ? 100 : 0,
+    });
+    return;
+  }
+
+  const totalReqs = (existing.totalRequests ?? 0) + 1;
+  const successes = (existing.successfulRemovals ?? 0) + (outcome === "success" ? 1 : 0);
+  const failures = (existing.failedRemovals ?? 0) + (outcome === "failure" ? 1 : 0);
+  const reappearances = (existing.reappearanceCount ?? 0) + (outcome === "reappearance" ? 1 : 0);
+
+  const avgDays = responseDays && existing.averageRemovalDays
+    ? Math.round((existing.averageRemovalDays * (totalReqs - 1) + responseDays) / totalReqs)
+    : responseDays ?? existing.averageRemovalDays;
+
+  const compRate = totalReqs > 0 ? Math.round((successes / totalReqs) * 100) : 100;
+  const reappRate = successes > 0 ? Math.round((reappearances / successes) * 100) : 0;
+
+  const failReasons = existing.commonFailureReasons ?? [];
+  if (failureReason && !failReasons.includes(failureReason)) {
+    failReasons.push(failureReason);
+  }
+
+  await db.update(brokerPerformance).set({
+    totalRequests: totalReqs,
+    successfulRemovals: successes,
+    failedRemovals: failures,
+    reappearanceCount: reappearances,
+    averageRemovalDays: avgDays,
+    reappearanceRate: reappRate,
+    complianceRate: compRate,
+    lastSuccessAt: outcome === "success" ? new Date() : existing.lastSuccessAt,
+    lastFailureAt: outcome === "failure" ? new Date() : existing.lastFailureAt,
+    commonFailureReasons: failReasons.slice(0, 10),
+    avgResponseTimeDays: avgDays,
+    updatedAt: new Date(),
+  }).where(eq(brokerPerformance.brokerId, brokerId));
+}
+
+export async function getSmartRemovalQueue(userId: string): Promise<Array<{
+  broker: DataBroker;
+  finding: ExposureFinding;
+  priorityScore: number;
+  priorityReason: string;
+  estimatedSuccessRate: number;
+  recommendedMethod: string;
+}>> {
+  const findings = await db.select().from(exposureFindings).where(eq(exposureFindings.userId, userId));
+  if (findings.length === 0) return [];
+
+  const brokerIds = Array.from(new Set(findings.map(f => f.brokerId)));
+  const brokers = await db.select().from(dataBrokers).where(inArray(dataBrokers.id, brokerIds));
+  const brokerMap = new Map(brokers.map(b => [b.id, b]));
+
+  const existingRequests = await db.select().from(removalRequests).where(eq(removalRequests.userId, userId));
+  const requestedBrokerIds = new Set(existingRequests.map(r => r.brokerId));
+
+  const perfRecords = await db.select().from(brokerPerformance).where(inArray(brokerPerformance.brokerId, brokerIds));
+  const perfMap = new Map(perfRecords.map(p => [p.brokerId, p]));
+
+  const queue = findings
+    .filter(f => !requestedBrokerIds.has(f.brokerId))
+    .map(finding => {
+      const broker = brokerMap.get(finding.brokerId);
+      if (!broker) return null;
+
+      const perf = perfMap.get(broker.id);
+      let priorityScore = 0;
+      const reasons: string[] = [];
+
+      if (finding.verificationMethod === "profile_discovered" || finding.verificationMethod === "breach_confirmed") {
+        priorityScore += 40;
+        reasons.push("Confirmed exposure");
+      } else {
+        priorityScore += 15;
+        reasons.push("Active broker");
+      }
+
+      const riskMap: Record<string, number> = { critical: 30, high: 20, medium: 10, low: 5 };
+      priorityScore += riskMap[broker.riskLevel ?? "medium"] || 10;
+
+      if (broker.automationFeasibility === "full") {
+        priorityScore += 15;
+        reasons.push("Fully automatable");
+      } else if (broker.automationFeasibility === "partial") {
+        priorityScore += 10;
+        reasons.push("Partially automatable");
+      }
+
+      const successRate = perf?.complianceRate ?? (broker.successRate ?? 70);
+      priorityScore += Math.floor(successRate / 10);
+
+      const bestMethod = perf?.bestMethod ?? broker.optOutMethod;
+
+      return {
+        broker,
+        finding,
+        priorityScore: Math.min(priorityScore, 100),
+        priorityReason: reasons.join("; "),
+        estimatedSuccessRate: successRate,
+        recommendedMethod: bestMethod,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => (b?.priorityScore ?? 0) - (a?.priorityScore ?? 0)) as any[];
+
+  return queue;
+}
+
+// ============================================
+// EXECUTIVE / MILITARY / GOV PRIVACY MODE
+// ============================================
+
+export async function setPrivacyMode(userId: string, vaultProfileId: string, mode: string, frameworks?: string[]) {
+  const validModes = ["standard", "executive", "military", "government", "high-risk"];
+  if (!validModes.includes(mode)) throw new Error("Invalid privacy mode");
+
+  const priorityMap: Record<string, string> = {
+    standard: "normal", executive: "high", military: "critical", government: "critical", "high-risk": "high",
+  };
+
+  const defaultFrameworks: Record<string, string[]> = {
+    standard: ["CCPA"],
+    executive: ["CCPA", "GDPR", "CPRA"],
+    military: ["CCPA", "GDPR", "Privacy Act", "OPSEC"],
+    government: ["CCPA", "GDPR", "Privacy Act", "FOIA-exempt"],
+    "high-risk": ["CCPA", "GDPR", "CPRA", "VCDPA"],
+  };
+
+  await db.update(userVaultProfiles).set({
+    privacyMode: mode,
+    priorityLevel: priorityMap[mode],
+    complianceFrameworks: frameworks ?? defaultFrameworks[mode] ?? ["CCPA"],
+    updatedAt: new Date(),
+  }).where(and(eq(userVaultProfiles.id, vaultProfileId), eq(userVaultProfiles.userId, userId)));
+
+  await db.insert(removalAuditLog).values({
+    userId,
+    action: "privacy_mode_changed",
+    entityType: "vault_profile",
+    entityId: vaultProfileId,
+    newState: mode,
+    metadata: { priorityLevel: priorityMap[mode], frameworks: frameworks ?? defaultFrameworks[mode] },
+  });
+
+  return { mode, priorityLevel: priorityMap[mode], frameworks: frameworks ?? defaultFrameworks[mode] };
+}
+
+export function generateExecutiveComplianceTemplate(broker: DataBroker, profile: UserVaultProfile, framework: string): string {
+  const isHighPriority = profile.priorityLevel === "critical" || profile.priorityLevel === "high";
+  const mode = profile.privacyMode ?? "standard";
+
+  let legalCitations = "";
+  let urgencyNote = "";
+  let additionalDemands = "";
+
+  switch (framework) {
+    case "Privacy Act":
+      legalCitations = "the Privacy Act of 1974, 5 U.S.C. § 552a";
+      urgencyNote = "As a government official, I am entitled to heightened privacy protections under federal law.";
+      additionalDemands = "I further request confirmation that no copies of my data are retained in backup systems or shared with third-party partners.";
+      break;
+    case "OPSEC":
+      legalCitations = "Operational Security (OPSEC) requirements and applicable DoD directives";
+      urgencyNote = "The presence of my personal information on public websites poses a direct operational security risk. Immediate removal is critical.";
+      additionalDemands = "I request that my data be permanently purged from all systems, including cached versions, and that my information be added to a permanent suppression list to prevent re-indexing.";
+      break;
+    case "FOIA-exempt":
+      legalCitations = "FOIA Exemption 6 (5 U.S.C. § 552(b)(6)) and applicable privacy statutes";
+      urgencyNote = "My personal information is exempt from public disclosure under federal law.";
+      additionalDemands = "I request permanent suppression of all personal identifiers and confirmation of removal within 72 hours.";
+      break;
+    case "GDPR":
+      legalCitations = "Article 17 of the General Data Protection Regulation (GDPR)";
+      urgencyNote = isHighPriority ? "Given the sensitivity of my position, I request expedited processing of this erasure request." : "";
+      additionalDemands = "I further invoke my right to restriction of processing under Article 18 GDPR pending the erasure of my data.";
+      break;
+    default:
+      legalCitations = "the California Consumer Privacy Act (CCPA), Cal. Civ. Code § 1798.105";
+      urgencyNote = isHighPriority ? "Due to the sensitive nature of my professional role, I request prioritized handling of this request." : "";
+      additionalDemands = "I also request that you not sell or share my personal information with any third parties pursuant to CCPA § 1798.120.";
+  }
+
+  const modeLabel = mode === "military" ? "Military/Defense Personnel" : mode === "government" ? "Government Official" : mode === "executive" ? "Executive" : "Individual";
+
+  return `Subject: ${framework} Data Deletion Request — ${modeLabel} Priority
+
+To the Privacy Officer at ${broker.name},
+
+I am writing to formally request the immediate deletion of all personal information you hold about me, pursuant to ${legalCitations}.
+
+${urgencyNote}
+
+My identifying information:
+- Name: ${profile.fullName || "[Name on file]"}
+${profile.emails?.length ? `- Email(s): ${profile.emails.join(", ")}` : ""}
+${profile.phoneNumbers?.length ? `- Phone(s): ${profile.phoneNumbers.join(", ")}` : ""}
+${profile.currentAddress ? `- Address: ${profile.currentAddress}` : ""}
+
+I request:
+1. Complete deletion of all personal data associated with my identity from your databases.
+2. Removal of my information from all public-facing search results and listings.
+3. Confirmation of deletion in writing within the legally required timeframe.
+${additionalDemands}
+
+Failure to comply within the statutory deadline may result in a formal complaint to the relevant regulatory authority.
+
+Regards,
+${profile.fullName || "[Your Name]"}`;
+}
+
+// ============================================
+// MONITORING ALERT THRESHOLDS & RE-INDEX DETECTION
+// ============================================
+
+export async function updateMonitoringThresholds(userId: string, scheduleId: string, settings: {
+  alertThresholdNewExposures?: number;
+  alertThresholdRiskScore?: number;
+  reindexDetection?: boolean;
+}) {
+  await db.update(monitoringSchedules).set({
+    ...(settings.alertThresholdNewExposures !== undefined && { alertThresholdNewExposures: settings.alertThresholdNewExposures }),
+    ...(settings.alertThresholdRiskScore !== undefined && { alertThresholdRiskScore: settings.alertThresholdRiskScore }),
+    ...(settings.reindexDetection !== undefined && { reindexDetection: settings.reindexDetection }),
+    updatedAt: new Date(),
+  }).where(and(eq(monitoringSchedules.id, scheduleId), eq(monitoringSchedules.userId, userId)));
+
+  return { success: true };
+}
+
+export async function checkReindexDetection(userId: string, currentFindings: number, previousFindings: number, currentRiskScore: number, schedule: MonitoringSchedule): Promise<{
+  triggered: boolean;
+  alerts: string[];
+}> {
+  const alerts: string[] = [];
+  let triggered = false;
+
+  const newExposures = currentFindings - previousFindings;
+  const threshold = schedule.alertThresholdNewExposures ?? 1;
+  if (newExposures >= threshold) {
+    triggered = true;
+    alerts.push(`${newExposures} new exposure(s) detected (threshold: ${threshold})`);
+  }
+
+  const riskThreshold = schedule.alertThresholdRiskScore ?? 70;
+  if (currentRiskScore >= riskThreshold) {
+    triggered = true;
+    alerts.push(`Identity risk score ${currentRiskScore} exceeds threshold of ${riskThreshold}`);
+  }
+
+  if (schedule.reindexDetection && previousFindings > 0 && currentFindings > previousFindings) {
+    const reindexRate = ((currentFindings - previousFindings) / previousFindings) * 100;
+    if (reindexRate > 20) {
+      triggered = true;
+      alerts.push(`Possible re-indexing detected: ${Math.round(reindexRate)}% increase in broker listings`);
+    }
+  }
+
+  if (triggered && schedule.lastRiskScore !== null) {
+    const previousRisk = schedule.lastRiskScore ?? 0;
+    if (currentRiskScore > previousRisk + 15) {
+      alerts.push(`Risk score increased significantly: ${previousRisk} → ${currentRiskScore}`);
+    }
+  }
+
+  return { triggered, alerts };
+}

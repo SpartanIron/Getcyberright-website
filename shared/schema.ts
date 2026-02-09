@@ -694,6 +694,9 @@ export const userVaultProfiles = pgTable("user_vault_profiles", {
   retentionExpiresAt: timestamp("retention_expires_at"),
   lastAccessedAt: timestamp("last_accessed_at"),
   isActive: boolean("is_active").default(true),
+  privacyMode: text("privacy_mode").default("standard"),
+  priorityLevel: text("priority_level").default("normal"),
+  complianceFrameworks: text("compliance_frameworks").array(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -715,6 +718,10 @@ export const exposureScans = pgTable("exposure_scans", {
   totalExposuresFound: integer("total_exposures_found").default(0),
   privacyScore: integer("privacy_score"),
   riskLevel: text("risk_level"),
+  identityRiskScore: integer("identity_risk_score"),
+  breachCount: integer("breach_count").default(0),
+  profilesDiscovered: integer("profiles_discovered").default(0),
+  activeBrokersFound: integer("active_brokers_found").default(0),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -810,6 +817,10 @@ export const monitoringSchedules = pgTable("monitoring_schedules", {
   notifyOnComplianceDeadline: boolean("notify_on_compliance_deadline").default(true),
   monitoringMode: text("monitoring_mode").default("periodic"),
   darkWebMonitoring: boolean("dark_web_monitoring").default(false),
+  alertThresholdNewExposures: integer("alert_threshold_new_exposures").default(1),
+  alertThresholdRiskScore: integer("alert_threshold_risk_score").default(70),
+  reindexDetection: boolean("reindex_detection").default(true),
+  lastRiskScore: integer("last_risk_score"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -975,6 +986,27 @@ export const insertProfileDiscoverySchema = createInsertSchema(profileDiscoverie
   createdAt: true,
 });
 export type InsertProfileDiscovery = z.infer<typeof insertProfileDiscoverySchema>;
+
+export const brokerPerformance = pgTable("broker_performance", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  brokerId: varchar("broker_id").notNull(),
+  totalRequests: integer("total_requests").default(0),
+  successfulRemovals: integer("successful_removals").default(0),
+  failedRemovals: integer("failed_removals").default(0),
+  averageRemovalDays: integer("average_removal_days"),
+  reappearanceCount: integer("reappearance_count").default(0),
+  reappearanceRate: integer("reappearance_rate").default(0),
+  lastSuccessAt: timestamp("last_success_at"),
+  lastFailureAt: timestamp("last_failure_at"),
+  fingerprint: text("fingerprint"),
+  bestMethod: text("best_method"),
+  commonFailureReasons: text("common_failure_reasons").array(),
+  avgResponseTimeDays: integer("avg_response_time_days"),
+  complianceRate: integer("compliance_rate").default(100),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type BrokerPerformance = typeof brokerPerformance.$inferSelect;
 
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],
