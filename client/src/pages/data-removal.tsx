@@ -1871,14 +1871,17 @@ function GuestScanForm() {
       {result && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           {(() => {
+            const confirmedFindings = result.findings.filter(f => f.evidenceTier === "confirmed");
             const profileFindings = result.findings.filter(f => f.evidenceTier === "profile_found");
+            const blockedFindings = result.findings.filter(f => f.evidenceTier === "verified_broker");
+            const exposedCount = confirmedFindings.length + profileFindings.length;
             const profileCount = profileFindings.length;
             return (
               <>
                 <Card>
                   <CardContent className="pt-6 pb-6">
                     <div className="flex items-center gap-4">
-                      {profileCount > 0 ? (
+                      {exposedCount > 0 ? (
                         <div className="h-12 w-12 rounded-md bg-red-100 dark:bg-red-950/40 flex items-center justify-center shrink-0">
                           <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
                         </div>
@@ -1889,23 +1892,60 @@ function GuestScanForm() {
                       )}
                       <div>
                         <p className="text-lg font-semibold" data-testid="text-scan-headline">
-                          {profileCount > 0
-                            ? `Your name was found on ${profileCount} site${profileCount !== 1 ? "s" : ""}`
-                            : "No profiles found"}
+                          {exposedCount > 0
+                            ? `Your data was found on ${exposedCount} site${exposedCount !== 1 ? "s" : ""}`
+                            : "No exposures found"}
                         </p>
                         <p className="text-sm text-muted-foreground" data-testid="text-scan-subline">
-                          {profileCount > 0
-                            ? "You can view each listing and request removal below."
-                            : `We searched ${result.totalBrokersScanned.toLocaleString()} people-search sites and didn't find any public profiles matching your information.`}
+                          {exposedCount > 0
+                            ? `${confirmedFindings.length > 0 ? `${confirmedFindings.length} confirmed breach${confirmedFindings.length !== 1 ? "es" : ""}` : ""}${confirmedFindings.length > 0 && profileCount > 0 ? " and " : ""}${profileCount > 0 ? `${profileCount} profile${profileCount !== 1 ? "s" : ""} found on people-search sites` : ""}. Review and request removal below.`
+                            : `We searched ${result.searchTransparency?.sitesSearched?.toLocaleString() ?? result.totalBrokersScanned.toLocaleString()} people-search sites and didn't find any public profiles matching your information.`}
                         </p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
+                {confirmedFindings.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2 flex-wrap">
+                        <Shield className="h-4 w-4 text-red-500" />
+                        Data Breaches ({confirmedFindings.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {confirmedFindings.map((finding, idx) => (
+                        <div key={`breach-${idx}`} className="p-4 border border-red-200 dark:border-red-900 rounded-md bg-red-50/30 dark:bg-red-950/10" data-testid={`breach-finding-${idx}`}>
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium">{finding.broker.name}</span>
+                              <Badge className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800 no-default-hover-elevate no-default-active-elevate">
+                                Breach Confirmed
+                              </Badge>
+                            </div>
+                          </div>
+                          {finding.breachDetails && (
+                            <div className="mt-2 text-sm text-muted-foreground">
+                              <p>Breach: {finding.breachDetails.breachName} ({finding.breachDetails.breachDate})</p>
+                              <p className="text-xs mt-1">Exposed: {finding.breachDetails.dataClasses.join(", ")}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
                 {profileCount > 0 && (
                   <Card>
-                    <CardContent className="pt-6 space-y-3">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2 flex-wrap">
+                        <User className="h-4 w-4 text-orange-500" />
+                        Public Profiles Found ({profileCount})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
                       {profileFindings.map((finding, idx) => (
                         <div key={idx} className="p-4 border border-red-200 dark:border-red-900 rounded-md bg-red-50/30 dark:bg-red-950/10" data-testid={`profile-finding-${idx}`}>
                           <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -1994,6 +2034,59 @@ function GuestScanForm() {
                           )}
                         </div>
                       ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {blockedFindings.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2 flex-wrap">
+                        <Shield className="h-4 w-4 text-muted-foreground" />
+                        Could Not Verify ({blockedFindings.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        These sites blocked or didn't respond to our automated search. Your data may still be listed.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {blockedFindings.slice(0, 20).map((finding, idx) => (
+                          <Badge key={idx} variant="outline" className="no-default-hover-elevate no-default-active-elevate" data-testid={`blocked-broker-${idx}`}>
+                            {finding.broker.name}
+                          </Badge>
+                        ))}
+                        {blockedFindings.length > 20 && (
+                          <Badge variant="outline" className="no-default-hover-elevate no-default-active-elevate">
+                            +{blockedFindings.length - 20} more
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {result.searchTransparency && (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div>
+                          <p className="text-2xl font-bold" data-testid="text-sites-searched">{result.searchTransparency.sitesSearched}</p>
+                          <p className="text-xs text-muted-foreground">Sites Searched</p>
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-red-600 dark:text-red-400" data-testid="text-profiles-found">{result.searchTransparency.profilesFound}</p>
+                          <p className="text-xs text-muted-foreground">Profiles Found</p>
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-green-600 dark:text-green-400" data-testid="text-not-found">{result.searchTransparency.notFound}</p>
+                          <p className="text-xs text-muted-foreground">Not Found</p>
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-muted-foreground" data-testid="text-blocked">{result.searchTransparency.blocked + result.searchTransparency.failed}</p>
+                          <p className="text-xs text-muted-foreground">Blocked/Failed</p>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 )}

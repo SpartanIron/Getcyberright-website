@@ -778,7 +778,20 @@ export async function runGuestExposureScan(guestData: {
     onProgress,
   );
 
-  const findings = verificationResult.findings.map((match) => ({
+  const personalizedFindings = verificationResult.findings.filter((match) => {
+    if (match.evidenceTier === "confirmed" || match.evidenceTier === "profile_found") {
+      return true;
+    }
+    if (match.evidenceTier === "verified_broker") {
+      if (match.verificationMethod === "search_blocked" || match.verificationMethod === "search_failed") {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  });
+
+  const findings = personalizedFindings.map((match) => ({
     broker: match.broker,
     dataTypesExposed: match.dataTypesExposed,
     exposureLevel: match.exposureLevel,
@@ -793,9 +806,9 @@ export async function runGuestExposureScan(guestData: {
     searchStatus: match.searchStatus ?? null,
   }));
 
-  const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
-  const profileFoundCount = verificationResult.findings.filter(f => f.evidenceTier === "profile_found").length;
-  const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
+  const confirmedCount = personalizedFindings.filter(f => f.evidenceTier === "confirmed").length;
+  const profileFoundCount = personalizedFindings.filter(f => f.evidenceTier === "profile_found").length;
+  const verifiedBrokerCount = personalizedFindings.filter(f => f.evidenceTier === "verified_broker").length;
 
   const ss = verificationResult.searchStats;
   const searchTransparency = ss ? {
