@@ -187,6 +187,7 @@ async function runRealVerification(
   dateOfBirth?: string,
   scanId?: string,
   userId?: string,
+  onProgress?: (phase: string, searched: number, total: number, found: number, currentBroker?: string) => void,
 ): Promise<{ findings: VerifiedFinding[]; brokersChecked: number; profilesFound: number; searchStats: SearchStats | null; breachResults: BreachResult[] }> {
   const findings: VerifiedFinding[] = [];
   let profilesFoundCount = 0;
@@ -194,6 +195,7 @@ async function runRealVerification(
 
   let breachResults: BreachResult[] = [];
   if (emails.length > 0) {
+    if (onProgress) onProgress("breach_check", 0, 0, 0);
     for (const email of emails.slice(0, 3)) {
       const results = await checkHaveIBeenPwned(email);
       breachResults.push(...results);
@@ -229,7 +231,12 @@ async function runRealVerification(
       };
 
       console.log(`[scan] Starting REAL profile discovery for "${firstName} ${lastName}" across ${getSearchableAdapters().length} broker sites`);
-      const searchOutput = await searchAllBrokersForProfile(searchParams);
+      const searchOutput = await searchAllBrokersForProfile(
+        searchParams,
+        75,
+        150,
+        onProgress ? (searched, total, found, currentBroker) => onProgress("scanning", searched, total, found, currentBroker) : undefined,
+      );
       profileSearchResults = searchOutput.results;
       searchStats = searchOutput.stats;
 
@@ -740,7 +747,7 @@ export async function runGuestExposureScan(guestData: {
   emails?: string[];
   phoneNumbers?: string[];
   currentAddress?: string;
-}) {
+}, onProgress?: (phase: string, searched: number, total: number, found: number, currentBroker?: string) => void) {
   const types = new Set<string>();
   if (guestData.fullName) types.add("name");
   if (guestData.currentAddress) types.add("address");
@@ -755,12 +762,20 @@ export async function runGuestExposureScan(guestData: {
 
   console.log(`[scan] Starting verified guest scan - ${allBrokers.length} brokers in catalog`);
 
+  if (onProgress) {
+    onProgress("initializing", 0, allBrokers.length, 0);
+  }
+
   const verificationResult = await runRealVerification(
     allBrokers,
     types,
     guestData.emails ?? [],
     guestData.fullName,
     guestData.currentAddress,
+    undefined,
+    undefined,
+    undefined,
+    onProgress,
   );
 
   const findings = verificationResult.findings.map((match) => ({

@@ -1245,6 +1245,7 @@ export async function searchAllBrokersForProfile(
   params: SearchParams,
   batchSize = 75,
   delayBetweenBatchesMs = 150,
+  onProgress?: (searched: number, total: number, found: number, currentBroker?: string) => void,
 ): Promise<{ results: Map<string, ProfileSearchResult>; stats: SearchStats }> {
   const results = new Map<string, ProfileSearchResult>();
   const searchable = getSearchableAdapters();
@@ -1317,6 +1318,11 @@ export async function searchAllBrokersForProfile(
           stats.brokerStatuses.set(adapter.brokerId, "search_failed");
         }
       }
+    }
+
+    if (onProgress) {
+      const lastBroker = batch[batch.length - 1];
+      onProgress(stats.searched, orderedSearchable.length, stats.found, lastBroker?.brokerName);
     }
 
     const delay = i < coreBrokers.length ? delayBetweenBatchesMs * 2 : delayBetweenBatchesMs;
