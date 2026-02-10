@@ -15,6 +15,7 @@ import { Footer } from "@/components/footer";
 import { SEOHead } from "@/components/seo-head";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
@@ -60,7 +61,32 @@ import {
   Crown,
   Fingerprint,
   Bell,
+  BookOpen,
+  ListChecks,
+  RotateCw,
 } from "lucide-react";
+
+interface WalkthroughStep {
+  stepNumber: number;
+  title: string;
+  description: string;
+  actionType: "navigate" | "click" | "fill_form" | "verify" | "wait" | "confirm";
+  url?: string;
+}
+
+interface WalkthroughData {
+  brokerId: string;
+  brokerName: string;
+  difficulty: "easy" | "medium" | "hard";
+  estimatedMinutes: number;
+  requiresCaptcha: boolean;
+  requiresAccount: boolean;
+  requiresId: boolean;
+  requiresPhone: boolean;
+  optOutUrl: string;
+  steps: WalkthroughStep[];
+  tips: string[];
+}
 
 interface DataBroker {
   id: string;
@@ -1549,10 +1575,73 @@ function FamilyProfilesSection() {
 
 function GuestScanForm() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
   const [guestAddress, setGuestAddress] = useState("");
+  const [walkthroughDialogBrokerId, setWalkthroughDialogBrokerId] = useState<string | null>(null);
+  const [verifyResults, setVerifyResults] = useState<Record<string, "still_listed" | "not_found" | "loading" | "error">>({});
+
+  const { data: walkthroughsData } = useQuery<WalkthroughData[]>({
+    queryKey: ["/api/data-removal/walkthroughs"],
+    staleTime: 1000 * 60 * 30,
+  });
+
+  const walkthroughMap = (walkthroughsData || []).reduce<Record<string, WalkthroughData>>((acc, w) => {
+    acc[w.brokerId] = w;
+    return acc;
+  }, {});
+
+  const selectedWalkthrough = walkthroughDialogBrokerId ? walkthroughMap[walkthroughDialogBrokerId] : null;
+
+  const stepActionIcon = (actionType: string) => {
+    switch (actionType) {
+      case "navigate": return <Globe className="h-4 w-4 flex-shrink-0" />;
+      case "click": return <ExternalLink className="h-4 w-4 flex-shrink-0" />;
+      case "fill_form": return <FileText className="h-4 w-4 flex-shrink-0" />;
+      case "verify": return <Shield className="h-4 w-4 flex-shrink-0" />;
+      case "wait": return <Clock className="h-4 w-4 flex-shrink-0" />;
+      case "confirm": return <CheckCircle className="h-4 w-4 flex-shrink-0" />;
+      default: return <ListChecks className="h-4 w-4 flex-shrink-0" />;
+    }
+  };
+
+  const verifyRemovalMutation = useMutation({
+    mutationFn: async ({ brokerId }: { brokerId: string }) => {
+      const nameParts = guestName.trim().split(/\s+/);
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || "";
+      const addressParts = guestAddress.trim().split(",").map(s => s.trim());
+      const city = addressParts[0] || "";
+      const state = addressParts[1] || "";
+      const res = await apiRequest("POST", "/api/data-removal/verify-removal", {
+        brokerId,
+        firstName,
+        lastName,
+        city,
+        state,
+      });
+      return res.json();
+    },
+    onSuccess: (data: any, variables: { brokerId: string }) => {
+      setVerifyResults(prev => ({
+        ...prev,
+        [variables.brokerId]: data.stillListed ? "still_listed" : "not_found",
+      }));
+    },
+    onError: (_error: Error, variables: { brokerId: string }) => {
+      setVerifyResults(prev => ({
+        ...prev,
+        [variables.brokerId]: "error",
+      }));
+    },
+  });
+
+  const handleVerifyRemoval = (brokerId: string) => {
+    setVerifyResults(prev => ({ ...prev, [brokerId]: "loading" }));
+    verifyRemovalMutation.mutate({ brokerId });
+  };
 
   const guestScanMutation = useMutation({
     mutationFn: async () => {
@@ -1764,6 +1853,17 @@ function GuestScanForm() {
                               })()}
                             </div>
                             <div className="flex items-center gap-2 flex-wrap">
+                              {walkthroughMap[finding.broker.id] && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setWalkthroughDialogBrokerId(finding.broker.id)}
+                                  data-testid={`button-how-to-remove-${idx}`}
+                                >
+                                  <BookOpen className="h-3 w-3 mr-1" />
+                                  How to Remove
+                                </Button>
+                              )}
                               {finding.profileUrl && (
                                 <Button variant="outline" size="sm" asChild>
                                   <a href={finding.profileUrl} target="_blank" rel="noopener noreferrer" data-testid={`link-view-profile-${idx}`}>
@@ -1778,13 +1878,73 @@ function GuestScanForm() {
                                   Request Removal
                                 </a>
                               </Button>
+                              {user && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleVerifyRemoval(finding.broker.id)}
+                                  disabled={verifyResults[finding.broker.id] === "loading"}
+                                  data-testid={`button-verify-removal-${idx}`}
+                                >
+                                  {verifyResults[finding.broker.id] === "loading" ? (
+                                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                  ) : (
+                                    <RotateCw className="h-3 w-3 mr-1" />
+                                  )}
+                                  Verify Removal
+                                </Button>
+                              )}
                             </div>
                           </div>
+                          {verifyResults[finding.broker.id] && verifyResults[finding.broker.id] !== "loading" && (
+                            <div className="mt-2" data-testid={`verify-result-${idx}`}>
+                              {verifyResults[finding.broker.id] === "still_listed" && (
+                                <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                                  <AlertTriangle className="h-3.5 w-3.5" />
+                                  Still listed
+                                </div>
+                              )}
+                              {verifyResults[finding.broker.id] === "not_found" && (
+                                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                                  <CheckCircle className="h-3.5 w-3.5" />
+                                  No longer found
+                                </div>
+                              )}
+                              {verifyResults[finding.broker.id] === "error" && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <AlertTriangle className="h-3.5 w-3.5" />
+                                  Verification failed
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </CardContent>
                   </Card>
                 )}
+
+                <Card data-testid="card-remove-from-google">
+                  <CardContent className="pt-6">
+                    <div className="flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-md bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center shrink-0">
+                        <Search className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <p className="font-semibold" data-testid="text-google-removal-title">Also Remove from Google Search</p>
+                        <p className="text-sm text-muted-foreground" data-testid="text-google-removal-desc">
+                          Even after removing your profiles from broker sites, old listings may still appear in Google search results. Use Google's "Results About You" tool to request removal of search results that contain your personal information.
+                        </p>
+                        <Button variant="outline" size="sm" asChild>
+                          <a href="https://myactivity.google.com/results-about-you" target="_blank" rel="noopener noreferrer" data-testid="link-google-results-about-you">
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Open Results About You
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </>
             );
           })()}
@@ -1803,6 +1963,108 @@ function GuestScanForm() {
           </Card>
         </motion.div>
       )}
+
+      <Dialog open={!!walkthroughDialogBrokerId} onOpenChange={(open) => { if (!open) setWalkthroughDialogBrokerId(null); }}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto" data-testid="dialog-walkthrough">
+          {selectedWalkthrough && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 flex-wrap" data-testid="text-walkthrough-title">
+                  <BookOpen className="h-5 w-5" />
+                  {selectedWalkthrough.brokerName}
+                </DialogTitle>
+                <DialogDescription>Step-by-step removal instructions</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge
+                    className={`no-default-hover-elevate no-default-active-elevate ${
+                      selectedWalkthrough.difficulty === "easy"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 border-green-200 dark:border-green-800"
+                        : selectedWalkthrough.difficulty === "medium"
+                        ? "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800"
+                        : "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800"
+                    }`}
+                    data-testid="badge-walkthrough-difficulty"
+                  >
+                    {selectedWalkthrough.difficulty}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5" />
+                    ~{selectedWalkthrough.estimatedMinutes} min
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
+                  {selectedWalkthrough.requiresCaptcha && (
+                    <span className="flex items-center gap-1" data-testid="text-requires-captcha">
+                      <Shield className="h-3 w-3" /> CAPTCHA
+                    </span>
+                  )}
+                  {selectedWalkthrough.requiresAccount && (
+                    <span className="flex items-center gap-1" data-testid="text-requires-account">
+                      <User className="h-3 w-3" /> Account Required
+                    </span>
+                  )}
+                  {selectedWalkthrough.requiresId && (
+                    <span className="flex items-center gap-1" data-testid="text-requires-id">
+                      <Fingerprint className="h-3 w-3" /> ID Required
+                    </span>
+                  )}
+                  {selectedWalkthrough.requiresPhone && (
+                    <span className="flex items-center gap-1" data-testid="text-requires-phone">
+                      <Phone className="h-3 w-3" /> Phone Required
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  {selectedWalkthrough.steps.map((step) => (
+                    <div key={step.stepNumber} className="flex items-start gap-3 p-3 rounded-md bg-muted/50" data-testid={`walkthrough-step-${step.stepNumber}`}>
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary font-bold text-xs flex-shrink-0 mt-0.5">
+                        {step.stepNumber}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          {stepActionIcon(step.actionType)}
+                          <span className="text-sm font-medium">{step.title}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{step.description}</p>
+                        {step.url && (
+                          <a href={step.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline mt-1 inline-block" data-testid={`walkthrough-step-link-${step.stepNumber}`}>
+                            {step.url}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {selectedWalkthrough.tips.length > 0 && (
+                  <div className="p-3 rounded-md bg-muted/50 space-y-2" data-testid="walkthrough-tips">
+                    <p className="text-sm font-medium flex items-center gap-2">
+                      <Info className="h-4 w-4" /> Tips
+                    </p>
+                    <ul className="space-y-1">
+                      {selectedWalkthrough.tips.map((tip, i) => (
+                        <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+                          <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {selectedWalkthrough.optOutUrl && (
+                  <Button variant="outline" size="sm" asChild className="w-full">
+                    <a href={selectedWalkthrough.optOutUrl} target="_blank" rel="noopener noreferrer" data-testid="link-walkthrough-optout">
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      Go to Opt-Out Page
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

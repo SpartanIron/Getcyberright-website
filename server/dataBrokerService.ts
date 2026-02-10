@@ -816,6 +816,35 @@ export async function runGuestExposureScan(guestData: {
   };
 }
 
+export async function scanSingleBroker(
+  brokerId: string,
+  params: { firstName: string; lastName: string; city?: string; state?: string },
+): Promise<{ found: boolean; matchScore: number; profileUrl: string | null }> {
+  const searchParams: SearchParams = {
+    firstName: params.firstName,
+    lastName: params.lastName,
+    city: params.city,
+    state: params.state,
+  };
+
+  const adapters = getSearchableAdapters();
+  const adapter = adapters.find(a => a.brokerId === brokerId);
+  if (!adapter) {
+    return { found: false, matchScore: 0, profileUrl: null };
+  }
+
+  try {
+    const result = await adapter.searchProfile(searchParams);
+    return {
+      found: result.found && result.nameMatch && result.matchScore >= 40,
+      matchScore: result.matchScore,
+      profileUrl: result.profileUrl,
+    };
+  } catch {
+    return { found: false, matchScore: 0, profileUrl: null };
+  }
+}
+
 export async function getUserScanHistory(userId: string) {
   return db
     .select()

@@ -913,6 +913,32 @@ export const insertRemovalVerificationSchema = createInsertSchema(removalVerific
 });
 export type InsertRemovalVerification = z.infer<typeof insertRemovalVerificationSchema>;
 
+export const brokerWalkthroughs = pgTable("broker_walkthroughs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  brokerId: varchar("broker_id").notNull(),
+  brokerName: text("broker_name").notNull(),
+  difficulty: text("difficulty").notNull().default("medium"),
+  estimatedMinutes: integer("estimated_minutes").default(5),
+  requiresCaptcha: boolean("requires_captcha").default(false),
+  requiresAccount: boolean("requires_account").default(false),
+  requiresId: boolean("requires_id").default(false),
+  requiresPhone: boolean("requires_phone").default(false),
+  optOutUrl: text("opt_out_url"),
+  steps: jsonb("steps").notNull(),
+  tips: text("tips").array(),
+  lastVerified: timestamp("last_verified"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type BrokerWalkthrough = typeof brokerWalkthroughs.$inferSelect;
+export const insertBrokerWalkthroughSchema = createInsertSchema(brokerWalkthroughs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertBrokerWalkthrough = z.infer<typeof insertBrokerWalkthroughSchema>;
+
 export const securityAlerts = pgTable("security_alerts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),

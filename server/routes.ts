@@ -3164,6 +3164,45 @@ EDGE CASE HANDLING
     }
   });
 
+  // Broker Walkthroughs
+  app.get("/api/data-removal/walkthroughs", standardRateLimit, async (req: Request, res: Response) => {
+    try {
+      const { brokerWalkthroughs: walkthroughData } = await import("./brokerWalkthroughData");
+      res.json(walkthroughData);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch walkthroughs" });
+    }
+  });
+
+  app.get("/api/data-removal/walkthroughs/:brokerId", standardRateLimit, async (req: Request, res: Response) => {
+    try {
+      const { brokerWalkthroughs: walkthroughData } = await import("./brokerWalkthroughData");
+      const walkthrough = walkthroughData.find(w => w.brokerId === req.params.brokerId);
+      if (!walkthrough) {
+        return res.status(404).json({ error: "Walkthrough not found for this broker" });
+      }
+      res.json(walkthrough);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch walkthrough" });
+    }
+  });
+
+  // Verify removal (re-scan a specific broker to check if profile is still listed)
+  app.post("/api/data-removal/verify-removal", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const { brokerId, firstName, lastName, city, state } = req.body;
+      if (!brokerId || !firstName || !lastName) {
+        return res.status(400).json({ error: "brokerId, firstName, and lastName are required" });
+      }
+      const { scanSingleBroker } = await import("./dataBrokerService");
+      const result = await scanSingleBroker(brokerId, { firstName, lastName, city, state });
+      res.json({ stillListed: result.found, matchScore: result.matchScore, profileUrl: result.profileUrl });
+    } catch (error: any) {
+      console.error("Error verifying removal:", error);
+      res.status(500).json({ error: "Failed to verify removal" });
+    }
+  });
+
   // Broker Metrics
   app.get("/api/data-removal/brokers/:id/metrics", standardRateLimit, async (req: Request, res: Response) => {
     try {
