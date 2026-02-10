@@ -82,7 +82,7 @@ export default function AdminUsers() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      setLocation("/api/login");
+      setLocation("/login");
     }
   }, [authLoading, user, setLocation]);
 

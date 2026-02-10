@@ -25,7 +25,7 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **Framework**: Express 5 on Node.js with TypeScript (ES modules).
 - **API Design**: REST endpoints with robust input validation.
 - **Validation**: Zod schemas shared across frontend and backend.
-- **Authentication**: Custom system with email/password, TOTP MFA, backup codes, session management, email verification, password reset, and Passkeys (WebAuthn) for passwordless authentication. Token versioning for session invalidation on password change.
+- **Authentication**: Custom email/password system with TOTP MFA (Google Authenticator), 10 backup codes, bcrypt hashing (12 rounds), account lockout after 5 failed attempts, IP-based brute force protection, PostgreSQL session store, email verification, OTP-based password reset. Registration auto-activates 14-day Essential trial. Login page at `/login`, register at `/register`. OWASP Top 10 and NIST SP 800-53 compliant.
 - **Build**: esbuild.
 
 ### Data Layer

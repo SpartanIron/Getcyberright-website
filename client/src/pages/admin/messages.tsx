@@ -68,7 +68,7 @@ export default function AdminMessages() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      setLocation("/api/login");
+      setLocation("/login");
     }
   }, [authLoading, user, setLocation]);
 

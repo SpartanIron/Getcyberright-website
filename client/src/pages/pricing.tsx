@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -199,7 +200,7 @@ export default function Pricing() {
 
   const handleSubscribe = async (tierId: string) => {
     if (!isAuthenticated) {
-      window.location.href = '/api/login';
+      window.location.href = '/register';
       return;
     }
 
@@ -387,10 +388,10 @@ export default function Pricing() {
                           </Button>
                         ) : (
                           <Button className="w-full" variant="outline" asChild data-testid="button-get-started-free">
-                            <a href="/api/login">
+                            <Link href="/register">
                               {tier.buttonText}
                               <ArrowRight className="w-4 h-4 ml-2" />
-                            </a>
+                            </Link>
                           </Button>
                         )
                       ) : tier.id === "enterprise" ? (
@@ -432,10 +433,10 @@ export default function Pricing() {
                           asChild
                           data-testid={`button-login-${tier.id}`}
                         >
-                          <a href="/api/login">
+                          <Link href="/register">
                             Start 14-Day Free Trial
                             <ArrowRight className="w-4 h-4 ml-2" />
-                          </a>
+                          </Link>
                         </Button>
                       ) : (
                         <Button 

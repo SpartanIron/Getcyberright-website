@@ -2126,7 +2126,7 @@ function GuestScanForm() {
                 </p>
                 <div className="flex items-center justify-center gap-2 flex-wrap">
                   <Button asChild>
-                    <a href="/api/login" data-testid="link-register-auto-remove">Start Free Trial</a>
+                    <Link href="/register" data-testid="link-register-auto-remove">Start Free Trial</Link>
                   </Button>
                 </div>
               </div>
