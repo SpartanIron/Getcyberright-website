@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -1643,26 +1643,83 @@ function GuestScanForm() {
     verifyRemovalMutation.mutate({ brokerId });
   };
 
-  const guestScanMutation = useMutation({
-    mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/data-removal/guest-scan", {
-        fullName: guestName,
-        emails: guestEmail ? guestEmail.split(",").map((s) => s.trim()).filter(Boolean) : [],
-        phoneNumbers: guestPhone ? guestPhone.split(",").map((s) => s.trim()).filter(Boolean) : [],
-        currentAddress: guestAddress || "",
-      });
-      return res.json();
-    },
-    onSuccess: () => {
-      trackToolUsage("data-broker-guest-scan", true);
-    },
-    onError: (error: Error) => {
-      toast({ title: "Scan Failed", description: error.message, variant: "destructive" });
-      trackToolUsage("data-broker-guest-scan", false, { error: error.message });
-    },
-  });
+  const [guestScanResult, setGuestScanResult] = useState<any>(null);
+  const [guestScanLoading, setGuestScanLoading] = useState(false);
+  const [scanProgress, setScanProgress] = useState<{ phase: string; searched: number; total: number; found: number; currentBroker?: string } | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
-  const result = guestScanMutation.data as {
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    };
+  }, []);
+
+  const startGuestScan = useCallback(() => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+
+    setGuestScanLoading(true);
+    setGuestScanResult(null);
+    setScanProgress({ phase: "initializing", searched: 0, total: 0, found: 0 });
+
+    const params = new URLSearchParams();
+    params.set("fullName", guestName);
+    if (guestEmail) params.set("emails", guestEmail.split(",").map(s => s.trim()).filter(Boolean).join(","));
+    if (guestPhone) params.set("phoneNumbers", guestPhone.split(",").map(s => s.trim()).filter(Boolean).join(","));
+    if (guestAddress) params.set("currentAddress", guestAddress);
+
+    const es = new EventSource(`/api/data-removal/guest-scan-stream?${params.toString()}`);
+    eventSourceRef.current = es;
+
+    es.addEventListener("progress", (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        setScanProgress(data);
+      } catch {}
+    });
+
+    es.addEventListener("complete", (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        setGuestScanResult(data);
+        trackToolUsage("data-broker-guest-scan", true);
+      } catch {}
+      setScanProgress(null);
+      setGuestScanLoading(false);
+      es.close();
+      eventSourceRef.current = null;
+    });
+
+    es.addEventListener("error", (e) => {
+      const msgEvent = e as MessageEvent;
+      let errorMsg = "Scan failed. Please try again.";
+      if (msgEvent.data) {
+        try { errorMsg = JSON.parse(msgEvent.data).error || errorMsg; } catch {}
+      }
+      toast({ title: "Scan Failed", description: errorMsg, variant: "destructive" });
+      trackToolUsage("data-broker-guest-scan", false, { error: errorMsg });
+      setScanProgress(null);
+      setGuestScanLoading(false);
+      es.close();
+      eventSourceRef.current = null;
+    });
+
+    es.onerror = () => {
+      if (es.readyState === EventSource.CLOSED) return;
+      toast({ title: "Scan Failed", description: "Connection lost. Please try again.", variant: "destructive" });
+      setScanProgress(null);
+      setGuestScanLoading(false);
+      es.close();
+      eventSourceRef.current = null;
+    };
+  }, [guestName, guestEmail, guestPhone, guestAddress, toast]);
+
+  const result = guestScanResult as {
     totalBrokersScanned: number;
     totalBrokersInCatalog: number;
     totalExposuresFound: number;
@@ -1765,30 +1822,47 @@ function GuestScanForm() {
             Your information is not stored and is only used for this one-time check.
           </div>
           <Button
-            onClick={() => guestScanMutation.mutate()}
-            disabled={!guestName || guestScanMutation.isPending}
+            onClick={startGuestScan}
+            disabled={!guestName || guestScanLoading}
             data-testid="button-guest-scan"
           >
-            {guestScanMutation.isPending ? (
+            {guestScanLoading ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
               <Search className="h-4 w-4 mr-2" />
             )}
-            {guestScanMutation.isPending ? "Scanning..." : "Search for My Profiles"}
+            {guestScanLoading ? "Scanning..." : "Search for My Profiles"}
           </Button>
 
-          {guestScanMutation.isPending && (
-            <div className="p-4 rounded-md bg-muted/50 space-y-3">
+          {guestScanLoading && scanProgress && (
+            <div className="p-4 rounded-md bg-muted/50 space-y-3" data-testid="scan-progress">
               <div className="flex items-center gap-3">
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                <div>
-                  <p className="text-sm font-medium">Scanning 500+ data broker sites...</p>
-                  <p className="text-xs text-muted-foreground">This typically takes 15-25 seconds. We're checking people-search sites, background check databases, and data aggregators for your information.</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium" data-testid="text-scan-phase">
+                    {scanProgress.phase === "initializing" && "Preparing scan..."}
+                    {scanProgress.phase === "breach_check" && "Checking breach databases..."}
+                    {scanProgress.phase === "scanning" && `Scanning broker sites... ${scanProgress.searched} of ${scanProgress.total}`}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {scanProgress.phase === "scanning" && scanProgress.found > 0
+                      ? `${scanProgress.found} profile${scanProgress.found !== 1 ? "s" : ""} found so far`
+                      : scanProgress.phase === "scanning"
+                        ? scanProgress.currentBroker ? `Checking ${scanProgress.currentBroker}...` : "Searching people-search sites and data aggregators..."
+                        : "This typically takes 15-25 seconds."}
+                  </p>
                 </div>
               </div>
               <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                <div className="bg-primary h-1.5 rounded-full animate-pulse" style={{ width: "60%" }} />
+                <div
+                  className={`bg-primary h-1.5 rounded-full transition-all duration-300 ease-out ${scanProgress.phase !== "scanning" ? "animate-pulse" : ""}`}
+                  style={{ width: scanProgress.total > 0 && scanProgress.phase === "scanning" ? `${Math.max(2, Math.round((scanProgress.searched / scanProgress.total) * 100))}%` : "5%" }}
+                  data-testid="progress-bar-fill"
+                />
               </div>
+              <p className="text-xs text-muted-foreground text-right" data-testid="text-progress-percent">
+                {scanProgress.total > 0 && scanProgress.phase === "scanning" ? `${Math.round((scanProgress.searched / scanProgress.total) * 100)}%` : "Starting..."}
+              </p>
             </div>
           )}
         </CardContent>

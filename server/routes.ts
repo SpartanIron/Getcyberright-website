@@ -2700,6 +2700,52 @@ EDGE CASE HANDLING
     }
   });
 
+  app.get("/api/data-removal/guest-scan-stream", strictRateLimit, async (req: Request, res: Response) => {
+    try {
+      const fullName = req.query.fullName as string;
+      const emails = req.query.emails ? (req.query.emails as string).split(",").filter(Boolean) : [];
+      const phoneNumbers = req.query.phoneNumbers ? (req.query.phoneNumbers as string).split(",").filter(Boolean) : [];
+      const currentAddress = (req.query.currentAddress as string) || "";
+
+      if (!fullName) {
+        return res.status(400).json({ error: "Please provide at least your name" });
+      }
+
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "X-Accel-Buffering": "no",
+      });
+
+      let closed = false;
+      req.on("close", () => { closed = true; });
+
+      const sendEvent = (event: string, data: any) => {
+        if (closed) return;
+        res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+      };
+
+      const result = await runGuestExposureScan(
+        { fullName, emails, phoneNumbers, currentAddress },
+        (phase, searched, total, found, currentBroker) => {
+          sendEvent("progress", { phase, searched, total, found, currentBroker });
+        },
+      );
+
+      sendEvent("complete", result);
+      res.end();
+    } catch (error: any) {
+      console.error("Error running guest scan stream:", error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: error.message || "Failed to run scan" });
+      } else {
+        res.write(`event: error\ndata: ${JSON.stringify({ error: error.message || "Scan failed" })}\n\n`);
+        res.end();
+      }
+    }
+  });
+
   app.post("/api/data-removal/guest-scan", strictRateLimit, async (req: Request, res: Response) => {
     try {
       const { fullName, emails, phoneNumbers, currentAddress } = req.body;
