@@ -85,6 +85,7 @@ import {
   runMonitoringScan,
   sendAutoRemovalRequest,
   bulkAutoRemoval,
+  autoRemoveAllFromScan,
   createVerification,
   completeVerification,
   getUserVerifications,
@@ -2889,7 +2890,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { brokerId, vaultProfileId, findingId } = req.body;
@@ -2933,7 +2934,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/:id/generate", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/:id/generate", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const requestId = req.params.id;
@@ -2949,7 +2950,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/:id/auto-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/:id/auto-send", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const requestId = req.params.id;
@@ -2962,7 +2963,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/bulk-auto-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/bulk-auto-send", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { requestIds } = req.body;
@@ -2982,7 +2983,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/bulk-create-and-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/bulk-create-and-send", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { findings, vaultProfileId } = req.body;
@@ -3034,6 +3035,52 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("Error bulk create-and-send:", error);
       res.status(500).json({ error: error.message || "Failed to process bulk removal requests" });
+    }
+  });
+
+  app.get("/api/data-removal/scans/:scanId/auto-remove-all", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const { scanId } = req.params;
+      const vaultProfileId = req.query.vaultProfileId as string;
+      if (!vaultProfileId) {
+        res.status(400).json({ error: "vaultProfileId query parameter is required" });
+        return;
+      }
+      const ipAddress = req.ip || req.connection?.remoteAddress;
+
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "X-Accel-Buffering": "no",
+      });
+
+      let closed = false;
+      req.on("close", () => { closed = true; });
+
+      const sendEvent = (data: any) => {
+        if (!closed) {
+          res.write(`data: ${JSON.stringify(data)}\n\n`);
+        }
+      };
+
+      await autoRemoveAllFromScan(user.id, scanId, vaultProfileId, ipAddress, (event) => {
+        sendEvent(event);
+      });
+
+      if (!closed) {
+        res.write("data: [DONE]\n\n");
+        res.end();
+      }
+    } catch (error: any) {
+      console.error("Error in auto-remove-all SSE:", error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: error.message || "Failed to process auto-removal" });
+      } else {
+        res.write(`data: ${JSON.stringify({ phase: "error", message: error.message || "Failed to process" })}\n\n`);
+        res.end();
+      }
     }
   });
 

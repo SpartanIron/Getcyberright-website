@@ -2119,12 +2119,16 @@ function GuestScanForm() {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center space-y-3">
+                <Zap className="h-8 w-8 mx-auto text-primary opacity-80" />
+                <p className="font-medium">Want us to remove your data automatically?</p>
                 <p className="text-sm text-muted-foreground">
-                  Create an account to automatically send removal requests, track progress, and get re-scan alerts when your data reappears.
+                  With an Essential plan ($9/mo), we'll automatically send legal removal requests to every broker where your data was found — no manual effort needed.
                 </p>
-                <Button asChild>
-                  <Link href="/register">Create Free Account</Link>
-                </Button>
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                  <Button asChild>
+                    <Link href="/register" data-testid="link-register-auto-remove">Get Started</Link>
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -2236,16 +2240,105 @@ function GuestScanForm() {
   );
 }
 
+interface AutoRemoveProgress {
+  phase: "starting" | "processing" | "complete" | "error";
+  current: number;
+  total: number;
+  brokerName: string;
+  brokerId: string;
+  status: "queued" | "created" | "sent" | "failed" | "manual_required";
+  method?: string;
+  message: string;
+  summary?: { total: number; sent: number; manual: number; failed: number };
+}
+
+interface AutoRemoveResult {
+  brokerName: string;
+  brokerId: string;
+  status: "sent" | "failed" | "manual_required";
+  method?: string;
+  message: string;
+}
+
 function ScanTab() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   const [selectedScanId, setSelectedScanId] = useState<string | null>(null);
   const [selectedFindings, setSelectedFindings] = useState<Set<string>>(new Set());
+  const [autoRemoveOpen, setAutoRemoveOpen] = useState(false);
+  const [autoRemoveRunning, setAutoRemoveRunning] = useState(false);
+  const [autoRemoveProgress, setAutoRemoveProgress] = useState<AutoRemoveProgress | null>(null);
+  const [autoRemoveResults, setAutoRemoveResults] = useState<AutoRemoveResult[]>([]);
+  const autoRemoveRef = useRef<EventSource | null>(null);
+
+  const userTier = (user as any)?.subscriptionTier || "free";
+  const hasAutoRemoveAccess = userTier === "essential" || userTier === "professional" || userTier === "enterprise";
 
   const handleSelectScan = (scanId: string) => {
     setSelectedScanId(scanId);
     setSelectedFindings(new Set());
   };
+
+  const startAutoRemoveAll = useCallback((scanId: string, vaultProfileId: string) => {
+    if (autoRemoveRef.current) {
+      autoRemoveRef.current.close();
+    }
+    setAutoRemoveOpen(true);
+    setAutoRemoveRunning(true);
+    setAutoRemoveProgress(null);
+    setAutoRemoveResults([]);
+
+    const url = `/api/data-removal/scans/${scanId}/auto-remove-all?vaultProfileId=${encodeURIComponent(vaultProfileId)}`;
+    const es = new EventSource(url, { withCredentials: true });
+    autoRemoveRef.current = es;
+
+    es.onmessage = (event) => {
+      if (event.data === "[DONE]") {
+        es.close();
+        autoRemoveRef.current = null;
+        setAutoRemoveRunning(false);
+        queryClient.invalidateQueries({ queryKey: ["/api/data-removal/requests"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/data-removal/findings", scanId] });
+        return;
+      }
+
+      try {
+        const data: AutoRemoveProgress = JSON.parse(event.data);
+        setAutoRemoveProgress(data);
+
+        if (data.phase === "processing" && (data.status === "sent" || data.status === "failed" || data.status === "manual_required")) {
+          setAutoRemoveResults(prev => [...prev, {
+            brokerName: data.brokerName,
+            brokerId: data.brokerId,
+            status: data.status as "sent" | "failed" | "manual_required",
+            method: data.method,
+            message: data.message,
+          }]);
+        }
+
+        if (data.phase === "error") {
+          setAutoRemoveRunning(false);
+          toast({ title: "Auto-Remove Error", description: data.message, variant: "destructive" });
+        }
+      } catch {}
+    };
+
+    es.onerror = () => {
+      es.close();
+      autoRemoveRef.current = null;
+      setAutoRemoveRunning(false);
+    };
+  }, [toast]);
+
+  useEffect(() => {
+    return () => {
+      if (autoRemoveRef.current) {
+        autoRemoveRef.current.close();
+        autoRemoveRef.current = null;
+      }
+    };
+  }, []);
 
   const { data: vaultData } = useQuery<VaultProfile | null>({
     queryKey: ["/api/data-removal/vault"],
@@ -2457,9 +2550,37 @@ function ScanTab() {
                 Scan Findings
               </CardTitle>
               {findings.length > 0 && (
-                <CardDescription>
-                  Select findings to submit removal requests in bulk, or handle them individually.
-                </CardDescription>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <CardDescription>
+                    Select findings to submit removal requests in bulk, or handle them individually.
+                  </CardDescription>
+                  {hasAutoRemoveAccess ? (
+                    <Button
+                      data-testid="button-auto-remove-all"
+                      onClick={() => vaultData?.id && selectedScanId && startAutoRemoveAll(selectedScanId, vaultData.id)}
+                      disabled={autoRemoveRunning || !vaultData?.id}
+                    >
+                      {autoRemoveRunning ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Zap className="h-4 w-4 mr-2" />
+                      )}
+                      Auto-Remove All
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      data-testid="button-upgrade-auto-remove"
+                      onClick={() => toast({
+                        title: "Upgrade Required",
+                        description: "Auto-Remove All is available on Essential plan ($9/mo) and above. Upgrade to automatically send removal requests to all brokers.",
+                      })}
+                    >
+                      <Crown className="h-4 w-4 mr-2" />
+                      Upgrade for Auto-Remove
+                    </Button>
+                  )}
+                </div>
               )}
             </CardHeader>
             <CardContent>
@@ -2666,6 +2787,93 @@ function ScanTab() {
           </CardContent>
         </Card>
       </motion.div>
+
+      <Dialog open={autoRemoveOpen} onOpenChange={(open) => { if (!autoRemoveRunning) setAutoRemoveOpen(open); }}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5" />
+              {autoRemoveProgress?.phase === "complete" ? "Auto-Removal Complete" : "Auto-Removing Your Data"}
+            </DialogTitle>
+            <DialogDescription>
+              {autoRemoveProgress?.phase === "complete"
+                ? "Here's a summary of what was processed."
+                : "Sending removal requests to all brokers where your data was found. This may take a moment."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {autoRemoveProgress && autoRemoveProgress.total > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2 text-sm">
+                  <span className="text-muted-foreground">
+                    {autoRemoveProgress.phase === "complete"
+                      ? `Processed ${autoRemoveProgress.total} broker${autoRemoveProgress.total !== 1 ? "s" : ""}`
+                      : `Processing ${autoRemoveProgress.current} of ${autoRemoveProgress.total}...`}
+                  </span>
+                  <span className="font-medium">{Math.round((autoRemoveProgress.current / autoRemoveProgress.total) * 100)}%</span>
+                </div>
+                <Progress value={(autoRemoveProgress.current / autoRemoveProgress.total) * 100} />
+                {autoRemoveRunning && autoRemoveProgress.brokerName && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    {autoRemoveProgress.message}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {autoRemoveProgress?.summary && (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center p-3 rounded-md bg-green-50 dark:bg-green-950/30">
+                  <div className="text-xl font-bold text-green-700 dark:text-green-400">{autoRemoveProgress.summary.sent}</div>
+                  <p className="text-xs text-green-600 dark:text-green-500">Sent</p>
+                </div>
+                <div className="text-center p-3 rounded-md bg-amber-50 dark:bg-amber-950/30">
+                  <div className="text-xl font-bold text-amber-700 dark:text-amber-400">{autoRemoveProgress.summary.manual}</div>
+                  <p className="text-xs text-amber-600 dark:text-amber-500">Manual</p>
+                </div>
+                <div className="text-center p-3 rounded-md bg-red-50 dark:bg-red-950/30">
+                  <div className="text-xl font-bold text-red-700 dark:text-red-400">{autoRemoveProgress.summary.failed}</div>
+                  <p className="text-xs text-red-600 dark:text-red-500">Failed</p>
+                </div>
+              </div>
+            )}
+
+            {autoRemoveResults.length > 0 && (
+              <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                {autoRemoveResults.map((result, idx) => (
+                  <div key={idx} className="flex items-center gap-2 p-2 rounded-md text-sm">
+                    {result.status === "sent" ? (
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    ) : result.status === "manual_required" ? (
+                      <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                    ) : (
+                      <ShieldAlert className="h-4 w-4 text-red-500 flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <span className="font-medium">{result.brokerName}</span>
+                      {result.method && result.method !== "email" && result.method !== "error" && (
+                        <Badge variant="secondary" className="ml-2">{result.method}</Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {autoRemoveProgress?.phase === "complete" && (
+              <Button
+                data-testid="button-close-auto-remove"
+                className="w-full"
+                onClick={() => setAutoRemoveOpen(false)}
+              >
+                Done
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
