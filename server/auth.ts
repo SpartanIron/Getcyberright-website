@@ -409,6 +409,11 @@ export function registerAuthRoutes(app: Express) {
   // Get current user
   app.get("/api/auth/user", isAuthenticated, async (req, res) => {
     const user = (req as any).user;
+    const { getEffectiveTier: getEffTier, isTrialActive: isTrialAct, getTrialDaysRemaining: getTrialDays } = await import("@shared/models/auth");
+    const effectiveTier = getEffTier(user);
+    const trialActive = isTrialAct(user);
+    const trialDaysRemaining = getTrialDays(user);
+    
     res.json({
       id: user.id,
       email: user.email,
@@ -417,9 +422,15 @@ export function registerAuthRoutes(app: Express) {
       profileImageUrl: user.profileImageUrl,
       mfaEnabled: user.mfaEnabled,
       mustChangePassword: user.mustChangePassword,
-      subscriptionTier: user.subscriptionTier,
+      subscriptionTier: effectiveTier,
       isAdmin: user.isAdmin,
-      emailVerified: user.emailVerified
+      emailVerified: user.emailVerified,
+      trial: {
+        active: trialActive,
+        daysRemaining: trialDaysRemaining,
+        endsAt: user.trialEndsAt,
+        trialTier: user.trialTier || "essential",
+      }
     });
   });
   

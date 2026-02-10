@@ -2122,11 +2122,11 @@ function GuestScanForm() {
                 <Zap className="h-8 w-8 mx-auto text-primary opacity-80" />
                 <p className="font-medium">Want us to remove your data automatically?</p>
                 <p className="text-sm text-muted-foreground">
-                  With an Essential plan ($9/mo), we'll automatically send legal removal requests to every broker where your data was found — no manual effort needed.
+                  Sign up and start a free 14-day trial — we'll automatically send legal removal requests to every broker where your data was found. No credit card needed.
                 </p>
                 <div className="flex items-center justify-center gap-2 flex-wrap">
                   <Button asChild>
-                    <Link href="/register" data-testid="link-register-auto-remove">Get Started</Link>
+                    <a href="/api/login" data-testid="link-register-auto-remove">Start Free Trial</a>
                   </Button>
                 </div>
               </div>
@@ -2568,17 +2568,15 @@ function ScanTab() {
                       Auto-Remove All
                     </Button>
                   ) : (
-                    <Button
-                      variant="outline"
-                      data-testid="button-upgrade-auto-remove"
-                      onClick={() => toast({
-                        title: "Upgrade Required",
-                        description: "Auto-Remove All is available on Essential plan ($9/mo) and above. Upgrade to automatically send removal requests to all brokers.",
-                      })}
-                    >
-                      <Crown className="h-4 w-4 mr-2" />
-                      Upgrade for Auto-Remove
-                    </Button>
+                    <Link href="/pricing">
+                      <Button
+                        variant="outline"
+                        data-testid="button-upgrade-auto-remove"
+                      >
+                        <Zap className="h-4 w-4 mr-2" />
+                        Start Free Trial for Auto-Remove
+                      </Button>
+                    </Link>
                   )}
                 </div>
               )}

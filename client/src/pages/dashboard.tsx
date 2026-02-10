@@ -17,7 +17,9 @@ import {
   Video,
   FileText,
   ArrowRight,
-  Lock
+  Lock,
+  Clock,
+  Zap
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
@@ -91,6 +93,10 @@ export default function Dashboard() {
   }
 
   const userTier = (user as any).subscriptionTier || "free";
+  const userTrial = (user as any)?.trial;
+  const trialActive = userTrial?.active;
+  const trialDaysRemaining = userTrial?.daysRemaining || 0;
+  const trialUsed = !!(userTrial?.endsAt);
   const displayName = user.firstName 
     ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ''}`
     : user.email || "Member";
@@ -128,11 +134,17 @@ export default function Dashboard() {
                       <h1 className="text-2xl font-bold text-foreground">
                         Welcome back, {user.firstName || 'Member'}
                       </h1>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 flex-wrap mt-1">
                         <Badge className={tierBadgeColors[userTier]}>
                           <Crown className="w-3 h-3 mr-1" />
                           {userTier.charAt(0).toUpperCase() + userTier.slice(1)} Plan
                         </Badge>
+                        {trialActive && (
+                          <Badge variant="outline" className="text-primary border-primary/30" data-testid="badge-trial-active">
+                            <Clock className="w-3 h-3 mr-1" />
+                            Trial: {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} left
+                          </Badge>
+                        )}
                         {user.email && (
                           <span className="text-sm text-muted-foreground">{user.email}</span>
                         )}
@@ -140,11 +152,33 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    {userTier === "free" && (
+                    {trialActive ? (
+                      <Link href="/pricing">
+                        <Button variant="outline">
+                          <Clock className="w-4 h-4 mr-2" />
+                          {trialDaysRemaining}d Trial Left — Subscribe
+                        </Button>
+                      </Link>
+                    ) : userTier === "free" && !trialUsed ? (
                       <Link href="/pricing">
                         <Button>
-                          Upgrade Plan
+                          <Zap className="w-4 h-4 mr-2" />
+                          Start Free Trial
                           <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </Link>
+                    ) : userTier === "free" && trialUsed ? (
+                      <Link href="/pricing">
+                        <Button>
+                          <Zap className="w-4 h-4 mr-2" />
+                          Upgrade Plan
+                        </Button>
+                      </Link>
+                    ) : null}
+                    {userTier !== "free" && !trialActive && (
+                      <Link href="/pricing">
+                        <Button variant="outline">
+                          Manage Plan
                         </Button>
                       </Link>
                     )}

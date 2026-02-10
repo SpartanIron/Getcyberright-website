@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, getEffectiveTier, isTrialActive, getTrialDaysRemaining, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -1113,15 +1113,22 @@ EDGE CASE HANDLING
         return res.status(401).json({ error: "Unauthorized" });
       }
       
-      const now = new Date();
-      const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
-      const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
+      const effectiveTier = getEffectiveTier(user);
+      const trialActive = isTrialActive(user);
+      const trialDaysLeft = getTrialDaysRemaining(user);
+      const isSubExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < new Date();
       
       res.json({
         tier: effectiveTier,
         expiresAt: user.subscriptionExpiresAt,
-        isExpired,
-        availableTiers: Object.values(SUBSCRIPTION_TIERS)
+        isExpired: isSubExpired,
+        availableTiers: Object.values(SUBSCRIPTION_TIERS),
+        trial: {
+          active: trialActive,
+          daysRemaining: trialDaysLeft,
+          endsAt: user.trialEndsAt,
+          trialTier: user.trialTier || "essential",
+        }
       });
     } catch (error) {
       console.error("Error fetching subscription status:", error);
@@ -1129,7 +1136,52 @@ EDGE CASE HANDLING
     }
   });
 
-  // Premium content access check middleware using shared tier hierarchy
+  // Start free trial for authenticated users who haven't had one
+  app.post("/api/subscription/start-trial", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      if (user.trialStartedAt) {
+        return res.status(400).json({ error: "Trial already used", trialEndsAt: user.trialEndsAt });
+      }
+      
+      if (user.subscriptionTier && user.subscriptionTier !== "free") {
+        const isSubExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < new Date();
+        if (!isSubExpired) {
+          return res.status(400).json({ error: "Already have an active subscription" });
+        }
+      }
+      
+      const now = new Date();
+      const { FREE_TRIAL_DAYS: trialDays } = await import("@shared/models/auth");
+      const trialEndsAt = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
+      
+      await db.update(users).set({
+        trialStartedAt: now,
+        trialEndsAt,
+        trialTier: "essential",
+        updatedAt: now,
+      }).where(eq(users.id, user.id));
+      
+      res.json({
+        success: true,
+        trial: {
+          active: true,
+          daysRemaining: trialDays,
+          endsAt: trialEndsAt,
+          trialTier: "essential",
+        }
+      });
+    } catch (error) {
+      console.error("Error starting trial:", error);
+      res.status(500).json({ error: "Failed to start trial" });
+    }
+  });
+
+  // Premium content access check middleware using shared tier hierarchy (includes trial support)
   const requireSubscription = (requiredTier: string) => {
     return async (req: any, res: Response, next: Function) => {
       try {
@@ -1138,16 +1190,15 @@ EDGE CASE HANDLING
           return res.status(401).json({ error: "Unauthorized" });
         }
         
-        const now = new Date();
-        const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
-        const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
+        const effectiveTier = getEffectiveTier(user);
         
-        // Use shared tier access helper
         if (!hasTierAccess(effectiveTier, requiredTier)) {
+          const trialActive = isTrialActive(user);
           return res.status(403).json({ 
             error: "Subscription required",
             requiredTier,
-            currentTier: effectiveTier
+            currentTier: effectiveTier,
+            trialExpired: user.trialEndsAt && !trialActive,
           });
         }
         

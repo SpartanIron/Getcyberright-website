@@ -70,7 +70,7 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **Marketing & Growth Features**: Social sharing, embeddable widgets, success stories, referral tracking.
 
 ### Premium Subscription Tiers
-Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers with feature gating.
+Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers with feature gating. **14-Day Free Trial**: All new users receive a 14-day free trial of the Essential tier upon sign-up. Trial status tracked via `trialStartedAt`, `trialEndsAt`, `trialTier` fields in the users table. `getEffectiveTier()` helper determines effective tier considering both paid subscriptions and active trials. Start-trial endpoint: `POST /api/subscription/start-trial`.
 
 ## External Dependencies
 

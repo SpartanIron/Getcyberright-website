@@ -42,6 +42,38 @@ export function hasTierAccess(userTier: string, requiredTier: string): boolean {
   return userRank >= requiredRank;
 }
 
+export const FREE_TRIAL_DAYS = 14;
+
+export function isTrialActive(user: { trialStartedAt?: Date | null; trialEndsAt?: Date | null }): boolean {
+  if (!user.trialEndsAt) return false;
+  return new Date(user.trialEndsAt) > new Date();
+}
+
+export function getTrialDaysRemaining(user: { trialEndsAt?: Date | null }): number {
+  if (!user.trialEndsAt) return 0;
+  const diff = new Date(user.trialEndsAt).getTime() - new Date().getTime();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+export function getEffectiveTier(user: {
+  subscriptionTier?: string | null;
+  subscriptionExpiresAt?: Date | null;
+  trialEndsAt?: Date | null;
+  trialTier?: string | null;
+}): string {
+  const now = new Date();
+  const isSubExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
+  const paidTier = isSubExpired ? "free" : (user.subscriptionTier || "free");
+  
+  if (paidTier !== "free") return paidTier;
+  
+  if (user.trialEndsAt && new Date(user.trialEndsAt) > now) {
+    return user.trialTier || "essential";
+  }
+  
+  return "free";
+}
+
 // User storage table with custom authentication
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -78,6 +110,11 @@ export const users = pgTable("users", {
   subscriptionTier: varchar("subscription_tier").default("free"),
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
   stripeCustomerId: varchar("stripe_customer_id"),
+  
+  // Free trial
+  trialStartedAt: timestamp("trial_started_at"),
+  trialEndsAt: timestamp("trial_ends_at"),
+  trialTier: varchar("trial_tier").default("essential"),
   
   // Admin
   isAdmin: boolean("is_admin").default(false),

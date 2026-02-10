@@ -16,10 +16,12 @@ import {
   ArrowRight,
   Loader2,
   HelpCircle,
-  Zap
+  Zap,
+  Clock,
+  ShieldCheck
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import bannerImage from "@/assets/banners/pricing-banner.png";
@@ -61,22 +63,22 @@ const pricingTiers: PricingTier[] = [
     id: "essential",
     name: "Essential",
     audience: "For individuals and families",
-    description: "Deeper protection with AI-powered analysis and training courses.",
+    description: "Full protection with automated data removal and AI-powered analysis.",
     price: "$9",
     period: "mo",
     icon: Users,
     features: [
       "Everything in Free, plus:",
       "AI Scam Analyzer (detailed threat reports)",
-      "Data broker exposure scan",
+      "Data broker exposure scan (501+ brokers)",
+      "One-click automated data removal",
       "Full Training Academy access",
       "Family safety toolkit",
-      "Monthly security webinars",
       "Email support"
     ],
     highlighted: true,
     buttonText: "Start 14-Day Free Trial",
-    badge: "Best for Families"
+    badge: "Most Popular"
   },
   {
     id: "professional",
@@ -133,12 +135,41 @@ interface StripeProduct {
 export default function Pricing() {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
 
   const { data: stripeData, isLoading: isLoadingProducts } = useQuery<{ products: StripeProduct[] }>({
     queryKey: ['/api/stripe/products'],
     staleTime: 1000 * 60 * 5,
     retry: 2,
+  });
+
+  const userTrial = (user as any)?.trial;
+  const userTier = (user as any)?.subscriptionTier || "free";
+  const trialActive = userTrial?.active;
+  const trialDaysRemaining = userTrial?.daysRemaining || 0;
+  const trialUsed = !!(userTrial?.endsAt);
+
+  const startTrialMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest('POST', '/api/subscription/start-trial');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription/status'] });
+      toast({
+        title: "Trial Activated",
+        description: "Your 14-day free trial of Essential is now active. Enjoy full access to all features!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Could not start trial",
+        description: error.message || "Please try again.",
+        variant: "destructive"
+      });
+    }
   });
 
   const hasStripeProducts = stripeData?.products && stripeData.products.length > 0;
@@ -230,6 +261,71 @@ export default function Pricing() {
           colorVariant="teal"
         />
 
+        {isAuthenticated && !trialUsed && userTier === "free" && (
+          <section className="px-4 sm:px-6 lg:px-8 pt-8" data-testid="section-trial-banner">
+            <div className="max-w-4xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card className="border-primary/30 bg-primary/5">
+                  <CardContent className="p-6 sm:p-8">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <Zap className="w-6 h-6 text-primary" />
+                      </div>
+                      <div className="flex-1 text-center sm:text-left">
+                        <h3 className="text-lg font-semibold text-foreground mb-1" data-testid="text-trial-banner-title">Try Everything Free for 14 Days</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Get full access to data removal, AI analysis, and training. No credit card required. No commitment.
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={() => startTrialMutation.mutate()}
+                        disabled={startTrialMutation.isPending}
+                        data-testid="button-start-trial-banner"
+                      >
+                        {startTrialMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : null}
+                        Start Free Trial
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </section>
+        )}
+
+        {isAuthenticated && trialActive && (
+          <section className="px-4 sm:px-6 lg:px-8 pt-8" data-testid="section-trial-active-banner">
+            <div className="max-w-4xl mx-auto">
+              <Card className="border-primary/30 bg-primary/5">
+                <CardContent className="p-6">
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 text-center sm:text-left">
+                      <p className="text-sm font-semibold text-foreground" data-testid="text-trial-active">
+                        Your free trial is active — {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} remaining
+                      </p>
+                      <p className="text-xs text-muted-foreground">You have full Essential access. Subscribe before your trial ends to keep all features.</p>
+                    </div>
+                    <Button variant="outline" onClick={() => handleSubscribe("essential")} data-testid="button-subscribe-during-trial">
+                      Subscribe Now
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        )}
+
         <section className="py-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <motion.div
@@ -241,7 +337,7 @@ export default function Pricing() {
             >
               <h2 className="text-3xl font-bold text-foreground mb-4" data-testid="text-pricing-heading">Simple, Transparent Pricing</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                No hidden fees. Cancel anytime. All paid plans include a 14-day free trial.
+                No hidden fees. Cancel anytime. Every paid plan comes with a 14-day free trial — no credit card needed.
               </p>
             </motion.div>
 
@@ -287,7 +383,7 @@ export default function Pricing() {
                       {tier.id === "free" ? (
                         isAuthenticated ? (
                           <Button className="w-full" variant="outline" disabled data-testid="button-current-plan">
-                            Current Plan
+                            {userTier === "free" && !trialActive ? "Current Plan" : "Free Tier"}
                           </Button>
                         ) : (
                           <Button className="w-full" variant="outline" asChild data-testid="button-get-started-free">
@@ -301,6 +397,44 @@ export default function Pricing() {
                         <Button className="w-full" variant="outline" asChild data-testid="button-contact-sales">
                           <a href="mailto:sales@getcyberright.com">
                             {tier.buttonText}
+                          </a>
+                        </Button>
+                      ) : isAuthenticated && trialActive && tier.id === "essential" ? (
+                        <Button 
+                          className="w-full" 
+                          variant="default"
+                          onClick={() => handleSubscribe(tier.id)}
+                          disabled={loadingTier === tier.id || isLoadingProducts}
+                          data-testid={`button-subscribe-${tier.id}`}
+                        >
+                          {loadingTier === tier.id && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                          <ShieldCheck className="w-4 h-4 mr-2" />
+                          Subscribe — Trial Active
+                        </Button>
+                      ) : isAuthenticated && !trialUsed && userTier === "free" && tier.id !== "enterprise" ? (
+                        <Button 
+                          className="w-full" 
+                          variant={tier.highlighted ? "default" : "outline"}
+                          onClick={() => startTrialMutation.mutate()}
+                          disabled={startTrialMutation.isPending}
+                          data-testid={`button-start-trial-${tier.id}`}
+                        >
+                          {startTrialMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : null}
+                          Start 14-Day Free Trial
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      ) : !isAuthenticated ? (
+                        <Button 
+                          className="w-full" 
+                          variant={tier.highlighted ? "default" : "outline"}
+                          asChild
+                          data-testid={`button-login-${tier.id}`}
+                        >
+                          <a href="/api/login">
+                            Start 14-Day Free Trial
+                            <ArrowRight className="w-4 h-4 ml-2" />
                           </a>
                         </Button>
                       ) : (
