@@ -1,28 +1,25 @@
-import { Mail, MapPin, Shield } from "lucide-react";
+import { Shield, MapPin } from "lucide-react";
 import { SiLinkedin, SiFacebook, SiYoutube } from "react-icons/si";
 import { Link } from "wouter";
 import logoImage from "@/assets/logo.png";
 
 const footerLinks = {
-  forYou: [
-    { name: "Parents", href: "/parents" },
-    { name: "Kids", href: "/kids" },
-    { name: "Seniors", href: "/seniors" },
-    { name: "Educators", href: "/educators" },
-    { name: "Small Business", href: "/small-business" },
-  ],
   tools: [
-    { name: "Security Scanner", href: "/tools" },
-    { name: "Data Broker Removal", href: "/data-removal" },
-    { name: "Safety Toolkit", href: "/tools?tab=safety-toolkit" },
+    { name: "Scam Checker", href: "/scam-checker" },
+    { name: "Report a Scam", href: "/report-scam" },
+    { name: "Emergency Help", href: "/emergency-help" },
+    { name: "Password Generator", href: "/tools?tab=safety-toolkit" },
+  ],
+  learn: [
     { name: "Training Academy", href: "/training" },
     { name: "Resource Library", href: "/resources" },
+    { name: "For Parents", href: "/parents" },
+    { name: "For Seniors", href: "/seniors" },
+    { name: "For Kids", href: "/kids" },
   ],
   company: [
     { name: "About", href: "/about" },
-    { name: "Events", href: "/events" },
     { name: "Pricing", href: "/pricing" },
-    { name: "Emergency Help", href: "/emergency-help" },
     { name: "Contact", href: "/contact" },
   ],
 };
@@ -44,7 +41,7 @@ export function Footer() {
               <span className="font-semibold text-white">GetCyberRight</span>
             </Link>
             <p className="text-sm leading-relaxed mb-4">
-              Cyber protection resources for families and small businesses.
+              Free scam detection and cybersecurity education for families.
             </p>
             <div className="flex gap-2">
               {socialLinks.map((social) => (
@@ -64,9 +61,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">For You</h4>
+            <h4 className="font-semibold text-white text-sm mb-3">Check & Protect</h4>
             <ul className="space-y-2">
-              {footerLinks.forYou.map((link) => (
+              {footerLinks.tools.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
@@ -81,9 +78,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">Tools & Learning</h4>
+            <h4 className="font-semibold text-white text-sm mb-3">Learn</h4>
             <ul className="space-y-2">
-              {footerLinks.tools.map((link) => (
+              {footerLinks.learn.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
@@ -116,33 +113,26 @@ export function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-slate-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-slate-400">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs text-slate-400">
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3" aria-hidden="true" /> United States
               </span>
               <span className="flex items-center gap-1">
                 <Shield className="w-3 h-3" aria-hidden="true" /> Free Tools Available
               </span>
-              <span>Trusted by families in 50+ countries</span>
             </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
-              <Link href="/support" className="hover:text-white transition-colors">Support</Link>
-              <Link href="/partnerships" className="hover:text-white transition-colors">Partnerships</Link>
-              <Link href="/advertising" className="hover:text-white transition-colors">Advertising</Link>
+            <div className="flex items-center gap-4 text-xs text-slate-500">
+              <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500">
+          <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500">
             <p data-testid="text-copyright">
               &copy; {new Date().getFullYear()} GetCyberRight. All rights reserved.
             </p>
-            <div className="flex items-center gap-4">
-              <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
-              <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
-              <span>Sources: FBI IC3, CISA, INTERPOL, FTC</span>
-            </div>
+            <span>Sources: FBI IC3, CISA, INTERPOL, FTC</span>
           </div>
 
           <div className="mt-4 text-center text-xs text-slate-500">
