@@ -140,14 +140,6 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    {userTier === "free" && (
-                      <Link href="/pricing">
-                        <Button>
-                          Upgrade Plan
-                          <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
-                      </Link>
-                    )}
                     <Button variant="outline" onClick={() => logout()}>
                       <LogOut className="w-4 h-4 mr-2" />
                       Log Out
@@ -221,9 +213,9 @@ export default function Dashboard() {
                   <CardDescription>Manage your profile</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Link href="/pricing">
+                  <Link href="/tools">
                     <Button variant="outline" className="w-full">
-                      Manage Plan
+                      Explore Tools
                       <Settings className="w-4 h-4 ml-2" />
                     </Button>
                   </Link>
@@ -290,11 +282,6 @@ export default function Dashboard() {
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">{resource.description}</p>
-                        {!hasAccess && (
-                          <Link href="/pricing" className="text-sm text-primary hover:underline mt-2 inline-block">
-                            Upgrade to access
-                          </Link>
-                        )}
                       </div>
                     </CardContent>
                   </Card>

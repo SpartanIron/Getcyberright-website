@@ -155,11 +155,11 @@ export default function Terms() {
                     refunds or credits will be issued for partial months.
                   </p>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.5 Price Changes</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.5 Service Changes</h3>
                   <p>
-                    We reserve the right to modify subscription prices. We will provide at least 30 days' 
-                    notice before any price increase takes effect. Your continued use of the Service after 
-                    the price change constitutes acceptance of the new pricing.
+                    All tools and resources on GetCyberRight are provided free of charge. We reserve the right 
+                    to modify or update features as needed, but we will never charge for access to our core 
+                    cybersecurity education tools and resources.
                   </p>
                 </section>
 

@@ -121,7 +121,6 @@ export function AudioDeepfakeDetector() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
-  const [needsUpgrade, setNeedsUpgrade] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -215,7 +214,6 @@ export function AudioDeepfakeDetector() {
     if (!selectedFile) return;
     
     setIsAnalyzing(true);
-    setNeedsUpgrade(false);
     setIsDemoMode(false);
     
     // If not authenticated, run in demo mode
@@ -242,12 +240,6 @@ export function AudioDeepfakeDetector() {
       });
       
       if (!response.ok) {
-        if (response.status === 403) {
-          // User needs to upgrade to Professional tier
-          setNeedsUpgrade(true);
-          setIsAnalyzing(false);
-          return;
-        }
         throw new Error("Analysis failed");
       }
       
@@ -284,7 +276,6 @@ export function AudioDeepfakeDetector() {
     if (!selectedFile) return;
     
     setIsAnalyzing(true);
-    setNeedsUpgrade(false);
     await new Promise(resolve => setTimeout(resolve, 2500));
     setIsDemoMode(true);
     const demoResult = generateDemoResults();
@@ -447,41 +438,8 @@ export function AudioDeepfakeDetector() {
                   )}
                 </div>
 
-                {/* Upgrade prompt for non-Professional users */}
-                {needsUpgrade && (
-                  <div className="bg-gradient-to-r from-purple-50 to-primary/5 dark:from-purple-950/30 dark:to-primary/10 border border-purple-200 dark:border-purple-900 rounded-xl p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center flex-shrink-0">
-                        <Crown className="w-6 h-6 text-purple-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-1">Professional Feature</h3>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Voice clone detection requires a Professional subscription for full analysis. 
-                          Upgrade to access AI-powered audio authentication.
-                        </p>
-                        <div className="flex flex-wrap gap-3">
-                          <Link href="/pricing">
-                            <Button data-testid="button-upgrade-professional">
-                              <Crown className="w-4 h-4 mr-2" />
-                              Upgrade to Professional
-                            </Button>
-                          </Link>
-                          <Button 
-                            variant="outline" 
-                            onClick={runDemoAnalysis}
-                            data-testid="button-try-demo"
-                          >
-                            Try Demo Instead
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {/* Non-authenticated users see login prompt */}
-                {!isAuthenticated && !authLoading && !analysisResult && !needsUpgrade && !isAnalyzing && selectedFile && (
+                {!isAuthenticated && !authLoading && !analysisResult && !isAnalyzing && selectedFile && (
                   <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-4">
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                       <div className="flex items-center gap-3">
@@ -502,7 +460,7 @@ export function AudioDeepfakeDetector() {
                   </div>
                 )}
 
-                {!analysisResult && !needsUpgrade && (
+                {!analysisResult && (
                   <Button
                     className="w-full"
                     size="lg"

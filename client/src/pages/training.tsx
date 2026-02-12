@@ -366,8 +366,8 @@ export default function Training() {
                   <Button size="lg" data-testid="button-get-started">
                     Get Started Free
                   </Button>
-                  <Button size="lg" variant="outline" data-testid="button-view-pricing">
-                    View Premium Plans
+                  <Button size="lg" variant="outline" data-testid="button-view-resources">
+                    Browse Resources
                   </Button>
                 </div>
               </CardContent>

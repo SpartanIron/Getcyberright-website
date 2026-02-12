@@ -18,7 +18,7 @@ const differentiators = [
     description: "Every tool, every guide, every course. Free forever. No premium tiers, no trial periods, no credit card required.",
     color: "text-primary",
     bgColor: "bg-primary/10",
-    href: "/pricing",
+    href: "/tools",
   },
   {
     icon: Globe,
@@ -232,8 +232,8 @@ export function ValueProposition() {
                 </Button>
               </Link>
               <Link href="/pricing">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto" data-testid="button-view-pricing">
-                  View Pricing Plans
+                <Button size="lg" variant="outline" className="w-full sm:w-auto" data-testid="button-view-promise">
+                  Our Free Promise
                 </Button>
               </Link>
             </div>
