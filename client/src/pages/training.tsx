@@ -198,6 +198,7 @@ export default function Training() {
         <section className="py-12 sm:py-16">
           <InlinePromoVideo
             src="/videos/promo-training.mp4"
+            poster="/videos/poster-training.png"
             heading="Learn at Your Own Pace"
             description="Structured courses, interactive quizzes, and certificates. All completely free for every family."
             className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"

@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 
 interface InlinePromoVideoProps {
   src: string;
+  poster?: string;
   heading?: string;
   description?: string;
   className?: string;
 }
 
-export function InlinePromoVideo({ src, heading, description, className = "" }: InlinePromoVideoProps) {
+export function InlinePromoVideo({ src, poster, heading, description, className = "" }: InlinePromoVideoProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -54,6 +55,7 @@ export function InlinePromoVideo({ src, heading, description, className = "" }: 
           <video
             ref={videoRef}
             src={src}
+            poster={poster}
             className="w-full h-full object-cover"
             muted={isMuted}
             playsInline

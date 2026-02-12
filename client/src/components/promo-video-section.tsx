@@ -12,11 +12,13 @@ export function PromoVideoSection() {
   const videos = [
     {
       src: "/videos/ai-generated-example-1.mp4",
+      poster: "/videos/poster-mission.png",
       label: "Our Mission",
       description: "See how GetCyberRight protects families from online threats",
     },
     {
       src: "/videos/ai-generated-example-2.mov",
+      poster: "/videos/poster-why-it-matters.png",
       label: "Why It Matters",
       description: "Real families. Real protection. 100% free.",
     },
@@ -91,6 +93,7 @@ export function PromoVideoSection() {
                 ref={videoRef}
                 key={videos[activeVideo].src}
                 src={videos[activeVideo].src}
+                poster={videos[activeVideo].poster}
                 className="w-full h-full object-cover"
                 muted={isMuted}
                 playsInline

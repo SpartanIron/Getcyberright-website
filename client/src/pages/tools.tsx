@@ -182,6 +182,7 @@ export default function Tools() {
         <section className="py-12 sm:py-16">
           <InlinePromoVideo
             src="/videos/promo-tools.mp4"
+            poster="/videos/poster-tools.png"
             heading="See Our Tools in Action"
             description="Watch how GetCyberRight helps families stay safe from scams, phishing, and online threats."
             className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"

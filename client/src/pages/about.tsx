@@ -98,6 +98,7 @@ export default function About() {
 
                 <InlinePromoVideo
                   src="/videos/promo-about.mp4"
+                  poster="/videos/poster-about.png"
                   className="my-8"
                 />
                 
