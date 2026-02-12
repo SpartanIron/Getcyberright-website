@@ -8,11 +8,9 @@ const footerLinks = {
     { name: "Parents", href: "/parents" },
     { name: "Kids", href: "/kids" },
     { name: "Seniors", href: "/seniors" },
-    { name: "Educators", href: "/educators" },
-    { name: "Small Business", href: "/small-business" },
   ],
   tools: [
-    { name: "Security Scanner", href: "/tools" },
+    { name: "Scam Checker", href: "/scam-checker" },
     { name: "Data Broker Removal", href: "/data-removal" },
     { name: "Safety Toolkit", href: "/tools?tab=safety-toolkit" },
     { name: "Training Academy", href: "/training" },
@@ -21,7 +19,6 @@ const footerLinks = {
   company: [
     { name: "About", href: "/about" },
     { name: "Our Promise", href: "/pricing" },
-    { name: "Events", href: "/events" },
     { name: "Emergency Help", href: "/emergency-help" },
     { name: "Contact", href: "/contact" },
   ],

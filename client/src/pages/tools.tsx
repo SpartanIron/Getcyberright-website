@@ -9,24 +9,17 @@ import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { PasswordGenerator } from "@/components/password-generator";
 import { ScamChecker } from "@/components/scam-checker";
-import { BreachChecker } from "@/components/breach-checker";
-import { AdvancedScan } from "@/components/advanced-scan";
-import { FamilyCodeword } from "@/components/family-codeword";
 import { AudioDeepfakeDetector } from "@/components/audio-deepfake-detector";
-import { GamificationBadges } from "@/components/gamification-badges";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { 
   Shield, 
   Search,
   Lock,
-  Database,
   AlertTriangle,
   ArrowRight,
   BookOpen,
   ShieldAlert,
-  Users,
   Radio,
-  Trophy,
   Trash2,
   Wrench,
 } from "lucide-react";
@@ -75,16 +68,13 @@ export default function Tools() {
 
   const [activeCategory, setActiveCategory] = useState(() => {
     if (tabParam === "safety-toolkit") return "safety-toolkit";
-    if (tabParam === "achievements") return "achievements";
     return "security-scanner";
   });
 
-  const [scannerTab, setScannerTab] = useState("scam-checker");
   const [toolkitTab, setToolkitTab] = useState("password");
 
   useEffect(() => {
     if (tabParam === "safety-toolkit") setActiveCategory("safety-toolkit");
-    else if (tabParam === "achievements") setActiveCategory("achievements");
   }, [tabParam]);
 
   return (
@@ -104,7 +94,7 @@ export default function Tools() {
 
         <section className="py-16 sm:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
               <button
                 onClick={() => setActiveCategory("security-scanner")}
                 className={`flex items-center gap-3 p-4 rounded-md border text-left transition-colors ${
@@ -116,7 +106,7 @@ export default function Tools() {
                   <Search className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium text-sm">Security Scanner</p>
+                  <p className="font-medium text-sm">Scam Checker</p>
                   <p className="text-xs text-muted-foreground">Scan URLs, emails, phones & more</p>
                 </div>
               </button>
@@ -151,69 +141,24 @@ export default function Tools() {
                 </div>
                 <div>
                   <p className="font-medium text-sm">Safety Toolkit</p>
-                  <p className="text-xs text-muted-foreground">Passwords, codewords & detectors</p>
-                </div>
-              </button>
-
-              <button
-                onClick={() => setActiveCategory("achievements")}
-                className={`flex items-center gap-3 p-4 rounded-md border text-left transition-colors ${
-                  activeCategory === "achievements" ? "border-primary bg-primary/5" : "hover-elevate"
-                }`}
-                data-testid="category-achievements"
-              >
-                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                </div>
-                <div>
-                  <p className="font-medium text-sm">Rewards</p>
-                  <p className="text-xs text-muted-foreground">Badges & achievements</p>
+                  <p className="text-xs text-muted-foreground">Passwords & voice detector</p>
                 </div>
               </button>
             </div>
 
             {activeCategory === "security-scanner" && (
               <div className="max-w-4xl mx-auto">
-                <Tabs value={scannerTab} onValueChange={setScannerTab}>
-                  <TabsList className="grid w-full grid-cols-3 mb-6" data-testid="tabs-security-scanner">
-                    <TabsTrigger value="scam-checker" className="gap-1.5" data-testid="tab-scam-checker">
-                      <Search className="w-4 h-4" />
-                      <span className="text-sm">Scam Checker</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="advanced" className="gap-1.5" data-testid="tab-advanced">
-                      <ShieldAlert className="w-4 h-4" />
-                      <span className="text-sm">Advanced Scan</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="breach" className="gap-1.5" data-testid="tab-breach">
-                      <Database className="w-4 h-4" />
-                      <span className="text-sm">Breach Check</span>
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="scam-checker">
-                    <ScamChecker />
-                  </TabsContent>
-                  <TabsContent value="advanced">
-                    <AdvancedScan />
-                  </TabsContent>
-                  <TabsContent value="breach">
-                    <BreachChecker />
-                  </TabsContent>
-                </Tabs>
+                <ScamChecker />
               </div>
             )}
 
             {activeCategory === "safety-toolkit" && (
               <div className="max-w-4xl mx-auto">
                 <Tabs value={toolkitTab} onValueChange={setToolkitTab}>
-                  <TabsList className="grid w-full grid-cols-3 mb-6" data-testid="tabs-safety-toolkit">
+                  <TabsList className="grid w-full grid-cols-2 mb-6" data-testid="tabs-safety-toolkit">
                     <TabsTrigger value="password" className="gap-1.5" data-testid="tab-password">
                       <Lock className="w-4 h-4" />
                       <span className="text-sm">Password Generator</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="codeword" className="gap-1.5" data-testid="tab-codeword">
-                      <Users className="w-4 h-4" />
-                      <span className="text-sm">Family Codeword</span>
                     </TabsTrigger>
                     <TabsTrigger value="voice-clone" className="gap-1.5" data-testid="tab-voice-clone">
                       <Radio className="w-4 h-4" />
@@ -224,19 +169,10 @@ export default function Tools() {
                   <TabsContent value="password">
                     <PasswordGenerator />
                   </TabsContent>
-                  <TabsContent value="codeword">
-                    <FamilyCodeword />
-                  </TabsContent>
                   <TabsContent value="voice-clone">
                     <AudioDeepfakeDetector />
                   </TabsContent>
                 </Tabs>
-              </div>
-            )}
-
-            {activeCategory === "achievements" && (
-              <div className="max-w-4xl mx-auto">
-                <GamificationBadges />
               </div>
             )}
           </div>

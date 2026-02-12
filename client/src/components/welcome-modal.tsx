@@ -51,9 +51,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
     },
     {
       icon: Lock,
-      title: "Protect my family's emails",
-      description: "Check for data breaches and get alerts when exposed",
-      path: "#breach-checker",
+      title: "Remove my data from brokers",
+      description: "Find and remove your personal info from 500+ data broker sites",
+      path: "/data-removal",
       color: "from-red-500 to-orange-500",
       bgColor: "bg-red-500/10 hover:bg-red-500/20",
     },

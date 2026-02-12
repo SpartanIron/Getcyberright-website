@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, Users, Heart, Briefcase, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Brain, Trash2, BookOpen, ClipboardCheck, Radio } from "lucide-react";
+import { Menu, Shield, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -18,14 +18,12 @@ const whoWeHelp = [
   { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/parents", icon: Users, featured: true, color: "text-blue-500", trainingHref: "/training/parents" },
   { title: "Kids Safety Hub", description: "Fun, interactive lessons for ages 8 to 16", href: "/kids", icon: Sparkles, featured: true, color: "text-purple-500", trainingHref: "/training/kids" },
   { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/seniors", icon: Heart, featured: true, color: "text-rose-500", trainingHref: "/training/seniors" },
-  { title: "Educators Hub", description: "Classroom resources for teaching digital citizenship", href: "/educators", icon: GraduationCap, featured: true, color: "text-emerald-500", trainingHref: "/training/educators" },
-  { title: "Small Business", description: "Enterprise-grade protection made accessible", href: "/small-business", icon: Briefcase, featured: true, color: "text-amber-500", trainingHref: "/training/business" },
 ];
 
 const toolsNav = [
   { title: "Security Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
   { title: "Data Broker Removal", description: "Remove your info from 500+ data brokers", href: "/data-removal", icon: Trash2 },
-  { title: "Safety Toolkit", description: "Password generator, family codewords & voice detector", href: "/tools?tab=safety-toolkit", icon: Shield },
+  { title: "Safety Toolkit", description: "Password generator & voice detector", href: "/tools?tab=safety-toolkit", icon: Shield },
 ];
 
 const learnItems = [
@@ -38,7 +36,6 @@ const learnTopics = [
   { title: "Phishing & Email Scams", href: "/resources?category=phishing", icon: AlertTriangle },
   { title: "Online Privacy", href: "/resources?category=privacy", icon: Lock },
   { title: "Password Security", href: "/resources?category=passwords", icon: Shield },
-  { title: "AI & Cyber Safety", href: "/ai-safety", icon: Brain },
 ];
 
 export function Navigation() {

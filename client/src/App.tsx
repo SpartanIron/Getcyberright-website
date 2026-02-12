@@ -27,20 +27,13 @@ const EmergencyHelp = lazy(() => import("@/pages/emergency-help"));
 const Kids = lazy(() => import("@/pages/kids"));
 const Seniors = lazy(() => import("@/pages/seniors"));
 const Parents = lazy(() => import("@/pages/parents"));
-const Educators = lazy(() => import("@/pages/educators"));
-const SmallBusiness = lazy(() => import("@/pages/small-business"));
 const Support = lazy(() => import("@/pages/support"));
-const Partnerships = lazy(() => import("@/pages/partnerships"));
-const Advertising = lazy(() => import("@/pages/advertising"));
 const Security = lazy(() => import("@/pages/security"));
-const Events = lazy(() => import("@/pages/events"));
 const Pricing = lazy(() => import("@/pages/pricing"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
-const CheckoutSuccess = lazy(() => import("@/pages/checkout-success"));
 const ThreatTrendsPage = lazy(() => import("@/pages/threat-trends"));
 const ReportScam = lazy(() => import("@/pages/report-scam"));
 const Checklists = lazy(() => import("@/pages/checklists"));
-const AISafety = lazy(() => import("@/pages/ai-safety"));
 const Training = lazy(() => import("@/pages/training"));
 const TrainingAudience = lazy(() => import("@/pages/training-audience"));
 const TrainingPath = lazy(() => import("@/pages/training-path"));
@@ -106,27 +99,18 @@ function Router() {
         <Route path="/seniors" component={Seniors} />
         <Route path="/parents" component={Parents} />
         <Route path="/parents/child-safety-scanner" component={ChildSafetyScanner} />
-        <Route path="/educators" component={Educators} />
-        <Route path="/small-business" component={SmallBusiness} />
         <Route path="/support" component={Support} />
-        <Route path="/partnerships" component={Partnerships} />
-        <Route path="/advertising" component={Advertising} />
         <Route path="/security" component={Security} />
-        <Route path="/events" component={Events} />
         <Route path="/pricing" component={Pricing} />
         <Route path="/dashboard" component={Dashboard} />
-        <Route path="/checkout/success" component={CheckoutSuccess} />
         <Route path="/threat-trends" component={ThreatTrendsPage} />
         <Route path="/report-scam" component={ReportScam} />
         <Route path="/checklists" component={Checklists} />
-        <Route path="/ai-safety" component={AISafety} />
         <Route path="/data-removal" component={DataRemoval} />
         <Route path="/training" component={Training} />
         <Route path="/training/kids" component={TrainingAudience} />
         <Route path="/training/parents" component={TrainingAudience} />
         <Route path="/training/seniors" component={TrainingAudience} />
-        <Route path="/training/educators" component={TrainingAudience} />
-        <Route path="/training/business" component={TrainingAudience} />
         <Route path="/training/:pathId" component={TrainingPath} />
         <Route path="/training/lesson/:lessonId" component={TrainingLesson} />
         <Route path="/training/quiz/:quizId" component={TrainingQuiz} />

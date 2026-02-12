@@ -71,7 +71,6 @@ export function Header() {
   const navigation: Array<{ nameKey: string; href: string; icon?: React.ReactNode; dropdown?: Array<{ nameKey: string; href: string; icon?: React.ReactNode }> }> = [
     { nameKey: "nav.tools", href: "/tools", dropdown: [
       { nameKey: "nav.scamChecker", href: "/scam-checker", icon: <ShieldCheck className="h-4 w-4" /> },
-      { nameKey: "nav.breachChecker", href: "/#breach-checker", icon: <Search className="h-4 w-4" /> },
       { nameKey: "nav.passwordGenerator", href: "/password-generator", icon: <Key className="h-4 w-4" /> },
       { nameKey: "nav.threatTrends", href: "/threat-trends", icon: <TrendingUp className="h-4 w-4" /> },
     ]},

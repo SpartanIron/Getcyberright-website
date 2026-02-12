@@ -589,9 +589,8 @@ ${regionNote}Our Emergency Help page has more detailed guidance, and you can als
 **Free Tools Available:**
 • **Scam Checker:** Analyze suspicious emails, URLs, and messages
 • **Password Generator:** Create strong, secure passwords instantly
-• **Family Codeword Generator:** Protect against impersonation scams
-• **Security Scanner:** Check websites for threats before visiting
-• **Printable Checklists:** Step by step security guides for your family
+• **Voice Detector:** Check audio for AI-generated deepfakes
+• **Data Broker Removal:** Remove your info from 500+ data brokers
 
 Explore all our tools at /tools
 
