@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { SEOHead } from "@/components/seo-head";
 import bannerImage from "@/assets/banners/training-banner.png";
 import { Button } from "@/components/ui/button";
@@ -193,6 +194,15 @@ export default function Training() {
             </div>
           </section>
         )}
+
+        <section className="py-12 sm:py-16">
+          <InlinePromoVideo
+            src="/videos/promo-training.mp4"
+            heading="Learn at Your Own Pace"
+            description="Structured courses, interactive quizzes, and certificates — all completely free for every family."
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+          />
+        </section>
 
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

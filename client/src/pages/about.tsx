@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
+import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
@@ -94,6 +95,11 @@ export default function About() {
                 <p className="text-foreground font-semibold text-xl">
                   That's why we built GetCyberRight.
                 </p>
+
+                <InlinePromoVideo
+                  src="/videos/promo-about.mp4"
+                  className="my-8"
+                />
                 
                 <p>
                   We set out to create straightforward tools that anyone can 

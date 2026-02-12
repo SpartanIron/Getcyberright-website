@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
+import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { PasswordGenerator } from "@/components/password-generator";
 import { ScamChecker } from "@/components/scam-checker";
 import { AudioDeepfakeDetector } from "@/components/audio-deepfake-detector";
@@ -176,6 +177,15 @@ export default function Tools() {
               </div>
             )}
           </div>
+        </section>
+
+        <section className="py-12 sm:py-16">
+          <InlinePromoVideo
+            src="/videos/promo-tools.mp4"
+            heading="See Our Tools in Action"
+            description="Watch how GetCyberRight helps families stay safe from scams, phishing, and online threats."
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+          />
         </section>
 
         <section className="py-16 sm:py-20">
