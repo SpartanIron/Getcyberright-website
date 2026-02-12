@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -125,14 +127,7 @@ export function AudioDeepfakeDetector() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Check if user is authenticated
-  const { data: authData, isLoading: authLoading } = useQuery<{ user: any }>({
-    queryKey: ["/api/auth/user"],
-    retry: false,
-  });
-  
-  const isAuthenticated = !!authData?.user;
-  const userTier = authData?.user?.subscriptionTier || "free";
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const handleFileSelect = useCallback((file: File) => {
     if (file.type.startsWith("audio/") || file.name.endsWith(".mp3") || file.name.endsWith(".wav") || file.name.endsWith(".m4a")) {
@@ -572,6 +567,12 @@ export function AudioDeepfakeDetector() {
                     >
                       Analyze Another File
                     </Button>
+
+                    <SignupEncouragementBanner
+                      toolName="deepfake-detector"
+                      show={!!analysisResult}
+                      contextMessage="Track your voice analysis history?"
+                    />
                   </div>
                 )}
               </div>

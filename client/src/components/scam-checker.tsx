@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trackToolUsage } from "@/lib/analytics";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -2319,6 +2320,12 @@ export function ScamChecker() {
             </Card>
           </div>
         )}
+
+        <SignupEncouragementBanner
+          toolName="scam-checker"
+          show={!!(result || aiResult || headerResult)}
+          contextMessage="Save this scan to your history?"
+        />
 
         <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
           <Info className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />

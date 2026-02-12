@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { trackToolUsage } from "@/lib/analytics";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -422,6 +423,12 @@ export function PasswordGenerator() {
             </div>
           </div>
         )}
+
+        <SignupEncouragementBanner
+          toolName="password-generator"
+          show={copied}
+          contextMessage="Like this tool? There's more for free."
+        />
 
         <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-900">
           <Shield className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
