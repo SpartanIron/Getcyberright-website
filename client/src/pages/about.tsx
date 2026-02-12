@@ -13,8 +13,8 @@ import familySecurityImage from "@/assets/images/about-family-security.jpg";
 import seniorsLearningImage from "@/assets/images/professional-black-woman.png";
 
 const stats = [
-  { value: "Global", label: "Reach" },
-  { value: "Free", label: "Core Tools" },
+  { value: "100%", label: "Free Forever" },
+  { value: "Global", label: "Family Reach" },
   { value: "24/7", label: "Access Available" },
   { value: "0", label: "Technical Jargon" }
 ];
@@ -28,7 +28,7 @@ export default function About() {
       <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Our Story: Why We Built GetCyberRight"
-          subtitle="Making cybersecurity accessible, practical, and people-centered. Everyone deserves protection they can understand and trust."
+          subtitle="Free cybersecurity tools built by a family, for families. Every parent, every grandparent, every child deserves protection they can understand and trust."
           imageSrc={bannerImage}
           imageAlt="Diverse GetCyberRight team with African woman leader in the center, all wearing branded red shirts in a modern office"
           imagePosition="left"
@@ -124,10 +124,11 @@ export default function About() {
                 </div>
                 
                 <p className="text-lg font-medium text-foreground">
-                  Today, GetCyberRight serves families and small businesses around 
-                  the world. From grandparents targeted by phone scams to 
-                  entrepreneurs protecting customer data, we are here to help. Start 
-                  with our Scam Checker tool, or explore resources designed for you.
+                  Today, GetCyberRight serves families around the world. From 
+                  grandparents targeted by phone scams to parents keeping kids safe 
+                  online, we are here to help. Every tool is free because we believe 
+                  no family should have to pay to feel safe. Start with our Scam 
+                  Checker, or explore resources designed for you.
                 </p>
               </div>
             </motion.div>
@@ -174,28 +175,21 @@ export default function About() {
               <Card>
                 <CardContent className="p-8">
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    GetCyberRight is supported by carefully selected advertising partners, 
-                    corporate partnerships, and premium subscriptions. This sustainable 
-                    business model allows us to keep our core tools and educational 
-                    resources accessible to everyone who needs them.
+                    Every tool, every guide, and every course on GetCyberRight is completely 
+                    free. No premium tiers, no hidden fees, no paywalls. We believe 
+                    cybersecurity should be accessible to every family, regardless of their 
+                    budget.
                   </p>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    We only work with advertisers whose products genuinely help protect 
-                    users. We never use fear-based marketing, and we are transparent 
-                    about sponsored content. Your trust is more important than any 
-                    advertising revenue.
+                    We are supported by community contributions and carefully selected 
+                    partners who share our mission. We never sell your data, we never use 
+                    fear-based marketing, and we are fully transparent about how we operate. 
+                    Your trust is everything to us.
                   </p>
                   <p className="text-muted-foreground leading-relaxed">
-                    If you are interested in partnering with us or advertising on our 
-                    platform, please visit our{" "}
-                    <Link href="/partnerships" className="text-primary hover:underline">
-                      Partnerships
-                    </Link>{" "}
-                    or{" "}
-                    <Link href="/advertising" className="text-primary hover:underline">
-                      Advertising
-                    </Link>{" "}
-                    pages.
+                    If you find our tools helpful, the best way to support us is to share 
+                    GetCyberRight with someone who needs it. A parent, a grandparent, a 
+                    neighbor. That is how we grow, one family at a time.
                   </p>
                 </CardContent>
               </Card>
@@ -213,10 +207,10 @@ export default function About() {
               className="text-center"
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Ready to Get Started?
+                Start Protecting Your Family Today
               </h2>
               <p className="text-white/80 max-w-2xl mx-auto mb-8">
-                Explore our tools and resources designed for your family and business.
+                Every tool is free. No account required for most. Just pick a tool and go.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/tools">

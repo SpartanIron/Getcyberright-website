@@ -3,21 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { hasTierAccess, SUBSCRIPTION_TIERS } from "@shared/schema";
 import { 
   Bell, 
   BellOff, 
   Shield, 
   AlertTriangle, 
   TrendingUp,
-  Crown,
   CheckCircle2,
   XCircle
 } from "lucide-react";
-import { Link } from "wouter";
 
 interface NotificationPreferences {
   threatAlerts: boolean;
@@ -39,8 +35,6 @@ export function NotificationSettings() {
     scamWarnings: true,
     securityTips: false,
   });
-
-  const isPremiumUser = user && hasTierAccess(user.subscriptionTier || "free", SUBSCRIPTION_TIERS.ESSENTIAL);
 
   useEffect(() => {
     setIsSupported("Notification" in window);
@@ -108,43 +102,6 @@ export function NotificationSettings() {
       description: `${key.replace(/([A-Z])/g, " $1").trim()} ${value ? "enabled" : "disabled"}.`,
     });
   };
-
-  if (!isPremiumUser) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="w-5 h-5" />
-            Push Notifications
-            <Badge variant="secondary" className="ml-2">
-              <Crown className="w-3 h-3 mr-1" />
-              Premium
-            </Badge>
-          </CardTitle>
-          <CardDescription>
-            Get real-time alerts about new threats and security tips
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-              <BellOff className="w-8 h-8 text-primary" />
-            </div>
-            <h4 className="font-semibold mb-2">Upgrade to Premium</h4>
-            <p className="text-muted-foreground text-sm mb-4 max-w-sm mx-auto">
-              Get instant alerts when new scams are detected and receive weekly security digests.
-            </p>
-            <Link href="/pricing">
-              <Button data-testid="button-upgrade-notifications">
-                <Crown className="w-4 h-4 mr-2" />
-                View Premium Plans
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card>

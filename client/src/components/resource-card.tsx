@@ -19,6 +19,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       case "free":
         return <GraduationCap className="h-5 w-5" />;
       case "premium":
+      case "advanced":
         return <IdCard className="h-5 w-5" />;
       case "career":
         return <Briefcase className="h-5 w-5" />;
@@ -34,6 +35,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       case "free":
         return "bg-emerald-500 text-white";
       case "premium":
+      case "advanced":
         return "bg-blue-500 text-white";
       case "career":
         return "bg-amber-500 text-white";
@@ -49,7 +51,8 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       case "free":
         return "Free Course";
       case "premium":
-        return "Premium";
+      case "advanced":
+        return "Advanced";
       case "career":
         return "Career Guide";
       case "tools":

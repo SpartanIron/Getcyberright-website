@@ -20,8 +20,8 @@ const footerLinks = {
   ],
   company: [
     { name: "About", href: "/about" },
+    { name: "Our Promise", href: "/pricing" },
     { name: "Events", href: "/events" },
-    { name: "Pricing", href: "/pricing" },
     { name: "Emergency Help", href: "/emergency-help" },
     { name: "Contact", href: "/contact" },
   ],
@@ -44,7 +44,7 @@ export function Footer() {
               <span className="font-semibold text-white">GetCyberRight</span>
             </Link>
             <p className="text-sm leading-relaxed mb-4">
-              Cyber protection resources for families and small businesses.
+              Free cyber safety tools for families, parents, kids, and seniors. Always free. Always will be.
             </p>
             <div className="flex gap-2">
               {socialLinks.map((social) => (
@@ -122,15 +122,14 @@ export function Footer() {
                 <MapPin className="w-3 h-3" aria-hidden="true" /> United States
               </span>
               <span className="flex items-center gap-1">
-                <Shield className="w-3 h-3" aria-hidden="true" /> Free Tools Available
+                <Shield className="w-3 h-3" aria-hidden="true" /> 100% Free for Families
               </span>
               <span>Trusted by families in 50+ countries</span>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
               <Link href="/support" className="hover:text-white transition-colors">Support</Link>
-              <Link href="/partnerships" className="hover:text-white transition-colors">Partnerships</Link>
-              <Link href="/advertising" className="hover:text-white transition-colors">Advertising</Link>
+              <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
             </div>
           </div>
 

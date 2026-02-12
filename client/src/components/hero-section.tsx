@@ -22,9 +22,9 @@ export function HeroSection() {
         <div className="relative px-5 py-8 bg-slate-900">
           <div className="max-w-md mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full mb-4">
-              <Shield className="w-4 h-4 text-primary" />
+              <Heart className="w-4 h-4 text-primary" />
               <span className="text-xs font-semibold text-primary uppercase tracking-wider">
-                Cyber Protection Powerhouse
+                Free for Every Family
               </span>
             </div>
             
@@ -32,25 +32,25 @@ export function HeroSection() {
               className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 leading-[1.15]" 
               data-testid="text-hero-heading-mobile"
             >
-              Welcome to GetCyberRight
+              Your Family's Safety Starts Here
             </h1>
 
             <p className="text-sm sm:text-base text-white/80 font-medium mb-4 leading-relaxed">
-              You have not simply accessed a website. You have entered a cyber protection powerhouse built to protect people.
+              Free tools that protect your kids, your parents, and you from scams, identity theft, and online threats. Built by a family, for families.
             </p>
 
             <ul className="space-y-2 mb-6 text-xs sm:text-sm font-medium text-left max-w-xs mx-auto">
               <li className="flex items-start gap-3 text-white/80">
-                <Globe className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>Security that follows you beyond your devices</span>
+                <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <span>100% free. No hidden fees. No premium tiers.</span>
               </li>
               <li className="flex items-start gap-3 text-white/80">
                 <Heart className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>Family safety for every generation</span>
+                <span>Made for parents, kids, seniors, and everyday people</span>
               </li>
               <li className="flex items-start gap-3 text-white/80">
                 <Users className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>Real world protection for real lives</span>
+                <span>Plain language. No jargon. Just safety you can trust.</span>
               </li>
             </ul>
 
@@ -156,9 +156,9 @@ export function HeroSection() {
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 h-full flex items-center">
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 bg-primary/20 px-4 py-2 rounded-full mb-6">
-              <Shield className="w-5 h-5 text-primary" />
+              <Heart className="w-5 h-5 text-primary" />
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                Cyber Protection Powerhouse
+                Free for Every Family
               </span>
             </div>
 
@@ -166,34 +166,34 @@ export function HeroSection() {
               className="text-5xl xl:text-6xl font-bold tracking-tight text-white leading-[1.1] mb-6" 
               data-testid="text-hero-heading"
             >
-              Welcome to GetCyberRight
+              Your Family's Safety Starts Here
             </h1>
 
             <p 
               className="text-xl text-white/90 font-medium leading-relaxed mb-4" 
               data-testid="text-hero-subtext"
             >
-              You have not simply accessed a website. You have entered a cyber protection powerhouse built to protect people.
+              Free tools that protect your kids, your parents, and you from scams, identity theft, and online threats. Built by a family, for families.
             </p>
 
             <ul className="space-y-3 mb-10 text-sm font-medium">
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Globe className="w-4 h-4 text-primary flex-shrink-0" />
+                  <Shield className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>Security that follows you beyond your devices</span>
+                <span>100% free. No hidden fees. No premium tiers.</span>
               </li>
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Heart className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>Family safety because cyber threats affect every generation</span>
+                <span>Made for parents, kids, seniors, and everyday people</span>
               </li>
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Users className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>Real world protection for real lives</span>
+                <span>Plain language. No jargon. Just safety you can trust.</span>
               </li>
             </ul>
 

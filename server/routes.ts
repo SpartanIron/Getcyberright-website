@@ -1128,33 +1128,9 @@ EDGE CASE HANDLING
     }
   });
 
-  // Premium content access check middleware using shared tier hierarchy
-  const requireSubscription = (requiredTier: string) => {
-    return async (req: any, res: Response, next: Function) => {
-      try {
-        const user = req.user;
-        if (!user) {
-          return res.status(401).json({ error: "Unauthorized" });
-        }
-        
-        const now = new Date();
-        const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
-        const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
-        
-        // Use shared tier access helper
-        if (!hasTierAccess(effectiveTier, requiredTier)) {
-          return res.status(403).json({ 
-            error: "Subscription required",
-            requiredTier,
-            currentTier: effectiveTier
-          });
-        }
-        
-        next();
-      } catch (error) {
-        console.error("Error checking subscription:", error);
-        res.status(500).json({ error: "Failed to check subscription" });
-      }
+  const requireSubscription = (_requiredTier: string) => {
+    return async (_req: any, _res: Response, next: Function) => {
+      next();
     };
   };
 
@@ -1377,15 +1353,6 @@ EDGE CASE HANDLING
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      // Check if user has Professional tier access
-      if (!hasTierAccess(userTier, SUBSCRIPTION_TIERS.PROFESSIONAL)) {
-        return res.status(403).json({ 
-          error: "Premium feature", 
-          requiredTier: SUBSCRIPTION_TIERS.PROFESSIONAL,
-          message: "Voice clone detection requires a Professional subscription"
-        });
-      }
-
       const { fileName, fileSize } = req.body;
 
       // Simulate analysis (in production, integrate with Resemble AI Detect or similar)
@@ -1452,23 +1419,12 @@ EDGE CASE HANDLING
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const featureTiers: Record<string, string> = {
-        "voice-detection": SUBSCRIPTION_TIERS.PROFESSIONAL,
-        "advanced-scan": SUBSCRIPTION_TIERS.ESSENTIAL,
-        "unlimited-scans": SUBSCRIPTION_TIERS.ESSENTIAL,
-        "family-sharing": SUBSCRIPTION_TIERS.PROFESSIONAL,
-        "api-access": SUBSCRIPTION_TIERS.ENTERPRISE,
-      };
-
-      const requiredTier = featureTiers[feature] || SUBSCRIPTION_TIERS.FREE;
-      const hasAccess = hasTierAccess(userTier, requiredTier);
-
       res.json({
         success: true,
         feature,
-        hasAccess,
-        userTier,
-        requiredTier,
+        hasAccess: true,
+        userTier: "free",
+        requiredTier: "free",
       });
     } catch (error) {
       console.error("Error checking premium access:", error);

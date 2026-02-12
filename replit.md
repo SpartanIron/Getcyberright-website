@@ -1,7 +1,7 @@
 # GetCyberRight - Cybersecurity Education Platform
 
 ## Overview
-GetCyberRight is a full-stack TypeScript project empowering families, seniors, and organizations with practical cybersecurity knowledge. It aims to be a leading resource for digital safety by providing accessible educational content, security guides, and community resources to protect users from modern cyber threats. The platform simplifies complex cybersecurity information for everyday users, offering interactive safety assessments, real-time threat intelligence, and audience-specific educational content. Its long-term vision includes expanding its reach globally with mobile applications and tiered features for "always-on protection."
+GetCyberRight is a 100% free, family-focused cybersecurity education platform. All tools and resources are free forever with no premium tiers, no paywalls, and no hidden fees. The platform empowers families, parents, kids, seniors, and everyday people with practical cybersecurity knowledge. It simplifies complex cybersecurity information for non-technical users, offering interactive safety assessments, real-time threat intelligence, and audience-specific educational content. The mission is to cover the people that corporate cybersecurity leaves behind.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -69,8 +69,8 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **Automated Content Governance System**: Monitors educational content for freshness and relevance.
 - **Marketing & Growth Features**: Social sharing, embeddable widgets, success stories, referral tracking.
 
-### Premium Subscription Tiers
-Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers with feature gating.
+### Pricing Model
+All tools and features are 100% free. No subscription tiers, no paywalls. The platform is supported by community contributions and mission-aligned partners.
 
 ## External Dependencies
 

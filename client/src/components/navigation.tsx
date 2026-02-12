@@ -24,7 +24,7 @@ const whoWeHelp = [
 
 const toolsNav = [
   { title: "Security Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
-  { title: "Data Broker Removal", description: "Remove your info from 500+ data brokers", href: "/data-removal", icon: Trash2, badge: "Premium" },
+  { title: "Data Broker Removal", description: "Remove your info from 500+ data brokers", href: "/data-removal", icon: Trash2 },
   { title: "Safety Toolkit", description: "Password generator, family codewords & voice detector", href: "/tools?tab=safety-toolkit", icon: Shield },
 ];
 

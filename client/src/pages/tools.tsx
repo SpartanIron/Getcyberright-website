@@ -132,7 +132,7 @@ export default function Tools() {
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-sm">Data Broker Removal</p>
-                      <Badge variant="secondary" className="text-[10px]">Premium</Badge>
+                      <Badge variant="outline" className="text-[10px] text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 no-default-hover-elevate no-default-active-elevate">Free</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">Remove data from 500+ brokers</p>
                   </div>

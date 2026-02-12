@@ -57,8 +57,8 @@ export function AudienceShowcase() {
             Cybersecurity for Everyone
           </h2>
           <p className="text-lg text-muted-foreground">
-            Whether you're protecting your kids online or training your team, 
-            we have free resources designed just for you.
+            Whether you are protecting your kids online, helping your parents avoid scams, 
+            or learning to stay safe yourself, we have free resources designed just for you.
           </p>
         </motion.div>
 

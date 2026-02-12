@@ -9,10 +9,10 @@ export function CTAFooter() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <h2 className="text-xl sm:text-2xl font-bold text-white" data-testid="text-cta-footer-heading">
-              Ready to take control of your digital safety?
+              Protect your family today. Always free.
             </h2>
             <p className="text-sm text-white/70 mt-1">
-              Check a suspicious message, scan your data exposure, or start learning today.
+              Check a suspicious message, remove your data from brokers, or learn how to stay safe online. No sign-up needed.
             </p>
           </div>
           <Link href="/tools">

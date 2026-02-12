@@ -10,7 +10,7 @@ interface SEOHeadProps {
 }
 
 const defaultTitle = "GetCyberRight - Cybersecurity Education for Everyone";
-const defaultDescription = "Simple, practical cybersecurity education and tools for families, seniors, and organizations. Protect yourself from modern cyber scams.";
+const defaultDescription = "Free cybersecurity tools and education for families, parents, kids, and seniors. 100% free, always. Protect yourself from scams, data brokers, and online threats.";
 const defaultKeywords = "cybersecurity, online safety, phishing protection, scam prevention, identity theft, security training";
 
 export function SEOHead({
@@ -68,7 +68,7 @@ export function SEOHead({
 export const pageSEO = {
   home: {
     title: undefined,
-    description: "Simple, practical cybersecurity education and tools for families, seniors, and organizations. Protect yourself from modern cyber scams.",
+    description: "Free cybersecurity tools for families, parents, kids, and seniors. Check scams, remove your data from brokers, and learn to stay safe online. 100% free, always.",
   },
   tools: {
     title: "Free Security Tools",
@@ -79,8 +79,8 @@ export const pageSEO = {
     description: "Learn to protect yourself online with easy-to-follow guides on phishing, password security, privacy, and more.",
   },
   pricing: {
-    title: "Pricing Plans",
-    description: "Choose the right security plan for you. From free tools to enterprise protection, find the perfect fit for your needs.",
+    title: "Our Promise - Everything Free",
+    description: "GetCyberRight is 100% free for families. No hidden fees, no premium tiers. Every tool and resource is yours at no cost, forever.",
   },
   contact: {
     title: "Contact Us",
@@ -92,7 +92,7 @@ export const pageSEO = {
   },
   login: {
     title: "Sign In",
-    description: "Sign in to your GetCyberRight account to access premium security features and personalized protection.",
+    description: "Sign in to your GetCyberRight account to access free security tools and personalized protection.",
   },
   register: {
     title: "Create Account",
@@ -172,7 +172,7 @@ export const pageSEO = {
   },
   checkoutSuccess: {
     title: "Thank You",
-    description: "Your purchase was successful. Welcome to GetCyberRight premium protection.",
+    description: "Welcome to GetCyberRight. Your account is ready. Start protecting your family online today.",
   },
   notFound: {
     title: "Page Not Found",

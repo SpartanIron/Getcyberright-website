@@ -1,237 +1,71 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { SEOHead, pageSEO } from "@/components/seo-head";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
   Check, 
   Shield, 
   Users, 
-  Crown,
-  Building2,
+  Heart,
   ArrowRight,
-  Loader2,
-  HelpCircle,
-  Zap
+  Lock,
+  Eye,
+  Ban,
+  Search,
+  BookOpen,
+  GraduationCap,
+  Trash2,
+  Mic,
+  Key,
+  FileText
 } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 import bannerImage from "@/assets/banners/pricing-banner.png";
 
-interface PricingTier {
-  id: string;
-  name: string;
-  audience: string;
-  description: string;
-  price: string;
-  period: string;
-  icon: typeof Shield;
-  features: string[];
-  highlighted?: boolean;
-  buttonText: string;
-  badge?: string;
-  stripePriceId?: string;
-}
-
-const pricingTiers: PricingTier[] = [
-  {
-    id: "free",
-    name: "Free",
-    audience: "For everyone",
-    description: "Get started with essential security tools at no cost.",
-    price: "$0",
-    period: "forever",
-    icon: Shield,
-    features: [
-      "Scam Checker (check suspicious messages)",
-      "Password Strength Tester",
-      "Data Breach Lookup",
-      "Security guides and articles",
-      "Weekly safety newsletter"
-    ],
-    buttonText: "Get Started"
-  },
-  {
-    id: "essential",
-    name: "Essential",
-    audience: "For individuals and families",
-    description: "Deeper protection with AI-powered analysis and training courses.",
-    price: "$9",
-    period: "mo",
-    icon: Users,
-    features: [
-      "Everything in Free, plus:",
-      "AI Scam Analyzer (detailed threat reports)",
-      "Data broker exposure scan",
-      "Full Training Academy access",
-      "Family safety toolkit",
-      "Monthly security webinars",
-      "Email support"
-    ],
-    highlighted: true,
-    buttonText: "Start 14-Day Free Trial",
-    badge: "Best for Families"
-  },
-  {
-    id: "professional",
-    name: "Professional",
-    audience: "For power users and small businesses",
-    description: "Full protection suite with automated data removal and monitoring.",
-    price: "$29",
-    period: "mo",
-    icon: Crown,
-    features: [
-      "Everything in Essential, plus:",
-      "Automated data broker removal requests",
-      "Continuous monitoring and re-scanning",
-      "Up to 6 family member profiles",
-      "Advanced URL and domain scanner",
-      "Priority support",
-      "Quarterly security review"
-    ],
-    buttonText: "Start 14-Day Free Trial"
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    audience: "For organizations and teams",
-    description: "Custom training programs with dedicated support for your team.",
-    price: "Custom",
-    period: "plan",
-    icon: Building2,
-    features: [
-      "Everything in Professional, plus:",
-      "Unlimited team member accounts",
-      "Custom employee training programs",
-      "Dedicated account manager",
-      "NIST compliance dashboard",
-      "API access and integrations",
-      "SLA guarantee"
-    ],
-    buttonText: "Contact Sales"
-  }
+const allFreeTools = [
+  { icon: Search, name: "Scam Checker", description: "Check suspicious emails, texts, URLs, QR codes, and phone numbers" },
+  { icon: Trash2, name: "Data Broker Removal", description: "Scan and remove your info from 500+ data broker sites" },
+  { icon: Mic, name: "Deepfake Voice Detector", description: "Detect AI-generated voice clones in suspicious calls" },
+  { icon: Key, name: "Password Generator", description: "Create strong, unique passwords for every account" },
+  { icon: Shield, name: "Family Safety Codewords", description: "Secret phrases to verify your family's identity during suspicious calls" },
+  { icon: GraduationCap, name: "Training Academy", description: "Full courses with quizzes and certificates for every skill level" },
+  { icon: BookOpen, name: "Resource Library", description: "Guides, articles, checklists, and printable materials" },
+  { icon: FileText, name: "Safety Score Assessment", description: "Evaluate your personal cybersecurity habits" },
 ];
 
-interface StripeProduct {
-  id: string;
-  name: string;
-  metadata?: { tier?: string };
-  prices: Array<{
-    id: string;
-    unitAmount: number;
-    currency: string;
-    recurring?: { interval: string };
-  }>;
-}
+const trustPromises = [
+  { icon: Ban, title: "No Hidden Fees", description: "Every tool, every guide, every course is free. No trial periods, no premium tiers, no upsells." },
+  { icon: Lock, title: "No Data Selling", description: "We never sell your personal information. Your data stays yours." },
+  { icon: Eye, title: "No Tracking", description: "We do not use behavioral tracking or sell your browsing habits to advertisers." },
+  { icon: Heart, title: "Family First", description: "We exist to protect families. Kids, parents, grandparents. Real people, not corporations." },
+];
 
 export default function Pricing() {
-  const { user, isAuthenticated } = useAuth();
-  const { toast } = useToast();
-  const [loadingTier, setLoadingTier] = useState<string | null>(null);
-
-  const { data: stripeData, isLoading: isLoadingProducts } = useQuery<{ products: StripeProduct[] }>({
-    queryKey: ['/api/stripe/products'],
-    staleTime: 1000 * 60 * 5,
-    retry: 2,
-  });
-
-  const hasStripeProducts = stripeData?.products && stripeData.products.length > 0;
-
-  const getMonthlyPriceId = (tierId: string): string | null => {
-    if (!stripeData?.products || stripeData.products.length === 0) return null;
-    
-    const tierNameMap: Record<string, string> = {
-      essential: 'GetCyberRight Essential',
-      professional: 'GetCyberRight Professional',
-      enterprise: 'GetCyberRight Enterprise'
-    };
-    
-    const product = stripeData.products.find(p => 
-      p.name === tierNameMap[tierId] || 
-      p.metadata?.tier === tierId
-    );
-    
-    if (!product) return null;
-    
-    const monthlyPrice = product.prices.find(p => 
-      p.recurring?.interval === 'month'
-    );
-    
-    return monthlyPrice?.id || null;
-  };
-
-  const handleSubscribe = async (tierId: string) => {
-    if (!isAuthenticated) {
-      window.location.href = '/api/login';
-      return;
-    }
-
-    const priceId = getMonthlyPriceId(tierId);
-    if (!priceId) {
-      if (isLoadingProducts) {
-        toast({
-          title: "Loading",
-          description: "Please wait while we load subscription options.",
-        });
-      } else {
-        toast({
-          title: "Subscription Unavailable",
-          description: "Our payment system is being configured. Please try again in a few minutes or contact support.",
-          variant: "destructive"
-        });
-      }
-      return;
-    }
-
-    setLoadingTier(tierId);
-    
-    try {
-      const response = await apiRequest('POST', '/api/stripe/create-checkout-session', {
-        priceId
-      });
-      
-      const data = await response.json();
-      
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL returned');
-      }
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to start checkout. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoadingTier(null);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.pricing} />
+      <SEOHead 
+        title="Our Promise - Everything Free | GetCyberRight"
+        description="GetCyberRight is 100% free for families, parents, kids, and seniors. No hidden fees, no premium tiers. Every tool and resource is yours at no cost."
+        keywords="free cybersecurity tools, free scam checker, family safety free"
+      />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>
         <PageBanner
-          title="Pricing Plans"
-          subtitle="Choose the protection level that fits your needs. All plans include our core security tools."
+          title="Our Promise to You"
+          subtitle="Every tool. Every guide. Every course. 100% free. Because your family's safety should never have a price tag."
           imageSrc={bannerImage}
-          imageAlt="Cybersecurity shield with layered protection tiers"
+          imageAlt="Shield protecting a family online"
           imagePosition="right"
           colorVariant="teal"
         />
 
         <section className="py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -239,115 +73,43 @@ export default function Pricing() {
               transition={{ duration: 0.5 }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl font-bold text-foreground mb-4" data-testid="text-pricing-heading">Simple, Transparent Pricing</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                No hidden fees. Cancel anytime. All paid plans include a 14-day free trial.
+              <Badge className="mb-4 bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 no-default-hover-elevate no-default-active-elevate">
+                100% Free Forever
+              </Badge>
+              <h2 className="text-3xl font-bold text-foreground mb-4" data-testid="text-promise-heading">
+                Cybersecurity Should Not Be a Luxury
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+                Other services charge $129/year or more for the same tools we give you for free. 
+                We believe every family deserves protection, regardless of their budget.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {pricingTiers.map((tier, index) => (
+            <div className="grid sm:grid-cols-2 gap-4 mb-16">
+              {trustPromises.map((promise, index) => (
                 <motion.div
-                  key={tier.id}
+                  key={promise.title}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <Card 
-                    className={`h-full flex flex-col ${tier.highlighted ? 'border-primary ring-2 ring-primary/20' : ''}`}
-                    data-testid={`pricing-card-${tier.id}`}
-                  >
-                    <CardHeader>
-                      {tier.badge && (
-                        <Badge className="w-fit mb-2 bg-primary text-primary-foreground">{tier.badge}</Badge>
-                      )}
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${tier.highlighted ? 'bg-primary/10' : 'bg-muted'}`}>
-                        <tier.icon className={`w-5 h-5 ${tier.highlighted ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <Card className="h-full" data-testid={`card-promise-${index}`}>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                          <promise.icon className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground mb-1">{promise.title}</h3>
+                          <p className="text-sm text-muted-foreground">{promise.description}</p>
+                        </div>
                       </div>
-                      <CardTitle className="text-xl">{tier.name}</CardTitle>
-                      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{tier.audience}</p>
-                      <CardDescription className="mt-1">{tier.description}</CardDescription>
-                      <div className="pt-4">
-                        <span className="text-3xl font-bold text-foreground">{tier.price}</span>
-                        <span className="text-muted-foreground ml-1">/{tier.period}</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex-1">
-                      <ul className="space-y-3">
-                        {tier.features.map((feature) => (
-                          <li key={feature} className="flex items-start gap-2 text-sm">
-                            <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                            <span className="text-muted-foreground">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
                     </CardContent>
-                    <CardFooter>
-                      {tier.id === "free" ? (
-                        isAuthenticated ? (
-                          <Button className="w-full" variant="outline" disabled data-testid="button-current-plan">
-                            Current Plan
-                          </Button>
-                        ) : (
-                          <Button className="w-full" variant="outline" asChild data-testid="button-get-started-free">
-                            <a href="/api/login">
-                              {tier.buttonText}
-                              <ArrowRight className="w-4 h-4 ml-2" />
-                            </a>
-                          </Button>
-                        )
-                      ) : tier.id === "enterprise" ? (
-                        <Button className="w-full" variant="outline" asChild data-testid="button-contact-sales">
-                          <a href="mailto:sales@getcyberright.com">
-                            {tier.buttonText}
-                          </a>
-                        </Button>
-                      ) : (
-                        <Button 
-                          className="w-full" 
-                          variant={tier.highlighted ? "default" : "outline"}
-                          onClick={() => handleSubscribe(tier.id)}
-                          disabled={loadingTier === tier.id || isLoadingProducts}
-                          data-testid={`button-subscribe-${tier.id}`}
-                        >
-                          {loadingTier === tier.id ? (
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          ) : isLoadingProducts ? (
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          ) : null}
-                          {tier.buttonText}
-                          {loadingTier !== tier.id && !isLoadingProducts && <ArrowRight className="w-4 h-4 ml-2" />}
-                        </Button>
-                      )}
-                    </CardFooter>
                   </Card>
                 </motion.div>
               ))}
             </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="mt-12"
-            >
-              <Card className="bg-muted/30">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <HelpCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
-                    <div>
-                      <h3 className="font-semibold text-foreground text-sm mb-1">What happens after the free trial?</h3>
-                      <p className="text-muted-foreground text-sm">
-                        You will not be charged during the 14-day trial. If you decide the plan is not for you, 
-                        cancel anytime before the trial ends. Your free tools will always remain available.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
           </div>
         </section>
 
@@ -358,23 +120,118 @@ export default function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-tools-heading">
+                All of This Is Yours, Free
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                No sign-up walls, no credit cards, no catch. Just tools built to keep your family safe.
+              </p>
+            </motion.div>
+
+            <div className="space-y-3">
+              {allFreeTools.map((tool, index) => (
+                <motion.div
+                  key={tool.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                >
+                  <Card data-testid={`card-tool-${index}`}>
+                    <CardContent className="py-4 px-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                          <tool.icon className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-foreground">{tool.name}</span>
+                            <Badge variant="outline" className="text-[10px] text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 no-default-hover-elevate no-default-active-elevate">
+                              Free
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{tool.description}</p>
+                        </div>
+                        <Check className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
             >
               <Card>
-                <CardContent className="p-8 text-center">
-                  <h3 className="text-2xl font-bold text-foreground mb-4">
-                    Not sure which plan is right for you?
-                  </h3>
-                  <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-                    Our team can help you find the perfect solution for your family or business. 
-                    Schedule a free consultation to discuss your needs.
+                <CardContent className="p-8">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Users className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground mb-2">Who We Built This For</h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        GetCyberRight was born from a family's real experience with cybercrime. 
+                        We watched our parents get targeted by scammers, worried about our kids 
+                        online, and realized that most cybersecurity help was designed for 
+                        corporations with big budgets, not for the families who need it most.
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    So we built something different. A platform where parents can check a 
+                    suspicious text in seconds. Where grandparents can learn to spot phone scams 
+                    in plain language. Where kids can learn digital safety through fun, 
+                    age-appropriate lessons. And where none of it costs a dime.
                   </p>
-                  <Button size="lg" asChild>
-                    <a href="mailto:info@getcyberright.com">
-                      Schedule a Consultation
-                    </a>
-                  </Button>
+                  <p className="text-foreground font-medium">
+                    If you are a parent, a grandparent, a teenager, or just someone trying to 
+                    stay safe online, this was made for you.
+                  </p>
                 </CardContent>
               </Card>
+            </motion.div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-20 bg-primary">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                Start Protecting Your Family Today
+              </h2>
+              <p className="text-white/80 max-w-2xl mx-auto mb-8">
+                No account required for most tools. Just pick a tool and go.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/tools">
+                  <Button size="lg" variant="secondary" data-testid="button-promise-tools">
+                    Use Our Free Tools
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </Link>
+                <Link href="/about">
+                  <Button size="lg" variant="outline" className="border-white/30 text-white bg-transparent" data-testid="button-promise-about">
+                    Read Our Story
+                  </Button>
+                </Link>
+              </div>
             </motion.div>
           </div>
         </section>

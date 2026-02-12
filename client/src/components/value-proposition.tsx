@@ -5,36 +5,36 @@ import { Button } from "@/components/ui/button";
 
 const differentiators = [
   {
-    icon: Globe,
-    title: "Security Beyond Devices",
-    description: "We provide protection that follows you wherever your digital life takes you, not just the hardware you use.",
-    color: "text-primary",
-    bgColor: "bg-primary/10",
-    href: "/tools",
+    icon: Heart,
+    title: "Built for Families, Not Corporations",
+    description: "While others sell cybersecurity to businesses, we give it free to the people who need it most: parents, kids, seniors, and everyday families.",
+    color: "text-red-500",
+    bgColor: "bg-red-500/10",
+    href: "/about",
   },
   {
     icon: Shield,
-    title: "Clarity Over Confusion",
-    description: "Trusted guidance through plain language education. No technical jargon, just clear security knowledge you can act on.",
+    title: "100% Free. No Catch.",
+    description: "Every tool, every guide, every course. Free forever. No premium tiers, no trial periods, no credit card required.",
+    color: "text-primary",
+    bgColor: "bg-primary/10",
+    href: "/pricing",
+  },
+  {
+    icon: Globe,
+    title: "Plain Language You Can Trust",
+    description: "No jargon, no scare tactics. Just clear, honest guidance written the way you would explain it to your own family.",
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
     href: "/resources",
   },
   {
-    icon: Heart,
-    title: "Family Safety First",
-    description: "Cyber threats affect every generation. We prioritize protecting your entire family from digital risks.",
-    color: "text-red-500",
-    bgColor: "bg-red-500/10",
-    href: "/kids",
-  },
-  {
     icon: Users,
-    title: "Real World Protection",
-    description: "Practical security for real lives. Not theoretical concepts, but actionable protection you can use today.",
+    title: "Every Generation Covered",
+    description: "From kids learning to spot online dangers to seniors avoiding phone scams, we have age-appropriate resources for everyone in your family.",
     color: "text-accent",
     bgColor: "bg-accent/10",
-    href: "/tools",
+    href: "/training",
   },
 ];
 
@@ -92,20 +92,20 @@ export function ValueProposition() {
           className="text-center mb-6"
         >
           <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-4">
-            <Shield className="w-4 h-4 text-primary" />
+            <Heart className="w-4 h-4 text-primary" />
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              People First Protection
+              Family First
             </span>
           </div>
           <h2 
             id="value-prop-heading" 
             className="text-3xl md:text-4xl font-bold text-foreground mb-4"
           >
-            What Sets GetCyberRight Apart
+            Why Families Trust GetCyberRight
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            This is not a collection of tools. It is a human centered cyber protection ecosystem 
-            designed to guide, defend, and empower you throughout your digital life.
+            Cybersecurity companies charge hundreds of dollars a year for tools we give you for free. 
+            We exist because your family deserves protection without a price tag.
           </p>
         </motion.div>
 

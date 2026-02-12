@@ -26,30 +26,30 @@ export function MissionBanner() {
           <div className="w-full max-w-lg lg:max-w-xl">
             <div className="bg-slate-900/95 backdrop-blur-sm rounded-2xl p-8 sm:p-10 shadow-2xl">
               <div className="flex items-center gap-2 mb-4">
-                <Shield className="w-5 h-5 text-primary" />
+                <Heart className="w-5 h-5 text-primary" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                  Our Commitment
+                  Built for Families
                 </span>
               </div>
               
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight" data-testid="text-mission-heading">
-                We Protect What Matters Most
+                We Cover the People Nobody Else Protects
               </h2>
               
               <div className="flex items-center gap-3 mb-6">
                 <Heart className="w-8 h-8 text-accent flex-shrink-0" />
                 <p className="text-2xl sm:text-3xl font-bold text-accent">
-                  You.
+                  Your Family.
                 </p>
               </div>
               
               <p className="text-white/80 text-base sm:text-lg leading-relaxed mb-6" data-testid="text-mission-description">
-                Our commitment is simple and unwavering. Whether you are navigating everyday digital activity or responding to a serious cyber incident, GetCyberRight stands between you and the risks you should not have to face alone.
+                Most cybersecurity is built for corporations. We are built for the rest of us. Parents trying to keep kids safe online. Seniors targeted by phone scams. Everyday people left to figure it out alone. We have your back, and it will never cost you a thing.
               </p>
               
               <Link href="/about">
                 <Button className="rounded-full px-6" data-testid="button-mission-cta">
-                  Learn About Our Mission
+                  Read Our Story
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
