@@ -29,9 +29,7 @@ import {
   Info,
   LogIn,
   Crown,
-  Loader2,
-  Video,
-  Eye
+  Loader2
 } from "lucide-react";
 
 interface AnalysisResult {
