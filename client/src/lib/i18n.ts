@@ -43,7 +43,7 @@ i18n
     applyDirection(i18n.language);
   });
 
-i18n.on('languageChanged', (lng) => {
+i18n.on('languageChanged', (lng: string) => {
   applyDirection(lng);
 });
 
