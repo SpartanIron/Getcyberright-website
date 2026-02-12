@@ -280,7 +280,7 @@ function analyzePasswordPatterns(password: string): PasswordPatternAnalysis {
   const leet = detectLeetspeak(password);
   if (leet.found) {
     analysis.leetspeak = leet.original;
-    warnings.push(`Leetspeak variation of "${leet.original}" - this is a well known trick`);
+    warnings.push(`Leetspeak variation of "${leet.original}" - this is a well-known trick`);
   }
   
   // Check date patterns
@@ -570,7 +570,7 @@ function simulateBreachCheck(email: string): BreachResult {
       ],
       recommendations: [
         "Change your password immediately for all accounts using this email",
-        "Enable two factor authentication on all important accounts",
+        "Enable two-factor authentication on all important accounts",
         "Consider using a different email for sensitive accounts",
         "Check your accounts for unauthorized activity",
         "Use a password manager to create unique passwords"
@@ -585,7 +585,7 @@ function simulateBreachCheck(email: string): BreachResult {
       recommendations: [
         "Consider using a more unique email address for sensitive accounts",
         "Ensure you have strong, unique passwords for each account",
-        "Enable two factor authentication wherever possible",
+        "Enable two-factor authentication wherever possible",
         "Monitor your accounts regularly for suspicious activity"
       ]
     };
@@ -620,7 +620,7 @@ function simulateBreachCheck(email: string): BreachResult {
       ],
       recommendations: [
         "As a precaution, update passwords for your most important accounts",
-        "Enable two factor authentication on financial and email accounts",
+        "Enable two-factor authentication on financial and email accounts",
         "Be extra vigilant about phishing emails",
         "Consider using a credit monitoring service"
       ]
@@ -632,7 +632,7 @@ function simulateBreachCheck(email: string): BreachResult {
     message: "Good news! We did not find this email in any known public data breaches.",
     recommendations: [
       "Continue using strong, unique passwords for each account",
-      "Keep two factor authentication enabled",
+      "Keep two-factor authentication enabled",
       "Stay alert for phishing attempts",
       "Check back periodically as new breaches are discovered"
     ]
@@ -706,7 +706,7 @@ async function checkPassword(password: string): Promise<PasswordResult> {
       crackTime: strength.crackTime,
       suggestions: allSuggestions.length > 0 ? allSuggestions : [
         "Your password appears strong",
-        "Enable two factor authentication for extra security",
+        "Enable two-factor authentication for extra security",
         "Never reuse passwords across multiple accounts"
       ],
       patternAnalysis,

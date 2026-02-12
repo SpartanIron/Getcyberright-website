@@ -117,7 +117,7 @@ export function ValueProposition() {
           className="text-center mb-12"
         >
           <p className="text-base text-muted-foreground max-w-2xl mx-auto">
-            Our approach to cybersecurity is grounded in people first protection.
+            Our approach to cybersecurity is grounded in people-first protection.
           </p>
         </motion.div>
 

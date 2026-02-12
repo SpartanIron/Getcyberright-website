@@ -426,7 +426,7 @@ This password is 16 characters long and includes uppercase letters, lowercase le
 **Best Practices:**
 • Use a different password for each account
 • Consider using a password manager to store your passwords securely
-• Enable two factor authentication when available
+• Enable two-factor authentication when available
 • Never share your passwords with anyone
 
 Would you like me to generate another password, or would you prefer to use our Password Generator tool for more options like custom length and character types?`;
@@ -526,7 +526,7 @@ Scammers send emails, texts, or messages pretending to be from trusted organizat
 • Never click links in unexpected messages
 • When in doubt, contact the organization directly
 • Check sender addresses for misspellings
-• Turn on two factor authentication for your accounts
+• Turn on two-factor authentication for your accounts
 ${regionNote}You can report phishing attempts to ${r.cyberCrime}${r.cyberCrimeUrl ? ` at ${r.cyberCrimeUrl}` : ""} or learn more from ${r.consumerProtection}${r.consumerProtectionUrl ? ` at ${r.consumerProtectionUrl}` : ""}.`;
   }
 
@@ -543,7 +543,7 @@ Teens benefit from conversations about their digital reputation and how online c
 Help set up fraud alerts on bank accounts and establish a family code word for emergencies. Review privacy settings together and encourage them to verify any unexpected requests before responding.
 
 **For Everyone:**
-Use strong, unique passwords for each account. Enable two factor authentication whenever possible, keep your devices updated, and talk as a family about the latest scam trends.
+Use strong, unique passwords for each account. Enable two-factor authentication whenever possible, keep your devices updated, and talk as a family about the latest scam trends.
 ${regionNote}For additional resources, visit ${r.consumerProtection}${r.consumerProtectionUrl ? ` at ${r.consumerProtectionUrl}` : ""}.`;
   }
 
@@ -557,10 +557,10 @@ Close the browser tab or window immediately. If you have not entered any informa
 Run a full antivirus scan. Look through your browser extensions for anything unfamiliar, check your downloads folder, and review your installed programs for anything you do not recognize.
 
 **If You Entered Any Information:**
-Change the password for that account right away. If you use the same password elsewhere, change those too. Turn on two factor authentication, and if you entered bank or credit card details, contact your bank immediately. Keep an eye on your accounts for any unusual activity.
+Change the password for that account right away. If you use the same password elsewhere, change those too. Turn on two-factor authentication, and if you entered bank or credit card details, contact your bank immediately. Keep an eye on your accounts for any unusual activity.
 
 **Moving Forward:**
-Consider setting up fraud alerts with credit bureaus. Report the phishing attempt to ${r.fraudReport}${r.fraudReportUrl ? ` at ${r.fraudReportUrl}` : ""}, and stay alert for suspicious follow up emails or calls over the next few weeks.
+Consider setting up fraud alerts with credit bureaus. Report the phishing attempt to ${r.fraudReport}${r.fraudReportUrl ? ` at ${r.fraudReportUrl}` : ""}, and stay alert for suspicious follow-up emails or calls over the next few weeks.
 ${regionNote}Our Emergency Help page has more detailed guidance, and you can also contact ${r.identityTheft}${r.identityTheftUrl ? ` at ${r.identityTheftUrl}` : ""} for identity protection support.`;
   }
 

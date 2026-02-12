@@ -123,7 +123,7 @@ const foundationsModules: LearningModule[] = [
       intro: "Some people online try to trick kids. They might pretend to be someone they are not or offer things that seem too good to be true. Learning to spot these tricks keeps you safe.",
       tips: [
         "If someone offers free games or prizes, it might be a trick.",
-        "Pop ups that say you won something are usually not real.",
+        "Pop-ups that say you won something are usually not real.",
         "Strangers who want to be your best friend right away may not be safe.",
         "Messages asking you to click strange links could be harmful.",
         "If something feels wrong, it probably is. Trust your feelings."
@@ -131,7 +131,7 @@ const foundationsModules: LearningModule[] = [
       remember: "When in doubt, do not click. Ask a parent or trusted adult to help you figure out if something is real or a trick."
     },
     quiz: {
-      question: "You see a pop up that says you won a free gaming console. What should you do?",
+      question: "You see a pop-up that says you won a free gaming console. What should you do?",
       options: [
         "Click it right away to claim your prize",
         "Enter your address so they can send it",
@@ -139,7 +139,7 @@ const foundationsModules: LearningModule[] = [
         "Share the link with friends so they can win too"
       ],
       correctIndex: 2,
-      explanation: "Close it and tell a trusted adult. These pop ups are almost always tricks to get your personal information or put harmful software on your device."
+      explanation: "Close it and tell a trusted adult. These pop-ups are almost always tricks to get your personal information or put harmful software on your device."
     }
   },
   {
@@ -272,7 +272,7 @@ const smartSafeModules: LearningModule[] = [
       tips: [
         "Use a gaming name that does not reveal your real identity.",
         "Never share personal information with other players.",
-        "Be careful about in game purchases and always ask a parent first.",
+        "Be careful about in-game purchases and always ask a parent first.",
         "Mute or block players who are being rude or inappropriate.",
         "Take regular breaks and balance gaming with other activities."
       ],
@@ -282,7 +282,7 @@ const smartSafeModules: LearningModule[] = [
       question: "Someone in an online game asks for your real name and where you live. What should you do?",
       options: [
         "Tell them because they seem friendly",
-        "Trade personal info for in game items",
+        "Trade personal info for in-game items",
         "Politely decline and only share your game name",
         "Give them fake information to trick them"
       ],
@@ -360,9 +360,9 @@ interface SpotTheScamItem {
 const spotTheScamItems: SpotTheScamItem[] = [
   {
     id: 1,
-    scenario: "A pop up says you won a free iPhone and just need to enter your address to receive it.",
+    scenario: "A pop-up says you won a free iPhone and just need to enter your address to receive it.",
     isScam: true,
-    explanation: "This is a scam. Real prizes do not come from random pop ups. They want your personal information."
+    explanation: "This is a scam. Real prizes do not come from random pop-ups. They want your personal information."
   },
   {
     id: 2,
@@ -1169,7 +1169,7 @@ export default function Kids() {
               <Badge className="mb-4 bg-orange-500">Interactive Game</Badge>
               <h2 className="text-3xl font-bold text-foreground mb-2">Spot the Scam Challenge</h2>
               <p className="text-muted-foreground">
-                Test your scam spotting skills with real world scenarios. Can you tell what is safe and what is not?
+                Test your scam-spotting skills with real-world scenarios. Can you tell what is safe and what is not?
               </p>
             </div>
             <SpotTheScamGame />

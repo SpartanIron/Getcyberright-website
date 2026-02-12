@@ -46,7 +46,7 @@ export function HeroSection() {
               </li>
               <li className="flex items-start gap-3 text-white/80">
                 <Heart className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>Made for parents, kids, seniors, and everyday people</span>
+                <span>Made for parents, kids, seniors, and everyday people.</span>
               </li>
               <li className="flex items-start gap-3 text-white/80">
                 <Users className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
@@ -187,7 +187,7 @@ export function HeroSection() {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Heart className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>Made for parents, kids, seniors, and everyday people</span>
+                <span>Made for parents, kids, seniors, and everyday people.</span>
               </li>
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">

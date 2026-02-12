@@ -49,7 +49,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
       protectionSteps: [
         "Never send money to someone you have not met in person.",
         "Do a reverse image search on their profile photos to check if they are stolen.",
-        "Be suspicious if someone avoids video calls or in person meetings.",
+        "Be suspicious if someone avoids video calls or in-person meetings.",
         "Talk to family or friends about new online relationships.",
         "Report suspicious profiles to the website and to the FTC."
       ],
@@ -63,7 +63,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     icon: Phone,
     color: "bg-blue-500",
     content: {
-      intro: "Tech support scammers pretend to be from well known companies like Microsoft, Apple, or your internet provider. They may call you directly or use scary pop-up messages claiming your computer has a virus. Their goal is to get remote access to your computer or convince you to pay for unnecessary services.",
+      intro: "Tech support scammers pretend to be from well-known companies like Microsoft, Apple, or your internet provider. They may call you directly or use scary pop-up messages claiming your computer has a virus. Their goal is to get remote access to your computer or convince you to pay for unnecessary services.",
       warningSignsSectionTitle: "Warning Signs",
       warningSigns: [
         "Unexpected phone calls claiming to be from tech support.",

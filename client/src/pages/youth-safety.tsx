@@ -44,7 +44,7 @@ const safetyTopics = [
     color: "purple",
     tips: [
       "Use a nickname, not your real name in games and apps",
-      "Don't share personal information in game chats or forums",
+      "Don't share personal information through game chats or forums",
       "Be careful with 'free' offers because they often lead to scams or malware",
       "Only download apps from official stores like Play Store"
     ]

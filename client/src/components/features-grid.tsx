@@ -16,7 +16,7 @@ const features = [
   {
     id: "security-training",
     category: "Security Education",
-    headline: "Learn to stay safe, in words you understand.",
+    headline: "Learn to stay safe in words you understand.",
     description: "Guides written for real people, not IT departments. Practical steps your whole family can follow, from teens to grandparents.",
     cta: "Browse Guides",
     href: "/resources",

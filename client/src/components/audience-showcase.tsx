@@ -12,7 +12,7 @@ const audiences = [
     image: familyImage,
     title: "For Families",
     subtitle: "Protect Everyone at Home",
-    description: "From toddlers with tablets to teenagers on social media. Get age-appropriate guides for the whole family.",
+    description: "From toddlers with tablets to teenagers on social media, get age-appropriate guides for the whole family.",
     icon: Users,
     href: "/resources",
     stats: "Free Family Resources",

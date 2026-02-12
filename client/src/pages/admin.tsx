@@ -721,8 +721,8 @@ function LoginForm({ onLogin }: { onLogin: (token: string, user: UserInfo) => vo
             <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Lock className="w-8 h-8 text-white" />
             </div>
-            <CardTitle className="text-2xl">Two Factor Authentication</CardTitle>
-            <CardDescription>Enter the 6 digit code from your authenticator app</CardDescription>
+            <CardTitle className="text-2xl">Two-Factor Authentication</CardTitle>
+            <CardDescription>Enter the 6-digit code from your authenticator app</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...twoFactorForm}>

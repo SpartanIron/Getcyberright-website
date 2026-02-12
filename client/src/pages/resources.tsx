@@ -99,17 +99,17 @@ const resources: Resource[] = [
         },
         {
           title: "Warning Signs During a Call",
-          content: "Scammers use high pressure tactics. They may demand immediate payment, request payment in gift cards or wire transfers, threaten arrest or legal action, or ask you to keep the call secret from family members.",
+          content: "Scammers use high-pressure tactics. They may demand immediate payment, request payment in gift cards or wire transfers, threaten arrest or legal action, or ask you to keep the call secret from family members.",
           tips: ["Legitimate organizations do not demand gift card payments", "It is okay to hang up and call back on an official number", "Never give personal information to unsolicited callers"]
         },
         {
           title: "Having the Conversation with Loved Ones",
-          content: "Talk with older family members about phone scams in a supportive, non judgmental way. Focus on how sophisticated these scams are rather than implying they are gullible. Share specific examples and practice responses together.",
-          tips: ["Make it a regular conversation, not a one time lecture", "Share news stories about scams to normalize the topic", "Establish a family code word for emergencies"]
+          content: "Talk with older family members about phone scams in a supportive, non-judgmental way. Focus on how sophisticated these scams are rather than implying they are gullible. Share specific examples and practice responses together.",
+          tips: ["Make it a regular conversation, not a one-time lecture", "Share news stories about scams to normalize the topic", "Establish a family code word for emergencies"]
         },
         {
           title: "Setting Up Protections",
-          content: "Register phone numbers on the National Do Not Call Registry. Consider call blocking apps or services from your phone provider. Set up a system where large financial decisions are discussed with a family member first.",
+          content: "Register phone numbers on the National Do Not Call Registry. Consider call-blocking apps or services from your phone provider. Set up a system where large financial decisions are discussed with a family member first.",
           tips: ["Many phone carriers offer free scam call blocking", "Consider a phone with large caller ID display", "Set up automatic fraud alerts on financial accounts"]
         }
       ],
@@ -153,28 +153,28 @@ const resources: Resource[] = [
   },
   {
     slug: "setting-up-two-factor-authentication",
-    title: "Setting Up Two Factor Authentication Without the Confusion",
-    excerpt: "Two factor authentication is one of the best ways to protect your accounts. We explain what it is and how to set it up simply.",
+    title: "Setting Up Two-Factor Authentication Without the Confusion",
+    excerpt: "Two-factor authentication is one of the best ways to protect your accounts. We explain what it is and how to set it up simply.",
     category: "Account Security",
     readTime: "5 min read",
     featured: false,
     type: "guide",
     content: {
-      intro: "Two factor authentication, often called 2FA, adds an extra layer of security to your accounts. Even if someone steals your password, they cannot get into your account without the second factor.",
+      intro: "Two-factor authentication, often called 2FA, adds an extra layer of security to your accounts. Even if someone steals your password, they cannot get into your account without the second factor.",
       sections: [
         {
-          title: "What Is Two Factor Authentication",
-          content: "Two factor authentication means you need two things to log in: something you know (your password) and something you have (usually your phone). After entering your password, you will receive a code on your phone to complete the login.",
+          title: "What Is Two-Factor Authentication",
+          content: "Two-factor authentication means you need two things to log in: something you know (your password) and something you have (usually your phone). After entering your password, you will receive a code on your phone to complete the login.",
           tips: ["Think of it like a deadbolt in addition to your regular door lock", "The extra step only takes a few seconds", "It stops most hackers even if they have your password"]
         },
         {
-          title: "Types of Two Factor Authentication",
+          title: "Types of Two-Factor Authentication",
           content: "The most common type is text message codes sent to your phone. Authenticator apps like Google Authenticator are more secure. Some services also support physical security keys or email codes.",
           tips: ["Authenticator apps are free and easy to use", "Text message codes are better than no 2FA at all", "Keep backup codes in a safe place in case you lose your phone"]
         },
         {
           title: "Setting It Up Step by Step",
-          content: "Go to the security settings of your account. Look for two factor authentication, two step verification, or login verification. Choose your preferred method and follow the prompts to add your phone number or set up an authenticator app.",
+          content: "Go to the security settings of your account. Look for two-factor authentication, two-step verification, or login verification. Choose your preferred method and follow the prompts to add your phone number or set up an authenticator app.",
           tips: ["Start with your email and banking accounts first", "Take screenshots of backup codes and store them securely", "Most setups take less than five minutes"]
         },
         {
@@ -183,7 +183,7 @@ const resources: Resource[] = [
           tips: ["Never store backup codes only on your phone", "Update your 2FA settings if you get a new phone", "Contact customer support if you are completely locked out"]
         }
       ],
-      conclusion: "Two factor authentication is one of the most effective ways to protect your accounts. Start with your most important accounts and gradually add it to all your online services."
+      conclusion: "Two-factor authentication is one of the most effective ways to protect your accounts. Start with your most important accounts and gradually add it to all your online services."
     }
   },
   {
@@ -230,7 +230,7 @@ const resources: Resource[] = [
     featured: true,
     type: "guide",
     content: {
-      intro: "We have all done it, clicked a link without thinking and then realized it might have been dangerous. The good news is that clicking a link alone usually will not infect your device. Here is what to do next.",
+      intro: "We have all done it: clicked a link without thinking and then realized it might have been dangerous. The good news is that clicking a link alone usually will not infect your device. Here is what to do next.",
       sections: [
         {
           title: "Immediate Steps",
@@ -245,7 +245,7 @@ const resources: Resource[] = [
         {
           title: "If You Entered Personal Information",
           content: "If you entered your password anywhere, change that password immediately and on any other sites where you use the same password. If you entered financial information, contact your bank right away to report potential fraud and monitor your accounts.",
-          tips: ["Change compromised passwords from a different device if possible", "Enable two factor authentication on affected accounts", "Check for any unauthorized transactions or activity"]
+          tips: ["Change compromised passwords from a different device if possible", "Enable two-factor authentication on affected accounts", "Check for any unauthorized transactions or activity"]
         },
         {
           title: "Ongoing Monitoring",
@@ -268,18 +268,18 @@ const resources: Resource[] = [
       intro: "Teaching children about online safety is essential in today's digital world. The key is having ongoing conversations that evolve as they grow, rather than one big talk.",
       sections: [
         {
-          title: "Young Children, Ages 5 to 8",
+          title: "Young Children: Ages 5 to 8",
           content: "Focus on the basics: never share personal information like your real name, address, school, or phone number with anyone online. Teach them to tell a parent if anything online makes them uncomfortable.",
-          tips: ["Compare online strangers to real world strangers", "Use parental controls and kid safe browsers", "Keep devices in shared family spaces"]
+          tips: ["Compare online strangers to real-world strangers", "Use parental controls and kid-safe browsers", "Keep devices in shared family spaces"]
         },
         {
-          title: "Pre Teens, Ages 9 to 12",
+          title: "Pre-Teens: Ages 9 to 12",
           content: "Expand the conversation to cover social media basics, cyberbullying, and critical thinking about what they see online. Help them understand that people online are not always who they claim to be.",
           tips: ["Review privacy settings together on any apps they use", "Talk about what to do if they receive mean messages", "Discuss that photos shared online can spread beyond intended recipients"]
         },
         {
-          title: "Teenagers, Ages 13 and Up",
-          content: "Address more complex topics like digital reputation, sexting consequences, online predators, and scams targeting young people. Focus on decision making skills rather than strict rules.",
+          title: "Teenagers: Ages 13 and Up",
+          content: "Address more complex topics like digital reputation, sexting consequences, online predators, and scams targeting young people. Focus on decision-making skills rather than strict rules.",
           tips: ["Discuss how colleges and employers check social media", "Talk about healthy online relationships", "Be available without judgment when they have concerns"]
         },
         {
@@ -288,7 +288,7 @@ const resources: Resource[] = [
           tips: ["Share your own experiences with suspicious emails or scams", "Check in regularly about their online activities", "Know the apps and games your children use"]
         }
       ],
-      conclusion: "Online safety is not a one time conversation but an ongoing dialogue. By staying involved and keeping communication open, you can help your children navigate the digital world safely."
+      conclusion: "Online safety is not a one-time conversation but an ongoing dialogue. By staying involved and keeping communication open, you can help your children navigate the digital world safely."
     }
   },
   {
@@ -304,7 +304,7 @@ const resources: Resource[] = [
       sections: [
         {
           title: "Secure Your Accounts",
-          content: "Enable two factor authentication on all business accounts, especially email, banking, and social media. Use strong, unique passwords for each account. Consider a business password manager to help employees manage credentials securely.",
+          content: "Enable two-factor authentication on all business accounts, especially email, banking, and social media. Use strong, unique passwords for each account. Consider a business password manager to help employees manage credentials securely.",
           tips: ["Start with your email and financial accounts", "Do not share passwords between employees", "Change passwords when employees leave the company"]
         },
         {
@@ -315,12 +315,12 @@ const resources: Resource[] = [
         {
           title: "Train Your Team",
           content: "Most breaches involve human error. Train all employees to recognize phishing emails and social engineering attempts. Create clear policies about what information can be shared and with whom.",
-          tips: ["Regular training is more effective than one time sessions", "Run practice phishing tests to identify weak spots", "Make it easy for employees to report suspicious activity"]
+          tips: ["Regular training is more effective than one-time sessions", "Run practice phishing tests to identify weak spots", "Make it easy for employees to report suspicious activity"]
         },
         {
           title: "Backup and Recovery",
           content: "Regularly backup all critical business data. Store backups in a separate location from your primary systems. Test your backups periodically to ensure you can actually restore from them.",
-          tips: ["Use the 3 2 1 rule: 3 copies, 2 different media types, 1 offsite", "Automate backups so they happen consistently", "Cloud backup services can simplify this process"]
+          tips: ["Use the 3-2-1 rule: 3 copies, 2 different media types, 1 offsite", "Automate backups so they happen consistently", "Cloud backup services can simplify this process"]
         }
       ],
       conclusion: "You do not need to be perfect at security to significantly reduce your risk. Start with these basics and gradually improve your security posture over time. The most important step is to start."
