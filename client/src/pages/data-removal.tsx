@@ -1956,7 +1956,7 @@ function GuestScanForm() {
                   Create an account to automatically send removal requests, track progress, and get re-scan alerts when your data reappears.
                 </p>
                 <Button asChild>
-                  <Link href="/register">Create Free Account</Link>
+                  <Link href="/register">Create Account</Link>
                 </Button>
               </div>
             </CardContent>

@@ -78,7 +78,7 @@ export default function AdminDashboard() {
       color: "text-blue-500",
     },
     {
-      title: "Premium Users",
+      title: "Verified Users",
       value: stats?.premiumUsers ?? 0,
       icon: Crown,
       href: "/admin/users",

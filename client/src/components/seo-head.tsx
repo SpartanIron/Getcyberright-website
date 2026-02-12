@@ -71,8 +71,8 @@ export const pageSEO = {
     description: "Free cybersecurity tools for families, parents, kids, and seniors. Check scams, remove your data from brokers, and learn to stay safe online. 100% free, always.",
   },
   tools: {
-    title: "Free Security Tools",
-    description: "Check suspicious emails, URLs, and phone numbers for scams. Free AI-powered threat detection tools to keep you safe online.",
+    title: "Security Tools",
+    description: "Check suspicious emails, URLs, and phone numbers for scams. AI-powered threat detection tools to keep you safe online.",
   },
   resources: {
     title: "Security Resources & Guides",

@@ -227,7 +227,7 @@ export function ValueProposition() {
             <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
               <Link href="/tools">
                 <Button size="lg" className="w-full sm:w-auto gap-2" data-testid="button-try-tools">
-                  Try Our Free Tools
+                  Explore Our Tools
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </Link>

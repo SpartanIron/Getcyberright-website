@@ -56,7 +56,7 @@ export function SignupEncouragementBanner({ toolName, show, contextMessage }: Si
               {contextMessage || "Want to save your results?"}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-              Create a free account to unlock more from GetCyberRight. No cost, no catch, ever.
+              Create an account to save your results and track your progress. No cost, no catch, ever.
             </p>
             <div className="grid grid-cols-2 gap-2 mb-4">
               {benefits.map((b) => (
@@ -69,7 +69,7 @@ export function SignupEncouragementBanner({ toolName, show, contextMessage }: Si
             <div className="flex flex-wrap items-center gap-2">
               <Link href="/register">
                 <Button size="sm" data-testid="button-signup-from-banner">
-                  Create Free Account
+                  Create Account
                 </Button>
               </Link>
               <Link href="/login">

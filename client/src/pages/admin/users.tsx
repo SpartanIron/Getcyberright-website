@@ -125,7 +125,7 @@ export default function AdminUsers() {
               User Management
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage user accounts, subscriptions, and admin privileges.
+              Manage user accounts and admin privileges.
             </p>
           </div>
           <Badge variant="outline" className="text-lg px-3 py-1">
@@ -145,7 +145,7 @@ export default function AdminUsers() {
                   <TableRow>
                     <TableHead>User</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Subscription</TableHead>
+                    <TableHead>Role</TableHead>
                     <TableHead>Admin</TableHead>
                     <TableHead>Joined</TableHead>
                     <TableHead className="text-right">Actions</TableHead>

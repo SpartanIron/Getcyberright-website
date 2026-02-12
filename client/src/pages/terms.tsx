@@ -80,7 +80,7 @@ export default function Terms() {
                     <li>Scam detection and analysis tools</li>
                     <li>Downloadable checklists and resources</li>
                     <li>Newsletter and security alert communications</li>
-                    <li>Premium subscription tiers with enhanced features</li>
+                    <li>Optional account creation to save progress and results</li>
                   </ul>
                   <p className="mt-4">
                     The Service is provided for educational and informational purposes. While we strive to 
@@ -122,44 +122,27 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-foreground mb-4">4. Subscription Services and Payments</h2>
+                  <h2 className="text-2xl font-bold text-foreground mb-4">4. Service Access and Availability</h2>
                   
-                  <h3 className="text-xl font-semibold text-foreground mb-3">4.1 Subscription Tiers</h3>
-                  <p>We offer the following subscription tiers:</p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li><strong className="text-foreground">Free Tier:</strong> Basic access to educational content and limited tool usage</li>
-                    <li><strong className="text-foreground">Essential ($9/month):</strong> Advanced scanner features and basic AI assistance</li>
-                    <li><strong className="text-foreground">Professional ($29/month):</strong> Voice clone detection, unlimited AI access, enhanced analysis</li>
-                    <li><strong className="text-foreground">Enterprise ($99/month):</strong> API access, team management, priority support</li>
-                  </ul>
-
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.2 Payment Terms</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3">4.1 All Tools and Resources</h3>
                   <p>
-                    All paid subscriptions are billed in advance on a monthly basis. Payment is processed 
-                    securely through Stripe. By subscribing, you authorize us to charge your payment method 
-                    for the subscription fee plus any applicable taxes.
+                    All tools, educational content, and resources on GetCyberRight are provided at no cost. 
+                    There are no paid tiers, no premium features, and no hidden fees. Every user has full 
+                    access to everything we offer.
                   </p>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.3 Automatic Renewal</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.2 Account Features</h3>
                   <p>
-                    Subscriptions automatically renew at the end of each billing period unless you cancel 
-                    before the renewal date. You can cancel your subscription at any time through your 
-                    account settings. Cancellation will take effect at the end of the current billing period.
+                    Creating an account allows you to save your results, track your learning progress, and 
+                    receive personalized safety tips. An account is never required to use our tools, but it 
+                    enhances your experience by keeping your history in one place.
                   </p>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.4 Refund Policy</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.3 Service Changes</h3>
                   <p>
-                    We offer a 14-day money-back guarantee for first-time subscribers. If you are not 
-                    satisfied with your subscription, contact us within 14 days of your initial purchase 
-                    for a full refund. After this period, subscription fees are non-refundable, and no 
-                    refunds or credits will be issued for partial months.
-                  </p>
-
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.5 Service Changes</h3>
-                  <p>
-                    All tools and resources on GetCyberRight are provided free of charge. We reserve the right 
-                    to modify or update features as needed, but we will never charge for access to our core 
-                    cybersecurity education tools and resources.
+                    We reserve the right to modify or update features as needed to improve the platform. 
+                    We are committed to keeping all cybersecurity education tools and resources available 
+                    at no cost.
                   </p>
                 </section>
 

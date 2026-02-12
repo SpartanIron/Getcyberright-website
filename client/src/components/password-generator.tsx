@@ -427,7 +427,7 @@ export function PasswordGenerator() {
         <SignupEncouragementBanner
           toolName="password-generator"
           show={copied}
-          contextMessage="Like this tool? There's more for free."
+          contextMessage="Like this tool? We have more."
         />
 
         <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-900">

@@ -441,7 +441,7 @@ export default function TrainingAudience() {
               )}
               <Link href="/signup">
                 <Button variant="outline" size="lg">
-                  Create Free Account
+                  Create Account
                 </Button>
               </Link>
             </div>
