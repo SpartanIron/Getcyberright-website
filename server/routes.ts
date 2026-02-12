@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, getEffectiveTier, isTrialActive, getTrialDaysRemaining, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -85,7 +85,6 @@ import {
   runMonitoringScan,
   sendAutoRemovalRequest,
   bulkAutoRemoval,
-  autoRemoveAllFromScan,
   createVerification,
   completeVerification,
   getUserVerifications,
@@ -1113,22 +1112,15 @@ EDGE CASE HANDLING
         return res.status(401).json({ error: "Unauthorized" });
       }
       
-      const effectiveTier = getEffectiveTier(user);
-      const trialActive = isTrialActive(user);
-      const trialDaysLeft = getTrialDaysRemaining(user);
-      const isSubExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < new Date();
+      const now = new Date();
+      const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
+      const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
       
       res.json({
         tier: effectiveTier,
         expiresAt: user.subscriptionExpiresAt,
-        isExpired: isSubExpired,
-        availableTiers: Object.values(SUBSCRIPTION_TIERS),
-        trial: {
-          active: trialActive,
-          daysRemaining: trialDaysLeft,
-          endsAt: user.trialEndsAt,
-          trialTier: user.trialTier || "essential",
-        }
+        isExpired,
+        availableTiers: Object.values(SUBSCRIPTION_TIERS)
       });
     } catch (error) {
       console.error("Error fetching subscription status:", error);
@@ -1136,52 +1128,7 @@ EDGE CASE HANDLING
     }
   });
 
-  // Start free trial for authenticated users who haven't had one
-  app.post("/api/subscription/start-trial", isAuthenticated, async (req: any, res) => {
-    try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-      
-      if (user.trialStartedAt) {
-        return res.status(400).json({ error: "Trial already used", trialEndsAt: user.trialEndsAt });
-      }
-      
-      if (user.subscriptionTier && user.subscriptionTier !== "free") {
-        const isSubExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < new Date();
-        if (!isSubExpired) {
-          return res.status(400).json({ error: "Already have an active subscription" });
-        }
-      }
-      
-      const now = new Date();
-      const { FREE_TRIAL_DAYS: trialDays } = await import("@shared/models/auth");
-      const trialEndsAt = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
-      
-      await db.update(users).set({
-        trialStartedAt: now,
-        trialEndsAt,
-        trialTier: "essential",
-        updatedAt: now,
-      }).where(eq(users.id, user.id));
-      
-      res.json({
-        success: true,
-        trial: {
-          active: true,
-          daysRemaining: trialDays,
-          endsAt: trialEndsAt,
-          trialTier: "essential",
-        }
-      });
-    } catch (error) {
-      console.error("Error starting trial:", error);
-      res.status(500).json({ error: "Failed to start trial" });
-    }
-  });
-
-  // Premium content access check middleware using shared tier hierarchy (includes trial support)
+  // Premium content access check middleware using shared tier hierarchy
   const requireSubscription = (requiredTier: string) => {
     return async (req: any, res: Response, next: Function) => {
       try {
@@ -1190,15 +1137,16 @@ EDGE CASE HANDLING
           return res.status(401).json({ error: "Unauthorized" });
         }
         
-        const effectiveTier = getEffectiveTier(user);
+        const now = new Date();
+        const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
+        const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
         
+        // Use shared tier access helper
         if (!hasTierAccess(effectiveTier, requiredTier)) {
-          const trialActive = isTrialActive(user);
           return res.status(403).json({ 
             error: "Subscription required",
             requiredTier,
-            currentTier: effectiveTier,
-            trialExpired: user.trialEndsAt && !trialActive,
+            currentTier: effectiveTier
           });
         }
         
@@ -2752,52 +2700,6 @@ EDGE CASE HANDLING
     }
   });
 
-  app.get("/api/data-removal/guest-scan-stream", strictRateLimit, async (req: Request, res: Response) => {
-    try {
-      const fullName = req.query.fullName as string;
-      const emails = req.query.emails ? (req.query.emails as string).split(",").filter(Boolean) : [];
-      const phoneNumbers = req.query.phoneNumbers ? (req.query.phoneNumbers as string).split(",").filter(Boolean) : [];
-      const currentAddress = (req.query.currentAddress as string) || "";
-
-      if (!fullName) {
-        return res.status(400).json({ error: "Please provide at least your name" });
-      }
-
-      res.writeHead(200, {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-        "X-Accel-Buffering": "no",
-      });
-
-      let closed = false;
-      req.on("close", () => { closed = true; });
-
-      const sendEvent = (event: string, data: any) => {
-        if (closed) return;
-        res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-      };
-
-      const result = await runGuestExposureScan(
-        { fullName, emails, phoneNumbers, currentAddress },
-        (phase, searched, total, found, currentBroker) => {
-          sendEvent("progress", { phase, searched, total, found, currentBroker });
-        },
-      );
-
-      sendEvent("complete", result);
-      res.end();
-    } catch (error: any) {
-      console.error("Error running guest scan stream:", error);
-      if (!res.headersSent) {
-        res.status(500).json({ error: error.message || "Failed to run scan" });
-      } else {
-        res.write(`event: error\ndata: ${JSON.stringify({ error: error.message || "Scan failed" })}\n\n`);
-        res.end();
-      }
-    }
-  });
-
   app.post("/api/data-removal/guest-scan", strictRateLimit, async (req: Request, res: Response) => {
     try {
       const { fullName, emails, phoneNumbers, currentAddress } = req.body;
@@ -2941,7 +2843,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { brokerId, vaultProfileId, findingId } = req.body;
@@ -2985,7 +2887,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/:id/generate", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/:id/generate", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const requestId = req.params.id;
@@ -3001,7 +2903,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/:id/auto-send", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/:id/auto-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const requestId = req.params.id;
@@ -3014,7 +2916,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/bulk-auto-send", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/bulk-auto-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { requestIds } = req.body;
@@ -3034,7 +2936,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/bulk-create-and-send", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/bulk-create-and-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { findings, vaultProfileId } = req.body;
@@ -3086,52 +2988,6 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("Error bulk create-and-send:", error);
       res.status(500).json({ error: error.message || "Failed to process bulk removal requests" });
-    }
-  });
-
-  app.get("/api/data-removal/scans/:scanId/auto-remove-all", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
-    try {
-      const user = req.user;
-      const { scanId } = req.params;
-      const vaultProfileId = req.query.vaultProfileId as string;
-      if (!vaultProfileId) {
-        res.status(400).json({ error: "vaultProfileId query parameter is required" });
-        return;
-      }
-      const ipAddress = req.ip || req.connection?.remoteAddress;
-
-      res.writeHead(200, {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-        "X-Accel-Buffering": "no",
-      });
-
-      let closed = false;
-      req.on("close", () => { closed = true; });
-
-      const sendEvent = (data: any) => {
-        if (!closed) {
-          res.write(`data: ${JSON.stringify(data)}\n\n`);
-        }
-      };
-
-      await autoRemoveAllFromScan(user.id, scanId, vaultProfileId, ipAddress, (event) => {
-        sendEvent(event);
-      });
-
-      if (!closed) {
-        res.write("data: [DONE]\n\n");
-        res.end();
-      }
-    } catch (error: any) {
-      console.error("Error in auto-remove-all SSE:", error);
-      if (!res.headersSent) {
-        res.status(500).json({ error: error.message || "Failed to process auto-removal" });
-      } else {
-        res.write(`data: ${JSON.stringify({ phase: "error", message: error.message || "Failed to process" })}\n\n`);
-        res.end();
-      }
     }
   });
 

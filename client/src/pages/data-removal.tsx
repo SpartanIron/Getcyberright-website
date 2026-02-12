@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -1643,83 +1643,26 @@ function GuestScanForm() {
     verifyRemovalMutation.mutate({ brokerId });
   };
 
-  const [guestScanResult, setGuestScanResult] = useState<any>(null);
-  const [guestScanLoading, setGuestScanLoading] = useState(false);
-  const [scanProgress, setScanProgress] = useState<{ phase: string; searched: number; total: number; found: number; currentBroker?: string } | null>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const guestScanMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/data-removal/guest-scan", {
+        fullName: guestName,
+        emails: guestEmail ? guestEmail.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        phoneNumbers: guestPhone ? guestPhone.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        currentAddress: guestAddress || "",
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      trackToolUsage("data-broker-guest-scan", true);
+    },
+    onError: (error: Error) => {
+      toast({ title: "Scan Failed", description: error.message, variant: "destructive" });
+      trackToolUsage("data-broker-guest-scan", false, { error: error.message });
+    },
+  });
 
-  useEffect(() => {
-    return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
-    };
-  }, []);
-
-  const startGuestScan = useCallback(() => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-
-    setGuestScanLoading(true);
-    setGuestScanResult(null);
-    setScanProgress({ phase: "initializing", searched: 0, total: 0, found: 0 });
-
-    const params = new URLSearchParams();
-    params.set("fullName", guestName);
-    if (guestEmail) params.set("emails", guestEmail.split(",").map(s => s.trim()).filter(Boolean).join(","));
-    if (guestPhone) params.set("phoneNumbers", guestPhone.split(",").map(s => s.trim()).filter(Boolean).join(","));
-    if (guestAddress) params.set("currentAddress", guestAddress);
-
-    const es = new EventSource(`/api/data-removal/guest-scan-stream?${params.toString()}`);
-    eventSourceRef.current = es;
-
-    es.addEventListener("progress", (e) => {
-      try {
-        const data = JSON.parse(e.data);
-        setScanProgress(data);
-      } catch {}
-    });
-
-    es.addEventListener("complete", (e) => {
-      try {
-        const data = JSON.parse(e.data);
-        setGuestScanResult(data);
-        trackToolUsage("data-broker-guest-scan", true);
-      } catch {}
-      setScanProgress(null);
-      setGuestScanLoading(false);
-      es.close();
-      eventSourceRef.current = null;
-    });
-
-    es.addEventListener("error", (e) => {
-      const msgEvent = e as MessageEvent;
-      let errorMsg = "Scan failed. Please try again.";
-      if (msgEvent.data) {
-        try { errorMsg = JSON.parse(msgEvent.data).error || errorMsg; } catch {}
-      }
-      toast({ title: "Scan Failed", description: errorMsg, variant: "destructive" });
-      trackToolUsage("data-broker-guest-scan", false, { error: errorMsg });
-      setScanProgress(null);
-      setGuestScanLoading(false);
-      es.close();
-      eventSourceRef.current = null;
-    });
-
-    es.onerror = () => {
-      if (es.readyState === EventSource.CLOSED) return;
-      toast({ title: "Scan Failed", description: "Connection lost. Please try again.", variant: "destructive" });
-      setScanProgress(null);
-      setGuestScanLoading(false);
-      es.close();
-      eventSourceRef.current = null;
-    };
-  }, [guestName, guestEmail, guestPhone, guestAddress, toast]);
-
-  const result = guestScanResult as {
+  const result = guestScanMutation.data as {
     totalBrokersScanned: number;
     totalBrokersInCatalog: number;
     totalExposuresFound: number;
@@ -1822,47 +1765,30 @@ function GuestScanForm() {
             Your information is not stored and is only used for this one-time check.
           </div>
           <Button
-            onClick={startGuestScan}
-            disabled={!guestName || guestScanLoading}
+            onClick={() => guestScanMutation.mutate()}
+            disabled={!guestName || guestScanMutation.isPending}
             data-testid="button-guest-scan"
           >
-            {guestScanLoading ? (
+            {guestScanMutation.isPending ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
               <Search className="h-4 w-4 mr-2" />
             )}
-            {guestScanLoading ? "Scanning..." : "Search for My Profiles"}
+            {guestScanMutation.isPending ? "Scanning..." : "Search for My Profiles"}
           </Button>
 
-          {guestScanLoading && scanProgress && (
-            <div className="p-4 rounded-md bg-muted/50 space-y-3" data-testid="scan-progress">
+          {guestScanMutation.isPending && (
+            <div className="p-4 rounded-md bg-muted/50 space-y-3">
               <div className="flex items-center gap-3">
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium" data-testid="text-scan-phase">
-                    {scanProgress.phase === "initializing" && "Preparing scan..."}
-                    {scanProgress.phase === "breach_check" && "Checking breach databases..."}
-                    {scanProgress.phase === "scanning" && `Scanning broker sites... ${scanProgress.searched} of ${scanProgress.total}`}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {scanProgress.phase === "scanning" && scanProgress.found > 0
-                      ? `${scanProgress.found} profile${scanProgress.found !== 1 ? "s" : ""} found so far`
-                      : scanProgress.phase === "scanning"
-                        ? scanProgress.currentBroker ? `Checking ${scanProgress.currentBroker}...` : "Searching people-search sites and data aggregators..."
-                        : "This typically takes 15-25 seconds."}
-                  </p>
+                <div>
+                  <p className="text-sm font-medium">Scanning 500+ data broker sites...</p>
+                  <p className="text-xs text-muted-foreground">This typically takes 15-25 seconds. We're checking people-search sites, background check databases, and data aggregators for your information.</p>
                 </div>
               </div>
               <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                <div
-                  className={`bg-primary h-1.5 rounded-full transition-all duration-300 ease-out ${scanProgress.phase !== "scanning" ? "animate-pulse" : ""}`}
-                  style={{ width: scanProgress.total > 0 && scanProgress.phase === "scanning" ? `${Math.max(2, Math.round((scanProgress.searched / scanProgress.total) * 100))}%` : "5%" }}
-                  data-testid="progress-bar-fill"
-                />
+                <div className="bg-primary h-1.5 rounded-full animate-pulse" style={{ width: "60%" }} />
               </div>
-              <p className="text-xs text-muted-foreground text-right" data-testid="text-progress-percent">
-                {scanProgress.total > 0 && scanProgress.phase === "scanning" ? `${Math.round((scanProgress.searched / scanProgress.total) * 100)}%` : "Starting..."}
-              </p>
             </div>
           )}
         </CardContent>
@@ -1871,17 +1797,14 @@ function GuestScanForm() {
       {result && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           {(() => {
-            const confirmedFindings = result.findings.filter(f => f.evidenceTier === "confirmed");
             const profileFindings = result.findings.filter(f => f.evidenceTier === "profile_found");
-            const blockedFindings = result.findings.filter(f => f.evidenceTier === "verified_broker");
-            const exposedCount = confirmedFindings.length + profileFindings.length;
             const profileCount = profileFindings.length;
             return (
               <>
                 <Card>
                   <CardContent className="pt-6 pb-6">
                     <div className="flex items-center gap-4">
-                      {exposedCount > 0 ? (
+                      {profileCount > 0 ? (
                         <div className="h-12 w-12 rounded-md bg-red-100 dark:bg-red-950/40 flex items-center justify-center shrink-0">
                           <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
                         </div>
@@ -1892,60 +1815,23 @@ function GuestScanForm() {
                       )}
                       <div>
                         <p className="text-lg font-semibold" data-testid="text-scan-headline">
-                          {exposedCount > 0
-                            ? `Your data was found on ${exposedCount} site${exposedCount !== 1 ? "s" : ""}`
-                            : "No exposures found"}
+                          {profileCount > 0
+                            ? `Your name was found on ${profileCount} site${profileCount !== 1 ? "s" : ""}`
+                            : "No profiles found"}
                         </p>
                         <p className="text-sm text-muted-foreground" data-testid="text-scan-subline">
-                          {exposedCount > 0
-                            ? `${confirmedFindings.length > 0 ? `${confirmedFindings.length} confirmed breach${confirmedFindings.length !== 1 ? "es" : ""}` : ""}${confirmedFindings.length > 0 && profileCount > 0 ? " and " : ""}${profileCount > 0 ? `${profileCount} profile${profileCount !== 1 ? "s" : ""} found on people-search sites` : ""}. Review and request removal below.`
-                            : `We searched ${result.searchTransparency?.sitesSearched?.toLocaleString() ?? result.totalBrokersScanned.toLocaleString()} people-search sites and didn't find any public profiles matching your information.`}
+                          {profileCount > 0
+                            ? "You can view each listing and request removal below."
+                            : `We searched ${result.totalBrokersScanned.toLocaleString()} people-search sites and didn't find any public profiles matching your information.`}
                         </p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {confirmedFindings.length > 0 && (
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2 flex-wrap">
-                        <Shield className="h-4 w-4 text-red-500" />
-                        Data Breaches ({confirmedFindings.length})
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {confirmedFindings.map((finding, idx) => (
-                        <div key={`breach-${idx}`} className="p-4 border border-red-200 dark:border-red-900 rounded-md bg-red-50/30 dark:bg-red-950/10" data-testid={`breach-finding-${idx}`}>
-                          <div className="flex items-center justify-between gap-2 flex-wrap">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-medium">{finding.broker.name}</span>
-                              <Badge className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800 no-default-hover-elevate no-default-active-elevate">
-                                Breach Confirmed
-                              </Badge>
-                            </div>
-                          </div>
-                          {finding.breachDetails && (
-                            <div className="mt-2 text-sm text-muted-foreground">
-                              <p>Breach: {finding.breachDetails.breachName} ({finding.breachDetails.breachDate})</p>
-                              <p className="text-xs mt-1">Exposed: {finding.breachDetails.dataClasses.join(", ")}</p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
-
                 {profileCount > 0 && (
                   <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2 flex-wrap">
-                        <User className="h-4 w-4 text-orange-500" />
-                        Public Profiles Found ({profileCount})
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
+                    <CardContent className="pt-6 space-y-3">
                       {profileFindings.map((finding, idx) => (
                         <div key={idx} className="p-4 border border-red-200 dark:border-red-900 rounded-md bg-red-50/30 dark:bg-red-950/10" data-testid={`profile-finding-${idx}`}>
                           <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -2038,59 +1924,6 @@ function GuestScanForm() {
                   </Card>
                 )}
 
-                {blockedFindings.length > 0 && (
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2 flex-wrap">
-                        <Shield className="h-4 w-4 text-muted-foreground" />
-                        Could Not Verify ({blockedFindings.length})
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        These sites blocked or didn't respond to our automated search. Your data may still be listed.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {blockedFindings.slice(0, 20).map((finding, idx) => (
-                          <Badge key={idx} variant="outline" className="no-default-hover-elevate no-default-active-elevate" data-testid={`blocked-broker-${idx}`}>
-                            {finding.broker.name}
-                          </Badge>
-                        ))}
-                        {blockedFindings.length > 20 && (
-                          <Badge variant="outline" className="no-default-hover-elevate no-default-active-elevate">
-                            +{blockedFindings.length - 20} more
-                          </Badge>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {result.searchTransparency && (
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                        <div>
-                          <p className="text-2xl font-bold" data-testid="text-sites-searched">{result.searchTransparency.sitesSearched}</p>
-                          <p className="text-xs text-muted-foreground">Sites Searched</p>
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold text-red-600 dark:text-red-400" data-testid="text-profiles-found">{result.searchTransparency.profilesFound}</p>
-                          <p className="text-xs text-muted-foreground">Profiles Found</p>
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold text-green-600 dark:text-green-400" data-testid="text-not-found">{result.searchTransparency.notFound}</p>
-                          <p className="text-xs text-muted-foreground">Not Found</p>
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold text-muted-foreground" data-testid="text-blocked">{result.searchTransparency.blocked + result.searchTransparency.failed}</p>
-                          <p className="text-xs text-muted-foreground">Blocked/Failed</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
                 <Card data-testid="card-remove-from-google">
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
@@ -2119,16 +1952,12 @@ function GuestScanForm() {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center space-y-3">
-                <Zap className="h-8 w-8 mx-auto text-primary opacity-80" />
-                <p className="font-medium">Want us to remove your data automatically?</p>
                 <p className="text-sm text-muted-foreground">
-                  Sign up and start a free 14-day trial — we'll automatically send legal removal requests to every broker where your data was found. No credit card needed.
+                  Create an account to automatically send removal requests, track progress, and get re-scan alerts when your data reappears.
                 </p>
-                <div className="flex items-center justify-center gap-2 flex-wrap">
-                  <Button asChild>
-                    <Link href="/register" data-testid="link-register-auto-remove">Start Free Trial</Link>
-                  </Button>
-                </div>
+                <Button asChild>
+                  <Link href="/register">Create Free Account</Link>
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -2240,105 +2069,16 @@ function GuestScanForm() {
   );
 }
 
-interface AutoRemoveProgress {
-  phase: "starting" | "processing" | "complete" | "error";
-  current: number;
-  total: number;
-  brokerName: string;
-  brokerId: string;
-  status: "queued" | "created" | "sent" | "failed" | "manual_required";
-  method?: string;
-  message: string;
-  summary?: { total: number; sent: number; manual: number; failed: number };
-}
-
-interface AutoRemoveResult {
-  brokerName: string;
-  brokerId: string;
-  status: "sent" | "failed" | "manual_required";
-  method?: string;
-  message: string;
-}
-
 function ScanTab() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [selectedScanId, setSelectedScanId] = useState<string | null>(null);
   const [selectedFindings, setSelectedFindings] = useState<Set<string>>(new Set());
-  const [autoRemoveOpen, setAutoRemoveOpen] = useState(false);
-  const [autoRemoveRunning, setAutoRemoveRunning] = useState(false);
-  const [autoRemoveProgress, setAutoRemoveProgress] = useState<AutoRemoveProgress | null>(null);
-  const [autoRemoveResults, setAutoRemoveResults] = useState<AutoRemoveResult[]>([]);
-  const autoRemoveRef = useRef<EventSource | null>(null);
-
-  const userTier = (user as any)?.subscriptionTier || "free";
-  const hasAutoRemoveAccess = userTier === "essential" || userTier === "professional" || userTier === "enterprise";
 
   const handleSelectScan = (scanId: string) => {
     setSelectedScanId(scanId);
     setSelectedFindings(new Set());
   };
-
-  const startAutoRemoveAll = useCallback((scanId: string, vaultProfileId: string) => {
-    if (autoRemoveRef.current) {
-      autoRemoveRef.current.close();
-    }
-    setAutoRemoveOpen(true);
-    setAutoRemoveRunning(true);
-    setAutoRemoveProgress(null);
-    setAutoRemoveResults([]);
-
-    const url = `/api/data-removal/scans/${scanId}/auto-remove-all?vaultProfileId=${encodeURIComponent(vaultProfileId)}`;
-    const es = new EventSource(url, { withCredentials: true });
-    autoRemoveRef.current = es;
-
-    es.onmessage = (event) => {
-      if (event.data === "[DONE]") {
-        es.close();
-        autoRemoveRef.current = null;
-        setAutoRemoveRunning(false);
-        queryClient.invalidateQueries({ queryKey: ["/api/data-removal/requests"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/data-removal/dashboard"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/data-removal/findings", scanId] });
-        return;
-      }
-
-      try {
-        const data: AutoRemoveProgress = JSON.parse(event.data);
-        setAutoRemoveProgress(data);
-
-        if (data.phase === "processing" && (data.status === "sent" || data.status === "failed" || data.status === "manual_required")) {
-          setAutoRemoveResults(prev => [...prev, {
-            brokerName: data.brokerName,
-            brokerId: data.brokerId,
-            status: data.status as "sent" | "failed" | "manual_required",
-            method: data.method,
-            message: data.message,
-          }]);
-        }
-
-        if (data.phase === "error") {
-          setAutoRemoveRunning(false);
-          toast({ title: "Auto-Remove Error", description: data.message, variant: "destructive" });
-        }
-      } catch {}
-    };
-
-    es.onerror = () => {
-      es.close();
-      autoRemoveRef.current = null;
-      setAutoRemoveRunning(false);
-    };
-  }, [toast]);
-
-  useEffect(() => {
-    return () => {
-      if (autoRemoveRef.current) {
-        autoRemoveRef.current.close();
-        autoRemoveRef.current = null;
-      }
-    };
-  }, []);
 
   const { data: vaultData } = useQuery<VaultProfile | null>({
     queryKey: ["/api/data-removal/vault"],
@@ -2550,35 +2290,9 @@ function ScanTab() {
                 Scan Findings
               </CardTitle>
               {findings.length > 0 && (
-                <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <CardDescription>
-                    Select findings to submit removal requests in bulk, or handle them individually.
-                  </CardDescription>
-                  {hasAutoRemoveAccess ? (
-                    <Button
-                      data-testid="button-auto-remove-all"
-                      onClick={() => vaultData?.id && selectedScanId && startAutoRemoveAll(selectedScanId, vaultData.id)}
-                      disabled={autoRemoveRunning || !vaultData?.id}
-                    >
-                      {autoRemoveRunning ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <Zap className="h-4 w-4 mr-2" />
-                      )}
-                      Auto-Remove All
-                    </Button>
-                  ) : (
-                    <Link href="/pricing">
-                      <Button
-                        variant="outline"
-                        data-testid="button-upgrade-auto-remove"
-                      >
-                        <Zap className="h-4 w-4 mr-2" />
-                        Start Free Trial for Auto-Remove
-                      </Button>
-                    </Link>
-                  )}
-                </div>
+                <CardDescription>
+                  Select findings to submit removal requests in bulk, or handle them individually.
+                </CardDescription>
               )}
             </CardHeader>
             <CardContent>
@@ -2785,93 +2499,6 @@ function ScanTab() {
           </CardContent>
         </Card>
       </motion.div>
-
-      <Dialog open={autoRemoveOpen} onOpenChange={(open) => { if (!autoRemoveRunning) setAutoRemoveOpen(open); }}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5" />
-              {autoRemoveProgress?.phase === "complete" ? "Auto-Removal Complete" : "Auto-Removing Your Data"}
-            </DialogTitle>
-            <DialogDescription>
-              {autoRemoveProgress?.phase === "complete"
-                ? "Here's a summary of what was processed."
-                : "Sending removal requests to all brokers where your data was found. This may take a moment."}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            {autoRemoveProgress && autoRemoveProgress.total > 0 && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-2 text-sm">
-                  <span className="text-muted-foreground">
-                    {autoRemoveProgress.phase === "complete"
-                      ? `Processed ${autoRemoveProgress.total} broker${autoRemoveProgress.total !== 1 ? "s" : ""}`
-                      : `Processing ${autoRemoveProgress.current} of ${autoRemoveProgress.total}...`}
-                  </span>
-                  <span className="font-medium">{Math.round((autoRemoveProgress.current / autoRemoveProgress.total) * 100)}%</span>
-                </div>
-                <Progress value={(autoRemoveProgress.current / autoRemoveProgress.total) * 100} />
-                {autoRemoveRunning && autoRemoveProgress.brokerName && (
-                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    {autoRemoveProgress.message}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {autoRemoveProgress?.summary && (
-              <div className="grid grid-cols-3 gap-3">
-                <div className="text-center p-3 rounded-md bg-green-50 dark:bg-green-950/30">
-                  <div className="text-xl font-bold text-green-700 dark:text-green-400">{autoRemoveProgress.summary.sent}</div>
-                  <p className="text-xs text-green-600 dark:text-green-500">Sent</p>
-                </div>
-                <div className="text-center p-3 rounded-md bg-amber-50 dark:bg-amber-950/30">
-                  <div className="text-xl font-bold text-amber-700 dark:text-amber-400">{autoRemoveProgress.summary.manual}</div>
-                  <p className="text-xs text-amber-600 dark:text-amber-500">Manual</p>
-                </div>
-                <div className="text-center p-3 rounded-md bg-red-50 dark:bg-red-950/30">
-                  <div className="text-xl font-bold text-red-700 dark:text-red-400">{autoRemoveProgress.summary.failed}</div>
-                  <p className="text-xs text-red-600 dark:text-red-500">Failed</p>
-                </div>
-              </div>
-            )}
-
-            {autoRemoveResults.length > 0 && (
-              <div className="space-y-1.5 max-h-60 overflow-y-auto">
-                {autoRemoveResults.map((result, idx) => (
-                  <div key={idx} className="flex items-center gap-2 p-2 rounded-md text-sm">
-                    {result.status === "sent" ? (
-                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                    ) : result.status === "manual_required" ? (
-                      <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
-                    ) : (
-                      <ShieldAlert className="h-4 w-4 text-red-500 flex-shrink-0" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <span className="font-medium">{result.brokerName}</span>
-                      {result.method && result.method !== "email" && result.method !== "error" && (
-                        <Badge variant="secondary" className="ml-2">{result.method}</Badge>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {autoRemoveProgress?.phase === "complete" && (
-              <Button
-                data-testid="button-close-auto-remove"
-                className="w-full"
-                onClick={() => setAutoRemoveOpen(false)}
-              >
-                Done
-              </Button>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

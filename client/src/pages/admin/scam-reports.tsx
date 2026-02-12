@@ -68,7 +68,7 @@ export default function AdminScamReports() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      setLocation("/login");
+      setLocation("/api/login");
     }
   }, [authLoading, user, setLocation]);
 

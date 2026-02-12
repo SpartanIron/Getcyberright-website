@@ -54,7 +54,7 @@ export function HeroSection() {
               </li>
             </ul>
 
-            <Link href="/scam-checker">
+            <Link href="/tools">
               <Button 
                 size="default" 
                 className="rounded-full px-6 bg-accent text-accent-foreground border-accent-border shadow-lg" 
@@ -197,7 +197,7 @@ export function HeroSection() {
               </li>
             </ul>
 
-            <Link href="/scam-checker">
+            <Link href="/tools">
               <Button 
                 size="lg" 
                 className="rounded-full px-8 py-6 text-base bg-accent text-accent-foreground border-accent-border shadow-lg" 

@@ -129,26 +129,30 @@ export function registerAuthRoutes(app: Express) {
     name: "gcr.sid",
   }));
   
-  // Register new user with 14-day Essential trial auto-activation
+  // Register new user - DISABLED (admin-only system)
   app.post("/api/auth/register", async (req, res) => {
+    return res.status(403).json({ error: "Public registration is disabled. Please contact an administrator." });
+    
+    // Original registration code disabled:
+    /*
     try {
       const validatedData = registerSchema.parse(req.body);
       
+      // Check if user exists
       const [existing] = await db.select().from(users).where(eq(users.email, validatedData.email.toLowerCase()));
       if (existing) {
         return res.status(400).json({ error: "An account with this email already exists" });
       }
       
+      // Hash password
       const passwordHash = await bcrypt.hash(validatedData.password, SALT_ROUNDS);
       
+      // Generate email verification token
       const emailVerificationToken = generateToken();
       const emailVerificationExpires = new Date();
       emailVerificationExpires.setHours(emailVerificationExpires.getHours() + TOKEN_EXPIRY_HOURS);
       
-      const now = new Date();
-      const { FREE_TRIAL_DAYS } = await import("@shared/models/auth");
-      const trialEndsAt = new Date(now.getTime() + FREE_TRIAL_DAYS * 24 * 60 * 60 * 1000);
-      
+      // Create user
       const [newUser] = await db.insert(users).values({
         email: validatedData.email.toLowerCase(),
         passwordHash,
@@ -156,26 +160,34 @@ export function registerAuthRoutes(app: Express) {
         lastName: validatedData.lastName,
         emailVerificationToken,
         emailVerificationExpires,
-        emailVerified: process.env.NODE_ENV !== "production",
-        trialStartedAt: now,
-        trialEndsAt,
-        trialTier: "essential",
+        mustChangePassword: true,
       }).returning();
       
-      securityLogger.info("New user registered with 14-day Essential trial", { userId: newUser.id, email: validatedData.email });
+      securityLogger.info("New user registered", { userId: newUser.id, email: validatedData.email });
+      
+      // In production, send verification email here
+      // For now, auto-verify in development
+      if (process.env.NODE_ENV !== "production") {
+        await db.update(users).set({ 
+          emailVerified: true,
+          emailVerificationToken: null,
+          emailVerificationExpires: null
+        }).where(eq(users.id, newUser.id));
+      }
       
       res.json({ 
         success: true, 
-        message: "Account created successfully! Your 14-day free trial of Essential features has been activated.",
+        message: "Account created successfully. Please check your email to verify your account.",
         requiresVerification: process.env.NODE_ENV === "production"
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Validation failed", details: error.issues });
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
       }
       console.error("Registration error:", error);
       res.status(500).json({ error: "Registration failed" });
     }
+    */
   });
   
   // Login
@@ -310,7 +322,7 @@ export function registerAuthRoutes(app: Express) {
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Validation failed", details: error.issues });
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
       }
       console.error("Login error:", error);
       res.status(500).json({ error: "Login failed" });
@@ -397,11 +409,6 @@ export function registerAuthRoutes(app: Express) {
   // Get current user
   app.get("/api/auth/user", isAuthenticated, async (req, res) => {
     const user = (req as any).user;
-    const { getEffectiveTier: getEffTier, isTrialActive: isTrialAct, getTrialDaysRemaining: getTrialDays } = await import("@shared/models/auth");
-    const effectiveTier = getEffTier(user);
-    const trialActive = isTrialAct(user);
-    const trialDaysRemaining = getTrialDays(user);
-    
     res.json({
       id: user.id,
       email: user.email,
@@ -410,15 +417,9 @@ export function registerAuthRoutes(app: Express) {
       profileImageUrl: user.profileImageUrl,
       mfaEnabled: user.mfaEnabled,
       mustChangePassword: user.mustChangePassword,
-      subscriptionTier: effectiveTier,
+      subscriptionTier: user.subscriptionTier,
       isAdmin: user.isAdmin,
-      emailVerified: user.emailVerified,
-      trial: {
-        active: trialActive,
-        daysRemaining: trialDaysRemaining,
-        endsAt: user.trialEndsAt,
-        trialTier: user.trialTier || "essential",
-      }
+      emailVerified: user.emailVerified
     });
   });
   
@@ -548,7 +549,7 @@ export function registerAuthRoutes(app: Express) {
       res.json({ success: true, message: "Password has been reset successfully" });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Validation failed", details: error.issues });
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
       }
       console.error("Reset password error:", error);
       res.status(500).json({ error: "Password reset failed" });
@@ -580,7 +581,7 @@ export function registerAuthRoutes(app: Express) {
       res.json({ success: true, message: "Password changed successfully" });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Validation failed", details: error.issues });
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
       }
       console.error("Change password error:", error);
       res.status(500).json({ error: "Password change failed" });

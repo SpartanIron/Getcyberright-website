@@ -1,7 +1,7 @@
 import { useSEO } from "@/hooks/use-seo";
 import { ScamChecker } from "@/components/scam-checker";
 import { ShareCallToAction } from "@/components/social-share";
-import { AlertTriangle, Shield, Phone, Link2, MessageSquare, CheckCircle, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { AlertTriangle, Shield, Phone, Link2, MessageSquare, CheckCircle, TrendingUp, TrendingDown, Minus, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -10,8 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { detectUserRegion, getRegionInfo, type Region } from "@/lib/region-detect";
 import { TechPatternBg } from "@/components/tech-pattern-bg";
-import { Navigation } from "@/components/navigation";
-import { Footer } from "@/components/footer";
 
 interface ScamTrend {
   scamType: string;
@@ -57,8 +55,17 @@ export default function ScamCheckerPage() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 overflow-hidden">
-      <Navigation />
       <TechPatternBg variant="radar" />
+      
+      {/* Back Navigation */}
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
+        <div className="container mx-auto px-4 py-3">
+          <Link to="/protect" className="inline-flex items-center text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Protect
+          </Link>
+        </div>
+      </div>
 
       <div className="container mx-auto px-4 py-8 sm:py-12">
         <div className="max-w-4xl mx-auto">
@@ -265,7 +272,6 @@ export default function ScamCheckerPage() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

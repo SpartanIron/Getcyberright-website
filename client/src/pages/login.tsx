@@ -81,15 +81,13 @@ export default function Login() {
 
       const result = await response.json();
 
-      if (result.requiresMfa) {
-        setRequiresMfa(true);
-        setError("");
-        setIsLoading(false);
-        return;
-      }
-
       if (!response.ok) {
-        setError(result.error || "Login failed");
+        if (result.requiresMfa) {
+          setRequiresMfa(true);
+          setError("");
+        } else {
+          setError(result.error || "Login failed");
+        }
         setIsLoading(false);
         return;
       }
@@ -105,7 +103,7 @@ export default function Login() {
       if (result.user?.mustChangePassword) {
         setLocation("/admin/change-password");
       } else {
-        setLocation("/dashboard");
+        setLocation("/admin");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -149,7 +147,7 @@ export default function Login() {
       if (result.user?.mustChangePassword) {
         setLocation("/admin/change-password");
       } else {
-        setLocation("/dashboard");
+        setLocation("/admin");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");

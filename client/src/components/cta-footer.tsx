@@ -15,7 +15,7 @@ export function CTAFooter() {
               Check a suspicious message, scan your data exposure, or start learning today.
             </p>
           </div>
-          <Link href="/scam-checker">
+          <Link href="/tools">
             <Button size="default" className="bg-accent text-accent-foreground border-accent-border" data-testid="button-cta-footer">
               Check If It's a Scam
               <ArrowRight className="ml-2 w-4 h-4" />

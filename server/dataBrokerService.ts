@@ -778,20 +778,7 @@ export async function runGuestExposureScan(guestData: {
     onProgress,
   );
 
-  const personalizedFindings = verificationResult.findings.filter((match) => {
-    if (match.evidenceTier === "confirmed" || match.evidenceTier === "profile_found") {
-      return true;
-    }
-    if (match.evidenceTier === "verified_broker") {
-      if (match.verificationMethod === "search_blocked" || match.verificationMethod === "search_failed") {
-        return true;
-      }
-      return false;
-    }
-    return false;
-  });
-
-  const findings = personalizedFindings.map((match) => ({
+  const findings = verificationResult.findings.map((match) => ({
     broker: match.broker,
     dataTypesExposed: match.dataTypesExposed,
     exposureLevel: match.exposureLevel,
@@ -806,9 +793,9 @@ export async function runGuestExposureScan(guestData: {
     searchStatus: match.searchStatus ?? null,
   }));
 
-  const confirmedCount = personalizedFindings.filter(f => f.evidenceTier === "confirmed").length;
-  const profileFoundCount = personalizedFindings.filter(f => f.evidenceTier === "profile_found").length;
-  const verifiedBrokerCount = personalizedFindings.filter(f => f.evidenceTier === "verified_broker").length;
+  const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
+  const profileFoundCount = verificationResult.findings.filter(f => f.evidenceTier === "profile_found").length;
+  const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
 
   const ss = verificationResult.searchStats;
   const searchTransparency = ss ? {
@@ -1356,137 +1343,6 @@ export async function bulkAutoRemoval(
   }, ipAddress);
 
   return { results };
-}
-
-export async function autoRemoveAllFromScan(
-  userId: string,
-  scanId: string,
-  vaultProfileId: string,
-  ipAddress?: string,
-  onProgress?: (event: {
-    phase: "starting" | "processing" | "complete";
-    current: number;
-    total: number;
-    brokerName: string;
-    brokerId: string;
-    status: "queued" | "created" | "sent" | "failed" | "manual_required";
-    method?: string;
-    message: string;
-    summary?: { total: number; sent: number; manual: number; failed: number };
-  }) => void
-): Promise<{ total: number; sent: number; manual: number; failed: number; results: Array<{ brokerId: string; brokerName: string; success: boolean; method: string; message: string }> }> {
-  const [scan] = await db.select().from(exposureScans)
-    .where(and(eq(exposureScans.id, scanId), eq(exposureScans.userId, userId)));
-  if (!scan) throw new Error("Scan not found or access denied");
-
-  if (scan.vaultProfileId !== vaultProfileId) {
-    throw new Error("Vault profile does not match the scan");
-  }
-
-  const [profile] = await db.select().from(userVaultProfiles)
-    .where(and(eq(userVaultProfiles.id, vaultProfileId), eq(userVaultProfiles.userId, userId)));
-  if (!profile) throw new Error("Vault profile not found");
-
-  const findings = await db.select().from(exposureFindings)
-    .where(and(eq(exposureFindings.scanId, scanId), eq(exposureFindings.userId, userId)));
-  
-  if (findings.length === 0) {
-    onProgress?.({
-      phase: "complete", current: 0, total: 0, brokerName: "", brokerId: "",
-      status: "sent", method: "", message: "No findings to process",
-      summary: { total: 0, sent: 0, manual: 0, failed: 0 }
-    });
-    return { total: 0, sent: 0, manual: 0, failed: 0, results: [] };
-  }
-
-  const brokerIds = Array.from(new Set(findings.map(f => f.brokerId)));
-  const brokers = await db.select().from(dataBrokers).where(inArray(dataBrokers.id, brokerIds));
-  const brokerMap = Object.fromEntries(brokers.map(b => [b.id, b]));
-
-  const existingRequests = await db.select().from(removalRequests)
-    .where(and(eq(removalRequests.userId, userId), inArray(removalRequests.brokerId, brokerIds)));
-  const existingBrokerIds = new Set(existingRequests
-    .filter(r => ["not_started", "pending", "request_sent", "in_progress", "confirmed_removed"].includes(r.status))
-    .map(r => r.brokerId));
-
-  const uniqueFindings = findings.filter(f => !existingBrokerIds.has(f.brokerId));
-  const seenBrokers = new Set<string>();
-  const deduped = uniqueFindings.filter(f => {
-    if (seenBrokers.has(f.brokerId)) return false;
-    seenBrokers.add(f.brokerId);
-    return true;
-  });
-
-  const total = deduped.length;
-  const results: Array<{ brokerId: string; brokerName: string; success: boolean; method: string; message: string }> = [];
-  let sent = 0, manual = 0, failed = 0;
-
-  onProgress?.({
-    phase: "starting", current: 0, total, brokerName: "", brokerId: "",
-    status: "queued", message: `Processing ${total} broker${total !== 1 ? "s" : ""} for removal`
-  });
-
-  for (let i = 0; i < deduped.length; i++) {
-    const finding = deduped[i];
-    const broker = brokerMap[finding.brokerId];
-    const brokerName = broker?.name || "Unknown Broker";
-
-    onProgress?.({
-      phase: "processing", current: i + 1, total, brokerName, brokerId: finding.brokerId,
-      status: "created", message: `Creating removal request for ${brokerName}...`
-    });
-
-    try {
-      const request = await createRemovalRequest(userId, finding.brokerId, vaultProfileId, finding.id, ipAddress);
-      const sendResult = await sendAutoRemovalRequest(userId, request.id, ipAddress);
-
-      const isManual = sendResult.method === "web-form" || sendResult.method === "phone" || sendResult.method === "manual";
-      if (isManual) {
-        manual++;
-        results.push({ brokerId: finding.brokerId, brokerName, success: true, method: sendResult.method, message: sendResult.message });
-        onProgress?.({
-          phase: "processing", current: i + 1, total, brokerName, brokerId: finding.brokerId,
-          status: "manual_required", method: sendResult.method, message: sendResult.message
-        });
-      } else if (sendResult.success) {
-        sent++;
-        results.push({ brokerId: finding.brokerId, brokerName, success: true, method: sendResult.method, message: sendResult.message });
-        onProgress?.({
-          phase: "processing", current: i + 1, total, brokerName, brokerId: finding.brokerId,
-          status: "sent", method: sendResult.method, message: sendResult.message
-        });
-      } else {
-        failed++;
-        results.push({ brokerId: finding.brokerId, brokerName, success: false, method: sendResult.method, message: sendResult.message });
-        onProgress?.({
-          phase: "processing", current: i + 1, total, brokerName, brokerId: finding.brokerId,
-          status: "failed", method: sendResult.method, message: sendResult.message
-        });
-      }
-    } catch (err: any) {
-      failed++;
-      const msg = err.message || "Unknown error";
-      results.push({ brokerId: finding.brokerId, brokerName, success: false, method: "error", message: msg });
-      onProgress?.({
-        phase: "processing", current: i + 1, total, brokerName, brokerId: finding.brokerId,
-        status: "failed", message: msg
-      });
-    }
-  }
-
-  const summary = { total, sent, manual, failed };
-
-  onProgress?.({
-    phase: "complete", current: total, total, brokerName: "", brokerId: "",
-    status: "sent", message: `Complete: ${sent} sent, ${manual} need manual action, ${failed} failed`,
-    summary
-  });
-
-  await logAuditEvent(userId, "auto_remove_all", "exposure_scan", scanId, null, null, {
-    scanId, totalFindings: total, sent, manual, failed,
-  }, ipAddress);
-
-  return { total, sent, manual, failed, results };
 }
 
 export async function getRetryableRequests(userId?: string) {

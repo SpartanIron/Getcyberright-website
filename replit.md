@@ -25,7 +25,7 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **Framework**: Express 5 on Node.js with TypeScript (ES modules).
 - **API Design**: REST endpoints with robust input validation.
 - **Validation**: Zod schemas shared across frontend and backend.
-- **Authentication**: Custom email/password system with TOTP MFA (Google Authenticator), 10 backup codes, bcrypt hashing (12 rounds), account lockout after 5 failed attempts, IP-based brute force protection, PostgreSQL session store, email verification, OTP-based password reset. Registration auto-activates 14-day Essential trial. Login page at `/login`, register at `/register`. OWASP Top 10 and NIST SP 800-53 compliant.
+- **Authentication**: Custom system with email/password, TOTP MFA, backup codes, session management, email verification, password reset, and Passkeys (WebAuthn) for passwordless authentication. Token versioning for session invalidation on password change.
 - **Build**: esbuild.
 
 ### Data Layer
@@ -52,7 +52,7 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **AI & Cyber Safety Hub**: Educational content on AI-powered threats.
 - **Child Safety Conversation Scanner**: Client-side grooming pattern detection.
 - **Dezi AI Assistant**: Provides analysis and security assistance.
-- **Data Broker Removal System**: Enterprise-grade personal data removal from 501 data broker sites. Features include encrypted personal data vault, exposure scanning across all 501+ brokers (13 core adapters + 489 universal adapters with category-specific URL patterns), automated opt-out content generation (CCPA/GDPR templates), removal request tracking, and monitoring schedules. Automated email-based removal request sending via Resend API. **Fully Automated Removal Execution** (Essential+ tier): One-click "Auto-Remove All" processes all scan findings automatically — creates removal requests, sends legal opt-out emails via Resend, and streams real-time progress via SSE. Endpoint: `/api/data-removal/scans/:scanId/auto-remove-all`. Tier-gated features (Free: scan + guided walkthroughs, Essential $9/mo: auto-send + auto-remove-all, Professional+: monitoring + advanced). **Privacy Automation AI**: Unified identity risk scoring (0-100), structured JSON automation API, AI-driven smart removal queue with broker fingerprinting and performance tracking, Executive/Military/Gov Privacy Mode with specialized compliance templates (Privacy Act, OPSEC, FOIA-exempt), exposure likelihood scoring, reappearance risk assessment, verification requirements tracking, ToS/ID risk flags, monitoring alert thresholds, and re-index detection.
+- **Data Broker Removal System**: Enterprise-grade personal data removal from 501 data broker sites. Features include encrypted personal data vault, exposure scanning across all 501+ brokers (13 core adapters + 489 universal adapters with category-specific URL patterns), automated opt-out content generation (CCPA/GDPR templates), removal request tracking, and monitoring schedules. Automated email-based removal request sending via Resend API. Tier-gated features (Free, Essential, Professional+). **Privacy Automation AI**: Unified identity risk scoring (0-100), structured JSON automation API, AI-driven smart removal queue with broker fingerprinting and performance tracking, Executive/Military/Gov Privacy Mode with specialized compliance templates (Privacy Act, OPSEC, FOIA-exempt), exposure likelihood scoring, reappearance risk assessment, verification requirements tracking, ToS/ID risk flags, monitoring alert thresholds, and re-index detection.
 - **AI Content Guardrails**: Enforces truthfulness, verifiability, anti-hallucination, writing quality, audience adaptation, and source attribution for all AI-generated content.
 - **Automated Weekly Newsletter System**: AI-powered content generation and scheduled sending.
 - **Training Academy**: Audience-specific training paths with learning modules, lessons, quizzes, and certificates. Integrated with gamification.
@@ -70,7 +70,7 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **Marketing & Growth Features**: Social sharing, embeddable widgets, success stories, referral tracking.
 
 ### Premium Subscription Tiers
-Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers with feature gating. **14-Day Free Trial**: All new users receive a 14-day free trial of the Essential tier upon sign-up. Trial status tracked via `trialStartedAt`, `trialEndsAt`, `trialTier` fields in the users table. `getEffectiveTier()` helper determines effective tier considering both paid subscriptions and active trials. Start-trial endpoint: `POST /api/subscription/start-trial`.
+Free, Essential ($9/mo), Professional ($29/mo), and Enterprise ($99/mo) tiers with feature gating.
 
 ## External Dependencies
 

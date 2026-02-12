@@ -14,7 +14,7 @@ const audiences = [
     subtitle: "Protect Everyone at Home",
     description: "From toddlers with tablets to teenagers on social media. Get age-appropriate guides for the whole family.",
     icon: Users,
-    href: "/training/parents",
+    href: "/resources",
     stats: "Free Family Resources",
   },
   {
@@ -24,7 +24,7 @@ const audiences = [
     subtitle: "Stay Safe, Stay Connected",
     description: "Learn to spot scams, protect your identity, and use technology with confidence. No tech jargon, just clear steps.",
     icon: Heart,
-    href: "/training/seniors",
+    href: "/resources",
     stats: "Plain Language Guides",
   },
   {
@@ -34,7 +34,7 @@ const audiences = [
     subtitle: "Train Your Team",
     description: "Free security awareness training for small businesses. Protect your company from phishing and social engineering.",
     icon: Briefcase,
-    href: "/training/business",
+    href: "/resources",
     stats: "Free Training Materials",
   },
 ];
