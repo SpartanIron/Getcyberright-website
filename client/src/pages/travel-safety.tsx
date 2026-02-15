@@ -440,7 +440,9 @@ export default function TravelSafety() {
                     </div>
                   </div>
                   <p className="text-xs text-slate-400 mt-4">
-                    Save this number in your phone before traveling. Embassy staff can assist with passport emergencies, medical crises, and crime victim assistance.
+                    Save this number in your phone before traveling. Embassy staff can assist with passport emergencies, medical crises, and crime victim assistance. Always verify current contact details at{" "}
+                    <a href="https://www.usembassy.gov" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">usembassy.gov</a>{" "}
+                    before your trip, as phone numbers may change.
                   </p>
                 </div>
               ) : (

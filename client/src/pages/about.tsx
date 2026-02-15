@@ -47,9 +47,9 @@ export default function About() {
             >
               <div className="space-y-6 text-muted-foreground leading-relaxed">
                 <p className="text-lg">
-                  For the past six years, my family has been on the front lines of 
-                  a growing crisis. It started during the pandemic, when the world 
-                  moved online almost overnight, and cyber scams and digital fraud 
+                  Since 2020, my family has been on the front lines of a growing 
+                  crisis. It started during the pandemic, when the world moved 
+                  online almost overnight, and cyber scams and digital fraud 
                   skyrocketed along with it.
                 </p>
                 

@@ -42,7 +42,7 @@ const exclusiveFeatures = [
   {
     icon: Mic,
     title: "Voice Clone Detection",
-    description: "Industry-first AI-powered detection of deepfake audio.",
+    description: "Advanced AI-powered detection of deepfake audio and voice cloning.",
     highlight: "Exclusive",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
@@ -52,7 +52,7 @@ const exclusiveFeatures = [
     icon: Lock,
     title: "Family Safety Codewords",
     description: "Secret verification phrases to confirm identities during suspicious calls.",
-    highlight: "Patent-Pending",
+    highlight: "GetCyberRight\u2122",
     color: "text-primary",
     bgColor: "bg-primary/10",
     href: "/tools",

@@ -820,8 +820,11 @@ export default function EmergencyHelp() {
               <h2 className="text-3xl font-bold text-foreground mb-4">
                 Report to Authorities in Your Country
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-muted-foreground max-w-2xl mx-auto mb-2">
                 Select your country to see official fraud reporting agencies and emergency contacts.
+              </p>
+              <p className="text-xs text-muted-foreground/70 max-w-2xl mx-auto">
+                Contact details sourced from official government websites. We recommend verifying phone numbers on the agency's official website before calling, as numbers may change.
               </p>
             </motion.div>
 

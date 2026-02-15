@@ -73,7 +73,7 @@ const aiThreats = [
     icon: Mic,
     title: "AI Voice Cloning",
     severity: "critical",
-    description: "Just 3 seconds of audio can create a convincing clone of anyone's voice.",
+    description: "As little as a few seconds of audio can create a convincing clone of anyone's voice.",
     realWorldExample: "Criminals cloned a teen's voice from social media to call parents demanding ransom for a fake kidnapping.",
     howItWorks: [
       "AI captures voice patterns from any audio source",
@@ -100,7 +100,7 @@ const aiThreats = [
     title: "AI-Enhanced Phishing",
     severity: "high",
     description: "AI writes personalized, grammatically perfect phishing emails that are nearly impossible to detect.",
-    realWorldExample: "AI-generated phishing emails now have a 60% higher click rate than traditional phishing because they're so convincing.",
+    realWorldExample: "Security researchers have found AI-generated phishing emails can have significantly higher click rates than traditional phishing because they are so convincing.",
     howItWorks: [
       "AI scrapes your social media and online presence",
       "Creates highly personalized messages referencing real details",
@@ -154,7 +154,7 @@ const aiThreats = [
     title: "AI Synthetic Identity Fraud",
     severity: "high",
     description: "AI creates entirely fake people with synthetic identities for financial fraud.",
-    realWorldExample: "Synthetic identity fraud costs $6 billion annually - AI generates fake IDs, social profiles, and credit histories.",
+    realWorldExample: "According to Federal Reserve estimates, synthetic identity fraud costs billions of dollars annually. AI generates fake IDs, social profiles, and credit histories.",
     howItWorks: [
       "AI generates realistic fake photos of non-existent people",
       "Creates matching social media profiles and histories",
