@@ -377,7 +377,7 @@ export function DeziHero({ compact = false }: DeziHeroProps) {
   const shareResult = async () => {
     if (!result) return;
     
-    const shareText = `I checked "${result.input}" with GetCyberRight - Result: ${getRiskConfig(result.riskLevel).label}. Check suspicious links and messages free at getcyberright.com`;
+    const shareText = `I checked "${result.input}" with GetCyberRight - Result: ${getRiskConfig(result.riskLevel).label}. Check suspicious links and messages at getcyberright.com`;
     
     if (navigator.share) {
       try {

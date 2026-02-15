@@ -78,9 +78,9 @@ export const pageSEO = {
     title: "Security Resources & Guides",
     description: "Learn to protect yourself online with easy-to-follow guides on phishing, password security, privacy, and more.",
   },
-  pricing: {
-    title: "Our Promise - Everything Free",
-    description: "Every tool, guide, and course on GetCyberRight is free. No hidden fees, no premium tiers. Your family's safety should never have a price tag.",
+  mission: {
+    title: "Our Mission",
+    description: "GetCyberRight protects the people that corporate cybersecurity leaves behind. Learn about our mission and the trusted partnerships that make it possible.",
   },
   contact: {
     title: "Contact Us",

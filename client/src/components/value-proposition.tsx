@@ -104,8 +104,8 @@ export function ValueProposition() {
             Why Families Trust GetCyberRight
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Cybersecurity companies charge hundreds of dollars a year for tools we give you for free. 
-            We exist because your family deserves protection without a price tag.
+            We protect the people that corporate cybersecurity leaves behind. 
+            Your family deserves real protection, explained in plain language.
           </p>
         </motion.div>
 
@@ -231,9 +231,9 @@ export function ValueProposition() {
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </Link>
-              <Link href="/pricing">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto" data-testid="button-view-promise">
-                  Our Free Promise
+              <Link href="/our-mission">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto" data-testid="button-view-mission">
+                  Our Mission
                 </Button>
               </Link>
             </div>

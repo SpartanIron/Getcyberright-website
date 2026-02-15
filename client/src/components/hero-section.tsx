@@ -24,7 +24,7 @@ export function HeroSection() {
             <div className="inline-flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full mb-4">
               <Heart className="w-4 h-4 text-primary" />
               <span className="text-xs font-semibold text-primary uppercase tracking-wider">
-                Free for Every Family
+                Cyber Safety for Every Family
               </span>
             </div>
             

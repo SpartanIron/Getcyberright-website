@@ -30,7 +30,7 @@ const Seniors = lazy(() => import("@/pages/seniors"));
 const Parents = lazy(() => import("@/pages/parents"));
 const Support = lazy(() => import("@/pages/support"));
 const Security = lazy(() => import("@/pages/security"));
-const Pricing = lazy(() => import("@/pages/pricing"));
+const OurMission = lazy(() => import("@/pages/pricing"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const ThreatTrendsPage = lazy(() => import("@/pages/threat-trends"));
 const ReportScam = lazy(() => import("@/pages/report-scam"));
@@ -104,7 +104,8 @@ function Router() {
         <Route path="/parents/child-safety-scanner" component={ChildSafetyScanner} />
         <Route path="/support" component={Support} />
         <Route path="/security" component={Security} />
-        <Route path="/pricing" component={Pricing} />
+        <Route path="/our-mission" component={OurMission} />
+        <Route path="/pricing" component={OurMission} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/threat-trends" component={ThreatTrendsPage} />
         <Route path="/report-scam" component={ReportScam} />
