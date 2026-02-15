@@ -31,6 +31,7 @@ const Parents = lazy(() => import("@/pages/parents"));
 const Support = lazy(() => import("@/pages/support"));
 const Security = lazy(() => import("@/pages/security"));
 const OurMission = lazy(() => import("@/pages/pricing"));
+const SupportTheMission = lazy(() => import("@/pages/support-the-mission"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const ThreatTrendsPage = lazy(() => import("@/pages/threat-trends"));
 const ReportScam = lazy(() => import("@/pages/report-scam"));
@@ -106,6 +107,7 @@ function Router() {
         <Route path="/security" component={Security} />
         <Route path="/our-mission" component={OurMission} />
         <Route path="/pricing" component={OurMission} />
+        <Route path="/support-the-mission" component={SupportTheMission} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/threat-trends" component={ThreatTrendsPage} />
         <Route path="/report-scam" component={ReportScam} />

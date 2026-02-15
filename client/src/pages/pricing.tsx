@@ -262,9 +262,9 @@ export default function OurMission() {
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>
-                <Link href="/about">
-                  <Button size="lg" variant="outline" className="border-white/30 text-white bg-transparent" data-testid="button-mission-about">
-                    Read Our Story
+                <Link href="/support-the-mission">
+                  <Button size="lg" variant="outline" className="border-white/30 text-white bg-transparent" data-testid="button-support-mission">
+                    Support the Mission
                   </Button>
                 </Link>
               </div>
