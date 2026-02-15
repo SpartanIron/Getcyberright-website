@@ -114,11 +114,11 @@ const faqCategories = [
     questions: [
       {
         q: "How do you protect my data?",
-        a: "We use industry-standard security measures including HTTPS encryption, secure authentication, and minimal data collection. We do not sell your data or use invasive tracking. See our Privacy Policy for complete details."
+        a: "We use industry-standard security measures including HTTPS encryption, secure authentication, and minimal data collection. We use analytics to improve your experience, but we never sell your data or share it with advertisers. See our Privacy Policy for complete details."
       },
       {
         q: "Do you use cookies?",
-        a: "We use essential cookies for site functionality. We do not use behavioral tracking cookies or share your data with advertisers. You can manage cookie preferences in your browser settings."
+        a: "We use essential cookies for site functionality and analytics cookies to understand how visitors use the site so we can improve it. We never share your data with advertisers. You can manage cookie preferences in your browser settings."
       },
       {
         q: "How can I contact you about privacy concerns?",

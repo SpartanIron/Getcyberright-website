@@ -43,7 +43,7 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **Compliance**: Mapped controls to OWASP ASVS, CIS Control, ISO 27001, NIST 800-53, MITRE ATT&CK. NIST 800-53 Compliance Dashboard for Enterprise.
 - **Admin Dashboard**: Real-time security monitoring at `/admin/security`.
 - **Security Monitoring**: Real-time threat detection tracking failed logins, rate limit exceeded events, and CSRF violations with automatic security alert generation.
-- **Privacy Commitment**: No behavioral tracking, minimal data collection, no data sales, GDPR-conscious design.
+- **Privacy Commitment**: Analytics used only to improve user experience, minimal data collection, no data sales, GDPR-conscious design.
 
 ### Content & Tools
 - **Content Guidelines**: Educational content based on verified sources (FTC, FBI IC3, CISA), emphasizing empowering language.

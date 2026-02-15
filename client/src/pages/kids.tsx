@@ -508,7 +508,7 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
               <div>
                 <p className="text-sm font-medium text-teal-800 dark:text-teal-200">Built for Learning, Not Data Collection</p>
                 <p className="text-sm text-teal-600 dark:text-teal-400">
-                  This section does not collect any personal information from children. No accounts, no tracking, no ads. Just safe learning.
+                  This section does not collect any personal information from children. No accounts required, no ads. Just safe learning.
                 </p>
               </div>
             </div>
@@ -1099,9 +1099,9 @@ function ParentSection() {
           <div className="grid md:grid-cols-3 gap-6">
             <Card className="text-center p-6">
               <Shield className="w-10 h-10 text-teal-500 mx-auto mb-4" />
-              <h4 className="font-semibold text-foreground mb-2">No Data Collection</h4>
+              <h4 className="font-semibold text-foreground mb-2">Child Privacy First</h4>
               <p className="text-sm text-muted-foreground">
-                We do not collect any personal information from children. No accounts, no tracking, no profiles.
+                We do not collect any personal information from children. No accounts required, no profiles, no ads.
               </p>
             </Card>
             <Card className="text-center p-6">

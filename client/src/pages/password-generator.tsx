@@ -64,8 +64,8 @@ export default function PasswordGeneratorPage() {
                 <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 mb-3">
                   <Eye className="h-5 w-5" />
                 </div>
-                <h3 className="font-semibold mb-1">No Tracking</h3>
-                <p className="text-sm text-muted-foreground">Zero data collection</p>
+                <h3 className="font-semibold mb-1">Runs Locally</h3>
+                <p className="text-sm text-muted-foreground">Passwords never leave your device</p>
               </CardContent>
             </Card>
           </div>

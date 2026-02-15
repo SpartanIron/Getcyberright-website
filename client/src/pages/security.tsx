@@ -70,9 +70,9 @@ export default function SecurityPage() {
       title: "Privacy Protection",
       description: "Your data is handled with care and transparency.",
       details: [
-        "No tracking cookies or third-party analytics",
+        "Analytics used only to improve your experience",
         "Form submissions stored securely",
-        "No personal data shared with third parties",
+        "Personal data never sold or shared with advertisers",
         "Security tools run entirely in your browser",
       ],
       compliance: ["GDPR", "Privacy by Design"],
