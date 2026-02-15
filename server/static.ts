@@ -27,6 +27,8 @@ const KNOWN_CLIENT_ROUTES = new Set([
   "/report-scam",
   "/checklists",
   "/data-removal",
+  "/advertise",
+  "/partner-deck",
   "/training",
   "/training/kids",
   "/training/parents",

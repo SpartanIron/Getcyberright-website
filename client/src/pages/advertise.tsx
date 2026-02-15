@@ -12,7 +12,6 @@ import { useSEO } from "@/hooks/use-seo";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { useRecaptcha } from "@/hooks/use-recaptcha";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 const audienceStats = [
@@ -62,7 +61,6 @@ const idealPartners = [
 
 export default function Advertise() {
   const { toast } = useToast();
-  const { getRecaptchaToken } = useRecaptcha();
   const [formData, setFormData] = useState({
     companyName: "",
     contactName: "",
@@ -95,14 +93,13 @@ export default function Advertise() {
   const submitInquiry = useMutation({
     mutationFn: async (data: typeof formData) => {
       const csrfToken = await getCSRFToken();
-      const recaptchaToken = await getRecaptchaToken('partnership_inquiry');
       const response = await fetch("/api/partnership/inquire", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
           "x-csrf-token": csrfToken
         },
-        body: JSON.stringify({ ...data, _timestamp: formTimestamp.toString(), recaptchaToken }),
+        body: JSON.stringify({ ...data, _timestamp: formTimestamp.toString() }),
         credentials: "include"
       });
       if (!response.ok) {
@@ -488,11 +485,6 @@ export default function Advertise() {
                           </Button>
                           <p className="text-xs text-center text-muted-foreground mt-3">
                             We'll review your inquiry and get back to you within 48 hours.
-                          </p>
-                          <p className="text-xs text-center text-muted-foreground/70 mt-2">
-                            This site is protected by reCAPTCHA and the Google{' '}
-                            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">Privacy Policy</a> and{' '}
-                            <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">Terms of Service</a> apply.
                           </p>
                         </div>
                       </form>
