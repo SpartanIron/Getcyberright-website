@@ -89,7 +89,7 @@ const aiThreats = [
       "Verify caller identity with personal questions"
     ],
     audienceImpact: {
-      seniors: "Voice cloning used for 'grandparent scams' - calls that sound exactly like family",
+      seniors: "Voice cloning used for 'grandparent scams': calls that sound exactly like family.",
       business: "Fake CEO voice messages authorizing urgent wire transfers",
       parents: "Fake distress calls from 'children' demanding immediate money"
     }
@@ -104,7 +104,7 @@ const aiThreats = [
     howItWorks: [
       "AI scrapes your social media and online presence",
       "Creates highly personalized messages referencing real details",
-      "Perfect grammar and natural tone - no obvious 'red flags'",
+      "Perfect grammar and natural tone with no obvious 'red flags'.",
       "Can mimic writing styles of specific individuals",
       "Generates thousands of unique emails instantly"
     ],
@@ -112,7 +112,7 @@ const aiThreats = [
       "Verify unexpected requests through a separate channel",
       "Hover over links before clicking (check the real URL)",
       "Be suspicious even if the email 'sounds' right",
-      "Don't trust sender names - verify email addresses",
+      "Don't trust sender names. Verify email addresses.",
       "When in doubt, contact the company directly"
     ],
     audienceImpact: {
@@ -294,7 +294,7 @@ export default function AISafety() {
               AI & Cyber Safety
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Artificial intelligence is transforming cybersecurity - both as a powerful defense tool and a dangerous weapon in the hands of criminals. Learn to protect yourself in the AI era.
+              Artificial intelligence is transforming cybersecurity, both as a powerful defense tool and a dangerous weapon in the hands of criminals. Learn to protect yourself in the AI era.
             </p>
             
             <div className="flex flex-wrap justify-center gap-4">
@@ -512,7 +512,7 @@ export default function AISafety() {
               Using AI Responsibly
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              AI tools like ChatGPT, Claude, and Gemini can be incredibly helpful - but only if you use them safely. Follow these guidelines to protect yourself.
+              AI tools like ChatGPT, Claude, and Gemini can be incredibly helpful, but only if you use them safely. Follow these guidelines to protect yourself.
             </p>
           </motion.div>
 

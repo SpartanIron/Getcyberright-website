@@ -924,7 +924,7 @@ export default function Resources() {
                                   <Play className="w-8 h-8 text-primary" />
                                 </div>
                                 <p className="text-muted-foreground text-center">
-                                  Video training content - In a full implementation, this would embed an educational video player.
+                                  Video training content. In a full implementation, this would embed an educational video player.
                                   <br />
                                   <span className="text-sm">For now, review the training topics below.</span>
                                 </p>

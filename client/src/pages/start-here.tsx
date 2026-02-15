@@ -115,7 +115,7 @@ export default function StartHere() {
   const [selectedPathway, setSelectedPathway] = useState<string | null>(null);
 
   useSEO({
-    title: "Start Here - GetCyberRight",
+    title: "Start Here | GetCyberRight",
     description: "New to GetCyberRight? Find the right resources for you based on who you're protecting.",
   });
 

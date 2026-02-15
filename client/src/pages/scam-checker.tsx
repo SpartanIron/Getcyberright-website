@@ -19,7 +19,7 @@ interface ScamTrend {
 
 export default function ScamCheckerPage() {
   useSEO({
-    title: "Scam Checker - Verify Links & Messages | GetCyberRight",
+    title: "Scam Checker: Verify Links & Messages | GetCyberRight",
     description: "Free scam detection tool. Check suspicious links, phone numbers, and messages instantly. Protect your family from fraud.",
     keywords: "scam checker, fraud detection, phishing detector, link checker, URL scanner, is it a scam, verify message, free scam checker"
   });

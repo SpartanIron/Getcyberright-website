@@ -109,7 +109,7 @@ export default function SupportTheMission() {
                     <h3 className="text-2xl font-bold mb-3" data-testid="heading-notify">Get Early Access</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       We're putting the finishing touches on the store. 
-                      Drop your email and we'll let you know the moment it goes live — early supporters get first pick.
+                      Drop your email and we'll let you know the moment it goes live. Early supporters get first pick.
                     </p>
                   </div>
                   <Link href="/contact">
