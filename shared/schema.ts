@@ -1034,6 +1034,78 @@ export const brokerPerformance = pgTable("broker_performance", {
 
 export type BrokerPerformance = typeof brokerPerformance.$inferSelect;
 
+// AI Prompt Library - Prompts stored in database
+export const aiPrompts = pgTable("ai_prompts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  promptText: text("prompt_text").notNull(),
+  audience: text("audience").array().notNull(),
+  category: text("category").notNull(),
+  tags: text("tags").array().notNull(),
+  useCase: text("use_case").notNull(),
+  safetyNote: text("safety_note"),
+  iconName: text("icon_name").notNull(),
+  isActive: boolean("is_active").default(true),
+  version: integer("version").default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type AiPrompt = typeof aiPrompts.$inferSelect;
+export const insertAiPromptSchema = createInsertSchema(aiPrompts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertAiPrompt = z.infer<typeof insertAiPromptSchema>;
+
+// AI Prompt Reviews - AI-suggested improvements and new prompts
+export const promptReviews = pgTable("prompt_reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  promptId: varchar("prompt_id"),
+  reviewType: text("review_type").notNull(),
+  proposedTitle: text("proposed_title"),
+  proposedPromptText: text("proposed_prompt_text"),
+  proposedTags: text("proposed_tags").array(),
+  proposedUseCase: text("proposed_use_case"),
+  proposedSafetyNote: text("proposed_safety_note"),
+  proposedAudience: text("proposed_audience").array(),
+  proposedCategory: text("proposed_category"),
+  proposedIconName: text("proposed_icon_name"),
+  rationale: text("rationale"),
+  qualityScore: integer("quality_score"),
+  aiModel: text("ai_model"),
+  status: text("status").notNull().default("pending"),
+  reviewRunId: varchar("review_run_id"),
+  reviewedBy: varchar("reviewed_by"),
+  reviewedAt: timestamp("reviewed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type PromptReview = typeof promptReviews.$inferSelect;
+export const insertPromptReviewSchema = createInsertSchema(promptReviews).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertPromptReview = z.infer<typeof insertPromptReviewSchema>;
+
+// Prompt Review Runs - Tracks batch review executions
+export const promptReviewRuns = pgTable("prompt_review_runs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  status: text("status").notNull().default("running"),
+  triggerType: text("trigger_type").notNull(),
+  promptsReviewed: integer("prompts_reviewed").default(0),
+  improvementsSuggested: integer("improvements_suggested").default(0),
+  newPromptsSuggested: integer("new_prompts_suggested").default(0),
+  summary: text("summary"),
+  errorMessage: text("error_message"),
+  startedAt: timestamp("started_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+});
+
+export type PromptReviewRun = typeof promptReviewRuns.$inferSelect;
+
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],
   scan_found: ["request_generated", "not_found"],
