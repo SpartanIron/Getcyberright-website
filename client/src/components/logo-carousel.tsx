@@ -5,12 +5,16 @@ const trustedSources = [
   { name: "FTC", fullName: "Federal Trade Commission", focus: "Consumer Protection" },
   { name: "CISA", fullName: "Cybersecurity & Infrastructure Security Agency", focus: "Cybersecurity" },
   { name: "FBI IC3", fullName: "FBI Internet Crime Complaint Center", focus: "Cybercrime Reporting" },
+  { name: "Europol", fullName: "European Union Agency for Law Enforcement", focus: "European Cybercrime" },
+  { name: "UK NCSC", fullName: "UK National Cyber Security Centre", focus: "UK Cybersecurity" },
+  { name: "INTERPOL", fullName: "INTERPOL Cybercrime", focus: "International Cybercrime" },
+  { name: "ACSC", fullName: "Australian Cyber Security Centre", focus: "Australian Cybersecurity" },
+  { name: "ITU", fullName: "International Telecommunication Union", focus: "UN Cybersecurity" },
   { name: "AARP", fullName: "AARP Fraud Watch Network", focus: "Senior Protection" },
   { name: "NCMEC", fullName: "National Center for Missing & Exploited Children", focus: "Child Safety" },
   { name: "StopBullying.gov", fullName: "StopBullying.gov", focus: "Youth Safety" },
   { name: "NCSA", fullName: "National Cyber Security Alliance", focus: "Cybersecurity Education" },
   { name: "BBB", fullName: "Better Business Bureau", focus: "Consumer Protection" },
-  { name: "INTERPOL", fullName: "INTERPOL Cybercrime", focus: "International Cybercrime" },
   { name: "OnGuardOnline", fullName: "OnGuard Online", focus: "Online Safety" },
 ];
 
@@ -33,13 +37,13 @@ export function LogoCarousel() {
         <motion.div
           className="flex items-center gap-12 md:gap-16"
           animate={{
-            x: [0, -1200],
+            x: [0, -1680],
           }}
           transition={{
             x: {
               repeat: Infinity,
               repeatType: "loop",
-              duration: 30,
+              duration: 40,
               ease: "linear",
             },
           }}
