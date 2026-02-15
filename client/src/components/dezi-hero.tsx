@@ -795,15 +795,15 @@ export function DeziHero({ compact = false }: DeziHeroProps) {
           >
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-teal-500" />
-              Always Free
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-teal-500" />
-              No Sign-up
+              No Sign-up Needed
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-teal-500" />
               Instant Results
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-teal-500" />
+              Expert Sources
             </div>
           </motion.div>
 

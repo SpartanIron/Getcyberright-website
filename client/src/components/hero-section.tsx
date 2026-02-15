@@ -36,13 +36,13 @@ export function HeroSection() {
             </h1>
 
             <p className="text-sm sm:text-base text-white/80 font-medium mb-4 leading-relaxed">
-              Free tools that protect your kids, your parents, and you from scams, identity theft, and online threats. Built by a family, for families.
+              Tools that protect your kids, your parents, and you from scams, identity theft, and online threats. Built by a family, for families.
             </p>
 
             <ul className="space-y-2 mb-6 text-xs sm:text-sm font-medium text-left max-w-xs mx-auto">
               <li className="flex items-start gap-3 text-white/80">
                 <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>100% free. No hidden fees. No premium tiers.</span>
+                <span>Check scams, remove your data, learn to stay safe.</span>
               </li>
               <li className="flex items-start gap-3 text-white/80">
                 <Heart className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
@@ -50,7 +50,7 @@ export function HeroSection() {
               </li>
               <li className="flex items-start gap-3 text-white/80">
                 <Users className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>Plain language. No jargon. Just safety you can trust.</span>
+                <span>Plain language. No jargon. No sign-up required.</span>
               </li>
             </ul>
 
@@ -158,7 +158,7 @@ export function HeroSection() {
             <div className="inline-flex items-center gap-2 bg-primary/20 px-4 py-2 rounded-full mb-6">
               <Heart className="w-5 h-5 text-primary" />
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                Free for Every Family
+                Cyber Safety for Every Family
               </span>
             </div>
 
@@ -173,7 +173,7 @@ export function HeroSection() {
               className="text-xl text-white/90 font-medium leading-relaxed mb-4" 
               data-testid="text-hero-subtext"
             >
-              Free tools that protect your kids, your parents, and you from scams, identity theft, and online threats. Built by a family, for families.
+              Tools that protect your kids, your parents, and you from scams, identity theft, and online threats. Built by a family, for families.
             </p>
 
             <ul className="space-y-3 mb-10 text-sm font-medium">
@@ -181,7 +181,7 @@ export function HeroSection() {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Shield className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>100% free. No hidden fees. No premium tiers.</span>
+                <span>Check scams, remove your data, learn to stay safe.</span>
               </li>
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
@@ -193,7 +193,7 @@ export function HeroSection() {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Users className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>Plain language. No jargon. Just safety you can trust.</span>
+                <span>Plain language. No jargon. No sign-up required.</span>
               </li>
             </ul>
 

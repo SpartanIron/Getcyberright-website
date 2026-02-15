@@ -604,7 +604,7 @@ export function AudioDeepfakeDetector() {
                   <p className="text-sm text-blue-700 dark:text-blue-300">
                     Production AI detection analyzes audio for patterns common in synthetic speech: 
                     unnatural pauses, missing breathing sounds, robotic intonation, 
-                    and digital artifacts. All analysis features are free for everyone.
+                    and digital artifacts.
                   </p>
                 </div>
               </div>

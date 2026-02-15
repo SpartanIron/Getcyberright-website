@@ -11,7 +11,7 @@ import { TechPatternBg } from "@/components/tech-pattern-bg";
 export default function PasswordGeneratorPage() {
   useSEO({
     title: "Security Key Generator (SKG) - Create Secure Keys & Passwords | GetCyberRight",
-    description: "Generate secure passwords, passphrases, API keys, encryption keys, UUIDs, and JWT secrets. 100% free, runs locally in your browser for maximum privacy.",
+    description: "Generate secure passwords, passphrases, API keys, encryption keys, UUIDs, and JWT secrets. Runs locally in your browser for maximum privacy.",
     keywords: "security key generator, password generator, API key generator, encryption key, JWT secret, UUID generator, passphrase, secure password"
   });
 

@@ -36,7 +36,7 @@ export function HeroBanner() {
             transition={{ duration: 0.6, delay: 0.1 }}
             style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
           >
-            Free tools and plain-language guides to protect your whole family, from kids on social media to seniors targeted by scammers.
+            Plain-language tools and guides to protect your whole family, from kids on social media to seniors targeted by scammers.
           </motion.p>
           
           <motion.div 
@@ -76,11 +76,11 @@ export function HeroBanner() {
           >
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-teal-400" />
-              Always Free
+              No Sign-up Needed
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-teal-400" />
-              No Sign-up Required
+              Works Instantly
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-teal-400" />

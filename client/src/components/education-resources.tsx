@@ -65,7 +65,7 @@ export function EducationResources() {
                 "Written by security experts, explained for everyone",
                 "Regularly updated with the latest threat information",
                 "Available in multiple formats for different learning styles",
-                "Completely free, no registration required",
+                "No registration required",
               ].map((item, index) => (
                 <li
                   key={index}

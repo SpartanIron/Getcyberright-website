@@ -200,7 +200,7 @@ export default function Training() {
             src="/videos/promo-training.mp4"
             poster="/videos/poster-training.png"
             heading="Learn at Your Own Pace"
-            description="Structured courses, interactive quizzes, and certificates. All completely free for every family."
+            description="Structured courses, interactive quizzes, and certificates for every family."
             className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
           />
         </section>

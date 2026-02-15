@@ -73,7 +73,7 @@ export function ScamStatsCounter() {
       />
       <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
         <CheckCircle className="w-4 h-4 text-teal-400" />
-        <span className="text-slate-300">Always free, no sign-up</span>
+        <span className="text-slate-300">No sign-up required</span>
       </div>
     </motion.div>
   );

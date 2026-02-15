@@ -38,7 +38,7 @@ const allFreeTools = [
 ];
 
 const trustPromises = [
-  { icon: Ban, title: "No Hidden Fees", description: "Every tool, every guide, every course is free. No trial periods, no premium tiers, no upsells." },
+  { icon: Ban, title: "No Hidden Fees", description: "Every tool, every guide, every course. No trial periods, no premium tiers, no upsells." },
   { icon: Lock, title: "No Data Selling", description: "We never sell your personal information. Your data stays yours." },
   { icon: Eye, title: "No Tracking", description: "We do not use behavioral tracking or sell your browsing habits to advertisers." },
   { icon: Heart, title: "Family First", description: "We exist to protect families. Kids, parents, grandparents. Real people, not corporations." },
@@ -49,7 +49,7 @@ export default function Pricing() {
     <div className="min-h-screen bg-background">
       <SEOHead 
         title="Our Promise - Everything Free | GetCyberRight"
-        description="GetCyberRight is 100% free for families, parents, kids, and seniors. No hidden fees, no premium tiers. Every tool and resource is yours at no cost."
+        description="Every tool, guide, and course on GetCyberRight is free. No hidden fees, no premium tiers. Your family's safety should never have a price tag."
         keywords="free cybersecurity tools, free scam checker, family safety free"
       />
       <Navigation />
@@ -57,7 +57,7 @@ export default function Pricing() {
       <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Our Promise to You"
-          subtitle="Every tool. Every guide. Every course. 100% free. Because your family's safety should never have a price tag."
+          subtitle="Every tool. Every guide. Every course. Because your family's safety should never have a price tag."
           imageSrc={bannerImage}
           imageAlt="Shield protecting a family online"
           imagePosition="right"
@@ -74,7 +74,7 @@ export default function Pricing() {
               className="text-center mb-12"
             >
               <Badge className="mb-4 bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 no-default-hover-elevate no-default-active-elevate">
-                100% Free Forever
+                No Cost, No Catch
               </Badge>
               <h2 className="text-3xl font-bold text-foreground mb-4" data-testid="text-promise-heading">
                 Cybersecurity Should Not Be a Luxury

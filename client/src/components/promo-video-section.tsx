@@ -20,7 +20,7 @@ export function PromoVideoSection() {
       src: "/videos/ai-generated-example-2.mov",
       poster: "/videos/poster-why-it-matters.png",
       label: "Why It Matters",
-      description: "Real families. Real protection. 100% free.",
+      description: "Real families. Real protection. Real results.",
     },
   ];
 

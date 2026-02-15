@@ -449,7 +449,7 @@ export function DailyTipsSubscription() {
             </Button>
 
             <p className="text-xs text-center text-muted-foreground">
-              Free forever. Unsubscribe anytime. We respect your privacy.
+              Unsubscribe anytime. We respect your privacy.
             </p>
             <p className="text-xs text-center text-muted-foreground/70 mt-2">
               This site is protected by reCAPTCHA and the Google{' '}

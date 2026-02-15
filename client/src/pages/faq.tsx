@@ -12,11 +12,11 @@ const faqCategories = [
     questions: [
       {
         q: "What is GetCyberRight?",
-        a: "GetCyberRight is a free, mission-driven platform dedicated to family cyber safety. We provide educational resources, tools, and guidance to help families navigate the online world safely. Our content is designed for everyone, from children learning about social media to seniors protecting themselves from scams."
+        a: "GetCyberRight is a mission-driven platform dedicated to family cyber safety. We provide educational resources, tools, and guidance to help families navigate the online world safely. Our content is designed for everyone, from children learning about social media to seniors protecting themselves from scams."
       },
       {
         q: "Is GetCyberRight really free?",
-        a: "Yes, all of our educational resources, safety tools, and newsletters are completely free. We believe everyone deserves access to cybersecurity education regardless of their financial situation. Our mission is to protect families, not profit from them."
+        a: "Yes, everything on GetCyberRight is free to use. We believe everyone deserves access to cybersecurity education regardless of their financial situation. Our mission is to protect families, not profit from them."
       },
       {
         q: "Who creates the content on GetCyberRight?",

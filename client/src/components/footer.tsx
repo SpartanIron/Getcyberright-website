@@ -41,7 +41,7 @@ export function Footer() {
               <span className="font-semibold text-white">GetCyberRight</span>
             </Link>
             <p className="text-sm leading-relaxed mb-4">
-              Free cyber safety tools for families, parents, kids, and seniors. Always free. Always will be.
+              Cyber safety tools and education for families, parents, kids, and seniors.
             </p>
             <div className="flex gap-2">
               {socialLinks.map((social) => (
@@ -119,7 +119,7 @@ export function Footer() {
                 <MapPin className="w-3 h-3" aria-hidden="true" /> United States
               </span>
               <span className="flex items-center gap-1">
-                <Shield className="w-3 h-3" aria-hidden="true" /> 100% Free for Families
+                <Shield className="w-3 h-3" aria-hidden="true" /> Built for Families
               </span>
               <span>Trusted by families in 50+ countries</span>
             </div>

@@ -7,15 +7,15 @@ const differentiators = [
   {
     icon: Heart,
     title: "Built for Families, Not Corporations",
-    description: "While others sell cybersecurity to businesses, we give it free to the people who need it most: parents, kids, seniors, and everyday families.",
+    description: "While others sell cybersecurity to businesses, we built ours for the people who need it most: parents, kids, seniors, and everyday families.",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     href: "/about",
   },
   {
     icon: Shield,
-    title: "100% Free. No Catch.",
-    description: "Every tool, every guide, every course. Free forever. No premium tiers, no trial periods, no credit card required.",
+    title: "Real Tools, Not Just Advice",
+    description: "AI-powered scam detection, data broker removal, voice clone detection, and more. No sign-up, no credit card, no barriers.",
     color: "text-primary",
     bgColor: "bg-primary/10",
     href: "/tools",

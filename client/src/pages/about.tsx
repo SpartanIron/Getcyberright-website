@@ -14,7 +14,7 @@ import familySecurityImage from "@/assets/images/about-family-security.jpg";
 import seniorsLearningImage from "@/assets/images/professional-black-woman.png";
 
 const stats = [
-  { value: "100%", label: "Free Forever" },
+  { value: "5", label: "Core Pillars" },
   { value: "Global", label: "Family Reach" },
   { value: "24/7", label: "Access Available" },
   { value: "0", label: "Technical Jargon" }
@@ -29,7 +29,7 @@ export default function About() {
       <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Our Story: Why We Built GetCyberRight"
-          subtitle="Free cybersecurity tools built by a family, for families. Every parent, every grandparent, every child deserves protection they can understand and trust."
+          subtitle="Cybersecurity tools built by a family, for families. Every parent, every grandparent, every child deserves protection they can understand and trust."
           imageSrc={bannerImage}
           imageAlt="Diverse GetCyberRight team with African woman leader in the center, all wearing branded red shirts in a modern office"
           imagePosition="left"
@@ -182,10 +182,9 @@ export default function About() {
               <Card>
                 <CardContent className="p-8">
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Every tool, every guide, and every course on GetCyberRight is completely 
-                    free. No premium tiers, no hidden fees, no paywalls. We believe 
-                    cybersecurity should be accessible to every family, regardless of their 
-                    budget.
+                    Every tool, guide, and course on GetCyberRight is yours to use. No premium 
+                    tiers, no hidden fees, no paywalls. We believe cybersecurity should be 
+                    accessible to every family, regardless of their budget.
                   </p>
                   <p className="text-muted-foreground leading-relaxed mb-4">
                     We are supported by community contributions and carefully selected 

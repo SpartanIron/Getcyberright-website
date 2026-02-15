@@ -10,7 +10,7 @@ interface SEOHeadProps {
 }
 
 const defaultTitle = "GetCyberRight - Cybersecurity Education for Everyone";
-const defaultDescription = "Free cybersecurity tools and education for families, parents, kids, and seniors. 100% free, always. Protect yourself from scams, data brokers, and online threats.";
+const defaultDescription = "Cybersecurity tools and education for families, parents, kids, and seniors. Protect yourself from scams, data brokers, and online threats.";
 const defaultKeywords = "cybersecurity, online safety, phishing protection, scam prevention, identity theft, security training";
 
 export function SEOHead({
@@ -68,7 +68,7 @@ export function SEOHead({
 export const pageSEO = {
   home: {
     title: undefined,
-    description: "Free cybersecurity tools for families, parents, kids, and seniors. Check scams, remove your data from brokers, and learn to stay safe online. 100% free, always.",
+    description: "Cybersecurity tools for families, parents, kids, and seniors. Check scams, remove your data from brokers, and learn to stay safe online. No sign-up required.",
   },
   tools: {
     title: "Security Tools",
@@ -80,7 +80,7 @@ export const pageSEO = {
   },
   pricing: {
     title: "Our Promise - Everything Free",
-    description: "GetCyberRight is 100% free for families. No hidden fees, no premium tiers. Every tool and resource is yours at no cost, forever.",
+    description: "Every tool, guide, and course on GetCyberRight is free. No hidden fees, no premium tiers. Your family's safety should never have a price tag.",
   },
   contact: {
     title: "Contact Us",
