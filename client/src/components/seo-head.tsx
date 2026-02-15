@@ -159,16 +159,16 @@ export const pageSEO = {
     description: "Stay informed about the latest cyber threats and scam trends. Real-time threat intelligence updates.",
   },
   partnerships: {
-    title: "Partnership Opportunities",
-    description: "Partner with GetCyberRight to bring cybersecurity education to your community or organization.",
+    title: "Partnership Deck",
+    description: "Explore how partnering with GetCyberRight connects your brand with safety-conscious families worldwide. Mission-aligned sponsorship with full editorial independence.",
   },
   security: {
     title: "Our Security Practices",
     description: "Learn how GetCyberRight keeps your data safe. Our security measures and certifications explained.",
   },
   advertising: {
-    title: "Advertising",
-    description: "Advertise with GetCyberRight. Reach security-conscious consumers with your trusted brand.",
+    title: "Partner With Us",
+    description: "Join GetCyberRight as a trusted partner. Reach families actively seeking security solutions through mission-aligned sponsorship.",
   },
   checkoutSuccess: {
     title: "Thank You",

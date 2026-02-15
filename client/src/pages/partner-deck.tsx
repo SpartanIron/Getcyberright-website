@@ -10,7 +10,8 @@ import { useQuery } from "@tanstack/react-query";
 import { 
   Shield, Globe, Users, TrendingUp, Heart, Building2,
   CheckCircle, Download, Mail, Handshake, Award,
-  Smartphone, Target, Zap, BarChart3, Languages
+  Target, Zap, BarChart3, Languages, Lock, Eye,
+  BookOpen, ArrowRight
 } from "lucide-react";
 import logoImage from "@assets/image_1767834716649.png";
 
@@ -22,9 +23,9 @@ interface PublicStats {
 
 export default function PartnerDeck() {
   useSEO({
-    title: "Partner With GetCyberRight | Partnership Overview",
-    description: "Partner with GetCyberRight to protect families worldwide from online threats. Download our partnership deck and explore collaboration opportunities.",
-    keywords: "partnership, cybersecurity partnership, family safety partner, digital safety collaboration"
+    title: "Partnership Deck | GetCyberRight",
+    description: "Explore how partnering with GetCyberRight connects your brand with safety-conscious families worldwide. Mission-aligned sponsorship with full editorial independence.",
+    keywords: "partnership deck, cybersecurity partnership, family safety partner, trusted sponsorship"
   });
 
   const { data: stats } = useQuery<PublicStats>({
@@ -44,17 +45,17 @@ export default function PartnerDeck() {
         <div className="relative container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center text-white">
             <div className="flex justify-center mb-6 print:mb-4">
-              <img src={logoImage} alt="GetCyberRight" className="h-16 print:h-12" />
+              <img src={logoImage} alt="GetCyberRight" className="h-16 print:h-12" data-testid="img-logo" />
             </div>
             <Badge className="mb-4 bg-teal-500/20 text-teal-300 border-teal-500/50 print:hidden">
               <Handshake className="h-3 w-3 mr-1" />
-              Partnership Overview
+              Partnership Deck
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 print:text-3xl">GetCyberRight</h1>
-            <p className="text-2xl text-teal-300 mb-4 print:text-xl">Family Cyber Safety for Everyone</p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 print:text-3xl" data-testid="heading-deck-title">GetCyberRight</h1>
+            <p className="text-2xl text-teal-300 mb-4 print:text-xl">Cyber Safety for Every Family</p>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto print:text-base">
-              A mission-driven platform protecting families from online threats across six continents. 
-              Free resources, real-time threat intelligence, and educational tools for all ages.
+              We protect the people that corporate cybersecurity leaves behind. 
+              Our partners help us reach more families while building brand trust with a high-intent audience.
             </p>
           </div>
         </div>
@@ -74,7 +75,7 @@ export default function PartnerDeck() {
                   <div className="w-12 h-12 mx-auto mb-3 bg-teal-100 dark:bg-teal-900/30 rounded-xl flex items-center justify-center print:w-10 print:h-10">
                     <Shield className="h-6 w-6 text-teal-600 dark:text-teal-400 print:h-5 print:w-5" />
                   </div>
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 print:text-2xl">{totalChecks > 0 ? totalChecks.toLocaleString() + "+" : "Growing"}</div>
+                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 print:text-2xl" data-testid="stat-checks">{totalChecks > 0 ? totalChecks.toLocaleString() + "+" : "Growing"}</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">Scam Checks Performed</div>
                 </CardContent>
               </Card>
@@ -85,7 +86,7 @@ export default function PartnerDeck() {
                   <div className="w-12 h-12 mx-auto mb-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center print:w-10 print:h-10">
                     <Languages className="h-6 w-6 text-blue-600 dark:text-blue-400 print:h-5 print:w-5" />
                   </div>
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 print:text-2xl">4</div>
+                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 print:text-2xl" data-testid="stat-languages">4</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">Languages Supported</div>
                 </CardContent>
               </Card>
@@ -96,7 +97,7 @@ export default function PartnerDeck() {
                   <div className="w-12 h-12 mx-auto mb-3 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center print:w-10 print:h-10">
                     <Globe className="h-6 w-6 text-green-600 dark:text-green-400 print:h-5 print:w-5" />
                   </div>
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 print:text-2xl">6+</div>
+                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 print:text-2xl" data-testid="stat-continents">6+</div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">Continents Reached</div>
                 </CardContent>
               </Card>
@@ -104,11 +105,11 @@ export default function PartnerDeck() {
             <motion.div variants={fadeInUp}>
               <Card className="text-center border-2 hover:border-teal-200 dark:hover:border-teal-800 transition-colors">
                 <CardContent className="p-6 print:p-4">
-                  <div className="w-12 h-12 mx-auto mb-3 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center print:w-10 print:h-10">
-                    <Heart className="h-6 w-6 text-red-600 dark:text-red-400 print:h-5 print:w-5" />
+                  <div className="w-12 h-12 mx-auto mb-3 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center print:w-10 print:h-10">
+                    <Target className="h-6 w-6 text-amber-600 dark:text-amber-400 print:h-5 print:w-5" />
                   </div>
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 print:text-2xl">100%</div>
-                  <div className="text-sm text-slate-600 dark:text-slate-400">Free Core Resources</div>
+                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1 print:text-2xl" data-testid="stat-audiences">5</div>
+                  <div className="text-sm text-slate-600 dark:text-slate-400">Dedicated Audience Hubs</div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -117,7 +118,7 @@ export default function PartnerDeck() {
           <div className="grid lg:grid-cols-2 gap-8 mb-12 print:gap-6 print:mb-8">
             <Card>
               <CardContent className="p-6 print:p-4">
-                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 print:text-xl">
+                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 print:text-xl" data-testid="heading-mission">
                   <Target className="w-6 h-6 text-teal-600 print:w-5 print:h-5" />
                   Our Mission
                 </h2>
@@ -143,7 +144,7 @@ export default function PartnerDeck() {
 
             <Card>
               <CardContent className="p-6 print:p-4">
-                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 print:text-xl">
+                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 print:text-xl" data-testid="heading-capabilities">
                   <Zap className="w-6 h-6 text-amber-600 print:w-5 print:h-5" />
                   Platform Capabilities
                 </h2>
@@ -151,10 +152,10 @@ export default function PartnerDeck() {
                   {[
                     { icon: Shield, label: "AI Scam Checker", desc: "URL, phone, email, QR analysis" },
                     { icon: BarChart3, label: "Threat Dashboard", desc: "Real-time global trends" },
-                    { icon: Users, label: "Age-Specific Hubs", desc: "Youth, seniors, parents" },
-                    { icon: Smartphone, label: "Mobile-First", desc: "75%+ mobile traffic" },
+                    { icon: Users, label: "Age-Specific Hubs", desc: "Kids, seniors, parents, educators" },
+                    { icon: BookOpen, label: "Training Academy", desc: "Courses, quizzes, certificates" },
                     { icon: Languages, label: "Multi-Language", desc: "EN, ES, FR, PT" },
-                    { icon: Mail, label: "Email Alerts", desc: "Weekly safety tips" }
+                    { icon: Mail, label: "Safety Newsletters", desc: "Weekly tips and alerts" }
                   ].map((item, i) => {
                     const Icon = item.icon;
                     return (
@@ -172,9 +173,35 @@ export default function PartnerDeck() {
             </Card>
           </div>
 
+          <Card className="mb-12 bg-gradient-to-br from-slate-50 to-teal-50 dark:from-slate-900 dark:to-teal-950/30 print:mb-8">
+            <CardContent className="p-6 print:p-4">
+              <h2 className="text-2xl font-bold mb-4 text-center print:text-xl" data-testid="heading-why-partner">Why Companies Partner With Us</h2>
+              <p className="text-sm text-muted-foreground text-center mb-6 max-w-2xl mx-auto">
+                Our audience arrives with intent. They're not browsing — they're actively seeking ways to protect their families. That makes every partnership placement meaningful.
+              </p>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  { title: "High-Intent Audience", desc: "Visitors actively seeking security solutions for their families", icon: Target },
+                  { title: "Trust Transfer", desc: "Your brand benefits from our credibility with families worldwide", icon: Heart },
+                  { title: "Contextual Fit", desc: "Your product appears alongside the content it naturally complements", icon: BookOpen },
+                  { title: "Growing Platform", desc: "Expanding reach with continuous development and new capabilities", icon: TrendingUp }
+                ].map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={i} className="text-center p-4">
+                      <Icon className="w-8 h-8 text-teal-600 mx-auto mb-2" />
+                      <h3 className="font-bold mb-1">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="mb-12 print:mb-8">
             <CardContent className="p-6 print:p-4">
-              <h2 className="text-2xl font-bold mb-6 text-center print:text-xl">Partnership Opportunities</h2>
+              <h2 className="text-2xl font-bold mb-6 text-center print:text-xl" data-testid="heading-opportunities">Partnership Opportunities</h2>
               <div className="grid md:grid-cols-3 gap-6 print:gap-4">
                 <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
                   <div className="flex items-center gap-2 mb-3">
@@ -182,7 +209,7 @@ export default function PartnerDeck() {
                     <h3 className="font-bold">Sponsorship</h3>
                   </div>
                   <ul className="space-y-1">
-                    {["Banner advertising", "Newsletter sponsorship", "Sponsored content", "Event partnerships"].map((item, j) => (
+                    {["Featured partner placement", "Newsletter sponsorship", "Sponsored educational content", "Safety campaign partnerships"].map((item, j) => (
                       <li key={j} className="text-sm text-muted-foreground flex items-center gap-2">
                         <CheckCircle className="w-3 h-3 text-teal-500 flex-shrink-0" />
                         {item}
@@ -222,22 +249,24 @@ export default function PartnerDeck() {
             </CardContent>
           </Card>
 
-          <Card className="mb-12 bg-gradient-to-br from-slate-50 to-teal-50 dark:from-slate-900 dark:to-teal-950/30 print:mb-8">
+          <Card className="mb-12 border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20 print:mb-8">
             <CardContent className="p-6 print:p-4">
-              <h2 className="text-2xl font-bold mb-4 text-center print:text-xl">Why Partner With Us?</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <h2 className="text-2xl font-bold mb-4 text-center print:text-xl" data-testid="heading-editorial">Our Commitment to Partners and Users</h2>
+              <p className="text-sm text-muted-foreground text-center mb-6 max-w-2xl mx-auto">
+                Trust is the foundation of everything we do. These commitments protect our users, our partners, and the integrity of this platform.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
                 {[
-                  { title: "Mission-Aligned", desc: "Your brand associates with trust and family protection", icon: Heart },
-                  { title: "Global Reach", desc: "Communities across Americas, Africa, Europe, Asia", icon: Globe },
-                  { title: "Engaged Audience", desc: "Safety-conscious families actively seeking solutions", icon: Users },
-                  { title: "Growing Platform", desc: "Continuous development and expanding capabilities", icon: TrendingUp }
-                ].map((item, i) => {
+                  { icon: Shield, text: "Partners never influence our recommendations or editorial content" },
+                  { icon: Eye, text: "All sponsored content is clearly labeled and transparent" },
+                  { icon: Lock, text: "We never share user data with partners or third parties" },
+                  { icon: CheckCircle, text: "We only partner with companies we'd recommend to our own families" },
+                ].map((item, index) => {
                   const Icon = item.icon;
                   return (
-                    <div key={i} className="text-center p-4">
-                      <Icon className="w-8 h-8 text-teal-600 mx-auto mb-2" />
-                      <h3 className="font-bold mb-1">{item.title}</h3>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    <div key={index} className="flex items-start gap-3">
+                      <Icon className="w-5 h-5 text-teal-600 dark:text-teal-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm font-medium">{item.text}</p>
                     </div>
                   );
                 })}
@@ -250,20 +279,21 @@ export default function PartnerDeck() {
               <Button 
                 onClick={handleDownloadPDF}
                 size="lg"
-                className="bg-teal-600 hover:bg-teal-700"
+                data-testid="button-download-pdf"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Download as PDF
               </Button>
               <Link href="/advertise">
-                <Button size="lg" variant="outline">
+                <Button size="lg" variant="outline" data-testid="button-contact-us">
                   <Mail className="w-4 h-4 mr-2" />
-                  Contact Us
+                  Start a Conversation
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
             <p className="text-sm text-muted-foreground mt-4">
-              Questions? Email us at <a href="mailto:partner@getcyberright.com" className="text-teal-600 hover:underline">partner@getcyberright.com</a>
+              Questions? Email us at <a href="mailto:partner@getcyberright.com" className="text-teal-600 hover:underline" data-testid="link-partner-email">partner@getcyberright.com</a>
             </p>
           </div>
 
