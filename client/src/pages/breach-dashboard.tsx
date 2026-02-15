@@ -506,7 +506,7 @@ export default function BreachDashboard() {
               Breach data is checked every 24 hours. You'll receive an email alert when new breaches are detected.
             </p>
             <p className="mt-2">
-              <a href="/privacy-policy" className="text-blue-400 hover:underline">Privacy Policy</a>
+              <a href="/privacy" className="text-blue-400 hover:underline">Privacy Policy</a>
               {' · '}
               <a href="/" className="text-blue-400 hover:underline">Back to Home</a>
             </p>

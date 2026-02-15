@@ -439,7 +439,7 @@ export default function TrainingAudience() {
                   </Button>
                 </Link>
               )}
-              <Link href="/signup">
+              <Link href="/register">
                 <Button variant="outline" size="lg">
                   Create Account
                 </Button>

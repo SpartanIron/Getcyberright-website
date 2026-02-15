@@ -72,10 +72,10 @@ export default function ArticleDetail() {
           <p className="text-muted-foreground mb-6">
             The article you're looking for doesn't exist or has been removed.
           </p>
-          <Link href="/news">
+          <Link href="/resources">
             <Button variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to News
+              Back to Resources
             </Button>
           </Link>
         </div>
@@ -88,10 +88,10 @@ export default function ArticleDetail() {
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
         <div className="mb-6">
-          <Link href="/news">
+          <Link href="/resources">
             <Button variant="ghost" className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to News
+              Back to Resources
             </Button>
           </Link>
         </div>
@@ -219,10 +219,10 @@ export default function ArticleDetail() {
 
         {/* Navigation */}
         <div className="mt-8 text-center">
-          <Link href="/news">
+          <Link href="/resources">
             <Button variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to News
+              Back to Resources
             </Button>
           </Link>
         </div>

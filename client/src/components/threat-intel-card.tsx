@@ -190,7 +190,7 @@ export function ThreatIntelCard({ className = "", limit = 5 }: ThreatIntelCardPr
             )}
 
             <div className="pt-2 border-t">
-              <Link href="/scam-checker">
+              <Link href="/tools">
                 <Button variant="outline" className="w-full" data-testid="button-scan-threats">
                   Scan URL or Email for Threats
                 </Button>
