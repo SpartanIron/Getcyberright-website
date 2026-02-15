@@ -12,7 +12,7 @@ Preferred communication style: Simple, everyday language.
 The platform uses an enterprise teal and orange color scheme with a flat, minimal aesthetic, prioritizing accessibility, SEO, and print support. Audience-specific hubs (Kids, Seniors, Parents, Educators, Small Business) feature distinct color themes while maintaining brand consistency. The Kids Digital Safety Hub offers age-segmented, gamified lessons.
 
 ### Technical Implementation
-- **Frontend**: React 18 with TypeScript and Vite, Wouter for routing, TanStack Query for state management, Tailwind CSS with shadcn/ui for styling, Framer Motion for animations, and React Hook Form with Zod for forms. It features a mobile-first design with dynamic SEO management.
+- **Frontend**: React 19 with TypeScript and Vite, Wouter for routing, TanStack Query for state management, Tailwind CSS with shadcn/ui for styling, Framer Motion for animations, and React Hook Form with Zod for forms. It features a mobile-first design with dynamic SEO management.
 - **Backend**: Express 5 on Node.js with TypeScript (ES modules), employing REST endpoints with robust input validation using shared Zod schemas.
 - **Authentication**: A custom system supporting email/password, TOTP MFA, backup codes, session management, email verification, password reset, and Passkeys (WebAuthn).
 - **Data Layer**: Drizzle ORM for PostgreSQL (serverless via Neon), using `drizzle-zod` for automatic Zod schema generation across 47 key tables.
