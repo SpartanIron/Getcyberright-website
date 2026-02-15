@@ -79,7 +79,7 @@ All tools and features are 100% free. No subscription tiers, no paywalls. The pl
 - **Form & Validation**: Zod, React Hook Form, @hookform/resolvers.
 - **Styling**: Tailwind CSS, class-variance-authority, tailwind-merge.
 - **Authentication**: `connect-pg-simple`, `bcrypt`, `speakeasy`, `qrcode`, `jsonwebtoken`, `otplib`, `@simplewebauthn/server`, `@simplewebauthn/browser`.
-- **Threat Intelligence**: PhishTank API, URLhaus API, Google Safe Browsing API, VirusTotal API, RDAP/WHOIS (all proxied via backend), FBI IC3, INTERPOL, CISA, The Hacker News, Krebs on Security.
+- **Threat Intelligence & Data Sources**: PhishTank API, URLhaus API, Google Safe Browsing API, VirusTotal API, RDAP/WHOIS (all proxied via backend). Authoritative report sources: FBI IC3 (2024), FTC Consumer Sentinel (2024), Europol IOCTA (2025), Verizon DBIR (2025), WEF Global Cybersecurity Outlook (2025), UK NCSC Annual Review (2025), Australian ACSC Cyber Threat Report (2024-25), INTERPOL (2025), ITU Global Cybersecurity Index (2024), AARP Fraud Survey (2025), CISA.
 - **AI Features**: Anthropic API (Claude), OpenAI.
 - **Email Service**: Brevo (primary), MailerSend, SMTP2GO (fallbacks), Resend (for data removal automation).
 - **Image Processing**: Tesseract.js (OCR), jsQR (QR code decoding).

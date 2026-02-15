@@ -90,7 +90,7 @@ const resources: Resource[] = [
     featured: true,
     type: "guide",
     content: {
-      intro: "Phone scams cost older Americans billions of dollars each year. According to FBI IC3 data, adults 60 and older lost $4.9 billion to fraud in 2024. Scammers specifically target seniors because they may be more trusting, have savings, and are less likely to report being scammed.",
+      intro: "Phone scams cost older Americans billions of dollars each year. According to the FBI IC3 2024 Report, adults 60 and older lost nearly $5 billion to fraud. Globally, the AARP 2025 Fraud Survey estimates total reported and unreported losses for older adults may exceed $61 billion. Scammers specifically target seniors because they may be more trusting, have savings, and are less likely to report being scammed.",
       sections: [
         {
           title: "Common Phone Scam Types",

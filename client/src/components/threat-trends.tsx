@@ -19,8 +19,10 @@ import {
   Target
 } from "lucide-react";
 
-// Data from FTC Consumer Sentinel 2024 Data Book (March 2025), FBI IC3 2024 Report,
-// and FTC Data Spotlights (August & December 2025)
+// Data from FBI IC3 2024 Report (April 2025), FTC Consumer Sentinel 2024 Data Book (March 2025),
+// Europol IOCTA 2025, Verizon 2025 DBIR, WEF Global Cybersecurity Outlook 2025,
+// UK NCSC Annual Review 2025, Australian ACSC Annual Cyber Threat Report 2024-25,
+// and INTERPOL Africa Cyberthreat Assessment 2025
 const stats: {
   id: string;
   label: string;
@@ -32,43 +34,88 @@ const stats: {
 }[] = [
   {
     id: "reports",
-    label: "Fraud Reports (2024)",
-    value: "2.6M",
+    label: "FBI IC3 Complaints (2024)",
+    value: "859K",
     change: "stable",
     trending: "neutral",
     icon: AlertTriangle,
-    detail: "FTC Consumer Sentinel",
+    detail: "FBI IC3 2024 Report",
   },
   {
     id: "losses",
-    label: "Total Money Lost",
-    value: "$12.5B",
-    change: "+25%",
+    label: "US Cybercrime Losses",
+    value: "$16.6B",
+    change: "+33%",
     trending: "up",
     icon: DollarSign,
-    detail: "FTC: Record high in 2024",
+    detail: "FBI IC3: Record high in 2024",
   },
   {
     id: "seniors",
     label: "Senior Losses (60+)",
-    value: "$4.9B",
+    value: "$5B",
     change: "+43%",
     trending: "up",
     icon: Users,
     detail: "FBI IC3 2024 Report",
   },
   {
-    id: "median",
-    label: "Victims Losing Money",
-    value: "38%",
-    change: "+11pts",
+    id: "global",
+    label: "Breaches w/ Human Error",
+    value: "60%",
+    change: "+5pts",
     trending: "up",
-    icon: Target,
-    detail: "Up from 27% in 2023",
+    icon: Globe,
+    detail: "Verizon 2025 DBIR (139 countries)",
   },
 ];
 
-// Data from FBI IC3 2024 Report and FTC Consumer Sentinel 2024
+const globalStats = [
+  {
+    source: "Europol IOCTA 2025",
+    region: "Europe",
+    stat: "Stolen data is the core currency of cybercrime — fueling ransomware, fraud, and identity theft across borders",
+    url: "https://www.europol.europa.eu/publication-events/main-reports/iocta-report",
+  },
+  {
+    source: "Verizon 2025 DBIR",
+    region: "Global (139 countries)",
+    stat: "60% of breaches involve human error or social engineering; ransomware present in 44% of breaches (up from 32%)",
+    url: "https://www.verizon.com/business/resources/reports/dbir/",
+  },
+  {
+    source: "WEF Cybersecurity Outlook 2025",
+    region: "Global",
+    stat: "72% of organizations report rising cyber risks; only 14% have the cybersecurity talent they need",
+    url: "https://www.weforum.org/publications/global-cybersecurity-outlook-2025/",
+  },
+  {
+    source: "UK NCSC Annual Review 2025",
+    region: "United Kingdom",
+    stat: "204 nationally significant incidents (up 130% from 89) — the highest ever recorded in the UK",
+    url: "https://www.ncsc.gov.uk/collection/ncsc-annual-review-2025",
+  },
+  {
+    source: "Australian ACSC 2024-25",
+    region: "Australia",
+    stat: "Average business loss per cyber incident: $80,850 (up 50%); one cybercrime report every 6 minutes",
+    url: "https://www.cyber.gov.au/about-us/view-all-content/reports-and-statistics/annual-cyber-threat-report-2024-2025",
+  },
+  {
+    source: "INTERPOL 2025",
+    region: "Africa / Global",
+    stat: "Operation Sentinel: 574 arrests across 19 countries, $3M recovered, 6,000+ malicious links taken down",
+    url: "https://www.interpol.int",
+  },
+  {
+    source: "ITU Global Cybersecurity Index 2024",
+    region: "Global (194 countries)",
+    stat: "Only 46 of 194 countries meet top-tier cybersecurity standards; 105 countries still in early stages",
+    url: "https://www.itu.int/en/ITU-D/Cybersecurity/Pages/global-cybersecurity-index.aspx",
+  },
+];
+
+// Data from FBI IC3 2024 Report (April 2025) and FTC Consumer Sentinel 2024 (March 2025)
 const topScamTypes = [
   { 
     name: "Investment Scams", 
@@ -76,9 +123,9 @@ const topScamTypes = [
     percentage: 40, 
     change: "+33%",
     victims: "48,000+",
-    description: "Cryptocurrency and fake investment schemes, including 'pig butchering' scams",
+    description: "Cryptocurrency and fake investment schemes, including 'pig butchering' scams. Crypto-related losses alone reached $9.3B (FBI IC3 2024).",
     targetAudience: "Adults 30-60",
-    prevention: "Never invest based on unsolicited offers. Verify with SEC before investing."
+    prevention: "Never invest based on unsolicited offers. Verify with SEC or your national financial regulator before investing."
   },
   { 
     name: "Business Email Compromise", 
@@ -86,7 +133,7 @@ const topScamTypes = [
     percentage: 17, 
     change: "+10%",
     victims: "21,442",
-    description: "Hacked or spoofed emails tricking businesses into wire transfers",
+    description: "Hacked or spoofed emails tricking businesses into wire transfers. Europol IOCTA 2025 identifies BEC as a top threat across Europe.",
     targetAudience: "Business employees",
     prevention: "Always verify large payment requests via phone call to a known number."
   },
@@ -96,7 +143,7 @@ const topScamTypes = [
     percentage: 9, 
     change: "+18%",
     victims: "35,000+",
-    description: "Fake computer virus alerts leading to remote access fraud",
+    description: "Fake computer virus alerts leading to remote access fraud. The UK NCSC and Australian ACSC report similar patterns globally.",
     targetAudience: "Seniors 60+",
     prevention: "Tech companies never call you first. Hang up and call official support."
   },
@@ -106,7 +153,7 @@ const topScamTypes = [
     percentage: 4, 
     change: "-39%",
     victims: "58,000+",
-    description: "Scammers create fake relationships to extract money over time",
+    description: "Scammers create fake relationships to extract money over time. AARP reports romance scams remain a top category reported to their helpline.",
     targetAudience: "Adults 40+, lonely individuals",
     prevention: "Never send money to someone you haven't met in person."
   },
@@ -116,9 +163,9 @@ const topScamTypes = [
     percentage: 5, 
     change: "+28%",
     victims: "28,000+",
-    description: "Fake IRS, Social Security, or Medicare agents demanding payment",
+    description: "Fake IRS, Social Security, or Medicare agents demanding payment. This pattern occurs globally with scammers posing as tax and benefits agencies.",
     targetAudience: "Seniors, immigrants",
-    prevention: "Government never demands immediate payment via gift cards or wire."
+    prevention: "Government agencies never demand immediate payment via gift cards or wire."
   },
 ];
 
@@ -205,17 +252,21 @@ export function ThreatTrends() {
           <div>
             <CardTitle className="text-xl">Threat Intelligence Dashboard</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Latest data from FTC Consumer Sentinel, FBI IC3, and 2025 FTC Data Spotlights
+              Data from FBI IC3, FTC, Europol, Verizon DBIR, WEF, UK NCSC, ACSC, and INTERPOL
             </p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview" className="gap-2">
               <TrendingUp className="w-4 h-4" />
               <span className="hidden sm:inline">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="global" className="gap-2" data-testid="tab-global-intel">
+              <Globe className="w-4 h-4" />
+              <span className="hidden sm:inline">Global</span>
             </TabsTrigger>
             <TabsTrigger value="alerts" className="gap-2">
               <AlertTriangle className="w-4 h-4" />
@@ -321,6 +372,41 @@ export function ThreatTrends() {
             </div>
           </TabsContent>
 
+          <TabsContent value="global" className="space-y-4 mt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Globe className="w-5 h-5 text-primary" />
+              <h4 className="font-semibold">Global Threat Intelligence</h4>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Cybercrime is a global problem. These findings come from internationally trusted authorities across multiple continents.
+            </p>
+            
+            <div className="space-y-3">
+              {globalStats.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 bg-muted/50 rounded-lg"
+                  data-testid={`global-stat-${idx}`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                    <span className="font-semibold text-sm">{item.source}</span>
+                    <Badge variant="outline" className="text-xs">{item.region}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">{item.stat}</p>
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary flex items-center gap-1 hover:underline"
+                    data-testid={`link-source-${idx}`}
+                  >
+                    View source report <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
           <TabsContent value="alerts" className="space-y-4 mt-4">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-5 h-5 text-red-500" />
@@ -417,27 +503,38 @@ export function ThreatTrends() {
           </TabsContent>
         </Tabs>
 
-        <div className="flex items-center justify-between pt-4 border-t">
+        <div className="pt-4 border-t space-y-2">
           <div className="text-xs text-muted-foreground flex items-center gap-1">
             <Info className="w-3 h-3" />
-            Data: FBI IC3, FTC Consumer Sentinel (2024)
+            Sources: FBI IC3 (2024), FTC (2024), Europol IOCTA (2025), Verizon DBIR (2025), WEF (2025), UK NCSC (2025), ACSC (2025), INTERPOL (2025), ITU GCI (2024)
           </div>
-          <div className="flex gap-2">
-            <a 
-              href="https://www.ic3.gov/Home/AnnualReports" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-xs text-primary flex items-center gap-1 hover:underline"
-            >
-              FBI Report <ExternalLink className="w-3 h-3" />
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            <a href="https://www.ic3.gov/Home/AnnualReports" target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">
+              FBI IC3 <ExternalLink className="w-3 h-3" />
             </a>
-            <a 
-              href="https://www.ftc.gov/reports" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-xs text-primary flex items-center gap-1 hover:underline"
-            >
-              FTC Data <ExternalLink className="w-3 h-3" />
+            <a href="https://www.ftc.gov/reports" target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">
+              FTC <ExternalLink className="w-3 h-3" />
+            </a>
+            <a href="https://www.europol.europa.eu/publication-events/main-reports/iocta-report" target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">
+              Europol <ExternalLink className="w-3 h-3" />
+            </a>
+            <a href="https://www.verizon.com/business/resources/reports/dbir/" target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">
+              Verizon DBIR <ExternalLink className="w-3 h-3" />
+            </a>
+            <a href="https://www.weforum.org/publications/global-cybersecurity-outlook-2025/" target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">
+              WEF <ExternalLink className="w-3 h-3" />
+            </a>
+            <a href="https://www.ncsc.gov.uk/collection/ncsc-annual-review-2025" target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">
+              UK NCSC <ExternalLink className="w-3 h-3" />
+            </a>
+            <a href="https://www.cyber.gov.au/about-us/view-all-content/reports-and-statistics/annual-cyber-threat-report-2024-2025" target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">
+              ACSC <ExternalLink className="w-3 h-3" />
+            </a>
+            <a href="https://www.interpol.int" target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">
+              INTERPOL <ExternalLink className="w-3 h-3" />
+            </a>
+            <a href="https://www.itu.int/en/ITU-D/Cybersecurity/Pages/global-cybersecurity-index.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">
+              ITU GCI <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>

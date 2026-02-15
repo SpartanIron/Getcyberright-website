@@ -100,7 +100,7 @@ const aiThreats = [
     title: "AI-Enhanced Phishing",
     severity: "high",
     description: "AI writes personalized, grammatically perfect phishing emails that are nearly impossible to detect.",
-    realWorldExample: "Security researchers have found AI-generated phishing emails can have significantly higher click rates than traditional phishing because they are so convincing.",
+    realWorldExample: "The Europol IOCTA 2025 report confirms AI-generated phishing emails now eliminate traditional warning signs like grammar errors, and the Verizon 2025 DBIR found AI-generated phishing emails have doubled since prior reports.",
     howItWorks: [
       "AI scrapes your social media and online presence",
       "Creates highly personalized messages referencing real details",
@@ -127,7 +127,7 @@ const aiThreats = [
     title: "AI Chatbot Scams",
     severity: "medium",
     description: "AI-powered chatbots that build relationships over weeks before executing scams.",
-    realWorldExample: "Romance scammers now use AI to manage hundreds of 'relationships' simultaneously, stealing millions.",
+    realWorldExample: "Europol's IOCTA 2025 confirms criminals use AI to personalize grooming and fraud messages at scale, managing hundreds of 'relationships' simultaneously across multiple languages.",
     howItWorks: [
       "AI chatbots pose as romantic interests or friends",
       "Maintain consistent personalities across weeks of conversation",
