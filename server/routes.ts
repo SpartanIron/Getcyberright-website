@@ -49,7 +49,7 @@ import { threatIntelService } from "./threatIntelService";
 import { contentGovernanceService } from "./contentGovernanceService";
 import { newsletterService } from "./newsletterService";
 import { complianceService } from "./complianceService";
-import { seedCurriculum } from "./curriculumSeed";
+import { seedCurriculum, seedAISafetyTraining } from "./curriculumSeed";
 import { seedDataBrokers } from "./dataBrokerSeed";
 import { registerUniversalAdapters } from "./brokerAdapters";
 import {
@@ -1616,6 +1616,10 @@ EDGE CASE HANDLING
   // Seed initial curriculum content
   seedCurriculum().catch(err => 
     console.error("Failed to seed curriculum:", err)
+  );
+
+  seedAISafetyTraining().catch(err =>
+    console.error("Failed to seed AI Safety training:", err)
   );
 
   (async () => {

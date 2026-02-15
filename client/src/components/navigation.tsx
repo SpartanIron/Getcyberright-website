@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen } from "lucide-react";
+import { Menu, Shield, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -22,12 +22,14 @@ const whoWeHelp = [
 
 const toolsNav = [
   { title: "Security Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
+  { title: "AI Prompt Library", description: "Ready-to-use AI templates for everyday life", href: "/ai-prompts", icon: Zap, badge: "New" },
   { title: "Data Broker Removal", description: "Remove your info from 500+ data brokers", href: "/data-removal", icon: Trash2 },
   { title: "Safety Toolkit", description: "Password generator & voice detector", href: "/tools?tab=safety-toolkit", icon: Shield },
 ];
 
 const learnItems = [
   { title: "Training Academy", description: "Structured courses with quizzes & certificates", href: "/training", icon: GraduationCap, color: "text-primary", featured: true },
+  { title: "AI Safety Guide", description: "Spot deepfakes, AI scams & protect your privacy", href: "/ai-safety", icon: Brain, color: "text-purple-500", featured: true },
   { title: "Resource Library", description: "Guides, articles, checklists & videos", href: "/resources", icon: BookOpen, color: "text-accent", featured: true },
   { title: "Emergency Help", description: "What to do if you've been scammed", href: "/emergency-help", icon: AlertTriangle, color: "text-red-500", featured: true },
 ];

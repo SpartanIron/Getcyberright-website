@@ -36,6 +36,8 @@ const Dashboard = lazy(() => import("@/pages/dashboard"));
 const ThreatTrendsPage = lazy(() => import("@/pages/threat-trends"));
 const ReportScam = lazy(() => import("@/pages/report-scam"));
 const Checklists = lazy(() => import("@/pages/checklists"));
+const AIPrompts = lazy(() => import("@/pages/ai-prompts"));
+const AISafety = lazy(() => import("@/pages/ai-safety"));
 const Training = lazy(() => import("@/pages/training"));
 const TrainingAudience = lazy(() => import("@/pages/training-audience"));
 const TrainingPath = lazy(() => import("@/pages/training-path"));
@@ -113,6 +115,8 @@ function Router() {
         <Route path="/report-scam" component={ReportScam} />
         <Route path="/checklists" component={Checklists} />
         <Route path="/data-removal" component={DataRemoval} />
+        <Route path="/ai-prompts" component={AIPrompts} />
+        <Route path="/ai-safety" component={AISafety} />
         <Route path="/advertise" component={Advertise} />
         <Route path="/partner-deck" component={PartnerDeck} />
         <Route path="/training" component={Training} />

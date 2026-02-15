@@ -30,7 +30,8 @@ import {
   ChevronRight,
   Award,
   BookOpen,
-  Target
+  Target,
+  Brain
 } from "lucide-react";
 import type { LearningPath } from "@shared/schema";
 
@@ -74,6 +75,14 @@ const audienceInfo = {
     color: "from-amber-500 to-yellow-500",
     bgColor: "bg-amber-50 dark:bg-amber-950/20",
     borderColor: "border-amber-200 dark:border-amber-800"
+  },
+  everyone: {
+    title: "Everyone",
+    description: "Essential safety skills for all ages and backgrounds",
+    icon: Brain,
+    color: "from-teal-500 to-cyan-500",
+    bgColor: "bg-teal-50 dark:bg-teal-950/20",
+    borderColor: "border-teal-200 dark:border-teal-800"
   }
 };
 

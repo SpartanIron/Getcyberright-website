@@ -1264,3 +1264,582 @@ function getQuestionsForModule(domain: string): Array<{ type: string; question: 
 
   return questionTemplates[domain] || [];
 }
+
+export async function seedAISafetyTraining(): Promise<void> {
+  const existingPaths = await db.select().from(learningPaths);
+  const hasAISafety = existingPaths.some(p => p.title === "AI Safety & Smart Usage");
+  if (hasAISafety) {
+    console.log("[curriculum] AI Safety training already exists, skipping");
+    return;
+  }
+
+  console.log("[curriculum] Seeding AI Safety training path...");
+
+  const [path] = await db.insert(learningPaths).values({
+    audience: "everyone",
+    title: "AI Safety & Smart Usage",
+    description: "Learn how to use AI tools safely and effectively. Spot deepfakes, detect AI-generated scams, protect your privacy, and build smart AI habits for everyday life.",
+    level: "foundation",
+    estimatedHours: 3,
+    learningOutcomes: [
+      "Identify AI-generated fake images, videos, and audio",
+      "Detect AI-powered scam emails, texts, and calls",
+      "Protect your personal information when using AI tools",
+      "Use AI responsibly for everyday tasks",
+      "Understand what AI can and cannot do"
+    ],
+    certificateName: "AI Safety Aware",
+    iconName: "brain",
+    color: "#8B5CF6",
+    sortOrder: 10,
+    isPublished: true
+  }).returning();
+
+  const aiModules = [
+    {
+      domain: "ai-deepfakes",
+      title: "Spotting Deepfakes and AI-Generated Media",
+      description: "Learn to identify AI-generated fake images, videos, and voice clones that are used in scams and misinformation.",
+      learningObjectives: [
+        "Recognize visual signs of AI-generated images and videos",
+        "Understand how voice cloning works and how to verify callers",
+        "Use free tools to check if media is AI-generated",
+        "Know why deepfakes are dangerous and who they target"
+      ],
+      estimatedMinutes: 30,
+      sortOrder: 0,
+      lessons: [
+        {
+          title: "What Are Deepfakes and Why Should You Care?",
+          description: "Understand what deepfakes are, how they work, and why they matter to you and your family.",
+          content: `<h2>AI Can Now Fake Almost Anything</h2>
+<p>Deepfakes are AI-generated fake videos, images, and audio that look and sound incredibly real. The technology has advanced so rapidly that even experts sometimes struggle to tell the difference.</p>
+<h3>How Deepfakes Are Made</h3>
+<p>AI analyzes thousands of photos, videos, or audio recordings of a person. It learns their facial expressions, voice patterns, and mannerisms. Then it creates entirely new content that never actually happened.</p>
+<ul>
+<li><strong>Face swaps:</strong> Putting one person's face onto another person's body in a video</li>
+<li><strong>Voice cloning:</strong> Creating a perfect copy of someone's voice from just a few seconds of audio</li>
+<li><strong>Full video generation:</strong> Creating entire videos of events that never occurred</li>
+<li><strong>Image generation:</strong> Creating photorealistic images of people who don't exist</li>
+</ul>
+<h3>Real-World Impact</h3>
+<p>In 2024, scammers used a deepfake video call impersonating a company CEO to trick an employee into transferring $25 million. Criminals have cloned teenagers' voices from social media posts to demand ransom from their parents. Deepfake technology has gone from a novelty to a serious security threat.</p>
+<h3>Who Is Most at Risk?</h3>
+<ul>
+<li><strong>Seniors:</strong> Voice cloning scams impersonating grandchildren or officials (the "grandparent scam" is now powered by AI)</li>
+<li><strong>Business owners:</strong> CEO fraud using deepfake video calls to authorize wire transfers</li>
+<li><strong>Families:</strong> Fake kidnapping calls using cloned voices of children</li>
+<li><strong>Everyone:</strong> Misinformation spread through fake videos of public figures</li>
+</ul>`,
+          takeaways: [
+            "Deepfakes are AI-generated fake videos, images, and audio that look real",
+            "Only a few seconds of audio is needed to clone someone's voice",
+            "Scammers are using deepfakes for financial fraud, extortion, and misinformation",
+            "Seniors, families, and businesses are especially targeted"
+          ]
+        },
+        {
+          title: "How to Spot Fake Videos and Images",
+          description: "Learn specific visual clues that reveal AI-generated content.",
+          content: `<h2>Training Your Eye to Spot Fakes</h2>
+<p>While AI-generated media is getting better, there are still telltale signs you can look for. The key is knowing where to look.</p>
+<h3>Signs of a Fake Video</h3>
+<ul>
+<li><strong>Unnatural blinking:</strong> AI sometimes gets blinking patterns wrong — too frequent, too slow, or not at all</li>
+<li><strong>Facial edges:</strong> Look where the face meets the hair and ears — you may see blurring, warping, or mismatched skin tones</li>
+<li><strong>Lip sync issues:</strong> The mouth may not perfectly match the words being spoken</li>
+<li><strong>Lighting inconsistencies:</strong> Shadows may fall in different directions on the face versus the background</li>
+<li><strong>Skin texture:</strong> AI faces can look too smooth, like they're wearing heavy makeup, or have unusual texture patterns</li>
+<li><strong>Background glitches:</strong> Objects behind the person may warp, flicker, or shift unnaturally</li>
+</ul>
+<h3>Signs of a Fake Image</h3>
+<ul>
+<li><strong>Hands and fingers:</strong> AI frequently generates extra fingers, merged fingers, or oddly bent joints</li>
+<li><strong>Text in images:</strong> Any text in AI images (signs, labels, books) is often garbled or nonsensical</li>
+<li><strong>Symmetry issues:</strong> Earrings, glasses, or facial features that don't match side to side</li>
+<li><strong>Too perfect:</strong> Skin that looks airbrushed with no pores or imperfections at all</li>
+<li><strong>Background details:</strong> Furniture, architecture, or objects that don't make physical sense</li>
+</ul>
+<h3>The Context Test</h3>
+<p>Beyond visual clues, always ask yourself:</p>
+<ul>
+<li>Does this video show something shocking or too good to be true?</li>
+<li>Is it asking me to act urgently or emotionally?</li>
+<li>Can I find this same video from a trusted news source?</li>
+<li>Was it shared by an account I know and trust?</li>
+</ul>`,
+          takeaways: [
+            "Look for unnatural blinking, facial edge blurring, and lip sync issues in videos",
+            "AI often gets hands, fingers, and text wrong in images",
+            "Always check the context: source, urgency, and whether trusted outlets report the same thing",
+            "Technology improves fast so combine visual checks with context checks"
+          ]
+        },
+        {
+          title: "Voice Cloning: Verifying Who You're Really Talking To",
+          description: "Understand voice cloning technology and learn verification techniques to protect yourself.",
+          content: `<h2>Your Voice Can Be Cloned in Seconds</h2>
+<p>Modern AI voice cloning technology can create a convincing copy of anyone's voice from as little as 3 seconds of audio. A voicemail, a social media video, or a phone recording is all it takes.</p>
+<h3>How Voice Cloning Scams Work</h3>
+<ol>
+<li>Scammers find audio of their target's voice (social media, voicemail greetings, phone recordings)</li>
+<li>AI creates a voice clone that sounds exactly like the person</li>
+<li>The scammer calls a family member or colleague using the cloned voice</li>
+<li>They create urgency: "I've been arrested," "I'm in the hospital," "I need money now"</li>
+<li>They pressure the victim to send money immediately via wire transfer, gift cards, or cryptocurrency</li>
+</ol>
+<h3>The Family Code Word System</h3>
+<p>The single most effective defense against voice cloning scams is a family code word — a secret word or phrase that only your family knows. Here's how to set it up:</p>
+<ul>
+<li>Choose a word or phrase that is unusual and not something you'd ever post online</li>
+<li>Share it only in person with family members</li>
+<li>If anyone calls claiming to be a family member in an emergency, ask for the code word</li>
+<li>Change it periodically, especially if you think it may have been compromised</li>
+</ul>
+<h3>Other Verification Steps</h3>
+<ul>
+<li><strong>Hang up and call back</strong> using the phone number you have saved, not the number that called you</li>
+<li><strong>Ask a specific question</strong> only the real person would know ("What did we have for dinner last night?")</li>
+<li><strong>Wait and verify:</strong> Real emergencies can wait 5 minutes for you to verify. Scammers cannot.</li>
+<li><strong>Contact another family member</strong> to confirm the story</li>
+</ul>`,
+          takeaways: [
+            "AI can clone anyone's voice from just a few seconds of audio",
+            "Set up a family code word that you only share in person",
+            "Always hang up and call back on a number you trust",
+            "Real emergencies can wait 5 minutes for verification — scams cannot"
+          ]
+        }
+      ],
+      questions: [
+        {
+          type: "multiple-choice",
+          question: "How much audio does AI need to clone someone's voice?",
+          options: ["At least 30 minutes", "About 10 minutes", "As little as a few seconds", "An entire phone conversation"],
+          answer: "As little as a few seconds",
+          explanation: "Modern AI voice cloning can create a convincing copy from as little as 3 seconds of audio from sources like social media videos or voicemails.",
+          difficulty: "easy"
+        },
+        {
+          type: "multiple-choice",
+          question: "What is the BEST defense against a voice cloning scam call?",
+          options: ["Block all unknown numbers", "Use a family code word and verify by calling back", "Never answer the phone", "Install an AI detection app"],
+          answer: "Use a family code word and verify by calling back",
+          explanation: "A family code word provides immediate verification. Always hang up and call back on a number you trust to confirm the person's identity.",
+          difficulty: "medium"
+        },
+        {
+          type: "true-false",
+          question: "If a video has perfect lip syncing, it is definitely real and not a deepfake.",
+          answer: "False",
+          explanation: "AI technology is improving rapidly. While lip sync issues are one indicator, advanced deepfakes can achieve convincing lip sync. Always use multiple checks including context verification.",
+          difficulty: "medium"
+        },
+        {
+          type: "multiple-choice",
+          question: "Which of these is a common sign of an AI-generated image?",
+          options: ["High resolution", "Perfect background", "Extra or oddly-shaped fingers", "Professional lighting"],
+          answer: "Extra or oddly-shaped fingers",
+          explanation: "AI frequently struggles with hands and fingers, often generating extra digits, merged fingers, or oddly bent joints. This is one of the most reliable visual indicators.",
+          difficulty: "easy"
+        },
+        {
+          type: "multiple-choice",
+          question: "Someone calls you sounding exactly like your grandchild, saying they need bail money immediately. What should you do?",
+          options: ["Send the money right away — it sounds just like them", "Ask for the family code word and hang up to call them back", "Give them your credit card number", "Post about it on social media to warn others"],
+          answer: "Ask for the family code word and hang up to call them back",
+          explanation: "Voice cloning scams create urgency to prevent you from verifying. Always ask for your code word, hang up, and call the person directly on a number you have saved.",
+          difficulty: "easy"
+        }
+      ]
+    },
+    {
+      domain: "ai-scam-detection",
+      title: "Detecting AI-Powered Scams",
+      description: "Learn how AI has supercharged traditional scams and how to protect yourself from increasingly sophisticated attacks.",
+      learningObjectives: [
+        "Identify AI-enhanced phishing emails that bypass traditional red flags",
+        "Recognize AI-generated scam websites and fake reviews",
+        "Understand how scammers use AI to personalize attacks",
+        "Know the warning signs that distinguish AI scams from legitimate communications"
+      ],
+      estimatedMinutes: 30,
+      sortOrder: 1,
+      lessons: [
+        {
+          title: "How AI Made Scams Harder to Spot",
+          description: "Understand why traditional scam detection advice is no longer enough.",
+          content: `<h2>The Old Rules No Longer Apply</h2>
+<p>For years, experts told people to watch for bad grammar, spelling mistakes, and suspicious formatting in scam emails. That advice worked when scammers were writing messages themselves. AI changed everything.</p>
+<h3>What AI Changed About Scams</h3>
+<ul>
+<li><strong>Perfect grammar and spelling:</strong> AI writes flawless English (or any language), eliminating the most obvious scam indicator</li>
+<li><strong>Personalized content:</strong> AI can scrape your social media and craft messages that reference your real life — your job, your interests, even your recent activities</li>
+<li><strong>Professional design:</strong> AI generates pixel-perfect copies of legitimate company emails, websites, and documents</li>
+<li><strong>Scale and speed:</strong> One scammer can now generate thousands of unique, personalized scam messages per hour</li>
+<li><strong>Multilingual attacks:</strong> AI translates scams perfectly into any language, expanding the victim pool globally</li>
+</ul>
+<h3>The New Red Flags</h3>
+<p>Since grammar and spelling are no longer reliable indicators, focus on these instead:</p>
+<ul>
+<li><strong>Urgency:</strong> "Your account will be closed in 24 hours" or "Act now or lose access"</li>
+<li><strong>Unexpected contact:</strong> Messages from companies you don't have accounts with, or surprising messages from ones you do</li>
+<li><strong>Requests for sensitive info:</strong> Legitimate companies never ask for passwords, Social Security numbers, or full credit card details via email</li>
+<li><strong>Unusual payment methods:</strong> Gift cards, cryptocurrency, or wire transfers are almost always scams</li>
+<li><strong>Too good to be true:</strong> Prizes you didn't enter for, incredible deals, or surprise refunds</li>
+</ul>`,
+          takeaways: [
+            "AI has eliminated spelling and grammar as reliable scam indicators",
+            "Modern scams are personalized using data scraped from your online presence",
+            "Focus on urgency, unexpected contact, and requests for sensitive information",
+            "Legitimate companies never ask for passwords or sensitive data via email"
+          ]
+        },
+        {
+          title: "AI-Generated Fake Websites, Reviews, and Listings",
+          description: "Learn how to identify AI-created fake websites and fraudulent online content.",
+          content: `<h2>Fake Websites That Look Completely Real</h2>
+<p>AI can now generate entire fake websites in minutes — complete with professional design, product photos, customer reviews, and even fake security badges. These sites are designed to steal your payment information or deliver nothing after you pay.</p>
+<h3>How to Spot Fake Websites</h3>
+<ul>
+<li><strong>Check the URL carefully:</strong> Look for subtle misspellings (amaz0n.com vs amazon.com) or unusual domain extensions (.shop, .xyz instead of .com)</li>
+<li><strong>Look for a physical address and phone number:</strong> Legitimate businesses provide real contact information. Call the number to verify.</li>
+<li><strong>Check the domain age:</strong> Scam sites are usually days or weeks old. Search "whois [domain name]" to check when it was registered.</li>
+<li><strong>Read the "About" page:</strong> AI-generated about pages often use vague, generic language without specific details about the company's history or team</li>
+<li><strong>Check reviews outside the site:</strong> Search for the company name + "reviews" or "scam" on Google. Don't trust reviews only shown on the site itself.</li>
+</ul>
+<h3>AI-Generated Fake Reviews</h3>
+<p>AI creates convincing fake reviews at scale. Warning signs include:</p>
+<ul>
+<li>Many reviews posted around the same date</li>
+<li>Reviews that sound similar in tone and structure</li>
+<li>Overly enthusiastic language without specific product details</li>
+<li>Reviewer accounts with no history or only reviews for similar products</li>
+</ul>
+<h3>Safe Shopping Practices</h3>
+<ul>
+<li>Stick to well-known retailers or verify unknown ones through the Better Business Bureau</li>
+<li>Use credit cards (not debit cards) for better fraud protection</li>
+<li>Be suspicious of prices that are dramatically lower than everywhere else</li>
+</ul>`,
+          takeaways: [
+            "AI can create entire fake websites with realistic design, products, and reviews",
+            "Always verify the URL, domain age, and contact information before buying",
+            "Search for independent reviews outside the website itself",
+            "Use credit cards for online purchases for better fraud protection"
+          ]
+        }
+      ],
+      questions: [
+        {
+          type: "multiple-choice",
+          question: "Why can't you rely on bad grammar and spelling to identify scam emails anymore?",
+          options: ["Scammers hire professional writers now", "AI writes perfect grammar in any language", "Email providers fix the grammar automatically", "Scammers only target non-English speakers"],
+          answer: "AI writes perfect grammar in any language",
+          explanation: "AI tools can generate flawless, natural-sounding text in any language, eliminating what used to be the most obvious sign of a scam email.",
+          difficulty: "easy"
+        },
+        {
+          type: "multiple-choice",
+          question: "What is the MOST reliable way to verify if a website is legitimate before making a purchase?",
+          options: ["It has a padlock icon in the browser", "It has lots of 5-star reviews on the site", "Check the domain age and search for independent reviews", "The website looks professional and well-designed"],
+          answer: "Check the domain age and search for independent reviews",
+          explanation: "Scam sites can have padlocks (SSL), fake reviews, and professional designs. Domain age and independent reviews provide more reliable verification.",
+          difficulty: "medium"
+        },
+        {
+          type: "true-false",
+          question: "A website with a padlock (HTTPS) in the browser address bar is always safe and legitimate.",
+          answer: "False",
+          explanation: "HTTPS only means the connection is encrypted — it doesn't verify the site is legitimate. Scam websites commonly use HTTPS to appear trustworthy.",
+          difficulty: "easy"
+        },
+        {
+          type: "multiple-choice",
+          question: "Which payment method offers the BEST protection against online shopping fraud?",
+          options: ["Wire transfer", "Gift cards", "Credit card", "Cryptocurrency"],
+          answer: "Credit card",
+          explanation: "Credit cards offer built-in fraud protection and the ability to dispute charges. Wire transfers, gift cards, and cryptocurrency are nearly impossible to recover once sent.",
+          difficulty: "easy"
+        }
+      ]
+    },
+    {
+      domain: "ai-privacy",
+      title: "Protecting Your Privacy When Using AI",
+      description: "Understand what happens to your data when you use AI tools and how to protect your personal information.",
+      learningObjectives: [
+        "Know what personal information should never be shared with AI",
+        "Understand how AI companies use your conversations",
+        "Configure privacy settings in popular AI tools",
+        "Develop safe habits for everyday AI use"
+      ],
+      estimatedMinutes: 25,
+      sortOrder: 2,
+      lessons: [
+        {
+          title: "What Happens to Everything You Tell AI",
+          description: "Understand how AI companies collect, store, and use your conversations.",
+          content: `<h2>Your Conversations Are Not Private</h2>
+<p>When you type something into ChatGPT, Google Gemini, or other AI tools, that conversation is stored on the company's servers. Understanding what happens to your data is the first step to protecting yourself.</p>
+<h3>How Your Data Is Used</h3>
+<ul>
+<li><strong>Training data:</strong> By default, most AI companies use your conversations to train and improve their models. This means your words could influence future AI responses.</li>
+<li><strong>Storage:</strong> Conversations are stored on servers, sometimes indefinitely. Even deleted chats may persist in backups.</li>
+<li><strong>Employee access:</strong> Human reviewers at AI companies can read flagged conversations for quality control and safety.</li>
+<li><strong>Inference:</strong> Even casual questions reveal information about you. Asking about low-sugar recipes tells the AI (and the company) about your health concerns.</li>
+</ul>
+<h3>7 Things You Should NEVER Share with AI</h3>
+<ol>
+<li><strong>Social Security numbers, driver's license, or passport details</strong></li>
+<li><strong>Passwords or security question answers</strong></li>
+<li><strong>Bank account or credit card numbers</strong></li>
+<li><strong>Medical records or health insurance IDs</strong></li>
+<li><strong>Confidential work documents or trade secrets</strong></li>
+<li><strong>Private conversations or legal matters</strong></li>
+<li><strong>Biometric data (fingerprints, face scans)</strong></li>
+</ol>
+<h3>Why This Matters</h3>
+<p>Data breaches happen. In 2025, a threat actor claimed access to 20 million OpenAI accounts. Information you share with AI tools could be exposed in a breach, used for training without your knowledge, or accessed by company employees reviewing conversations.</p>`,
+          takeaways: [
+            "AI companies store and often use your conversations to train their models",
+            "Never share Social Security numbers, passwords, financial details, or health IDs with AI",
+            "Even casual questions reveal personal information about you",
+            "Data breaches at AI companies can expose your private conversations"
+          ]
+        },
+        {
+          title: "How to Use AI Safely: Privacy Settings and Smart Habits",
+          description: "Practical steps to protect your privacy while still getting value from AI tools.",
+          content: `<h2>Practical Privacy Protection</h2>
+<p>You don't have to avoid AI tools entirely — but you should use them wisely. Here are specific settings to change and habits to build.</p>
+<h3>Privacy Settings to Change Right Now</h3>
+<ul>
+<li><strong>ChatGPT:</strong> Settings > Data Controls > Toggle OFF "Improve the model for everyone" — this stops your chats from being used for training</li>
+<li><strong>Google Gemini:</strong> Go to myactivity.google.com and turn off Gemini Apps Activity</li>
+<li><strong>Use temporary/incognito chats:</strong> Most AI tools offer a mode where conversations are not saved. Use this for anything sensitive.</li>
+<li><strong>Clear your history regularly:</strong> Delete old conversations you no longer need</li>
+<li><strong>Disable memory features:</strong> Some AI tools remember past conversations. Turn this off unless you have a specific reason to keep it on.</li>
+</ul>
+<h3>Smart AI Habits</h3>
+<ul>
+<li><strong>Treat everything as public:</strong> Before typing anything, ask yourself "Would I be comfortable if this appeared in a newspaper?"</li>
+<li><strong>Use generic details:</strong> Instead of "I live at 123 Main Street and make $75,000," say "I live in a suburban area with a middle income"</li>
+<li><strong>Never use AI for regulated data:</strong> Medical records (HIPAA), financial documents (PCI), or data covered by privacy laws (GDPR/CCPA) should never go into consumer AI tools</li>
+<li><strong>Verify before acting:</strong> AI can be confidently wrong. Never make financial, medical, or legal decisions based solely on AI advice</li>
+<li><strong>Use enterprise versions for work:</strong> Business versions of AI tools (ChatGPT Enterprise, etc.) offer better data isolation and don't use your conversations for training</li>
+</ul>
+<h3>Teaching Your Family</h3>
+<p>Make sure everyone in your household knows these basics. Kids especially need to understand that AI is not a trusted friend — it's a tool run by a company that stores what you say.</p>`,
+          takeaways: [
+            "Turn off model training in ChatGPT settings and Gemini activity",
+            "Use temporary chats for anything you wouldn't want stored permanently",
+            "Always use generic details instead of specific personal information",
+            "Verify AI advice independently before making important decisions"
+          ]
+        }
+      ],
+      questions: [
+        {
+          type: "multiple-choice",
+          question: "By default, what do most AI companies do with your conversations?",
+          options: ["Delete them immediately", "Use them to train and improve their AI models", "Share them with advertisers", "Encrypt them and never access them"],
+          answer: "Use them to train and improve their AI models",
+          explanation: "Most AI companies use your conversations to train their models by default. You can opt out in settings, but many users don't know this.",
+          difficulty: "easy"
+        },
+        {
+          type: "multiple-choice",
+          question: "Which of these is safe to share with an AI tool?",
+          options: ["Your Social Security number", "Your credit card number", "A general question about meal planning", "Your medical records"],
+          answer: "A general question about meal planning",
+          explanation: "General questions about topics like cooking, planning, or learning are safe. Never share identifying information, financial details, or health records.",
+          difficulty: "easy"
+        },
+        {
+          type: "true-false",
+          question: "If you delete a conversation in ChatGPT, it is permanently removed from all servers.",
+          answer: "False",
+          explanation: "Deleted conversations may persist in backups and could have already been used for training. Treat every message as potentially permanent.",
+          difficulty: "medium"
+        },
+        {
+          type: "multiple-choice",
+          question: "What is the BEST practice when you need to ask AI about a personal financial situation?",
+          options: ["Share your exact income and bank details for accurate advice", "Use generic terms like 'middle income' instead of exact numbers", "Create a fake identity to protect yourself", "Avoid using AI for any financial questions"],
+          answer: "Use generic terms like 'middle income' instead of exact numbers",
+          explanation: "You can still get useful financial guidance by using approximate or generic details instead of sharing exact personal financial information.",
+          difficulty: "medium"
+        }
+      ]
+    },
+    {
+      domain: "ai-smart-usage",
+      title: "Using AI Effectively and Responsibly",
+      description: "Learn how to get the most out of AI tools while understanding their limitations and potential for error.",
+      learningObjectives: [
+        "Understand what AI can and cannot do reliably",
+        "Write better prompts to get more useful responses",
+        "Verify AI-generated information before acting on it",
+        "Use AI as a tool while thinking critically about its output"
+      ],
+      estimatedMinutes: 25,
+      sortOrder: 3,
+      lessons: [
+        {
+          title: "What AI Actually Is (and What It Is Not)",
+          description: "Cut through the hype and understand what AI tools can and cannot do.",
+          content: `<h2>AI Is Not What You Think</h2>
+<p>AI chatbots like ChatGPT, Gemini, and Claude are powerful — but they are not what most people imagine. Understanding what they really are helps you use them better and avoid costly mistakes.</p>
+<h3>What AI Actually Does</h3>
+<p>AI language models work by predicting the most likely next word in a sequence. They have been trained on billions of web pages, books, and documents. They are very good at:</p>
+<ul>
+<li><strong>Summarizing and rewriting text:</strong> Condensing long documents, changing tone, or restructuring content</li>
+<li><strong>Brainstorming:</strong> Generating ideas, outlines, and creative suggestions</li>
+<li><strong>Explaining concepts:</strong> Breaking down complex topics in simple language</li>
+<li><strong>Drafting communications:</strong> Writing emails, letters, and messages</li>
+<li><strong>Organizing information:</strong> Creating schedules, checklists, and structured plans</li>
+</ul>
+<h3>What AI Is NOT Good At</h3>
+<ul>
+<li><strong>Facts and accuracy:</strong> AI confidently states incorrect information ("hallucinations"). It can invent fake statistics, citations, and historical events.</li>
+<li><strong>Math:</strong> AI frequently makes calculation errors, especially with multi-step problems</li>
+<li><strong>Current events:</strong> AI's training data has a cutoff date. It may not know about recent events.</li>
+<li><strong>Personal advice:</strong> AI doesn't know your actual situation — medical, legal, or financial advice from AI should always be verified with professionals</li>
+<li><strong>Judgment:</strong> AI has no real understanding of context, ethics, or consequences the way humans do</li>
+</ul>
+<h3>The Golden Rule</h3>
+<p>Use AI as a starting point, never as the final answer. Think of it as a smart assistant that's very good at drafting but needs a human to check its work.</p>`,
+          takeaways: [
+            "AI predicts text based on patterns — it doesn't truly 'understand' anything",
+            "AI is great for drafting, summarizing, brainstorming, and organizing",
+            "AI confidently presents wrong information — always verify facts and numbers",
+            "Use AI as a starting point, never as the final answer for important decisions"
+          ]
+        },
+        {
+          title: "Getting Better Results: How to Talk to AI",
+          description: "Simple techniques for writing prompts that get you more useful, accurate responses.",
+          content: `<h2>Better Questions, Better Answers</h2>
+<p>The quality of what AI gives you depends almost entirely on how you ask. You don't need to be technical — you just need to be specific.</p>
+<h3>5 Simple Prompt Techniques</h3>
+<h4>1. Be Specific</h4>
+<p>Instead of: "Give me a recipe"<br/>
+Try: "Give me a recipe for a healthy chicken dinner for 4 people that takes under 30 minutes with ingredients I can find at any grocery store"</p>
+<h4>2. Give Context</h4>
+<p>Instead of: "Write an email"<br/>
+Try: "Write a polite but firm email to my internet provider asking them to fix a billing error where I was charged twice for last month"</p>
+<h4>3. Specify the Format</h4>
+<p>Instead of: "Tell me about budgeting"<br/>
+Try: "Give me a simple monthly budget template as a table with categories for housing, food, transportation, savings, and entertainment"</p>
+<h4>4. Set the Tone</h4>
+<p>Instead of: "Explain blockchain"<br/>
+Try: "Explain blockchain to my 70-year-old mother who has never used cryptocurrency, using everyday analogies she would understand"</p>
+<h4>5. Ask for Alternatives</h4>
+<p>Instead of accepting the first answer, say: "Give me 3 different approaches to this" or "What's another way to look at this?"</p>
+<h3>Follow-Up Is Key</h3>
+<p>AI conversations are back-and-forth. If the first response isn't quite right, say things like:</p>
+<ul>
+<li>"Make that shorter" or "Make that more detailed"</li>
+<li>"Can you simplify the language?"</li>
+<li>"That's not quite what I meant — I was asking about..."</li>
+<li>"Give me a real-world example of that"</li>
+</ul>`,
+          takeaways: [
+            "Specific prompts get dramatically better results than vague ones",
+            "Include context about who you are and what you need",
+            "Ask for a specific format (table, list, step-by-step) for clearer responses",
+            "Always follow up and refine — AI conversations are back-and-forth"
+          ]
+        }
+      ],
+      questions: [
+        {
+          type: "multiple-choice",
+          question: "What is an AI 'hallucination'?",
+          options: ["When AI sees images that aren't there", "When AI confidently presents incorrect information as fact", "When AI crashes due to overload", "When AI refuses to answer a question"],
+          answer: "When AI confidently presents incorrect information as fact",
+          explanation: "AI hallucinations occur when the model generates plausible-sounding but false information, including fake statistics, citations, or events that never happened.",
+          difficulty: "easy"
+        },
+        {
+          type: "multiple-choice",
+          question: "Which prompt will give you the BEST result?",
+          options: ["Write an email", "Write a professional, friendly email to my landlord about a broken heater, requesting repair within the week", "Help me with my landlord", "Email template"],
+          answer: "Write a professional, friendly email to my landlord about a broken heater, requesting repair within the week",
+          explanation: "Specific prompts with context (who, what, tone, desired outcome) produce dramatically better results than vague requests.",
+          difficulty: "easy"
+        },
+        {
+          type: "true-false",
+          question: "You should always verify important facts that AI tells you, even if the AI sounds very confident.",
+          answer: "True",
+          explanation: "AI presents all information with the same level of confidence, whether it's correct or completely fabricated. Always verify important facts independently.",
+          difficulty: "easy"
+        },
+        {
+          type: "multiple-choice",
+          question: "What is AI BEST suited for?",
+          options: ["Making final medical decisions", "Drafting, summarizing, and brainstorming", "Providing accurate legal advice", "Predicting stock market movements"],
+          answer: "Drafting, summarizing, and brainstorming",
+          explanation: "AI excels at text generation tasks like drafting emails, summarizing documents, and brainstorming ideas. It should not be relied on for professional medical, legal, or financial decisions.",
+          difficulty: "easy"
+        }
+      ]
+    }
+  ];
+
+  for (const moduleData of aiModules) {
+    const [module] = await db.insert(trainingModules).values({
+      pathId: path.id,
+      domain: moduleData.domain,
+      title: moduleData.title,
+      description: moduleData.description,
+      learningObjectives: moduleData.learningObjectives,
+      estimatedMinutes: moduleData.estimatedMinutes,
+      sortOrder: moduleData.sortOrder,
+      isPublished: true
+    }).returning();
+
+    for (let i = 0; i < moduleData.lessons.length; i++) {
+      await db.insert(trainingLessons).values({
+        moduleId: module.id,
+        title: moduleData.lessons[i].title,
+        description: moduleData.lessons[i].description,
+        contentType: "text",
+        contentHtml: moduleData.lessons[i].content,
+        keyTakeaways: moduleData.lessons[i].takeaways,
+        estimatedMinutes: 10,
+        sortOrder: i,
+        isPublished: true
+      });
+    }
+
+    const [quiz] = await db.insert(trainingQuizzes).values({
+      moduleId: module.id,
+      title: `${moduleData.title} Assessment`,
+      description: "Test your knowledge from this module",
+      passingScore: 70,
+      maxAttempts: 3,
+      shuffleQuestions: true,
+      showCorrectAnswers: true,
+      isPublished: true
+    }).returning();
+
+    for (let i = 0; i < moduleData.questions.length; i++) {
+      await db.insert(quizQuestions).values({
+        quizId: quiz.id,
+        questionType: moduleData.questions[i].type,
+        questionText: moduleData.questions[i].question,
+        options: moduleData.questions[i].options || null,
+        correctAnswer: moduleData.questions[i].answer,
+        explanation: moduleData.questions[i].explanation,
+        difficulty: moduleData.questions[i].difficulty || "medium",
+        points: 10,
+        sortOrder: i
+      });
+    }
+  }
+
+  console.log("[curriculum] AI Safety training path seeded successfully");
+}
