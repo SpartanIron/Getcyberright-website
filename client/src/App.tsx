@@ -11,6 +11,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { initGA, trackPageView } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { Loader2 } from "lucide-react";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
 // Critical pages loaded immediately
 import Home from "@/pages/home";
@@ -149,19 +150,23 @@ function App() {
     }
   }, []);
 
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
+
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <ScrollToTop />
-          <Toaster />
-          <WelcomeOverlay />
-          <ErrorBoundary>
-            <Router />
-          </ErrorBoundary>
-          <DeziAssistant />
-        </TooltipProvider>
-      </ThemeProvider>
+      <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
+        <ThemeProvider>
+          <TooltipProvider>
+            <ScrollToTop />
+            <Toaster />
+            <WelcomeOverlay />
+            <ErrorBoundary>
+              <Router />
+            </ErrorBoundary>
+            <DeziAssistant />
+          </TooltipProvider>
+        </ThemeProvider>
+      </GoogleReCaptchaProvider>
     </QueryClientProvider>
   );
 }
