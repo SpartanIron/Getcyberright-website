@@ -20,7 +20,8 @@ import {
   Mic,
   Key,
   FileText,
-  Check
+  Check,
+  ShoppingBag
 } from "lucide-react";
 import { Link } from "wouter";
 import bannerImage from "@/assets/banners/pricing-banner.png";
@@ -264,7 +265,8 @@ export default function OurMission() {
                 </Link>
                 <Link href="/support-the-mission">
                   <Button size="lg" variant="outline" className="border-white/30 text-white bg-transparent" data-testid="button-support-mission">
-                    Support the Mission
+                    <ShoppingBag className="mr-2 w-4 h-4" />
+                    Shop
                   </Button>
                 </Link>
               </div>
