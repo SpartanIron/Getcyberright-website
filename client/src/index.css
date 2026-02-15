@@ -405,3 +405,7 @@
     font-weight: bold;
   }
 }
+
+.grecaptcha-badge {
+  bottom: 70px !important;
+}
