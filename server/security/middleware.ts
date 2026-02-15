@@ -23,6 +23,7 @@ export const securityHeaders = helmet({
         "https://www.google-analytics.com",
         "https://www.google.com",
         "https://www.gstatic.com",
+        "https://www.recaptcha.net",
         "https://replit.com"
       ],
       connectSrc: [
@@ -41,7 +42,8 @@ export const securityHeaders = helmet({
         "https://www.youtube.com", 
         "https://youtube.com",
         "https://www.google.com",
-        "https://recaptcha.google.com"
+        "https://recaptcha.google.com",
+        "https://www.recaptcha.net"
       ],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
