@@ -180,6 +180,20 @@ app.use((req, res, next) => {
     () => {
       log(`serving on port ${port}`);
 
+      // Seed AI prompts on first startup
+      import("./promptSeed").then(({ seedAiPrompts }) => {
+        seedAiPrompts();
+      }).catch(err => {
+        console.error("Failed to seed AI prompts:", err);
+      });
+
+      // Start prompt review scheduler (runs weekly - every 168 hours)
+      import("./promptReviewService").then(({ startPromptReviewScheduler }) => {
+        startPromptReviewScheduler(168);
+      }).catch(err => {
+        console.error("Failed to start prompt review scheduler:", err);
+      });
+
       // Start breach monitoring scheduler (checks every 24 hours)
       import("./breach-monitor").then(({ startBreachMonitoringScheduler }) => {
         startBreachMonitoringScheduler(24);

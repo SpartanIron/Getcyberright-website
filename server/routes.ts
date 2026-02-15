@@ -3258,5 +3258,130 @@ EDGE CASE HANDLING
     }
   });
 
+  // ==================== AI PROMPT LIBRARY ====================
+
+  app.get("/api/prompts", standardRateLimit, async (_req: Request, res: Response) => {
+    try {
+      const prompts = await storage.getActivePrompts();
+      res.json(prompts);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch prompts" });
+    }
+  });
+
+  // ==================== ADMIN: PROMPT MANAGEMENT ====================
+
+  app.get("/api/admin/prompts", isAuthenticated, isAdmin, async (_req: Request, res: Response) => {
+    try {
+      const prompts = await storage.getAllPrompts();
+      res.json(prompts);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch prompts" });
+    }
+  });
+
+  app.patch("/api/admin/prompts/:id", isAuthenticated, isAdmin, async (req: any, res: Response) => {
+    try {
+      const prompt = await storage.updatePrompt(req.params.id, req.body);
+      if (!prompt) return res.status(404).json({ error: "Prompt not found" });
+      res.json(prompt);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to update prompt" });
+    }
+  });
+
+  app.get("/api/admin/prompt-reviews", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const reviews = await storage.getPromptReviews(status);
+      res.json(reviews);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch prompt reviews" });
+    }
+  });
+
+  app.post("/api/admin/prompt-reviews/:id/approve", isAuthenticated, isAdmin, async (req: any, res: Response) => {
+    try {
+      const review = await storage.getPromptReviewById(req.params.id);
+      if (!review) return res.status(404).json({ error: "Review not found" });
+      if (review.status !== "pending") return res.status(400).json({ error: "Review is not pending" });
+
+      if (review.reviewType === "improvement" && review.promptId) {
+        const updateData: any = {};
+        if (review.proposedTitle) updateData.title = review.proposedTitle;
+        if (review.proposedPromptText) updateData.promptText = review.proposedPromptText;
+        if (review.proposedTags) updateData.tags = review.proposedTags;
+        if (review.proposedUseCase) updateData.useCase = review.proposedUseCase;
+        if (review.proposedSafetyNote) updateData.safetyNote = review.proposedSafetyNote;
+        if (review.proposedAudience) updateData.audience = review.proposedAudience;
+        if (review.proposedCategory) updateData.category = review.proposedCategory;
+        if (review.proposedIconName) updateData.iconName = review.proposedIconName;
+
+        const existingPrompt = await storage.getPromptById(review.promptId);
+        if (existingPrompt) {
+          updateData.version = (existingPrompt.version || 1) + 1;
+        }
+        await storage.updatePrompt(review.promptId, updateData);
+      } else if (review.reviewType === "new_prompt") {
+        const slug = (review.proposedTitle || "new-prompt")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+
+        await storage.createPrompt({
+          slug: slug + "-" + Date.now().toString(36),
+          title: review.proposedTitle || "New Prompt",
+          promptText: review.proposedPromptText || "",
+          audience: review.proposedAudience || ["everyday"],
+          category: review.proposedCategory || "safety",
+          tags: review.proposedTags || [],
+          useCase: review.proposedUseCase || "",
+          safetyNote: review.proposedSafetyNote || null,
+          iconName: review.proposedIconName || "Shield",
+          isActive: true,
+          version: 1,
+        });
+      }
+
+      const updated = await storage.updatePromptReviewStatus(req.params.id, "approved", req.user?.id || "admin");
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to approve review" });
+    }
+  });
+
+  app.post("/api/admin/prompt-reviews/:id/reject", isAuthenticated, isAdmin, async (req: any, res: Response) => {
+    try {
+      const review = await storage.getPromptReviewById(req.params.id);
+      if (!review) return res.status(404).json({ error: "Review not found" });
+      if (review.status !== "pending") return res.status(400).json({ error: "Review is not pending" });
+
+      const updated = await storage.updatePromptReviewStatus(req.params.id, "rejected", req.user?.id || "admin");
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to reject review" });
+    }
+  });
+
+  app.get("/api/admin/prompt-review-runs", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const runs = await storage.getPromptReviewRuns(limit);
+      res.json(runs);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch review runs" });
+    }
+  });
+
+  app.post("/api/admin/prompt-reviews/run", isAuthenticated, isAdmin, async (_req: Request, res: Response) => {
+    try {
+      const { runPromptReview } = await import("./promptReviewService");
+      const result = await runPromptReview("manual");
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to trigger prompt review" });
+    }
+  });
+
   return httpServer;
 }
