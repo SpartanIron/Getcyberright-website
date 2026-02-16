@@ -34,8 +34,7 @@ const aboutBreadcrumbs: BreadcrumbData = {
 };
 
 const stats = [
-  { value: "100%", label: "Free Forever" },
-  { value: "116+", label: "AI Safety Prompts" },
+  { value: "406+", label: "AI Safety Prompts" },
   { value: "501+", label: "Data Brokers Tracked" },
   { value: "8", label: "Threat Intel Sources" }
 ];
@@ -237,7 +236,7 @@ export default function About() {
                 Start Protecting Your Family Today
               </h2>
               <p className="text-white/80 max-w-2xl mx-auto mb-8">
-                Every tool is free. No account required for most. Just pick a tool and go.
+                No account required for most tools. Just pick one and go.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/tools">

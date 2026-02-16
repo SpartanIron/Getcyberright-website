@@ -173,7 +173,7 @@ export function Navigation() {
                     </div>
                     <div className="mt-4 pt-4 border-t">
                       <p className="text-xs text-muted-foreground">
-                        Free tools available. No signup required.
+                        No signup required to use our tools.
                       </p>
                     </div>
                   </div>

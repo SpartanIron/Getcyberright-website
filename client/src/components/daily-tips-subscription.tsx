@@ -238,7 +238,7 @@ export function DailyTipsSubscription() {
         </div>
         <CardTitle className="text-xl md:text-2xl">Digital Safety Tips</CardTitle>
         <CardDescription className="text-base">
-          Get free cybersecurity tips delivered to your inbox
+          Get cybersecurity tips delivered to your inbox
         </CardDescription>
       </CardHeader>
       <CardContent>

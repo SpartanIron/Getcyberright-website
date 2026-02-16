@@ -27,7 +27,7 @@ export function InviteFriends({ variant = "card", className = "" }: InviteFriend
     setTimeout(() => setCopied(false), 3000);
   };
 
-  const shareText = "I use GetCyberRight to check suspicious links and protect my family online. It's free! Try it:";
+  const shareText = "I use GetCyberRight to check suspicious links and protect my family online. Try it:";
   
   const shareLinks = {
     twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(referralLink)}`,

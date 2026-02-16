@@ -34,7 +34,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "summarize-article",
     title: "Summarize a Long Article",
-    promptText: "Summarize the following article in exactly 5 bullet points. Each bullet should be one clear sentence that captures a key takeaway. Use plain language that a non-expert would understand. After the bullets, add one sentence explaining why this article matters.\n\nArticle text:\n[PASTE ARTICLE TEXT]",
+    promptText: "Act as a research analyst skilled at distilling complex information. Summarize the following article in exactly 5 bullet points. Each bullet should be one clear sentence that captures a key takeaway. Use plain language that a non-expert would understand. After the bullets, add one sentence explaining why this article matters.\n\nArticle text:\n[PASTE ARTICLE TEXT]",
     audience: ["everyday", "seniors", "students"],
     category: "productivity",
     tags: ["summarize", "reading", "news"],
@@ -54,7 +54,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "weekly-meals",
     title: "Plan Weekly Meals on a Budget",
-    promptText: "Create a practical 7-day meal plan for [NUMBER] people with a weekly grocery budget of approximately $[AMOUNT].\n\nRequirements:\n- Include breakfast, lunch, and dinner for each day.\n- Use simple recipes with 6 or fewer common ingredients.\n- Reuse ingredients across multiple meals to reduce waste.\n- Dietary needs: [LIST ANY RESTRICTIONS, OR TYPE \"NONE\"].\n\nFormat the output as:\n1. A day-by-day meal plan.\n2. A grocery list organized by store section (produce, dairy, pantry, protein, frozen).\n3. Two meal-prep tips to save time during the week.",
+    promptText: "Act as a certified nutritionist and budget meal planning specialist. Create a practical 7-day meal plan for [NUMBER] people with a weekly grocery budget of approximately $[AMOUNT].\n\nRequirements:\n- Include breakfast, lunch, and dinner for each day.\n- Use simple recipes with 6 or fewer common ingredients.\n- Reuse ingredients across multiple meals to reduce waste.\n- Dietary needs: [LIST ANY RESTRICTIONS, OR TYPE \"NONE\"].\n\nFormat the output as:\n1. A day-by-day meal plan.\n2. A grocery list organized by store section (produce, dairy, pantry, protein, frozen).\n3. Two meal-prep tips to save time during the week.",
     audience: ["everyday", "families", "seniors"],
     category: "productivity",
     tags: ["meal planning", "cooking", "budget", "grocery"],
@@ -64,7 +64,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "declutter-home",
     title: "Organize and Declutter",
-    promptText: "Create a step-by-step decluttering plan for my [ROOM/SPACE].\n\nConstraints:\n- I can spend about [TIME] per day on this project.\n- Spread the plan across [NUMBER] days.\n\nFor each day, give me:\n1. One specific area or category to focus on.\n2. A clear \"keep, donate, discard\" decision rule for that category.\n3. A small reward or milestone to celebrate when that day is done.\n\nEnd with three tips for staying organized once the space is clean.",
+    promptText: "Act as a professional home organization consultant. Create a step-by-step decluttering plan for my [ROOM/SPACE].\n\nConstraints:\n- I can spend about [TIME] per day on this project.\n- Spread the plan across [NUMBER] days.\n\nFor each day, give me:\n1. One specific area or category to focus on.\n2. A clear \"keep, donate, discard\" decision rule for that category.\n3. A small reward or milestone to celebrate when that day is done.\n\nEnd with three tips for staying organized once the space is clean.",
     audience: ["everyday", "seniors"],
     category: "productivity",
     tags: ["organizing", "home", "cleaning"],
@@ -74,7 +74,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "compare-products",
     title: "Compare Products Before Buying",
-    promptText: "I am deciding between these options: [LIST 2-3 PRODUCTS OR SERVICES WITH PRICES IF KNOWN].\n\nCompare them in a table with the following columns: Feature, Option A, Option B, Option C.\n\nEvaluate each on:\n- Price and long-term value.\n- Quality and durability.\n- Ease of use.\n- Customer reviews summary.\n\nThen recommend the best choice for someone who [DESCRIBE YOUR SITUATION AND PRIORITIES]. Explain your reasoning in 2-3 sentences.",
+    promptText: "Act as a consumer research analyst specializing in product evaluation. I am deciding between these options: [LIST 2-3 PRODUCTS OR SERVICES WITH PRICES IF KNOWN].\n\nCompare them in a table with the following columns: Feature, Option A, Option B, Option C.\n\nEvaluate each on:\n- Price and long-term value.\n- Quality and durability.\n- Ease of use.\n- Customer reviews summary.\n\nThen recommend the best choice for someone who [DESCRIBE YOUR SITUATION AND PRIORITIES]. Explain your reasoning in 2-3 sentences.",
     audience: ["everyday", "seniors"],
     category: "finance",
     tags: ["shopping", "comparison", "decision making"],
@@ -84,7 +84,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "professional-email",
     title: "Write a Professional Email",
-    promptText: "Write a professional email on my behalf using the details below.\n\nRecipient: [WHO (e.g., landlord, company, school administrator)]\nPurpose: [WHAT YOU NEED]\nDesired outcome: [WHAT YOU WANT TO HAPPEN]\nKey facts to include: [RELEVANT DETAILS]\n\nTone: Polite, confident, and direct. Keep the email under 200 words. Include a clear subject line, a brief opening, the main request with supporting facts, and a professional closing.",
+    promptText: "Act as a professional communications specialist. Write a professional email on my behalf using the details below.\n\nRecipient: [WHO (e.g., landlord, company, school administrator)]\nPurpose: [WHAT YOU NEED]\nDesired outcome: [WHAT YOU WANT TO HAPPEN]\nKey facts to include: [RELEVANT DETAILS]\n\nTone: Polite, confident, and direct. Keep the email under 200 words. Include a clear subject line, a brief opening, the main request with supporting facts, and a professional closing.",
     audience: ["everyday", "seniors", "business"],
     category: "communication",
     tags: ["email", "writing", "professional"],
@@ -94,7 +94,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "complaint-letter",
     title: "Write a Polite Complaint",
-    promptText: "Write a professional complaint letter on my behalf.\n\nCompany or organization: [NAME]\nIssue: [DESCRIBE THE PROBLEM]\nTimeline: [WHEN IT HAPPENED AND KEY DATES]\nReference numbers: [ORDER NUMBER, CASE ID, OR ACCOUNT NUMBER]\nDesired resolution: [WHAT YOU WANT THEM TO DO]\n\nThe letter should be firm but respectful, under 250 words, and structured as follows:\n1. State the issue clearly in the opening sentence.\n2. Present the facts in chronological order.\n3. Reference any relevant policies or guarantees.\n4. State exactly what resolution I expect and by when.\n5. Close professionally with contact information.",
+    promptText: "Act as a consumer advocacy specialist skilled in professional correspondence. Write a professional complaint letter on my behalf.\n\nCompany or organization: [NAME]\nIssue: [DESCRIBE THE PROBLEM]\nTimeline: [WHEN IT HAPPENED AND KEY DATES]\nReference numbers: [ORDER NUMBER, CASE ID, OR ACCOUNT NUMBER]\nDesired resolution: [WHAT YOU WANT THEM TO DO]\n\nThe letter should be firm but respectful, under 250 words, and structured as follows:\n1. State the issue clearly in the opening sentence.\n2. Present the facts in chronological order.\n3. Reference any relevant policies or guarantees.\n4. State exactly what resolution I expect and by when.\n5. Close professionally with contact information.",
     audience: ["everyday", "seniors"],
     category: "communication",
     tags: ["complaint", "customer service", "writing"],
@@ -104,7 +104,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "difficult-conversation",
     title: "Prepare for a Difficult Conversation",
-    promptText: "Help me prepare for a difficult conversation.\n\nWho I am speaking with: [RELATIONSHIP]\nTopic: [WHAT THE CONVERSATION IS ABOUT]\nMy main points: [LIST 2-4 THINGS YOU WANT TO SAY]\nMy goal: [WHAT OUTCOME YOU HOPE FOR]\n\nProvide:\n1. A calm, non-confrontational opening sentence.\n2. A way to frame each point using \"I\" statements instead of accusations.\n3. Two responses I can use if the other person gets defensive.\n4. A way to end the conversation on a constructive note, even if we disagree.",
+    promptText: "Act as a certified conflict resolution and interpersonal communication coach. Help me prepare for a difficult conversation.\n\nWho I am speaking with: [RELATIONSHIP]\nTopic: [WHAT THE CONVERSATION IS ABOUT]\nMy main points: [LIST 2-4 THINGS YOU WANT TO SAY]\nMy goal: [WHAT OUTCOME YOU HOPE FOR]\n\nProvide:\n1. A calm, non-confrontational opening sentence.\n2. A way to frame each point using \"I\" statements instead of accusations.\n3. Two responses I can use if the other person gets defensive.\n4. A way to end the conversation on a constructive note, even if we disagree.",
     audience: ["everyday", "families"],
     category: "communication",
     tags: ["conversation", "conflict resolution", "relationships"],
@@ -114,7 +114,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "thank-you-note",
     title: "Write a Thoughtful Thank-You Note",
-    promptText: "Write a heartfelt thank-you message using these details.\n\nRecipient: [WHO]\nWhat they did: [THE KINDNESS OR GIFT]\nOur relationship: [BRIEF CONTEXT]\nTone: [CASUAL/FORMAL]\nLength: [SHORT (3-4 SENTENCES) / MEDIUM (1 PARAGRAPH) / LONG (2-3 PARAGRAPHS)]\n\nMake it feel genuine and personal, not like a template. Reference something specific about our relationship or what their gesture meant to me.",
+    promptText: "Act as a professional writer specializing in personal correspondence. Write a heartfelt thank-you message using these details.\n\nRecipient: [WHO]\nWhat they did: [THE KINDNESS OR GIFT]\nOur relationship: [BRIEF CONTEXT]\nTone: [CASUAL/FORMAL]\nLength: [SHORT (3-4 SENTENCES) / MEDIUM (1 PARAGRAPH) / LONG (2-3 PARAGRAPHS)]\n\nMake it feel genuine and personal, not like a template. Reference something specific about our relationship or what their gesture meant to me.",
     audience: ["everyday", "seniors"],
     category: "communication",
     tags: ["thank you", "gratitude", "writing"],
@@ -124,7 +124,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "explain-to-child",
     title: "Explain Something to My Child",
-    promptText: "Help me explain [TOPIC] to my [AGE]-year-old child.\n\nRules:\n1. Use simple words and short sentences.\n2. Include one relatable analogy from their everyday life.\n3. Avoid anything frightening or overly complex.\n4. End with the key takeaway I want them to remember: [KEY TAKEAWAY].\n5. Suggest one follow-up activity or question to check if they understood.",
+    promptText: "Act as a child development specialist skilled at age-appropriate communication. Help me explain [TOPIC] to my [AGE]-year-old child.\n\nRules:\n1. Use simple words and short sentences.\n2. Include one relatable analogy from their everyday life.\n3. Avoid anything frightening or overly complex.\n4. End with the key takeaway I want them to remember: [KEY TAKEAWAY].\n5. Suggest one follow-up activity or question to check if they understood.",
     audience: ["families"],
     category: "communication",
     tags: ["parenting", "kids", "education", "explaining"],
@@ -177,7 +177,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "online-safety-kids",
     title: "Set Up Safe Internet for My Kids",
-    promptText: "Create an age-appropriate internet safety plan for my child.\n\nChild's age: [AGE]\nDevices they use: [LIST DEVICES]\n\nInclude the following sections:\n1. Recommended parental controls for their specific devices and age.\n2. Screen time guidelines (weekdays vs. weekends).\n3. A list of 5 apps or platforms to monitor closely at their age, with reasons why.\n4. Three conversation starters I can use to talk about online safety without lecturing.\n5. Warning signs that my child may be encountering something harmful online.\n6. A simple family agreement we can both sign.",
+    promptText: "Act as a family digital safety consultant specializing in child online protection. Create an age-appropriate internet safety plan for my child.\n\nChild's age: [AGE]\nDevices they use: [LIST DEVICES]\n\nInclude the following sections:\n1. Recommended parental controls for their specific devices and age.\n2. Screen time guidelines (weekdays vs. weekends).\n3. A list of 5 apps or platforms to monitor closely at their age, with reasons why.\n4. Three conversation starters I can use to talk about online safety without lecturing.\n5. Warning signs that my child may be encountering something harmful online.\n6. A simple family agreement we can both sign.",
     audience: ["families"],
     category: "safety",
     tags: ["kids", "parental controls", "online safety", "screen time"],
@@ -187,7 +187,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "ai-privacy-check",
     title: "What Should I Never Tell AI?",
-    promptText: "Create a clear, categorized list of information I should never share with AI tools like ChatGPT, Gemini, Claude, or Copilot.\n\nOrganize it into these categories:\n1. Financial information.\n2. Personal identity details.\n3. Medical information.\n4. Work and business data.\n5. Passwords and security credentials.\n\nFor each item, explain in one sentence why sharing it is risky. Then provide step-by-step instructions for turning off chat history and data training in ChatGPT, Google Gemini, and Microsoft Copilot.",
+    promptText: "Act as a digital privacy and AI safety educator. Create a clear, categorized list of information I should never share with AI tools like ChatGPT, Gemini, Claude, or Copilot.\n\nOrganize it into these categories:\n1. Financial information.\n2. Personal identity details.\n3. Medical information.\n4. Work and business data.\n5. Passwords and security credentials.\n\nFor each item, explain in one sentence why sharing it is risky. Then provide step-by-step instructions for turning off chat history and data training in ChatGPT, Google Gemini, and Microsoft Copilot.",
     audience: ["everyday", "seniors", "students", "business"],
     category: "safety",
     tags: ["AI privacy", "data protection", "ChatGPT safety"],
@@ -218,7 +218,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "medical-bill",
     title: "Understand My Medical Bill",
-    promptText: "Help me understand the following medical bill by explaining each charge in plain language.\n\nFor each line item:\n1. Explain what the charge is for in simple terms.\n2. Flag anything that looks unusual, duplicated, or higher than typical.\n3. Suggest questions I should ask my insurance company or billing department.\n\nEnd with a checklist of steps I can take if I believe any charges are incorrect.\n\nBill details:\n[PASTE BILL DETAILS HERE (remove your name, account numbers, and personal information first)]",
+    promptText: "Act as a certified medical billing advocate. Help me understand the following medical bill by explaining each charge in plain language.\n\nFor each line item:\n1. Explain what the charge is for in simple terms.\n2. Flag anything that looks unusual, duplicated, or higher than typical.\n3. Suggest questions I should ask my insurance company or billing department.\n\nEnd with a checklist of steps I can take if I believe any charges are incorrect.\n\nBill details:\n[PASTE BILL DETAILS HERE (remove your name, account numbers, and personal information first)]",
     audience: ["everyday", "seniors"],
     category: "health",
     tags: ["medical", "billing", "healthcare", "insurance"],
@@ -229,7 +229,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "doctor-questions",
     title: "Prepare Questions for My Doctor",
-    promptText: "Help me prepare for a doctor's appointment about [HEALTH CONCERN].\n\nMy details: I am [AGE] years old and my general health is [BRIEF DESCRIPTION].\n\nCreate a prioritized list of questions organized by category:\n1. Diagnosis: What tests might I need? What conditions should be ruled out?\n2. Treatment: What are my options? What are the benefits and risks of each?\n3. Medications: What side effects should I watch for? How long will I need them?\n4. Lifestyle: What changes to diet, exercise, or habits could help?\n5. Follow-up: When should I come back? What symptoms should prompt an urgent visit?\n\nKeep questions clear and specific so I can take this list to my appointment.",
+    promptText: "Act as a patient advocacy specialist. Help me prepare for a doctor's appointment about [HEALTH CONCERN].\n\nMy details: I am [AGE] years old and my general health is [BRIEF DESCRIPTION].\n\nCreate a prioritized list of questions organized by category:\n1. Diagnosis: What tests might I need? What conditions should be ruled out?\n2. Treatment: What are my options? What are the benefits and risks of each?\n3. Medications: What side effects should I watch for? How long will I need them?\n4. Lifestyle: What changes to diet, exercise, or habits could help?\n5. Follow-up: When should I come back? What symptoms should prompt an urgent visit?\n\nKeep questions clear and specific so I can take this list to my appointment.",
     audience: ["everyday", "seniors"],
     category: "health",
     tags: ["doctor", "health", "medical appointment", "preparation"],
@@ -240,7 +240,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "exercise-plan",
     title: "Simple Exercise Routine",
-    promptText: "Design a safe, beginner-friendly exercise routine I can do at home with no equipment.\n\nMy details:\n- Age: [AGE]\n- Fitness level: [BEGINNER/MODERATE]\n- Physical limitations: [DESCRIBE ANY, OR TYPE \"NONE\"]\n- Available time: [MINUTES] per day, [DAYS] per week\n- Goal: Improve [STRENGTH/FLEXIBILITY/BALANCE/GENERAL FITNESS]\n\nProvide:\n1. A warm-up (3-5 minutes).\n2. The main routine with exercise name, reps or duration, and a brief description of proper form.\n3. A cool-down and stretching sequence (3-5 minutes).\n4. A weekly progression plan so I gradually build up over 4 weeks.",
+    promptText: "Act as a certified personal trainer specializing in beginner fitness programs. Design a safe, beginner-friendly exercise routine I can do at home with no equipment.\n\nMy details:\n- Age: [AGE]\n- Fitness level: [BEGINNER/MODERATE]\n- Physical limitations: [DESCRIBE ANY, OR TYPE \"NONE\"]\n- Available time: [MINUTES] per day, [DAYS] per week\n- Goal: Improve [STRENGTH/FLEXIBILITY/BALANCE/GENERAL FITNESS]\n\nProvide:\n1. A warm-up (3-5 minutes).\n2. The main routine with exercise name, reps or duration, and a brief description of proper form.\n3. A cool-down and stretching sequence (3-5 minutes).\n4. A weekly progression plan so I gradually build up over 4 weeks.",
     audience: ["everyday", "seniors"],
     category: "health",
     tags: ["exercise", "fitness", "wellness", "home workout"],
@@ -251,7 +251,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "medication-organizer",
     title: "Organize My Medications",
-    promptText: "Create a clear daily medication schedule based on the following list.\n\nMy medications and dosages:\n[LIST EACH MEDICATION AND DOSAGE]\n\nOrganize them into a table with columns for: Time of Day (Morning, Afternoon, Evening, Bedtime), Medication Name, Dosage, and Special Instructions.\n\nFor each medication, note:\n- Whether it should be taken with food or on an empty stomach.\n- Common interactions with other medications on the list.\n- What to do if I miss a dose.\n\nEnd with a reminder to verify this schedule with my pharmacist.",
+    promptText: "Act as a certified pharmacy technician specializing in medication management. Create a clear daily medication schedule based on the following list.\n\nMy medications and dosages:\n[LIST EACH MEDICATION AND DOSAGE]\n\nOrganize them into a table with columns for: Time of Day (Morning, Afternoon, Evening, Bedtime), Medication Name, Dosage, and Special Instructions.\n\nFor each medication, note:\n- Whether it should be taken with food or on an empty stomach.\n- Common interactions with other medications on the list.\n- What to do if I miss a dose.\n\nEnd with a reminder to verify this schedule with my pharmacist.",
     audience: ["seniors"],
     category: "health",
     tags: ["medication", "health management", "schedule", "reminders"],
@@ -262,7 +262,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "monthly-budget",
     title: "Create a Monthly Budget",
-    promptText: "Help me build a monthly budget using the 50/30/20 method.\n\nMy details:\n- Monthly take-home pay: approximately $[AMOUNT]\n- Fixed expenses: [LIST RENT, UTILITIES, INSURANCE, LOAN PAYMENTS, ETC.]\n- Financial goals: [SAVING FOR SOMETHING SPECIFIC, PAYING OFF DEBT, ETC.]\n\nCreate a budget breakdown with:\n1. Needs (50%): List my fixed expenses and how much is left for essentials like groceries and transportation.\n2. Wants (30%): Suggest a realistic allocation for dining out, entertainment, and personal spending.\n3. Savings (20%): Recommend how to split this between emergency fund and other goals.\n\nEnd with 3 specific tips for reducing my expenses based on what I listed.",
+    promptText: "Act as a certified personal finance advisor specializing in household budgeting. Help me build a monthly budget using the 50/30/20 method.\n\nMy details:\n- Monthly take-home pay: approximately $[AMOUNT]\n- Fixed expenses: [LIST RENT, UTILITIES, INSURANCE, LOAN PAYMENTS, ETC.]\n- Financial goals: [SAVING FOR SOMETHING SPECIFIC, PAYING OFF DEBT, ETC.]\n\nCreate a budget breakdown with:\n1. Needs (50%): List my fixed expenses and how much is left for essentials like groceries and transportation.\n2. Wants (30%): Suggest a realistic allocation for dining out, entertainment, and personal spending.\n3. Savings (20%): Recommend how to split this between emergency fund and other goals.\n\nEnd with 3 specific tips for reducing my expenses based on what I listed.",
     audience: ["everyday", "seniors", "students"],
     category: "finance",
     tags: ["budget", "money management", "savings", "expenses"],
@@ -273,7 +273,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "insurance-compare",
     title: "Compare Insurance Plans",
-    promptText: "Help me compare these insurance options side by side.\n\nPlan details:\n[DESCRIBE 2-3 PLANS WITH PREMIUMS, DEDUCTIBLES, AND COVERAGE DETAILS]\n\nMy situation:\n- Age: [AGE]\n- Health status: [GENERAL DESCRIPTION]\n- Priorities: [LIST WHAT MATTERS MOST (e.g., prescription coverage, low deductible, specialist access)]\n\nCreate a comparison table with columns for each plan and rows for: Monthly Premium, Annual Deductible, Out-of-Pocket Maximum, Prescription Coverage, Specialist Access, and Network Size.\n\nThen recommend the best plan for my situation and explain your reasoning in 3-4 sentences.",
+    promptText: "Act as a licensed insurance comparison specialist. Help me compare these insurance options side by side.\n\nPlan details:\n[DESCRIBE 2-3 PLANS WITH PREMIUMS, DEDUCTIBLES, AND COVERAGE DETAILS]\n\nMy situation:\n- Age: [AGE]\n- Health status: [GENERAL DESCRIPTION]\n- Priorities: [LIST WHAT MATTERS MOST (e.g., prescription coverage, low deductible, specialist access)]\n\nCreate a comparison table with columns for each plan and rows for: Monthly Premium, Annual Deductible, Out-of-Pocket Maximum, Prescription Coverage, Specialist Access, and Network Size.\n\nThen recommend the best plan for my situation and explain your reasoning in 3-4 sentences.",
     audience: ["everyday", "seniors"],
     category: "finance",
     tags: ["insurance", "healthcare", "comparison", "decision making"],
@@ -283,7 +283,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "negotiate-bill",
     title: "Help Me Negotiate a Bill",
-    promptText: "Write a phone script I can use to negotiate a lower rate on my [TYPE OF BILL (cable, internet, phone, or medical)] bill.\n\nCurrent provider: [COMPANY]\nCurrent monthly cost: $[AMOUNT]\nHow long I have been a customer: [DURATION]\n\nThe script should include:\n1. An opening that establishes me as a loyal customer.\n2. A specific request for a better rate.\n3. Competitor prices I can reference (suggest realistic examples).\n4. A response if they say no or offer something too small.\n5. An escalation line asking to speak with the retention department.\n6. A polite closing whether I accept or need to think about it.\n\nKeep the tone friendly but firm.",
+    promptText: "Act as a consumer savings specialist skilled in bill negotiation. Write a phone script I can use to negotiate a lower rate on my [TYPE OF BILL (cable, internet, phone, or medical)] bill.\n\nCurrent provider: [COMPANY]\nCurrent monthly cost: $[AMOUNT]\nHow long I have been a customer: [DURATION]\n\nThe script should include:\n1. An opening that establishes me as a loyal customer.\n2. A specific request for a better rate.\n3. Competitor prices I can reference (suggest realistic examples).\n4. A response if they say no or offer something too small.\n5. An escalation line asking to speak with the retention department.\n6. A polite closing whether I accept or need to think about it.\n\nKeep the tone friendly but firm.",
     audience: ["everyday", "seniors"],
     category: "finance",
     tags: ["negotiation", "bills", "saving money", "customer service"],
@@ -293,7 +293,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "screen-time-rules",
     title: "Create Family Screen Time Rules",
-    promptText: "Help me create a family screen time agreement.\n\nChildren's ages: [LIST AGES]\n\nThe agreement should include:\n1. Daily screen time limits for school nights and weekends, adjusted by age.\n2. Approved content categories and specific apps or sites for each child.\n3. Device-free times (meals, bedtime, homework) and device-free zones.\n4. Consequences for breaking the rules, phrased as \"if/then\" statements.\n5. A section where the whole family agrees to the same core rules (including parents).\n\nKeep the tone positive. Frame rules as boundaries that protect fun, not punishments.",
+    promptText: "Act as a family digital wellness consultant. Help me create a family screen time agreement.\n\nChildren's ages: [LIST AGES]\n\nThe agreement should include:\n1. Daily screen time limits for school nights and weekends, adjusted by age.\n2. Approved content categories and specific apps or sites for each child.\n3. Device-free times (meals, bedtime, homework) and device-free zones.\n4. Consequences for breaking the rules, phrased as \"if/then\" statements.\n5. A section where the whole family agrees to the same core rules (including parents).\n\nKeep the tone positive. Frame rules as boundaries that protect fun, not punishments.",
     audience: ["families"],
     category: "productivity",
     tags: ["screen time", "parenting", "family rules", "digital wellness"],
@@ -303,7 +303,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "talk-about-cyberbullying",
     title: "Talk to My Kid About Cyberbullying",
-    promptText: "Help me prepare a conversation with my [AGE]-year-old about cyberbullying.\n\nCreate a conversation guide that includes:\n1. A natural opening question to start the discussion without making it feel like a lecture.\n2. Age-appropriate examples of what cyberbullying looks like (not just mean messages, but also exclusion, rumor-spreading, fake accounts, and screenshot-sharing).\n3. Three things they should do if it happens to them.\n4. Two things they should do if they see it happening to someone else.\n5. A reassurance that they can always come to me without getting in trouble.\n6. A closing question that invites them to share anything on their mind.\n\nKeep the tone warm, supportive, and age-appropriate.",
+    promptText: "Act as a child cybersafety educator and family counselor. Help me prepare a conversation with my [AGE]-year-old about cyberbullying.\n\nCreate a conversation guide that includes:\n1. A natural opening question to start the discussion without making it feel like a lecture.\n2. Age-appropriate examples of what cyberbullying looks like (not just mean messages, but also exclusion, rumor-spreading, fake accounts, and screenshot-sharing).\n3. Three things they should do if it happens to them.\n4. Two things they should do if they see it happening to someone else.\n5. A reassurance that they can always come to me without getting in trouble.\n6. A closing question that invites them to share anything on their mind.\n\nKeep the tone warm, supportive, and age-appropriate.",
     audience: ["families"],
     category: "safety",
     tags: ["cyberbullying", "kids", "online safety", "parenting"],
@@ -313,7 +313,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "family-emergency-plan",
     title: "Create a Family Safety Plan",
-    promptText: "Create a family digital safety plan for a household of [NUMBER] people aged [AGES].\n\nThe plan should include:\n1. A family code word system for verifying emergency calls (with instructions on how to use it).\n2. Rules for handling calls from someone claiming a family member is in danger.\n3. Step-by-step instructions for what to do if a phone or laptop is lost or stolen.\n4. A printable emergency contact list (not just stored on phones).\n5. A quarterly review checklist to keep the plan current.\n\nFormat it as a simple document the family can print and post at home.",
+    promptText: "Act as a family safety and emergency preparedness consultant. Create a family digital safety plan for a household of [NUMBER] people aged [AGES].\n\nThe plan should include:\n1. A family code word system for verifying emergency calls (with instructions on how to use it).\n2. Rules for handling calls from someone claiming a family member is in danger.\n3. Step-by-step instructions for what to do if a phone or laptop is lost or stolen.\n4. A printable emergency contact list (not just stored on phones).\n5. A quarterly review checklist to keep the plan current.\n\nFormat it as a simple document the family can print and post at home.",
     audience: ["families"],
     category: "safety",
     tags: ["family safety", "emergency plan", "code word", "verification"],
@@ -323,7 +323,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "homework-help",
     title: "Help My Child Study (Without Doing It for Them)",
-    promptText: "My child (age [AGE]) is struggling with [SUBJECT/TOPIC].\n\nHelp me support their learning without doing the work for them. Provide:\n1. A simple, age-appropriate explanation of the concept using a real-world example.\n2. Five practice questions at their level, starting easy and getting harder.\n3. The answer key for those questions (so I can check their work).\n4. Three tips for how I can help them study, even if I do not know the subject well.\n5. One encouraging thing I can say when they get frustrated.",
+    promptText: "Act as an experienced educator specializing in parent-guided learning. My child (age [AGE]) is struggling with [SUBJECT/TOPIC].\n\nHelp me support their learning without doing the work for them. Provide:\n1. A simple, age-appropriate explanation of the concept using a real-world example.\n2. Five practice questions at their level, starting easy and getting harder.\n3. The answer key for those questions (so I can check their work).\n4. Three tips for how I can help them study, even if I do not know the subject well.\n5. One encouraging thing I can say when they get frustrated.",
     audience: ["families"],
     category: "learning",
     tags: ["homework", "study", "parenting", "education"],
@@ -333,7 +333,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "tech-help-phone",
     title: "Fix Something on My Phone",
-    promptText: "I need help fixing a problem on my [iPhone/Android] phone.\n\nThe problem: [DESCRIBE WHAT IS HAPPENING (e.g., cannot connect to Wi-Fi, text is too small, getting too many notifications, camera is not working)]\n\nPlease walk me through the fix with these rules:\n1. Use simple, non-technical language.\n2. Number each step clearly.\n3. Tell me exactly what to tap and where to find it on screen.\n4. Describe what the screen should look like after each step so I know I did it right.\n5. If there are multiple possible solutions, start with the simplest one.\n6. Let me know if I might need someone else to help at any point.",
+    promptText: "Act as a certified tech support specialist with expertise in mobile devices. I need help fixing a problem on my [iPhone/Android] phone.\n\nThe problem: [DESCRIBE WHAT IS HAPPENING (e.g., cannot connect to Wi-Fi, text is too small, getting too many notifications, camera is not working)]\n\nPlease walk me through the fix with these rules:\n1. Use simple, non-technical language.\n2. Number each step clearly.\n3. Tell me exactly what to tap and where to find it on screen.\n4. Describe what the screen should look like after each step so I know I did it right.\n5. If there are multiple possible solutions, start with the simplest one.\n6. Let me know if I might need someone else to help at any point.",
     audience: ["seniors"],
     category: "tech",
     tags: ["phone", "troubleshooting", "technology help", "step-by-step"],
@@ -343,7 +343,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "social-security-explain",
     title: "Explain Benefits in Plain Language",
-    promptText: "Explain [Social Security benefits / Medicare / VA benefits / pension options] in plain language for someone who is not familiar with the system.\n\nMy situation: I am [AGE] years old and [BRIEF DESCRIPTION OF YOUR SITUATION].\n\nPlease cover:\n1. What I am likely eligible for based on my age and situation.\n2. Important deadlines I should be aware of, and what happens if I miss them.\n3. Common mistakes people make that cost them money or benefits.\n4. Steps I should take right now, in order of priority.\n5. Where to go for official, free help (not scam websites).\n\nKeep the language simple and avoid government jargon.",
+    promptText: "Act as a certified benefits enrollment counselor. Explain [Social Security benefits / Medicare / VA benefits / pension options] in plain language for someone who is not familiar with the system.\n\nMy situation: I am [AGE] years old and [BRIEF DESCRIPTION OF YOUR SITUATION].\n\nPlease cover:\n1. What I am likely eligible for based on my age and situation.\n2. Important deadlines I should be aware of, and what happens if I miss them.\n3. Common mistakes people make that cost them money or benefits.\n4. Steps I should take right now, in order of priority.\n5. Where to go for official, free help (not scam websites).\n\nKeep the language simple and avoid government jargon.",
     audience: ["seniors"],
     category: "finance",
     tags: ["benefits", "Social Security", "Medicare", "retirement"],
@@ -354,7 +354,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "letter-writing",
     title: "Write a Personal Letter",
-    promptText: "Help me write a personal letter with the following details.\n\nType: [BIRTHDAY / SYMPATHY / CONGRATULATIONS / THINKING OF YOU / HOLIDAY]\nRecipient: [WHO (e.g., grandchild, old friend, neighbor)]\nA detail about our relationship: [SHARE A MEMORY OR SOMETHING SPECIAL ABOUT THEM]\nLength: [SHORT / MEDIUM / LONG]\nStyle: [WARM AND CASUAL / POLISHED AND FORMAL]\n\nMake it feel genuine and personal. Reference the specific detail I shared. Avoid cliches and generic phrases. End with something that invites a response or expresses looking forward to seeing them.",
+    promptText: "Act as a professional writer specializing in personal correspondence. Help me write a personal letter with the following details.\n\nType: [BIRTHDAY / SYMPATHY / CONGRATULATIONS / THINKING OF YOU / HOLIDAY]\nRecipient: [WHO (e.g., grandchild, old friend, neighbor)]\nA detail about our relationship: [SHARE A MEMORY OR SOMETHING SPECIAL ABOUT THEM]\nLength: [SHORT / MEDIUM / LONG]\nStyle: [WARM AND CASUAL / POLISHED AND FORMAL]\n\nMake it feel genuine and personal. Reference the specific detail I shared. Avoid cliches and generic phrases. End with something that invites a response or expresses looking forward to seeing them.",
     audience: ["seniors"],
     category: "communication",
     tags: ["letter writing", "personal", "relationships"],
@@ -375,7 +375,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "travel-planning-senior",
     title: "Plan an Accessible Trip",
-    promptText: "Help me plan a [LENGTH]-day trip to [DESTINATION].\n\nMy needs:\n- Mobility considerations: [DESCRIBE ANY]\n- Budget: approximately $[AMOUNT]\n- Travel companions: [SOLO / WITH PARTNER / WITH FAMILY]\n\nProvide:\n1. Accessible accommodation recommendations with key accessibility features.\n2. Transportation options that accommodate my needs.\n3. A daily itinerary that is enjoyable without being physically exhausting.\n4. Tips for traveling with medications (TSA rules, time zone adjustments).\n5. Nearby emergency medical facilities and pharmacies.\n6. Packing essentials I might forget.",
+    promptText: "Act as an accessible travel planning specialist. Help me plan a [LENGTH]-day trip to [DESTINATION].\n\nMy needs:\n- Mobility considerations: [DESCRIBE ANY]\n- Budget: approximately $[AMOUNT]\n- Travel companions: [SOLO / WITH PARTNER / WITH FAMILY]\n\nProvide:\n1. Accessible accommodation recommendations with key accessibility features.\n2. Transportation options that accommodate my needs.\n3. A daily itinerary that is enjoyable without being physically exhausting.\n4. Tips for traveling with medications (TSA rules, time zone adjustments).\n5. Nearby emergency medical facilities and pharmacies.\n6. Packing essentials I might forget.",
     audience: ["seniors"],
     category: "productivity",
     tags: ["travel", "accessibility", "planning", "vacation"],
@@ -385,7 +385,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "essay-outline",
     title: "Outline an Essay (Do Not Write It for Me)",
-    promptText: "Create a detailed outline for a [LENGTH]-word essay on [TOPIC]. Do NOT write the essay itself.\n\nProvide:\n1. A strong, arguable thesis statement.\n2. Three to four main arguments, each with:\n   - A topic sentence.\n   - Two supporting points or evidence types I should research.\n   - A suggested source type (academic journal, government report, news article).\n3. A logical paragraph structure showing how the arguments build on each other.\n4. An introduction strategy (hook, context, thesis).\n5. A conclusion strategy that goes beyond just repeating the thesis.\n6. Three transitional phrases I can use between sections.",
+    promptText: "Act as an experienced academic writing instructor. Create a detailed outline for a [LENGTH]-word essay on [TOPIC]. Do NOT write the essay itself.\n\nProvide:\n1. A strong, arguable thesis statement.\n2. Three to four main arguments, each with:\n   - A topic sentence.\n   - Two supporting points or evidence types I should research.\n   - A suggested source type (academic journal, government report, news article).\n3. A logical paragraph structure showing how the arguments build on each other.\n4. An introduction strategy (hook, context, thesis).\n5. A conclusion strategy that goes beyond just repeating the thesis.\n6. Three transitional phrases I can use between sections.",
     audience: ["students"],
     category: "learning",
     tags: ["essay", "writing", "school", "outline"],
@@ -396,7 +396,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "study-quiz",
     title: "Quiz Me on What I Studied",
-    promptText: "I just studied [TOPIC/CHAPTER] for my [CLASS] class. Test my understanding.\n\nCreate 10 quiz questions:\n- Questions 1-3: Multiple choice (4 options each).\n- Questions 4-6: True or false with a brief explanation.\n- Questions 7-9: Short answer requiring 1-2 sentences.\n- Question 10: One application question that requires me to use the concept in a new scenario.\n\nPresent all questions first without answers. Then provide a separate answer key with explanations for each correct answer, including why wrong answers are wrong.",
+    promptText: "Act as an experienced educator specializing in exam preparation. I just studied [TOPIC/CHAPTER] for my [CLASS] class. Test my understanding.\n\nCreate 10 quiz questions:\n- Questions 1-3: Multiple choice (4 options each).\n- Questions 4-6: True or false with a brief explanation.\n- Questions 7-9: Short answer requiring 1-2 sentences.\n- Question 10: One application question that requires me to use the concept in a new scenario.\n\nPresent all questions first without answers. Then provide a separate answer key with explanations for each correct answer, including why wrong answers are wrong.",
     audience: ["students"],
     category: "learning",
     tags: ["quiz", "study", "test prep", "review"],
@@ -406,7 +406,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "explain-concept",
     title: "Explain This Like I Am a Beginner",
-    promptText: "Explain [CONCEPT/TOPIC] at three levels of complexity.\n\nLevel 1 (Everyday language): Use a real-world analogy that makes the concept immediately intuitive. No technical terms.\n\nLevel 2 (Intermediate): Introduce the proper terminology and explain how the parts connect.\n\nLevel 3 (Applied): Give me one specific exercise or problem I can work through to prove I understand it.\n\nContext: I am studying this for [CLASS/PURPOSE].\n\nEnd with one common misconception about this topic and why it is wrong.",
+    promptText: "Act as an experienced educator skilled at multi-level concept explanation. Explain [CONCEPT/TOPIC] at three levels of complexity.\n\nLevel 1 (Everyday language): Use a real-world analogy that makes the concept immediately intuitive. No technical terms.\n\nLevel 2 (Intermediate): Introduce the proper terminology and explain how the parts connect.\n\nLevel 3 (Applied): Give me one specific exercise or problem I can work through to prove I understand it.\n\nContext: I am studying this for [CLASS/PURPOSE].\n\nEnd with one common misconception about this topic and why it is wrong.",
     audience: ["students", "everyday"],
     category: "learning",
     tags: ["explanation", "learning", "understanding", "analogies"],
@@ -416,7 +416,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "proofread-paper",
     title: "Proofread and Explain Corrections",
-    promptText: "Proofread the following text for grammar, spelling, punctuation, and clarity.\n\nRules:\n1. Do not rewrite the text. Only suggest specific corrections.\n2. For each error, show the original text, the correction, and a one-sentence explanation of the rule.\n3. Identify sentences that are grammatically correct but could be clearer or more concise.\n4. At the end, list my three most frequent error types so I know what to watch for next time.\n\nText to proofread:\n[PASTE YOUR WRITING]",
+    promptText: "Act as a professional editor and writing instructor. Proofread the following text for grammar, spelling, punctuation, and clarity.\n\nRules:\n1. Do not rewrite the text. Only suggest specific corrections.\n2. For each error, show the original text, the correction, and a one-sentence explanation of the rule.\n3. Identify sentences that are grammatically correct but could be clearer or more concise.\n4. At the end, list my three most frequent error types so I know what to watch for next time.\n\nText to proofread:\n[PASTE YOUR WRITING]",
     audience: ["students"],
     category: "communication",
     tags: ["proofreading", "grammar", "writing improvement"],
@@ -427,7 +427,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "study-schedule",
     title: "Create a Study Schedule",
-    promptText: "Create a study schedule for the next [NUMBER] weeks.\n\nMy exams:\n[LIST EACH SUBJECT AND EXAM DATE]\n\nMy availability:\n- Hours I can study per day: [HOURS]\n- Days I am busy with work or activities: [LIST DAYS]\n- Subjects I struggle with most: [LIST]\n\nRequirements:\n1. Prioritize weaker subjects but do not neglect others.\n2. Use spaced repetition: revisit each subject at increasing intervals.\n3. Include 10-minute breaks every 50 minutes.\n4. Schedule review sessions 2 days before each exam.\n5. Leave one day per week completely free for rest.\n6. Present the schedule as a weekly calendar.",
+    promptText: "Act as an academic success coach specializing in study planning. Create a study schedule for the next [NUMBER] weeks.\n\nMy exams:\n[LIST EACH SUBJECT AND EXAM DATE]\n\nMy availability:\n- Hours I can study per day: [HOURS]\n- Days I am busy with work or activities: [LIST DAYS]\n- Subjects I struggle with most: [LIST]\n\nRequirements:\n1. Prioritize weaker subjects but do not neglect others.\n2. Use spaced repetition: revisit each subject at increasing intervals.\n3. Include 10-minute breaks every 50 minutes.\n4. Schedule review sessions 2 days before each exam.\n5. Leave one day per week completely free for rest.\n6. Present the schedule as a weekly calendar.",
     audience: ["students"],
     category: "productivity",
     tags: ["study plan", "exam prep", "time management", "scheduling"],
@@ -437,7 +437,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "research-sources",
     title: "Find Research Directions",
-    promptText: "I am researching [TOPIC] for a [TYPE OF PAPER (research paper, presentation, or report)].\n\nSuggest 5-7 specific subtopics or angles worth exploring. For each one, provide:\n1. The subtopic or research question.\n2. Why it is relevant and interesting.\n3. The best type of source to use (peer-reviewed journal, government data, industry report, expert interview).\n4. Two specific search terms I can use in a library database or Google Scholar.\n\nImportant: Do NOT generate citations, references, or source names. I will find real sources myself using your search terms.",
+    promptText: "Act as a research librarian and academic research mentor. I am researching [TOPIC] for a [TYPE OF PAPER (research paper, presentation, or report)].\n\nSuggest 5-7 specific subtopics or angles worth exploring. For each one, provide:\n1. The subtopic or research question.\n2. Why it is relevant and interesting.\n3. The best type of source to use (peer-reviewed journal, government data, industry report, expert interview).\n4. Two specific search terms I can use in a library database or Google Scholar.\n\nImportant: Do NOT generate citations, references, or source names. I will find real sources myself using your search terms.",
     audience: ["students"],
     category: "learning",
     tags: ["research", "sources", "academic", "paper"],
@@ -448,7 +448,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "respond-negative-review",
     title: "Respond to a Negative Review",
-    promptText: "Write a professional response to the following negative review of my business.\n\nBusiness type: [DESCRIBE YOUR BUSINESS]\nReview:\n[PASTE THE REVIEW]\n\nThe response should:\n1. Thank the reviewer by name (if visible) for their feedback.\n2. Acknowledge their specific concern without being defensive.\n3. Apologize for the experience without admitting liability.\n4. Offer a concrete resolution or next step.\n5. Invite them to contact you directly to resolve the issue.\n6. Stay under 120 words.\n\nThe tone should be empathetic and professional, since other potential customers will read this response too.",
+    promptText: "Act as a reputation management specialist. Write a professional response to the following negative review of my business.\n\nBusiness type: [DESCRIBE YOUR BUSINESS]\nReview:\n[PASTE THE REVIEW]\n\nThe response should:\n1. Thank the reviewer by name (if visible) for their feedback.\n2. Acknowledge their specific concern without being defensive.\n3. Apologize for the experience without admitting liability.\n4. Offer a concrete resolution or next step.\n5. Invite them to contact you directly to resolve the issue.\n6. Stay under 120 words.\n\nThe tone should be empathetic and professional, since other potential customers will read this response too.",
     audience: ["business"],
     category: "communication",
     tags: ["reviews", "customer service", "reputation management"],
@@ -458,7 +458,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "job-posting",
     title: "Write a Job Posting",
-    promptText: "Write a compelling job posting using these details.\n\nJob title: [TITLE]\nBusiness type: [TYPE OF BUSINESS]\nKey responsibilities: [LIST 3-5 MAIN DUTIES]\nRequired experience: [LIST REQUIREMENTS]\nPay range: [RANGE]\nWhat makes this a great place to work: [CULTURE, BENEFITS, PERKS]\n\nStructure the posting as:\n1. A hook (1-2 sentences about why someone would want this job).\n2. About the role (responsibilities).\n3. What you bring (requirements).\n4. What we offer (compensation and culture).\n5. How to apply.\n\nKeep the tone conversational and welcoming. Use inclusive language throughout.",
+    promptText: "Act as a talent acquisition specialist skilled in writing compelling job postings. Write a compelling job posting using these details.\n\nJob title: [TITLE]\nBusiness type: [TYPE OF BUSINESS]\nKey responsibilities: [LIST 3-5 MAIN DUTIES]\nRequired experience: [LIST REQUIREMENTS]\nPay range: [RANGE]\nWhat makes this a great place to work: [CULTURE, BENEFITS, PERKS]\n\nStructure the posting as:\n1. A hook (1-2 sentences about why someone would want this job).\n2. About the role (responsibilities).\n3. What you bring (requirements).\n4. What we offer (compensation and culture).\n5. How to apply.\n\nKeep the tone conversational and welcoming. Use inclusive language throughout.",
     audience: ["business"],
     category: "work",
     tags: ["hiring", "job posting", "recruitment", "HR"],
@@ -468,7 +468,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "social-media-plan",
     title: "Create a Social Media Content Plan",
-    promptText: "Create a 2-week social media content plan for my business.\n\nBusiness type: [DESCRIBE YOUR BUSINESS]\nActive platforms: [LIST PLATFORMS]\nTarget audience: [DESCRIBE YOUR IDEAL CUSTOMER]\nPosting frequency: [NUMBER] times per week\n\nFor each post, provide:\n1. The platform it is for.\n2. Content type (educational, promotional, behind-the-scenes, or engagement).\n3. A draft caption under 100 words.\n4. Suggested hashtags (5-8 per post).\n5. Best day and time to post.\n\nInclude a mix: 40% educational or valuable content, 30% engagement and conversation starters, 20% promotional, and 10% behind-the-scenes.",
+    promptText: "Act as a social media marketing strategist for small businesses. Create a 2-week social media content plan for my business.\n\nBusiness type: [DESCRIBE YOUR BUSINESS]\nActive platforms: [LIST PLATFORMS]\nTarget audience: [DESCRIBE YOUR IDEAL CUSTOMER]\nPosting frequency: [NUMBER] times per week\n\nFor each post, provide:\n1. The platform it is for.\n2. Content type (educational, promotional, behind-the-scenes, or engagement).\n3. A draft caption under 100 words.\n4. Suggested hashtags (5-8 per post).\n5. Best day and time to post.\n\nInclude a mix: 40% educational or valuable content, 30% engagement and conversation starters, 20% promotional, and 10% behind-the-scenes.",
     audience: ["business"],
     category: "work",
     tags: ["social media", "marketing", "content planning", "small business"],
@@ -478,7 +478,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "contract-review",
     title: "Review This Contract Before I Sign",
-    promptText: "Review the following contract and explain it in plain language.\n\nFor each section, identify:\n1. What it means in simple terms.\n2. Whether it is standard or unusual.\n3. Any terms that could be unfavorable to me.\n4. Auto-renewal clauses and how to cancel.\n5. Hidden fees, penalties, or escalation clauses.\n6. Liability or indemnification issues.\n\nEnd with a summary: \"Sign as-is,\" \"Negotiate these points first,\" or \"Consult a lawyer before signing.\"\n\nContract text:\n[PASTE CONTRACT TEXT (remove sensitive details first)]",
+    promptText: "Act as a contract analysis specialist skilled in plain-language legal review. Review the following contract and explain it in plain language.\n\nFor each section, identify:\n1. What it means in simple terms.\n2. Whether it is standard or unusual.\n3. Any terms that could be unfavorable to me.\n4. Auto-renewal clauses and how to cancel.\n5. Hidden fees, penalties, or escalation clauses.\n6. Liability or indemnification issues.\n\nEnd with a summary: \"Sign as-is,\" \"Negotiate these points first,\" or \"Consult a lawyer before signing.\"\n\nContract text:\n[PASTE CONTRACT TEXT (remove sensitive details first)]",
     audience: ["business", "everyday"],
     category: "finance",
     tags: ["contract", "legal", "business", "review"],
@@ -489,7 +489,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "customer-email-templates",
     title: "Create Customer Email Templates",
-    promptText: "Create 5 professional email templates for my [TYPE OF BUSINESS].\n\nI need:\n1. Welcome email for new customers.\n2. Follow-up after a purchase or service.\n3. Request for a review or testimonial.\n4. Response to a common inquiry about [TOPIC].\n5. Re-engagement email for customers who have not returned in a while.\n\nFor each template:\n- Include a compelling subject line.\n- Keep the body under 120 words.\n- Include a clear call-to-action.\n- Use a warm but professional tone.\n- Add a placeholder for personalization (e.g., customer name, purchase details).",
+    promptText: "Act as a customer communications specialist for small businesses. Create 5 professional email templates for my [TYPE OF BUSINESS].\n\nI need:\n1. Welcome email for new customers.\n2. Follow-up after a purchase or service.\n3. Request for a review or testimonial.\n4. Response to a common inquiry about [TOPIC].\n5. Re-engagement email for customers who have not returned in a while.\n\nFor each template:\n- Include a compelling subject line.\n- Keep the body under 120 words.\n- Include a clear call-to-action.\n- Use a warm but professional tone.\n- Add a placeholder for personalization (e.g., customer name, purchase details).",
     audience: ["business"],
     category: "communication",
     tags: ["email templates", "customer communication", "automation"],
@@ -499,7 +499,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "competitor-analysis",
     title: "Analyze My Competition",
-    promptText: "Help me analyze my competitive landscape.\n\nMy business: [TYPE OF BUSINESS] in [LOCATION/MARKET]\nMain competitors: [LIST 2-3 COMPETITORS]\n\nCompare us across these dimensions:\n1. Pricing and value proposition.\n2. Online presence and website quality.\n3. Customer review themes (strengths and complaints).\n4. Unique selling points.\n5. Weaknesses or gaps in their offering.\n\nThen answer:\n- What are 3 opportunities they are missing that I could capitalize on?\n- What is one thing they do better than me that I should learn from?\n- What is my strongest competitive advantage right now?",
+    promptText: "Act as a competitive intelligence analyst for small businesses. Help me analyze my competitive landscape.\n\nMy business: [TYPE OF BUSINESS] in [LOCATION/MARKET]\nMain competitors: [LIST 2-3 COMPETITORS]\n\nCompare us across these dimensions:\n1. Pricing and value proposition.\n2. Online presence and website quality.\n3. Customer review themes (strengths and complaints).\n4. Unique selling points.\n5. Weaknesses or gaps in their offering.\n\nThen answer:\n- What are 3 opportunities they are missing that I could capitalize on?\n- What is one thing they do better than me that I should learn from?\n- What is my strongest competitive advantage right now?",
     audience: ["business"],
     category: "work",
     tags: ["competition", "strategy", "market analysis", "business planning"],
@@ -509,7 +509,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "business-security-audit",
     title: "Cybersecurity Checklist for My Business",
-    promptText: "Create a practical cybersecurity checklist for my small business.\n\nBusiness details:\n- Number of employees: [NUMBER]\n- Tools and software we use: [LIST]\n- Types of data we handle: [CUSTOMER INFO / PAYMENT DATA / HEALTH RECORDS / ETC.]\n\nOrganize the checklist by priority:\n\nImmediate (do this week):\n- Password policies and multi-factor authentication.\n- Critical software updates.\n\nShort-term (this month):\n- Backup procedures and testing.\n- Employee security awareness basics.\n\nOngoing:\n- Monitoring and incident response plan.\n- Vendor security review.\n\nFor each item, give a one-line action step, not just a recommendation. End with a simple incident response checklist: what to do in the first 60 minutes if we suspect a breach.",
+    promptText: "Act as a small business cybersecurity consultant. Create a practical cybersecurity checklist for my small business.\n\nBusiness details:\n- Number of employees: [NUMBER]\n- Tools and software we use: [LIST]\n- Types of data we handle: [CUSTOMER INFO / PAYMENT DATA / HEALTH RECORDS / ETC.]\n\nOrganize the checklist by priority:\n\nImmediate (do this week):\n- Password policies and multi-factor authentication.\n- Critical software updates.\n\nShort-term (this month):\n- Backup procedures and testing.\n- Employee security awareness basics.\n\nOngoing:\n- Monitoring and incident response plan.\n- Vendor security review.\n\nFor each item, give a one-line action step, not just a recommendation. End with a simple incident response checklist: what to do in the first 60 minutes if we suspect a breach.",
     audience: ["business"],
     category: "safety",
     tags: ["cybersecurity", "business security", "compliance", "data protection"],
@@ -519,7 +519,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "ai-tool-comparison",
     title: "Which AI Tool Should I Use?",
-    promptText: "I want to use AI for: [DESCRIBE YOUR TASK (e.g., writing emails, summarizing documents, creating images, or analyzing data)].\n\nCompare the following tools for my specific use case:\n- ChatGPT (OpenAI)\n- Google Gemini\n- Claude (Anthropic)\n- Microsoft Copilot\n\nFor each tool, tell me:\n1. How well it handles my specific task (rated Good, Very Good, or Excellent).\n2. Whether a free version is available and what its limitations are.\n3. The privacy tradeoff: what data the company keeps and how to minimize exposure.\n4. One standout feature for my use case.\n\nEnd with a clear recommendation: which tool I should start with and why.",
+    promptText: "Act as an AI technology advisor specializing in tool evaluation. I want to use AI for: [DESCRIBE YOUR TASK (e.g., writing emails, summarizing documents, creating images, or analyzing data)].\n\nCompare the following tools for my specific use case:\n- ChatGPT (OpenAI)\n- Google Gemini\n- Claude (Anthropic)\n- Microsoft Copilot\n\nFor each tool, tell me:\n1. How well it handles my specific task (rated Good, Very Good, or Excellent).\n2. Whether a free version is available and what its limitations are.\n3. The privacy tradeoff: what data the company keeps and how to minimize exposure.\n4. One standout feature for my use case.\n\nEnd with a clear recommendation: which tool I should start with and why.",
     audience: ["everyday", "business", "students"],
     category: "tech",
     tags: ["AI tools", "comparison", "ChatGPT", "Gemini", "technology"],
@@ -529,7 +529,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "verify-ai-output",
     title: "How to Verify What AI Tells Me",
-    promptText: "I asked an AI tool a question and want to verify the response.\n\nMy question was: [YOUR QUESTION]\nThe AI's answer was: [PASTE THE AI RESPONSE]\n\nHelp me fact-check this by:\n1. Identifying which claims in the response are verifiable facts vs. opinions.\n2. Listing specific sources I should check (official websites, databases, or organizations).\n3. Flagging any parts that sound plausible but are commonly hallucinated by AI.\n4. Highlighting anything that is outdated (AI training data has a cutoff date).\n5. Giving me a confidence rating: Likely Accurate, Verify Before Using, or Treat With Caution.\n\nTell me the single most important claim to verify first and exactly where to check it.",
+    promptText: "Act as a critical thinking and AI literacy instructor. I asked an AI tool a question and want to verify the response.\n\nMy question was: [YOUR QUESTION]\nThe AI's answer was: [PASTE THE AI RESPONSE]\n\nHelp me fact-check this by:\n1. Identifying which claims in the response are verifiable facts vs. opinions.\n2. Listing specific sources I should check (official websites, databases, or organizations).\n3. Flagging any parts that sound plausible but are commonly hallucinated by AI.\n4. Highlighting anything that is outdated (AI training data has a cutoff date).\n5. Giving me a confidence rating: Likely Accurate, Verify Before Using, or Treat With Caution.\n\nTell me the single most important claim to verify first and exactly where to check it.",
     audience: ["everyday", "seniors", "students"],
     category: "safety",
     tags: ["fact-checking", "verification", "AI accuracy", "misinformation"],
@@ -539,7 +539,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "resume-improvement",
     title: "Improve My Resume",
-    promptText: "Review my resume and provide specific, actionable improvements.\n\nTarget role: [JOB TITLE / INDUSTRY]\n\nAnalyze and improve:\n1. Impact statements: Rewrite weak bullet points using strong action verbs and quantifiable results.\n2. Structure: Suggest a better format or section order for my target industry.\n3. Gaps: Identify anything missing that hiring managers in [INDUSTRY] expect to see.\n4. Keywords: Suggest industry-specific terms that will help pass applicant tracking systems.\n5. Overall impression: In 2 sentences, what does this resume communicate about me, and how can I strengthen that message?\n\nMy current resume:\n[PASTE RESUME TEXT (remove your home address, phone number, and email first)]",
+    promptText: "Act as a professional resume writer and career coach. Review my resume and provide specific, actionable improvements.\n\nTarget role: [JOB TITLE / INDUSTRY]\n\nAnalyze and improve:\n1. Impact statements: Rewrite weak bullet points using strong action verbs and quantifiable results.\n2. Structure: Suggest a better format or section order for my target industry.\n3. Gaps: Identify anything missing that hiring managers in [INDUSTRY] expect to see.\n4. Keywords: Suggest industry-specific terms that will help pass applicant tracking systems.\n5. Overall impression: In 2 sentences, what does this resume communicate about me, and how can I strengthen that message?\n\nMy current resume:\n[PASTE RESUME TEXT (remove your home address, phone number, and email first)]",
     audience: ["everyday", "students"],
     category: "work",
     tags: ["resume", "job search", "career", "writing"],
@@ -550,7 +550,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "learn-new-skill",
     title: "Learn Something New in 30 Days",
-    promptText: "Design a 30-day learning plan for [SKILL/TOPIC].\n\nMy starting level: Complete beginner.\nTime I can commit: [MINUTES/HOURS] per day.\nGoal by day 30: [SPECIFIC, MEASURABLE OUTCOME]\n\nStructure the plan as:\n\nWeek 1 (Foundation): Core concepts and vocabulary.\nWeek 2 (Practice): Hands-on exercises and drills.\nWeek 3 (Application): Real-world projects or scenarios.\nWeek 4 (Mastery): Review, fill gaps, and demonstrate competence.\n\nFor each day, provide:\n1. The specific topic or skill to focus on.\n2. One free resource (YouTube channel, website, or app) with the search term to find it.\n3. One 15-minute practice exercise.\n\nInclude a simple progress tracker I can check off each day.",
+    promptText: "Act as a self-directed learning coach and curriculum designer. Design a 30-day learning plan for [SKILL/TOPIC].\n\nMy starting level: Complete beginner.\nTime I can commit: [MINUTES/HOURS] per day.\nGoal by day 30: [SPECIFIC, MEASURABLE OUTCOME]\n\nStructure the plan as:\n\nWeek 1 (Foundation): Core concepts and vocabulary.\nWeek 2 (Practice): Hands-on exercises and drills.\nWeek 3 (Application): Real-world projects or scenarios.\nWeek 4 (Mastery): Review, fill gaps, and demonstrate competence.\n\nFor each day, provide:\n1. The specific topic or skill to focus on.\n2. One free resource (YouTube channel, website, or app) with the search term to find it.\n3. One 15-minute practice exercise.\n\nInclude a simple progress tracker I can check off each day.",
     audience: ["everyday", "students", "seniors"],
     category: "learning",
     tags: ["learning plan", "self-improvement", "skills", "goals"],
@@ -560,7 +560,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "wi-fi-security-check",
     title: "Is My Home Wi-Fi Secure?",
-    promptText: "Walk me through a complete home Wi-Fi security check.\n\nMy router brand: [BRAND/MODEL, OR TYPE \"NOT SURE\"]\nMy internet provider: [ISP NAME]\n\nCheck the following and give me step-by-step instructions for each:\n1. How to log into my router and where to find the login credentials.\n2. Whether my Wi-Fi password is strong enough, and how to change it if not.\n3. How to check if I am using WPA3 or WPA2 encryption, and how to upgrade.\n4. How to see all devices connected to my network and identify unknown ones.\n5. Whether my router firmware is up to date and how to update it.\n6. How to disable WPS and remote management.\n7. Whether I should set up a guest network and why.\n\nUse simple, non-technical language and tell me what each setting actually protects me from.",
+    promptText: "Act as a home network security specialist. Walk me through a complete home Wi-Fi security check.\n\nMy router brand: [BRAND/MODEL, OR TYPE \"NOT SURE\"]\nMy internet provider: [ISP NAME]\n\nCheck the following and give me step-by-step instructions for each:\n1. How to log into my router and where to find the login credentials.\n2. Whether my Wi-Fi password is strong enough, and how to change it if not.\n3. How to check if I am using WPA3 or WPA2 encryption, and how to upgrade.\n4. How to see all devices connected to my network and identify unknown ones.\n5. Whether my router firmware is up to date and how to update it.\n6. How to disable WPS and remote management.\n7. Whether I should set up a guest network and why.\n\nUse simple, non-technical language and tell me what each setting actually protects me from.",
     audience: ["everyday", "seniors", "families"],
     category: "safety",
     tags: ["Wi-Fi", "router security", "home network", "internet safety"],
@@ -570,7 +570,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "two-factor-setup",
     title: "Set Up Two-Factor Authentication",
-    promptText: "Give me a step-by-step guide to setting up two-factor authentication (2FA) on my most important accounts.\n\nAccounts I want to protect:\n[LIST YOUR ACCOUNTS (e.g., email, banking, social media)]\n\nMy phone type: [iPhone / Android]\n\nFor each account:\n1. Explain where to find the 2FA setting (exact menu path).\n2. Recommend the best 2FA method (authenticator app, SMS, or security key) and explain why.\n3. Walk me through the setup process step by step.\n4. Tell me how to generate and safely store backup codes.\n5. Explain what to do if I lose my phone and cannot access my authenticator app.\n\nRecommend one authenticator app to use and explain how to set it up on my phone.",
+    promptText: "Act as a cybersecurity awareness specialist focused on account protection. Give me a step-by-step guide to setting up two-factor authentication (2FA) on my most important accounts.\n\nAccounts I want to protect:\n[LIST YOUR ACCOUNTS (e.g., email, banking, social media)]\n\nMy phone type: [iPhone / Android]\n\nFor each account:\n1. Explain where to find the 2FA setting (exact menu path).\n2. Recommend the best 2FA method (authenticator app, SMS, or security key) and explain why.\n3. Walk me through the setup process step by step.\n4. Tell me how to generate and safely store backup codes.\n5. Explain what to do if I lose my phone and cannot access my authenticator app.\n\nRecommend one authenticator app to use and explain how to set it up on my phone.",
     audience: ["everyday", "seniors"],
     category: "safety",
     tags: ["2FA", "account security", "authentication", "login protection"],
@@ -580,7 +580,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "social-media-cleanup",
     title: "Clean Up My Social Media",
-    promptText: "Help me audit and clean up my [PLATFORM (Facebook, Instagram, X/Twitter, LinkedIn, or TikTok)] account.\n\nCreate a checklist covering:\n1. Profile information that reveals too much (birthday, phone number, hometown, employer).\n2. Old posts, photos, or comments I should review or delete.\n3. Apps and websites connected to my account that I no longer use.\n4. People or pages I follow that I forgot about.\n5. Tagged photos and posts I appear in from other people.\n6. Privacy settings to tighten (who can see my posts, who can find me, who can message me).\n\nFor each item, tell me exactly where to find it in the app and what to do. Estimate the total time needed so I can plan accordingly.",
+    promptText: "Act as a digital privacy consultant specializing in social media auditing. Help me audit and clean up my [PLATFORM (Facebook, Instagram, X/Twitter, LinkedIn, or TikTok)] account.\n\nCreate a checklist covering:\n1. Profile information that reveals too much (birthday, phone number, hometown, employer).\n2. Old posts, photos, or comments I should review or delete.\n3. Apps and websites connected to my account that I no longer use.\n4. People or pages I follow that I forgot about.\n5. Tagged photos and posts I appear in from other people.\n6. Privacy settings to tighten (who can see my posts, who can find me, who can message me).\n\nFor each item, tell me exactly where to find it in the app and what to do. Estimate the total time needed so I can plan accordingly.",
     audience: ["everyday", "students"],
     category: "safety",
     tags: ["social media", "privacy", "digital footprint", "cleanup"],
@@ -590,7 +590,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "phishing-training",
     title: "Train Me to Spot Phishing",
-    promptText: "Create a phishing awareness training exercise for me.\n\nGenerate 5 example messages (mix of emails, texts, and social media DMs). For each one:\n- Make it realistic, using current scam tactics.\n- Include some that are actually legitimate and some that are scams.\n\nPresent all 5 messages first without revealing which are real or fake.\n\nThen provide an answer key with:\n1. Whether each is legitimate or a phishing attempt.\n2. The specific red flags (or trust signals) in each one.\n3. What the scammer is trying to accomplish.\n4. What I should do if I received this in real life.\n\nEnd with 5 universal rules I can always apply to spot phishing attempts.",
+    promptText: "Act as a cybersecurity awareness trainer specializing in phishing detection. Create a phishing awareness training exercise for me.\n\nGenerate 5 example messages (mix of emails, texts, and social media DMs). For each one:\n- Make it realistic, using current scam tactics.\n- Include some that are actually legitimate and some that are scams.\n\nPresent all 5 messages first without revealing which are real or fake.\n\nThen provide an answer key with:\n1. Whether each is legitimate or a phishing attempt.\n2. The specific red flags (or trust signals) in each one.\n3. What the scammer is trying to accomplish.\n4. What I should do if I received this in real life.\n\nEnd with 5 universal rules I can always apply to spot phishing attempts.",
     audience: ["everyday", "seniors", "business"],
     category: "safety",
     tags: ["phishing", "training", "email security", "awareness"],
@@ -610,7 +610,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "grocery-list-healthy",
     title: "Build a Healthy Grocery List",
-    promptText: "Create a healthy grocery shopping list for [NUMBER] people for one week.\n\nDietary preferences: [VEGETARIAN / VEGAN / GLUTEN-FREE / NONE / OTHER]\nBudget range: [TIGHT / MODERATE / FLEXIBLE]\nCooking skill level: [BEGINNER / INTERMEDIATE / ADVANCED]\n\nOrganize the list by store section:\n1. Produce (fruits and vegetables).\n2. Proteins (meat, fish, plant-based options).\n3. Dairy and alternatives.\n4. Grains and bread.\n5. Pantry staples.\n6. Frozen items.\n7. Snacks.\n\nFor each section, mark items as \"Essential\" or \"Nice to Have.\" Include approximate quantities. Add 3 tips for saving money at the grocery store without sacrificing nutrition.\n\nEnd with 3 quick, healthy meal ideas using only items from this list.",
+    promptText: "Act as a registered dietitian specializing in practical nutrition planning. Create a healthy grocery shopping list for [NUMBER] people for one week.\n\nDietary preferences: [VEGETARIAN / VEGAN / GLUTEN-FREE / NONE / OTHER]\nBudget range: [TIGHT / MODERATE / FLEXIBLE]\nCooking skill level: [BEGINNER / INTERMEDIATE / ADVANCED]\n\nOrganize the list by store section:\n1. Produce (fruits and vegetables).\n2. Proteins (meat, fish, plant-based options).\n3. Dairy and alternatives.\n4. Grains and bread.\n5. Pantry staples.\n6. Frozen items.\n7. Snacks.\n\nFor each section, mark items as \"Essential\" or \"Nice to Have.\" Include approximate quantities. Add 3 tips for saving money at the grocery store without sacrificing nutrition.\n\nEnd with 3 quick, healthy meal ideas using only items from this list.",
     audience: ["everyday", "families", "seniors"],
     category: "health",
     tags: ["grocery", "healthy eating", "nutrition", "meal planning"],
@@ -620,7 +620,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "sleep-improvement",
     title: "Improve My Sleep Quality",
-    promptText: "Help me create a personalized plan to improve my sleep.\n\nMy current situation:\n- Average bedtime: [TIME]\n- Average wake time: [TIME]\n- Main sleep problems: [TROUBLE FALLING ASLEEP / WAKING UP AT NIGHT / WAKING TOO EARLY / FEELING TIRED AFTER SLEEPING]\n- Screen use before bed: [YES / NO, AND HOW LONG BEFORE BED]\n- Caffeine consumption: [AMOUNT AND LAST CUP TIME]\n\nCreate a 2-week sleep improvement plan that includes:\n1. A recommended evening routine (starting 90 minutes before bed).\n2. Environmental adjustments for my bedroom (light, temperature, noise).\n3. A gradual schedule adjustment if my current times are irregular.\n4. Foods and drinks that help or hurt sleep quality.\n5. Relaxation techniques I can try if I cannot fall asleep within 20 minutes.\n6. When to talk to a doctor about my sleep.\n\nKeep the advice practical and grounded in established sleep science.",
+    promptText: "Act as a certified sleep science consultant. Help me create a personalized plan to improve my sleep.\n\nMy current situation:\n- Average bedtime: [TIME]\n- Average wake time: [TIME]\n- Main sleep problems: [TROUBLE FALLING ASLEEP / WAKING UP AT NIGHT / WAKING TOO EARLY / FEELING TIRED AFTER SLEEPING]\n- Screen use before bed: [YES / NO, AND HOW LONG BEFORE BED]\n- Caffeine consumption: [AMOUNT AND LAST CUP TIME]\n\nCreate a 2-week sleep improvement plan that includes:\n1. A recommended evening routine (starting 90 minutes before bed).\n2. Environmental adjustments for my bedroom (light, temperature, noise).\n3. A gradual schedule adjustment if my current times are irregular.\n4. Foods and drinks that help or hurt sleep quality.\n5. Relaxation techniques I can try if I cannot fall asleep within 20 minutes.\n6. When to talk to a doctor about my sleep.\n\nKeep the advice practical and grounded in established sleep science.",
     audience: ["everyday", "seniors"],
     category: "health",
     tags: ["sleep", "wellness", "health habits", "self-care"],
@@ -631,7 +631,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "stress-management",
     title: "Create a Stress Management Plan",
-    promptText: "Help me build a practical stress management plan.\n\nMy main sources of stress: [LIST 2-3 SOURCES]\nTime I can commit daily: [MINUTES]\nPhysical limitations: [ANY, OR \"NONE\"]\n\nProvide:\n1. Three 5-minute calming techniques I can use anywhere (work, home, in the car).\n2. A weekly stress-reduction schedule that fits into my existing routine.\n3. Physical activities suited to my limitations that reduce stress.\n4. A simple journaling prompt I can use each evening to process the day.\n5. Warning signs that my stress level needs professional attention.\n6. Three boundaries I can set to reduce my stress sources.\n\nKeep every suggestion realistic for someone who is already feeling overwhelmed.",
+    promptText: "Act as a licensed wellness counselor specializing in stress reduction. Help me build a practical stress management plan.\n\nMy main sources of stress: [LIST 2-3 SOURCES]\nTime I can commit daily: [MINUTES]\nPhysical limitations: [ANY, OR \"NONE\"]\n\nProvide:\n1. Three 5-minute calming techniques I can use anywhere (work, home, in the car).\n2. A weekly stress-reduction schedule that fits into my existing routine.\n3. Physical activities suited to my limitations that reduce stress.\n4. A simple journaling prompt I can use each evening to process the day.\n5. Warning signs that my stress level needs professional attention.\n6. Three boundaries I can set to reduce my stress sources.\n\nKeep every suggestion realistic for someone who is already feeling overwhelmed.",
     audience: ["everyday", "seniors", "students"],
     category: "health",
     tags: ["stress", "mental health", "wellness", "self-care"],
@@ -642,7 +642,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "tax-prep-checklist",
     title: "Prepare for Tax Season",
-    promptText: "Create a tax preparation checklist for my situation.\n\nMy filing status: [SINGLE / MARRIED FILING JOINTLY / HEAD OF HOUSEHOLD / OTHER]\nEmployment: [W-2 EMPLOYEE / SELF-EMPLOYED / RETIRED / COMBINATION]\nSignificant life changes this year: [BOUGHT A HOME / HAD A CHILD / CHANGED JOBS / RETIRED / NONE]\n\nOrganize the checklist into:\n1. Documents I need to gather (income statements, deductions, credits).\n2. Deductions and credits I might be eligible for based on my situation.\n3. Common mistakes to avoid.\n4. Key deadlines and what happens if I miss them.\n5. Whether I should file myself, use software, or hire a professional.\n6. How to organize my documents so next year is easier.\n\nKeep explanations simple and jargon-free.",
+    promptText: "Act as a certified tax preparation specialist. Create a tax preparation checklist for my situation.\n\nMy filing status: [SINGLE / MARRIED FILING JOINTLY / HEAD OF HOUSEHOLD / OTHER]\nEmployment: [W-2 EMPLOYEE / SELF-EMPLOYED / RETIRED / COMBINATION]\nSignificant life changes this year: [BOUGHT A HOME / HAD A CHILD / CHANGED JOBS / RETIRED / NONE]\n\nOrganize the checklist into:\n1. Documents I need to gather (income statements, deductions, credits).\n2. Deductions and credits I might be eligible for based on my situation.\n3. Common mistakes to avoid.\n4. Key deadlines and what happens if I miss them.\n5. Whether I should file myself, use software, or hire a professional.\n6. How to organize my documents so next year is easier.\n\nKeep explanations simple and jargon-free.",
     audience: ["everyday", "seniors", "business"],
     category: "finance",
     tags: ["taxes", "tax preparation", "financial planning", "deductions"],
@@ -653,7 +653,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "emergency-fund-plan",
     title: "Build an Emergency Fund",
-    promptText: "Help me create a realistic emergency fund savings plan.\n\nMy details:\n- Monthly take-home pay: approximately $[AMOUNT]\n- Current savings: approximately $[AMOUNT]\n- Monthly expenses (approximate): $[AMOUNT]\n- Goal: [3 MONTHS / 6 MONTHS] of expenses saved\n\nProvide:\n1. My target emergency fund amount based on my expenses.\n2. A monthly savings plan to reach my goal in [6 / 12 / 18] months.\n3. Three places to keep my emergency fund (explain pros and cons of each).\n4. Five specific areas where I can cut spending to save more.\n5. Automation tips: how to set up automatic transfers so I save without thinking about it.\n6. Rules for when it is okay to use the emergency fund and when it is not.\n\nKeep the plan realistic for someone living on a tight budget.",
+    promptText: "Act as a certified personal finance coach specializing in savings strategies. Help me create a realistic emergency fund savings plan.\n\nMy details:\n- Monthly take-home pay: approximately $[AMOUNT]\n- Current savings: approximately $[AMOUNT]\n- Monthly expenses (approximate): $[AMOUNT]\n- Goal: [3 MONTHS / 6 MONTHS] of expenses saved\n\nProvide:\n1. My target emergency fund amount based on my expenses.\n2. A monthly savings plan to reach my goal in [6 / 12 / 18] months.\n3. Three places to keep my emergency fund (explain pros and cons of each).\n4. Five specific areas where I can cut spending to save more.\n5. Automation tips: how to set up automatic transfers so I save without thinking about it.\n6. Rules for when it is okay to use the emergency fund and when it is not.\n\nKeep the plan realistic for someone living on a tight budget.",
     audience: ["everyday", "students"],
     category: "finance",
     tags: ["savings", "emergency fund", "financial planning", "budgeting"],
@@ -663,7 +663,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "interview-prep",
     title: "Prepare for a Job Interview",
-    promptText: "Help me prepare for a job interview.\n\nPosition: [JOB TITLE]\nCompany: [COMPANY NAME, OR \"PREFER NOT TO SAY\"]\nIndustry: [INDUSTRY]\nInterview type: [PHONE / VIDEO / IN-PERSON / PANEL]\n\nProvide:\n1. 10 likely interview questions for this role, organized by type (behavioral, technical, situational).\n2. A framework for answering behavioral questions (STAR method with examples).\n3. Five questions I should ask the interviewer (that show genuine interest, not generic ones).\n4. Common mistakes candidates make for this type of role.\n5. A pre-interview checklist for the day of (what to wear, bring, research).\n6. A 30-second elevator pitch about myself that I can customize.\n\nKeep advice practical and specific to the role, not generic interview tips.",
+    promptText: "Act as a career coach specializing in interview preparation. Help me prepare for a job interview.\n\nPosition: [JOB TITLE]\nCompany: [COMPANY NAME, OR \"PREFER NOT TO SAY\"]\nIndustry: [INDUSTRY]\nInterview type: [PHONE / VIDEO / IN-PERSON / PANEL]\n\nProvide:\n1. 10 likely interview questions for this role, organized by type (behavioral, technical, situational).\n2. A framework for answering behavioral questions (STAR method with examples).\n3. Five questions I should ask the interviewer (that show genuine interest, not generic ones).\n4. Common mistakes candidates make for this type of role.\n5. A pre-interview checklist for the day of (what to wear, bring, research).\n6. A 30-second elevator pitch about myself that I can customize.\n\nKeep advice practical and specific to the role, not generic interview tips.",
     audience: ["everyday", "students"],
     category: "work",
     tags: ["interview", "job search", "career", "preparation"],
@@ -673,7 +673,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "cover-letter",
     title: "Write a Cover Letter",
-    promptText: "Write a tailored cover letter for a [JOB TITLE] position.\n\nAbout me:\n- Years of experience: [NUMBER]\n- Key skills: [LIST 3-5 RELEVANT SKILLS]\n- Why I want this role: [1-2 SENTENCES]\n- Something unique about me: [WHAT SETS YOU APART]\n\nJob requirements (copy from posting): [PASTE KEY REQUIREMENTS]\n\nThe cover letter should:\n1. Open with a compelling hook, not \"I am writing to apply.\"\n2. Connect my specific experience to their requirements.\n3. Show I have researched the company.\n4. Be exactly 3 paragraphs and under 300 words.\n5. End with a confident call to action.\n\nTone: Professional but personable, showing genuine enthusiasm without being generic.",
+    promptText: "Act as a professional career coach specializing in job application materials. Write a tailored cover letter for a [JOB TITLE] position.\n\nAbout me:\n- Years of experience: [NUMBER]\n- Key skills: [LIST 3-5 RELEVANT SKILLS]\n- Why I want this role: [1-2 SENTENCES]\n- Something unique about me: [WHAT SETS YOU APART]\n\nJob requirements (copy from posting): [PASTE KEY REQUIREMENTS]\n\nThe cover letter should:\n1. Open with a compelling hook, not \"I am writing to apply.\"\n2. Connect my specific experience to their requirements.\n3. Show I have researched the company.\n4. Be exactly 3 paragraphs and under 300 words.\n5. End with a confident call to action.\n\nTone: Professional but personable, showing genuine enthusiasm without being generic.",
     audience: ["everyday", "students"],
     category: "work",
     tags: ["cover letter", "job application", "career", "writing"],
@@ -684,7 +684,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "rental-rights",
     title: "Know My Renter Rights",
-    promptText: "Explain my basic rights as a renter.\n\nMy situation:\n- State or country: [LOCATION]\n- Type of rental: [APARTMENT / HOUSE / ROOM]\n- Issue I am facing: [DESCRIBE THE PROBLEM (e.g., security deposit dispute, repairs not being made, lease violation by landlord, noise complaints)]\n\nHelp me understand:\n1. What my rights are in this specific situation based on my location.\n2. What my landlord is legally required to do.\n3. What steps I should take, in order.\n4. How to document the issue (what evidence to keep).\n5. Where to get free legal help if needed (tenant rights organizations, legal aid).\n6. Sample language I can use in a written notice to my landlord.\n\nKeep explanations in everyday language, not legal jargon.",
+    promptText: "Act as a tenant rights advocate and housing counselor. Explain my basic rights as a renter.\n\nMy situation:\n- State or country: [LOCATION]\n- Type of rental: [APARTMENT / HOUSE / ROOM]\n- Issue I am facing: [DESCRIBE THE PROBLEM (e.g., security deposit dispute, repairs not being made, lease violation by landlord, noise complaints)]\n\nHelp me understand:\n1. What my rights are in this specific situation based on my location.\n2. What my landlord is legally required to do.\n3. What steps I should take, in order.\n4. How to document the issue (what evidence to keep).\n5. Where to get free legal help if needed (tenant rights organizations, legal aid).\n6. Sample language I can use in a written notice to my landlord.\n\nKeep explanations in everyday language, not legal jargon.",
     audience: ["everyday", "students"],
     category: "finance",
     tags: ["renting", "tenant rights", "housing", "legal"],
@@ -695,7 +695,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "senior-tech-basics",
     title: "Learn the Basics of My New Device",
-    promptText: "Teach me the basics of using my new [DEVICE (iPhone, Android phone, iPad, laptop, or smart TV)].\n\nMy experience level: [NEVER USED ONE / USED AN OLDER VERSION / SOMEWHAT FAMILIAR]\n\nCreate a beginner-friendly lesson plan covering:\n1. How to turn it on, unlock it, and navigate the home screen.\n2. How to make and receive phone calls or video calls.\n3. How to send a text message and use email.\n4. How to download and open apps safely.\n5. How to adjust settings I will need most (text size, brightness, volume, Wi-Fi).\n6. How to take and view photos.\n7. Three safety settings to turn on immediately.\n\nUse very simple language. For each step, describe exactly what I should see on screen so I know I did it correctly. Include a \"What to do if something goes wrong\" tip for each section.",
+    promptText: "Act as a patient technology educator specializing in digital literacy for beginners. Teach me the basics of using my new [DEVICE (iPhone, Android phone, iPad, laptop, or smart TV)].\n\nMy experience level: [NEVER USED ONE / USED AN OLDER VERSION / SOMEWHAT FAMILIAR]\n\nCreate a beginner-friendly lesson plan covering:\n1. How to turn it on, unlock it, and navigate the home screen.\n2. How to make and receive phone calls or video calls.\n3. How to send a text message and use email.\n4. How to download and open apps safely.\n5. How to adjust settings I will need most (text size, brightness, volume, Wi-Fi).\n6. How to take and view photos.\n7. Three safety settings to turn on immediately.\n\nUse very simple language. For each step, describe exactly what I should see on screen so I know I did it correctly. Include a \"What to do if something goes wrong\" tip for each section.",
     audience: ["seniors"],
     category: "tech",
     tags: ["technology basics", "device setup", "beginner", "digital literacy"],
@@ -705,7 +705,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "video-call-guide",
     title: "Help Me Use Video Calls",
-    promptText: "Teach me how to make video calls using [PLATFORM (Zoom, FaceTime, Google Meet, WhatsApp, or Skype)].\n\nMy device: [iPhone / Android / iPad / Laptop]\n\nWalk me through:\n1. How to download and set up the app (if needed).\n2. How to start a video call with someone.\n3. How to join a call someone else started (using a link or invitation).\n4. How to mute my microphone and turn off my camera.\n5. How to share my screen (if the platform supports it).\n6. Troubleshooting: what to do if they cannot hear me, see me, or if the call is choppy.\n7. How to end the call.\n\nUse numbered steps with what I should see on screen at each point. Keep language simple and patient.",
+    promptText: "Act as a certified tech support specialist focused on video communication tools. Teach me how to make video calls using [PLATFORM (Zoom, FaceTime, Google Meet, WhatsApp, or Skype)].\n\nMy device: [iPhone / Android / iPad / Laptop]\n\nWalk me through:\n1. How to download and set up the app (if needed).\n2. How to start a video call with someone.\n3. How to join a call someone else started (using a link or invitation).\n4. How to mute my microphone and turn off my camera.\n5. How to share my screen (if the platform supports it).\n6. Troubleshooting: what to do if they cannot hear me, see me, or if the call is choppy.\n7. How to end the call.\n\nUse numbered steps with what I should see on screen at each point. Keep language simple and patient.",
     audience: ["seniors"],
     category: "tech",
     tags: ["video calls", "Zoom", "FaceTime", "communication technology"],
@@ -715,7 +715,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "avoid-tech-support-scams",
     title: "Recognize Tech Support Scams",
-    promptText: "Teach me how to spot and avoid tech support scams.\n\nCover the following:\n1. How these scams typically start (pop-up warnings, phone calls, emails).\n2. Five phrases that are always a red flag (e.g., \"Your computer has been compromised,\" \"Microsoft detected a virus\").\n3. What a legitimate tech company will never ask you to do.\n4. How scammers trick people into giving remote access to their computers.\n5. What to do if I already gave someone remote access.\n6. How to get legitimate tech support (official channels for Apple, Microsoft, Google).\n\nInclude real examples of common tech support scam scripts so I can recognize the pattern. End with a simple rule I can always follow.",
+    promptText: "Act as a cybersecurity awareness educator specializing in tech support fraud prevention. Teach me how to spot and avoid tech support scams.\n\nCover the following:\n1. How these scams typically start (pop-up warnings, phone calls, emails).\n2. Five phrases that are always a red flag (e.g., \"Your computer has been compromised,\" \"Microsoft detected a virus\").\n3. What a legitimate tech company will never ask you to do.\n4. How scammers trick people into giving remote access to their computers.\n5. What to do if I already gave someone remote access.\n6. How to get legitimate tech support (official channels for Apple, Microsoft, Google).\n\nInclude real examples of common tech support scam scripts so I can recognize the pattern. End with a simple rule I can always follow.",
     audience: ["seniors", "everyday"],
     category: "safety",
     tags: ["tech support scams", "fraud prevention", "computer safety"],
@@ -745,7 +745,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "morning-routine",
     title: "Design a Morning Routine",
-    promptText: "Help me create a morning routine that sets me up for a productive day.\n\nMy details:\n- Wake-up time: [TIME]\n- Time I need to leave for work/school: [TIME, OR \"WORK FROM HOME\"]\n- My biggest morning challenge: [RUSHING / LOW ENERGY / SKIPPING BREAKFAST / PHONE SCROLLING / OTHER]\n\nDesign a routine that includes:\n1. A realistic timeline with specific activities and time allocations.\n2. One mindfulness or centering practice (under 5 minutes).\n3. A quick, healthy breakfast idea I can prepare in under 10 minutes.\n4. A strategy to reduce morning decision fatigue (clothing, meals, bag packing).\n5. A technique to transition from the routine into focused work mode.\n\nKeep the routine under [30 / 45 / 60 / 90] minutes total. Make it achievable on the first day, not aspirational.",
+    promptText: "Act as a personal productivity and habits coach. Help me create a morning routine that sets me up for a productive day.\n\nMy details:\n- Wake-up time: [TIME]\n- Time I need to leave for work/school: [TIME, OR \"WORK FROM HOME\"]\n- My biggest morning challenge: [RUSHING / LOW ENERGY / SKIPPING BREAKFAST / PHONE SCROLLING / OTHER]\n\nDesign a routine that includes:\n1. A realistic timeline with specific activities and time allocations.\n2. One mindfulness or centering practice (under 5 minutes).\n3. A quick, healthy breakfast idea I can prepare in under 10 minutes.\n4. A strategy to reduce morning decision fatigue (clothing, meals, bag packing).\n5. A technique to transition from the routine into focused work mode.\n\nKeep the routine under [30 / 45 / 60 / 90] minutes total. Make it achievable on the first day, not aspirational.",
     audience: ["everyday", "students"],
     category: "productivity",
     tags: ["morning routine", "habits", "productivity", "wellness"],
@@ -755,7 +755,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "goal-setting",
     title: "Set Achievable Goals",
-    promptText: "Help me turn a vague goal into a specific, achievable plan.\n\nMy goal: [DESCRIBE YOUR GOAL IN YOUR OWN WORDS]\nTimeline: [BY WHEN DO YOU WANT TO ACHIEVE IT?]\nBiggest obstacle: [WHAT HAS STOPPED YOU BEFORE?]\n\nTransform my goal using this framework:\n1. Rewrite it as a SMART goal (Specific, Measurable, Achievable, Relevant, Time-bound).\n2. Break it into 3-5 milestones with target dates.\n3. For each milestone, list 2-3 concrete action steps.\n4. Identify one accountability method (tracking app, partner, journal).\n5. Create an \"if/then\" plan for my biggest obstacle.\n6. Design a reward system for reaching each milestone.\n\nEnd with one thing I can do in the next 15 minutes to start.",
+    promptText: "Act as a certified life coach specializing in goal achievement. Help me turn a vague goal into a specific, achievable plan.\n\nMy goal: [DESCRIBE YOUR GOAL IN YOUR OWN WORDS]\nTimeline: [BY WHEN DO YOU WANT TO ACHIEVE IT?]\nBiggest obstacle: [WHAT HAS STOPPED YOU BEFORE?]\n\nTransform my goal using this framework:\n1. Rewrite it as a SMART goal (Specific, Measurable, Achievable, Relevant, Time-bound).\n2. Break it into 3-5 milestones with target dates.\n3. For each milestone, list 2-3 concrete action steps.\n4. Identify one accountability method (tracking app, partner, journal).\n5. Create an \"if/then\" plan for my biggest obstacle.\n6. Design a reward system for reaching each milestone.\n\nEnd with one thing I can do in the next 15 minutes to start.",
     audience: ["everyday", "students"],
     category: "productivity",
     tags: ["goal setting", "planning", "motivation", "habits"],
@@ -765,7 +765,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "home-maintenance",
     title: "Create a Home Maintenance Schedule",
-    promptText: "Create a seasonal home maintenance checklist for my [HOUSE / APARTMENT / CONDO].\n\nMy climate: [WARM / COLD / MILD / FOUR SEASONS]\nHome age: [APPROXIMATE AGE OF HOME]\nI am comfortable with: [BASIC DIY / INTERMEDIATE / I PREFER TO HIRE PROFESSIONALS]\n\nOrganize tasks by season:\n- Spring: Focus on exterior and deep cleaning.\n- Summer: Focus on cooling systems and outdoor spaces.\n- Fall: Focus on heating prep and weatherization.\n- Winter: Focus on indoor maintenance and safety.\n\nFor each task:\n1. What to do (in simple terms).\n2. Why it matters (what it prevents).\n3. Estimated time and difficulty level.\n4. Whether I can do it myself or should hire someone.\n5. Approximate cost if hiring a professional.\n\nAdd a monthly checklist of quick tasks that take under 15 minutes.",
+    promptText: "Act as a licensed home inspector and maintenance planning specialist. Create a seasonal home maintenance checklist for my [HOUSE / APARTMENT / CONDO].\n\nMy climate: [WARM / COLD / MILD / FOUR SEASONS]\nHome age: [APPROXIMATE AGE OF HOME]\nI am comfortable with: [BASIC DIY / INTERMEDIATE / I PREFER TO HIRE PROFESSIONALS]\n\nOrganize tasks by season:\n- Spring: Focus on exterior and deep cleaning.\n- Summer: Focus on cooling systems and outdoor spaces.\n- Fall: Focus on heating prep and weatherization.\n- Winter: Focus on indoor maintenance and safety.\n\nFor each task:\n1. What to do (in simple terms).\n2. Why it matters (what it prevents).\n3. Estimated time and difficulty level.\n4. Whether I can do it myself or should hire someone.\n5. Approximate cost if hiring a professional.\n\nAdd a monthly checklist of quick tasks that take under 15 minutes.",
     audience: ["everyday", "seniors"],
     category: "productivity",
     tags: ["home maintenance", "house", "seasonal tasks", "DIY"],
@@ -775,7 +775,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "pet-care-guide",
     title: "Create a Pet Care Schedule",
-    promptText: "Help me create a comprehensive care schedule for my [PET TYPE (dog, cat, bird, fish, etc.)].\n\nPet details:\n- Breed/type: [BREED OR DESCRIPTION]\n- Age: [AGE]\n- Any health issues: [DESCRIBE, OR \"NONE\"]\n\nCreate a schedule covering:\n1. Daily tasks (feeding times, exercise, grooming basics).\n2. Weekly tasks (deeper grooming, toy cleaning, litter/cage maintenance).\n3. Monthly tasks (flea/tick prevention, weight checks).\n4. Annual tasks (vet checkups, vaccinations, dental cleaning).\n5. Signs of illness I should watch for in this specific breed/species.\n6. Emergency vet checklist: what to have ready and when to go immediately.\n\nInclude estimated costs for annual care so I can budget accordingly.",
+    promptText: "Act as a certified veterinary care advisor. Help me create a comprehensive care schedule for my [PET TYPE (dog, cat, bird, fish, etc.)].\n\nPet details:\n- Breed/type: [BREED OR DESCRIPTION]\n- Age: [AGE]\n- Any health issues: [DESCRIBE, OR \"NONE\"]\n\nCreate a schedule covering:\n1. Daily tasks (feeding times, exercise, grooming basics).\n2. Weekly tasks (deeper grooming, toy cleaning, litter/cage maintenance).\n3. Monthly tasks (flea/tick prevention, weight checks).\n4. Annual tasks (vet checkups, vaccinations, dental cleaning).\n5. Signs of illness I should watch for in this specific breed/species.\n6. Emergency vet checklist: what to have ready and when to go immediately.\n\nInclude estimated costs for annual care so I can budget accordingly.",
     audience: ["everyday", "families"],
     category: "productivity",
     tags: ["pet care", "animals", "scheduling", "health"],
@@ -785,7 +785,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "moving-checklist",
     title: "Plan a Move",
-    promptText: "Create a complete moving checklist for moving from [CURRENT LOCATION TYPE] to [NEW LOCATION TYPE].\n\nTimeline: I am moving in [NUMBER] weeks.\nHousehold size: [NUMBER OF PEOPLE]\nMoving method: [HIRING MOVERS / RENTING A TRUCK / ASKING FRIENDS / NOT SURE]\n\nOrganize the checklist by timeline:\n- 4+ weeks before: Planning and preparation.\n- 2-3 weeks before: Packing and logistics.\n- 1 week before: Final preparations.\n- Moving day: What to do, bring, and check.\n- First week after: Settling in and admin tasks.\n\nInclude:\n1. Who to notify about my address change (create a complete list).\n2. How to set up utilities at the new place.\n3. Packing tips room by room.\n4. An essentials bag checklist for moving day.\n5. Budget estimate for the move.\n6. How to avoid common moving scams when hiring movers.",
+    promptText: "Act as a professional relocation coordinator. Create a complete moving checklist for moving from [CURRENT LOCATION TYPE] to [NEW LOCATION TYPE].\n\nTimeline: I am moving in [NUMBER] weeks.\nHousehold size: [NUMBER OF PEOPLE]\nMoving method: [HIRING MOVERS / RENTING A TRUCK / ASKING FRIENDS / NOT SURE]\n\nOrganize the checklist by timeline:\n- 4+ weeks before: Planning and preparation.\n- 2-3 weeks before: Packing and logistics.\n- 1 week before: Final preparations.\n- Moving day: What to do, bring, and check.\n- First week after: Settling in and admin tasks.\n\nInclude:\n1. Who to notify about my address change (create a complete list).\n2. How to set up utilities at the new place.\n3. Packing tips room by room.\n4. An essentials bag checklist for moving day.\n5. Budget estimate for the move.\n6. How to avoid common moving scams when hiring movers.",
     audience: ["everyday", "students"],
     category: "productivity",
     tags: ["moving", "relocation", "planning", "checklist"],
@@ -795,7 +795,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "parent-app-review",
     title: "Is This App Safe for My Child?",
-    promptText: "Help me evaluate whether [APP NAME] is safe and appropriate for my [AGE]-year-old.\n\nAnalyze the following:\n1. What the app does and why kids are attracted to it.\n2. Age rating and whether it is accurate based on actual content.\n3. Privacy concerns: what data the app collects from children.\n4. Social features: can strangers contact my child through this app?\n5. In-app purchases: can my child accidentally spend money?\n6. Content risks: is there user-generated content that could be inappropriate?\n7. Recommended parental controls and settings within the app.\n8. Alternatives that are safer but serve the same purpose.\n\nEnd with a clear recommendation: Safe, Safe With Settings, Use With Supervision, or Not Recommended for their age.",
+    promptText: "Act as a child digital safety analyst specializing in app evaluation. Help me evaluate whether [APP NAME] is safe and appropriate for my [AGE]-year-old.\n\nAnalyze the following:\n1. What the app does and why kids are attracted to it.\n2. Age rating and whether it is accurate based on actual content.\n3. Privacy concerns: what data the app collects from children.\n4. Social features: can strangers contact my child through this app?\n5. In-app purchases: can my child accidentally spend money?\n6. Content risks: is there user-generated content that could be inappropriate?\n7. Recommended parental controls and settings within the app.\n8. Alternatives that are safer but serve the same purpose.\n\nEnd with a clear recommendation: Safe, Safe With Settings, Use With Supervision, or Not Recommended for their age.",
     audience: ["families"],
     category: "safety",
     tags: ["app safety", "parenting", "children", "digital safety"],
@@ -805,7 +805,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "family-game-night",
     title: "Plan a Family Activity",
-    promptText: "Suggest [NUMBER] engaging family activities for our group.\n\nFamily details:\n- Ages of children: [LIST AGES]\n- Number of adults: [NUMBER]\n- Indoor or outdoor: [PREFERENCE]\n- Budget: [FREE / UNDER $20 / UNDER $50 / FLEXIBLE]\n- Time available: [30 MINUTES / 1 HOUR / HALF DAY / FULL DAY]\n\nFor each activity, provide:\n1. What the activity is and how it works.\n2. Why it works for our specific age range.\n3. Materials or preparation needed.\n4. How to adapt it if someone gets bored or frustrated.\n5. A way to make it educational without feeling like school.\n6. A variation to try next time.\n\nInclude at least one screen-free option and one that encourages cooperation rather than competition.",
+    promptText: "Act as a family engagement specialist skilled in age-appropriate activities. Suggest [NUMBER] engaging family activities for our group.\n\nFamily details:\n- Ages of children: [LIST AGES]\n- Number of adults: [NUMBER]\n- Indoor or outdoor: [PREFERENCE]\n- Budget: [FREE / UNDER $20 / UNDER $50 / FLEXIBLE]\n- Time available: [30 MINUTES / 1 HOUR / HALF DAY / FULL DAY]\n\nFor each activity, provide:\n1. What the activity is and how it works.\n2. Why it works for our specific age range.\n3. Materials or preparation needed.\n4. How to adapt it if someone gets bored or frustrated.\n5. A way to make it educational without feeling like school.\n6. A variation to try next time.\n\nInclude at least one screen-free option and one that encourages cooperation rather than competition.",
     audience: ["families"],
     category: "productivity",
     tags: ["family activities", "games", "quality time", "kids"],
@@ -815,7 +815,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "homework-motivation",
     title: "Motivate My Child to Do Homework",
-    promptText: "My [AGE]-year-old is resistant to doing homework, especially in [SUBJECT].\n\nHelp me create a motivation strategy:\n1. Three techniques for making homework feel less overwhelming (chunking, timers, rewards).\n2. An after-school routine that transitions naturally into homework time.\n3. How to set up a distraction-free homework environment.\n4. Positive phrases to use instead of nagging or threatening.\n5. When to help and when to let them struggle (building resilience).\n6. A simple reward system that does not rely on screen time or treats.\n7. Signs that the resistance might indicate a learning difficulty versus normal reluctance.\n\nKeep the approach supportive, not authoritarian. The goal is intrinsic motivation over time.",
+    promptText: "Act as a child education psychologist specializing in academic motivation. My [AGE]-year-old is resistant to doing homework, especially in [SUBJECT].\n\nHelp me create a motivation strategy:\n1. Three techniques for making homework feel less overwhelming (chunking, timers, rewards).\n2. An after-school routine that transitions naturally into homework time.\n3. How to set up a distraction-free homework environment.\n4. Positive phrases to use instead of nagging or threatening.\n5. When to help and when to let them struggle (building resilience).\n6. A simple reward system that does not rely on screen time or treats.\n7. Signs that the resistance might indicate a learning difficulty versus normal reluctance.\n\nKeep the approach supportive, not authoritarian. The goal is intrinsic motivation over time.",
     audience: ["families"],
     category: "learning",
     tags: ["homework", "parenting", "motivation", "education"],
@@ -825,7 +825,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "teen-social-media-talk",
     title: "Talk to My Teen About Social Media",
-    promptText: "Help me have a productive conversation with my [AGE]-year-old about social media use.\n\nPlatforms they use or want to use: [LIST PLATFORMS]\nMy main concern: [SCREEN TIME / CYBERBULLYING / INAPPROPRIATE CONTENT / PRIVACY / MENTAL HEALTH / ALL OF THESE]\n\nCreate a conversation guide that:\n1. Opens with curiosity, not judgment (ask what they enjoy about it).\n2. Discusses real risks without being preachy or fear-based.\n3. Explores how social media makes them feel (comparison, FOMO, validation).\n4. Establishes mutually agreed-upon boundaries.\n5. Creates a safe word or signal they can use if something online makes them uncomfortable.\n6. Ends with reassurance that they can always come to me.\n\nSuggest follow-up conversations for the next month. Include age-appropriate statistics about social media and teen mental health.",
+    promptText: "Act as an adolescent digital wellness counselor. Help me have a productive conversation with my [AGE]-year-old about social media use.\n\nPlatforms they use or want to use: [LIST PLATFORMS]\nMy main concern: [SCREEN TIME / CYBERBULLYING / INAPPROPRIATE CONTENT / PRIVACY / MENTAL HEALTH / ALL OF THESE]\n\nCreate a conversation guide that:\n1. Opens with curiosity, not judgment (ask what they enjoy about it).\n2. Discusses real risks without being preachy or fear-based.\n3. Explores how social media makes them feel (comparison, FOMO, validation).\n4. Establishes mutually agreed-upon boundaries.\n5. Creates a safe word or signal they can use if something online makes them uncomfortable.\n6. Ends with reassurance that they can always come to me.\n\nSuggest follow-up conversations for the next month. Include age-appropriate statistics about social media and teen mental health.",
     audience: ["families"],
     category: "safety",
     tags: ["teen safety", "social media", "parenting", "mental health"],
@@ -835,7 +835,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "elderly-parent-care",
     title: "Care Planning for an Aging Parent",
-    promptText: "Help me create a care plan for my aging parent.\n\nParent's situation:\n- Age: [AGE]\n- Living arrangement: [ALONE / WITH SPOUSE / WITH FAMILY / ASSISTED LIVING]\n- Health concerns: [LIST MAIN CONCERNS]\n- Current level of independence: [FULLY INDEPENDENT / NEEDS SOME HELP / NEEDS SIGNIFICANT HELP]\n\nCreate a comprehensive plan covering:\n1. Safety assessment: potential hazards in their current living situation.\n2. Daily needs: meals, medications, mobility, hygiene.\n3. Medical management: organizing appointments, medications, and records.\n4. Social and emotional well-being: preventing isolation.\n5. Financial and legal preparation: power of attorney, advance directives, estate planning.\n6. Available resources: local agencies, meal delivery, transportation services.\n7. Caregiver self-care: how to avoid burnout.\n\nSuggest how to have these sensitive conversations with respect for their independence.",
+    promptText: "Act as a certified eldercare planning specialist. Help me create a care plan for my aging parent.\n\nParent's situation:\n- Age: [AGE]\n- Living arrangement: [ALONE / WITH SPOUSE / WITH FAMILY / ASSISTED LIVING]\n- Health concerns: [LIST MAIN CONCERNS]\n- Current level of independence: [FULLY INDEPENDENT / NEEDS SOME HELP / NEEDS SIGNIFICANT HELP]\n\nCreate a comprehensive plan covering:\n1. Safety assessment: potential hazards in their current living situation.\n2. Daily needs: meals, medications, mobility, hygiene.\n3. Medical management: organizing appointments, medications, and records.\n4. Social and emotional well-being: preventing isolation.\n5. Financial and legal preparation: power of attorney, advance directives, estate planning.\n6. Available resources: local agencies, meal delivery, transportation services.\n7. Caregiver self-care: how to avoid burnout.\n\nSuggest how to have these sensitive conversations with respect for their independence.",
     audience: ["families", "seniors"],
     category: "health",
     tags: ["eldercare", "aging parents", "caregiving", "family planning"],
@@ -845,7 +845,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "college-application-help",
     title: "Brainstorm My College Essay",
-    promptText: "Help me brainstorm ideas for my college application essay.\n\nPrompt I need to answer: [PASTE THE ESSAY PROMPT]\nWord limit: [NUMBER]\n\nDo NOT write the essay for me. Instead:\n1. Ask me 5 probing questions that will help me uncover my best story.\n2. Suggest 3 possible angles or themes, and explain why each would resonate with admissions readers.\n3. For each angle, suggest a specific opening line approach (anecdote, question, vivid scene, bold statement).\n4. Provide a structural outline I can follow.\n5. List 3 common cliches to avoid for this type of prompt.\n6. Share what admissions officers have said they value most in essays.\n\nRemember: the best essays are specific, honest, and reveal character through story, not by listing achievements.",
+    promptText: "Act as a college admissions counselor with experience guiding essay development. Help me brainstorm ideas for my college application essay.\n\nPrompt I need to answer: [PASTE THE ESSAY PROMPT]\nWord limit: [NUMBER]\n\nDo NOT write the essay for me. Instead:\n1. Ask me 5 probing questions that will help me uncover my best story.\n2. Suggest 3 possible angles or themes, and explain why each would resonate with admissions readers.\n3. For each angle, suggest a specific opening line approach (anecdote, question, vivid scene, bold statement).\n4. Provide a structural outline I can follow.\n5. List 3 common cliches to avoid for this type of prompt.\n6. Share what admissions officers have said they value most in essays.\n\nRemember: the best essays are specific, honest, and reveal character through story, not by listing achievements.",
     audience: ["students"],
     category: "learning",
     tags: ["college application", "essay", "admissions", "writing"],
@@ -856,7 +856,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "group-project-plan",
     title: "Organize a Group Project",
-    promptText: "Help me organize a group project for [CLASS/COURSE].\n\nProject topic: [TOPIC]\nTeam members: [NUMBER]\nDeadline: [DATE]\n\nCreate a project management plan that includes:\n1. A task breakdown: divide the project into clear, assignable pieces.\n2. A suggested role for each team member (researcher, writer, editor, presenter, organizer).\n3. A timeline with milestones and check-in dates.\n4. A communication plan (when to meet, how to share files, how to make decisions).\n5. A quality checklist: what to review before submission.\n6. A fair contribution tracker so everyone does their share.\n7. Diplomatic language for addressing a team member who is not contributing.\n\nFormat this as a document I can share with my team.",
+    promptText: "Act as an academic project management coach. Help me organize a group project for [CLASS/COURSE].\n\nProject topic: [TOPIC]\nTeam members: [NUMBER]\nDeadline: [DATE]\n\nCreate a project management plan that includes:\n1. A task breakdown: divide the project into clear, assignable pieces.\n2. A suggested role for each team member (researcher, writer, editor, presenter, organizer).\n3. A timeline with milestones and check-in dates.\n4. A communication plan (when to meet, how to share files, how to make decisions).\n5. A quality checklist: what to review before submission.\n6. A fair contribution tracker so everyone does their share.\n7. Diplomatic language for addressing a team member who is not contributing.\n\nFormat this as a document I can share with my team.",
     audience: ["students"],
     category: "productivity",
     tags: ["group project", "teamwork", "school", "organization"],
@@ -866,7 +866,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "math-concept-help",
     title: "Explain This Math Concept",
-    promptText: "Help me understand [MATH CONCEPT (e.g., fractions, algebra, statistics, calculus topic)].\n\nMy level: [MIDDLE SCHOOL / HIGH SCHOOL / COLLEGE]\nWhat I already understand: [WHAT YOU KNOW SO FAR]\nWhat confuses me: [SPECIFIC PART YOU STRUGGLE WITH]\n\nExplain it to me using:\n1. A real-world analogy that makes it click.\n2. A visual representation or diagram description.\n3. A step-by-step worked example with every step explained.\n4. A second example where you show the work but I fill in the blanks.\n5. Two common mistakes students make with this concept and how to avoid them.\n6. A memory trick or shortcut for remembering the key formula or rule.\n\nEnd with 3 practice problems (easy, medium, hard) with answers in a separate section.",
+    promptText: "Act as an experienced math tutor specializing in concept-based instruction. Help me understand [MATH CONCEPT (e.g., fractions, algebra, statistics, calculus topic)].\n\nMy level: [MIDDLE SCHOOL / HIGH SCHOOL / COLLEGE]\nWhat I already understand: [WHAT YOU KNOW SO FAR]\nWhat confuses me: [SPECIFIC PART YOU STRUGGLE WITH]\n\nExplain it to me using:\n1. A real-world analogy that makes it click.\n2. A visual representation or diagram description.\n3. A step-by-step worked example with every step explained.\n4. A second example where you show the work but I fill in the blanks.\n5. Two common mistakes students make with this concept and how to avoid them.\n6. A memory trick or shortcut for remembering the key formula or rule.\n\nEnd with 3 practice problems (easy, medium, hard) with answers in a separate section.",
     audience: ["students"],
     category: "learning",
     tags: ["math", "tutoring", "homework help", "study"],
@@ -876,7 +876,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "scholarship-search",
     title: "Find Scholarships for Me",
-    promptText: "Help me find scholarships I might qualify for.\n\nAbout me:\n- Education level: [HIGH SCHOOL / UNDERGRADUATE / GRADUATE]\n- GPA (if comfortable sharing range): [RANGE OR \"PREFER NOT TO SAY\"]\n- Field of study or intended major: [FIELD]\n- Background: [FIRST-GENERATION / MINORITY / MILITARY FAMILY / FINANCIAL NEED / OTHER RELEVANT FACTORS]\n- Extracurriculars or skills: [LIST]\n- State: [STATE]\n\nProvide:\n1. Ten scholarship types I should search for based on my profile.\n2. For each type, suggest specific search terms to use on scholarship databases.\n3. A list of the most reputable free scholarship search websites.\n4. Red flags that a scholarship is actually a scam.\n5. A timeline for when to apply (deadlines by season).\n6. Tips for writing a strong scholarship essay.\n\nDo not invent specific scholarship names. Give me the tools to find real ones.",
+    promptText: "Act as a financial aid advisor specializing in scholarship research. Help me find scholarships I might qualify for.\n\nAbout me:\n- Education level: [HIGH SCHOOL / UNDERGRADUATE / GRADUATE]\n- GPA (if comfortable sharing range): [RANGE OR \"PREFER NOT TO SAY\"]\n- Field of study or intended major: [FIELD]\n- Background: [FIRST-GENERATION / MINORITY / MILITARY FAMILY / FINANCIAL NEED / OTHER RELEVANT FACTORS]\n- Extracurriculars or skills: [LIST]\n- State: [STATE]\n\nProvide:\n1. Ten scholarship types I should search for based on my profile.\n2. For each type, suggest specific search terms to use on scholarship databases.\n3. A list of the most reputable free scholarship search websites.\n4. Red flags that a scholarship is actually a scam.\n5. A timeline for when to apply (deadlines by season).\n6. Tips for writing a strong scholarship essay.\n\nDo not invent specific scholarship names. Give me the tools to find real ones.",
     audience: ["students"],
     category: "finance",
     tags: ["scholarships", "financial aid", "college", "money"],
@@ -887,7 +887,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "time-management-student",
     title: "Balance School and Life",
-    promptText: "Help me create a balanced weekly schedule that includes all my commitments.\n\nMy schedule:\n- Classes: [LIST DAYS AND TIMES]\n- Work or job: [HOURS PER WEEK]\n- Extracurriculars: [LIST ACTIVITIES AND TIME COMMITMENTS]\n- Commute time: [DAILY COMMUTE]\n\nI need help fitting in:\n- Study time for each class.\n- Exercise or physical activity.\n- Social time and relaxation.\n- Sleep (at least 7-8 hours).\n\nCreate a weekly calendar that:\n1. Blocks study time near each class for best retention.\n2. Places difficult studying during my peak energy time: [MORNING / AFTERNOON / EVENING].\n3. Includes transition time between activities.\n4. Has at least one fully free block per day.\n5. Shows a realistic weekend balance.\n6. Flags if I am over-committed and suggests what to cut.",
+    promptText: "Act as an academic success coach specializing in student time management. Help me create a balanced weekly schedule that includes all my commitments.\n\nMy schedule:\n- Classes: [LIST DAYS AND TIMES]\n- Work or job: [HOURS PER WEEK]\n- Extracurriculars: [LIST ACTIVITIES AND TIME COMMITMENTS]\n- Commute time: [DAILY COMMUTE]\n\nI need help fitting in:\n- Study time for each class.\n- Exercise or physical activity.\n- Social time and relaxation.\n- Sleep (at least 7-8 hours).\n\nCreate a weekly calendar that:\n1. Blocks study time near each class for best retention.\n2. Places difficult studying during my peak energy time: [MORNING / AFTERNOON / EVENING].\n3. Includes transition time between activities.\n4. Has at least one fully free block per day.\n5. Shows a realistic weekend balance.\n6. Flags if I am over-committed and suggests what to cut.",
     audience: ["students"],
     category: "productivity",
     tags: ["time management", "student life", "balance", "scheduling"],
@@ -897,7 +897,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "business-plan-basics",
     title: "Outline a Simple Business Plan",
-    promptText: "Help me create a basic business plan outline for my idea.\n\nBusiness idea: [DESCRIBE YOUR IDEA IN 2-3 SENTENCES]\nTarget customers: [WHO WOULD BUY THIS?]\nHow I plan to make money: [YOUR REVENUE MODEL]\nStartup budget: approximately $[AMOUNT]\n\nCreate a practical business plan with:\n1. Executive summary (3-4 sentences capturing the essence).\n2. Problem and solution: what pain point I solve and how.\n3. Target market: who my customers are and how many exist locally.\n4. Revenue model: how I will make money and projected pricing.\n5. Startup costs: a realistic breakdown of initial expenses.\n6. Marketing plan: three low-cost ways to get my first 10 customers.\n7. Competitive advantage: what makes me different.\n8. Risks and how to mitigate them.\n9. 6-month milestones.\n\nKeep it practical and focused on action, not theory.",
+    promptText: "Act as a small business startup advisor. Help me create a basic business plan outline for my idea.\n\nBusiness idea: [DESCRIBE YOUR IDEA IN 2-3 SENTENCES]\nTarget customers: [WHO WOULD BUY THIS?]\nHow I plan to make money: [YOUR REVENUE MODEL]\nStartup budget: approximately $[AMOUNT]\n\nCreate a practical business plan with:\n1. Executive summary (3-4 sentences capturing the essence).\n2. Problem and solution: what pain point I solve and how.\n3. Target market: who my customers are and how many exist locally.\n4. Revenue model: how I will make money and projected pricing.\n5. Startup costs: a realistic breakdown of initial expenses.\n6. Marketing plan: three low-cost ways to get my first 10 customers.\n7. Competitive advantage: what makes me different.\n8. Risks and how to mitigate them.\n9. 6-month milestones.\n\nKeep it practical and focused on action, not theory.",
     audience: ["business"],
     category: "work",
     tags: ["business plan", "entrepreneurship", "startup", "strategy"],
@@ -907,7 +907,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "pricing-strategy",
     title: "Help Me Price My Product or Service",
-    promptText: "Help me determine the right pricing for my [PRODUCT / SERVICE].\n\nDetails:\n- What I sell: [DESCRIBE]\n- My costs per unit or per service: approximately $[AMOUNT]\n- What competitors charge: [RANGE, OR \"NOT SURE\"]\n- My target customer: [DESCRIBE]\n- My goal: [MAXIMIZE PROFIT / GROW FAST / COMPETE ON VALUE]\n\nAnalyze pricing options:\n1. Cost-plus pricing: what my price should be based on margins.\n2. Value-based pricing: what customers would likely pay based on the value I provide.\n3. Competitive pricing: where I should position relative to competitors.\n4. Tiered pricing: whether offering packages or levels makes sense.\n\nRecommend a pricing strategy with specific numbers. Explain how to test my pricing and when to raise prices.\n\nInclude three psychological pricing tactics that are ethical and effective.",
+    promptText: "Act as a pricing strategy consultant for small businesses. Help me determine the right pricing for my [PRODUCT / SERVICE].\n\nDetails:\n- What I sell: [DESCRIBE]\n- My costs per unit or per service: approximately $[AMOUNT]\n- What competitors charge: [RANGE, OR \"NOT SURE\"]\n- My target customer: [DESCRIBE]\n- My goal: [MAXIMIZE PROFIT / GROW FAST / COMPETE ON VALUE]\n\nAnalyze pricing options:\n1. Cost-plus pricing: what my price should be based on margins.\n2. Value-based pricing: what customers would likely pay based on the value I provide.\n3. Competitive pricing: where I should position relative to competitors.\n4. Tiered pricing: whether offering packages or levels makes sense.\n\nRecommend a pricing strategy with specific numbers. Explain how to test my pricing and when to raise prices.\n\nInclude three psychological pricing tactics that are ethical and effective.",
     audience: ["business"],
     category: "finance",
     tags: ["pricing", "business strategy", "revenue", "sales"],
@@ -917,7 +917,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "employee-feedback",
     title: "Give Constructive Feedback to an Employee",
-    promptText: "Help me prepare constructive feedback for a team member.\n\nSituation:\n- Their role: [ROLE/TITLE]\n- What they do well: [STRENGTHS]\n- Area that needs improvement: [SPECIFIC ISSUE]\n- Impact of the issue: [HOW IT AFFECTS THE TEAM OR BUSINESS]\n\nCreate:\n1. An opening that starts with genuine, specific praise.\n2. A clear, non-personal description of the issue (behavior, not character).\n3. The impact statement: how it affects the team or customers.\n4. A collaborative question that invites their perspective.\n5. A specific, achievable improvement goal with a timeline.\n6. An offer of support (training, resources, check-ins).\n7. A closing that expresses confidence in their ability to improve.\n\nTone: Direct but kind. Frame this as investing in their growth, not criticizing their work.",
+    promptText: "Act as a leadership development coach specializing in constructive feedback. Help me prepare constructive feedback for a team member.\n\nSituation:\n- Their role: [ROLE/TITLE]\n- What they do well: [STRENGTHS]\n- Area that needs improvement: [SPECIFIC ISSUE]\n- Impact of the issue: [HOW IT AFFECTS THE TEAM OR BUSINESS]\n\nCreate:\n1. An opening that starts with genuine, specific praise.\n2. A clear, non-personal description of the issue (behavior, not character).\n3. The impact statement: how it affects the team or customers.\n4. A collaborative question that invites their perspective.\n5. A specific, achievable improvement goal with a timeline.\n6. An offer of support (training, resources, check-ins).\n7. A closing that expresses confidence in their ability to improve.\n\nTone: Direct but kind. Frame this as investing in their growth, not criticizing their work.",
     audience: ["business"],
     category: "communication",
     tags: ["management", "feedback", "leadership", "team"],
@@ -927,7 +927,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "customer-survey",
     title: "Create a Customer Feedback Survey",
-    promptText: "Design a customer feedback survey for my [TYPE OF BUSINESS].\n\nPurpose: [WHAT I WANT TO LEARN (e.g., satisfaction, improvement areas, new product ideas)]\nSurvey format: [ONLINE / IN-PERSON / EMAIL]\n\nCreate a survey with:\n1. A friendly introduction that explains why their feedback matters (2-3 sentences).\n2. Eight to ten questions, including:\n   - Two satisfaction rating questions (1-5 scale).\n   - Two multiple choice questions.\n   - Two open-ended questions.\n   - One Net Promoter Score question.\n   - One question about what I could improve.\n3. A thank-you message with an optional incentive idea.\n\nFor each question, explain what insight it gives me and how to use the data. Keep the survey under 3 minutes to complete.",
+    promptText: "Act as a customer experience research specialist. Design a customer feedback survey for my [TYPE OF BUSINESS].\n\nPurpose: [WHAT I WANT TO LEARN (e.g., satisfaction, improvement areas, new product ideas)]\nSurvey format: [ONLINE / IN-PERSON / EMAIL]\n\nCreate a survey with:\n1. A friendly introduction that explains why their feedback matters (2-3 sentences).\n2. Eight to ten questions, including:\n   - Two satisfaction rating questions (1-5 scale).\n   - Two multiple choice questions.\n   - Two open-ended questions.\n   - One Net Promoter Score question.\n   - One question about what I could improve.\n3. A thank-you message with an optional incentive idea.\n\nFor each question, explain what insight it gives me and how to use the data. Keep the survey under 3 minutes to complete.",
     audience: ["business"],
     category: "work",
     tags: ["surveys", "customer feedback", "business improvement", "market research"],
@@ -937,7 +937,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "small-business-taxes",
     title: "Small Business Tax Basics",
-    promptText: "Explain the basics of small business taxes for my situation.\n\nBusiness type: [SOLE PROPRIETORSHIP / LLC / S-CORP / PARTNERSHIP]\nBusiness age: [NEW / 1-3 YEARS / 3+ YEARS]\nApproximate annual revenue: [RANGE]\nDo I have employees: [YES / NO]\n\nExplain in plain language:\n1. What taxes I am responsible for (income, self-employment, sales, payroll).\n2. Key deductions I might be missing (home office, vehicle, equipment, meals).\n3. Quarterly estimated tax obligations and how to calculate them.\n4. Record-keeping requirements: what receipts and documents to keep and for how long.\n5. Common mistakes small business owners make that trigger audits.\n6. When to hire an accountant versus doing taxes myself.\n7. Key deadlines and penalties for missing them.\n\nCreate a simple monthly bookkeeping routine I can follow in under 30 minutes.",
+    promptText: "Act as a small business tax advisor. Explain the basics of small business taxes for my situation.\n\nBusiness type: [SOLE PROPRIETORSHIP / LLC / S-CORP / PARTNERSHIP]\nBusiness age: [NEW / 1-3 YEARS / 3+ YEARS]\nApproximate annual revenue: [RANGE]\nDo I have employees: [YES / NO]\n\nExplain in plain language:\n1. What taxes I am responsible for (income, self-employment, sales, payroll).\n2. Key deductions I might be missing (home office, vehicle, equipment, meals).\n3. Quarterly estimated tax obligations and how to calculate them.\n4. Record-keeping requirements: what receipts and documents to keep and for how long.\n5. Common mistakes small business owners make that trigger audits.\n6. When to hire an accountant versus doing taxes myself.\n7. Key deadlines and penalties for missing them.\n\nCreate a simple monthly bookkeeping routine I can follow in under 30 minutes.",
     audience: ["business"],
     category: "finance",
     tags: ["small business taxes", "deductions", "bookkeeping", "accounting"],
@@ -948,7 +948,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "local-marketing",
     title: "Market My Business Locally",
-    promptText: "Create a local marketing plan for my business.\n\nBusiness type: [DESCRIBE]\nLocation: [CITY / NEIGHBORHOOD]\nTarget customer: [WHO]\nMonthly marketing budget: $[AMOUNT]\n\nSuggest 10 local marketing tactics, mixing free and paid:\n1. For each tactic, explain exactly how to implement it step by step.\n2. Estimate the time and cost involved.\n3. Rate the expected impact (High, Medium, or Low).\n4. Provide a timeline: how long before I see results.\n\nPrioritize tactics that:\n- Work for my specific budget.\n- Build long-term customer relationships, not just one-time sales.\n- Can be started this week.\n\nEnd with a 90-day marketing calendar showing what to do each week.",
+    promptText: "Act as a local marketing strategist for small businesses. Create a local marketing plan for my business.\n\nBusiness type: [DESCRIBE]\nLocation: [CITY / NEIGHBORHOOD]\nTarget customer: [WHO]\nMonthly marketing budget: $[AMOUNT]\n\nSuggest 10 local marketing tactics, mixing free and paid:\n1. For each tactic, explain exactly how to implement it step by step.\n2. Estimate the time and cost involved.\n3. Rate the expected impact (High, Medium, or Low).\n4. Provide a timeline: how long before I see results.\n\nPrioritize tactics that:\n- Work for my specific budget.\n- Build long-term customer relationships, not just one-time sales.\n- Can be started this week.\n\nEnd with a 90-day marketing calendar showing what to do each week.",
     audience: ["business"],
     category: "work",
     tags: ["local marketing", "small business", "advertising", "customers"],
@@ -958,7 +958,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "website-content",
     title: "Write My Business Website Content",
-    promptText: "Help me write the main content for my business website.\n\nBusiness: [DESCRIBE YOUR BUSINESS]\nTarget audience: [WHO YOUR CUSTOMERS ARE]\nTone: [FRIENDLY / PROFESSIONAL / CASUAL / AUTHORITATIVE]\n\nWrite content for these pages:\n1. Home page: A compelling headline, subheadline, and three key benefits (under 200 words total).\n2. About page: Our story, values, and what makes us different (under 250 words).\n3. Services/Products page: Clear descriptions of [NUMBER] offerings with benefits, not just features.\n4. Contact page: A welcoming message that encourages people to reach out.\n5. Call-to-action: A consistent CTA phrase to use across all pages.\n\nFor each page:\n- Include a suggested headline.\n- Write in a way that speaks to customer needs, not business features.\n- Include SEO-friendly keywords naturally.\n\nEnd with 5 headlines I can test for my home page.",
+    promptText: "Act as a professional copywriter specializing in small business websites. Help me write the main content for my business website.\n\nBusiness: [DESCRIBE YOUR BUSINESS]\nTarget audience: [WHO YOUR CUSTOMERS ARE]\nTone: [FRIENDLY / PROFESSIONAL / CASUAL / AUTHORITATIVE]\n\nWrite content for these pages:\n1. Home page: A compelling headline, subheadline, and three key benefits (under 200 words total).\n2. About page: Our story, values, and what makes us different (under 250 words).\n3. Services/Products page: Clear descriptions of [NUMBER] offerings with benefits, not just features.\n4. Contact page: A welcoming message that encourages people to reach out.\n5. Call-to-action: A consistent CTA phrase to use across all pages.\n\nFor each page:\n- Include a suggested headline.\n- Write in a way that speaks to customer needs, not business features.\n- Include SEO-friendly keywords naturally.\n\nEnd with 5 headlines I can test for my home page.",
     audience: ["business"],
     category: "communication",
     tags: ["website", "copywriting", "business content", "marketing"],
@@ -968,7 +968,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "gardening-plan",
     title: "Plan My Garden",
-    promptText: "Help me plan a garden based on my space and experience.\n\nDetails:\n- Space: [BACKYARD / BALCONY / WINDOWSILL / RAISED BED / COMMUNITY PLOT]\n- Size: approximately [DIMENSIONS]\n- Sunlight: [FULL SUN / PARTIAL SHADE / MOSTLY SHADE]\n- Climate zone or location: [CITY/STATE OR ZONE NUMBER]\n- Experience level: [FIRST TIME / SOME EXPERIENCE / EXPERIENCED]\n- What I want to grow: [VEGETABLES / HERBS / FLOWERS / MIX]\n\nProvide:\n1. A list of plants recommended for my specific conditions.\n2. A planting calendar: when to start seeds and when to transplant.\n3. A layout suggestion for my space (companion planting considered).\n4. Watering and care schedule.\n5. Common pests for my area and organic control methods.\n6. Estimated harvest timeline.\n7. Three beginner mistakes to avoid.\n\nKeep it achievable for my experience level.",
+    promptText: "Act as a master gardener and horticultural advisor. Help me plan a garden based on my space and experience.\n\nDetails:\n- Space: [BACKYARD / BALCONY / WINDOWSILL / RAISED BED / COMMUNITY PLOT]\n- Size: approximately [DIMENSIONS]\n- Sunlight: [FULL SUN / PARTIAL SHADE / MOSTLY SHADE]\n- Climate zone or location: [CITY/STATE OR ZONE NUMBER]\n- Experience level: [FIRST TIME / SOME EXPERIENCE / EXPERIENCED]\n- What I want to grow: [VEGETABLES / HERBS / FLOWERS / MIX]\n\nProvide:\n1. A list of plants recommended for my specific conditions.\n2. A planting calendar: when to start seeds and when to transplant.\n3. A layout suggestion for my space (companion planting considered).\n4. Watering and care schedule.\n5. Common pests for my area and organic control methods.\n6. Estimated harvest timeline.\n7. Three beginner mistakes to avoid.\n\nKeep it achievable for my experience level.",
     audience: ["everyday", "seniors"],
     category: "productivity",
     tags: ["gardening", "outdoor", "plants", "hobby"],
@@ -978,7 +978,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "event-planning",
     title: "Plan a Special Event",
-    promptText: "Help me plan a [EVENT TYPE (birthday party, anniversary, graduation celebration, retirement party, family reunion)].\n\nDetails:\n- Number of guests: approximately [NUMBER]\n- Budget: approximately $[AMOUNT]\n- Venue: [HOME / RESTAURANT / PARK / RENTED SPACE / UNDECIDED]\n- Date: [DATE OR TIMEFRAME]\n- Special considerations: [DIETARY NEEDS, ACCESSIBILITY, CHILDREN, THEME PREFERENCES]\n\nCreate a complete planning checklist:\n1. Timeline: tasks organized by weeks before the event.\n2. Budget breakdown: how to allocate money across food, decorations, entertainment.\n3. Menu suggestions that fit the budget and guest count.\n4. Activity or entertainment ideas appropriate for the guest mix.\n5. A day-of timeline so things run smoothly.\n6. Delegation list: tasks I can assign to helpers.\n7. A backup plan for weather or last-minute changes.\n\nKeep suggestions realistic for someone planning without a professional event planner.",
+    promptText: "Act as a professional event planning coordinator. Help me plan a [EVENT TYPE (birthday party, anniversary, graduation celebration, retirement party, family reunion)].\n\nDetails:\n- Number of guests: approximately [NUMBER]\n- Budget: approximately $[AMOUNT]\n- Venue: [HOME / RESTAURANT / PARK / RENTED SPACE / UNDECIDED]\n- Date: [DATE OR TIMEFRAME]\n- Special considerations: [DIETARY NEEDS, ACCESSIBILITY, CHILDREN, THEME PREFERENCES]\n\nCreate a complete planning checklist:\n1. Timeline: tasks organized by weeks before the event.\n2. Budget breakdown: how to allocate money across food, decorations, entertainment.\n3. Menu suggestions that fit the budget and guest count.\n4. Activity or entertainment ideas appropriate for the guest mix.\n5. A day-of timeline so things run smoothly.\n6. Delegation list: tasks I can assign to helpers.\n7. A backup plan for weather or last-minute changes.\n\nKeep suggestions realistic for someone planning without a professional event planner.",
     audience: ["everyday", "families", "seniors"],
     category: "productivity",
     tags: ["event planning", "party", "celebration", "organization"],
@@ -988,7 +988,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "road-trip-planner",
     title: "Plan a Road Trip",
-    promptText: "Help me plan a road trip.\n\nDetails:\n- Starting point: [CITY/STATE]\n- Destination: [CITY/STATE, OR \"OPEN TO SUGGESTIONS WITHIN [HOURS] HOURS\"]\n- Duration: [NUMBER] days\n- Travelers: [NUMBER OF ADULTS AND CHILDREN WITH AGES]\n- Budget: approximately $[AMOUNT]\n- Interests: [NATURE / HISTORY / FOOD / ADVENTURE / RELAXATION / KID-FRIENDLY]\n\nProvide:\n1. A suggested route with daily driving distances (keep under 4-5 hours per day).\n2. Must-see stops along the way.\n3. Recommended places to eat (mix of local favorites and budget options).\n4. Accommodation suggestions for each night.\n5. A packing checklist specific to this trip.\n6. A car safety and maintenance checklist before departing.\n7. Entertainment ideas for the car.\n8. An estimated budget breakdown (gas, food, lodging, activities).\n\nInclude one unexpected or hidden-gem stop most people miss.",
+    promptText: "Act as an experienced travel planner specializing in road trip itineraries. Help me plan a road trip.\n\nDetails:\n- Starting point: [CITY/STATE]\n- Destination: [CITY/STATE, OR \"OPEN TO SUGGESTIONS WITHIN [HOURS] HOURS\"]\n- Duration: [NUMBER] days\n- Travelers: [NUMBER OF ADULTS AND CHILDREN WITH AGES]\n- Budget: approximately $[AMOUNT]\n- Interests: [NATURE / HISTORY / FOOD / ADVENTURE / RELAXATION / KID-FRIENDLY]\n\nProvide:\n1. A suggested route with daily driving distances (keep under 4-5 hours per day).\n2. Must-see stops along the way.\n3. Recommended places to eat (mix of local favorites and budget options).\n4. Accommodation suggestions for each night.\n5. A packing checklist specific to this trip.\n6. A car safety and maintenance checklist before departing.\n7. Entertainment ideas for the car.\n8. An estimated budget breakdown (gas, food, lodging, activities).\n\nInclude one unexpected or hidden-gem stop most people miss.",
     audience: ["everyday", "families"],
     category: "productivity",
     tags: ["road trip", "travel", "vacation", "planning"],
@@ -998,7 +998,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "retirement-planning-basics",
     title: "Retirement Planning Basics",
-    promptText: "Help me understand the basics of retirement planning for my situation.\n\nMy details:\n- Age: [AGE]\n- Current retirement savings: [APPROXIMATE RANGE]\n- Employer offers: [401K / PENSION / NEITHER / NOT SURE]\n- Expected retirement age: [AGE]\n- Monthly expenses in retirement (estimate): $[AMOUNT]\n\nExplain in simple terms:\n1. How much I should ideally have saved by my target retirement age.\n2. How much I should be saving each month to get on track.\n3. The difference between a 401(k), IRA, and Roth IRA in plain language.\n4. How Social Security fits into my plan.\n5. The concept of the \"4% rule\" and whether it still applies.\n6. Three common retirement planning mistakes and how to avoid them.\n7. When I should talk to a financial advisor.\n\nPresent everything in terms I can understand without a finance background.",
+    promptText: "Act as a certified retirement planning advisor. Help me understand the basics of retirement planning for my situation.\n\nMy details:\n- Age: [AGE]\n- Current retirement savings: [APPROXIMATE RANGE]\n- Employer offers: [401K / PENSION / NEITHER / NOT SURE]\n- Expected retirement age: [AGE]\n- Monthly expenses in retirement (estimate): $[AMOUNT]\n\nExplain in simple terms:\n1. How much I should ideally have saved by my target retirement age.\n2. How much I should be saving each month to get on track.\n3. The difference between a 401(k), IRA, and Roth IRA in plain language.\n4. How Social Security fits into my plan.\n5. The concept of the \"4% rule\" and whether it still applies.\n6. Three common retirement planning mistakes and how to avoid them.\n7. When I should talk to a financial advisor.\n\nPresent everything in terms I can understand without a finance background.",
     audience: ["everyday", "seniors"],
     category: "finance",
     tags: ["retirement", "savings", "financial planning", "401k", "IRA"],
@@ -1009,7 +1009,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "mental-health-check-in",
     title: "Daily Mental Health Check-In",
-    promptText: "Guide me through a mental health check-in.\n\nRight now I am feeling: [DESCRIBE HOW YOU FEEL IN YOUR OWN WORDS]\n\nHelp me process this by:\n1. Reflecting my feeling back to me in a way that feels validating (not dismissive).\n2. Asking me 3 gentle follow-up questions to help me understand what might be driving this feeling.\n3. Suggesting a grounding technique I can use right now (5-4-3-2-1, box breathing, or body scan).\n4. Offering one small, concrete action I can take in the next 10 minutes.\n5. Providing a reframe: a different way to think about the situation that might feel more manageable.\n6. Reminding me of when it is a good idea to talk to a professional.\n\nTone: Warm, non-judgmental, and supportive. This is not therapy; it is a moment of reflection.",
+    promptText: "Act as a compassionate mental wellness guide. Guide me through a mental health check-in.\n\nRight now I am feeling: [DESCRIBE HOW YOU FEEL IN YOUR OWN WORDS]\n\nHelp me process this by:\n1. Reflecting my feeling back to me in a way that feels validating (not dismissive).\n2. Asking me 3 gentle follow-up questions to help me understand what might be driving this feeling.\n3. Suggesting a grounding technique I can use right now (5-4-3-2-1, box breathing, or body scan).\n4. Offering one small, concrete action I can take in the next 10 minutes.\n5. Providing a reframe: a different way to think about the situation that might feel more manageable.\n6. Reminding me of when it is a good idea to talk to a professional.\n\nTone: Warm, non-judgmental, and supportive. This is not therapy; it is a moment of reflection.",
     audience: ["everyday", "students"],
     category: "health",
     tags: ["mental health", "emotional wellness", "mindfulness", "self-care"],
@@ -1020,7 +1020,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "presentation-help",
     title: "Create a Presentation Outline",
-    promptText: "Help me create a presentation on [TOPIC].\n\nDetails:\n- Audience: [WHO WILL BE WATCHING]\n- Length: [NUMBER] minutes\n- Purpose: [INFORM / PERSUADE / TEACH / PITCH]\n- Tools I am using: [POWERPOINT / GOOGLE SLIDES / KEYNOTE / CANVA]\n\nCreate:\n1. A slide-by-slide outline with:\n   - Slide title.\n   - Key points (3 max per slide).\n   - Suggested visual (chart type, image description, or diagram).\n2. An engaging opening that grabs attention in the first 30 seconds.\n3. A clear narrative arc: setup, key message, supporting evidence, conclusion.\n4. Speaker notes for the 3 most important slides.\n5. A strong closing with a clear call to action.\n6. Anticipate 3 questions the audience might ask and draft brief answers.\n\nDesign principle: One idea per slide. More visuals, fewer words.",
+    promptText: "Act as a professional presentation coach and public speaking consultant. Help me create a presentation on [TOPIC].\n\nDetails:\n- Audience: [WHO WILL BE WATCHING]\n- Length: [NUMBER] minutes\n- Purpose: [INFORM / PERSUADE / TEACH / PITCH]\n- Tools I am using: [POWERPOINT / GOOGLE SLIDES / KEYNOTE / CANVA]\n\nCreate:\n1. A slide-by-slide outline with:\n   - Slide title.\n   - Key points (3 max per slide).\n   - Suggested visual (chart type, image description, or diagram).\n2. An engaging opening that grabs attention in the first 30 seconds.\n3. A clear narrative arc: setup, key message, supporting evidence, conclusion.\n4. Speaker notes for the 3 most important slides.\n5. A strong closing with a clear call to action.\n6. Anticipate 3 questions the audience might ask and draft brief answers.\n\nDesign principle: One idea per slide. More visuals, fewer words.",
     audience: ["students", "business", "everyday"],
     category: "communication",
     tags: ["presentation", "public speaking", "slides", "communication"],
@@ -1030,7 +1030,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "debug-computer",
     title: "My Computer Is Running Slowly",
-    promptText: "Help me figure out why my [Windows / Mac] computer is running slowly and fix it.\n\nComputer details:\n- Operating system: [WINDOWS 10 / WINDOWS 11 / MACOS]\n- Approximate age: [YEARS]\n- When the slowness started: [RECENTLY / GRADUALLY / ALWAYS]\n\nWalk me through these diagnostic steps in order:\n1. How to check what programs are using the most resources (Task Manager / Activity Monitor).\n2. Programs running at startup that I can safely disable.\n3. How to check my available storage space and free some up.\n4. Whether I need more RAM and how to check.\n5. How to check for malware using built-in tools (no downloads needed).\n6. Browser cleanup: clearing cache, disabling unnecessary extensions.\n7. When a slow computer actually means I need a new one.\n\nFor each step, provide exact instructions with what to click. Use simple language and tell me what each step fixes.",
+    promptText: "Act as a certified computer technician specializing in performance troubleshooting. Help me figure out why my [Windows / Mac] computer is running slowly and fix it.\n\nComputer details:\n- Operating system: [WINDOWS 10 / WINDOWS 11 / MACOS]\n- Approximate age: [YEARS]\n- When the slowness started: [RECENTLY / GRADUALLY / ALWAYS]\n\nWalk me through these diagnostic steps in order:\n1. How to check what programs are using the most resources (Task Manager / Activity Monitor).\n2. Programs running at startup that I can safely disable.\n3. How to check my available storage space and free some up.\n4. Whether I need more RAM and how to check.\n5. How to check for malware using built-in tools (no downloads needed).\n6. Browser cleanup: clearing cache, disabling unnecessary extensions.\n7. When a slow computer actually means I need a new one.\n\nFor each step, provide exact instructions with what to click. Use simple language and tell me what each step fixes.",
     audience: ["everyday", "seniors"],
     category: "tech",
     tags: ["computer", "troubleshooting", "slow PC", "maintenance"],
@@ -1040,7 +1040,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "backup-data",
     title: "Back Up My Important Files",
-    promptText: "Help me set up a reliable backup system for my important files.\n\nMy devices: [LIST DEVICES (computer, phone, tablet)]\nOperating systems: [WINDOWS / MAC / IPHONE / ANDROID]\nWhat I need to protect: [PHOTOS / DOCUMENTS / CONTACTS / EVERYTHING]\nBudget for backup: [FREE OPTIONS ONLY / UNDER $10/MONTH / FLEXIBLE]\n\nCreate a backup plan that includes:\n1. The 3-2-1 backup rule explained simply.\n2. How to set up automatic cloud backup for my photos and documents.\n3. How to create a local backup on an external drive.\n4. How to back up my phone contacts and text messages.\n5. How to verify my backups are actually working.\n6. How often each type of backup should run.\n7. How to restore files if something goes wrong.\n\nRecommend specific free or affordable tools for my setup. Prioritize solutions that work automatically without me remembering to do anything.",
+    promptText: "Act as a data protection specialist skilled in backup and recovery solutions. Help me set up a reliable backup system for my important files.\n\nMy devices: [LIST DEVICES (computer, phone, tablet)]\nOperating systems: [WINDOWS / MAC / IPHONE / ANDROID]\nWhat I need to protect: [PHOTOS / DOCUMENTS / CONTACTS / EVERYTHING]\nBudget for backup: [FREE OPTIONS ONLY / UNDER $10/MONTH / FLEXIBLE]\n\nCreate a backup plan that includes:\n1. The 3-2-1 backup rule explained simply.\n2. How to set up automatic cloud backup for my photos and documents.\n3. How to create a local backup on an external drive.\n4. How to back up my phone contacts and text messages.\n5. How to verify my backups are actually working.\n6. How often each type of backup should run.\n7. How to restore files if something goes wrong.\n\nRecommend specific free or affordable tools for my setup. Prioritize solutions that work automatically without me remembering to do anything.",
     audience: ["everyday", "seniors", "business"],
     category: "tech",
     tags: ["backup", "data protection", "cloud storage", "file safety"],
@@ -1050,7 +1050,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "digital-estate-plan",
     title: "Plan My Digital Legacy",
-    promptText: "Help me create a digital estate plan so my important online accounts and files are accessible if something happens to me.\n\nCreate a checklist covering:\n1. An inventory of digital accounts I should document (email, banking, social media, subscriptions, photos, cloud storage).\n2. How to set up legacy contacts or inactive account managers on major platforms (Google, Apple, Facebook).\n3. Secure ways to store account information for a trusted person (not on a sticky note).\n4. What to include in my instructions: which accounts to close, which to memorialize, which to transfer.\n5. Digital assets with financial value I should not forget (cryptocurrency, domain names, digital purchases).\n6. How to include digital accounts in my legal will.\n7. Subscription services that should be cancelled to avoid ongoing charges.\n\nFormat this as a step-by-step action plan I can complete over a weekend.",
+    promptText: "Act as a digital estate planning advisor. Help me create a digital estate plan so my important online accounts and files are accessible if something happens to me.\n\nCreate a checklist covering:\n1. An inventory of digital accounts I should document (email, banking, social media, subscriptions, photos, cloud storage).\n2. How to set up legacy contacts or inactive account managers on major platforms (Google, Apple, Facebook).\n3. Secure ways to store account information for a trusted person (not on a sticky note).\n4. What to include in my instructions: which accounts to close, which to memorialize, which to transfer.\n5. Digital assets with financial value I should not forget (cryptocurrency, domain names, digital purchases).\n6. How to include digital accounts in my legal will.\n7. Subscription services that should be cancelled to avoid ongoing charges.\n\nFormat this as a step-by-step action plan I can complete over a weekend.",
     audience: ["seniors", "everyday"],
     category: "productivity",
     tags: ["digital legacy", "estate planning", "account management", "preparation"],
@@ -1061,7 +1061,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "dispute-charge",
     title: "Dispute a Charge on My Account",
-    promptText: "Help me dispute a charge on my [CREDIT CARD / BANK ACCOUNT / SUBSCRIPTION].\n\nDetails:\n- Amount: $[AMOUNT]\n- Merchant or company: [NAME]\n- Date of charge: [DATE]\n- Why I am disputing: [UNAUTHORIZED / DUPLICATE / NOT AS DESCRIBED / NEVER RECEIVED / CANCELLED BUT STILL CHARGED]\n\nProvide:\n1. My rights under the Fair Credit Billing Act (in simple terms).\n2. Step-by-step instructions for filing a dispute with my bank or card company.\n3. A written dispute letter I can send (fill-in-the-blank template).\n4. What evidence to gather and submit.\n5. Timelines: how long I have to dispute and how long resolution takes.\n6. What to do if the dispute is denied.\n7. When to escalate to the Consumer Financial Protection Bureau (CFPB).\n\nKeep instructions specific and actionable.",
+    promptText: "Act as a consumer rights advocate specializing in billing disputes. Help me dispute a charge on my [CREDIT CARD / BANK ACCOUNT / SUBSCRIPTION].\n\nDetails:\n- Amount: $[AMOUNT]\n- Merchant or company: [NAME]\n- Date of charge: [DATE]\n- Why I am disputing: [UNAUTHORIZED / DUPLICATE / NOT AS DESCRIBED / NEVER RECEIVED / CANCELLED BUT STILL CHARGED]\n\nProvide:\n1. My rights under the Fair Credit Billing Act (in simple terms).\n2. Step-by-step instructions for filing a dispute with my bank or card company.\n3. A written dispute letter I can send (fill-in-the-blank template).\n4. What evidence to gather and submit.\n5. Timelines: how long I have to dispute and how long resolution takes.\n6. What to do if the dispute is denied.\n7. When to escalate to the Consumer Financial Protection Bureau (CFPB).\n\nKeep instructions specific and actionable.",
     audience: ["everyday", "seniors"],
     category: "finance",
     tags: ["dispute", "billing", "consumer rights", "banking"],
@@ -1072,7 +1072,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "neighborhood-safety",
     title: "Assess My Neighborhood Safety Online",
-    promptText: "Help me evaluate the online safety resources available for my area and create a neighborhood awareness plan.\n\nMy details:\n- General area: [CITY / NEIGHBORHOOD]\n- Household: [LIVES ALONE / WITH FAMILY / WITH ROOMMATES]\n- Main concerns: [PACKAGE THEFT / BREAK-INS / SCAMS TARGETING AREA / GENERAL SAFETY]\n\nProvide:\n1. How to find and use my local police department's online crime mapping tool.\n2. Community alert and notification systems I should sign up for.\n3. Neighborhood communication tools (how to connect with neighbors safely online).\n4. How to report suspicious activity (the right way, without being harmful).\n5. Smart home security basics that do not require expensive equipment.\n6. A seasonal home security checklist (vacation prep, holiday packages, winter).\n7. How to talk to elderly neighbors about common scams targeting our area.\n\nFocus on free resources and community-based approaches.",
+    promptText: "Act as a community safety and crime prevention advisor. Help me evaluate the online safety resources available for my area and create a neighborhood awareness plan.\n\nMy details:\n- General area: [CITY / NEIGHBORHOOD]\n- Household: [LIVES ALONE / WITH FAMILY / WITH ROOMMATES]\n- Main concerns: [PACKAGE THEFT / BREAK-INS / SCAMS TARGETING AREA / GENERAL SAFETY]\n\nProvide:\n1. How to find and use my local police department's online crime mapping tool.\n2. Community alert and notification systems I should sign up for.\n3. Neighborhood communication tools (how to connect with neighbors safely online).\n4. How to report suspicious activity (the right way, without being harmful).\n5. Smart home security basics that do not require expensive equipment.\n6. A seasonal home security checklist (vacation prep, holiday packages, winter).\n7. How to talk to elderly neighbors about common scams targeting our area.\n\nFocus on free resources and community-based approaches.",
     audience: ["everyday", "seniors", "families"],
     category: "safety",
     tags: ["neighborhood safety", "community", "crime prevention", "home security"],
@@ -1082,7 +1082,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "ai-image-creation",
     title: "Create Images with AI",
-    promptText: "Teach me how to create good images using AI image generators.\n\nWhat I want to create: [DESCRIBE WHAT YOU WANT (e.g., a logo, social media post, illustration, greeting card)]\nAI tool I plan to use: [DALL-E / MIDJOURNEY / STABLE DIFFUSION / CANVA AI / NOT SURE]\n\nProvide:\n1. How AI image generation works in simple terms.\n2. Five example prompts I can use for my specific goal, each progressively more detailed.\n3. The anatomy of a good image prompt: subject, style, lighting, mood, composition.\n4. Terms and keywords that produce better results.\n5. Common mistakes that produce bad images and how to fix them.\n6. Copyright and usage rules: can I use AI images commercially?\n7. Ethical considerations: when NOT to use AI-generated images.\n\nInclude a cheat sheet of style keywords (photorealistic, watercolor, minimalist, etc.) and when to use each.",
+    promptText: "Act as a digital art instructor specializing in AI-powered image generation. Teach me how to create good images using AI image generators.\n\nWhat I want to create: [DESCRIBE WHAT YOU WANT (e.g., a logo, social media post, illustration, greeting card)]\nAI tool I plan to use: [DALL-E / MIDJOURNEY / STABLE DIFFUSION / CANVA AI / NOT SURE]\n\nProvide:\n1. How AI image generation works in simple terms.\n2. Five example prompts I can use for my specific goal, each progressively more detailed.\n3. The anatomy of a good image prompt: subject, style, lighting, mood, composition.\n4. Terms and keywords that produce better results.\n5. Common mistakes that produce bad images and how to fix them.\n6. Copyright and usage rules: can I use AI images commercially?\n7. Ethical considerations: when NOT to use AI-generated images.\n\nInclude a cheat sheet of style keywords (photorealistic, watercolor, minimalist, etc.) and when to use each.",
     audience: ["everyday", "business", "students"],
     category: "tech",
     tags: ["AI images", "image generation", "DALL-E", "creative tools"],
@@ -1092,7 +1092,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "debt-payoff-plan",
     title: "Create a Debt Payoff Plan",
-    promptText: "Help me create a plan to pay off my debts.\n\nMy debts:\n[LIST EACH DEBT WITH: TYPE, BALANCE, INTEREST RATE, MINIMUM PAYMENT]\n\nMonthly income after necessities: approximately $[AMOUNT AVAILABLE FOR DEBT]\n\nCompare two strategies for my specific debts:\n1. Avalanche method (highest interest first): Show the total interest saved and payoff timeline.\n2. Snowball method (smallest balance first): Show the psychological wins and payoff timeline.\n\nRecommend which method is better for my situation and explain why.\n\nAdditionally:\n- Identify any debts I should try to negotiate a lower rate on.\n- Suggest whether debt consolidation makes sense for me.\n- Create a month-by-month payoff calendar for the first 6 months.\n- Give me 3 motivational milestones to celebrate along the way.\n- Tell me one thing to avoid that people commonly do when trying to pay off debt.",
+    promptText: "Act as a certified debt management counselor. Help me create a plan to pay off my debts.\n\nMy debts:\n[LIST EACH DEBT WITH: TYPE, BALANCE, INTEREST RATE, MINIMUM PAYMENT]\n\nMonthly income after necessities: approximately $[AMOUNT AVAILABLE FOR DEBT]\n\nCompare two strategies for my specific debts:\n1. Avalanche method (highest interest first): Show the total interest saved and payoff timeline.\n2. Snowball method (smallest balance first): Show the psychological wins and payoff timeline.\n\nRecommend which method is better for my situation and explain why.\n\nAdditionally:\n- Identify any debts I should try to negotiate a lower rate on.\n- Suggest whether debt consolidation makes sense for me.\n- Create a month-by-month payoff calendar for the first 6 months.\n- Give me 3 motivational milestones to celebrate along the way.\n- Tell me one thing to avoid that people commonly do when trying to pay off debt.",
     audience: ["everyday", "students"],
     category: "finance",
     tags: ["debt payoff", "financial freedom", "money management", "budgeting"],
@@ -1103,7 +1103,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "email-unsubscribe",
     title: "Clean Up My Email Inbox",
-    promptText: "Help me reclaim control of my email inbox.\n\nMy email provider: [GMAIL / OUTLOOK / YAHOO / APPLE MAIL / OTHER]\nMy problem: [TOO MANY NEWSLETTERS / SPAM / UNORGANIZED / ALL OF THESE]\n\nCreate a step-by-step inbox cleanup plan:\n1. How to quickly identify and unsubscribe from newsletters I do not read.\n2. How to set up filters or rules to automatically sort incoming mail.\n3. A folder or label system that keeps things organized (suggest categories).\n4. How to deal with the backlog: a time-efficient approach to clearing old emails.\n5. How to spot the difference between a real unsubscribe link and a phishing trap.\n6. Settings to adjust so less junk reaches my inbox in the first place.\n7. A weekly email maintenance routine that takes under 10 minutes.\n\nEstimate how long the initial cleanup will take and suggest breaking it into manageable sessions.",
+    promptText: "Act as a digital organization and productivity specialist. Help me reclaim control of my email inbox.\n\nMy email provider: [GMAIL / OUTLOOK / YAHOO / APPLE MAIL / OTHER]\nMy problem: [TOO MANY NEWSLETTERS / SPAM / UNORGANIZED / ALL OF THESE]\n\nCreate a step-by-step inbox cleanup plan:\n1. How to quickly identify and unsubscribe from newsletters I do not read.\n2. How to set up filters or rules to automatically sort incoming mail.\n3. A folder or label system that keeps things organized (suggest categories).\n4. How to deal with the backlog: a time-efficient approach to clearing old emails.\n5. How to spot the difference between a real unsubscribe link and a phishing trap.\n6. Settings to adjust so less junk reaches my inbox in the first place.\n7. A weekly email maintenance routine that takes under 10 minutes.\n\nEstimate how long the initial cleanup will take and suggest breaking it into manageable sessions.",
     audience: ["everyday", "seniors"],
     category: "productivity",
     tags: ["email", "inbox management", "organization", "digital cleanup"],
@@ -1113,7 +1113,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "password-manager-setup",
     title: "Set Up a Password Manager",
-    promptText: "Help me choose and set up a password manager.\n\nMy devices: [LIST YOUR DEVICES]\nMy browsers: [CHROME / SAFARI / FIREFOX / EDGE]\nBudget: [FREE / UNDER $5/MONTH / FLEXIBLE]\n\nWalk me through:\n1. What a password manager is and why I need one (in non-technical terms).\n2. Comparison of top options for my setup (free and paid).\n3. How to choose and create a strong master password I will not forget.\n4. Step-by-step setup on my primary device.\n5. How to import existing passwords from my browser.\n6. How to start using it for new logins.\n7. How to share passwords safely with family members (if applicable).\n8. What happens if I forget my master password.\n9. How it works across all my devices.\n\nReassure me about security: is it safe to put all my passwords in one place?",
+    promptText: "Act as a cybersecurity advisor specializing in password management solutions. Help me choose and set up a password manager.\n\nMy devices: [LIST YOUR DEVICES]\nMy browsers: [CHROME / SAFARI / FIREFOX / EDGE]\nBudget: [FREE / UNDER $5/MONTH / FLEXIBLE]\n\nWalk me through:\n1. What a password manager is and why I need one (in non-technical terms).\n2. Comparison of top options for my setup (free and paid).\n3. How to choose and create a strong master password I will not forget.\n4. Step-by-step setup on my primary device.\n5. How to import existing passwords from my browser.\n6. How to start using it for new logins.\n7. How to share passwords safely with family members (if applicable).\n8. What happens if I forget my master password.\n9. How it works across all my devices.\n\nReassure me about security: is it safe to put all my passwords in one place?",
     audience: ["everyday", "seniors"],
     category: "safety",
     tags: ["password manager", "passwords", "security tools", "account protection"],
@@ -1123,7 +1123,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "vpn-explained",
     title: "Do I Need a VPN?",
-    promptText: "Explain VPNs in plain language and help me decide if I need one.\n\nMy situation:\n- I regularly use public Wi-Fi: [YES / NO / SOMETIMES]\n- I work remotely: [YES / NO]\n- I travel internationally: [YES / NO]\n- I am concerned about online privacy: [YES / SOMEWHAT / NOT REALLY]\n\nExplain:\n1. What a VPN actually does (and does not do) in simple terms.\n2. Three situations where a VPN genuinely protects me.\n3. Three situations where a VPN is unnecessary.\n4. Common myths about VPNs debunked.\n5. If I need one: recommend trustworthy options (free and paid) and explain why.\n6. If I do not need one: what I should do instead to protect my privacy.\n7. Red flags that a VPN provider is not trustworthy.\n\nGive me a clear yes/no recommendation based on my specific situation with a brief explanation.",
+    promptText: "Act as a network privacy consultant. Explain VPNs in plain language and help me decide if I need one.\n\nMy situation:\n- I regularly use public Wi-Fi: [YES / NO / SOMETIMES]\n- I work remotely: [YES / NO]\n- I travel internationally: [YES / NO]\n- I am concerned about online privacy: [YES / SOMEWHAT / NOT REALLY]\n\nExplain:\n1. What a VPN actually does (and does not do) in simple terms.\n2. Three situations where a VPN genuinely protects me.\n3. Three situations where a VPN is unnecessary.\n4. Common myths about VPNs debunked.\n5. If I need one: recommend trustworthy options (free and paid) and explain why.\n6. If I do not need one: what I should do instead to protect my privacy.\n7. Red flags that a VPN provider is not trustworthy.\n\nGive me a clear yes/no recommendation based on my specific situation with a brief explanation.",
     audience: ["everyday", "business"],
     category: "tech",
     tags: ["VPN", "privacy", "internet security", "online safety"],
@@ -1133,7 +1133,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "first-aid-digital",
     title: "Digital First Aid After Being Hacked",
-    promptText: "I think my [ACCOUNT / DEVICE / EMAIL] has been compromised. Help me respond immediately.\n\nWhat happened: [DESCRIBE WHAT YOU NOTICED (e.g., strange emails sent from my account, password no longer works, unauthorized purchases, unfamiliar devices logged in)]\n\nGive me an emergency action plan in priority order:\n1. Immediate actions (do these right now, in this exact order).\n2. Account recovery steps for my specific situation.\n3. How to check what the attacker accessed or changed.\n4. How to secure my other accounts that might use the same password.\n5. Who to contact (email provider, bank, credit bureaus, law enforcement).\n6. How to set up better security to prevent this from happening again.\n7. Emotional support: what to expect in the coming days and how to handle it.\n\nBe direct and specific. Treat this like a digital emergency room visit.",
+    promptText: "Act as a cybersecurity incident response specialist. I think my [ACCOUNT / DEVICE / EMAIL] has been compromised. Help me respond immediately.\n\nWhat happened: [DESCRIBE WHAT YOU NOTICED (e.g., strange emails sent from my account, password no longer works, unauthorized purchases, unfamiliar devices logged in)]\n\nGive me an emergency action plan in priority order:\n1. Immediate actions (do these right now, in this exact order).\n2. Account recovery steps for my specific situation.\n3. How to check what the attacker accessed or changed.\n4. How to secure my other accounts that might use the same password.\n5. Who to contact (email provider, bank, credit bureaus, law enforcement).\n6. How to set up better security to prevent this from happening again.\n7. Emotional support: what to expect in the coming days and how to handle it.\n\nBe direct and specific. Treat this like a digital emergency room visit.",
     audience: ["everyday", "seniors", "business"],
     category: "safety",
     tags: ["hacked", "account recovery", "incident response", "emergency"],
@@ -1144,7 +1144,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "parenting-digital-contract",
     title: "Create a Digital Device Contract for My Child",
-    promptText: "Create a parent-child digital device agreement for my [AGE]-year-old who is getting their first [SMARTPHONE / TABLET / LAPTOP].\n\nThe contract should include:\n1. Device ownership: who owns it and the conditions for use.\n2. Privacy expectations: what I will and will not monitor, and why.\n3. Time limits: daily and weekly screen time boundaries.\n4. Content rules: what apps, websites, and content types are approved.\n5. Social media rules: what platforms are allowed and privacy settings required.\n6. Consequences: specific, fair consequences for breaking each rule.\n7. Safety commitments: what to do if they see something scary, mean, or inappropriate.\n8. An \"amnesty clause\": they can always come to me without punishment if they feel unsafe.\n9. A review date: when we will revisit and update the rules together.\n\nWrite it in a tone that feels collaborative, not controlling. Include signature lines for both of us.",
+    promptText: "Act as a family digital wellness advisor. Create a parent-child digital device agreement for my [AGE]-year-old who is getting their first [SMARTPHONE / TABLET / LAPTOP].\n\nThe contract should include:\n1. Device ownership: who owns it and the conditions for use.\n2. Privacy expectations: what I will and will not monitor, and why.\n3. Time limits: daily and weekly screen time boundaries.\n4. Content rules: what apps, websites, and content types are approved.\n5. Social media rules: what platforms are allowed and privacy settings required.\n6. Consequences: specific, fair consequences for breaking each rule.\n7. Safety commitments: what to do if they see something scary, mean, or inappropriate.\n8. An \"amnesty clause\": they can always come to me without punishment if they feel unsafe.\n9. A review date: when we will revisit and update the rules together.\n\nWrite it in a tone that feels collaborative, not controlling. Include signature lines for both of us.",
     audience: ["families"],
     category: "safety",
     tags: ["digital contract", "first phone", "parenting", "device rules"],
@@ -1154,7 +1154,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "volunteer-opportunities",
     title: "Find Volunteer Opportunities",
-    promptText: "Help me find volunteer opportunities that match my interests and availability.\n\nAbout me:\n- Location: [CITY / STATE]\n- Interests: [ANIMALS / ENVIRONMENT / EDUCATION / HEALTHCARE / COMMUNITY / TECHNOLOGY / SENIORS / OTHER]\n- Availability: [WEEKDAYS / WEEKENDS / EVENINGS] for approximately [HOURS] per week\n- Physical limitations: [ANY, OR \"NONE\"]\n- Skills I can offer: [LIST ANY RELEVANT SKILLS]\n- Preference: [IN-PERSON / VIRTUAL / EITHER]\n\nProvide:\n1. Five specific types of volunteer roles that match my interests and availability.\n2. Where to find these opportunities (specific organizations and websites).\n3. What to expect on my first day as a volunteer.\n4. How volunteering can benefit my career or personal growth.\n5. Tips for staying committed without overcommitting.\n6. How to evaluate whether an organization is legitimate and well-run.\n\nFocus on opportunities that create meaningful impact, not just resume padding.",
+    promptText: "Act as a community engagement coordinator specializing in volunteer placement. Help me find volunteer opportunities that match my interests and availability.\n\nAbout me:\n- Location: [CITY / STATE]\n- Interests: [ANIMALS / ENVIRONMENT / EDUCATION / HEALTHCARE / COMMUNITY / TECHNOLOGY / SENIORS / OTHER]\n- Availability: [WEEKDAYS / WEEKENDS / EVENINGS] for approximately [HOURS] per week\n- Physical limitations: [ANY, OR \"NONE\"]\n- Skills I can offer: [LIST ANY RELEVANT SKILLS]\n- Preference: [IN-PERSON / VIRTUAL / EITHER]\n\nProvide:\n1. Five specific types of volunteer roles that match my interests and availability.\n2. Where to find these opportunities (specific organizations and websites).\n3. What to expect on my first day as a volunteer.\n4. How volunteering can benefit my career or personal growth.\n5. Tips for staying committed without overcommitting.\n6. How to evaluate whether an organization is legitimate and well-run.\n\nFocus on opportunities that create meaningful impact, not just resume padding.",
     audience: ["everyday", "seniors", "students"],
     category: "productivity",
     tags: ["volunteering", "community service", "giving back", "social impact"],
@@ -1164,7 +1164,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "recipe-converter",
     title: "Convert and Adapt a Recipe",
-    promptText: "Help me adapt this recipe for my needs.\n\nOriginal recipe:\n[PASTE RECIPE OR DESCRIBE IT]\n\nWhat I need:\n- Scale to [NUMBER] servings (original serves [NUMBER]).\n- Dietary adaptation: [MAKE IT VEGETARIAN / VEGAN / GLUTEN-FREE / DAIRY-FREE / LOW-SODIUM / NONE]\n- Substitutions needed: [LIST INGREDIENTS I DO NOT HAVE OR CANNOT EAT]\n- Equipment: [WHAT I HAVE (oven, slow cooker, Instant Pot, air fryer, stovetop only)]\n\nProvide:\n1. The adapted recipe with adjusted quantities.\n2. Step-by-step instructions rewritten for my equipment.\n3. Substitution notes explaining why each swap works.\n4. Storage instructions: how long it keeps and how to reheat.\n5. Tips for making it ahead or freezing it.\n\nHighlight any steps where timing is critical (where walking away could ruin the dish).",
+    promptText: "Act as a culinary nutritionist skilled in recipe adaptation. Help me adapt this recipe for my needs.\n\nOriginal recipe:\n[PASTE RECIPE OR DESCRIBE IT]\n\nWhat I need:\n- Scale to [NUMBER] servings (original serves [NUMBER]).\n- Dietary adaptation: [MAKE IT VEGETARIAN / VEGAN / GLUTEN-FREE / DAIRY-FREE / LOW-SODIUM / NONE]\n- Substitutions needed: [LIST INGREDIENTS I DO NOT HAVE OR CANNOT EAT]\n- Equipment: [WHAT I HAVE (oven, slow cooker, Instant Pot, air fryer, stovetop only)]\n\nProvide:\n1. The adapted recipe with adjusted quantities.\n2. Step-by-step instructions rewritten for my equipment.\n3. Substitution notes explaining why each swap works.\n4. Storage instructions: how long it keeps and how to reheat.\n5. Tips for making it ahead or freezing it.\n\nHighlight any steps where timing is critical (where walking away could ruin the dish).",
     audience: ["everyday", "families", "seniors"],
     category: "productivity",
     tags: ["cooking", "recipe", "meal adaptation", "food"],
@@ -1174,7 +1174,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "reading-list",
     title: "Build a Reading List for Me",
-    promptText: "Recommend books based on my preferences and create a reading plan.\n\nMy reading preferences:\n- Genres I enjoy: [LIST GENRES]\n- Books I have loved: [LIST 2-3 FAVORITES]\n- Topics I want to learn about: [LIST ANY]\n- Format preference: [PHYSICAL / EBOOK / AUDIOBOOK / ANY]\n- Reading pace: [1 BOOK PER MONTH / 2 PER MONTH / VARIES]\n\nProvide:\n1. Ten book recommendations organized by category.\n2. For each book: title, author, one-sentence hook (why I will love it), and length.\n3. A suggested reading order that alternates between lighter and heavier reads.\n4. Three books that are outside my comfort zone but I would probably enjoy.\n5. Free or low-cost ways to access these books (library apps, free ebook sources).\n6. A simple reading tracker format I can use.\n\nDo not recommend books that are difficult to find or out of print.",
+    promptText: "Act as a knowledgeable librarian and reading coach. Recommend books based on my preferences and create a reading plan.\n\nMy reading preferences:\n- Genres I enjoy: [LIST GENRES]\n- Books I have loved: [LIST 2-3 FAVORITES]\n- Topics I want to learn about: [LIST ANY]\n- Format preference: [PHYSICAL / EBOOK / AUDIOBOOK / ANY]\n- Reading pace: [1 BOOK PER MONTH / 2 PER MONTH / VARIES]\n\nProvide:\n1. Ten book recommendations organized by category.\n2. For each book: title, author, one-sentence hook (why I will love it), and length.\n3. A suggested reading order that alternates between lighter and heavier reads.\n4. Three books that are outside my comfort zone but I would probably enjoy.\n5. Free or low-cost ways to access these books (library apps, free ebook sources).\n6. A simple reading tracker format I can use.\n\nDo not recommend books that are difficult to find or out of print.",
     audience: ["everyday", "students", "seniors"],
     category: "learning",
     tags: ["reading", "books", "self-improvement", "leisure"],
@@ -1184,7 +1184,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "senior-fall-prevention",
     title: "Fall Prevention Safety Plan",
-    promptText: "Create a home safety plan to prevent falls.\n\nDetails:\n- Age: [AGE]\n- Living situation: [ALONE / WITH PARTNER / WITH FAMILY]\n- Home type: [SINGLE STORY / TWO STORY / APARTMENT]\n- Current mobility level: [INDEPENDENT / USE A CANE OR WALKER / LIMITED MOBILITY]\n- Previous falls: [YES / NO]\n\nProvide a room-by-room assessment:\n1. Bathroom: specific safety modifications and products.\n2. Kitchen: reaching, standing, and hot surface precautions.\n3. Bedroom: getting in and out of bed safely, nighttime navigation.\n4. Stairs and hallways: lighting, handrails, and obstacle removal.\n5. Outdoor areas: walkways, steps, and weather-related hazards.\n\nFor each recommendation:\n- Explain what it prevents.\n- Provide a cost estimate (free, under $25, under $100, professional installation needed).\n- Indicate priority (essential, recommended, or nice to have).\n\nInclude exercises that improve balance and strength, and signs that a medical evaluation is needed.",
+    promptText: "Act as an occupational therapist specializing in fall prevention and home safety. Create a home safety plan to prevent falls.\n\nDetails:\n- Age: [AGE]\n- Living situation: [ALONE / WITH PARTNER / WITH FAMILY]\n- Home type: [SINGLE STORY / TWO STORY / APARTMENT]\n- Current mobility level: [INDEPENDENT / USE A CANE OR WALKER / LIMITED MOBILITY]\n- Previous falls: [YES / NO]\n\nProvide a room-by-room assessment:\n1. Bathroom: specific safety modifications and products.\n2. Kitchen: reaching, standing, and hot surface precautions.\n3. Bedroom: getting in and out of bed safely, nighttime navigation.\n4. Stairs and hallways: lighting, handrails, and obstacle removal.\n5. Outdoor areas: walkways, steps, and weather-related hazards.\n\nFor each recommendation:\n- Explain what it prevents.\n- Provide a cost estimate (free, under $25, under $100, professional installation needed).\n- Indicate priority (essential, recommended, or nice to have).\n\nInclude exercises that improve balance and strength, and signs that a medical evaluation is needed.",
     audience: ["seniors", "families"],
     category: "health",
     tags: ["fall prevention", "home safety", "senior health", "accessibility"],
@@ -1195,7 +1195,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "conversation-starter",
     title: "Break the Ice in Social Situations",
-    promptText: "Give me conversation starters for a specific social situation.\n\nThe situation: [DESCRIBE (e.g., work networking event, new neighbor, child's school function, community group, family gathering where I do not know many people)]\n\nMy personality: [INTROVERTED / EXTROVERTED / SOMEWHERE IN BETWEEN]\n\nProvide:\n1. Five natural opening lines that do not feel forced or awkward.\n2. Three follow-up questions for each opener to keep the conversation going.\n3. How to gracefully exit a conversation when it is time to move on.\n4. Body language tips that make me appear approachable.\n5. What to do if there is an awkward silence.\n6. Topics to avoid in this specific setting.\n7. How to remember people's names (practical techniques).\n\nMake the suggestions feel genuine, not scripted. Adjust for my personality type.",
+    promptText: "Act as a social skills coach specializing in conversational confidence. Give me conversation starters for a specific social situation.\n\nThe situation: [DESCRIBE (e.g., work networking event, new neighbor, child's school function, community group, family gathering where I do not know many people)]\n\nMy personality: [INTROVERTED / EXTROVERTED / SOMEWHERE IN BETWEEN]\n\nProvide:\n1. Five natural opening lines that do not feel forced or awkward.\n2. Three follow-up questions for each opener to keep the conversation going.\n3. How to gracefully exit a conversation when it is time to move on.\n4. Body language tips that make me appear approachable.\n5. What to do if there is an awkward silence.\n6. Topics to avoid in this specific setting.\n7. How to remember people's names (practical techniques).\n\nMake the suggestions feel genuine, not scripted. Adjust for my personality type.",
     audience: ["everyday", "seniors", "students"],
     category: "communication",
     tags: ["social skills", "networking", "conversation", "relationships"],
@@ -1205,7 +1205,7 @@ const seedPrompts: PromptSeedData[] = [
   {
     slug: "smart-home-setup",
     title: "Set Up Smart Home Basics",
-    promptText: "Help me set up basic smart home features.\n\nMy situation:\n- Budget: $[AMOUNT]\n- Tech comfort level: [BEGINNER / INTERMEDIATE / ADVANCED]\n- Priorities: [SECURITY / CONVENIENCE / ENERGY SAVING / ENTERTAINMENT / ALL]\n- Existing devices: [LIST ANY SMART DEVICES YOU ALREADY OWN]\n- Phone type: [iPhone / Android]\n\nRecommend a starter smart home setup:\n1. The best voice assistant ecosystem for my phone (Alexa, Google Home, or Apple HomeKit).\n2. Three essential devices to start with and why.\n3. Step-by-step setup instructions for each device.\n4. How to connect devices so they work together.\n5. Privacy settings I should change immediately.\n6. Common mistakes beginners make.\n7. A plan for expanding over time without wasting money.\n\nPrioritize devices that are easy to set up, work reliably, and respect my privacy.",
+    promptText: "Act as a smart home technology consultant. Help me set up basic smart home features.\n\nMy situation:\n- Budget: $[AMOUNT]\n- Tech comfort level: [BEGINNER / INTERMEDIATE / ADVANCED]\n- Priorities: [SECURITY / CONVENIENCE / ENERGY SAVING / ENTERTAINMENT / ALL]\n- Existing devices: [LIST ANY SMART DEVICES YOU ALREADY OWN]\n- Phone type: [iPhone / Android]\n\nRecommend a starter smart home setup:\n1. The best voice assistant ecosystem for my phone (Alexa, Google Home, or Apple HomeKit).\n2. Three essential devices to start with and why.\n3. Step-by-step setup instructions for each device.\n4. How to connect devices so they work together.\n5. Privacy settings I should change immediately.\n6. Common mistakes beginners make.\n7. A plan for expanding over time without wasting money.\n\nPrioritize devices that are easy to set up, work reliably, and respect my privacy.",
     audience: ["everyday", "seniors"],
     category: "tech",
     tags: ["smart home", "technology", "home automation", "IoT"],

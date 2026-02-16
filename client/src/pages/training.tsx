@@ -122,7 +122,7 @@ export default function Training() {
   const trainingCourseSchema: CourseData = {
     type: "Course",
     name: "GetCyberRight Training Academy",
-    description: "Free cybersecurity training courses with quizzes and certificates. Structured learning paths for kids, parents, seniors, educators, and small businesses.",
+    description: "Cybersecurity training courses with quizzes and certificates. Structured learning paths for kids, parents, seniors, educators, and small businesses.",
     provider: "GetCyberRight",
     url: "https://getcyberright.com/training",
     isAccessibleForFree: true,
@@ -404,7 +404,7 @@ export default function Training() {
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
                   <Button size="lg" data-testid="button-get-started">
-                    Get Started Free
+                    Get Started
                   </Button>
                   <Button size="lg" variant="outline" data-testid="button-view-resources">
                     Browse Resources

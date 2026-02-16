@@ -18,7 +18,7 @@ export function HeroTools() {
             Take Action Right Now
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Start protecting yourself in seconds. No account needed for our free tools.
+            Start protecting yourself in seconds. No account needed.
           </p>
         </div>
 
@@ -39,13 +39,13 @@ export function HeroTools() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h3 className="text-lg font-semibold text-white">Scan for Your Exposed Data</h3>
-                        <Badge className="text-[10px] bg-white/20 text-white border-white/30">Free Scan</Badge>
+                        <Badge className="text-[10px] bg-white/20 text-white border-white/30">Instant Scan</Badge>
                       </div>
                       <p className="text-sm text-white/80 mb-4">
                         Discover which of 500+ data brokers are selling your personal information. See exactly what's exposed and take action to remove it.
                       </p>
                       <div className="flex items-center gap-2 text-sm font-medium text-white">
-                        Start Free Scan <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        Start Your Scan <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
                   </div>
@@ -70,7 +70,7 @@ export function HeroTools() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h3 className="text-lg font-semibold text-white">Check Something Suspicious</h3>
-                        <Badge className="text-[10px] bg-white/20 text-white border-white/30">Free</Badge>
+                        <Badge className="text-[10px] bg-white/20 text-white border-white/30">Instant Check</Badge>
                       </div>
                       <p className="text-sm text-white/80 mb-4">
                         Got a sketchy link, email, or phone call? Paste it in and get an instant risk assessment with detailed analysis.

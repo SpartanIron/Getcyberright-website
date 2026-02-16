@@ -56,7 +56,7 @@ export function SignupEncouragementBanner({ toolName, show, contextMessage }: Si
               {contextMessage || "Want to save your results?"}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-              Create an account to save your results and track your progress. No cost, no catch, ever.
+              Create an account to save your results and track your progress.
             </p>
             <div className="grid grid-cols-2 gap-2 mb-4">
               {benefits.map((b) => (

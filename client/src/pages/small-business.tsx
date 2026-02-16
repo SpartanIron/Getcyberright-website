@@ -288,7 +288,7 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
                 <Button variant="outline" onClick={() => {
                   window.location.href = '/tools';
                 }} data-testid="button-security-tools">
-                  Free Security Tools
+                  Security Tools
                 </Button>
               </div>
             </CardContent>
