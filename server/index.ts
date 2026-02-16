@@ -14,6 +14,7 @@ import {
   apiAnomalyDetection,
   securityLogger,
 } from "./security";
+import { antiScrapingHeaders, botProtection } from "./security/middleware";
 
 const app = express();
 
@@ -54,6 +55,12 @@ app.use(securityLoggingMiddleware);
 
 // Security: API anomaly detection (MITRE ATT&CK T1071)
 app.use(apiAnomalyDetection);
+
+// Security: Anti-scraping headers for API routes
+app.use(antiScrapingHeaders);
+
+// Security: Block known scraper bots from API endpoints
+app.use(botProtection);
 
 // Body parsing with size limits
 app.use(

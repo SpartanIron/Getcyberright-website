@@ -424,6 +424,46 @@ export const requestSizeLimiter = (req: Request, res: Response, next: NextFuncti
   next();
 };
 
+// Anti-scraping middleware for API routes
+export const antiScrapingHeaders = (req: Request, res: Response, next: NextFunction) => {
+  if (req.path.startsWith('/api/')) {
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+    res.setHeader('Cache-Control', 'private, no-store');
+  }
+  next();
+};
+
+// Bot detection middleware - blocks known scraper user agents
+const blockedBots = [
+  /GPTBot/i,
+  /ChatGPT-User/i,
+  /CCBot/i,
+  /anthropic-ai/i,
+  /Claude-Web/i,
+  /Google-Extended/i,
+  /Bytespider/i,
+  /PetalBot/i,
+  /FacebookBot/i,
+];
+
+export const botProtection = (req: Request, res: Response, next: NextFunction) => {
+  const userAgent = req.get('User-Agent') || '';
+  const isBlockedBot = blockedBots.some(pattern => pattern.test(userAgent));
+
+  if (isBlockedBot && req.path.startsWith('/api/')) {
+    recordSecurityEvent({
+      type: 'suspicious_pattern',
+      ip: req.ip || 'unknown',
+      userAgent,
+      details: `Blocked scraper bot on ${req.method} ${req.path}`,
+      severity: 'low'
+    });
+    res.status(403).json({ error: 'Access denied' });
+    return;
+  }
+  next();
+};
+
 // File Upload Security (if needed later)
 export const fileUploadSecurity = {
   limits: {

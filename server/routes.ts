@@ -8,6 +8,7 @@ import { db } from "./db";
 import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
+import { embedFingerprint } from "./content-fingerprint";
 import { registerAuthRoutes, isAuthenticated, isAdmin, seedAdminUser } from "./auth";
 import { registerAdminRoutes, registerToolTrackingRoutes } from "./admin";
 import { 
@@ -2259,7 +2260,11 @@ EDGE CASE HANDLING
         return res.status(404).json({ error: "Lesson not found" });
       }
       
-      res.json(lesson);
+      const fingerprintedLesson = {
+        ...lesson,
+        content: lesson.content ? embedFingerprint(lesson.content, `lesson-${lessonId}`) : lesson.content
+      };
+      res.json(fingerprintedLesson);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -3263,7 +3268,11 @@ EDGE CASE HANDLING
   app.get("/api/prompts", standardRateLimit, async (_req: Request, res: Response) => {
     try {
       const prompts = await storage.getActivePrompts();
-      res.json(prompts);
+      const fingerprintedPrompts = prompts.map((p: any) => ({
+        ...p,
+        promptText: embedFingerprint(p.promptText, `prompt-${p.slug}`)
+      }));
+      res.json(fingerprintedPrompts);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to fetch prompts" });
     }

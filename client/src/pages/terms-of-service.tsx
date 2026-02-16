@@ -185,7 +185,53 @@ export default function TermsOfService() {
 
             <Card>
               <CardHeader>
-                <CardTitle>7. Educational Content</CardTitle>
+                <CardTitle>7. Automated Access and Content Protection</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  You may not use any automated means, including but not limited to bots, crawlers, scrapers, 
+                  spiders, data mining tools, or any other automated technology to access, scrape, harvest, copy, 
+                  monitor, or collect content, data, or information from the Platform without our prior written consent.
+                </p>
+                <p className="text-muted-foreground">Specifically prohibited activities include:</p>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Scraping, copying, or systematically downloading content from the Platform</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Creating derivative works, mirror sites, or clones of the Platform or its content</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Using the Platform's content to train machine learning or artificial intelligence models</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Circumventing any technical measures designed to prevent unauthorized access or scraping</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Republishing, redistributing, or reselling Platform content without explicit authorization</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                    <span>Using automated tools to submit forms, create accounts, or interact with Platform features</span>
+                  </li>
+                </ul>
+                <p className="text-muted-foreground mt-4">
+                  Violations of this section may result in immediate termination of access, IP blocking, 
+                  and pursuit of legal remedies including injunctive relief and damages under applicable laws 
+                  including the Computer Fraud and Abuse Act (CFAA), the Digital Millennium Copyright Act (DMCA), 
+                  and equivalent international legislation.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>8. Educational Content</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
@@ -201,7 +247,7 @@ export default function TermsOfService() {
 
             <Card>
               <CardHeader>
-                <CardTitle>8. Disclaimers</CardTitle>
+                <CardTitle>9. Disclaimers</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
@@ -221,7 +267,7 @@ export default function TermsOfService() {
 
             <Card>
               <CardHeader>
-                <CardTitle>9. Limitation of Liability</CardTitle>
+                <CardTitle>10. Limitation of Liability</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
@@ -234,7 +280,7 @@ export default function TermsOfService() {
 
             <Card>
               <CardHeader>
-                <CardTitle>10. Termination</CardTitle>
+                <CardTitle>11. Termination</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
@@ -247,7 +293,7 @@ export default function TermsOfService() {
 
             <Card>
               <CardHeader>
-                <CardTitle>11. Governing Law</CardTitle>
+                <CardTitle>12. Governing Law</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
@@ -260,7 +306,7 @@ export default function TermsOfService() {
 
             <Card>
               <CardHeader>
-                <CardTitle>12. Changes to Terms</CardTitle>
+                <CardTitle>13. Changes to Terms</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
@@ -273,7 +319,7 @@ export default function TermsOfService() {
 
             <Card>
               <CardHeader>
-                <CardTitle>13. Contact</CardTitle>
+                <CardTitle>14. Contact</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
