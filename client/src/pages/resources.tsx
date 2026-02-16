@@ -8,6 +8,8 @@ import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
 import { SEOHead, pageSEO } from "@/components/seo-head";
+import { StructuredData } from "@/components/structured-data";
+import type { BreadcrumbData } from "@/components/structured-data";
 import { useSearch } from "wouter";
 import { 
   ArrowRight, 
@@ -22,11 +24,18 @@ import {
   ClipboardCheck,
   Play,
   FileText,
-  Printer
+  Printer,
+  ExternalLink,
+  CalendarDays
 } from "lucide-react";
 import bannerImage from "@/assets/banners/resources-banner.png";
 
 type ResourceType = "guide" | "video" | "checklist";
+
+interface ResourceSource {
+  name: string;
+  url: string;
+}
 
 interface Resource {
   slug: string;
@@ -36,6 +45,8 @@ interface Resource {
   readTime: string;
   featured: boolean;
   type: ResourceType;
+  lastReviewed: string;
+  sources?: ResourceSource[];
   content: {
     intro: string;
     sections: { title: string; content: string; tips?: string[] }[];
@@ -53,7 +64,13 @@ const resources: Resource[] = [
     category: "Email Safety",
     readTime: "8 min read",
     featured: true,
+    lastReviewed: "February 2026",
     type: "guide",
+    sources: [
+      { name: "FBI Internet Crime Complaint Center (IC3) Annual Report", url: "https://www.ic3.gov/AnnualReport" },
+      { name: "CISA Phishing Guidance", url: "https://www.cisa.gov/phishing" },
+      { name: "Anti-Phishing Working Group (APWG)", url: "https://apwg.org/trendsreports/" }
+    ],
     content: {
       intro: "Phishing emails are one of the most common ways cybercriminals try to steal your personal information. Learning to recognize these deceptive messages is your first line of defense.",
       sections: [
@@ -88,7 +105,13 @@ const resources: Resource[] = [
     category: "Senior Safety",
     readTime: "6 min read",
     featured: true,
+    lastReviewed: "February 2026",
     type: "guide",
+    sources: [
+      { name: "FBI IC3 2024 Elder Fraud Report", url: "https://www.ic3.gov/AnnualReport" },
+      { name: "FTC Consumer Sentinel Network", url: "https://www.ftc.gov/reports/consumer-sentinel-network" },
+      { name: "AARP Fraud Watch Network", url: "https://www.aarp.org/money/scams-fraud/" }
+    ],
     content: {
       intro: "Phone scams cost older Americans billions of dollars each year. According to the FBI IC3 2024 Report, adults 60 and older lost nearly $5 billion to fraud. Globally, the AARP 2025 Fraud Survey estimates total reported and unreported losses for older adults may exceed $61 billion. Scammers specifically target seniors because they may be more trusting, have savings, and are less likely to report being scammed.",
       sections: [
@@ -123,7 +146,13 @@ const resources: Resource[] = [
     category: "Scam Awareness",
     readTime: "10 min read",
     featured: false,
+    lastReviewed: "February 2026",
     type: "guide",
+    sources: [
+      { name: "FTC Romance Scam Data", url: "https://www.ftc.gov/news-events/data-visualizations/data-spotlight/romance-scams" },
+      { name: "FBI IC3 Annual Report", url: "https://www.ic3.gov/AnnualReport" },
+      { name: "Action Fraud UK", url: "https://www.actionfraud.police.uk/fraud-az-dating-fraud" }
+    ],
     content: {
       intro: "Romance scams involve criminals who build fake online relationships to steal money from their victims. These scammers are patient and manipulative, often spending weeks or months building trust before asking for money.",
       sections: [
@@ -158,7 +187,12 @@ const resources: Resource[] = [
     category: "Account Security",
     readTime: "5 min read",
     featured: false,
+    lastReviewed: "February 2026",
     type: "guide",
+    sources: [
+      { name: "CISA Multi-Factor Authentication Guide", url: "https://www.cisa.gov/MFA" },
+      { name: "NIST Digital Identity Guidelines (SP 800-63B)", url: "https://pages.nist.gov/800-63-3/sp800-63b.html" }
+    ],
     content: {
       intro: "Two-factor authentication, often called 2FA, adds an extra layer of security to your accounts. Even if someone steals your password, they cannot get into your account without the second factor.",
       sections: [
@@ -193,7 +227,12 @@ const resources: Resource[] = [
     category: "Privacy",
     readTime: "12 min read",
     featured: false,
+    lastReviewed: "February 2026",
     type: "guide",
+    sources: [
+      { name: "FTC Privacy and Security Guidance", url: "https://www.ftc.gov/tips-advice/business-center/privacy-and-security" },
+      { name: "Electronic Frontier Foundation (EFF)", url: "https://ssd.eff.org/module/social-media" }
+    ],
     content: {
       intro: "Social media platforms collect and share more information about you than you might realize. Taking a few minutes to adjust your privacy settings can significantly reduce what strangers can see and limit data collection.",
       sections: [
@@ -228,7 +267,12 @@ const resources: Resource[] = [
     category: "Emergency Response",
     readTime: "4 min read",
     featured: true,
+    lastReviewed: "February 2026",
     type: "guide",
+    sources: [
+      { name: "CISA Stop Ransomware Guide", url: "https://www.cisa.gov/stopransomware" },
+      { name: "FBI IC3 Reporting", url: "https://www.ic3.gov" }
+    ],
     content: {
       intro: "We have all done it: clicked a link without thinking and then realized it might have been dangerous. The good news is that clicking a link alone usually will not infect your device. Here is what to do next.",
       sections: [
@@ -263,7 +307,13 @@ const resources: Resource[] = [
     category: "Family Safety",
     readTime: "9 min read",
     featured: false,
+    lastReviewed: "February 2026",
     type: "guide",
+    sources: [
+      { name: "National Center for Missing & Exploited Children", url: "https://www.missingkids.org/netsmartz" },
+      { name: "Common Sense Media", url: "https://www.commonsensemedia.org/articles/parents-ultimate-guide-to-parental-controls" },
+      { name: "UNICEF Online Safety", url: "https://www.unicef.org/online-safety" }
+    ],
     content: {
       intro: "Teaching children about online safety is essential in today's digital world. The key is having ongoing conversations that evolve as they grow, rather than one big talk.",
       sections: [
@@ -298,7 +348,13 @@ const resources: Resource[] = [
     category: "Business",
     readTime: "7 min read",
     featured: false,
+    lastReviewed: "February 2026",
     type: "guide",
+    sources: [
+      { name: "CISA Cybersecurity for Small Business", url: "https://www.cisa.gov/small-business" },
+      { name: "NIST Small Business Cybersecurity Corner", url: "https://www.nist.gov/itl/smallbusinesscyber" },
+      { name: "SBA Cybersecurity Resources", url: "https://www.sba.gov/business-guide/manage-your-business/strengthen-your-cybersecurity" }
+    ],
     content: {
       intro: "Small businesses are increasingly targeted by cybercriminals because they often lack the security resources of larger companies. The good news is that basic security does not require a large budget or technical expertise.",
       sections: [
@@ -334,7 +390,12 @@ const resources: Resource[] = [
     category: "Email Safety",
     readTime: "5 min watch",
     featured: true,
+    lastReviewed: "February 2026",
     type: "video",
+    sources: [
+      { name: "CISA Phishing Guidance", url: "https://www.cisa.gov/phishing" },
+      { name: "Anti-Phishing Working Group (APWG)", url: "https://apwg.org/trendsreports/" }
+    ],
     content: {
       intro: "This visual training walks you through real-world examples of phishing emails, showing you exactly what to look for before you click.",
       sections: [
@@ -364,7 +425,11 @@ const resources: Resource[] = [
     category: "Account Security",
     readTime: "4 min watch",
     featured: false,
+    lastReviewed: "February 2026",
     type: "video",
+    sources: [
+      { name: "NIST Password Guidelines (SP 800-63B)", url: "https://pages.nist.gov/800-63-3/sp800-63b.html" }
+    ],
     content: {
       intro: "Forget everything you know about complex passwords with random characters. This training shows you a better way to create passwords that are both secure and memorable.",
       sections: [
@@ -394,7 +459,12 @@ const resources: Resource[] = [
     category: "Senior Safety",
     readTime: "6 min watch",
     featured: true,
+    lastReviewed: "February 2026",
     type: "video",
+    sources: [
+      { name: "FTC Tech Support Scams", url: "https://consumer.ftc.gov/articles/how-spot-avoid-and-report-tech-support-scams" },
+      { name: "Microsoft Official Support Scam Info", url: "https://support.microsoft.com/en-us/windows/protect-yourself-from-tech-support-scams" }
+    ],
     content: {
       intro: "Tech support scams are designed to frighten you into thinking your computer has a serious problem. This training shows you exactly what these scams look and sound like.",
       sections: [
@@ -424,7 +494,11 @@ const resources: Resource[] = [
     category: "Privacy",
     readTime: "7 min watch",
     featured: false,
+    lastReviewed: "February 2026",
     type: "video",
+    sources: [
+      { name: "EFF Surveillance Self-Defense", url: "https://ssd.eff.org/module/social-media" }
+    ],
     content: {
       intro: "Facebook has dozens of privacy settings hidden in different places. This walkthrough shows you exactly where to find them and what each setting does.",
       sections: [
@@ -455,7 +529,11 @@ const resources: Resource[] = [
     category: "Account Security",
     readTime: "5 min checklist",
     featured: true,
+    lastReviewed: "February 2026",
     type: "checklist",
+    sources: [
+      { name: "CISA Cyber Essentials", url: "https://www.cisa.gov/cyber-essentials" }
+    ],
     checklistItems: [
       { task: "Review recent account activity", description: "Check your email, bank, and social media accounts for any logins or transactions you do not recognize." },
       { task: "Update one password", description: "Pick one account each week to update with a stronger password. Over time, all your accounts will be more secure." },
@@ -476,7 +554,12 @@ const resources: Resource[] = [
     category: "Privacy",
     readTime: "10 min checklist",
     featured: false,
+    lastReviewed: "February 2026",
     type: "checklist",
+    sources: [
+      { name: "US State Department Travel Security", url: "https://travel.state.gov/content/travel/en/international-travel.html" },
+      { name: "CISA Travel Tips", url: "https://www.cisa.gov/tips" }
+    ],
     checklistItems: [
       { task: "Enable two-factor authentication on all accounts", description: "If your password is compromised while traveling, 2FA provides a crucial backup layer of security." },
       { task: "Notify your bank of travel plans", description: "Prevent your cards from being frozen for suspicious activity. Most banks have an online form or app setting for this." },
@@ -500,7 +583,12 @@ const resources: Resource[] = [
     category: "Account Security",
     readTime: "15 min checklist",
     featured: false,
+    lastReviewed: "February 2026",
     type: "checklist",
+    sources: [
+      { name: "CISA Securing Your Devices", url: "https://www.cisa.gov/tips" },
+      { name: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" }
+    ],
     checklistItems: [
       { task: "Set a strong screen lock", description: "Use a 6-digit PIN at minimum, or better yet, a passphrase. Enable biometric unlock for convenience." },
       { task: "Enable automatic updates", description: "Turn on automatic updates for both the operating system and apps. This ensures you always have the latest security patches." },
@@ -526,7 +614,13 @@ const resources: Resource[] = [
     category: "Emergency Response",
     readTime: "20 min checklist",
     featured: true,
+    lastReviewed: "February 2026",
     type: "checklist",
+    sources: [
+      { name: "IdentityTheft.gov (FTC)", url: "https://www.identitytheft.gov" },
+      { name: "CISA Data Breach Guidance", url: "https://www.cisa.gov/tips" },
+      { name: "Annual Credit Report", url: "https://www.annualcreditreport.com" }
+    ],
     checklistItems: [
       { task: "Change the breached password immediately", description: "If you used that password anywhere else, change it on those accounts too. Each account should have a unique password." },
       { task: "Enable two-factor authentication", description: "Add 2FA to the breached account and any other accounts where you used the same password." },
@@ -552,7 +646,12 @@ const resources: Resource[] = [
     category: "Family Safety",
     readTime: "15 min checklist",
     featured: false,
+    lastReviewed: "February 2026",
     type: "checklist",
+    sources: [
+      { name: "National Cyber Security Alliance", url: "https://staysafeonline.org" },
+      { name: "CISA Family Online Safety", url: "https://www.cisa.gov/topics/cybersecurity-best-practices" }
+    ],
     checklistItems: [
       { task: "Explain why security matters", description: "Start with real examples of how scams affect real people. Avoid scare tactics but be honest about risks." },
       { task: "Discuss password habits", description: "Talk about using different passwords for different accounts and how password managers can help." },
@@ -655,6 +754,13 @@ export default function Resources() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.resources} />
+      <StructuredData data={{
+        type: "BreadcrumbList",
+        items: [
+          { name: "Home", url: "https://getcyberright.com/" },
+          { name: "Resources", url: "https://getcyberright.com/resources" },
+        ],
+      } as BreadcrumbData} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>
@@ -794,6 +900,36 @@ export default function Resources() {
                                 <p className="text-muted-foreground">{resource.content.conclusion}</p>
                               </div>
                             )}
+
+                            {resource.sources && resource.sources.length > 0 && (
+                              <div className="mt-8 pt-6 border-t border-border">
+                                <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                                  <BookOpen className="w-4 h-4 text-muted-foreground" />
+                                  Sources and Further Reading
+                                </h4>
+                                <ul className="space-y-1.5">
+                                  {resource.sources.map((source, sidx) => (
+                                    <li key={sidx}>
+                                      <a
+                                        href={source.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-sm text-primary hover:underline inline-flex items-center gap-1.5"
+                                        data-testid={`source-link-${resource.slug}-${sidx}`}
+                                      >
+                                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                                        {source.name}
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            <div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <CalendarDays className="w-3 h-3" />
+                              <span>Last reviewed: {resource.lastReviewed}</span>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -1035,6 +1171,36 @@ export default function Resources() {
                               <p className="text-muted-foreground">
                                 {resource.content.conclusion}
                               </p>
+                            </div>
+
+                            {resource.sources && resource.sources.length > 0 && (
+                              <div className="mt-8 pt-6 border-t border-border">
+                                <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                                  <BookOpen className="w-4 h-4 text-muted-foreground" />
+                                  Sources and Further Reading
+                                </h4>
+                                <ul className="space-y-1.5">
+                                  {resource.sources.map((source, sidx) => (
+                                    <li key={sidx}>
+                                      <a
+                                        href={source.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-sm text-primary hover:underline inline-flex items-center gap-1.5"
+                                        data-testid={`source-link-main-${resource.slug}-${sidx}`}
+                                      >
+                                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                                        {source.name}
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            <div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <CalendarDays className="w-3 h-3" />
+                              <span>Last reviewed: {resource.lastReviewed}</span>
                             </div>
                           </div>
 

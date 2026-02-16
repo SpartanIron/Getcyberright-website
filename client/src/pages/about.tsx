@@ -7,23 +7,44 @@ import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
 import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { SEOHead, pageSEO } from "@/components/seo-head";
+import { StructuredData } from "@/components/structured-data";
+import type { ArticleData, BreadcrumbData } from "@/components/structured-data";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 import bannerImage from "@/assets/banners/about-banner.png";
 import familySecurityImage from "@/assets/images/about-family-security.jpg";
 import seniorsLearningImage from "@/assets/images/professional-black-woman.png";
 
+const aboutArticleSchema: ArticleData = {
+  type: "Article",
+  headline: "Our Story: Why We Built GetCyberRight",
+  description: "Cybersecurity tools built by a family, for families. Every parent, every grandparent, every child deserves protection they can understand and trust.",
+  datePublished: "2024-01-15",
+  dateModified: "2026-02-01",
+  author: { name: "GetCyberRight", url: "https://getcyberright.com" },
+  publisher: { name: "GetCyberRight", logo: "https://getcyberright.com/og-image.png" },
+};
+
+const aboutBreadcrumbs: BreadcrumbData = {
+  type: "BreadcrumbList",
+  items: [
+    { name: "Home", url: "https://getcyberright.com/" },
+    { name: "About Us", url: "https://getcyberright.com/about" },
+  ],
+};
+
 const stats = [
-  { value: "5", label: "Core Pillars" },
-  { value: "Global", label: "Family Reach" },
-  { value: "24/7", label: "Access Available" },
-  { value: "0", label: "Technical Jargon" }
+  { value: "100%", label: "Free Forever" },
+  { value: "116+", label: "AI Safety Prompts" },
+  { value: "501+", label: "Data Brokers Tracked" },
+  { value: "8", label: "Threat Intel Sources" }
 ];
 
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.about} />
+      <StructuredData data={[aboutArticleSchema, aboutBreadcrumbs]} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

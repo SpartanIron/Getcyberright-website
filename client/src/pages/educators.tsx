@@ -10,7 +10,7 @@ import {
   Shield, BookOpen, Users, Presentation, FileText,
   CheckCircle, Star, AlertTriangle, MessageCircle,
   ArrowRight, Lightbulb, GraduationCap, School,
-  ClipboardList, Download
+  ClipboardList, Download, CalendarDays
 } from "lucide-react";
 import bannerImage from "@/assets/banners/educators-banner.png";
 
@@ -451,6 +451,10 @@ export default function Educators() {
         ) : (
           <EducatorsLanding onSelectResource={setSelectedResource} />
         )}
+        <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
+          <CalendarDays className="w-3 h-3" />
+          <span>Content last reviewed: February 2026</span>
+        </div>
       </main>
 
       <Footer />

@@ -10,7 +10,8 @@ import { SEOHead, pageSEO } from "@/components/seo-head";
 import { 
   Shield, Lock, Eye, MessageCircle, Smartphone, Gamepad2,
   CheckCircle, Star, Users, AlertTriangle, Heart,
-  ArrowRight, Lightbulb, Settings, Clock, BookOpen
+  ArrowRight, Lightbulb, Settings, Clock, BookOpen,
+  CalendarDays
 } from "lucide-react";
 import bannerImage from "@/assets/banners/parents-banner.png";
 
@@ -446,6 +447,10 @@ export default function Parents() {
         ) : (
           <ParentsLanding onSelectTopic={setSelectedTopic} />
         )}
+        <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
+          <CalendarDays className="w-3 h-3" />
+          <span>Content last reviewed: February 2026</span>
+        </div>
       </main>
 
       <Footer />

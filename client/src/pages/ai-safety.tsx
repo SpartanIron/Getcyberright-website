@@ -27,7 +27,8 @@ import {
   Fingerprint,
   Phone,
   FileText,
-  ArrowRight
+  ArrowRight,
+  CalendarDays
 } from "lucide-react";
 import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
@@ -654,6 +655,44 @@ export default function AISafety() {
         </div>
       </section>
 
+      <section className="py-12 bg-muted/20 print:hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-2">Put Your Knowledge Into Practice</h2>
+            <p className="text-muted-foreground">Use our free tools to detect AI-powered threats and protect yourself.</p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <Link href="/scam-checker" data-testid="link-tool-scam-checker">
+              <Card className="hover-elevate cursor-pointer h-full">
+                <CardContent className="p-5 text-center">
+                  <Shield className="w-8 h-8 text-primary mx-auto mb-3" />
+                  <h3 className="font-semibold text-sm text-foreground mb-1">Scam Checker</h3>
+                  <p className="text-xs text-muted-foreground">Analyze suspicious URLs, emails, and messages for AI-generated threats.</p>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href="/ai-scam-analyzer" data-testid="link-tool-ai-scam-analyzer">
+              <Card className="hover-elevate cursor-pointer h-full">
+                <CardContent className="p-5 text-center">
+                  <Brain className="w-8 h-8 text-primary mx-auto mb-3" />
+                  <h3 className="font-semibold text-sm text-foreground mb-1">AI Scam Analyzer</h3>
+                  <p className="text-xs text-muted-foreground">Get AI-powered analysis of suspicious content and phishing attempts.</p>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href="/password-generator" data-testid="link-tool-password-generator">
+              <Card className="hover-elevate cursor-pointer h-full">
+                <CardContent className="p-5 text-center">
+                  <Lock className="w-8 h-8 text-primary mx-auto mb-3" />
+                  <h3 className="font-semibold text-sm text-foreground mb-1">Password Generator</h3>
+                  <p className="text-xs text-muted-foreground">Create strong, unique passwords to secure your accounts against AI attacks.</p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
@@ -676,6 +715,10 @@ export default function AISafety() {
         </div>
       </section>
 
+        <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
+          <CalendarDays className="w-3 h-3" />
+          <span>Content last reviewed: February 2026</span>
+        </div>
       </main>
       <Footer />
     </div>

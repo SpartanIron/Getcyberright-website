@@ -11,7 +11,8 @@ import {
   Shield, Lock, Eye, MessageCircle, Gamepad2, Users, 
   CheckCircle, Star, Trophy, BookOpen, Heart, 
   Smartphone, AlertCircle, ThumbsUp, ArrowRight,
-  GraduationCap, Home, Lightbulb, Target, Sparkles
+  GraduationCap, Home, Lightbulb, Target, Sparkles,
+  CalendarDays
 } from "lucide-react";
 
 // Floating decorative shapes component for kid-friendly design
@@ -1177,6 +1178,10 @@ export default function Kids() {
         </div>
 
         <ParentSection />
+        <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
+          <CalendarDays className="w-3 h-3" />
+          <span>Content last reviewed: February 2026</span>
+        </div>
       </main>
       <Footer />
     </div>

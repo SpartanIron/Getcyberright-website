@@ -1,9 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays } from "lucide-react";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { useSEO } from "@/hooks/use-seo";
 import { Link } from "wouter";
+import { StructuredData } from "@/components/structured-data";
+import type { FAQData } from "@/components/structured-data";
 
 const faqCategories = [
   {
@@ -128,6 +131,8 @@ const faqCategories = [
   }
 ];
 
+const LAST_REVIEWED = "February 2026";
+
 export default function FAQ() {
   useSEO({
     title: "Frequently Asked Questions | GetCyberRight",
@@ -135,8 +140,16 @@ export default function FAQ() {
     keywords: "FAQ, frequently asked questions, cyber safety help, online safety questions, GetCyberRight support"
   });
 
+  const faqStructuredData: FAQData = {
+    type: "FAQPage",
+    items: faqCategories.flatMap((cat) =>
+      cat.questions.map((q) => ({ question: q.q, answer: q.a }))
+    ),
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <StructuredData data={faqStructuredData} />
       <section className="relative py-16 overflow-hidden">
         <AnimatedCyberBackground />
         <div className="relative container mx-auto px-4">
@@ -150,6 +163,10 @@ export default function FAQ() {
             <p className="text-xl text-slate-300">
               Find answers to common questions about staying safe online and using GetCyberRight.
             </p>
+            <div className="flex items-center justify-center gap-2 mt-4 text-sm text-slate-400">
+              <CalendarDays className="w-4 h-4" />
+              <span>Last reviewed: {LAST_REVIEWED}</span>
+            </div>
           </div>
         </div>
       </section>

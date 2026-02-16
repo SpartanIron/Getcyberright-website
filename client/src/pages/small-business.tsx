@@ -10,7 +10,7 @@ import {
   Shield, Lock, Mail, Users, Building, Briefcase,
   CheckCircle, Star, AlertTriangle, FileText,
   ArrowRight, Lightbulb, DollarSign, Server,
-  Smartphone, Key, Eye
+  Smartphone, Key, Eye, CalendarDays
 } from "lucide-react";
 import bannerImage from "@/assets/banners/small-business-banner.png";
 
@@ -445,6 +445,10 @@ export default function SmallBusiness() {
         ) : (
           <SmallBusinessLanding onSelectTopic={setSelectedTopic} />
         )}
+        <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
+          <CalendarDays className="w-3 h-3" />
+          <span>Content last reviewed: February 2026</span>
+        </div>
       </main>
 
       <Footer />

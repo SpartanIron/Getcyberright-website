@@ -6,11 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SEOHead, pageSEO } from "@/components/seo-head";
+import { StructuredData } from "@/components/structured-data";
+import type { FAQData, BreadcrumbData } from "@/components/structured-data";
+import { Link } from "wouter";
 import { 
   Shield, Lock, Phone, Heart, Mail, CreditCard,
   CheckCircle, Star, BookOpen, AlertTriangle,
   Users, Home, Lightbulb, ArrowRight, HelpCircle,
-  Eye, MessageCircle, Smartphone, BadgeCheck
+  Eye, MessageCircle, Smartphone, BadgeCheck,
+  ExternalLink, Wallet, UserX
 } from "lucide-react";
 import bannerImage from "@/assets/banners/seniors-banner.png";
 
@@ -185,6 +189,58 @@ const seniorSafetyTopics: SafetyTopic[] = [
       ],
       remember: "You do not need to be a technology expert to stay safe online. Simple habits like using strong passwords and being cautious about unexpected messages go a long way."
     }
+  },
+  {
+    id: "government-impersonation",
+    title: "Government Impersonation Scams",
+    description: "Scammers posing as IRS, Social Security, or law enforcement.",
+    icon: UserX,
+    color: "bg-indigo-500",
+    content: {
+      intro: "Government impersonation scams are among the fastest-growing threats targeting older adults. According to the FTC, consumers reported losing over $500 million to these scams in recent years. Criminals pose as IRS agents, Social Security Administration employees, Medicare officials, or even local police to intimidate victims into sending money or sharing personal information.",
+      warningSignsSectionTitle: "Warning Signs",
+      warningSigns: [
+        "A caller claims your Social Security number has been suspended or compromised.",
+        "Threats of arrest, deportation, or legal action if you do not pay immediately.",
+        "Demands for payment through gift cards, wire transfers, or cryptocurrency.",
+        "Caller ID shows a government agency name or phone number (these can be faked).",
+        "The caller tells you not to speak with family, friends, or your bank."
+      ],
+      protectionSteps: [
+        "Government agencies will never call demanding immediate payment or threatening arrest.",
+        "The IRS initiates contact through the mail, not by phone, email, or text.",
+        "Never give your Social Security number to someone who contacts you unexpectedly.",
+        "Hang up and call the agency directly using the number from their official website.",
+        "Report impersonation attempts to the FTC at reportfraud.ftc.gov."
+      ],
+      remember: "No government agency will ever demand payment over the phone, threaten you with arrest, or ask for gift cards. If someone claims to be from the government and is pressuring you, hang up. It is a scam."
+    }
+  },
+  {
+    id: "investment-cryptocurrency",
+    title: "Investment and Cryptocurrency Fraud",
+    description: "Protect your retirement savings from fake investment schemes.",
+    icon: Wallet,
+    color: "bg-orange-500",
+    content: {
+      intro: "Investment fraud targeting seniors has surged, with cryptocurrency scams alone costing victims over $3.4 billion in 2023 according to the FBI IC3 report. Scammers approach through social media, dating apps, unsolicited emails, or even through people you know who have been deceived themselves. They promise guaranteed returns with little or no risk.",
+      warningSignsSectionTitle: "Warning Signs",
+      warningSigns: [
+        "Promises of guaranteed high returns with zero risk.",
+        "Pressure to invest quickly before an opportunity disappears.",
+        "Unsolicited contact about investment opportunities via social media or messaging apps.",
+        "Requests to move money into cryptocurrency or unfamiliar digital wallets.",
+        "An online friend or romantic interest who steers conversations toward investing."
+      ],
+      protectionSteps: [
+        "Never invest based on advice from someone you have only met online.",
+        "Research any investment opportunity through SEC.gov or FINRA BrokerCheck.",
+        "Consult a licensed, independent financial advisor before making large investments.",
+        "Be extremely cautious of cryptocurrency investments you do not fully understand.",
+        "Report suspected investment fraud to the SEC or your state securities regulator."
+      ],
+      remember: "Legitimate investments carry risk and no one can guarantee returns. If someone promises guaranteed profits, especially through cryptocurrency, it is almost certainly a scam. Consult a trusted advisor before investing."
+    }
   }
 ];
 
@@ -210,6 +266,36 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
         imageAlt="Seniors using technology safely"
         colorVariant="teal"
       />
+
+      <section className="py-8 bg-muted/30">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-6">
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">The Scale of the Problem</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <p className="text-3xl sm:text-4xl font-bold text-primary">$4.8B+</p>
+              <p className="text-sm text-muted-foreground mt-1">Lost by adults 60+ in 2024</p>
+              <p className="text-xs text-muted-foreground">(FBI IC3 Report)</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl sm:text-4xl font-bold text-primary">$61B</p>
+              <p className="text-sm text-muted-foreground mt-1">Estimated total losses including unreported</p>
+              <p className="text-xs text-muted-foreground">(AARP 2025 Survey)</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl sm:text-4xl font-bold text-primary">1 in 3</p>
+              <p className="text-sm text-muted-foreground mt-1">Seniors targeted by fraud annually</p>
+              <p className="text-xs text-muted-foreground">(FTC Consumer Sentinel)</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl sm:text-4xl font-bold text-primary">70%</p>
+              <p className="text-sm text-muted-foreground mt-1">Of fraud against seniors goes unreported</p>
+              <p className="text-xs text-muted-foreground">(DOJ Elder Justice Initiative)</p>
+            </div>
+          </div>
+        </div>
+      </section>
       
       <div className="relative py-12">
         <FloatingShapes />
@@ -264,6 +350,41 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
             </CardContent>
           </Card>
 
+          <Card className="mt-8 border-2 border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+                Think You Have Been Scammed? Act Now
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground">Contact your bank immediately to freeze accounts and reverse charges.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground">Change passwords on any accounts that may be compromised.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground">Report to the FTC at reportfraud.ftc.gov or call 1-877-382-4357.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-muted-foreground">Tell a trusted family member or friend what happened. You are not alone.</p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <Link href="/emergency-help">
+                  <Button variant="outline" className="border-red-300 dark:border-red-700" data-testid="button-seniors-emergency">
+                    Full Emergency Guidance
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="mt-8 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
             <div className="flex items-start gap-3">
               <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5" />
@@ -274,6 +395,28 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
                 </p>
               </div>
             </div>
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-border">
+            <h4 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              Sources
+            </h4>
+            <div className="flex flex-wrap gap-x-6 gap-y-1">
+              <a href="https://www.ic3.gov/AnnualReport" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline inline-flex items-center gap-1" data-testid="source-fbi-ic3">
+                <ExternalLink className="w-3 h-3" />FBI IC3 Annual Report
+              </a>
+              <a href="https://www.ftc.gov/reports/consumer-sentinel-network" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline inline-flex items-center gap-1" data-testid="source-ftc">
+                <ExternalLink className="w-3 h-3" />FTC Consumer Sentinel Network
+              </a>
+              <a href="https://www.aarp.org/money/scams-fraud/" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline inline-flex items-center gap-1" data-testid="source-aarp">
+                <ExternalLink className="w-3 h-3" />AARP Fraud Watch Network
+              </a>
+              <a href="https://justice.gov/elderjustice" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline inline-flex items-center gap-1" data-testid="source-doj">
+                <ExternalLink className="w-3 h-3" />DOJ Elder Justice Initiative
+              </a>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">Last reviewed: February 2026</p>
           </div>
         </div>
       </div>
@@ -382,6 +525,19 @@ export default function Seniors() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.seniors} />
+      <StructuredData data={[{
+        type: "BreadcrumbList",
+        items: [
+          { name: "Home", url: "https://getcyberright.com/" },
+          { name: "Seniors Safety Hub", url: "https://getcyberright.com/seniors" },
+        ],
+      } as BreadcrumbData, {
+        type: "FAQPage",
+        items: seniorSafetyTopics.map(t => ({
+          question: t.title + " - what are the warning signs?",
+          answer: t.content.intro + " Warning signs include: " + t.content.warningSigns.slice(0, 3).join(". ") + ".",
+        })),
+      } as FAQData]} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

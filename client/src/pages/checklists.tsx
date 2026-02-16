@@ -5,8 +5,10 @@ import { SEOHead, pageSEO } from "@/components/seo-head";
 import { PageBanner } from "@/components/page-banner";
 import { PrintableChecklist, securityChecklists } from "@/components/printable-checklist";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Home, User, Users, Briefcase } from "lucide-react";
+import { Home, User, Users, Briefcase, Shield, CalendarDays } from "lucide-react";
 import { Link } from "wouter";
+import { StructuredData } from "@/components/structured-data";
+import type { BreadcrumbData } from "@/components/structured-data";
 import bannerImage from "@/assets/banners/resources-banner.png";
 
 const checklistTabs = [
@@ -20,6 +22,13 @@ export default function Checklists() {
   return (
     <div className="min-h-screen bg-background print:bg-white">
       <SEOHead {...pageSEO.checklists} />
+      <StructuredData data={{
+        type: "BreadcrumbList",
+        items: [
+          { name: "Home", url: "https://getcyberright.com/" },
+          { name: "Security Checklists", url: "https://getcyberright.com/checklists" },
+        ],
+      } as BreadcrumbData} />
       <div className="print:hidden">
         <Navigation />
       </div>
@@ -35,7 +44,22 @@ export default function Checklists() {
           />
         </div>
 
-        <section className="py-12 sm:py-16 print:py-4">
+        <section className="py-6 print:hidden">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-start gap-4 p-5 bg-muted/30 rounded-lg border border-border">
+              <Shield className="w-8 h-8 text-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-foreground leading-relaxed">
+                  These checklists are based on guidance from <strong>CISA</strong>, <strong>NIST</strong>, and <strong>the FTC</strong>. 
+                  Print them, check off each step as you complete it, and revisit quarterly to stay protected. 
+                  Most items take just a few minutes and make a significant difference in your security posture.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-6 sm:py-10 print:py-4">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 print:px-0">
             <Tabs defaultValue="home" className="print:hidden">
               <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-8">
@@ -103,6 +127,11 @@ export default function Checklists() {
                 View All Resources
               </Link>
             </motion.div>
+
+            <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground mt-6 print:hidden">
+              <CalendarDays className="w-3 h-3" />
+              <span>Content last reviewed: February 2026</span>
+            </div>
           </div>
         </section>
       </main>

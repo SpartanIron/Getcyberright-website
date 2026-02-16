@@ -5,6 +5,8 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { SEOHead } from "@/components/seo-head";
+import { StructuredData } from "@/components/structured-data";
+import type { CourseData, BreadcrumbData } from "@/components/structured-data";
 import bannerImage from "@/assets/banners/training-banner.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -117,9 +119,27 @@ export default function Training() {
     ? learningPaths 
     : learningPaths?.filter(p => p.audience === selectedAudience);
 
+  const trainingCourseSchema: CourseData = {
+    type: "Course",
+    name: "GetCyberRight Training Academy",
+    description: "Free cybersecurity training courses with quizzes and certificates. Structured learning paths for kids, parents, seniors, educators, and small businesses.",
+    provider: "GetCyberRight",
+    url: "https://getcyberright.com/training",
+    isAccessibleForFree: true,
+  };
+
+  const trainingBreadcrumbs: BreadcrumbData = {
+    type: "BreadcrumbList",
+    items: [
+      { name: "Home", url: "https://getcyberright.com/" },
+      { name: "Training Academy", url: "https://getcyberright.com/training" },
+    ],
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEOHead title="Training Academy" description="Learn cybersecurity through structured courses with quizzes and certificates. Training paths for kids, parents, seniors, educators, and businesses." />
+      <StructuredData data={[trainingCourseSchema, trainingBreadcrumbs]} />
       <Navigation />
       
       <main id="main-content" className="flex-1" tabIndex={-1}>
