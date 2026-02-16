@@ -21,7 +21,7 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 ### Key Features
 - **AI Scam Analyzer**: OpenAI-powered tool for threat analysis of messages, emails, headers, and URLs.
 - **Scam Checker**: Comprehensive analysis of URLs, QR codes, images, phone numbers, and email headers using multiple engines and AI.
-- **AI Prompt Library & Management System**: 116 curated AI prompts with automated weekly review and improvement suggestions via Claude, and admin approval workflows.
+- **AI Prompt Library & Management System**: 406+ expert-crafted AI prompts across 8 categories (safety, productivity, finance, communication, learning, health, work, tech) with automated weekly review and improvement suggestions via Claude, and admin approval workflows. Prompts use advanced prompt engineering: role assignment, chain-of-thought reasoning, structured output formatting, and safety guardrails.
 - **Dezi AI Assistant**: A floating chat widget offering real-time scam analysis, password generation, phishing education, and region-aware security resources.
 - **Data Broker Removal System**: Enterprise-grade system for automated personal data removal from 501+ data broker sites, featuring an encrypted data vault, exposure scanning, automated opt-out content generation, and AI-driven privacy automation for identity risk scoring and removal queue management.
 - **AI Content Guardrails**: Ensures truthfulness, verifiability, and quality for AI-generated content.
