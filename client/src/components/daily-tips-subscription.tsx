@@ -17,8 +17,8 @@ import { useRecaptcha } from "@/hooks/use-recaptcha";
 
 const subscriptionFormSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  audience: z.enum(["youth", "senior", "all"], {
-    required_error: "Please select an audience",
+  audience: z.enum(["youth", "senior", "all"] as const, {
+    message: "Please select an audience",
   }),
   frequency: z.enum(["daily", "thrice_weekly", "weekly"]).optional(),
   region: z.enum(["global", "north_america", "europe", "asia_pacific", "africa", "latin_america", "middle_east"]).optional(),
