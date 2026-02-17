@@ -13,7 +13,7 @@ interface ProgressCelebrationProps {
 export function ProgressCelebration({ completedCount, totalCount, inProgressCount }: ProgressCelebrationProps) {
   if (completedCount === 0) return null;
 
-  const remaining = totalCount - completedCount - inProgressCount;
+  const remaining = Math.max(0, totalCount - completedCount - inProgressCount);
   const estimatedTimeSavedMinutes = completedCount * 15;
   const hours = Math.floor(estimatedTimeSavedMinutes / 60);
   const minutes = estimatedTimeSavedMinutes % 60;

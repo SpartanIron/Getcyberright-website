@@ -8,7 +8,6 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead } from "@/components/seo-head";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
   Shield,
@@ -32,6 +31,7 @@ import { Dashboard } from "@/components/data-removal/dashboard";
 import { BrokerDatabase } from "@/components/data-removal/brokers";
 import { Reports } from "@/components/data-removal/reports";
 import { ProgressCelebration } from "@/components/data-removal/progress-celebration";
+import { MonitoringPanel, ComplianceTracker } from "@/components/data-removal/monitoring";
 import type { VaultProfile, DashboardStats } from "@/components/data-removal/types";
 
 type JourneyStep = "vault" | "scan" | "remove" | "monitor";
@@ -89,8 +89,7 @@ function AuthenticatedJourney() {
     queryKey: ["/api/data-removal/dashboard"],
   });
 
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const [activeView, setActiveView] = useState<"journey" | "dashboard" | "vault" | "scan" | "tracker" | "brokers" | "reports">("journey");
+  const [activeView, setActiveView] = useState<"journey" | "dashboard" | "vault" | "scan" | "tracker" | "brokers" | "reports" | "monitoring">("journey");
 
   if (vaultLoading || dashboardLoading) {
     return (
@@ -126,6 +125,7 @@ function AuthenticatedJourney() {
   if (activeView === "tracker") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><RemovalTracker /></>;
   if (activeView === "brokers") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><BrokerDatabase /></>;
   if (activeView === "reports") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><Reports /></>;
+  if (activeView === "monitoring") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><div className="space-y-6"><MonitoringPanel /><ComplianceTracker /></div></>;
 
   return (
     <div className="space-y-6">
@@ -240,19 +240,14 @@ function AuthenticatedJourney() {
         <p className="text-sm font-medium text-muted-foreground">Tools & Resources</p>
         {[
           { id: "vault", label: "Personal Vault", icon: Lock, desc: "Manage your protected information", view: "vault" as const },
+          { id: "monitoring", label: "Monitoring & Compliance", icon: Eye, desc: "Continuous monitoring and regulatory compliance tracking", view: "monitoring" as const },
           { id: "brokers", label: "Broker Database", icon: Database, desc: "Browse 500+ known data broker sites", view: "brokers" as const },
-          { id: "reports", label: "Reports & Compliance", icon: ClipboardCheck, desc: "Progress reports and regulatory compliance tracking", view: "reports" as const },
+          { id: "reports", label: "Reports", icon: ClipboardCheck, desc: "Detailed progress reports and analytics", view: "reports" as const },
         ].map((item) => (
           <motion.div key={item.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
             <button
               className="w-full flex items-center gap-3 p-3 rounded-md border text-left hover-elevate"
-              onClick={() => {
-                if (item.view) {
-                  setActiveView(item.view);
-                } else {
-                  setExpandedSection(expandedSection === item.id ? null : item.id);
-                }
-              }}
+              onClick={() => setActiveView(item.view)}
               data-testid={`button-section-${item.id}`}
             >
               <item.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -269,9 +264,19 @@ function AuthenticatedJourney() {
   );
 }
 
-function ViewNav({ activeView, setActiveView }: { activeView: string; setActiveView: (v: any) => void }) {
+const viewLabels: Record<string, string> = {
+  dashboard: "Full Dashboard",
+  vault: "Personal Vault",
+  scan: "Exposure Scan",
+  tracker: "Removal Tracker",
+  brokers: "Broker Database",
+  reports: "Reports",
+  monitoring: "Monitoring & Compliance",
+};
+
+function ViewNav({ activeView, setActiveView }: { activeView: string; setActiveView: (v: "journey" | "dashboard" | "vault" | "scan" | "tracker" | "brokers" | "reports" | "monitoring") => void }) {
   return (
-    <div className="mb-6">
+    <div className="mb-6 flex items-center gap-2">
       <Button
         variant="ghost"
         size="sm"
@@ -281,6 +286,8 @@ function ViewNav({ activeView, setActiveView }: { activeView: string; setActiveV
         <ChevronDown className="h-4 w-4 mr-1 rotate-90" />
         Back to Overview
       </Button>
+      <span className="text-sm text-muted-foreground">/</span>
+      <span className="text-sm font-medium">{viewLabels[activeView] ?? activeView}</span>
     </div>
   );
 }
