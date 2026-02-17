@@ -74,7 +74,7 @@ const globalStats = [
   {
     source: "Europol IOCTA 2025",
     region: "Europe",
-    stat: "Stolen data is the core currency of cybercrime — fueling ransomware, fraud, and identity theft across borders",
+    stat: "Stolen data is the core currency of cybercrime, fueling ransomware, fraud, and identity theft across borders",
     url: "https://www.europol.europa.eu/publication-events/main-reports/iocta-report",
   },
   {
@@ -92,7 +92,7 @@ const globalStats = [
   {
     source: "UK NCSC Annual Review 2025",
     region: "United Kingdom",
-    stat: "204 nationally significant incidents (up 130% from 89) — the highest ever recorded in the UK",
+    stat: "204 nationally significant incidents (up 130% from 89), the highest ever recorded in the UK",
     url: "https://www.ncsc.gov.uk/collection/ncsc-annual-review-2025",
   },
   {

@@ -177,7 +177,7 @@ export default function PartnerDeck() {
             <CardContent className="p-6 print:p-4">
               <h2 className="text-2xl font-bold mb-4 text-center print:text-xl" data-testid="heading-why-partner">Why Companies Partner With Us</h2>
               <p className="text-sm text-muted-foreground text-center mb-6 max-w-2xl mx-auto">
-                Our audience arrives with intent. They're not browsing — they're actively seeking ways to protect their families. That makes every partnership placement meaningful.
+                Our audience arrives with intent. They are not browsing. They are actively seeking ways to protect their families. That makes every partnership placement meaningful.
               </p>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
