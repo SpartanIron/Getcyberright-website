@@ -10,7 +10,7 @@ const footerLinks = {
     { name: "Seniors", href: "/seniors" },
   ],
   tools: [
-    { name: "Scam Checker", href: "/scam-checker" },
+    { name: "Scam Checker", href: "/tools" },
     { name: "AI Prompt Library", href: "/ai-prompts" },
     { name: "Data Broker Removal", href: "/data-removal" },
     { name: "Safety Toolkit", href: "/tools?tab=safety-toolkit" },

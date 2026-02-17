@@ -116,13 +116,13 @@ function getRecommendations(answers: Record<string, number>) {
     recs.push({ title: "Set up two-factor authentication", link: "/resources", priority: "high" });
   }
   if ((answers["links"] || 0) < 2 || (answers["calls"] || 0) < 2) {
-    recs.push({ title: "Learn to spot scams and phishing", link: "/senior-safety", priority: "high" });
+    recs.push({ title: "Learn to spot scams and phishing", link: "/seniors", priority: "high" });
   }
   if ((answers["family"] || 0) < 2) {
     recs.push({ title: "Talk to your family about online safety", link: "/parent-guide", priority: "medium" });
   }
   if ((answers["updates"] || 0) < 2) {
-    recs.push({ title: "Enable automatic updates on your devices", link: "/cyber-awareness", priority: "medium" });
+    recs.push({ title: "Enable automatic updates on your devices", link: "/resources", priority: "medium" });
   }
   
   return recs;

@@ -16,7 +16,7 @@ const primaryTools = [
     title: "Scam Checker",
     description: "Check suspicious URLs, phone numbers, or describe a situation to get instant analysis. Uses AI to detect common scam patterns.",
     icon: Search,
-    link: "/scam-checker",
+    link: "/tools",
     color: "bg-teal-100 dark:bg-teal-900/50",
     iconColor: "text-teal-600 dark:text-teal-400",
     badge: "AI-Powered"

@@ -662,7 +662,7 @@ export default function AISafety() {
             <p className="text-muted-foreground">Use our free tools to detect AI-powered threats and protect yourself.</p>
           </div>
           <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            <Link href="/scam-checker" data-testid="link-tool-scam-checker">
+            <Link href="/tools" data-testid="link-tool-scam-checker">
               <Card className="hover-elevate cursor-pointer h-full">
                 <CardContent className="p-5 text-center">
                   <Shield className="w-8 h-8 text-primary mx-auto mb-3" />
@@ -671,7 +671,7 @@ export default function AISafety() {
                 </CardContent>
               </Card>
             </Link>
-            <Link href="/ai-scam-analyzer" data-testid="link-tool-ai-scam-analyzer">
+            <Link href="/tools" data-testid="link-tool-ai-scam-analyzer">
               <Card className="hover-elevate cursor-pointer h-full">
                 <CardContent className="p-5 text-center">
                   <Brain className="w-8 h-8 text-primary mx-auto mb-3" />
@@ -680,7 +680,7 @@ export default function AISafety() {
                 </CardContent>
               </Card>
             </Link>
-            <Link href="/password-generator" data-testid="link-tool-password-generator">
+            <Link href="/tools?tab=safety-toolkit" data-testid="link-tool-password-generator">
               <Card className="hover-elevate cursor-pointer h-full">
                 <CardContent className="p-5 text-center">
                   <Lock className="w-8 h-8 text-primary mx-auto mb-3" />

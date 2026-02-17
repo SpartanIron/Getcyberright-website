@@ -44,7 +44,7 @@ export function FloatingHelpButton() {
                 </div>
               </Link>
               
-              <Link to="/scam-checker" onClick={() => setIsOpen(false)}>
+              <Link to="/tools" onClick={() => setIsOpen(false)}>
                 <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors cursor-pointer group">
                   <div className="w-10 h-10 bg-teal-100 dark:bg-teal-900/40 rounded-full flex items-center justify-center flex-shrink-0">
                     <Search className="h-5 w-5 text-teal-600 dark:text-teal-400" />

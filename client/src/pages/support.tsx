@@ -59,7 +59,7 @@ const quickLinks = [
   {
     title: "Scam Checker",
     description: "Check if a link, email, or message is a scam",
-    href: "/scam-checker",
+    href: "/tools",
     icon: Shield
   },
   {

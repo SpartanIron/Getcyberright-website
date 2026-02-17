@@ -35,7 +35,7 @@ const familyGuides: FamilyGuide[] = [
     icon: <Users className="h-6 w-6" />,
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-50 dark:bg-blue-900/20",
-    link: "/youth-safety",
+    link: "/kids",
     audience: ["Children", "Teens", "Parents"],
     topics: ["Social media safety", "Gaming security", "Cyberbullying prevention", "Privacy basics"]
   },
@@ -55,7 +55,7 @@ const familyGuides: FamilyGuide[] = [
     icon: <AlertTriangle className="h-6 w-6" />,
     color: "text-amber-600 dark:text-amber-400",
     bgColor: "bg-amber-50 dark:bg-amber-900/20",
-    link: "/senior-safety",
+    link: "/seniors",
     audience: ["Seniors", "Caregivers"],
     topics: ["Phone scam detection", "Romance scam awareness", "Tech support fraud", "Safe online shopping"]
   },
@@ -65,7 +65,7 @@ const familyGuides: FamilyGuide[] = [
     icon: <Smartphone className="h-6 w-6" />,
     color: "text-green-600 dark:text-green-400",
     bgColor: "bg-green-50 dark:bg-green-900/20",
-    link: "/learning-path",
+    link: "/training",
     audience: ["Everyone"],
     topics: ["Password managers", "Two-factor authentication", "Device updates", "Secure WiFi setup"]
   },
@@ -75,7 +75,7 @@ const familyGuides: FamilyGuide[] = [
     icon: <CreditCard className="h-6 w-6" />,
     color: "text-red-600 dark:text-red-400",
     bgColor: "bg-red-50 dark:bg-red-900/20",
-    link: "/learning-path",
+    link: "/training",
     audience: ["Adults", "Seniors"],
     topics: ["Credit freeze", "Transaction alerts", "Identity theft prevention", "Safe online banking"]
   },
@@ -85,7 +85,7 @@ const familyGuides: FamilyGuide[] = [
     icon: <Eye className="h-6 w-6" />,
     color: "text-teal-600 dark:text-teal-400",
     bgColor: "bg-teal-50 dark:bg-teal-900/20",
-    link: "/learning-path",
+    link: "/training",
     audience: ["Teens", "Adults"],
     topics: ["Social media settings", "App permissions", "Data broker removal", "Browser privacy"]
   }

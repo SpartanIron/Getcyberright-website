@@ -495,21 +495,21 @@ export default function CybersecurityRoadmap() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
-            <Link to="/resources/free-courses">
+            <Link to="/resources">
               <BookOpen className="mr-2 h-5 w-5" />
               Start Free Training
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link to="/cyber-awareness">
+            <Link to="/resources">
               <Target className="mr-2 h-5 w-5" />
               Take Skills Assessment
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link to="/career">
+            <Link to="/about">
               <TrendingUp className="mr-2 h-5 w-5" />
-              Explore Job Market
+              About Us
             </Link>
           </Button>
         </div>

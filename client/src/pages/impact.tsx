@@ -462,7 +462,7 @@ export default function Impact() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600">
-                <Link to="/cyber-awareness">
+                <Link to="/resources">
                   <Shield className="w-5 h-5 mr-2" />
                   {t("impact.cta.primaryButton")}
                 </Link>

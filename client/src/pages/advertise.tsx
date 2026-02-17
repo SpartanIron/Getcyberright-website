@@ -203,12 +203,12 @@ export default function Advertise() {
               appearing alongside trusted content, reaching families who are actively looking for solutions.
             </p>
             <a 
-              href="/partner-deck"
+              href="/contact"
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-medium transition-colors"
               data-testid="link-partner-deck"
             >
               <Building2 className="w-4 h-4" />
-              View Partnership Deck
+              Contact Us
             </a>
           </div>
         </div>

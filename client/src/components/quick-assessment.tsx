@@ -68,9 +68,9 @@ function getSkillLevel(score: number): SkillLevel {
       level: "beginner",
       score,
       recommendations: [
-        { title: "Youth Safety Guide", description: "Learn how to stay safe on social media and apps", link: "/youth-safety", icon: BookOpen },
-        { title: "Digital Safety Tips", description: "Learn one tip per day to build habits", link: "/cyber-awareness", icon: Shield },
-        { title: "Scam Checker", description: "Check if a message or offer is a scam", link: "/scam-checker", icon: Target }
+        { title: "Youth Safety Guide", description: "Learn how to stay safe on social media and apps", link: "/kids", icon: BookOpen },
+        { title: "Digital Safety Tips", description: "Learn one tip per day to build habits", link: "/resources", icon: Shield },
+        { title: "Scam Checker", description: "Check if a message or offer is a scam", link: "/tools", icon: Target }
       ]
     };
   } else if (score <= 10) {
@@ -79,7 +79,7 @@ function getSkillLevel(score: number): SkillLevel {
       score,
       recommendations: [
         { title: "Latest Threat News", description: "Stay updated on current threats", link: "/news", icon: Zap },
-        { title: "Senior Protection", description: "Learn to spot mobile money and phone scams", link: "/senior-safety", icon: Shield },
+        { title: "Senior Protection", description: "Learn to spot mobile money and phone scams", link: "/seniors", icon: Shield },
         { title: "Emergency Help", description: "Get help if you've been scammed", link: "/emergency-help", icon: Target }
       ]
     };
@@ -231,7 +231,7 @@ export function QuickAssessment() {
               className="flex-1 bg-blue-600 hover:bg-blue-700"
               data-testid="button-full-assessment"
             >
-              <Link to="/cyber-awareness">
+              <Link to="/resources">
                 Take Full Assessment
               </Link>
             </Button>
@@ -254,7 +254,7 @@ export function QuickAssessment() {
                 </div>
               </div>
               <Button asChild variant="outline" size="sm" className="border-amber-300 hover:bg-amber-100 dark:border-amber-700 dark:hover:bg-amber-900/40" data-testid="button-share-feedback">
-                <Link to="/feedback">Share Feedback</Link>
+                <Link to="/contact">Share Feedback</Link>
               </Button>
             </div>
           </div>

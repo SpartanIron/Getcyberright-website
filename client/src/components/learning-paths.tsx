@@ -111,7 +111,7 @@ export function LearningPaths() {
       </div>
 
       <div className="text-center pt-4">
-        <Link to="/learning-path">
+        <Link to="/training">
           <Button size="lg" className="bg-teal-600 hover:bg-teal-700">
             Start the Family Safety Roadmap
             <ArrowRight className="ml-2 h-5 w-5" />

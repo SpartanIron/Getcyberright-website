@@ -70,13 +70,13 @@ export function Header() {
 
   const navigation: Array<{ nameKey: string; href: string; icon?: React.ReactNode; dropdown?: Array<{ nameKey: string; href: string; icon?: React.ReactNode }> }> = [
     { nameKey: "nav.tools", href: "/tools", dropdown: [
-      { nameKey: "nav.scamChecker", href: "/scam-checker", icon: <ShieldCheck className="h-4 w-4" /> },
-      { nameKey: "nav.passwordGenerator", href: "/password-generator", icon: <Key className="h-4 w-4" /> },
+      { nameKey: "nav.scamChecker", href: "/tools", icon: <ShieldCheck className="h-4 w-4" /> },
+      { nameKey: "nav.passwordGenerator", href: "/tools?tab=safety-toolkit", icon: <Key className="h-4 w-4" /> },
       { nameKey: "nav.threatTrends", href: "/threat-trends", icon: <TrendingUp className="h-4 w-4" /> },
     ]},
     { nameKey: "nav.learn", href: "/resources", dropdown: [
-      { nameKey: "nav.youthSafety", href: "/youth-safety" },
-      { nameKey: "nav.seniorProtection", href: "/senior-safety" },
+      { nameKey: "nav.youthSafety", href: "/kids" },
+      { nameKey: "nav.seniorProtection", href: "/seniors" },
       { nameKey: "nav.parentGuide", href: "/parent-guide" },
       { nameKey: "nav.resources", href: "/resources" },
     ]},
@@ -209,7 +209,7 @@ export function Header() {
             className="hidden md:inline-flex bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white shadow-md"
             data-testid="nav-scam-checker"
           >
-            <Link to="/scam-checker" className="flex items-center gap-1.5">
+            <Link to="/tools" className="flex items-center gap-1.5">
               <ShieldCheck className="h-4 w-4" />
               {t("nav.scamChecker")}
             </Link>
@@ -334,7 +334,7 @@ export function Header() {
 
                 {/* Scam Checker for mobile */}
                 <Link
-                  to="/scam-checker"
+                  to="/tools"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-3 font-semibold min-h-[52px] py-3 px-4 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md active:from-teal-600 active:to-cyan-600"
                 >

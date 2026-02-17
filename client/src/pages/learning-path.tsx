@@ -307,7 +307,7 @@ const safetyLevels: SafetyLevel[] = [
               "Use our Scam Checker tool to analyze suspicious messages together"
             ],
             resources: [
-              { label: "GetCyberRight Scam Checker", url: "/scam-checker" }
+              { label: "GetCyberRight Scam Checker", url: "/tools" }
             ]
           }
         ]
@@ -1127,7 +1127,7 @@ export default function FamilySafetyRoadmap() {
               <p className="text-teal-100 mb-6 max-w-lg mx-auto">
                 Take our Family Safety Score quiz to see how well protected your family is and get personalized recommendations.
               </p>
-              <Link to="/safety-score">
+              <Link to="/cyber-hygiene">
                 <Button size="lg" variant="secondary" className="bg-white text-teal-700 hover:bg-teal-50">
                   Take the Safety Quiz
                   <ArrowRight className="ml-2 h-5 w-5" />

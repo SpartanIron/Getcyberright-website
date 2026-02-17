@@ -39,7 +39,7 @@ const pathways: Pathway[] = [
     bgColor: "bg-blue-100 dark:bg-blue-900/30",
     links: [
       { label: "Parent's Guide to Online Safety", href: "/parent-guide" },
-      { label: "Youth Safety Hub", href: "/youth-safety" },
+      { label: "Youth Safety Hub", href: "/kids" },
       { label: "Parental Control Tools", href: "/resources" },
     ],
   },
@@ -52,7 +52,7 @@ const pathways: Pathway[] = [
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-100 dark:bg-purple-900/30",
     links: [
-      { label: "Senior Protection Center", href: "/senior-safety" },
+      { label: "Senior Protection Center", href: "/seniors" },
       { label: "Common Scams Targeting Seniors", href: "/senior-safety#scams" },
       { label: "Emergency Help", href: "/emergency-help" },
     ],
@@ -68,7 +68,7 @@ const pathways: Pathway[] = [
     links: [
       { label: "Check for Data Breaches", href: "/#breach-checker" },
       { label: "Cyber Hygiene Guide", href: "/cyber-hygiene" },
-      { label: "Take the Safety Quiz", href: "/safety-score" },
+      { label: "Take the Safety Quiz", href: "/cyber-hygiene" },
     ],
   },
   {
@@ -92,7 +92,7 @@ const quickActions = [
     icon: ShieldCheck,
     title: "Check Something Suspicious",
     description: "Paste a URL, phone number, or message to check if it's a scam",
-    href: "/scam-checker",
+    href: "/tools",
     color: "bg-teal-500",
   },
   {
@@ -259,7 +259,7 @@ export default function StartHere() {
               Not sure where to start?
             </p>
             <Button asChild variant="outline" size="lg">
-              <Link to="/safety-score" className="flex items-center gap-2">
+              <Link to="/cyber-hygiene" className="flex items-center gap-2">
                 Take our Safety Quiz
                 <ArrowRight className="h-4 w-4" />
               </Link>

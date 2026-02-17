@@ -284,7 +284,7 @@ export default function PartnerDeck() {
                 <Download className="w-4 h-4 mr-2" />
                 Download as PDF
               </Button>
-              <Link href="/advertise">
+              <Link href="/contact">
                 <Button size="lg" variant="outline" data-testid="button-contact-us">
                   <Mail className="w-4 h-4 mr-2" />
                   Start a Conversation

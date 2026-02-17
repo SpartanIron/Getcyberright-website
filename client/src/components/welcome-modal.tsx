@@ -61,7 +61,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
       icon: Users,
       title: "Secure my home step-by-step",
       description: "Guided checklists for your family's devices and accounts",
-      path: "/learning-path",
+      path: "/training",
       color: "from-green-500 to-emerald-500",
       bgColor: "bg-green-500/10 hover:bg-green-500/20",
     },

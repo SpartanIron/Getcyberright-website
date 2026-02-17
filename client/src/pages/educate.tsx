@@ -15,7 +15,7 @@ const guides = [
     title: "Youth Safety Hub",
     description: "Age-appropriate guides for protecting children and teens online. Social media safety, gaming, and digital citizenship.",
     icon: Baby,
-    link: "/youth-safety",
+    link: "/kids",
     color: "bg-blue-100 dark:bg-blue-900/50",
     iconColor: "text-blue-600 dark:text-blue-400",
     audience: "Parents & Kids"
@@ -24,7 +24,7 @@ const guides = [
     title: "Senior Safety Center",
     description: "Plain-language guides designed for older adults. Scam recognition, safe banking, and staying connected with family.",
     icon: Heart,
-    link: "/senior-safety",
+    link: "/seniors",
     color: "bg-rose-100 dark:bg-rose-900/50",
     iconColor: "text-rose-600 dark:text-rose-400",
     audience: "Seniors & Caregivers"
@@ -42,7 +42,7 @@ const guides = [
     title: "Cyber Awareness Basics",
     description: "Foundation knowledge everyone needs. Common threats, safe practices, and how to spot suspicious activity.",
     icon: Lightbulb,
-    link: "/cyber-awareness",
+    link: "/resources",
     color: "bg-amber-100 dark:bg-amber-900/50",
     iconColor: "text-amber-600 dark:text-amber-400",
     audience: "Everyone"
@@ -250,7 +250,7 @@ export default function Educate() {
               Take our quick Safety Score quiz to get personalized recommendations based on your situation.
             </p>
             <Button asChild size="lg" className="bg-green-500 text-white hover:bg-green-600 font-semibold px-8">
-              <Link to="/safety-score" className="flex items-center gap-2">
+              <Link to="/cyber-hygiene" className="flex items-center gap-2">
                 <Target className="h-5 w-5" />
                 Check Your Safety Score
               </Link>

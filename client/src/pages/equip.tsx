@@ -15,7 +15,7 @@ const tools = [
     title: "Printable Safety Guides",
     description: "Download and print checklists, quick reference cards, and conversation starters for your family.",
     icon: Printer,
-    link: "/printable-guides",
+    link: "/resources",
     color: "bg-amber-100 dark:bg-amber-900/50",
     iconColor: "text-amber-600 dark:text-amber-400",
     badge: "Free Downloads"
@@ -258,7 +258,7 @@ export default function Equip() {
               Our printable quick-start guides walk you through setting up protection step by step.
             </p>
             <Button asChild size="lg" className="bg-green-500 text-white hover:bg-green-600 font-semibold px-8">
-              <Link to="/printable-guides" className="flex items-center gap-2">
+              <Link to="/resources" className="flex items-center gap-2">
                 <Printer className="h-5 w-5" />
                 Get Printable Guides
               </Link>

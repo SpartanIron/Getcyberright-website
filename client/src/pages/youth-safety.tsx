@@ -169,9 +169,9 @@ export default function YouthSafety() {
       {/* Back Navigation */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
         <div className="container mx-auto px-4 py-3">
-          <Link to="/educate" className="inline-flex items-center text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
+          <Link to="/resources" className="inline-flex items-center text-sm text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Educate
+            Back to Resources
           </Link>
         </div>
       </div>
@@ -433,7 +433,7 @@ export default function YouthSafety() {
               Take our quick quiz to see how much you know about staying safe online
             </p>
             <Button asChild size="lg" data-testid="button-take-quiz">
-              <Link to="/quick-assessment" className="flex items-center gap-2">
+              <Link to="/cyber-hygiene" className="flex items-center gap-2">
                 Take the Safety Quiz <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>

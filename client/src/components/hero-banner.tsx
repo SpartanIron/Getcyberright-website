@@ -61,7 +61,7 @@ export function HeroBanner() {
               variant="outline"
               className="bg-white/10 hover:bg-white/20 text-white border-white/30 px-6 py-6 text-lg font-semibold backdrop-blur-sm"
             >
-              <Link to="/password-generator" className="flex items-center gap-2">
+              <Link to="/tools?tab=safety-toolkit" className="flex items-center gap-2">
                 <Key className="h-5 w-5" />
                 Create Strong Passwords
               </Link>

@@ -110,9 +110,9 @@ export default function ThreatIntelligence() {
       {/* Back Navigation */}
       <div className="bg-slate-800 border-b border-slate-700">
         <div className="container mx-auto px-4 py-3">
-          <Link to="/protect" className="inline-flex items-center text-sm text-slate-400 hover:text-teal-400 transition-colors">
+          <Link to="/tools" className="inline-flex items-center text-sm text-slate-400 hover:text-teal-400 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Protect
+            Back to Tools
           </Link>
         </div>
       </div>
@@ -409,12 +409,12 @@ export default function ThreatIntelligence() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-teal-500 hover:bg-teal-600">
-                <Link to="/youth-safety" className="flex items-center gap-2">
+                <Link to="/kids" className="flex items-center gap-2">
                   Youth Safety Guide <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link to="/senior-safety" className="flex items-center gap-2">
+                <Link to="/seniors" className="flex items-center gap-2">
                   Senior Safety Guide <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

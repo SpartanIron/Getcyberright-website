@@ -556,7 +556,7 @@ export function DeziHero({ compact = false }: DeziHeroProps) {
                       Share
                     </Button>
                     <Button size="sm" asChild className="text-xs bg-teal-600 hover:bg-teal-700">
-                      <Link to="/scam-checker">Full Details</Link>
+                      <Link to="/tools">Full Details</Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -814,7 +814,7 @@ export function DeziHero({ compact = false }: DeziHeroProps) {
             className="mt-6"
           >
             <Link 
-              to="/scam-checker" 
+              to="/tools" 
               className="inline-flex items-center text-teal-600 hover:text-teal-500 dark:text-teal-400 dark:hover:text-teal-300 text-sm font-medium"
             >
               Need more options? Use advanced Scam Checker
