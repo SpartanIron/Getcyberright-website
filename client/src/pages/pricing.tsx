@@ -123,7 +123,7 @@ export default function OurMission() {
                 What We Offer
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                No sign-up walls, no credit cards, no catch. Just tools built to keep your family safe.
+                Powerful tools designed to keep your family safe. No sign-up walls, no credit cards required.
               </p>
             </motion.div>
 

@@ -202,15 +202,15 @@ export default function About() {
               <Card>
                 <CardContent className="p-8">
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Every tool, guide, and course on GetCyberRight is yours to use. No premium 
-                    tiers, no hidden fees, no paywalls. We believe cybersecurity should be 
-                    accessible to every family, regardless of their budget.
+                    Every tool, guide, and course on GetCyberRight is free to use. We believe 
+                    cybersecurity education should be accessible to every family, regardless 
+                    of their budget.
                   </p>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    We are supported by community contributions and carefully selected 
-                    partners who share our mission. We never sell your data, we never use 
-                    fear-based marketing, and we are fully transparent about how we operate. 
-                    Your trust is everything to us.
+                    We are sustained through trusted partnerships with companies and 
+                    organizations who share our mission. We never sell your data, we never 
+                    use fear-based marketing, and we are fully transparent about how we 
+                    operate. Your trust is everything to us.
                   </p>
                   <p className="text-muted-foreground leading-relaxed">
                     If you find our tools helpful, the best way to support us is to share 

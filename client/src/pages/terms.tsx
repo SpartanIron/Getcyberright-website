@@ -126,9 +126,8 @@ export default function Terms() {
                   
                   <h3 className="text-xl font-semibold text-foreground mb-3">4.1 All Tools and Resources</h3>
                   <p>
-                    All tools, educational content, and resources on GetCyberRight are provided at no cost. 
-                    There are no paid tiers, no premium features, and no hidden fees. Every user has full 
-                    access to everything we offer.
+                    All tools, educational content, and resources on GetCyberRight are currently provided 
+                    free of charge. Every user has full access to everything we offer.
                   </p>
 
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.2 Account Features</h3>
@@ -141,8 +140,7 @@ export default function Terms() {
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.3 Service Changes</h3>
                   <p>
                     We reserve the right to modify or update features as needed to improve the platform. 
-                    We are committed to keeping all cybersecurity education tools and resources available 
-                    at no cost.
+                    We are committed to keeping cybersecurity education accessible to everyone.
                   </p>
                 </section>
 
