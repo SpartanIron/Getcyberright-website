@@ -7,7 +7,6 @@ Disallow: /register
 Disallow: /forgot-password
 Disallow: /dashboard
 Disallow: /preferences
-Disallow: /embed-widget
 Disallow: /checkout-success
 
 User-agent: GPTBot

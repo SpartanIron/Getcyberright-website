@@ -190,4 +190,48 @@ export const pageSEO = {
     title: "Child Safety Conversation Scanner",
     description: "Scan conversations for grooming patterns and protect children from online predatory behavior.",
   },
+  passwordGenerator: {
+    title: "Password Generator",
+    description: "Create strong, secure passwords instantly. Free tool to generate random passwords that protect your accounts.",
+  },
+  breachDashboard: {
+    title: "Breach Monitor",
+    description: "Check if your email or personal data has been exposed in a data breach. Free breach monitoring for families.",
+  },
+  search: {
+    title: "Search",
+    description: "Search GetCyberRight for security guides, tools, and resources to keep your family safe online.",
+  },
+  parentGuide: {
+    title: "Parent's Guide to Online Safety",
+    description: "A complete guide for parents to protect children online. Screen time, social media, gaming safety, and age-appropriate conversations.",
+  },
+  travelSafety: {
+    title: "Travel Safety Guide",
+    description: "Stay safe online while traveling. Tips for public Wi-Fi, hotel networks, airport security, and protecting devices abroad.",
+  },
+  accessibility: {
+    title: "Accessibility",
+    description: "GetCyberRight is committed to making cybersecurity education accessible to everyone regardless of ability.",
+  },
+  feedback: {
+    title: "Share Your Feedback",
+    description: "Help us improve GetCyberRight. Share your experience and suggestions for better cybersecurity education.",
+  },
+  quickAssessment: {
+    title: "Quick Security Assessment",
+    description: "Take a quick assessment to find out how secure your online habits are. Get personalized recommendations in minutes.",
+  },
+  safetyScore: {
+    title: "Your Safety Score",
+    description: "Calculate your family's online safety score and get actionable steps to improve your cybersecurity posture.",
+  },
+  printableGuides: {
+    title: "Printable Safety Guides",
+    description: "Download and print cybersecurity guides for your family. Easy reference cards for passwords, phishing, and more.",
+  },
+  scamChecker: {
+    title: "Scam Checker",
+    description: "Check suspicious messages, emails, URLs, and phone numbers for scams. AI-powered threat analysis to keep you safe.",
+  },
 };

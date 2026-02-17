@@ -39,7 +39,6 @@ const Checklists = lazy(() => import("@/pages/checklists"));
 const AIPrompts = lazy(() => import("@/pages/ai-prompts"));
 const AISafety = lazy(() => import("@/pages/ai-safety"));
 const Training = lazy(() => import("@/pages/training"));
-const TrainingAudience = lazy(() => import("@/pages/training-audience"));
 const TrainingPath = lazy(() => import("@/pages/training-path"));
 const TrainingLesson = lazy(() => import("@/pages/training-lesson"));
 const TrainingQuiz = lazy(() => import("@/pages/training-quiz"));
@@ -63,6 +62,24 @@ const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
 const DataRemoval = lazy(() => import("@/pages/data-removal"));
 const News = lazy(() => import("@/pages/news"));
 const CyberHygiene = lazy(() => import("@/pages/cyber-hygiene"));
+const PasswordGenerator = lazy(() => import("@/pages/password-generator"));
+const BreachDashboard = lazy(() => import("@/pages/breach-dashboard"));
+const Search = lazy(() => import("@/pages/search"));
+const ParentGuide = lazy(() => import("@/pages/parent-guide"));
+const SmallBusiness = lazy(() => import("@/pages/small-business"));
+const Educators = lazy(() => import("@/pages/educators"));
+const TravelSafety = lazy(() => import("@/pages/travel-safety"));
+const Accessibility = lazy(() => import("@/pages/accessibility"));
+const Advertise = lazy(() => import("@/pages/advertise"));
+const PartnerDeck = lazy(() => import("@/pages/partner-deck"));
+const Feedback = lazy(() => import("@/pages/feedback"));
+const CheckoutSuccess = lazy(() => import("@/pages/checkout-success"));
+const Preferences = lazy(() => import("@/pages/preferences"));
+const PrintableGuides = lazy(() => import("@/pages/printable-guides"));
+const QuickAssessment = lazy(() => import("@/pages/quick-assessment"));
+const SafetyScore = lazy(() => import("@/pages/safety-score"));
+const ScamChecker = lazy(() => import("@/pages/scam-checker"));
+const FAQ = lazy(() => import("@/pages/faq"));
 
 // Loading fallback component
 function PageLoader() {
@@ -120,10 +137,28 @@ function Router() {
         <Route path="/ai-safety" component={AISafety} />
         <Route path="/news" component={News} />
         <Route path="/cyber-hygiene" component={CyberHygiene} />
+        <Route path="/password-generator" component={PasswordGenerator} />
+        <Route path="/breach-dashboard" component={BreachDashboard} />
+        <Route path="/search" component={Search} />
+        <Route path="/parent-guide" component={ParentGuide} />
+        <Route path="/small-business" component={SmallBusiness} />
+        <Route path="/educators" component={Educators} />
+        <Route path="/travel-safety" component={TravelSafety} />
+        <Route path="/accessibility" component={Accessibility} />
+        <Route path="/advertise" component={Advertise} />
+        <Route path="/partner-deck" component={PartnerDeck} />
+        <Route path="/feedback" component={Feedback} />
+        <Route path="/checkout-success" component={CheckoutSuccess} />
+        <Route path="/preferences" component={Preferences} />
+        <Route path="/printable-guides" component={PrintableGuides} />
+        <Route path="/quick-assessment" component={QuickAssessment} />
+        <Route path="/safety-score" component={SafetyScore} />
+        <Route path="/scam-checker" component={ScamChecker} />
+        <Route path="/faq" component={FAQ} />
         <Route path="/training" component={Training} />
-        <Route path="/training/kids" component={TrainingAudience} />
-        <Route path="/training/parents" component={TrainingAudience} />
-        <Route path="/training/seniors" component={TrainingAudience} />
+        <Route path="/training/kids" component={Training} />
+        <Route path="/training/parents" component={Training} />
+        <Route path="/training/seniors" component={Training} />
         <Route path="/training/:pathId" component={TrainingPath} />
         <Route path="/training/lesson/:lessonId" component={TrainingLesson} />
         <Route path="/training/quiz/:quizId" component={TrainingQuiz} />
