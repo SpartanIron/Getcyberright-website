@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Users, Heart, Globe } from "lucide-react";
+import { ArrowRight, Shield, Users, Zap } from "lucide-react";
 import { Link } from "wouter";
 import professionalImage from "@/assets/images/professional-laptop.jpg";
 
@@ -22,9 +22,9 @@ export function HeroSection() {
         <div className="relative px-5 py-8 bg-slate-900">
           <div className="max-w-md mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full mb-4">
-              <Heart className="w-4 h-4 text-primary" />
+              <Shield className="w-4 h-4 text-primary" />
               <span className="text-xs font-semibold text-primary uppercase tracking-wider">
-                Built by a Family, for Families
+                100% Free. No Ads. No Catch.
               </span>
             </div>
             
@@ -32,25 +32,25 @@ export function HeroSection() {
               className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 leading-[1.15]" 
               data-testid="text-hero-heading-mobile"
             >
-              We Help Families Stay Safe Online
+              Don't Get Scammed.<br />Get CyberRight.
             </h1>
 
             <p className="text-sm sm:text-base text-white/80 font-medium mb-4 leading-relaxed">
-              We started this after helping our own parents avoid scams and teaching our kids to stay safe online. Now we share what we learned with every family.
+              Free tools and plain-language guides that help your whole family stay safe online, from your kids' first device to your parents' inbox.
             </p>
 
             <ul className="space-y-2 mb-6 text-xs sm:text-sm font-medium text-left max-w-xs mx-auto">
               <li className="flex items-start gap-3 text-white/80">
-                <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <Zap className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span>Check a suspicious message in 60 seconds.</span>
               </li>
               <li className="flex items-start gap-3 text-white/80">
-                <Heart className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>Guides written like you'd explain it to your own family.</span>
+                <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <span>Real protection, explained in real words.</span>
               </li>
               <li className="flex items-start gap-3 text-white/80">
                 <Users className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>No jargon. No sign-up. No catch.</span>
+                <span>Trusted by thousands of families.</span>
               </li>
             </ul>
 
@@ -156,9 +156,9 @@ export function HeroSection() {
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 h-full flex items-center">
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 bg-primary/20 px-4 py-2 rounded-full mb-6">
-              <Heart className="w-5 h-5 text-primary" />
+              <Shield className="w-5 h-5 text-primary" />
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                Built by a Family, for Families
+                100% Free. No Ads. No Catch.
               </span>
             </div>
 
@@ -166,34 +166,34 @@ export function HeroSection() {
               className="text-5xl xl:text-6xl font-bold tracking-tight text-white leading-[1.1] mb-6" 
               data-testid="text-hero-heading"
             >
-              We Help Families Stay Safe Online
+              Don't Get Scammed.<br />Get CyberRight.
             </h1>
 
             <p 
               className="text-xl text-white/90 font-medium leading-relaxed mb-4" 
               data-testid="text-hero-subtext"
             >
-              We started this after helping our own parents avoid scams and teaching our kids to stay safe online. Now we share what we learned with every family.
+              Free tools and plain-language guides that help your whole family stay safe online.
             </p>
 
             <ul className="space-y-3 mb-10 text-sm font-medium">
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Shield className="w-4 h-4 text-primary flex-shrink-0" />
+                  <Zap className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
                 <span>Check a suspicious message in 60 seconds.</span>
               </li>
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Heart className="w-4 h-4 text-primary flex-shrink-0" />
+                  <Shield className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>Guides written like you'd explain it to your own family.</span>
+                <span>Real protection, explained in real words.</span>
               </li>
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Users className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>No jargon. No sign-up. No catch.</span>
+                <span>Trusted by thousands of families.</span>
               </li>
             </ul>
 

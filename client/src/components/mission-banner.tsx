@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ArrowRight, Shield, Heart } from "lucide-react";
+import { ArrowRight, Shield, Globe } from "lucide-react";
 import professionalImage from "@/assets/images/professional-focused.jpg";
 
 export function MissionBanner() {
@@ -26,30 +26,30 @@ export function MissionBanner() {
           <div className="w-full max-w-lg lg:max-w-xl">
             <div className="bg-slate-900/95 backdrop-blur-sm rounded-2xl p-8 sm:p-10 shadow-2xl">
               <div className="flex items-center gap-2 mb-4">
-                <Heart className="w-5 h-5 text-primary" />
+                <Globe className="w-5 h-5 text-primary" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                  Our Story
+                  Our Mission
                 </span>
               </div>
               
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight" data-testid="text-mission-heading">
-                This Started with Our Own Family
+                Cybersecurity Belongs to Everyone
               </h2>
               
               <div className="flex items-center gap-3 mb-6">
-                <Heart className="w-8 h-8 text-accent flex-shrink-0" />
+                <Shield className="w-8 h-8 text-accent flex-shrink-0" />
                 <p className="text-2xl sm:text-3xl font-bold text-accent">
-                  Now it's for yours, too.
+                  Not just those who can afford it.
                 </p>
               </div>
               
               <p className="text-white/80 text-base sm:text-lg leading-relaxed mb-6" data-testid="text-mission-description">
-                When our parents started getting scam calls and our kids started navigating social media, we realized something: the people who need cybersecurity help the most are the ones nobody is building it for. So we built it ourselves, and we made it free because safety shouldn't have a price tag.
+                Most cybersecurity is built for enterprises and IT professionals. That leaves everyday people, your parents, your kids, your neighbors, unprotected. We exist to close that gap with free tools, trusted guidance, and a community that has each other's backs.
               </p>
               
               <Link href="/about">
                 <Button className="rounded-full px-6" data-testid="button-mission-cta">
-                  Read Our Full Story
+                  Learn Why We Do This
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>

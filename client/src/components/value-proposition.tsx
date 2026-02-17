@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 const differentiators = [
   {
     icon: Heart,
-    title: "A Family Project, Not a Corporation",
-    description: "This started at our kitchen table. We were helping our own parents avoid scams and teaching our kids to stay safe. We turned those lessons into something every family can use.",
+    title: "People Over Profit",
+    description: "No investors. No premium tier. No selling your data. We exist for one reason: to make real cybersecurity accessible to everyone who needs it.",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     href: "/about",
@@ -23,7 +23,7 @@ const differentiators = [
   {
     icon: Globe,
     title: "Honest Guidance You Can Trust",
-    description: "No scare tactics. No hidden sales pitch. Just the same straightforward advice we give our own family members.",
+    description: "No scare tactics. No hidden sales pitch. Just straightforward advice backed by real threat intelligence and explained for real people.",
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
     href: "/resources",
@@ -92,9 +92,9 @@ export function ValueProposition() {
           className="text-center mb-6"
         >
           <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-4">
-            <Heart className="w-4 h-4 text-primary" />
+            <Shield className="w-4 h-4 text-primary" />
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-              Family First
+              What Makes Us Different
             </span>
           </div>
           <h2
@@ -104,7 +104,7 @@ export function ValueProposition() {
             Why Families Trust GetCyberRight
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            We are not a big tech company. We are a family who got tired of seeing the people we love left unprotected, so we did something about it.
+            Most cybersecurity tools are built for IT departments. Ours are built for your mom, your teenager, and you.
           </p>
         </motion.div>
 
