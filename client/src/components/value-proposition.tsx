@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 const differentiators = [
   {
     icon: Heart,
-    title: "People Over Profit",
-    description: "No investors. No premium tier. No selling your data. We exist for one reason: to make real cybersecurity accessible to everyone who needs it.",
+    title: "Mission First. Always.",
+    description: "No premium tiers. No selling your data. We exist for one reason: to make real cybersecurity accessible to everyone who needs it.",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     href: "/about",
