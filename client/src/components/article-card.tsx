@@ -4,9 +4,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Clock, Share2, Bookmark, ExternalLink, TrendingUp } from "lucide-react";
-import type { Article } from "@shared/schema";
+interface Article {
+  title: string;
+  excerpt: string;
+  author: string;
+  authorAvatar?: string | null;
+  authorTitle?: string;
+  category: string;
+  imageUrl?: string | null;
+  publishedAt?: Date | string | null;
+  readTime?: number;
+  url?: string | null;
+  breaking?: boolean;
+}
 
-// Decode HTML entities in text (e.g., &#8216; -> ')
 function decodeHtmlEntities(text: string): string {
   if (!text) return text;
   const entities: Record<string, string> = {
@@ -154,7 +165,7 @@ export function ArticleCard({ article, featured = false, compact = false }: Arti
       selectedImageIndex = 4; // Learning/education images
     } else {
       // Fallback to title hash for consistent selection
-      const titleHash = article.title.split('').reduce((a, b) => {
+      const titleHash = article.title.split('').reduce((a: number, b: string) => {
         a = ((a << 5) - a) + b.charCodeAt(0);
         return a & a;
       }, 0);
@@ -218,7 +229,7 @@ export function ArticleCard({ article, featured = false, compact = false }: Arti
                 <Avatar className="w-6 h-6">
                   <AvatarImage src={article.authorAvatar ?? undefined} alt={article.author} />
                   <AvatarFallback className="text-xs bg-gray-200 dark:bg-gray-700">
-                    {article.author.split(' ').map(n => n[0]).join('')}
+                    {article.author.split(' ').map((n: string) => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">{article.author}</span>
@@ -285,7 +296,7 @@ export function ArticleCard({ article, featured = false, compact = false }: Arti
                 <Avatar className="w-10 h-10">
                   <AvatarImage src={article.authorAvatar ?? undefined} alt={article.author} />
                   <AvatarFallback className="bg-gray-200 dark:bg-gray-700 font-semibold">
-                    {article.author.split(' ').map(n => n[0]).join('')}
+                    {article.author.split(' ').map((n: string) => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 <div>
