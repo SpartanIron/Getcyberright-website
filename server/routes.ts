@@ -2728,7 +2728,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.get("/api/data-removal/vault/profiles", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+  app.get("/api/data-removal/vault/profiles", isAuthenticated, async (req: any, res: Response) => {
     try {
       const profiles = await getAllVaultProfiles(req.user.id);
       res.json(profiles);
@@ -2738,7 +2738,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/vault/family", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/vault/family", isAuthenticated, async (req: any, res: Response) => {
     try {
       const { profileName, fullName, emails, phoneNumbers, currentAddress } = req.body;
       if (!profileName) {
@@ -2758,7 +2758,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.delete("/api/data-removal/vault/family/:id", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+  app.delete("/api/data-removal/vault/family/:id", isAuthenticated, async (req: any, res: Response) => {
     try {
       const profileId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const result = await deleteFamilyProfile(req.user.id, profileId);
@@ -2769,7 +2769,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/scan", isAuthenticated, requireSubscription("essential"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/scan", isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { vaultProfileId } = req.body;
@@ -2808,7 +2808,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests", isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { brokerId, vaultProfileId, findingId } = req.body;
@@ -2852,7 +2852,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/:id/generate", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/:id/generate", isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const requestId = req.params.id;
@@ -2868,7 +2868,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/:id/auto-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/:id/auto-send", isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const requestId = req.params.id;
@@ -2881,7 +2881,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/bulk-auto-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/bulk-auto-send", isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { requestIds } = req.body;
@@ -2901,7 +2901,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/bulk-create-and-send", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/bulk-create-and-send", isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { findings, vaultProfileId } = req.body;
@@ -2967,7 +2967,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/monitoring", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/monitoring", isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { vaultProfileId, frequencyDays, autoReRemoval, notifyOnNewExposure, notifyOnReAppearance, notifyOnComplianceDeadline, monitoringMode, darkWebMonitoring } = req.body;
@@ -3000,7 +3000,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/monitoring/run", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/monitoring/run", isAuthenticated, async (req: any, res: Response) => {
     try {
       const result = await runMonitoringScan(req.user.id);
       res.json(result);
@@ -3070,7 +3070,7 @@ EDGE CASE HANDLING
   });
 
   // Removal Verification Routes
-  app.post("/api/data-removal/verifications", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/verifications", isAuthenticated, async (req: any, res: Response) => {
     try {
       const { removalRequestId, brokerId, scheduledFor } = req.body;
       if (!removalRequestId || !brokerId) {
@@ -3088,7 +3088,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/verifications/:id/complete", isAuthenticated, requireSubscription("professional"), async (req: any, res: Response) => {
+  app.post("/api/data-removal/verifications/:id/complete", isAuthenticated, async (req: any, res: Response) => {
     try {
       const { dataStillPresent, evidenceUrl, notes } = req.body;
       if (typeof dataStillPresent !== "boolean") {
