@@ -111,11 +111,18 @@ interface BreachResult {
 }
 
 async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
+  const hibpApiKey = process.env.HIBP_API_KEY;
+  if (!hibpApiKey) {
+    console.log("[scan] HIBP API key not configured — breach check skipped. Add HIBP_API_KEY secret to enable breach detection.");
+    return [];
+  }
+
   try {
     const response = await fetch(
       `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(email)}?truncateResponse=false`,
       {
         headers: {
+          "hibp-api-key": hibpApiKey,
           "User-Agent": "GetCyberRight-ExposureScanner",
           "Accept": "application/json",
         },
@@ -123,11 +130,18 @@ async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
     );
 
     if (response.status === 404) return [];
-    if (response.status === 429) {
-      console.log("[scan] HIBP rate limited, using breach database fallback");
+    if (response.status === 401) {
+      console.log("[scan] HIBP API key invalid or expired — breach check skipped");
       return [];
     }
-    if (!response.ok) return [];
+    if (response.status === 429) {
+      console.log("[scan] HIBP rate limited, waiting before retry");
+      return [];
+    }
+    if (!response.ok) {
+      console.log(`[scan] HIBP returned status ${response.status} — breach check skipped`);
+      return [];
+    }
 
     const data = await response.json() as any[];
     return data.map((breach: any) => ({
@@ -327,24 +341,6 @@ async function runRealVerification(
           facts.push(`PROFILE FOUND: We searched ${broker.name} and found a profile matching your information (${matchDetails}). Confidence: ${confLabel}.`);
           if (profileResult.profileUrl) {
             facts.push(`Profile URL: ${profileResult.profileUrl}`);
-          }
-        }
-
-        if (!evidenceTier && broker.isActive && broker.optOutUrl && domain) {
-          const searchStatus = searchStats?.brokerStatuses?.get(broker.id);
-          const wasSuccessfullySearchedAndClear = searchStatus === "searched_not_found";
-          if (!wasSuccessfullySearchedAndClear) {
-            if (searchStatus === "search_blocked") {
-              facts.push(`BLOCKED: ${broker.name} blocked our automated search attempt. Your data may still be listed.`);
-              verificationMethod = "search_blocked";
-            } else if (searchStatus === "search_failed") {
-              facts.push(`UNREACHABLE: ${broker.name} could not be reached during scanning. Your data may still be listed.`);
-              verificationMethod = "search_failed";
-            } else {
-              facts.push(`ACTIVE BROKER: ${broker.name} is a known active data broker with an opt-out process available`);
-              verificationMethod = "catalog_verified_active";
-            }
-            evidenceTier = "verified_broker";
           }
         }
 
@@ -690,13 +686,12 @@ export async function runExposureScan(userId: string, vaultProfileId: string) {
 
     const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
     const profileFoundCount = verificationResult.findings.filter(f => f.evidenceTier === "profile_found").length;
-    const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
     const riskLevel =
       confirmedCount >= 10 || profileFoundCount >= 8 ? "critical" :
-      confirmedCount >= 5 || profileFoundCount >= 4 || verifiedBrokerCount >= 30 ? "high" :
-      verifiedBrokerCount >= 15 || profileFoundCount >= 2 ? "medium" : "low";
+      confirmedCount >= 5 || profileFoundCount >= 4 ? "high" :
+      profileFoundCount >= 2 || confirmedCount >= 1 ? "medium" : "low";
 
-    console.log(`[scan] Scan complete: ${findings.length} findings (${confirmedCount} breaches confirmed, ${profileFoundCount} profiles found, ${verifiedBrokerCount} active brokers) from ${verificationResult.brokersChecked} brokers checked`);
+    console.log(`[scan] Scan complete: ${findings.length} person-specific findings (${confirmedCount} breaches confirmed, ${profileFoundCount} profiles found) from ${verificationResult.brokersChecked} brokers checked`);
 
     const [updatedScan] = await db
       .update(exposureScans)
@@ -795,7 +790,6 @@ export async function runGuestExposureScan(guestData: {
 
   const confirmedCount = verificationResult.findings.filter(f => f.evidenceTier === "confirmed").length;
   const profileFoundCount = verificationResult.findings.filter(f => f.evidenceTier === "profile_found").length;
-  const verifiedBrokerCount = verificationResult.findings.filter(f => f.evidenceTier === "verified_broker").length;
 
   const ss = verificationResult.searchStats;
   const searchTransparency = ss ? {
@@ -823,7 +817,6 @@ export async function runGuestExposureScan(guestData: {
     totalExposuresFound: findings.length,
     confirmedExposures: confirmedCount,
     profilesFound: profileFoundCount,
-    verifiedBrokers: verifiedBrokerCount,
     findings,
     scanMethod: "verified",
     searchTransparency,
