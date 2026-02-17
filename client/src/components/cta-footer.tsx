@@ -9,15 +9,15 @@ export function CTAFooter() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <h2 className="text-xl sm:text-2xl font-bold text-white" data-testid="text-cta-footer-heading">
-              Protect your family today.
+              Your family's safety is worth 5 minutes.
             </h2>
             <p className="text-sm text-white/70 mt-1">
-              Check a suspicious message, remove your data from brokers, or learn how to stay safe online. No sign-up needed.
+              Take a quick safety check and find out where your family stands. No account needed, no data stored.
             </p>
           </div>
-          <Link href="/tools">
+          <Link href="/cyber-hygiene">
             <Button size="default" className="bg-accent text-accent-foreground border-accent-border" data-testid="button-cta-footer">
-              Check If It's a Scam
+              Take the Safety Check
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </Link>

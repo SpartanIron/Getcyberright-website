@@ -73,10 +73,10 @@ export function PromoVideoSection() {
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" data-testid="text-promo-heading">
-            Cybersecurity That Speaks Your Language
+            See How We Help Families Like Yours
           </h2>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            No jargon. No scare tactics. Just the tools and knowledge your family needs to stay safe online.
+            Real guidance for real families. Watch how we make cybersecurity simple, personal, and actually useful.
           </p>
         </motion.div>
 

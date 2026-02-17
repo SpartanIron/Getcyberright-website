@@ -6,32 +6,32 @@ import { Button } from "@/components/ui/button";
 const differentiators = [
   {
     icon: Heart,
-    title: "Built for Families, Not Corporations",
-    description: "While others sell cybersecurity to businesses, we built ours for the people who need it most: parents, kids, seniors, and everyday families.",
+    title: "A Family Project, Not a Corporation",
+    description: "This started at our kitchen table. We were helping our own parents avoid scams and teaching our kids to stay safe. We turned those lessons into something every family can use.",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     href: "/about",
   },
   {
     icon: Shield,
-    title: "Real Tools, Not Just Advice",
-    description: "AI-powered scam detection, data broker removal, voice clone detection, and more. No sign-up, no credit card, no barriers.",
+    title: "We Walk You Through It",
+    description: "We don't just tell you what's dangerous. We show you what to do about it, step by step, in words that actually make sense.",
     color: "text-primary",
     bgColor: "bg-primary/10",
     href: "/tools",
   },
   {
     icon: Globe,
-    title: "Plain Language You Can Trust",
-    description: "No jargon, no scare tactics. Just clear, honest guidance written the way you would explain it to your own family.",
+    title: "Honest Guidance You Can Trust",
+    description: "No scare tactics. No hidden sales pitch. Just the same straightforward advice we give our own family members.",
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
     href: "/resources",
   },
   {
     icon: Users,
-    title: "Every Generation Covered",
-    description: "From kids learning to spot online dangers to seniors avoiding phone scams, we have age-appropriate resources for everyone in your family.",
+    title: "Something for Every Generation",
+    description: "Kids, teens, parents, grandparents. Everyone in your family faces different threats online. We have age-appropriate help for each of them.",
     color: "text-accent",
     bgColor: "bg-accent/10",
     href: "/training",
@@ -42,7 +42,7 @@ const exclusiveFeatures = [
   {
     icon: Mic,
     title: "Voice Clone Detection",
-    description: "Advanced AI-powered detection of deepfake audio and voice cloning.",
+    description: "Someone impersonating a loved one's voice? We help you spot AI-generated voice fakes.",
     highlight: "Exclusive",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
@@ -51,7 +51,7 @@ const exclusiveFeatures = [
   {
     icon: Lock,
     title: "Family Safety Codewords",
-    description: "Secret verification phrases to confirm identities during suspicious calls.",
+    description: "Create a secret family phrase so you can always verify it's really your loved one calling.",
     highlight: "GetCyberRight\u2122",
     color: "text-primary",
     bgColor: "bg-primary/10",
@@ -60,7 +60,7 @@ const exclusiveFeatures = [
   {
     icon: Brain,
     title: "Dezi AI Assistant",
-    description: "Your personal cybersecurity advisor for instant threat analysis.",
+    description: "Ask Dezi anything about staying safe online and get a clear, friendly answer in seconds.",
     highlight: "AI-Powered",
     color: "text-accent",
     bgColor: "bg-accent/10",
@@ -68,8 +68,8 @@ const exclusiveFeatures = [
   },
   {
     icon: Award,
-    title: "Gamified Learning",
-    description: "Earn badges and track progress as you master security skills.",
+    title: "Learn as a Family",
+    description: "Earn badges together as your family levels up their safety skills. Make learning fun, not scary.",
     highlight: "Engaging",
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
@@ -97,15 +97,14 @@ export function ValueProposition() {
               Family First
             </span>
           </div>
-          <h2 
+          <h2
             id="value-prop-heading" 
             className="text-3xl md:text-4xl font-bold text-foreground mb-4"
           >
             Why Families Trust GetCyberRight
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            We protect the people that corporate cybersecurity leaves behind. 
-            Your family deserves real protection, explained in plain language.
+            We are not a big tech company. We are a family who got tired of seeing the people we love left unprotected, so we did something about it.
           </p>
         </motion.div>
 

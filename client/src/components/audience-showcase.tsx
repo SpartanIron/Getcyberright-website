@@ -10,32 +10,32 @@ const audiences = [
   {
     id: "families",
     image: familyImage,
-    title: "For Families",
+    title: "For Parents & Families",
     subtitle: "Protect Everyone at Home",
-    description: "From toddlers with tablets to teenagers on social media, get age-appropriate guides for the whole family.",
+    description: "We know what it's like to worry about your kids online. Age-appropriate guides, conversation starters, and monitoring tips from parents who get it.",
     icon: Users,
-    href: "/resources",
-    stats: "Free Family Resources",
+    href: "/parents",
+    stats: "From Parents Who Get It",
   },
   {
     id: "seniors",
     image: seniorsImage,
     title: "For Seniors",
     subtitle: "Stay Safe, Stay Connected",
-    description: "Learn to spot scams, protect your identity, and use technology with confidence. No tech jargon, just clear steps.",
+    description: "Our own parents inspired this. Learn to spot phone scams, protect your identity, and use technology with confidence. Written in plain language, always.",
     icon: Heart,
-    href: "/resources",
-    stats: "Plain Language Guides",
+    href: "/seniors",
+    stats: "Written in Plain Language",
   },
   {
     id: "business",
     image: businessImage,
     title: "For Small Businesses",
     subtitle: "Train Your Team",
-    description: "Free security awareness training for small businesses. Protect your company from phishing and social engineering.",
+    description: "Small businesses face the same threats as big ones, without the security budget. Free awareness training your whole team can complete in a lunch break.",
     icon: Briefcase,
-    href: "/resources",
-    stats: "Free Training Materials",
+    href: "/training",
+    stats: "Free Team Training",
   },
 ];
 
@@ -54,11 +54,11 @@ export function AudienceShowcase() {
             Who We Protect
           </p>
           <h2 id="audience-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-audience-heading">
-            Cybersecurity for Everyone
+            We Built This for People Like You
           </h2>
           <p className="text-lg text-muted-foreground">
             Whether you are protecting your kids online, helping your parents avoid scams, 
-            or learning to stay safe yourself, we have free resources designed just for you.
+            or keeping your small business safe, start with the path that fits your life.
           </p>
         </motion.div>
 

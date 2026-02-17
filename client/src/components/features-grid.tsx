@@ -7,35 +7,35 @@ const features = [
   {
     id: "scam-detection",
     category: "Scam Detection",
-    headline: "Spot scams before they cost your family.",
-    description: "Got a suspicious text or email? Paste it in and we will tell you if it is real or a scam. Free, instant, and no sign-up needed.",
+    headline: "Not sure if it's a scam? Find out in seconds.",
+    description: "Paste that suspicious text, email, or link and get a plain-English answer. We built this because our own family kept asking us to check things for them.",
     cta: "Check for Scams",
     href: "/tools",
     variant: "light" as const,
   },
   {
     id: "security-training",
-    category: "Security Education",
-    headline: "Learn to stay safe in words you understand.",
-    description: "Guides written for real people, not IT departments. Practical steps your whole family can follow, from teens to grandparents.",
-    cta: "Browse Guides",
+    category: "Family Learning",
+    headline: "Learn to stay safe, the way we'd teach our own family.",
+    description: "Short, practical guides written for real people. No IT background needed. Just clear steps your whole family can follow together.",
+    cta: "Start Learning",
     href: "/resources",
     variant: "dark" as const,
   },
   {
     id: "family-protection",
-    category: "Family Safety",
-    headline: "Every generation, protected.",
-    description: "Fun lessons for kids, scam alerts for seniors, monitoring tips for parents. Your whole family covered under one roof, for free.",
-    cta: "Family Resources",
+    category: "Every Generation",
+    headline: "Your kids, your parents, and you. All covered.",
+    description: "Interactive safety lessons for kids. Scam protection for seniors. Monitoring tips for parents. Pick the path that fits your family.",
+    cta: "Find Your Path",
     href: "/training",
     variant: "medium" as const,
   },
   {
     id: "emergency-help",
-    category: "Victim Support",
-    headline: "Been scammed? We are here to help.",
-    description: "Step-by-step guidance on what to do right now. Who to call, what to report, how to recover. You are not alone in this.",
+    category: "We've Got Your Back",
+    headline: "Been scammed? We will walk you through it.",
+    description: "It happens to the best of us. Here is exactly what to do right now: who to call, what to report, and how to recover. You are not alone.",
     cta: "Get Help Now",
     href: "/emergency-help",
     variant: "pattern" as const,
@@ -71,10 +71,10 @@ export function FeaturesGrid() {
             What We Offer
           </p>
           <h2 id="features-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-features-heading">
-            Everything You Need to Stay Safe Online
+            What We Can Help You With
           </h2>
           <p className="text-lg text-muted-foreground">
-            Free tools and plain-language guides for parents, kids, seniors, and everyday families.
+            The same things we help our own family with, now available to yours.
           </p>
         </motion.div>
 

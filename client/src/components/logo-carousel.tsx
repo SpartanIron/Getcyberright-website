@@ -25,11 +25,11 @@ export function LogoCarousel() {
         <div className="flex items-center justify-center gap-2 mb-2">
           <Shield className="w-4 h-4 text-muted-foreground" />
           <p className="text-center text-sm text-foreground dark:text-white uppercase tracking-wider font-semibold">
-            Trusted Sources
+            Where We Get Our Facts
           </p>
         </div>
         <p className="text-center text-xs text-muted-foreground">
-          Sources listed for educational reference and public guidance purposes
+          We research these authoritative sources and translate their guidance into plain language for families
         </p>
       </div>
       

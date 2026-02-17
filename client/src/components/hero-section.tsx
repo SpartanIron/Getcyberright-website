@@ -24,7 +24,7 @@ export function HeroSection() {
             <div className="inline-flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full mb-4">
               <Heart className="w-4 h-4 text-primary" />
               <span className="text-xs font-semibold text-primary uppercase tracking-wider">
-                Cyber Safety for Every Family
+                Built by a Family, for Families
               </span>
             </div>
             
@@ -32,25 +32,25 @@ export function HeroSection() {
               className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 leading-[1.15]" 
               data-testid="text-hero-heading-mobile"
             >
-              Your Family's Safety Starts Here
+              We Help Families Stay Safe Online
             </h1>
 
             <p className="text-sm sm:text-base text-white/80 font-medium mb-4 leading-relaxed">
-              Tools that protect your kids, your parents, and you from scams, identity theft, and online threats. Built by a family, for families.
+              We started this after helping our own parents avoid scams and teaching our kids to stay safe online. Now we share what we learned with every family.
             </p>
 
             <ul className="space-y-2 mb-6 text-xs sm:text-sm font-medium text-left max-w-xs mx-auto">
               <li className="flex items-start gap-3 text-white/80">
                 <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>Check scams, remove your data, learn to stay safe.</span>
+                <span>Check a suspicious message in 60 seconds.</span>
               </li>
               <li className="flex items-start gap-3 text-white/80">
                 <Heart className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>Made for parents, kids, seniors, and everyday people.</span>
+                <span>Guides written like you'd explain it to your own family.</span>
               </li>
               <li className="flex items-start gap-3 text-white/80">
                 <Users className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span>Plain language. No jargon. No sign-up required.</span>
+                <span>No jargon. No sign-up. No catch.</span>
               </li>
             </ul>
 
@@ -158,7 +158,7 @@ export function HeroSection() {
             <div className="inline-flex items-center gap-2 bg-primary/20 px-4 py-2 rounded-full mb-6">
               <Heart className="w-5 h-5 text-primary" />
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                Cyber Safety for Every Family
+                Built by a Family, for Families
               </span>
             </div>
 
@@ -166,14 +166,14 @@ export function HeroSection() {
               className="text-5xl xl:text-6xl font-bold tracking-tight text-white leading-[1.1] mb-6" 
               data-testid="text-hero-heading"
             >
-              Your Family's Safety Starts Here
+              We Help Families Stay Safe Online
             </h1>
 
             <p 
               className="text-xl text-white/90 font-medium leading-relaxed mb-4" 
               data-testid="text-hero-subtext"
             >
-              Tools that protect your kids, your parents, and you from scams, identity theft, and online threats. Built by a family, for families.
+              We started this after helping our own parents avoid scams and teaching our kids to stay safe online. Now we share what we learned with every family.
             </p>
 
             <ul className="space-y-3 mb-10 text-sm font-medium">
@@ -181,19 +181,19 @@ export function HeroSection() {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Shield className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>Check scams, remove your data, learn to stay safe.</span>
+                <span>Check a suspicious message in 60 seconds.</span>
               </li>
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Heart className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>Made for parents, kids, seniors, and everyday people.</span>
+                <span>Guides written like you'd explain it to your own family.</span>
               </li>
               <li className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Users className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>Plain language. No jargon. No sign-up required.</span>
+                <span>No jargon. No sign-up. No catch.</span>
               </li>
             </ul>
 

@@ -28,28 +28,28 @@ export function MissionBanner() {
               <div className="flex items-center gap-2 mb-4">
                 <Heart className="w-5 h-5 text-primary" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                  Built for Families
+                  Our Story
                 </span>
               </div>
               
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight" data-testid="text-mission-heading">
-                We Cover the People Nobody Else Protects
+                This Started with Our Own Family
               </h2>
               
               <div className="flex items-center gap-3 mb-6">
                 <Heart className="w-8 h-8 text-accent flex-shrink-0" />
                 <p className="text-2xl sm:text-3xl font-bold text-accent">
-                  Your Family.
+                  Now it's for yours, too.
                 </p>
               </div>
               
               <p className="text-white/80 text-base sm:text-lg leading-relaxed mb-6" data-testid="text-mission-description">
-                Most cybersecurity is built for corporations. We are built for the rest of us. Parents trying to keep kids safe online. Seniors targeted by phone scams. Everyday people left to figure it out alone. We have your back, and it will never cost you a thing.
+                When our parents started getting scam calls and our kids started navigating social media, we realized something: the people who need cybersecurity help the most are the ones nobody is building it for. So we built it ourselves, and we made it free because safety shouldn't have a price tag.
               </p>
               
               <Link href="/about">
                 <Button className="rounded-full px-6" data-testid="button-mission-cta">
-                  Read Our Story
+                  Read Our Full Story
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
