@@ -156,9 +156,6 @@ function Router() {
         <Route path="/scam-checker" component={ScamChecker} />
         <Route path="/faq" component={FAQ} />
         <Route path="/training" component={Training} />
-        <Route path="/training/kids" component={Training} />
-        <Route path="/training/parents" component={Training} />
-        <Route path="/training/seniors" component={Training} />
         <Route path="/training/:pathId" component={TrainingPath} />
         <Route path="/training/lesson/:lessonId" component={TrainingLesson} />
         <Route path="/training/quiz/:quizId" component={TrainingQuiz} />

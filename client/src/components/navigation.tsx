@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/navigation-menu";
 
 const whoWeHelp = [
-  { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/parents", icon: Users, featured: true, color: "text-blue-500", trainingHref: "/training/parents" },
-  { title: "Kids Safety Hub", description: "Fun, interactive lessons for ages 8 to 16", href: "/kids", icon: Sparkles, featured: true, color: "text-purple-500", trainingHref: "/training/kids" },
-  { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/seniors", icon: Heart, featured: true, color: "text-rose-500", trainingHref: "/training/seniors" },
+  { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/parents", icon: Users, featured: true, color: "text-blue-500" },
+  { title: "Kids Safety Hub", description: "Fun, interactive lessons for ages 8 to 16", href: "/kids", icon: Sparkles, featured: true, color: "text-purple-500" },
+  { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/seniors", icon: Heart, featured: true, color: "text-rose-500" },
 ];
 
 const toolsNav = [

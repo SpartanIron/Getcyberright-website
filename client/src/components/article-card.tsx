@@ -325,7 +325,7 @@ export function ArticleCard({ article, featured = false, compact = false }: Arti
             {formatDate(article.publishedAt!)}
           </span>
         </div>
-        <Link to={`/article/${article.id}`}>
+        <Link to="/news">
           <h3 className="text-lg font-semibold hover:text-[var(--cyber-blue)] transition-colors mb-3 leading-tight cursor-pointer">
             {decodeHtmlEntities(article.title)}
           </h3>
