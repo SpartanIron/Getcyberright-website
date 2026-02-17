@@ -64,7 +64,7 @@ const alertSources = [
     title: "Live Threat Feed",
     description: "Real-time feed of emerging threats and security alerts from around the world.",
     icon: Zap,
-    link: "/live-feed"
+    link: "/news"
   }
 ];
 

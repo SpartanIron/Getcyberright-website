@@ -13,9 +13,11 @@ const footerLinks = {
     { name: "Scam Checker", href: "/scam-checker" },
     { name: "AI Prompt Library", href: "/ai-prompts" },
     { name: "Data Broker Removal", href: "/data-removal" },
+    { name: "Cyber Hygiene Check", href: "/cyber-hygiene" },
     { name: "Safety Toolkit", href: "/tools?tab=safety-toolkit" },
     { name: "Training Academy", href: "/training" },
     { name: "AI Safety Guide", href: "/ai-safety" },
+    { name: "Safety Alerts & News", href: "/news" },
     { name: "Resource Library", href: "/resources" },
   ],
   company: [
