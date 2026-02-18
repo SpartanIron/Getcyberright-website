@@ -51,7 +51,7 @@ export default function About() {
           title="Our Story: Why We Built GetCyberRight"
           subtitle="Cybersecurity tools built by a family, for families. Every parent, every grandparent, every child deserves protection they can understand and trust."
           imageSrc={bannerImage}
-          imageAlt="Diverse GetCyberRight team with African woman leader in the center, all wearing branded red shirts in a modern office"
+          imageAlt="Diverse GetCyberRight team wearing branded red shirts with the founder Jude Kweku in the center, in a modern office with ring light"
           imagePosition="left"
           colorVariant="slate"
         />
@@ -143,7 +143,7 @@ export default function About() {
                 <div className="my-8 rounded-lg overflow-hidden shadow-lg">
                   <img 
                     src={seniorsLearningImage} 
-                    alt="Senior learning technology with family support"
+                    alt="Jude Kweku, founder of GetCyberRight, standing confidently outdoors"
                     className="w-full h-auto object-cover"
                     loading="lazy"
                     data-testid="img-about-seniors-learning"
