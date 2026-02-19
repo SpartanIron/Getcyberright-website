@@ -1,8 +1,8 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
-import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema } from "@shared/schema";
+import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema } from "@shared/schema";
 import { isAuthenticated } from "./auth";
-import { eq, desc, count, sql } from "drizzle-orm";
+import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
 import { securityLogger } from "./security";
 import { z } from "zod";
 
@@ -402,6 +402,102 @@ export function registerToolTrackingRoutes(app: Express) {
     } catch (error) {
       console.error("Tool tracking error:", error);
       res.status(500).json({ error: "Failed to track tool usage" });
+    }
+  });
+
+  // === Platform Announcements ===
+
+  // Public: Get active announcements (no auth required)
+  app.get("/api/announcements", async (_req, res) => {
+    try {
+      const now = new Date();
+      const announcements = await db
+        .select()
+        .from(platformAnnouncements)
+        .where(
+          and(
+            eq(platformAnnouncements.isActive, true),
+            or(
+              isNull(platformAnnouncements.startsAt),
+              lte(platformAnnouncements.startsAt, now)
+            ),
+            or(
+              isNull(platformAnnouncements.expiresAt),
+              gte(platformAnnouncements.expiresAt, now)
+            )
+          )
+        )
+        .orderBy(desc(platformAnnouncements.createdAt));
+
+      res.json({ announcements });
+    } catch (error) {
+      console.error("Fetch announcements error:", error);
+      res.status(500).json({ error: "Failed to fetch announcements" });
+    }
+  });
+
+  // Admin: Get all announcements
+  app.get("/api/admin/announcements", isAuthenticated, isAdminMiddleware, async (_req, res) => {
+    try {
+      const announcements = await db
+        .select()
+        .from(platformAnnouncements)
+        .orderBy(desc(platformAnnouncements.createdAt));
+
+      res.json({ announcements });
+    } catch (error) {
+      console.error("Admin fetch announcements error:", error);
+      res.status(500).json({ error: "Failed to fetch announcements" });
+    }
+  });
+
+  // Admin: Create announcement
+  app.post("/api/admin/announcements", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const parsed = insertAnnouncementSchema.parse(req.body);
+      const [announcement] = await db
+        .insert(platformAnnouncements)
+        .values(parsed)
+        .returning();
+
+      res.json({ announcement });
+    } catch (error) {
+      console.error("Create announcement error:", error);
+      res.status(500).json({ error: "Failed to create announcement" });
+    }
+  });
+
+  // Admin: Update announcement
+  app.patch("/api/admin/announcements/:id", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateSchema = insertAnnouncementSchema.partial();
+      const parsed = updateSchema.parse(req.body);
+      const [updated] = await db
+        .update(platformAnnouncements)
+        .set(parsed)
+        .where(eq(platformAnnouncements.id, id))
+        .returning();
+
+      if (!updated) {
+        return res.status(404).json({ error: "Announcement not found" });
+      }
+      res.json({ announcement: updated });
+    } catch (error) {
+      console.error("Update announcement error:", error);
+      res.status(500).json({ error: "Failed to update announcement" });
+    }
+  });
+
+  // Admin: Delete announcement
+  app.delete("/api/admin/announcements/:id", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await db.delete(platformAnnouncements).where(eq(platformAnnouncements.id, id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete announcement error:", error);
+      res.status(500).json({ error: "Failed to delete announcement" });
     }
   });
 }

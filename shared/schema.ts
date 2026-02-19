@@ -1106,6 +1106,29 @@ export const promptReviewRuns = pgTable("prompt_review_runs", {
 
 export type PromptReviewRun = typeof promptReviewRuns.$inferSelect;
 
+// Platform Announcements
+export const platformAnnouncements = pgTable("platform_announcements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  type: text("type").notNull().default("update"),
+  priority: text("priority").notNull().default("normal"),
+  linkUrl: text("link_url"),
+  linkText: text("link_text"),
+  isActive: boolean("is_active").notNull().default(true),
+  startsAt: timestamp("starts_at"),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAnnouncementSchema = createInsertSchema(platformAnnouncements).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type PlatformAnnouncement = typeof platformAnnouncements.$inferSelect;
+export type InsertAnnouncement = z.infer<typeof insertAnnouncementSchema>;
+
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],
   scan_found: ["request_generated", "not_found"],

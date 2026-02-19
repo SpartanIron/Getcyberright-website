@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { DeziAssistant } from "@/components/dezi-assistant";
+import { AnnouncementBanner } from "@/components/announcement-banner";
 import { WelcomeOverlay } from "@/components/welcome-overlay";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { initGA, trackPageView } from "./lib/analytics";
@@ -55,6 +56,7 @@ const AdminContentGovernance = lazy(() => import("@/pages/admin-content-governan
 const AdminCompliance = lazy(() => import("@/pages/admin-compliance"));
 const AdminNewsletter = lazy(() => import("@/pages/admin-newsletter"));
 const AdminPromptManagement = lazy(() => import("@/pages/admin-prompt-management"));
+const AdminAnnouncements = lazy(() => import("@/pages/admin/announcements"));
 const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
@@ -171,6 +173,7 @@ function Router() {
         <Route path="/admin/compliance" component={AdminCompliance} />
         <Route path="/admin/newsletter" component={AdminNewsletter} />
         <Route path="/admin/prompt-management" component={AdminPromptManagement} />
+        <Route path="/admin/announcements" component={AdminAnnouncements} />
         <Route path="/admin/change-password" component={AdminChangePassword} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
@@ -199,6 +202,7 @@ function App() {
         <ThemeProvider>
           <TooltipProvider>
             <ScrollToTop />
+            <AnnouncementBanner />
             <Toaster />
             <WelcomeOverlay />
             <ErrorBoundary>

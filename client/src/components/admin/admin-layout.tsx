@@ -9,7 +9,8 @@ import {
   AlertTriangle,
   ArrowLeft,
   Shield,
-  BarChart3
+  BarChart3,
+  Megaphone
 } from "lucide-react";
 import logoImage from "@/assets/logo.png";
 
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/admin/subscribers", label: "Subscribers", icon: Newspaper },
   { href: "/admin/scam-reports", label: "Scam Reports", icon: AlertTriangle },
   { href: "/admin/tool-analytics", label: "Tool Analytics", icon: BarChart3 },
+  { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/security", label: "Security", icon: Shield },
 ];
 
