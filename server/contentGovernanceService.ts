@@ -1,11 +1,13 @@
 import { db } from "./db";
 import { contentPages, contentAuditLog, threatItems, ContentPage } from "@shared/schema";
 import { eq, desc, and, gte, sql, inArray } from "drizzle-orm";
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import { ContentGuardrails } from "@shared/contentGuardrails";
 
-// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const anthropic = new Anthropic({
+  apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
+});
 
 // Content integrity guardrails and validation functions
 const AI_GUARDRAILS = {
@@ -519,7 +521,7 @@ export class ContentGovernanceService {
       summary: string;
     } | null = null;
     
-    if (process.env.OPENAI_API_KEY && relatedThreats.length > 0) {
+    if (relatedThreats.length > 0) {
       try {
         const threatSummary = relatedThreats.slice(0, 5).map(t => 
           `Source: ${t.source} | Severity: ${t.severity} | ${t.title}: ${t.description.substring(0, 150)}`
@@ -562,17 +564,17 @@ WRITING RULES:
 - Each content section should be 50-150 words
 - Generate 2-4 content sections`;
 
-        const response = await openai.chat.completions.create({
-          model: "gpt-5",
-          messages: [
-            { role: "system", content: AI_GUARDRAILS.systemPrompt },
-            { role: "user", content: userPrompt }
-          ],
-          response_format: { type: "json_object" },
-          max_completion_tokens: 1024,
+        const message = await anthropic.messages.create({
+          model: "claude-haiku-4-5",
+          max_tokens: 8192,
+          system: AI_GUARDRAILS.systemPrompt,
+          messages: [{ role: "user", content: userPrompt }],
         });
-        
-        const result = JSON.parse(response.choices[0].message.content || "{}");
+
+        const block = message.content[0];
+        const rawText = block && block.type === "text" ? block.text : "{}";
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        const result = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
         
         // Apply guardrails validation and sanitization
         const rawRecommendations = result.recommendations || [];

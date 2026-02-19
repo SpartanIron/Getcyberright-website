@@ -786,51 +786,21 @@ EDGE CASE HANDLING
 
       const userMessage = `Please analyze the following content for scam/threat indicators:\n\n${content}`;
 
-      let resultText: string | null = null;
+      const Anthropic = (await import("@anthropic-ai/sdk")).default;
+      const anthropic = new Anthropic({
+        apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+        baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
+      });
 
-      // Try OpenAI first
-      try {
-        const OpenAI = (await import("openai")).default;
-        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const message = await anthropic.messages.create({
+        model: "claude-haiku-4-5",
+        max_tokens: 8192,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMessage }],
+      });
 
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userMessage }
-          ],
-          response_format: { type: "json_object" },
-          max_completion_tokens: 1024,
-        });
-
-        resultText = response.choices[0]?.message?.content || null;
-      } catch (openaiError: any) {
-        console.warn("OpenAI unavailable, falling back to Anthropic:", openaiError?.message || openaiError);
-      }
-
-      // Fallback to Anthropic if OpenAI failed
-      if (!resultText) {
-        try {
-          const Anthropic = (await import("@anthropic-ai/sdk")).default;
-          const anthropic = new Anthropic({
-            apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
-            baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
-          });
-
-          const message = await anthropic.messages.create({
-            model: "claude-haiku-4-5",
-            max_tokens: 8192,
-            system: systemPrompt,
-            messages: [{ role: "user", content: userMessage }],
-          });
-
-          const block = message.content[0];
-          resultText = block && block.type === "text" ? block.text : null;
-        } catch (anthropicError: any) {
-          console.error("Anthropic fallback also failed:", anthropicError?.message || anthropicError);
-          throw new Error("All AI providers unavailable");
-        }
-      }
+      const block = message.content[0];
+      const resultText = block && block.type === "text" ? block.text : null;
 
       if (!resultText) {
         throw new Error("No response from AI model");

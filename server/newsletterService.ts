@@ -1,11 +1,14 @@
 import { db } from "./db";
 import { newsletterSubscribers, newsletterIssues, threatItems } from "@shared/schema";
 import { eq, desc, gte, and } from "drizzle-orm";
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import { ContentGuardrails } from "@shared/contentGuardrails";
 import { Resend } from "resend";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const anthropic = new Anthropic({
+  apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
+});
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 interface NewsletterContent {
@@ -63,28 +66,17 @@ class NewsletterService {
       `${t.title} (${t.severity || "medium"}): ${(t.summary || "").substring(0, 100)}`
     ).join("\n");
 
-    if (!process.env.OPENAI_API_KEY) {
-      return this.generateFallbackContent(threats.length);
-    }
-
     try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [
-          {
-            role: "system",
-            content: `You are a cybersecurity education specialist writing a friendly, accessible weekly newsletter for GetCyberRight subscribers. Your audience includes families, seniors, and small business owners who are not technical experts.
+      const systemPrompt = `You are a cybersecurity education specialist writing a friendly, accessible weekly newsletter for GetCyberRight subscribers. Your audience includes families, seniors, and small business owners who are not technical experts.
 
 WRITING RULES:
 - Use simple, everyday language
 - Never use dashes to separate clauses; use periods, commas, or semicolons instead
 - Be encouraging and empowering, not scary
 - Provide specific, actionable advice
-- Keep each section concise (2-3 sentences for summaries, 3-4 for tips)`
-          },
-          {
-            role: "user",
-            content: `Based on this week's threat intelligence, create newsletter content:
+- Keep each section concise (2-3 sentences for summaries, 3-4 for tips)`;
+
+      const userPrompt = `Based on this week's threat intelligence, create newsletter content:
 
 THREATS DETECTED THIS WEEK:
 ${threatSummary || "No significant new threats detected this week."}
@@ -96,14 +88,19 @@ Generate a JSON response with:
   "protectionTip": "One practical tip with step by step guidance (3-4 sentences)",
   "familyTopic": "A conversation starter for families about online safety (2-3 sentences)",
   "quickWins": ["Quick action 1", "Quick action 2", "Quick action 3"]
-}`
-          }
-        ],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 1024,
+}`;
+
+      const message = await anthropic.messages.create({
+        model: "claude-haiku-4-5",
+        max_tokens: 8192,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }],
       });
 
-      const result = JSON.parse(response.choices[0].message.content || "{}");
+      const block = message.content[0];
+      const rawText = block && block.type === "text" ? block.text : "{}";
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      const result = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
       
       const content = {
         subject: ContentGuardrails.sanitizeText(result.subject || "Your Weekly Cyber Safety Update"),
