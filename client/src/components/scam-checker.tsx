@@ -157,6 +157,59 @@ const threatPatterns: { pattern: RegExp; category: string; indicator: string; se
   // Account Security Threats
   { pattern: /\b(account (has been |is )?(hacked|compromised|breached|suspended|locked|frozen))\b/i, category: "Account Compromise Scam", indicator: "Account threat claim", severity: "high", explanation: "Claims that your account is compromised are often lies to steal your credentials. Check directly with the company." },
   { pattern: /\b(unusual (activity|login|sign[- ]?in)|unrecognized device|security alert)\b/i, category: "Account Compromise Scam", indicator: "Security alert language", severity: "medium", explanation: "While sometimes legitimate, these alerts are often spoofed. Always navigate directly to the service to verify." },
+
+  // === SCENARIO-BASED SCAM DETECTION ===
+  // These patterns catch conversational descriptions of common scams
+
+  // Overpayment / Accidental Money Transfer Scam
+  { pattern: /\b(mistakenly|accidentally|by mistake|by accident|wrong person)\b.{0,80}(sent|transfer|paid|money|payment)/i, category: "Overpayment Scam", indicator: "Accidental money transfer claim", severity: "critical", explanation: "This is a classic overpayment scam. Scammers claim they accidentally sent you money and ask you to 'return' it. The original payment is fake or will be reversed, leaving you out the money you 'returned'. Never send money back to strangers." },
+  { pattern: /\b(sent|transfer|paid|money|payment).{0,80}(mistakenly|accidentally|by mistake|by accident|wrong person)/i, category: "Overpayment Scam", indicator: "Accidental payment narrative", severity: "critical", explanation: "This is a classic overpayment scam. Scammers claim they accidentally sent you money and ask you to 'return' it. The original payment is fake or will be reversed, leaving you out the money you 'returned'. Never send money back to strangers." },
+  { pattern: /\b(send|return|give).{0,40}(back|refund).{0,40}(money|payment|funds|amount|difference)/i, category: "Overpayment Scam", indicator: "Request to return money", severity: "critical", explanation: "Requests to 'send back' or 'return' money are a hallmark of overpayment scams. Even if money appears in your account, it may be from a stolen account or fraudulent check and will be reversed." },
+  { pattern: /\b(overpay|overpaid|over-?payment|too much money|extra money|excess (funds|payment|amount))\b/i, category: "Overpayment Scam", indicator: "Overpayment language", severity: "critical", explanation: "Overpayment scams involve sending you more than owed (via fake check or stolen card) and asking you to refund the difference. The original payment bounces, but your refund is real and gone." },
+  { pattern: /\b(random|stranger|unknown|don'?t know).{0,40}(person|people|someone|number|text|message|contact)/i, category: "Social Engineering", indicator: "Contact from unknown person", severity: "medium", explanation: "Unsolicited contact from strangers is a common starting point for scams including wrong-number scams, pig butchering, and romance fraud. Be cautious about engaging with unknown contacts." },
+  { pattern: /\b(wrong number|wrong person|didn'?t mean to|not who I meant)\b/i, category: "Wrong Number Scam", indicator: "Wrong number/person claim", severity: "high", explanation: "The 'wrong number' text is a calculated social engineering tactic. Scammers pretend to contact you by accident to start a conversation, then build trust before eventually asking for money or promoting fake investments." },
+
+  // Pig Butchering / Investment Romance Scam
+  { pattern: /\b(invest(ment|ing)?|trad(e|ing)|crypto|forex).{0,60}(profit|return|earn|make money|guaranteed|platform)/i, category: "Pig Butchering Scam", indicator: "Investment opportunity from contact", severity: "high", explanation: "This matches the pattern of 'pig butchering' scams where someone befriends you then lures you into a fake investment platform. All profits shown are fake, and you cannot withdraw real money." },
+  { pattern: /\b(special|private|exclusive|insider).{0,30}(opportunity|platform|group|access|trading)/i, category: "Investment Scam", indicator: "Exclusive opportunity claim", severity: "high", explanation: "Claims of exclusive or insider access to investment opportunities are red flags. Legitimate investments don't recruit through texts or social media messages." },
+
+  // Cash Flipping / Money Multiplication
+  { pattern: /\b(flip|double|triple|multiply|turn).{0,30}(money|cash|\$\d+|funds|payment)/i, category: "Cash Flipping Scam", indicator: "Money multiplication promise", severity: "critical", explanation: "Cash flipping scams promise to multiply your money through a 'method' or 'system.' There is no legitimate way to multiply money instantly. You will lose everything you send." },
+  { pattern: /\b(send|give|transfer).{0,20}\$?\d+.{0,30}(get|receive|back).{0,20}\$?\d+/i, category: "Cash Flipping Scam", indicator: "Send-to-receive money scheme", severity: "critical", explanation: "Any scheme asking you to send money first to receive more back is a scam. This is the fundamental pattern behind cash flipping, advance fee fraud, and blessing circles." },
+
+  // Sextortion / Blackmail
+  { pattern: /\b(nude|naked|intimate|explicit|compromising).{0,60}(photo|picture|image|video|recording|content)/i, category: "Sextortion", indicator: "Intimate content threat", severity: "critical", explanation: "Sextortion scammers claim to have compromising images/videos and threaten to share them unless you pay. Often they have nothing. Never pay — it only leads to more demands." },
+  { pattern: /\b(recorded|captured|hacked).{0,40}(webcam|camera|screen|browsing|activity)/i, category: "Sextortion", indicator: "Webcam/device recording claim", severity: "critical", explanation: "Claims of having recorded you through your webcam are almost always false. This is a mass-sent extortion email. Do not respond or pay." },
+  { pattern: /\b(share|send|post|release|publish).{0,40}(contacts|friends|family|everyone|public)/i, category: "Blackmail Scam", indicator: "Threat to share with contacts", severity: "high", explanation: "Threats to share information with your contacts or publicly are a blackmail tactic. Do not engage or pay. Report to law enforcement." },
+
+  // Rental / Housing Scam
+  { pattern: /\b(rent|rental|apartment|house|room).{0,60}(deposit|payment|wire|hold|reserve|secure)/i, category: "Rental Scam", indicator: "Rental deposit request", severity: "high", explanation: "Rental scams ask for deposits or payments before you can see the property. Never pay for a rental you haven't visited in person. Scammers list properties they don't own." },
+  { pattern: /\b(can'?t (show|meet)|out of (town|country|state)).{0,60}(property|apartment|house|rental|place)/i, category: "Rental Scam", indicator: "Landlord unavailable to show property", severity: "high", explanation: "A landlord who can't show the property in person is a major red flag. Scammers invent excuses to avoid in-person meetings while collecting deposits for properties they don't control." },
+
+  // Fake Check / Money Order Scam
+  { pattern: /\b(check|cheque|money order|cashier'?s check).{0,60}(deposit|cash|send|difference|extra|overpay)/i, category: "Fake Check Scam", indicator: "Check deposit scheme", severity: "critical", explanation: "Fake check scams involve depositing a check, then sending part of the money elsewhere. The check bounces days later, but the money you sent is gone forever. Banks hold you responsible." },
+
+  // Charity / Disaster Scam
+  { pattern: /\b(donat|charit|relief|disaster|hurricane|earthquake|flood|wildfire|victim).{0,60}(send|give|transfer|payment|donate|help|contribute)/i, category: "Charity Scam", indicator: "Unsolicited charity request", severity: "medium", explanation: "Scammers exploit disasters and tragedies to collect fake donations. Only donate through established charities you've researched. Verify at give.org or charitynavigator.org." },
+
+  // Brushing / Unsolicited Package Scam
+  { pattern: /\b(package|parcel|delivery).{0,40}(didn'?t order|never ordered|unexpected|unsolicited)/i, category: "Brushing Scam", indicator: "Unsolicited package", severity: "medium", explanation: "Receiving packages you didn't order may be a 'brushing' scam where sellers use your address to post fake reviews. Don't scan any QR codes on these packages and report to the retailer." },
+  { pattern: /\b(scan|open).{0,20}(qr|code|barcode).{0,40}(package|delivery|parcel|gift)/i, category: "QR Code Scam", indicator: "QR code on unsolicited item", severity: "high", explanation: "QR codes on unexpected packages or mail can lead to phishing sites or malware. Never scan QR codes from unknown sources." },
+
+  // Impersonation of Friends/Family
+  { pattern: /\b(grandma|grandpa|grandson|granddaughter|grandchild|nephew|niece|family member).{0,60}(trouble|jail|hospital|accident|emergency|arrested|help|money)/i, category: "Grandparent Scam", indicator: "Family emergency scam", severity: "critical", explanation: "The grandparent scam involves someone pretending to be a family member in an emergency needing money. Always verify by calling the family member directly on their known phone number." },
+  { pattern: /\b(it'?s me|this is me|new (number|phone)).{0,40}(help|money|emergency|trouble|stuck)/i, category: "Impersonation Scam", indicator: "New number impersonation", severity: "high", explanation: "Scammers text from unknown numbers claiming to be someone you know with a 'new number' before asking for money. Always verify by calling the person's old number." },
+
+  // SIM Swap / Account Takeover Indicators
+  { pattern: /\b(sim|phone|number).{0,30}(swap|port|transfer|change).{0,30}(carrier|provider|service)/i, category: "SIM Swap Attack", indicator: "SIM swap attempt", severity: "critical", explanation: "SIM swapping is when criminals transfer your phone number to their device to intercept 2FA codes and access your accounts. Contact your carrier immediately if you suspect this." },
+
+  // Task/Job Scam (Pay to Start)
+  { pattern: /\b(job|work|task|position).{0,40}(pay|fee|buy|purchase|invest|deposit).{0,30}(start|begin|training|equipment|supplies)/i, category: "Job Scam", indicator: "Pay-to-start job offer", severity: "high", explanation: "Legitimate employers never ask you to pay to start working. Requirements to buy equipment, pay for training, or make deposits before starting are always scams." },
+  { pattern: /\b(like|review|rate|follow|subscribe).{0,30}(earn|make|get paid|\$\d+|money|commission)/i, category: "Task Scam", indicator: "Paid social media task scam", severity: "high", explanation: "Task scams promise easy money for liking, reviewing, or rating content online. They start with small real payments to build trust, then ask you to 'invest' larger amounts that you'll never get back." },
+
+  // Loan / Debt Relief Scam
+  { pattern: /\b(pre-?approved|guaranteed approval|no credit check|bad credit ok)\b.{0,40}(loan|credit|card|mortgage)/i, category: "Loan Scam", indicator: "Guaranteed loan approval", severity: "high", explanation: "No legitimate lender guarantees approval without checking credit. These scams collect upfront fees and personal information without ever providing a real loan." },
+  { pattern: /\b(student loan|debt).{0,40}(forgive|forgiveness|relief|eliminate|wipe|cancel)/i, category: "Debt Relief Scam", indicator: "Debt forgiveness promise", severity: "medium", explanation: "Debt relief scams charge fees for services that are free through official government programs. Never pay a company to apply for student loan forgiveness or debt relief." },
 ];
 
 const suspiciousUrlPatterns = [
