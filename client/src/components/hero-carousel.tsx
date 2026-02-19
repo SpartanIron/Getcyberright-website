@@ -125,7 +125,7 @@ export function HeroCarousel() {
               size="lg"
               className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-6 text-lg font-bold shadow-xl"
             >
-              <a href="#scam-checker" className="flex items-center gap-2">
+              <a href="/tools#scam-checker" className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
                 {t('scamChecker.checkButton')}
               </a>

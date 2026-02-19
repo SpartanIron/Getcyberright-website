@@ -45,7 +45,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
       icon: Search,
       title: "Check if something is a scam",
       description: "Verify suspicious links, messages, or situations instantly",
-      path: "#scam-checker",
+      path: "/tools#scam-checker",
       color: "from-blue-500 to-cyan-500",
       bgColor: "bg-blue-500/10 hover:bg-blue-500/20",
     },

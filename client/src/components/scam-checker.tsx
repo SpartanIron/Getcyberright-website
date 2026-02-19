@@ -1736,7 +1736,7 @@ export function ScamChecker() {
             <Search className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-xl">Scam Scanner</CardTitle>
+            <CardTitle className="text-xl">Scam Checker</CardTitle>
             <p className="text-sm text-muted-foreground">Paste anything suspicious and we'll analyze it instantly with pattern matching and AI</p>
           </div>
         </div>

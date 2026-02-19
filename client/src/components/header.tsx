@@ -209,10 +209,10 @@ export function Header() {
             className="hidden md:inline-flex bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white shadow-md"
             data-testid="nav-scam-checker"
           >
-            <Link to="/tools" className="flex items-center gap-1.5">
+            <a href="/tools#scam-checker" className="flex items-center gap-1.5">
               <ShieldCheck className="h-4 w-4" />
               {t("nav.scamChecker")}
-            </Link>
+            </a>
           </Button>
 
           {/* Site Search */}
@@ -333,14 +333,14 @@ export function Header() {
                 </Link>
 
                 {/* Scam Checker for mobile */}
-                <Link
-                  to="/tools"
+                <a
+                  href="/tools#scam-checker"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-3 font-semibold min-h-[52px] py-3 px-4 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md active:from-teal-600 active:to-cyan-600"
                 >
                   <ShieldCheck className="h-5 w-5 flex-shrink-0" />
                   <span>{t("nav.scamChecker")}</span>
-                </Link>
+                </a>
 
               </div>
             </SheetContent>

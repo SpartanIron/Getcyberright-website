@@ -78,6 +78,16 @@ export default function Tools() {
     if (tabParam === "safety-toolkit") setActiveCategory("safety-toolkit");
   }, [tabParam]);
 
+  useEffect(() => {
+    if (window.location.hash === "#scam-checker") {
+      setActiveCategory("security-scanner");
+      requestAnimationFrame(() => {
+        const el = document.getElementById("scam-checker");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.tools} />
@@ -148,7 +158,7 @@ export default function Tools() {
             </div>
 
             {activeCategory === "security-scanner" && (
-              <div className="max-w-4xl mx-auto">
+              <div id="scam-checker" className="max-w-4xl mx-auto scroll-mt-24">
                 <ScamChecker />
               </div>
             )}
