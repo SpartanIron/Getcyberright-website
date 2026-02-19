@@ -704,7 +704,7 @@ export function DeziAssistant() {
     const hasBeenWelcomed = sessionStorage.getItem(WELCOME_KEY);
     
     if (!hasBeenWelcomed) {
-      const timer = setTimeout(() => {
+      const showTimer = setTimeout(() => {
         setShowWelcomeBubble(true);
         sessionStorage.setItem(WELCOME_KEY, "true");
         
@@ -713,8 +713,15 @@ export function DeziAssistant() {
           (window as any).deziNotificationSound();
         }
       }, 3000); // 3 second delay
+
+      const hideTimer = setTimeout(() => {
+        setShowWelcomeBubble(false);
+      }, 11000); // Auto-hide after 8 seconds of visibility
       
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
     }
   }, [hasInteracted]);
 
@@ -1017,7 +1024,7 @@ export function DeziAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-16 right-4 sm:right-6 z-50 max-w-[280px] sm:max-w-[320px]"
+            className="fixed bottom-16 right-4 sm:right-6 z-50 max-w-[250px] sm:max-w-[320px]"
             data-testid="dezi-welcome-bubble"
           >
             <div className="bg-card border shadow-lg rounded-xl p-4 relative">
