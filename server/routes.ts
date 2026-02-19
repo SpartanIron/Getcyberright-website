@@ -715,16 +715,13 @@ export async function registerRoutes(
     }
   });
 
-  // AI-Powered Scam Analyzer (streaming)
+  // AI-Powered Scam Analyzer with Anthropic fallback
   app.post("/api/security/ai-scam-analyze", standardRateLimit, async (req, res) => {
     try {
       const { content } = z.object({
         content: z.string().min(5, "Please provide at least 5 characters").max(50000, "Content too long"),
         contentType: z.string().optional()
       }).parse(req.body);
-
-      const OpenAI = (await import("openai")).default;
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
       const systemPrompt = `You are a cybersecurity threat-analysis AI specializing in:
 - Phishing detection
@@ -789,30 +786,63 @@ EDGE CASE HANDLING
 
       const userMessage = `Please analyze the following content for scam/threat indicators:\n\n${content}`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage }
-        ],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 1024,
-      });
+      let resultText: string | null = null;
 
-      const resultText = response.choices[0]?.message?.content;
+      // Try OpenAI first
+      try {
+        const OpenAI = (await import("openai")).default;
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage }
+          ],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 1024,
+        });
+
+        resultText = response.choices[0]?.message?.content || null;
+      } catch (openaiError: any) {
+        console.warn("OpenAI unavailable, falling back to Anthropic:", openaiError?.message || openaiError);
+      }
+
+      // Fallback to Anthropic if OpenAI failed
+      if (!resultText) {
+        try {
+          const Anthropic = (await import("@anthropic-ai/sdk")).default;
+          const anthropic = new Anthropic({
+            apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+            baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
+          });
+
+          const message = await anthropic.messages.create({
+            model: "claude-haiku-4-5",
+            max_tokens: 8192,
+            system: systemPrompt,
+            messages: [{ role: "user", content: userMessage }],
+          });
+
+          const block = message.content[0];
+          resultText = block && block.type === "text" ? block.text : null;
+        } catch (anthropicError: any) {
+          console.error("Anthropic fallback also failed:", anthropicError?.message || anthropicError);
+          throw new Error("All AI providers unavailable");
+        }
+      }
+
       if (!resultText) {
         throw new Error("No response from AI model");
       }
 
-      const parsed = JSON.parse(resultText);
+      const jsonMatch = resultText.match(/\{[\s\S]*\}/);
+      const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : resultText);
       res.json({ success: true, result: parsed });
     } catch (error: any) {
       console.error("AI Scam Analyzer error:", error);
-      const isQuota = error?.status === 429 || error?.message?.includes("quota") || error?.message?.includes("429");
-      const errorMessage = isQuota 
-        ? "The AI analysis service is temporarily at capacity. Please try again in a few minutes, or use the pattern-based Scam Checker tool."
-        : "Analysis could not be completed. Please try again or use the pattern-based Scam Checker tool.";
-      res.status(isQuota ? 429 : 500).json({ success: false, error: errorMessage });
+      const errorMessage = "Analysis could not be completed. Please try again or use the pattern-based Scam Checker tool.";
+      res.status(500).json({ success: false, error: errorMessage });
     }
   });
 
