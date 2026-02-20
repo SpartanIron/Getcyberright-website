@@ -262,11 +262,9 @@ export function TrendingThreats() {
 function ThreatCard({ threat }: { threat: TrendingThreat }) {
   const Icon = categoryIcons[threat.category] || AlertTriangle;
   const severityClass = severityColors[threat.severity] || severityColors.low;
-  const isClickable = !!threat.linkUrl;
-
-  const content = (
+  return (
     <div
-      className={`rounded-lg border border-teal-300 dark:border-teal-700/50 bg-white dark:bg-card p-4 sm:p-5 transition-opacity duration-300 animate-in fade-in slide-in-from-right-2 shadow-sm ${isClickable ? "hover-elevate" : ""}`}
+      className="rounded-lg border border-teal-300 dark:border-teal-700/50 bg-white dark:bg-card p-4 sm:p-5 transition-opacity duration-300 animate-in fade-in slide-in-from-right-2 shadow-sm"
       data-testid={`card-threat-${threat.id}`}
     >
       <div className="flex items-start gap-3 sm:gap-4">
@@ -303,20 +301,4 @@ function ThreatCard({ threat }: { threat: TrendingThreat }) {
       </div>
     </div>
   );
-
-  if (isClickable) {
-    return (
-      <a
-        href={threat.linkUrl!}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-        data-testid={`link-threat-${threat.id}`}
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return content;
 }
