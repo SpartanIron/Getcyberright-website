@@ -114,8 +114,8 @@ export function AnnouncementBanner() {
               <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${isUrgent ? "text-white" : config.accent}`} aria-hidden="true" />
             </div>
 
-            <div className="flex-1 min-w-0 flex items-center gap-2 overflow-hidden">
-              <p className="text-[13px] leading-tight truncate" data-testid="text-announcement-title">
+            <div className="flex-1 min-w-0 flex items-center gap-2">
+              <p className="text-[13px] leading-tight truncate sm:whitespace-normal sm:overflow-visible sm:text-clip" data-testid="text-announcement-title">
                 <span className="font-semibold">{current.title}</span>
                 <span className="opacity-80 ml-1.5" data-testid="text-announcement-content">
                   {current.content}
