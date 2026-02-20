@@ -523,7 +523,22 @@ export function registerToolTrackingRoutes(app: Express) {
         .orderBy(trendingThreats.displayOrder, desc(trendingThreats.createdAt))
         .limit(6);
 
-      res.json({ threats, detectedRegion: region });
+      const SOURCE_URL_FALLBACKS: Record<string, string> = {
+        "FBI": "https://www.ic3.gov/Home/ComplaintChoice",
+        "FTC": "https://consumer.ftc.gov/scams",
+        "CISA": "https://www.cisa.gov/news-events/cybersecurity-advisories",
+        "Europol": "https://www.europol.europa.eu/crime-areas/cybercrime",
+        "NCMEC": "https://www.missingkids.org/theissues/onlineexploitation",
+        "AARP": "https://www.aarp.org/money/scams-fraud/",
+      };
+      const threatsWithUrls = threats.map(t => {
+        if (!t.linkUrl) {
+          const match = Object.entries(SOURCE_URL_FALLBACKS).find(([k]) => t.source.includes(k));
+          return { ...t, linkUrl: match ? match[1] : "https://www.cisa.gov/news-events/cybersecurity-advisories" };
+        }
+        return t;
+      });
+      res.json({ threats: threatsWithUrls, detectedRegion: region });
     } catch (error) {
       console.error("Fetch trending threats error:", error);
       res.status(500).json({ error: "Failed to fetch trending threats" });

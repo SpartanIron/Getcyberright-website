@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, ShieldAlert, Bug, AlertOctagon, Lock, UserX, Users, MapPin, ChevronLeft, ChevronRight, Radio } from "lucide-react";
+import { AlertTriangle, ShieldAlert, Bug, AlertOctagon, Lock, UserX, Users, MapPin, ChevronLeft, ChevronRight, Radio, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { TrendingThreat } from "@shared/schema";
@@ -262,9 +262,11 @@ export function TrendingThreats() {
 function ThreatCard({ threat }: { threat: TrendingThreat }) {
   const Icon = categoryIcons[threat.category] || AlertTriangle;
   const severityClass = severityColors[threat.severity] || severityColors.low;
-  return (
+  const hasLink = !!threat.linkUrl;
+
+  const card = (
     <div
-      className="rounded-lg border border-teal-300 dark:border-teal-700/50 bg-white dark:bg-card p-4 sm:p-5 transition-opacity duration-300 animate-in fade-in slide-in-from-right-2 shadow-sm"
+      className={`rounded-lg border border-teal-300 dark:border-teal-700/50 bg-white dark:bg-card p-4 sm:p-5 transition-opacity duration-300 animate-in fade-in slide-in-from-right-2 shadow-sm ${hasLink ? "hover-elevate" : ""}`}
       data-testid={`card-threat-${threat.id}`}
     >
       <div className="flex items-start gap-3 sm:gap-4">
@@ -283,22 +285,45 @@ function ThreatCard({ threat }: { threat: TrendingThreat }) {
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2.5">
             {threat.summary}
           </p>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] text-muted-foreground/70">
-              {threat.source}
-            </span>
-            {threat.audience && threat.audience !== "general" && (
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 no-default-hover-elevate no-default-active-elevate">
-                <Users className="w-2.5 h-2.5 mr-0.5" />
-                {audienceLabels[threat.audience] || threat.audience}
-              </Badge>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] text-muted-foreground/70">
+                {threat.source}
+              </span>
+              {threat.audience && threat.audience !== "general" && (
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 no-default-hover-elevate no-default-active-elevate">
+                  <Users className="w-2.5 h-2.5 mr-0.5" />
+                  {audienceLabels[threat.audience] || threat.audience}
+                </Badge>
+              )}
+              <span className="text-[11px] text-muted-foreground/50 capitalize">
+                {threat.category?.replace("_", " ")}
+              </span>
+            </div>
+            {hasLink && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-teal-600 dark:text-teal-400">
+                Verify at source <ExternalLink className="w-3 h-3" aria-hidden="true" />
+              </span>
             )}
-            <span className="text-[11px] text-muted-foreground/50 capitalize">
-              {threat.category?.replace("_", " ")}
-            </span>
           </div>
         </div>
       </div>
     </div>
   );
+
+  if (hasLink) {
+    return (
+      <a
+        href={threat.linkUrl!}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+        data-testid={`link-threat-${threat.id}`}
+      >
+        {card}
+      </a>
+    );
+  }
+
+  return card;
 }
