@@ -118,41 +118,6 @@ export function HeroSection() {
           />
         </svg>
 
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 overflow-hidden pointer-events-none" aria-hidden="true">
-          <svg className="absolute -left-16 top-1/2 -translate-y-1/2 w-[350px] h-[350px]" viewBox="0 0 350 350">
-            {Array.from({ length: 50 }).map((_, i) => {
-              const angle = (i / 50) * Math.PI * 0.7 + Math.PI * 0.65;
-              const radius = 120 + Math.random() * 35;
-              const x = 175 + Math.cos(angle) * radius;
-              const y = 175 + Math.sin(angle) * radius;
-              const size = 1 + Math.random() * 2;
-              return (
-                <circle
-                  key={i}
-                  cx={x}
-                  cy={y}
-                  r={size}
-                  fill="hsl(174 65% 42%)"
-                  opacity={0.2 + Math.random() * 0.4}
-                />
-              );
-            })}
-            <path
-              d="M40,310 Q175,175 310,40"
-              fill="none"
-              stroke="hsl(174 65% 42%)"
-              strokeOpacity="0.3"
-              strokeWidth="1"
-            />
-          </svg>
-        </div>
-
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-visible pointer-events-none" aria-hidden="true">
-          <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-accent/80" />
-          <div className="absolute top-24 right-4 w-20 h-20 rounded-full bg-accent/60" />
-          <div className="absolute bottom-16 -right-6 w-24 h-24 rounded-full bg-accent/50" />
-        </div>
-
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 h-full flex items-center">
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 bg-primary/20 px-4 py-2 rounded-full mb-6">

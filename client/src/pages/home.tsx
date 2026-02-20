@@ -2,11 +2,7 @@ import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
 import { TrendingThreats } from "@/components/trending-threats";
 import { HeroTools } from "@/components/hero-tools";
-import { LogoCarousel } from "@/components/logo-carousel";
-import { PromoVideoSection } from "@/components/promo-video-section";
-import { ValueProposition } from "@/components/value-proposition";
 import { FeaturesGrid } from "@/components/features-grid";
-import { MissionBanner } from "@/components/mission-banner";
 import { AudienceShowcase } from "@/components/audience-showcase";
 import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
@@ -43,12 +39,8 @@ export default function Home() {
         <HeroSection />
         <TrendingThreats />
         <HeroTools />
-        <LogoCarousel />
-        <PromoVideoSection />
-        <ValueProposition />
         <FeaturesGrid />
         <AudienceShowcase />
-        <MissionBanner />
         <CTAFooter />
       </main>
       <Footer />
