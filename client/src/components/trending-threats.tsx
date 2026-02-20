@@ -164,7 +164,7 @@ export function TrendingThreats() {
 
   return (
     <section
-      className="py-6 sm:py-8"
+      className="py-6 sm:py-8 bg-teal-50/60 dark:bg-teal-950/20 border-y border-teal-100 dark:border-teal-900/30"
       aria-label="Trending threats"
       data-testid="section-trending-threats"
     >
@@ -213,7 +213,7 @@ export function TrendingThreats() {
         </div>
 
         {isLoading && (
-          <div className="rounded-md border bg-card p-4 animate-pulse">
+          <div className="rounded-lg border border-teal-300 dark:border-teal-700/50 bg-white dark:bg-card p-4 animate-pulse shadow-sm">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-md bg-muted" />
               <div className="flex-1 space-y-2">
@@ -266,12 +266,12 @@ function ThreatCard({ threat }: { threat: TrendingThreat }) {
 
   const content = (
     <div
-      className={`rounded-md border bg-card p-4 sm:p-5 transition-opacity duration-300 animate-in fade-in slide-in-from-right-2 ${isClickable ? "hover-elevate" : ""}`}
+      className={`rounded-lg border border-teal-300 dark:border-teal-700/50 bg-white dark:bg-card p-4 sm:p-5 transition-opacity duration-300 animate-in fade-in slide-in-from-right-2 shadow-sm ${isClickable ? "hover-elevate" : ""}`}
       data-testid={`card-threat-${threat.id}`}
     >
       <div className="flex items-start gap-3 sm:gap-4">
-        <div className="flex-shrink-0 mt-0.5 w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center">
-          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" aria-hidden="true" />
+        <div className="flex-shrink-0 mt-0.5 w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-teal-500/10 dark:bg-teal-500/20 flex items-center justify-center">
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 dark:text-teal-400" aria-hidden="true" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-2 flex-wrap mb-1.5">
