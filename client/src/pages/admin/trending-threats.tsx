@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -26,7 +27,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { TrendingUp, Plus, Pencil, Trash2 } from "lucide-react";
+import { TrendingUp, Plus, Pencil, Trash2, RefreshCw, MapPin, Users, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { TrendingThreat } from "@shared/schema";
@@ -48,6 +49,29 @@ const SEVERITIES = [
   { value: "critical", label: "Critical" },
 ];
 
+const REGIONS = [
+  { value: "GLOBAL", label: "Global" },
+  { value: "US", label: "United States" },
+  { value: "CA", label: "Canada" },
+  { value: "GB", label: "United Kingdom" },
+  { value: "EU", label: "Europe" },
+  { value: "AU", label: "Australia" },
+  { value: "NZ", label: "New Zealand" },
+  { value: "AF_WEST", label: "West Africa" },
+  { value: "AF_EAST", label: "East Africa" },
+  { value: "AF_SOUTH", label: "Southern Africa" },
+  { value: "SA", label: "South America" },
+  { value: "AS_SOUTH", label: "South Asia" },
+  { value: "AS_SOUTHEAST", label: "Southeast Asia" },
+];
+
+const AUDIENCES = [
+  { value: "general", label: "Everyone" },
+  { value: "seniors", label: "Seniors" },
+  { value: "families", label: "Families" },
+  { value: "children", label: "Children" },
+];
+
 interface ThreatForm {
   title: string;
   summary: string;
@@ -55,6 +79,8 @@ interface ThreatForm {
   category: string;
   severity: string;
   linkUrl: string;
+  regions: string[];
+  audience: string;
   isActive: boolean;
   displayOrder: number;
 }
@@ -66,6 +92,8 @@ const emptyForm: ThreatForm = {
   category: "scam",
   severity: "high",
   linkUrl: "",
+  regions: ["GLOBAL"],
+  audience: "general",
   isActive: true,
   displayOrder: 0,
 };
@@ -153,6 +181,19 @@ export default function AdminTrendingThreats() {
     },
   });
 
+  const refreshMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/admin/trending-threats/refresh");
+      return res.json();
+    },
+    onSuccess: (data: { added: number; expired: number }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/trending-threats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trending-threats"] });
+      toast({ title: `Refreshed: ${data.added} new, ${data.expired} expired` });
+    },
+    onError: () => toast({ title: "Failed to refresh threats", variant: "destructive" }),
+  });
+
   const handleSubmit = () => {
     const payload: Record<string, unknown> = {
       title: form.title,
@@ -163,6 +204,8 @@ export default function AdminTrendingThreats() {
       isActive: form.isActive,
       displayOrder: form.displayOrder,
       linkUrl: form.linkUrl || null,
+      regions: form.regions.length > 0 ? form.regions : ["GLOBAL"],
+      audience: form.audience,
     };
 
     if (editingId) {
@@ -170,6 +213,21 @@ export default function AdminTrendingThreats() {
     } else {
       createMutation.mutate(payload);
     }
+  };
+
+  const toggleRegion = (regionValue: string) => {
+    setForm((prev) => {
+      const current = prev.regions;
+      if (current.includes(regionValue)) {
+        const filtered = current.filter((r) => r !== regionValue);
+        return { ...prev, regions: filtered.length > 0 ? filtered : ["GLOBAL"] };
+      } else {
+        const updated = regionValue === "GLOBAL"
+          ? ["GLOBAL"]
+          : [...current.filter((r) => r !== "GLOBAL"), regionValue];
+        return { ...prev, regions: updated };
+      }
+    });
   };
 
   const openEdit = (t: TrendingThreat) => {
@@ -181,6 +239,8 @@ export default function AdminTrendingThreats() {
       category: t.category,
       severity: t.severity,
       linkUrl: t.linkUrl || "",
+      regions: (t.regions as string[]) || ["GLOBAL"],
+      audience: t.audience || "general",
       isActive: t.isActive,
       displayOrder: t.displayOrder,
     });
@@ -207,9 +267,9 @@ export default function AdminTrendingThreats() {
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
-      case "critical": return <Badge className="bg-red-600 text-white no-default-hover-elevate no-default-active-elevate">Critical</Badge>;
-      case "high": return <Badge className="bg-orange-500 text-white no-default-hover-elevate no-default-active-elevate">High</Badge>;
-      case "medium": return <Badge className="bg-amber-500 text-white no-default-hover-elevate no-default-active-elevate">Medium</Badge>;
+      case "critical": return <Badge className="bg-red-600 dark:bg-red-700 text-white no-default-hover-elevate no-default-active-elevate">Critical</Badge>;
+      case "high": return <Badge className="bg-orange-500 dark:bg-orange-600 text-white no-default-hover-elevate no-default-active-elevate">High</Badge>;
+      case "medium": return <Badge className="bg-amber-500 dark:bg-amber-600 text-white no-default-hover-elevate no-default-active-elevate">Medium</Badge>;
       default: return <Badge variant="secondary">Low</Badge>;
     }
   };
@@ -224,13 +284,28 @@ export default function AdminTrendingThreats() {
               Trending Threats
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Highlight current threats shown on the homepage
+              Manage region-specific threats shown on the homepage. Auto-refreshes every 6 hours.
             </p>
           </div>
-          <Button onClick={openCreate} data-testid="button-create-threat">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Threat
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              onClick={() => refreshMutation.mutate()}
+              disabled={refreshMutation.isPending}
+              data-testid="button-refresh-threats"
+            >
+              {refreshMutation.isPending ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4 mr-2" />
+              )}
+              {refreshMutation.isPending ? "Generating..." : "AI Refresh"}
+            </Button>
+            <Button onClick={openCreate} data-testid="button-create-threat">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Threat
+            </Button>
+          </div>
         </div>
 
         <Card>
@@ -243,7 +318,7 @@ export default function AdminTrendingThreats() {
               <div className="text-center py-12 text-muted-foreground">
                 <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p>No trending threats yet</p>
-                <p className="text-sm">Add one to highlight current threats on the homepage</p>
+                <p className="text-sm">Click AI Refresh to auto-generate, or add one manually</p>
               </div>
             ) : (
               <Table>
@@ -253,7 +328,8 @@ export default function AdminTrendingThreats() {
                     <TableHead>Title</TableHead>
                     <TableHead className="hidden sm:table-cell">Category</TableHead>
                     <TableHead className="hidden sm:table-cell">Severity</TableHead>
-                    <TableHead className="hidden md:table-cell">Source</TableHead>
+                    <TableHead className="hidden md:table-cell">Audience</TableHead>
+                    <TableHead className="hidden lg:table-cell">Regions</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -271,7 +347,12 @@ export default function AdminTrendingThreats() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-medium text-sm">{t.title}</p>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="font-medium text-sm">{t.title}</p>
+                            {t.isAutoGenerated && (
+                              <Sparkles className="w-3 h-3 text-primary flex-shrink-0" />
+                            )}
+                          </div>
                           <p className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-[300px]">
                             {t.summary}
                           </p>
@@ -283,8 +364,26 @@ export default function AdminTrendingThreats() {
                       <TableCell className="hidden sm:table-cell">
                         {getSeverityBadge(t.severity)}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                        {t.source}
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant="secondary" className="text-xs capitalize">
+                          <Users className="w-3 h-3 mr-1" />
+                          {t.audience || "general"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {((t.regions as string[]) || ["GLOBAL"]).slice(0, 2).map((r) => (
+                            <Badge key={r} variant="outline" className="text-[10px]">
+                              <MapPin className="w-2.5 h-2.5 mr-0.5" />
+                              {r}
+                            </Badge>
+                          ))}
+                          {((t.regions as string[]) || []).length > 2 && (
+                            <Badge variant="outline" className="text-[10px]">
+                              +{((t.regions as string[]) || []).length - 2}
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
@@ -306,7 +405,7 @@ export default function AdminTrendingThreats() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg" data-testid="dialog-threat-form">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" data-testid="dialog-threat-form">
           <DialogHeader>
             <DialogTitle>
               {editingId ? "Edit Trending Threat" : "Add Trending Threat"}
@@ -375,6 +474,36 @@ export default function AdminTrendingThreats() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Target Audience</Label>
+              <Select value={form.audience} onValueChange={(v) => setForm({ ...form, audience: v })}>
+                <SelectTrigger data-testid="select-threat-audience">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {AUDIENCES.map((a) => (
+                    <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Regions</Label>
+              <div className="grid grid-cols-2 gap-2 p-3 border rounded-md max-h-[160px] overflow-y-auto" data-testid="region-checkboxes">
+                {REGIONS.map((r) => (
+                  <label key={r.value} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <Checkbox
+                      checked={form.regions.includes(r.value)}
+                      onCheckedChange={() => toggleRegion(r.value)}
+                      data-testid={`checkbox-region-${r.value}`}
+                    />
+                    <span className="text-xs">{r.label}</span>
+                  </label>
+                ))}
               </div>
             </div>
 

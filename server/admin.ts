@@ -504,16 +504,26 @@ export function registerToolTrackingRoutes(app: Express) {
   // === Trending Threats ===
 
   // Public: Get active trending threats
-  app.get("/api/trending-threats", async (_req, res) => {
+  app.get("/api/trending-threats", async (req, res) => {
     try {
+      const region = (req.query.region as string || "GLOBAL").toUpperCase();
+
       const threats = await db
         .select()
         .from(trendingThreats)
-        .where(eq(trendingThreats.isActive, true))
+        .where(
+          and(
+            eq(trendingThreats.isActive, true),
+            or(
+              sql`${trendingThreats.regions} @> ARRAY[${region}]::text[]`,
+              sql`${trendingThreats.regions} @> ARRAY['GLOBAL']::text[]`
+            )
+          )
+        )
         .orderBy(trendingThreats.displayOrder, desc(trendingThreats.createdAt))
-        .limit(5);
+        .limit(6);
 
-      res.json({ threats });
+      res.json({ threats, detectedRegion: region });
     } catch (error) {
       console.error("Fetch trending threats error:", error);
       res.status(500).json({ error: "Failed to fetch trending threats" });
@@ -570,6 +580,18 @@ export function registerToolTrackingRoutes(app: Express) {
     } catch (error) {
       console.error("Update trending threat error:", error);
       res.status(500).json({ error: "Failed to update trending threat" });
+    }
+  });
+
+  // Admin: Manually refresh trending threats (trigger AI generation)
+  app.post("/api/admin/trending-threats/refresh", isAuthenticated, isAdminMiddleware, async (_req, res) => {
+    try {
+      const { refreshTrendingThreats } = await import("./trendingThreatService");
+      const result = await refreshTrendingThreats();
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error("Manual threat refresh error:", error);
+      res.status(500).json({ error: "Failed to refresh threats" });
     }
   });
 

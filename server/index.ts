@@ -214,6 +214,13 @@ app.use((req, res, next) => {
       }).catch(err => {
         console.error("Failed to start security alert fetcher:", err);
       });
+
+      // Start trending threat auto-refresh (every 6 hours)
+      import("./trendingThreatService").then(({ startThreatRefreshScheduler }) => {
+        startThreatRefreshScheduler();
+      }).catch(err => {
+        console.error("Failed to start trending threat scheduler:", err);
+      });
     },
   );
 

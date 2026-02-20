@@ -32,9 +32,10 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **Audio/Voice Deepfake Detector**: Analyzes audio for deepfake indicators.
 - **Family Safety Codeword Generator**: Generates secure codewords for emergency verification.
 - **Gamification & Achievement System**: Includes badge definitions, user badges, and progress tracking.
+- **Dynamic Trending Threats**: AI-powered, geo-tagged threat alerts on the homepage that auto-refresh every 6 hours using Claude Haiku. Threats are region-specific (13 regions including US, EU, West/East/Southern Africa, South/Southeast Asia) and audience-targeted (seniors, families, children, general). Uses timezone-based geo-detection on the frontend. Admin can manually trigger AI refresh or add threats manually. Em dashes are sanitized from all content. Schema: `trending_threats` table with regions array, audience, severity, auto-expiration.
 - **Automated Threat Intelligence**: Ingests data from 8 trusted sources (URLhaus, PhishTank, CISA, NVD, HIBP).
 - **Automated Content Governance System**: Monitors educational content for freshness and relevance.
-- **Admin System**: Comprehensive admin dashboard for user management, security monitoring, threat intelligence, content governance, and AI prompt management.
+- **Admin System**: Comprehensive admin dashboard for user management, security monitoring, threat intelligence, content governance, AI prompt management, and trending threat management.
 
 ## External Dependencies
 
