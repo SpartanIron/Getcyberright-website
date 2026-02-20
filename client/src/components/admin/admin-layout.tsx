@@ -10,7 +10,8 @@ import {
   ArrowLeft,
   Shield,
   BarChart3,
-  Megaphone
+  Megaphone,
+  TrendingUp
 } from "lucide-react";
 import logoImage from "@/assets/logo.png";
 
@@ -26,6 +27,7 @@ const navItems = [
   { href: "/admin/scam-reports", label: "Scam Reports", icon: AlertTriangle },
   { href: "/admin/tool-analytics", label: "Tool Analytics", icon: BarChart3 },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
+  { href: "/admin/trending-threats", label: "Trending Threats", icon: TrendingUp },
   { href: "/admin/security", label: "Security", icon: Shield },
 ];
 

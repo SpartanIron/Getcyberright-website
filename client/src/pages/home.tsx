@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
+import { TrendingThreats } from "@/components/trending-threats";
 import { HeroTools } from "@/components/hero-tools";
 import { LogoCarousel } from "@/components/logo-carousel";
 import { PromoVideoSection } from "@/components/promo-video-section";
@@ -40,6 +41,7 @@ export default function Home() {
       <Navigation />
       <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
         <HeroSection />
+        <TrendingThreats />
         <HeroTools />
         <LogoCarousel />
         <PromoVideoSection />

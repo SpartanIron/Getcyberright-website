@@ -1129,6 +1129,28 @@ export const insertAnnouncementSchema = createInsertSchema(platformAnnouncements
 export type PlatformAnnouncement = typeof platformAnnouncements.$inferSelect;
 export type InsertAnnouncement = z.infer<typeof insertAnnouncementSchema>;
 
+// Trending Threats
+export const trendingThreats = pgTable("trending_threats", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  summary: text("summary").notNull(),
+  source: text("source").notNull(),
+  category: text("category").notNull().default("scam"),
+  severity: text("severity").notNull().default("high"),
+  linkUrl: text("link_url"),
+  isActive: boolean("is_active").notNull().default(true),
+  displayOrder: integer("display_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertTrendingThreatSchema = createInsertSchema(trendingThreats).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type TrendingThreat = typeof trendingThreats.$inferSelect;
+export type InsertTrendingThreat = z.infer<typeof insertTrendingThreatSchema>;
+
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],
   scan_found: ["request_generated", "not_found"],

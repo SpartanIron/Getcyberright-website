@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
-import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema } from "@shared/schema";
+import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
 import { securityLogger } from "./security";
@@ -498,6 +498,90 @@ export function registerToolTrackingRoutes(app: Express) {
     } catch (error) {
       console.error("Delete announcement error:", error);
       res.status(500).json({ error: "Failed to delete announcement" });
+    }
+  });
+
+  // === Trending Threats ===
+
+  // Public: Get active trending threats
+  app.get("/api/trending-threats", async (_req, res) => {
+    try {
+      const threats = await db
+        .select()
+        .from(trendingThreats)
+        .where(eq(trendingThreats.isActive, true))
+        .orderBy(trendingThreats.displayOrder, desc(trendingThreats.createdAt))
+        .limit(5);
+
+      res.json({ threats });
+    } catch (error) {
+      console.error("Fetch trending threats error:", error);
+      res.status(500).json({ error: "Failed to fetch trending threats" });
+    }
+  });
+
+  // Admin: Get all trending threats
+  app.get("/api/admin/trending-threats", isAuthenticated, isAdminMiddleware, async (_req, res) => {
+    try {
+      const threats = await db
+        .select()
+        .from(trendingThreats)
+        .orderBy(trendingThreats.displayOrder, desc(trendingThreats.createdAt));
+
+      res.json({ threats });
+    } catch (error) {
+      console.error("Admin fetch trending threats error:", error);
+      res.status(500).json({ error: "Failed to fetch trending threats" });
+    }
+  });
+
+  // Admin: Create trending threat
+  app.post("/api/admin/trending-threats", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const parsed = insertTrendingThreatSchema.parse(req.body);
+      const [threat] = await db
+        .insert(trendingThreats)
+        .values(parsed)
+        .returning();
+
+      res.json({ threat });
+    } catch (error) {
+      console.error("Create trending threat error:", error);
+      res.status(500).json({ error: "Failed to create trending threat" });
+    }
+  });
+
+  // Admin: Update trending threat
+  app.patch("/api/admin/trending-threats/:id", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateSchema = insertTrendingThreatSchema.partial();
+      const parsed = updateSchema.parse(req.body);
+      const [updated] = await db
+        .update(trendingThreats)
+        .set(parsed)
+        .where(eq(trendingThreats.id, id))
+        .returning();
+
+      if (!updated) {
+        return res.status(404).json({ error: "Trending threat not found" });
+      }
+      res.json({ threat: updated });
+    } catch (error) {
+      console.error("Update trending threat error:", error);
+      res.status(500).json({ error: "Failed to update trending threat" });
+    }
+  });
+
+  // Admin: Delete trending threat
+  app.delete("/api/admin/trending-threats/:id", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await db.delete(trendingThreats).where(eq(trendingThreats.id, id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete trending threat error:", error);
+      res.status(500).json({ error: "Failed to delete trending threat" });
     }
   });
 }

@@ -57,6 +57,7 @@ const AdminCompliance = lazy(() => import("@/pages/admin-compliance"));
 const AdminNewsletter = lazy(() => import("@/pages/admin-newsletter"));
 const AdminPromptManagement = lazy(() => import("@/pages/admin-prompt-management"));
 const AdminAnnouncements = lazy(() => import("@/pages/admin/announcements"));
+const AdminTrendingThreats = lazy(() => import("@/pages/admin/trending-threats"));
 const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
@@ -174,6 +175,7 @@ function Router() {
         <Route path="/admin/newsletter" component={AdminNewsletter} />
         <Route path="/admin/prompt-management" component={AdminPromptManagement} />
         <Route path="/admin/announcements" component={AdminAnnouncements} />
+        <Route path="/admin/trending-threats" component={AdminTrendingThreats} />
         <Route path="/admin/change-password" component={AdminChangePassword} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
