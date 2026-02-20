@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Megaphone, AlertTriangle, Sparkles, Info, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, AlertTriangle, Sparkles, Megaphone, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { PlatformAnnouncement } from "@shared/schema";
 
@@ -24,45 +24,28 @@ function dismissAnnouncement(id: string) {
   }
 }
 
-function getTypeConfig(type: string, priority: string) {
-  if (priority === "urgent") {
-    return {
-      icon: AlertTriangle,
-      bg: "bg-red-600 dark:bg-red-700",
-      text: "text-white",
-      border: "",
-    };
-  }
-
-  switch (type) {
-    case "scam_alert":
-      return {
-        icon: AlertTriangle,
-        bg: "bg-orange-500 dark:bg-orange-600",
-        text: "text-white",
-        border: "",
-      };
-    case "new_feature":
-      return {
-        icon: Sparkles,
-        bg: "bg-primary",
-        text: "text-primary-foreground",
-        border: "",
-      };
-    case "update":
-    default:
-      return {
-        icon: Megaphone,
-        bg: "bg-slate-800 dark:bg-slate-700",
-        text: "text-white",
-        border: "",
-      };
-  }
-}
+const typeConfig: Record<string, { icon: typeof Megaphone; accent: string; dot: string }> = {
+  scam_alert: {
+    icon: AlertTriangle,
+    accent: "text-amber-300",
+    dot: "bg-amber-400",
+  },
+  new_feature: {
+    icon: Sparkles,
+    accent: "text-emerald-300",
+    dot: "bg-emerald-400",
+  },
+  update: {
+    icon: Megaphone,
+    accent: "text-sky-300",
+    dot: "bg-sky-400",
+  },
+};
 
 export function AnnouncementBanner() {
   const [dismissedIds, setDismissedIds] = useState<string[]>(getDismissedIds);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [autoRotate, setAutoRotate] = useState(true);
 
   const { data } = useQuery<{ announcements: PlatformAnnouncement[] }>({
     queryKey: ["/api/announcements"],
@@ -79,6 +62,14 @@ export function AnnouncementBanner() {
     }
   }, [visibleAnnouncements.length, currentIndex]);
 
+  useEffect(() => {
+    if (visibleAnnouncements.length <= 1 || !autoRotate) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % visibleAnnouncements.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [visibleAnnouncements.length, autoRotate]);
+
   const handleDismiss = (id: string) => {
     dismissAnnouncement(id);
     setDismissedIds(getDismissedIds());
@@ -89,54 +80,51 @@ export function AnnouncementBanner() {
   const current = visibleAnnouncements[currentIndex] || visibleAnnouncements[0];
   if (!current) return null;
 
-  const config = getTypeConfig(current.type, current.priority);
-  const Icon = config.icon;
+  const config = typeConfig[current.type] || typeConfig.update;
+  const isUrgent = current.priority === "urgent";
+  const Icon = isUrgent ? AlertTriangle : config.icon;
   const hasMultiple = visibleAnnouncements.length > 1;
 
   return (
     <AnimatePresence mode="wait">
       <motion.div
         key={current.id}
-        initial={{ height: 0, opacity: 0 }}
-        animate={{ height: "auto", opacity: 1 }}
-        exit={{ height: 0, opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className={`${config.bg} ${config.text} relative z-50`}
+        initial={{ opacity: 0, y: -4 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        className={`relative z-50 ${
+          isUrgent
+            ? "bg-red-600 dark:bg-red-700"
+            : "bg-slate-900 dark:bg-slate-800"
+        } text-white`}
         role="status"
         aria-live="polite"
         data-testid="announcement-banner"
+        onMouseEnter={() => setAutoRotate(false)}
+        onMouseLeave={() => setAutoRotate(true)}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3 py-2.5 sm:py-2">
-            {hasMultiple && (
-              <button
-                onClick={() =>
-                  setCurrentIndex(
-                    (currentIndex - 1 + visibleAnnouncements.length) %
-                      visibleAnnouncements.length
-                  )
-                }
-                className="opacity-70 hover:opacity-100 flex-shrink-0"
-                aria-label="Previous announcement"
-                data-testid="button-announcement-prev"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            )}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center gap-3 py-1.5">
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="relative flex items-center justify-center">
+                <span className={`absolute w-1.5 h-1.5 rounded-full ${isUrgent ? "bg-white" : config.dot} animate-pulse`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${isUrgent ? "bg-white/50" : config.dot + "/50"}`} />
+              </span>
+              <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${isUrgent ? "text-white" : config.accent}`} aria-hidden="true" />
+            </div>
 
-            <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium" data-testid="text-announcement-title">
-                <span>{current.title}</span>
-                <span className="font-normal opacity-90 ml-1" data-testid="text-announcement-content">
-                  &mdash; {current.content}
+            <div className="flex-1 min-w-0 flex items-center gap-2 overflow-hidden">
+              <p className="text-[13px] leading-tight truncate" data-testid="text-announcement-title">
+                <span className="font-semibold">{current.title}</span>
+                <span className="opacity-80 ml-1.5" data-testid="text-announcement-content">
+                  {current.content}
                 </span>
               </p>
               {current.linkUrl && (
                 <a
                   href={current.linkUrl}
-                  className="inline-flex items-center gap-1 text-xs font-medium underline underline-offset-2 opacity-90 hover:opacity-100 mt-0.5"
+                  className="inline-flex items-center gap-0.5 text-[12px] font-medium opacity-80 flex-shrink-0 underline underline-offset-2"
                   data-testid="link-announcement"
                 >
                   {current.linkText || "Learn more"}
@@ -145,34 +133,54 @@ export function AnnouncementBanner() {
               )}
             </div>
 
-            {hasMultiple && (
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <span className="text-xs opacity-70 hidden sm:inline">
-                  {currentIndex + 1}/{visibleAnnouncements.length}
-                </span>
-                <button
-                  onClick={() =>
-                    setCurrentIndex(
-                      (currentIndex + 1) % visibleAnnouncements.length
-                    )
-                  }
-                  className="opacity-70 hover:opacity-100"
-                  aria-label="Next announcement"
-                  data-testid="button-announcement-next"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-
-            <button
-              onClick={() => handleDismiss(current.id)}
-              className="opacity-70 hover:opacity-100 flex-shrink-0 p-0.5"
-              aria-label="Dismiss announcement"
-              data-testid="button-dismiss-announcement"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-0.5 flex-shrink-0">
+              {hasMultiple && (
+                <>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() =>
+                      setCurrentIndex(
+                        (currentIndex - 1 + visibleAnnouncements.length) %
+                          visibleAnnouncements.length
+                      )
+                    }
+                    aria-label="Previous announcement"
+                    data-testid="button-announcement-prev"
+                    className="text-white/60"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                  </Button>
+                  <span className="text-[11px] opacity-50 tabular-nums">
+                    {currentIndex + 1}/{visibleAnnouncements.length}
+                  </span>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() =>
+                      setCurrentIndex(
+                        (currentIndex + 1) % visibleAnnouncements.length
+                      )
+                    }
+                    aria-label="Next announcement"
+                    data-testid="button-announcement-next"
+                    className="text-white/60"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Button>
+                </>
+              )}
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => handleDismiss(current.id)}
+                aria-label="Dismiss announcement"
+                data-testid="button-dismiss-announcement"
+                className="text-white/60 ml-0.5"
+              >
+                <X className="w-3.5 h-3.5" />
+              </Button>
+            </div>
           </div>
         </div>
       </motion.div>
