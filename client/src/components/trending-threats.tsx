@@ -302,7 +302,7 @@ function ThreatCard({ threat }: { threat: TrendingThreat }) {
             </div>
             {hasLink && (
               <span className="inline-flex items-center gap-1 text-[11px] font-medium text-teal-600 dark:text-teal-400">
-                Verify at source <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                Read full report <ExternalLink className="w-3 h-3" aria-hidden="true" />
               </span>
             )}
           </div>

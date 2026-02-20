@@ -524,12 +524,13 @@ export function registerToolTrackingRoutes(app: Express) {
         .limit(6);
 
       const SOURCE_URL_FALLBACKS: Record<string, string> = {
+        "CISA": "https://www.cisa.gov/news-events/cybersecurity-advisories",
+        "BleepingComputer": "https://www.bleepingcomputer.com/",
+        "The Hacker News": "https://thehackernews.com/",
+        "Krebs": "https://krebsonsecurity.com/",
+        "Dark Reading": "https://www.darkreading.com/",
         "FBI": "https://www.ic3.gov/Home/ComplaintChoice",
         "FTC": "https://consumer.ftc.gov/scams",
-        "CISA": "https://www.cisa.gov/news-events/cybersecurity-advisories",
-        "Europol": "https://www.europol.europa.eu/crime-areas/cybercrime",
-        "NCMEC": "https://www.missingkids.org/theissues/onlineexploitation",
-        "AARP": "https://www.aarp.org/money/scams-fraud/",
       };
       const threatsWithUrls = threats.map(t => {
         if (!t.linkUrl) {
