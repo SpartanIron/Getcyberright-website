@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
+import { TrustStats } from "@/components/trust-stats";
 import { TrendingThreats } from "@/components/trending-threats";
 import { HeroTools } from "@/components/hero-tools";
 import { FeaturesGrid } from "@/components/features-grid";
@@ -37,6 +38,7 @@ export default function Home() {
       <Navigation />
       <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
         <HeroSection />
+        <TrustStats />
         <TrendingThreats />
         <HeroTools />
         <FeaturesGrid />

@@ -409,3 +409,39 @@
 .grecaptcha-badge {
   bottom: 70px !important;
 }
+
+.hero-gradient-text {
+  background: linear-gradient(135deg, hsl(174 65% 55%), hsl(174 65% 42%), hsl(32 95% 52%), hsl(174 65% 55%));
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 6s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.hero-glow-bg {
+  background: radial-gradient(ellipse at 30% 50%, hsl(174 65% 42% / 0.15) 0%, transparent 60%),
+              radial-gradient(ellipse at 60% 30%, hsl(32 95% 52% / 0.08) 0%, transparent 50%);
+  animation: glow-pulse 8s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-gradient-text {
+    animation: none;
+    background-position: 50% 50%;
+  }
+  .hero-glow-bg {
+    animation: none;
+    opacity: 0.3;
+  }
+}

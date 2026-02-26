@@ -9,7 +9,7 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Brand Identity & Design
-The platform uses an enterprise teal and orange color scheme with a flat, minimal aesthetic, prioritizing accessibility, SEO, and print support. Audience-specific hubs (Kids, Seniors, Parents, Educators, Small Business) feature distinct color themes while maintaining brand consistency. The Kids Digital Safety Hub offers age-segmented, gamified lessons.
+The platform uses an enterprise teal and orange color scheme with a flat, minimal aesthetic, prioritizing accessibility, SEO, and print support. Audience-specific hubs (Kids, Seniors, Parents, Educators, Small Business) feature distinct color themes while maintaining brand consistency. The Kids Digital Safety Hub offers age-segmented, gamified lessons. The homepage features animated hero entrance (Framer Motion staggered animations), gradient-animated "Get CyberRight." headline text (teal-to-orange shimmer), animated trust stats bar with count-up numbers (500+ brokers, 406+ prompts, 5 feeds, 100% free), and a subtle hero background glow effect. All animations respect prefers-reduced-motion. Em dashes are prohibited in all user-facing content.
 
 ### Technical Implementation
 - **Frontend**: React 19 with TypeScript and Vite, Wouter for routing, TanStack Query for state management, Tailwind CSS with shadcn/ui for styling, Framer Motion for animations, and React Hook Form with Zod for forms. It features a mobile-first design with dynamic SEO management.

@@ -1,7 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Users, Zap } from "lucide-react";
 import { Link } from "wouter";
+import { motion } from "framer-motion";
 import professionalImage from "@/assets/images/professional-laptop.jpg";
+
+const stagger = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15, delayChildren: 0.2 },
+  },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
+const fadeSide = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
 
 export function HeroSection() {
   return (
@@ -19,52 +38,63 @@ export function HeroSection() {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-900/40" />
         </div>
         
-        <div className="relative px-5 py-8 bg-slate-900">
-          <div className="max-w-md mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full mb-4">
+        <div className="relative px-5 py-8 bg-slate-900 overflow-hidden">
+          <div className="absolute inset-0 hero-glow-bg opacity-40" />
+
+          <motion.div
+            className="max-w-md mx-auto text-center relative z-10"
+            variants={stagger}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full mb-4">
               <Shield className="w-4 h-4 text-primary" />
               <span className="text-xs font-semibold text-primary uppercase tracking-wider">
                 Free Tools. Real Protection.
               </span>
-            </div>
+            </motion.div>
             
-            <h1 
+            <motion.h1 
+              variants={fadeUp}
               className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 leading-[1.15]" 
               data-testid="text-hero-heading-mobile"
             >
-              Don't Get Scammed.<br />Get CyberRight.
-            </h1>
+              Don't Get Scammed.<br />
+              <span className="hero-gradient-text">Get CyberRight.</span>
+            </motion.h1>
 
-            <p className="text-sm sm:text-base text-white/80 font-medium mb-4 leading-relaxed">
+            <motion.p variants={fadeUp} className="text-sm sm:text-base text-white/80 font-medium mb-4 leading-relaxed">
               Free tools and plain-language guides that help your whole family stay safe online, from your kids' first device to your parents' inbox.
-            </p>
+            </motion.p>
 
-            <ul className="space-y-2 mb-6 text-xs sm:text-sm font-medium text-left max-w-xs mx-auto">
-              <li className="flex items-start gap-3 text-white/80">
+            <motion.ul variants={stagger} className="space-y-2 mb-6 text-xs sm:text-sm font-medium text-left max-w-xs mx-auto">
+              <motion.li variants={fadeSide} className="flex items-start gap-3 text-white/80">
                 <Zap className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span>Check a suspicious message in 60 seconds.</span>
-              </li>
-              <li className="flex items-start gap-3 text-white/80">
+              </motion.li>
+              <motion.li variants={fadeSide} className="flex items-start gap-3 text-white/80">
                 <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span>Real protection, explained in real words.</span>
-              </li>
-              <li className="flex items-start gap-3 text-white/80">
+              </motion.li>
+              <motion.li variants={fadeSide} className="flex items-start gap-3 text-white/80">
                 <Users className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span>Trusted by thousands of families.</span>
-              </li>
-            </ul>
+              </motion.li>
+            </motion.ul>
 
-            <Link href="/tools">
-              <Button 
-                size="default" 
-                className="rounded-full px-6 bg-accent text-accent-foreground border-accent-border shadow-lg" 
-                data-testid="button-hero-primary-cta-mobile"
-              >
-                Check If It's a Scam
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
+            <motion.div variants={fadeUp}>
+              <Link href="/tools">
+                <Button 
+                  size="default" 
+                  className="rounded-full px-6 bg-accent text-accent-foreground border-accent-border shadow-lg" 
+                  data-testid="button-hero-primary-cta-mobile"
+                >
+                  Check If It's a Scam
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
 
@@ -118,62 +148,76 @@ export function HeroSection() {
           />
         </svg>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 h-full flex items-center">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute left-0 top-0 w-[680px] h-full hero-glow-bg opacity-30" />
+        </div>
+
+        <motion.div
+          className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 h-full flex items-center"
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+        >
           <div className="max-w-xl">
-            <div className="inline-flex items-center gap-2 bg-primary/20 px-4 py-2 rounded-full mb-6">
+            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-primary/20 px-4 py-2 rounded-full mb-6">
               <Shield className="w-5 h-5 text-primary" />
               <span className="text-sm font-semibold text-primary uppercase tracking-wider">
                 Free Tools. Real Protection.
               </span>
-            </div>
+            </motion.div>
 
-            <h1 
+            <motion.h1 
+              variants={fadeUp}
               className="text-5xl xl:text-6xl font-bold tracking-tight text-white leading-[1.1] mb-6" 
               data-testid="text-hero-heading"
             >
-              Don't Get Scammed.<br />Get CyberRight.
-            </h1>
+              Don't Get Scammed.<br />
+              <span className="hero-gradient-text">Get CyberRight.</span>
+            </motion.h1>
 
-            <p 
+            <motion.p 
+              variants={fadeUp}
               className="text-xl text-white/90 font-medium leading-relaxed mb-4" 
               data-testid="text-hero-subtext"
             >
               Free tools and plain-language guides that help your whole family stay safe online.
-            </p>
+            </motion.p>
 
-            <ul className="space-y-3 mb-10 text-sm font-medium">
-              <li className="flex items-center gap-3 text-white/85">
+            <motion.ul variants={stagger} className="space-y-3 mb-10 text-sm font-medium">
+              <motion.li variants={fadeSide} className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Zap className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
                 <span>Check a suspicious message in 60 seconds.</span>
-              </li>
-              <li className="flex items-center gap-3 text-white/85">
+              </motion.li>
+              <motion.li variants={fadeSide} className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Shield className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
                 <span>Real protection, explained in real words.</span>
-              </li>
-              <li className="flex items-center gap-3 text-white/85">
+              </motion.li>
+              <motion.li variants={fadeSide} className="flex items-center gap-3 text-white/85">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   <Users className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
                 <span>Trusted by thousands of families.</span>
-              </li>
-            </ul>
+              </motion.li>
+            </motion.ul>
 
-            <Link href="/tools">
-              <Button 
-                size="lg" 
-                className="rounded-full px-8 py-6 text-base bg-accent text-accent-foreground border-accent-border shadow-lg" 
-                data-testid="button-hero-primary-cta"
-              >
-                Check If It's a Scam
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
+            <motion.div variants={fadeUp}>
+              <Link href="/tools">
+                <Button 
+                  size="lg" 
+                  className="rounded-full px-8 py-6 text-base bg-accent text-accent-foreground border-accent-border shadow-lg" 
+                  data-testid="button-hero-primary-cta"
+                >
+                  Check If It's a Scam
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
