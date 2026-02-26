@@ -17,15 +17,16 @@ const stats = [
   },
   {
     icon: Shield,
-    value: 5,
+    value: 6,
     suffix: "",
     label: "Live Threat Feeds",
   },
   {
     icon: DollarSign,
-    value: 100,
-    suffix: "%",
-    label: "Free Forever",
+    value: 0,
+    suffix: "",
+    label: "Zero Cost, No Paywalls",
+    displayValue: "$0",
   },
 ];
 
@@ -55,12 +56,13 @@ function useCountUp(target: number, duration: number, shouldStart: boolean) {
   return count;
 }
 
-function StatItem({ icon: Icon, value, suffix, label, delay }: {
+function StatItem({ icon: Icon, value, suffix, label, delay, displayValue }: {
   icon: typeof Shield;
   value: number;
   suffix: string;
   label: string;
   delay: number;
+  displayValue?: string;
 }) {
   const [inView, setInView] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -76,6 +78,7 @@ function StatItem({ icon: Icon, value, suffix, label, delay }: {
   }, []);
 
   const count = useCountUp(value, 1800, inView);
+  const rendered = displayValue ? displayValue : `${count}${suffix}`;
 
   return (
     <motion.div
@@ -85,13 +88,13 @@ function StatItem({ icon: Icon, value, suffix, label, delay }: {
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
       className="flex flex-col items-center text-center px-2"
-      data-testid={`stat-${label.toLowerCase().replace(/\s+/g, "-")}`}
+      data-testid={`stat-${label.toLowerCase().replace(/[,\s]+/g, "-")}`}
     >
       <div className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-3">
         <Icon className="w-6 h-6 text-primary" />
       </div>
-      <div className="text-3xl sm:text-4xl font-bold text-foreground tabular-nums" aria-label={`${value}${suffix}`}>
-        {count}{suffix}
+      <div className="text-3xl sm:text-4xl font-bold text-foreground tabular-nums" aria-label={displayValue || `${value}${suffix}`}>
+        {rendered}
       </div>
       <div className="text-sm text-muted-foreground mt-1 font-medium">
         {label}
