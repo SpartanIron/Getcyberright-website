@@ -264,7 +264,7 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
                 aria-label={`Learn about ${topic.title}`}
                 data-testid={`card-topic-${topic.id}`}
               >
-                <div className="relative h-36 w-full">
+                <div className="relative h-48 sm:h-56 w-full">
                   <img
                     src={topic.image}
                     alt={topic.title}

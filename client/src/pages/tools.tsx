@@ -233,7 +233,7 @@ export default function Tools() {
             <div className="grid md:grid-cols-2 gap-6">
               {guides.map((guide) => (
                 <Card key={guide.id} className="overflow-visible hover-elevate" data-testid={`card-guide-${guide.id}`}>
-                  <div className="relative h-44 sm:h-48 overflow-hidden rounded-t-md">
+                  <div className="relative h-48 sm:h-56 overflow-hidden rounded-t-md">
                     <img
                       src={guide.image}
                       alt={guide.imageAlt}

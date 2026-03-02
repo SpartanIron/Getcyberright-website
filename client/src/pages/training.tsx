@@ -269,7 +269,7 @@ export default function Training() {
                     }`}
                     data-testid={`button-audience-${key}`}
                   >
-                    <div className="aspect-[4/3] relative">
+                    <div className="aspect-[16/10] relative">
                       <img
                         src={info.image}
                         alt={info.title}

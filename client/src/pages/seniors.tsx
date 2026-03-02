@@ -23,6 +23,8 @@ import cardMedicareScams from "@/assets/images/card-medicare-scams.png";
 import cardPhoneEmailScams from "@/assets/images/card-phone-email-scams.png";
 import cardIdentityTheft from "@/assets/images/card-identity-theft-seniors.png";
 import cardOnlineShopping from "@/assets/images/card-online-shopping-seniors.png";
+import cardGovernmentScams from "@/assets/images/card-government-scams.png";
+import cardInvestmentFraud from "@/assets/images/card-investment-fraud.png";
 
 interface SafetyTopic {
   id: string;
@@ -209,6 +211,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Scammers posing as IRS, Social Security, or law enforcement.",
     icon: UserX,
     color: "bg-indigo-500",
+    image: cardGovernmentScams,
     content: {
       intro: "Government impersonation scams are among the fastest-growing threats targeting older adults. According to the FTC, consumers reported losing over $500 million to these scams in recent years. Criminals pose as IRS agents, Social Security Administration employees, Medicare officials, or even local police to intimidate victims into sending money or sharing personal information.",
       warningSignsSectionTitle: "Warning Signs",
@@ -235,6 +238,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Protect your retirement savings from fake investment schemes.",
     icon: Wallet,
     color: "bg-orange-500",
+    image: cardInvestmentFraud,
     content: {
       intro: "Investment fraud targeting seniors has surged, with cryptocurrency scams alone costing victims over $3.4 billion in 2023 according to the FBI IC3 report. Scammers approach through social media, dating apps, unsolicited emails, or even through people you know who have been deceived themselves. They promise guaranteed returns with little or no risk.",
       warningSignsSectionTitle: "Warning Signs",
@@ -328,7 +332,7 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
                 data-testid={`card-topic-${topic.id}`}
               >
                 {topic.image && (
-                  <div className="relative h-40 w-full">
+                  <div className="relative h-48 sm:h-56 w-full">
                     <img
                       src={topic.image}
                       alt={topic.title}

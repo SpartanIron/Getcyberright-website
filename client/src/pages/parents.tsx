@@ -258,7 +258,7 @@ function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
                 aria-label={`Learn about ${topic.title}`}
                 data-testid={`card-topic-${topic.id}`}
               >
-                <div className="relative h-40 rounded-t-md overflow-hidden">
+                <div className="relative h-48 sm:h-56 rounded-t-md overflow-hidden">
                   <img
                     src={topic.image}
                     alt={topic.title}

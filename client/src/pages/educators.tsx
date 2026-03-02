@@ -277,7 +277,7 @@ function EducatorsLanding({ onSelectResource }: { onSelectResource: (id: string)
                 aria-label={`View ${resource.title} resource`}
                 data-testid={`card-resource-${resource.id}`}
               >
-                <div className="relative h-40 w-full">
+                <div className="relative h-48 sm:h-56 w-full">
                   <img 
                     src={resource.image} 
                     alt={resource.title}
