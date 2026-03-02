@@ -10,10 +10,11 @@ import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { ArticleData, BreadcrumbData } from "@/components/structured-data";
 import { Link } from "wouter";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Shield, Heart, DollarSign, Eye, Users, BookOpen } from "lucide-react";
 import bannerImage from "@/assets/banners/about-banner.png";
-import familySecurityImage from "@/assets/images/about-family-security.jpg";
-import seniorsLearningImage from "@/assets/images/professional-black-woman.png";
+import familyTogetherImage from "@/assets/images/about-family-together.png";
+import seniorsLearningImage from "@/assets/images/about-seniors-learning.png";
+import ctaBackgroundImage from "@/assets/images/about-cta-background.png";
 
 const aboutArticleSchema: ArticleData = {
   type: "Article",
@@ -34,9 +35,28 @@ const aboutBreadcrumbs: BreadcrumbData = {
 };
 
 const stats = [
-  { value: "406+", label: "AI Safety Prompts" },
-  { value: "501+", label: "Data Brokers Tracked" },
-  { value: "8", label: "Threat Intel Sources" }
+  { value: "406+", label: "AI Safety Prompts", icon: BookOpen },
+  { value: "501+", label: "Data Brokers Tracked", icon: Eye },
+  { value: "6", label: "Live Threat Feeds", icon: Shield },
+  { value: "$0", label: "Zero Cost, No Paywalls", icon: DollarSign },
+];
+
+const principles = [
+  {
+    icon: DollarSign,
+    title: "100% Free, Always",
+    description: "Every tool, guide, and course on GetCyberRight is free to use. We believe cybersecurity education should be accessible to every family, regardless of their budget.",
+  },
+  {
+    icon: Eye,
+    title: "Full Transparency",
+    description: "We are sustained through trusted partnerships with organizations who share our mission. We never sell your data, never use fear-based marketing, and are fully transparent about how we operate.",
+  },
+  {
+    icon: Heart,
+    title: "Community Powered",
+    description: "If you find our tools helpful, the best way to support us is to share GetCyberRight with someone who needs it. A parent, a grandparent, a neighbor. That is how we grow, one family at a time.",
+  },
 ];
 
 export default function About() {
@@ -57,77 +77,141 @@ export default function About() {
         />
 
         <section className="py-16 sm:py-24">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6" data-testid="text-story-heading">
+                  It Started With Our Own Family
+                </h2>
+                <div className="space-y-4 text-muted-foreground leading-relaxed">
+                  <p className="text-lg">
+                    Since 2020, my family has been on the front lines of a growing 
+                    crisis. It started during the pandemic, when the world moved 
+                    online almost overnight, and cyber scams and digital fraud 
+                    skyrocketed along with it.
+                  </p>
+                  <p>
+                    Hackers took over my relatives' social media accounts and used them 
+                    to impersonate people we trusted, sending messages to friends and 
+                    family asking for money. My father was targeted repeatedly by fake 
+                    telecom "anti-fraud" calls that claimed to secure his bank account, 
+                    but instead drained his savings more than once.
+                  </p>
+                  <p>
+                    As COVID-19 kept people isolated at home, criminals seized the 
+                    opportunity. <span className="text-foreground font-medium">Millions 
+                    of families found themselves under attack</span>, often alone, unsure 
+                    who to trust, and with nowhere to turn for help.
+                  </p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl"
+              >
+                <img
+                  src={familyTogetherImage}
+                  alt="Diverse multiracial family feeling safe and connected at home"
+                  className="w-full h-56 sm:h-80 lg:h-96 object-cover"
+                  loading="lazy"
+                  data-testid="img-about-family-together"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-20 bg-muted/30">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="order-2 lg:order-1 relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl"
+              >
+                <img
+                  src={seniorsLearningImage}
+                  alt="Seniors being helped to use technology safely"
+                  className="w-full h-56 sm:h-80 lg:h-96 object-cover"
+                  loading="lazy"
+                  data-testid="img-about-seniors-learning"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="order-1 lg:order-2"
+              >
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6" data-testid="text-mission-heading">
+                  Why GetCyberRight Exists
+                </h2>
+                <div className="space-y-4 text-muted-foreground leading-relaxed">
+                  <p>
+                    At the same time, my own children were growing up in a world where 
+                    screens are everywhere. They're already on tablets, exploring learning 
+                    apps, and asking about social media. The thought of what they might 
+                    encounter online keeps me up at night.
+                  </p>
+                  <p>
+                    When I searched for resources that could protect everyone in my 
+                    family, from my kids to older parents to cousins overseas, I came 
+                    up short. Cybersecurity information was written for corporations, 
+                    buried in technical jargon that ordinary people couldn't understand.
+                  </p>
+                  <p className="text-foreground font-semibold text-xl">
+                    That's why we built GetCyberRight.
+                  </p>
+                  <p>
+                    We set out to create straightforward tools that anyone can 
+                    use to determine whether something is a scam, without needing a 
+                    technical background or a computer science degree.
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-12 sm:py-16">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="max-w-3xl mx-auto text-center mb-6"
+            >
+              <InlinePromoVideo
+                src="/videos/promo-about.mp4"
+                poster="/videos/poster-about.png"
+                className="my-4"
+              />
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="prose prose-lg max-w-none"
+              className="max-w-3xl mx-auto"
             >
-              <div className="space-y-6 text-muted-foreground leading-relaxed">
-                <p className="text-lg">
-                  Since 2020, my family has been on the front lines of a growing 
-                  crisis. It started during the pandemic, when the world moved 
-                  online almost overnight, and cyber scams and digital fraud 
-                  skyrocketed along with it.
-                </p>
-                
-                <p>
-                  Hackers took over my relatives' social media accounts and used them 
-                  to impersonate people we trusted, sending messages to friends and 
-                  family asking for money. My father was targeted repeatedly by fake 
-                  telecom "anti-fraud" calls that claimed to secure his bank account, 
-                  but instead drained his savings more than once.
-                </p>
-                
-                <p>
-                  As COVID-19 kept people isolated at home, criminals seized the 
-                  opportunity. <span className="text-foreground font-medium">Millions 
-                  of families found themselves under attack</span>, often alone, unsure 
-                  who to trust, and with nowhere to turn for help.
-                </p>
-                
-                <p>
-                  At the same time, my own children were growing up in a world where 
-                  screens are everywhere. They're already on tablets, exploring learning 
-                  apps, and asking about social media. The thought of what they might 
-                  encounter online keeps me up at night.
-                </p>
-
-                <div className="my-8 rounded-lg overflow-hidden shadow-lg">
-                  <img 
-                    src={familySecurityImage} 
-                    alt="Family learning together about online safety"
-                    className="w-full h-auto object-cover"
-                    loading="lazy"
-                    data-testid="img-about-family-security"
-                  />
-                </div>
-                
-                <p>
-                  When I searched for resources that could protect everyone in my 
-                  family, from my kids to older parents to cousins overseas, I came 
-                  up short. Cybersecurity information was written for corporations, 
-                  buried in technical jargon that ordinary people couldn't understand.
-                </p>
-                
-                <p className="text-foreground font-semibold text-xl">
-                  That's why we built GetCyberRight.
-                </p>
-
-                <InlinePromoVideo
-                  src="/videos/promo-about.mp4"
-                  poster="/videos/poster-about.png"
-                  className="my-8"
-                />
-                
-                <p>
-                  We set out to create straightforward tools that anyone can 
-                  use to determine whether something is a scam, without needing a 
-                  technical background or a computer science degree.
-                </p>
-
+              <div className="space-y-4 text-muted-foreground leading-relaxed text-center">
                 <p>
                   Along the way, we discovered that small business owners face the 
                   same challenges. They need enterprise-grade security knowledge but 
@@ -135,27 +219,8 @@ export default function About() {
                   email can devastate a small business just as easily as it can 
                   empty a family's savings.
                 </p>
-                
-                <p className="border-l-4 border-accent pl-6 py-2 text-foreground font-medium bg-accent/5 rounded-r-lg">
+                <p className="border-l-4 border-accent pl-6 py-3 text-foreground font-medium bg-accent/5 text-left text-lg">
                   My hope is that no family or business has to learn these lessons the hard way.
-                </p>
-
-                <div className="my-8 rounded-lg overflow-hidden shadow-lg">
-                  <img 
-                    src={seniorsLearningImage} 
-                    alt="Senior learning technology with family support"
-                    className="w-full h-auto object-cover"
-                    loading="lazy"
-                    data-testid="img-about-seniors-learning"
-                  />
-                </div>
-                
-                <p className="text-lg font-medium text-foreground">
-                  Today, GetCyberRight serves families around the world. From 
-                  grandparents targeted by phone scams to parents keeping kids safe 
-                  online, we are here to help. Every tool is free because we believe 
-                  no family should have to pay to feel safe. Start with our Scam 
-                  Checker, or explore resources designed for you.
                 </p>
               </div>
             </motion.div>
@@ -164,7 +229,7 @@ export default function About() {
 
         <section className="py-16 sm:py-24 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               {stats.map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -172,10 +237,17 @@ export default function About() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="text-center"
+                  data-testid={`stat-${index}`}
                 >
-                  <p className="text-4xl sm:text-5xl font-bold text-primary mb-2">{stat.value}</p>
-                  <p className="text-muted-foreground">{stat.label}</p>
+                  <Card className="text-center h-full">
+                    <CardContent className="p-6 flex flex-col items-center">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                        <stat.icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <p className="text-3xl sm:text-4xl font-bold text-primary mb-1">{stat.value}</p>
+                      <p className="text-muted-foreground text-sm">{stat.label}</p>
+                    </CardContent>
+                  </Card>
                 </motion.div>
               ))}
             </div>
@@ -183,48 +255,52 @@ export default function About() {
         </section>
 
         <section className="py-16 sm:py-24">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="text-center mb-8"
+              className="text-center mb-12"
             >
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">How We Operate</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3" data-testid="text-principles-heading">How We Operate</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">Our guiding principles keep us accountable to every family we serve.</p>
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <Card>
-                <CardContent className="p-8">
-                  <p className="text-muted-foreground leading-relaxed mb-4">
-                    Every tool, guide, and course on GetCyberRight is free to use. We believe 
-                    cybersecurity education should be accessible to every family, regardless 
-                    of their budget.
-                  </p>
-                  <p className="text-muted-foreground leading-relaxed mb-4">
-                    We are sustained through trusted partnerships with companies and 
-                    organizations who share our mission. We never sell your data, we never 
-                    use fear-based marketing, and we are fully transparent about how we 
-                    operate. Your trust is everything to us.
-                  </p>
-                  <p className="text-muted-foreground leading-relaxed">
-                    If you find our tools helpful, the best way to support us is to share 
-                    GetCyberRight with someone who needs it. A parent, a grandparent, a 
-                    neighbor. That is how we grow, one family at a time.
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {principles.map((item, index) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="h-full text-center">
+                    <CardContent className="p-8">
+                      <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                        <item.icon className="w-7 h-7 text-primary" />
+                      </div>
+                      <h3 className="font-semibold text-lg text-foreground mb-3" data-testid={`text-principle-${index}`}>{item.title}</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="py-16 sm:py-24 bg-primary">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="relative py-20 sm:py-28 overflow-hidden">
+          <img
+            src={ctaBackgroundImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="eager"
+            aria-hidden="true"
+            data-testid="img-cta-background"
+          />
+          <div className="absolute inset-0 bg-primary/85" />
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -232,21 +308,21 @@ export default function About() {
               transition={{ duration: 0.5 }}
               className="text-center"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4" data-testid="text-cta-heading">
                 Start Protecting Your Family Today
               </h2>
-              <p className="text-white/80 max-w-2xl mx-auto mb-8">
+              <p className="text-white/80 text-lg max-w-2xl mx-auto mb-10">
                 No account required for most tools. Just pick one and go.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/tools">
-                  <Button size="lg" variant="secondary" data-testid="button-about-cta">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center max-w-md sm:max-w-none mx-auto">
+                <Link href="/tools" className="block">
+                  <Button size="lg" variant="secondary" className="w-full" data-testid="button-about-cta">
                     Explore Our Tools
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
-                <Link href="/contact">
-                  <Button size="lg" variant="outline" className="border-white/30 text-white bg-transparent" data-testid="button-about-contact">
+                <Link href="/contact" className="block">
+                  <Button size="lg" variant="outline" className="w-full border-white/40 text-white bg-white/10" data-testid="button-about-contact">
                     Contact Us
                   </Button>
                 </Link>
