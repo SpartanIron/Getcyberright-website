@@ -238,6 +238,153 @@ export function getThreatsByRegion(regionCode: string): ThreatTrend[] {
   });
 }
 
+export interface RegionalScamProfile {
+  region: string;
+  regionName: string;
+  scams: {
+    name: string;
+    description: string;
+    severity: "critical" | "high" | "medium";
+    tip: string;
+    category: string;
+  }[];
+}
+
+export const REGIONAL_SCAM_PROFILES: RegionalScamProfile[] = [
+  {
+    region: "US",
+    regionName: "United States",
+    scams: [
+      { name: "IRS Impersonation", description: "Calls or emails claiming you owe back taxes and threatening arrest or deportation", severity: "critical", tip: "The IRS will never call you demanding immediate payment or threaten arrest", category: "Government" },
+      { name: "Social Security Fraud", description: "Callers claiming your Social Security number has been suspended or compromised", severity: "critical", tip: "Social Security will never call to threaten your benefits or ask for payment", category: "Government" },
+      { name: "Medicare Enrollment Scams", description: "Fake representatives offering free equipment or demanding your Medicare number", severity: "high", tip: "Never give your Medicare number to someone who contacts you unsolicited", category: "Healthcare" },
+      { name: "Student Loan Forgiveness Scams", description: "Fake companies charging fees to apply for loan forgiveness programs", severity: "high", tip: "Legitimate federal programs never charge application fees", category: "Financial" },
+      { name: "AI Voice Clone Scams", description: "Scammers using AI to clone a family member's voice in fake emergency calls", severity: "critical", tip: "Use your family safety codeword to verify the caller's identity", category: "AI/Deepfake" },
+      { name: "Robocall Auto Warranty Scams", description: "Automated calls about expiring car warranties pressuring you to pay immediately", severity: "medium", tip: "Hang up. Legitimate warranty companies send written notices", category: "Phone" },
+    ],
+  },
+  {
+    region: "UK",
+    regionName: "United Kingdom",
+    scams: [
+      { name: "HMRC Tax Refund Scams", description: "Emails or texts claiming you are owed a tax refund from HMRC", severity: "critical", tip: "HMRC will never email, text, or call about tax refunds. Log in to your HMRC account directly", category: "Government" },
+      { name: "Royal Mail Delivery Fraud", description: "Fake SMS claiming a parcel needs a redelivery fee", severity: "high", tip: "Royal Mail charges are paid at the door, never via text links", category: "Delivery" },
+      { name: "Energy Bill Rebate Scams", description: "Fake government messages offering energy bill discounts or rebates", severity: "high", tip: "Government energy support is applied automatically through your provider", category: "Utility" },
+      { name: "NHS Vaccination Scams", description: "Messages asking for payment or bank details to book health appointments", severity: "high", tip: "The NHS will never ask for payment or bank details", category: "Healthcare" },
+      { name: "Action Fraud Impersonation", description: "Callers pretending to be from Action Fraud or the police asking you to move money", severity: "critical", tip: "Police and fraud agencies will never ask you to transfer money to a safe account", category: "Impersonation" },
+      { name: "Council Tax Rebate Scams", description: "Fake emails about council tax rebates asking for bank details", severity: "medium", tip: "Your council will never email asking for bank details for rebates", category: "Government" },
+    ],
+  },
+  {
+    region: "CA",
+    regionName: "Canada",
+    scams: [
+      { name: "CRA Tax Scams", description: "Calls from fake Canada Revenue Agency agents threatening arrest for unpaid taxes", severity: "critical", tip: "The CRA will never threaten you with arrest over the phone", category: "Government" },
+      { name: "Immigration Scams", description: "Fake IRCC agents demanding fees to avoid deportation or speed up applications", severity: "high", tip: "IRCC will never call demanding immediate payment", category: "Government" },
+      { name: "Interac e-Transfer Fraud", description: "Fake e-Transfer notifications directing you to phishing sites", severity: "high", tip: "Check your bank app directly instead of clicking email links", category: "Financial" },
+      { name: "Canadian Anti-Fraud Centre Impersonation", description: "Scammers pretending to be from the CAFC to collect personal information", severity: "high", tip: "The CAFC investigates fraud. They will not call to collect personal information", category: "Impersonation" },
+      { name: "SIM Swap Attacks", description: "Criminals transferring your phone number to steal banking codes", severity: "critical", tip: "Set a PIN with your mobile carrier and use authenticator apps instead of SMS codes", category: "Identity" },
+    ],
+  },
+  {
+    region: "AU",
+    regionName: "Australia",
+    scams: [
+      { name: "MyGov Impersonation", description: "Fake myGov emails or texts asking you to verify your identity or claim a refund", severity: "critical", tip: "Always log in to myGov directly. Never click links in emails or texts", category: "Government" },
+      { name: "Toll Road SMS Scams", description: "Fake texts claiming unpaid toll fees with a payment link", severity: "high", tip: "Check directly with your toll provider's official app or website", category: "Financial" },
+      { name: "NBN Impersonation", description: "Callers claiming to be from the NBN offering upgrades or warning of disconnection", severity: "high", tip: "NBN Co does not make unsolicited calls about your internet connection", category: "Impersonation" },
+      { name: "Flubot SMS Malware", description: "Text messages with links that install malware on Android phones", severity: "critical", tip: "Never click links in unexpected text messages. Delete them immediately", category: "Malware" },
+      { name: "Bushfire and Flood Charity Scams", description: "Fake charities exploiting natural disasters to collect donations", severity: "high", tip: "Only donate through verified charities on the ACNC register", category: "Fraud" },
+    ],
+  },
+  {
+    region: "EU",
+    regionName: "Europe",
+    scams: [
+      { name: "EU Customs and VAT Scams", description: "Fake customs notifications demanding VAT or duty payments on packages", severity: "high", tip: "Verify directly with the postal service or courier before paying any fees", category: "Delivery" },
+      { name: "Bank Verification Fraud", description: "Calls or messages claiming your bank account has been compromised, asking you to verify", severity: "critical", tip: "Banks will never ask for your full PIN, password, or one-time codes", category: "Financial" },
+      { name: "GDPR Compliance Scams", description: "Fake fines for GDPR violations targeting small businesses", severity: "medium", tip: "Official GDPR fines come through your national data protection authority, not email", category: "Business" },
+      { name: "Energy Rebate Phishing", description: "Fake government energy rebate offers stealing banking credentials", severity: "high", tip: "Government energy support programs never require you to enter banking details via email", category: "Utility" },
+      { name: "Holiday Rental Fraud", description: "Fake vacation property listings that disappear after payment", severity: "high", tip: "Use verified booking platforms and never pay by direct bank transfer", category: "Fraud" },
+    ],
+  },
+  {
+    region: "AF",
+    regionName: "Africa",
+    scams: [
+      { name: "Mobile Money Fraud", description: "Fake M-Pesa, MTN, or Airtel Money messages tricking you into sending money or sharing PINs", severity: "critical", tip: "Your mobile money provider will never ask for your PIN via SMS or phone call", category: "Financial" },
+      { name: "SIM Swap Scams", description: "Criminals taking over your phone number to access banking and mobile money accounts", severity: "critical", tip: "Set a SIM swap PIN with your carrier and use app-based authentication", category: "Identity" },
+      { name: "Fake Job Offers", description: "Job postings requiring upfront fees for training, uniforms, or processing", severity: "high", tip: "Legitimate employers never charge applicants to get hired", category: "Employment" },
+      { name: "Advance Fee Fraud", description: "Messages promising large sums of money in exchange for a small upfront payment", severity: "high", tip: "If someone asks for money to release money, it is always a scam", category: "Fraud" },
+      { name: "Fake Government Grant Scams", description: "Social media posts or WhatsApp messages about government grants requiring registration fees", severity: "high", tip: "Verify government programs through official government websites only", category: "Government" },
+      { name: "WhatsApp and Telegram Fraud", description: "Impersonators cloning contacts and requesting urgent money transfers", severity: "critical", tip: "Call the person directly on a known number before sending any money", category: "Impersonation" },
+    ],
+  },
+  {
+    region: "AS_SOUTH",
+    regionName: "South Asia",
+    scams: [
+      { name: "UPI Payment Fraud", description: "Scammers sending collect requests disguised as payments on Google Pay, PhonePe, or Paytm", severity: "critical", tip: "Never approve a collect request to receive money. You only approve requests to send money", category: "Financial" },
+      { name: "KYC Verification Scams", description: "Fake bank messages threatening account suspension unless you update KYC details", severity: "critical", tip: "Banks send KYC reminders in-app. Never share OTP or card details via phone or text", category: "Financial" },
+      { name: "Fake Customer Service Numbers", description: "Search engine results showing fake toll-free numbers for banks and companies", severity: "high", tip: "Only use customer service numbers from the official app or website", category: "Impersonation" },
+      { name: "Lottery and Prize Scams", description: "WhatsApp messages claiming you have won a lottery or prize requiring a processing fee", severity: "high", tip: "You cannot win a lottery you never entered. These are always scams", category: "Fraud" },
+      { name: "Part-Time Job Scams", description: "Work-from-home offers on Telegram requiring an initial investment", severity: "high", tip: "Legitimate jobs pay you. You should never have to pay to work", category: "Employment" },
+    ],
+  },
+  {
+    region: "AS_SOUTHEAST",
+    regionName: "Southeast Asia",
+    scams: [
+      { name: "QR Code Payment Fraud", description: "Tampered QR codes at shops and restaurants redirecting payments to scammers", severity: "critical", tip: "Always verify the merchant name on screen before confirming any QR payment", category: "Financial" },
+      { name: "Ride-Hailing Phishing", description: "Fake Grab or Gojek messages with phishing links to steal login credentials", severity: "high", tip: "Only open ride-hailing notifications through the official app", category: "Phishing" },
+      { name: "Telegram Investment Groups", description: "Fake cryptocurrency and forex trading groups promising guaranteed returns", severity: "critical", tip: "No legitimate investment guarantees returns. These groups are designed to steal your money", category: "Investment" },
+      { name: "E-Commerce Fake Shops", description: "Social media ads for deeply discounted products from stores that never deliver", severity: "high", tip: "Stick to established e-commerce platforms with buyer protection", category: "Fraud" },
+      { name: "WhatsApp OTP Theft", description: "Friends or contacts asking you to forward a verification code sent to your phone", severity: "high", tip: "Never share verification codes. This lets scammers take over your accounts", category: "Identity" },
+    ],
+  },
+  {
+    region: "SA",
+    regionName: "Latin America",
+    scams: [
+      { name: "Banking Trojans", description: "Fake banking apps or links that install malware to steal your banking credentials", severity: "critical", tip: "Only download banking apps from official app stores and verify the developer name", category: "Malware" },
+      { name: "Fake Delivery Notifications", description: "SMS claiming a package needs customs payment with a link to a phishing site", severity: "high", tip: "Track packages only through the official courier website or app", category: "Delivery" },
+      { name: "WhatsApp Cloning", description: "Scammers duplicating your WhatsApp account to contact and defraud your family", severity: "critical", tip: "Enable two-step verification in WhatsApp settings immediately", category: "Identity" },
+      { name: "Fake Boleto Scams", description: "Altered payment slips that redirect payments to scammer accounts", severity: "high", tip: "Always verify the recipient details before confirming any boleto payment", category: "Financial" },
+      { name: "Prize and Lottery Scams", description: "Messages claiming you won a prize from a major company requiring a fee to claim", severity: "medium", tip: "Legitimate companies do not charge winners to collect prizes", category: "Fraud" },
+    ],
+  },
+  {
+    region: "NZ",
+    regionName: "New Zealand",
+    scams: [
+      { name: "IRD Tax Scams", description: "Fake Inland Revenue emails or texts about tax refunds or overdue payments", severity: "high", tip: "IRD will never ask for banking details via email or text. Use myIR directly", category: "Government" },
+      { name: "Waka Kotahi Toll Scams", description: "Fake road toll SMS demanding payment via a link", severity: "high", tip: "Pay tolls only through the official Waka Kotahi website", category: "Financial" },
+      { name: "TradeMe and Marketplace Fraud", description: "Fake listings on online marketplaces that disappear after receiving payment", severity: "high", tip: "Use platform payment protections and never pay by direct bank transfer", category: "Fraud" },
+      { name: "Fake Charity Scams", description: "Fraudulent charities soliciting donations after natural disasters", severity: "medium", tip: "Verify charities on the Charities Register before donating", category: "Fraud" },
+    ],
+  },
+  {
+    region: "GLOBAL",
+    regionName: "Worldwide",
+    scams: [
+      { name: "Romance Scams", description: "Someone you met online builds a relationship, then asks for money due to an emergency", severity: "critical", tip: "Never send money to someone you have not met in person, no matter how long you have been talking", category: "Romance" },
+      { name: "Phishing Emails", description: "Emails pretending to be from trusted companies asking you to click a link or download a file", severity: "critical", tip: "Check the sender's email address carefully and go to websites directly instead of clicking links", category: "Phishing" },
+      { name: "Tech Support Scams", description: "Pop-ups or calls claiming your computer is infected and offering to fix it for a fee", severity: "high", tip: "Legitimate tech companies never call you about problems or use pop-up warnings", category: "Tech Support" },
+      { name: "Business Email Compromise", description: "Emails impersonating company executives requesting urgent wire transfers", severity: "critical", tip: "Always verify payment requests through a separate communication channel", category: "Business" },
+      { name: "Cryptocurrency Investment Scams", description: "Social media or messaging app groups promising guaranteed high returns on crypto investments", severity: "critical", tip: "No legitimate investment guarantees returns. If it sounds too good to be true, it is", category: "Investment" },
+    ],
+  },
+];
+
+export function getScamProfileByRegion(regionCode: string): RegionalScamProfile {
+  const tzRegionMap: Record<string, string> = {
+    "AF_WEST": "AF", "AF_EAST": "AF", "AF_SOUTH": "AF",
+  };
+  const mapped = tzRegionMap[regionCode] || regionCode;
+  return REGIONAL_SCAM_PROFILES.find(p => p.region === mapped) ||
+    REGIONAL_SCAM_PROFILES.find(p => p.region === "GLOBAL")!;
+}
+
 // Map country codes to regions
 export const COUNTRY_TO_REGION: Record<string, string> = {
   // North America

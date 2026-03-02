@@ -4,6 +4,7 @@ import { TrustStats } from "@/components/trust-stats";
 import { TrendingThreats } from "@/components/trending-threats";
 import { HeroTools } from "@/components/hero-tools";
 import { FeaturesGrid } from "@/components/features-grid";
+import { RegionalScams } from "@/components/regional-scams";
 import { AudienceShowcase } from "@/components/audience-showcase";
 import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
@@ -42,6 +43,7 @@ export default function Home() {
         <TrendingThreats />
         <HeroTools />
         <FeaturesGrid />
+        <RegionalScams />
         <AudienceShowcase />
         <CTAFooter />
       </main>
