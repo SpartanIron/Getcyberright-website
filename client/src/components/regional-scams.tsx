@@ -1,9 +1,25 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { MapPin, AlertTriangle, Shield, ChevronDown, ChevronUp, Lightbulb, Globe } from "lucide-react";
+import { MapPin, Shield, ChevronDown, ChevronUp, Lightbulb, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getScamProfileByRegion, ALL_REGIONS, type RegionalScamProfile } from "@shared/regions";
+
+import scamGovernment from "@/assets/images/scam-government.png";
+import scamHealthcare from "@/assets/images/scam-healthcare.png";
+import scamFinancial from "@/assets/images/scam-financial.png";
+import scamRomance from "@/assets/images/scam-romance.png";
+import scamPhone from "@/assets/images/scam-phone.png";
+import scamAiDeepfake from "@/assets/images/scam-ai-deepfake.png";
+import scamTechSupport from "@/assets/images/scam-tech-support.png";
+import scamPhishing from "@/assets/images/scam-phishing.png";
+import scamIdentity from "@/assets/images/scam-identity.png";
+import scamDelivery from "@/assets/images/scam-delivery.png";
+import scamBusiness from "@/assets/images/scam-business.png";
+import scamInvestment from "@/assets/images/scam-investment.png";
+import scamImpersonation from "@/assets/images/scam-impersonation.png";
+import scamMalware from "@/assets/images/scam-malware.png";
+import scamGeneral from "@/assets/images/scam-general.png";
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
   "America/New_York": "US",
@@ -81,10 +97,53 @@ function detectRegion(): string {
   }
 }
 
-const severityConfig: Record<string, { color: string; label: string }> = {
-  critical: { color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300", label: "Critical" },
-  high: { color: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300", label: "High Risk" },
-  medium: { color: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300", label: "Moderate" },
+const categoryImageMap: Record<string, string> = {
+  "Government": scamGovernment,
+  "Healthcare": scamHealthcare,
+  "Financial": scamFinancial,
+  "Romance": scamRomance,
+  "Phone": scamPhone,
+  "AI/Deepfake": scamAiDeepfake,
+  "Tech Support": scamTechSupport,
+  "Phishing": scamPhishing,
+  "Identity": scamIdentity,
+  "Delivery": scamDelivery,
+  "Business": scamBusiness,
+  "Investment": scamInvestment,
+  "Impersonation": scamImpersonation,
+  "Malware": scamMalware,
+  "Fraud": scamFinancial,
+  "Employment": scamBusiness,
+  "Utility": scamGovernment,
+};
+
+function getCategoryImage(category?: string): string {
+  if (!category) return scamGeneral;
+  return categoryImageMap[category] || scamGeneral;
+}
+
+const severityConfig: Record<string, { border: string; bg: string; text: string; label: string; dot: string }> = {
+  critical: {
+    border: "border-red-400/60 dark:border-red-500/40",
+    bg: "bg-red-50 dark:bg-red-950/30",
+    text: "text-red-700 dark:text-red-300",
+    label: "Critical",
+    dot: "bg-red-500",
+  },
+  high: {
+    border: "border-orange-400/60 dark:border-orange-500/40",
+    bg: "bg-orange-50 dark:bg-orange-950/30",
+    text: "text-orange-700 dark:text-orange-300",
+    label: "High Risk",
+    dot: "bg-orange-500",
+  },
+  medium: {
+    border: "border-amber-400/60 dark:border-amber-500/40",
+    bg: "bg-amber-50 dark:bg-amber-950/30",
+    text: "text-amber-700 dark:text-amber-300",
+    label: "Moderate",
+    dot: "bg-amber-500",
+  },
 };
 
 const fadeUp = {
@@ -103,7 +162,7 @@ export function RegionalScams() {
     [selectedRegion]
   );
 
-  const displayedScams = showAll ? profile.scams : profile.scams.slice(0, 3);
+  const displayedScams = showAll ? profile.scams : profile.scams.slice(0, 6);
 
   const regionOptions = [
     ...ALL_REGIONS.filter(r => r.code !== "GLOBAL"),
@@ -120,7 +179,7 @@ export function RegionalScams() {
       aria-labelledby="regional-scams-heading"
       data-testid="section-regional-scams"
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -183,7 +242,7 @@ export function RegionalScams() {
                   id="region-listbox"
                   role="listbox"
                   aria-label="Select your region"
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-card border border-border rounded-lg shadow-lg py-1 z-50 min-w-[180px]"
+                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-card border border-border rounded-lg shadow-lg py-1 z-50 min-w-[180px] max-h-64 overflow-y-auto"
                 >
                   {regionOptions.map((r) => (
                     <li
@@ -219,9 +278,10 @@ export function RegionalScams() {
           </div>
         </motion.div>
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {displayedScams.map((scam, index) => {
             const sev = severityConfig[scam.severity];
+            const categoryImg = getCategoryImage(scam.category);
             return (
               <motion.div
                 key={`${profile.region}-${scam.name}`}
@@ -230,34 +290,50 @@ export function RegionalScams() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 variants={fadeUp}
-                className="rounded-lg border border-border bg-card p-4 sm:p-5 hover:border-primary/30 transition-colors"
+                className={`group relative rounded-xl border ${sev.border} bg-card overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300`}
                 data-testid={`card-scam-${index}`}
               >
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div className="flex-shrink-0 mt-0.5 w-9 h-9 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                    <AlertTriangle className="w-4.5 h-4.5 text-primary" aria-hidden="true" />
+                <div className="relative h-36 sm:h-40 overflow-hidden">
+                  <img
+                    src={categoryImg}
+                    alt=""
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    aria-hidden="true"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+                  <div className="absolute top-3 right-3">
+                    <Badge
+                      className={`text-[10px] px-2 py-0.5 font-semibold border-0 shadow-sm ${sev.bg} ${sev.text}`}
+                      variant="secondary"
+                    >
+                      <span className={`inline-block w-1.5 h-1.5 rounded-full ${sev.dot} mr-1.5`} />
+                      {sev.label}
+                    </Badge>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2 flex-wrap mb-1.5">
-                      <h3 className="font-semibold text-sm sm:text-base text-foreground">
-                        {scam.name}
-                      </h3>
-                      <Badge
-                        className={`text-[10px] px-1.5 py-0 flex-shrink-0 ${sev.color}`}
-                        variant="secondary"
-                      >
-                        {sev.label}
-                      </Badge>
+                  {scam.category && (
+                    <div className="absolute top-3 left-3">
+                      <span className="text-[10px] font-medium text-white/80 bg-white/15 backdrop-blur-sm rounded-full px-2.5 py-0.5">
+                        {scam.category}
+                      </span>
                     </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2.5">
-                      {scam.description}
+                  )}
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <h3 className="font-bold text-sm sm:text-base text-white leading-snug drop-shadow-md">
+                      {scam.name}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="p-4">
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-2">
+                    {scam.description}
+                  </p>
+                  <div className="flex items-start gap-2 bg-primary/5 dark:bg-primary/10 rounded-lg px-3 py-2.5">
+                    <Lightbulb className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <p className="text-xs text-primary font-medium leading-relaxed line-clamp-2">
+                      {scam.tip}
                     </p>
-                    <div className="flex items-start gap-2 bg-primary/5 dark:bg-primary/10 rounded-md px-3 py-2">
-                      <Lightbulb className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
-                      <p className="text-xs text-primary font-medium leading-relaxed">
-                        {scam.tip}
-                      </p>
-                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -265,14 +341,14 @@ export function RegionalScams() {
           })}
         </div>
 
-        {profile.scams.length > 3 && (
+        {profile.scams.length > 6 && (
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
             variants={fadeUp}
-            className="text-center mt-6"
+            className="text-center mt-8"
           >
             <Button
               variant="outline"
@@ -287,7 +363,7 @@ export function RegionalScams() {
                 </>
               ) : (
                 <>
-                  Show {profile.scams.length - 3} More Scams <ChevronDown className="w-4 h-4" />
+                  Show {profile.scams.length - 6} More Scams <ChevronDown className="w-4 h-4" />
                 </>
               )}
             </Button>
