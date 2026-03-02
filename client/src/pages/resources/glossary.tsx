@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, BookOpen, Search, Filter, Hash } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
+import { SEOHead } from "@/components/seo-head";
 
 interface GlossaryTerm {
   id: string;
@@ -192,7 +193,12 @@ export default function Glossary() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      <SEOHead
+        page="glossary"
+        title="Cybersecurity Glossary - Terms Explained Simply | GetCyberRight"
+        description="Plain-language cybersecurity glossary. Learn what phishing, malware, VPN, encryption, and other security terms mean in simple, everyday language."
+        keywords="cybersecurity glossary, security terms explained, what is phishing, malware definition, VPN meaning, cybersecurity dictionary"
+      />
       <section className="py-12 bg-gradient-to-br from-background to-muted/50">
         <div className="container mx-auto px-4">
           <Link href="/resources" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6">

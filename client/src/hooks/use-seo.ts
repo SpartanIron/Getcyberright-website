@@ -56,8 +56,9 @@ export function useSEO({
     updateMeta("twitter:description", ogDescription || description);
     
     if (ogImage) {
-      updateMeta("og:image", ogImage, true);
-      updateMeta("twitter:image", ogImage);
+      const absoluteImage = ogImage.startsWith("http") ? ogImage : `https://www.getcyberright.com${ogImage}`;
+      updateMeta("og:image", absoluteImage, true);
+      updateMeta("twitter:image", absoluteImage);
     }
     
     if (keywords) {

@@ -17,11 +17,12 @@ export function SEOHead({
   title,
   description = defaultDescription,
   keywords = defaultKeywords,
-  ogImage = "/og-image.png",
+  ogImage = "https://www.getcyberright.com/og-image.png",
   ogType = "website",
   canonical,
 }: SEOHeadProps) {
   const fullTitle = title ? `${title} | GetCyberRight` : defaultTitle;
+  const absoluteOgImage = ogImage.startsWith("http") ? ogImage : `https://www.getcyberright.com${ogImage}`;
 
   useEffect(() => {
     document.title = fullTitle;
@@ -39,28 +40,29 @@ export function SEOHead({
       }
     };
 
+    const canonicalUrl = canonical || `https://www.getcyberright.com${window.location.pathname}`;
+
     updateMeta("description", description);
     updateMeta("keywords", keywords);
     updateMeta("og:title", fullTitle, true);
     updateMeta("og:description", description, true);
-    updateMeta("og:image", ogImage, true);
+    updateMeta("og:image", absoluteOgImage, true);
     updateMeta("og:type", ogType, true);
+    updateMeta("og:url", canonicalUrl, true);
     updateMeta("twitter:title", fullTitle);
     updateMeta("twitter:description", description);
-    updateMeta("twitter:image", ogImage);
+    updateMeta("twitter:image", absoluteOgImage);
 
-    if (canonical) {
-      let link = document.querySelector('link[rel="canonical"]');
-      if (link) {
-        link.setAttribute("href", canonical);
-      } else {
-        link = document.createElement("link");
-        link.setAttribute("rel", "canonical");
-        link.setAttribute("href", canonical);
-        document.head.appendChild(link);
-      }
+    let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (link) {
+      link.setAttribute("href", canonicalUrl);
+    } else {
+      link = document.createElement("link") as HTMLLinkElement;
+      link.setAttribute("rel", "canonical");
+      link.setAttribute("href", canonicalUrl);
+      document.head.appendChild(link);
     }
-  }, [fullTitle, description, keywords, ogImage, ogType, canonical]);
+  }, [fullTitle, description, keywords, absoluteOgImage, ogType, canonical]);
 
   return null;
 }
