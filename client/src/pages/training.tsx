@@ -181,11 +181,15 @@ export default function Training() {
                 and industry-recognized certifications tailored to your needs.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Button size="lg" data-testid="button-start-learning">
+                <Button size="lg" data-testid="button-start-learning" onClick={() => {
+                  document.getElementById("learning-paths")?.scrollIntoView({ behavior: "smooth" });
+                }}>
                   <BookOpen className="w-4 h-4 mr-2" />
                   Start Learning
                 </Button>
-                <Button size="lg" variant="outline" data-testid="button-view-paths">
+                <Button size="lg" variant="outline" data-testid="button-view-paths" onClick={() => {
+                  document.getElementById("learning-paths")?.scrollIntoView({ behavior: "smooth" });
+                }}>
                   <Target className="w-4 h-4 mr-2" />
                   Explore Paths
                 </Button>
@@ -246,7 +250,7 @@ export default function Training() {
           />
         </section>
 
-        <section className="py-16">
+        <section className="py-16" id="learning-paths">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold mb-4">Choose Your Learning Path</h2>
@@ -358,9 +362,11 @@ export default function Training() {
                       We're developing comprehensive training content for each audience. 
                       Sign up to be notified when new courses are available.
                     </p>
-                    <Button variant="outline" data-testid="button-notify-me">
-                      Notify Me
-                    </Button>
+                    <Link href="/register">
+                      <Button variant="outline" data-testid="button-notify-me">
+                        Sign Up for Updates
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </TabsContent>
@@ -428,12 +434,16 @@ export default function Training() {
                   Join thousands of learners who have improved their digital safety skills through our structured training programs.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
-                  <Button size="lg" data-testid="button-get-started">
+                  <Button size="lg" data-testid="button-get-started" onClick={() => {
+                    document.getElementById("learning-paths")?.scrollIntoView({ behavior: "smooth" });
+                  }}>
                     Get Started
                   </Button>
-                  <Button size="lg" variant="outline" data-testid="button-view-resources">
-                    Browse Resources
-                  </Button>
+                  <Link href="/resources">
+                    <Button size="lg" variant="outline" data-testid="button-view-resources">
+                      Browse Resources
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

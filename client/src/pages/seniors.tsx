@@ -376,7 +376,7 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
                   </p>
                 </div>
                 <Button variant="outline" className="border-amber-300 dark:border-amber-700" onClick={() => {
-                  window.location.href = '/emergency';
+                  window.location.href = '/emergency-help';
                 }} data-testid="button-emergency-help">
                   Get Help
                 </Button>
