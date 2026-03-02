@@ -12,7 +12,8 @@ import {
   BarChart3,
   Crown,
   TrendingUp,
-  Shield
+  Shield,
+  MessageSquare
 } from "lucide-react";
 import { Link } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
@@ -23,6 +24,8 @@ interface AdminStats {
   contactMessages: number;
   newsletterSubscribers: number;
   scamReports: number;
+  totalFeedback: number;
+  newFeedback: number;
 }
 
 export default function AdminDashboard() {
@@ -105,6 +108,13 @@ export default function AdminDashboard() {
       href: "/admin/scam-reports",
       color: "text-red-500",
     },
+    {
+      title: "User Feedback",
+      value: stats?.newFeedback ?? 0,
+      icon: MessageSquare,
+      href: "/admin/feedback",
+      color: "text-teal-500",
+    },
   ];
 
   return (
@@ -170,6 +180,12 @@ export default function AdminDashboard() {
                 <Button variant="outline" className="w-full justify-start gap-2">
                   <AlertTriangle className="w-4 h-4" />
                   Review Scam Reports
+                </Button>
+              </Link>
+              <Link href="/admin/feedback">
+                <Button variant="outline" className="w-full justify-start gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  Review Feedback
                 </Button>
               </Link>
             </CardContent>

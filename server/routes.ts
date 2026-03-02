@@ -3392,6 +3392,71 @@ EDGE CASE HANDLING
     }
   });
 
+  app.post("/api/feedback", createRateLimitMiddleware("standard"), async (req: Request, res: Response) => {
+    try {
+      const schema = z.object({
+        category: z.enum(["bug", "feature", "question", "praise", "other"]),
+        message: z.string().min(5, "Message must be at least 5 characters").max(2000),
+        email: z.string().email().optional().or(z.literal("")),
+        page: z.string().max(500).optional(),
+      });
+
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: parsed.error.errors[0]?.message || "Invalid input" });
+      }
+
+      const feedback = await storage.createFeedback({
+        ...parsed.data,
+        email: parsed.data.email || null,
+        userAgent: req.headers["user-agent"] || null,
+      });
+
+      try {
+        const { Resend } = await import("resend");
+        const resendKey = process.env.RESEND_API_KEY;
+        const adminEmail = process.env.ADMIN_EMAIL;
+        if (resendKey && adminEmail) {
+          const resend = new Resend(resendKey);
+          const escapeHtml = (str: string) => str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+          const safeMessage = escapeHtml(parsed.data.message);
+          const safeEmail = parsed.data.email ? escapeHtml(parsed.data.email) : "";
+          const safePage = escapeHtml(parsed.data.page || "Not specified");
+          const safeCategory = escapeHtml(parsed.data.category);
+          await resend.emails.send({
+            from: "GetCyberRight <onboarding@resend.dev>",
+            to: [adminEmail],
+            subject: `[Feedback] New ${parsed.data.category} from GetCyberRight`,
+            html: `
+              <div style="font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: #0d9488; padding: 20px; border-radius: 8px 8px 0 0;">
+                  <h2 style="color: white; margin: 0;">New User Feedback</h2>
+                </div>
+                <div style="border: 1px solid #e5e7eb; border-top: none; padding: 20px; border-radius: 0 0 8px 8px;">
+                  <p><strong>Category:</strong> ${safeCategory}</p>
+                  <p><strong>Page:</strong> ${safePage}</p>
+                  ${safeEmail ? `<p><strong>Email:</strong> ${safeEmail}</p>` : ""}
+                  <div style="background: #f9fafb; padding: 16px; border-radius: 6px; margin: 16px 0;">
+                    <p style="margin: 0; white-space: pre-wrap;">${safeMessage}</p>
+                  </div>
+                  <p style="color: #6b7280; font-size: 14px;">Submitted: ${new Date().toLocaleString()}</p>
+                  <a href="${req.protocol}://${req.get("host")}/admin/feedback" style="display: inline-block; background: #0d9488; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; margin-top: 8px;">View in Admin</a>
+                </div>
+              </div>
+            `,
+          });
+        }
+      } catch (emailErr) {
+        console.error("[feedback] Email notification error:", emailErr);
+      }
+
+      res.json({ success: true, message: "Thank you for your feedback!" });
+    } catch (error: any) {
+      console.error("[feedback] Error:", error);
+      res.status(500).json({ error: "Failed to submit feedback. Please try again." });
+    }
+  });
+
   app.post("/api/download-cyber-hygiene-guide", createRateLimitMiddleware("strict"), async (req: Request, res: Response) => {
     try {
       const schema = z.object({

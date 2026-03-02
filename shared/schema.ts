@@ -1155,6 +1155,30 @@ export const insertTrendingThreatSchema = createInsertSchema(trendingThreats).om
 export type TrendingThreat = typeof trendingThreats.$inferSelect;
 export type InsertTrendingThreat = z.infer<typeof insertTrendingThreatSchema>;
 
+export const userFeedback = pgTable("user_feedback", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  category: text("category").notNull(),
+  message: text("message").notNull(),
+  email: text("email"),
+  page: text("page"),
+  status: text("status").notNull().default("new"),
+  adminNotes: text("admin_notes"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserFeedbackSchema = createInsertSchema(userFeedback).omit({
+  id: true,
+  status: true,
+  adminNotes: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type UserFeedback = typeof userFeedback.$inferSelect;
+export type InsertUserFeedback = z.infer<typeof insertUserFeedbackSchema>;
+
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],
   scan_found: ["request_generated", "not_found"],

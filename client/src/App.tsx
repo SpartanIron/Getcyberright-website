@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { DeziAssistant } from "@/components/dezi-assistant";
+import { FeedbackWidget } from "@/components/feedback-widget";
 import { AnnouncementBanner } from "@/components/announcement-banner";
 import { WelcomeOverlay } from "@/components/welcome-overlay";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -58,6 +59,7 @@ const AdminNewsletter = lazy(() => import("@/pages/admin-newsletter"));
 const AdminPromptManagement = lazy(() => import("@/pages/admin-prompt-management"));
 const AdminAnnouncements = lazy(() => import("@/pages/admin/announcements"));
 const AdminTrendingThreats = lazy(() => import("@/pages/admin/trending-threats"));
+const AdminFeedback = lazy(() => import("@/pages/admin/feedback"));
 const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
@@ -176,6 +178,7 @@ function Router() {
         <Route path="/admin/prompt-management" component={AdminPromptManagement} />
         <Route path="/admin/announcements" component={AdminAnnouncements} />
         <Route path="/admin/trending-threats" component={AdminTrendingThreats} />
+        <Route path="/admin/feedback" component={AdminFeedback} />
         <Route path="/admin/change-password" component={AdminChangePassword} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
@@ -211,6 +214,7 @@ function App() {
               <Router />
             </ErrorBoundary>
             <DeziAssistant />
+            <FeedbackWidget />
           </TooltipProvider>
         </ThemeProvider>
       </GoogleReCaptchaProvider>

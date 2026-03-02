@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
-import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema } from "@shared/schema";
+import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
 import { securityLogger } from "./security";
@@ -41,8 +41,9 @@ export function registerAdminRoutes(app: Express) {
       const [messageCount] = await db.select({ count: count() }).from(contactMessages);
       const [subscriberCount] = await db.select({ count: count() }).from(newsletterSubscribers);
       const [scamReportCount] = await db.select({ count: count() }).from(scamReports);
+      const [feedbackCount] = await db.select({ count: count() }).from(userFeedback);
+      const [newFeedbackCount] = await db.select({ count: count() }).from(userFeedback).where(eq(userFeedback.status, "new"));
       
-      // Count premium users
       const [premiumCount] = await db
         .select({ count: count() })
         .from(users)
@@ -54,6 +55,8 @@ export function registerAdminRoutes(app: Express) {
         contactMessages: messageCount.count,
         newsletterSubscribers: subscriberCount.count,
         scamReports: scamReportCount.count,
+        totalFeedback: feedbackCount.count,
+        newFeedback: newFeedbackCount.count,
       });
     } catch (error) {
       console.error("Admin stats error:", error);
@@ -620,6 +623,42 @@ export function registerToolTrackingRoutes(app: Express) {
     } catch (error) {
       console.error("Delete trending threat error:", error);
       res.status(500).json({ error: "Failed to delete trending threat" });
+    }
+  });
+
+  app.get("/api/admin/feedback", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const feedback = status
+        ? await db.select().from(userFeedback).where(eq(userFeedback.status, status)).orderBy(desc(userFeedback.createdAt))
+        : await db.select().from(userFeedback).orderBy(desc(userFeedback.createdAt));
+      res.json({ feedback });
+    } catch (error) {
+      console.error("Admin feedback error:", error);
+      res.status(500).json({ error: "Failed to fetch feedback" });
+    }
+  });
+
+  app.patch("/api/admin/feedback/:id", isAuthenticated, isAdminMiddleware, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const schema = z.object({
+        status: z.enum(["new", "in_progress", "resolved", "dismissed"]).optional(),
+        adminNotes: z.string().max(2000).optional(),
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid data" });
+      }
+      const updateData: Record<string, any> = { updatedAt: new Date() };
+      if (parsed.data.status) updateData.status = parsed.data.status;
+      if (parsed.data.adminNotes !== undefined) updateData.adminNotes = parsed.data.adminNotes;
+      const [updated] = await db.update(userFeedback).set(updateData).where(eq(userFeedback.id, id)).returning();
+      if (!updated) return res.status(404).json({ error: "Feedback not found" });
+      res.json({ feedback: updated });
+    } catch (error) {
+      console.error("Admin feedback update error:", error);
+      res.status(500).json({ error: "Failed to update feedback" });
     }
   });
 }

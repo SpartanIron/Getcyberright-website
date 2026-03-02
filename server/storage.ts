@@ -10,12 +10,15 @@ import {
   type PromptReview,
   type InsertPromptReview,
   type PromptReviewRun,
+  type UserFeedback,
+  type InsertUserFeedback,
   users,
   contactMessages,
   newsletterSubscribers,
   aiPrompts,
   promptReviews,
   promptReviewRuns,
+  userFeedback,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -45,6 +48,12 @@ export interface IStorage {
   createPromptReviewRun(triggerType: string): Promise<PromptReviewRun>;
   updatePromptReviewRun(id: string, data: Partial<PromptReviewRun>): Promise<PromptReviewRun | undefined>;
   getPromptReviewRuns(limit?: number): Promise<PromptReviewRun[]>;
+
+  createFeedback(feedback: InsertUserFeedback): Promise<UserFeedback>;
+  getAllFeedback(status?: string): Promise<UserFeedback[]>;
+  getFeedbackById(id: string): Promise<UserFeedback | undefined>;
+  updateFeedbackStatus(id: string, status: string, adminNotes?: string): Promise<UserFeedback | undefined>;
+  getFeedbackCount(): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -168,6 +177,41 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(promptReviewRuns)
       .orderBy(desc(promptReviewRuns.startedAt))
       .limit(limit);
+  }
+  async createFeedback(feedback: InsertUserFeedback): Promise<UserFeedback> {
+    const result = await db.insert(userFeedback).values(feedback).returning();
+    return result[0];
+  }
+
+  async getAllFeedback(status?: string): Promise<UserFeedback[]> {
+    if (status) {
+      return await db.select().from(userFeedback)
+        .where(eq(userFeedback.status, status))
+        .orderBy(desc(userFeedback.createdAt));
+    }
+    return await db.select().from(userFeedback).orderBy(desc(userFeedback.createdAt));
+  }
+
+  async getFeedbackById(id: string): Promise<UserFeedback | undefined> {
+    const result = await db.select().from(userFeedback).where(eq(userFeedback.id, id));
+    return result[0];
+  }
+
+  async updateFeedbackStatus(id: string, status: string, adminNotes?: string): Promise<UserFeedback | undefined> {
+    const updateData: Record<string, any> = { status, updatedAt: new Date() };
+    if (adminNotes !== undefined) {
+      updateData.adminNotes = adminNotes;
+    }
+    const result = await db.update(userFeedback)
+      .set(updateData)
+      .where(eq(userFeedback.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getFeedbackCount(): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` }).from(userFeedback);
+    return Number(result[0].count);
   }
 }
 

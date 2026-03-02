@@ -36,7 +36,8 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **Regional Scam Profiles**: Visually rich "Common Scams in Your Area" card grid on homepage with auto-detected region (timezone-based). Covers 11 regions (US, UK, CA, AU, EU, AF, South Asia, Southeast Asia, Latin America, NZ, Global) with 4-6 region-specific scam profiles each displayed as image-backed cards with category illustrations, severity-colored borders/badges, and protective tips. Responsive 1/2/3-column grid layout. Region picker dropdown for manual override. Data in `shared/regions.ts` (REGIONAL_SCAM_PROFILES). Dezi AI assistant enhanced with region-aware scam guidance in system prompt.
 - **Automated Threat Intelligence**: Ingests data from 8 trusted sources (URLhaus, PhishTank, CISA, NVD, HIBP).
 - **Automated Content Governance System**: Monitors educational content for freshness and relevance.
-- **Admin System**: Comprehensive admin dashboard for user management, security monitoring, threat intelligence, content governance, AI prompt management, and trending threat management.
+- **User Feedback System**: Floating feedback widget (bottom-left) on every page with 5 categories (bug, feature, question, praise, other). No login required. Submissions stored in `user_feedback` table. Admin email notification via Resend on each submission. Admin dashboard at `/admin/feedback` for reviewing, filtering by status (new/in_progress/resolved/dismissed), adding internal notes, and replying via email.
+- **Admin System**: Comprehensive admin dashboard for user management, security monitoring, threat intelligence, content governance, AI prompt management, trending threat management, and user feedback management.
 
 ## External Dependencies
 
