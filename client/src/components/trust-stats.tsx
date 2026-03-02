@@ -25,7 +25,7 @@ const stats = [
     icon: DollarSign,
     value: 0,
     suffix: "",
-    label: "Zero Cost, No Paywalls",
+    label: "Free to Get Started",
     displayValue: "$0",
   },
 ];

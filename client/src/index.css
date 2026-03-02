@@ -435,6 +435,17 @@
   50% { opacity: 0.5; }
 }
 
+.hero-ken-burns {
+  animation: ken-burns 25s ease-in-out infinite alternate;
+  transform-origin: center center;
+}
+
+@keyframes ken-burns {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.08) translate(-1%, -1%); }
+  100% { transform: scale(1.04) translate(1%, 0.5%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-gradient-text {
     animation: none;
@@ -443,5 +454,9 @@
   .hero-glow-bg {
     animation: none;
     opacity: 0.3;
+  }
+  .hero-ken-burns {
+    animation: none;
+    transform: scale(1);
   }
 }

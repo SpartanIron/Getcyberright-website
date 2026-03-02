@@ -38,7 +38,7 @@ const stats = [
   { value: "406+", label: "AI Safety Prompts", icon: BookOpen },
   { value: "501+", label: "Data Brokers Tracked", icon: Eye },
   { value: "6", label: "Live Threat Feeds", icon: Shield },
-  { value: "$0", label: "Zero Cost, No Paywalls", icon: DollarSign },
+  { value: "$0", label: "Free to Get Started", icon: DollarSign },
 ];
 
 const principles = [
