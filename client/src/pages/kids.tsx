@@ -15,6 +15,21 @@ import {
   CalendarDays
 } from "lucide-react";
 
+import kidsYoungLearnersImg from "@/assets/images/kids-young-learners.png";
+import kidsTeenLearnersImg from "@/assets/images/kids-teen-learners.png";
+import kidsSpotScamImg from "@/assets/images/kids-spot-scam.png";
+import kidsFamilyTogetherImg from "@/assets/images/kids-family-together.png";
+import kidsPersonalInfoImg from "@/assets/images/kids-personal-info.png";
+import kidsPasswordPowerImg from "@/assets/images/kids-password-power.png";
+import kidsSpottingTricksImg from "@/assets/images/kids-spotting-tricks.png";
+import kidsDeviceSafetyImg from "@/assets/images/kids-device-safety.png";
+import kidsTrustedAdultsImg from "@/assets/images/kids-trusted-adults.png";
+import kidsSocialMediaImg from "@/assets/images/kids-social-media.png";
+import kidsCyberbullyingImg from "@/assets/images/kids-cyberbullying.png";
+import kidsGamingSmartImg from "@/assets/images/kids-gaming-smart.png";
+import kidsPhishingImg from "@/assets/images/kids-phishing.png";
+import kidsDigitalFootprintImg from "@/assets/images/kids-digital-footprint.png";
+
 // Floating decorative shapes component for kid-friendly design
 function FloatingShapes() {
   return (
@@ -42,6 +57,7 @@ interface LearningModule {
   description: string;
   icon: typeof Shield;
   color: string;
+  image: string;
   content: {
     intro: string;
     tips: string[];
@@ -62,6 +78,7 @@ const foundationsModules: LearningModule[] = [
     description: "Learn what information to keep private online.",
     icon: Eye,
     color: "bg-blue-500",
+    image: kidsPersonalInfoImg,
     content: {
       intro: "Personal information is anything that tells people who you are or where to find you. Just like you would not give your house key to a stranger, you should not share personal details online with people you do not know.",
       tips: [
@@ -91,6 +108,7 @@ const foundationsModules: LearningModule[] = [
     description: "Create strong passwords that keep you safe.",
     icon: Lock,
     color: "bg-purple-500",
+    image: kidsPasswordPowerImg,
     content: {
       intro: "Passwords are like secret codes that protect your accounts. A strong password keeps your games, photos, and messages safe from people who should not see them.",
       tips: [
@@ -120,6 +138,7 @@ const foundationsModules: LearningModule[] = [
     description: "Learn to recognize when something seems wrong.",
     icon: AlertCircle,
     color: "bg-orange-500",
+    image: kidsSpottingTricksImg,
     content: {
       intro: "Some people online try to trick kids. They might pretend to be someone they are not or offer things that seem too good to be true. Learning to spot these tricks keeps you safe.",
       tips: [
@@ -149,6 +168,7 @@ const foundationsModules: LearningModule[] = [
     description: "Keep your phone, tablet, and computer safe.",
     icon: Smartphone,
     color: "bg-teal-500",
+    image: kidsDeviceSafetyImg,
     content: {
       intro: "Your devices are valuable tools for learning and fun. Taking care of them means keeping them physically safe and making sure the information on them stays protected.",
       tips: [
@@ -178,6 +198,7 @@ const foundationsModules: LearningModule[] = [
     description: "Know who to ask for help and when.",
     icon: Heart,
     color: "bg-pink-500",
+    image: kidsTrustedAdultsImg,
     content: {
       intro: "Trusted adults are people who care about you and want to keep you safe. They can be parents, grandparents, teachers, or other family members you know well. You can always go to them when something online makes you uncomfortable.",
       tips: [
@@ -210,6 +231,7 @@ const smartSafeModules: LearningModule[] = [
     description: "Navigate social platforms safely and wisely.",
     icon: MessageCircle,
     color: "bg-blue-600",
+    image: kidsSocialMediaImg,
     content: {
       intro: "Social media can be a great way to connect with friends and share your interests. But it is important to use it wisely. What you post online can stay there forever and be seen by more people than you expect.",
       tips: [
@@ -239,6 +261,7 @@ const smartSafeModules: LearningModule[] = [
     description: "Recognize bullying and know how to respond.",
     icon: Users,
     color: "bg-red-500",
+    image: kidsCyberbullyingImg,
     content: {
       intro: "Online bullying, sometimes called cyberbullying, happens when someone uses technology to hurt, embarrass, or threaten others. It can happen through texts, social media, games, or any online platform. Knowing how to handle it helps you and your friends stay safe.",
       tips: [
@@ -268,6 +291,7 @@ const smartSafeModules: LearningModule[] = [
     description: "Stay safe while having fun in online games.",
     icon: Gamepad2,
     color: "bg-green-600",
+    image: kidsGamingSmartImg,
     content: {
       intro: "Online gaming is fun, but it comes with some risks. Some players are not who they say they are, and some games try to get you to spend money. Knowing how to game safely means you can enjoy playing while protecting yourself.",
       tips: [
@@ -297,6 +321,7 @@ const smartSafeModules: LearningModule[] = [
     description: "Identify fake messages designed to steal information.",
     icon: AlertCircle,
     color: "bg-orange-600",
+    image: kidsPhishingImg,
     content: {
       intro: "Phishing is when someone sends fake messages that look real to trick you into giving up passwords or personal information. These can come as emails, texts, or messages in apps. Scammers have become very good at making these look legitimate.",
       tips: [
@@ -326,6 +351,7 @@ const smartSafeModules: LearningModule[] = [
     description: "Understand how your online actions follow you.",
     icon: Target,
     color: "bg-purple-600",
+    image: kidsDigitalFootprintImg,
     content: {
       intro: "Your digital footprint is the trail of information you leave behind online. Every post, comment, photo, and search adds to it. This footprint can be seen by friends, family, schools, and even future employers. Managing it wisely is an important life skill.",
       tips: [
@@ -423,19 +449,33 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <Card 
-              className="relative overflow-visible cursor-pointer transition-shadow hover:shadow-xl border-2 border-teal-200 dark:border-teal-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
+              className="relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 border-teal-200 dark:border-teal-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
               onClick={() => onSelectAge("8-11")}
               data-testid="card-age-8-11"
             >
-              <CardHeader className="text-center pb-2">
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center shadow-lg">
-                  <Star className="w-10 h-10 text-white" />
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={kidsYoungLearnersImg}
+                  alt="Young children learning about internet safety together"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  data-testid="img-age-8-11"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-teal-900/60 via-teal-800/20 to-transparent" />
+                <div className="absolute bottom-3 left-4 right-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center shadow-lg">
+                      <Star className="w-5 h-5 text-white fill-current" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white drop-shadow-md">Ages 8 to 11</h3>
+                      <p className="text-teal-100 text-sm font-medium">Foundations</p>
+                    </div>
+                  </div>
                 </div>
-                <CardTitle className="text-2xl">Ages 8 to 11</CardTitle>
-                <CardDescription className="text-lg">Foundations</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-muted-foreground mb-4">
+              </div>
+              <CardContent className="text-center pt-5 pb-5">
+                <p className="text-muted-foreground mb-4 text-sm">
                   Start your internet safety journey with fun lessons about passwords, personal information, and staying safe online.
                 </p>
                 <div className="flex flex-wrap justify-center gap-2 mb-4">
@@ -443,26 +483,40 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
                   <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">5 Lessons</Badge>
                   <Badge className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300">Fun Quizzes</Badge>
                 </div>
-                <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-500" data-testid="button-start-8-11">
+                <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-500 shadow-md" data-testid="button-start-8-11">
                   Start Learning <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </CardContent>
             </Card>
 
             <Card 
-              className="relative overflow-visible cursor-pointer transition-shadow hover:shadow-xl border-2 border-purple-200 dark:border-purple-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
+              className="relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 border-purple-200 dark:border-purple-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
               onClick={() => onSelectAge("12-16")}
               data-testid="card-age-12-16"
             >
-              <CardHeader className="text-center pb-2">
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg">
-                  <Trophy className="w-10 h-10 text-white" />
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={kidsTeenLearnersImg}
+                  alt="Teenagers confidently using devices with security shields"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  data-testid="img-age-12-16"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 via-purple-800/20 to-transparent" />
+                <div className="absolute bottom-3 left-4 right-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg">
+                      <Trophy className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white drop-shadow-md">Ages 12 to 16</h3>
+                      <p className="text-purple-100 text-sm font-medium">Smart and Safe Online</p>
+                    </div>
+                  </div>
                 </div>
-                <CardTitle className="text-2xl">Ages 12 to 16</CardTitle>
-                <CardDescription className="text-lg">Smart and Safe Online</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-muted-foreground mb-4">
+              </div>
+              <CardContent className="text-center pt-5 pb-5">
+                <p className="text-muted-foreground mb-4 text-sm">
                   Level up your digital skills with lessons on social media, gaming safety, spotting scams, and building a positive online reputation.
                 </p>
                 <div className="flex flex-wrap justify-center gap-2 mb-4">
@@ -470,7 +524,7 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
                   <Badge className="bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-300">5 Lessons</Badge>
                   <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">Real Scenarios</Badge>
                 </div>
-                <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500" data-testid="button-start-12-16">
+                <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-md" data-testid="button-start-12-16">
                   Start Learning <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </CardContent>
@@ -597,45 +651,55 @@ function LearningTrack({
             isCompleted={completedModules.includes(activeModule)}
           />
           ) : (
-            <div className="grid md:grid-cols-2 gap-5">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {modules.map((module, index) => {
                 const isCompleted = completedModules.includes(module.id);
                 return (
                   <Card 
                     key={module.id}
-                    className={`cursor-pointer transition-shadow hover:shadow-xl bg-white/80 dark:bg-card/80 backdrop-blur-sm border-2 ${isCompleted ? 'border-green-400 dark:border-green-600 ring-2 ring-green-200 dark:ring-green-800' : 'border-white/50 dark:border-white/10'}`}
+                    className={`cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-white/80 dark:bg-card/80 backdrop-blur-sm border-2 overflow-hidden ${isCompleted ? 'border-green-400 dark:border-green-600 ring-2 ring-green-200 dark:ring-green-800' : 'border-white/50 dark:border-white/10'}`}
                     onClick={() => setActiveModule(module.id)}
                     data-testid={`card-module-${module.id}`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <div className={`w-14 h-14 rounded-xl ${module.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
-                          <module.icon className="w-7 h-7 text-white" />
+                    <div className="relative h-36 overflow-hidden">
+                      <img
+                        src={module.image}
+                        alt={module.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <div className={`absolute inset-0 bg-gradient-to-t from-black/50 to-transparent`} />
+                      {isCompleted && (
+                        <div className="absolute top-2 right-2 flex items-center gap-1 bg-green-500 text-white rounded-full px-2.5 py-1 shadow-md">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          <span className="text-xs font-semibold">Done</span>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-lg text-foreground">{module.title}</h3>
-                            {isCompleted && (
-                              <div className="flex items-center gap-1">
-                                <CheckCircle className="w-5 h-5 text-green-500" />
-                                <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                              </div>
-                            )}
-                          </div>
-                          <p className="text-muted-foreground">{module.description}</p>
-                          {!isCompleted && (
-                            <Badge className="mt-2 bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
-                              Ready to start
-                            </Badge>
-                          )}
-                          {isCompleted && (
-                            <Badge className="mt-2 bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300">
-                              Completed
-                            </Badge>
-                          )}
+                      )}
+                      <div className="absolute bottom-2 left-3">
+                        <div className={`w-9 h-9 rounded-lg ${module.color} flex items-center justify-center shadow-md`}>
+                          <module.icon className="w-5 h-5 text-white" />
                         </div>
                       </div>
+                    </div>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-base text-foreground leading-tight">{module.title}</h3>
+                        {isCompleted && (
+                          <Star className="w-4 h-4 text-yellow-500 fill-current flex-shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-muted-foreground text-sm mb-2">{module.description}</p>
+                      {!isCompleted && (
+                        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 text-xs">
+                          Ready to start
+                        </Badge>
+                      )}
+                      {isCompleted && (
+                        <Badge className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 text-xs">
+                          Completed
+                        </Badge>
+                      )}
                     </CardContent>
                   </Card>
                 );
@@ -695,19 +759,27 @@ function ModuleContent({
         Back to Lessons
       </Button>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-4">
-            <div className={`w-14 h-14 rounded-lg ${module.color} flex items-center justify-center`}>
-              <module.icon className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <CardTitle className="text-2xl">{module.title}</CardTitle>
-              <CardDescription className="text-base">{module.description}</CardDescription>
+      <Card className="overflow-hidden">
+        <div className="relative h-44 sm:h-52 overflow-hidden">
+          <img
+            src={module.image}
+            alt={module.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute bottom-4 left-5 right-5">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-xl ${module.color} flex items-center justify-center shadow-lg`}>
+                <module.icon className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white drop-shadow-md">{module.title}</h3>
+                <p className="text-white/80 text-sm">{module.description}</p>
+              </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        </div>
+        <CardContent className="space-y-6 pt-6">
           {!showQuiz ? (
             <>
               <div className="bg-muted/50 rounded-lg p-6">
@@ -996,6 +1068,15 @@ function ParentSection() {
     <div id="parent-section" className="py-16 bg-muted/30">
       <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-12">
+          <div className="mb-6">
+            <img
+              src={kidsFamilyTogetherImg}
+              alt="Diverse family learning about online safety together on a tablet"
+              className="w-36 h-36 sm:w-44 sm:h-44 mx-auto rounded-2xl shadow-lg object-cover"
+              loading="lazy"
+              data-testid="img-parent-section-hero"
+            />
+          </div>
           <Badge className="mb-4">For Parents and Educators</Badge>
           <h2 className="text-3xl font-bold text-foreground mb-4">
             Partnering with You for Online Safety
@@ -1167,6 +1248,15 @@ export default function Kids() {
         <div className="py-12 bg-gradient-to-b from-background to-muted/30">
           <div className="max-w-5xl mx-auto px-4">
             <div className="text-center mb-8">
+              <div className="mb-6">
+                <img
+                  src={kidsSpotScamImg}
+                  alt="Fun detective character examining suspicious messages"
+                  className="w-32 h-32 sm:w-40 sm:h-40 mx-auto rounded-2xl shadow-lg object-cover"
+                  loading="lazy"
+                  data-testid="img-spot-scam-hero"
+                />
+              </div>
               <Badge className="mb-4 bg-orange-500">Interactive Game</Badge>
               <h2 className="text-3xl font-bold text-foreground mb-2">Spot the Scam Challenge</h2>
               <p className="text-muted-foreground">
