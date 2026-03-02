@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import dataScanImg from "@/assets/images/tool-data-scan.jpg";
-import securityCheckImg from "@/assets/images/tool-security-check.jpg";
+import dataScanImg from "@/assets/images/tool-data-scan-diverse.png";
+import securityCheckImg from "@/assets/images/tool-security-check-diverse.png";
 
 const tools = [
   {
