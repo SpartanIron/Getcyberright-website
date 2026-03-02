@@ -13,6 +13,12 @@ import {
   Smartphone, Key, Eye, CalendarDays
 } from "lucide-react";
 import bannerImage from "@/assets/banners/small-business-banner.png";
+import imgEmployeeTraining from "@/assets/images/card-employee-training.png";
+import imgPhishingBusiness from "@/assets/images/card-phishing-business.png";
+import imgPasswordManagement from "@/assets/images/card-password-management.png";
+import imgDataProtection from "@/assets/images/card-data-protection.png";
+import imgCyberInsurance from "@/assets/images/card-cyber-insurance.png";
+import imgIncidentResponse from "@/assets/images/card-incident-response-biz.png";
 
 interface BusinessTopic {
   id: string;
@@ -21,6 +27,7 @@ interface BusinessTopic {
   icon: typeof Shield;
   color: string;
   priority: string;
+  image: string;
   content: {
     intro: string;
     risks: string[];
@@ -38,6 +45,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Users,
     color: "bg-blue-500",
     priority: "Essential",
+    image: imgEmployeeTraining,
     content: {
       intro: "Your employees are both your greatest asset and your biggest security vulnerability. The vast majority of successful cyberattacks begin with social engineering, particularly phishing emails. Regular security awareness training transforms your staff from potential weak points into your first line of defense.",
       risks: [
@@ -70,6 +78,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Mail,
     color: "bg-red-500",
     priority: "Critical",
+    image: imgPhishingBusiness,
     content: {
       intro: "Business Email Compromise (BEC) and phishing attacks cost businesses billions annually. Attackers often research companies to craft convincing emails that appear to come from executives, vendors, or customers. A single successful attack can result in significant financial loss or data breach.",
       risks: [
@@ -102,6 +111,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Key,
     color: "bg-purple-500",
     priority: "Essential",
+    image: imgPasswordManagement,
     content: {
       intro: "Weak and reused passwords are a leading cause of data breaches. Small businesses often struggle with password management as they grow, leading to shared accounts, sticky note passwords, and forgotten access when employees leave. A systematic approach to access management reduces risk significantly.",
       risks: [
@@ -134,6 +144,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Server,
     color: "bg-green-500",
     priority: "Critical",
+    image: imgDataProtection,
     content: {
       intro: "Data is often a small business's most valuable asset. Customer information, financial records, and intellectual property need protection from both external threats and accidental loss. Regular backups and proper data handling are essential for business continuity.",
       risks: [
@@ -166,6 +177,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Building,
     color: "bg-amber-500",
     priority: "Important",
+    image: imgCyberInsurance,
     content: {
       intro: "Your business is only as secure as your weakest vendor. Third-party providers often have access to your data or systems, and a breach at a vendor can quickly become your problem. Due diligence before engagement and ongoing monitoring are essential.",
       risks: [
@@ -198,6 +210,7 @@ const businessTopics: BusinessTopic[] = [
     icon: AlertTriangle,
     color: "bg-orange-500",
     priority: "Important",
+    image: imgIncidentResponse,
     content: {
       intro: "Security incidents are not a matter of if but when. Having a plan in place before an incident occurs dramatically reduces response time, limits damage, and helps maintain customer trust. Even a simple plan is far better than no plan at all.",
       risks: [
@@ -243,7 +256,7 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
             {businessTopics.map((topic) => (
               <Card 
                 key={topic.id}
-                className="cursor-pointer transition-shadow hover:shadow-lg border"
+                className="cursor-pointer transition-shadow hover:shadow-lg border overflow-hidden"
                 onClick={() => onSelectTopic(topic.id)}
                 onKeyDown={(e) => e.key === 'Enter' && onSelectTopic(topic.id)}
                 tabIndex={0}
@@ -251,18 +264,28 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
                 aria-label={`Learn about ${topic.title}`}
                 data-testid={`card-topic-${topic.id}`}
               >
+                <div className="relative h-36 w-full">
+                  <img
+                    src={topic.image}
+                    alt={topic.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    data-testid={`img-topic-${topic.id}`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <Badge 
+                    className={`absolute top-3 right-3 ${topic.priority === 'Critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300' : topic.priority === 'Essential' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'}`}
+                  >
+                    {topic.priority}
+                  </Badge>
+                </div>
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-lg ${topic.color} flex items-center justify-center`}>
-                      <topic.icon className="w-6 h-6 text-white" />
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-10 h-10 rounded-lg ${topic.color} flex items-center justify-center flex-shrink-0`}>
+                      <topic.icon className="w-5 h-5 text-white" />
                     </div>
-                    <Badge 
-                      className={topic.priority === 'Critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300' : topic.priority === 'Essential' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'}
-                    >
-                      {topic.priority}
-                    </Badge>
+                    <h3 className="font-semibold text-lg text-foreground">{topic.title}</h3>
                   </div>
-                  <h3 className="font-semibold text-lg text-foreground mb-2">{topic.title}</h3>
                   <p className="text-muted-foreground text-sm">{topic.description}</p>
                 </CardContent>
               </Card>

@@ -14,6 +14,12 @@ import {
   CalendarDays
 } from "lucide-react";
 import bannerImage from "@/assets/banners/parents-banner.png";
+import cardParentalControls from "@/assets/images/card-parental-controls.png";
+import cardSocialMedia from "@/assets/images/card-social-media-safety.png";
+import cardScreenTime from "@/assets/images/card-screen-time.png";
+import cardGamingSafety from "@/assets/images/card-gaming-safety.png";
+import cardOnlinePredators from "@/assets/images/card-online-predators.png";
+import cardFirstDevice from "@/assets/images/card-first-device.png";
 
 interface ParentTopic {
   id: string;
@@ -21,6 +27,7 @@ interface ParentTopic {
   description: string;
   icon: typeof Shield;
   color: string;
+  image: string;
   content: {
     intro: string;
     keyPoints: string[];
@@ -36,6 +43,7 @@ const parentTopics: ParentTopic[] = [
     description: "Configure devices and apps to keep your children safer online.",
     icon: Settings,
     color: "bg-blue-500",
+    image: cardParentalControls,
     content: {
       intro: "Parental controls are your first line of defense in creating a safer online environment for your children. These tools help you manage screen time, filter inappropriate content, and monitor online activities. While no tool is perfect, they provide an important layer of protection.",
       keyPoints: [
@@ -65,6 +73,7 @@ const parentTopics: ParentTopic[] = [
     description: "Guide your children through social media risks and responsibilities.",
     icon: MessageCircle,
     color: "bg-pink-500",
+    image: cardSocialMedia,
     content: {
       intro: "Social media is a significant part of many children's lives, offering connection and creativity but also real risks. Your role is to help them navigate these platforms safely, understand what they share, and recognize when something feels wrong.",
       keyPoints: [
@@ -94,6 +103,7 @@ const parentTopics: ParentTopic[] = [
     description: "Create healthy boundaries around device use for the whole family.",
     icon: Clock,
     color: "bg-purple-500",
+    image: cardScreenTime,
     content: {
       intro: "Finding the right balance with screen time is challenging for every family. The goal is not to eliminate technology but to ensure it does not interfere with sleep, physical activity, homework, and family time. Consistent rules and modeling good behavior yourself are key.",
       keyPoints: [
@@ -123,6 +133,7 @@ const parentTopics: ParentTopic[] = [
     description: "Understand gaming risks including strangers, purchases, and addiction.",
     icon: Gamepad2,
     color: "bg-green-500",
+    image: cardGamingSafety,
     content: {
       intro: "Video games can be fun, educational, and social, but they also present unique risks. Many games include chat features with strangers, in-app purchases, and mechanics designed to keep players engaged for long periods. Understanding these risks helps you set appropriate boundaries.",
       keyPoints: [
@@ -152,6 +163,7 @@ const parentTopics: ParentTopic[] = [
     description: "Recognize grooming behaviors and keep communication open.",
     icon: AlertTriangle,
     color: "bg-red-500",
+    image: cardOnlinePredators,
     content: {
       intro: "Online predators use technology to target and manipulate children. They often spend weeks or months building trust before attempting to exploit. Teaching children about these tactics and maintaining open communication are your strongest defenses.",
       keyPoints: [
@@ -181,6 +193,7 @@ const parentTopics: ParentTopic[] = [
     description: "Help children understand that online actions have lasting consequences.",
     icon: Eye,
     color: "bg-teal-500",
+    image: cardFirstDevice,
     content: {
       intro: "Everything posted online creates a digital footprint that can follow your child for years. Colleges and employers regularly review social media. Teaching children to think before they post helps them build a positive online reputation.",
       keyPoints: [
@@ -237,7 +250,7 @@ function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
             {parentTopics.map((topic) => (
               <Card 
                 key={topic.id}
-                className="cursor-pointer transition-shadow hover:shadow-xl border-2 border-white/50 dark:border-white/10 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
+                className="cursor-pointer transition-shadow hover:shadow-xl border-2 border-white/50 dark:border-white/10 bg-white/80 dark:bg-card/80 backdrop-blur-sm overflow-visible"
                 onClick={() => onSelectTopic(topic.id)}
                 onKeyDown={(e) => e.key === 'Enter' && onSelectTopic(topic.id)}
                 tabIndex={0}
@@ -245,11 +258,21 @@ function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
                 aria-label={`Learn about ${topic.title}`}
                 data-testid={`card-topic-${topic.id}`}
               >
-                <CardContent className="p-6">
-                  <div className={`w-14 h-14 rounded-xl ${topic.color} flex items-center justify-center mb-4 shadow-lg`}>
-                    <topic.icon className="w-7 h-7 text-white" />
+                <div className="relative h-40 rounded-t-md overflow-hidden">
+                  <img
+                    src={topic.image}
+                    alt={topic.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    data-testid={`img-topic-${topic.id}`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className={`absolute bottom-3 left-3 w-10 h-10 rounded-md ${topic.color} flex items-center justify-center shadow-lg`}>
+                    <topic.icon className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-lg text-foreground mb-2">{topic.title}</h3>
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-lg text-foreground mb-1">{topic.title}</h3>
                   <p className="text-muted-foreground text-sm">{topic.description}</p>
                 </CardContent>
               </Card>

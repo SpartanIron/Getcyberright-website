@@ -8,6 +8,12 @@ import { SEOHead } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { CourseData, BreadcrumbData } from "@/components/structured-data";
 import bannerImage from "@/assets/banners/training-banner.png";
+import trainingKidsImg from "@/assets/images/card-training-kids.png";
+import trainingParentsImg from "@/assets/images/card-training-parents.png";
+import trainingSeniorsImg from "@/assets/images/card-training-seniors.png";
+import trainingEducatorsImg from "@/assets/images/card-training-educators.png";
+import trainingBusinessImg from "@/assets/images/card-training-business.png";
+import trainingEveryoneImg from "@/assets/images/card-training-everyone.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +50,8 @@ const audienceInfo = {
     icon: Sparkles,
     color: "from-purple-500 to-pink-500",
     bgColor: "bg-purple-50 dark:bg-purple-950/20",
-    borderColor: "border-purple-200 dark:border-purple-800"
+    borderColor: "border-purple-200 dark:border-purple-800",
+    image: trainingKidsImg
   },
   parents: {
     title: "Parents & Families",
@@ -52,7 +59,8 @@ const audienceInfo = {
     icon: Users,
     color: "from-blue-500 to-cyan-500",
     bgColor: "bg-blue-50 dark:bg-blue-950/20",
-    borderColor: "border-blue-200 dark:border-blue-800"
+    borderColor: "border-blue-200 dark:border-blue-800",
+    image: trainingParentsImg
   },
   seniors: {
     title: "Seniors Protection",
@@ -60,7 +68,8 @@ const audienceInfo = {
     icon: Heart,
     color: "from-rose-500 to-orange-500",
     bgColor: "bg-rose-50 dark:bg-rose-950/20",
-    borderColor: "border-rose-200 dark:border-rose-800"
+    borderColor: "border-rose-200 dark:border-rose-800",
+    image: trainingSeniorsImg
   },
   educators: {
     title: "Educators & Schools",
@@ -68,7 +77,8 @@ const audienceInfo = {
     icon: GraduationCap,
     color: "from-emerald-500 to-teal-500",
     bgColor: "bg-emerald-50 dark:bg-emerald-950/20",
-    borderColor: "border-emerald-200 dark:border-emerald-800"
+    borderColor: "border-emerald-200 dark:border-emerald-800",
+    image: trainingEducatorsImg
   },
   "small-business": {
     title: "Small Business",
@@ -76,7 +86,8 @@ const audienceInfo = {
     icon: Briefcase,
     color: "from-amber-500 to-yellow-500",
     bgColor: "bg-amber-50 dark:bg-amber-950/20",
-    borderColor: "border-amber-200 dark:border-amber-800"
+    borderColor: "border-amber-200 dark:border-amber-800",
+    image: trainingBusinessImg
   },
   everyone: {
     title: "Everyone",
@@ -84,7 +95,8 @@ const audienceInfo = {
     icon: Brain,
     color: "from-teal-500 to-cyan-500",
     bgColor: "bg-teal-50 dark:bg-teal-950/20",
-    borderColor: "border-teal-200 dark:border-teal-800"
+    borderColor: "border-teal-200 dark:border-teal-800",
+    image: trainingEveryoneImg
   }
 };
 
@@ -243,22 +255,35 @@ export default function Training() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
               {Object.entries(audienceInfo).map(([key, info]) => {
                 const Icon = info.icon;
                 return (
                   <button
                     key={key}
                     onClick={() => setSelectedAudience(key === selectedAudience ? "all" : key)}
-                    className={`p-4 rounded-lg border-2 transition-all hover-elevate ${
+                    className={`relative rounded-lg border-2 transition-all overflow-hidden ${
                       selectedAudience === key 
                         ? `${info.borderColor} ${info.bgColor}` 
                         : "border-border hover:border-muted-foreground/30"
                     }`}
                     data-testid={`button-audience-${key}`}
                   >
-                    <Icon className="w-8 h-8 mx-auto mb-2 text-foreground" />
-                    <p className="font-medium text-sm">{info.title.split(" ")[0]}</p>
+                    <div className="aspect-[4/3] relative">
+                      <img
+                        src={info.image}
+                        alt={info.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                        data-testid={`img-training-${key}`}
+                      />
+                      <div className="absolute inset-0 bg-black/40" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                        <Icon className="w-7 h-7 mb-1" />
+                        <p className="font-semibold text-sm">{info.title.split(" ")[0]}</p>
+                      </div>
+                    </div>
                   </button>
                 );
               })}

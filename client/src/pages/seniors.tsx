@@ -17,6 +17,12 @@ import {
   ExternalLink, Wallet, UserX
 } from "lucide-react";
 import bannerImage from "@/assets/banners/seniors-banner.png";
+import cardRomanceScams from "@/assets/images/card-romance-scams.png";
+import cardTechSupportScams from "@/assets/images/card-tech-support-scams.png";
+import cardMedicareScams from "@/assets/images/card-medicare-scams.png";
+import cardPhoneEmailScams from "@/assets/images/card-phone-email-scams.png";
+import cardIdentityTheft from "@/assets/images/card-identity-theft-seniors.png";
+import cardOnlineShopping from "@/assets/images/card-online-shopping-seniors.png";
 
 interface SafetyTopic {
   id: string;
@@ -24,6 +30,7 @@ interface SafetyTopic {
   description: string;
   icon: typeof Shield;
   color: string;
+  image?: string;
   content: {
     intro: string;
     warningSignsSectionTitle: string;
@@ -40,6 +47,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Recognize fake online relationships designed to steal money.",
     icon: Heart,
     color: "bg-rose-500",
+    image: cardRomanceScams,
     content: {
       intro: "Romance scammers create fake profiles on dating sites, social media, or even through text messages. They build emotional connections over weeks or months, then ask for money for emergencies, travel, or investments. These criminals are skilled at manipulation and target people seeking companionship.",
       warningSignsSectionTitle: "Warning Signs",
@@ -66,6 +74,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Avoid fake computer support calls and pop-up warnings.",
     icon: Phone,
     color: "bg-blue-500",
+    image: cardTechSupportScams,
     content: {
       intro: "Tech support scammers pretend to be from well-known companies like Microsoft, Apple, or your internet provider. They may call you directly or use scary pop-up messages claiming your computer has a virus. Their goal is to get remote access to your computer or convince you to pay for unnecessary services.",
       warningSignsSectionTitle: "Warning Signs",
@@ -92,6 +101,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Protect your Medicare number and health information.",
     icon: BadgeCheck,
     color: "bg-green-500",
+    image: cardMedicareScams,
     content: {
       intro: "Scammers target seniors by pretending to be from Medicare or health insurance companies. They try to steal your Medicare number, which can be used to file false claims and steal your identity. They may offer free medical equipment, genetic testing, or new Medicare cards to trick you.",
       warningSignsSectionTitle: "Warning Signs",
@@ -118,6 +128,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Identify fraudulent calls, texts, and emails.",
     icon: Mail,
     color: "bg-purple-500",
+    image: cardPhoneEmailScams,
     content: {
       intro: "Scammers use phones and email to impersonate banks, government agencies, delivery services, and family members. They create urgency to prevent you from thinking clearly. These scams are becoming more sophisticated, sometimes using technology to make calls appear to come from legitimate numbers.",
       warningSignsSectionTitle: "Warning Signs",
@@ -144,6 +155,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Protect your savings from fraudulent schemes.",
     icon: CreditCard,
     color: "bg-amber-500",
+    image: cardIdentityTheft,
     content: {
       intro: "Financial scammers target seniors because they often have retirement savings and own their homes. Scams range from fake investment opportunities promising high returns to predatory lending and contractor fraud. Protecting your finances requires skepticism about unsolicited offers.",
       warningSignsSectionTitle: "Warning Signs",
@@ -170,6 +182,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Essential skills for safe internet use.",
     icon: Shield,
     color: "bg-teal-500",
+    image: cardOnlineShopping,
     content: {
       intro: "The internet offers wonderful ways to stay connected, learn new things, and manage daily tasks. With some basic precautions, you can enjoy these benefits while staying safe. These fundamental practices will help protect you from most online threats.",
       warningSignsSectionTitle: "Key Safety Practices",
@@ -314,10 +327,27 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
                 aria-label={`Learn about ${topic.title}`}
                 data-testid={`card-topic-${topic.id}`}
               >
-                <CardContent className="p-6">
-                  <div className={`w-14 h-14 rounded-xl ${topic.color} flex items-center justify-center mb-4 shadow-lg`}>
-                    <topic.icon className="w-7 h-7 text-white" />
+                {topic.image && (
+                  <div className="relative h-40 w-full">
+                    <img
+                      src={topic.image}
+                      alt={topic.title}
+                      className="w-full h-full object-cover rounded-t-md"
+                      loading="lazy"
+                      data-testid={`img-topic-${topic.id}`}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-t-md" />
+                    <div className={`absolute bottom-3 left-3 w-10 h-10 rounded-lg ${topic.color} flex items-center justify-center shadow-lg`}>
+                      <topic.icon className="w-5 h-5 text-white" />
+                    </div>
                   </div>
+                )}
+                <CardContent className={topic.image ? "p-4" : "p-6"}>
+                  {!topic.image && (
+                    <div className={`w-14 h-14 rounded-xl ${topic.color} flex items-center justify-center mb-4 shadow-lg`}>
+                      <topic.icon className="w-7 h-7 text-white" />
+                    </div>
+                  )}
                   <h3 className="font-semibold text-lg text-foreground mb-2">{topic.title}</h3>
                   <p className="text-muted-foreground text-sm">{topic.description}</p>
                 </CardContent>

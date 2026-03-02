@@ -25,6 +25,10 @@ import {
   Wrench,
 } from "lucide-react";
 import bannerImage from "@/assets/banners/tools-banner.png";
+import phishingGuideImg from "@/assets/images/card-phishing-guide.png";
+import safetyAssessmentImg from "@/assets/images/card-safety-assessment.png";
+import privacyChecklistImg from "@/assets/images/card-privacy-checklist.png";
+import incidentResponseImg from "@/assets/images/card-incident-response.png";
 
 const guides = [
   {
@@ -33,7 +37,9 @@ const guides = [
     title: "Phishing Red Flag Guide",
     description: "Learn the telltale signs of phishing emails, texts, and calls. This visual guide shows you exactly what to look for.",
     category: "Education",
-    features: ["Visual examples", "Real-world samples", "Quick reference"]
+    features: ["Visual examples", "Real-world samples", "Quick reference"],
+    image: phishingGuideImg,
+    imageAlt: "Diverse team examining a phishing warning on a laptop screen"
   },
   {
     id: "safety-assessment",
@@ -41,7 +47,9 @@ const guides = [
     title: "Online Safety Assessment",
     description: "Take a quick assessment of your current online safety practices. Get personalized recommendations.",
     category: "Assessment",
-    features: ["5-minute assessment", "Personalized tips", "Action plan"]
+    features: ["5-minute assessment", "Personalized tips", "Action plan"],
+    image: safetyAssessmentImg,
+    imageAlt: "Couple reviewing online safety assessment on a tablet"
   },
   {
     id: "privacy-checklist",
@@ -49,7 +57,9 @@ const guides = [
     title: "Privacy Settings Checklist",
     description: "Step-by-step guides for securing your privacy on Facebook, Instagram, and other major platforms.",
     category: "Guides",
-    features: ["Platform-specific", "Screenshot guides", "Regular updates"]
+    features: ["Platform-specific", "Screenshot guides", "Regular updates"],
+    image: privacyChecklistImg,
+    imageAlt: "Person adjusting privacy settings on a smartphone"
   },
   {
     id: "incident-response",
@@ -58,7 +68,9 @@ const guides = [
     description: "Step-by-step guide on exactly what to do if you think you've been scammed.",
     category: "Emergency",
     features: ["Step-by-step actions", "Contact list", "Documentation help"],
-    href: "/emergency-help"
+    href: "/emergency-help",
+    image: incidentResponseImg,
+    imageAlt: "Person looking at fraud alert on computer screen"
   }
 ];
 
@@ -220,17 +232,27 @@ export default function Tools() {
 
             <div className="grid md:grid-cols-2 gap-6">
               {guides.map((guide) => (
-                <Card key={guide.id} className="hover-elevate" data-testid={`card-guide-${guide.id}`}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <guide.icon className="w-6 h-6 text-primary" />
-                      </div>
-                      <Badge variant="outline">{guide.category}</Badge>
+                <Card key={guide.id} className="overflow-visible hover-elevate" data-testid={`card-guide-${guide.id}`}>
+                  <div className="relative h-44 sm:h-48 overflow-hidden rounded-t-md">
+                    <img
+                      src={guide.image}
+                      alt={guide.imageAlt}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy"
+                      data-testid={`img-guide-${guide.id}`}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+                    <div className="absolute top-3 right-3">
+                      <Badge variant="secondary" className="text-xs">{guide.category}</Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardTitle className="text-lg mb-2">{guide.title}</CardTitle>
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <guide.icon className="w-5 h-5 text-white/90 flex-shrink-0" />
+                        <h3 className="text-white font-semibold text-lg leading-tight">{guide.title}</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <CardContent className="pt-4">
                     <p className="text-muted-foreground text-sm mb-4">
                       {guide.description}
                     </p>

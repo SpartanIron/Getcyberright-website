@@ -13,6 +13,12 @@ import {
   ClipboardList, Download, CalendarDays
 } from "lucide-react";
 import bannerImage from "@/assets/banners/educators-banner.png";
+import digitalCitizenshipImg from "@/assets/images/card-digital-citizenship.png";
+import cyberbullyingImg from "@/assets/images/card-cyberbullying.png";
+import privacyEducationImg from "@/assets/images/card-privacy-education.png";
+import socialMediaLiteracyImg from "@/assets/images/card-social-media-literacy.png";
+import onlineResearchImg from "@/assets/images/card-online-research.png";
+import passwordEducationImg from "@/assets/images/card-password-education.png";
 
 interface EducatorResource {
   id: string;
@@ -21,6 +27,7 @@ interface EducatorResource {
   icon: typeof Shield;
   color: string;
   gradeLevel: string;
+  image: string;
   content: {
     overview: string;
     learningObjectives: string[];
@@ -38,6 +45,7 @@ const educatorResources: EducatorResource[] = [
     icon: Users,
     color: "bg-blue-500",
     gradeLevel: "All Grades",
+    image: digitalCitizenshipImg,
     content: {
       overview: "Digital citizenship encompasses the norms of appropriate and responsible technology use. Students need to understand that online actions have real consequences, and that being a good digital citizen means treating others with respect, protecting privacy, and contributing positively to online communities.",
       learningObjectives: [
@@ -70,6 +78,7 @@ const educatorResources: EducatorResource[] = [
     icon: AlertTriangle,
     color: "bg-red-500",
     gradeLevel: "Grades 3-12",
+    image: cyberbullyingImg,
     content: {
       overview: "Cyberbullying can happen 24 hours a day, follows students home, and can spread quickly to large audiences. Unlike traditional bullying, digital content can be preserved and shared repeatedly. Teaching students to recognize cyberbullying and empowering bystanders to act are key prevention strategies.",
       learningObjectives: [
@@ -102,6 +111,7 @@ const educatorResources: EducatorResource[] = [
     icon: Shield,
     color: "bg-green-500",
     gradeLevel: "Grades 4-12",
+    image: privacyEducationImg,
     content: {
       overview: "Students often share personal information online without considering the consequences. Teaching privacy and security helps students understand what information is sensitive, how it can be misused, and practical steps to protect themselves. Strong passwords and privacy settings are foundational skills.",
       learningObjectives: [
@@ -134,6 +144,7 @@ const educatorResources: EducatorResource[] = [
     icon: BookOpen,
     color: "bg-purple-500",
     gradeLevel: "Grades 5-12",
+    image: socialMediaLiteracyImg,
     content: {
       overview: "Students encounter a constant stream of information online, but not all of it is accurate or trustworthy. Media literacy teaches students to think critically about the content they consume, verify information before sharing, and understand how algorithms and bias shape what they see.",
       learningObjectives: [
@@ -166,6 +177,7 @@ const educatorResources: EducatorResource[] = [
     icon: Presentation,
     color: "bg-orange-500",
     gradeLevel: "Grades 3-10",
+    image: onlineResearchImg,
     content: {
       overview: "Gaming is a significant part of many students' lives. While games can be educational and social, they also present risks including exposure to inappropriate content, in-game purchases, and excessive screen time. Teaching balanced digital habits helps students develop healthy relationships with technology.",
       learningObjectives: [
@@ -198,6 +210,7 @@ const educatorResources: EducatorResource[] = [
     icon: School,
     color: "bg-teal-500",
     gradeLevel: "Educators",
+    image: passwordEducationImg,
     content: {
       overview: "Schools are increasingly targets for cyberattacks, and educators play an important role in maintaining security. Understanding basic security practices, recognizing threats, and knowing how to respond to incidents helps protect student data and school operations.",
       learningObjectives: [
@@ -256,7 +269,7 @@ function EducatorsLanding({ onSelectResource }: { onSelectResource: (id: string)
             {educatorResources.map((resource) => (
               <Card 
                 key={resource.id}
-                className="cursor-pointer transition-shadow hover:shadow-xl border-2 border-white/50 dark:border-white/10 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
+                className="cursor-pointer transition-shadow hover:shadow-xl border-2 border-white/50 dark:border-white/10 bg-white/80 dark:bg-card/80 backdrop-blur-sm overflow-hidden"
                 onClick={() => onSelectResource(resource.id)}
                 onKeyDown={(e) => e.key === 'Enter' && onSelectResource(resource.id)}
                 tabIndex={0}
@@ -264,14 +277,24 @@ function EducatorsLanding({ onSelectResource }: { onSelectResource: (id: string)
                 aria-label={`View ${resource.title} resource`}
                 data-testid={`card-resource-${resource.id}`}
               >
+                <div className="relative h-40 w-full">
+                  <img 
+                    src={resource.image} 
+                    alt={resource.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    data-testid={`img-resource-${resource.id}`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <Badge variant="secondary" className="absolute top-3 right-3 text-xs">{resource.gradeLevel}</Badge>
+                </div>
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-14 h-14 rounded-xl ${resource.color} flex items-center justify-center shadow-lg`}>
-                      <resource.icon className="w-7 h-7 text-white" />
+                  <div className="flex items-start gap-3 mb-2">
+                    <div className={`w-10 h-10 rounded-md ${resource.color} flex items-center justify-center shadow-sm flex-shrink-0`}>
+                      <resource.icon className="w-5 h-5 text-white" />
                     </div>
-                    <Badge variant="secondary" className="text-xs">{resource.gradeLevel}</Badge>
+                    <h3 className="font-semibold text-lg text-foreground">{resource.title}</h3>
                   </div>
-                  <h3 className="font-semibold text-lg text-foreground mb-2">{resource.title}</h3>
                   <p className="text-muted-foreground text-sm">{resource.description}</p>
                 </CardContent>
               </Card>
