@@ -3424,7 +3424,7 @@ EDGE CASE HANDLING
           const safePage = escapeHtml(parsed.data.page || "Not specified");
           const safeCategory = escapeHtml(parsed.data.category);
           await resend.emails.send({
-            from: "GetCyberRight <onboarding@resend.dev>",
+            from: "GetCyberRight <tips@getcyberright.com>",
             to: [adminEmail],
             subject: `[Feedback] New ${parsed.data.category} from GetCyberRight`,
             html: `
@@ -3612,7 +3612,7 @@ EDGE CASE HANDLING
         const resendKey = process.env.RESEND_API_KEY;
         if (resendKey) {
           const resend = new Resend(resendKey);
-          const fromAddr = "GetCyberRight <onboarding@resend.dev>";
+          const fromAddr = "GetCyberRight <tips@getcyberright.com>";
           const result = await resend.emails.send({
             from: fromAddr,
             to: [email],
