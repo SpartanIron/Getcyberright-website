@@ -3392,5 +3392,199 @@ EDGE CASE HANDLING
     }
   });
 
+  app.post("/api/download-cyber-hygiene-guide", createRateLimitMiddleware("strict"), async (req: Request, res: Response) => {
+    try {
+      const schema = z.object({
+        email: z.string().email("Please provide a valid email address"),
+        name: z.string().max(100).optional().default(""),
+        score: z.number().min(0).max(100),
+        level: z.enum(["critical", "poor", "fair", "good", "excellent"]),
+      });
+
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: parsed.error.errors[0]?.message || "Invalid input" });
+      }
+
+      const { email, name, score, level } = parsed.data;
+      const displayName = name || "there";
+
+      const levelInfo: Record<string, { label: string; color: string; emoji: string }> = {
+        critical: { label: "Critical", color: "#dc2626", emoji: "🔴" },
+        poor: { label: "Needs Improvement", color: "#ea580c", emoji: "🟠" },
+        fair: { label: "Fair", color: "#ca8a04", emoji: "🟡" },
+        good: { label: "Good", color: "#16a34a", emoji: "🟢" },
+        excellent: { label: "Excellent", color: "#0d9488", emoji: "⭐" },
+      };
+
+      const info = levelInfo[level] || levelInfo.fair;
+
+      const recommendations: Record<string, string[]> = {
+        critical: [
+          "Start using unique, strong passwords for every account immediately.",
+          "Enable two-factor authentication on your email and banking accounts.",
+          "Install reputable antivirus software and run a full scan.",
+          "Update all your devices and software to the latest versions.",
+          "Review your privacy settings on all social media accounts.",
+        ],
+        poor: [
+          "Create a password manager account and start migrating your passwords.",
+          "Enable two-factor authentication on your most important accounts.",
+          "Set your devices to update automatically.",
+          "Be cautious with links in emails and texts from unknown senders.",
+          "Review which apps have access to your personal data.",
+        ],
+        fair: [
+          "Consider using a password manager if you are not already.",
+          "Enable two-factor authentication on remaining accounts.",
+          "Review your social media privacy settings quarterly.",
+          "Back up your important files to a secure cloud service.",
+          "Stay informed about the latest scam techniques in your area.",
+        ],
+        good: [
+          "Keep up your great security habits and stay consistent.",
+          "Consider enabling a VPN when using public Wi-Fi.",
+          "Review your digital footprint and remove old accounts you no longer use.",
+          "Share your knowledge with family members to help them stay safe too.",
+          "Set up breach monitoring for your email addresses.",
+        ],
+        excellent: [
+          "You are a cybersecurity champion! Keep maintaining your excellent habits.",
+          "Help friends and family improve their security practices.",
+          "Stay updated on emerging threats like AI-powered scams.",
+          "Consider advanced measures like hardware security keys.",
+          "Regularly audit your connected devices and services.",
+        ],
+      };
+
+      const tips = recommendations[level] || recommendations.fair;
+
+      const htmlBody = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cyber Hygiene Improvement Plan</title>
+</head>
+<body style="margin:0;padding:0;background:#f0fdfa;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdfa;padding:20px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background:linear-gradient(135deg,#0d9488,#0284c7);padding:32px 24px;text-align:center;">
+              <h1 style="color:#ffffff;margin:0 0 8px;font-size:24px;">Your Cyber Hygiene Report</h1>
+              <p style="color:#ccfbf1;margin:0;font-size:14px;">Personalized improvement plan from GetCyberRight</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 24px;">
+              <p style="color:#334155;font-size:16px;margin:0 0 24px;">Hi ${displayName},</p>
+              <p style="color:#334155;font-size:15px;line-height:1.6;margin:0 0 24px;">
+                Thank you for completing the Cyber Hygiene Self-Check. Here is your personalized improvement plan based on your results.
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;margin-bottom:24px;">
+                <tr>
+                  <td style="padding:24px;text-align:center;">
+                    <p style="font-size:48px;margin:0 0 4px;font-weight:bold;color:${info.color};">${score}%</p>
+                    <p style="font-size:18px;margin:0;color:${info.color};font-weight:600;">${info.emoji} ${info.label}</p>
+                  </td>
+                </tr>
+              </table>
+
+              <h2 style="color:#0d9488;font-size:18px;margin:0 0 16px;border-bottom:2px solid #ccfbf1;padding-bottom:8px;">Your Action Plan</h2>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                ${tips.map((tip, i) => `
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="width:28px;vertical-align:top;padding-top:2px;">
+                          <span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:#0d9488;color:#fff;text-align:center;line-height:22px;font-size:12px;font-weight:bold;">${i + 1}</span>
+                        </td>
+                        <td style="padding-left:10px;color:#475569;font-size:14px;line-height:1.5;">${tip}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                `).join('')}
+              </table>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;background:#f0fdfa;border-radius:8px;border:1px solid #ccfbf1;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <p style="color:#0d9488;font-weight:600;margin:0 0 4px;font-size:14px;">Quick Tip</p>
+                    <p style="color:#334155;margin:0;font-size:13px;line-height:1.5;">
+                      Focus on one improvement at a time. Even small changes in your digital habits can significantly reduce your risk of falling victim to cyber threats.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px;text-align:center;border-top:1px solid #e2e8f0;">
+              <p style="color:#94a3b8;font-size:12px;margin:0 0 8px;">
+                This report was generated by GetCyberRight, a free cybersecurity education platform for families.
+              </p>
+              <a href="https://getcyberright.com" style="color:#0d9488;font-size:12px;text-decoration:none;">Visit GetCyberRight.com</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+      let sent = false;
+      const subject = `Your Cyber Hygiene Report: ${info.label} (${score}%)`;
+
+      try {
+        const { Resend } = await import("resend");
+        const resendKey = process.env.RESEND_API_KEY;
+        if (resendKey) {
+          const resend = new Resend(resendKey);
+          const fromAddr = "GetCyberRight <onboarding@resend.dev>";
+          const result = await resend.emails.send({
+            from: fromAddr,
+            to: [email],
+            subject,
+            html: htmlBody,
+          });
+          if (result.data?.id) {
+            sent = true;
+          } else if (result.error) {
+            console.error("[cyber-hygiene-guide] Resend API error:", JSON.stringify(result.error));
+          }
+        }
+      } catch (emailErr) {
+        console.error("[cyber-hygiene-guide] Resend error:", emailErr);
+      }
+
+      if (!sent) {
+        try {
+          const { sendEmail, isEmailConfigured } = await import("./email-service");
+          if (isEmailConfigured()) {
+            sent = await sendEmail({ to: [email], subject, htmlBody });
+          }
+        } catch (fallbackErr) {
+          console.error("[cyber-hygiene-guide] Fallback email error:", fallbackErr);
+        }
+      }
+
+      if (sent) {
+        res.json({ success: true, message: "Guide sent successfully" });
+      } else {
+        res.status(500).json({ error: "Email service is not available. Please try again later." });
+      }
+    } catch (error: any) {
+      console.error("[cyber-hygiene-guide] Error:", error);
+      res.status(500).json({ error: "Failed to send the guide. Please try again." });
+    }
+  });
+
   return httpServer;
 }
