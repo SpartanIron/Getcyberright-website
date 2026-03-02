@@ -1,9 +1,33 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Trash2, ArrowRight, Shield, Zap } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import dataScanImg from "@/assets/images/tool-data-scan.jpg";
+import securityCheckImg from "@/assets/images/tool-security-check.jpg";
+
+const tools = [
+  {
+    id: "data-scan",
+    image: dataScanImg,
+    title: "Scan for Your Exposed Data",
+    badge: "Instant Scan",
+    description: "Discover which of 500+ data brokers are selling your personal information. See exactly what's exposed and take action to remove it.",
+    cta: "Start Your Scan",
+    href: "/data-removal",
+    accentColor: "from-orange-600/90 via-orange-700/80",
+  },
+  {
+    id: "security-scanner",
+    image: securityCheckImg,
+    title: "Check Something Suspicious",
+    badge: "Instant Check",
+    description: "Got a sketchy link, email, or phone call? Paste it in and get an instant risk assessment with detailed analysis.",
+    cta: "Open Security Scanner",
+    href: "/tools",
+    accentColor: "from-green-700/90 via-green-800/80",
+  },
+];
 
 export function HeroTools() {
   return (
@@ -23,67 +47,43 @@ export function HeroTools() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-          >
-            <Link href="/data-removal">
-              <Card className="h-full hover-elevate cursor-pointer group bg-orange-500 border-orange-600 dark:bg-orange-600 dark:border-orange-700" data-testid="card-hero-data-scan">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
-                      <Trash2 className="w-7 h-7 text-white" />
+          {tools.map((tool, index) => (
+            <motion.div
+              key={tool.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+            >
+              <Link href={tool.href}>
+                <div
+                  className="relative h-full rounded-xl overflow-hidden hover-elevate cursor-pointer group min-h-[220px]"
+                  data-testid={`card-hero-${tool.id}`}
+                >
+                  <img
+                    src={tool.image}
+                    alt={tool.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div className={`absolute inset-0 bg-gradient-to-t ${tool.accentColor} to-black/30`} />
+                  <div className="relative z-10 h-full flex flex-col justify-end p-5 sm:p-6">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h3 className="text-lg font-semibold text-white">{tool.title}</h3>
+                      <Badge className="text-[10px] bg-white/20 text-white border-white/30 no-default-hover-elevate no-default-active-elevate">{tool.badge}</Badge>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="text-lg font-semibold text-white">Scan for Your Exposed Data</h3>
-                        <Badge className="text-[10px] bg-white/20 text-white border-white/30">Instant Scan</Badge>
-                      </div>
-                      <p className="text-sm text-white/80 mb-4">
-                        Discover which of 500+ data brokers are selling your personal information. See exactly what's exposed and take action to remove it.
-                      </p>
-                      <div className="flex items-center gap-2 text-sm font-medium text-white">
-                        Start Your Scan <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            <Link href="/tools">
-              <Card className="h-full hover-elevate cursor-pointer group bg-green-600 border-green-700 dark:bg-green-700 dark:border-green-800" data-testid="card-hero-security-scanner">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
-                      <Search className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="text-lg font-semibold text-white">Check Something Suspicious</h3>
-                        <Badge className="text-[10px] bg-white/20 text-white border-white/30">Instant Check</Badge>
-                      </div>
-                      <p className="text-sm text-white/80 mb-4">
-                        Got a sketchy link, email, or phone call? Paste it in and get an instant risk assessment with detailed analysis.
-                      </p>
-                      <div className="flex items-center gap-2 text-sm font-medium text-white">
-                        Open Security Scanner <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </div>
+                    <p className="text-sm text-white/80 mb-4 line-clamp-2">
+                      {tool.description}
+                    </p>
+                    <div className="flex items-center gap-2 text-sm font-medium text-white">
+                      {tool.cta} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          </motion.div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

@@ -2,6 +2,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
+import featureScamImg from "@/assets/images/feature-scam-detection.jpg";
+import featureLearningImg from "@/assets/images/feature-family-learning.jpg";
+import featureGenerationImg from "@/assets/images/feature-every-generation.jpg";
+import featureEmergencyImg from "@/assets/images/feature-emergency-help.jpg";
 
 const features = [
   {
@@ -11,7 +15,7 @@ const features = [
     description: "Paste that suspicious text, email, or link and get a plain-English answer. We built this because our own family kept asking us to check things for them.",
     cta: "Check for Scams",
     href: "/tools",
-    variant: "light" as const,
+    image: featureScamImg,
   },
   {
     id: "security-training",
@@ -20,7 +24,7 @@ const features = [
     description: "Short, practical guides written for real people. No IT background needed. Just clear steps your whole family can follow together.",
     cta: "Start Learning",
     href: "/resources",
-    variant: "dark" as const,
+    image: featureLearningImg,
   },
   {
     id: "family-protection",
@@ -29,7 +33,7 @@ const features = [
     description: "Interactive safety lessons for kids. Scam protection for seniors. Monitoring tips for parents. Pick the path that fits your family.",
     cta: "Find Your Path",
     href: "/training",
-    variant: "medium" as const,
+    image: featureGenerationImg,
   },
   {
     id: "emergency-help",
@@ -38,23 +42,9 @@ const features = [
     description: "It happens to the best of us. Here is exactly what to do right now: who to call, what to report, and how to recover. You are not alone.",
     cta: "Get Help Now",
     href: "/emergency-help",
-    variant: "pattern" as const,
+    image: featureEmergencyImg,
   },
 ];
-
-const variantStyles = {
-  light: "bg-gray-100 dark:bg-gray-800 text-foreground",
-  dark: "bg-primary dark:bg-primary/90 text-white",
-  medium: "bg-accent dark:bg-accent/90 text-white",
-  pattern: "bg-slate-800 dark:bg-slate-900 text-white bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:20px_20px]",
-};
-
-const buttonVariants = {
-  light: "bg-white hover:bg-gray-50 text-foreground border border-border",
-  dark: "bg-white/10 hover:bg-white/20 text-white border border-white/20",
-  medium: "bg-white hover:bg-gray-50 text-foreground border border-border",
-  pattern: "bg-white/10 hover:bg-white/20 text-white border border-white/20",
-};
 
 export function FeaturesGrid() {
   return (
@@ -78,51 +68,47 @@ export function FeaturesGrid() {
           </p>
         </motion.div>
 
-        <div className="relative">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-primary z-10 hidden lg:flex items-center justify-center shadow-lg">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-              <div className="w-6 h-6 rounded-full bg-white/40" />
-            </div>
-          </div>
-
-          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-primary/20 -translate-x-1/2 hidden lg:block" />
-          <div className="absolute top-1/2 left-0 right-0 h-1 bg-primary/20 -translate-y-1/2 hidden lg:block" />
-
-          <div className="grid md:grid-cols-2 gap-4 lg:gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`relative rounded-2xl p-8 sm:p-10 ${variantStyles[feature.variant]}`}
-                data-testid={`card-feature-${feature.id}`}
-              >
-                <p className="text-sm font-medium uppercase tracking-wider opacity-70 mb-4">
+        <div className="grid md:grid-cols-2 gap-4 lg:gap-6">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="relative rounded-2xl overflow-hidden group min-h-[320px] sm:min-h-[360px]"
+              data-testid={`card-feature-${feature.id}`}
+            >
+              <img
+                src={feature.image}
+                alt={feature.headline}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/20" />
+              <div className="relative z-10 h-full flex flex-col justify-end p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wider text-white/70 mb-2">
                   {feature.category}
                 </p>
-                
-                <h3 className="text-2xl sm:text-3xl font-bold mb-4 leading-tight" data-testid={`text-feature-headline-${feature.id}`}>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight" data-testid={`text-feature-headline-${feature.id}`}>
                   {feature.headline}
                 </h3>
-                
-                <p className="opacity-80 mb-8 leading-relaxed" data-testid={`text-feature-desc-${feature.id}`}>
+                <p className="text-sm text-white/80 mb-5 leading-relaxed line-clamp-3" data-testid={`text-feature-desc-${feature.id}`}>
                   {feature.description}
                 </p>
-                
                 <Link href={feature.href}>
-                  <Button 
-                    className={`rounded-full ${buttonVariants[feature.variant]}`}
+                  <Button
+                    className="rounded-full bg-white/15 hover:bg-white/25 text-white border border-white/25 backdrop-blur-sm w-fit"
                     data-testid={`button-feature-${feature.id}`}
                   >
                     {feature.cta}
                     <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
                   </Button>
                 </Link>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
