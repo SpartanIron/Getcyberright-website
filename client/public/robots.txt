@@ -10,21 +10,36 @@ Disallow: /preferences
 Disallow: /checkout-success
 
 User-agent: GPTBot
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard
 
 User-agent: ChatGPT-User
-Disallow: /
-
-User-agent: CCBot
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard
 
 User-agent: anthropic-ai
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard
 
 User-agent: Claude-Web
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard
 
 User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard
+
+User-agent: CCBot
 Disallow: /
 
 User-agent: facebookexternalhit
