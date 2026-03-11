@@ -1,4 +1,6 @@
 import { useSEO } from "@/hooks/use-seo";
+import { StructuredData } from "@/components/structured-data";
+import type { WebApplicationData, FAQData, BreadcrumbData } from "@/components/structured-data";
 import { PasswordGenerator } from "@/components/password-generator";
 import { ShareCallToAction } from "@/components/social-share";
 import { Shield, Key, Lock, ArrowLeft, Zap, Eye, CheckCircle, Lightbulb, BookOpen, Wifi, Database, Server, Globe, Smartphone, FileKey } from "lucide-react";
@@ -7,6 +9,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TechPatternBg } from "@/components/tech-pattern-bg";
+
+const passwordGenApp: WebApplicationData = {
+  type: "WebApplication",
+  name: "Security Key Generator",
+  description: "Free online tool to generate strong passwords, passphrases, API keys, encryption keys, UUIDs, and JWT secrets. All generation happens locally in your browser for maximum privacy.",
+  url: "https://www.getcyberright.com/password-generator",
+  applicationCategory: "SecurityApplication",
+  provider: "GetCyberRight",
+};
+
+const passwordGenFaq: FAQData = {
+  type: "FAQPage",
+  items: [
+    { question: "How do I create a strong password?", answer: "A strong password should be at least 16 characters long and include a mix of uppercase and lowercase letters, numbers, and special characters. Use our Security Key Generator to create one instantly." },
+    { question: "Is this password generator safe to use?", answer: "Yes. All passwords are generated locally in your browser. Nothing is sent to our servers or stored anywhere. Your generated passwords never leave your device." },
+    { question: "What is a passphrase and why is it more secure?", answer: "A passphrase is a series of random words strung together, like 'correct horse battery staple'. Passphrases are easier to remember than random characters but can be equally secure due to their length." },
+  ],
+};
+
+const passwordGenBreadcrumbs: BreadcrumbData = {
+  type: "BreadcrumbList",
+  items: [
+    { name: "Home", url: "https://www.getcyberright.com/" },
+    { name: "Tools", url: "https://www.getcyberright.com/tools" },
+    { name: "Password Generator", url: "https://www.getcyberright.com/password-generator" },
+  ],
+};
 
 export default function PasswordGeneratorPage() {
   useSEO({
@@ -17,6 +46,7 @@ export default function PasswordGeneratorPage() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 overflow-hidden">
+      <StructuredData data={[passwordGenApp, passwordGenFaq, passwordGenBreadcrumbs]} />
       <TechPatternBg variant="matrix" />
       
       <div className="relative container mx-auto px-4 py-8">

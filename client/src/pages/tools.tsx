@@ -12,6 +12,8 @@ import { PasswordGenerator } from "@/components/password-generator";
 import { ScamChecker } from "@/components/scam-checker";
 import { AudioDeepfakeDetector } from "@/components/audio-deepfake-detector";
 import { SEOHead, pageSEO } from "@/components/seo-head";
+import { StructuredData } from "@/components/structured-data";
+import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
 import { 
   Shield, 
   Search,
@@ -100,9 +102,45 @@ export default function Tools() {
     }
   }, []);
 
+  const toolsSchemas: WebApplicationData[] = [
+    {
+      type: "WebApplication",
+      name: "Scam Checker",
+      description: "AI-powered tool to check if URLs, emails, phone numbers, and QR codes are scams. Analyzes threats using multiple security engines.",
+      url: "https://www.getcyberright.com/scam-checker",
+      applicationCategory: "SecurityApplication",
+      provider: "GetCyberRight",
+    },
+    {
+      type: "WebApplication",
+      name: "Password Generator",
+      description: "Generate strong, secure passwords with customizable length, complexity, and character types. Free online password generator tool.",
+      url: "https://www.getcyberright.com/password-generator",
+      applicationCategory: "SecurityApplication",
+      provider: "GetCyberRight",
+    },
+    {
+      type: "WebApplication",
+      name: "Data Broker Removal Tool",
+      description: "Find and remove your personal data from 501+ data broker sites. Automated opt-out and privacy protection for individuals and families.",
+      url: "https://www.getcyberright.com/data-removal",
+      applicationCategory: "SecurityApplication",
+      provider: "GetCyberRight",
+    },
+  ];
+
+  const toolsBreadcrumbs: BreadcrumbData = {
+    type: "BreadcrumbList",
+    items: [
+      { name: "Home", url: "https://www.getcyberright.com/" },
+      { name: "Security Tools", url: "https://www.getcyberright.com/tools" },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.tools} />
+      <StructuredData data={[...toolsSchemas, toolsBreadcrumbs]} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

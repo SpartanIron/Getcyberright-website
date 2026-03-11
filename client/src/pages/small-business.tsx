@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SEOHead, pageSEO } from "@/components/seo-head";
+import { StructuredData } from "@/components/structured-data";
+import type { FAQData, BreadcrumbData } from "@/components/structured-data";
 import { 
   Shield, Lock, Mail, Users, Building, Briefcase,
   CheckCircle, Star, AlertTriangle, FileText,
@@ -454,9 +456,26 @@ export default function SmallBusiness() {
     ? businessTopics.find(t => t.id === selectedTopic) 
     : null;
 
+  const businessFaqSchema: FAQData = {
+    type: "FAQPage",
+    items: businessTopics.map(topic => ({
+      question: `What should small businesses know about ${topic.title.toLowerCase()}?`,
+      answer: topic.content.intro,
+    })),
+  };
+
+  const businessBreadcrumbs: BreadcrumbData = {
+    type: "BreadcrumbList",
+    items: [
+      { name: "Home", url: "https://www.getcyberright.com/" },
+      { name: "Small Business", url: "https://www.getcyberright.com/small-business" },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.smallBusiness} />
+      <StructuredData data={[businessFaqSchema, businessBreadcrumbs]} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

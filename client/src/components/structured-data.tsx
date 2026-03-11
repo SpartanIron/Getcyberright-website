@@ -73,6 +73,17 @@ interface CourseData {
   isAccessibleForFree?: boolean;
 }
 
+interface WebApplicationData {
+  type: "WebApplication";
+  name: string;
+  description: string;
+  url: string;
+  applicationCategory: string;
+  operatingSystem?: string;
+  offers?: { price: string; priceCurrency: string };
+  provider?: string;
+}
+
 type StructuredDataInput =
   | OrganizationData
   | FAQData
@@ -80,7 +91,8 @@ type StructuredDataInput =
   | HowToData
   | WebSiteData
   | BreadcrumbData
-  | CourseData;
+  | CourseData
+  | WebApplicationData;
 
 function buildJsonLd(data: StructuredDataInput): object {
   switch (data.type) {
@@ -194,6 +206,32 @@ function buildJsonLd(data: StructuredDataInput): object {
         isAccessibleForFree: data.isAccessibleForFree ?? true,
       };
 
+    case "WebApplication":
+      return {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: data.name,
+        description: data.description,
+        url: data.url,
+        applicationCategory: data.applicationCategory,
+        operatingSystem: data.operatingSystem || "All",
+        offers: data.offers ? {
+          "@type": "Offer",
+          price: data.offers.price,
+          priceCurrency: data.offers.priceCurrency,
+        } : {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+        },
+        ...(data.provider ? {
+          provider: {
+            "@type": "Organization",
+            name: data.provider,
+          },
+        } : {}),
+      };
+
     default:
       return {};
   }
@@ -240,5 +278,6 @@ export type {
   WebSiteData,
   BreadcrumbData,
   CourseData,
+  WebApplicationData,
   StructuredDataInput,
 };

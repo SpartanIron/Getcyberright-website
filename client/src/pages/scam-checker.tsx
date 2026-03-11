@@ -1,4 +1,6 @@
 import { useSEO } from "@/hooks/use-seo";
+import { StructuredData } from "@/components/structured-data";
+import type { WebApplicationData, FAQData, BreadcrumbData } from "@/components/structured-data";
 import { ScamChecker } from "@/components/scam-checker";
 import { ShareCallToAction } from "@/components/social-share";
 import { AlertTriangle, Shield, Phone, Link2, MessageSquare, CheckCircle, TrendingUp, TrendingDown, Minus, ArrowLeft } from "lucide-react";
@@ -16,6 +18,33 @@ interface ScamTrend {
   count: number;
   trend: string;
 }
+
+const scamCheckerApp: WebApplicationData = {
+  type: "WebApplication",
+  name: "Scam Checker",
+  description: "Free AI-powered scam detection tool. Check suspicious URLs, emails, phone numbers, QR codes, and messages for fraud. Uses multiple security engines for comprehensive threat analysis.",
+  url: "https://www.getcyberright.com/scam-checker",
+  applicationCategory: "SecurityApplication",
+  provider: "GetCyberRight",
+};
+
+const scamCheckerFaq: FAQData = {
+  type: "FAQPage",
+  items: [
+    { question: "How does the Scam Checker work?", answer: "The Scam Checker analyzes URLs, emails, phone numbers, QR codes, and messages using multiple security engines including AI analysis, threat intelligence databases, and domain reputation checks to determine if something is a scam." },
+    { question: "Is the Scam Checker free to use?", answer: "Yes, the Scam Checker is completely free to use. No account or sign-up is required. Just paste a suspicious link, message, or phone number and get instant results." },
+    { question: "What types of scams can it detect?", answer: "The tool can detect phishing links, fraudulent websites, scam phone numbers, suspicious email content, malicious QR codes, and social engineering attempts across multiple categories of online fraud." },
+  ],
+};
+
+const scamCheckerBreadcrumbs: BreadcrumbData = {
+  type: "BreadcrumbList",
+  items: [
+    { name: "Home", url: "https://www.getcyberright.com/" },
+    { name: "Tools", url: "https://www.getcyberright.com/tools" },
+    { name: "Scam Checker", url: "https://www.getcyberright.com/scam-checker" },
+  ],
+};
 
 export default function ScamCheckerPage() {
   useSEO({
@@ -55,6 +84,7 @@ export default function ScamCheckerPage() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 overflow-hidden">
+      <StructuredData data={[scamCheckerApp, scamCheckerFaq, scamCheckerBreadcrumbs]} />
       <TechPatternBg variant="radar" />
       
       {/* Back Navigation */}

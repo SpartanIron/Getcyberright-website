@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SEOHead, pageSEO } from "@/components/seo-head";
+import { StructuredData } from "@/components/structured-data";
+import type { FAQData, BreadcrumbData } from "@/components/structured-data";
 import { 
   Shield, BookOpen, Users, Presentation, FileText,
   CheckCircle, Star, AlertTriangle, MessageCircle,
@@ -460,9 +462,26 @@ export default function Educators() {
     ? educatorResources.find(r => r.id === selectedResource) 
     : null;
 
+  const educatorsFaqSchema: FAQData = {
+    type: "FAQPage",
+    items: educatorResources.map(resource => ({
+      question: `How do I teach ${resource.title.toLowerCase()} in the classroom?`,
+      answer: resource.content.overview,
+    })),
+  };
+
+  const educatorsBreadcrumbs: BreadcrumbData = {
+    type: "BreadcrumbList",
+    items: [
+      { name: "Home", url: "https://www.getcyberright.com/" },
+      { name: "Educators", url: "https://www.getcyberright.com/educators" },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.educators} />
+      <StructuredData data={[educatorsFaqSchema, educatorsBreadcrumbs]} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

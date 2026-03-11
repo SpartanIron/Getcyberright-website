@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SEOHead, pageSEO } from "@/components/seo-head";
+import { StructuredData } from "@/components/structured-data";
+import type { FAQData, BreadcrumbData } from "@/components/structured-data";
 import { 
   Shield, Lock, Eye, MessageCircle, Smartphone, Gamepad2,
   CheckCircle, Star, Users, AlertTriangle, Heart,
@@ -456,9 +458,26 @@ export default function Parents() {
     ? parentTopics.find(t => t.id === selectedTopic) 
     : null;
 
+  const parentsFaqSchema: FAQData = {
+    type: "FAQPage",
+    items: parentTopics.map(topic => ({
+      question: `How can I help my child with ${topic.title.toLowerCase()}?`,
+      answer: topic.content.intro,
+    })),
+  };
+
+  const parentsBreadcrumbs: BreadcrumbData = {
+    type: "BreadcrumbList",
+    items: [
+      { name: "Home", url: "https://www.getcyberright.com/" },
+      { name: "Parents", url: "https://www.getcyberright.com/parents" },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.parents} />
+      <StructuredData data={[parentsFaqSchema, parentsBreadcrumbs]} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

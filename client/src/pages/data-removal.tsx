@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead } from "@/components/seo-head";
+import { StructuredData } from "@/components/structured-data";
+import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import {
@@ -295,12 +297,31 @@ function ViewNav({ activeView, setActiveView }: { activeView: string; setActiveV
 export default function DataRemoval() {
   const { isAuthenticated } = useAuth();
 
+  const dataRemovalApp: WebApplicationData = {
+    type: "WebApplication",
+    name: "Data Broker Removal Tool",
+    description: "Find and remove your personal data from 501+ data broker sites. Scan for exposures, generate opt-out requests, and monitor your privacy. Free to get started.",
+    url: "https://www.getcyberright.com/data-removal",
+    applicationCategory: "SecurityApplication",
+    provider: "GetCyberRight",
+  };
+
+  const dataRemovalBreadcrumbs: BreadcrumbData = {
+    type: "BreadcrumbList",
+    items: [
+      { name: "Home", url: "https://www.getcyberright.com/" },
+      { name: "Tools", url: "https://www.getcyberright.com/tools" },
+      { name: "Data Broker Removal", url: "https://www.getcyberright.com/data-removal" },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
         title="Data Broker Removal - Protect Your Privacy"
         description="Check for confirmed data breaches and send opt-out requests to 500+ data broker sites. Honest, fact-based privacy protection tools."
       />
+      <StructuredData data={[dataRemovalApp, dataRemovalBreadcrumbs]} />
       <Navigation />
 
       <main id="main-content" tabIndex={-1}>
