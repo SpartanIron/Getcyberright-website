@@ -25,6 +25,7 @@ import {
   getSocialDistributionStats,
 } from "./socialDistributionService";
 import { publishPost, getConnectedPlatforms, publishAllDrafts } from "./socialPublisher";
+import { getBufferStatus, isBufferConfigured } from "./bufferPublisher";
 import { serveImagePath } from "./socialImageService";
 import * as fs from "fs";
 import * as path from "path";
@@ -502,7 +503,23 @@ export function registerPlatformRoutes(app: Express): void {
   });
 
   app.get("/api/admin/social/connected-platforms", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
-    res.json(getConnectedPlatforms());
+    const platforms = getConnectedPlatforms();
+    const bufferStatus = await getBufferStatus();
+
+    if (bufferStatus.configured) {
+      platforms.push({
+        name: "buffer",
+        isConfigured: bufferStatus.configured,
+        requiredVars: ["BUFFER_API_KEY"],
+      });
+    }
+
+    res.json({ platforms, buffer: bufferStatus });
+  });
+
+  app.get("/api/admin/social/buffer-status", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    const status = await getBufferStatus();
+    res.json(status);
   });
 
   app.get("/api/social-images/:filename", async (req: Request, res: Response) => {

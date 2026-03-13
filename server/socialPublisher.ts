@@ -1,5 +1,6 @@
 import { storage } from "./storage";
 import { getImageAsBase64 } from "./socialImageService";
+import { isBufferConfigured, publishPostViaBuffer, publishAllDraftsViaBuffer, getBufferProfilesByPlatform } from "./bufferPublisher";
 import * as fs from "fs";
 
 interface PublishResult {
@@ -285,6 +286,14 @@ export async function publishPost(postId: string): Promise<PublishResult> {
   const post = await storage.getSocialPostById(postId);
   if (!post) return { success: false, platform: "unknown", error: "Post not found" };
 
+  if (isBufferConfigured() && post.platform !== "alert") {
+    const bufferResult = await publishPostViaBuffer(postId);
+    if (bufferResult.success) {
+      return { success: true, platform: post.platform, externalId: bufferResult.bufferId };
+    }
+    console.warn(`[SocialPublisher] Buffer failed for ${post.platform}, falling back to direct API: ${bufferResult.error}`);
+  }
+
   let result: PublishResult;
 
   switch (post.platform) {
@@ -322,6 +331,34 @@ export async function publishPost(postId: string): Promise<PublishResult> {
 }
 
 export async function publishAllDrafts(): Promise<PublishResult[]> {
+  if (isBufferConfigured()) {
+    console.log("[SocialPublisher] Using Buffer as primary publishing channel");
+    const bufferResults = await publishAllDraftsViaBuffer();
+    const results: PublishResult[] = bufferResults.map(r => ({
+      success: r.success,
+      platform: r.platform,
+      externalId: r.bufferId,
+      error: r.error,
+    }));
+
+    const failedPlatforms = new Set(bufferResults.filter(r => !r.success).map(r => r.platform));
+    if (failedPlatforms.size > 0) {
+      console.log(`[SocialPublisher] Buffer failed for some posts, falling back to direct API for remaining drafts`);
+      const remainingDrafts = await storage.getSocialPosts("draft", 50);
+      const platforms = getConnectedPlatforms();
+      const configuredPlatforms = new Set(platforms.filter(p => p.isConfigured).map(p => p.name));
+
+      for (const draft of remainingDrafts) {
+        if (!configuredPlatforms.has(draft.platform)) continue;
+        const result = await publishPostDirect(draft);
+        results.push(result);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+
+    return results;
+  }
+
   const drafts = await storage.getSocialPosts("draft", 50);
   const results: PublishResult[] = [];
 
@@ -330,11 +367,48 @@ export async function publishAllDrafts(): Promise<PublishResult[]> {
 
   for (const draft of drafts) {
     if (!configuredPlatforms.has(draft.platform)) continue;
-    const result = await publishPost(draft.id);
+    const result = await publishPostDirect(draft);
     results.push(result);
 
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
 
   return results;
+}
+
+async function publishPostDirect(post: { id: string; platform: string; postContent: string; imageUrl: string | null }): Promise<PublishResult> {
+  let result: PublishResult;
+
+  switch (post.platform) {
+    case "linkedin":
+      result = await publishToLinkedIn(post.postContent, post.imageUrl || undefined);
+      break;
+    case "facebook":
+      result = await publishToFacebook(post.postContent, post.imageUrl || undefined);
+      break;
+    case "instagram":
+      result = await publishToInstagram(post.postContent, post.imageUrl || undefined);
+      break;
+    case "x":
+      result = await publishToX(post.postContent, post.imageUrl || undefined);
+      break;
+    default:
+      result = { success: false, platform: post.platform, error: `Unsupported platform: ${post.platform}` };
+  }
+
+  if (result.success) {
+    await storage.updateSocialPost(post.id, {
+      status: "published",
+      publishedAt: new Date(),
+    });
+    console.log(`[SocialPublisher] Published ${post.platform} post: ${post.id}`);
+  } else {
+    await storage.updateSocialPost(post.id, {
+      status: "failed",
+      publishError: result.error || "Unknown error",
+    });
+    console.error(`[SocialPublisher] Failed to publish ${post.platform} post: ${result.error}`);
+  }
+
+  return result;
 }
