@@ -58,7 +58,7 @@ function countWords(text: string): number {
 async function generateArticleFromKeyword(keyword: string, cluster: string, category: string): Promise<GeneratedArticle | null> {
   try {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 4096,
       messages: [
         {
@@ -240,7 +240,7 @@ export async function generateGuideDraft(keyword: string, cluster: string): Prom
     relatedScamSlugs: getRelatedScams(cluster),
     relatedToolPaths: getRelatedTools(cluster),
     generatedByAi: true,
-    aiModel: "claude-sonnet-4-20250514",
+    aiModel: "claude-sonnet-4-5",
   };
 
   const guide = await storage.createGuide(guideData);

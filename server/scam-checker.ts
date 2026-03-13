@@ -757,7 +757,7 @@ CRITICAL ANTI-HALLUCINATION RULES:
 Provide a 2-3 sentence plain-language summary explaining what these findings mean for a non-technical person. Focus on the most important security indicators. Do not use dashes for punctuation. Be direct and actionable.`;
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5',
       max_tokens: 300,
       messages: [{ role: 'user', content: prompt }]
     });

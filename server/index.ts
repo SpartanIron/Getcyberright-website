@@ -201,6 +201,20 @@ app.use((req, res, next) => {
         console.error("Failed to seed initial content:", err);
       });
 
+      // Seed badge definitions for gamification
+      import("./badgeSeed").then(({ seedBadgeDefinitions }) => {
+        seedBadgeDefinitions();
+      }).catch(err => {
+        console.error("Failed to seed badge definitions:", err);
+      });
+
+      // Generate social posts for any published content that doesn't have them
+      import("./socialPostSeed").then(({ seedSocialPosts }) => {
+        seedSocialPosts();
+      }).catch(err => {
+        console.error("Failed to seed social posts:", err);
+      });
+
       // Start prompt review scheduler (runs weekly - every 168 hours)
       import("./promptReviewService").then(({ startPromptReviewScheduler }) => {
         startPromptReviewScheduler(168);

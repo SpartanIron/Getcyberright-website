@@ -32,7 +32,7 @@ interface NewPromptSuggestion {
 async function reviewSinglePrompt(prompt: AiPrompt): Promise<PromptImprovement | null> {
   try {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 2048,
       messages: [
         {
@@ -108,7 +108,7 @@ async function generateNewPromptSuggestions(existingPrompts: AiPrompt[]): Promis
     const existingCategories = Array.from(new Set(existingPrompts.map(p => p.category))).join(", ");
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 4096,
       messages: [
         {
@@ -185,7 +185,7 @@ export async function runPromptReview(triggerType: string = "scheduled"): Promis
             proposedIconName: null,
             rationale: improvement.rationale,
             qualityScore: improvement.qualityScore,
-            aiModel: "claude-sonnet-4-20250514",
+            aiModel: "claude-sonnet-4-5",
             status: "pending",
             reviewRunId: run.id,
             reviewedBy: null,
@@ -211,7 +211,7 @@ export async function runPromptReview(triggerType: string = "scheduled"): Promis
         proposedIconName: suggestion.iconName,
         rationale: suggestion.rationale,
         qualityScore: null,
-        aiModel: "claude-sonnet-4-20250514",
+        aiModel: "claude-sonnet-4-5",
         status: "pending",
         reviewRunId: run.id,
         reviewedBy: null,
