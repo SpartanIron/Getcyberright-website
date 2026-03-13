@@ -1303,9 +1303,11 @@ export const socialPosts = pgTable("social_posts", {
   platform: text("platform").notNull(),
   postContent: text("post_content").notNull(),
   hashtags: text("hashtags").array().default([]),
+  imageUrl: text("image_url"),
   scheduledAt: timestamp("scheduled_at"),
   publishedAt: timestamp("published_at"),
   status: text("status").notNull().default("draft"),
+  publishError: text("publish_error"),
   engagementMetrics: jsonb("engagement_metrics").$type<{ views?: number; clicks?: number; shares?: number }>(),
   createdAt: timestamp("created_at").defaultNow(),
 });

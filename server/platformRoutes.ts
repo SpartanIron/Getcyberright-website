@@ -24,6 +24,10 @@ import {
   distributeScamIntelContent,
   getSocialDistributionStats,
 } from "./socialDistributionService";
+import { publishPost, getConnectedPlatforms, publishAllDrafts } from "./socialPublisher";
+import { serveImagePath } from "./socialImageService";
+import * as fs from "fs";
+import * as path from "path";
 import { getAllScamSlugs } from "@shared/scam-content";
 import {
   scheduleTask,
@@ -471,6 +475,52 @@ export function registerPlatformRoutes(app: Express): void {
     } catch (error: any) {
       if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
       res.status(400).json({ error: error.message || "Failed to update social post" });
+    }
+  });
+
+  app.post("/api/admin/social-posts/:id/publish", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const result = await publishPost(req.params.id);
+      if (result.success) {
+        res.json({ success: true, externalId: result.externalId, platform: result.platform });
+      } else {
+        res.status(400).json({ success: false, error: result.error, platform: result.platform });
+      }
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to publish post" });
+    }
+  });
+
+  app.post("/api/admin/social-posts/publish-all", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const results = await publishAllDrafts();
+      const succeeded = results.filter(r => r.success).length;
+      const failed = results.filter(r => !r.success).length;
+      res.json({ succeeded, failed, total: results.length, results });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to publish posts" });
+    }
+  });
+
+  app.get("/api/admin/social/connected-platforms", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    res.json(getConnectedPlatforms());
+  });
+
+  app.get("/api/social-images/:filename", async (req: Request, res: Response) => {
+    try {
+      const filename = req.params.filename;
+      if (filename.includes("..") || filename.includes("/")) {
+        return res.status(400).send("Invalid filename");
+      }
+      const filepath = path.join(process.cwd(), ".local", "social-images", filename);
+      if (!fs.existsSync(filepath)) {
+        return res.status(404).send("Image not found");
+      }
+      res.set("Content-Type", "image/webp");
+      res.set("Cache-Control", "public, max-age=86400");
+      res.sendFile(filepath);
+    } catch (error: any) {
+      res.status(500).send("Failed to serve image");
     }
   });
 

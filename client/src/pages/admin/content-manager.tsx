@@ -23,6 +23,14 @@ import {
   CheckCircle,
   Clock,
   FileText,
+  Image,
+  ExternalLink,
+  Wifi,
+  WifiOff,
+  Rocket,
+  Hash,
+  XCircle,
+  RefreshCw,
 } from "lucide-react";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { useToast } from "@/hooks/use-toast";
@@ -33,12 +41,14 @@ function StatusBadge({ status }: { status: string }) {
     published: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
     draft: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
     archived: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400",
+    failed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
   };
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[status] || variants.draft}`}>
       {status === "published" && <CheckCircle className="w-3 h-3 mr-1" />}
       {status === "draft" && <Clock className="w-3 h-3 mr-1" />}
       {status === "archived" && <FileText className="w-3 h-3 mr-1" />}
+      {status === "failed" && <XCircle className="w-3 h-3 mr-1" />}
       {status}
     </span>
   );
@@ -327,58 +337,258 @@ function AlertsTab() {
   );
 }
 
+const PLATFORM_COLORS: Record<string, string> = {
+  linkedin: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  x: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
+  instagram: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
+  facebook: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+  alert: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+};
+
+const PLATFORM_LABELS: Record<string, string> = {
+  linkedin: "LinkedIn",
+  x: "X (Twitter)",
+  instagram: "Instagram",
+  facebook: "Facebook",
+  alert: "Email Alert",
+};
+
+function ConnectedPlatforms() {
+  const { data: platforms = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/social/connected-platforms"],
+  });
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {platforms.map((p: any) => (
+        <div
+          key={p.name}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
+            p.isConfigured
+              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+              : "bg-muted text-muted-foreground"
+          }`}
+          data-testid={`status-platform-${p.name}`}
+        >
+          {p.isConfigured ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+          {PLATFORM_LABELS[p.name] || p.name}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SocialPostCard({ post, onPublish, isPublishing }: { post: any; onPublish: (id: string) => void; isPublishing: boolean }) {
+  const platformColor = PLATFORM_COLORS[post.platform] || "bg-muted text-muted-foreground";
+  const content = post.postContent || post.content || "";
+
+  return (
+    <Card className="overflow-hidden" data-testid={`card-social-${post.id}`}>
+      <div className="flex flex-col sm:flex-row">
+        {post.imageUrl && (
+          <div className="sm:w-40 h-32 sm:h-auto bg-muted flex-shrink-0">
+            <img
+              src={`/api/social-images/${post.imageUrl.split('/').pop()}`}
+              alt="Post preview"
+              className="w-full h-full object-cover"
+              data-testid={`img-social-${post.id}`}
+            />
+          </div>
+        )}
+        <div className="flex-1 p-4 space-y-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${platformColor}`}>
+                {PLATFORM_LABELS[post.platform] || post.platform}
+              </span>
+              <Badge variant="secondary" className="text-xs">{post.contentType?.replace("_", " ")}</Badge>
+              <StatusBadge status={post.status} />
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}
+            </span>
+          </div>
+
+          {post.contentTitle && (
+            <p className="text-sm font-medium text-foreground">{post.contentTitle}</p>
+          )}
+
+          <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">{content}</p>
+
+          {post.hashtags && post.hashtags.length > 0 && (
+            <div className="flex items-center gap-1 flex-wrap">
+              <Hash className="w-3 h-3 text-muted-foreground" />
+              {post.hashtags.slice(0, 5).map((tag: string) => (
+                <span key={tag} className="text-xs text-primary/70">#{tag}</span>
+              ))}
+            </div>
+          )}
+
+          {post.publishError && (
+            <div className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 px-2 py-1 rounded">
+              <XCircle className="w-3 h-3 flex-shrink-0" />
+              <span className="line-clamp-1">{post.publishError}</span>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 pt-1">
+            {post.status === "published" ? (
+              <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                <CheckCircle className="w-3.5 h-3.5" /> Published
+                {post.publishedAt && ` on ${new Date(post.publishedAt).toLocaleDateString()}`}
+              </span>
+            ) : post.platform !== "alert" ? (
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => onPublish(post.id)}
+                disabled={isPublishing}
+                data-testid={`button-publish-${post.id}`}
+                className="h-7 text-xs"
+              >
+                {isPublishing ? (
+                  <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Publishing...</>
+                ) : (
+                  <><Rocket className="w-3 h-3 mr-1" /> Publish to {PLATFORM_LABELS[post.platform] || post.platform}</>
+                )}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 function SocialPostsTab() {
+  const { toast } = useToast();
+  const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<string>("all");
+
   const { data: posts = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/admin/social-posts"],
   });
 
+  const publishMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      setPublishingId(postId);
+      const res = await apiRequest("POST", `/api/admin/social-posts/${postId}/publish`);
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: data.success ? "Published!" : "Publish Failed",
+        description: data.success
+          ? `Post published to ${data.platform}`
+          : data.error || "Could not publish post",
+        variant: data.success ? "default" : "destructive",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts"] });
+      setPublishingId(null);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to publish post", variant: "destructive" });
+      setPublishingId(null);
+    },
+  });
+
+  const publishAllMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/admin/social-posts/publish-all");
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Bulk Publish Complete",
+        description: `${data.succeeded} published, ${data.failed} failed out of ${data.total} posts`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to publish posts", variant: "destructive" });
+    },
+  });
+
+  const filteredPosts = filter === "all" ? posts : posts.filter((p: any) => p.platform === filter);
+  const draftCount = posts.filter((p: any) => p.status === "draft").length;
+  const publishedCount = posts.filter((p: any) => p.status === "published").length;
+  const failedCount = posts.filter((p: any) => p.status === "failed").length;
+
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading social posts...</div>;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Send className="w-5 h-5" />
-          Social Posts ({posts.length})
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {posts.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">No social posts yet. They are auto-generated when you publish content.</p>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Platform</TableHead>
-                <TableHead>Content</TableHead>
-                <TableHead>Content Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {posts.map((post: any) => (
-                <TableRow key={post.id} data-testid={`row-social-${post.id}`}>
-                  <TableCell>
-                    <Badge variant="outline">{post.platform}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="max-w-md text-sm line-clamp-2">{post.content}</div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{post.contentType}</Badge>
-                  </TableCell>
-                  <TableCell><StatusBadge status={post.status} /></TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}
-                  </TableCell>
-                </TableRow>
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <CardTitle className="flex items-center gap-2">
+              <Send className="w-5 h-5" />
+              Social Posts ({posts.length})
+            </CardTitle>
+            <ConnectedPlatforms />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex gap-1.5 text-sm">
+                <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 font-medium">{draftCount} Drafts</span>
+                <span className="px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 font-medium">{publishedCount} Published</span>
+                {failedCount > 0 && <span className="px-2 py-0.5 rounded bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 font-medium">{failedCount} Failed</span>}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <select
+                className="text-sm border rounded px-2 py-1 bg-background"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                data-testid="select-platform-filter"
+              >
+                <option value="all">All Platforms</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="x">X (Twitter)</option>
+                <option value="instagram">Instagram</option>
+                <option value="alert">Email Alerts</option>
+              </select>
+              {draftCount > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => publishAllMutation.mutate()}
+                  disabled={publishAllMutation.isPending}
+                  data-testid="button-publish-all"
+                >
+                  {publishAllMutation.isPending ? (
+                    <><RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" /> Publishing...</>
+                  ) : (
+                    <><Rocket className="w-3.5 h-3.5 mr-1" /> Publish All Drafts</>
+                  )}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {filteredPosts.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              {filter === "all"
+                ? "No social posts yet. They are auto-generated when you publish content."
+                : `No ${PLATFORM_LABELS[filter] || filter} posts found.`}
+            </p>
+          ) : (
+            <div className="grid gap-3">
+              {filteredPosts.map((post: any) => (
+                <SocialPostCard
+                  key={post.id}
+                  post={post}
+                  onPublish={(id) => publishMutation.mutate(id)}
+                  isPublishing={publishingId === post.id && publishMutation.isPending}
+                />
               ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

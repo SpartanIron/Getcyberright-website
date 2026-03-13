@@ -101,7 +101,8 @@ export interface IStorage {
 
   createSocialPost(post: InsertSocialPost): Promise<SocialPost>;
   getSocialPosts(status?: string, limit?: number): Promise<SocialPost[]>;
-  updateSocialPost(id: string, data: Partial<InsertSocialPost>): Promise<SocialPost | undefined>;
+  getSocialPostById(id: string): Promise<SocialPost | undefined>;
+  updateSocialPost(id: string, data: Partial<InsertSocialPost & { publishedAt?: Date; publishError?: string }>): Promise<SocialPost | undefined>;
   getSocialPostCount(status?: string): Promise<number>;
 
   createGrowthTask(task: InsertGrowthTask): Promise<GrowthTask>;
@@ -446,7 +447,12 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(socialPosts).orderBy(desc(socialPosts.createdAt)).limit(limit);
   }
 
-  async updateSocialPost(id: string, data: Partial<InsertSocialPost>): Promise<SocialPost | undefined> {
+  async getSocialPostById(id: string): Promise<SocialPost | undefined> {
+    const result = await db.select().from(socialPosts).where(eq(socialPosts.id, id));
+    return result[0];
+  }
+
+  async updateSocialPost(id: string, data: Partial<InsertSocialPost & { publishedAt?: Date; publishError?: string }>): Promise<SocialPost | undefined> {
     const result = await db.update(socialPosts)
       .set(data)
       .where(eq(socialPosts.id, id))

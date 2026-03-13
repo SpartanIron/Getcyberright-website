@@ -31,4 +31,5 @@ The frontend is built with React 19, TypeScript, and Vite, using Wouter for rout
 - **Threat Intelligence & Data Sources**: PhishTank API, URLhaus API, Google Safe Browsing API, VirusTotal API, RDAP/WHOIS. Authoritative sources include FBI IC3, FTC Consumer Sentinel, Europol IOCTA, Verizon DBIR, WEF Global Cybersecurity Outlook, UK NCSC, Australian ACSC, INTERPOL, ITU Global Cybersecurity Index, AARP Fraud Survey, CISA.
 - **AI Services**: Anthropic API (Claude), OpenAI.
 - **Email Services**: Brevo, MailerSend, SMTP2GO, Resend.
-- **Image Processing**: Tesseract.js (OCR), jsQR (QR code decoding).
+- **Image Processing**: Tesseract.js (OCR), jsQR (QR code decoding), Sharp (social media image resizing/compression).
+- **Social Publishing**: Social Distribution Engine with branded image generation (SVG-to-WebP via Sharp, platform-specific dimensions: FB 1200x630, LinkedIn 1200x627, Instagram 1080x1080, X 1200x675), API publishers for LinkedIn, Facebook, Instagram, X (env var gated), admin publish UI with preview cards, platform connection status, and bulk publish. Social images served at `/api/social-images/:filename`. Env vars: LINKEDIN_ACCESS_TOKEN, FACEBOOK_PAGE_TOKEN, FACEBOOK_PAGE_ID, INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_USER_ID, PUBLIC_IMAGE_BASE_URL, X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET.

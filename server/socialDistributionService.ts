@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { storage } from "./storage";
 import type { CyberSafetyGuide, CyberThreatAlert, ScamIntelligence, InsertSocialPost } from "@shared/schema";
+import { generateBrandedImage, serveImagePath } from "./socialImageService";
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -80,6 +81,16 @@ Format as JSON:
   }
 }
 
+async function generateImageForPost(title: string, contentType: string, platform: string): Promise<string | null> {
+  try {
+    const imagePath = await generateBrandedImage(title, contentType, platform);
+    return imagePath;
+  } catch (error: any) {
+    console.error(`[SocialDistribution] Image generation failed for ${platform}:`, error.message);
+    return null;
+  }
+}
+
 export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<string[]> {
   const url = `https://getcyberright.com/guides/${guide.slug}`;
   const posts = await generateSocialPosts(
@@ -103,6 +114,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 
   for (const { platform, content } of platforms) {
     if (!content) continue;
+    const imagePath = await generateImageForPost(guide.title, "guide", platform);
     const post: InsertSocialPost = {
       contentType: "guide",
       contentId: guide.id,
@@ -110,6 +122,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
       platform,
       postContent: content,
       hashtags: posts.hashtags,
+      imageUrl: imagePath || undefined,
       status: "draft",
     };
 
@@ -117,7 +130,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
     createdIds.push(created.id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} social posts for guide: "${guide.title}"`);
+  console.log(`[SocialDistribution] Generated ${createdIds.length} social posts with images for guide: "${guide.title}"`);
   return createdIds;
 }
 
@@ -144,6 +157,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
 
   for (const { platform, content } of platforms) {
     if (!content) continue;
+    const imagePath = await generateImageForPost(alert.threatName, "threat_alert", platform);
     const post: InsertSocialPost = {
       contentType: "threat_alert",
       contentId: alert.id,
@@ -151,6 +165,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
       platform,
       postContent: content,
       hashtags: posts.hashtags,
+      imageUrl: imagePath || undefined,
       status: "draft",
     };
 
@@ -158,7 +173,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
     createdIds.push(created.id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} social posts for alert: "${alert.threatName}"`);
+  console.log(`[SocialDistribution] Generated ${createdIds.length} social posts with images for alert: "${alert.threatName}"`);
   return createdIds;
 }
 
@@ -185,6 +200,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
 
   for (const { platform, content } of platforms) {
     if (!content) continue;
+    const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform);
     const post: InsertSocialPost = {
       contentType: "scam_intel",
       contentId: scam.id,
@@ -192,6 +208,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
       platform,
       postContent: content,
       hashtags: posts.hashtags,
+      imageUrl: imagePath || undefined,
       status: "draft",
     };
 
@@ -199,7 +216,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
     createdIds.push(created.id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} social posts for scam: "${scam.scamName}"`);
+  console.log(`[SocialDistribution] Generated ${createdIds.length} social posts with images for scam: "${scam.scamName}"`);
   return createdIds;
 }
 
