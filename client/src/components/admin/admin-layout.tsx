@@ -12,7 +12,8 @@ import {
   BarChart3,
   Megaphone,
   TrendingUp,
-  MessageSquare
+  MessageSquare,
+  FileText
 } from "lucide-react";
 import logoImage from "@/assets/logo.png";
 
@@ -22,6 +23,7 @@ interface AdminLayoutProps {
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/content", label: "Content Manager", icon: FileText },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/subscribers", label: "Subscribers", icon: Newspaper },
