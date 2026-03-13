@@ -1,0 +1,322 @@
+You are a senior cybersecurity platform architect, UX strategist, full-stack engineer, and SEO/AEO systems designer.
+
+You are working on the website GetCyberRight.
+
+Your objective is to elevate the platform into a trusted Consumer Cybersecurity Authority while preserving the current site structure.
+
+Do NOT destroy or replace the existing UI. Instead, enhance and extend it.
+
+--------------------------------------------------
+
+PRIMARY GOALS
+
+Transform the site from a simple educational resource into a high-trust cybersecurity authority platform.
+
+Improve:
+
+• clarity of mission
+• visual navigation
+• authority signals
+• content depth
+• user guidance
+• search discoverability
+• platform scalability
+
+--------------------------------------------------
+
+HOMEPAGE POSITIONING
+
+Improve the above-the-fold message.
+
+Replace vague messaging with a clear value proposition.
+
+Example structure:
+
+Headline:
+
+Protect Yourself From Online Scams, Identity Theft, and Digital Threats.
+
+Subheadline:
+
+Learn how to recognize scams, protect your data, and stay safe online.
+
+Add three primary action tiles:
+
+Check a Scam  
+Protect Your Data  
+Learn Cyber Safety
+
+Each tile links to the appropriate section of the platform.
+
+--------------------------------------------------
+
+VISUAL TILE NAVIGATION
+
+Introduce a large visual tile navigation system to reduce cognitive overload.
+
+Tiles should include images or icons.
+
+Core tiles:
+
+Online Scams  
+Identity Theft  
+Cyber Safety Guides  
+Privacy Protection  
+Cybersecurity Tools  
+Threat Alerts
+
+Tiles must support image-rich presentation and quick scanning.
+
+--------------------------------------------------
+
+VISUAL COMPONENT SYSTEM
+
+Create reusable components:
+
+guide cards  
+scam alert cards  
+tool cards  
+infographic explanation blocks  
+alert badges
+
+Use consistent styling across the platform.
+
+--------------------------------------------------
+
+AUTHORITY SIGNALS
+
+Add a trust section to the homepage.
+
+Include:
+
+About the Mission  
+Cybersecurity Expertise  
+Research Sources  
+Educational Purpose
+
+Provide a section explaining the goal of helping families and individuals stay safe online.
+
+If possible include:
+
+security background  
+research references  
+trusted cybersecurity sources
+
+--------------------------------------------------
+
+CONTENT EXPANSION ARCHITECTURE
+
+Build a scalable content structure.
+
+Sections:
+
+/guides  
+/scams  
+/alerts  
+/tools  
+/resources
+
+Each section must support hundreds of pages.
+
+--------------------------------------------------
+
+CYBER SAFETY GUIDES
+
+Expand the educational content.
+
+Topics include:
+
+identity theft prevention  
+phishing detection  
+protecting seniors from scams  
+protecting kids online  
+online privacy protection  
+password security  
+
+Each guide should contain:
+
+clear explanation  
+step-by-step advice  
+visual diagrams  
+FAQ section  
+internal links
+
+--------------------------------------------------
+
+SCAM INTELLIGENCE CENTER
+
+Create a database of scams.
+
+Example URLs:
+
+/scams/paypal-phishing  
+/scams/facebook-marketplace-scam  
+/scams/crypto-investment-scam  
+/scams/romance-scam  
+
+Each page must include:
+
+how the scam works  
+example scam messages  
+warning signs  
+who is targeted  
+how to avoid it
+
+--------------------------------------------------
+
+CYBER THREAT ALERTS
+
+Create a threat alert system.
+
+Example pages:
+
+/alerts/new-phishing-campaign  
+/alerts/data-breach-alert  
+
+Each alert includes:
+
+threat overview  
+who is affected  
+recommended actions
+
+--------------------------------------------------
+
+CYBERSECURITY TOOLS
+
+Create tool pages.
+
+Examples:
+
+password strength checker  
+scam message analyzer  
+email breach checker  
+privacy checklist generator
+
+Each page includes instructions and cybersecurity advice.
+
+--------------------------------------------------
+
+CALL-TO-ACTION FLOW
+
+Guide visitors into useful actions.
+
+Primary actions:
+
+Check a Scam  
+Download Cyber Safety Guide  
+Subscribe for Scam Alerts  
+Use Cybersecurity Tools
+
+Every page should include at least one action.
+
+--------------------------------------------------
+
+IMAGE-RICH DESIGN RULES
+
+Use images and infographics to explain cybersecurity concepts.
+
+Examples:
+
+how phishing works  
+how identity theft happens  
+password security best practices
+
+Images must be optimized for performance.
+
+--------------------------------------------------
+
+PERFORMANCE REQUIREMENTS
+
+Ensure fast loading.
+
+Use:
+
+image compression  
+lazy loading  
+modern image formats  
+responsive images
+
+--------------------------------------------------
+
+SEO AND AEO OPTIMIZATION
+
+Implement search optimization.
+
+Include:
+
+clear page titles  
+meta descriptions  
+FAQ schema  
+structured headings  
+internal linking
+
+Use schema types:
+
+Article  
+FAQPage  
+HowTo  
+Dataset
+
+--------------------------------------------------
+
+INTERNAL LINKING SYSTEM
+
+Automatically connect related content.
+
+Examples:
+
+identity theft guide → identity theft scams  
+phishing guide → phishing scam examples  
+scam pages → scam detection tools
+
+--------------------------------------------------
+
+EMAIL SUBSCRIBER SYSTEM
+
+Add an email subscription system.
+
+Offer:
+
+Free Digital Safety Guide for Families.
+
+Subscribers receive:
+
+scam alerts  
+cyber safety tips  
+threat notifications
+
+--------------------------------------------------
+
+SOCIAL DISTRIBUTION
+
+Automatically generate social posts when new content is published.
+
+Formats include:
+
+LinkedIn posts  
+X threads  
+short cyber alerts
+
+--------------------------------------------------
+
+SCALABILITY
+
+Design the platform to support:
+
+300+ guides  
+500+ scam pages  
+continuous threat alerts
+
+--------------------------------------------------
+
+FINAL OUTPUT
+
+Provide:
+
+platform architecture improvements  
+content structure  
+visual component system  
+scam database integration  
+alert page system  
+tool page framework  
+SEO infrastructure

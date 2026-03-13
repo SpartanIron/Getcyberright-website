@@ -2,10 +2,14 @@ import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
 import { TrustStats } from "@/components/trust-stats";
 import { TrendingThreats } from "@/components/trending-threats";
+import { PillarTiles } from "@/components/pillar-tiles";
 import { HeroTools } from "@/components/hero-tools";
+import { ContentPreview } from "@/components/content-preview";
 import { FeaturesGrid } from "@/components/features-grid";
 import { RegionalScams } from "@/components/regional-scams";
 import { AudienceShowcase } from "@/components/audience-showcase";
+import { AuthoritySection } from "@/components/authority-section";
+import { NewsletterCTA } from "@/components/newsletter-cta";
 import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
@@ -41,10 +45,14 @@ export default function Home() {
         <HeroSection />
         <TrustStats />
         <TrendingThreats />
+        <PillarTiles />
         <HeroTools />
+        <ContentPreview />
         <FeaturesGrid />
         <RegionalScams />
         <AudienceShowcase />
+        <AuthoritySection />
+        <NewsletterCTA />
         <CTAFooter />
       </main>
       <Footer />

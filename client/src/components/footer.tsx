@@ -4,26 +4,35 @@ import { Link } from "wouter";
 import logoImage from "@/assets/logo.png";
 
 const footerLinks = {
-  forYou: [
-    { name: "Parents", href: "/parents" },
-    { name: "Kids", href: "/kids" },
-    { name: "Seniors", href: "/seniors" },
+  knowledge: [
+    { name: "Cyber Safety Guides", href: "/guides" },
+    { name: "Scam Intelligence", href: "/scam-intel" },
+    { name: "Threat Alerts", href: "/alerts" },
+    { name: "Common Scams", href: "/scams/phishing" },
+    { name: "Training Academy", href: "/training" },
+    { name: "Resource Library", href: "/resources" },
   ],
   tools: [
     { name: "Scam Checker", href: "/tools" },
-    { name: "AI Prompt Library", href: "/ai-prompts" },
     { name: "Data Broker Removal", href: "/data-removal" },
-    { name: "Safety Toolkit", href: "/tools?tab=safety-toolkit" },
-    { name: "Training Academy", href: "/training" },
-    { name: "AI Safety Guide", href: "/ai-safety" },
-    { name: "Resource Library", href: "/resources" },
+    { name: "Password Generator", href: "/password-generator" },
+    { name: "AI Prompt Library", href: "/ai-prompts" },
+    { name: "Breach Monitor", href: "/breach-dashboard" },
+    { name: "Deepfake Detector", href: "/deepfake-detector" },
+  ],
+  forYou: [
+    { name: "Parents & Families", href: "/parents" },
+    { name: "Kids Safety", href: "/kids" },
+    { name: "Seniors", href: "/seniors" },
+    { name: "Small Business", href: "/small-business" },
+    { name: "Educators", href: "/educators" },
   ],
   company: [
     { name: "About", href: "/about" },
     { name: "Our Mission", href: "/our-mission" },
-    { name: "Shop", href: "/support-the-mission" },
     { name: "Emergency Help", href: "/emergency-help" },
     { name: "Contact", href: "/contact" },
+    { name: "FAQ", href: "/faq" },
   ],
 };
 
@@ -37,14 +46,14 @@ export function Footer() {
   return (
     <footer className="bg-slate-900 text-slate-300" role="contentinfo" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-10">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4" data-testid="footer-link-logo">
               <img src={logoImage} alt="GetCyberRight" className="w-8 h-8 object-contain" />
               <span className="font-semibold text-white">GetCyberRight</span>
             </Link>
             <p className="text-sm leading-relaxed mb-4">
-              Cyber safety tools and education for families, parents, kids, and seniors.
+              Protecting families from online scams, identity theft, and digital threats.
             </p>
             <div className="flex gap-2">
               {socialLinks.map((social) => (
@@ -64,9 +73,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">For You</h4>
+            <h4 className="font-semibold text-white text-sm mb-3">Knowledge Hub</h4>
             <ul className="space-y-2">
-              {footerLinks.forYou.map((link) => (
+              {footerLinks.knowledge.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
@@ -81,9 +90,26 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">Tools & Learning</h4>
+            <h4 className="font-semibold text-white text-sm mb-3">Tools</h4>
             <ul className="space-y-2">
               {footerLinks.tools.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm hover:text-white transition-colors"
+                    data-testid={`footer-link-${link.name.toLowerCase().replace(/\s/g, "-")}`}
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold text-white text-sm mb-3">For You</h4>
+            <ul className="space-y-2">
+              {footerLinks.forYou.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}

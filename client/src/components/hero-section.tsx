@@ -104,7 +104,7 @@ export function HeroSection() {
             </motion.div>
 
             <motion.p variants={fadeUp} className="text-sm text-white/70 mb-6 leading-relaxed">
-              Plain-language guides and powerful tools that help your whole family stay safe online.
+              Learn how to recognize scams, protect your personal data, and stay safe online. Free tools and guides for your whole family.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col gap-3 max-w-xs mx-auto w-full">
@@ -244,7 +244,7 @@ export function HeroSection() {
               className="text-lg text-white/75 leading-relaxed mb-8"
               data-testid="text-hero-subtext"
             >
-              Plain-language guides and powerful tools that help your whole family stay safe online.
+              Learn how to recognize scams, protect your personal data, and stay safe online. Free tools and guides for your whole family.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mb-8">
