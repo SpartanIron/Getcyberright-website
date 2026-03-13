@@ -5,6 +5,7 @@ import viteConfig from "../vite.config";
 import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
+import { seoMiddleware } from "./seo-renderer";
 
 const viteLogger = createLogger();
 
@@ -30,6 +31,8 @@ export async function setupVite(server: Server, app: Express) {
   });
 
   app.use(vite.middlewares);
+
+  app.use(seoMiddleware());
 
   app.use("/{*path}", async (req, res, next) => {
     const url = req.originalUrl;

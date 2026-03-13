@@ -795,6 +795,1400 @@ export const SCAM_PAGES: ScamPageContent[] = [
     relatedScams: ["identity-theft", "phishing", "shopping-scam"],
     lastUpdated: "2026-03-01"
   },
+  {
+    slug: "irs-tax-scam",
+    title: "IRS & Tax Scams: How Criminals Exploit Tax Season",
+    metaTitle: "IRS Tax Scams: Spot Fake IRS Calls, Emails & Letters | GetCyberRight",
+    metaDescription: "Protect yourself from IRS and tax scams. Learn to identify fake IRS calls, phishing emails, and fraudulent tax refund schemes with real examples.",
+    keywords: ["irs scam", "tax scam", "fake irs call", "irs phishing email", "tax refund scam"],
+    cluster: "online-scams",
+    overview: "IRS and tax scams intensify during tax season but occur year-round. Criminals impersonate IRS agents through phone calls, emails, and letters, threatening arrest or legal action to pressure victims into immediate payment. These scams exploit fear and urgency, targeting taxpayers who may owe money or expect refunds. The real IRS never demands immediate payment by gift card, wire transfer, or cryptocurrency, and always initiates contact by mail.",
+    howItWorks: [
+      "Scammers call pretending to be IRS agents, claiming you owe back taxes and threatening arrest or license suspension if you do not pay immediately.",
+      "Phishing emails mimic official IRS communications, directing you to fake websites that steal your Social Security number, bank details, and tax information.",
+      "Fake tax preparation services collect your personal information under the guise of filing your taxes, then use it for identity theft or fraudulent refund claims.",
+      "Criminals file fraudulent tax returns using stolen Social Security numbers to claim refunds before the real taxpayer files."
+    ],
+    warningSigns: [
+      "Phone calls demanding immediate payment through gift cards, wire transfers, or cryptocurrency",
+      "Threats of arrest, deportation, or license revocation for unpaid taxes",
+      "Emails claiming to be from the IRS asking you to click links or download attachments",
+      "Requests for your Social Security number or financial information over the phone",
+      "Caller ID showing IRS or government numbers, which can be spoofed",
+      "Promises of large, unexpected tax refunds"
+    ],
+    exampleMessages: [
+      { type: "Phone Call", content: "This is Officer Johnson from the IRS Criminal Investigation Division. We have filed a lawsuit against you for unpaid federal taxes totaling $4,328. If you do not settle this amount within the next two hours, a warrant will be issued for your arrest." },
+      { type: "Phishing Email", content: "Subject: IRS Tax Refund Notification. Dear Taxpayer, After reviewing your tax records, we have determined you are eligible for a refund of $3,247.50. Please complete the attached form with your banking information to receive your refund within 5 business days." }
+    ],
+    preventionSteps: [
+      { title: "Know how the IRS contacts you", description: "The IRS always initiates contact by mail, never by phone, email, text, or social media. If someone claims to be the IRS and contacts you any other way, it is a scam." },
+      { title: "Never pay with gift cards or wire transfers", description: "The IRS accepts payments through official channels like IRS.gov or by check payable to the US Treasury. They never demand payment by gift card, cryptocurrency, or wire transfer." },
+      { title: "File your taxes early", description: "Filing your tax return early prevents criminals from filing a fraudulent return using your Social Security number." },
+      { title: "Protect your Social Security number", description: "Never give your SSN to unsolicited callers or in response to emails. Use an IRS Identity Protection PIN if one is available to you." },
+      { title: "Report suspicious contact", description: "Report IRS impersonation scams to TIGTA (Treasury Inspector General for Tax Administration) and forward suspicious IRS emails to phishing@irs.gov." }
+    ],
+    faq: [
+      { question: "Will the IRS call me about unpaid taxes?", answer: "The IRS does not initiate contact by phone to demand immediate payment. They always send official letters first. If you receive a threatening call claiming to be the IRS, hang up and report it." },
+      { question: "What if I actually owe taxes?", answer: "If you owe taxes, you will receive official correspondence by mail. You can verify any tax debt by calling the IRS directly at 1-800-829-1040 or checking your account online at IRS.gov." },
+      { question: "How do I protect myself from tax identity theft?", answer: "File your taxes early, use an IRS Identity Protection PIN, monitor your IRS account online, protect your Social Security number, and use strong passwords on tax preparation software." }
+    ],
+    relatedScams: ["government-impersonation-scam", "phishing", "identity-theft"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "medicare-scam",
+    title: "Medicare Scams: Protecting Seniors from Healthcare Fraud",
+    metaTitle: "Medicare Scams: Identify & Avoid Healthcare Fraud | GetCyberRight",
+    metaDescription: "Learn about Medicare scams targeting seniors. Spot fake Medicare calls, identity theft through healthcare fraud, and protect your benefits.",
+    keywords: ["medicare scam", "medicare fraud", "fake medicare call", "healthcare scam", "medicare identity theft"],
+    cluster: "cyber-safety-seniors",
+    overview: "Medicare scams specifically target seniors and people with disabilities who depend on Medicare benefits. Scammers pose as Medicare representatives to steal personal information, bill for services never provided, or trick beneficiaries into sharing their Medicare numbers. These schemes can result in identity theft, unauthorized charges to Medicare accounts, and loss of benefits. Understanding how to verify legitimate Medicare communications is essential for protecting your healthcare coverage.",
+    howItWorks: [
+      "Callers posing as Medicare representatives claim your card needs to be updated or replaced, then ask for your Medicare number and personal details.",
+      "Scammers offer free medical equipment, genetic testing, or health screenings in exchange for your Medicare number, then bill Medicare for services you never received.",
+      "Fake Medicare websites collect personal and financial information under the pretense of enrollment or benefit verification.",
+      "Door-to-door visitors claim to be from Medicare and pressure you into signing up for unnecessary services or sharing your information."
+    ],
+    warningSigns: [
+      "Unsolicited calls or visits from people claiming to be Medicare representatives",
+      "Requests for your Medicare number to activate new cards or verify benefits",
+      "Offers for free medical equipment or testing that require your Medicare information",
+      "Threats that your Medicare benefits will be canceled if you do not provide information",
+      "Bills or Explanation of Benefits statements for services you never received"
+    ],
+    exampleMessages: [
+      { type: "Phone Call", content: "Hello, this is Sarah from Medicare Services. We are issuing new Medicare cards and need to verify your information to send your replacement. Can you please confirm your Medicare number and date of birth?" },
+      { type: "Text Message", content: "MEDICARE ALERT: Your benefits are at risk of suspension. Call 1-800-XXX-XXXX immediately to verify your enrollment and avoid losing coverage." }
+    ],
+    preventionSteps: [
+      { title: "Guard your Medicare number", description: "Treat your Medicare number like a credit card number. Never share it with unsolicited callers, visitors, or in response to texts and emails." },
+      { title: "Know that Medicare will not call you unsolicited", description: "Medicare does not call beneficiaries to sell products, ask for personal information, or threaten benefit cancellation. If someone calls claiming to be Medicare, hang up." },
+      { title: "Review your Medicare statements", description: "Check your Medicare Summary Notice or Explanation of Benefits for services you did not receive. Report any discrepancies to 1-800-MEDICARE." },
+      { title: "Report Medicare fraud", description: "Call 1-800-MEDICARE (1-800-633-4227) or contact your local Senior Medicare Patrol (SMP) program to report suspected fraud." }
+    ],
+    faq: [
+      { question: "How do I know if a Medicare call is real?", answer: "Medicare rarely calls beneficiaries, and when they do, it is because you called first or are already enrolled in a plan. Medicare never calls to sell products, ask for your Medicare number, or threaten to cancel your coverage." },
+      { question: "What should I do if someone has my Medicare number?", answer: "Call 1-800-MEDICARE to report the theft. You can request a new Medicare number and card. Monitor your Medicare statements closely for unauthorized charges." },
+      { question: "Are free medical equipment offers legitimate?", answer: "Be cautious of any unsolicited offer for free medical supplies. Legitimate providers require a doctor's prescription and do not cold-call or go door-to-door soliciting your Medicare number." }
+    ],
+    relatedScams: ["grandparent-scam", "government-impersonation-scam", "identity-theft"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "student-loan-scam",
+    title: "Student Loan Scams: Spotting Fake Forgiveness Programs",
+    metaTitle: "Student Loan Scams: Fake Forgiveness & Relief Fraud | GetCyberRight",
+    metaDescription: "Protect yourself from student loan scams. Identify fake forgiveness programs, fee-based relief services, and impersonation schemes targeting borrowers.",
+    keywords: ["student loan scam", "student loan forgiveness scam", "fake loan relief", "student debt scam", "loan forgiveness fraud"],
+    cluster: "online-scams",
+    overview: "Student loan scams prey on borrowers seeking relief from education debt. Scammers promise loan forgiveness, debt elimination, or dramatically reduced payments in exchange for upfront fees. They often impersonate the Department of Education or legitimate loan servicers, creating urgency by claiming limited-time forgiveness programs. Legitimate student loan assistance is always free through your servicer or the Department of Education.",
+    howItWorks: [
+      "Companies charge upfront fees of hundreds or thousands of dollars for student loan assistance services that are available for free through the Department of Education.",
+      "Scammers impersonate your loan servicer or the Department of Education, claiming you qualify for a special forgiveness program that requires immediate action.",
+      "Fraudulent companies ask you to sign a third-party authorization form, then change your loan payment address to their company, redirecting your payments to them.",
+      "Fake websites mimic official government portals to collect your personal information and Federal Student Aid credentials."
+    ],
+    warningSigns: [
+      "Promises of immediate or guaranteed loan forgiveness",
+      "Requests for upfront fees before any services are provided",
+      "Pressure to act immediately before a deadline expires",
+      "Requests for your Federal Student Aid (FSA) login credentials",
+      "Companies that claim special relationships with the Department of Education",
+      "Unsolicited calls or emails about student loan relief programs"
+    ],
+    exampleMessages: [
+      { type: "Phone Call", content: "Congratulations! Based on your student loan profile, you qualify for the new Biden Student Loan Forgiveness Program. This program has limited spots and closes in 48 hours. We just need a one-time processing fee of $499 to submit your application." },
+      { type: "Email", content: "Subject: Action Required - Student Loan Forgiveness Application. Your federal student loans may be eligible for 100% forgiveness under the new relief act. Click here to verify your eligibility before the enrollment period ends on Friday." }
+    ],
+    preventionSteps: [
+      { title: "Use free official resources only", description: "Apply for income-driven repayment plans and forgiveness programs for free at studentaid.gov or by contacting your loan servicer directly. Never pay for help with federal loans." },
+      { title: "Never share your FSA credentials", description: "Your Federal Student Aid ID gives access to your loan accounts. Never share these credentials with any third party. No legitimate company needs your FSA login." },
+      { title: "Research any company before signing up", description: "Check with the Better Business Bureau, FTC, and your state attorney general before engaging with any student loan relief company." },
+      { title: "Verify directly with your servicer", description: "If you receive a call about your loans, hang up and call your loan servicer directly using the number on your billing statement." }
+    ],
+    faq: [
+      { question: "Are student loan forgiveness programs real?", answer: "Yes, legitimate federal forgiveness programs exist, such as Public Service Loan Forgiveness (PSLF) and income-driven repayment forgiveness. These are administered for free through the Department of Education. Any company charging fees for these services is a scam." },
+      { question: "How do I apply for real student loan forgiveness?", answer: "Visit studentaid.gov or contact your loan servicer directly. All legitimate applications are free. Do not pay any company to submit applications on your behalf." },
+      { question: "What if I already paid a student loan scam company?", answer: "Contact your bank to dispute the charges. File complaints with the FTC at reportfraud.ftc.gov, your state attorney general, and the Consumer Financial Protection Bureau (CFPB)." }
+    ],
+    relatedScams: ["phishing", "government-impersonation-scam", "identity-theft"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "rental-scam",
+    title: "Rental Scams: How to Avoid Fake Listings and Fraud",
+    metaTitle: "Rental Scams: Spot Fake Listings & Rental Fraud | GetCyberRight",
+    metaDescription: "Learn to identify rental scams including fake listings, phantom landlords, and deposit theft. Protect yourself when searching for housing.",
+    keywords: ["rental scam", "fake rental listing", "apartment scam", "rental fraud", "landlord scam"],
+    cluster: "online-scams",
+    overview: "Rental scams target people searching for apartments and houses, exploiting the competitive housing market to steal deposits and personal information. Scammers post fake listings using photos stolen from legitimate properties, offer below-market prices to attract attention, and pressure victims to send money before viewing the property. These scams are particularly devastating because victims lose both money and time in their housing search.",
+    howItWorks: [
+      "Scammers copy legitimate property listings and repost them at lower prices on classified sites, then collect deposits from multiple victims for a property they do not own.",
+      "Fake landlords insist on collecting deposits or first month's rent before allowing property viewings, claiming high demand or out-of-town status.",
+      "Scammers create convincing fake lease agreements to appear legitimate, then disappear after collecting move-in costs.",
+      "Fraudulent property managers collect application fees, personal information, and credit reports from multiple applicants without ever renting the property."
+    ],
+    warningSigns: [
+      "Rental prices significantly below market rate for the area",
+      "Landlord refuses or is unable to show the property in person",
+      "Requests for payment via wire transfer, gift cards, or cryptocurrency",
+      "Pressure to send deposit money immediately to secure the unit",
+      "Landlord claims to be out of town and cannot meet in person",
+      "Listing photos that look too professional or appear on other websites"
+    ],
+    exampleMessages: [
+      { type: "Email", content: "Thank you for your interest in my property! I am currently overseas for missionary work and cannot show the apartment in person. However, I can offer you a great deal at $800/month. Just send the first month's rent and security deposit via Zelle and I will mail you the keys." },
+      { type: "Text Message", content: "Hi! The apartment at 123 Main St is still available but I have 5 other people interested. If you can send the $1,200 deposit by tonight via CashApp, I can hold it for you. Otherwise it will go to the next person." }
+    ],
+    preventionSteps: [
+      { title: "Always view the property in person", description: "Never send money for a rental you have not physically visited. Verify the property exists and matches the listing description." },
+      { title: "Research the landlord or property manager", description: "Verify property ownership through county records. Search for the property address and landlord name online to check for scam reports." },
+      { title: "Never wire money or pay with gift cards", description: "Use traceable payment methods like checks. Legitimate landlords accept standard payment methods and provide receipts." },
+      { title: "Be skeptical of prices below market rate", description: "If a rental price seems too good to be true, it probably is. Compare prices with similar properties in the area." },
+      { title: "Reverse image search listing photos", description: "Use Google reverse image search to check if listing photos appear on other websites or have been stolen from legitimate listings." }
+    ],
+    faq: [
+      { question: "How common are rental scams?", answer: "Rental scams affect millions of people annually, with the average victim losing over $1,000. They are especially common on classified sites like Craigslist, Facebook Marketplace, and during competitive rental seasons." },
+      { question: "Can I get my money back from a rental scam?", answer: "Recovery depends on the payment method. Wire transfers and gift cards are nearly impossible to recover. Credit card payments can be disputed. File a police report, report to the FTC, and contact your bank immediately." },
+      { question: "How do I verify a rental listing is real?", answer: "Visit the property in person, verify ownership through county records, meet the landlord face-to-face, never pay before seeing the unit, and be wary of prices significantly below market rate." }
+    ],
+    relatedScams: ["shopping-scam", "phishing", "wire-fraud-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "lottery-scam",
+    title: "Lottery & Sweepstakes Scams: You Did Not Win",
+    metaTitle: "Lottery Scams: Fake Sweepstakes & Prize Fraud | GetCyberRight",
+    metaDescription: "Protect yourself from lottery and sweepstakes scams. Learn why you cannot win a contest you never entered and how to spot fake prize notifications.",
+    keywords: ["lottery scam", "sweepstakes scam", "fake prize notification", "you won scam", "foreign lottery scam"],
+    cluster: "online-scams",
+    overview: "Lottery and sweepstakes scams notify victims they have won a large prize in a contest they never entered. To claim the prize, victims must pay taxes, processing fees, or insurance costs upfront. The prize never materializes, and scammers continue requesting payments for additional fees. These scams especially target seniors and can result in devastating financial losses over extended periods.",
+    howItWorks: [
+      "Victims receive calls, emails, texts, or letters announcing they have won a large prize in a lottery or sweepstakes.",
+      "To claim the winnings, victims must pay upfront fees for taxes, processing, insurance, or currency conversion.",
+      "After paying initial fees, scammers invent additional costs that must be paid before the prize can be released.",
+      "Some scammers send fake checks that bounce after the victim deposits them and sends money to cover supposed fees."
+    ],
+    warningSigns: [
+      "Notification that you won a contest you never entered",
+      "Requirement to pay fees, taxes, or charges to collect your prize",
+      "Requests for payment via wire transfer, gift cards, or cryptocurrency",
+      "Prize notifications from foreign countries you have never visited",
+      "Urgency to respond quickly or forfeit the winnings",
+      "A check for part of the winnings arrives with instructions to send some back"
+    ],
+    exampleMessages: [
+      { type: "Email", content: "CONGRATULATIONS! Your email has been selected as the winner of the Euro Millions International Lottery. You have won 2,500,000 EUR. To process your winnings, please remit a processing fee of $299 via Western Union to our claims agent." },
+      { type: "Letter", content: "Official Notification: You are the Grand Prize Winner of the Publishers Clearing House Sweepstakes. Prize amount: $750,000. To release your funds, please call our claims department and provide your bank routing number for direct deposit of your winnings." }
+    ],
+    preventionSteps: [
+      { title: "Remember the golden rule", description: "You cannot win a contest you did not enter. Period. Any notification saying otherwise is a scam." },
+      { title: "Never pay to collect a prize", description: "Legitimate contests never require winners to pay fees, taxes, or processing charges to receive their prize. All costs are deducted from winnings." },
+      { title: "Do not deposit unexpected checks", description: "Fake checks can take weeks to bounce. If you deposit one and spend the money, you will owe the bank the full amount plus fees." },
+      { title: "Warn family members, especially seniors", description: "Lottery scams disproportionately target older adults. Talk to elderly family members about these scams and help them recognize the warning signs." }
+    ],
+    faq: [
+      { question: "Can I really win a foreign lottery?", answer: "No. It is illegal for US residents to participate in foreign lotteries. Any notification claiming you won a foreign lottery is a scam. Legitimate lotteries do not notify winners by email, phone, or text." },
+      { question: "Why do scammers send real-looking checks?", answer: "Fake checks can look identical to real ones and may initially clear at your bank. However, they will bounce days or weeks later, and you will be responsible for any money you have already spent or sent to the scammer." },
+      { question: "What should I do if I receive a prize notification?", answer: "Do not respond, do not pay anything, and do not provide personal information. Report it to the FTC at reportfraud.ftc.gov and delete the message." }
+    ],
+    relatedScams: ["grandparent-scam", "wire-fraud-scam", "gift-card-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "charity-scam",
+    title: "Charity Scams: How to Spot Fake Charitable Organizations",
+    metaTitle: "Charity Scams: Identify Fake Charities & Donation Fraud | GetCyberRight",
+    metaDescription: "Learn to identify charity scams and fake organizations. Verify charities before donating and protect yourself from donation fraud.",
+    keywords: ["charity scam", "fake charity", "donation scam", "charity fraud", "fake fundraiser"],
+    cluster: "online-scams",
+    overview: "Charity scams exploit people's generosity, especially after natural disasters, during holiday seasons, or following tragic events. Scammers create fake charitable organizations with names similar to well-known charities, use emotional appeals to pressure donations, and pocket the money. Some operate fake crowdfunding campaigns or impersonate legitimate charity workers. Verifying charities before donating ensures your money reaches those who truly need help.",
+    howItWorks: [
+      "Scammers create organizations with names nearly identical to well-known charities, making it difficult to distinguish real from fake.",
+      "Unsolicited callers use high-pressure tactics and emotional stories to solicit immediate donations by phone, often requesting gift cards or wire transfers.",
+      "Fake crowdfunding campaigns on social media and fundraising platforms collect donations for fabricated causes or individuals.",
+      "Scammers impersonate charity workers going door-to-door, collecting cash donations and personal information."
+    ],
+    warningSigns: [
+      "Charity name closely resembles a well-known organization",
+      "High-pressure tactics demanding immediate donations",
+      "Requests for donations via wire transfer, gift cards, or cryptocurrency",
+      "Vague descriptions of how donations will be used",
+      "Inability to provide tax ID number or proof of tax-exempt status",
+      "Thank-you messages for donations you did not make"
+    ],
+    exampleMessages: [
+      { type: "Phone Call", content: "Hi, I am calling from the National Veterans Relief Foundation. We are collecting donations for disabled veterans who need medical care. Can we count on you for a $100 donation today? We accept all major gift cards for your convenience." },
+      { type: "Social Media Post", content: "URGENT: My neighbor's family lost everything in a house fire. The kids have no clothes and the family has nowhere to go. Please donate to this GoFundMe to help them get back on their feet. Every dollar counts!" }
+    ],
+    preventionSteps: [
+      { title: "Research before donating", description: "Use Charity Navigator (charitynavigator.org), GuideStar (guidestar.org), or the BBB Wise Giving Alliance to verify the charity's legitimacy and financial health before donating." },
+      { title: "Donate directly through official websites", description: "Type the charity's URL directly into your browser rather than clicking links in emails or social media posts." },
+      { title: "Never donate via gift cards or wire transfers", description: "Legitimate charities accept checks, credit cards, and online payments through secure platforms. Gift card requests are always a scam." },
+      { title: "Ask for documentation", description: "Request the charity's tax ID number and verify it on the IRS Tax Exempt Organization Search tool at irs.gov." }
+    ],
+    faq: [
+      { question: "How can I verify if a charity is real?", answer: "Check Charity Navigator, GuideStar, or the BBB Wise Giving Alliance. You can also verify tax-exempt status on the IRS website. Legitimate charities are transparent about their finances and operations." },
+      { question: "Are GoFundMe campaigns safe to donate to?", answer: "While many crowdfunding campaigns are legitimate, fraud does occur. Look for detailed descriptions, updates, verified identities, and media coverage supporting the campaign's claims before donating." },
+      { question: "What should I do if I donated to a fake charity?", answer: "Contact your bank or credit card company to dispute the charge. Report the fraudulent charity to your state attorney general, the FTC, and the National Center for Charitable Statistics." }
+    ],
+    relatedScams: ["phishing", "social-media-scam", "wire-fraud-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "sim-swap-scam",
+    title: "SIM Swap Attacks: How Criminals Hijack Your Phone Number",
+    metaTitle: "SIM Swap Scams: Protect Your Phone Number from Hijacking | GetCyberRight",
+    metaDescription: "Learn about SIM swap attacks where criminals transfer your phone number to their device. Protect your accounts from this growing threat.",
+    keywords: ["sim swap scam", "sim swapping", "phone number hijack", "sim card fraud", "number porting scam"],
+    cluster: "device-security",
+    overview: "SIM swap attacks occur when criminals convince your mobile carrier to transfer your phone number to a SIM card they control. Once they have your number, they can receive your text messages and calls, including two-factor authentication codes. This gives them access to your bank accounts, email, social media, and cryptocurrency wallets. SIM swapping has become one of the fastest-growing forms of fraud, with losses reaching hundreds of millions of dollars.",
+    howItWorks: [
+      "Criminals gather personal information about the victim through social media, data breaches, phishing, or social engineering.",
+      "They contact the victim's mobile carrier pretending to be the account holder, claiming a lost or damaged phone and requesting a SIM transfer.",
+      "Once the carrier transfers the number, the criminal's phone receives all calls and texts meant for the victim.",
+      "With access to SMS-based two-factor authentication codes, the criminal quickly accesses and drains bank accounts, cryptocurrency wallets, and other valuable accounts."
+    ],
+    warningSigns: [
+      "Sudden loss of cell phone service (no signal, calls, or texts)",
+      "Notification from your carrier about a SIM change you did not request",
+      "Unable to log into your accounts despite using correct passwords",
+      "Unexpected password reset notifications",
+      "Unusual activity on your bank or financial accounts",
+      "Social media accounts posting content you did not create"
+    ],
+    exampleMessages: [
+      { type: "Carrier Notification", content: "Your SIM card has been changed. If you did not request this change, please contact customer service immediately at [carrier number]." },
+      { type: "Phishing Text (used to gather info)", content: "Your mobile account requires verification. Reply with your account PIN and the last 4 digits of your SSN to avoid service interruption." }
+    ],
+    preventionSteps: [
+      { title: "Set up a PIN or passphrase with your carrier", description: "Add an extra security PIN or passphrase to your mobile account that must be provided before any changes can be made, including SIM swaps." },
+      { title: "Use authenticator apps instead of SMS", description: "Replace SMS-based two-factor authentication with authenticator apps like Google Authenticator, Authy, or hardware security keys whenever possible." },
+      { title: "Limit personal information shared online", description: "Reduce the personal details you share on social media. Criminals use publicly available information to impersonate you to your carrier." },
+      { title: "Contact your carrier about SIM lock features", description: "Many carriers offer SIM lock or number lock features that prevent unauthorized transfers. Enable these protections on your account." },
+      { title: "Act immediately if you lose service", description: "If your phone suddenly loses service, contact your carrier right away. Quick action can prevent criminals from accessing your accounts." }
+    ],
+    faq: [
+      { question: "How quickly do SIM swap attacks happen?", answer: "Once a criminal successfully performs a SIM swap, they can access your accounts within minutes. They typically target financial accounts first, draining funds before the victim realizes what has happened." },
+      { question: "Can my carrier protect me from SIM swaps?", answer: "Yes. Most carriers offer account PINs, port-out PINs, and SIM lock features. Contact your carrier to enable all available protections. Some carriers also offer number lock features that completely prevent transfers." },
+      { question: "What should I do if I am a victim of SIM swapping?", answer: "Contact your carrier immediately to regain control of your number. Change passwords on all accounts, especially financial ones. Enable non-SMS two-factor authentication. File a report with the FBI IC3 and your local police." }
+    ],
+    relatedScams: ["identity-theft", "phishing", "bank-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "utility-scam",
+    title: "Utility Scams: Fake Power, Gas & Water Company Threats",
+    metaTitle: "Utility Scams: Spot Fake Shutoff Threats & Utility Fraud | GetCyberRight",
+    metaDescription: "Protect yourself from utility scams. Learn to identify fake shutoff threats from scammers impersonating electric, gas, and water companies.",
+    keywords: ["utility scam", "fake utility call", "power company scam", "electric bill scam", "gas company fraud"],
+    cluster: "online-scams",
+    overview: "Utility scams target homeowners and businesses by impersonating electric, gas, water, or internet service providers. Scammers threaten immediate service disconnection unless the victim makes an instant payment, usually through gift cards, wire transfers, or cryptocurrency. These scams spike during extreme weather when the threat of losing power or heat feels most urgent.",
+    howItWorks: [
+      "Scammers call claiming to be from your utility company and state your account is past due with service disconnection scheduled within the hour.",
+      "They demand immediate payment through untraceable methods like prepaid debit cards, gift cards, or cryptocurrency.",
+      "Some scammers visit homes in person wearing fake utility uniforms, demanding cash payments at the door.",
+      "Others send phishing emails with fake past-due notices containing links to fraudulent payment portals."
+    ],
+    warningSigns: [
+      "Threats of immediate service disconnection within hours",
+      "Demands for payment via gift cards, wire transfer, or cryptocurrency",
+      "Callers who refuse to provide their name, ID number, or callback number",
+      "In-person visits demanding cash payments",
+      "Emails with urgent payment links that do not match your utility's official website"
+    ],
+    exampleMessages: [
+      { type: "Phone Call", content: "This is the disconnection department at your electric company. Your account is $547 past due and your power will be shut off in 45 minutes unless you make a payment right now. We can accept Green Dot cards or Bitcoin for immediate processing." },
+      { type: "In-Person Visit", content: "Hi, I am from the gas company. We detected a leak in your area and need to inspect your meter. I also show your account has an unpaid balance. If you can pay $200 cash right now, I can make sure your service continues." }
+    ],
+    preventionSteps: [
+      { title: "Call your utility directly", description: "If you receive a threatening call, hang up and call your utility company using the number on your bill or their official website." },
+      { title: "Know your utility's policies", description: "Utility companies send multiple written notices before disconnection and never demand immediate payment by gift card or cryptocurrency." },
+      { title: "Verify in-person visitors", description: "Legitimate utility workers carry photo ID and drive marked vehicles. Call your utility company to verify any unexpected visits." },
+      { title: "Check your account online", description: "Log into your utility account through the official website to verify your actual balance and payment status." }
+    ],
+    faq: [
+      { question: "Will my utility really shut off my service immediately?", answer: "No. Utility companies are required to send written notices before disconnection and provide payment plan options. They never threaten immediate shutoff over the phone or demand payment by gift card." },
+      { question: "Do utility workers come to your door asking for payment?", answer: "Legitimate utility workers do not collect payments at your door. If someone comes to your home claiming to be from a utility company and asks for money, do not pay them and call the utility to verify." },
+      { question: "How do I report a utility scam?", answer: "Report it to your actual utility company, file a complaint with the FTC at reportfraud.ftc.gov, and contact your state public utility commission." }
+    ],
+    relatedScams: ["government-impersonation-scam", "gift-card-scam", "phishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "investment-scam",
+    title: "Investment Scams: Ponzi Schemes, Pump and Dump & More",
+    metaTitle: "Investment Scams: Spot Ponzi Schemes & Investment Fraud | GetCyberRight",
+    metaDescription: "Learn to identify investment scams including Ponzi schemes, pump and dump, and guaranteed return fraud. Protect your money from financial scammers.",
+    keywords: ["investment scam", "ponzi scheme", "pump and dump", "investment fraud", "guaranteed returns scam"],
+    cluster: "online-scams",
+    overview: "Investment scams promise extraordinary returns with little or no risk. From Ponzi schemes that use new investor money to pay earlier investors, to pump-and-dump schemes that artificially inflate stock prices, these scams cause billions in losses annually. Social media has accelerated investment fraud with influencer-promoted schemes, fake trading platforms, and AI-generated testimonials. If an investment opportunity sounds too good to be true, it almost certainly is.",
+    howItWorks: [
+      "Ponzi schemes pay existing investors with money from new investors, creating the illusion of legitimate returns until the scheme collapses.",
+      "Pump-and-dump operators hype worthless stocks through social media, newsletters, or spam, sell their holdings at inflated prices, then watch the price crash.",
+      "Fake trading platforms show fictional profits to encourage larger deposits, but never allow withdrawals.",
+      "Affinity fraud targets members of specific communities, using trusted leaders or members to recruit new victims."
+    ],
+    warningSigns: [
+      "Promises of guaranteed high returns with no risk",
+      "Pressure to invest quickly before an opportunity disappears",
+      "Unlicensed sellers or unregistered investment products",
+      "Difficulty withdrawing your money or receiving returns",
+      "Secretive or complex strategies that cannot be clearly explained",
+      "Investments promoted through social media influencers or unsolicited contacts"
+    ],
+    exampleMessages: [
+      { type: "Social Media DM", content: "Hey! I started investing with this amazing platform 3 months ago and I have already turned $500 into $15,000. They use AI trading algorithms that guarantee 30% returns monthly. Want me to send you the link? Spots are limited!" },
+      { type: "Email", content: "EXCLUSIVE INVESTMENT ALERT: Our proprietary algorithmic trading system has generated 847% returns this year. We are opening 50 spots for qualified investors. Minimum investment: $5,000. Guaranteed returns. Risk-free. Click to schedule your consultation." }
+    ],
+    preventionSteps: [
+      { title: "Verify the investment and the seller", description: "Check if the investment is registered with the SEC (sec.gov/edgar) and if the seller is licensed through FINRA BrokerCheck (brokercheck.finra.org)." },
+      { title: "Be skeptical of guaranteed returns", description: "No legitimate investment can guarantee returns. All investments carry risk. Promises of guaranteed high returns are a hallmark of fraud." },
+      { title: "Understand the investment fully", description: "If you cannot clearly explain how the investment generates returns, do not invest. Legitimate investments can be explained simply." },
+      { title: "Be cautious of social media investment advice", description: "Do not make investment decisions based on social media posts, influencer recommendations, or unsolicited messages. These are common channels for pump-and-dump schemes." }
+    ],
+    faq: [
+      { question: "How do I check if an investment is legitimate?", answer: "Verify the company and securities are registered with the SEC at sec.gov. Check the seller's license through FINRA BrokerCheck. Research the company independently and be wary of unsolicited investment offers." },
+      { question: "What are the signs of a Ponzi scheme?", answer: "Consistently high returns regardless of market conditions, difficulty withdrawing funds, unregistered investments, secretive strategies, and recruitment-focused business models are all red flags of Ponzi schemes." },
+      { question: "Can I recover money lost to an investment scam?", answer: "Recovery is difficult but possible. Report to the SEC, FINRA, and the FBI IC3. Contact a securities attorney. If you paid by credit card, dispute the charges. File a complaint with your state securities regulator." }
+    ],
+    relatedScams: ["crypto-scam", "social-media-scam", "phishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "work-from-home-scam",
+    title: "Work From Home Scams: Fake Remote Job Offers",
+    metaTitle: "Work From Home Scams: Spot Fake Remote Jobs & Employment Fraud | GetCyberRight",
+    metaDescription: "Learn to identify work-from-home scams including fake job offers, reshipping schemes, and payment processing fraud targeting remote workers.",
+    keywords: ["work from home scam", "remote job scam", "fake job offer", "work at home fraud", "online job scam"],
+    cluster: "online-scams",
+    overview: "Work-from-home scams exploit the growing demand for remote employment. Scammers post attractive job listings promising high pay for minimal work, then use these fake positions to steal personal information, collect fees for training materials, or recruit unwitting participants into money laundering schemes. The rise of remote work has made these scams harder to distinguish from legitimate opportunities.",
+    howItWorks: [
+      "Scammers post job listings for positions like data entry, envelope stuffing, or product testing that promise high pay for easy work.",
+      "They collect personal information, including Social Security numbers and bank details, during the fake hiring process for identity theft.",
+      "Some require payment for training materials, software, or certification before starting work.",
+      "Reshipping scams recruit workers to receive and forward packages purchased with stolen credit cards, making the worker an unwitting accomplice to fraud."
+    ],
+    warningSigns: [
+      "Job offers that promise high pay for little or no experience required",
+      "Requests to pay for training materials, certifications, or equipment upfront",
+      "Job offers received without applying or interviewing",
+      "Vague job descriptions that avoid specifics about the work",
+      "Requests for personal financial information before hiring is finalized",
+      "Payment by check with instructions to send a portion to someone else"
+    ],
+    exampleMessages: [
+      { type: "Email", content: "We have reviewed your resume and would like to offer you a remote position as a Financial Processing Agent. Salary: $4,500/month. No experience needed. Your duties include receiving and forwarding payments. To get started, please send us your bank details for payroll setup." },
+      { type: "Job Listing", content: "IMMEDIATE HIRE: Work from home product tester. Earn $75/hour testing products shipped to your home. Write short reviews and keep the products. Apply now! One-time registration fee of $49.99 required." }
+    ],
+    preventionSteps: [
+      { title: "Research the company thoroughly", description: "Verify the company exists with a legitimate website, physical address, and business registration. Check reviews on Glassdoor and the BBB." },
+      { title: "Never pay to get a job", description: "Legitimate employers never charge employees for training, equipment, or the privilege of working. Any upfront fee is a red flag." },
+      { title: "Be cautious of unsolicited offers", description: "Real employers do not typically send job offers to people who have not applied. Unsolicited job offers, especially via text or social media, are usually scams." },
+      { title: "Never forward payments or packages", description: "Any job that involves receiving and forwarding money or packages is likely a fraud scheme. You could face criminal liability for participating." }
+    ],
+    faq: [
+      { question: "How can I find legitimate remote jobs?", answer: "Use established job boards like LinkedIn, Indeed, FlexJobs, or company career pages. Research the company, verify the job posting on the company's official website, and never pay upfront fees." },
+      { question: "What is a reshipping scam?", answer: "Scammers hire workers to receive packages at home and forward them to another address. The packages contain items purchased with stolen credit cards. Workers face criminal liability for receiving stolen goods." },
+      { question: "What if I already shared my bank details?", answer: "Contact your bank immediately to secure your account. Place fraud alerts on your credit reports. Monitor your accounts closely for unauthorized transactions. File a report with the FTC and local police." }
+    ],
+    relatedScams: ["job-scam", "phishing", "identity-theft"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "puppy-scam",
+    title: "Puppy & Pet Scams: Fake Animal Sales Online",
+    metaTitle: "Puppy Scams: Spot Fake Pet Sales & Breeder Fraud | GetCyberRight",
+    metaDescription: "Protect yourself from puppy and pet scams. Learn to identify fake breeders, fraudulent pet listings, and phantom animal sales online.",
+    keywords: ["puppy scam", "pet scam", "fake breeder", "puppy fraud", "online pet scam"],
+    cluster: "online-scams",
+    overview: "Puppy and pet scams use adorable animal photos to lure victims into paying for pets that do not exist. Scammers post fake listings on social media, classified sites, and fake breeder websites, collect payment for the animal plus shipping fees, then demand additional money for insurance, crates, vaccinations, or customs fees. The pet never arrives, leaving victims heartbroken and financially harmed.",
+    howItWorks: [
+      "Scammers steal photos of cute puppies or kittens and post fake listings at attractive prices on social media and classified sites.",
+      "After collecting payment for the pet, they claim additional fees are needed for shipping, insurance, temperature-controlled crates, or veterinary certificates.",
+      "They create fake shipping company websites with tracking numbers that show the pet in transit to maintain the illusion.",
+      "Some send fake videos or photos to build emotional attachment before requesting more money."
+    ],
+    warningSigns: [
+      "Seller cannot or will not meet in person or video chat with the pet",
+      "Price is significantly below market rate for the breed",
+      "Requests for payment via wire transfer, gift cards, or cryptocurrency",
+      "Multiple fees added after initial payment",
+      "Seller's website was recently created or lacks verifiable contact information",
+      "Only accepting payment methods that cannot be reversed"
+    ],
+    exampleMessages: [
+      { type: "Email", content: "Great news! Your golden retriever puppy is ready for shipping. We need $350 for the climate-controlled crate and pet insurance. Once paid, your puppy will arrive within 48 hours via our certified pet delivery service." },
+      { type: "Social Media Post", content: "Beautiful AKC registered French Bulldog puppies available. Champion bloodline. Only $800 each (normally $3,500). We are relocating and need to find loving homes fast. Shipping available nationwide. Venmo or Zelle accepted." }
+    ],
+    preventionSteps: [
+      { title: "Visit the pet in person before paying", description: "Always meet the seller and see the animal in person before sending any money. Legitimate breeders welcome visits to their facilities." },
+      { title: "Research the breeder or seller", description: "Check reviews, verify business registration, and look for complaints. Use reverse image search on pet photos to see if they appear on other websites." },
+      { title: "Be wary of below-market prices", description: "If a purebred pet is listed at a fraction of the typical price, it is likely a scam. Research average prices for the breed you are interested in." },
+      { title: "Use adoption resources", description: "Consider adopting from local shelters or rescue organizations where you can meet the animal in person. Sites like Petfinder and Adopt-a-Pet list animals from verified rescues." }
+    ],
+    faq: [
+      { question: "How common are puppy scams?", answer: "The BBB reports that pet scams are one of the most common types of online fraud, with thousands of victims annually. Losses can range from hundreds to thousands of dollars." },
+      { question: "Can I buy a pet safely online?", answer: "Buying pets online carries significant risk. The safest approach is to visit the animal in person before paying. If you must buy remotely, verify the breeder through breed-specific registries and use payment methods that offer buyer protection." },
+      { question: "What breeds are most commonly used in pet scams?", answer: "French Bulldogs, English Bulldogs, Dachshunds, Yorkshire Terriers, and other popular or expensive breeds are frequently used in scam listings because their high prices make the fraud more profitable." }
+    ],
+    relatedScams: ["shopping-scam", "wire-fraud-scam", "social-media-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "ticket-scam",
+    title: "Ticket Scams: Fake Concert, Sports & Event Tickets",
+    metaTitle: "Ticket Scams: Spot Fake Event Tickets & Resale Fraud | GetCyberRight",
+    metaDescription: "Learn to avoid ticket scams for concerts, sports events, and festivals. Identify fake tickets, fraudulent resellers, and counterfeit ticket websites.",
+    keywords: ["ticket scam", "fake concert tickets", "fake event tickets", "ticket fraud", "counterfeit tickets"],
+    cluster: "online-scams",
+    overview: "Ticket scams sell counterfeit, duplicate, or nonexistent tickets for concerts, sporting events, festivals, and shows. Scammers set up fake resale websites, post listings on social media, and use the urgency of sold-out events to pressure buyers into quick purchases. Victims discover the fraud only when they are turned away at the venue, often after traveling significant distances.",
+    howItWorks: [
+      "Scammers create professional-looking websites that mimic legitimate ticket resale platforms.",
+      "Fake sellers post tickets on social media and classified sites, often at prices that seem like a deal.",
+      "Duplicate tickets are sold to multiple buyers using the same barcode, so only the first person to scan gets in.",
+      "After payment, scammers either send fake tickets, provide invalid digital tickets, or simply disappear."
+    ],
+    warningSigns: [
+      "Tickets priced significantly below face value for sold-out events",
+      "Seller insists on payment through non-refundable methods",
+      "Ticket website URL does not match the official venue or ticketing company",
+      "Seller cannot or will not meet in person for the exchange",
+      "No clear refund policy or buyer protection guarantees"
+    ],
+    exampleMessages: [
+      { type: "Social Media Post", content: "2 Taylor Swift tickets for Saturday night, Section A Row 5. Face value $450 each, selling for $200 each because I can't go anymore. Venmo only. First come first served! DM me." },
+      { type: "Fake Website", content: "VIPTicketExchange.com: Premium concert and sports tickets at unbeatable prices. 100% guaranteed authentic. Secure checkout. Same-day digital delivery. All major events available." }
+    ],
+    preventionSteps: [
+      { title: "Buy from official sources only", description: "Purchase tickets directly from the venue, official ticketing partners (Ticketmaster, AXS, etc.), or verified resale platforms (StubHub, SeatGeek) with buyer guarantees." },
+      { title: "Verify resale websites", description: "Check for HTTPS, read reviews, and verify the website is the real platform, not a lookalike. Scam sites often use similar domain names." },
+      { title: "Use payment methods with buyer protection", description: "Pay with credit cards or through platforms that offer purchase protection. Never use wire transfers, cryptocurrency, or peer-to-peer payment apps for ticket purchases from strangers." },
+      { title: "Be cautious of social media sellers", description: "If buying from individuals on social media, meet in person at a safe location and verify the ticket is legitimate before paying." }
+    ],
+    faq: [
+      { question: "How do I verify if a ticket is real?", answer: "Legitimate tickets from official sources include unique barcodes, holograms, or QR codes. Contact the venue or official ticketing partner directly to verify a ticket's authenticity if you have doubts." },
+      { question: "Are ticket resale websites safe?", answer: "Established platforms like StubHub and SeatGeek offer buyer protection guarantees. However, many fake resale websites exist that look professional but are fraudulent. Always verify the website URL carefully." },
+      { question: "What should I do if I bought fake tickets?", answer: "Dispute the charge with your credit card company, report the seller to the platform where you found them, file a complaint with the FTC, and report the incident to local police." }
+    ],
+    relatedScams: ["shopping-scam", "social-media-scam", "phishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "auto-warranty-scam",
+    title: "Auto Warranty Scams: Fake Vehicle Protection Plans",
+    metaTitle: "Auto Warranty Scams: Spot Fake Extended Warranty Calls | GetCyberRight",
+    metaDescription: "Protect yourself from auto warranty scams. Learn to identify fake extended warranty calls, texts, and mailers targeting vehicle owners.",
+    keywords: ["auto warranty scam", "extended warranty scam", "car warranty fraud", "vehicle warranty scam", "fake warranty call"],
+    cluster: "online-scams",
+    overview: "Auto warranty scams are among the most common robocall schemes. Scammers contact vehicle owners through calls, texts, emails, and official-looking mailers, claiming your vehicle's warranty is about to expire and urging immediate action. They sell worthless or nonexistent service contracts, collect payment, and either disappear or deny all claims when repairs are needed.",
+    howItWorks: [
+      "Robocalls and texts claim your vehicle's warranty is expiring and urge you to call immediately to avoid losing coverage.",
+      "Official-looking mailers disguised as urgent notices from your dealer or manufacturer create a false sense of legitimacy.",
+      "When you call back, high-pressure salespeople rush you through the purchase of an overpriced, limited, or completely fake warranty.",
+      "If you buy the plan and need repairs, claims are denied for various technicalities, or the company has disappeared entirely."
+    ],
+    warningSigns: [
+      "Unsolicited calls, texts, or mail about your vehicle warranty",
+      "Claims that your warranty is about to expire (when it may not be)",
+      "High-pressure tactics to purchase immediately",
+      "Vague details about coverage and exclusions",
+      "Inability to provide the company's official name, address, or license information"
+    ],
+    exampleMessages: [
+      { type: "Robocall", content: "This is your final notice regarding your vehicle's extended warranty. Your warranty coverage is about to expire and this is your last chance to renew. Press 1 now to speak with a coverage specialist before you lose all benefits." },
+      { type: "Mail", content: "URGENT NOTICE: Your vehicle warranty is set to expire. Protect yourself from expensive repairs. Call 1-800-XXX-XXXX within 5 business days to maintain your coverage at the current rate." }
+    ],
+    preventionSteps: [
+      { title: "Check your actual warranty status", description: "Contact your vehicle manufacturer or dealer directly to find out if your factory warranty is still active and what it covers." },
+      { title: "Do not respond to unsolicited contacts", description: "Ignore robocalls, texts, and mailers about warranties. Your manufacturer or dealer will not contact you this way about warranty expiration." },
+      { title: "Research any warranty company thoroughly", description: "Before purchasing any extended warranty, check the company's BBB rating, read reviews, and verify they are licensed in your state." },
+      { title: "Block robocall numbers", description: "Register on the National Do Not Call Registry (donotcall.gov) and use your phone's built-in call blocking features or third-party apps." }
+    ],
+    faq: [
+      { question: "Is my car warranty really expiring?", answer: "Most factory warranties are 3-5 years or a set mileage. Check your owner's manual or contact your dealer to verify your actual warranty status. Scammers have no way of knowing your real warranty status." },
+      { question: "Are extended warranties worth buying?", answer: "Some legitimate extended warranties can be worthwhile, but always purchase directly from your manufacturer or a well-established, licensed company. Never buy from unsolicited callers or mailers." },
+      { question: "How do I stop auto warranty robocalls?", answer: "Register on the Do Not Call Registry, block individual numbers, use your carrier's spam call filtering, and consider call-blocking apps. Report repeated calls to the FTC." }
+    ],
+    relatedScams: ["vishing", "phishing", "identity-theft"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "gift-card-scam",
+    title: "Gift Card Scams: Why Scammers Want Gift Card Payments",
+    metaTitle: "Gift Card Scams: Why Criminals Request Gift Card Payment | GetCyberRight",
+    metaDescription: "Understand why scammers demand gift card payments. Learn about gift card fraud, draining schemes, and how to protect yourself.",
+    keywords: ["gift card scam", "gift card fraud", "gift card payment scam", "itunes gift card scam", "google play gift card scam"],
+    cluster: "online-scams",
+    overview: "Gift card scams are a preferred payment method for many types of fraud because gift cards are nearly impossible to trace or reverse. Scammers demand payment in gift cards for fake IRS debts, utility bills, tech support, bail money, and more. They also tamper with gift cards on store racks, draining the value before the buyer can use them. No legitimate business or government agency ever requests payment by gift card.",
+    howItWorks: [
+      "Scammers demand payment through gift cards (iTunes, Google Play, Amazon, Green Dot) because the funds are nearly untraceable and cannot be reversed.",
+      "The victim is instructed to purchase specific gift cards, then read the card numbers and PINs to the scammer over the phone.",
+      "In-store tampering involves scammers recording the numbers on gift cards displayed on store racks, then monitoring for activation so they can drain the value remotely.",
+      "Online scammers sell discounted gift cards that are stolen, counterfeit, or have already been drained."
+    ],
+    warningSigns: [
+      "Any request to pay with gift cards for bills, fines, or debts",
+      "Instructions to purchase gift cards and share the numbers by phone or text",
+      "Gift card packaging that appears tampered with or resealed",
+      "Online gift card deals at significantly below face value",
+      "Urgency to buy cards immediately and share the information right away"
+    ],
+    exampleMessages: [
+      { type: "Phone Call", content: "This is the IRS. You owe $3,200 in back taxes. To avoid criminal prosecution, you must purchase $3,200 in Google Play gift cards and call us back with the redemption codes. A warrant for your arrest will be issued if this is not resolved today." },
+      { type: "Text Message", content: "Boss: I need you to do me a favor. I am in a meeting and need you to buy 5 Apple gift cards at $100 each for a client. I will reimburse you. Just scratch off the backs and send me photos of the codes." }
+    ],
+    preventionSteps: [
+      { title: "Remember: gift cards are for gifts only", description: "No legitimate business, government agency, or utility company will ever ask you to pay with gift cards. This is always a scam." },
+      { title: "Inspect gift cards before purchasing", description: "Check that the protective scratch-off coating is intact and the packaging has not been opened, resealed, or tampered with." },
+      { title: "Keep gift card receipts", description: "Save the receipt and the card until the full value has been used. If the card is drained by a scammer, the receipt may help with a store investigation." },
+      { title: "Report gift card scams", description: "Report to the FTC at reportfraud.ftc.gov and contact the gift card company directly. Some companies may be able to freeze remaining funds." }
+    ],
+    faq: [
+      { question: "Why do scammers prefer gift cards?", answer: "Gift cards are essentially untraceable cash. Once the scammer has the card numbers and PINs, they can instantly convert the value to cash or cryptocurrency. Unlike credit cards, gift card transactions cannot be reversed." },
+      { question: "Can I get my money back from a gift card scam?", answer: "Recovery is very difficult but not impossible. Contact the gift card company immediately, as some may freeze the funds if they have not been redeemed. File a report with the FTC and keep all documentation." },
+      { question: "How do scammers drain gift cards from store racks?", answer: "Scammers carefully open packaging, record the card numbers and PINs, then reseal the package. They use automated systems to check when the card is activated, then immediately redeem the value online." }
+    ],
+    relatedScams: ["irs-tax-scam", "utility-scam", "tech-support-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "wire-fraud-scam",
+    title: "Wire Transfer Fraud: Protecting Your Money from Wire Scams",
+    metaTitle: "Wire Transfer Fraud: How to Protect Against Wire Scams | GetCyberRight",
+    metaDescription: "Learn about wire transfer fraud, including real estate wire fraud, business email compromise, and romance scam wire transfers. Protect your money.",
+    keywords: ["wire fraud", "wire transfer scam", "real estate wire fraud", "money transfer scam", "western union scam"],
+    cluster: "online-scams",
+    overview: "Wire transfer fraud causes billions in losses annually because wire transfers are fast, irreversible, and difficult to trace. Criminals use business email compromise, real estate closing fraud, romance scams, and other schemes to trick victims into wiring money. Once the wire is sent, the money is typically moved through multiple accounts and across borders within minutes, making recovery nearly impossible.",
+    howItWorks: [
+      "In real estate wire fraud, scammers hack email accounts of title companies or agents and send victims fake closing instructions with fraudulent wire transfer details.",
+      "Business email compromise involves impersonating executives or vendors to trick employees into wiring company funds to criminal accounts.",
+      "Romance scammers build relationships over weeks or months, then create emergencies requiring urgent wire transfers.",
+      "Fake invoice schemes send convincing invoices for services with wire transfer payment instructions to criminal accounts."
+    ],
+    warningSigns: [
+      "Last-minute changes to wire transfer instructions, especially received by email",
+      "Urgency to send wire transfers immediately without time to verify",
+      "Wire instructions to personal accounts rather than business accounts",
+      "Requests to keep the wire transfer confidential",
+      "Email addresses that look similar to but are slightly different from legitimate contacts"
+    ],
+    exampleMessages: [
+      { type: "Email (Real Estate)", content: "Hi, I am reaching out regarding your upcoming closing. Please note our wire instructions have been updated. Wire your closing costs of $47,350 to the following account by end of business today to avoid delays: [fraudulent account details]" },
+      { type: "Email (Business)", content: "Hi [Employee Name], I need you to process an urgent wire transfer of $28,500 to this vendor today. Please do not discuss this with anyone as it is part of a confidential acquisition. I am in meetings all day but will explain later." }
+    ],
+    preventionSteps: [
+      { title: "Verify wire instructions by phone", description: "Always call the recipient using a known phone number (not one from the email) to verbally confirm wire transfer instructions before sending any money." },
+      { title: "Be suspicious of last-minute changes", description: "If wire instructions change at the last minute, stop the process and verify through an independent channel. This is a major red flag." },
+      { title: "Use multi-person authorization", description: "Implement dual authorization requirements for all wire transfers above a certain threshold at your business." },
+      { title: "Act immediately if you sent a fraudulent wire", description: "Contact your bank within 24 hours to attempt a wire recall. File reports with the FBI IC3 and local law enforcement." }
+    ],
+    faq: [
+      { question: "Can I recover money from a fraudulent wire transfer?", answer: "Recovery is possible but time-sensitive. Contact your bank immediately to initiate a wire recall. Banks have limited time to freeze recipient accounts. The sooner you act, the better your chances." },
+      { question: "How do scammers intercept real estate transactions?", answer: "Scammers compromise email accounts of real estate agents, title companies, or attorneys by phishing. They monitor email threads for closing details, then send fake wire instructions at the critical moment." },
+      { question: "How can businesses prevent wire fraud?", answer: "Implement dual authorization for wire transfers, verify all changes to payment instructions by phone, train employees to recognize business email compromise, and use email security measures like DMARC." }
+    ],
+    relatedScams: ["business-email-scam", "romance-scam", "phishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "business-email-scam",
+    title: "Business Email Compromise (BEC): Corporate Email Fraud",
+    metaTitle: "Business Email Compromise: Prevent BEC Scams | GetCyberRight",
+    metaDescription: "Protect your business from email compromise scams. Learn how BEC attacks work, warning signs, and prevention strategies for corporate email fraud.",
+    keywords: ["business email compromise", "BEC scam", "CEO fraud", "corporate email scam", "email spoofing"],
+    cluster: "phishing-attacks",
+    overview: "Business Email Compromise (BEC) is one of the costliest forms of cybercrime, with the FBI reporting billions in losses annually. Attackers compromise or spoof corporate email accounts to trick employees, vendors, or partners into making fraudulent wire transfers or sharing sensitive information. Unlike mass phishing, BEC attacks are highly targeted and often involve extensive research into the target organization.",
+    howItWorks: [
+      "Attackers compromise an executive's email account through phishing or credential stuffing, then use it to send fraudulent requests to employees.",
+      "Email spoofing creates messages that appear to come from the CEO, CFO, or a trusted vendor, requesting urgent wire transfers or sensitive data.",
+      "Vendor email compromise involves hacking a supplier's email to send fake invoices with updated payment information.",
+      "Payroll diversion schemes redirect employee direct deposits to criminal accounts by impersonating employees through HR email requests."
+    ],
+    warningSigns: [
+      "Urgent requests for wire transfers or payment changes from executives",
+      "Emails requesting secrecy about financial transactions",
+      "Changes to vendor payment information received by email",
+      "Requests for W-2s, employee data, or sensitive company information",
+      "Slight variations in email addresses from known contacts",
+      "Unusual timing of requests, such as after business hours or during travel"
+    ],
+    exampleMessages: [
+      { type: "CEO Impersonation", content: "Hi [CFO Name], I need you to process a wire transfer of $125,000 to complete a confidential acquisition. This is time-sensitive and cannot wait until Monday. I am traveling and unreachable by phone. Please process immediately and confirm by email." },
+      { type: "Vendor Impersonation", content: "Hello, This is to inform you that our banking information has changed. Please update your records with the new account details below for all future payments. Invoice #4827 for $67,450 is due this week." }
+    ],
+    preventionSteps: [
+      { title: "Implement verification procedures", description: "Require phone verification for all wire transfers, payment changes, and sensitive data requests using known contact numbers, not numbers provided in the suspicious email." },
+      { title: "Use multi-factor authentication on all email accounts", description: "MFA prevents attackers from accessing email accounts even if passwords are compromised through phishing." },
+      { title: "Deploy email authentication protocols", description: "Implement SPF, DKIM, and DMARC to prevent email spoofing and flag messages from unauthorized senders." },
+      { title: "Train employees regularly", description: "Conduct regular BEC awareness training with realistic phishing simulations. Ensure all employees, especially those in finance and HR, understand BEC tactics." }
+    ],
+    faq: [
+      { question: "How much do BEC scams cost businesses?", answer: "The FBI reports that BEC scams cause billions in losses annually, with average losses per incident exceeding $120,000. They affect businesses of all sizes across all industries." },
+      { question: "How do attackers choose their targets?", answer: "BEC attackers research companies through LinkedIn, SEC filings, social media, and company websites. They identify key personnel in finance and executive roles, and time their attacks around known events like mergers or travel." },
+      { question: "What should we do if we fall victim to BEC?", answer: "Contact your bank immediately to attempt a wire recall. File a report with the FBI IC3, notify law enforcement, engage a cybersecurity firm to investigate, and implement stronger controls to prevent future attacks." }
+    ],
+    relatedScams: ["phishing", "wire-fraud-scam", "identity-theft"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "smishing",
+    title: "Smishing: How SMS Phishing Attacks Steal Your Data",
+    metaTitle: "Smishing: Protect Against SMS Phishing Attacks | GetCyberRight",
+    metaDescription: "Learn about smishing (SMS phishing) attacks. Identify fake text messages, protect your phone, and avoid clicking malicious links in texts.",
+    keywords: ["smishing", "sms phishing", "text message scam", "phishing text", "fake text message"],
+    cluster: "phishing-attacks",
+    overview: "Smishing (SMS phishing) uses text messages to trick recipients into clicking malicious links, sharing personal information, or downloading malware. Smishing attacks have surged as people increasingly trust text messages over email. Scammers impersonate banks, delivery services, government agencies, and tech companies, exploiting the urgency and brevity of text communication to catch victims off guard.",
+    howItWorks: [
+      "Scammers send mass text messages impersonating trusted organizations with urgent calls to action.",
+      "Messages contain shortened URLs that redirect to phishing websites designed to steal login credentials, personal data, or financial information.",
+      "Some smishing texts deliver malware that gives attackers access to the victim's phone, contacts, and banking apps.",
+      "Two-step smishing involves a text followed by a phone call from someone claiming to be from the organization, using information from the text interaction to seem legitimate."
+    ],
+    warningSigns: [
+      "Unexpected text messages from unknown numbers claiming to be from known companies",
+      "Urgent messages about account problems, suspicious activity, or missed deliveries",
+      "Shortened URLs that hide the actual destination website",
+      "Texts requesting personal information, passwords, or verification codes",
+      "Messages with poor grammar, unusual formatting, or generic greetings",
+      "Offers that seem too good to be true sent via text"
+    ],
+    exampleMessages: [
+      { type: "Fake Bank Alert", content: "ALERT: Unusual activity detected on your Chase account. Your account has been temporarily locked. Verify your identity now: https://bit.ly/ch4se-verify" },
+      { type: "Fake Delivery", content: "USPS: Your package cannot be delivered due to incomplete address. Update your delivery info here: https://usps-redeliver.info/track/8847362" }
+    ],
+    preventionSteps: [
+      { title: "Do not click links in unexpected texts", description: "If you receive a text claiming to be from your bank or a delivery service, open the official app or website directly instead of clicking the link in the message." },
+      { title: "Verify through official channels", description: "Contact the organization directly using a phone number from their official website, not from the text message." },
+      { title: "Enable spam filtering on your phone", description: "Both iPhone and Android have built-in spam text filtering. Enable these features and report spam messages when you receive them." },
+      { title: "Never share verification codes", description: "Legitimate companies will never text you asking for verification codes or passwords. These codes are for your use only." }
+    ],
+    faq: [
+      { question: "What makes smishing different from email phishing?", answer: "Smishing exploits the higher trust people place in text messages. Texts feel more personal and urgent, and people are less likely to scrutinize links on small phone screens. Smishing also bypasses email spam filters." },
+      { question: "Can clicking a smishing link infect my phone?", answer: "Yes, some smishing links can install malware on your phone, especially on Android devices. Even without malware, the link may lead to a convincing fake website designed to steal your information." },
+      { question: "How do I report smishing texts?", answer: "Forward suspicious texts to 7726 (SPAM) to report them to your carrier. You can also report them to the FTC at reportfraud.ftc.gov and block the sender on your phone." }
+    ],
+    relatedScams: ["phishing", "delivery-scam", "bank-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "vishing",
+    title: "Vishing: Voice Phishing Phone Scams Explained",
+    metaTitle: "Vishing: Protect Against Voice Phishing Phone Scams | GetCyberRight",
+    metaDescription: "Learn about vishing (voice phishing) attacks. Protect yourself from phone scams using caller ID spoofing, robocalls, and social engineering.",
+    keywords: ["vishing", "voice phishing", "phone scam", "caller id spoofing", "phone fraud"],
+    cluster: "phishing-attacks",
+    overview: "Vishing (voice phishing) uses phone calls to manipulate victims into revealing sensitive information or making payments. Advanced caller ID spoofing makes calls appear to come from legitimate organizations, including banks, government agencies, and tech companies. AI-powered voice cloning has made vishing even more dangerous, enabling scammers to impersonate specific individuals convincingly.",
+    howItWorks: [
+      "Scammers use caller ID spoofing to make calls appear to come from legitimate numbers, including your bank, the IRS, or local police.",
+      "Robocalls deliver automated messages about account problems, warranty expirations, or legal issues, directing victims to press a number or call back.",
+      "Live callers use social engineering techniques, creating urgency and fear to pressure victims into sharing personal information or making payments.",
+      "AI voice cloning technology allows scammers to mimic the voices of family members, executives, or authority figures."
+    ],
+    warningSigns: [
+      "Unsolicited calls demanding immediate action or payment",
+      "Callers who refuse to provide identifying information or a callback number",
+      "Threats of arrest, account closure, or legal action",
+      "Requests for personal information your bank or service provider should already have",
+      "Caller ID showing a trusted organization but the call feels suspicious",
+      "Being asked to confirm information the caller provides rather than being asked to identify yourself"
+    ],
+    exampleMessages: [
+      { type: "Bank Impersonation Call", content: "This is the fraud department at Wells Fargo. We have detected unauthorized transactions on your account totaling $2,340. To verify your identity and block these charges, I need your account number and the last four digits of your Social Security number." },
+      { type: "Tech Support Call", content: "Hello, this is Microsoft Technical Support. We have detected critical errors on your computer that indicate a virus infection. If not resolved immediately, your personal data including banking information will be compromised. I need remote access to your computer to fix this." }
+    ],
+    preventionSteps: [
+      { title: "Let unknown calls go to voicemail", description: "If you do not recognize the number, let it go to voicemail. Legitimate callers will leave a message. Scammers rarely do." },
+      { title: "Never give information to incoming callers", description: "If someone calls claiming to be from your bank or a government agency, hang up and call the organization directly using the number on their official website." },
+      { title: "Use call blocking and spam detection", description: "Enable your phone's built-in call screening features and consider apps like Nomorobo, Hiya, or Truecaller to identify potential scam calls." },
+      { title: "Register on the Do Not Call Registry", description: "While scammers ignore it, registering at donotcall.gov means any telemarketing call you receive is more likely to be fraudulent." }
+    ],
+    faq: [
+      { question: "Can scammers really spoof my bank's phone number?", answer: "Yes, caller ID spoofing technology allows scammers to display any phone number they choose, including your bank's, the IRS, or even your own number. Never trust caller ID alone to verify a call's legitimacy." },
+      { question: "How do AI voice scams work?", answer: "Scammers use AI to clone voices from short audio samples found on social media, voicemail greetings, or recorded calls. They can create convincing impersonations of family members or executives to request money or information." },
+      { question: "What should I do if I gave information to a vishing scammer?", answer: "Change passwords immediately for any accounts discussed. Contact your bank to secure financial accounts. Place fraud alerts on your credit reports. Monitor all accounts closely for unauthorized activity." }
+    ],
+    relatedScams: ["smishing", "tech-support-scam", "grandparent-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "catfishing",
+    title: "Catfishing: How Fake Online Profiles Lead to Fraud",
+    metaTitle: "Catfishing: Spot Fake Profiles & Online Impersonation | GetCyberRight",
+    metaDescription: "Learn about catfishing and fake online profiles. Identify imposters on dating sites and social media before they exploit your trust.",
+    keywords: ["catfishing", "fake profile", "online impersonation", "catfish scam", "fake dating profile"],
+    cluster: "social-media-security",
+    overview: "Catfishing involves creating fake online identities to deceive others, typically on dating platforms and social media. Catfishers use stolen photos and fabricated life stories to build emotional connections, eventually exploiting their victims for money, personal information, or other purposes. With AI-generated photos and deepfake technology, catfishing has become increasingly sophisticated and harder to detect.",
+    howItWorks: [
+      "Scammers create attractive profiles using stolen photos and carefully crafted backstories on dating apps and social media.",
+      "They invest weeks or months building emotional connections through frequent messaging, calls, and video chats (often with excuses for not using video).",
+      "Once trust is established, they create emergencies requiring financial help, such as medical bills, travel costs, or business problems.",
+      "AI-generated photos and deepfake video technology make fake identities increasingly convincing and difficult to detect."
+    ],
+    warningSigns: [
+      "Profile photos that look professionally shot or too perfect",
+      "Refusal or inability to video chat or meet in person",
+      "Excuses for why they cannot meet, such as military deployment, working overseas, or medical emergencies",
+      "Relationship progresses very quickly with intense emotional declarations",
+      "Requests for money or gift cards for emergencies",
+      "Inconsistencies in their stories or personal details"
+    ],
+    exampleMessages: [
+      { type: "Dating App Message", content: "I feel like we have a real connection. I have never felt this way about anyone before. I wish I could be with you right now, but I am stationed overseas for another 6 months. I just found out my mother needs surgery and I do not have access to my bank account from here. Could you help me with $2,000? I will pay you back as soon as I get home." },
+      { type: "Social Media DM", content: "Hi! I came across your profile and I love your energy. I am a petroleum engineer working on an oil rig off the coast of Scotland. It gets lonely out here. I would love to get to know you better. Can we chat on WhatsApp?" }
+    ],
+    preventionSteps: [
+      { title: "Reverse image search profile photos", description: "Use Google reverse image search or TinEye to check if the person's photos appear elsewhere online or belong to someone else." },
+      { title: "Insist on video calls early", description: "A real person will be willing to video chat. If someone consistently avoids video calls, it is a major red flag." },
+      { title: "Never send money to someone you have not met", description: "No matter how genuine the connection feels, never send money, gift cards, or financial information to someone you have only met online." },
+      { title: "Watch for AI-generated photos", description: "Look for signs of AI-generated images: asymmetric features, blurry backgrounds, strange ear shapes, or mismatched jewelry and accessories." }
+    ],
+    faq: [
+      { question: "How common is catfishing?", answer: "Romance scams involving catfishing account for billions in reported losses annually. The FTC reports that romance scams are the most financially damaging form of consumer fraud." },
+      { question: "Can catfishers use AI to create fake photos?", answer: "Yes, AI tools can generate realistic photos of people who do not exist. These photos will not appear in reverse image searches, making them harder to detect. Look for subtle signs like asymmetric features or unusual backgrounds." },
+      { question: "What should I do if I think I am being catfished?", answer: "Stop sending money immediately. Reverse image search their photos. Ask for a live video call. If they cannot or will not verify their identity, cut off contact. Report the profile to the platform and to the FTC." }
+    ],
+    relatedScams: ["romance-scam", "social-media-scam", "sextortion-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "sextortion-scam",
+    title: "Sextortion Scams: Blackmail and Online Exploitation",
+    metaTitle: "Sextortion Scams: Protect Against Online Blackmail | GetCyberRight",
+    metaDescription: "Learn about sextortion scams and online blackmail. Protect yourself and your family from criminals who use intimate content for extortion.",
+    keywords: ["sextortion", "online blackmail", "sextortion scam", "blackmail email", "intimate image threat"],
+    cluster: "social-media-security",
+    overview: "Sextortion involves criminals threatening to release intimate images or information unless the victim pays money. Some sextortion attempts are completely fabricated, with scammers sending mass emails claiming to have compromising footage from hacked webcams. Others target victims who have shared intimate content online, particularly teenagers and young adults. Sextortion can have devastating emotional and psychological effects on victims.",
+    howItWorks: [
+      "Mass sextortion emails claim the sender hacked your webcam and recorded you visiting adult websites, demanding Bitcoin payment to prevent release.",
+      "Criminals build online relationships, convince victims to share intimate photos or videos, then threaten to distribute them unless paid.",
+      "Fake dating profiles or social media accounts lure victims into compromising video chats that are secretly recorded.",
+      "Some criminals use AI to create fake compromising images of victims from their social media photos."
+    ],
+    warningSigns: [
+      "Emails claiming to have hacked your webcam and recorded you",
+      "Messages including an old password of yours (obtained from data breaches) as proof of hacking",
+      "New online contacts who quickly push for intimate photo or video exchanges",
+      "Threats to send compromising material to your contacts unless you pay",
+      "Demands for payment in cryptocurrency or gift cards"
+    ],
+    exampleMessages: [
+      { type: "Blackmail Email", content: "I have installed malware on your computer and recorded you through your webcam while you visited adult websites. I have your contact list. Pay $2,000 in Bitcoin within 48 hours or I will send the video to everyone you know. Your password is [old password from breach]." },
+      { type: "Social Media Threat", content: "I have screenshots of everything you sent me. If you do not send $500 via CashApp in the next hour, I am sending these to your family, friends, and employer. Do not try to block me, I already have everything saved." }
+    ],
+    preventionSteps: [
+      { title: "Do not respond to mass sextortion emails", description: "These are sent to millions of people and are almost always fake. They use old passwords from data breaches to seem credible. Delete them and change any passwords mentioned." },
+      { title: "Never share intimate content online", description: "Once images or videos are shared digitally, you lose control of them. Even with people you trust, relationships can change and content can be stolen." },
+      { title: "Cover your webcam when not in use", description: "Use a webcam cover or piece of tape for an extra layer of privacy protection against any potential unauthorized access." },
+      { title: "Report and do not pay", description: "Paying never guarantees the threats will stop. Report sextortion to the FBI IC3 (ic3.gov), the National Center for Missing and Exploited Children (if involving a minor), and local law enforcement." }
+    ],
+    faq: [
+      { question: "Are mass sextortion emails real?", answer: "Almost never. These emails are sent to millions of people using email lists from data breaches. The old password they include is real (from a breach) but they have not actually hacked your webcam. Change the password mentioned and delete the email." },
+      { question: "What should I do if someone is threatening to share my images?", answer: "Do not pay. Save all communications as evidence. Block the person but do not delete conversations. Report to the platform, FBI IC3, and local police. Contact the Cyber Civil Rights Initiative (cybercivilrights.org) for support." },
+      { question: "How can I protect my teenager from sextortion?", answer: "Talk openly about the risks of sharing intimate content online. Explain that sextortion is a crime and that victims should never pay or feel ashamed to ask for help. Ensure they know to report to a trusted adult immediately." }
+    ],
+    relatedScams: ["catfishing", "romance-scam", "social-media-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "ransomware",
+    title: "Ransomware: Understanding and Preventing Data Hostage Attacks",
+    metaTitle: "Ransomware: Prevent, Detect & Recover from Attacks | GetCyberRight",
+    metaDescription: "Learn about ransomware attacks that encrypt your files and demand payment. Prevention strategies, detection tips, and recovery options explained.",
+    keywords: ["ransomware", "ransomware attack", "ransomware prevention", "file encryption malware", "ransomware protection"],
+    cluster: "device-security",
+    overview: "Ransomware is malicious software that encrypts your files and demands payment (usually in cryptocurrency) to restore access. Attacks target individuals, businesses, hospitals, schools, and government agencies. Modern ransomware operations have evolved into professional criminal enterprises, with some groups offering ransomware-as-a-service to other criminals. Prevention through backups, updates, and security awareness remains the best defense.",
+    howItWorks: [
+      "Ransomware typically enters systems through phishing emails with malicious attachments, compromised websites, or exploited software vulnerabilities.",
+      "Once activated, the malware encrypts files on the infected computer and any connected network drives, making them inaccessible.",
+      "A ransom note appears demanding payment in cryptocurrency within a deadline, after which the ransom increases or files are permanently destroyed.",
+      "Double extortion ransomware also steals data before encrypting it, threatening to publish sensitive information if the ransom is not paid."
+    ],
+    warningSigns: [
+      "Files suddenly cannot be opened or have unusual extensions added",
+      "A ransom note appears on your screen or in every folder",
+      "Computer performance significantly slows down during the encryption process",
+      "Antivirus software is disabled or blocked from running",
+      "Unexpected pop-ups or system messages about encryption"
+    ],
+    exampleMessages: [
+      { type: "Ransom Note", content: "ALL YOUR FILES HAVE BEEN ENCRYPTED! Your personal files, documents, photos, and databases are no longer accessible. The only way to recover them is to purchase our decryption tool. Send 0.5 Bitcoin to the following wallet address within 72 hours. After this time, your files will be permanently deleted." },
+      { type: "Phishing Email (delivery method)", content: "Subject: Invoice #INV-2026-0847. Dear Customer, Please review the attached invoice for your recent order. Payment is due within 30 days. [Attachment: Invoice-0847.docm]" }
+    ],
+    preventionSteps: [
+      { title: "Maintain offline backups", description: "Regularly back up important files to an external drive that is disconnected from your computer when not in use. Cloud backups should use versioning so encrypted files do not overwrite clean copies." },
+      { title: "Keep all software updated", description: "Install security updates promptly for your operating system, browsers, and all software. Ransomware often exploits known vulnerabilities in outdated software." },
+      { title: "Use reputable antivirus and anti-malware software", description: "Keep security software active and updated. Enable real-time scanning and behavior-based detection that can identify ransomware activity." },
+      { title: "Do not open suspicious email attachments", description: "Be extremely cautious with email attachments, especially from unknown senders. Disable macros in office documents unless specifically needed." },
+      { title: "Use network segmentation", description: "For businesses, segment your network so that if one system is infected, the ransomware cannot easily spread to other systems and backup drives." }
+    ],
+    faq: [
+      { question: "Should I pay the ransom?", answer: "Law enforcement agencies generally advise against paying ransoms. Payment funds criminal operations, does not guarantee file recovery, and marks you as a willing payer for future attacks. Focus on prevention and maintaining good backups." },
+      { question: "Can I recover encrypted files without paying?", answer: "Sometimes. Check nomoreransom.org for free decryption tools for known ransomware variants. If you have offline backups, you can restore from those. Some security firms may be able to help with specific ransomware strains." },
+      { question: "How do I protect my business from ransomware?", answer: "Implement the 3-2-1 backup rule (3 copies, 2 different media, 1 offsite), keep all systems updated, train employees on phishing awareness, use network segmentation, implement email filtering, and have an incident response plan ready." }
+    ],
+    relatedScams: ["phishing", "business-email-scam", "fake-antivirus-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "fake-antivirus-scam",
+    title: "Fake Antivirus Scams: Bogus Security Alert Pop-ups",
+    metaTitle: "Fake Antivirus Scams: Spot Bogus Security Alerts | GetCyberRight",
+    metaDescription: "Learn to identify fake antivirus pop-ups and scareware. Protect yourself from bogus security alerts that trick you into paying for fake software.",
+    keywords: ["fake antivirus", "scareware", "fake virus alert", "fake security warning", "bogus antivirus"],
+    cluster: "device-security",
+    overview: "Fake antivirus scams, also known as scareware, use alarming pop-ups and fake security alerts to trick you into believing your computer is infected with viruses. These pop-ups mimic legitimate antivirus warnings and pressure you to purchase fake security software, call a fake support number, or download actual malware. The fraudulent software either does nothing or actively harms your computer while charging you for protection.",
+    howItWorks: [
+      "Malicious websites or ads display fake virus detection pop-ups that mimic Windows Defender, Norton, or McAfee alerts.",
+      "The pop-ups claim your computer is infected and cannot be closed normally, creating panic and urgency.",
+      "Victims are directed to purchase fake antivirus software, call a tech support number, or download a program that installs actual malware.",
+      "Some scareware installs legitimate-looking programs that run fake scans showing dozens of threats, reinforcing the need to pay for the full version."
+    ],
+    warningSigns: [
+      "Pop-ups claiming your computer has many viruses that appeared while browsing",
+      "Security warnings that cannot be closed by normal means",
+      "Alerts from antivirus software you do not have installed",
+      "Warnings urging you to call a phone number immediately",
+      "Pop-ups that look slightly different from your actual antivirus software",
+      "Websites that trigger full-screen alerts about virus infections"
+    ],
+    exampleMessages: [
+      { type: "Pop-Up Alert", content: "WARNING! Windows has detected 47 viruses on your system! Your personal data, bank passwords, and photos are at risk. Download TotalSecure Antivirus NOW to remove threats. Your PC will be permanently damaged in 5:00 minutes if action is not taken." },
+      { type: "Browser Alert", content: "CRITICAL ALERT FROM MICROSOFT: Your computer has been locked. Trojan Spyware detected! Call Microsoft Support immediately: 1-888-XXX-XXXX. Do not restart your computer or you will lose all data." }
+    ],
+    preventionSteps: [
+      { title: "Close the browser to dismiss fake alerts", description: "Use Ctrl+Alt+Delete (Windows) or Force Quit (Mac) to close your browser. Do not click anything within the pop-up, including close or cancel buttons." },
+      { title: "Use only reputable antivirus software", description: "Install trusted antivirus software from known companies like Windows Defender (built-in), Malwarebytes, Bitdefender, or Norton. Purchase directly from official websites." },
+      { title: "Keep your browser updated", description: "Modern browsers have built-in protection against malicious pop-ups and known scareware sites. Ensure your browser is always up to date." },
+      { title: "Use an ad blocker", description: "Ad blockers can prevent many malicious ads and pop-ups from appearing in the first place, reducing your exposure to scareware." }
+    ],
+    faq: [
+      { question: "How do I know if a virus alert is real?", answer: "Real antivirus alerts come from software you have actually installed and appear within the application, not in your browser. Your built-in antivirus (like Windows Defender) will never ask you to call a phone number or purchase software through a pop-up." },
+      { question: "What if I already downloaded fake antivirus software?", answer: "Run a scan with legitimate antivirus software (Windows Defender or Malwarebytes Free). Uninstall the fake software through your system settings. If you paid, dispute the charge with your bank or credit card company." },
+      { question: "Can fake virus alerts actually infect my computer?", answer: "Clicking on fake alerts or downloading the recommended software can install actual malware on your computer. However, simply seeing the pop-up does not infect your system. Close the browser without clicking anything inside the alert." }
+    ],
+    relatedScams: ["tech-support-scam", "ransomware", "phishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "cashapp-scam",
+    title: "Cash App Scams: How to Protect Your Money",
+    metaTitle: "Cash App Scams: Spot Fraud & Protect Your Account | GetCyberRight",
+    metaDescription: "Learn about Cash App scams including fake giveaways, money flipping, and payment fraud. Protect your Cash App account from scammers.",
+    keywords: ["cash app scam", "cashapp fraud", "cash app money flip", "cash app giveaway scam", "cash app hack"],
+    cluster: "online-scams",
+    overview: "Cash App scams exploit the platform's peer-to-peer payment system, where transactions are instant and difficult to reverse. Scammers use fake giveaways, money flipping promises, impersonation of Cash App support, and fraudulent sales to steal money from users. Because Cash App payments are designed for people you know and trust, sending money to strangers carries significant risk.",
+    howItWorks: [
+      "Fake Cash App giveaways on social media promise to multiply your money if you send a small amount first. You send money and receive nothing back.",
+      "Money flipping scams promise to turn small amounts into large returns through a secret technique or glitch. There is no glitch; they just keep your money.",
+      "Scammers impersonate Cash App support through fake accounts and ask for your login information, PIN, or sign-in code to steal your account.",
+      "Fake sellers accept Cash App payment for items that are never delivered, knowing the buyer has limited recourse."
+    ],
+    warningSigns: [
+      "Promises to multiply your money through Cash App",
+      "Social media posts about Cash App giveaways requiring you to send money first",
+      "Messages from Cash App support asking for your PIN or sign-in code",
+      "Sellers who only accept Cash App payment with no other options",
+      "Requests from strangers to receive and forward Cash App payments"
+    ],
+    exampleMessages: [
+      { type: "Social Media Post", content: "CASH APP FRIDAY! Send $50 to $CashFlip2026 and receive $500 back within 1 hour! DM me for proof. First 20 people only! #CashAppFriday #MoneyFlip" },
+      { type: "Direct Message", content: "Hi, I am from Cash App customer support. We detected unusual activity on your account. To verify your identity and prevent your account from being locked, please send us your sign-in code and PIN." }
+    ],
+    preventionSteps: [
+      { title: "Only send money to people you know", description: "Cash App is designed for sending money to friends and family. Treat Cash App payments like cash. Once sent, they are very difficult to recover." },
+      { title: "Enable security features", description: "Turn on Security Lock to require a PIN, Touch ID, or Face ID for every payment. Enable notifications for all transactions." },
+      { title: "Ignore money multiplication offers", description: "No one can multiply your money through Cash App. All money flipping and giveaway schemes that require you to send money first are scams." },
+      { title: "Know that Cash App support will never ask for your PIN", description: "Cash App support is available only through the app or at cash.app/help. They will never ask for your sign-in code, PIN, or password." }
+    ],
+    faq: [
+      { question: "Can I get my money back on Cash App if scammed?", answer: "Cash App transactions are generally instant and non-reversible. You can request a refund from the recipient or dispute the transaction through Cash App support, but recovery is not guaranteed. Prevention is the best protection." },
+      { question: "How do I contact real Cash App support?", answer: "Access support only through the Cash App application or at cash.app/help. Cash App support will never contact you first through social media, text, or phone calls." },
+      { question: "Are Cash App giveaways on social media real?", answer: "While Cash App has occasionally run official promotions, any giveaway requiring you to send money first is a scam. Official Cash App promotions never ask you to send money to receive a prize." }
+    ],
+    relatedScams: ["venmo-scam", "zelle-scam", "social-media-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "venmo-scam",
+    title: "Venmo Scams: Protect Yourself from Payment Fraud",
+    metaTitle: "Venmo Scams: Spot Payment Fraud & Protect Your Account | GetCyberRight",
+    metaDescription: "Learn about Venmo scams including fake payments, overpayment fraud, and account takeover. Protect your Venmo account from common fraud schemes.",
+    keywords: ["venmo scam", "venmo fraud", "venmo payment scam", "venmo phishing", "venmo fake payment"],
+    cluster: "online-scams",
+    overview: "Venmo scams target the platform's social and peer-to-peer features to defraud users. Common schemes include sending fake payment notifications, overpayment scams, phishing for account credentials, and using stolen credit cards to make payments that are later reversed. Venmo is designed for transactions between people who know and trust each other, making it risky for purchases from strangers.",
+    howItWorks: [
+      "Scammers send fake Venmo payment notification emails that look legitimate but contain phishing links to steal your login credentials.",
+      "Overpayment scams involve sending more than the agreed amount (often from a stolen account), then asking you to return the difference before the original payment is reversed.",
+      "Fraudulent buyers pay with Venmo for items sold online, then dispute the charge or the payment reverses because the linked payment source was stolen.",
+      "Account takeover through phishing or credential stuffing gives scammers access to drain your Venmo balance and linked bank account."
+    ],
+    warningSigns: [
+      "Payment notifications from Venmo that arrive by email rather than in the app",
+      "Strangers sending you money and asking for a refund",
+      "Requests to use Venmo for purchases from people you do not know",
+      "Emails or texts asking you to verify your Venmo account through a link",
+      "Unexpected password reset notifications for your Venmo account"
+    ],
+    exampleMessages: [
+      { type: "Phishing Email", content: "Subject: You've got money! [Name] paid you $850.00. Note: For the couch - thanks! View your Venmo account: [phishing link]. If you did not request this transaction, click here to report." },
+      { type: "Text from Buyer", content: "Hey, I just sent you $400 on Venmo for the concert tickets but I accidentally sent $600. Can you please send $200 back? I really need it corrected ASAP." }
+    ],
+    preventionSteps: [
+      { title: "Only use Venmo with people you know", description: "Venmo is designed for splitting costs with friends. Avoid using it for transactions with strangers. For business transactions, use Venmo for Business which offers seller protection." },
+      { title: "Verify payments in the app", description: "Always check your Venmo app directly to confirm payments. Do not rely on email notifications, which can be faked." },
+      { title: "Enable multi-factor authentication", description: "Add PIN protection and enable two-factor authentication on your Venmo account to prevent unauthorized access." },
+      { title: "Make your transactions private", description: "Set your Venmo transactions to private in settings. Public transaction history can be used by scammers to gather information about your activity." }
+    ],
+    faq: [
+      { question: "Does Venmo offer buyer or seller protection?", answer: "Standard Venmo person-to-person payments do not include buyer or seller protection. Only Venmo for Business profiles and authorized merchant transactions offer some protection. This is why using Venmo with strangers is risky." },
+      { question: "Can Venmo payments be reversed?", answer: "Payments made from stolen credit cards or bank accounts can be reversed, leaving you without the payment. This is why overpayment scams are effective. Never refund a stranger's overpayment." },
+      { question: "How do I secure my Venmo account?", answer: "Enable PIN or biometric authentication, turn on two-factor authentication, use a strong unique password, set transactions to private, and review connected payment methods regularly." }
+    ],
+    relatedScams: ["cashapp-scam", "zelle-scam", "phishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "apple-scam",
+    title: "Apple & iCloud Scams: Fake Apple ID Phishing",
+    metaTitle: "Apple Scams: Protect Your Apple ID & iCloud Account | GetCyberRight",
+    metaDescription: "Learn about Apple and iCloud phishing scams. Spot fake Apple ID alerts, iCloud storage warnings, and App Store purchase notifications.",
+    keywords: ["apple scam", "icloud phishing", "apple id scam", "fake apple email", "apple support scam"],
+    cluster: "phishing-attacks",
+    overview: "Apple scams target the billions of iPhone, iPad, and Mac users worldwide. Scammers send fake Apple ID alerts, iCloud storage warnings, and App Store purchase notifications to steal Apple ID credentials, payment information, and personal data. Because Apple IDs are connected to payment methods, photos, contacts, and device management, compromising one account gives criminals extensive access to a victim's digital life.",
+    howItWorks: [
+      "Phishing emails mimic Apple's branding, warning about unauthorized purchases, iCloud storage limits, or account security issues.",
+      "Fake Apple support calls claim your iCloud account has been compromised and request your Apple ID credentials or remote access to your device.",
+      "Scam texts alert you to fake problems with your Apple ID, directing you to phishing websites that capture your login information.",
+      "Fake App Store refund emails lead to credential-harvesting websites designed to look identical to Apple's login page."
+    ],
+    warningSigns: [
+      "Emails from addresses that do not end in @apple.com",
+      "Messages about purchases you did not make requesting immediate action",
+      "Calls from Apple support that you did not initiate",
+      "Texts with shortened links about Apple ID problems",
+      "Pop-ups on websites claiming your iPhone has a virus",
+      "Requests for your Apple ID password or verification code"
+    ],
+    exampleMessages: [
+      { type: "Phishing Email", content: "Your Apple ID was used to sign in to iCloud on a new device. If this was not you, your account may be compromised. Verify your identity now to secure your account: [Sign In] If you do not respond within 24 hours, your account will be locked." },
+      { type: "Fake Text", content: "Apple Alert: Your iCloud storage is 99% full. Photos and documents will stop syncing. Upgrade your storage plan now: https://icloud-upgrade.info/manage" }
+    ],
+    preventionSteps: [
+      { title: "Go directly to Apple's website", description: "Never click links in emails or texts claiming to be from Apple. Instead, go directly to appleid.apple.com or open the Settings app on your device." },
+      { title: "Enable two-factor authentication", description: "Turn on two-factor authentication for your Apple ID. Never share the verification code with anyone, even someone claiming to be Apple support." },
+      { title: "Know how Apple communicates", description: "Apple will never call you about account problems unless you requested a call. They will never ask for your password or verification code." },
+      { title: "Report suspicious messages", description: "Forward suspicious emails to reportphishing@apple.com. Report suspicious calls to Apple and the FTC." }
+    ],
+    faq: [
+      { question: "How do I know if an Apple email is real?", answer: "Legitimate Apple emails come from @apple.com addresses, use your real name (not generic greetings), and never ask you to click a link to provide your password. Check your account directly through Settings or appleid.apple.com." },
+      { question: "Will Apple call me about my account?", answer: "Apple does not make unsolicited calls about account problems or suspicious activity. If you receive such a call, it is a scam. Apple Support can be reached at support.apple.com if you need help." },
+      { question: "What if someone has my Apple ID password?", answer: "Change your Apple ID password immediately at appleid.apple.com. Enable two-factor authentication, review your trusted devices, check for unauthorized purchases, and update your security questions." }
+    ],
+    relatedScams: ["phishing", "tech-support-scam", "smishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "google-scam",
+    title: "Google Account Scams: Phishing and Account Takeover",
+    metaTitle: "Google Scams: Protect Your Gmail & Google Account | GetCyberRight",
+    metaDescription: "Learn about Google account scams including Gmail phishing, fake security alerts, and Google Voice scams. Protect your Google account from takeover.",
+    keywords: ["google scam", "gmail phishing", "google account hack", "google voice scam", "fake google alert"],
+    cluster: "phishing-attacks",
+    overview: "Google account scams target the billions of people who use Gmail, Google Drive, YouTube, and other Google services. Because a Google account often serves as the central hub for email, cloud storage, photos, and account recovery for other services, compromising it gives criminals access to a victim's entire digital life. Scammers use sophisticated phishing, fake security alerts, and Google Voice verification scams.",
+    howItWorks: [
+      "Phishing emails mimic Google security alerts about unauthorized sign-ins or suspicious activity, directing victims to fake Google login pages.",
+      "Google Voice scams trick victims into sharing a Google Voice verification code, which the scammer uses to set up a Google Voice number linked to the victim's phone.",
+      "Fake Google Drive sharing notifications lead to phishing pages when clicked.",
+      "Calendar spam adds events to your Google Calendar with phishing links, exploiting the automatic event acceptance feature."
+    ],
+    warningSigns: [
+      "Security alert emails with links that do not go to accounts.google.com",
+      "Requests to share Google verification codes with strangers",
+      "Unexpected Google Drive sharing notifications from unknown people",
+      "Calendar events you did not create with suspicious links",
+      "Emails about Google accounts or services you do not use"
+    ],
+    exampleMessages: [
+      { type: "Fake Security Alert", content: "Someone just signed in to your Google Account from a new Windows device. If this was not you, someone else has access to your account. Review your account now: [Sign In to Review Activity]" },
+      { type: "Google Voice Scam", content: "Hi! I am responding to your listing on Craigslist. Before we meet, I just want to make sure you are a real person. I sent a Google verification code to your phone. Can you just read me that code so I know you are not a bot?" }
+    ],
+    preventionSteps: [
+      { title: "Use Google's Security Checkup", description: "Visit myaccount.google.com/security-checkup regularly to review your account security, connected devices, and third-party access." },
+      { title: "Enable Advanced Protection", description: "Google's Advanced Protection Program provides the strongest defense against phishing and account takeover. It requires a physical security key for sign-in." },
+      { title: "Never share verification codes", description: "Google verification codes are for your use only. No legitimate person or service will ask you to share a code sent to your phone." },
+      { title: "Check email sender addresses carefully", description: "Google security emails come from specific addresses like no-reply@accounts.google.com. Hover over links to verify they go to google.com before clicking." }
+    ],
+    faq: [
+      { question: "What is the Google Voice verification scam?", answer: "Scammers ask you to share a Google verification code, claiming it is to verify your identity. They actually use it to create a Google Voice number linked to your phone, which they then use for other scams." },
+      { question: "How do I know if a Google security email is real?", answer: "Legitimate Google emails come from @google.com or @accounts.google.com. You can also check recent security activity directly at myaccount.google.com/notifications without clicking any links in the email." },
+      { question: "What should I do if my Google account is compromised?", answer: "Go to myaccount.google.com immediately, change your password, review and remove unrecognized devices, revoke third-party access, enable two-factor authentication, and check for forwarding rules in Gmail settings." }
+    ],
+    relatedScams: ["phishing", "smishing", "identity-theft"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "microsoft-scam",
+    title: "Microsoft & Windows Scams: Fake Tech Support Alerts",
+    metaTitle: "Microsoft Scams: Spot Fake Windows Alerts & Support Scams | GetCyberRight",
+    metaDescription: "Protect yourself from Microsoft and Windows scams. Identify fake support calls, phishing emails, and fraudulent Windows security alerts.",
+    keywords: ["microsoft scam", "windows scam", "fake microsoft call", "windows virus alert", "microsoft support scam"],
+    cluster: "phishing-attacks",
+    overview: "Microsoft scams exploit the dominance of Windows as the world's most-used operating system. Criminals impersonate Microsoft through fake tech support calls, phishing emails about Microsoft 365 subscriptions, and fraudulent Windows security pop-ups. These scams aim to gain remote access to your computer, steal your credentials, or charge for unnecessary services. Microsoft never makes unsolicited calls about computer problems.",
+    howItWorks: [
+      "Cold calls from people claiming to be Microsoft support agents who have detected problems on your computer.",
+      "Pop-up alerts in your browser claiming Windows has detected critical errors, directing you to call a fake support number.",
+      "Phishing emails about Microsoft 365 subscription renewals or account security issues leading to credential-stealing websites.",
+      "Remote access scams where fake technicians ask you to install remote control software, then use it to steal data or install malware."
+    ],
+    warningSigns: [
+      "Unsolicited calls from Microsoft or Windows support",
+      "Pop-ups claiming your computer has critical errors with a phone number to call",
+      "Emails about Microsoft subscriptions you do not have",
+      "Requests to install remote access software like TeamViewer or AnyDesk",
+      "Technicians who claim to find many problems after accessing your computer"
+    ],
+    exampleMessages: [
+      { type: "Phone Call", content: "Hello, this is the Windows Technical Department. Our system has detected that your computer is sending error reports and may be infected with a dangerous virus. We need to connect to your computer remotely to diagnose and fix the problem before your data is compromised." },
+      { type: "Email", content: "Your Microsoft 365 subscription will expire today. Failure to renew will result in permanent loss of all emails, documents, and OneDrive files. Renew now for the discounted rate of $49.99: [Renew Subscription]" }
+    ],
+    preventionSteps: [
+      { title: "Know that Microsoft does not make unsolicited calls", description: "Microsoft will never call you about computer problems. If someone calls claiming to be from Microsoft, it is a scam. Hang up immediately." },
+      { title: "Close browser pop-ups without calling", description: "Use Task Manager (Ctrl+Alt+Delete) to force close your browser if a fake alert appears. Never call the phone number displayed in a pop-up." },
+      { title: "Never give remote access to unsolicited callers", description: "Do not install remote access software at the request of someone who called you. Legitimate tech support only connects remotely when you initiate the contact." },
+      { title: "Manage Microsoft subscriptions through your account", description: "Check your actual Microsoft subscriptions at account.microsoft.com. Do not rely on email notifications for subscription status." }
+    ],
+    faq: [
+      { question: "Does Microsoft monitor my computer for problems?", answer: "No. Microsoft does not monitor individual computers and will never call you about detected issues. Windows may show legitimate error messages, but these appear as system notifications, not browser pop-ups with phone numbers." },
+      { question: "What if I already gave a scammer remote access?", answer: "Disconnect from the internet immediately. Uninstall any remote access software they had you install. Run a full antivirus scan. Change all passwords from a different, secure device. Monitor financial accounts for unauthorized activity." },
+      { question: "How can I get real Microsoft support?", answer: "Visit support.microsoft.com for legitimate help. You can also use the Get Help app built into Windows. Microsoft support is available through official channels only." }
+    ],
+    relatedScams: ["tech-support-scam", "fake-antivirus-scam", "phishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "bank-scam",
+    title: "Bank Impersonation Scams: Fake Bank Calls and Texts",
+    metaTitle: "Bank Scams: Spot Fake Bank Calls, Texts & Emails | GetCyberRight",
+    metaDescription: "Protect yourself from bank impersonation scams. Learn to identify fake bank fraud alerts, phishing texts, and impersonation calls targeting your accounts.",
+    keywords: ["bank scam", "fake bank call", "bank phishing", "bank fraud alert scam", "bank impersonation"],
+    cluster: "online-scams",
+    overview: "Bank impersonation scams are among the most convincing fraud schemes because they exploit the trust people place in their financial institutions. Scammers use caller ID spoofing, sophisticated phishing emails, and fake fraud alert texts that closely mimic legitimate bank communications. They create urgency around supposed unauthorized transactions to trick victims into revealing account credentials, transferring funds, or providing personal information.",
+    howItWorks: [
+      "Scammers send fake fraud alert texts about suspicious transactions, then call pretending to be the bank's fraud department when you respond.",
+      "Caller ID spoofing makes the call appear to come from your bank's actual phone number, increasing credibility.",
+      "Fake bank representatives walk you through 'securing' your account, which actually involves authorizing transfers to the scammer's account.",
+      "Phishing emails about account locks, new statements, or security updates lead to convincing fake banking login pages."
+    ],
+    warningSigns: [
+      "Unsolicited calls or texts about suspicious account activity",
+      "Requests for your full account number, PIN, online banking password, or one-time codes",
+      "Instructions to transfer money to a 'safe account' to protect it from fraud",
+      "Caller asking you to verify information they should already have",
+      "Urgency and pressure to act immediately without time to think"
+    ],
+    exampleMessages: [
+      { type: "Fake Fraud Alert", content: "Chase Alert: We detected a $1,847.00 purchase at Target in Miami, FL. If this was not you, reply NO. A fraud specialist will call you shortly to secure your account." },
+      { type: "Phone Call Follow-Up", content: "Hello, this is the Chase fraud prevention team following up on the alert you received. We need to verify your identity to reverse the fraudulent charge. Can you please confirm the last four digits of your Social Security number and your online banking password?" }
+    ],
+    preventionSteps: [
+      { title: "Call your bank directly", description: "If you receive a suspicious fraud alert, hang up and call the number on the back of your debit or credit card. Do not use any phone number provided in the alert." },
+      { title: "Never share passwords or one-time codes", description: "Your bank will never ask for your online banking password, PIN, or one-time authentication codes. These are major red flags." },
+      { title: "Do not transfer money to protect it", description: "Banks never ask you to move money to a different account to keep it safe. Any such request is a scam." },
+      { title: "Set up legitimate bank alerts", description: "Enable real transaction alerts through your bank's official app or website so you can distinguish genuine notifications from scam attempts." }
+    ],
+    faq: [
+      { question: "How can scammers spoof my bank's phone number?", answer: "Caller ID spoofing technology allows scammers to display any phone number, including your bank's. This is why you should never trust caller ID alone. Always call your bank back using the number on your card." },
+      { question: "Will my bank really text me about fraud?", answer: "Many banks do send legitimate fraud alert texts. However, real bank alerts will never ask you to reply with personal information or click links. When in doubt, call your bank directly." },
+      { question: "What should I do if I gave a scammer my banking information?", answer: "Contact your bank immediately through their official number. Request to freeze or close compromised accounts. Change your online banking password. File reports with local police and the FTC." }
+    ],
+    relatedScams: ["phishing", "smishing", "vishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "government-impersonation-scam",
+    title: "Government Impersonation Scams: Fake Federal Agency Fraud",
+    metaTitle: "Government Impersonation Scams: Spot Fake Agency Contacts | GetCyberRight",
+    metaDescription: "Protect yourself from government impersonation scams. Learn how criminals pose as IRS, SSA, Medicare, and law enforcement to steal money and information.",
+    keywords: ["government impersonation scam", "fake government call", "ssa scam", "federal agency scam", "impersonation fraud"],
+    cluster: "online-scams",
+    overview: "Government impersonation scams involve criminals posing as officials from agencies like the IRS, Social Security Administration, Medicare, FBI, DEA, or local law enforcement. They use threats of arrest, benefit suspension, or legal action to intimidate victims into making immediate payments or sharing sensitive personal information. These scams are particularly effective against seniors and immigrants who may be less familiar with how government agencies actually communicate.",
+    howItWorks: [
+      "Callers claim to be from the Social Security Administration, stating your SSN has been linked to criminal activity and will be suspended unless you verify your identity.",
+      "Fake law enforcement officials threaten arrest for unpaid fines, missed jury duty, or alleged crimes, demanding immediate payment.",
+      "Scammers impersonating immigration officials threaten deportation or visa revocation unless fees are paid immediately.",
+      "Fake emails and letters mimic official government correspondence, complete with agency logos and case numbers."
+    ],
+    warningSigns: [
+      "Unsolicited calls from government agencies demanding immediate payment",
+      "Threats of arrest, deportation, or benefit suspension",
+      "Requests for payment via gift cards, wire transfer, or cryptocurrency",
+      "Caller provides a badge number or case number unsolicited",
+      "Pressure to stay on the phone and not contact anyone else",
+      "Claims that your Social Security number has been suspended"
+    ],
+    exampleMessages: [
+      { type: "SSA Impersonation Call", content: "This is Officer Williams from the Social Security Administration. Your Social Security number has been connected to suspicious activity and will be suspended immediately. To resolve this matter, you need to verify your identity and pay a $500 reactivation fee. We accept payment through Target or Walmart gift cards." },
+      { type: "Law Enforcement Impersonation", content: "This is Sergeant Johnson from the county sheriff's office. A warrant has been issued for your arrest due to failure to appear for jury duty. You can resolve this by paying the $750 fine immediately. If you do not pay today, officers will be sent to your home." }
+    ],
+    preventionSteps: [
+      { title: "Know how government agencies contact you", description: "The SSA, IRS, and other federal agencies primarily communicate by mail. They do not call to demand immediate payment, threaten arrest, or ask for payment by gift card." },
+      { title: "Your SSN cannot be suspended", description: "No government agency can suspend your Social Security number. This is not a real thing. Any call claiming otherwise is a scam." },
+      { title: "Hang up and call the agency directly", description: "If you receive a suspicious call from a government agency, hang up and call the agency using the number from their official website." },
+      { title: "Report government impersonation scams", description: "Report to the FTC at reportfraud.ftc.gov, the relevant agency's Office of Inspector General, and your local police department." }
+    ],
+    faq: [
+      { question: "Can the government suspend my Social Security number?", answer: "No. The Social Security Administration cannot suspend, revoke, or freeze your Social Security number. Any caller making this claim is a scammer." },
+      { question: "Will law enforcement call me about a warrant?", answer: "Legitimate law enforcement does not call to collect fines or resolve warrants over the phone, especially not through gift card payments. If you are concerned, contact your local police non-emergency line directly." },
+      { question: "How do I verify a government communication?", answer: "Look up the agency's contact information independently (not from the message you received) and call them directly. The SSA can be reached at 1-800-772-1213, the IRS at 1-800-829-1040." }
+    ],
+    relatedScams: ["irs-tax-scam", "medicare-scam", "vishing"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "ai-deepfake-scam",
+    title: "AI Deepfake Scams: When You Cannot Trust What You See",
+    metaTitle: "AI Deepfake Scams: Detect Fake Videos, Audio & Images | GetCyberRight",
+    metaDescription: "Learn about AI deepfake scams using fake videos, cloned voices, and generated images. Protect yourself from AI-powered fraud and manipulation.",
+    keywords: ["deepfake scam", "ai scam", "voice cloning scam", "deepfake fraud", "ai generated scam"],
+    cluster: "online-scams",
+    overview: "AI deepfake scams represent a new frontier in fraud, using artificial intelligence to create convincing fake videos, clone voices, and generate realistic images of real people. Scammers use these technologies to impersonate family members in emergency calls, create fake celebrity endorsements for fraudulent investments, manipulate video calls for business fraud, and produce fake compromising content for extortion. As AI technology becomes more accessible, these scams are rapidly increasing.",
+    howItWorks: [
+      "Voice cloning technology creates convincing replicas of family members' voices from short audio samples found on social media or voicemail, used to make fake emergency calls requesting money.",
+      "Deepfake videos of celebrities are used to promote fake investment platforms, cryptocurrency schemes, and fraudulent products.",
+      "AI-generated images create realistic but fake identity documents, profile photos, and product images for various scam operations.",
+      "Real-time deepfake technology can alter appearances during live video calls, enabling business email compromise and romance scams at unprecedented levels of sophistication."
+    ],
+    warningSigns: [
+      "Emergency calls from family members that sound slightly off or robotic",
+      "Celebrity endorsements for investment platforms on social media",
+      "Video calls where the person's lips do not perfectly match their speech",
+      "Unusual requests from people who sound like someone you know",
+      "Images that appear too perfect or have subtle visual artifacts",
+      "Skin that appears unnaturally smooth or lighting that seems inconsistent"
+    ],
+    exampleMessages: [
+      { type: "AI Voice Clone Call", content: "[In daughter's cloned voice]: Mom, I have been in a car accident and I am at the hospital. They say I need surgery but I do not have my insurance card. Can you send $5,000 right away? Please do not tell Dad, I do not want him to worry." },
+      { type: "Deepfake Celebrity Ad", content: "[Deepfake video of Elon Musk]: I am excited to announce a new cryptocurrency platform that uses my proprietary AI to guarantee 500% returns. I am personally investing $100 million. Visit the link below to get started with just $250." }
+    ],
+    preventionSteps: [
+      { title: "Establish a family code word", description: "Create a secret code word or phrase with family members that only you know. In an emergency call, ask for the code word to verify the caller's identity." },
+      { title: "Verify before acting", description: "If you receive an urgent call from a family member, hang up and call them back on their known number. If they are truly in trouble, they will answer." },
+      { title: "Be skeptical of celebrity endorsements", description: "No legitimate investment opportunity uses celebrity deepfakes for promotion. Verify any investment through official SEC databases and the celebrity's official channels." },
+      { title: "Learn to spot deepfake signs", description: "Look for unnatural blinking, inconsistent lighting, blurry edges around the face, lip sync issues, and artificial-looking skin textures in videos." },
+      { title: "Use the GetCyberRight Deepfake Detector", description: "Our AI-powered tools can help analyze suspicious audio and video content for signs of deepfake manipulation." }
+    ],
+    faq: [
+      { question: "How realistic are AI deepfakes now?", answer: "Modern deepfake technology can create highly convincing fake videos, images, and audio that are difficult for the human eye to detect. Voice cloning can replicate a person's voice from just a few seconds of sample audio." },
+      { question: "How can I protect my voice from being cloned?", answer: "Limit the amount of audio and video you share publicly on social media. Consider making your social media profiles private. Be aware that any audio of your voice, including voicemail greetings, could potentially be used for voice cloning." },
+      { question: "What is the family code word strategy?", answer: "Choose a memorable but uncommon word or phrase that only your family knows. In any emergency call requesting money or sensitive information, ask for the code word first. A real family member will know it; a deepfake cannot." }
+    ],
+    relatedScams: ["vishing", "investment-scam", "sextortion-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "qr-code-scam",
+    title: "QR Code Scams (Quishing): Malicious QR Code Attacks",
+    metaTitle: "QR Code Scams: Protect Against Malicious QR Codes | GetCyberRight",
+    metaDescription: "Learn about QR code scams (quishing). Identify malicious QR codes on parking meters, in emails, and on fake flyers before they steal your data.",
+    keywords: ["qr code scam", "quishing", "malicious qr code", "fake qr code", "qr code phishing"],
+    cluster: "phishing-attacks",
+    overview: "QR code scams, known as quishing, exploit the widespread adoption of QR codes for payments, menus, and information sharing. Criminals place malicious QR codes over legitimate ones on parking meters, restaurant tables, and public signage, or embed them in phishing emails and fake flyers. Scanning a malicious QR code can redirect you to phishing websites, trigger malware downloads, or initiate unauthorized payments.",
+    howItWorks: [
+      "Criminals place stickers with malicious QR codes over legitimate ones on parking meters, leading victims to fake payment sites that steal credit card information.",
+      "Phishing emails and letters contain QR codes that bypass email security filters, which cannot scan the content of QR code images.",
+      "Fake flyers and posters in public places advertise deals, contests, or Wi-Fi access through QR codes that lead to malicious websites.",
+      "QR codes on fake parking tickets, utility bills, and government notices direct victims to fraudulent payment portals."
+    ],
+    warningSigns: [
+      "QR codes that appear to be stickers placed over existing codes",
+      "QR codes in unexpected places or on unofficial-looking materials",
+      "QR codes in emails from unknown senders",
+      "Scanning a QR code that opens a website URL that does not match the expected organization",
+      "QR codes that immediately prompt you to download an app or file"
+    ],
+    exampleMessages: [
+      { type: "Fake Parking Meter", content: "[Sticker on parking meter]: Scan to pay for parking. Quick, contactless payment accepted. [QR code links to phishing site that steals credit card information]" },
+      { type: "Phishing Email", content: "Your package could not be delivered. Scan the QR code below to update your delivery address and reschedule. [QR code embedded in email to bypass text-based spam filters]" }
+    ],
+    preventionSteps: [
+      { title: "Preview QR code URLs before opening", description: "Most phone cameras show the URL preview before opening it. Check that the URL matches the expected organization before tapping to open." },
+      { title: "Look for tampered QR codes", description: "Before scanning QR codes in public places, check if the code appears to be a sticker placed over an original code. Tampered codes may have different textures or edges." },
+      { title: "Use your phone's built-in camera", description: "Use your phone's native camera app rather than third-party QR scanner apps, as the built-in camera provides better URL previews and security warnings." },
+      { title: "Be skeptical of QR codes in emails", description: "QR codes in emails are often used to bypass spam filters. If an email contains a QR code, it is likely more trustworthy to navigate to the company's website directly." },
+      { title: "Use the GetCyberRight Scam Checker", description: "Our scam checker tool can analyze QR code contents and URLs for known phishing indicators before you visit the link." }
+    ],
+    faq: [
+      { question: "Can scanning a QR code hack my phone?", answer: "Simply scanning a QR code is generally safe. The danger comes from what happens next: visiting a malicious website, downloading malware, or entering personal information. Always check the URL before proceeding." },
+      { question: "How do I check if a QR code is safe?", answer: "Preview the URL that the QR code links to before opening it. Verify the domain matches the expected organization. Use our Scam Checker tool to analyze suspicious URLs. Look for HTTPS and legitimate domain names." },
+      { question: "Why are QR code scams increasing?", answer: "QR code adoption surged during the pandemic. People are accustomed to scanning codes without thinking about security. Additionally, QR codes bypass email security filters that scan text-based phishing links." }
+    ],
+    relatedScams: ["phishing", "smishing", "delivery-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "elder-abuse-scam",
+    title: "Financial Elder Abuse: Protecting Seniors from Exploitation",
+    metaTitle: "Financial Elder Abuse: Protect Seniors from Scams | GetCyberRight",
+    metaDescription: "Learn about financial elder abuse and how to protect senior family members. Identify warning signs, prevention strategies, and reporting resources.",
+    keywords: ["elder abuse scam", "senior financial abuse", "elder fraud", "elderly scam", "financial exploitation seniors"],
+    cluster: "cyber-safety-seniors",
+    overview: "Financial elder abuse costs seniors billions of dollars annually and is committed by both strangers and trusted individuals, including family members, caregivers, and financial advisors. Seniors are targeted because they often have accumulated savings, may be isolated, and may have cognitive vulnerabilities that make them susceptible to manipulation. Protecting seniors requires awareness, open communication, and proactive safeguards.",
+    howItWorks: [
+      "Trusted individuals such as family members, caregivers, or financial advisors misuse their access to exploit an elder's finances through theft, coercion, or manipulation.",
+      "Scammers target seniors through phone calls, posing as grandchildren in trouble, government officials, or tech support representatives.",
+      "Power of attorney abuse occurs when appointed individuals use their authority for personal gain rather than the elder's benefit.",
+      "Romance scammers specifically target widowed or lonely seniors on social media and dating sites, building relationships before requesting money."
+    ],
+    warningSigns: [
+      "Unexplained withdrawals or transfers from bank accounts",
+      "New names added to bank accounts or property titles",
+      "Sudden changes to wills, trusts, or power of attorney documents",
+      "Unpaid bills despite having adequate income",
+      "Isolation from family and friends by a new caregiver or companion",
+      "Fear, anxiety, or reluctance to discuss financial matters",
+      "Missing personal belongings, cash, or valuables"
+    ],
+    exampleMessages: [
+      { type: "Caregiver Manipulation", content: "I am the only one who truly cares about you. Your children do not visit. Let me help manage your finances so you do not have to worry. I just need access to your checking account to pay your bills." },
+      { type: "Grandchild Impersonation", content: "Grandma, it is me. I got arrested and I need $5,000 for bail right now. Please do not tell Mom and Dad, they will be so disappointed in me. Can you go to Walmart and get money orders?" }
+    ],
+    preventionSteps: [
+      { title: "Stay connected with elderly family members", description: "Regular contact helps you notice changes in behavior, finances, or living situation. Isolation is a major risk factor for elder financial abuse." },
+      { title: "Set up account monitoring", description: "Help seniors set up bank alerts for large transactions, balance changes, and new payees. Consider joint account monitoring where appropriate." },
+      { title: "Discuss common scams openly", description: "Talk with elderly family members about common scams targeting seniors. Make it safe for them to ask questions about suspicious contacts without feeling embarrassed." },
+      { title: "Protect legal documents", description: "Keep copies of wills, trusts, and power of attorney documents. Ensure that the appointed agents are trustworthy and that appropriate oversight mechanisms are in place." },
+      { title: "Know the reporting resources", description: "Adult Protective Services (APS) is available in every state. The Elder Fraud Hotline at 1-833-FRAUD-11 provides help for seniors who have been victimized." }
+    ],
+    faq: [
+      { question: "How common is financial elder abuse?", answer: "Financial exploitation is the most common form of elder abuse. The National Council on Aging estimates that 1 in 10 Americans over 60 experience some form of elder abuse, with financial exploitation affecting millions each year." },
+      { question: "What should I do if I suspect elder financial abuse?", answer: "Contact Adult Protective Services (APS) in your state, report to local law enforcement, and call the Elder Fraud Hotline at 1-833-FRAUD-11. If the senior is in immediate danger, call 911." },
+      { question: "Can a power of attorney be revoked?", answer: "Yes, a competent adult can revoke power of attorney at any time. If the elder is no longer competent, a court can appoint a guardian or conservator and revoke the existing power of attorney if abuse is found." }
+    ],
+    relatedScams: ["grandparent-scam", "romance-scam", "medicare-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "travel-scam",
+    title: "Travel Scams: Fake Vacation Deals and Booking Fraud",
+    metaTitle: "Travel Scams: Spot Fake Vacation Deals & Booking Fraud | GetCyberRight",
+    metaDescription: "Learn about travel scams including fake vacation packages, fraudulent booking sites, and timeshare fraud. Protect your money when planning trips.",
+    keywords: ["travel scam", "fake vacation deal", "booking scam", "timeshare scam", "travel fraud"],
+    cluster: "online-scams",
+    overview: "Travel scams exploit vacation excitement by offering too-good-to-be-true deals on flights, hotels, vacation rentals, and tour packages. Scammers create fake booking websites, send phishing emails mimicking legitimate travel companies, and use high-pressure tactics to sell fraudulent vacation packages. Victims discover the fraud when they arrive at their destination to find their reservation does not exist.",
+    howItWorks: [
+      "Fake booking websites mimic legitimate travel platforms, collecting payment for reservations that do not exist.",
+      "Phishing emails offer exclusive travel deals that lead to credential-stealing websites.",
+      "Timeshare exit scams charge large upfront fees to help owners exit timeshare contracts, then deliver no results.",
+      "Free vacation offers require you to attend high-pressure sales presentations or pay hidden fees."
+    ],
+    warningSigns: [
+      "Travel deals significantly below market rates",
+      "Websites that closely mimic legitimate booking platforms",
+      "Pressure to book immediately before the price increases",
+      "Requests for payment via wire transfer or gift cards",
+      "Free vacation offers that require attending presentations or paying fees",
+      "No clear cancellation or refund policy"
+    ],
+    exampleMessages: [
+      { type: "Email", content: "FLASH SALE: 7-night all-inclusive Cancun resort package for just $299 per person! This exclusive deal expires in 24 hours. Book now with just a $99 deposit via wire transfer to lock in your rate." },
+      { type: "Phone Call", content: "Congratulations! You have been selected for a complimentary 3-night stay in Orlando. All you need to do is attend a brief 90-minute presentation and pay the $49 processing fee with a credit card." }
+    ],
+    preventionSteps: [
+      { title: "Book through reputable platforms", description: "Use well-known booking sites or contact hotels and airlines directly. Verify website URLs carefully, as scam sites often use similar domain names." },
+      { title: "Research properties independently", description: "Search for the property name and address separately from the booking platform. Read reviews on multiple sites. Check Google Maps street view." },
+      { title: "Pay with credit cards", description: "Credit cards offer purchase protection and chargeback options. Never pay for travel with wire transfers, gift cards, or cryptocurrency." },
+      { title: "Be skeptical of deeply discounted deals", description: "If a travel deal seems impossibly cheap, it probably is. Compare prices across multiple legitimate platforms to gauge fair market rates." }
+    ],
+    faq: [
+      { question: "How do I verify a vacation rental is real?", answer: "Cross-reference the listing on multiple platforms. Search for the property address independently. Read reviews on several sites. Use Google Maps to verify the location exists. Contact the property directly through independently verified contact information." },
+      { question: "Are free vacation offers legitimate?", answer: "Free vacation offers almost always come with strings attached, typically high-pressure timeshare presentations. The accommodations are usually substandard, and there may be hidden fees. It is rarely worth the time and stress." },
+      { question: "What should I do if I booked through a fake site?", answer: "Contact your credit card company to dispute the charge. File a complaint with the FTC and your state attorney general. Report the fake website to the legitimate company being impersonated." }
+    ],
+    relatedScams: ["shopping-scam", "phishing", "rental-scam"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "insurance-scam",
+    title: "Insurance Scams: Fake Policies and Fraudulent Claims",
+    metaTitle: "Insurance Scams: Spot Fake Policies & Insurance Fraud | GetCyberRight",
+    metaDescription: "Learn about insurance scams including fake policies, ghost brokers, and fraudulent claims. Protect yourself from insurance fraud schemes.",
+    keywords: ["insurance scam", "fake insurance", "ghost broker", "insurance fraud", "fake policy scam"],
+    cluster: "online-scams",
+    overview: "Insurance scams take many forms, from ghost brokers selling fake or doctored insurance policies at below-market prices to scammers posing as insurance agents to collect personal information. Victims may believe they have coverage until they need to file a claim, only to discover their policy is invalid. These scams target health insurance, auto insurance, homeowners insurance, and life insurance.",
+    howItWorks: [
+      "Ghost brokers sell fake or modified legitimate insurance policies at discounted prices, often targeting people who find standard rates unaffordable.",
+      "Scammers impersonate insurance companies to collect personal information, including Social Security numbers and bank details, during fake application processes.",
+      "Fraudulent insurance comparison websites collect your data and sell it to marketers or identity thieves rather than providing actual quotes.",
+      "After natural disasters, scammers pose as insurance adjusters or contractors, collecting fees for work they never perform."
+    ],
+    warningSigns: [
+      "Insurance prices significantly below market rates",
+      "Pressure to purchase immediately without time to review the policy",
+      "Agents who cannot provide a valid license number",
+      "Payment required only in cash, wire transfer, or prepaid cards",
+      "Policy documents with errors, misspellings, or inconsistent formatting",
+      "No way to verify the policy through the insurance company directly"
+    ],
+    exampleMessages: [
+      { type: "Social Media Ad", content: "Full coverage auto insurance for just $29/month! No credit check, no down payment. All drivers accepted. Call now for an instant quote. [Unlicensed ghost broker]" },
+      { type: "Post-Disaster Call", content: "Hello, I am an insurance adjuster sent by your insurance company to assess the storm damage. I can expedite your claim for a $500 processing fee. Cash or money order only." }
+    ],
+    preventionSteps: [
+      { title: "Verify the agent's license", description: "Check the insurance agent or broker's license through your state's Department of Insurance website. All legitimate agents must be licensed." },
+      { title: "Contact the insurance company directly", description: "Verify any policy by calling the insurance company's official number. Provide your policy number and confirm it is active and valid." },
+      { title: "Be wary of prices far below market rate", description: "If insurance prices seem too good to be true, the policy may be fake, modified, or from an unlicensed company." },
+      { title: "Review policy documents carefully", description: "Read the full policy before purchasing. Verify the insurance company's name, your coverage details, and contact information match legitimate records." }
+    ],
+    faq: [
+      { question: "What is a ghost broker?", answer: "A ghost broker is an unlicensed person who sells fake, modified, or fraudulently obtained insurance policies. They may take a real policy and alter the details, or create entirely fake documents. Victims believe they are insured until they need to file a claim." },
+      { question: "How do I check if my insurance is real?", answer: "Contact the insurance company directly using their official phone number (not one provided by the agent). Provide your policy number and verify your coverage details, effective dates, and premium amounts." },
+      { question: "What should I do after a natural disaster to avoid scams?", answer: "Only work with contractors and adjusters sent by your insurance company. Verify identities through your insurer. Never pay upfront fees for claims assistance. Document all damage with photos before any work begins." }
+    ],
+    relatedScams: ["government-impersonation-scam", "phishing", "identity-theft"],
+    lastUpdated: "2026-03-01"
+  },
+  {
+    slug: "moving-scam",
+    title: "Moving Scams: How to Avoid Fraudulent Moving Companies",
+    metaTitle: "Moving Scams: Spot Fake Movers & Avoid Moving Fraud | GetCyberRight",
+    metaDescription: "Protect yourself from moving scams. Learn to identify fraudulent moving companies, hostage loads, and bait-and-switch pricing before your move.",
+    keywords: ["moving scam", "fake moving company", "moving fraud", "hostage load scam", "rogue movers"],
+    cluster: "online-scams",
+    overview: "Moving scams target people during one of life's most stressful transitions. Rogue moving companies offer low estimates to win business, then dramatically increase prices once your belongings are loaded on the truck. Some hold possessions hostage until additional fees are paid. Others simply disappear with your belongings. Knowing how to vet moving companies and understand your rights can protect you from these devastating scams.",
+    howItWorks: [
+      "Movers provide extremely low initial estimates to win the contract, then significantly increase the price after loading your belongings.",
+      "Hostage load scams involve movers refusing to deliver your possessions until you pay substantially more than the agreed price.",
+      "Fly-by-night companies accept deposits, set a moving date, then never show up or answer calls.",
+      "Some scammers operate under constantly changing company names to avoid negative reviews and legal action."
+    ],
+    warningSigns: [
+      "Estimates significantly lower than other reputable companies",
+      "No in-person or virtual assessment of your belongings before quoting",
+      "Large deposit required before the move",
+      "Company has no physical address or uses a P.O. box only",
+      "No USDOT number for interstate moves",
+      "Cash-only payment requirements"
+    ],
+    exampleMessages: [
+      { type: "Online Quote", content: "2-bedroom apartment move from Chicago to New York: Only $999! Guaranteed lowest price. Book today with just a $200 deposit." },
+      { type: "Moving Day Surprise", content: "Due to the actual volume of items, your adjusted price is $4,500. We need payment before we can unload. If you do not pay, your items will go to storage and daily fees will apply." }
+    ],
+    preventionSteps: [
+      { title: "Get in-home estimates from multiple companies", description: "Legitimate movers provide estimates based on in-person or detailed video assessments. Phone or email-only estimates are unreliable and often used by scammers." },
+      { title: "Verify licensing and insurance", description: "For interstate moves, check the company's USDOT number at protectyourmove.gov. For local moves, verify state licensing." },
+      { title: "Read reviews and check complaints", description: "Check the BBB, Google Reviews, and FMCSA complaint history. Be cautious of companies with few reviews or only recent ones." },
+      { title: "Get everything in writing", description: "Ensure your estimate, terms, and final price are documented in a binding contract. Understand the difference between binding and non-binding estimates." }
+    ],
+    faq: [
+      { question: "How do I find a reputable moving company?", answer: "Get recommendations from friends, verify USDOT numbers at protectyourmove.gov, read reviews on multiple platforms, get at least three in-home estimates, and check BBB ratings. Avoid companies that only provide phone estimates." },
+      { question: "What should I do if movers are holding my belongings hostage?", answer: "File a complaint with the FMCSA (Federal Motor Carrier Safety Administration) for interstate moves. Contact your state attorney general for local moves. File a police report if theft is involved. Document everything." },
+      { question: "What are my rights during a move?", answer: "For interstate moves, the FMCSA requires movers to provide a written estimate, honor binding estimates, and deliver within agreed timelines. Your rights are detailed in the FMCSA's 'Your Rights and Responsibilities When You Move' booklet." }
+    ],
+    relatedScams: ["rental-scam", "shopping-scam", "wire-fraud-scam"],
+    lastUpdated: "2026-03-01"
+  },
 ];
 
 export function getScamBySlug(slug: string): ScamPageContent | undefined {

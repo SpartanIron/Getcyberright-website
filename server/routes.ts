@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
+import { getAllScamSlugs } from "@shared/scam-content";
 import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, inArray } from "drizzle-orm";
@@ -175,52 +176,58 @@ export async function registerRoutes(
       { path: '/', changefreq: 'daily', priority: '1.0' },
       { path: '/tools', changefreq: 'weekly', priority: '0.9' },
       { path: '/scam-checker', changefreq: 'weekly', priority: '0.9' },
-      { path: '/password-generator', changefreq: 'monthly', priority: '0.8' },
+      { path: '/password-generator', changefreq: 'monthly', priority: '0.9' },
       { path: '/data-removal', changefreq: 'weekly', priority: '0.9' },
+      { path: '/cyber-threat-radar', changefreq: 'daily', priority: '0.9' },
+      { path: '/awareness-hub', changefreq: 'weekly', priority: '0.9' },
+      { path: '/kids', changefreq: 'weekly', priority: '0.9' },
+      { path: '/seniors', changefreq: 'weekly', priority: '0.9' },
+      { path: '/parents', changefreq: 'weekly', priority: '0.9' },
+      { path: '/emergency-help', changefreq: 'monthly', priority: '0.9' },
       { path: '/breach-dashboard', changefreq: 'weekly', priority: '0.8' },
       { path: '/ai-prompts', changefreq: 'weekly', priority: '0.8' },
-      { path: '/ai-safety', changefreq: 'monthly', priority: '0.7' },
-      { path: '/cyber-hygiene', changefreq: 'monthly', priority: '0.7' },
+      { path: '/ai-safety', changefreq: 'weekly', priority: '0.8' },
       { path: '/training', changefreq: 'weekly', priority: '0.8' },
-      { path: '/news', changefreq: 'daily', priority: '0.7' },
-      { path: '/resources', changefreq: 'monthly', priority: '0.7' },
-      { path: '/checklists', changefreq: 'monthly', priority: '0.7' },
-      { path: '/printable-guides', changefreq: 'monthly', priority: '0.6' },
-      { path: '/kids', changefreq: 'monthly', priority: '0.8' },
-      { path: '/seniors', changefreq: 'monthly', priority: '0.8' },
-      { path: '/parents', changefreq: 'monthly', priority: '0.8' },
-      { path: '/parents/child-safety-scanner', changefreq: 'monthly', priority: '0.7' },
+      { path: '/resources', changefreq: 'weekly', priority: '0.8' },
+      { path: '/checklists', changefreq: 'weekly', priority: '0.8' },
+      { path: '/cyber-hygiene', changefreq: 'monthly', priority: '0.8' },
       { path: '/small-business', changefreq: 'monthly', priority: '0.8' },
       { path: '/educators', changefreq: 'monthly', priority: '0.8' },
-      { path: '/about', changefreq: 'monthly', priority: '0.6' },
-      { path: '/contact', changefreq: 'monthly', priority: '0.5' },
-      { path: '/faq', changefreq: 'monthly', priority: '0.7' },
-      { path: '/emergency-help', changefreq: 'monthly', priority: '0.8' },
-      { path: '/report-scam', changefreq: 'monthly', priority: '0.7' },
-      { path: '/travel-safety', changefreq: 'monthly', priority: '0.6' },
-      { path: '/quick-assessment', changefreq: 'monthly', priority: '0.6' },
-      { path: '/safety-score', changefreq: 'monthly', priority: '0.6' },
-      { path: '/search', changefreq: 'monthly', priority: '0.5' },
+      { path: '/about', changefreq: 'monthly', priority: '0.8' },
       { path: '/guides', changefreq: 'daily', priority: '0.8' },
       { path: '/alerts', changefreq: 'daily', priority: '0.8' },
       { path: '/scam-intel', changefreq: 'daily', priority: '0.8' },
-      { path: '/threat-trends', changefreq: 'daily', priority: '0.7' },
-      { path: '/our-mission', changefreq: 'monthly', priority: '0.5' },
-      { path: '/support-the-mission', changefreq: 'monthly', priority: '0.5' },
-      { path: '/privacy', changefreq: 'yearly', priority: '0.3' },
-      { path: '/terms', changefreq: 'yearly', priority: '0.3' },
-      { path: '/accessibility', changefreq: 'yearly', priority: '0.3' },
-      { path: '/security', changefreq: 'yearly', priority: '0.4' },
-      { path: '/feedback', changefreq: 'monthly', priority: '0.4' },
-      { path: '/support', changefreq: 'monthly', priority: '0.5' },
+      { path: '/threat-trends', changefreq: 'daily', priority: '0.8' },
+      { path: '/news', changefreq: 'daily', priority: '0.7' },
+      { path: '/printable-guides', changefreq: 'monthly', priority: '0.7' },
+      { path: '/report-scam', changefreq: 'monthly', priority: '0.7' },
+      { path: '/quick-assessment', changefreq: 'monthly', priority: '0.7' },
+      { path: '/safety-score', changefreq: 'monthly', priority: '0.7' },
+      { path: '/travel-safety', changefreq: 'monthly', priority: '0.7' },
+      { path: '/faq', changefreq: 'monthly', priority: '0.7' },
+      { path: '/parents/child-safety-scanner', changefreq: 'monthly', priority: '0.7' },
+      { path: '/resources/glossary', changefreq: 'monthly', priority: '0.7' },
+      { path: '/resources/cheat-sheets', changefreq: 'monthly', priority: '0.7' },
       { path: '/parent-guide', changefreq: 'monthly', priority: '0.6' },
+      { path: '/contact', changefreq: 'monthly', priority: '0.6' },
+      { path: '/pricing', changefreq: 'monthly', priority: '0.6' },
+      { path: '/support', changefreq: 'monthly', priority: '0.6' },
+      { path: '/support-the-mission', changefreq: 'monthly', priority: '0.6' },
+      { path: '/our-mission', changefreq: 'monthly', priority: '0.5' },
+      { path: '/search', changefreq: 'weekly', priority: '0.5' },
+      { path: '/feedback', changefreq: 'monthly', priority: '0.5' },
+      { path: '/security', changefreq: 'monthly', priority: '0.5' },
+      { path: '/privacy', changefreq: 'yearly', priority: '0.4' },
+      { path: '/terms', changefreq: 'yearly', priority: '0.4' },
+      { path: '/accessibility', changefreq: 'yearly', priority: '0.4' },
     ];
 
-    const scamSlugs = [
-      'paypal-scam', 'amazon-scam', 'facebook-scam', 'romance-scam', 'crypto-scam',
-      'tech-support-scam', 'phishing', 'instagram-scam', 'whatsapp-scam', 'job-scam',
-      'delivery-scam', 'zelle-scam', 'shopping-scam', 'grandparent-scam',
-      'social-media-scam', 'identity-theft', 'data-breach',
+    const scamSlugs = getAllScamSlugs();
+
+    const topicClusters = [
+      'identity-theft', 'online-scams', 'phishing-attacks', 'cyber-safety-seniors',
+      'cyber-safety-kids', 'password-security', 'privacy-protection', 'device-security',
+      'data-breaches', 'social-media-security',
     ];
 
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -232,6 +239,15 @@ export async function registerRoutes(
       xml += `    <lastmod>${today}</lastmod>\n`;
       xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
       xml += `    <priority>${page.priority}</priority>\n`;
+      xml += `  </url>\n`;
+    }
+
+    for (const cluster of topicClusters) {
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}/topics/${cluster}</loc>\n`;
+      xml += `    <lastmod>${today}</lastmod>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.8</priority>\n`;
       xml += `  </url>\n`;
     }
 

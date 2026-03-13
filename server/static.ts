@@ -2,6 +2,7 @@ import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { seoMiddleware } from "./seo-renderer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,16 @@ const KNOWN_CLIENT_ROUTES = new Set([
   "/login",
   "/register",
   "/forgot-password",
+  "/guides",
+  "/alerts",
+  "/scam-intel",
+  "/scam-checker",
+  "/password-generator",
+  "/breach-dashboard",
+  "/awareness-hub",
+  "/cyber-threat-radar",
+  "/small-business",
+  "/educators",
   "/admin",
   "/admin/users",
   "/admin/messages",
@@ -52,6 +63,11 @@ const KNOWN_CLIENT_ROUTES = new Set([
 
 const DYNAMIC_ROUTE_PREFIXES = [
   "/training/",
+  "/guides/",
+  "/alerts/",
+  "/scam-intel/",
+  "/scams/",
+  "/topics/",
 ];
 
 function isKnownRoute(url: string): boolean {
@@ -76,6 +92,8 @@ export function serveStatic(app: Express) {
   }
 
   app.use(express.static(distPath));
+
+  app.use(seoMiddleware());
 
   app.use("/{*path}", (req, res) => {
     const statusCode = isKnownRoute(req.path) ? 200 : 404;
