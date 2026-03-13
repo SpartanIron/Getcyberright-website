@@ -12,6 +12,7 @@ type ContentItem = CyberSafetyGuide | CyberThreatAlert | ScamIntelligence;
 
 interface SocialPostSet {
   linkedin: string;
+  facebook: string;
   xThread: string[];
   instagram: string;
   shortAlert: string;
@@ -43,10 +44,11 @@ Tags: ${tags.join(", ")}
 
 Create:
 1. LinkedIn post (200-300 words, professional tone, actionable insights, end with CTA)
-2. X/Twitter thread (3-5 tweets, each under 280 chars, first tweet hooks attention, last has CTA)
-3. Instagram caption (150-250 words, engaging visual storytelling tone, include line breaks for readability, end with CTA and hashtags section)
-4. Short alert message (under 160 chars, urgent/informative, for email/SMS)
-5. 5-8 relevant hashtags
+2. Facebook post (100-200 words, conversational and warm tone, ask a question to encourage comments, include CTA)
+3. X/Twitter thread (3-5 tweets, each under 280 chars, first tweet hooks attention, last has CTA)
+4. Instagram caption (150-250 words, engaging visual storytelling tone, include line breaks for readability, end with CTA and hashtags section)
+5. Short alert message (under 160 chars, urgent/informative, for email/SMS)
+6. 5-8 relevant hashtags
 
 Rules:
 - Do NOT use em dashes
@@ -59,6 +61,7 @@ Rules:
 Format as JSON:
 {
   "linkedin": "Full LinkedIn post text",
+  "facebook": "Full Facebook post text",
   "xThread": ["Tweet 1", "Tweet 2", "Tweet 3"],
   "instagram": "Full Instagram caption text",
   "shortAlert": "Short alert message",
@@ -107,6 +110,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 
   const platforms: { platform: string; content: string }[] = [
     { platform: "linkedin", content: posts.linkedin },
+    { platform: "facebook", content: posts.facebook || posts.linkedin },
     { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
@@ -150,6 +154,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
 
   const platforms: { platform: string; content: string }[] = [
     { platform: "linkedin", content: posts.linkedin },
+    { platform: "facebook", content: posts.facebook || posts.linkedin },
     { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
@@ -193,6 +198,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
 
   const platforms: { platform: string; content: string }[] = [
     { platform: "linkedin", content: posts.linkedin },
+    { platform: "facebook", content: posts.facebook || posts.linkedin },
     { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },

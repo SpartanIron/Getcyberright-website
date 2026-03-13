@@ -1,7 +1,28 @@
 import { storage } from "./storage";
+import * as path from "path";
+import * as fs from "fs";
 
 const BUFFER_GRAPHQL_URL = "https://api.buffer.com/graphql";
 const BUFFER_ORG_ID = "69b48dd8282d615a79db2ab3";
+
+function getPublicImageUrl(localImagePath: string): string | null {
+  if (!localImagePath) return null;
+
+  const filename = path.basename(localImagePath);
+
+  const baseUrl = process.env.PUBLIC_IMAGE_BASE_URL;
+  if (baseUrl) {
+    return `${baseUrl}/api/social-images/${filename}`;
+  }
+
+  const replitDomains = process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN;
+  if (replitDomains) {
+    const domain = replitDomains.split(",")[0].trim();
+    return `https://${domain}/api/social-images/${filename}`;
+  }
+
+  return null;
+}
 
 interface BufferChannel {
   id: string;
@@ -96,10 +117,30 @@ export async function createBufferPost(
   options: {
     mode?: "addToQueue" | "shareNow" | "shareNext" | "customScheduled" | "recommendedTime";
     dueAt?: string;
+    imageUrl?: string;
   } = {}
 ): Promise<BufferPublishResult> {
   try {
     const mode = options.mode || "addToQueue";
+
+    const input: Record<string, any> = {
+      channelId,
+      text,
+      mode,
+      schedulingType: "automatic",
+      source: "getcyberright",
+    };
+
+    if (options.dueAt) {
+      input.dueAt = options.dueAt;
+    }
+
+    if (options.imageUrl) {
+      input.assets = {
+        images: [{ url: options.imageUrl }],
+      };
+      console.log(`[Buffer] Attaching image: ${options.imageUrl}`);
+    }
 
     const data = await graphql<{ createPost: any }>(
       `mutation CreatePost($input: CreatePostInput!) {
@@ -115,16 +156,7 @@ export async function createBufferPost(
           ... on RestProxyError { message }
         }
       }`,
-      {
-        input: {
-          channelId,
-          text,
-          mode,
-          schedulingType: "automatic",
-          source: "getcyberright",
-          ...(options.dueAt ? { dueAt: options.dueAt } : {}),
-        },
-      }
+      { input }
     );
 
     const result = data.createPost;
@@ -180,8 +212,43 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     };
   }
 
+  let imageUrl: string | undefined;
+  if (post.imageUrl) {
+    if (fs.existsSync(post.imageUrl)) {
+      const publicUrl = getPublicImageUrl(post.imageUrl);
+      if (publicUrl) {
+        imageUrl = publicUrl;
+      } else {
+        console.warn(`[Buffer] Could not resolve public URL for image: ${post.imageUrl}`);
+      }
+    } else {
+      console.warn(`[Buffer] Image file not found: ${post.imageUrl}, generating new one`);
+      const { generateBrandedImage } = await import("./socialImageService");
+      const newImagePath = await generateBrandedImage(post.contentTitle, post.contentType, post.platform);
+      if (newImagePath) {
+        await storage.updateSocialPost(postId, { imageUrl: newImagePath });
+        const publicUrl = getPublicImageUrl(newImagePath);
+        if (publicUrl) {
+          imageUrl = publicUrl;
+        }
+      }
+    }
+  } else {
+    const { generateBrandedImage } = await import("./socialImageService");
+    const newImagePath = await generateBrandedImage(post.contentTitle, post.contentType, post.platform);
+    if (newImagePath) {
+      await storage.updateSocialPost(postId, { imageUrl: newImagePath });
+      const publicUrl = getPublicImageUrl(newImagePath);
+      if (publicUrl) {
+        imageUrl = publicUrl;
+        console.log(`[Buffer] Generated new image for ${post.platform}: ${imageUrl}`);
+      }
+    }
+  }
+
   const result = await createBufferPost(channel.id, post.postContent, {
     mode: "addToQueue",
+    imageUrl,
   });
 
   if (result.success) {
