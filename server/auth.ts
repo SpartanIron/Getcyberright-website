@@ -852,7 +852,7 @@ export async function seedAdminUser(): Promise<void> {
 
   try {
     const targetEmail = "judekwekuannan@gmail.com";
-    const passwordHash = await bcrypt.hash("T9D3L7X2kA8wR5Qs", 12);
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
 
     // Ensure the target admin account exists, is unlocked, and password is synced
     const existing = await db.select().from(users).where(eq(users.email, targetEmail));
