@@ -37,9 +37,9 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { name: "LinkedIn", icon: SiLinkedin, href: "https://www.linkedin.com/company/getcyberright" },
-  { name: "Facebook", icon: SiFacebook, href: "https://www.facebook.com/getcyberright" },
-  { name: "YouTube", icon: SiYoutube, href: "https://www.youtube.com/@getcyberright" },
+  { name: "LinkedIn", icon: SiLinkedin, href: "https://www.linkedin.com/company/getcyberright", color: "text-[#0A66C2]", hoverBg: "hover:bg-[#0A66C2]" },
+  { name: "Facebook", icon: SiFacebook, href: "https://www.facebook.com/getcyberright", color: "text-[#1877F2]", hoverBg: "hover:bg-[#1877F2]" },
+  { name: "YouTube", icon: SiYoutube, href: "https://www.youtube.com/@getcyberright", color: "text-[#FF0000]", hoverBg: "hover:bg-[#FF0000]" },
 ];
 
 export function Footer() {
@@ -62,7 +62,7 @@ export function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-md bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                  className={`w-8 h-8 rounded-md bg-slate-800 flex items-center justify-center ${social.color} hover:text-white ${social.hoverBg} transition-colors`}
                   aria-label={social.name}
                   data-testid={`social-link-${social.name.toLowerCase()}`}
                 >
