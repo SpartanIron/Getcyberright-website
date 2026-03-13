@@ -17,8 +17,29 @@ export class ThumbnailService {
     return ThumbnailService.instance;
   }
 
+  private isInternalUrl(urlString: string): boolean {
+    try {
+      const parsed = new URL(urlString);
+      const hostname = parsed.hostname.toLowerCase();
+      if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname === '0.0.0.0') return true;
+      if (hostname.endsWith('.local') || hostname.endsWith('.internal')) return true;
+      if (/^10\./.test(hostname)) return true;
+      if (/^172\.(1[6-9]|2\d|3[01])\./.test(hostname)) return true;
+      if (/^192\.168\./.test(hostname)) return true;
+      if (/^169\.254\./.test(hostname)) return true;
+      if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return true;
+      if (parsed.port && !['80', '443', ''].includes(parsed.port)) return true;
+      return false;
+    } catch {
+      return true;
+    }
+  }
+
   async fetchThumbnail(url: string): Promise<ThumbnailResult> {
-    // Check cache first
+    if (this.isInternalUrl(url)) {
+      return { imageUrl: null, title: null, description: null };
+    }
+
     if (this.cache.has(url)) {
       return this.cache.get(url)!;
     }
@@ -28,8 +49,16 @@ export class ThumbnailService {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; GetCyberRight/1.0; +https://getcyberright.com)',
         },
-        signal: AbortSignal.timeout(10000) // 10 second timeout
+        signal: AbortSignal.timeout(10000),
+        redirect: 'manual'
       });
+
+      if (response.status >= 300 && response.status < 400) {
+        const redirectUrl = response.headers.get('location');
+        if (redirectUrl && this.isInternalUrl(redirectUrl)) {
+          return { imageUrl: null, title: null, description: null };
+        }
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);

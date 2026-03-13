@@ -32,9 +32,9 @@ function generateToken(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
-// Generate 6-digit OTP code
+// Generate 6-digit OTP code using cryptographically secure random
 function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 999999).toString();
 }
 
 // Authentication middleware
@@ -264,7 +264,12 @@ export function registerAuthRoutes(app: Express) {
         if (!verified) {
           // Check backup codes
           const backupCodes = user.mfaBackupCodes ? JSON.parse(user.mfaBackupCodes) : [];
-          const codeIndex = backupCodes.indexOf(validatedData.mfaCode);
+          const codeIndex = backupCodes.findIndex((c: string) => {
+            try {
+              return c.length === validatedData.mfaCode.length &&
+                crypto.timingSafeEqual(Buffer.from(c, 'utf8'), Buffer.from(validatedData.mfaCode, 'utf8'));
+            } catch { return false; }
+          });
           
           if (codeIndex === -1) {
             await incrementFailedAttempts(user.id);
@@ -292,32 +297,39 @@ export function registerAuthRoutes(app: Express) {
         updatedAt: new Date()
       }).where(eq(users.id, user.id));
       
-      // Create session
-      req.session.userId = user.id;
-      req.session.mfaPending = false;
-      req.session.tempUserId = undefined;
-      
-      // Explicitly save session before responding
-      req.session.save((err) => {
-        if (err) {
-          console.error("Session save error:", err);
+      // Regenerate session to prevent session fixation attacks
+      const oldSession = { ...req.session };
+      req.session.regenerate((regenerateErr) => {
+        if (regenerateErr) {
+          console.error("Session regeneration error:", regenerateErr);
           return res.status(500).json({ error: "Login failed" });
         }
-        
-        securityLogger.info("Successful login", { userId: user.id, ip: clientIp });
-        
-        res.json({ 
-          success: true,
-          user: {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            mfaEnabled: user.mfaEnabled,
-            mustChangePassword: user.mustChangePassword,
-            subscriptionTier: user.subscriptionTier,
-            isAdmin: user.isAdmin
+
+        req.session.userId = user.id;
+        req.session.mfaPending = false;
+        req.session.tempUserId = undefined;
+
+        req.session.save((err) => {
+          if (err) {
+            console.error("Session save error:", err);
+            return res.status(500).json({ error: "Login failed" });
           }
+          
+          securityLogger.info("Successful login", { userId: user.id, ip: clientIp });
+          
+          res.json({ 
+            success: true,
+            user: {
+              id: user.id,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              mfaEnabled: user.mfaEnabled,
+              mustChangePassword: user.mustChangePassword,
+              subscriptionTier: user.subscriptionTier,
+              isAdmin: user.isAdmin
+            }
+          });
         });
       });
     } catch (error) {
@@ -353,13 +365,18 @@ export function registerAuthRoutes(app: Express) {
       });
       
       if (!verified) {
-        // Check backup codes
+        // Check backup codes with timing-safe comparison
         const backupCodes = user.mfaBackupCodes ? JSON.parse(user.mfaBackupCodes) : [];
-        const codeIndex = backupCodes.indexOf(code);
+        const codeIndex = backupCodes.findIndex((c: string) => {
+          try {
+            return c.length === code.length &&
+              crypto.timingSafeEqual(Buffer.from(c, 'utf8'), Buffer.from(code, 'utf8'));
+          } catch { return false; }
+        });
         
         if (codeIndex === -1) {
           await incrementFailedAttempts(user.id);
-          failedLoginTracker.recordFailedAttempt(clientIp, user.email); // Track MFA failures
+          failedLoginTracker.recordFailedAttempt(clientIp, user.email);
           return res.status(401).json({ error: "Invalid authentication code" });
         }
         
@@ -372,30 +389,45 @@ export function registerAuthRoutes(app: Express) {
       
       // Complete login
       await resetFailedAttempts(user.id);
-      failedLoginTracker.recordSuccessfulLogin(clientIp); // Clear IP-based tracking
+      failedLoginTracker.recordSuccessfulLogin(clientIp);
       await db.update(users).set({
         lastLoginAt: new Date(),
         lastLoginIp: clientIp
       }).where(eq(users.id, user.id));
       
-      req.session.userId = user.id;
-      req.session.mfaPending = false;
-      req.session.tempUserId = undefined;
-      
-      securityLogger.info("MFA verification successful", { userId: user.id });
-      
-      res.json({ 
-        success: true,
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          mfaEnabled: user.mfaEnabled,
-          mustChangePassword: user.mustChangePassword,
-          subscriptionTier: user.subscriptionTier,
-          isAdmin: user.isAdmin
+      // Regenerate session to prevent session fixation attacks
+      req.session.regenerate((regenerateErr) => {
+        if (regenerateErr) {
+          console.error("Session regeneration error:", regenerateErr);
+          return res.status(500).json({ error: "Verification failed" });
         }
+
+        req.session.userId = user.id;
+        req.session.mfaPending = false;
+        req.session.tempUserId = undefined;
+
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error("Session save error:", saveErr);
+            return res.status(500).json({ error: "Verification failed" });
+          }
+          
+          securityLogger.info("MFA verification successful", { userId: user.id });
+          
+          res.json({ 
+            success: true,
+            user: {
+              id: user.id,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              mfaEnabled: user.mfaEnabled,
+              mustChangePassword: user.mustChangePassword,
+              subscriptionTier: user.subscriptionTier,
+              isAdmin: user.isAdmin
+            }
+          });
+        });
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -497,8 +529,14 @@ export function registerAuthRoutes(app: Express) {
         return res.status(400).json({ error: "Code has expired. Please request a new one." });
       }
       
-      // Verify code
-      if (user.passwordResetToken !== code) {
+      // Verify code with timing-safe comparison
+      try {
+        const tokenBuffer = Buffer.from(user.passwordResetToken, 'utf8');
+        const codeBuffer = Buffer.from(String(code), 'utf8');
+        if (tokenBuffer.length !== codeBuffer.length || !crypto.timingSafeEqual(tokenBuffer, codeBuffer)) {
+          return res.status(400).json({ error: "Invalid code" });
+        }
+      } catch {
         return res.status(400).json({ error: "Invalid code" });
       }
       

@@ -1324,7 +1324,7 @@ EDGE CASE HANDLING
   });
 
   // Record an activity (scan, lesson, etc.) and award points
-  app.post("/api/gamification/record-activity", isAuthenticated, async (req: any, res) => {
+  app.post("/api/gamification/record-activity", standardRateLimit, isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -1395,7 +1395,7 @@ EDGE CASE HANDLING
   // =====================================================
 
   // Save a family codeword (requires Essential tier or higher)
-  app.post("/api/codeword/save", isAuthenticated, async (req: any, res) => {
+  app.post("/api/codeword/save", standardRateLimit, isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       const userTier = req.user?.subscriptionTier || "free";
@@ -2383,7 +2383,7 @@ EDGE CASE HANDLING
   });
 
   // Mark lesson as complete
-  app.post("/api/training/lessons/:lessonId/complete", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/training/lessons/:lessonId/complete", standardRateLimit, isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = (req as any).user.id;
       const lessonId = req.params.lessonId as string;
@@ -2481,7 +2481,7 @@ EDGE CASE HANDLING
   });
 
   // Submit quiz answers
-  app.post("/api/training/quizzes/:quizId/submit", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/training/quizzes/:quizId/submit", standardRateLimit, isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = (req as any).user.id;
       const quizId = req.params.quizId as string;
@@ -2592,7 +2592,7 @@ EDGE CASE HANDLING
   });
 
   // Generate certificate for completed path
-  app.post("/api/training/paths/:pathId/certificate", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/training/paths/:pathId/certificate", strictRateLimit, isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = (req as any).user.id;
       const pathId = req.params.pathId as string;
@@ -2807,22 +2807,22 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/vault", isAuthenticated, async (req: any, res: Response) => {
+  app.post("/api/data-removal/vault", standardRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
-      const sanitized = { ...req.body };
-      const arrayFields = ["previousNames", "emails", "phoneNumbers", "previousAddresses", "relativeNames", "employerNames"];
-      for (const field of arrayFields) {
-        if (sanitized[field]) {
-          sanitized[field] = sanitized[field].filter((v: string) => v && v.trim().length > 0);
-          if (sanitized[field].length === 0) delete sanitized[field];
+      const allowedArrayFields = ["previousNames", "emails", "phoneNumbers", "previousAddresses", "relativeNames", "employerNames"] as const;
+      const allowedStringFields = ["fullName", "currentAddress", "dateOfBirth"] as const;
+      const sanitized: Record<string, any> = {};
+      for (const field of allowedArrayFields) {
+        if (Array.isArray(req.body[field])) {
+          const filtered = req.body[field].filter((v: any) => typeof v === "string" && v.trim().length > 0);
+          if (filtered.length > 0) sanitized[field] = filtered;
         }
       }
-      const stringFields = ["fullName", "currentAddress", "dateOfBirth"];
-      for (const field of stringFields) {
-        if (sanitized[field] && typeof sanitized[field] === "string") {
-          sanitized[field] = sanitized[field].trim();
-          if (sanitized[field].length === 0) delete sanitized[field];
+      for (const field of allowedStringFields) {
+        if (req.body[field] && typeof req.body[field] === "string") {
+          const trimmed = req.body[field].trim();
+          if (trimmed.length > 0) sanitized[field] = trimmed;
         }
       }
       const retentionDays = 365;
@@ -2850,7 +2850,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/vault/family", isAuthenticated, async (req: any, res: Response) => {
+  app.post("/api/data-removal/vault/family", standardRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const { profileName, fullName, emails, phoneNumbers, currentAddress } = req.body;
       if (!profileName) {
@@ -2870,7 +2870,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.delete("/api/data-removal/vault/family/:id", isAuthenticated, async (req: any, res: Response) => {
+  app.delete("/api/data-removal/vault/family/:id", standardRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const profileId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const result = await deleteFamilyProfile(req.user.id, profileId);
@@ -2881,7 +2881,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/scan", isAuthenticated, async (req: any, res: Response) => {
+  app.post("/api/data-removal/scan", strictRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { vaultProfileId } = req.body;
@@ -2980,7 +2980,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/:id/auto-send", isAuthenticated, async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/:id/auto-send", standardRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const requestId = req.params.id;
@@ -2993,7 +2993,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/bulk-auto-send", isAuthenticated, async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/bulk-auto-send", strictRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { requestIds } = req.body;
@@ -3013,7 +3013,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/requests/bulk-create-and-send", isAuthenticated, async (req: any, res: Response) => {
+  app.post("/api/data-removal/requests/bulk-create-and-send", strictRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { findings, vaultProfileId } = req.body;
@@ -3079,7 +3079,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/monitoring", isAuthenticated, async (req: any, res: Response) => {
+  app.post("/api/data-removal/monitoring", standardRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const { vaultProfileId, frequencyDays, autoReRemoval, notifyOnNewExposure, notifyOnReAppearance, notifyOnComplianceDeadline, monitoringMode, darkWebMonitoring } = req.body;
@@ -3112,7 +3112,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/monitoring/run", isAuthenticated, async (req: any, res: Response) => {
+  app.post("/api/data-removal/monitoring/run", strictRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const result = await runMonitoringScan(req.user.id);
       res.json(result);
@@ -3122,7 +3122,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/data-removal/report", isAuthenticated, async (req: any, res: Response) => {
+  app.post("/api/data-removal/report", standardRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const report = await generatePrivacyReport(user.id);

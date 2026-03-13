@@ -29,6 +29,27 @@ import {
   processPendingTasks,
   getOrchestratorDashboard,
 } from "./growthOrchestrator";
+import { z } from "zod";
+
+const guideUpdateSchema = insertCyberSafetyGuideSchema.partial();
+const scamIntelUpdateSchema = insertScamIntelligenceSchema.partial();
+const threatAlertUpdateSchema = insertCyberThreatAlertSchema.partial();
+
+const socialPostUpdateSchema = z.object({
+  status: z.enum(["draft", "scheduled", "published", "failed"]).optional(),
+  scheduledFor: z.string().datetime().nullable().optional(),
+}).strict();
+
+const scheduleTaskSchema = z.object({
+  taskType: z.string().min(1).max(100),
+  taskName: z.string().min(1).max(200),
+  payload: z.record(z.unknown()).optional(),
+  priority: z.number().int().min(0).max(10).optional(),
+});
+
+const processTasksSchema = z.object({
+  batchSize: z.number().int().min(1).max(20).optional(),
+});
 
 export function registerPlatformRoutes(app: Express): void {
 
@@ -145,10 +166,12 @@ export function registerPlatformRoutes(app: Express): void {
 
   app.patch("/api/admin/guides/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
     try {
-      const guide = await storage.updateGuide(req.params.id, req.body);
+      const validated = guideUpdateSchema.parse(req.body);
+      const guide = await storage.updateGuide(req.params.id, validated);
       if (!guide) return res.status(404).json({ error: "Guide not found" });
       res.json(guide);
     } catch (error: any) {
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
       res.status(400).json({ error: error.message || "Failed to update guide" });
     }
   });
@@ -202,10 +225,12 @@ export function registerPlatformRoutes(app: Express): void {
 
   app.patch("/api/admin/scam-intel/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
     try {
-      const scam = await storage.updateScamIntel(req.params.id, req.body);
+      const validated = scamIntelUpdateSchema.parse(req.body);
+      const scam = await storage.updateScamIntel(req.params.id, validated);
       if (!scam) return res.status(404).json({ error: "Scam intel not found" });
       res.json(scam);
     } catch (error: any) {
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
       res.status(400).json({ error: error.message || "Failed to update scam intel" });
     }
   });
@@ -258,10 +283,12 @@ export function registerPlatformRoutes(app: Express): void {
 
   app.patch("/api/admin/threat-alerts/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
     try {
-      const alert = await storage.updateThreatAlert(req.params.id, req.body);
+      const validated = threatAlertUpdateSchema.parse(req.body);
+      const alert = await storage.updateThreatAlert(req.params.id, validated);
       if (!alert) return res.status(404).json({ error: "Alert not found" });
       res.json(alert);
     } catch (error: any) {
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
       res.status(400).json({ error: error.message || "Failed to update alert" });
     }
   });
@@ -306,10 +333,12 @@ export function registerPlatformRoutes(app: Express): void {
 
   app.patch("/api/admin/social-posts/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
     try {
-      const post = await storage.updateSocialPost(req.params.id, req.body);
+      const validated = socialPostUpdateSchema.parse(req.body);
+      const post = await storage.updateSocialPost(req.params.id, validated);
       if (!post) return res.status(404).json({ error: "Social post not found" });
       res.json(post);
     } catch (error: any) {
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
       res.status(400).json({ error: error.message || "Failed to update social post" });
     }
   });
@@ -318,7 +347,11 @@ export function registerPlatformRoutes(app: Express): void {
 
   app.post("/api/admin/content-automation/generate", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
     try {
-      const { keyword, cluster } = req.body;
+      const generateSchema = z.object({
+        keyword: z.string().min(1).max(200).optional(),
+        cluster: z.string().min(1).max(200).optional(),
+      });
+      const { keyword, cluster } = generateSchema.parse(req.body);
       if (keyword && cluster) {
         const id = await generateGuideDraft(keyword, cluster);
         if (!id) return res.status(400).json({ error: "Failed to generate guide" });
@@ -403,21 +436,19 @@ export function registerPlatformRoutes(app: Express): void {
 
   app.post("/api/admin/growth/schedule-task", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
     try {
-      const { taskType, taskName, payload, priority } = req.body;
-      if (!taskType || !taskName) {
-        return res.status(400).json({ error: "taskType and taskName are required" });
-      }
+      const { taskType, taskName, payload, priority } = scheduleTaskSchema.parse(req.body);
       const taskId = await scheduleTask(taskType, taskName, payload, undefined, priority);
       res.json({ taskId });
     } catch (error: any) {
+      if (error instanceof z.ZodError) return res.status(400).json({ error: "Validation failed", details: error.errors });
       res.status(500).json({ error: error.message || "Failed to schedule task" });
     }
   });
 
   app.post("/api/admin/growth/process-tasks", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
     try {
-      const batchSize = req.body.batchSize || 5;
-      const completed = await processPendingTasks(batchSize);
+      const { batchSize } = processTasksSchema.parse(req.body);
+      const completed = await processPendingTasks(batchSize || 5);
       res.json({ completed });
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to process tasks" });
