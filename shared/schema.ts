@@ -1179,6 +1179,195 @@ export const insertUserFeedbackSchema = createInsertSchema(userFeedback).omit({
 export type UserFeedback = typeof userFeedback.$inferSelect;
 export type InsertUserFeedback = z.infer<typeof insertUserFeedbackSchema>;
 
+// Cyber Safety Guides - Database-driven article publishing engine
+export const cyberSafetyGuides = pgTable("cyber_safety_guides", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  title: text("title").notNull(),
+  metaDescription: text("meta_description").notNull(),
+  content: text("content").notNull(),
+  headings: jsonb("headings").$type<{ level: number; text: string; id: string }[]>().default([]),
+  tableOfContents: jsonb("table_of_contents").$type<{ text: string; anchor: string; level: number }[]>().default([]),
+  faq: jsonb("faq").$type<{ question: string; answer: string }[]>().default([]),
+  category: text("category").notNull(),
+  tags: text("tags").array().default([]),
+  targetKeywords: text("target_keywords").array().default([]),
+  cluster: text("cluster"),
+  wordCount: integer("word_count").default(0),
+  readingTimeMinutes: integer("reading_time_minutes").default(0),
+  status: text("status").notNull().default("draft"),
+  publishedAt: timestamp("published_at"),
+  authorName: text("author_name").default("GetCyberRight Team"),
+  featuredImage: text("featured_image"),
+  relatedGuideIds: text("related_guide_ids").array().default([]),
+  relatedScamSlugs: text("related_scam_slugs").array().default([]),
+  relatedToolPaths: text("related_tool_paths").array().default([]),
+  seoScore: integer("seo_score").default(0),
+  generatedByAi: boolean("generated_by_ai").default(false),
+  aiModel: text("ai_model"),
+  lastAiReviewAt: timestamp("last_ai_review_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertCyberSafetyGuideSchema = createInsertSchema(cyberSafetyGuides).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true,
+  seoScore: true,
+});
+
+export type CyberSafetyGuide = typeof cyberSafetyGuides.$inferSelect;
+export type InsertCyberSafetyGuide = z.infer<typeof insertCyberSafetyGuideSchema>;
+
+// Scam Intelligence - Enhanced scam database for auto-generated pages
+export const scamIntelligence = pgTable("scam_intelligence", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  scamName: text("scam_name").notNull(),
+  scamCategory: text("scam_category").notNull(),
+  platformUsed: text("platform_used").array().default([]),
+  targetAudience: text("target_audience").array().default([]),
+  exampleMessages: jsonb("example_messages").$type<{ context: string; message: string }[]>().default([]),
+  warningSigns: text("warning_signs").array().default([]),
+  preventionTips: text("prevention_tips").array().default([]),
+  howItWorks: jsonb("how_it_works").$type<{ step: number; title: string; description: string }[]>().default([]),
+  riskLevel: text("risk_level").notNull().default("medium"),
+  metaDescription: text("meta_description"),
+  faq: jsonb("faq").$type<{ question: string; answer: string }[]>().default([]),
+  relatedScamSlugs: text("related_scam_slugs").array().default([]),
+  reportCount: integer("report_count").default(0),
+  averageLoss: text("average_loss"),
+  dateDetected: timestamp("date_detected").defaultNow(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  status: text("status").notNull().default("draft"),
+  generatedByAi: boolean("generated_by_ai").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertScamIntelligenceSchema = createInsertSchema(scamIntelligence).omit({
+  id: true,
+  reportCount: true,
+  createdAt: true,
+});
+
+export type ScamIntelligence = typeof scamIntelligence.$inferSelect;
+export type InsertScamIntelligence = z.infer<typeof insertScamIntelligenceSchema>;
+
+// Cyber Threat Alerts - Emerging threat monitoring with alert pages
+export const cyberThreatAlerts = pgTable("cyber_threat_alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  threatName: text("threat_name").notNull(),
+  threatCategory: text("threat_category").notNull(),
+  description: text("description").notNull(),
+  detailedAnalysis: text("detailed_analysis"),
+  riskLevel: text("risk_level").notNull().default("medium"),
+  affectedPlatforms: text("affected_platforms").array().default([]),
+  indicators: jsonb("indicators").$type<{ type: string; value: string; description: string }[]>().default([]),
+  mitigationSteps: text("mitigation_steps").array().default([]),
+  sourceUrls: text("source_urls").array().default([]),
+  cveIds: text("cve_ids").array().default([]),
+  regions: text("regions").array().default([]),
+  targetAudience: text("target_audience").default("general"),
+  metaDescription: text("meta_description"),
+  relatedAlertIds: text("related_alert_ids").array().default([]),
+  relatedGuideSlugs: text("related_guide_slugs").array().default([]),
+  status: text("status").notNull().default("draft"),
+  publishedAt: timestamp("published_at"),
+  expiresAt: timestamp("expires_at"),
+  sourceType: text("source_type"),
+  generatedByAi: boolean("generated_by_ai").default(false),
+  dateDetected: timestamp("date_detected").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertCyberThreatAlertSchema = createInsertSchema(cyberThreatAlerts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CyberThreatAlert = typeof cyberThreatAlerts.$inferSelect;
+export type InsertCyberThreatAlert = z.infer<typeof insertCyberThreatAlertSchema>;
+
+// Social Distribution - Generated social media posts
+export const socialPosts = pgTable("social_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  contentType: text("content_type").notNull(),
+  contentId: varchar("content_id").notNull(),
+  contentTitle: text("content_title").notNull(),
+  platform: text("platform").notNull(),
+  postContent: text("post_content").notNull(),
+  hashtags: text("hashtags").array().default([]),
+  scheduledAt: timestamp("scheduled_at"),
+  publishedAt: timestamp("published_at"),
+  status: text("status").notNull().default("draft"),
+  engagementMetrics: jsonb("engagement_metrics").$type<{ views?: number; clicks?: number; shares?: number }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertSocialPostSchema = createInsertSchema(socialPosts).omit({
+  id: true,
+  publishedAt: true,
+  engagementMetrics: true,
+  createdAt: true,
+});
+
+export type SocialPost = typeof socialPosts.$inferSelect;
+export type InsertSocialPost = z.infer<typeof insertSocialPostSchema>;
+
+// Growth Orchestrator - Automation task tracking
+export const growthTasks = pgTable("growth_tasks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  taskType: text("task_type").notNull(),
+  taskName: text("task_name").notNull(),
+  status: text("status").notNull().default("pending"),
+  priority: text("priority").notNull().default("normal"),
+  payload: jsonb("payload").$type<Record<string, unknown>>(),
+  result: jsonb("result").$type<Record<string, unknown>>(),
+  errorMessage: text("error_message"),
+  scheduledAt: timestamp("scheduled_at"),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  retryCount: integer("retry_count").default(0),
+  maxRetries: integer("max_retries").default(3),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertGrowthTaskSchema = createInsertSchema(growthTasks).omit({
+  id: true,
+  result: true,
+  errorMessage: true,
+  startedAt: true,
+  completedAt: true,
+  retryCount: true,
+  createdAt: true,
+});
+
+export type GrowthTask = typeof growthTasks.$inferSelect;
+export type InsertGrowthTask = z.infer<typeof insertGrowthTaskSchema>;
+
+// Platform Growth Metrics - Dashboard analytics
+export const platformMetrics = pgTable("platform_metrics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  metricDate: timestamp("metric_date").notNull(),
+  articlesPublished: integer("articles_published").default(0),
+  keywordsCovered: integer("keywords_covered").default(0),
+  scamPagesGenerated: integer("scam_pages_generated").default(0),
+  alertsGenerated: integer("alerts_generated").default(0),
+  socialPostsCreated: integer("social_posts_created").default(0),
+  subscriberCount: integer("subscriber_count").default(0),
+  subscriberGrowth: integer("subscriber_growth").default(0),
+  totalPageViews: integer("total_page_views").default(0),
+  toolUsageCount: integer("tool_usage_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type PlatformMetric = typeof platformMetrics.$inferSelect;
+
 export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   not_started: ["scan_found", "request_generated", "pending", "request_sent", "failed"],
   scan_found: ["request_generated", "not_found"],

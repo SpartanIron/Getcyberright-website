@@ -11,6 +11,7 @@ import { createRateLimitMiddleware, securityLogger } from "./security";
 import { embedFingerprint } from "./content-fingerprint";
 import { registerAuthRoutes, isAuthenticated, isAdmin, seedAdminUser } from "./auth";
 import { registerAdminRoutes, registerToolTrackingRoutes } from "./admin";
+import { registerPlatformRoutes } from "./platformRoutes";
 import { 
   checkGoogleSafeBrowsing, 
   checkVirusTotal, 
@@ -166,7 +167,7 @@ export async function registerRoutes(
 ): Promise<Server> {
   
   // Dynamic sitemap.xml generation
-  app.get('/sitemap.xml', (_req: Request, res: Response) => {
+  app.get('/sitemap.xml', async (_req: Request, res: Response) => {
     const baseUrl = 'https://www.getcyberright.com';
     const today = new Date().toISOString().split('T')[0];
 
@@ -240,6 +241,43 @@ export async function registerRoutes(
       xml += `  </url>\n`;
     }
 
+    try {
+      const publishedGuides = await storage.getPublishedGuides(undefined, 500);
+      for (const guide of publishedGuides) {
+        const lastmod = guide.updatedAt ? new Date(guide.updatedAt).toISOString().split('T')[0] : today;
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/guides/${guide.slug}</loc>\n`;
+        xml += `    <lastmod>${lastmod}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.8</priority>\n`;
+        xml += `  </url>\n`;
+      }
+
+      const publishedAlerts = await storage.getPublishedThreatAlerts(undefined, 500);
+      for (const alert of publishedAlerts) {
+        const lastmod = alert.updatedAt ? new Date(alert.updatedAt).toISOString().split('T')[0] : today;
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/alerts/${alert.slug}</loc>\n`;
+        xml += `    <lastmod>${lastmod}</lastmod>\n`;
+        xml += `    <changefreq>daily</changefreq>\n`;
+        xml += `    <priority>0.8</priority>\n`;
+        xml += `  </url>\n`;
+      }
+
+      const publishedScamIntel = await storage.getPublishedScamIntel(undefined, 1000);
+      for (const scam of publishedScamIntel) {
+        const lastmod = scam.lastUpdated ? new Date(scam.lastUpdated).toISOString().split('T')[0] : today;
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/scam-intel/${scam.slug}</loc>\n`;
+        xml += `    <lastmod>${lastmod}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.7</priority>\n`;
+        xml += `  </url>\n`;
+      }
+    } catch (err) {
+      console.error("[Sitemap] Error fetching dynamic content:", err);
+    }
+
     xml += '</urlset>';
 
     res.setHeader('Content-Type', 'application/xml');
@@ -296,6 +334,9 @@ export async function registerRoutes(
   
   // Register tool tracking routes (public)
   registerToolTrackingRoutes(app);
+
+  // Register platform module routes (guides, scam intel, alerts, social, growth)
+  registerPlatformRoutes(app);
 
   // Contact form - strict rate limiting (10 req/min)
   app.post("/api/contact", strictRateLimit, async (req, res) => {

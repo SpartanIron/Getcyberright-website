@@ -221,6 +221,13 @@ app.use((req, res, next) => {
       }).catch(err => {
         console.error("Failed to start trending threat scheduler:", err);
       });
+
+      // Start growth orchestrator (processes tasks every 15 min, schedules daily)
+      import("./growthOrchestrator").then(({ startGrowthOrchestrator }) => {
+        startGrowthOrchestrator();
+      }).catch(err => {
+        console.error("Failed to start growth orchestrator:", err);
+      });
     },
   );
 

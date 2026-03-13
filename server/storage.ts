@@ -12,6 +12,17 @@ import {
   type PromptReviewRun,
   type UserFeedback,
   type InsertUserFeedback,
+  type CyberSafetyGuide,
+  type InsertCyberSafetyGuide,
+  type ScamIntelligence,
+  type InsertScamIntelligence,
+  type CyberThreatAlert,
+  type InsertCyberThreatAlert,
+  type SocialPost,
+  type InsertSocialPost,
+  type GrowthTask,
+  type InsertGrowthTask,
+  type PlatformMetric,
   users,
   contactMessages,
   newsletterSubscribers,
@@ -19,9 +30,15 @@ import {
   promptReviews,
   promptReviewRuns,
   userFeedback,
+  cyberSafetyGuides,
+  scamIntelligence,
+  cyberThreatAlerts,
+  socialPosts,
+  growthTasks,
+  platformMetrics,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, and, sql, gte, lte, ilike, or } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -54,6 +71,47 @@ export interface IStorage {
   getFeedbackById(id: string): Promise<UserFeedback | undefined>;
   updateFeedbackStatus(id: string, status: string, adminNotes?: string): Promise<UserFeedback | undefined>;
   getFeedbackCount(): Promise<number>;
+
+  createGuide(guide: InsertCyberSafetyGuide): Promise<CyberSafetyGuide>;
+  getGuideBySlug(slug: string): Promise<CyberSafetyGuide | undefined>;
+  getGuideById(id: string): Promise<CyberSafetyGuide | undefined>;
+  getPublishedGuides(category?: string, limit?: number): Promise<CyberSafetyGuide[]>;
+  getAllGuides(status?: string): Promise<CyberSafetyGuide[]>;
+  updateGuide(id: string, data: Partial<InsertCyberSafetyGuide>): Promise<CyberSafetyGuide | undefined>;
+  deleteGuide(id: string): Promise<boolean>;
+  getGuideCount(status?: string): Promise<number>;
+
+  createScamIntel(scam: InsertScamIntelligence): Promise<ScamIntelligence>;
+  getScamIntelBySlug(slug: string): Promise<ScamIntelligence | undefined>;
+  getScamIntelById(id: string): Promise<ScamIntelligence | undefined>;
+  getPublishedScamIntel(category?: string, limit?: number): Promise<ScamIntelligence[]>;
+  getAllScamIntel(status?: string): Promise<ScamIntelligence[]>;
+  updateScamIntel(id: string, data: Partial<InsertScamIntelligence>): Promise<ScamIntelligence | undefined>;
+  deleteScamIntel(id: string): Promise<boolean>;
+  getScamIntelCount(status?: string): Promise<number>;
+
+  createThreatAlert(alert: InsertCyberThreatAlert): Promise<CyberThreatAlert>;
+  getThreatAlertBySlug(slug: string): Promise<CyberThreatAlert | undefined>;
+  getThreatAlertById(id: string): Promise<CyberThreatAlert | undefined>;
+  getPublishedThreatAlerts(category?: string, limit?: number): Promise<CyberThreatAlert[]>;
+  getAllThreatAlerts(status?: string): Promise<CyberThreatAlert[]>;
+  updateThreatAlert(id: string, data: Partial<InsertCyberThreatAlert>): Promise<CyberThreatAlert | undefined>;
+  deleteThreatAlert(id: string): Promise<boolean>;
+  getThreatAlertCount(status?: string): Promise<number>;
+
+  createSocialPost(post: InsertSocialPost): Promise<SocialPost>;
+  getSocialPosts(status?: string, limit?: number): Promise<SocialPost[]>;
+  updateSocialPost(id: string, data: Partial<InsertSocialPost>): Promise<SocialPost | undefined>;
+  getSocialPostCount(status?: string): Promise<number>;
+
+  createGrowthTask(task: InsertGrowthTask): Promise<GrowthTask>;
+  getGrowthTasks(status?: string, limit?: number): Promise<GrowthTask[]>;
+  getGrowthTaskById(id: string): Promise<GrowthTask | undefined>;
+  updateGrowthTask(id: string, data: Partial<GrowthTask>): Promise<GrowthTask | undefined>;
+  getPendingGrowthTasks(taskType?: string): Promise<GrowthTask[]>;
+
+  recordPlatformMetrics(metrics: Partial<PlatformMetric>): Promise<PlatformMetric>;
+  getLatestPlatformMetrics(days?: number): Promise<PlatformMetric[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -212,6 +270,247 @@ export class DatabaseStorage implements IStorage {
   async getFeedbackCount(): Promise<number> {
     const result = await db.select({ count: sql<number>`count(*)` }).from(userFeedback);
     return Number(result[0].count);
+  }
+
+  async createGuide(guide: InsertCyberSafetyGuide): Promise<CyberSafetyGuide> {
+    const result = await db.insert(cyberSafetyGuides).values(guide).returning();
+    return result[0];
+  }
+
+  async getGuideBySlug(slug: string): Promise<CyberSafetyGuide | undefined> {
+    const result = await db.select().from(cyberSafetyGuides).where(eq(cyberSafetyGuides.slug, slug));
+    return result[0];
+  }
+
+  async getGuideById(id: string): Promise<CyberSafetyGuide | undefined> {
+    const result = await db.select().from(cyberSafetyGuides).where(eq(cyberSafetyGuides.id, id));
+    return result[0];
+  }
+
+  async getPublishedGuides(category?: string, limit = 50): Promise<CyberSafetyGuide[]> {
+    const conditions = [eq(cyberSafetyGuides.status, "published")];
+    if (category) conditions.push(eq(cyberSafetyGuides.category, category));
+    return await db.select().from(cyberSafetyGuides)
+      .where(and(...conditions))
+      .orderBy(desc(cyberSafetyGuides.publishedAt))
+      .limit(limit);
+  }
+
+  async getAllGuides(status?: string): Promise<CyberSafetyGuide[]> {
+    if (status) {
+      return await db.select().from(cyberSafetyGuides)
+        .where(eq(cyberSafetyGuides.status, status))
+        .orderBy(desc(cyberSafetyGuides.createdAt));
+    }
+    return await db.select().from(cyberSafetyGuides).orderBy(desc(cyberSafetyGuides.createdAt));
+  }
+
+  async updateGuide(id: string, data: Partial<InsertCyberSafetyGuide>): Promise<CyberSafetyGuide | undefined> {
+    const result = await db.update(cyberSafetyGuides)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(cyberSafetyGuides.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteGuide(id: string): Promise<boolean> {
+    const result = await db.delete(cyberSafetyGuides).where(eq(cyberSafetyGuides.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async getGuideCount(status?: string): Promise<number> {
+    const conditions = status ? [eq(cyberSafetyGuides.status, status)] : [];
+    const result = await db.select({ count: sql<number>`count(*)` }).from(cyberSafetyGuides)
+      .where(conditions.length ? and(...conditions) : undefined);
+    return Number(result[0].count);
+  }
+
+  async createScamIntel(scam: InsertScamIntelligence): Promise<ScamIntelligence> {
+    const result = await db.insert(scamIntelligence).values(scam).returning();
+    return result[0];
+  }
+
+  async getScamIntelBySlug(slug: string): Promise<ScamIntelligence | undefined> {
+    const result = await db.select().from(scamIntelligence).where(eq(scamIntelligence.slug, slug));
+    return result[0];
+  }
+
+  async getScamIntelById(id: string): Promise<ScamIntelligence | undefined> {
+    const result = await db.select().from(scamIntelligence).where(eq(scamIntelligence.id, id));
+    return result[0];
+  }
+
+  async getPublishedScamIntel(category?: string, limit = 50): Promise<ScamIntelligence[]> {
+    const conditions = [eq(scamIntelligence.status, "published")];
+    if (category) conditions.push(eq(scamIntelligence.scamCategory, category));
+    return await db.select().from(scamIntelligence)
+      .where(and(...conditions))
+      .orderBy(desc(scamIntelligence.lastUpdated))
+      .limit(limit);
+  }
+
+  async getAllScamIntel(status?: string): Promise<ScamIntelligence[]> {
+    if (status) {
+      return await db.select().from(scamIntelligence)
+        .where(eq(scamIntelligence.status, status))
+        .orderBy(desc(scamIntelligence.createdAt));
+    }
+    return await db.select().from(scamIntelligence).orderBy(desc(scamIntelligence.createdAt));
+  }
+
+  async updateScamIntel(id: string, data: Partial<InsertScamIntelligence>): Promise<ScamIntelligence | undefined> {
+    const result = await db.update(scamIntelligence)
+      .set({ ...data, lastUpdated: new Date() })
+      .where(eq(scamIntelligence.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteScamIntel(id: string): Promise<boolean> {
+    const result = await db.delete(scamIntelligence).where(eq(scamIntelligence.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async getScamIntelCount(status?: string): Promise<number> {
+    const conditions = status ? [eq(scamIntelligence.status, status)] : [];
+    const result = await db.select({ count: sql<number>`count(*)` }).from(scamIntelligence)
+      .where(conditions.length ? and(...conditions) : undefined);
+    return Number(result[0].count);
+  }
+
+  async createThreatAlert(alert: InsertCyberThreatAlert): Promise<CyberThreatAlert> {
+    const result = await db.insert(cyberThreatAlerts).values(alert).returning();
+    return result[0];
+  }
+
+  async getThreatAlertBySlug(slug: string): Promise<CyberThreatAlert | undefined> {
+    const result = await db.select().from(cyberThreatAlerts).where(eq(cyberThreatAlerts.slug, slug));
+    return result[0];
+  }
+
+  async getThreatAlertById(id: string): Promise<CyberThreatAlert | undefined> {
+    const result = await db.select().from(cyberThreatAlerts).where(eq(cyberThreatAlerts.id, id));
+    return result[0];
+  }
+
+  async getPublishedThreatAlerts(category?: string, limit = 50): Promise<CyberThreatAlert[]> {
+    const conditions = [eq(cyberThreatAlerts.status, "published")];
+    if (category) conditions.push(eq(cyberThreatAlerts.threatCategory, category));
+    return await db.select().from(cyberThreatAlerts)
+      .where(and(...conditions))
+      .orderBy(desc(cyberThreatAlerts.dateDetected))
+      .limit(limit);
+  }
+
+  async getAllThreatAlerts(status?: string): Promise<CyberThreatAlert[]> {
+    if (status) {
+      return await db.select().from(cyberThreatAlerts)
+        .where(eq(cyberThreatAlerts.status, status))
+        .orderBy(desc(cyberThreatAlerts.createdAt));
+    }
+    return await db.select().from(cyberThreatAlerts).orderBy(desc(cyberThreatAlerts.createdAt));
+  }
+
+  async updateThreatAlert(id: string, data: Partial<InsertCyberThreatAlert>): Promise<CyberThreatAlert | undefined> {
+    const result = await db.update(cyberThreatAlerts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(cyberThreatAlerts.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteThreatAlert(id: string): Promise<boolean> {
+    const result = await db.delete(cyberThreatAlerts).where(eq(cyberThreatAlerts.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async getThreatAlertCount(status?: string): Promise<number> {
+    const conditions = status ? [eq(cyberThreatAlerts.status, status)] : [];
+    const result = await db.select({ count: sql<number>`count(*)` }).from(cyberThreatAlerts)
+      .where(conditions.length ? and(...conditions) : undefined);
+    return Number(result[0].count);
+  }
+
+  async createSocialPost(post: InsertSocialPost): Promise<SocialPost> {
+    const result = await db.insert(socialPosts).values(post).returning();
+    return result[0];
+  }
+
+  async getSocialPosts(status?: string, limit = 50): Promise<SocialPost[]> {
+    if (status) {
+      return await db.select().from(socialPosts)
+        .where(eq(socialPosts.status, status))
+        .orderBy(desc(socialPosts.createdAt))
+        .limit(limit);
+    }
+    return await db.select().from(socialPosts).orderBy(desc(socialPosts.createdAt)).limit(limit);
+  }
+
+  async updateSocialPost(id: string, data: Partial<InsertSocialPost>): Promise<SocialPost | undefined> {
+    const result = await db.update(socialPosts)
+      .set(data)
+      .where(eq(socialPosts.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getSocialPostCount(status?: string): Promise<number> {
+    const conditions = status ? [eq(socialPosts.status, status)] : [];
+    const result = await db.select({ count: sql<number>`count(*)` }).from(socialPosts)
+      .where(conditions.length ? and(...conditions) : undefined);
+    return Number(result[0].count);
+  }
+
+  async createGrowthTask(task: InsertGrowthTask): Promise<GrowthTask> {
+    const result = await db.insert(growthTasks).values(task).returning();
+    return result[0];
+  }
+
+  async getGrowthTasks(status?: string, limit = 50): Promise<GrowthTask[]> {
+    if (status) {
+      return await db.select().from(growthTasks)
+        .where(eq(growthTasks.status, status))
+        .orderBy(desc(growthTasks.createdAt))
+        .limit(limit);
+    }
+    return await db.select().from(growthTasks).orderBy(desc(growthTasks.createdAt)).limit(limit);
+  }
+
+  async getGrowthTaskById(id: string): Promise<GrowthTask | undefined> {
+    const result = await db.select().from(growthTasks).where(eq(growthTasks.id, id));
+    return result[0];
+  }
+
+  async updateGrowthTask(id: string, data: Partial<GrowthTask>): Promise<GrowthTask | undefined> {
+    const result = await db.update(growthTasks)
+      .set(data)
+      .where(eq(growthTasks.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getPendingGrowthTasks(taskType?: string): Promise<GrowthTask[]> {
+    const conditions = [eq(growthTasks.status, "pending")];
+    if (taskType) conditions.push(eq(growthTasks.taskType, taskType));
+    return await db.select().from(growthTasks)
+      .where(and(...conditions))
+      .orderBy(growthTasks.scheduledAt);
+  }
+
+  async recordPlatformMetrics(metrics: Partial<PlatformMetric>): Promise<PlatformMetric> {
+    const result = await db.insert(platformMetrics).values({
+      metricDate: new Date(),
+      ...metrics,
+    } as any).returning();
+    return result[0];
+  }
+
+  async getLatestPlatformMetrics(days = 30): Promise<PlatformMetric[]> {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    return await db.select().from(platformMetrics)
+      .where(gte(platformMetrics.metricDate, cutoff))
+      .orderBy(desc(platformMetrics.metricDate));
   }
 }
 

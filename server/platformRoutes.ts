@@ -1,0 +1,447 @@
+import { type Express, type Request, type Response } from "express";
+import { storage } from "./storage";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import { isAuthenticated } from "./auth";
+import { isAdminMiddleware } from "./admin";
+import {
+  insertCyberSafetyGuideSchema,
+  insertScamIntelligenceSchema,
+  insertCyberThreatAlertSchema,
+  cyberSafetyGuides,
+  scamIntelligence,
+  cyberThreatAlerts,
+} from "@shared/schema";
+import {
+  generateGuideDraft,
+  runContentAutomationBatch,
+  getContentAutomationStats,
+  getUnusedKeywords,
+} from "./contentAutomationService";
+import {
+  distributeGuideContent,
+  distributeThreatAlertContent,
+  distributeScamIntelContent,
+  getSocialDistributionStats,
+} from "./socialDistributionService";
+import {
+  scheduleTask,
+  processPendingTasks,
+  getOrchestratorDashboard,
+} from "./growthOrchestrator";
+
+export function registerPlatformRoutes(app: Express): void {
+
+  // ─── Public Guide Routes ───────────────────────────────────────────
+
+  app.get("/api/guides", async (_req: Request, res: Response) => {
+    try {
+      const category = _req.query.category as string | undefined;
+      const limit = _req.query.limit ? parseInt(_req.query.limit as string) : 50;
+      const guides = await storage.getPublishedGuides(category, limit);
+      res.json(guides);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch guides" });
+    }
+  });
+
+  app.get("/api/guides/:slug", async (req: Request, res: Response) => {
+    try {
+      const guide = await storage.getGuideBySlug(req.params.slug);
+      if (!guide || guide.status !== "published") {
+        return res.status(404).json({ error: "Guide not found" });
+      }
+      res.json(guide);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch guide" });
+    }
+  });
+
+  // ─── Public Scam Intelligence Routes ───────────────────────────────
+
+  app.get("/api/scam-intel", async (_req: Request, res: Response) => {
+    try {
+      const category = _req.query.category as string | undefined;
+      const limit = _req.query.limit ? parseInt(_req.query.limit as string) : 50;
+      const scams = await storage.getPublishedScamIntel(category, limit);
+      res.json(scams);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch scam intelligence" });
+    }
+  });
+
+  app.get("/api/scam-intel/:slug", async (req: Request, res: Response) => {
+    try {
+      const scam = await storage.getScamIntelBySlug(req.params.slug);
+      if (!scam || scam.status !== "published") {
+        return res.status(404).json({ error: "Scam intelligence not found" });
+      }
+      res.json(scam);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch scam intelligence" });
+    }
+  });
+
+  // ─── Public Threat Alert Routes ────────────────────────────────────
+
+  app.get("/api/alerts", async (_req: Request, res: Response) => {
+    try {
+      const category = _req.query.category as string | undefined;
+      const limit = _req.query.limit ? parseInt(_req.query.limit as string) : 50;
+      const alerts = await storage.getPublishedThreatAlerts(category, limit);
+      res.json(alerts);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch threat alerts" });
+    }
+  });
+
+  app.get("/api/alerts/:slug", async (req: Request, res: Response) => {
+    try {
+      const alert = await storage.getThreatAlertBySlug(req.params.slug);
+      if (!alert || alert.status !== "published") {
+        return res.status(404).json({ error: "Threat alert not found" });
+      }
+      res.json(alert);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch threat alert" });
+    }
+  });
+
+  // ─── Public Social Posts ───────────────────────────────────────────
+
+  app.get("/api/social-posts", async (_req: Request, res: Response) => {
+    try {
+      const platform = _req.query.platform as string | undefined;
+      const limit = _req.query.limit ? parseInt(_req.query.limit as string) : 20;
+      const posts = await storage.getSocialPosts("published", limit);
+      const filtered = platform ? posts.filter((p) => p.platform === platform) : posts;
+      res.json(filtered);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch social posts" });
+    }
+  });
+
+  // ─── Admin Guide Management ────────────────────────────────────────
+
+  app.get("/api/admin/guides", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const guides = await storage.getAllGuides(status);
+      res.json(guides);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch guides" });
+    }
+  });
+
+  app.post("/api/admin/guides", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const parsed = insertCyberSafetyGuideSchema.parse(req.body);
+      const guide = await storage.createGuide(parsed);
+      res.status(201).json(guide);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Invalid guide data" });
+    }
+  });
+
+  app.patch("/api/admin/guides/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const guide = await storage.updateGuide(req.params.id, req.body);
+      if (!guide) return res.status(404).json({ error: "Guide not found" });
+      res.json(guide);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to update guide" });
+    }
+  });
+
+  app.post("/api/admin/guides/:id/publish", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const existing = await storage.getGuideById(req.params.id);
+      if (!existing) return res.status(404).json({ error: "Guide not found" });
+      const now = new Date();
+      const guide = await db.update(cyberSafetyGuides)
+        .set({ status: "published", publishedAt: now, updatedAt: now })
+        .where(eq(cyberSafetyGuides.id, req.params.id))
+        .returning();
+      res.json(guide[0]);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to publish guide" });
+    }
+  });
+
+  app.delete("/api/admin/guides/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const deleted = await storage.deleteGuide(req.params.id);
+      if (!deleted) return res.status(404).json({ error: "Guide not found" });
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to delete guide" });
+    }
+  });
+
+  // ─── Admin Scam Intelligence Management ────────────────────────────
+
+  app.get("/api/admin/scam-intel", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const scams = await storage.getAllScamIntel(status);
+      res.json(scams);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch scam intelligence" });
+    }
+  });
+
+  app.post("/api/admin/scam-intel", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const parsed = insertScamIntelligenceSchema.parse(req.body);
+      const scam = await storage.createScamIntel(parsed);
+      res.status(201).json(scam);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Invalid scam data" });
+    }
+  });
+
+  app.patch("/api/admin/scam-intel/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const scam = await storage.updateScamIntel(req.params.id, req.body);
+      if (!scam) return res.status(404).json({ error: "Scam intel not found" });
+      res.json(scam);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to update scam intel" });
+    }
+  });
+
+  app.post("/api/admin/scam-intel/:id/publish", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const existing = await storage.getScamIntelById(req.params.id);
+      if (!existing) return res.status(404).json({ error: "Scam intel not found" });
+      const result = await db.update(scamIntelligence)
+        .set({ status: "published", lastUpdated: new Date() })
+        .where(eq(scamIntelligence.id, req.params.id))
+        .returning();
+      res.json(result[0]);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to publish scam intel" });
+    }
+  });
+
+  app.delete("/api/admin/scam-intel/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const deleted = await storage.deleteScamIntel(req.params.id);
+      if (!deleted) return res.status(404).json({ error: "Scam intel not found" });
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to delete scam intel" });
+    }
+  });
+
+  // ─── Admin Threat Alert Management ─────────────────────────────────
+
+  app.get("/api/admin/threat-alerts", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const alerts = await storage.getAllThreatAlerts(status);
+      res.json(alerts);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch threat alerts" });
+    }
+  });
+
+  app.post("/api/admin/threat-alerts", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const parsed = insertCyberThreatAlertSchema.parse(req.body);
+      const alert = await storage.createThreatAlert(parsed);
+      res.status(201).json(alert);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Invalid alert data" });
+    }
+  });
+
+  app.patch("/api/admin/threat-alerts/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const alert = await storage.updateThreatAlert(req.params.id, req.body);
+      if (!alert) return res.status(404).json({ error: "Alert not found" });
+      res.json(alert);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to update alert" });
+    }
+  });
+
+  app.post("/api/admin/threat-alerts/:id/publish", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const existing = await storage.getThreatAlertById(req.params.id);
+      if (!existing) return res.status(404).json({ error: "Alert not found" });
+      const now = new Date();
+      const result = await db.update(cyberThreatAlerts)
+        .set({ status: "published", publishedAt: now, updatedAt: now })
+        .where(eq(cyberThreatAlerts.id, req.params.id))
+        .returning();
+      res.json(result[0]);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to publish alert" });
+    }
+  });
+
+  app.delete("/api/admin/threat-alerts/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const deleted = await storage.deleteThreatAlert(req.params.id);
+      if (!deleted) return res.status(404).json({ error: "Alert not found" });
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to delete alert" });
+    }
+  });
+
+  // ─── Admin Social Post Management ──────────────────────────────────
+
+  app.get("/api/admin/social-posts", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const posts = await storage.getSocialPosts(status, limit);
+      res.json(posts);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch social posts" });
+    }
+  });
+
+  app.patch("/api/admin/social-posts/:id", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const post = await storage.updateSocialPost(req.params.id, req.body);
+      if (!post) return res.status(404).json({ error: "Social post not found" });
+      res.json(post);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to update social post" });
+    }
+  });
+
+  // ─── Content Automation Endpoints ──────────────────────────────────
+
+  app.post("/api/admin/content-automation/generate", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { keyword, cluster } = req.body;
+      if (keyword && cluster) {
+        const id = await generateGuideDraft(keyword, cluster);
+        if (!id) return res.status(400).json({ error: "Failed to generate guide" });
+        res.json({ guideId: id });
+      } else {
+        const count = req.body.count || 3;
+        const ids = await runContentAutomationBatch(count);
+        res.json({ generatedCount: ids.length, guideIds: ids });
+      }
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Content automation failed" });
+    }
+  });
+
+  app.get("/api/admin/content-automation/stats", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const stats = await getContentAutomationStats();
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch content stats" });
+    }
+  });
+
+  app.get("/api/admin/content-automation/unused-keywords", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+      const keywords = await getUnusedKeywords(limit);
+      res.json(keywords);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch unused keywords" });
+    }
+  });
+
+  // ─── Social Distribution Endpoints ─────────────────────────────────
+
+  app.post("/api/admin/social-distribution/generate", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { contentType, contentId } = req.body;
+      let postIds: string[] = [];
+
+      if (contentType === "guide") {
+        const guide = await storage.getGuideById(contentId);
+        if (!guide) return res.status(404).json({ error: "Guide not found" });
+        postIds = await distributeGuideContent(guide);
+      } else if (contentType === "threat_alert") {
+        const alert = await storage.getThreatAlertById(contentId);
+        if (!alert) return res.status(404).json({ error: "Alert not found" });
+        postIds = await distributeThreatAlertContent(alert);
+      } else if (contentType === "scam_intel") {
+        const scam = await storage.getScamIntelById(contentId);
+        if (!scam) return res.status(404).json({ error: "Scam intel not found" });
+        postIds = await distributeScamIntelContent(scam);
+      } else {
+        return res.status(400).json({ error: "Invalid content type" });
+      }
+
+      res.json({ postsCreated: postIds.length, postIds });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Social distribution failed" });
+    }
+  });
+
+  app.get("/api/admin/social-distribution/stats", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const stats = await getSocialDistributionStats();
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch social stats" });
+    }
+  });
+
+  // ─── Growth Orchestrator Endpoints ─────────────────────────────────
+
+  app.get("/api/admin/growth/dashboard", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const dashboard = await getOrchestratorDashboard();
+      res.json(dashboard);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch growth dashboard" });
+    }
+  });
+
+  app.post("/api/admin/growth/schedule-task", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { taskType, taskName, payload, priority } = req.body;
+      if (!taskType || !taskName) {
+        return res.status(400).json({ error: "taskType and taskName are required" });
+      }
+      const taskId = await scheduleTask(taskType, taskName, payload, undefined, priority);
+      res.json({ taskId });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to schedule task" });
+    }
+  });
+
+  app.post("/api/admin/growth/process-tasks", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const batchSize = req.body.batchSize || 5;
+      const completed = await processPendingTasks(batchSize);
+      res.json({ completed });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to process tasks" });
+    }
+  });
+
+  app.get("/api/admin/growth/tasks", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const tasks = await storage.getGrowthTasks(status, limit);
+      res.json(tasks);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch growth tasks" });
+    }
+  });
+
+  app.get("/api/admin/growth/metrics", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const days = req.query.days ? parseInt(req.query.days as string) : 30;
+      const metrics = await storage.getLatestPlatformMetrics(days);
+      res.json(metrics);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch metrics" });
+    }
+  });
+}
