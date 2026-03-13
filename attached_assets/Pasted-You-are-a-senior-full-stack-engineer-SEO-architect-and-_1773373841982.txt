@@ -1,0 +1,243 @@
+You are a senior full-stack engineer, SEO architect, and cybersecurity platform developer.
+
+You are working on an existing website called GetCyberRight.
+
+CRITICAL RULES:
+
+1. DO NOT modify the current UI, layout, navigation, styling, fonts, or design system.
+2. DO NOT change existing page structure or visual appearance.
+3. All improvements must be backend improvements, SEO enhancements, content additions, or performance optimizations.
+4. Any new functionality must integrate into the current UI without redesigning it.
+
+The objective is to transform the website into a high-authority cybersecurity education platform that ranks strongly on Google and is easily discoverable by AI search engines and social platforms.
+
+---------------------------------------
+
+PRIMARY OBJECTIVES
+
+1. Improve SEO infrastructure
+2. Generate high-ranking cybersecurity content
+3. Add structured data for AI search
+4. Add cybersecurity tools that drive traffic
+5. Improve discoverability without changing UI
+6. Prepare site for scalable content publishing
+
+---------------------------------------
+
+TECHNICAL SEO IMPROVEMENTS
+
+Implement the following improvements without altering UI:
+
+- Generate sitemap.xml automatically
+- Create robots.txt
+- Implement canonical URLs
+- Optimize meta titles and descriptions
+- Add internal linking automation
+- Ensure semantic HTML structure
+- Optimize image loading and compression
+- Implement lazy loading
+- Target Lighthouse performance score above 90
+
+---------------------------------------
+
+STRUCTURED DATA (SCHEMA MARKUP)
+
+Add JSON-LD structured data across the site.
+
+Include schemas for:
+
+Organization
+Article
+BlogPosting
+FAQPage
+HowTo
+BreadcrumbList
+
+These must be automatically injected into relevant pages.
+
+---------------------------------------
+
+PROGRAMMATIC SEO CONTENT ENGINE
+
+Create a scalable content system that automatically generates SEO pages.
+
+Create pages for the following search intents:
+
+Identity theft prevention
+Online scam detection
+Phishing protection
+Cybersecurity for seniors
+Cybersecurity for families
+Cybersecurity for kids
+Password security
+Digital privacy protection
+Email breach detection
+Social media account protection
+
+Each page must include:
+
+SEO optimized title
+structured headings
+FAQ section
+internal links
+schema markup
+1500+ word content
+
+---------------------------------------
+
+BLOG CONTENT ENGINE
+
+Implement a markdown-based blog system.
+
+Create initial articles:
+
+Top 10 online scams targeting seniors in 2026
+How hackers steal passwords in under 60 seconds
+How to detect phishing emails instantly
+The biggest cybersecurity mistakes families make
+How to secure your phone from hackers
+How identity theft actually happens
+
+Each blog post should include:
+
+Table of contents
+structured headings
+related article suggestions
+share buttons
+SEO metadata
+
+---------------------------------------
+
+CYBERSECURITY TOOLS MODULE
+
+Create a backend tools framework.
+
+Each tool must have its own page and SEO metadata.
+
+Tools to implement:
+
+Password strength checker
+Scam message analyzer
+Email breach checker
+Digital privacy checklist generator
+Family cyber safety checklist generator
+
+Each tool page must include:
+
+explanation
+usage instructions
+FAQ section
+schema markup
+
+---------------------------------------
+
+AI SCAM ANALYZER (BASIC VERSION)
+
+Create a simple scam message analyzer tool.
+
+Functionality:
+
+User pastes a message or email.
+
+The tool scans for:
+
+urgency language
+financial requests
+spoofed domains
+common scam phrases
+
+The tool returns:
+
+risk score
+possible scam indicators
+recommended actions
+
+---------------------------------------
+
+EMAIL ALERT SYSTEM
+
+Create a cybersecurity alert subscription system.
+
+Features:
+
+email signup form
+database storage
+admin dashboard for sending alerts
+
+Lead magnet:
+
+"Free Digital Safety Guide for Families"
+
+---------------------------------------
+
+INTERNAL LINKING ENGINE
+
+Automatically connect related articles and guides.
+
+Example:
+
+A phishing article should link to:
+
+password security
+identity theft
+scam detection
+
+This improves SEO authority.
+
+---------------------------------------
+
+SOCIAL SHARING OPTIMIZATION
+
+Ensure every page supports rich sharing.
+
+Add metadata for:
+
+Open Graph
+Twitter/X cards
+LinkedIn previews
+
+Include share buttons for:
+
+LinkedIn
+X
+Facebook
+
+---------------------------------------
+
+ANALYTICS PREPARATION
+
+Prepare integration hooks for:
+
+traffic analytics
+search ranking tracking
+user engagement tracking
+
+---------------------------------------
+
+CONTENT AUTHORITY STRATEGY
+
+Create a structure to support future publication of:
+
+cybersecurity guides
+scam alerts
+data breach alerts
+online safety tips
+cyber threat explainers
+
+---------------------------------------
+
+PROJECT OUTPUT REQUIREMENTS
+
+Generate:
+
+optimized project structure
+SEO middleware
+schema markup modules
+blog system
+cybersecurity tools framework
+content templates
+deployment instructions
+
+Ensure all changes respect the rule:
+
+DO NOT MODIFY EXISTING UI OR DESIGN.
