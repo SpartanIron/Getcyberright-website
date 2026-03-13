@@ -851,34 +851,31 @@ export async function seedAdminUser(): Promise<void> {
   }
 
   try {
-    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    const targetEmail = "judekwekuannan@gmail.com";
 
-    // Check if admin already exists
-    const existing = await db.select().from(users).where(eq(users.email, adminEmail));
+    // Ensure the target admin account exists and is unlocked
+    const existing = await db.select().from(users).where(eq(users.email, targetEmail));
     if (existing.length > 0) {
       await db.update(users).set({
         isAdmin: true,
-        passwordHash,
         failedLoginAttempts: "0",
         lockedUntil: null,
         emailVerified: true,
-      }).where(eq(users.email, adminEmail));
-      console.log(`[auth] Admin user ${adminEmail} synced`);
-      return;
+      }).where(eq(users.email, targetEmail));
+      console.log(`[auth] Admin user ${targetEmail} synced`);
+    } else {
+      const passwordHash = await bcrypt.hash(adminPassword, 12);
+      await db.insert(users).values({
+        email: targetEmail,
+        passwordHash,
+        firstName: "Admin",
+        lastName: "User",
+        isAdmin: true,
+        emailVerified: true,
+        subscriptionTier: "enterprise",
+      });
+      console.log(`[auth] Created admin user: ${targetEmail}`);
     }
-
-    // Create new admin user
-    await db.insert(users).values({
-      email: adminEmail,
-      passwordHash,
-      firstName: "Admin",
-      lastName: "User",
-      isAdmin: true,
-      emailVerified: true,
-      subscriptionTier: "enterprise",
-    });
-
-    console.log(`[auth] Created admin user: ${adminEmail}`);
   } catch (error) {
     console.error("[auth] Failed to seed admin user:", error);
   }
