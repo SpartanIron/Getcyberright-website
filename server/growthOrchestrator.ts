@@ -12,7 +12,37 @@ const TASK_TYPES = {
   OPTIMIZE_LINKS: "optimize_internal_links",
   RECORD_METRICS: "record_platform_metrics",
   REFRESH_THREAT_FEEDS: "refresh_threat_feeds",
+  AUTO_PUBLISH: "auto_publish",
 } as const;
+
+import * as fs from "fs";
+import * as path from "path";
+
+const SETTINGS_FILE = path.join(process.cwd(), ".local", "orchestrator-settings.json");
+
+function loadAutoPublishSetting(): boolean {
+  try {
+    if (fs.existsSync(SETTINGS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SETTINGS_FILE, "utf-8"));
+      return data.autoPublishEnabled !== false;
+    }
+    return true;
+  } catch {
+    return true;
+  }
+}
+
+function saveAutoPublishSetting(enabled: boolean): void {
+  try {
+    const dir = path.dirname(SETTINGS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify({ autoPublishEnabled: enabled }, null, 2));
+  } catch (err: any) {
+    console.error("[GrowthOrchestrator] Failed to save auto-publish setting:", err.message);
+  }
+}
+
+let autoPublishEnabled = true;
 
 async function executeTask(taskId: string, taskType: string, payload: Record<string, unknown> | null): Promise<Record<string, unknown>> {
   switch (taskType) {
@@ -54,6 +84,27 @@ async function executeTask(taskId: string, taskType: string, payload: Record<str
       const stats = await collectPlatformMetrics();
       await storage.recordPlatformMetrics(stats);
       return stats;
+    }
+
+    case TASK_TYPES.AUTO_PUBLISH: {
+      if (!autoPublishEnabled) {
+        return { skipped: true, reason: "Auto-publish disabled" };
+      }
+      const maxPublish = (payload?.count as number) || 3;
+      const allDrafts = await storage.getAllGuides("draft");
+      const draftGuides = allDrafts.slice(0, maxPublish);
+      let published = 0;
+      for (const guide of draftGuides) {
+        try {
+          await storage.updateGuide(guide.id, { status: "published", publishedAt: new Date() } as any);
+          await distributeGuideContent(guide);
+          published++;
+          console.log(`[GrowthOrchestrator] Auto-published guide: "${guide.title}"`);
+        } catch (err: any) {
+          console.error(`[GrowthOrchestrator] Failed to auto-publish guide ${guide.id}:`, err.message);
+        }
+      }
+      return { published, total: draftGuides.length };
     }
 
     default:
@@ -149,8 +200,28 @@ export async function scheduleWeeklyContentGeneration(): Promise<void> {
         undefined,
         "high"
       );
+
+      if (autoPublishEnabled) {
+        await scheduleTask(
+          TASK_TYPES.AUTO_PUBLISH,
+          `Auto-publish drafts (Day ${day})`,
+          { count: 3 },
+          undefined,
+          "normal"
+        );
+      }
     }
   }
+}
+
+export function setAutoPublish(enabled: boolean): void {
+  autoPublishEnabled = enabled;
+  saveAutoPublishSetting(enabled);
+  console.log(`[GrowthOrchestrator] Auto-publish ${enabled ? "enabled" : "disabled"} (persisted)`);
+}
+
+export function getAutoPublishStatus(): boolean {
+  return autoPublishEnabled;
 }
 
 export async function scheduleDailyMetrics(): Promise<void> {
@@ -219,6 +290,9 @@ export function startGrowthOrchestrator(): void {
   if (orchestratorInterval) return;
 
   console.log("[GrowthOrchestrator] Starting growth orchestrator...");
+  
+  autoPublishEnabled = loadAutoPublishSetting();
+  console.log(`[GrowthOrchestrator] Auto-publish: ${autoPublishEnabled ? "enabled" : "disabled"}`);
 
   processPendingTasks().catch((e) => console.error("[GrowthOrchestrator] Initial run error:", e));
 

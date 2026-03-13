@@ -6,7 +6,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Clock, Search, ArrowRight, Loader2, BookMarked } from "lucide-react";
+import { BookOpen, Clock, Search, ArrowRight, Loader2, BookMarked, Shield, Lock, Smartphone, Users, Globe, Brain } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
@@ -23,6 +23,15 @@ interface Guide {
   featuredImage: string | null;
   authorName: string;
 }
+
+const categoryIcons: Record<string, { icon: typeof BookOpen; color: string; bg: string }> = {
+  "Identity Theft": { icon: Shield, color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
+  "Phishing": { icon: Lock, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
+  "Privacy": { icon: Globe, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
+  "Device Security": { icon: Smartphone, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
+  "Family Safety": { icon: Users, color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
+  "AI Threats": { icon: Brain, color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
+};
 
 export default function GuidesListing() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,6 +85,29 @@ export default function GuidesListing() {
       </div>
 
       <main className="container mx-auto px-4 py-8">
+        {categories.length > 0 && (
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-8" data-testid="category-tiles">
+            {categories.map((cat) => {
+              const catConfig = categoryIcons[cat] || { icon: BookOpen, color: "text-primary", bg: "bg-primary/10" };
+              const Icon = catConfig.icon;
+              const isSelected = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(isSelected ? null : cat)}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all cursor-pointer ${
+                    isSelected ? "border-primary bg-primary/5 shadow-md" : "border-border hover:border-primary/50 hover:shadow-sm"
+                  } ${catConfig.bg}`}
+                  data-testid={`tile-${cat}`}
+                >
+                  <Icon className={`h-6 w-6 ${catConfig.color}`} />
+                  <span className="text-xs font-medium text-center leading-tight">{cat}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -87,27 +119,16 @@ export default function GuidesListing() {
               data-testid="input-search-guides"
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          {selectedCategory && (
             <Badge
-              variant={!selectedCategory ? "default" : "outline"}
-              className="cursor-pointer"
+              variant="default"
+              className="cursor-pointer self-start"
               onClick={() => setSelectedCategory(null)}
-              data-testid="filter-all"
+              data-testid="filter-clear"
             >
-              All
+              {selectedCategory} x
             </Badge>
-            {categories.map((cat) => (
-              <Badge
-                key={cat}
-                variant={selectedCategory === cat ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => setSelectedCategory(cat)}
-                data-testid={`filter-${cat}`}
-              >
-                {cat}
-              </Badge>
-            ))}
-          </div>
+          )}
         </div>
 
         {isLoading ? (

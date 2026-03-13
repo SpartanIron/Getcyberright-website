@@ -7,8 +7,8 @@ const footerLinks = {
   knowledge: [
     { name: "Cyber Safety Guides", href: "/guides" },
     { name: "Scam Intelligence", href: "/scam-intel" },
-    { name: "Threat Alerts", href: "/alerts" },
-    { name: "Common Scams", href: "/scams/phishing" },
+    { name: "Cyber Threat Radar", href: "/cyber-threat-radar" },
+    { name: "Awareness Hub", href: "/awareness-hub" },
     { name: "Training Academy", href: "/training" },
     { name: "Resource Library", href: "/resources" },
   ],

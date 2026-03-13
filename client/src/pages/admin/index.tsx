@@ -13,7 +13,13 @@ import {
   Crown,
   TrendingUp,
   Shield,
-  MessageSquare
+  MessageSquare,
+  FileText,
+  ShieldAlert,
+  Share2,
+  CalendarDays,
+  UserPlus,
+  Cog
 } from "lucide-react";
 import { Link } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
@@ -26,6 +32,16 @@ interface AdminStats {
   scamReports: number;
   totalFeedback: number;
   newFeedback: number;
+  totalGuides: number;
+  publishedGuides: number;
+  totalAlerts: number;
+  publishedAlerts: number;
+  totalScamIntel: number;
+  totalSocialPosts: number;
+  draftSocialPosts: number;
+  guidesThisWeek: number;
+  newSubscribersThisWeek: number;
+  pendingTasks: number;
 }
 
 export default function AdminDashboard() {
@@ -117,6 +133,51 @@ export default function AdminDashboard() {
     },
   ];
 
+  const contentCards = [
+    {
+      title: "Published Guides",
+      value: `${stats?.publishedGuides ?? 0} / ${stats?.totalGuides ?? 0}`,
+      subtitle: `${stats?.guidesThisWeek ?? 0} this week`,
+      icon: FileText,
+      color: "text-teal-500",
+    },
+    {
+      title: "Threat Alerts",
+      value: `${stats?.publishedAlerts ?? 0} / ${stats?.totalAlerts ?? 0}`,
+      subtitle: "published / total",
+      icon: ShieldAlert,
+      color: "text-red-500",
+    },
+    {
+      title: "Scam Intelligence",
+      value: stats?.totalScamIntel ?? 0,
+      subtitle: "entries tracked",
+      icon: AlertTriangle,
+      color: "text-orange-500",
+    },
+    {
+      title: "Social Posts",
+      value: stats?.totalSocialPosts ?? 0,
+      subtitle: `${stats?.draftSocialPosts ?? 0} drafts ready`,
+      icon: Share2,
+      color: "text-blue-500",
+    },
+    {
+      title: "New Subscribers",
+      value: stats?.newSubscribersThisWeek ?? 0,
+      subtitle: "this week",
+      icon: UserPlus,
+      color: "text-green-500",
+    },
+    {
+      title: "Pending Tasks",
+      value: stats?.pendingTasks ?? 0,
+      subtitle: "in automation queue",
+      icon: Cog,
+      color: "text-purple-500",
+    },
+  ];
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -141,12 +202,37 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold" data-testid={`stat-${stat.title.toLowerCase().replace(/\s/g, "-")}`}>
-                    {statsLoading ? "..." : stat.value.toLocaleString()}
+                    {statsLoading ? "..." : typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
                   </div>
                 </CardContent>
               </Card>
             </Link>
           ))}
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            Content Pipeline
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {contentCards.map((stat) => (
+              <Card key={stat.title} className="transition-all hover:shadow-md">
+                <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {stat.title}
+                  </CardTitle>
+                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold" data-testid={`stat-${stat.title.toLowerCase().replace(/\s/g, "-")}`}>
+                    {statsLoading ? "..." : stat.value}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">{stat.subtitle}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

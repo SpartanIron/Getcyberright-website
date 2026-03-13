@@ -28,6 +28,8 @@ import {
   scheduleTask,
   processPendingTasks,
   getOrchestratorDashboard,
+  setAutoPublish,
+  getAutoPublishStatus,
 } from "./growthOrchestrator";
 import { z } from "zod";
 
@@ -580,5 +582,18 @@ export function registerPlatformRoutes(app: Express): void {
     } catch (error: any) {
       res.status(500).json({ error: "Failed to fetch metrics" });
     }
+  });
+
+  app.get("/api/admin/growth/auto-publish", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    res.json({ enabled: getAutoPublishStatus() });
+  });
+
+  app.post("/api/admin/growth/auto-publish", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    const { enabled } = req.body;
+    if (typeof enabled !== "boolean") {
+      return res.status(400).json({ error: "enabled must be a boolean" });
+    }
+    setAutoPublish(enabled);
+    res.json({ enabled: getAutoPublishStatus() });
   });
 }

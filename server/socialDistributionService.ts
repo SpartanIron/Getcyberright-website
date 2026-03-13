@@ -12,6 +12,7 @@ type ContentItem = CyberSafetyGuide | CyberThreatAlert | ScamIntelligence;
 interface SocialPostSet {
   linkedin: string;
   xThread: string[];
+  instagram: string;
   shortAlert: string;
   hashtags: string[];
 }
@@ -42,8 +43,9 @@ Tags: ${tags.join(", ")}
 Create:
 1. LinkedIn post (200-300 words, professional tone, actionable insights, end with CTA)
 2. X/Twitter thread (3-5 tweets, each under 280 chars, first tweet hooks attention, last has CTA)
-3. Short alert message (under 160 chars, urgent/informative, for email/SMS)
-4. 5-8 relevant hashtags
+3. Instagram caption (150-250 words, engaging visual storytelling tone, include line breaks for readability, end with CTA and hashtags section)
+4. Short alert message (under 160 chars, urgent/informative, for email/SMS)
+5. 5-8 relevant hashtags
 
 Rules:
 - Do NOT use em dashes
@@ -51,11 +53,13 @@ Rules:
 - Include relevant emojis sparingly
 - Make content shareable and educational
 - Always reference GetCyberRight as the source
+- Instagram caption should be visual and educational with a hook in the first line
 
 Format as JSON:
 {
   "linkedin": "Full LinkedIn post text",
   "xThread": ["Tweet 1", "Tweet 2", "Tweet 3"],
+  "instagram": "Full Instagram caption text",
   "shortAlert": "Short alert message",
   "hashtags": ["hashtag1", "hashtag2"]
 }`,
@@ -93,10 +97,12 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
   const platforms: { platform: string; content: string }[] = [
     { platform: "linkedin", content: posts.linkedin },
     { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
+    { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
 
   for (const { platform, content } of platforms) {
+    if (!content) continue;
     const post: InsertSocialPost = {
       contentType: "guide",
       contentId: guide.id,
@@ -132,10 +138,12 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
   const platforms: { platform: string; content: string }[] = [
     { platform: "linkedin", content: posts.linkedin },
     { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
+    { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
 
   for (const { platform, content } of platforms) {
+    if (!content) continue;
     const post: InsertSocialPost = {
       contentType: "threat_alert",
       contentId: alert.id,
@@ -171,10 +179,12 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
   const platforms: { platform: string; content: string }[] = [
     { platform: "linkedin", content: posts.linkedin },
     { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
+    { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
 
   for (const { platform, content } of platforms) {
+    if (!content) continue;
     const post: InsertSocialPost = {
       contentType: "scam_intel",
       contentId: scam.id,

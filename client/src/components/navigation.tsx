@@ -29,9 +29,9 @@ const toolsNav = [
 
 const learnItems = [
   { title: "Training Academy", description: "Structured courses with quizzes & certificates", href: "/training", icon: GraduationCap, color: "text-primary", featured: true },
+  { title: "Awareness Hub", description: "Visual guides, checklists & safety resources", href: "/awareness-hub", icon: BookOpen, color: "text-teal-500", featured: true },
+  { title: "Cyber Threat Radar", description: "Real-time threat monitoring & alerts", href: "/cyber-threat-radar", icon: AlertTriangle, color: "text-red-500", featured: true },
   { title: "AI Safety Guide", description: "Spot deepfakes, AI scams & protect your privacy", href: "/ai-safety", icon: Brain, color: "text-purple-500", featured: true },
-  { title: "Resource Library", description: "Guides, articles, checklists & videos", href: "/resources", icon: BookOpen, color: "text-accent", featured: true },
-  { title: "Emergency Help", description: "What to do if you've been scammed", href: "/emergency-help", icon: AlertTriangle, color: "text-red-500", featured: true },
 ];
 
 const learnTopics = [

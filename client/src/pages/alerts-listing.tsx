@@ -88,6 +88,28 @@ export default function AlertsListing() {
       </div>
 
       <main className="container mx-auto px-4 py-8">
+        {alerts.length > 0 && (
+          <div className="grid grid-cols-3 gap-4 mb-8" data-testid="alert-risk-summary">
+            {["high", "medium", "low"].map((level) => {
+              const cnt = alerts.filter(a => a.riskLevel === level).length;
+              const config = { high: { color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-200 dark:border-red-800", pulse: true }, medium: { color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-200 dark:border-orange-800", pulse: false }, low: { color: "text-green-500", bg: "bg-green-50 dark:bg-green-950/30", border: "border-green-200 dark:border-green-800", pulse: false } }[level]!;
+              return (
+                <div
+                  key={level}
+                  className={`p-4 rounded-xl border ${config.border} ${config.bg} text-center`}
+                  data-testid={`alert-risk-${level}`}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <div className={`text-2xl font-bold ${config.color}`}>{cnt}</div>
+                    {config.pulse && cnt > 0 && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />}
+                  </div>
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{level} risk alerts</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

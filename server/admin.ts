@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
-import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback } from "@shared/schema";
+import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
 import { securityLogger } from "./security";
@@ -49,6 +49,21 @@ export function registerAdminRoutes(app: Express) {
         .from(users)
         .where(sql`${users.subscriptionTier} != 'free' AND ${users.subscriptionTier} IS NOT NULL`);
       
+      const [guideCount] = await db.select({ count: count() }).from(cyberSafetyGuides);
+      const [publishedGuideCount] = await db.select({ count: count() }).from(cyberSafetyGuides).where(eq(cyberSafetyGuides.status, "published"));
+      const [alertCount] = await db.select({ count: count() }).from(cyberThreatAlerts);
+      const [publishedAlertCount] = await db.select({ count: count() }).from(cyberThreatAlerts).where(eq(cyberThreatAlerts.status, "published"));
+      const [scamIntelCount] = await db.select({ count: count() }).from(scamIntelligence);
+      const [socialPostCount] = await db.select({ count: count() }).from(socialPosts);
+      const [draftSocialCount] = await db.select({ count: count() }).from(socialPosts).where(eq(socialPosts.status, "draft"));
+
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const [recentGuideCount] = await db.select({ count: count() }).from(cyberSafetyGuides).where(gte(cyberSafetyGuides.createdAt, oneWeekAgo));
+      const [recentSubscriberCount] = await db.select({ count: count() }).from(newsletterSubscribers).where(gte(newsletterSubscribers.createdAt, oneWeekAgo));
+
+      const [pendingTaskCount] = await db.select({ count: count() }).from(growthTasks).where(eq(growthTasks.status, "pending"));
+
       res.json({
         totalUsers: userCount.count,
         premiumUsers: premiumCount.count,
@@ -57,6 +72,16 @@ export function registerAdminRoutes(app: Express) {
         scamReports: scamReportCount.count,
         totalFeedback: feedbackCount.count,
         newFeedback: newFeedbackCount.count,
+        totalGuides: guideCount.count,
+        publishedGuides: publishedGuideCount.count,
+        totalAlerts: alertCount.count,
+        publishedAlerts: publishedAlertCount.count,
+        totalScamIntel: scamIntelCount.count,
+        totalSocialPosts: socialPostCount.count,
+        draftSocialPosts: draftSocialCount.count,
+        guidesThisWeek: recentGuideCount.count,
+        newSubscribersThisWeek: recentSubscriberCount.count,
+        pendingTasks: pendingTaskCount.count,
       });
     } catch (error) {
       console.error("Admin stats error:", error);

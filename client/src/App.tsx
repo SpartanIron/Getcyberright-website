@@ -36,6 +36,8 @@ const OurMission = lazy(() => import("@/pages/pricing"));
 const SupportTheMission = lazy(() => import("@/pages/support-the-mission"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const ThreatTrendsPage = lazy(() => import("@/pages/threat-trends"));
+const CyberThreatRadar = lazy(() => import("@/pages/cyber-threat-radar"));
+const AwarenessHub = lazy(() => import("@/pages/awareness-hub"));
 const ReportScam = lazy(() => import("@/pages/report-scam"));
 const Checklists = lazy(() => import("@/pages/checklists"));
 const AIPrompts = lazy(() => import("@/pages/ai-prompts"));
@@ -143,6 +145,8 @@ function Router() {
         <Route path="/support-the-mission" component={SupportTheMission} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/threat-trends" component={ThreatTrendsPage} />
+        <Route path="/cyber-threat-radar" component={CyberThreatRadar} />
+        <Route path="/awareness-hub" component={AwarenessHub} />
         <Route path="/report-scam" component={ReportScam} />
         <Route path="/checklists" component={Checklists} />
         <Route path="/data-removal" component={DataRemoval} />
