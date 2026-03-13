@@ -1068,7 +1068,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  private async seedThreatStatsData() {
+  async seedThreatStatsData() {
     try {
       const existingStats = await db.select().from(threatStats).limit(1);
       if (existingStats.length > 0) {

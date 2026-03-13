@@ -53,6 +53,50 @@ const processTasksSchema = z.object({
 
 export function registerPlatformRoutes(app: Express): void {
 
+  // ─── Public Threat Intelligence Stats ─────────────────────────────
+
+  app.get("/api/threat-stats", async (_req: Request, res: Response) => {
+    try {
+      const { threatStats, ageGroupStats, regionalAttackTypes } = await import("@shared/schema");
+      const stats = await db.select().from(threatStats).orderBy(threatStats.displayOrder);
+      const ageGroups = await db.select().from(ageGroupStats).orderBy(ageGroupStats.displayOrder);
+      const regions = await db.select().from(regionalAttackTypes).orderBy(regionalAttackTypes.displayOrder);
+
+      if (stats.length === 0) {
+        const { insertThreatStatSchema, insertAgeGroupStatSchema, insertRegionalAttackTypeSchema } = await import("@shared/schema");
+        await db.insert(threatStats).values([
+          { statKey: "global_losses", value: "$12.5B", label: "Global Losses (2023)", description: "Total reported cybercrime losses worldwide", source: "FBI IC3 Report", sourceUrl: "https://www.ic3.gov/Media/PDF/AnnualReport/2023_IC3Report.pdf", category: "financial", colorTheme: "teal", displayOrder: 1, reportYear: 2023 },
+          { statKey: "most_targeted_age", value: "60+", label: "Age Group Most Targeted", description: "Seniors face the highest financial losses from cybercrime", source: "FBI IC3 Report", sourceUrl: "https://www.ic3.gov/Media/PDF/AnnualReport/2023_IC3Report.pdf", category: "demographics", colorTheme: "amber", displayOrder: 2, reportYear: 2023 },
+          { statKey: "youth_harassment", value: "40%", label: "Youth Online Harassment", description: "Percentage of youth ages 10-17 experiencing cyberbullying", source: "Cyberbullying Research Center", sourceUrl: "https://cyberbullying.org/facts", category: "youth", colorTheme: "cyan", displayOrder: 3, reportYear: 2023 },
+          { statKey: "mobile_fraud_rise", value: "300%", label: "Mobile Money Fraud Rise", description: "Increase in mobile money fraud in Africa from 2020-2024", source: "INTERPOL Africa", sourceUrl: "https://www.interpol.int/en/Crimes/Cybercrime", category: "africa", colorTheme: "red", displayOrder: 4, reportYear: 2024 },
+        ]);
+        await db.insert(ageGroupStats).values([
+          { ageGroup: "Under 20", percentage: 8, colorClass: "bg-cyan-400", displayOrder: 1, source: "FBI Internet Crime Report 2023" },
+          { ageGroup: "20-29", percentage: 15, colorClass: "bg-teal-400", displayOrder: 2, source: "FBI Internet Crime Report 2023" },
+          { ageGroup: "30-49", percentage: 35, colorClass: "bg-green-400", displayOrder: 3, source: "FBI Internet Crime Report 2023" },
+          { ageGroup: "50-59", percentage: 20, colorClass: "bg-orange-400", displayOrder: 4, source: "FBI Internet Crime Report 2023" },
+          { ageGroup: "60+", percentage: 22, colorClass: "bg-amber-400", displayOrder: 5, source: "FBI Internet Crime Report 2023" },
+        ]);
+        await db.insert(regionalAttackTypes).values([
+          { region: "Africa", attackTypes: "Mobile Money Fraud, SIM Swap, WhatsApp Scams", colorClass: "bg-amber-400", displayOrder: 1, source: "INTERPOL Africa Assessment 2024" },
+          { region: "North America", attackTypes: "Investment Fraud, BEC, Tech Support Scams", colorClass: "bg-teal-400", displayOrder: 2, source: "FBI IC3 Report 2023" },
+          { region: "Europe", attackTypes: "Ransomware, Phishing, Data Breaches", colorClass: "bg-cyan-400", displayOrder: 3, source: "Europol IOCTA 2024" },
+          { region: "Asia Pacific", attackTypes: "Romance Scams, E-commerce Fraud, Crypto Scams", colorClass: "bg-purple-400", displayOrder: 4, source: "APAC Cybersecurity Report 2024" },
+        ]);
+        console.log("[threat-stats] Seeded threat statistics data");
+        const newStats = await db.select().from(threatStats).orderBy(threatStats.displayOrder);
+        const newAgeGroups = await db.select().from(ageGroupStats).orderBy(ageGroupStats.displayOrder);
+        const newRegions = await db.select().from(regionalAttackTypes).orderBy(regionalAttackTypes.displayOrder);
+        return res.json({ stats: newStats, ageGroups: newAgeGroups, regions: newRegions });
+      }
+
+      res.json({ stats, ageGroups, regions });
+    } catch (error: any) {
+      console.error("[threat-stats] Error:", error?.message || error);
+      res.status(500).json({ error: "Failed to fetch threat statistics" });
+    }
+  });
+
   // ─── Public Guide Routes ───────────────────────────────────────────
 
   app.get("/api/guides", async (_req: Request, res: Response) => {

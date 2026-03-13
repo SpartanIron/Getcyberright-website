@@ -1383,3 +1383,51 @@ export const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
   re_appeared: ["request_generated", "in_progress"],
   not_found: ["scan_found"],
 };
+
+// Threat Intelligence Stats - Global cybercrime statistics
+export const threatStats = pgTable("threat_stats", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  statKey: varchar("stat_key", { length: 100 }).notNull().unique(),
+  value: text("value").notNull(),
+  label: text("label").notNull(),
+  description: text("description"),
+  source: text("source"),
+  sourceUrl: text("source_url"),
+  category: text("category"),
+  colorTheme: text("color_theme"),
+  displayOrder: integer("display_order").default(0),
+  reportYear: integer("report_year"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertThreatStatSchema = createInsertSchema(threatStats).omit({ id: true, updatedAt: true });
+export type ThreatStat = typeof threatStats.$inferSelect;
+export type InsertThreatStat = z.infer<typeof insertThreatStatSchema>;
+
+// Age Group Statistics - Cybercrime demographics breakdown
+export const ageGroupStats = pgTable("age_group_stats", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  ageGroup: text("age_group").notNull(),
+  percentage: integer("percentage").notNull(),
+  colorClass: text("color_class"),
+  displayOrder: integer("display_order").default(0),
+  source: text("source"),
+});
+
+export const insertAgeGroupStatSchema = createInsertSchema(ageGroupStats).omit({ id: true });
+export type AgeGroupStat = typeof ageGroupStats.$inferSelect;
+export type InsertAgeGroupStat = z.infer<typeof insertAgeGroupStatSchema>;
+
+// Regional Attack Types - Regional cybercrime patterns
+export const regionalAttackTypes = pgTable("regional_attack_types", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  region: text("region").notNull(),
+  attackTypes: text("attack_types").notNull(),
+  colorClass: text("color_class"),
+  displayOrder: integer("display_order").default(0),
+  source: text("source"),
+});
+
+export const insertRegionalAttackTypeSchema = createInsertSchema(regionalAttackTypes).omit({ id: true });
+export type RegionalAttackType = typeof regionalAttackTypes.$inferSelect;
+export type InsertRegionalAttackType = z.infer<typeof insertRegionalAttackTypeSchema>;
