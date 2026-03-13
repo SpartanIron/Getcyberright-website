@@ -84,6 +84,20 @@ interface WebApplicationData {
   provider?: string;
 }
 
+interface BlogPostingData {
+  type: "BlogPosting";
+  headline: string;
+  description: string;
+  datePublished: string;
+  dateModified: string;
+  author: { name: string; url?: string };
+  publisher: { name: string; logo?: string };
+  image?: string;
+  articleSection?: string;
+  keywords?: string[];
+  wordCount?: number;
+}
+
 type StructuredDataInput =
   | OrganizationData
   | FAQData
@@ -92,7 +106,8 @@ type StructuredDataInput =
   | WebSiteData
   | BreadcrumbData
   | CourseData
-  | WebApplicationData;
+  | WebApplicationData
+  | BlogPostingData;
 
 function buildJsonLd(data: StructuredDataInput): object {
   switch (data.type) {
@@ -232,6 +247,35 @@ function buildJsonLd(data: StructuredDataInput): object {
         } : {}),
       };
 
+    case "BlogPosting":
+      return {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: data.headline,
+        description: data.description,
+        datePublished: data.datePublished,
+        dateModified: data.dateModified,
+        author: {
+          "@type": "Organization",
+          name: data.author.name,
+          ...(data.author.url ? { url: data.author.url } : {}),
+        },
+        publisher: {
+          "@type": "Organization",
+          name: data.publisher.name,
+          ...(data.publisher.logo ? {
+            logo: {
+              "@type": "ImageObject",
+              url: data.publisher.logo,
+            },
+          } : {}),
+        },
+        ...(data.image ? { image: data.image } : {}),
+        ...(data.articleSection ? { articleSection: data.articleSection } : {}),
+        ...(data.keywords ? { keywords: data.keywords.join(", ") } : {}),
+        ...(data.wordCount ? { wordCount: data.wordCount } : {}),
+      };
+
     default:
       return {};
   }
@@ -274,6 +318,7 @@ export type {
   FAQData,
   FAQItem,
   ArticleData,
+  BlogPostingData,
   HowToData,
   WebSiteData,
   BreadcrumbData,

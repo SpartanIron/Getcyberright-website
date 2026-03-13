@@ -84,6 +84,7 @@ const PrintableGuides = lazy(() => import("@/pages/printable-guides"));
 const QuickAssessment = lazy(() => import("@/pages/quick-assessment"));
 const SafetyScore = lazy(() => import("@/pages/safety-score"));
 const ScamChecker = lazy(() => import("@/pages/scam-checker"));
+const ScamPage = lazy(() => import("@/pages/scam-page"));
 const FAQ = lazy(() => import("@/pages/faq"));
 
 // Loading fallback component
@@ -159,6 +160,7 @@ function Router() {
         <Route path="/quick-assessment" component={QuickAssessment} />
         <Route path="/safety-score" component={SafetyScore} />
         <Route path="/scam-checker" component={ScamChecker} />
+        <Route path="/scams/:scamType" component={ScamPage} />
         <Route path="/faq" component={FAQ} />
         <Route path="/training" component={Training} />
         <Route path="/training/:pathId" component={TrainingPath} />

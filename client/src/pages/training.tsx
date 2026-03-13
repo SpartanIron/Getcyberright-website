@@ -133,7 +133,7 @@ export default function Training() {
 
   const trainingCourseSchema: CourseData = {
     type: "Course",
-    name: "GetCyberRight Training Academy",
+    name: "GetCyberRight Cybersecurity and AI Training Academy",
     description: "Cybersecurity training courses with quizzes and certificates. Structured learning paths for kids, parents, seniors, educators, and small businesses.",
     provider: "GetCyberRight",
     url: "https://getcyberright.com/training",
@@ -150,7 +150,7 @@ export default function Training() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SEOHead title="Training Academy" description="Learn cybersecurity through structured courses with quizzes and certificates. Training paths for kids, parents, seniors, educators, and businesses." />
+      <SEOHead title="Cybersecurity and AI Training Academy" description="Learn cybersecurity through structured courses with quizzes and certificates. Training paths for kids, parents, seniors, educators, and businesses." />
       <StructuredData data={[trainingCourseSchema, trainingBreadcrumbs]} />
       <Navigation />
       
@@ -159,7 +159,7 @@ export default function Training() {
           <div className="absolute inset-0">
             <img 
               src={bannerImage} 
-              alt="Cybersecurity Training Academy - diverse people learning together" 
+              alt="Cybersecurity and AI Training Academy - diverse people learning together" 
               className="w-full h-full object-cover"
               loading="eager"
               decoding="async"
@@ -174,7 +174,7 @@ export default function Training() {
                 AI-Powered Curriculum
               </Badge>
               <h1 className="text-4xl md:text-5xl font-bold mb-6" data-testid="text-training-title">
-                Cybersecurity Training Academy
+                Cybersecurity and AI Training Academy
               </h1>
               <p className="text-xl text-muted-foreground mb-8" data-testid="text-training-subtitle">
                 Master digital safety with structured learning paths, interactive lessons, 

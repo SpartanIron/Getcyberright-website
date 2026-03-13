@@ -37,6 +37,11 @@ The platform uses an enterprise teal and orange color scheme with a flat, minima
 - **Automated Threat Intelligence**: Ingests data from 8 trusted sources (URLhaus, PhishTank, CISA, NVD, HIBP).
 - **Automated Content Governance System**: Monitors educational content for freshness and relevance.
 - **User Feedback System**: Floating feedback widget (bottom-left) on every page with 5 categories (bug, feature, question, praise, other). No login required. Submissions stored in `user_feedback` table. Admin email notification via Resend on each submission. Admin dashboard at `/admin/feedback` for reviewing, filtering by status (new/in_progress/resolved/dismissed), adding internal notes, and replying via email.
+- **Programmatic Scam Pages**: 17 SEO-optimized scam guide pages at `/scams/:scamType` (PayPal, Amazon, Facebook, romance, crypto, tech support, phishing, Instagram, WhatsApp, job, delivery, Zelle, shopping, grandparent, social media, identity theft, data breach). Each page includes overview, how-it-works steps, warning signs, real example messages, prevention steps, and FAQ. All pages have BlogPosting + FAQPage + BreadcrumbList structured data. Content in `shared/scam-content.ts`.
+- **SEO Keyword Database**: 300 keywords across 10 clusters (identity theft, online scams, phishing, seniors, kids, password security, privacy, device security, data breaches, social media security) with cluster relationships for internal linking. Data in `shared/seo-keywords.ts`.
+- **Internal Linking Engine**: `RelatedContent` component (`client/src/components/related-content.tsx`) auto-generates related page links based on keyword cluster relationships and content cross-references. Used on programmatic scam pages.
+- **Dynamic Sitemap**: Server-generated `sitemap.xml` with 56 URLs including all static pages and programmatic scam pages. Replaces static file approach. Includes changefreq and priority values.
+- **BlogPosting Schema**: Added to structured data system for content pages with articleSection, keywords, and wordCount support.
 - **Admin System**: Comprehensive admin dashboard for user management, security monitoring, threat intelligence, content governance, AI prompt management, trending threat management, and user feedback management.
 
 ## External Dependencies

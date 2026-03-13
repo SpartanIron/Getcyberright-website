@@ -165,15 +165,86 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
-  // Serve sitemap.xml
+  // Dynamic sitemap.xml generation
   app.get('/sitemap.xml', (_req: Request, res: Response) => {
-    const sitemapPath = path.resolve(process.cwd(), 'client/public/sitemap.xml');
-    if (fs.existsSync(sitemapPath)) {
-      res.setHeader('Content-Type', 'application/xml');
-      res.sendFile(sitemapPath);
-    } else {
-      res.status(404).send('Sitemap not found');
+    const baseUrl = 'https://www.getcyberright.com';
+    const today = new Date().toISOString().split('T')[0];
+
+    const staticPages = [
+      { path: '/', changefreq: 'daily', priority: '1.0' },
+      { path: '/tools', changefreq: 'weekly', priority: '0.9' },
+      { path: '/scam-checker', changefreq: 'weekly', priority: '0.9' },
+      { path: '/password-generator', changefreq: 'monthly', priority: '0.8' },
+      { path: '/data-removal', changefreq: 'weekly', priority: '0.9' },
+      { path: '/breach-dashboard', changefreq: 'weekly', priority: '0.8' },
+      { path: '/ai-prompts', changefreq: 'weekly', priority: '0.8' },
+      { path: '/ai-safety', changefreq: 'monthly', priority: '0.7' },
+      { path: '/cyber-hygiene', changefreq: 'monthly', priority: '0.7' },
+      { path: '/training', changefreq: 'weekly', priority: '0.8' },
+      { path: '/news', changefreq: 'daily', priority: '0.7' },
+      { path: '/resources', changefreq: 'monthly', priority: '0.7' },
+      { path: '/checklists', changefreq: 'monthly', priority: '0.7' },
+      { path: '/printable-guides', changefreq: 'monthly', priority: '0.6' },
+      { path: '/kids', changefreq: 'monthly', priority: '0.8' },
+      { path: '/seniors', changefreq: 'monthly', priority: '0.8' },
+      { path: '/parents', changefreq: 'monthly', priority: '0.8' },
+      { path: '/parents/child-safety-scanner', changefreq: 'monthly', priority: '0.7' },
+      { path: '/small-business', changefreq: 'monthly', priority: '0.8' },
+      { path: '/educators', changefreq: 'monthly', priority: '0.8' },
+      { path: '/about', changefreq: 'monthly', priority: '0.6' },
+      { path: '/contact', changefreq: 'monthly', priority: '0.5' },
+      { path: '/faq', changefreq: 'monthly', priority: '0.7' },
+      { path: '/emergency-help', changefreq: 'monthly', priority: '0.8' },
+      { path: '/report-scam', changefreq: 'monthly', priority: '0.7' },
+      { path: '/travel-safety', changefreq: 'monthly', priority: '0.6' },
+      { path: '/quick-assessment', changefreq: 'monthly', priority: '0.6' },
+      { path: '/safety-score', changefreq: 'monthly', priority: '0.6' },
+      { path: '/search', changefreq: 'monthly', priority: '0.5' },
+      { path: '/threat-trends', changefreq: 'daily', priority: '0.7' },
+      { path: '/our-mission', changefreq: 'monthly', priority: '0.5' },
+      { path: '/support-the-mission', changefreq: 'monthly', priority: '0.5' },
+      { path: '/privacy', changefreq: 'yearly', priority: '0.3' },
+      { path: '/terms', changefreq: 'yearly', priority: '0.3' },
+      { path: '/accessibility', changefreq: 'yearly', priority: '0.3' },
+      { path: '/security', changefreq: 'yearly', priority: '0.4' },
+      { path: '/feedback', changefreq: 'monthly', priority: '0.4' },
+      { path: '/support', changefreq: 'monthly', priority: '0.5' },
+      { path: '/parent-guide', changefreq: 'monthly', priority: '0.6' },
+    ];
+
+    const scamSlugs = [
+      'paypal-scam', 'amazon-scam', 'facebook-scam', 'romance-scam', 'crypto-scam',
+      'tech-support-scam', 'phishing', 'instagram-scam', 'whatsapp-scam', 'job-scam',
+      'delivery-scam', 'zelle-scam', 'shopping-scam', 'grandparent-scam',
+      'social-media-scam', 'identity-theft', 'data-breach',
+    ];
+
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+    for (const page of staticPages) {
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}${page.path}</loc>\n`;
+      xml += `    <lastmod>${today}</lastmod>\n`;
+      xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+      xml += `    <priority>${page.priority}</priority>\n`;
+      xml += `  </url>\n`;
     }
+
+    for (const slug of scamSlugs) {
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}/scams/${slug}</loc>\n`;
+      xml += `    <lastmod>2026-03-01</lastmod>\n`;
+      xml += `    <changefreq>monthly</changefreq>\n`;
+      xml += `    <priority>0.7</priority>\n`;
+      xml += `  </url>\n`;
+    }
+
+    xml += '</urlset>';
+
+    res.setHeader('Content-Type', 'application/xml');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(xml);
   });
 
   // Serve robots.txt
