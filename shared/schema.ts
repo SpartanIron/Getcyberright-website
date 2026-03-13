@@ -1237,6 +1237,7 @@ export const scamIntelligence = pgTable("scam_intelligence", {
   metaDescription: text("meta_description"),
   faq: jsonb("faq").$type<{ question: string; answer: string }[]>().default([]),
   relatedScamSlugs: text("related_scam_slugs").array().default([]),
+  regions: text("regions").array().default([]),
   reportCount: integer("report_count").default(0),
   averageLoss: text("average_loss"),
   dateDetected: timestamp("date_detected").defaultNow(),

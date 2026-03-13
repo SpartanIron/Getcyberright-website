@@ -6,9 +6,11 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, ArrowRight, Loader2, AlertTriangle, Users, DollarSign } from "lucide-react";
+import { Search, ArrowRight, Loader2, AlertTriangle, Users, DollarSign, MapPin, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState, useEffect } from "react";
+import { detectUserRegion, setUserRegion, type Region } from "@/lib/region-detect";
 
 interface ScamIntel {
   id: string;
@@ -19,6 +21,7 @@ interface ScamIntel {
   targetAudience: string[];
   riskLevel: string;
   metaDescription: string;
+  regions: string[];
   reportCount: number;
   averageLoss: string;
   dateDetected: string;
@@ -36,9 +39,31 @@ const riskBorder: Record<string, string> = {
   low: "border-t-green-500",
 };
 
+const regionLabels: Record<string, string> = {
+  global: "All Regions",
+  us: "United States",
+  americas: "Americas",
+  europe: "Europe",
+  africa: "Africa",
+  asia: "Asia",
+  "middle-east": "Middle East",
+  australia: "Australia & Oceania",
+};
+
 export default function ScamIntelListing() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [detectedRegion, setDetectedRegion] = useState<Region>("global");
+  const [selectedRegion, setSelectedRegion] = useState<Region>("global");
+  const [regionLoading, setRegionLoading] = useState(true);
+
+  useEffect(() => {
+    detectUserRegion().then((region) => {
+      setDetectedRegion(region);
+      setSelectedRegion(region);
+      setRegionLoading(false);
+    });
+  }, []);
 
   useSEO({
     title: "Scam Intelligence Center | GetCyberRight",
@@ -55,7 +80,16 @@ export default function ScamIntelListing() {
   };
 
   const { data: scams = [], isLoading, isError } = useQuery<ScamIntel[]>({
-    queryKey: ["/api/scam-intel"],
+    queryKey: ["/api/scam-intel", { region: selectedRegion }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (selectedRegion && selectedRegion !== "global") {
+        params.set("region", selectedRegion.toUpperCase());
+      }
+      const res = await fetch(`/api/scam-intel?${params.toString()}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
   });
 
   const categories = Array.from(new Set(scams.map((s) => s.scamCategory).filter(Boolean)));
@@ -67,6 +101,19 @@ export default function ScamIntelListing() {
     const matchesCategory = !selectedCategory || s.scamCategory === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleRegionChange = (value: string) => {
+    const region = value as Region;
+    setSelectedRegion(region);
+    setUserRegion(region);
+  };
+
+  const isRegionScam = (scam: ScamIntel) => {
+    if (!scam.regions || scam.regions.length === 0) return false;
+    return scam.regions.some(
+      (r) => r.toLowerCase() === selectedRegion.toLowerCase() || r.toLowerCase() === "global"
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -84,6 +131,18 @@ export default function ScamIntelListing() {
               <p className="text-slate-300 mt-2">Detailed analysis of scams targeting real people, with practical tips to stay safe</p>
             </div>
           </div>
+
+          <div className="flex items-center gap-2 mt-4">
+            <MapPin className="h-4 w-4 text-teal-400" />
+            <span className="text-sm text-slate-300">
+              {regionLoading ? "Detecting your region..." : `Showing scams relevant to ${regionLabels[selectedRegion] || "your region"}`}
+            </span>
+            {detectedRegion !== "global" && selectedRegion === detectedRegion && (
+              <Badge variant="secondary" className="text-xs bg-teal-500/20 text-teal-300 border-teal-500/30" data-testid="badge-auto-detected">
+                Auto-detected
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
 
@@ -99,27 +158,43 @@ export default function ScamIntelListing() {
               data-testid="input-search-scams"
             />
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant={!selectedCategory ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => setSelectedCategory(null)}
-              data-testid="filter-all"
-            >
-              All
-            </Badge>
-            {categories.map((cat) => (
-              <Badge
-                key={cat}
-                variant={selectedCategory === cat ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => setSelectedCategory(cat)}
-                data-testid={`filter-${cat}`}
-              >
-                {cat}
-              </Badge>
-            ))}
+          <div className="flex items-center gap-3">
+            <Select value={selectedRegion} onValueChange={handleRegionChange}>
+              <SelectTrigger className="w-52" data-testid="select-region">
+                <Globe className="h-4 w-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Select region" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(regionLabels).map(([code, label]) => (
+                  <SelectItem key={code} value={code} data-testid={`option-region-${code}`}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Badge
+            variant={!selectedCategory ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => setSelectedCategory(null)}
+            data-testid="filter-all"
+          >
+            All
+          </Badge>
+          {categories.map((cat) => (
+            <Badge
+              key={cat}
+              variant={selectedCategory === cat ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => setSelectedCategory(cat)}
+              data-testid={`filter-${cat}`}
+            >
+              {cat}
+            </Badge>
+          ))}
         </div>
 
         {isLoading ? (
@@ -139,7 +214,7 @@ export default function ScamIntelListing() {
             <p className="text-muted-foreground">
               {searchQuery ? "Try a different search term." : "Our intelligence database is growing. Check back soon!"}
             </p>
-            <Link href="/scam-checker" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium mt-4">
+            <Link href="/scam-checker" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium mt-4" data-testid="link-scam-checker">
               Check something suspicious
               <ArrowRight className="h-4 w-4 ml-1" />
             </Link>
@@ -155,8 +230,14 @@ export default function ScamIntelListing() {
                         {scam.riskLevel?.toUpperCase()}
                       </Badge>
                       {scam.scamCategory && <Badge variant="outline">{scam.scamCategory}</Badge>}
+                      {selectedRegion !== "global" && isRegionScam(scam) && (
+                        <Badge variant="secondary" className="text-xs gap-1" data-testid={`badge-region-${scam.slug}`}>
+                          <MapPin className="h-3 w-3" />
+                          {regionLabels[selectedRegion]?.split(" ")[0] || "Local"}
+                        </Badge>
+                      )}
                     </div>
-                    <h2 className="text-lg font-semibold mb-2 line-clamp-2">{scam.scamName}</h2>
+                    <h2 className="text-lg font-semibold mb-2 line-clamp-2" data-testid={`text-scam-name-${scam.slug}`}>{scam.scamName}</h2>
                     <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{scam.metaDescription}</p>
 
                     <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-3">

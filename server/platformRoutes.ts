@@ -83,8 +83,24 @@ export function registerPlatformRoutes(app: Express): void {
   app.get("/api/scam-intel", async (_req: Request, res: Response) => {
     try {
       const category = _req.query.category as string | undefined;
+      const region = _req.query.region as string | undefined;
       const limit = _req.query.limit ? parseInt(_req.query.limit as string) : 50;
       const scams = await storage.getPublishedScamIntel(category, limit);
+      if (region && region !== "GLOBAL") {
+        const regionUpper = region.toUpperCase();
+        const regionScams = scams.filter((s: any) =>
+          s.regions && Array.isArray(s.regions) && (
+            s.regions.some((r: string) => r.toUpperCase() === regionUpper) ||
+            s.regions.some((r: string) => r.toUpperCase() === "GLOBAL")
+          )
+        );
+        const nonRegionScams = scams.filter((s: any) =>
+          !s.regions || !Array.isArray(s.regions) || s.regions.length === 0 ||
+          (!s.regions.some((r: string) => r.toUpperCase() === regionUpper) &&
+           !s.regions.some((r: string) => r.toUpperCase() === "GLOBAL"))
+        );
+        return res.json([...regionScams, ...nonRegionScams]);
+      }
       res.json(scams);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to fetch scam intelligence" });

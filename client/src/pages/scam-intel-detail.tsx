@@ -7,7 +7,7 @@ import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AlertTriangle, ArrowLeft, Eye, CheckCircle, Shield, MessageSquareWarning, HelpCircle, Loader2, ArrowRight, Users, DollarSign } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Eye, CheckCircle, Shield, MessageSquareWarning, HelpCircle, Loader2, ArrowRight, Users, DollarSign, MapPin } from "lucide-react";
 
 interface ScamIntelDetail {
   id: string;
@@ -23,6 +23,7 @@ interface ScamIntelDetail {
   riskLevel: string;
   metaDescription: string;
   faq: Array<{ question: string; answer: string }>;
+  regions: string[];
   relatedScamSlugs: string[];
   reportCount: number;
   averageLoss: string;
@@ -159,6 +160,11 @@ export default function ScamIntelDetailPage() {
             )}
             {scam.averageLoss && (
               <span className="flex items-center gap-1"><DollarSign className="h-4 w-4" /> Avg loss: {scam.averageLoss}</span>
+            )}
+            {scam.regions?.length > 0 && (
+              <span className="flex items-center gap-1" data-testid="text-regions">
+                <MapPin className="h-4 w-4" /> Regions: {scam.regions.map((r) => r.charAt(0).toUpperCase() + r.slice(1).toLowerCase()).join(", ")}
+              </span>
             )}
           </div>
         </div>
