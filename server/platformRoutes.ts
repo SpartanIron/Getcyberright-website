@@ -24,6 +24,7 @@ import {
   distributeScamIntelContent,
   getSocialDistributionStats,
 } from "./socialDistributionService";
+import { getAllScamSlugs } from "@shared/scam-content";
 import {
   scheduleTask,
   processPendingTasks,
@@ -150,6 +151,28 @@ export function registerPlatformRoutes(app: Express): void {
       res.json(scams);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to fetch scam intelligence" });
+    }
+  });
+
+  app.get("/api/scam-intel/cross-link/:scamSlug", async (req: Request, res: Response) => {
+    try {
+      const scamSlug = req.params.scamSlug.toLowerCase();
+      const keywords = scamSlug.replace(/-/g, " ").split(" ").filter(w => w.length > 2);
+      const allIntel = await storage.getPublishedScamIntel(undefined, 200);
+      const matches = allIntel.filter((intel: any) => {
+        const name = (intel.scamName || "").toLowerCase();
+        const category = (intel.scamCategory || "").toLowerCase();
+        const slug = (intel.slug || "").toLowerCase();
+        return keywords.some(kw => name.includes(kw) || category.includes(kw) || slug.includes(kw));
+      }).slice(0, 5).map((intel: any) => ({
+        slug: intel.slug,
+        scamName: intel.scamName,
+        riskLevel: intel.riskLevel,
+        reportCount: intel.reportCount || 0,
+      }));
+      res.json(matches);
+    } catch (error: any) {
+      res.json([]);
     }
   });
 
@@ -595,5 +618,160 @@ export function registerPlatformRoutes(app: Express): void {
     }
     setAutoPublish(enabled);
     res.json({ enabled: getAutoPublishStatus() });
+  });
+
+  app.get("/sitemap.xml", async (_req: Request, res: Response) => {
+    try {
+      const baseUrl = "https://www.getcyberright.com";
+      const today = new Date().toISOString().split("T")[0];
+
+      const staticPages = [
+        { path: "/", priority: "1.0", changefreq: "weekly" },
+        { path: "/tools", priority: "0.9", changefreq: "weekly" },
+        { path: "/scam-checker", priority: "0.9", changefreq: "weekly" },
+        { path: "/password-generator", priority: "0.9", changefreq: "monthly" },
+        { path: "/data-removal", priority: "0.9", changefreq: "weekly" },
+        { path: "/kids", priority: "0.9", changefreq: "weekly" },
+        { path: "/seniors", priority: "0.9", changefreq: "weekly" },
+        { path: "/parents", priority: "0.9", changefreq: "weekly" },
+        { path: "/emergency-help", priority: "0.9", changefreq: "monthly" },
+        { path: "/cyber-threat-radar", priority: "0.9", changefreq: "daily" },
+        { path: "/awareness-hub", priority: "0.9", changefreq: "weekly" },
+        { path: "/resources", priority: "0.8", changefreq: "weekly" },
+        { path: "/training", priority: "0.8", changefreq: "weekly" },
+        { path: "/ai-prompts", priority: "0.8", changefreq: "weekly" },
+        { path: "/ai-safety", priority: "0.8", changefreq: "weekly" },
+        { path: "/cyber-hygiene", priority: "0.8", changefreq: "monthly" },
+        { path: "/checklists", priority: "0.8", changefreq: "weekly" },
+        { path: "/threat-trends", priority: "0.8", changefreq: "daily" },
+        { path: "/breach-dashboard", priority: "0.8", changefreq: "weekly" },
+        { path: "/about", priority: "0.8", changefreq: "monthly" },
+        { path: "/parent-guide", priority: "0.8", changefreq: "monthly" },
+        { path: "/small-business", priority: "0.8", changefreq: "monthly" },
+        { path: "/educators", priority: "0.8", changefreq: "monthly" },
+        { path: "/guides", priority: "0.8", changefreq: "weekly" },
+        { path: "/scam-intel", priority: "0.8", changefreq: "weekly" },
+        { path: "/alerts", priority: "0.8", changefreq: "daily" },
+        { path: "/news", priority: "0.7", changefreq: "daily" },
+        { path: "/printable-guides", priority: "0.7", changefreq: "monthly" },
+        { path: "/report-scam", priority: "0.7", changefreq: "monthly" },
+        { path: "/quick-assessment", priority: "0.7", changefreq: "monthly" },
+        { path: "/safety-score", priority: "0.7", changefreq: "monthly" },
+        { path: "/travel-safety", priority: "0.7", changefreq: "monthly" },
+        { path: "/parents/child-safety-scanner", priority: "0.7", changefreq: "monthly" },
+        { path: "/resources/glossary", priority: "0.7", changefreq: "monthly" },
+        { path: "/resources/cheat-sheets", priority: "0.7", changefreq: "monthly" },
+        { path: "/faq", priority: "0.6", changefreq: "monthly" },
+        { path: "/contact", priority: "0.6", changefreq: "monthly" },
+        { path: "/support", priority: "0.6", changefreq: "monthly" },
+        { path: "/support-the-mission", priority: "0.6", changefreq: "monthly" },
+        { path: "/pricing", priority: "0.6", changefreq: "monthly" },
+        { path: "/feedback", priority: "0.5", changefreq: "monthly" },
+        { path: "/search", priority: "0.5", changefreq: "weekly" },
+        { path: "/security", priority: "0.5", changefreq: "monthly" },
+        { path: "/privacy", priority: "0.4", changefreq: "yearly" },
+        { path: "/terms", priority: "0.4", changefreq: "yearly" },
+        { path: "/accessibility", priority: "0.4", changefreq: "yearly" },
+      ];
+
+      const scamSlugs = getAllScamSlugs();
+      const [publishedGuides, publishedAlerts, publishedScamIntel] = await Promise.all([
+        storage.getPublishedGuides(undefined, 500),
+        storage.getPublishedThreatAlerts(undefined, 500),
+        storage.getPublishedScamIntel(undefined, 500),
+      ]);
+
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+      xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+      for (const page of staticPages) {
+        xml += `  <url>\n    <loc>${baseUrl}${page.path}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${page.changefreq}</changefreq>\n    <priority>${page.priority}</priority>\n  </url>\n`;
+      }
+
+      for (const slug of scamSlugs) {
+        xml += `  <url>\n    <loc>${baseUrl}/scams/${slug}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+      }
+
+      for (const guide of publishedGuides) {
+        const lastmod = guide.updatedAt ? new Date(guide.updatedAt).toISOString().split("T")[0] : today;
+        xml += `  <url>\n    <loc>${baseUrl}/guides/${guide.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+      }
+
+      for (const alert of publishedAlerts) {
+        const lastmod = alert.updatedAt ? new Date(alert.updatedAt).toISOString().split("T")[0] : today;
+        xml += `  <url>\n    <loc>${baseUrl}/alerts/${alert.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+      }
+
+      for (const scam of publishedScamIntel) {
+        const lastmod = scam.lastUpdated ? new Date(scam.lastUpdated).toISOString().split("T")[0] : today;
+        xml += `  <url>\n    <loc>${baseUrl}/scam-intel/${scam.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+      }
+
+      xml += `</urlset>`;
+
+      res.set("Content-Type", "application/xml");
+      res.send(xml);
+    } catch (error) {
+      console.error("Sitemap generation error:", error);
+      res.status(500).send("Failed to generate sitemap");
+    }
+  });
+
+  app.get("/api/admin/growth/task-stats", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const tasks = await storage.getGrowthTasks(undefined, 200);
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      const recentTasks = tasks.filter(t => t.createdAt && new Date(t.createdAt) >= thirtyDaysAgo);
+      const weekTasks = tasks.filter(t => t.createdAt && new Date(t.createdAt) >= oneWeekAgo);
+
+      const completed = recentTasks.filter(t => t.status === "completed");
+      const failed = recentTasks.filter(t => t.status === "failed");
+      const pending = recentTasks.filter(t => t.status === "pending");
+      const running = recentTasks.filter(t => t.status === "running");
+
+      const byType: Record<string, { total: number; completed: number; failed: number }> = {};
+      for (const task of recentTasks) {
+        if (!byType[task.taskType]) {
+          byType[task.taskType] = { total: 0, completed: 0, failed: 0 };
+        }
+        byType[task.taskType].total++;
+        if (task.status === "completed") byType[task.taskType].completed++;
+        if (task.status === "failed") byType[task.taskType].failed++;
+      }
+
+      const successRate = recentTasks.length > 0
+        ? Math.round((completed.length / (completed.length + failed.length || 1)) * 100)
+        : 0;
+
+      const recentActivity = tasks.slice(0, 10).map(t => ({
+        id: t.id,
+        taskType: t.taskType,
+        taskName: t.taskName,
+        status: t.status,
+        errorMessage: t.errorMessage,
+        createdAt: t.createdAt,
+        completedAt: t.completedAt,
+      }));
+
+      res.json({
+        summary: {
+          totalThisMonth: recentTasks.length,
+          totalThisWeek: weekTasks.length,
+          completed: completed.length,
+          failed: failed.length,
+          pending: pending.length,
+          running: running.length,
+          successRate,
+        },
+        byType,
+        recentActivity,
+      });
+    } catch (error) {
+      console.error("Growth task stats error:", error);
+      res.status(500).json({ error: "Failed to fetch task stats" });
+    }
   });
 }

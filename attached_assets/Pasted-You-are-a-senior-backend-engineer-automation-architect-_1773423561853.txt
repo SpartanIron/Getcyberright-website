@@ -1,0 +1,328 @@
+You are a senior backend engineer, automation architect, and social media API integration specialist.
+
+Your task is to build an automated content distribution system for the cybersecurity platform GetCyberRight.
+
+The system must automatically generate social media posts and attach relevant high-resolution images whenever new content is published on the website.
+
+The automation must support publishing to the following platforms:
+
+Facebook  
+LinkedIn  
+Instagram  
+X (Twitter)
+
+--------------------------------------------------
+
+SYSTEM OBJECTIVE
+
+When a new article, scam report, cybersecurity guide, or threat alert is published on the website, the system must:
+
+1. Detect the newly published content.
+2. Extract the article title, summary, and URL.
+3. Generate platform-specific social media posts.
+4. Generate or retrieve a relevant image.
+5. Attach the image to the post.
+6. Publish the post automatically to social media platforms.
+
+--------------------------------------------------
+
+SUPPORTED WEBSITE CONTENT
+
+The automation system must process these types of content:
+
+Cyber Safety Guides  
+Scam Intelligence Reports  
+Cyber Threat Alerts  
+Cybersecurity Tool Announcements  
+Cyber Awareness Resources  
+
+--------------------------------------------------
+
+CONTENT PROCESSING PIPELINE
+
+Implement the following workflow:
+
+New content published
+↓
+Content processor extracts title, summary, and link
+↓
+Image generator or image fetcher creates a visual asset
+↓
+Social content generator creates platform-specific captions
+↓
+Social publisher posts content to APIs
+
+--------------------------------------------------
+
+IMAGE GENERATION SYSTEM
+
+Each post must include a relevant image.
+
+Images may be generated using one of two methods:
+
+AI-generated images
+
+or
+
+Stock image APIs
+
+--------------------------------------------------
+
+AI IMAGE GENERATION
+
+Generate high-resolution images illustrating cybersecurity threats such as:
+
+phishing attacks  
+online scams  
+identity theft  
+digital privacy risks  
+cyber threat warnings  
+
+Image style guidelines:
+
+ultra-realistic cybersecurity visuals  
+dark blue or cyber-themed color palettes  
+clear threat visualization  
+
+Example prompt:
+
+Ultra realistic visualization of phishing email cyber attack with glowing network security interface.
+
+--------------------------------------------------
+
+STOCK IMAGE FALLBACK
+
+If AI generation fails, fetch images from stock APIs such as:
+
+Unsplash API  
+Pexels API  
+
+Search queries should match the topic.
+
+Example queries:
+
+phishing email scam  
+cybersecurity threat  
+identity theft warning  
+
+Images must be high resolution and relevant.
+
+--------------------------------------------------
+
+IMAGE PROCESSING
+
+Before posting, images must be optimized:
+
+resize for platform requirements  
+compress for fast loading  
+convert to WebP or optimized formats  
+
+--------------------------------------------------
+
+PLATFORM IMAGE DIMENSIONS
+
+Facebook
+
+1200 x 630
+
+LinkedIn
+
+1200 x 627
+
+Instagram
+
+1080 x 1080
+
+X (Twitter)
+
+1200 x 675
+
+The automation system must resize images automatically.
+
+--------------------------------------------------
+
+SOCIAL MEDIA CONTENT GENERATION
+
+Each platform must receive a unique caption format.
+
+LinkedIn
+
+Write professional cybersecurity insights and educational posts.
+
+Facebook
+
+Write awareness-focused posts explaining scams and cyber threats.
+
+Instagram
+
+Write short captions designed for visual engagement and cybersecurity tips.
+
+X (Twitter)
+
+Generate short cyber threat alerts or threads.
+
+Example alert:
+
+⚠️ New phishing campaign targeting PayPal users detected.
+
+--------------------------------------------------
+
+SOCIAL MEDIA API INTEGRATIONS
+
+Implement integrations with the following APIs.
+
+LinkedIn API
+
+POST /ugcPosts
+
+Required permissions:
+
+w_member_social  
+r_liteprofile  
+
+--------------------------------------------------
+
+Facebook Graph API
+
+POST /{page-id}/feed
+
+Required permissions:
+
+pages_manage_posts  
+pages_read_engagement  
+
+--------------------------------------------------
+
+Instagram Graph API
+
+POST /{ig-user-id}/media  
+POST /{ig-user-id}/media_publish
+
+Required permissions:
+
+instagram_basic  
+instagram_content_publish  
+
+--------------------------------------------------
+
+X API
+
+POST /2/tweets
+
+Required permissions:
+
+tweet.read  
+tweet.write  
+
+--------------------------------------------------
+
+API SECURITY
+
+All API credentials must be stored using environment variables.
+
+Example environment variables:
+
+LINKEDIN_API_KEY  
+FACEBOOK_API_KEY  
+INSTAGRAM_API_KEY  
+X_API_KEY  
+
+Never hardcode API credentials.
+
+--------------------------------------------------
+
+POST STRUCTURE
+
+Each post must include:
+
+post text  
+image  
+link to website content  
+optional hashtags  
+
+Example:
+
+⚠️ Cyber Scam Alert
+
+A new PayPal phishing campaign is targeting online shoppers.
+
+Learn the warning signs and how to protect yourself.
+
+--------------------------------------------------
+
+POST SCHEDULING
+
+Allow posts to be either:
+
+published immediately
+
+or
+
+scheduled for a specific time.
+
+--------------------------------------------------
+
+AUTOMATION SCHEDULER
+
+Implement background jobs that run the automation pipeline.
+
+Example workflow:
+
+New article published
+↓
+Generate social posts
+↓
+Generate image
+↓
+Resize image
+↓
+Publish posts to platforms
+
+--------------------------------------------------
+
+ERROR HANDLING
+
+If posting fails:
+
+log the error  
+retry the API request  
+alert the administrator after repeated failures  
+
+--------------------------------------------------
+
+ADMIN MONITORING DASHBOARD
+
+Create a dashboard to monitor:
+
+recent social posts  
+posting success or failures  
+queued posts waiting for publishing  
+connected social accounts  
+
+--------------------------------------------------
+
+SCALABILITY
+
+The system must support:
+
+multiple social platforms  
+high posting frequency  
+future platform integrations  
+
+--------------------------------------------------
+
+FINAL OUTPUT
+
+Generate the following components:
+
+content detection service  
+image generation module  
+stock image fallback module  
+image processing pipeline  
+social media caption generator  
+platform-specific API publishing services  
+environment variable configuration  
+background job scheduler  
+admin monitoring dashboard  
+
+The completed system must automatically publish cybersecurity awareness content with relevant images to Facebook, LinkedIn, Instagram, and X whenever new website content is published

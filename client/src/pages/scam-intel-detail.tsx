@@ -7,7 +7,8 @@ import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AlertTriangle, ArrowLeft, Eye, CheckCircle, Shield, MessageSquareWarning, HelpCircle, Loader2, ArrowRight, Users, DollarSign, MapPin } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Eye, CheckCircle, Shield, MessageSquareWarning, HelpCircle, Loader2, ArrowRight, Users, DollarSign, MapPin, BookOpen } from "lucide-react";
+import { getAllScamSlugs, getScamBySlug } from "@shared/scam-content";
 
 interface ScamIntelDetail {
   id: string;
@@ -301,6 +302,45 @@ export default function ScamIntelDetailPage() {
                 </Accordion>
               </section>
             )}
+
+            {(() => {
+              const allSlugs = getAllScamSlugs();
+              const scamNameWords = (scam.scamName || "").toLowerCase().replace(/-/g, " ").split(" ").filter((w: string) => w.length > 3);
+              const scamCatWords = (scam.scamCategory || "").toLowerCase().replace(/-/g, " ").split(" ").filter((w: string) => w.length > 3);
+              const searchWords = [...new Set([...scamNameWords, ...scamCatWords])];
+              const matchedSlugs = allSlugs.filter(s => {
+                const slugWords = s.replace(/-/g, " ");
+                return searchWords.some(w => slugWords.includes(w));
+              });
+              const matchedPages = matchedSlugs.map(s => getScamBySlug(s)).filter(Boolean).slice(0, 3);
+              if (matchedPages.length === 0) return null;
+              return (
+                <section className="mt-8">
+                  <div className="flex items-center gap-2 mb-4">
+                    <BookOpen className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                    <h2 className="text-xl font-bold">In-depth Scam Guides</h2>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Read our comprehensive prevention guides for detailed protection strategies.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {matchedPages.map((page: any) => (
+                      <Link key={page.slug} href={`/scams/${page.slug}`}>
+                        <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-orange-500" data-testid={`link-guide-${page.slug}`}>
+                          <CardContent className="p-4 flex items-center justify-between">
+                            <div>
+                              <span className="text-sm font-medium">{page.title}</span>
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{page.metaDescription}</p>
+                            </div>
+                            <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0 ml-2" />
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              );
+            })()}
 
             {scam.relatedScamSlugs && scam.relatedScamSlugs.length > 0 && (
               <section className="mt-12">

@@ -1,19 +1,37 @@
 import { useParams, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BlogPostingData, type FAQData, type BreadcrumbData } from "@/components/structured-data";
 import { RelatedContent } from "@/components/related-content";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { getScamBySlug } from "@shared/scam-content";
-import { AlertTriangle, Shield, Search, ChevronRight, ExternalLink, ArrowLeft, MessageSquareWarning, Eye, CheckCircle, HelpCircle } from "lucide-react";
+import { AlertTriangle, Shield, Search, ChevronRight, ExternalLink, ArrowLeft, MessageSquareWarning, Eye, CheckCircle, HelpCircle, Database, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
+interface ScamIntelMatch {
+  slug: string;
+  scamName: string;
+  riskLevel: string;
+  reportCount: number;
+}
 
 export default function ScamPage() {
   const params = useParams<{ scamType: string }>();
   const scamType = params.scamType || "";
   const scam = getScamBySlug(scamType);
+
+  const { data: relatedIntel = [] } = useQuery<ScamIntelMatch[]>({
+    queryKey: ["/api/scam-intel/cross-link", scamType],
+    queryFn: async () => {
+      const res = await fetch(`/api/scam-intel/cross-link/${scamType}`);
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: !!scam,
+  });
 
   useSEO({
     title: scam?.metaTitle || "Scam Guide | GetCyberRight",
@@ -245,6 +263,38 @@ export default function ScamPage() {
                 </Link>
               </div>
             </div>
+
+            {relatedIntel.length > 0 && (
+              <section className="mt-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <Database className="h-5 w-5 text-teal-600" />
+                  <h2 className="text-xl font-bold">Live Intelligence Reports</h2>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Our Scam Intelligence Center tracks real-time data on active scams related to this topic.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {relatedIntel.map((intel) => (
+                    <Link key={intel.slug} href={`/scam-intel/${intel.slug}`}>
+                      <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-teal-500" data-testid={`link-intel-${intel.slug}`}>
+                        <CardContent className="p-4 flex items-center justify-between">
+                          <div>
+                            <span className="text-sm font-medium">{intel.scamName}</span>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs capitalize">{intel.riskLevel} risk</Badge>
+                              {intel.reportCount > 0 && (
+                                <span className="text-xs text-muted-foreground">{intel.reportCount.toLocaleString()} reports</span>
+                              )}
+                            </div>
+                          </div>
+                          <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <RelatedContent
               currentCluster={scam.cluster}

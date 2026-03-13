@@ -98,6 +98,20 @@ interface BlogPostingData {
   wordCount?: number;
 }
 
+interface DatasetData {
+  type: "Dataset";
+  name: string;
+  description: string;
+  url: string;
+  keywords?: string[];
+  creator?: { name: string; url?: string };
+  dateModified?: string;
+  license?: string;
+  variableMeasured?: string[];
+  measurementTechnique?: string;
+  distribution?: { contentUrl: string; encodingFormat: string };
+}
+
 type StructuredDataInput =
   | OrganizationData
   | FAQData
@@ -107,7 +121,8 @@ type StructuredDataInput =
   | BreadcrumbData
   | CourseData
   | WebApplicationData
-  | BlogPostingData;
+  | BlogPostingData
+  | DatasetData;
 
 function buildJsonLd(data: StructuredDataInput): object {
   switch (data.type) {
@@ -276,6 +291,34 @@ function buildJsonLd(data: StructuredDataInput): object {
         ...(data.wordCount ? { wordCount: data.wordCount } : {}),
       };
 
+    case "Dataset":
+      return {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        name: data.name,
+        description: data.description,
+        url: data.url,
+        ...(data.keywords ? { keywords: data.keywords } : {}),
+        ...(data.creator ? {
+          creator: {
+            "@type": "Organization",
+            name: data.creator.name,
+            ...(data.creator.url ? { url: data.creator.url } : {}),
+          },
+        } : {}),
+        ...(data.dateModified ? { dateModified: data.dateModified } : {}),
+        ...(data.license ? { license: data.license } : {}),
+        ...(data.variableMeasured ? { variableMeasured: data.variableMeasured } : {}),
+        ...(data.measurementTechnique ? { measurementTechnique: data.measurementTechnique } : {}),
+        ...(data.distribution ? {
+          distribution: {
+            "@type": "DataDownload",
+            contentUrl: data.distribution.contentUrl,
+            encodingFormat: data.distribution.encodingFormat,
+          },
+        } : {}),
+      };
+
     default:
       return {};
   }
@@ -324,5 +367,6 @@ export type {
   BreadcrumbData,
   CourseData,
   WebApplicationData,
+  DatasetData,
   StructuredDataInput,
 };

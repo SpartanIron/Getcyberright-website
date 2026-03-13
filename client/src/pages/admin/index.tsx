@@ -19,7 +19,11 @@ import {
   Share2,
   CalendarDays,
   UserPlus,
-  Cog
+  Cog,
+  CheckCircle2,
+  XCircle,
+  Activity,
+  Zap
 } from "lucide-react";
 import { Link } from "wouter";
 import { AdminLayout } from "@/components/admin/admin-layout";
@@ -44,6 +48,28 @@ interface AdminStats {
   pendingTasks: number;
 }
 
+interface TaskStats {
+  summary: {
+    totalThisMonth: number;
+    totalThisWeek: number;
+    completed: number;
+    failed: number;
+    pending: number;
+    running: number;
+    successRate: number;
+  };
+  byType: Record<string, { total: number; completed: number; failed: number }>;
+  recentActivity: Array<{
+    id: string;
+    taskType: string;
+    taskName: string;
+    status: string;
+    errorMessage: string | null;
+    createdAt: string;
+    completedAt: string | null;
+  }>;
+}
+
 export default function AdminDashboard() {
   const { user, isLoading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
@@ -55,6 +81,11 @@ export default function AdminDashboard() {
 
   const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
     queryKey: ["/api/admin/stats"],
+    enabled: adminCheck?.isAdmin === true,
+  });
+
+  const { data: taskStats } = useQuery<TaskStats>({
+    queryKey: ["/api/admin/growth/task-stats"],
     enabled: adminCheck?.isAdmin === true,
   });
 
@@ -234,6 +265,114 @@ export default function AdminDashboard() {
             ))}
           </div>
         </div>
+
+        {taskStats && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-primary" />
+              Content Automation
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Success Rate</CardTitle>
+                  <Zap className="w-5 h-5 text-amber-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold" data-testid="stat-success-rate">
+                    {taskStats.summary.successRate}%
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">last 30 days</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
+                  <CheckCircle2 className="w-5 h-5 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600" data-testid="stat-completed-tasks">
+                    {taskStats.summary.completed}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">{taskStats.summary.totalThisWeek} this week</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Failed</CardTitle>
+                  <XCircle className="w-5 h-5 text-red-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-600" data-testid="stat-failed-tasks">
+                    {taskStats.summary.failed}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">{taskStats.summary.totalThisMonth} total this month</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">In Progress</CardTitle>
+                  <Activity className="w-5 h-5 text-blue-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold" data-testid="stat-running-tasks">
+                    {taskStats.summary.running + taskStats.summary.pending}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">{taskStats.summary.running} running, {taskStats.summary.pending} queued</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {Object.keys(taskStats.byType).length > 0 && (
+              <Card className="mb-4">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Task Breakdown by Type</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {Object.entries(taskStats.byType).map(([type, counts]) => (
+                      <div key={type} className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground capitalize">{type.replace(/_/g, " ")}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-green-600">{counts.completed} done</span>
+                          {counts.failed > 0 && <span className="text-red-600">{counts.failed} failed</span>}
+                          <span className="text-muted-foreground">{counts.total} total</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {taskStats.recentActivity.length > 0 && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {taskStats.recentActivity.map((task) => (
+                      <div key={task.id} className="flex items-center justify-between text-xs border-b border-border/50 pb-1">
+                        <div className="flex items-center gap-2">
+                          {task.status === "completed" && <CheckCircle2 className="w-3 h-3 text-green-500" />}
+                          {task.status === "failed" && <XCircle className="w-3 h-3 text-red-500" />}
+                          {task.status === "pending" && <Cog className="w-3 h-3 text-muted-foreground" />}
+                          {task.status === "running" && <Activity className="w-3 h-3 text-blue-500 animate-pulse" />}
+                          <span className="font-medium truncate max-w-[200px]">{task.taskName}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <span className="capitalize">{task.status}</span>
+                          {task.createdAt && <span>{new Date(task.createdAt).toLocaleDateString()}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>

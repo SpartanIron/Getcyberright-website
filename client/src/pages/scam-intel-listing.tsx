@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useSEO } from "@/hooks/use-seo";
-import { StructuredData, type BreadcrumbData } from "@/components/structured-data";
+import { StructuredData, type BreadcrumbData, type DatasetData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -117,7 +117,16 @@ export default function ScamIntelListing() {
 
   return (
     <div className="min-h-screen bg-background">
-      <StructuredData data={[breadcrumbs]} />
+      <StructuredData data={[breadcrumbs, {
+        type: "Dataset" as const,
+        name: "Scam Intelligence Database",
+        description: "Comprehensive database of active scams with risk levels, warning signs, prevention tips, and regional targeting data. Covers phishing, romance scams, crypto fraud, tech support scams, and more.",
+        url: "https://www.getcyberright.com/scam-intel",
+        keywords: ["scam database", "fraud intelligence", "cybersecurity threats", "scam prevention", "phishing scams"],
+        creator: { name: "GetCyberRight", url: "https://www.getcyberright.com" },
+        dateModified: new Date().toISOString().split("T")[0],
+        variableMeasured: ["risk level", "report count", "average financial loss", "target audience", "platforms used"],
+      }]} />
       <Navigation />
 
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
