@@ -851,21 +851,23 @@ export async function seedAdminUser(): Promise<void> {
   }
 
   try {
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
+
     // Check if admin already exists
     const existing = await db.select().from(users).where(eq(users.email, adminEmail));
     if (existing.length > 0) {
-      // Ensure existing user is admin
-      if (!existing[0].isAdmin) {
-        await db.update(users).set({ isAdmin: true }).where(eq(users.email, adminEmail));
-        console.log(`[auth] Promoted existing user ${adminEmail} to admin`);
-      } else {
-        console.log(`[auth] Admin user ${adminEmail} already exists`);
-      }
+      await db.update(users).set({
+        isAdmin: true,
+        passwordHash,
+        failedLoginAttempts: "0",
+        lockedUntil: null,
+        emailVerified: true,
+      }).where(eq(users.email, adminEmail));
+      console.log(`[auth] Admin user ${adminEmail} synced`);
       return;
     }
 
     // Create new admin user
-    const passwordHash = await bcrypt.hash(adminPassword, 12);
     await db.insert(users).values({
       email: adminEmail,
       passwordHash,
