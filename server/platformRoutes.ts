@@ -240,12 +240,24 @@ export function registerPlatformRoutes(app: Express): void {
     try {
       const existing = await storage.getGuideById(req.params.id);
       if (!existing) return res.status(404).json({ error: "Guide not found" });
+      const wasAlreadyPublished = existing.status === "published";
       const now = new Date();
-      const guide = await db.update(cyberSafetyGuides)
-        .set({ status: "published", publishedAt: now, updatedAt: now })
+      const result = await db.update(cyberSafetyGuides)
+        .set({ status: "published", publishedAt: existing.publishedAt || now, updatedAt: now })
         .where(eq(cyberSafetyGuides.id, req.params.id))
         .returning();
-      res.json(guide[0]);
+      const published = result[0];
+
+      if (!wasAlreadyPublished) {
+        try {
+          await distributeGuideContent(published);
+          console.log(`[publish] Auto-generated social posts for guide: ${published.title}`);
+        } catch (socialErr) {
+          console.error("[publish] Social distribution failed (non-blocking):", socialErr);
+        }
+      }
+
+      res.json(published);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to publish guide" });
     }
@@ -299,11 +311,23 @@ export function registerPlatformRoutes(app: Express): void {
     try {
       const existing = await storage.getScamIntelById(req.params.id);
       if (!existing) return res.status(404).json({ error: "Scam intel not found" });
+      const wasAlreadyPublished = existing.status === "published";
       const result = await db.update(scamIntelligence)
         .set({ status: "published", lastUpdated: new Date() })
         .where(eq(scamIntelligence.id, req.params.id))
         .returning();
-      res.json(result[0]);
+      const published = result[0];
+
+      if (!wasAlreadyPublished) {
+        try {
+          await distributeScamIntelContent(published);
+          console.log(`[publish] Auto-generated social posts for scam intel: ${published.scamName}`);
+        } catch (socialErr) {
+          console.error("[publish] Social distribution failed (non-blocking):", socialErr);
+        }
+      }
+
+      res.json(published);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to publish scam intel" });
     }
@@ -357,12 +381,34 @@ export function registerPlatformRoutes(app: Express): void {
     try {
       const existing = await storage.getThreatAlertById(req.params.id);
       if (!existing) return res.status(404).json({ error: "Alert not found" });
+      const wasAlreadyPublished = existing.status === "published";
       const now = new Date();
       const result = await db.update(cyberThreatAlerts)
-        .set({ status: "published", publishedAt: now, updatedAt: now })
+        .set({ status: "published", publishedAt: existing.publishedAt || now, updatedAt: now })
         .where(eq(cyberThreatAlerts.id, req.params.id))
         .returning();
-      res.json(result[0]);
+      const published = result[0];
+
+      if (!wasAlreadyPublished) {
+        try {
+          await distributeThreatAlertContent(published);
+          console.log(`[publish] Auto-generated social posts for alert: ${published.threatName}`);
+        } catch (socialErr) {
+          console.error("[publish] Social distribution failed (non-blocking):", socialErr);
+        }
+
+        if (published.riskLevel === "critical" || published.riskLevel === "high") {
+          try {
+            const { sendAlertToSubscribers } = await import("./newsletterService");
+            await sendAlertToSubscribers(published.threatName, published.description, `/alerts/${published.slug}`);
+            console.log(`[publish] Email alert sent for high-risk alert: ${published.threatName}`);
+          } catch (emailErr) {
+            console.error("[publish] Email alert failed (non-blocking):", emailErr);
+          }
+        }
+      }
+
+      res.json(published);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to publish alert" });
     }

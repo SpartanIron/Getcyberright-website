@@ -194,6 +194,13 @@ app.use((req, res, next) => {
         console.error("Failed to seed AI prompts:", err);
       });
 
+      // Seed initial content (guides, scam intel, alerts)
+      import("./contentSeed").then(({ seedInitialContent }) => {
+        return seedInitialContent();
+      }).catch(err => {
+        console.error("Failed to seed initial content:", err);
+      });
+
       // Start prompt review scheduler (runs weekly - every 168 hours)
       import("./promptReviewService").then(({ startPromptReviewScheduler }) => {
         startPromptReviewScheduler(168);

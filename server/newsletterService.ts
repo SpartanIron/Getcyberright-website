@@ -409,3 +409,56 @@ Privacy Policy: https://getcyberright.com/privacy
 }
 
 export const newsletterService = new NewsletterService();
+
+export async function sendAlertToSubscribers(threatName: string, description: string, alertPath: string) {
+  if (!resend) {
+    console.log("[newsletter] Resend not configured, skipping alert email");
+    return;
+  }
+
+  const subscribers = await db.select().from(newsletterSubscribers).where(eq(newsletterSubscribers.isActive, true));
+  if (subscribers.length === 0) {
+    console.log("[newsletter] No active subscribers for alert email");
+    return;
+  }
+
+  const siteUrl = "https://getcyberright.com";
+  const alertUrl = `${siteUrl}${alertPath}`;
+  const subject = `Security Alert: ${threatName}`;
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #0d9488, #f97316); padding: 2px; border-radius: 12px;">
+        <div style="background: #1e293b; padding: 24px; border-radius: 10px;">
+          <h1 style="color: #f97316; font-size: 18px; margin: 0 0 4px 0;">⚠️ Security Alert</h1>
+          <h2 style="color: #ffffff; font-size: 22px; margin: 0 0 16px 0;">${threatName}</h2>
+          <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0;">${description}</p>
+          <a href="${alertUrl}" style="display: inline-block; background: #0d9488; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">Read Full Alert</a>
+        </div>
+      </div>
+      <p style="color: #64748b; font-size: 12px; text-align: center; margin-top: 16px;">
+        You received this because you subscribe to GetCyberRight security alerts.<br/>
+        <a href="${siteUrl}" style="color: #0d9488;">GetCyberRight.com</a>
+      </p>
+    </div>
+  `;
+
+  let sent = 0;
+  const batchSize = 10;
+  for (let i = 0; i < subscribers.length; i += batchSize) {
+    const batch = subscribers.slice(i, i + batchSize);
+    for (const sub of batch) {
+      try {
+        await resend.emails.send({
+          from: "GetCyberRight Alerts <alerts@getcyberright.com>",
+          to: sub.email,
+          subject,
+          html,
+        });
+        sent++;
+      } catch (err) {
+        console.error(`[newsletter] Failed to send alert to ${sub.email}`);
+      }
+    }
+  }
+  console.log(`[newsletter] Alert email sent to ${sent}/${subscribers.length} subscribers`);
+}

@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Shield, AlertTriangle, BookOpen, Lock, Wrench, Radio } from "lucide-react";
+import { Shield, AlertTriangle, BookOpen, Lock, Wrench, Radio, Bot } from "lucide-react";
 
 const tiles = [
   {
@@ -62,6 +62,16 @@ const tiles = [
     color: "bg-purple-500/10 dark:bg-purple-500/20",
     iconColor: "text-purple-500",
     borderColor: "border-purple-200 dark:border-purple-800/40",
+  },
+  {
+    id: "ai-threats",
+    icon: Bot,
+    title: "AI Cyber Threats",
+    description: "Deepfakes, voice cloning, and AI-powered scams explained",
+    href: "/guides/ai-powered-scams-explained",
+    color: "bg-pink-500/10 dark:bg-pink-500/20",
+    iconColor: "text-pink-500",
+    borderColor: "border-pink-200 dark:border-pink-800/40",
   },
 ];
 

@@ -1,0 +1,327 @@
+You are a senior cybersecurity platform architect, UX strategist, AI safety researcher, SEO/AEO engineer, and full-stack developer.
+
+You are working on the website GetCyberRight.
+
+Your objective is to transform the site into a Consumer Cybersecurity Authority Platform that educates individuals, families, and seniors about online threats and how to stay safe.
+
+The platform must cover:
+
+• traditional cyber threats  
+• scams and identity theft  
+• digital privacy  
+• cybersecurity tools  
+• threat alerts  
+• AI-enabled cyber threats and AI-powered defenses
+
+The site must scale to hundreds or thousands of pages while remaining easy to understand for non-technical users.
+
+--------------------------------------------------
+
+CRITICAL DESIGN RULE
+
+Do NOT completely redesign the existing UI.
+
+You may enhance the interface with:
+
+• image-rich sections  
+• large visual tiles  
+• infographic blocks  
+• icon-based navigation  
+• visual alert indicators  
+
+Maintain the current design style and navigation hierarchy.
+
+The goal is to reduce cognitive overload and make cybersecurity concepts easier to understand.
+
+--------------------------------------------------
+
+IMAGE PERFORMANCE RULES
+
+All images must:
+
+• use WebP or AVIF formats  
+• be compressed under 200 KB  
+• implement lazy loading  
+• support responsive sizes  
+
+The website must remain fast and optimized.
+
+--------------------------------------------------
+
+VISUAL COMPONENT SYSTEM
+
+Create reusable UI components:
+
+guide cards  
+scam alert cards  
+tool cards  
+infographic blocks  
+AI threat cards  
+risk-level badges
+
+These components should allow image-rich presentation while keeping the site visually consistent.
+
+--------------------------------------------------
+
+PLATFORM AUTHORITY PILLARS
+
+Build the platform around six pillars.
+
+1. Cyber Safety Guides  
+2. Scam Intelligence Center  
+3. Cyber Threat Radar  
+4. Cybersecurity Tools  
+5. Cyber Awareness Hub  
+6. AI Cybersecurity Awareness
+
+--------------------------------------------------
+
+HOMEPAGE STRUCTURE
+
+The homepage must clearly communicate:
+
+What the platform does  
+Who it helps  
+Why cybersecurity matters  
+What visitors should do next
+
+Hero section headline:
+
+Protect Yourself From Online Scams, Identity Theft, and AI-Driven Cyber Threats.
+
+Subheadline:
+
+Learn how to recognize scams, protect your personal data, and stay safe in the digital and AI age.
+
+Primary action buttons:
+
+Check a Scam  
+Protect Your Data  
+Learn Cyber Safety
+
+--------------------------------------------------
+
+VISUAL TILE NAVIGATION
+
+Create a tile navigation grid.
+
+Tiles include:
+
+Online Scams  
+Identity Theft  
+Cyber Safety Guides  
+Privacy Protection  
+Cybersecurity Tools  
+Threat Alerts  
+AI Cyber Threats
+
+Each tile includes:
+
+icon or illustration  
+short explanation  
+link to the section
+
+--------------------------------------------------
+
+CYBER SAFETY GUIDES
+
+Create an educational guide system.
+
+Example topics:
+
+How to Prevent Identity Theft  
+How to Detect Phishing Emails  
+Protecting Seniors From Online Scams  
+Online Privacy Protection Guide  
+Password Security Best Practices  
+How Hackers Steal Passwords  
+
+Each guide includes:
+
+clear explanation  
+step-by-step advice  
+visual diagrams  
+FAQ section  
+internal linking
+
+--------------------------------------------------
+
+SCAM INTELLIGENCE CENTER
+
+Create a scam database.
+
+Example URLs:
+
+/scams/paypal-phishing  
+/scams/facebook-marketplace-scam  
+/scams/crypto-investment-scam  
+/scams/romance-scam  
+
+Each page must include:
+
+how the scam works  
+example scam messages  
+warning signs  
+who is targeted  
+how to avoid it
+
+--------------------------------------------------
+
+CYBER THREAT RADAR
+
+Create pages for emerging threats.
+
+Example URLs:
+
+/alerts/new-phishing-campaign  
+/alerts/data-breach-alert  
+/alerts/new-scam-alert  
+
+Each page includes:
+
+threat overview  
+who is affected  
+recommended actions
+
+--------------------------------------------------
+
+AI CYBERSECURITY AWARENESS
+
+Create a dedicated section about AI-driven cyber threats.
+
+Example topics:
+
+AI phishing attacks  
+deepfake scams  
+voice cloning fraud  
+AI romance scams  
+AI investment scams  
+
+Example URLs:
+
+/ai-cybersecurity/ai-phishing  
+/ai-cybersecurity/deepfake-scams  
+/ai-cybersecurity/voice-cloning-fraud  
+
+Each page must explain:
+
+how AI enables the attack  
+warning signs  
+how to protect yourself
+
+Also include educational guides:
+
+how AI helps detect cyber threats  
+AI fraud detection tools
+
+--------------------------------------------------
+
+CYBERSECURITY TOOLS
+
+Create tool pages.
+
+Examples:
+
+Password Strength Checker  
+Scam Message Analyzer  
+Email Breach Checker  
+Privacy Risk Checker  
+AI Scam Analyzer
+
+Each tool page must include:
+
+tool explanation  
+usage instructions  
+security tips
+
+--------------------------------------------------
+
+VISUAL EDUCATION
+
+Create infographic-style content explaining:
+
+how phishing works  
+how identity theft happens  
+how AI scams work  
+how scammers manipulate victims
+
+Visual content should simplify cybersecurity concepts.
+
+--------------------------------------------------
+
+CALL-TO-ACTION FLOW
+
+Guide users toward helpful actions.
+
+Examples:
+
+Check a Scam  
+Use a Cybersecurity Tool  
+Download Digital Safety Guide  
+Subscribe for Scam Alerts
+
+Every page should include a clear action.
+
+--------------------------------------------------
+
+EMAIL ALERT SYSTEM
+
+Add subscriber functionality.
+
+Offer:
+
+Free Digital Safety Guide for Families.
+
+Subscribers receive:
+
+scam alerts  
+AI threat alerts  
+cyber safety tips
+
+--------------------------------------------------
+
+SEO AND AEO OPTIMIZATION
+
+Improve search visibility.
+
+Include:
+
+SEO titles  
+meta descriptions  
+structured headings  
+FAQ schema  
+internal linking  
+
+Use schema types:
+
+Article  
+FAQPage  
+HowTo  
+Dataset  
+Organization
+
+--------------------------------------------------
+
+SCALABILITY
+
+The platform must support:
+
+300+ guides  
+500+ scam pages  
+AI cybersecurity content expansion  
+continuous threat alerts
+
+--------------------------------------------------
+
+FINAL OUTPUT
+
+Generate:
+
+improved homepage structure  
+visual tile navigation  
+guide content framework  
+scam database architecture  
+AI cybersecurity content system  
+threat alert pages  
+tool page framework  
+SEO schema implementation
