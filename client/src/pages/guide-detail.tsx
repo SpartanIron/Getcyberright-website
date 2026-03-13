@@ -1,0 +1,259 @@
+import { useParams, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { useSEO } from "@/hooks/use-seo";
+import { StructuredData, type BlogPostingData, type FAQData, type BreadcrumbData } from "@/components/structured-data";
+import { Navigation } from "@/components/navigation";
+import { Footer } from "@/components/footer";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { BookOpen, Clock, Calendar, ArrowLeft, User, HelpCircle, Loader2, ArrowRight } from "lucide-react";
+import { sanitizeHtml } from "@/lib/sanitize";
+
+interface GuideDetail {
+  id: string;
+  slug: string;
+  title: string;
+  metaDescription: string;
+  content: string;
+  headings: Array<{ level: number; text: string; id: string }>;
+  tableOfContents: Array<{ id: string; text: string; level: number }>;
+  faq: Array<{ question: string; answer: string }>;
+  category: string;
+  tags: string[];
+  targetKeywords: string[];
+  wordCount: number;
+  readingTimeMinutes: number;
+  publishedAt: string;
+  updatedAt: string;
+  authorName: string;
+  featuredImage: string | null;
+  relatedGuideIds: string[];
+  relatedScamSlugs: string[];
+  relatedToolPaths: string[];
+}
+
+export default function GuideDetailPage() {
+  const params = useParams<{ slug: string }>();
+  const slug = params.slug || "";
+
+  const { data: guide, isLoading, error } = useQuery<GuideDetail>({
+    queryKey: ["/api/guides", slug],
+    queryFn: async () => {
+      const res = await fetch(`/api/guides/${slug}`);
+      if (!res.ok) throw new Error("Guide not found");
+      return res.json();
+    },
+    enabled: !!slug,
+  });
+
+  useSEO({
+    title: guide?.title ? `${guide.title} | GetCyberRight` : "Cyber Safety Guide | GetCyberRight",
+    description: guide?.metaDescription || "Expert cybersecurity guide from GetCyberRight.",
+    keywords: guide?.targetKeywords?.join(", ") || guide?.tags?.join(", "),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="flex justify-center py-32">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !guide) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <BookOpen className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
+          <h1 className="text-3xl font-bold mb-4" data-testid="text-not-found">Guide Not Found</h1>
+          <p className="text-muted-foreground mb-8">This guide does not exist or has been moved.</p>
+          <Link href="/guides" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-back-guides">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Browse All Guides
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const blogPosting: BlogPostingData = {
+    type: "BlogPosting",
+    headline: guide.title,
+    description: guide.metaDescription,
+    datePublished: guide.publishedAt || guide.updatedAt,
+    dateModified: guide.updatedAt,
+    author: { name: guide.authorName || "GetCyberRight Team", url: "https://www.getcyberright.com" },
+    publisher: { name: "GetCyberRight", logo: "https://www.getcyberright.com/favicon.svg" },
+    image: guide.featuredImage || undefined,
+    articleSection: guide.category || "Cybersecurity",
+    keywords: guide.targetKeywords || guide.tags,
+    wordCount: guide.wordCount,
+  };
+
+  const breadcrumbs: BreadcrumbData = {
+    type: "BreadcrumbList",
+    items: [
+      { name: "Home", url: "https://www.getcyberright.com/" },
+      { name: "Guides", url: "https://www.getcyberright.com/guides" },
+      { name: guide.title, url: `https://www.getcyberright.com/guides/${guide.slug}` },
+    ],
+  };
+
+  const structuredDataItems: Array<BlogPostingData | FAQData | BreadcrumbData> = [blogPosting, breadcrumbs];
+  if (guide.faq && guide.faq.length > 0) {
+    structuredDataItems.push({ type: "FAQPage", items: guide.faq });
+  }
+
+  const toc = guide.tableOfContents || guide.headings || [];
+  const readTime = guide.readingTimeMinutes || Math.ceil((guide.wordCount || 0) / 200);
+  const publishDate = guide.publishedAt || guide.updatedAt;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <StructuredData data={structuredDataItems} />
+      <Navigation />
+
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+        <div className="container mx-auto px-4 py-12">
+          <Link href="/guides" className="inline-flex items-center text-slate-300 hover:text-white text-sm mb-6 transition-colors" data-testid="link-back-guides">
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Guides
+          </Link>
+
+          <div className="flex items-start gap-4 mb-4">
+            <div className="p-3 bg-teal-500/20 rounded-lg">
+              <BookOpen className="h-8 w-8 text-teal-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold" data-testid="text-guide-title">{guide.title}</h1>
+              <div className="flex flex-wrap items-center gap-4 mt-3 text-slate-300 text-sm">
+                <span className="flex items-center gap-1">
+                  <User className="h-4 w-4" />
+                  {guide.authorName || "GetCyberRight Team"}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  {new Date(publishDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  {readTime} min read
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {guide.tags && guide.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {guide.tags.slice(0, 5).map((tag) => (
+                <Badge key={tag} variant="outline" className="border-slate-500 text-slate-300">{tag}</Badge>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <main className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {toc.length > 0 && (
+            <aside className="hidden lg:block">
+              <div className="sticky top-24">
+                <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Table of Contents</h3>
+                <nav className="space-y-1" data-testid="nav-toc">
+                  {toc.map((item, i) => (
+                    <a
+                      key={i}
+                      href={`#${item.id || `section-${i}`}`}
+                      className="block text-sm text-muted-foreground hover:text-teal-600 dark:hover:text-teal-400 py-1 transition-colors"
+                      style={{ paddingLeft: ((item.level || 2) - 2) * 12 }}
+                      data-testid={`link-toc-${i}`}
+                    >
+                      {item.text}
+                    </a>
+                  ))}
+                  {guide.faq && guide.faq.length > 0 && (
+                    <a href="#faq" className="block text-sm text-muted-foreground hover:text-teal-600 dark:hover:text-teal-400 py-1 transition-colors">
+                      FAQ
+                    </a>
+                  )}
+                </nav>
+
+                <Card className="mt-6 bg-teal-50 dark:bg-teal-950/20 border-teal-200 dark:border-teal-800">
+                  <CardContent className="pt-4 pb-4">
+                    <p className="text-sm font-medium mb-2">Need help?</p>
+                    <Link href="/scam-checker" className="text-sm text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1">
+                      Try the Scam Checker
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+            </aside>
+          )}
+
+          <div className={toc.length > 0 ? "lg:col-span-3" : "lg:col-span-4 max-w-3xl mx-auto"}>
+            {guide.featuredImage && (
+              <div className="mb-8 rounded-lg overflow-hidden">
+                <img src={guide.featuredImage} alt={guide.title} className="w-full h-64 md:h-80 object-cover" />
+              </div>
+            )}
+
+            <article 
+              className="prose prose-slate dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-teal-600 dark:prose-a:text-teal-400"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(guide.content || "") }}
+              data-testid="article-content"
+            />
+
+            {guide.faq && guide.faq.length > 0 && (
+              <section id="faq" className="mt-12 scroll-mt-20">
+                <div className="flex items-center gap-2 mb-6">
+                  <HelpCircle className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                  <h2 className="text-2xl font-bold">Frequently Asked Questions</h2>
+                </div>
+                <Accordion type="multiple" className="space-y-2" data-testid="accordion-faq">
+                  {guide.faq.map((item, i) => (
+                    <AccordionItem key={i} value={`faq-${i}`} className="border rounded-lg px-4">
+                      <AccordionTrigger className="text-left font-medium" data-testid={`faq-question-${i}`}>
+                        {item.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-muted-foreground" data-testid={`faq-answer-${i}`}>
+                        {item.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </section>
+            )}
+
+            {guide.relatedScamSlugs && guide.relatedScamSlugs.length > 0 && (
+              <section className="mt-12">
+                <h2 className="text-xl font-bold mb-4">Related Content</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {guide.relatedScamSlugs.map((slug) => (
+                    <Link key={slug} href={`/scams/${slug}`}>
+                      <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                        <CardContent className="pt-4 pb-4 flex items-center justify-between">
+                          <span className="text-sm font-medium">{slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+                          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

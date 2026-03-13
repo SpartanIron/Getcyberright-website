@@ -86,6 +86,12 @@ const SafetyScore = lazy(() => import("@/pages/safety-score"));
 const ScamChecker = lazy(() => import("@/pages/scam-checker"));
 const ScamPage = lazy(() => import("@/pages/scam-page"));
 const FAQ = lazy(() => import("@/pages/faq"));
+const GuidesListing = lazy(() => import("@/pages/guides"));
+const GuideDetail = lazy(() => import("@/pages/guide-detail"));
+const AlertsListing = lazy(() => import("@/pages/alerts-listing"));
+const AlertDetail = lazy(() => import("@/pages/alert-detail"));
+const ScamIntelListing = lazy(() => import("@/pages/scam-intel-listing"));
+const ScamIntelDetail = lazy(() => import("@/pages/scam-intel-detail"));
 
 // Loading fallback component
 function PageLoader() {
@@ -162,6 +168,12 @@ function Router() {
         <Route path="/scam-checker" component={ScamChecker} />
         <Route path="/scams/:scamType" component={ScamPage} />
         <Route path="/faq" component={FAQ} />
+        <Route path="/guides" component={GuidesListing} />
+        <Route path="/guides/:slug" component={GuideDetail} />
+        <Route path="/alerts" component={AlertsListing} />
+        <Route path="/alerts/:slug" component={AlertDetail} />
+        <Route path="/scam-intel" component={ScamIntelListing} />
+        <Route path="/scam-intel/:slug" component={ScamIntelDetail} />
         <Route path="/training" component={Training} />
         <Route path="/training/:pathId" component={TrainingPath} />
         <Route path="/training/lesson/:lessonId" component={TrainingLesson} />
