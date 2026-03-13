@@ -1,6 +1,6 @@
 import { storage } from "./storage";
 import { getImageAsBase64 } from "./socialImageService";
-import { isBufferConfigured, publishPostViaBuffer, publishAllDraftsViaBuffer, getBufferProfilesByPlatform } from "./bufferPublisher";
+import { isBufferConfigured, publishPostViaBuffer, publishAllDraftsViaBuffer } from "./bufferPublisher";
 import * as fs from "fs";
 
 interface PublishResult {

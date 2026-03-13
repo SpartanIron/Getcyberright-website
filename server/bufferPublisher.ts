@@ -1,13 +1,12 @@
 import { storage } from "./storage";
-import * as fs from "fs";
 
-interface BufferProfile {
+const BUFFER_GRAPHQL_URL = "https://api.buffer.com/graphql";
+const BUFFER_ORG_ID = "69b48dd8282d615a79db2ab3";
+
+interface BufferChannel {
   id: string;
+  name: string;
   service: string;
-  formatted_service: string;
-  formatted_username: string;
-  avatar: string;
-  default: boolean;
 }
 
 interface BufferPublishResult {
@@ -17,8 +16,6 @@ interface BufferPublishResult {
   error?: string;
 }
 
-const BUFFER_API_BASE = "https://api.bufferapp.com/1";
-
 function getBufferToken(): string | undefined {
   return process.env.BUFFER_API_KEY;
 }
@@ -27,124 +24,134 @@ export function isBufferConfigured(): boolean {
   return !!getBufferToken();
 }
 
-async function bufferRequest(endpoint: string, options: RequestInit = {}): Promise<any> {
+async function graphql<T = any>(query: string, variables?: Record<string, any>): Promise<T> {
   const token = getBufferToken();
   if (!token) throw new Error("Buffer API key not configured");
 
-  const separator = endpoint.includes("?") ? "&" : "?";
-  const url = `${BUFFER_API_BASE}${endpoint}${separator}access_token=${token}`;
-
-  const res = await fetch(url, {
-    ...options,
+  const res = await fetch(BUFFER_GRAPHQL_URL, {
+    method: "POST",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      ...options.headers,
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({ query, variables }),
   });
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Buffer API error ${res.status}: ${body}`);
+    throw new Error(`Buffer GraphQL HTTP error ${res.status}: ${body}`);
   }
 
-  return res.json();
+  const json = await res.json() as any;
+  if (json.errors && json.errors.length > 0) {
+    throw new Error(`Buffer GraphQL error: ${json.errors[0].message}`);
+  }
+
+  return json.data as T;
 }
 
-let cachedProfiles: BufferProfile[] | null = null;
-let profileCacheTime = 0;
+let cachedChannels: BufferChannel[] | null = null;
+let channelCacheTime = 0;
 const CACHE_TTL = 5 * 60 * 1000;
 
-export async function getBufferProfiles(): Promise<BufferProfile[]> {
-  if (cachedProfiles && Date.now() - profileCacheTime < CACHE_TTL) {
-    return cachedProfiles;
+export async function getBufferChannels(): Promise<BufferChannel[]> {
+  if (cachedChannels && Date.now() - channelCacheTime < CACHE_TTL) {
+    return cachedChannels;
   }
 
   try {
-    const profiles = await bufferRequest("/profiles.json");
-    cachedProfiles = profiles;
-    profileCacheTime = Date.now();
-    return profiles;
+    const data = await graphql<{ channels: BufferChannel[] }>(
+      `query GetChannels($input: ChannelsInput!) {
+        channels(input: $input) { id name service }
+      }`,
+      { input: { organizationId: BUFFER_ORG_ID } }
+    );
+    cachedChannels = data.channels;
+    channelCacheTime = Date.now();
+    return data.channels;
   } catch (error: any) {
-    console.error("[Buffer] Failed to fetch profiles:", error.message);
+    console.error("[Buffer] Failed to fetch channels:", error.message);
     return [];
   }
 }
 
-export async function getBufferProfilesByPlatform(): Promise<Record<string, BufferProfile>> {
-  const profiles = await getBufferProfiles();
-  const map: Record<string, BufferProfile> = {};
+export async function getBufferChannelsByPlatform(): Promise<Record<string, BufferChannel>> {
+  const channels = await getBufferChannels();
+  const map: Record<string, BufferChannel> = {};
 
-  for (const profile of profiles) {
-    const service = profile.service?.toLowerCase();
-    if (service === "linkedin") map.linkedin = profile;
-    else if (service === "facebook") map.facebook = profile;
-    else if (service === "instagram") map.instagram = profile;
-    else if (service === "twitter" || service === "x") map.x = profile;
+  for (const channel of channels) {
+    const service = channel.service?.toLowerCase();
+    if (service === "linkedin") map.linkedin = channel;
+    else if (service === "facebook") map.facebook = channel;
+    else if (service === "instagram") map.instagram = channel;
+    else if (service === "twitter" || service === "x") map.x = channel;
   }
 
   return map;
 }
 
-function platformToBufferService(platform: string): string {
-  switch (platform) {
-    case "linkedin": return "linkedin";
-    case "facebook": return "facebook";
-    case "instagram": return "instagram";
-    case "x": return "twitter";
-    default: return platform;
-  }
-}
-
-export async function publishToBuffer(
-  profileId: string,
+export async function createBufferPost(
+  channelId: string,
   text: string,
   options: {
-    mediaUrl?: string;
-    mediaPath?: string;
-    scheduled_at?: string;
-    shorten?: boolean;
+    mode?: "addToQueue" | "shareNow" | "shareNext" | "customScheduled" | "recommendedTime";
+    dueAt?: string;
   } = {}
 ): Promise<BufferPublishResult> {
   try {
-    const params = new URLSearchParams();
-    params.append("profile_ids[]", profileId);
-    params.append("text", text);
+    const mode = options.mode || "addToQueue";
 
-    if (options.shorten !== undefined) {
-      params.append("shorten", options.shorten ? "true" : "false");
-    }
+    const data = await graphql<{ createPost: any }>(
+      `mutation CreatePost($input: CreatePostInput!) {
+        createPost(input: $input) {
+          ... on PostActionSuccess {
+            post { id status text dueAt channelService }
+          }
+          ... on InvalidInputError { message }
+          ... on UnexpectedError { message }
+          ... on UnauthorizedError { message }
+          ... on LimitReachedError { message }
+          ... on NotFoundError { message }
+          ... on RestProxyError { message }
+        }
+      }`,
+      {
+        input: {
+          channelId,
+          text,
+          mode,
+          schedulingType: "automatic",
+          source: "getcyberright",
+          ...(options.dueAt ? { dueAt: options.dueAt } : {}),
+        },
+      }
+    );
 
-    if (options.mediaUrl) {
-      params.append("media[link]", options.mediaUrl);
-    }
+    const result = data.createPost;
 
-    if (options.mediaPath && fs.existsSync(options.mediaPath)) {
-      params.append("media[photo]", options.mediaPath);
-    }
-
-    if (options.scheduled_at) {
-      params.append("scheduled_at", options.scheduled_at);
-    }
-
-    const result = await bufferRequest("/updates/create.json", {
-      method: "POST",
-      body: params.toString(),
-    });
-
-    if (result.success) {
-      const updateId = result.updates?.[0]?.id || result.update?.id;
+    if (result?.post) {
+      const scheduledInfo = result.post.dueAt ? ` (scheduled: ${result.post.dueAt})` : "";
+      console.log(`[Buffer] Post created on ${result.post.channelService}: ${result.post.status}${scheduledInfo}`);
       return {
         success: true,
         platform: "buffer",
-        bufferId: updateId,
+        bufferId: result.post.id,
       };
-    } else {
+    }
+
+    if (result?.message) {
       return {
         success: false,
         platform: "buffer",
-        error: result.message || "Buffer API returned unsuccessful response",
+        error: result.message,
       };
     }
+
+    return {
+      success: false,
+      platform: "buffer",
+      error: "Unexpected response from Buffer API",
+    };
   } catch (error: any) {
     return {
       success: false,
@@ -162,20 +169,19 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     return { success: false, platform: "buffer", error: "Alert posts are not published via Buffer" };
   }
 
-  const profiles = await getBufferProfilesByPlatform();
-  const profile = profiles[post.platform];
+  const channels = await getBufferChannelsByPlatform();
+  const channel = channels[post.platform];
 
-  if (!profile) {
+  if (!channel) {
     return {
       success: false,
       platform: post.platform,
-      error: `No Buffer profile connected for ${post.platform}. Connect it in your Buffer dashboard.`,
+      error: `No Buffer channel connected for ${post.platform}. Connect it in your Buffer dashboard.`,
     };
   }
 
-  const result = await publishToBuffer(profile.id, post.postContent, {
-    mediaPath: post.imageUrl || undefined,
-    shorten: true,
+  const result = await createBufferPost(channel.id, post.postContent, {
+    mode: "addToQueue",
   });
 
   if (result.success) {
@@ -183,13 +189,13 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
       status: "published",
       publishedAt: new Date(),
     });
-    console.log(`[Buffer] Published ${post.platform} post: ${postId} (Buffer ID: ${result.bufferId})`);
+    console.log(`[Buffer] Queued ${post.platform} post: ${postId} (Buffer ID: ${result.bufferId})`);
   } else {
     await storage.updateSocialPost(postId, {
       status: "failed",
       publishError: `Buffer: ${result.error}`,
     });
-    console.error(`[Buffer] Failed to publish ${post.platform} post: ${result.error}`);
+    console.error(`[Buffer] Failed to queue ${post.platform} post: ${result.error}`);
   }
 
   return result;
@@ -198,8 +204,8 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
 export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]> {
   const drafts = await storage.getSocialPosts("draft", 50);
   const results: BufferPublishResult[] = [];
-  const profiles = await getBufferProfilesByPlatform();
-  const connectedPlatforms = new Set(Object.keys(profiles));
+  const channels = await getBufferChannelsByPlatform();
+  const connectedPlatforms = new Set(Object.keys(channels));
 
   for (const draft of drafts) {
     if (draft.platform === "alert") continue;
@@ -208,7 +214,7 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
     const result = await publishPostViaBuffer(draft.id);
     results.push(result);
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
 
   return results;
@@ -217,29 +223,32 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
 export async function getBufferStatus(): Promise<{
   configured: boolean;
   connected: boolean;
-  profiles: { service: string; username: string; id: string }[];
+  organizationId: string;
+  channels: { service: string; name: string; id: string }[];
   error?: string;
 }> {
   if (!isBufferConfigured()) {
-    return { configured: false, connected: false, profiles: [] };
+    return { configured: false, connected: false, organizationId: "", channels: [] };
   }
 
   try {
-    const profiles = await getBufferProfiles();
+    const channels = await getBufferChannels();
     return {
       configured: true,
-      connected: profiles.length > 0,
-      profiles: profiles.map(p => ({
-        service: p.service,
-        username: p.formatted_username,
-        id: p.id,
+      connected: channels.length > 0,
+      organizationId: BUFFER_ORG_ID,
+      channels: channels.map(c => ({
+        service: c.service,
+        name: c.name,
+        id: c.id,
       })),
     };
   } catch (error: any) {
     return {
       configured: true,
       connected: false,
-      profiles: [],
+      organizationId: BUFFER_ORG_ID,
+      channels: [],
       error: error.message,
     };
   }
