@@ -115,10 +115,10 @@ export function HeroSection() {
               right: "1%",
               width: "75px",
               height: "220%",
-              background: "linear-gradient(180deg, #00293C 0%, #0A3A4F 50%, #00293C 100%)",
+              background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
-              filter: "drop-shadow(0 0 20px rgba(13, 148, 136, 0.15))",
+              filter: "drop-shadow(0 0 24px rgba(13, 148, 136, 0.2))",
             }}
           />
           <div
@@ -128,7 +128,7 @@ export function HeroSection() {
               right: "8%",
               width: "3px",
               height: "220%",
-              background: "linear-gradient(180deg, transparent 10%, rgba(20, 184, 166, 0.4) 50%, transparent 90%)",
+              background: "linear-gradient(180deg, transparent 10%, rgba(45, 212, 191, 0.5) 50%, transparent 90%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
             }}
@@ -140,11 +140,11 @@ export function HeroSection() {
               right: "16%",
               width: "55px",
               height: "220%",
-              background: "linear-gradient(180deg, #2dd4bf 0%, #14b8a6 40%, #0d9488 100%)",
+              background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
-              opacity: 0.65,
-              filter: "drop-shadow(0 0 28px rgba(20, 184, 166, 0.3))",
+              opacity: 0.75,
+              filter: "drop-shadow(0 0 32px rgba(45, 212, 191, 0.4))",
             }}
           />
           <div
@@ -154,7 +154,7 @@ export function HeroSection() {
               right: "24%",
               width: "3px",
               height: "220%",
-              background: "linear-gradient(180deg, transparent 10%, hsla(16, 90%, 55%, 0.35) 50%, transparent 90%)",
+              background: "linear-gradient(180deg, transparent 10%, hsla(16, 95%, 58%, 0.45) 50%, transparent 90%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
             }}
@@ -164,13 +164,13 @@ export function HeroSection() {
               position: "absolute",
               top: "-30%",
               right: "30%",
-              width: "45px",
+              width: "80px",
               height: "220%",
-              background: "linear-gradient(180deg, hsl(16, 95%, 58%) 0%, hsl(16, 90%, 48%) 40%, hsl(16, 85%, 38%) 100%)",
+              background: "linear-gradient(180deg, hsl(16, 100%, 62%) 0%, hsl(16, 95%, 52%) 40%, hsl(16, 90%, 42%) 100%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
-              opacity: 0.55,
-              filter: "drop-shadow(0 0 24px hsla(16, 90%, 50%, 0.25))",
+              opacity: 0.7,
+              filter: "drop-shadow(0 0 30px hsla(16, 95%, 55%, 0.35))",
             }}
           />
         </div>
