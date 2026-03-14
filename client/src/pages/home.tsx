@@ -2,6 +2,7 @@ import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
 import { TrustStrip } from "@/components/trust-strip";
 import { PillarTiles } from "@/components/pillar-tiles";
+import { ThreatAwareness } from "@/components/threat-awareness";
 import { ContentPreview } from "@/components/content-preview";
 import { AudiencePaths } from "@/components/audience-paths";
 import { AuthoritySection } from "@/components/authority-section";
@@ -41,6 +42,7 @@ export default function Home() {
         <HeroSection />
         <TrustStrip />
         <PillarTiles />
+        <ThreatAwareness />
         <ContentPreview />
         <AudiencePaths />
         <AuthoritySection />

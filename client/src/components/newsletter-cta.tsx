@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Shield, CheckCircle, ArrowRight } from "lucide-react";
 import { useRecaptcha } from "@/hooks/use-recaptcha";
+import familyDevicesImg from "@/assets/images/family-devices.jpg";
 
 const benefits = [
   "Weekly cyber safety tips",
@@ -71,10 +72,21 @@ export function NewsletterCTA() {
 
   return (
     <section
-      className="relative py-20 sm:py-28 lg:py-32 bg-[#001C48] overflow-hidden"
+      className="relative py-20 sm:py-28 lg:py-32 overflow-hidden"
       data-testid="section-newsletter-cta"
       aria-labelledby="newsletter-heading"
     >
+      <div className="absolute inset-0">
+        <img
+          src={familyDevicesImg}
+          alt=""
+          className="w-full h-full object-cover"
+          loading="lazy"
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-[#001C48]/90" />
+      </div>
+
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/[0.04] rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent/[0.03] rounded-full blur-3xl" />
