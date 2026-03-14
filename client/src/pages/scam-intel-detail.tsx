@@ -6,8 +6,10 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AlertTriangle, ArrowLeft, Eye, CheckCircle, Shield, MessageSquareWarning, HelpCircle, Loader2, ArrowRight, Users, DollarSign, MapPin, BookOpen } from "lucide-react";
+import { ShareButtons } from "@/components/share-buttons";
+import { AlertTriangle, ArrowLeft, Eye, CheckCircle, Shield, MessageSquareWarning, HelpCircle, Loader2, ArrowRight, Users, DollarSign, MapPin, BookOpen, Flag, Search, Share2, Calendar } from "lucide-react";
 import { getAllScamSlugs, getScamBySlug } from "@shared/scam-content";
 
 interface ScamIntelDetail {
@@ -32,10 +34,23 @@ interface ScamIntelDetail {
   lastUpdated: string;
 }
 
+interface RelatedScam {
+  slug: string;
+  scamName: string;
+  riskLevel: string;
+  reportCount: number;
+}
+
 const riskConfig: Record<string, { bg: string; icon: string; label: string }> = {
   high: { bg: "bg-red-500/20", icon: "text-red-400", label: "High Risk" },
   medium: { bg: "bg-orange-500/20", icon: "text-orange-400", label: "Medium Risk" },
   low: { bg: "bg-green-500/20", icon: "text-green-400", label: "Low Risk" },
+};
+
+const riskColors: Record<string, string> = {
+  high: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+  medium: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
+  low: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
 };
 
 export default function ScamIntelDetailPage() {
@@ -50,6 +65,26 @@ export default function ScamIntelDetailPage() {
       return res.json();
     },
     enabled: !!slug,
+  });
+
+  const { data: relatedScams = [] } = useQuery<RelatedScam[]>({
+    queryKey: ["/api/scam-intel/related", slug],
+    queryFn: async () => {
+      if (!scam?.relatedScamSlugs?.length) return [];
+      const promises = scam.relatedScamSlugs.map(async (relSlug) => {
+        try {
+          const res = await fetch(`/api/scam-intel/${relSlug}`);
+          if (!res.ok) return null;
+          const data = await res.json();
+          return { slug: data.slug, scamName: data.scamName, riskLevel: data.riskLevel, reportCount: data.reportCount || 0 };
+        } catch {
+          return null;
+        }
+      });
+      const results = await Promise.all(promises);
+      return results.filter(Boolean) as RelatedScam[];
+    },
+    enabled: !!scam?.relatedScamSlugs?.length,
   });
 
   useSEO({
@@ -89,6 +124,7 @@ export default function ScamIntelDetailPage() {
   }
 
   const risk = riskConfig[scam.riskLevel] || riskConfig.medium;
+  const shareUrl = `https://www.getcyberright.com/scam-intel/${scam.slug}`;
 
   const blogPosting: BlogPostingData = {
     type: "BlogPosting",
@@ -107,7 +143,7 @@ export default function ScamIntelDetailPage() {
     items: [
       { name: "Home", url: "https://www.getcyberright.com/" },
       { name: "Scam Intelligence", url: "https://www.getcyberright.com/scam-intel" },
-      { name: scam.scamName, url: `https://www.getcyberright.com/scam-intel/${scam.slug}` },
+      { name: scam.scamName, url: shareUrl },
     ],
   };
 
@@ -140,7 +176,7 @@ export default function ScamIntelDetailPage() {
             <div className={`p-3 ${risk.bg} rounded-lg`}>
               <AlertTriangle className={`h-8 w-8 ${risk.icon}`} />
             </div>
-            <div>
+            <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <Badge className={`${scam.riskLevel === "high" ? "bg-red-600" : scam.riskLevel === "medium" ? "bg-orange-600" : "bg-green-600"} text-white`}>
                   {risk.label}
@@ -162,12 +198,46 @@ export default function ScamIntelDetailPage() {
             {scam.averageLoss && (
               <span className="flex items-center gap-1"><DollarSign className="h-4 w-4" /> Avg loss: {scam.averageLoss}</span>
             )}
+            {scam.reportCount > 0 && (
+              <span className="flex items-center gap-1"><Flag className="h-4 w-4" /> {scam.reportCount.toLocaleString()} reports</span>
+            )}
             {scam.regions?.length > 0 && (
               <span className="flex items-center gap-1" data-testid="text-regions">
                 <MapPin className="h-4 w-4" /> Regions: {scam.regions.map((r) => r.charAt(0).toUpperCase() + r.slice(1).toLowerCase()).join(", ")}
               </span>
             )}
           </div>
+
+          <div className="flex flex-wrap items-center gap-4 mt-6 pt-4 border-t border-slate-700">
+            <div className="[&_span]:text-slate-300 [&_button]:border-slate-600 [&_button]:text-slate-300" data-testid="share-buttons-header">
+              <ShareButtons
+                url={shareUrl}
+                title={`${scam.scamName} - Scam Alert`}
+                description={scam.metaDescription}
+                variant="compact"
+              />
+            </div>
+            {(scam.dateDetected || scam.lastUpdated) && (
+              <span className="text-xs text-slate-400 flex items-center gap-1 ml-auto">
+                <Calendar className="h-3 w-3" />
+                {scam.lastUpdated ? `Updated ${new Date(scam.lastUpdated).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` :
+                  `Detected ${new Date(scam.dateDetected).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile quick-scan CTA (hidden on desktop where sidebar has this) */}
+      <div className="lg:hidden bg-orange-50 dark:bg-orange-950/20 border-b border-orange-200 dark:border-orange-800">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <p className="text-sm font-medium">Think you've been targeted?</p>
+          <Link href="/scam-checker">
+            <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white gap-1" data-testid="button-mobile-scan">
+              <Search className="h-3 w-3" />
+              Scan It
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -192,6 +262,17 @@ export default function ScamIntelDetailPage() {
                       Scan it with our AI Checker
                       <ArrowRight className="h-3 w-3" />
                     </Link>
+                  </CardContent>
+                </Card>
+
+                <Card className="mt-4 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                  <CardContent className="pt-4 pb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Share2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <p className="text-sm font-medium">Warn Others</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-3">Share this scam report to help protect friends and family.</p>
+                    <ShareButtons url={shareUrl} title={`${scam.scamName} - Scam Alert`} description={scam.metaDescription} variant="compact" />
                   </CardContent>
                 </Card>
               </div>
@@ -303,6 +384,26 @@ export default function ScamIntelDetailPage() {
               </section>
             )}
 
+            <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 border border-orange-200 dark:border-orange-800 rounded-2xl p-6 md:p-8" data-testid="cta-been-targeted">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-full shrink-0">
+                  <Shield className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold mb-1">Have you been targeted by this scam?</h3>
+                  <p className="text-sm text-muted-foreground">
+                    If you think you've received a suspicious message, email, or link related to this scam, use our free AI-powered scam checker to analyze it instantly.
+                  </p>
+                </div>
+                <Link href="/scam-checker">
+                  <Button className="bg-teal-600 hover:bg-teal-700 text-white gap-2 whitespace-nowrap" data-testid="button-check-targeted">
+                    <Search className="h-4 w-4" />
+                    Check Now
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
             {(() => {
               const allSlugs = getAllScamSlugs();
               const scamNameWords = (scam.scamName || "").toLowerCase().replace(/-/g, " ").split(" ").filter((w: string) => w.length > 3);
@@ -342,7 +443,30 @@ export default function ScamIntelDetailPage() {
               );
             })()}
 
-            {scam.relatedScamSlugs && scam.relatedScamSlugs.length > 0 && (
+            {relatedScams.length > 0 && (
+              <section className="mt-12">
+                <h2 className="text-xl font-bold mb-4">Related Scams</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {relatedScams.map((rel) => (
+                    <Link key={rel.slug} href={`/scam-intel/${rel.slug}`}>
+                      <Card className="hover:shadow-md transition-shadow cursor-pointer" data-testid={`card-related-${rel.slug}`}>
+                        <CardContent className="pt-4 pb-4 flex items-center justify-between">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Badge className={`${riskColors[rel.riskLevel] || ""} shrink-0 text-xs`}>
+                              {rel.riskLevel?.toUpperCase()}
+                            </Badge>
+                            <span className="text-sm font-medium truncate">{rel.scamName}</span>
+                          </div>
+                          <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {relatedScams.length === 0 && scam.relatedScamSlugs && scam.relatedScamSlugs.length > 0 && (
               <section className="mt-12">
                 <h2 className="text-xl font-bold mb-4">Related Scams</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -359,6 +483,21 @@ export default function ScamIntelDetailPage() {
                 </div>
               </section>
             )}
+
+            <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl" data-testid="cta-share-bottom">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div>
+                  <h3 className="text-base font-bold mb-1 flex items-center gap-2">
+                    <Share2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    Help Protect Others
+                  </h3>
+                  <p className="text-sm text-muted-foreground">Share this scam report to warn friends and family.</p>
+                </div>
+                <div className="shrink-0">
+                  <ShareButtons url={shareUrl} title={`${scam.scamName} - Scam Alert`} description={scam.metaDescription} variant="compact" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
