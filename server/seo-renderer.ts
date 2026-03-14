@@ -711,8 +711,8 @@ function renderStaticToolPage(pagePath: string): string | null {
 
 function renderAboutPage(): string {
   const head = buildHead({
-    title: "About GetCyberRight: Cybersecurity Built for Real People",
-    description: "GetCyberRight helps families, seniors, and small businesses fight phishing, scams, identity theft, and data brokers with an AI Scam Checker, Data Broker Removal, Training Academy, and 125+ safety guides.",
+    title: "About GetCyberRight: AI-Powered Cybersecurity for Real People",
+    description: "Scammers use AI. Your protection should too. GetCyberRight combines AI-powered scam detection, data broker removal, and plain-language education to protect families, seniors, and small businesses from phishing, deepfakes, and online fraud.",
     url: "/about",
     type: "article",
     publishedTime: "2024-01-15",
@@ -722,8 +722,8 @@ function renderAboutPage(): string {
   const articleSchema = buildJsonLd({
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: "About GetCyberRight: Cybersecurity Built for Real People",
-    description: "GetCyberRight is a digital safety platform that helps families, seniors, and small businesses protect themselves from phishing, scams, identity theft, and data brokers with practical, plain-language tools.",
+    headline: "About GetCyberRight: AI-Powered Cybersecurity for Real People",
+    description: "GetCyberRight is an AI-powered digital safety platform that helps families, seniors, and small businesses protect themselves from AI-generated phishing, deepfake scams, identity theft, and data brokers.",
     datePublished: "2024-01-15",
     dateModified: "2026-03-01",
     author: { "@type": "Organization", name: "GetCyberRight", url: "https://getcyberright.com" },
@@ -741,12 +741,12 @@ function renderAboutPage(): string {
   });
 
   const faqSchema = buildFaqSchema([
-    { question: "What is GetCyberRight?", answer: "GetCyberRight is a digital safety platform that helps families, seniors, students, and small businesses protect themselves from phishing, scams, identity theft, and data brokers. It provides practical tools and plain-language education." },
-    { question: "What tools does GetCyberRight offer?", answer: "GetCyberRight offers an AI-powered Scam Checker, Data Broker Removal covering 501+ brokers, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ cybersecurity guides, and real-time threat intelligence from 8 verified feeds." },
-    { question: "Who is GetCyberRight designed for?", answer: "GetCyberRight is designed for everyday internet users including families, seniors, students, parents, educators, and small business owners who need cybersecurity protection without technical expertise." },
-    { question: "How does the Scam Checker work?", answer: "The Scam Checker lets you paste any suspicious message, email, link, or phone number. It cross-references 8 verified threat intelligence feeds including PhishTank, URLhaus, and VirusTotal, then uses AI analysis to determine if the content is a scam." },
-    { question: "Is GetCyberRight free to use?", answer: "GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and educational content are available at no cost without requiring an account." },
-    { question: "Why was GetCyberRight created?", answer: "GetCyberRight was started by a family that experienced scams, impersonation attacks, and phone fraud firsthand. The mission is to make cybersecurity simple and accessible for non-experts so no family has to learn these lessons the hard way." },
+    { question: "What is GetCyberRight?", answer: "GetCyberRight is an AI-powered digital safety platform that helps families, seniors, students, and small businesses protect themselves from AI-generated phishing, deepfake scams, identity theft, and data brokers. It combines AI-powered scam detection with plain-language education." },
+    { question: "How does the AI Scam Checker work?", answer: "The AI Scam Checker lets you paste any suspicious message, email, link, or phone number. AI analyzes the content for social engineering patterns and cross-references 8 live threat intelligence feeds including PhishTank, URLhaus, and VirusTotal to determine if it is a scam." },
+    { question: "Can AI really detect AI-generated scams?", answer: "Yes. While AI-generated phishing emails may look flawless to humans, AI analysis can detect patterns in language structure, URL construction, sender behavior, and social engineering tactics that are characteristic of scam content, even when the grammar and formatting are perfect." },
+    { question: "What tools does GetCyberRight offer?", answer: "GetCyberRight offers an AI Scam Checker, Data Broker Removal covering 501+ brokers, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ cybersecurity guides, and real-time threat intelligence from 8 verified feeds across 13 regions." },
+    { question: "Is GetCyberRight free to use?", answer: "GetCyberRight is free to get started. Core tools like the AI Scam Checker, safety guides, and educational content are available at no cost without requiring an account." },
+    { question: "Why was GetCyberRight created?", answer: "GetCyberRight was started by a family that experienced AI-powered scams, impersonation attacks, and phone fraud firsthand. The mission is to use AI to fight AI-powered threats and make cybersecurity accessible for non-experts." },
   ]);
 
   return `${head}
@@ -756,29 +756,29 @@ function renderAboutPage(): string {
   ${faqSchema}
 
   <header>
-    <h1>About GetCyberRight: Cybersecurity Built for Real People</h1>
-    <p style="font-size:18px;color:#444;">Most cybersecurity tools are built for IT teams and enterprises. GetCyberRight is different. We build practical scam detection, data protection, and safety education tools for the people who need them most: families, seniors, students, and small businesses.</p>
+    <h1>About GetCyberRight: AI-Powered Cybersecurity for Real People</h1>
+    <p style="font-size:18px;color:#444;">Scammers are using AI to create attacks that look real. GetCyberRight uses AI to catch them. We combine AI-powered scam detection, data broker removal, and plain-language education to give families, seniors, and small businesses the same level of protection that large enterprises have.</p>
   </header>
 
   <section>
-    <h2>The Problem: Online Scams Are Growing Faster Than Awareness</h2>
-    <p>Cybercriminals are no longer just targeting corporations. They are targeting your inbox, your phone, your social media, and your family. The scams are sophisticated, personalized, and designed to exploit trust.</p>
+    <h2>The Problem: Scammers Now Use AI. Your Defenses Should Too.</h2>
+    <p>Cybercriminals are using the same AI tools that power ChatGPT and voice assistants to create attacks that are nearly impossible to detect by eye. AI-generated phishing, deepfake video calls, and cloned voices are targeting ordinary people, not just corporations.</p>
     <ul>
-      <li><strong>Phishing Emails</strong> - Fake messages designed to steal your passwords, banking details, or personal information.</li>
-      <li><strong>Impersonation Scams</strong> - Criminals posing as friends, family, banks, or government agencies to trick you into sending money.</li>
-      <li><strong>Romance Scams</strong> - Fake relationships built over weeks or months, ending with requests for money or personal data.</li>
-      <li><strong>Crypto and Investment Fraud</strong> - Too-good-to-be-true investment opportunities, fake trading platforms, and pig butchering schemes.</li>
-      <li><strong>Phone and SMS Scams</strong> - Urgent text messages and calls about suspended accounts, fake deliveries, or IRS threats.</li>
-      <li><strong>Data Broker Exposure</strong> - Companies collecting and selling your personal information to anyone willing to pay, including scammers.</li>
+      <li><strong>AI-Generated Phishing</strong> - Scammers use AI to write flawless phishing emails with no typos, perfect branding, and personalized details scraped from social media.</li>
+      <li><strong>Deepfake Impersonation</strong> - AI-generated voice clones and video deepfakes are used to impersonate family members, CEOs, and government officials in real time.</li>
+      <li><strong>Romance and Social Engineering</strong> - AI chatbots run long-term romance scams on thousands of victims simultaneously, building trust over weeks before requesting money.</li>
+      <li><strong>Crypto and Investment Fraud</strong> - Fake trading platforms with AI-generated testimonials and deepfake celebrity endorsements designed to steal savings.</li>
+      <li><strong>AI Voice Cloning Scams</strong> - Criminals clone a family member's voice from seconds of audio, then call pretending to be in an emergency.</li>
+      <li><strong>Data Broker Exposure</strong> - Over 501 companies collect and sell personal information, giving scammers the details they need to make AI-powered attacks convincing.</li>
     </ul>
-    <p>Most people do not recognize a scam until after they have been victimized. Cybersecurity knowledge that was once only available to IT professionals is now essential for everyone.</p>
+    <p>AI has made scams faster, cheaper, and more convincing than ever. The old advice of "look for typos" no longer works. You need AI-powered tools to fight AI-powered threats.</p>
   </section>
 
   <section>
-    <h2>The Solution: One Platform, Every Tool You Need</h2>
-    <p>GetCyberRight gives you practical tools to detect scams, remove your data from brokers, and learn how to protect yourself online.</p>
+    <h2>The Solution: AI-Powered Protection. Plain-Language Education.</h2>
+    <p>GetCyberRight uses AI to analyze suspicious content, detect social engineering patterns, and identify threats that humans miss. Combined with data broker removal and plain-language education, it gives everyday people the same level of protection that enterprises have.</p>
     <ul>
-      <li><a href="/scam-checker"><strong>Scam Checker</strong></a> - Paste any suspicious message, email, link, or phone number. Our AI cross-references 8 verified threat intelligence feeds and tells you if it is a scam.</li>
+      <li><a href="/scam-checker"><strong>AI Scam Checker</strong></a> - Paste any suspicious message, email, link, or phone number. AI analyzes the content for social engineering patterns, cross-references 8 live threat intelligence feeds, and gives you a detailed risk breakdown.</li>
       <li><a href="/data-removal"><strong>Data Broker Removal</strong></a> - We track 501+ companies that buy and sell your personal data. Step-by-step instructions to remove yourself from each one.</li>
       <li><a href="/training"><strong>Training Academy</strong></a> - Structured courses that teach you how modern scams work and how to recognize them, designed for all skill levels.</li>
       <li><a href="/ai-prompts"><strong>AI Safety Prompt Library</strong></a> - 406+ ready-to-use prompts that help you use AI tools like ChatGPT safely, without accidentally exposing sensitive information.</li>
@@ -787,10 +787,10 @@ function renderAboutPage(): string {
   </section>
 
   <section>
-    <h2>Why This Matters</h2>
-    <p>Behind every scam is a real person who lost something. A grandmother who lost her retirement savings to a romance scam. A small business owner whose company was paralyzed by a phishing attack. A college student whose identity was stolen through a fake job offer.</p>
-    <p>GetCyberRight was started by a family that experienced these attacks firsthand. Hacked social media accounts, impersonation scams targeting relatives, and repeated phone fraud that drained a family member's savings.</p>
-    <p>That experience became the mission: build tools that help ordinary people recognize and stop scams before they cause harm.</p>
+    <h2>Why This Matters: AI Made Scams Unrecognizable</h2>
+    <p>A grandmother who received a phone call in her grandson's cloned voice begging for bail money. A small business owner who wired $47,000 after a deepfake video call. A college student whose identity was stolen through an AI-generated job offer that passed every red-flag check.</p>
+    <p>AI has removed the telltale signs that people used to rely on to spot scams: bad grammar, obvious fakes, generic messages. Today's attacks are personalized, polished, and nearly indistinguishable from legitimate communication.</p>
+    <p>GetCyberRight was started by a family that experienced these attacks firsthand. We built AI-powered tools because we realized the old methods of spotting scams no longer work. If scammers are using AI, your protection needs AI too.</p>
   </section>
 
   <section>
@@ -819,17 +819,17 @@ function renderAboutPage(): string {
   <section>
     <h2>Frequently Asked Questions</h2>
     <h3>What is GetCyberRight?</h3>
-    <p>GetCyberRight is a digital safety platform that helps families, seniors, students, and small businesses protect themselves from phishing, scams, identity theft, and data brokers.</p>
+    <p>GetCyberRight is an AI-powered digital safety platform that helps families, seniors, students, and small businesses protect themselves from AI-generated phishing, deepfake scams, identity theft, and data brokers. It combines AI-powered scam detection with plain-language education.</p>
+    <h3>How does the AI Scam Checker work?</h3>
+    <p>The AI Scam Checker lets you paste any suspicious message, email, link, or phone number. AI analyzes the content for social engineering patterns and cross-references 8 live threat intelligence feeds including PhishTank, URLhaus, and VirusTotal to determine if it is a scam.</p>
+    <h3>Can AI really detect AI-generated scams?</h3>
+    <p>Yes. While AI-generated phishing emails may look flawless to humans, AI analysis can detect patterns in language structure, URL construction, sender behavior, and social engineering tactics that are characteristic of scam content, even when the grammar and formatting are perfect.</p>
     <h3>What tools does GetCyberRight offer?</h3>
-    <p>We offer an AI-powered Scam Checker, Data Broker Removal covering 501+ brokers, a Training Academy, an AI Safety Prompt Library with 406+ prompts, and 125+ cybersecurity guides.</p>
-    <h3>How does the Scam Checker work?</h3>
-    <p>Paste any suspicious message, email, link, or phone number. It cross-references 8 verified threat intelligence feeds including PhishTank, URLhaus, and VirusTotal, then uses AI to determine if it is a scam.</p>
+    <p>GetCyberRight offers an AI Scam Checker, Data Broker Removal covering 501+ brokers, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ cybersecurity guides, and real-time threat intelligence from 8 verified feeds across 13 regions.</p>
     <h3>Is GetCyberRight free to use?</h3>
-    <p>GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and educational content are available at no cost.</p>
+    <p>GetCyberRight is free to get started. Core tools like the AI Scam Checker, safety guides, and educational content are available at no cost without requiring an account.</p>
     <h3>Why was GetCyberRight created?</h3>
-    <p>GetCyberRight was started by a family that experienced scams and fraud firsthand. The mission is to make cybersecurity accessible for non-experts.</p>
-    <h3>Who is GetCyberRight designed for?</h3>
-    <p>Everyone: families, seniors, students, parents, educators, and small business owners who need cybersecurity protection without technical expertise.</p>
+    <p>GetCyberRight was started by a family that experienced AI-powered scams, impersonation attacks, and phone fraud firsthand. The mission is to use AI to fight AI-powered threats and make cybersecurity accessible for non-experts.</p>
   </section>
 
   ${buildFooter()}
@@ -893,7 +893,7 @@ function renderHomePage(): string {
 
   <header>
     <h1>GetCyberRight: Free Cybersecurity Tools for Families, Seniors &amp; Small Businesses</h1>
-    <p style="font-size:18px;color:#444;">Got a suspicious message? Check it before it costs you. Free AI-powered scam detection, data broker removal, and practical safety training for families, seniors, and small businesses.</p>
+    <p style="font-size:18px;color:#444;">Got a suspicious message? AI checks it in seconds. AI-powered scam detection across 8 live threat intelligence feeds, data broker removal, and practical safety training for families, seniors, and small businesses.</p>
   </header>
 
   <section>

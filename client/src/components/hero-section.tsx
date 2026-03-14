@@ -228,9 +228,9 @@ function HeroScamChecker() {
 }
 
 const trustPoints = [
-  { icon: ShieldCheck, text: "Checks against PhishTank, URLhaus, VirusTotal, and 5 more feeds" },
+  { icon: Zap, text: "AI-powered analysis detects phishing, social engineering, and deepfake patterns" },
+  { icon: ShieldCheck, text: "Cross-references PhishTank, URLhaus, VirusTotal, and 5 more live feeds" },
   { icon: Eye, text: "No account required. Your data is never stored or sold." },
-  { icon: Database, text: "Tracks 501+ data brokers selling your personal information" },
 ];
 
 const stats = [
@@ -279,14 +279,14 @@ export function HeroSection() {
               >
                 Got a Suspicious Message?
                 <br />
-                <span className="hero-gradient-text">Check It Before It Costs You.</span>
+                <span className="hero-gradient-text">AI Checks It in Seconds.</span>
               </h1>
 
               <p
                 className="text-base sm:text-[1.05rem] text-white/50 leading-relaxed mb-8 max-w-lg"
                 data-testid="text-hero-subtext"
               >
-                Paste any suspicious text, email, link, or phone number into our AI-powered Scam Checker. It cross-references 8 verified threat intelligence feeds and tells you if it's a scam in seconds.
+                Paste any text, email, link, or phone number. Our AI analyzes it against 8 live threat intelligence feeds, detects social engineering patterns, and tells you exactly what to watch for.
               </p>
 
               <div className="space-y-3.5 mb-8">

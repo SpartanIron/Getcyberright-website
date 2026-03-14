@@ -89,8 +89,8 @@ export const pageSEO = {
     description: "Get in touch with our cybersecurity experts. We're here to help you stay safe online.",
   },
   about: {
-    title: "About Us: Cybersecurity Built for Real People",
-    description: "GetCyberRight helps families, seniors, and small businesses fight phishing, scams, identity theft, and data brokers with an AI Scam Checker, Data Broker Removal, Training Academy, and 125+ safety guides.",
+    title: "About Us: AI-Powered Cybersecurity for Real People",
+    description: "Scammers use AI. Your protection should too. GetCyberRight combines AI-powered scam detection, data broker removal, and plain-language education to protect families, seniors, and small businesses from phishing, deepfakes, and online fraud.",
   },
   login: {
     title: "Sign In",

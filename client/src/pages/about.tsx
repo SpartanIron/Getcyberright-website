@@ -18,8 +18,8 @@ import ctaBackgroundImage from "@/assets/images/about-cta-background.png";
 
 const aboutArticleSchema: ArticleData = {
   type: "Article",
-  headline: "About GetCyberRight: Cybersecurity Built for Real People",
-  description: "GetCyberRight is a digital safety platform that helps families, seniors, and small businesses protect themselves from phishing, scams, identity theft, and data brokers with practical, plain-language tools.",
+  headline: "About GetCyberRight: AI-Powered Cybersecurity for Real People",
+  description: "GetCyberRight is an AI-powered digital safety platform that helps families, seniors, and small businesses protect themselves from AI-generated phishing, deepfake scams, identity theft, and data brokers.",
   datePublished: "2024-01-15",
   dateModified: "2026-03-01",
   author: { name: "GetCyberRight", url: "https://getcyberright.com" },
@@ -35,19 +35,19 @@ const aboutBreadcrumbs: BreadcrumbData = {
 };
 
 const threatTypes = [
-  { icon: Mail, label: "Phishing Emails", description: "Fake messages designed to steal your passwords, banking details, or personal information." },
-  { icon: UserX, label: "Impersonation Scams", description: "Criminals posing as friends, family, banks, or government agencies to trick you into sending money." },
-  { icon: Heart, label: "Romance Scams", description: "Fake relationships built over weeks or months, ending with requests for money or personal data." },
-  { icon: Landmark, label: "Crypto & Investment Fraud", description: "Too-good-to-be-true investment opportunities, fake trading platforms, and pig butchering schemes." },
-  { icon: Phone, label: "Phone & SMS Scams", description: "Urgent text messages and calls about suspended accounts, fake deliveries, or IRS threats." },
-  { icon: Eye, label: "Data Broker Exposure", description: "Companies collecting and selling your personal information to anyone willing to pay, including scammers." },
+  { icon: Mail, label: "AI-Generated Phishing", description: "Scammers now use AI to write flawless phishing emails with no typos, perfect branding, and personalized details scraped from your social media." },
+  { icon: UserX, label: "Deepfake Impersonation", description: "AI-generated voice clones and video deepfakes are being used to impersonate family members, CEOs, and government officials in real time." },
+  { icon: Heart, label: "Romance & Social Engineering", description: "AI chatbots run long-term romance scams simultaneously on thousands of victims, building trust over weeks before requesting money." },
+  { icon: Landmark, label: "Crypto & Investment Fraud", description: "Fake trading platforms with AI-generated testimonials and deepfake celebrity endorsements designed to steal your savings." },
+  { icon: Phone, label: "AI Voice Cloning Scams", description: "Criminals clone a family member's voice from a few seconds of audio, then call pretending to be in an emergency and asking for money." },
+  { icon: Eye, label: "Data Broker Exposure", description: "Over 501 companies collect and sell your personal information, giving scammers the details they need to make their attacks convincing." },
 ];
 
 const platformTools = [
   {
     icon: ScanLine,
-    title: "Scam Checker",
-    description: "Paste any suspicious message, email, link, or phone number. Our AI cross-references 8 verified threat intelligence feeds and tells you if it's a scam.",
+    title: "AI Scam Checker",
+    description: "Paste any suspicious message, email, link, or phone number. AI analyzes the content for social engineering patterns, cross-references 8 live threat intelligence feeds, and gives you a detailed risk breakdown.",
     href: "/scam-checker",
     color: "text-red-400",
     bg: "bg-red-500/10",
@@ -117,11 +117,11 @@ export default function About() {
               <div className="max-w-xl">
                 <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-4" data-testid="text-about-label">About GetCyberRight</p>
                 <h1 id="about-hero-heading" className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-[1.1] mb-6" data-testid="text-about-heading">
-                  Cybersecurity Built
+                  AI-Powered Protection
                   <br />for Real People.
                 </h1>
                 <p className="text-lg text-white/55 leading-relaxed mb-6">
-                  Most cybersecurity tools are built for IT teams and enterprises. GetCyberRight is different. We build practical scam detection, data protection, and safety education tools for the people who need them most: families, seniors, students, and small businesses.
+                  Scammers are using AI to create attacks that look real. GetCyberRight uses AI to catch them. We combine AI-powered scam detection, data broker removal, and plain-language education to give families, seniors, and small businesses the same level of protection that large enterprises have.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link href="/scam-checker">
@@ -168,10 +168,10 @@ export default function About() {
                 <span className="text-sm font-semibold text-red-500 uppercase tracking-wider">The Problem</span>
               </div>
               <h2 id="problem-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-problem-heading">
-                Online Scams Are Growing Faster Than Awareness
+                Scammers Now Use AI. Your Defenses Should Too.
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                Cybercriminals are no longer just targeting corporations. They are targeting your inbox, your phone, your social media, and your family. The scams are sophisticated, personalized, and designed to exploit trust.
+                Cybercriminals are using the same AI tools that power ChatGPT and voice assistants to create attacks that are nearly impossible to detect by eye. AI-generated phishing, deepfake video calls, and cloned voices are targeting ordinary people, not just corporations.
               </p>
             </div>
 
@@ -198,7 +198,7 @@ export default function About() {
             <div className="mt-10 bg-red-500/[0.06] border border-red-500/15 rounded-xl p-5 sm:p-6 flex items-start gap-3.5" data-testid="text-problem-callout">
               <BadgeAlert className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-foreground/80 leading-relaxed">
-                <span className="font-semibold text-foreground">The reality:</span> Most people do not recognize a scam until after they have been victimized. Cybersecurity knowledge that was once only available to IT professionals is now essential for everyone.
+                <span className="font-semibold text-foreground">The reality:</span> AI has made scams faster, cheaper, and more convincing than ever. A single AI tool can generate thousands of personalized phishing emails in minutes. The old advice of "look for typos" no longer works. You need AI-powered tools to fight AI-powered threats.
               </p>
             </div>
           </div>
@@ -212,10 +212,10 @@ export default function About() {
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">The Solution</span>
               </div>
               <h2 id="solution-heading" className="text-2xl sm:text-3xl font-bold text-white mb-4" data-testid="text-solution-heading">
-                One Platform. Every Tool You Need.
+                AI-Powered Protection. Plain-Language Education.
               </h2>
               <p className="text-white/50 leading-relaxed">
-                GetCyberRight gives you practical tools to detect scams, remove your data from brokers, and learn how to protect yourself online. No jargon. No subscriptions required to get started.
+                GetCyberRight uses AI to analyze suspicious content, detect social engineering patterns, and identify threats that humans miss. Combined with plain-language education and data broker removal, it gives everyday people the same level of protection that enterprises have.
               </p>
             </div>
 
@@ -254,23 +254,23 @@ export default function About() {
                   <span className="text-sm font-semibold text-accent uppercase tracking-wider">Why This Matters</span>
                 </div>
                 <h2 id="impact-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-6" data-testid="text-impact-heading">
-                  Behind Every Scam Is a Real Person Who Lost Something
+                  AI Made Scams Unrecognizable. We Built Tools to Fight Back.
                 </h2>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    A grandmother who lost her retirement savings to a romance scam. A small business owner whose company was paralyzed by a phishing attack. A college student whose identity was stolen through a fake job offer.
+                    A grandmother who received a phone call in her grandson's cloned voice begging for bail money. A small business owner who wired $47,000 after a deepfake video call with someone who looked exactly like their CEO. A college student whose identity was stolen through an AI-generated job offer that passed every red-flag check.
                   </p>
                   <p>
-                    These are not statistics. They are real people. And in most cases, the scam could have been prevented with the right knowledge and tools at the right time.
+                    These are not hypothetical scenarios. They are happening right now. AI has removed the telltale signs that people used to rely on to spot scams: bad grammar, obvious fakes, generic messages. Today's attacks are personalized, polished, and nearly indistinguishable from legitimate communication.
                   </p>
                   <p>
-                    GetCyberRight was started by a family that experienced these attacks firsthand. Hacked social media accounts, impersonation scams targeting relatives, and repeated phone fraud that drained a family member's savings.
+                    GetCyberRight was started by a family that experienced these attacks firsthand. Hacked social media accounts, impersonation scams targeting relatives, and repeated phone fraud that drained a family member's savings. We built AI-powered tools because we realized the old methods of spotting scams no longer work.
                   </p>
                   <blockquote className="border-l-4 border-accent pl-5 py-2 text-foreground font-medium bg-accent/5 text-lg rounded-r-lg">
-                    No family or business should have to learn these lessons the hard way.
+                    If scammers are using AI, your protection needs AI too.
                   </blockquote>
                   <p>
-                    That experience became the mission: build tools that help ordinary people recognize and stop scams before they cause harm. Make cybersecurity simple enough that a teenager, a grandparent, and a small business owner can all use it.
+                    That is the mission: use the same AI technology that powers modern scams to detect and stop them. Make it simple enough that a teenager, a grandparent, and a small business owner can all use it without technical knowledge.
                   </p>
                 </div>
               </div>
