@@ -70,7 +70,7 @@ export function SEOHead({
 export const pageSEO = {
   home: {
     title: undefined,
-    description: "Cybersecurity tools for families, parents, kids, and seniors. Check scams, remove your data from brokers, and learn to stay safe online. No sign-up required.",
+    description: "Got a suspicious message? Check it before it costs you. Free AI-powered scam detection, data broker removal, and safety training for families, seniors, and small businesses.",
   },
   tools: {
     title: "Security Tools",
@@ -89,8 +89,8 @@ export const pageSEO = {
     description: "Get in touch with our cybersecurity experts. We're here to help you stay safe online.",
   },
   about: {
-    title: "About Us",
-    description: "Learn about GetCyberRight's mission to make cybersecurity accessible to everyone through education and practical tools.",
+    title: "About Us: Cybersecurity Built for Real People",
+    description: "GetCyberRight helps families, seniors, and small businesses fight phishing, scams, identity theft, and data brokers with an AI Scam Checker, Data Broker Removal, Training Academy, and 125+ safety guides.",
   },
   login: {
     title: "Sign In",

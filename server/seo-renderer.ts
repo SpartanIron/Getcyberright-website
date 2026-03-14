@@ -709,6 +709,135 @@ function renderStaticToolPage(pagePath: string): string | null {
 </body></html>`;
 }
 
+function renderAboutPage(): string {
+  const head = buildHead({
+    title: "About GetCyberRight: Cybersecurity Built for Real People",
+    description: "GetCyberRight helps families, seniors, and small businesses fight phishing, scams, identity theft, and data brokers with an AI Scam Checker, Data Broker Removal, Training Academy, and 125+ safety guides.",
+    url: "/about",
+    type: "article",
+    publishedTime: "2024-01-15",
+    modifiedTime: "2026-03-01",
+  });
+
+  const articleSchema = buildJsonLd({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "About GetCyberRight: Cybersecurity Built for Real People",
+    description: "GetCyberRight is a digital safety platform that helps families, seniors, and small businesses protect themselves from phishing, scams, identity theft, and data brokers with practical, plain-language tools.",
+    datePublished: "2024-01-15",
+    dateModified: "2026-03-01",
+    author: { "@type": "Organization", name: "GetCyberRight", url: "https://getcyberright.com" },
+    publisher: { "@type": "Organization", name: "GetCyberRight", logo: { "@type": "ImageObject", url: "https://getcyberright.com/og-image.png" } },
+    mainEntityOfPage: { "@type": "WebPage", "@id": "https://getcyberright.com/about" },
+  });
+
+  const breadcrumbs = buildJsonLd({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://getcyberright.com/" },
+      { "@type": "ListItem", position: 2, name: "About", item: "https://getcyberright.com/about" },
+    ],
+  });
+
+  const faqSchema = buildFaqSchema([
+    { question: "What is GetCyberRight?", answer: "GetCyberRight is a digital safety platform that helps families, seniors, students, and small businesses protect themselves from phishing, scams, identity theft, and data brokers. It provides practical tools and plain-language education." },
+    { question: "What tools does GetCyberRight offer?", answer: "GetCyberRight offers an AI-powered Scam Checker, Data Broker Removal covering 501+ brokers, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ cybersecurity guides, and real-time threat intelligence from 8 verified feeds." },
+    { question: "Who is GetCyberRight designed for?", answer: "GetCyberRight is designed for everyday internet users including families, seniors, students, parents, educators, and small business owners who need cybersecurity protection without technical expertise." },
+    { question: "How does the Scam Checker work?", answer: "The Scam Checker lets you paste any suspicious message, email, link, or phone number. It cross-references 8 verified threat intelligence feeds including PhishTank, URLhaus, and VirusTotal, then uses AI analysis to determine if the content is a scam." },
+    { question: "Is GetCyberRight free to use?", answer: "GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and educational content are available at no cost without requiring an account." },
+    { question: "Why was GetCyberRight created?", answer: "GetCyberRight was started by a family that experienced scams, impersonation attacks, and phone fraud firsthand. The mission is to make cybersecurity simple and accessible for non-experts so no family has to learn these lessons the hard way." },
+  ]);
+
+  return `${head}
+<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+  ${articleSchema}
+  ${breadcrumbs}
+  ${faqSchema}
+
+  <header>
+    <h1>About GetCyberRight: Cybersecurity Built for Real People</h1>
+    <p style="font-size:18px;color:#444;">Most cybersecurity tools are built for IT teams and enterprises. GetCyberRight is different. We build practical scam detection, data protection, and safety education tools for the people who need them most: families, seniors, students, and small businesses.</p>
+  </header>
+
+  <section>
+    <h2>The Problem: Online Scams Are Growing Faster Than Awareness</h2>
+    <p>Cybercriminals are no longer just targeting corporations. They are targeting your inbox, your phone, your social media, and your family. The scams are sophisticated, personalized, and designed to exploit trust.</p>
+    <ul>
+      <li><strong>Phishing Emails</strong> - Fake messages designed to steal your passwords, banking details, or personal information.</li>
+      <li><strong>Impersonation Scams</strong> - Criminals posing as friends, family, banks, or government agencies to trick you into sending money.</li>
+      <li><strong>Romance Scams</strong> - Fake relationships built over weeks or months, ending with requests for money or personal data.</li>
+      <li><strong>Crypto and Investment Fraud</strong> - Too-good-to-be-true investment opportunities, fake trading platforms, and pig butchering schemes.</li>
+      <li><strong>Phone and SMS Scams</strong> - Urgent text messages and calls about suspended accounts, fake deliveries, or IRS threats.</li>
+      <li><strong>Data Broker Exposure</strong> - Companies collecting and selling your personal information to anyone willing to pay, including scammers.</li>
+    </ul>
+    <p>Most people do not recognize a scam until after they have been victimized. Cybersecurity knowledge that was once only available to IT professionals is now essential for everyone.</p>
+  </section>
+
+  <section>
+    <h2>The Solution: One Platform, Every Tool You Need</h2>
+    <p>GetCyberRight gives you practical tools to detect scams, remove your data from brokers, and learn how to protect yourself online.</p>
+    <ul>
+      <li><a href="/scam-checker"><strong>Scam Checker</strong></a> - Paste any suspicious message, email, link, or phone number. Our AI cross-references 8 verified threat intelligence feeds and tells you if it is a scam.</li>
+      <li><a href="/data-removal"><strong>Data Broker Removal</strong></a> - We track 501+ companies that buy and sell your personal data. Step-by-step instructions to remove yourself from each one.</li>
+      <li><a href="/training"><strong>Training Academy</strong></a> - Structured courses that teach you how modern scams work and how to recognize them, designed for all skill levels.</li>
+      <li><a href="/ai-prompts"><strong>AI Safety Prompt Library</strong></a> - 406+ ready-to-use prompts that help you use AI tools like ChatGPT safely, without accidentally exposing sensitive information.</li>
+      <li><a href="/guides"><strong>Cybersecurity Guides</strong></a> - 125+ plain-language guides covering password security, two-factor authentication, safe browsing, and protecting your devices.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Why This Matters</h2>
+    <p>Behind every scam is a real person who lost something. A grandmother who lost her retirement savings to a romance scam. A small business owner whose company was paralyzed by a phishing attack. A college student whose identity was stolen through a fake job offer.</p>
+    <p>GetCyberRight was started by a family that experienced these attacks firsthand. Hacked social media accounts, impersonation scams targeting relatives, and repeated phone fraud that drained a family member's savings.</p>
+    <p>That experience became the mission: build tools that help ordinary people recognize and stop scams before they cause harm.</p>
+  </section>
+
+  <section>
+    <h2>Platform Coverage</h2>
+    <ul>
+      <li><strong>501+</strong> Data Brokers Tracked - Companies monitored for selling personal data</li>
+      <li><strong>406+</strong> AI Safety Prompts - Ready-to-use prompts for secure AI usage</li>
+      <li><strong>125+</strong> Safety Guides - Plain-language cybersecurity resources</li>
+      <li><strong>8</strong> Threat Intelligence Feeds - Real-time data from PhishTank, URLhaus, VirusTotal, and more</li>
+      <li><strong>13</strong> Regions Covered - Scam alerts localized for regions worldwide</li>
+      <li><strong>52+</strong> Scam Categories - Detailed guides on specific scam types</li>
+    </ul>
+    <p>Every tool is powered by the same threat intelligence that enterprise security teams rely on, including data from FBI IC3, CISA, INTERPOL, Europol, NIST, PhishTank, and VirusTotal.</p>
+  </section>
+
+  <section>
+    <h2>Our Philosophy: Cybersecurity Should Not Require a Degree</h2>
+    <p>The biggest gap in cybersecurity is not technology. It is accessibility. The knowledge exists to prevent most scams, but it is locked behind corporate firewalls and technical jargon.</p>
+    <ul>
+      <li><strong>Accessible to Everyone</strong> - Every core tool and guide is free to use. No login walls for scam checking. No credit card required.</li>
+      <li><strong>Transparent and Trustworthy</strong> - We never sell your data. We never use fear-based marketing. Our tools are powered by verified, public threat intelligence sources.</li>
+      <li><strong>Community Driven</strong> - The best way to support GetCyberRight is to share it with someone who needs it.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is GetCyberRight?</h3>
+    <p>GetCyberRight is a digital safety platform that helps families, seniors, students, and small businesses protect themselves from phishing, scams, identity theft, and data brokers.</p>
+    <h3>What tools does GetCyberRight offer?</h3>
+    <p>We offer an AI-powered Scam Checker, Data Broker Removal covering 501+ brokers, a Training Academy, an AI Safety Prompt Library with 406+ prompts, and 125+ cybersecurity guides.</p>
+    <h3>How does the Scam Checker work?</h3>
+    <p>Paste any suspicious message, email, link, or phone number. It cross-references 8 verified threat intelligence feeds including PhishTank, URLhaus, and VirusTotal, then uses AI to determine if it is a scam.</p>
+    <h3>Is GetCyberRight free to use?</h3>
+    <p>GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and educational content are available at no cost.</p>
+    <h3>Why was GetCyberRight created?</h3>
+    <p>GetCyberRight was started by a family that experienced scams and fraud firsthand. The mission is to make cybersecurity accessible for non-experts.</p>
+    <h3>Who is GetCyberRight designed for?</h3>
+    <p>Everyone: families, seniors, students, parents, educators, and small business owners who need cybersecurity protection without technical expertise.</p>
+  </section>
+
+  ${buildFooter()}
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body></html>`;
+}
+
 function renderHomePage(): string {
   const head = buildHead({
     title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
@@ -763,8 +892,8 @@ function renderHomePage(): string {
   ${faqSchema}
 
   <header>
-    <h1>GetCyberRight: Free Cybersecurity Education for Families</h1>
-    <p style="font-size:18px;color:#444;">Protect your family online with free cybersecurity tools, AI-powered scam detection, and practical safety training. Trusted by thousands of families worldwide.</p>
+    <h1>GetCyberRight: Free Cybersecurity Tools for Families, Seniors &amp; Small Businesses</h1>
+    <p style="font-size:18px;color:#444;">Got a suspicious message? Check it before it costs you. Free AI-powered scam detection, data broker removal, and practical safety training for families, seniors, and small businesses.</p>
   </header>
 
   <section>
@@ -873,6 +1002,10 @@ export function seoMiddleware() {
     try {
       if (path === "/") {
         html = renderHomePage();
+      }
+
+      if (!html && path === "/about") {
+        html = renderAboutPage();
       }
 
       const guideMatch = path.match(/^\/guides\/([a-z0-9-]+)$/);
