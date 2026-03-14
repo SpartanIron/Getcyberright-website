@@ -111,7 +111,26 @@ export default function About() {
 
         <section className="bg-[#0A2A3C] relative overflow-hidden" aria-labelledby="about-hero-heading">
           <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/[0.03] to-transparent" />
+
+          <div
+            className="absolute pointer-events-none hidden lg:block"
+            aria-hidden="true"
+            style={{
+              top: 0,
+              right: 0,
+              width: "58%",
+              height: "100%",
+              overflow: "hidden",
+              maskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+            }}
+          >
+            <div style={{ position: "absolute", top: "-40%", right: "1%", width: "75px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center", filter: "drop-shadow(0 0 24px rgba(13,148,136,0.2))" }} />
+            <div style={{ position: "absolute", top: "-40%", right: "8%", width: "3px", height: "220%", background: "linear-gradient(180deg, transparent 10%, rgba(45,212,191,0.5) 50%, transparent 90%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+            <div style={{ position: "absolute", top: "-35%", right: "16%", width: "55px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.75, filter: "drop-shadow(0 0 32px rgba(45,212,191,0.4))" }} />
+            <div style={{ position: "absolute", top: "-35%", right: "24%", width: "3px", height: "220%", background: "linear-gradient(180deg, transparent 10%, hsla(16,95%,58%,0.45) 50%, transparent 90%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+            <div style={{ position: "absolute", top: "-30%", right: "30%", width: "80px", height: "220%", background: "linear-gradient(180deg, hsl(16,100%,62%) 0%, hsl(16,95%,52%) 40%, hsl(16,90%,42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.7, filter: "drop-shadow(0 0 30px hsla(16,95%,55%,0.35))" }} />
+          </div>
           <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
               <div className="max-w-xl">
@@ -247,42 +266,61 @@ export default function About() {
 
         <section className="py-16 sm:py-20 lg:py-24" aria-labelledby="impact-heading">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <Heart className="w-5 h-5 text-accent" />
                   <span className="text-sm font-semibold text-accent uppercase tracking-wider">Why This Matters</span>
                 </div>
-                <h2 id="impact-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-6" data-testid="text-impact-heading">
+                <h2 id="impact-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-8" data-testid="text-impact-heading">
                   Why This Matters Now More Than Ever
                 </h2>
-                <div className="space-y-5 text-lg text-muted-foreground leading-relaxed">
-                  <p>
-                    A grandmother who got a phone call that sounded exactly like her grandson, begging for bail money. A small business owner who sent $47,000 after a video call with someone who looked just like their boss. A college student whose identity was stolen through a job offer that looked completely legitimate.
-                  </p>
-                  <p>
-                    These are not made-up stories. They are happening right now. The warning signs people used to rely on, like bad spelling, obvious fakes, and generic messages, are gone. Today's scams are personal, polished, and almost impossible to tell apart from the real thing. Knowing how to stay safe online is no longer a nice-to-have. It is a necessity.
-                  </p>
-                  <p>
-                    GetCyberRight was started by a family that went through this firsthand. Hacked social media accounts, scammers pretending to be relatives, and repeated phone scams that drained a family member's savings. That experience made one thing clear: the people who need protection the most have the fewest resources.
-                  </p>
-                  <blockquote className="border-l-4 border-accent pl-5 py-2 text-foreground font-medium bg-accent/5 text-lg rounded-r-lg">
-                    No family should have to learn online safety the hard way.
-                  </blockquote>
-                  <p>
-                    That is the mission: make online safety simple, practical, and available to everyone so that a teenager, a grandparent, and a small business owner can all protect themselves without needing a technical background.
-                  </p>
+
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-start gap-4 bg-muted/40 rounded-xl p-5 border border-border/60">
+                    <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Phone className="w-5 h-5 text-red-400" />
+                    </div>
+                    <p className="text-base text-muted-foreground leading-relaxed">A grandmother who got a phone call that sounded exactly like her grandson, begging for bail money.</p>
+                  </div>
+                  <div className="flex items-start gap-4 bg-muted/40 rounded-xl p-5 border border-border/60">
+                    <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <DollarSign className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <p className="text-base text-muted-foreground leading-relaxed">A small business owner who sent $47,000 after a video call with someone who looked just like their boss.</p>
+                  </div>
+                  <div className="flex items-start gap-4 bg-muted/40 rounded-xl p-5 border border-border/60">
+                    <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <UserX className="w-5 h-5 text-violet-400" />
+                    </div>
+                    <p className="text-base text-muted-foreground leading-relaxed">A college student whose identity was stolen through a job offer that looked completely legitimate.</p>
+                  </div>
                 </div>
+
+                <p className="text-lg text-muted-foreground leading-relaxed mb-5">
+                  These are not made-up stories. They are happening right now. The warning signs people used to rely on are gone. Today's scams are personal, polished, and almost impossible to tell apart from the real thing.
+                </p>
+
+                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                  GetCyberRight was started by a family that went through this firsthand. Hacked accounts, scammers pretending to be relatives, and phone scams that drained a family member's savings. That experience made one thing clear: the people who need protection the most have the fewest resources.
+                </p>
+
+                <blockquote className="border-l-4 border-accent pl-6 py-4 text-xl text-foreground font-semibold bg-accent/5 rounded-r-xl mb-6">
+                  No family should have to learn online safety the hard way.
+                </blockquote>
+
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  That is the mission: make online safety simple, practical, and available to everyone so that a teenager, a grandparent, and a small business owner can all protect themselves without needing a technical background.
+                </p>
               </div>
-              <div className="relative rounded-xl overflow-hidden">
+              <div className="relative rounded-xl overflow-hidden lg:sticky lg:top-24">
                 <img
                   src={seniorsLearningImage}
                   alt="Seniors being helped to use technology safely with family support"
-                  className="w-full h-64 sm:h-80 lg:h-[440px] object-cover"
+                  className="w-full h-64 sm:h-80 lg:h-[520px] object-cover"
                   loading="lazy"
                   data-testid="img-about-seniors-learning"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
               </div>
             </div>
           </div>
