@@ -1,0 +1,235 @@
+Act as a cybersecurity product strategist, UX designer, conversion copywriter, and front-end engineer.
+
+Your task is to redesign the **entire About page** for a cybersecurity platform called **GetCyberRight** so it builds trust, credibility, and emotional connection while clearly explaining what the platform does.
+
+The current About section reads like a mission statement and lacks authority, product clarity, and trust signals.
+
+The new page must look like a **serious cybersecurity platform**, not a blog or nonprofit awareness site.
+
+---
+
+PLATFORM CONTEXT
+
+GetCyberRight is a digital safety platform designed for:
+
+• families
+• seniors
+• students
+• small businesses
+• everyday internet users
+
+The platform helps people protect themselves from:
+
+• phishing
+• online scams
+• identity theft
+• impersonation attacks
+• data brokers
+• digital fraud
+
+The platform includes:
+
+• Scam Checker
+• Data Broker Removal tools
+• Training Academy
+• AI Safety Prompt Library
+• Plain-language cybersecurity guides
+
+The mission is to make cybersecurity **simple and accessible for non-experts**.
+
+---
+
+MAIN OBJECTIVE
+
+The About page must immediately communicate:
+
+1. WHY the platform exists
+2. WHAT problem it solves
+3. WHAT tools it provides
+4. WHY users should trust it
+
+Users must feel:
+
+• understood
+• protected
+• confident in the platform
+
+Avoid making the page sound like a nonprofit awareness campaign.
+
+---
+
+PAGE STRUCTURE
+
+Design the About page with the following sections.
+
+---
+
+SECTION 1 — MISSION HERO
+
+Create a strong opening section.
+
+Headline examples to explore:
+
+• Built by a Family. Designed to Protect Yours.
+• Cybersecurity Built for Real People
+• Fighting Online Scams with Simple Tools
+
+Supporting text should explain:
+
+• scams and digital fraud are increasing
+• most cybersecurity tools are built for experts
+• GetCyberRight exists to simplify digital protection
+
+The tone should feel human, protective, and credible.
+
+---
+
+SECTION 2 — THE PROBLEM
+
+Explain the modern scam landscape.
+
+Include examples such as:
+
+• phishing emails
+• fake job offers
+• romance scams
+• crypto fraud
+• impersonation scams
+
+Make it clear that many people do not recognize scams until it is too late.
+
+This section should build urgency and awareness.
+
+---
+
+SECTION 3 — THE SOLUTION
+
+Explain what GetCyberRight actually provides.
+
+Introduce the platform ecosystem clearly.
+
+Example components:
+
+• Scam Checker — analyze suspicious messages and links
+• Data Broker Removal — reduce exposure of personal data
+• Training Academy — learn how modern scams operate
+• AI Safety Prompt Library — use AI securely
+• Cybersecurity Guides — plain-language protection advice
+
+Use cards or icons for each feature.
+
+---
+
+SECTION 4 — WHY THIS MATTERS
+
+Explain the human reason behind the platform.
+
+Focus on:
+
+• the emotional impact of scams
+• financial loss and identity theft
+• protecting families and small businesses
+
+Position GetCyberRight as a practical protection tool.
+
+---
+
+SECTION 5 — TRUST AND CREDIBILITY
+
+Add signals that build legitimacy.
+
+Examples:
+
+• number of data brokers tracked
+• number of safety guides
+• number of AI prompts
+• number of threat categories addressed
+
+Avoid exaggerated or fake numbers.
+
+Use credibility language such as:
+
+• practical cybersecurity knowledge
+• scam detection resources
+• plain-language education
+
+---
+
+SECTION 6 — SECURITY PHILOSOPHY
+
+Add a section explaining the philosophy of the platform.
+
+Example message:
+
+Cybersecurity should not require a computer science degree.
+
+Everyone deserves tools that help them recognize and stop scams.
+
+This reinforces accessibility and purpose.
+
+---
+
+VISUAL DESIGN REQUIREMENTS
+
+The About page should feel like a **modern cybersecurity startup**.
+
+Use:
+
+• dark modern interface
+• subtle gradients
+• card-based layouts
+• security-themed iconography
+• strong typography hierarchy
+
+Avoid:
+
+• large empty sections
+• overly long paragraphs
+• generic marketing copy
+
+---
+
+UX REQUIREMENTS
+
+The page should create a logical narrative:
+
+Mission → Threat → Solution → Impact → Credibility
+
+The user should feel increasingly confident in the platform as they scroll.
+
+---
+
+TECHNICAL REQUIREMENTS
+
+Provide:
+
+1. Improved headline options
+2. Full rewritten About page copy
+3. Suggested layout hierarchy
+4. Visual design recommendations
+5. Microcopy for credibility signals
+6. Production-ready **React + Tailwind components**
+
+The layout must:
+
+• be fully responsive
+• look excellent on desktop and mobile
+• maintain strong visual hierarchy
+• feel polished and modern
+
+---
+
+IMPORTANT
+
+Do NOT produce a generic About page.
+
+Do NOT focus only on the founders’ story.
+
+Focus on:
+
+• the real problem
+• the tools solving the problem
+• the mission behind the platform
+• credibility and trust
+
+The final output should look like an About page for a serious cybersecurity platform designed to help everyday people stay safe from modern online threats.
