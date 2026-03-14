@@ -37,11 +37,11 @@ export function ThreatAwareness() {
         <img
           src={seniorsImg}
           alt=""
-          className="absolute right-0 top-0 w-[55%] h-full object-cover"
+          className="absolute right-0 top-0 w-[50%] h-full object-cover object-center"
           loading="lazy"
           aria-hidden="true"
         />
-        <div className="absolute right-0 top-0 w-[55%] h-full" style={{ background: "linear-gradient(to right, #0A2A3C 0%, #0A2A3C 10%, rgba(10,42,60,0.85) 30%, rgba(10,42,60,0.4) 60%, rgba(10,42,60,0.15) 80%, transparent 100%)" }} />
+        <div className="absolute right-0 top-0 w-[50%] h-full" style={{ background: "linear-gradient(to right, #0A2A3C 0%, transparent 25%)" }} />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-28">
