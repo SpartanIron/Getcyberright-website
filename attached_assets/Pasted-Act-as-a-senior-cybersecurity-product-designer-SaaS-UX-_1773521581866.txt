@@ -1,0 +1,369 @@
+Act as a senior cybersecurity product designer, SaaS UX architect, conversion strategist, and full-stack React engineer.
+
+Your task is to design and build the **homepage and UI component system** for a cybersecurity platform called **GetCyberRight**.
+
+The platform helps everyday people protect themselves from:
+
+• phishing scams
+• fake job offers
+• romance scams
+• identity theft
+• crypto fraud
+• impersonation attacks
+• data broker exposure
+
+The product includes:
+
+• Scam Checker
+• Data Broker Defense
+• Cyber Safety Academy
+• AI Safety Tools
+• Plain-language security guides
+
+The site must feel like a **serious cybersecurity platform**, not a blog or generic landing page.
+
+The design should combine:
+
+• the structured credibility of enterprise cybersecurity sites
+• modern SaaS UI patterns
+• clear product interaction
+• consumer-friendly accessibility
+
+Do NOT produce a generic marketing site.
+
+---
+
+PRIMARY OBJECTIVE
+
+The homepage must immediately communicate:
+
+1. what the platform does
+2. the threat it protects against
+3. the tools available
+4. why the user should trust it
+5. the action the user should take immediately
+
+The homepage must feel like a **cyber defense platform interface**, not just a marketing page.
+
+---
+
+HOMEPAGE STRUCTURE
+
+Build the homepage using this exact structure:
+
+Hero
+Threat Awareness
+Try the Scam Checker
+Platform Overview
+Real Scam Examples
+Cybersecurity Education
+Trust Signals
+Final Call to Action
+
+---
+
+SECTION 1 — HERO (INTERACTIVE)
+
+The hero must contain:
+
+Headline
+Subheadline
+Interactive Scam Checker input
+Primary CTA
+Trust indicators
+
+Example direction:
+
+Headline example options:
+
+• Stop Online Scams Before They Steal Your Money
+• Detect Suspicious Messages Before It’s Too Late
+• Your Personal Cyber Defense Platform
+
+Subheadline example:
+
+Analyze suspicious emails, texts, and links instantly. Protect your identity and personal data from modern scams.
+
+Scam Checker UI:
+
+Input field placeholder:
+
+Paste suspicious message, email, or link
+
+Button:
+
+Analyze for Scam
+
+Trust indicators below the hero:
+
+Detect phishing
+Block scams
+Protect personal data
+Learn modern threats
+
+---
+
+SECTION 2 — THREAT AWARENESS
+
+Explain the threat landscape clearly.
+
+Examples of threats to show:
+
+Phishing emails
+Fake job scams
+Romance scams
+Crypto investment scams
+Identity theft
+
+Visual idea:
+
+Scam Attempt → Scam Check → Safe Decision
+
+This section should build urgency and explain why the tool matters.
+
+---
+
+SECTION 3 — PLATFORM OVERVIEW
+
+Introduce the platform ecosystem.
+
+Use feature cards for:
+
+Scam Detection
+Analyze suspicious messages instantly
+
+Data Broker Defense
+Reduce exposure of personal information
+
+Cyber Safety Academy
+Learn how modern scams operate
+
+AI Safety Tools
+Use AI responsibly and securely
+
+Each feature should appear as a modern card component with icons.
+
+---
+
+SECTION 4 — REAL SCAM EXAMPLES
+
+Create cards showing real scam messages.
+
+Example cards:
+
+Fake PayPal Email
+Romance Scam Message
+Crypto Investment Scam
+Fake Job Offer
+
+Each card should include:
+
+scam message snippet
+scam category badge
+button: Analyze This Message
+
+---
+
+SECTION 5 — CYBERSECURITY EDUCATION
+
+Create article cards showing educational resources.
+
+Examples:
+
+How Phishing Works
+How to Verify Suspicious Messages
+How Scammers Impersonate Companies
+How to Remove Your Data from Brokers
+
+These cards should include:
+
+headline
+short summary
+read more link
+
+---
+
+SECTION 6 — TRUST SIGNALS
+
+Display credibility indicators.
+
+Examples:
+
+500+ data brokers tracked
+400+ AI safety prompts
+Cybersecurity guides for families
+Tools designed for small businesses
+
+Use icon + number + label layout.
+
+---
+
+SECTION 7 — FINAL CTA
+
+Headline:
+
+Don’t Wait Until a Scam Works
+
+CTA button:
+
+Check a Suspicious Message Now
+
+Secondary CTA:
+
+Explore Free Tools
+
+---
+
+UI COMPONENT SYSTEM
+
+Create reusable components for the entire platform.
+
+Components should include:
+
+HeroSection
+ScamCheckerCard
+FeatureCards
+ThreatSection
+ScamExampleCards
+EducationCards
+TrustSignalRow
+CallToActionSection
+
+Each component should be modular and reusable.
+
+---
+
+VISUAL DESIGN SYSTEM
+
+Color palette:
+
+Background: #0b1020
+Primary Blue: #2563eb
+Accent Blue: #3b82f6
+Security Green: #10b981
+Warning Red: #ef4444
+Text: #e5e7eb
+
+Use:
+
+dark modern interface
+subtle gradients
+glow accents
+glass style cards
+security-style icons
+
+---
+
+UI STYLE REQUIREMENTS
+
+Cards should have:
+
+rounded corners
+subtle glow borders
+hover elevation
+soft shadows
+
+Hover animation:
+
+scale slightly
+increase glow intensity
+
+Hero background:
+
+animated network lines or nodes
+subtle cybersecurity visual theme
+
+---
+
+TYPOGRAPHY
+
+Use modern SaaS typography.
+
+Recommended fonts:
+
+Inter
+Plus Jakarta Sans
+
+Hierarchy:
+
+Hero headline: 48-60px
+Section titles: 32-36px
+Card titles: 18-20px
+Body text: 16px
+
+---
+
+TECH STACK
+
+Build using:
+
+React
+Tailwind CSS
+component-based architecture
+
+Ensure:
+
+fully responsive design
+clean semantic layout
+accessible color contrast
+mobile-first responsiveness
+
+---
+
+PROJECT STRUCTURE
+
+Use the following structure:
+
+src
+components
+hero
+scamChecker
+featureCards
+threatSection
+scamExamples
+trustRow
+educationCards
+ctaSection
+
+pages
+home
+about
+tools
+academy
+resources
+
+styles
+utils
+
+---
+
+UX PRINCIPLES
+
+The page should guide users through this narrative:
+
+Threat → Solution → Platform → Proof → Action
+
+The Scam Checker must be the primary interaction point.
+
+Avoid:
+
+generic marketing layouts
+long paragraphs
+equal visual weight across sections
+
+The Scam Checker should be the most visually dominant element.
+
+---
+
+OUTPUT REQUIREMENTS
+
+Provide:
+
+1. final homepage layout
+2. all UI component code
+3. React + Tailwind implementation
+4. responsive behavior
+5. realistic cybersecurity copy
+6. production-ready structure
+
+The final result should look like a **modern cybersecurity startup platform**, not a template landing page.
