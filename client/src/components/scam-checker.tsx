@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { trackToolUsage } from "@/lib/analytics";
 import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1722,7 +1722,13 @@ function getAIRiskIcon(level: string) {
 }
 
 export function ScamChecker() {
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem("gcr_scam_input");
+      if (stored) { sessionStorage.removeItem("gcr_scam_input"); return stored; }
+    } catch {}
+    return "";
+  });
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isChecking, setIsChecking] = useState(false);
 
@@ -1737,6 +1743,8 @@ export function ScamChecker() {
 
   const [sslResults, setSslResults] = useState<Record<string, SSLCheckResult>>({});
   const [isCheckingSSL, setIsCheckingSSL] = useState<Record<string, boolean>>({});
+
+  const autoScanRef = useRef(false);
 
   const handleScan = () => {
     if (!content.trim()) return;
@@ -1786,6 +1794,14 @@ export function ScamChecker() {
         setIsAiAnalyzing(false);
       });
   };
+
+  useEffect(() => {
+    if (content.trim() && !autoScanRef.current) {
+      autoScanRef.current = true;
+      const timer = setTimeout(() => handleScan(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleClear = () => {
     setContent("");

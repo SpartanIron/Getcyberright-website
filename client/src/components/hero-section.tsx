@@ -1,17 +1,9 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronRight, Radio, MapPin, Shield, Search, Trash2, GraduationCap, Zap, Database } from "lucide-react";
-import { Link } from "wouter";
+import { ArrowRight, ChevronRight, Radio, MapPin, Shield, Search, Trash2, GraduationCap, Zap, Database, AlertTriangle, ShieldCheck, ScanLine, Lock, Eye } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { TrendingThreat } from "@shared/schema";
-
-const rotatingMessages = [
-  "Protect your kids' first phone.",
-  "Keep your parents safe from scams.",
-  "Secure your small business today.",
-  "Help seniors spot fraud instantly.",
-  "Guard your family's privacy online.",
-];
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
   "America/New_York": "US", "America/Chicago": "US", "America/Denver": "US",
@@ -85,7 +77,7 @@ const severityColors: Record<string, string> = {
   low: "bg-slate-500/20 text-slate-400 border-slate-500/30",
 };
 
-function LiveThreatBadge() {
+function ThreatAlertBar() {
   const region = useMemo(() => detectRegion(), []);
   const regionLabel = REGION_LABELS[region] || "your region";
   const { data } = useQuery<{ threats: TrendingThreat[] }>({
@@ -100,26 +92,28 @@ function LiveThreatBadge() {
   return (
     <Link href="/alerts">
       <div
-        className="inline-flex items-center gap-3 bg-white/[0.04] border border-white/10 rounded-lg px-4 py-2.5 cursor-pointer hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-colors group"
+        className="inline-flex items-center gap-2.5 bg-red-500/[0.08] border border-red-500/20 rounded-full px-4 py-2 cursor-pointer hover:bg-red-500/[0.12] transition-colors group"
         data-testid="badge-live-threat"
       >
         <div className="relative flex-shrink-0">
-          <Radio className="w-3.5 h-3.5 text-red-400" />
-          <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full animate-ping motion-reduce:animate-none" />
-          <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
+          <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
         </div>
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-xs font-medium text-white/50 uppercase tracking-wider whitespace-nowrap">Live</span>
-          {region !== "GLOBAL" && (
-            <span className="text-[10px] text-white/30 flex items-center gap-0.5">
-              <MapPin className="w-2.5 h-2.5" />{regionLabel}
-            </span>
-          )}
-          <span className="text-sm text-white/75 font-medium truncate max-w-[200px] sm:max-w-xs group-hover:text-white transition-colors">
-            {threat.title}
+        <span className="flex items-center gap-1.5">
+          <span className="relative flex h-2 w-2 flex-shrink-0">
+            <span className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
           </span>
-        </div>
-        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border flex-shrink-0 ${sevClass}`}>
+          <span className="text-xs font-semibold text-red-400 uppercase tracking-wider">Active</span>
+        </span>
+        <span className="text-sm text-white/70 font-medium truncate max-w-[220px] sm:max-w-xs group-hover:text-white transition-colors">
+          {threat.title}
+        </span>
+        {region !== "GLOBAL" && (
+          <span className="text-[10px] text-white/30 flex items-center gap-0.5 flex-shrink-0">
+            <MapPin className="w-2.5 h-2.5" />{regionLabel}
+          </span>
+        )}
+        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border flex-shrink-0 ${sevClass}`}>
           {threat.severity}
         </span>
       </div>
@@ -127,39 +121,123 @@ function LiveThreatBadge() {
   );
 }
 
-const quickTools = [
-  { icon: Search, label: "Scam Checker", desc: "Paste a URL, email, or message to check", href: "/scam-checker", color: "text-red-400", bg: "bg-red-500/10" },
-  { icon: Trash2, label: "Data Broker Removal", desc: "Remove your info from 500+ brokers", href: "/data-removal", color: "text-teal-400", bg: "bg-teal-500/10" },
-  { icon: GraduationCap, label: "Training Academy", desc: "Structured courses for all skill levels", href: "/training", color: "text-blue-400", bg: "bg-blue-500/10" },
-  { icon: Zap, label: "AI Prompt Library", desc: "406+ ready-to-use safety prompts", href: "/ai-prompts", color: "text-amber-400", bg: "bg-amber-500/10" },
-];
+function HeroScamChecker() {
+  const [input, setInput] = useState("");
+  const [, navigate] = useLocation();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-function HeroToolCards() {
+  const handleAnalyze = () => {
+    if (!input.trim()) return;
+    try { sessionStorage.setItem("gcr_scam_input", input.trim()); } catch {}
+    navigate("/scam-checker");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      handleAnalyze();
+    }
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-3" data-testid="hero-tool-cards">
-      {quickTools.map((tool) => (
-        <Link key={tool.label} href={tool.href}>
-          <div className="group flex items-center gap-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3.5 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" data-testid={`hero-tool-${tool.label.toLowerCase().replace(/\s+/g, "-")}`}>
-            <div className={`w-10 h-10 rounded-lg ${tool.bg} flex items-center justify-center flex-shrink-0`}>
-              <tool.icon className={`w-5 h-5 ${tool.color}`} />
+    <div className="relative" data-testid="hero-scam-checker">
+      <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 sm:p-6 backdrop-blur-sm">
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+            <ScanLine className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <span className="text-sm font-semibold text-white">AI Scam Checker</span>
+            <span className="text-[10px] text-primary/80 font-semibold uppercase tracking-widest ml-2">Free</span>
+          </div>
+        </div>
+
+        <div className="relative">
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={'Paste a suspicious message, email, URL, or phone number...\n\nExample: "URGENT: Your account has been locked. Click here to verify: bit.ly/acct-verify"'}
+            className="w-full min-h-[120px] sm:min-h-[140px] bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-white/25 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/30 transition-all"
+            aria-label="Paste suspicious content to analyze"
+            data-testid="input-hero-scam-checker"
+          />
+        </div>
+
+        <div className="flex items-center justify-between mt-4 gap-3">
+          <div className="hidden sm:flex items-center gap-3 text-[11px] text-white/30">
+            <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> Private</span>
+            <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> AI-Powered</span>
+            <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 8 Threat Feeds</span>
+          </div>
+          <Button
+            onClick={handleAnalyze}
+            disabled={!input.trim()}
+            className="bg-accent text-accent-foreground border-accent-border font-semibold px-6 py-2.5 rounded-lg shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all disabled:opacity-40 disabled:shadow-none"
+            data-testid="button-hero-analyze"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            Analyze Now
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mt-3">
+        <Link href="/data-removal">
+          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-3.5 py-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-data-removal">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-4 h-4 text-teal-400" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-semibold text-white group-hover:text-teal-400 transition-colors truncate">Data Broker Removal</div>
+                <div className="text-[10px] text-white/30 mt-0.5 truncate">501+ brokers</div>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-white group-hover:text-primary transition-colors">{tool.label}</div>
-              <div className="text-xs text-white/40 mt-0.5 truncate">{tool.desc}</div>
-            </div>
-            <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
           </div>
         </Link>
-      ))}
+        <Link href="/training">
+          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-3.5 py-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-training">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                <GraduationCap className="w-4 h-4 text-blue-400" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-semibold text-white group-hover:text-blue-400 transition-colors truncate">Training Academy</div>
+                <div className="text-[10px] text-white/30 mt-0.5 truncate">All skill levels</div>
+              </div>
+            </div>
+          </div>
+        </Link>
+        <Link href="/ai-prompts">
+          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-3.5 py-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-ai-prompts">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                <Zap className="w-4 h-4 text-amber-400" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-semibold text-white group-hover:text-amber-400 transition-colors truncate">AI Prompt Library</div>
+                <div className="text-[10px] text-white/30 mt-0.5 truncate">406+ prompts</div>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }
 
+const trustPoints = [
+  { icon: ShieldCheck, text: "Checks against PhishTank, URLhaus, VirusTotal, and 5 more feeds" },
+  { icon: Eye, text: "No account required. Your data is never stored or sold." },
+  { icon: Database, text: "Tracks 501+ data brokers selling your personal information" },
+];
+
 const stats = [
-  { value: 500, suffix: "+", label: "Data Brokers Tracked", icon: Database, duration: 1400 },
-  { value: 406, suffix: "+", label: "AI Safety Prompts", icon: Zap, duration: 1200 },
-  { value: 8, suffix: "", label: "Live Threat Feeds", icon: Radio, duration: 600 },
-  { value: 125, suffix: "+", label: "Safety Guides", icon: Shield, duration: 1000 },
+  { value: 500, suffix: "+", label: "Data Brokers Tracked", duration: 1400 },
+  { value: 406, suffix: "+", label: "AI Safety Prompts", duration: 1200 },
+  { value: 8, suffix: "", label: "Live Threat Feeds", duration: 600 },
+  { value: 125, suffix: "+", label: "Safety Guides", duration: 1000 },
 ];
 
 function StatBar() {
@@ -168,16 +246,11 @@ function StatBar() {
       {stats.map((stat) => {
         const count = useAnimatedCounter(stat.value, stat.duration);
         return (
-          <div key={stat.label} className="flex items-center gap-3" data-testid={`stat-hero-${stat.label.toLowerCase().replace(/[,\s]+/g, "-")}`}>
-            <div className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center flex-shrink-0">
-              <stat.icon className="w-4 h-4 text-primary" />
+          <div key={stat.label} className="text-center" data-testid={`stat-hero-${stat.label.toLowerCase().replace(/[,\s]+/g, "-")}`}>
+            <div className="text-2xl sm:text-3xl font-bold text-white tabular-nums leading-none">
+              {count}{stat.suffix}
             </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold text-white tabular-nums leading-none">
-                {count}{stat.suffix}
-              </div>
-              <div className="text-[11px] text-white/35 font-medium mt-0.5 leading-tight">{stat.label}</div>
-            </div>
+            <div className="text-[11px] text-white/35 font-medium mt-1.5 leading-tight">{stat.label}</div>
           </div>
         );
       })}
@@ -186,129 +259,65 @@ function StatBar() {
 }
 
 export function HeroSection() {
-  const [messageIndex, setMessageIndex] = useState(0);
-  const [displayText, setDisplayText] = useState("");
-  const [isTyping, setIsTyping] = useState(true);
-
-  useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) {
-      setDisplayText(rotatingMessages[messageIndex]);
-      setIsTyping(false);
-      const interval = setInterval(() => {
-        setMessageIndex((prev) => (prev + 1) % rotatingMessages.length);
-      }, 4000);
-      return () => clearInterval(interval);
-    }
-
-    const text = rotatingMessages[messageIndex];
-    let charIndex = 0;
-    setIsTyping(true);
-    setDisplayText("");
-
-    const typeInterval = setInterval(() => {
-      if (charIndex < text.length) {
-        setDisplayText(text.slice(0, charIndex + 1));
-        charIndex++;
-      } else {
-        clearInterval(typeInterval);
-        setIsTyping(false);
-      }
-    }, 45);
-
-    let nextTimeout: ReturnType<typeof setTimeout>;
-    const checkDone = setInterval(() => {
-      if (charIndex >= text.length) {
-        clearInterval(checkDone);
-        nextTimeout = setTimeout(() => {
-          setMessageIndex((prev) => (prev + 1) % rotatingMessages.length);
-        }, 2200);
-      }
-    }, 50);
-
-    return () => {
-      clearInterval(typeInterval);
-      clearInterval(checkDone);
-      clearTimeout(nextTimeout);
-    };
-  }, [messageIndex]);
-
   return (
     <section className="relative w-full" data-testid="section-hero">
       <div className="bg-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/[0.03] to-transparent" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/[0.04] to-transparent" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-primary/[0.02] rounded-full blur-3xl" />
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center pt-12 sm:pt-16 lg:pt-20 pb-10 sm:pb-12 lg:pb-14">
+          <div className="pt-8 sm:pt-10 lg:pt-12 pb-4">
+            <ThreatAlertBar />
+          </div>
 
-            <div className="max-w-xl">
-              <div className="mb-6">
-                <LiveThreatBadge />
-              </div>
-
+          <div className="grid lg:grid-cols-[1fr_minmax(0,480px)] gap-10 lg:gap-14 items-start pb-10 sm:pb-12 lg:pb-14">
+            <div className="max-w-xl pt-2 lg:pt-6">
               <h1
-                className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight text-white leading-[1.08] mb-5"
+                className="text-3xl sm:text-4xl lg:text-[2.85rem] font-extrabold tracking-tight text-white leading-[1.12] mb-5"
                 data-testid="text-hero-heading"
               >
-                Don't Get Scammed.
+                Got a Suspicious Message?
                 <br />
-                <span className="hero-gradient-text">Get CyberRight.</span>
+                <span className="hero-gradient-text">Check It Before It Costs You.</span>
               </h1>
 
               <p
-                className="text-base sm:text-lg text-white/55 leading-relaxed mb-3"
+                className="text-base sm:text-[1.05rem] text-white/50 leading-relaxed mb-8 max-w-lg"
                 data-testid="text-hero-subtext"
               >
-                Free tools and plain-language guides that help families, seniors, and small businesses stay safe from online scams, data brokers, and identity theft.
+                Paste any suspicious text, email, link, or phone number into our AI-powered Scam Checker. It cross-references 8 verified threat intelligence feeds and tells you if it's a scam in seconds.
               </p>
 
-              <div className="h-7 mb-7 flex items-center" aria-hidden="true">
-                <span className="text-base sm:text-lg text-accent font-semibold" data-testid="text-hero-rotating">
-                  {displayText}
-                  {isTyping && <span className="inline-block w-[2px] h-[1em] bg-accent ml-0.5 align-text-bottom animate-blink" />}
-                </span>
+              <div className="space-y-3.5 mb-8">
+                {trustPoints.map((point) => (
+                  <div key={point.text} className="flex items-start gap-2.5">
+                    <point.icon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-white/45 leading-snug">{point.text}</span>
+                  </div>
+                ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <Link href="/scam-checker">
-                  <Button
-                    size="lg"
-                    className="rounded-lg px-7 py-3 bg-accent text-accent-foreground border-accent-border shadow-lg shadow-accent/15 font-semibold text-base w-full sm:w-auto"
-                    data-testid="button-hero-primary-cta"
-                  >
-                    Check a Scam Now
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
-                </Link>
-                <Link href="/tools">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="rounded-lg px-7 py-3 border-white/15 text-white bg-white/[0.04] hover:bg-white/[0.08] font-medium text-base w-full sm:w-auto"
-                    data-testid="button-hero-secondary-cta"
-                  >
-                    Explore Free Tools
-                    <ChevronRight className="ml-1 w-5 h-5" />
-                  </Button>
+              <div className="lg:hidden mt-2 mb-2">
+                <HeroScamChecker />
+              </div>
+
+              <div className="hidden lg:block">
+                <Link href="/tools" className="inline-flex items-center gap-1.5 text-sm text-white/40 hover:text-white/60 transition-colors group">
+                  Explore all free tools
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
             </div>
 
             <div className="hidden lg:block">
-              <HeroToolCards />
+              <HeroScamChecker />
             </div>
           </div>
 
           <div className="border-t border-white/[0.06] py-8 sm:py-10">
             <StatBar />
           </div>
-        </div>
-      </div>
-
-      <div className="lg:hidden bg-slate-900 border-t border-white/[0.04] px-5 sm:px-6 py-6">
-        <div className="max-w-7xl mx-auto">
-          <HeroToolCards />
         </div>
       </div>
     </section>

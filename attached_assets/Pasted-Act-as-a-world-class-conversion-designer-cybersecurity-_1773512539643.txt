@@ -1,0 +1,217 @@
+Act as a world-class conversion designer, cybersecurity SaaS product strategist, UX/UI expert, and front-end engineer.
+
+Your task is to redesign the hero section for a cybersecurity website called **GetCyberRight** so it feels premium, modern, credible, emotionally compelling, and conversion-focused.
+
+## Core business context
+GetCyberRight helps families, seniors, and small businesses protect themselves from:
+- online scams
+- phishing
+- identity theft
+- data brokers
+- digital fraud
+
+The website offers:
+- a Scam Checker
+- Data Broker Removal
+- a Training Academy
+- an AI Prompt Library
+- safety guides and tools
+
+## Main objective
+Redesign the hero section so that within 3 seconds a visitor understands:
+1. what GetCyberRight does
+2. who it helps
+3. why they should trust it
+4. what action they should take first
+
+The hero must not feel like a generic awareness website or blog. It must feel like a serious, modern cybersecurity platform with immediate utility.
+
+## Critical conversion problems to solve
+The current hero has these weaknesses:
+- headline is too generic and brand-led instead of value-led
+- subheadline is too long and not punchy enough
+- best feature (Scam Checker) is hidden as a side card instead of being the central interactive element
+- trust signals are weak and abstract
+- the “LIVE” banner is visually interesting but not tightly aligned with the core user journey
+- overall layout looks clean but not memorable or conversion-aggressive enough
+- emotional urgency is present but not strong enough
+
+## What the new hero must achieve
+Design a hero that feels like a blend of:
+- cybersecurity startup
+- consumer trust platform
+- AI-powered protection tool
+- modern SaaS landing page
+
+The hero should communicate:
+- protection
+- speed
+- clarity
+- intelligence
+- authority
+- ease of use
+
+## Hero strategy
+The redesign should use this strategic structure:
+
+### 1. Value-first headline
+The headline must clearly state the outcome, not just the brand.
+Avoid vague taglines.
+Create 5 strong headline options.
+
+The best headline types are:
+- stop scams before they hurt you
+- check suspicious messages instantly
+- protect your money, identity, and family online
+
+### 2. Clear subheadline
+Write a concise supporting sentence that explains the product simply.
+It should make clear that users can scan suspicious messages, links, or emails and access tools to improve digital safety.
+
+### 3. Make the Scam Checker the centerpiece
+The hero should prominently feature an interactive-looking Scam Checker input area above the fold.
+This should visually invite the user to paste:
+- a suspicious text
+- an email
+- a URL
+- or a message
+
+The UI should feel frictionless and immediate.
+
+### 4. Strong primary CTA
+Use one dominant call-to-action that is impossible to miss.
+Primary CTA examples:
+- Check a Scam Now
+- Analyze a Suspicious Message
+- Scan for Scam Risk
+
+Include one secondary CTA for users who want to browse tools.
+
+### 5. Real trust signals
+Trust signals must feel concrete and relevant.
+Do not rely only on vanity numbers.
+Use a mix of:
+- scam/fraud categories protected against
+- plain language credibility statements
+- proof indicators
+- stats with context
+- icon-supported reassurance
+
+### 6. Emotional urgency without looking spammy
+The hero should make users feel:
+- this threat is real
+- I can take action now
+- this tool is built for someone like me
+
+Use tasteful urgency, not hype.
+
+### 7. Modern visual direction
+Create a premium dark-theme hero with subtle glow, depth, gradient lighting, strong hierarchy, and polished card UI.
+Use modern SaaS design patterns.
+Visual design should feel like a top-tier funded startup.
+
+## Specific design requirements
+Design the hero with the following layout logic:
+
+### Left side
+- high-impact headline
+- concise subheadline
+- trust micro-points or threat badges
+- primary and secondary CTA
+- optional urgency/support line
+
+### Right side
+Feature a visually dominant interactive Scam Checker card/module.
+It should include:
+- input field or text area placeholder
+- “Analyze” button
+- subtle AI/cyber styling
+- optional example message text
+- polished hover/focus states
+
+Below or around it, show secondary tool access cards for:
+- Data Broker Removal
+- Training Academy
+- AI Prompt Library
+
+These secondary cards must support the hero, not compete with the main action.
+
+## Replace the top ticker/banner concept
+The existing “LIVE” banner should be reimagined into something more relevant, such as:
+- latest scam alert
+- active fraud warning
+- today’s scam trend
+- real-time protection signal
+
+It must directly reinforce the user’s need to act now.
+
+## Copy direction
+Tone should be:
+- clear
+- protective
+- modern
+- confident
+- credible
+- plain-English
+- non-corporate
+- non-cheesy
+
+Avoid:
+- clichés
+- vague “stay safe online” copy without specifics
+- excessive jargon
+- sounding like a government awareness poster
+- sounding like a scammy ad
+
+## Deliverables
+Provide all of the following:
+
+1. **A complete redesigned hero concept**
+2. **5 headline options**
+3. **3 subheadline options**
+4. **Primary CTA and secondary CTA options**
+5. **Suggested trust signal copy**
+6. **Suggested alert/ticker copy**
+7. **Full visual design direction**
+8. **Recommended layout hierarchy**
+9. **Microinteractions and animation ideas**
+10. **A polished production-ready hero section in React + Tailwind**
+11. Ensure the code is responsive and looks excellent on desktop and mobile
+12. Make the design feel premium and launch-ready
+
+## Technical requirements
+- Use React
+- Use Tailwind CSS
+- Make the section fully responsive
+- Use accessible spacing, contrast, and semantic structure
+- Add subtle animations, but keep them tasteful and performance-friendly
+- Use reusable components where sensible
+- Do not generate placeholder junk
+- Use realistic copy for a live brand
+- Make sure the primary CTA is visually dominant
+- Ensure the Scam Checker is the visual focal point
+
+## UX requirements
+- Above the fold, the user must instantly know what to do
+- The eye path should naturally move from headline → explanation → action → trust
+- Avoid clutter
+- Avoid equal visual weight across all cards
+- Use clear hierarchy so the Scam Checker wins attention first
+
+## Mobile requirements
+On mobile:
+- headline remains strong and readable
+- Scam Checker still appears early
+- CTA remains prominent
+- cards stack cleanly
+- no cramped spacing
+- no tiny text
+- no weak hierarchy
+
+## Output format
+Return:
+1. a short explanation of the redesign strategy
+2. the final copy recommendations
+3. the final React + Tailwind hero component
+
+Build something that looks like it belongs on a serious, venture-backed cybersecurity platform and is optimized for conversion, trust, clarity, and immediate action.
