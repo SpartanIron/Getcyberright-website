@@ -41,8 +41,7 @@ export function ThreatAwareness() {
           loading="lazy"
           aria-hidden="true"
         />
-        <div className="absolute right-0 top-0 w-[55%] h-full" style={{ background: "linear-gradient(to right, #0A2A3C 0%, rgba(10,42,60,0.6) 20%, transparent 40%)" }} />
-        <div className="absolute right-0 bottom-0 w-[55%] h-[30%]" style={{ background: "linear-gradient(to top, #0A2A3C 0%, transparent 100%)" }} />
+        <div className="absolute right-0 top-0 w-[55%] h-full" style={{ background: "linear-gradient(to right, #0A2A3C 0%, transparent 15%)" }} />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
