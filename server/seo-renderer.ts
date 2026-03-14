@@ -56,7 +56,7 @@ function buildHead(meta: {
   <meta name="theme-color" content="#0d9488">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>`;
 }
 
@@ -125,7 +125,7 @@ function buildArticleSchema(data: {
 
 function buildFooter(): string {
   return `
-<footer style="padding:40px 20px;text-align:center;color:#666;font-family:Inter,sans-serif;font-size:14px;border-top:1px solid #e5e7eb;margin-top:40px;">
+<footer style="padding:40px 20px;text-align:center;color:#666;font-family:Sora,sans-serif;font-size:14px;border-top:1px solid #e5e7eb;margin-top:40px;">
   <nav style="margin-bottom:20px;">
     <a href="/" style="margin:0 12px;color:#0d9488;">Home</a>
     <a href="/guides" style="margin:0 12px;color:#0d9488;">Guides</a>
@@ -181,7 +181,7 @@ async function renderGuidePage(slug: string): Promise<string | null> {
   }).join("");
 
   return `${head}
-<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   ${breadcrumbs}
   ${article}
   ${faqSchema}
@@ -236,7 +236,7 @@ async function renderAlertPage(slug: string): Promise<string | null> {
   });
 
   return `${head}
-<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   ${breadcrumbs}
   ${article}
   <article>
@@ -293,7 +293,7 @@ async function renderScamIntelPage(slug: string): Promise<string | null> {
   });
 
   return `${head}
-<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   ${breadcrumbs}
   ${article}
   <article>
@@ -351,7 +351,7 @@ function renderScamPage(slug: string): string | null {
   const faqSchema = buildFaqSchema(scam.faq);
 
   return `${head}
-<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   ${breadcrumbs}
   ${article}
   ${faqSchema}
@@ -420,7 +420,7 @@ async function renderTopicHub(cluster: string): Promise<string | null> {
   ]);
 
   return `${head}
-<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   ${breadcrumbs}
   <h1>${escapeHtml(clusterName)}</h1>
   <p style="font-size:18px;color:#444;">Your complete resource for understanding and protecting against ${clusterName.toLowerCase()}. Browse our guides, scam intelligence reports, and protection tools below.</p>
@@ -488,7 +488,7 @@ async function renderListingPage(type: "guides" | "scam-intel" | "alerts"): Prom
   }
 
   return `${head}
-<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   <h1>${escapeHtml(titles[type])}</h1>
   <p style="font-size:18px;color:#444;">${escapeHtml(descriptions[type])}</p>
   <ul style="list-style:none;padding:0;">${listItems}</ul>
@@ -716,16 +716,49 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { question: "Can I get my money back after being scammed?", answer: "It depends on the payment method. Credit card payments have the best recovery chances through chargebacks. Bank transfers and wire transfers are harder to recover. Contact your financial institution as soon as possible." },
     ],
   },
+  "/tools": {
+    title: "Free Cybersecurity Tools: Scam Checker, Password Generator & More | GetCyberRight",
+    description: "Access free cybersecurity tools including an AI-powered Scam Checker, secure Password Generator, Data Broker Removal, and Breach Monitor. No signup required.",
+    path: "/tools",
+    schemaType: "WebApplication",
+    features: ["AI Scam Checker", "Secure Password Generator", "Data Broker Removal", "Breach Monitor", "Voice Deepfake Detector", "QR Code Scanner"],
+    faqs: [
+      { question: "Are these cybersecurity tools free?", answer: "Yes, our core security tools are free to get started. You can use the Scam Checker, Password Generator, and other tools without creating an account." },
+      { question: "Do I need to sign up to use the tools?", answer: "No signup is required for our core tools. You can start checking suspicious links, generating passwords, and scanning for data brokers immediately." },
+    ],
+  },
+  "/ai-safety": {
+    title: "AI Safety Guide: Protect Yourself from AI-Powered Threats | GetCyberRight",
+    description: "Learn how to identify and protect yourself from AI-powered scams, deepfakes, and synthetic media. Understand AI risks and get practical safety tips for the age of artificial intelligence.",
+    path: "/ai-safety",
+    features: ["Deepfake detection tips", "AI scam identification", "Voice cloning awareness", "Synthetic media safety", "AI privacy protection", "Practical AI safety checklists"],
+    faqs: [
+      { question: "What are AI-powered scams?", answer: "AI-powered scams use artificial intelligence to create convincing fake voices, videos, emails, and websites. They can clone someone's voice from a short audio clip or generate realistic-looking phishing emails that are hard to distinguish from real ones." },
+      { question: "How can I spot a deepfake?", answer: "Look for unnatural facial movements, inconsistent lighting, blurred edges around the face, and audio that does not match lip movements. Our guide covers detailed techniques for identifying deepfakes across video, audio, and images." },
+    ],
+  },
+  "/checklists": {
+    title: "Cybersecurity Checklists: Printable Security Guides | GetCyberRight",
+    description: "Download free printable cybersecurity checklists for families, seniors, and small businesses. Step-by-step security guides covering passwords, devices, social media, and online shopping safety.",
+    path: "/checklists",
+    features: ["Printable PDF checklists", "Family security checklist", "Senior safety checklist", "Device setup guides", "Social media privacy checklist", "Online shopping safety"],
+    faqs: [
+      { question: "Can I print these checklists?", answer: "Yes, all checklists are designed to be printer-friendly. You can download and print them to keep by your computer or share with family members." },
+      { question: "Who are the checklists designed for?", answer: "We have checklists for everyone including families, seniors, parents, students, and small business owners. Each one is written in plain language with clear action steps." },
+    ],
+  },
 };
 
 function renderStaticToolPage(pagePath: string): string | null {
   const pageDef = STATIC_TOOL_PAGES[pagePath];
   if (!pageDef) return null;
 
+  const fullTitle = pageDef.title.includes("GetCyberRight") ? pageDef.title : `${pageDef.title} | GetCyberRight`;
   const head = buildHead({
-    title: `${pageDef.title} | GetCyberRight`,
+    title: fullTitle,
     description: pageDef.description,
     url: pageDef.path,
+    type: "website",
   });
 
   const breadcrumbs = buildBreadcrumbs([
@@ -781,7 +814,7 @@ function renderStaticToolPage(pagePath: string): string | null {
     : "";
 
   return `${head}
-<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   ${breadcrumbs}
   ${jsonLdItems.join("\n")}
   <h1>${escapeHtml(pageDef.title.split("|")[0].trim())}</h1>
@@ -835,7 +868,7 @@ function renderAboutPage(): string {
   ]);
 
   return `${head}
-<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   ${articleSchema}
   ${breadcrumbs}
   ${faqSchema}
@@ -971,7 +1004,7 @@ function renderHomePage(): string {
   ]);
 
   return `${head}
-<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   ${orgSchema}
   ${websiteSchema}
   ${faqSchema}
