@@ -66,29 +66,34 @@ function StatItem({ value, suffix, label }: { value: number; suffix: string; lab
 
 export function TrustStrip() {
   return (
-    <section className="py-10 sm:py-12 bg-slate-50 dark:bg-slate-800/50 border-y border-border" data-testid="section-trust-strip">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-6 mb-10" data-testid="hero-stat-bar">
+    <section className="bg-slate-50 dark:bg-slate-800/50 border-y border-border" data-testid="section-trust-strip">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-6" data-testid="hero-stat-bar">
           {stats.map((stat) => (
             <StatItem key={stat.label} {...stat} />
           ))}
         </div>
+      </div>
 
-        <div className="border-t border-border pt-6">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-8">
-            <div className="flex items-center gap-2.5 flex-shrink-0">
-              <Shield className="w-5 h-5 text-primary" />
-              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
-                Data from
-              </span>
-            </div>
-            <div className="w-px h-6 bg-border hidden sm:block" />
-            <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-2">
-              {sources.map((source) => (
+      <div className="border-t border-border">
+        <div className="py-6 sm:py-8 overflow-hidden">
+          <div className="flex items-center justify-center gap-3 mb-5">
+            <Shield className="w-5 h-5 text-primary" />
+            <span className="text-sm font-bold text-muted-foreground uppercase tracking-[0.15em]">
+              Trusted Data Sources
+            </span>
+          </div>
+
+          <div className="relative">
+            <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-slate-50 dark:from-slate-800/50 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-slate-50 dark:from-slate-800/50 to-transparent z-10 pointer-events-none" />
+
+            <div className="flex animate-marquee motion-reduce:animate-none motion-reduce:justify-center motion-reduce:flex-wrap motion-reduce:gap-8">
+              {[...sources, ...sources].map((source, i) => (
                 <span
-                  key={source}
-                  className="text-[15px] font-semibold text-foreground/70 hover:text-foreground transition-colors"
-                  data-testid={`text-trust-source-${source.toLowerCase().replace(/\s+/g, "-")}`}
+                  key={`${source}-${i}`}
+                  className="text-lg sm:text-xl font-bold text-foreground/60 whitespace-nowrap mx-6 sm:mx-10 flex-shrink-0"
+                  data-testid={i < sources.length ? `text-trust-source-${source.toLowerCase().replace(/\s+/g, "-")}` : undefined}
                 >
                   {source}
                 </span>
