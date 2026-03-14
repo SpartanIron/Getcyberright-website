@@ -2,7 +2,7 @@ import { storage } from "./storage";
 import { SCAM_PAGES, getAllScamSlugs } from "@shared/scam-content";
 import type { Request, Response, NextFunction } from "express";
 
-const BOT_PATTERN = /googlebot|bingbot|yandexbot|duckduckbot|baiduspider|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|ia_archiver|msnbot|semrushbot|ahrefsbot|mj12bot|rogerbot|dotbot|petalbot|bytespider|gptbot|anthropic-ai|claude-web|google-extended|chatgpt-user/i;
+const BOT_PATTERN = /googlebot|bingbot|yandexbot|duckduckbot|baiduspider|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|ia_archiver|msnbot|semrushbot|ahrefsbot|mj12bot|rogerbot|dotbot|petalbot|bytespider|gptbot|anthropic-ai|claude-web|claudebot|google-extended|chatgpt-user|oai-searchbot|perplexitybot|cohere-ai|youbot|amazonbot|meta-externalagent|meta-externalfetcher|iaskspider|phind-search/i;
 
 function isBot(userAgent: string | undefined): boolean {
   if (!userAgent) return false;
@@ -629,6 +629,91 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     faqs: [
       { question: "What does my safety score mean?", answer: "Your safety score reflects how well your current security practices protect you online. A higher score means better protection. We provide specific recommendations to help you improve your score." },
       { question: "How is the score calculated?", answer: "The score evaluates your practices across key areas: password hygiene, two-factor authentication usage, software updates, privacy settings, and awareness of common threats." },
+    ],
+  },
+  "/seniors": {
+    title: "Senior Safety Center: Protect Yourself from Online Scams | GetCyberRight",
+    description: "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, protect your identity, avoid romance fraud, and use technology with confidence.",
+    path: "/seniors",
+    features: ["Phone scam detection tips", "Identity theft prevention", "Romance scam awareness", "Medicare and government scam alerts", "Technology confidence guides", "Emergency help contacts"],
+    faqs: [
+      { question: "What types of scams target seniors?", answer: "Seniors are commonly targeted by phone scams, Medicare fraud, romance scams, tech support scams, grandparent scams, lottery and prize scams, and investment fraud. Our guides cover each type with real examples and warning signs." },
+      { question: "How can I help an older family member stay safe online?", answer: "Start with open conversations about common scams. Set up their devices with security basics, bookmark trusted sites, and establish a family code word for verifying emergency calls. Our Parents hub has resources for helping family members." },
+      { question: "What should I do if I think I have been scammed?", answer: "Contact your bank immediately to freeze accounts, report the scam to the FTC at reportfraud.ftc.gov, change passwords for compromised accounts, and visit our Emergency Help page for step-by-step guidance." },
+      { question: "Are these resources free?", answer: "Yes. All senior safety guides, scam alerts, and educational content are free to get started. No account is required to access our core resources." },
+    ],
+  },
+  "/parents": {
+    title: "Parents Hub: Keep Your Family Safe Online | GetCyberRight",
+    description: "Free cybersecurity guides for parents. Learn about parental controls, age-appropriate device settings, conversation starters about online safety, and how to protect your children from online threats.",
+    path: "/parents",
+    features: ["Parental control setup guides", "Age-appropriate safety conversations", "Device monitoring tips", "Social media safety", "Online predator awareness", "Gaming safety for kids"],
+    faqs: [
+      { question: "At what age should I start teaching my kids about online safety?", answer: "Start as early as they begin using devices. For children ages 5 to 7, focus on basic rules like not sharing personal information. For ages 8 to 12, introduce concepts about stranger danger online and safe browsing. Teens need guidance on social media privacy and recognizing scams." },
+      { question: "What parental controls should I set up?", answer: "Set up content filters on browsers and apps, enable screen time limits, turn on safe search, review app permissions, and consider family sharing settings. Our guides walk you through setup on every major platform." },
+      { question: "How do I talk to my kids about online dangers?", answer: "Keep conversations casual and ongoing rather than one big lecture. Use real examples from the news, ask what they see online, and create an environment where they feel safe telling you about uncomfortable encounters. Our conversation starter guides can help." },
+    ],
+  },
+  "/kids": {
+    title: "Kids Digital Safety Hub: Fun Online Safety Lessons for Ages 8-16 | GetCyberRight",
+    description: "Interactive cybersecurity lessons designed for kids and teens ages 8 to 16. Learn about password safety, spotting scams, protecting personal information, and being a good digital citizen through fun activities.",
+    path: "/kids",
+    features: ["Age-appropriate lessons (8-11 and 12-16)", "Interactive safety activities", "Password security games", "Social media awareness", "Cyberbullying prevention", "Digital citizenship skills"],
+    faqs: [
+      { question: "What age group are these lessons designed for?", answer: "Our lessons are designed for two age groups: ages 8 to 11 (foundational concepts with fun activities) and ages 12 to 16 (more advanced topics including social media safety, privacy, and recognizing scams)." },
+      { question: "Can teachers use these materials in the classroom?", answer: "Absolutely. Our lessons are designed to work both at home and in classroom settings. Visit our Educators hub for curriculum-ready materials and lesson plans." },
+      { question: "Are the lessons safe for kids to use independently?", answer: "Yes. All content is age-appropriate and designed for independent learning. No personal information is required and there are no external links to unsafe sites." },
+    ],
+  },
+  "/educators": {
+    title: "Educator Resources: Cybersecurity Curriculum & Teaching Materials | GetCyberRight",
+    description: "Free cybersecurity teaching resources for educators. Access lesson plans, classroom activities, printable guides, and curriculum materials to teach students about online safety.",
+    path: "/educators",
+    features: ["Ready-made lesson plans", "Classroom activity guides", "Printable safety worksheets", "Age-graded curriculum", "Assessment tools", "Professional development resources"],
+    faqs: [
+      { question: "What grade levels do the materials cover?", answer: "Our materials cover elementary through high school levels, with content specifically designed for different developmental stages and learning objectives." },
+      { question: "How do I integrate cybersecurity into my existing curriculum?", answer: "Our resources are designed to complement existing curricula. We provide cross-curricular connections to subjects like math, language arts, and social studies, making it easy to weave cybersecurity concepts into your teaching." },
+      { question: "Are the materials aligned with educational standards?", answer: "Our content aligns with common educational frameworks and digital citizenship standards. Each resource includes learning objectives and assessment criteria." },
+    ],
+  },
+  "/small-business": {
+    title: "Small Business Cybersecurity: Free Security Training & Guides | GetCyberRight",
+    description: "Free cybersecurity resources for small businesses. Employee awareness training, security policy templates, incident response guides, and practical steps to protect your business from cyber threats.",
+    path: "/small-business",
+    features: ["Employee awareness training", "Security policy templates", "Incident response planning", "Phishing simulation guidance", "Data backup strategies", "Compliance basics"],
+    faqs: [
+      { question: "How much does cybersecurity cost for a small business?", answer: "Many effective cybersecurity measures are free or low-cost. Employee training, strong password policies, multi-factor authentication, and regular software updates cost nothing but significantly reduce risk. Our free resources help you build a strong security foundation." },
+      { question: "What are the biggest cybersecurity risks for small businesses?", answer: "The top risks include phishing emails, ransomware, weak passwords, outdated software, and employee mistakes. Over 43% of cyber attacks target small businesses, making awareness training essential." },
+      { question: "Where should I start with cybersecurity for my business?", answer: "Start with three fundamentals: train your employees to recognize phishing, enable multi-factor authentication on all accounts, and ensure regular data backups. Our guides walk you through each step." },
+    ],
+  },
+  "/contact": {
+    title: "Contact GetCyberRight: Get in Touch | GetCyberRight",
+    description: "Contact the GetCyberRight team for questions about cybersecurity education, partnership opportunities, or to report a scam. We are here to help families, seniors, and small businesses stay safe online.",
+    path: "/contact",
+    faqs: [
+      { question: "How can I contact GetCyberRight?", answer: "You can reach us through our contact form on this page or email us at tips@getcyberright.com. We aim to respond within 24 to 48 hours." },
+      { question: "How do I report a scam?", answer: "Use our Report a Scam page to submit details about scam attempts. Your reports help us update our threat intelligence and protect others in the community." },
+    ],
+  },
+  "/resources": {
+    title: "Cybersecurity Resources: Guides, Tools & Training | GetCyberRight",
+    description: "Explore our complete library of cybersecurity resources including safety guides, interactive tools, training courses, and scam alerts. Free to get started for families, seniors, educators, and small businesses.",
+    path: "/resources",
+    features: ["125+ safety guides", "Interactive security tools", "Training courses", "Scam alert database", "Printable checklists", "AI prompt library"],
+    faqs: [
+      { question: "Are all resources free?", answer: "Our core resources are free to get started. This includes safety guides, scam alerts, the Scam Checker tool, and foundational training content." },
+      { question: "How often is new content added?", answer: "We publish new content regularly, including updated scam alerts, new safety guides, and training materials. Subscribe to our newsletter to stay informed about new resources." },
+    ],
+  },
+  "/emergency-help": {
+    title: "Emergency Cyber Help: What to Do If You Have Been Scammed | GetCyberRight",
+    description: "Immediate steps to take if you have been scammed online. Emergency contacts, account recovery guidance, financial protection steps, and reporting resources for cyber crime victims.",
+    path: "/emergency-help",
+    features: ["Immediate action checklist", "Emergency contact numbers by country", "Account recovery steps", "Financial protection guidance", "Scam reporting resources", "Identity theft recovery"],
+    faqs: [
+      { question: "What should I do first if I have been scammed?", answer: "Stop all communication with the scammer immediately. Contact your bank to freeze affected accounts, change passwords for compromised accounts, and report the incident to local authorities and the FTC." },
+      { question: "Can I get my money back after being scammed?", answer: "It depends on the payment method. Credit card payments have the best recovery chances through chargebacks. Bank transfers and wire transfers are harder to recover. Contact your financial institution as soon as possible." },
     ],
   },
 };
