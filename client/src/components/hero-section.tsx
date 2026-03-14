@@ -103,10 +103,10 @@ export function HeroSection() {
             <ThreatAlertBar />
           </div>
 
-          <div className="grid lg:grid-cols-[45%_55%] gap-8 lg:gap-14 items-center pb-14 sm:pb-18 lg:pb-24">
-            <div className="max-w-xl pt-2 lg:pt-4">
+          <div className="grid lg:grid-cols-[42%_58%] gap-8 lg:gap-10 items-center pb-16 sm:pb-20 lg:pb-28">
+            <div className="max-w-xl pt-4 lg:pt-8">
               <h1
-                className="text-[2.75rem] sm:text-6xl lg:text-[4.25rem] font-extrabold tracking-tight text-white leading-[1.05] mb-7"
+                className="text-[2.75rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-white leading-[1.02] mb-8"
                 data-testid="text-hero-heading"
               >
                 Your Family Is
@@ -117,13 +117,13 @@ export function HeroSection() {
               </h1>
 
               <p
-                className="text-lg sm:text-xl text-white/50 leading-relaxed mb-9 max-w-lg"
+                className="text-lg sm:text-xl text-white/65 leading-relaxed mb-10 max-w-lg"
                 data-testid="text-hero-subtext"
               >
                 Scams cost families $12.5 billion last year. Paste any suspicious message, link, or phone number and our AI checks it against 8 trusted security databases in seconds.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 mb-8">
+              <div className="flex flex-wrap items-center gap-4 mb-10">
                 <Button
                   asChild
                   size="lg"
@@ -135,39 +135,38 @@ export function HeroSection() {
                     <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
                   </Link>
                 </Button>
-                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/55 hover:text-white/70 transition-colors group font-medium">
+                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/60 hover:text-white/80 transition-colors group font-medium">
                   Explore all free tools
                   <ArrowRight className="w-4 h-4 cta-arrow-right" />
                 </Link>
               </div>
 
-              <div className="flex items-center gap-6 text-sm text-white/50">
-                <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary/60" /> No account needed</span>
-                <span className="flex items-center gap-2"><Eye className="w-4 h-4 text-primary/60" /> Nothing stored</span>
+              <div className="flex items-center gap-6 text-sm text-white/45">
+                <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary/70" /> No account needed</span>
+                <span className="flex items-center gap-2"><Eye className="w-4 h-4 text-primary/70" /> Nothing stored</span>
               </div>
             </div>
 
             <div className="hidden lg:block">
-              <div className="relative">
-                <div className="rounded-2xl overflow-hidden shadow-2xl shadow-black/40">
+              <div className="relative -mr-8 xl:-mr-16">
+                <div className="relative overflow-hidden rounded-l-3xl">
                   <img
                     src={heroFamilyImg}
                     alt="Diverse family learning together on a laptop"
-                    className="w-full h-[480px] object-cover"
+                    className="w-full h-[520px] object-cover"
                     loading="eager"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C]/50 via-transparent to-transparent rounded-2xl" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0A2A3C]/80 via-[#0A2A3C]/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C]/40 via-transparent to-transparent" />
                 </div>
 
-                <div className="absolute -bottom-5 -left-5 bg-white/[0.07] backdrop-blur-md border border-white/[0.12] rounded-xl px-5 py-4 shadow-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Shield className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-white">Trusted by families worldwide</div>
-                      <div className="text-xs text-white/55">Backed by FBI, CISA, INTERPOL data</div>
-                    </div>
+                <div className="absolute bottom-8 left-8 flex items-center gap-3 bg-white/[0.08] backdrop-blur-md border border-white/[0.12] rounded-xl px-5 py-3.5">
+                  <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Shield className="w-[18px] h-[18px] text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-white">Trusted by families worldwide</div>
+                    <div className="text-xs text-white/50">Backed by FBI, CISA, INTERPOL data</div>
                   </div>
                 </div>
               </div>
