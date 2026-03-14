@@ -3,85 +3,10 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { seoMiddleware } from "./seo-renderer";
+import { isKnownRoute } from "./known-routes";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const KNOWN_CLIENT_ROUTES = new Set([
-  "/",
-  "/about",
-  "/tools",
-  "/resources",
-  "/contact",
-  "/privacy",
-  "/terms",
-  "/emergency-help",
-  "/kids",
-  "/seniors",
-  "/parents",
-  "/parents/child-safety-scanner",
-  "/support",
-  "/security",
-  "/pricing",
-  "/dashboard",
-  "/threat-trends",
-  "/report-scam",
-  "/checklists",
-  "/data-removal",
-  "/advertise",
-  "/partner-deck",
-  "/training",
-  "/training/kids",
-  "/training/parents",
-  "/training/seniors",
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/guides",
-  "/alerts",
-  "/scam-intel",
-  "/scam-checker",
-  "/password-generator",
-  "/breach-dashboard",
-  "/awareness-hub",
-  "/cyber-threat-radar",
-  "/small-business",
-  "/educators",
-  "/admin",
-  "/admin/users",
-  "/admin/messages",
-  "/admin/subscribers",
-  "/admin/scam-reports",
-  "/admin/tool-analytics",
-  "/admin/security",
-  "/admin/threat-intelligence",
-  "/admin/content-governance",
-  "/admin/compliance",
-  "/admin/newsletter",
-  "/admin/change-password",
-]);
-
-const DYNAMIC_ROUTE_PREFIXES = [
-  "/training/",
-  "/guides/",
-  "/alerts/",
-  "/scam-intel/",
-  "/scams/",
-  "/topics/",
-];
-
-function isKnownRoute(url: string): boolean {
-  const pathname = url.split("?")[0].split("#")[0];
-  if (KNOWN_CLIENT_ROUTES.has(pathname)) {
-    return true;
-  }
-  for (const prefix of DYNAMIC_ROUTE_PREFIXES) {
-    if (pathname.startsWith(prefix) && pathname.length > prefix.length) {
-      return true;
-    }
-  }
-  return false;
-}
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
