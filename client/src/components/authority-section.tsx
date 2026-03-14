@@ -17,14 +17,14 @@ export function AuthoritySection() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           <div>
-            <h2 id="authority-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-authority-heading">
+            <h2 id="authority-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-5" data-testid="text-authority-heading">
               Why People Trust GetCyberRight
             </h2>
-            <p className="text-muted-foreground leading-relaxed mb-4">
-              Cybersecurity should not be complicated or expensive. We translate complex threat intelligence into plain-language guidance so everyday people can protect themselves and their families.
+            <p className="text-lg text-muted-foreground leading-relaxed mb-4">
+              Online safety should not be complicated or expensive. We turn the same data that large organizations use into simple, everyday guidance anyone can follow.
             </p>
-            <p className="text-muted-foreground leading-relaxed mb-8">
-              Our tools and content are backed by the same government and industry sources that large enterprises rely on. The difference is we make it accessible to everyone.
+            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+              Our tools and content are backed by the same government and industry sources that professionals rely on. The difference is we make it accessible to everyone.
             </p>
 
             <Link href="/about">
@@ -45,8 +45,8 @@ export function AuthoritySection() {
                 className="flex items-start gap-3 py-3.5 border-b border-border last:border-b-0"
                 data-testid={`text-trust-point-${index}`}
               >
-                <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-foreground leading-relaxed">{point}</span>
+                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <span className="text-base text-foreground leading-relaxed">{point}</span>
               </div>
             ))}
           </div>

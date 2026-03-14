@@ -78,16 +78,16 @@ export function NewsletterCTA() {
       <div className="max-w-2xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
         <Mail className="w-8 h-8 text-primary mx-auto mb-5" />
 
-        <h2 id="newsletter-heading" className="text-2xl sm:text-3xl font-bold text-white mb-3" data-testid="text-newsletter-heading">
+        <h2 id="newsletter-heading" className="text-3xl sm:text-4xl font-bold text-white mb-4" data-testid="text-newsletter-heading">
           Stay One Step Ahead
         </h2>
-        <p className="text-white/60 mb-6 leading-relaxed">
+        <p className="text-lg text-white/60 mb-6 leading-relaxed">
           Join families who get weekly scam alerts, safety tips, and tool updates delivered to their inbox. Free, no spam, unsubscribe anytime.
         </p>
 
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           {benefits.map((benefit) => (
-            <span key={benefit} className="flex items-center gap-1.5 text-sm text-white/50">
+            <span key={benefit} className="flex items-center gap-2 text-base text-white/50">
               <CheckCircle className="w-3.5 h-3.5 text-primary flex-shrink-0" />
               {benefit}
             </span>

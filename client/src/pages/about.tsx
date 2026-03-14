@@ -115,12 +115,12 @@ export default function About() {
           <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
               <div className="max-w-xl">
-                <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-4" data-testid="text-about-label">About GetCyberRight</p>
-                <h1 id="about-hero-heading" className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-[1.1] mb-6" data-testid="text-about-heading">
+                <p className="text-sm sm:text-base font-semibold text-primary uppercase tracking-wider mb-4" data-testid="text-about-label">About GetCyberRight</p>
+                <h1 id="about-hero-heading" className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold text-white leading-[1.08] mb-6" data-testid="text-about-heading">
                   Digital Safety Has Never
                   <br />Mattered More.
                 </h1>
-                <p className="text-lg text-white/55 leading-relaxed mb-6">
+                <p className="text-lg sm:text-xl text-white/55 leading-relaxed mb-6">
                   The world is changing fast. New technology is making scams harder to spot, identity theft easier to pull off, and personal data easier to steal. GetCyberRight gives families, seniors, and small businesses the simple tools and knowledge they need to stay safe online.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -167,10 +167,10 @@ export default function About() {
                 <AlertTriangle className="w-5 h-5 text-red-500" />
                 <span className="text-sm font-semibold text-red-500 uppercase tracking-wider">The Problem</span>
               </div>
-              <h2 id="problem-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-problem-heading">
+              <h2 id="problem-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-5" data-testid="text-problem-heading">
                 Online Scams Have Changed. Most People Have Not Caught Up.
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-lg text-muted-foreground leading-relaxed">
                 The rise of AI has given criminals powerful new tools. Scams that used to be easy to spot are now nearly perfect. Fake emails look real. Cloned voices sound like your family. And your personal data is being sold to anyone willing to pay for it.
               </p>
             </div>
@@ -179,25 +179,25 @@ export default function About() {
               {threatTypes.map((threat) => (
                 <div
                   key={threat.label}
-                  className="bg-card border border-border rounded-xl p-5 hover:border-border/80 transition-colors"
+                  className="bg-card border border-border rounded-xl p-6 hover:border-border/80 transition-colors"
                   data-testid={`threat-${threat.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <threat.icon className="w-4 h-4 text-red-400" />
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <threat.icon className="w-5 h-5 text-red-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground text-sm mb-1">{threat.label}</h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{threat.description}</p>
+                      <h3 className="font-semibold text-foreground text-base mb-1.5">{threat.label}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{threat.description}</p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-10 bg-red-500/[0.06] border border-red-500/15 rounded-xl p-5 sm:p-6 flex items-start gap-3.5" data-testid="text-problem-callout">
-              <BadgeAlert className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-foreground/80 leading-relaxed">
+            <div className="mt-10 bg-red-500/[0.06] border border-red-500/15 rounded-xl p-6 sm:p-7 flex items-start gap-4" data-testid="text-problem-callout">
+              <BadgeAlert className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-base text-foreground/80 leading-relaxed">
                 <span className="font-semibold text-foreground">The reality:</span> Anyone can now create convincing scams using free online tools. What used to take a skilled criminal now takes minutes. Learning how to protect yourself online is no longer optional. It is essential for everyone.
               </p>
             </div>
@@ -211,10 +211,10 @@ export default function About() {
                 <ShieldCheck className="w-5 h-5 text-primary" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">The Solution</span>
               </div>
-              <h2 id="solution-heading" className="text-2xl sm:text-3xl font-bold text-white mb-4" data-testid="text-solution-heading">
+              <h2 id="solution-heading" className="text-3xl sm:text-4xl font-bold text-white mb-5" data-testid="text-solution-heading">
                 Simple Tools. Clear Guidance. Real Protection.
               </h2>
-              <p className="text-white/50 leading-relaxed">
+              <p className="text-lg text-white/50 leading-relaxed">
                 GetCyberRight was built because the people who need online safety the most have the fewest resources. We put scam checking, data removal, and safety training all in one place, designed for everyday people. No confusing language, no expensive subscriptions, and no technical knowledge needed to get started.
               </p>
             </div>
@@ -223,19 +223,19 @@ export default function About() {
               {platformTools.map((tool) => (
                 <Link key={tool.title} href={tool.href}>
                   <div
-                    className={`group bg-white/[0.03] border ${tool.borderColor} rounded-xl p-5 sm:p-6 hover:bg-white/[0.05] transition-all cursor-pointer`}
+                    className={`group bg-white/[0.03] border ${tool.borderColor} rounded-xl p-6 sm:p-7 hover:bg-white/[0.05] transition-all cursor-pointer`}
                     data-testid={`solution-${tool.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
                   >
                     <div className="flex items-start gap-4">
-                      <div className={`w-11 h-11 rounded-lg ${tool.bg} flex items-center justify-center flex-shrink-0`}>
-                        <tool.icon className={`w-5 h-5 ${tool.color}`} />
+                      <div className={`w-12 h-12 rounded-lg ${tool.bg} flex items-center justify-center flex-shrink-0`}>
+                        <tool.icon className={`w-6 h-6 ${tool.color}`} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-3">
-                          <h3 className="font-semibold text-white group-hover:text-primary transition-colors">{tool.title}</h3>
-                          <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
+                          <h3 className="font-semibold text-lg text-white group-hover:text-primary transition-colors">{tool.title}</h3>
+                          <ArrowRight className="w-5 h-5 text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
                         </div>
-                        <p className="text-sm text-white/40 leading-relaxed mt-1">{tool.description}</p>
+                        <p className="text-base text-white/40 leading-relaxed mt-1.5">{tool.description}</p>
                       </div>
                     </div>
                   </div>
@@ -253,10 +253,10 @@ export default function About() {
                   <Heart className="w-5 h-5 text-accent" />
                   <span className="text-sm font-semibold text-accent uppercase tracking-wider">Why This Matters</span>
                 </div>
-                <h2 id="impact-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-6" data-testid="text-impact-heading">
+                <h2 id="impact-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-6" data-testid="text-impact-heading">
                   Why This Matters Now More Than Ever
                 </h2>
-                <div className="space-y-4 text-muted-foreground leading-relaxed">
+                <div className="space-y-5 text-lg text-muted-foreground leading-relaxed">
                   <p>
                     A grandmother who got a phone call that sounded exactly like her grandson, begging for bail money. A small business owner who sent $47,000 after a video call with someone who looked just like their boss. A college student whose identity was stolen through a job offer that looked completely legitimate.
                   </p>
@@ -295,19 +295,19 @@ export default function About() {
                 <TrendingUp className="w-5 h-5 text-primary" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">Platform Coverage</span>
               </div>
-              <h2 id="credibility-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-3" data-testid="text-credibility-heading">
-                Built on Verified Sources. Measured in Results.
+              <h2 id="credibility-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-credibility-heading">
+                Built on Trusted Sources. Measured in Results.
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Every tool on GetCyberRight is powered by the same threat intelligence that enterprise security teams rely on, including data from FBI IC3, CISA, INTERPOL, Europol, NIST, PhishTank, and VirusTotal.
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Every tool on GetCyberRight uses the same trusted security sources that professionals rely on, including data from FBI IC3, CISA, INTERPOL, and more.
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {credibilityStats.map((stat) => (
-                <div key={stat.label} className="bg-card border border-border rounded-xl p-5" data-testid={`credibility-${stat.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
-                  <p className="text-3xl font-bold text-primary mb-1 tabular-nums">{stat.value}</p>
-                  <p className="font-semibold text-foreground text-sm mb-1">{stat.label}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{stat.detail}</p>
+                <div key={stat.label} className="bg-card border border-border rounded-xl p-6" data-testid={`credibility-${stat.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
+                  <p className="text-4xl font-bold text-primary mb-1.5 tabular-nums">{stat.value}</p>
+                  <p className="font-semibold text-foreground text-base mb-1">{stat.label}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{stat.detail}</p>
                 </div>
               ))}
             </div>
@@ -321,38 +321,38 @@ export default function About() {
                 <Lock className="w-5 h-5 text-primary" />
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">Our Philosophy</span>
               </div>
-              <h2 id="philosophy-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-philosophy-heading">
+              <h2 id="philosophy-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-5" data-testid="text-philosophy-heading">
                 Staying Safe Online Should Not Be Complicated
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-lg text-muted-foreground leading-relaxed">
                 The knowledge to prevent most scams already exists, but it has been locked away in technical language and expensive tools built for large companies. We believe everyone deserves access to it, in words they can understand.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-card border border-border rounded-xl p-6 text-center" data-testid="philosophy-accessible">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Globe className="w-6 h-6 text-primary" />
+              <div className="bg-card border border-border rounded-xl p-7 text-center" data-testid="philosophy-accessible">
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                  <Globe className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Accessible to Everyone</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold text-lg text-foreground mb-2">Accessible to Everyone</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">
                   Every core tool and guide is free to use. No login walls for scam checking. No credit card required. We believe access to safety should not depend on your budget.
                 </p>
               </div>
-              <div className="bg-card border border-border rounded-xl p-6 text-center" data-testid="philosophy-transparent">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Eye className="w-6 h-6 text-primary" />
+              <div className="bg-card border border-border rounded-xl p-7 text-center" data-testid="philosophy-transparent">
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                  <Eye className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Transparent and Trustworthy</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold text-lg text-foreground mb-2">Transparent and Trustworthy</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">
                   We never sell your data. We never use scare tactics to pressure you. Our tools use trusted, public security sources and we are upfront about how everything works.
                 </p>
               </div>
-              <div className="bg-card border border-border rounded-xl p-6 text-center" data-testid="philosophy-community">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-6 h-6 text-primary" />
+              <div className="bg-card border border-border rounded-xl p-7 text-center" data-testid="philosophy-community">
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                  <Users className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Community Driven</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold text-lg text-foreground mb-2">Community Driven</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">
                   The best way to support GetCyberRight is to share it with someone who needs it. A parent, a grandparent, a friend, a small business. That is how we grow, one person at a time.
                 </p>
               </div>
@@ -371,10 +371,10 @@ export default function About() {
           />
           <div className="absolute inset-0 bg-primary/85" />
           <div className="relative z-10 max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4" data-testid="text-cta-heading">
+            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-5" data-testid="text-cta-heading">
               Start Protecting Yourself Today
             </h2>
-            <p className="text-white/80 text-lg max-w-2xl mx-auto mb-8">
+            <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8">
               No account required. Paste a suspicious message into our Scam Checker, browse our guides, or start a training course. Pick a tool and go.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -14,10 +14,10 @@ export function AudiencePaths() {
     <section className="py-16 sm:py-20 bg-background" data-testid="section-audience-paths" aria-labelledby="audience-paths-heading">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="max-w-2xl mb-10 sm:mb-14">
-          <h2 id="audience-paths-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-3" data-testid="text-audience-paths-heading">
+          <h2 id="audience-paths-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-audience-paths-heading">
             Built for People Like You
           </h2>
-          <p className="text-muted-foreground leading-relaxed">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             Pick the path that fits your life. Every guide is written for real people, not IT departments.
           </p>
         </div>
@@ -33,10 +33,10 @@ export function AudiencePaths() {
                 <h3 className="font-semibold text-foreground mb-1.5 group-hover:text-primary transition-colors">
                   {path.title}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                <p className="text-base text-muted-foreground leading-relaxed mb-3">
                   {path.description}
                 </p>
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                   Explore <ArrowRight className="w-3 h-3" />
                 </span>
               </div>

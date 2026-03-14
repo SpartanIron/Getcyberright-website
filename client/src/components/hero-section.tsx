@@ -247,10 +247,10 @@ function StatBar() {
         const count = useAnimatedCounter(stat.value, stat.duration);
         return (
           <div key={stat.label} className="text-center" data-testid={`stat-hero-${stat.label.toLowerCase().replace(/[,\s]+/g, "-")}`}>
-            <div className="text-2xl sm:text-3xl font-bold text-white tabular-nums leading-none">
+            <div className="text-3xl sm:text-4xl font-bold text-white tabular-nums leading-none">
               {count}{stat.suffix}
             </div>
-            <div className="text-[11px] text-white/35 font-medium mt-1.5 leading-tight">{stat.label}</div>
+            <div className="text-xs sm:text-sm text-white/35 font-medium mt-2 leading-tight">{stat.label}</div>
           </div>
         );
       })}
@@ -274,7 +274,7 @@ export function HeroSection() {
           <div className="grid lg:grid-cols-[1fr_minmax(0,480px)] gap-10 lg:gap-14 items-start pb-10 sm:pb-12 lg:pb-14">
             <div className="max-w-xl pt-2 lg:pt-6">
               <h1
-                className="text-3xl sm:text-4xl lg:text-[2.85rem] font-extrabold tracking-tight text-white leading-[1.12] mb-5"
+                className="text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold tracking-tight text-white leading-[1.1] mb-6"
                 data-testid="text-hero-heading"
               >
                 Got a Suspicious Message?
@@ -283,17 +283,17 @@ export function HeroSection() {
               </h1>
 
               <p
-                className="text-base sm:text-[1.05rem] text-white/50 leading-relaxed mb-8 max-w-lg"
+                className="text-lg sm:text-xl text-white/50 leading-relaxed mb-8 max-w-lg"
                 data-testid="text-hero-subtext"
               >
-                Paste any text, email, link, or phone number. Our AI analyzes it against 8 live threat intelligence feeds, detects social engineering patterns, and tells you exactly what to watch for.
+                Paste any text, email, link, or phone number. We check it against 8 trusted security databases and tell you exactly what to watch for.
               </p>
 
-              <div className="space-y-3.5 mb-8">
+              <div className="space-y-4 mb-8">
                 {trustPoints.map((point) => (
-                  <div key={point.text} className="flex items-start gap-2.5">
-                    <point.icon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-white/45 leading-snug">{point.text}</span>
+                  <div key={point.text} className="flex items-start gap-3">
+                    <point.icon className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-base text-white/45 leading-snug">{point.text}</span>
                   </div>
                 ))}
               </div>
@@ -303,9 +303,9 @@ export function HeroSection() {
               </div>
 
               <div className="hidden lg:block">
-                <Link href="/tools" className="inline-flex items-center gap-1.5 text-sm text-white/40 hover:text-white/60 transition-colors group">
+                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/40 hover:text-white/60 transition-colors group">
                   Explore all free tools
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
             </div>

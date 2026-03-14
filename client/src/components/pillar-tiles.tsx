@@ -7,7 +7,7 @@ const features = [
     id: "scam-checker",
     label: "Most Popular",
     title: "AI Scam Checker",
-    description: "Paste a suspicious URL, email, phone number, or message and get an instant risk analysis. Powered by real-time threat intelligence from 8 verified sources.",
+    description: "Paste a suspicious URL, email, phone number, or message and get an instant risk analysis. Checked against 8 trusted security databases in real time.",
     href: "/scam-checker",
     cta: "Check a Scam",
     icon: Search,
@@ -49,10 +49,10 @@ export function PillarTiles() {
     <section className="py-16 sm:py-20 bg-background" data-testid="section-pillar-tiles" aria-labelledby="pillars-heading">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="max-w-2xl mb-10 sm:mb-14">
-          <h2 id="pillars-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-3" data-testid="text-pillars-heading">
+          <h2 id="pillars-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-pillars-heading">
             What We Do
           </h2>
-          <p className="text-muted-foreground leading-relaxed">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             Three core tools that give everyday people the same level of cyber protection that large organizations have. All free to get started.
           </p>
         </div>
@@ -75,8 +75,8 @@ export function PillarTiles() {
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold text-foreground mb-3">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6">{feature.description}</p>
+                <h3 className="text-2xl font-bold text-foreground mb-3">{feature.title}</h3>
+                <p className="text-base text-muted-foreground leading-relaxed mb-6">{feature.description}</p>
 
                 <Link href={feature.href}>
                   <Button
