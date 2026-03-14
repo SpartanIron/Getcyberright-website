@@ -95,48 +95,58 @@ export function HeroSection() {
       <div className="bg-[#0A2A3C] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
 
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div
+          className="absolute pointer-events-none hidden lg:block"
+          aria-hidden="true"
+          style={{
+            top: 0,
+            right: 0,
+            width: "55%",
+            height: "100%",
+            overflow: "hidden",
+          }}
+        >
           <div
-            className="absolute"
             style={{
-              top: "-20%",
-              left: "-10%",
-              width: "140%",
-              height: "30%",
+              position: "absolute",
+              top: "-30%",
+              right: "12%",
+              width: "90px",
+              height: "200%",
               background: "#00293C",
-              transform: "rotate(-8deg)",
+              transform: "rotate(20deg)",
+              transformOrigin: "top center",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: "-30%",
+              right: "22%",
+              width: "70px",
+              height: "200%",
+              background: "linear-gradient(180deg, #0d9488 0%, #0f766e 100%)",
+              transform: "rotate(20deg)",
+              transformOrigin: "top center",
+              opacity: 0.55,
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: "-30%",
+              right: "30%",
+              width: "50px",
+              height: "200%",
+              background: "linear-gradient(180deg, hsl(16, 90%, 50%) 0%, hsl(16, 85%, 40%) 100%)",
+              transform: "rotate(20deg)",
+              transformOrigin: "top center",
               opacity: 0.45,
-            }}
-          />
-          <div
-            className="absolute"
-            style={{
-              top: "25%",
-              left: "-10%",
-              width: "140%",
-              height: "22%",
-              background: "linear-gradient(90deg, #0d9488 0%, #0f766e 100%)",
-              transform: "rotate(-8deg)",
-              opacity: 0.10,
-            }}
-          />
-          <div
-            className="absolute"
-            style={{
-              bottom: "-15%",
-              left: "-10%",
-              width: "140%",
-              height: "28%",
-              background: "linear-gradient(90deg, hsl(16, 85%, 48%) 0%, hsl(16, 90%, 42%) 100%)",
-              transform: "rotate(-8deg)",
-              opacity: 0.09,
             }}
           />
         </div>
 
-        <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-primary/[0.06] to-transparent" />
         <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-primary/[0.05] rounded-full blur-[120px]" />
-        <div className="absolute -top-20 right-1/4 w-[400px] h-[400px] bg-accent/[0.04] rounded-full blur-[100px]" />
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
           <div className="pt-8 sm:pt-10 lg:pt-12 pb-4">
