@@ -94,6 +94,46 @@ export function HeroSection() {
     <section className="relative w-full" data-testid="section-hero">
       <div className="bg-[#0A2A3C] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+          <div
+            className="absolute"
+            style={{
+              top: "-20%",
+              left: "-10%",
+              width: "140%",
+              height: "30%",
+              background: "#00293C",
+              transform: "rotate(-8deg)",
+              opacity: 0.45,
+            }}
+          />
+          <div
+            className="absolute"
+            style={{
+              top: "25%",
+              left: "-10%",
+              width: "140%",
+              height: "22%",
+              background: "linear-gradient(90deg, #0d9488 0%, #0f766e 100%)",
+              transform: "rotate(-8deg)",
+              opacity: 0.10,
+            }}
+          />
+          <div
+            className="absolute"
+            style={{
+              bottom: "-15%",
+              left: "-10%",
+              width: "140%",
+              height: "28%",
+              background: "linear-gradient(90deg, hsl(16, 85%, 48%) 0%, hsl(16, 90%, 42%) 100%)",
+              transform: "rotate(-8deg)",
+              opacity: 0.09,
+            }}
+          />
+        </div>
+
         <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-primary/[0.06] to-transparent" />
         <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-primary/[0.05] rounded-full blur-[120px]" />
         <div className="absolute -top-20 right-1/4 w-[400px] h-[400px] bg-accent/[0.04] rounded-full blur-[100px]" />
