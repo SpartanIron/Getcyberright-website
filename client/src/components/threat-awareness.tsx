@@ -33,18 +33,10 @@ const threats = [
 export function ThreatAwareness() {
   return (
     <section className="relative overflow-hidden bg-[#0A2A3C]" data-testid="section-threat-awareness" aria-labelledby="threat-heading">
-      <div className="absolute inset-0 hidden lg:block">
-        <img
-          src={seniorsImg}
-          alt=""
-          className="absolute right-0 top-0 w-[55%] h-full object-cover object-center"
-          loading="lazy"
-          aria-hidden="true"
-        />
-      </div>
+      <div className="relative max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-[50%_50%]">
 
-      <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
-        <div className="max-w-xl">
+        <div className="px-5 sm:px-6 lg:pl-8 lg:pr-12 py-16 sm:py-20 lg:py-24">
           <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-full px-4 py-2 mb-6">
             <AlertTriangle className="w-4 h-4 text-red-400" />
             <span className="text-sm font-semibold text-red-400">The Threat Is Real</span>
@@ -84,6 +76,17 @@ export function ThreatAwareness() {
               <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
             </Link>
           </Button>
+        </div>
+
+        <div className="hidden lg:block">
+          <img
+            src={seniorsImg}
+            alt="Diverse group of people learning about online safety"
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+
         </div>
       </div>
 
