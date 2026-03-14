@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
+import { TrustStrip } from "@/components/trust-strip";
 import { PillarTiles } from "@/components/pillar-tiles";
 import { ContentPreview } from "@/components/content-preview";
 import { AudiencePaths } from "@/components/audience-paths";
@@ -38,6 +39,7 @@ export default function Home() {
       <Navigation />
       <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
         <HeroSection />
+        <TrustStrip />
         <PillarTiles />
         <ContentPreview />
         <AudiencePaths />

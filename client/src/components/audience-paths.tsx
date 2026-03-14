@@ -1,112 +1,56 @@
-import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { ArrowRight, Users, Heart, Briefcase, GraduationCap, Baby } from "lucide-react";
 
 const paths = [
-  {
-    id: "families",
-    title: "Parents & Families",
-    description: "Age-appropriate guides, conversation starters, and monitoring tips to protect your kids without hovering.",
-    icon: Users,
-    href: "/parents",
-    cta: "Parent's Guide",
-    iconBg: "bg-blue-500/10 dark:bg-blue-500/20",
-    iconColor: "text-blue-500",
-  },
-  {
-    id: "seniors",
-    title: "Seniors",
-    description: "Spot phone scams, protect your identity, and use technology with confidence. Written in plain language.",
-    icon: Heart,
-    href: "/seniors",
-    cta: "Senior Safety",
-    iconBg: "bg-rose-500/10 dark:bg-rose-500/20",
-    iconColor: "text-rose-500",
-  },
-  {
-    id: "kids",
-    title: "Kids & Teens",
-    description: "Interactive safety lessons and activities designed for different age groups. Learning cyber safety can be fun.",
-    icon: Baby,
-    href: "/kids",
-    cta: "Kids Hub",
-    iconBg: "bg-green-500/10 dark:bg-green-500/20",
-    iconColor: "text-green-500",
-  },
-  {
-    id: "educators",
-    title: "Educators",
-    description: "Cybersecurity curriculum, teaching materials, and classroom-ready resources for all grade levels.",
-    icon: GraduationCap,
-    href: "/educators",
-    cta: "Educator Resources",
-    iconBg: "bg-purple-500/10 dark:bg-purple-500/20",
-    iconColor: "text-purple-500",
-  },
-  {
-    id: "business",
-    title: "Small Businesses",
-    description: "Free awareness training your whole team can complete in a lunch break. Same threats, smaller budget.",
-    icon: Briefcase,
-    href: "/small-business",
-    cta: "Business Security",
-    iconBg: "bg-amber-500/10 dark:bg-amber-500/20",
-    iconColor: "text-amber-500",
-  },
+  { id: "families", title: "Parents & Families", description: "Age-appropriate guides, device monitoring tips, and conversation starters.", icon: Users, href: "/parents" },
+  { id: "seniors", title: "Seniors", description: "Spot phone scams, protect your identity, and use technology with confidence.", icon: Heart, href: "/seniors" },
+  { id: "kids", title: "Kids & Teens", description: "Interactive safety lessons designed for ages 8 to 16.", icon: Baby, href: "/kids" },
+  { id: "educators", title: "Educators", description: "Curriculum resources and classroom-ready cybersecurity materials.", icon: GraduationCap, href: "/educators" },
+  { id: "business", title: "Small Businesses", description: "Free awareness training your whole team can finish in a lunch break.", icon: Briefcase, href: "/small-business" },
 ];
 
 export function AudiencePaths() {
   return (
-    <section className="py-12 sm:py-16 bg-muted/30" data-testid="section-audience-paths" aria-labelledby="audience-paths-heading">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center max-w-2xl mx-auto mb-8 sm:mb-10"
-        >
-          <h2 id="audience-paths-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-2" data-testid="text-audience-paths-heading">
+    <section className="py-16 sm:py-20 bg-background" data-testid="section-audience-paths" aria-labelledby="audience-paths-heading">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mb-10 sm:mb-14">
+          <h2 id="audience-paths-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-3" data-testid="text-audience-paths-heading">
             Built for People Like You
           </h2>
-          <p className="text-muted-foreground text-sm sm:text-base">
-            Pick the path that fits your life. Every guide is written for real people, not IT professionals.
+          <p className="text-muted-foreground leading-relaxed">
+            Pick the path that fits your life. Every guide is written for real people, not IT departments.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paths.map((path, index) => (
-            <motion.div
-              key={path.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: index * 0.06 }}
-              className={index >= 3 ? "sm:col-span-1 lg:col-span-1" : ""}
-            >
-              <Link href={path.href}>
-                <div
-                  className="group flex items-start gap-4 p-5 rounded-xl border border-border bg-card hover:-translate-y-0.5 hover:shadow-md focus-visible:-translate-y-0.5 focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer transition-all duration-200 h-full"
-                  data-testid={`card-audience-${path.id}`}
-                >
-                  <div className={`w-11 h-11 rounded-lg ${path.iconBg} flex items-center justify-center flex-shrink-0`}>
-                    <path.icon className={`w-5 h-5 ${path.iconColor}`} aria-hidden="true" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground text-sm sm:text-base mb-1 group-hover:text-primary transition-colors">
-                      {path.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2.5 line-clamp-2">
-                      {path.description}
-                    </p>
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-primary group-hover:gap-1.5 transition-all">
-                      {path.cta} <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border rounded-xl overflow-hidden border border-border">
+          {paths.map((path) => (
+            <Link key={path.id} href={path.href}>
+              <div
+                className="group bg-card p-6 sm:p-7 cursor-pointer hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 transition-colors h-full"
+                data-testid={`card-audience-${path.id}`}
+              >
+                <path.icon className="w-5 h-5 text-muted-foreground mb-3" aria-hidden="true" />
+                <h3 className="font-semibold text-foreground mb-1.5 group-hover:text-primary transition-colors">
+                  {path.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                  {path.description}
+                </p>
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  Explore <ArrowRight className="w-3 h-3" />
+                </span>
+              </div>
+            </Link>
           ))}
+          <div className="hidden lg:block bg-card p-6 sm:p-7">
+            <div className="flex items-center justify-center h-full">
+              <Link href="/resources">
+                <span className="text-sm font-medium text-primary hover:underline flex items-center gap-1.5 cursor-pointer" data-testid="link-more-resources">
+                  See all resources <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>

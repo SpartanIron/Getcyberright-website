@@ -1,115 +1,55 @@
 import { Link } from "wouter";
-import { motion } from "framer-motion";
-import { Shield, BookOpen, Globe, Users, ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const credentials = [
-  {
-    icon: Shield,
-    title: "Security First",
-    description: "Every tool and guide is built with cybersecurity best practices at its core.",
-  },
-  {
-    icon: BookOpen,
-    title: "Research-Backed",
-    description: "Content sourced from FBI IC3, CISA, INTERPOL, FTC, and leading cybersecurity research.",
-  },
-  {
-    icon: Globe,
-    title: "Global Coverage",
-    description: "Threat intelligence and scam data covering 13 regions worldwide.",
-  },
-  {
-    icon: Users,
-    title: "Built for Families",
-    description: "Designed for non-technical users: parents, kids, seniors, and small businesses.",
-  },
-];
-
-const trustSources = [
-  "FBI IC3 Reports",
-  "CISA Advisories",
-  "FTC Consumer Sentinel",
-  "INTERPOL Threat Intelligence",
-  "Europol IOCTA",
-  "NIST Cybersecurity Framework",
+const trustPoints = [
+  "Threat data sourced from FBI IC3, CISA, INTERPOL, Europol, and FTC",
+  "Real-time monitoring from 8 verified intelligence feeds",
+  "Content aligned with NIST Cybersecurity Framework guidelines",
+  "Written in plain language by cybersecurity professionals",
+  "Free to get started with no account required for core tools",
+  "Used by families, educators, and small businesses worldwide",
 ];
 
 export function AuthoritySection() {
   return (
-    <section className="py-14 sm:py-20 bg-background" data-testid="section-authority" aria-labelledby="authority-heading">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">About Our Mission</p>
+    <section className="py-16 sm:py-20 bg-muted/30" data-testid="section-authority" aria-labelledby="authority-heading">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          <div>
             <h2 id="authority-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-authority-heading">
-              Your Trusted Source for Cyber Safety
+              Why People Trust GetCyberRight
             </h2>
-            <p className="text-muted-foreground leading-relaxed mb-6">
-              GetCyberRight exists because cybersecurity should not be complicated.
-              We translate complex threat intelligence into plain-language guidance
-              that helps everyday people protect themselves and their families from
-              online scams, identity theft, and digital threats.
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              Cybersecurity should not be complicated or expensive. We translate complex threat intelligence into plain-language guidance so everyday people can protect themselves and their families.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-8">
-              Our tools and guides are free to get started, because we believe
-              everyone deserves access to cyber safety resources, not just those
-              with a security budget.
+              Our tools and content are backed by the same government and industry sources that large enterprises rely on. The difference is we make it accessible to everyone.
             </p>
 
-            <div className="mb-8">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Trusted Sources</p>
-              <div className="flex flex-wrap gap-2">
-                {trustSources.map((source) => (
-                  <span
-                    key={source}
-                    className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground"
-                    data-testid={`badge-source-${source.toLowerCase().replace(/\s+/g, "-")}`}
-                  >
-                    <CheckCircle className="w-3 h-3 text-primary" />
-                    {source}
-                  </span>
-                ))}
-              </div>
-            </div>
-
             <Link href="/about">
-              <Button variant="outline" className="rounded-full" data-testid="button-learn-mission">
-                Learn About Our Mission <ArrowRight className="ml-2 w-4 h-4" />
+              <Button
+                variant="outline"
+                className="rounded-lg font-medium"
+                data-testid="button-learn-mission"
+              >
+                About Our Mission <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-          >
-            {credentials.map((cred, index) => (
-              <motion.div
-                key={cred.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.1 + index * 0.08 }}
-                className="p-5 rounded-xl border border-border bg-card"
-                data-testid={`card-authority-${cred.title.toLowerCase().replace(/\s+/g, "-")}`}
+          <div className="space-y-0">
+            {trustPoints.map((point, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-3 py-3.5 border-b border-border last:border-b-0"
+                data-testid={`text-trust-point-${index}`}
               >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
-                  <cred.icon className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-semibold text-foreground text-sm mb-1">{cred.title}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">{cred.description}</p>
-              </motion.div>
+                <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <span className="text-sm text-foreground leading-relaxed">{point}</span>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

@@ -1,9 +1,7 @@
 import { Link } from "wouter";
-import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, AlertTriangle, Shield, ArrowRight, FileText, Radio } from "lucide-react";
+import { BookOpen, ArrowRight, FileText, Radio, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 const severityColors: Record<string, string> = {
   critical: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
@@ -13,182 +11,106 @@ const severityColors: Record<string, string> = {
 };
 
 const staticGuides = [
-  {
-    title: "How to Prevent Identity Theft",
-    description: "Learn the essential steps to protect your personal information from identity thieves and data brokers.",
-    href: "/scams/identity-theft",
-    icon: Shield,
-  },
-  {
-    title: "How to Detect Phishing Emails",
-    description: "Spot fake emails before they trick you. Real examples and red flags to watch for.",
-    href: "/scams/phishing",
-    icon: FileText,
-  },
-  {
-    title: "Protecting Seniors from Scams",
-    description: "A practical guide to helping older adults recognize and avoid common scam tactics.",
-    href: "/seniors",
-    icon: BookOpen,
-  },
+  { title: "How to Prevent Identity Theft", description: "Learn the essential steps to protect your personal information from identity thieves and data brokers.", href: "/scams/identity-theft", icon: Shield },
+  { title: "How to Detect Phishing Emails", description: "Spot fake emails before they trick you. Real examples and red flags to watch for.", href: "/scams/phishing", icon: FileText },
+  { title: "Protecting Seniors from Scams", description: "A practical guide to helping older adults recognize and avoid common scam tactics.", href: "/seniors", icon: BookOpen },
 ];
 
 const staticAlerts = [
-  {
-    title: "PayPal Phishing Scam",
-    description: "Fraudulent emails impersonating PayPal asking users to verify their accounts.",
-    risk: "high",
-    href: "/scams/paypal-scam",
-  },
-  {
-    title: "Crypto Investment Scam",
-    description: "Fake cryptocurrency platforms promising guaranteed returns.",
-    risk: "critical",
-    href: "/scams/crypto-scam",
-  },
-  {
-    title: "Amazon Delivery Scam",
-    description: "Text messages about fake Amazon deliveries designed to steal personal data.",
-    risk: "medium",
-    href: "/scams/amazon-scam",
-  },
+  { title: "PayPal Phishing Scam", description: "Fraudulent emails impersonating PayPal asking users to verify their accounts.", risk: "high", href: "/scams/paypal-scam" },
+  { title: "Crypto Investment Scam", description: "Fake cryptocurrency platforms promising guaranteed returns.", risk: "critical", href: "/scams/crypto-scam" },
+  { title: "Amazon Delivery Scam", description: "Text messages about fake Amazon deliveries designed to steal personal data.", risk: "medium", href: "/scams/amazon-scam" },
 ];
 
 export function ContentPreview() {
-  const { data: guidesData } = useQuery<any[]>({
-    queryKey: ["/api/guides"],
-    staleTime: 10 * 60 * 1000,
-  });
-
-  const { data: alertsData } = useQuery<any[]>({
-    queryKey: ["/api/alerts"],
-    staleTime: 10 * 60 * 1000,
-  });
+  const { data: guidesData } = useQuery<any[]>({ queryKey: ["/api/guides"], staleTime: 10 * 60 * 1000 });
+  const { data: alertsData } = useQuery<any[]>({ queryKey: ["/api/alerts"], staleTime: 10 * 60 * 1000 });
 
   const hasLiveGuides = guidesData && guidesData.length > 0;
   const hasLiveAlerts = alertsData && alertsData.length > 0;
 
   return (
-    <section className="py-14 sm:py-20 bg-muted/30" data-testid="section-content-preview" aria-labelledby="content-heading">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center max-w-3xl mx-auto mb-12"
-        >
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">Knowledge Hub</p>
+    <section className="py-16 sm:py-20 bg-muted/30" data-testid="section-content-preview" aria-labelledby="content-heading">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mb-10 sm:mb-14">
           <h2 id="content-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-3" data-testid="text-content-heading">
-            Learn, Detect, Protect
+            Latest from the Knowledge Hub
           </h2>
-          <p className="text-muted-foreground">
-            Explore our growing library of safety guides, scam intelligence, and threat alerts.
+          <p className="text-muted-foreground leading-relaxed">
+            Up-to-date guides and scam alerts written in plain language. No jargon, no fluff.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="flex items-center gap-2 mb-5">
-              <BookOpen className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-bold text-foreground">Cyber Safety Guides</h3>
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-14">
+          <div>
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-primary" />
+                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Guides</h3>
+              </div>
+              <Link href="/guides">
+                <span className="text-xs font-medium text-primary hover:underline flex items-center gap-1" data-testid="link-all-guides">
+                  View all <ArrowRight className="w-3 h-3" />
+                </span>
+              </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-0 divide-y divide-border border-t border-border">
               {(hasLiveGuides ? guidesData!.slice(0, 3) : staticGuides).map((guide: any, index: number) => (
-                <Link
-                  key={index}
-                  href={hasLiveGuides ? `/guides/${guide.slug}` : guide.href}
-                >
+                <Link key={index} href={hasLiveGuides ? `/guides/${guide.slug}` : guide.href}>
                   <div
-                    className="group flex items-start gap-3 p-4 rounded-lg border border-border bg-card hover-elevate cursor-pointer transition-all"
+                    className="group py-4 cursor-pointer focus-visible:outline-none focus-visible:bg-muted/50 focus-visible:ring-1 focus-visible:ring-primary/30 rounded-md -mx-2 px-2"
                     data-testid={`card-guide-preview-${index}`}
                   >
-                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex-shrink-0 flex items-center justify-center mt-0.5">
-                      {hasLiveGuides ? (
-                        <BookOpen className="w-4 h-4 text-primary" />
-                      ) : (
-                        <guide.icon className="w-4 h-4 text-primary" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                        {guide.title}
-                      </h4>
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                        {hasLiveGuides ? guide.metaDescription : guide.description}
-                      </p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-1" />
+                    <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors mb-1">
+                      {guide.title}
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                      {hasLiveGuides ? guide.metaDescription : guide.description}
+                    </p>
                   </div>
                 </Link>
               ))}
             </div>
-            <div className="mt-4">
-              <Link href="/guides">
-                <Button variant="outline" size="sm" className="rounded-full" data-testid="button-view-all-guides">
-                  View All Guides <ArrowRight className="ml-1 w-3.5 h-3.5" />
-                </Button>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <Radio className="w-4 h-4 text-red-500" />
+                <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Scam Alerts</h3>
+              </div>
+              <Link href="/alerts">
+                <span className="text-xs font-medium text-primary hover:underline flex items-center gap-1" data-testid="link-all-alerts">
+                  View all <ArrowRight className="w-3 h-3" />
+                </span>
               </Link>
             </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <div className="flex items-center gap-2 mb-5">
-              <Radio className="w-5 h-5 text-red-500" />
-              <h3 className="text-lg font-bold text-foreground">Latest Scam Alerts</h3>
-            </div>
-            <div className="space-y-3">
+            <div className="space-y-0 divide-y divide-border border-t border-border">
               {(hasLiveAlerts ? alertsData!.slice(0, 3) : staticAlerts).map((alert: any, index: number) => {
                 const risk = hasLiveAlerts ? (alert.riskLevel || "medium") : alert.risk;
                 return (
-                  <Link
-                    key={index}
-                    href={hasLiveAlerts ? `/alerts/${alert.slug}` : alert.href}
-                  >
+                  <Link key={index} href={hasLiveAlerts ? `/alerts/${alert.slug}` : alert.href}>
                     <div
-                      className="group flex items-start gap-3 p-4 rounded-lg border border-border bg-card hover-elevate cursor-pointer transition-all"
+                      className="group py-4 cursor-pointer focus-visible:outline-none focus-visible:bg-muted/50 focus-visible:ring-1 focus-visible:ring-primary/30 rounded-md -mx-2 px-2"
                       data-testid={`card-alert-preview-${index}`}
                     >
-                      <div className="w-9 h-9 rounded-lg bg-red-500/10 flex-shrink-0 flex items-center justify-center mt-0.5">
-                        <AlertTriangle className="w-4 h-4 text-red-500" />
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                          {hasLiveAlerts ? alert.threatName : alert.title}
+                        </h4>
+                        <Badge className={`text-[10px] px-1.5 py-0 no-default-hover-elevate no-default-active-elevate ${severityColors[risk] || severityColors.medium}`}>
+                          {risk}
+                        </Badge>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                          <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                            {hasLiveAlerts ? alert.threatName : alert.title}
-                          </h4>
-                          <Badge className={`text-[10px] px-1.5 py-0 no-default-hover-elevate no-default-active-elevate ${severityColors[risk] || severityColors.medium}`}>
-                            {risk}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          {alert.description}
-                        </p>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-1" />
+                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                        {alert.description}
+                      </p>
                     </div>
                   </Link>
                 );
               })}
             </div>
-            <div className="mt-4">
-              <Link href="/alerts">
-                <Button variant="outline" size="sm" className="rounded-full" data-testid="button-view-all-alerts">
-                  View All Alerts <ArrowRight className="ml-1 w-3.5 h-3.5" />
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
