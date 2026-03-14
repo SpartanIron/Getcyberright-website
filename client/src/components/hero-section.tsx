@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, ChevronRight, Radio, Database, Sparkles, DollarSign, MapPin } from "lucide-react";
 import { Link } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import type { TrendingThreat } from "@shared/schema";
 
@@ -28,10 +28,10 @@ const rotatingMessages = [
 ];
 
 const stats = [
-  { icon: Database, value: "500+", label: "Data Brokers Tracked" },
-  { icon: Sparkles, value: "406+", label: "AI Safety Prompts" },
-  { icon: Shield, value: "6", label: "Live Threat Feeds" },
-  { icon: DollarSign, value: "$0", label: "Free to Get Started" },
+  { icon: Database, numericValue: 500, suffix: "+", label: "Data Brokers Tracked" },
+  { icon: Sparkles, numericValue: 406, suffix: "+", label: "AI Safety Prompts" },
+  { icon: Shield, numericValue: 6, suffix: "", label: "Live Threat Feeds" },
+  { icon: DollarSign, prefix: "$", numericValue: 0, suffix: "", label: "Free to Get Started" },
 ];
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
@@ -66,6 +66,114 @@ function detectRegion(): string {
   }
 }
 
+function useAnimatedCounter(target: number, duration: number = 1200, startDelay: number = 0) {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.5 });
+
+  useEffect(() => {
+    if (!isInView || hasStarted) return;
+
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) {
+      setCount(target);
+      setHasStarted(true);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setHasStarted(true);
+      const startTime = performance.now();
+      const step = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setCount(Math.round(eased * target));
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }, startDelay);
+
+    return () => clearTimeout(timeout);
+  }, [isInView, target, duration, startDelay, hasStarted]);
+
+  return { count, ref };
+}
+
+function TypewriterText({ text, className }: { text: string; className?: string }) {
+  const [displayText, setDisplayText] = useState("");
+  const [showCursor, setShowCursor] = useState(true);
+
+  useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) {
+      setDisplayText(text);
+      setShowCursor(false);
+      return;
+    }
+
+    setDisplayText("");
+    setShowCursor(true);
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        setDisplayText(text.slice(0, i + 1));
+        i++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => setShowCursor(false), 800);
+      }
+    }, 40);
+
+    return () => clearInterval(interval);
+  }, [text]);
+
+  return (
+    <span className={className}>
+      {displayText}
+      {showCursor && (
+        <span className="inline-block w-[2px] h-[1em] bg-accent ml-0.5 align-text-bottom animate-blink" />
+      )}
+    </span>
+  );
+}
+
+const particles = Array.from({ length: 24 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 2.5 + 1,
+  duration: Math.random() * 15 + 15,
+  delay: Math.random() * 8,
+  opacity: Math.random() * 0.3 + 0.05,
+}));
+
+function FloatingParticles() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none motion-reduce:hidden" aria-hidden="true">
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full bg-primary/30"
+          style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
+          animate={{
+            y: [0, -30, 10, -20, 0],
+            x: [0, 15, -10, 5, 0],
+            opacity: [p.opacity, p.opacity * 2, p.opacity, p.opacity * 1.5, p.opacity],
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 const severityColors: Record<string, string> = {
   critical: "bg-red-500/20 text-red-400 border-red-500/30",
   high: "bg-orange-500/20 text-orange-400 border-orange-500/30",
@@ -96,7 +204,7 @@ function LiveThreatBadge() {
     >
       <Link href="/alerts">
         <div
-          className="inline-flex items-start sm:items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 cursor-pointer hover:bg-white/8 transition-colors max-w-xl group"
+          className="inline-flex items-start sm:items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 cursor-pointer hover:bg-white/8 transition-colors max-w-xl group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           data-testid="badge-live-threat"
         >
           <div className="relative flex-shrink-0 mt-0.5 sm:mt-0">
@@ -127,6 +235,31 @@ function LiveThreatBadge() {
   );
 }
 
+function AnimatedStat({ stat, index }: { stat: typeof stats[0]; index: number }) {
+  const { count, ref } = useAnimatedCounter(stat.numericValue, stat.numericValue > 100 ? 1500 : 800, 700 + index * 100);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.7 + index * 0.08 }}
+      className="flex items-center gap-3 bg-white/5 border border-white/8 rounded-xl px-4 py-3 hover:bg-white/[0.07] transition-colors"
+      data-testid={`stat-hero-${stat.label.toLowerCase().replace(/[,\s]+/g, "-")}`}
+    >
+      <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
+        <stat.icon className="w-[18px] h-[18px] text-primary" />
+      </div>
+      <div>
+        <div className="text-lg sm:text-xl font-bold text-white tabular-nums leading-none">
+          {stat.prefix || ""}{count}{stat.suffix}
+        </div>
+        <div className="text-[11px] text-white/45 font-medium mt-0.5 leading-tight">{stat.label}</div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function HeroSection() {
   const [messageIndex, setMessageIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -137,7 +270,7 @@ export function HeroSection() {
 
     const interval = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % rotatingMessages.length);
-    }, 3500);
+    }, 4000);
     return () => clearInterval(interval);
   }, [isPaused]);
 
@@ -146,6 +279,7 @@ export function HeroSection() {
       <div className="relative bg-slate-900">
         <div className="absolute inset-0 hero-mesh-bg" />
         <div className="absolute inset-0 hero-grid-overlay" />
+        <FloatingParticles />
 
         <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
           <motion.div
@@ -178,17 +312,19 @@ export function HeroSection() {
               onMouseLeave={() => setIsPaused(false)}
             >
               <AnimatePresence mode="wait">
-                <motion.p
+                <motion.div
                   key={messageIndex}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-base sm:text-lg lg:text-xl text-accent font-semibold"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
                   data-testid="text-hero-rotating"
                 >
-                  {rotatingMessages[messageIndex]}
-                </motion.p>
+                  <TypewriterText
+                    text={rotatingMessages[messageIndex]}
+                    className="text-base sm:text-lg lg:text-xl text-accent font-semibold"
+                  />
+                </motion.div>
               </AnimatePresence>
             </motion.div>
 
@@ -204,7 +340,7 @@ export function HeroSection() {
               <Link href="/scam-checker">
                 <Button
                   size="lg"
-                  className="rounded-full px-7 bg-accent text-accent-foreground border-accent-border shadow-lg shadow-accent/20 w-full sm:w-auto"
+                  className="hero-cta-glow rounded-full px-7 bg-accent text-accent-foreground border-accent-border shadow-lg shadow-accent/20 w-full sm:w-auto"
                   data-testid="button-hero-primary-cta"
                 >
                   Check If It's a Scam
@@ -235,22 +371,7 @@ export function HeroSection() {
           >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-3xl lg:max-w-4xl mx-auto lg:mx-0">
               {stats.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.7 + i * 0.08 }}
-                  className="flex items-center gap-3 bg-white/5 border border-white/8 rounded-xl px-4 py-3"
-                  data-testid={`stat-hero-${stat.label.toLowerCase().replace(/[,\s]+/g, "-")}`}
-                >
-                  <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
-                    <stat.icon className="w-[18px] h-[18px] text-primary" />
-                  </div>
-                  <div>
-                    <div className="text-lg sm:text-xl font-bold text-white tabular-nums leading-none">{stat.value}</div>
-                    <div className="text-[11px] text-white/45 font-medium mt-0.5 leading-tight">{stat.label}</div>
-                  </div>
-                </motion.div>
+                <AnimatedStat key={stat.label} stat={stat} index={i} />
               ))}
             </div>
           </motion.div>
