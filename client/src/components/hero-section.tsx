@@ -228,8 +228,8 @@ function HeroScamChecker() {
 }
 
 const trustPoints = [
-  { icon: Zap, text: "AI-powered analysis detects phishing, social engineering, and deepfake patterns" },
-  { icon: ShieldCheck, text: "Cross-references PhishTank, URLhaus, VirusTotal, and 5 more live feeds" },
+  { icon: ShieldCheck, text: "Scans against PhishTank, URLhaus, VirusTotal, and 5 more live threat feeds" },
+  { icon: Zap, text: "Detects phishing, deepfakes, social engineering, and AI-generated scam patterns" },
   { icon: Eye, text: "No account required. Your data is never stored or sold." },
 ];
 

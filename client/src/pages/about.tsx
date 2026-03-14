@@ -18,8 +18,8 @@ import ctaBackgroundImage from "@/assets/images/about-cta-background.png";
 
 const aboutArticleSchema: ArticleData = {
   type: "Article",
-  headline: "About GetCyberRight: AI-Powered Cybersecurity for Real People",
-  description: "GetCyberRight is an AI-powered digital safety platform that helps families, seniors, and small businesses protect themselves from AI-generated phishing, deepfake scams, identity theft, and data brokers.",
+  headline: "About GetCyberRight: Digital Safety Has Never Mattered More",
+  description: "The explosion of AI has made cybersecurity essential for everyone. GetCyberRight gives families, seniors, and small businesses practical tools and plain-language education to protect themselves from modern threats.",
   datePublished: "2024-01-15",
   dateModified: "2026-03-01",
   author: { name: "GetCyberRight", url: "https://getcyberright.com" },
@@ -35,19 +35,19 @@ const aboutBreadcrumbs: BreadcrumbData = {
 };
 
 const threatTypes = [
-  { icon: Mail, label: "AI-Generated Phishing", description: "Scammers now use AI to write flawless phishing emails with no typos, perfect branding, and personalized details scraped from your social media." },
-  { icon: UserX, label: "Deepfake Impersonation", description: "AI-generated voice clones and video deepfakes are being used to impersonate family members, CEOs, and government officials in real time." },
-  { icon: Heart, label: "Romance & Social Engineering", description: "AI chatbots run long-term romance scams simultaneously on thousands of victims, building trust over weeks before requesting money." },
-  { icon: Landmark, label: "Crypto & Investment Fraud", description: "Fake trading platforms with AI-generated testimonials and deepfake celebrity endorsements designed to steal your savings." },
-  { icon: Phone, label: "AI Voice Cloning Scams", description: "Criminals clone a family member's voice from a few seconds of audio, then call pretending to be in an emergency and asking for money." },
-  { icon: Eye, label: "Data Broker Exposure", description: "Over 501 companies collect and sell your personal information, giving scammers the details they need to make their attacks convincing." },
+  { icon: Mail, label: "Phishing at Scale", description: "AI tools now generate flawless phishing emails with perfect grammar, real branding, and personalized details. The old advice to 'look for typos' no longer works." },
+  { icon: UserX, label: "Deepfake Impersonation", description: "Voice cloning and video deepfakes allow criminals to impersonate family members, executives, and government officials with alarming accuracy." },
+  { icon: Heart, label: "Romance & Social Engineering", description: "Sophisticated social engineering scams build trust over weeks or months, often using AI chatbots to target thousands of victims at once." },
+  { icon: Landmark, label: "Crypto & Investment Fraud", description: "Fake trading platforms with fabricated testimonials and deepfake celebrity endorsements are designed to look indistinguishable from legitimate services." },
+  { icon: Phone, label: "Voice Cloning Scams", description: "A family member's voice can now be cloned from just a few seconds of audio, then used to make urgent calls requesting money." },
+  { icon: Eye, label: "Data Broker Exposure", description: "Over 501 companies collect and sell your personal information to anyone willing to pay, giving criminals the details they need to make attacks convincing." },
 ];
 
 const platformTools = [
   {
     icon: ScanLine,
-    title: "AI Scam Checker",
-    description: "Paste any suspicious message, email, link, or phone number. AI analyzes the content for social engineering patterns, cross-references 8 live threat intelligence feeds, and gives you a detailed risk breakdown.",
+    title: "Scam Checker",
+    description: "Paste any suspicious message, email, link, or phone number. It cross-references 8 live threat intelligence feeds and analyzes the content for social engineering patterns to give you a clear risk breakdown.",
     href: "/scam-checker",
     color: "text-red-400",
     bg: "bg-red-500/10",
@@ -117,11 +117,11 @@ export default function About() {
               <div className="max-w-xl">
                 <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-4" data-testid="text-about-label">About GetCyberRight</p>
                 <h1 id="about-hero-heading" className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-[1.1] mb-6" data-testid="text-about-heading">
-                  AI-Powered Protection
-                  <br />for Real People.
+                  Digital Safety Has Never
+                  <br />Mattered More.
                 </h1>
                 <p className="text-lg text-white/55 leading-relaxed mb-6">
-                  Scammers are using AI to create attacks that look real. GetCyberRight uses AI to catch them. We combine AI-powered scam detection, data broker removal, and plain-language education to give families, seniors, and small businesses the same level of protection that large enterprises have.
+                  The explosion of AI is transforming everything, including how criminals operate. Scams are more sophisticated, identity theft is easier, and personal data is more exposed than ever. GetCyberRight gives families, seniors, and small businesses the practical tools and knowledge they need to stay safe in this new reality.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link href="/scam-checker">
@@ -168,10 +168,10 @@ export default function About() {
                 <span className="text-sm font-semibold text-red-500 uppercase tracking-wider">The Problem</span>
               </div>
               <h2 id="problem-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-problem-heading">
-                Scammers Now Use AI. Your Defenses Should Too.
+                The Threat Landscape Has Fundamentally Changed
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                Cybercriminals are using the same AI tools that power ChatGPT and voice assistants to create attacks that are nearly impossible to detect by eye. AI-generated phishing, deepfake video calls, and cloned voices are targeting ordinary people, not just corporations.
+                The rise of AI has supercharged the tools available to cybercriminals. Scams that once required skilled hackers can now be generated at scale by anyone with access to freely available AI tools. Phishing emails are flawless. Deepfake voices sound real. And personal data is more exposed than ever.
               </p>
             </div>
 
@@ -198,7 +198,7 @@ export default function About() {
             <div className="mt-10 bg-red-500/[0.06] border border-red-500/15 rounded-xl p-5 sm:p-6 flex items-start gap-3.5" data-testid="text-problem-callout">
               <BadgeAlert className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-foreground/80 leading-relaxed">
-                <span className="font-semibold text-foreground">The reality:</span> AI has made scams faster, cheaper, and more convincing than ever. A single AI tool can generate thousands of personalized phishing emails in minutes. The old advice of "look for typos" no longer works. You need AI-powered tools to fight AI-powered threats.
+                <span className="font-semibold text-foreground">The reality:</span> The explosion of AI has lowered the barrier for cybercrime dramatically. What once required technical skill now takes minutes with freely available tools. Cybersecurity education and accessible protection tools are no longer optional. They are essential for everyone.
               </p>
             </div>
           </div>
@@ -212,10 +212,10 @@ export default function About() {
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">The Solution</span>
               </div>
               <h2 id="solution-heading" className="text-2xl sm:text-3xl font-bold text-white mb-4" data-testid="text-solution-heading">
-                AI-Powered Protection. Plain-Language Education.
+                Practical Tools. Plain-Language Education.
               </h2>
               <p className="text-white/50 leading-relaxed">
-                GetCyberRight uses AI to analyze suspicious content, detect social engineering patterns, and identify threats that humans miss. Combined with plain-language education and data broker removal, it gives everyday people the same level of protection that enterprises have.
+                GetCyberRight was built because the people who need cybersecurity the most have the fewest resources. We combine scam detection, data broker removal, and safety education into one platform designed for non-technical users. No jargon, no enterprise pricing, no technical expertise required to get started.
               </p>
             </div>
 
@@ -254,23 +254,23 @@ export default function About() {
                   <span className="text-sm font-semibold text-accent uppercase tracking-wider">Why This Matters</span>
                 </div>
                 <h2 id="impact-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-6" data-testid="text-impact-heading">
-                  AI Made Scams Unrecognizable. We Built Tools to Fight Back.
+                  Why This Matters Now More Than Ever
                 </h2>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    A grandmother who received a phone call in her grandson's cloned voice begging for bail money. A small business owner who wired $47,000 after a deepfake video call with someone who looked exactly like their CEO. A college student whose identity was stolen through an AI-generated job offer that passed every red-flag check.
+                    A grandmother who received a phone call in her grandson's cloned voice begging for bail money. A small business owner who wired $47,000 after a deepfake video call with someone who looked exactly like their CEO. A college student whose identity was stolen through a job offer so polished it passed every red-flag check.
                   </p>
                   <p>
-                    These are not hypothetical scenarios. They are happening right now. AI has removed the telltale signs that people used to rely on to spot scams: bad grammar, obvious fakes, generic messages. Today's attacks are personalized, polished, and nearly indistinguishable from legitimate communication.
+                    These are not hypothetical scenarios. They are happening right now. The explosion of AI has removed the telltale signs that people used to rely on to spot scams: bad grammar, obvious fakes, generic messages. Today's attacks are personalized, polished, and nearly indistinguishable from legitimate communication. Digital safety education is no longer a nice-to-have. It is a necessity.
                   </p>
                   <p>
-                    GetCyberRight was started by a family that experienced these attacks firsthand. Hacked social media accounts, impersonation scams targeting relatives, and repeated phone fraud that drained a family member's savings. We built AI-powered tools because we realized the old methods of spotting scams no longer work.
+                    GetCyberRight was started by a family that experienced these threats firsthand. Hacked social media accounts, impersonation scams targeting relatives, and repeated phone fraud that drained a family member's savings. That experience made one thing clear: the people who need cybersecurity the most have the fewest resources to protect themselves.
                   </p>
                   <blockquote className="border-l-4 border-accent pl-5 py-2 text-foreground font-medium bg-accent/5 text-lg rounded-r-lg">
-                    If scammers are using AI, your protection needs AI too.
+                    No family should have to learn cybersecurity the hard way.
                   </blockquote>
                   <p>
-                    That is the mission: use the same AI technology that powers modern scams to detect and stop them. Make it simple enough that a teenager, a grandparent, and a small business owner can all use it without technical knowledge.
+                    That is the mission: make digital safety simple, practical, and accessible so that a teenager, a grandparent, and a small business owner can all protect themselves without technical expertise.
                   </p>
                 </div>
               </div>
