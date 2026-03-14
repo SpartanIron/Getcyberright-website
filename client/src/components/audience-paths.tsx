@@ -81,7 +81,7 @@ export function AudiencePaths() {
                   <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
                     {path.title}
                   </h3>
-                  <p className="text-base text-white/70 leading-relaxed mb-4 line-clamp-2">
+                  <p className="text-base text-white/80 leading-relaxed mb-4 line-clamp-2">
                     {path.description}
                   </p>
                   <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 group-focus-visible:translate-y-0">
@@ -101,7 +101,7 @@ export function AudiencePaths() {
                   <ArrowRight className="w-6 h-6 text-primary" />
                 </div>
                 <div className="text-xl font-bold text-white mb-2">Explore All Resources</div>
-                <p className="text-sm text-white/60 mb-5">Guides, tools, and training for everyone</p>
+                <p className="text-sm text-white/75 mb-5">Guides, tools, and training for everyone</p>
                 <span className="inline-flex items-center gap-2 text-base font-semibold text-primary group-hover:gap-3 transition-all" data-testid="link-more-resources">
                   See everything <ArrowRight className="w-5 h-5 cta-arrow-right" />
                 </span>

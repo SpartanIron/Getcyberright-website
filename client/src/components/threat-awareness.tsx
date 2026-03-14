@@ -54,7 +54,7 @@ export function ThreatAwareness() {
           <h2 id="threat-heading" className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-6" data-testid="text-threat-heading">
             Online scams have changed. Most people have not caught up.
           </h2>
-          <p className="text-lg text-white/55 leading-relaxed mb-10">
+          <p className="text-lg text-white/75 leading-relaxed mb-10">
             Scam messages now look identical to real ones from your bank, employer, or favorite stores. Criminals can copy someone's voice to make phone calls. And your personal data is being collected and sold at a massive scale.
           </p>
 
@@ -63,8 +63,8 @@ export function ThreatAwareness() {
               <div key={threat.stat} className="bg-white/[0.05] border border-white/[0.10] rounded-xl p-5 hover:bg-white/[0.08] hover:border-primary/20 transition-all duration-300" data-testid={`stat-threat-${threat.stat.replace(/[^a-z0-9]/gi, "").toLowerCase()}`}>
                 <threat.icon className="w-5 h-5 text-primary mb-3" />
                 <div className="text-2xl sm:text-3xl font-extrabold text-primary mb-1">{threat.stat}</div>
-                <div className="text-sm text-white/55 leading-snug">{threat.label}</div>
-                <div className="text-[11px] text-white/30 mt-2 uppercase tracking-wider font-medium">{threat.source}</div>
+                <div className="text-sm text-white/70 leading-snug">{threat.label}</div>
+                <div className="text-[11px] text-white/50 mt-2 uppercase tracking-wider font-medium">{threat.source}</div>
               </div>
             ))}
           </div>

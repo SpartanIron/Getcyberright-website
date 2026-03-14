@@ -58,7 +58,7 @@ export function PillarTiles() {
           <h2 id="pillars-heading" className="text-4xl sm:text-5xl font-extrabold text-white mb-5" data-testid="text-pillars-heading">
             What We Do
           </h2>
-          <p className="text-xl text-white/60 leading-relaxed">
+          <p className="text-xl text-white/75 leading-relaxed">
             Three core tools that give everyday people the same level of protection that large organizations have. All free to get started.
           </p>
         </div>
@@ -90,7 +90,7 @@ export function PillarTiles() {
                   <feature.icon className={`w-6 h-6 ${feature.accentText}`} />
                   <h3 className="text-xl sm:text-2xl font-bold text-white">{feature.title}</h3>
                 </div>
-                <p className="text-base text-white/60 leading-relaxed mb-6">{feature.description}</p>
+                <p className="text-base text-white/75 leading-relaxed mb-6">{feature.description}</p>
 
                 <Button
                   asChild

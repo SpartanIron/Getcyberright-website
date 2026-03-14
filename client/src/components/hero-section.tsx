@@ -117,7 +117,7 @@ export function HeroSection() {
               </h1>
 
               <p
-                className="text-lg sm:text-xl text-white/65 leading-relaxed mb-10 max-w-lg"
+                className="text-lg sm:text-xl text-white/80 leading-relaxed mb-10 max-w-lg"
                 data-testid="text-hero-subtext"
               >
                 Scams cost families $12.5 billion last year. Paste any suspicious message, link, or phone number and our AI checks it against 8 trusted security databases in seconds.
@@ -135,15 +135,15 @@ export function HeroSection() {
                     <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
                   </Link>
                 </Button>
-                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/60 hover:text-white/80 transition-colors group font-medium">
+                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/70 hover:text-white/90 transition-colors group font-medium">
                   Explore all free tools
                   <ArrowRight className="w-4 h-4 cta-arrow-right" />
                 </Link>
               </div>
 
-              <div className="flex items-center gap-6 text-sm text-white/45">
-                <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary/70" /> No account needed</span>
-                <span className="flex items-center gap-2"><Eye className="w-4 h-4 text-primary/70" /> Nothing stored</span>
+              <div className="flex items-center gap-6 text-sm text-white/60">
+                <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /> No account needed</span>
+                <span className="flex items-center gap-2"><Eye className="w-4 h-4 text-primary" /> Nothing stored</span>
               </div>
             </div>
 
@@ -166,7 +166,7 @@ export function HeroSection() {
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-white">Trusted by families worldwide</div>
-                    <div className="text-xs text-white/50">Backed by FBI, CISA, INTERPOL data</div>
+                    <div className="text-xs text-white/65">Backed by FBI, CISA, INTERPOL data</div>
                   </div>
                 </div>
               </div>

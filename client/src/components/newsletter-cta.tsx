@@ -100,13 +100,13 @@ export function NewsletterCTA() {
         <h2 id="newsletter-heading" className="text-4xl sm:text-5xl font-extrabold text-white mb-5" data-testid="text-newsletter-heading">
           Stay One Step Ahead
         </h2>
-        <p className="text-xl text-white/60 mb-8 leading-relaxed">
+        <p className="text-xl text-white/80 mb-8 leading-relaxed">
           Join families who get weekly scam alerts, safety tips, and tool updates delivered to their inbox. Free, no spam, unsubscribe anytime.
         </p>
 
         <div className="flex flex-wrap justify-center gap-5 sm:gap-6 mb-10">
           {benefits.map((benefit) => (
-            <span key={benefit} className="flex items-center gap-2 text-base text-white/50">
+            <span key={benefit} className="flex items-center gap-2 text-base text-white/70">
               <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
               {benefit}
             </span>
@@ -136,15 +136,15 @@ export function NewsletterCTA() {
           </Button>
         </form>
 
-        <div className="flex items-center justify-center gap-2 text-white/30 text-sm">
+        <div className="flex items-center justify-center gap-2 text-white/50 text-sm">
           <Shield className="w-3.5 h-3.5" />
           <span>Your email is never shared or sold.</span>
         </div>
 
-        <p className="text-white/40 text-[11px] mt-4">
+        <p className="text-white/50 text-[11px] mt-4">
           This site is protected by reCAPTCHA and the Google{' '}
-          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-white/40">Privacy Policy</a> and{' '}
-          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-white/40">Terms of Service</a> apply.
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-white/60">Privacy Policy</a> and{' '}
+          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-white/60">Terms of Service</a> apply.
         </p>
       </div>
     </section>

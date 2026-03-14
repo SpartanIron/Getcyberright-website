@@ -23,7 +23,7 @@ export function CTAFooter() {
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white" data-testid="text-cta-footer-heading">
               Your family's safety is worth 5 minutes.
             </h2>
-            <p className="text-lg text-white/70 mt-3">
+            <p className="text-lg text-white/80 mt-3">
               Take a quick safety check and find out where your family stands. No account needed, no data stored.
             </p>
           </div>
