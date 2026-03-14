@@ -82,11 +82,11 @@ export function PillarTiles() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="rounded-xl font-semibold text-base px-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    className="rounded-full font-semibold text-base px-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                     data-testid={`button-feature-${feature.id}`}
                   >
                     {feature.cta}
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
                   </Button>
                 </Link>
               </div>

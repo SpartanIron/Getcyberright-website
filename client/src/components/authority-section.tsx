@@ -31,10 +31,10 @@ export function AuthoritySection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-xl font-semibold text-base px-8"
+                className="rounded-full font-semibold text-base px-8"
                 data-testid="button-learn-mission"
               >
-                About Our Mission <ArrowRight className="ml-2 w-5 h-5" />
+                About Our Mission <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
               </Button>
             </Link>
           </div>

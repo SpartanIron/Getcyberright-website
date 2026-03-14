@@ -16,9 +16,9 @@ export function CTAFooter() {
             </p>
           </div>
           <Link href="/cyber-hygiene">
-            <Button size="lg" className="bg-accent text-accent-foreground border-accent-border rounded-xl px-8 font-semibold text-base" data-testid="button-cta-footer">
+            <Button size="lg" className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold text-base" data-testid="button-cta-footer">
               Take the Safety Check
-              <ArrowRight className="ml-2 w-5 h-5" />
+              <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
             </Button>
           </Link>
         </div>

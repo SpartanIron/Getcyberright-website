@@ -101,7 +101,7 @@ export function NewsletterCTA() {
             aria-label="Email address for newsletter"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="flex-1 h-12 text-base bg-white/[0.06] border-white/10 text-white placeholder:text-white/30 focus:ring-2 focus:ring-primary rounded-xl"
+            className="flex-1 h-12 text-base bg-white/[0.06] border-white/10 text-white placeholder:text-white/30 focus:ring-2 focus:ring-primary rounded-full px-5"
             disabled={subscribeMutation.isPending}
             data-testid="input-newsletter-email"
           />
@@ -109,11 +109,11 @@ export function NewsletterCTA() {
             type="submit"
             disabled={subscribeMutation.isPending}
             size="lg"
-            className="bg-accent text-accent-foreground border-accent-border rounded-xl px-8 font-semibold text-base h-12"
+            className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold text-base h-12"
             data-testid="button-newsletter-subscribe"
           >
             {subscribeMutation.isPending ? "Subscribing..." : "Subscribe"}
-            <ArrowRight className="ml-2 w-4 h-4" />
+            <ArrowRight className="ml-2 w-4 h-4 cta-arrow-right" />
           </Button>
         </form>
 

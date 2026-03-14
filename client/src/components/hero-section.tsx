@@ -173,7 +173,7 @@ function HeroScamChecker() {
           <Button
             onClick={handleAnalyze}
             disabled={!input.trim()}
-            className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 py-3 text-base rounded-xl shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all disabled:opacity-40 disabled:shadow-none"
+            className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 py-3 text-base rounded-full shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all disabled:opacity-40 disabled:shadow-none"
             data-testid="button-hero-analyze"
           >
             <Search className="w-4 h-4 mr-2" />
@@ -305,7 +305,7 @@ export function HeroSection() {
               <div className="hidden lg:block">
                 <Link href="/tools" className="inline-flex items-center gap-2.5 text-lg text-white/40 hover:text-white/60 transition-colors group">
                   Explore all free tools
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight className="w-5 h-5 cta-arrow-right" />
                 </Link>
               </div>
             </div>
