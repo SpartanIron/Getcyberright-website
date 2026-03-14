@@ -55,7 +55,7 @@ function useAnimatedCounter(target: number, duration: number = 1200) {
 function StatItem({ value, suffix, label }: { value: number; suffix: string; label: string }) {
   const count = useAnimatedCounter(value, value > 100 ? 1400 : 600);
   return (
-    <div className="text-center px-3" data-testid={`stat-hero-${label.toLowerCase().replace(/[,\s]+/g, "-")}`}>
+    <div className="text-center" data-testid={`stat-hero-${label.toLowerCase().replace(/[,\s]+/g, "-")}`}>
       <div className="text-2xl sm:text-3xl font-extrabold text-foreground tabular-nums leading-none">
         {count}{suffix}
       </div>
@@ -75,7 +75,7 @@ export function TrustStrip() {
         </div>
 
         <div className="border-t border-border pt-6">
-          <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-8">
             <div className="flex items-center gap-2.5 flex-shrink-0">
               <Shield className="w-5 h-5 text-primary" />
               <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
@@ -83,7 +83,7 @@ export function TrustStrip() {
               </span>
             </div>
             <div className="w-px h-6 bg-border hidden sm:block" />
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-6 sm:gap-x-8 gap-y-2">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-2">
               {sources.map((source) => (
                 <span
                   key={source}

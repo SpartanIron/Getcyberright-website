@@ -92,16 +92,17 @@ export function PillarTiles() {
                 </div>
                 <p className="text-base text-white/60 leading-relaxed mb-6">{feature.description}</p>
 
-                <Link href={feature.href}>
-                  <Button
-                    size="lg"
-                    className="rounded-full font-semibold text-base px-8 w-full sm:w-auto"
-                    data-testid={`button-feature-${feature.id}`}
-                  >
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-full font-semibold text-base px-8 w-full sm:w-auto"
+                  data-testid={`button-feature-${feature.id}`}
+                >
+                  <Link href={feature.href}>
                     {feature.cta}
                     <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </div>
           ))}

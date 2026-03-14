@@ -16,23 +16,23 @@ export function AuthoritySection() {
   return (
     <section className="py-20 sm:py-28 lg:py-32 bg-muted/30" data-testid="section-authority" aria-labelledby="authority-heading">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center">
-          <div className="hidden lg:block">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+          <div className="order-2 lg:order-1">
             <div className="relative">
               <div className="rounded-2xl overflow-hidden shadow-xl">
                 <img
                   src={authorityImg}
                   alt="Diverse family learning about online safety together"
-                  className="w-full h-auto object-cover"
+                  className="w-full h-64 sm:h-80 lg:h-auto object-cover"
                   loading="lazy"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-2xl -z-10" />
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-accent/10 rounded-2xl -z-10" />
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-2xl -z-10 hidden sm:block" />
+              <div className="absolute -top-4 -left-4 w-24 h-24 bg-accent/10 rounded-2xl -z-10 hidden sm:block" />
             </div>
           </div>
 
-          <div>
+          <div className="order-1 lg:order-2">
             <h2 id="authority-heading" className="text-4xl sm:text-5xl font-extrabold text-foreground mb-6" data-testid="text-authority-heading">
               Why People Trust GetCyberRight
             </h2>
@@ -53,16 +53,17 @@ export function AuthoritySection() {
               ))}
             </div>
 
-            <Link href="/about">
-              <Button
-                size="lg"
-                variant="outline"
-                className="rounded-full font-semibold text-base px-8"
-                data-testid="button-learn-mission"
-              >
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="rounded-full font-semibold text-base px-8"
+              data-testid="button-learn-mission"
+            >
+              <Link href="/about">
                 About Our Mission <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

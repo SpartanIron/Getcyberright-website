@@ -102,7 +102,7 @@ export function HeroSection() {
             <ThreatAlertBar />
           </div>
 
-          <div className="grid lg:grid-cols-[45%_55%] gap-10 lg:gap-14 items-center pb-16 sm:pb-20 lg:pb-24">
+          <div className="grid lg:grid-cols-[45%_55%] gap-8 lg:gap-14 items-center pb-14 sm:pb-18 lg:pb-24">
             <div className="max-w-xl pt-2 lg:pt-4">
               <h1
                 className="text-[2.75rem] sm:text-6xl lg:text-[4.25rem] font-extrabold tracking-tight text-white leading-[1.05] mb-7"

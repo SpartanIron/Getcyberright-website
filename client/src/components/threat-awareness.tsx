@@ -33,12 +33,12 @@ const threats = [
 export function ThreatAwareness() {
   return (
     <section className="relative overflow-hidden" data-testid="section-threat-awareness" aria-labelledby="threat-heading">
-      <div className="grid lg:grid-cols-2">
-        <div className="relative bg-[#001C48] py-20 sm:py-28 lg:py-32 px-5 sm:px-6 lg:px-12 xl:px-20">
+      <div className="grid lg:grid-cols-2 min-h-[600px]">
+        <div className="relative bg-[#001C48] py-20 sm:py-24 lg:py-28">
           <div className="absolute inset-0 bg-gradient-to-br from-[#001C48] via-[#001C48] to-[#00293C]/80" />
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/[0.03] to-transparent" />
 
-          <div className="relative max-w-xl lg:ml-auto">
+          <div className="relative max-w-xl mx-auto lg:mx-0 lg:ml-auto lg:mr-16 xl:mr-20 px-5 sm:px-6 lg:px-0">
             <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-full px-4 py-2 mb-8">
               <AlertTriangle className="w-4 h-4 text-red-400" />
               <span className="text-sm font-semibold text-red-400">The Threat Is Real</span>
@@ -51,7 +51,7 @@ export function ThreatAwareness() {
               Scam messages now look identical to real ones from your bank, employer, or favorite stores. Criminals can copy someone's voice to make phone calls. And your personal data is being collected and sold at a massive scale.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
               {threats.map((threat) => (
                 <div key={threat.stat} className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-5" data-testid={`stat-threat-${threat.stat.replace(/[^a-z0-9]/gi, "").toLowerCase()}`}>
                   <threat.icon className="w-5 h-5 text-primary/70 mb-3" />
@@ -76,14 +76,14 @@ export function ThreatAwareness() {
           </div>
         </div>
 
-        <div className="relative hidden lg:block">
+        <div className="relative lg:block">
           <img
             src={seniorsImg}
             alt="Diverse group of people learning about online safety"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="w-full h-64 sm:h-80 lg:absolute lg:inset-0 lg:h-full object-cover"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#001C48] via-transparent to-transparent w-1/3" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#001C48] via-transparent to-transparent w-1/3 hidden lg:block" />
         </div>
       </div>
     </section>

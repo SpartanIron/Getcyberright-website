@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ArrowRight, Shield } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import aboutFamilyImg from "@/assets/images/about-family-together.png";
 
 export function CTAFooter() {
@@ -27,12 +27,12 @@ export function CTAFooter() {
               Take a quick safety check and find out where your family stands. No account needed, no data stored.
             </p>
           </div>
-          <Link href="/cyber-hygiene">
-            <Button size="lg" className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold text-base flex-shrink-0" data-testid="button-cta-footer">
+          <Button asChild size="lg" className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold text-base flex-shrink-0" data-testid="button-cta-footer">
+            <Link href="/cyber-hygiene">
               Take the Safety Check
               <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
