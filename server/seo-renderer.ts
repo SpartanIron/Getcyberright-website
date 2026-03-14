@@ -712,7 +712,7 @@ function renderStaticToolPage(pagePath: string): string | null {
 function renderAboutPage(): string {
   const head = buildHead({
     title: "About GetCyberRight: Digital Safety Has Never Mattered More",
-    description: "The explosion of AI has made cybersecurity essential for everyone. GetCyberRight gives families, seniors, and small businesses practical scam detection, data broker removal, and safety education to stay protected.",
+    description: "Online scams have changed. GetCyberRight gives families, seniors, and small businesses the simple tools and knowledge they need to stay safe, including scam checking, data removal, and safety training.",
     url: "/about",
     type: "article",
     publishedTime: "2024-01-15",
@@ -723,7 +723,7 @@ function renderAboutPage(): string {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: "About GetCyberRight: Digital Safety Has Never Mattered More",
-    description: "The explosion of AI has made cybersecurity essential for everyone. GetCyberRight gives families, seniors, and small businesses practical tools and plain-language education to protect themselves from modern threats.",
+    description: "Online scams have changed. GetCyberRight gives families, seniors, and small businesses the simple tools and clear guidance they need to stay safe online.",
     datePublished: "2024-01-15",
     dateModified: "2026-03-01",
     author: { "@type": "Organization", name: "GetCyberRight", url: "https://getcyberright.com" },
@@ -741,12 +741,12 @@ function renderAboutPage(): string {
   });
 
   const faqSchema = buildFaqSchema([
-    { question: "What is GetCyberRight?", answer: "GetCyberRight is a digital safety platform that helps families, seniors, students, and small businesses protect themselves from phishing, deepfake scams, identity theft, and data brokers. It combines practical protection tools with plain-language education." },
-    { question: "Why is cybersecurity more important now?", answer: "The explosion of AI has made scams more sophisticated and harder to detect. Phishing emails are now flawless, voice cloning allows criminals to impersonate family members, and personal data is more exposed than ever. Digital safety education and tools are now essential for everyone, not just IT professionals." },
-    { question: "How does the Scam Checker work?", answer: "The Scam Checker lets you paste any suspicious message, email, link, or phone number. It cross-references 8 live threat intelligence feeds including PhishTank, URLhaus, and VirusTotal and analyzes the content for social engineering patterns to determine if it is a scam." },
-    { question: "What tools does GetCyberRight offer?", answer: "GetCyberRight offers a Scam Checker, Data Broker Removal covering 501+ brokers, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ cybersecurity guides, and real-time threat intelligence from 8 verified feeds across 13 regions." },
-    { question: "Is GetCyberRight free to use?", answer: "GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and educational content are available at no cost without requiring an account." },
-    { question: "Why was GetCyberRight created?", answer: "GetCyberRight was started by a family that experienced scams, impersonation attacks, and phone fraud firsthand. The mission is to make cybersecurity simple, practical, and accessible for everyone, because no family should have to learn digital safety the hard way." },
+    { question: "What is GetCyberRight?", answer: "GetCyberRight is an online safety platform that helps families, seniors, students, and small businesses protect themselves from scams, identity theft, and data exposure. It combines simple protection tools with easy-to-understand guides and training." },
+    { question: "Why is online safety more important now?", answer: "New technology has made scams harder to spot than ever. Fake emails now look perfect, criminals can copy someone's voice to make phone calls, and personal data is being collected and sold at a massive scale. Knowing how to protect yourself online is now essential for everyone." },
+    { question: "How does the Scam Checker work?", answer: "Paste any suspicious message, email, link, or phone number into the Scam Checker. It checks 8 trusted security databases and looks for common scam tactics to tell you whether it is safe or dangerous." },
+    { question: "What tools does GetCyberRight offer?", answer: "GetCyberRight offers a Scam Checker, Data Broker Removal covering 501+ companies, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ safety guides, and scam alerts covering 13 regions worldwide." },
+    { question: "Is GetCyberRight free to use?", answer: "GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and training content are available at no cost and do not require an account." },
+    { question: "Why was GetCyberRight created?", answer: "GetCyberRight was started by a family that experienced scams, impersonation, and phone fraud firsthand. The mission is to make online safety simple and available to everyone, because no family should have to learn these lessons the hard way." },
   ]);
 
   return `${head}
@@ -757,40 +757,40 @@ function renderAboutPage(): string {
 
   <header>
     <h1>About GetCyberRight: Digital Safety Has Never Mattered More</h1>
-    <p style="font-size:18px;color:#444;">The explosion of AI is transforming everything, including how criminals operate. Scams are more sophisticated, identity theft is easier, and personal data is more exposed than ever. GetCyberRight gives families, seniors, and small businesses the practical tools and knowledge they need to stay safe in this new reality.</p>
+    <p style="font-size:18px;color:#444;">The world is changing fast. New technology is making scams harder to spot, identity theft easier to pull off, and personal data easier to steal. GetCyberRight gives families, seniors, and small businesses the simple tools and knowledge they need to stay safe online.</p>
   </header>
 
   <section>
-    <h2>The Problem: The Threat Landscape Has Fundamentally Changed</h2>
-    <p>The rise of AI has supercharged the tools available to cybercriminals. Scams that once required skilled hackers can now be generated at scale by anyone with access to freely available AI tools. Phishing emails are flawless. Deepfake voices sound real. And personal data is more exposed than ever.</p>
+    <h2>The Problem: Online Scams Have Changed. Most People Have Not Caught Up.</h2>
+    <p>The rise of AI has given criminals powerful new tools. Scams that used to be easy to spot are now nearly perfect. Fake emails look real. Cloned voices sound like your family. And your personal data is being sold to anyone willing to pay for it.</p>
     <ul>
-      <li><strong>Phishing at Scale</strong> - AI tools now generate flawless phishing emails with perfect grammar, real branding, and personalized details. The old advice to "look for typos" no longer works.</li>
-      <li><strong>Deepfake Impersonation</strong> - Voice cloning and video deepfakes allow criminals to impersonate family members, executives, and government officials with alarming accuracy.</li>
-      <li><strong>Romance and Social Engineering</strong> - Sophisticated social engineering scams build trust over weeks or months, often using AI chatbots to target thousands of victims at once.</li>
-      <li><strong>Crypto and Investment Fraud</strong> - Fake trading platforms with fabricated testimonials and deepfake celebrity endorsements designed to look indistinguishable from legitimate services.</li>
-      <li><strong>Voice Cloning Scams</strong> - A family member's voice can now be cloned from just a few seconds of audio, then used to make urgent calls requesting money.</li>
-      <li><strong>Data Broker Exposure</strong> - Over 501 companies collect and sell personal information to anyone willing to pay, giving criminals the details they need to make attacks convincing.</li>
+      <li><strong>Fake Emails and Texts</strong> - Scam messages now look identical to real ones from your bank, employer, or favorite stores. Perfect grammar, real logos, and personal details make them nearly impossible to spot.</li>
+      <li><strong>Fake Voices and Video Calls</strong> - Criminals can now copy someone's voice or face to make calls and video chats that look and sound like a real person you know and trust.</li>
+      <li><strong>Romance and Trust Scams</strong> - Scammers build fake relationships over weeks or months to gain your trust before asking for money.</li>
+      <li><strong>Fake Investment Platforms</strong> - Fake trading platforms with made-up success stories and celebrity endorsements are designed to look exactly like the real thing.</li>
+      <li><strong>Cloned Voice Calls</strong> - A family member's voice can now be copied from just a few seconds of audio, then used to call you pretending to be in an emergency.</li>
+      <li><strong>Your Data Being Sold</strong> - Over 501 companies collect and sell your personal information to anyone willing to pay, giving scammers the details they need to trick you.</li>
     </ul>
-    <p>The explosion of AI has lowered the barrier for cybercrime dramatically. Cybersecurity education and accessible protection tools are no longer optional. They are essential for everyone.</p>
+    <p>Anyone can now create convincing scams using free online tools. Learning how to protect yourself online is no longer optional. It is essential for everyone.</p>
   </section>
 
   <section>
-    <h2>The Solution: Practical Tools. Plain-Language Education.</h2>
-    <p>GetCyberRight was built because the people who need cybersecurity the most have the fewest resources. We combine scam detection, data broker removal, and safety education into one platform designed for non-technical users.</p>
+    <h2>The Solution: Simple Tools. Clear Guidance. Real Protection.</h2>
+    <p>GetCyberRight was built because the people who need online safety the most have the fewest resources. We put scam checking, data removal, and safety training all in one place, designed for everyday people.</p>
     <ul>
-      <li><a href="/scam-checker"><strong>Scam Checker</strong></a> - Paste any suspicious message, email, link, or phone number. It cross-references 8 live threat intelligence feeds and analyzes the content for social engineering patterns to give you a clear risk breakdown.</li>
-      <li><a href="/data-removal"><strong>Data Broker Removal</strong></a> - We track 501+ companies that buy and sell your personal data. Step-by-step instructions to remove yourself from each one.</li>
-      <li><a href="/training"><strong>Training Academy</strong></a> - Structured courses that teach you how modern scams work and how to recognize them, designed for all skill levels.</li>
-      <li><a href="/ai-prompts"><strong>AI Safety Prompt Library</strong></a> - 406+ ready-to-use prompts that help you use AI tools like ChatGPT safely, without accidentally exposing sensitive information.</li>
-      <li><a href="/guides"><strong>Cybersecurity Guides</strong></a> - 125+ plain-language guides covering password security, two-factor authentication, safe browsing, and protecting your devices.</li>
+      <li><a href="/scam-checker"><strong>Scam Checker</strong></a> - Paste any suspicious message, email, link, or phone number. We check it against 8 trusted security databases and tell you whether it is safe or a scam.</li>
+      <li><a href="/data-removal"><strong>Data Broker Removal</strong></a> - We track 501+ companies that collect and sell your personal information. Get step-by-step instructions to remove yourself from each one.</li>
+      <li><a href="/training"><strong>Training Academy</strong></a> - Easy-to-follow courses that teach you how modern scams work and how to spot them, no technical background needed.</li>
+      <li><a href="/ai-prompts"><strong>AI Safety Prompt Library</strong></a> - 406+ ready-to-use prompts that help you use AI tools like ChatGPT safely, without accidentally sharing private information.</li>
+      <li><a href="/guides"><strong>Safety Guides</strong></a> - 125+ easy-to-read guides covering passwords, account security, safe browsing, and keeping your devices protected.</li>
     </ul>
   </section>
 
   <section>
     <h2>Why This Matters Now More Than Ever</h2>
-    <p>A grandmother who received a phone call in her grandson's cloned voice begging for bail money. A small business owner who wired $47,000 after a deepfake video call. A college student whose identity was stolen through a job offer so polished it passed every red-flag check.</p>
-    <p>The explosion of AI has removed the telltale signs that people used to rely on to spot scams. Today's attacks are personalized, polished, and nearly indistinguishable from legitimate communication. Digital safety education is no longer a nice-to-have. It is a necessity.</p>
-    <p>GetCyberRight was started by a family that experienced these threats firsthand. That experience made one thing clear: the people who need cybersecurity the most have the fewest resources to protect themselves. No family should have to learn cybersecurity the hard way.</p>
+    <p>A grandmother who got a phone call that sounded exactly like her grandson, begging for bail money. A small business owner who sent $47,000 after a video call with someone who looked just like their boss. A college student whose identity was stolen through a job offer that looked completely legitimate.</p>
+    <p>The warning signs people used to rely on, like bad spelling and obvious fakes, are gone. Today's scams are personal, polished, and almost impossible to tell apart from the real thing. Knowing how to stay safe online is no longer a nice-to-have. It is a necessity.</p>
+    <p>GetCyberRight was started by a family that went through this firsthand. That experience made one thing clear: the people who need protection the most have the fewest resources. No family should have to learn online safety the hard way.</p>
   </section>
 
   <section>
@@ -807,11 +807,11 @@ function renderAboutPage(): string {
   </section>
 
   <section>
-    <h2>Our Philosophy: Cybersecurity Should Not Require a Degree</h2>
-    <p>The biggest gap in cybersecurity is not technology. It is accessibility. The knowledge exists to prevent most scams, but it is locked behind corporate firewalls and technical jargon.</p>
+    <h2>Our Philosophy: Staying Safe Online Should Not Be Complicated</h2>
+    <p>The knowledge to prevent most scams already exists, but it has been locked away in technical language and expensive tools built for large companies. We believe everyone deserves access to it, in words they can understand.</p>
     <ul>
-      <li><strong>Accessible to Everyone</strong> - Every core tool and guide is free to use. No login walls for scam checking. No credit card required.</li>
-      <li><strong>Transparent and Trustworthy</strong> - We never sell your data. We never use fear-based marketing. Our tools are powered by verified, public threat intelligence sources.</li>
+      <li><strong>Available to Everyone</strong> - Every core tool and guide is free to use. No login required for scam checking. No credit card needed.</li>
+      <li><strong>Honest and Trustworthy</strong> - We never sell your data. We never use scare tactics to pressure you. Our tools use trusted, public security sources and we are upfront about how everything works.</li>
       <li><strong>Community Driven</strong> - The best way to support GetCyberRight is to share it with someone who needs it.</li>
     </ul>
   </section>
@@ -819,17 +819,17 @@ function renderAboutPage(): string {
   <section>
     <h2>Frequently Asked Questions</h2>
     <h3>What is GetCyberRight?</h3>
-    <p>GetCyberRight is a digital safety platform that helps families, seniors, students, and small businesses protect themselves from phishing, deepfake scams, identity theft, and data brokers. It combines practical protection tools with plain-language education.</p>
-    <h3>Why is cybersecurity more important now?</h3>
-    <p>The explosion of AI has made scams more sophisticated and harder to detect. Phishing emails are now flawless, voice cloning allows criminals to impersonate family members, and personal data is more exposed than ever. Digital safety education and tools are now essential for everyone, not just IT professionals.</p>
+    <p>GetCyberRight is an online safety platform that helps families, seniors, students, and small businesses protect themselves from scams, identity theft, and data exposure. It combines simple protection tools with easy-to-understand guides and training.</p>
+    <h3>Why is online safety more important now?</h3>
+    <p>New technology has made scams harder to spot than ever. Fake emails now look perfect, criminals can copy someone's voice to make phone calls, and personal data is being collected and sold at a massive scale. Knowing how to protect yourself online is now essential for everyone.</p>
     <h3>How does the Scam Checker work?</h3>
-    <p>The Scam Checker lets you paste any suspicious message, email, link, or phone number. It cross-references 8 live threat intelligence feeds including PhishTank, URLhaus, and VirusTotal and analyzes the content for social engineering patterns to determine if it is a scam.</p>
+    <p>Paste any suspicious message, email, link, or phone number into the Scam Checker. It checks 8 trusted security databases and looks for common scam tactics to tell you whether it is safe or dangerous.</p>
     <h3>What tools does GetCyberRight offer?</h3>
-    <p>GetCyberRight offers a Scam Checker, Data Broker Removal covering 501+ brokers, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ cybersecurity guides, and real-time threat intelligence from 8 verified feeds across 13 regions.</p>
+    <p>GetCyberRight offers a Scam Checker, Data Broker Removal covering 501+ companies, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ safety guides, and scam alerts covering 13 regions worldwide.</p>
     <h3>Is GetCyberRight free to use?</h3>
-    <p>GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and educational content are available at no cost without requiring an account.</p>
+    <p>GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and training content are available at no cost and do not require an account.</p>
     <h3>Why was GetCyberRight created?</h3>
-    <p>GetCyberRight was started by a family that experienced scams, impersonation attacks, and phone fraud firsthand. The mission is to make cybersecurity simple, practical, and accessible for everyone, because no family should have to learn digital safety the hard way.</p>
+    <p>GetCyberRight was started by a family that experienced scams, impersonation, and phone fraud firsthand. The mission is to make online safety simple and available to everyone, because no family should have to learn these lessons the hard way.</p>
   </section>
 
   ${buildFooter()}

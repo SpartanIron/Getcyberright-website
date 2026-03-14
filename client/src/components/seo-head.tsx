@@ -90,7 +90,7 @@ export const pageSEO = {
   },
   about: {
     title: "About Us: Digital Safety Has Never Mattered More",
-    description: "The explosion of AI has made cybersecurity essential for everyone. GetCyberRight gives families, seniors, and small businesses practical scam detection, data broker removal, and safety education to stay protected.",
+    description: "Online scams have changed. GetCyberRight gives families, seniors, and small businesses the simple tools and knowledge they need to stay safe, including scam checking, data removal, and safety training.",
   },
   login: {
     title: "Sign In",

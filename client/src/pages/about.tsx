@@ -19,7 +19,7 @@ import ctaBackgroundImage from "@/assets/images/about-cta-background.png";
 const aboutArticleSchema: ArticleData = {
   type: "Article",
   headline: "About GetCyberRight: Digital Safety Has Never Mattered More",
-  description: "The explosion of AI has made cybersecurity essential for everyone. GetCyberRight gives families, seniors, and small businesses practical tools and plain-language education to protect themselves from modern threats.",
+  description: "Online scams have changed. GetCyberRight gives families, seniors, and small businesses the simple tools and clear guidance they need to stay safe online.",
   datePublished: "2024-01-15",
   dateModified: "2026-03-01",
   author: { name: "GetCyberRight", url: "https://getcyberright.com" },
@@ -35,19 +35,19 @@ const aboutBreadcrumbs: BreadcrumbData = {
 };
 
 const threatTypes = [
-  { icon: Mail, label: "Phishing at Scale", description: "AI tools now generate flawless phishing emails with perfect grammar, real branding, and personalized details. The old advice to 'look for typos' no longer works." },
-  { icon: UserX, label: "Deepfake Impersonation", description: "Voice cloning and video deepfakes allow criminals to impersonate family members, executives, and government officials with alarming accuracy." },
-  { icon: Heart, label: "Romance & Social Engineering", description: "Sophisticated social engineering scams build trust over weeks or months, often using AI chatbots to target thousands of victims at once." },
-  { icon: Landmark, label: "Crypto & Investment Fraud", description: "Fake trading platforms with fabricated testimonials and deepfake celebrity endorsements are designed to look indistinguishable from legitimate services." },
-  { icon: Phone, label: "Voice Cloning Scams", description: "A family member's voice can now be cloned from just a few seconds of audio, then used to make urgent calls requesting money." },
-  { icon: Eye, label: "Data Broker Exposure", description: "Over 501 companies collect and sell your personal information to anyone willing to pay, giving criminals the details they need to make attacks convincing." },
+  { icon: Mail, label: "Fake Emails & Texts", description: "Scam messages now look identical to real ones from your bank, employer, or favorite stores. Perfect grammar, real logos, and details pulled from your social media make them nearly impossible to spot." },
+  { icon: UserX, label: "Fake Voices & Video Calls", description: "Criminals can now copy someone's voice or face to make calls and video chats that look and sound like a real person you know and trust." },
+  { icon: Heart, label: "Romance & Trust Scams", description: "Scammers build fake relationships over weeks or months to gain your trust before asking for money. Some use chatbots to target thousands of people at once." },
+  { icon: Landmark, label: "Fake Investment Platforms", description: "Fake trading platforms with made-up success stories and celebrity endorsements are designed to look exactly like the real thing." },
+  { icon: Phone, label: "Cloned Voice Calls", description: "A family member's voice can now be copied from just a few seconds of audio, then used to call you pretending to be in an emergency." },
+  { icon: Eye, label: "Your Data Being Sold", description: "Over 501 companies collect and sell your personal information to anyone willing to pay, giving scammers the details they need to trick you." },
 ];
 
 const platformTools = [
   {
     icon: ScanLine,
     title: "Scam Checker",
-    description: "Paste any suspicious message, email, link, or phone number. It cross-references 8 live threat intelligence feeds and analyzes the content for social engineering patterns to give you a clear risk breakdown.",
+    description: "Paste any suspicious message, email, link, or phone number. We check it against 8 trusted security databases and tell you whether it is safe or a scam.",
     href: "/scam-checker",
     color: "text-red-400",
     bg: "bg-red-500/10",
@@ -56,7 +56,7 @@ const platformTools = [
   {
     icon: Trash2,
     title: "Data Broker Removal",
-    description: "We track 501+ companies that buy and sell your personal data. Step-by-step instructions to remove yourself from each one.",
+    description: "We track 501+ companies that collect and sell your personal information. Get step-by-step instructions to remove yourself from each one.",
     href: "/data-removal",
     color: "text-teal-400",
     bg: "bg-teal-500/10",
@@ -65,7 +65,7 @@ const platformTools = [
   {
     icon: GraduationCap,
     title: "Training Academy",
-    description: "Structured courses that teach you how modern scams work and how to recognize them, designed for all skill levels.",
+    description: "Easy-to-follow courses that teach you how modern scams work and how to spot them, no technical background needed.",
     href: "/training",
     color: "text-blue-400",
     bg: "bg-blue-500/10",
@@ -74,7 +74,7 @@ const platformTools = [
   {
     icon: Zap,
     title: "AI Safety Prompt Library",
-    description: "406+ ready-to-use prompts that help you use AI tools like ChatGPT safely, without accidentally exposing sensitive information.",
+    description: "406+ ready-to-use prompts that help you use AI tools like ChatGPT safely, without accidentally sharing private information.",
     href: "/ai-prompts",
     color: "text-amber-400",
     bg: "bg-amber-500/10",
@@ -82,8 +82,8 @@ const platformTools = [
   },
   {
     icon: FileText,
-    title: "Cybersecurity Guides",
-    description: "125+ plain-language guides covering password security, two-factor authentication, safe browsing, and protecting your devices.",
+    title: "Safety Guides",
+    description: "125+ easy-to-read guides covering passwords, account security, safe browsing, and keeping your devices protected.",
     href: "/guides",
     color: "text-violet-400",
     bg: "bg-violet-500/10",
@@ -92,12 +92,12 @@ const platformTools = [
 ];
 
 const credibilityStats = [
-  { value: "501+", label: "Data Brokers Tracked", detail: "Companies monitored for selling personal data" },
-  { value: "406+", label: "AI Safety Prompts", detail: "Ready-to-use prompts for secure AI usage" },
-  { value: "125+", label: "Safety Guides", detail: "Plain-language cybersecurity resources" },
-  { value: "8", label: "Threat Intelligence Feeds", detail: "Real-time data from PhishTank, URLhaus, VirusTotal, and more" },
-  { value: "13", label: "Regions Covered", detail: "Scam alerts localized for regions worldwide" },
-  { value: "52+", label: "Scam Categories", detail: "Detailed guides on specific scam types" },
+  { value: "501+", label: "Data Brokers Tracked", detail: "Companies we monitor that sell your personal information" },
+  { value: "406+", label: "AI Safety Prompts", detail: "Ready-to-use prompts for using AI tools safely" },
+  { value: "125+", label: "Safety Guides", detail: "Easy-to-read guides on staying safe online" },
+  { value: "8", label: "Security Databases", detail: "Trusted sources we check to verify if something is a scam" },
+  { value: "13", label: "Regions Covered", detail: "Scam alerts tailored for regions around the world" },
+  { value: "52+", label: "Scam Types Covered", detail: "Detailed guides on specific kinds of scams" },
 ];
 
 export default function About() {
@@ -121,7 +121,7 @@ export default function About() {
                   <br />Mattered More.
                 </h1>
                 <p className="text-lg text-white/55 leading-relaxed mb-6">
-                  The explosion of AI is transforming everything, including how criminals operate. Scams are more sophisticated, identity theft is easier, and personal data is more exposed than ever. GetCyberRight gives families, seniors, and small businesses the practical tools and knowledge they need to stay safe in this new reality.
+                  The world is changing fast. New technology is making scams harder to spot, identity theft easier to pull off, and personal data easier to steal. GetCyberRight gives families, seniors, and small businesses the simple tools and knowledge they need to stay safe online.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link href="/scam-checker">
@@ -168,10 +168,10 @@ export default function About() {
                 <span className="text-sm font-semibold text-red-500 uppercase tracking-wider">The Problem</span>
               </div>
               <h2 id="problem-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-problem-heading">
-                The Threat Landscape Has Fundamentally Changed
+                Online Scams Have Changed. Most People Have Not Caught Up.
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                The rise of AI has supercharged the tools available to cybercriminals. Scams that once required skilled hackers can now be generated at scale by anyone with access to freely available AI tools. Phishing emails are flawless. Deepfake voices sound real. And personal data is more exposed than ever.
+                The rise of AI has given criminals powerful new tools. Scams that used to be easy to spot are now nearly perfect. Fake emails look real. Cloned voices sound like your family. And your personal data is being sold to anyone willing to pay for it.
               </p>
             </div>
 
@@ -198,7 +198,7 @@ export default function About() {
             <div className="mt-10 bg-red-500/[0.06] border border-red-500/15 rounded-xl p-5 sm:p-6 flex items-start gap-3.5" data-testid="text-problem-callout">
               <BadgeAlert className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-foreground/80 leading-relaxed">
-                <span className="font-semibold text-foreground">The reality:</span> The explosion of AI has lowered the barrier for cybercrime dramatically. What once required technical skill now takes minutes with freely available tools. Cybersecurity education and accessible protection tools are no longer optional. They are essential for everyone.
+                <span className="font-semibold text-foreground">The reality:</span> Anyone can now create convincing scams using free online tools. What used to take a skilled criminal now takes minutes. Learning how to protect yourself online is no longer optional. It is essential for everyone.
               </p>
             </div>
           </div>
@@ -212,10 +212,10 @@ export default function About() {
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">The Solution</span>
               </div>
               <h2 id="solution-heading" className="text-2xl sm:text-3xl font-bold text-white mb-4" data-testid="text-solution-heading">
-                Practical Tools. Plain-Language Education.
+                Simple Tools. Clear Guidance. Real Protection.
               </h2>
               <p className="text-white/50 leading-relaxed">
-                GetCyberRight was built because the people who need cybersecurity the most have the fewest resources. We combine scam detection, data broker removal, and safety education into one platform designed for non-technical users. No jargon, no enterprise pricing, no technical expertise required to get started.
+                GetCyberRight was built because the people who need online safety the most have the fewest resources. We put scam checking, data removal, and safety training all in one place, designed for everyday people. No confusing language, no expensive subscriptions, and no technical knowledge needed to get started.
               </p>
             </div>
 
@@ -258,19 +258,19 @@ export default function About() {
                 </h2>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    A grandmother who received a phone call in her grandson's cloned voice begging for bail money. A small business owner who wired $47,000 after a deepfake video call with someone who looked exactly like their CEO. A college student whose identity was stolen through a job offer so polished it passed every red-flag check.
+                    A grandmother who got a phone call that sounded exactly like her grandson, begging for bail money. A small business owner who sent $47,000 after a video call with someone who looked just like their boss. A college student whose identity was stolen through a job offer that looked completely legitimate.
                   </p>
                   <p>
-                    These are not hypothetical scenarios. They are happening right now. The explosion of AI has removed the telltale signs that people used to rely on to spot scams: bad grammar, obvious fakes, generic messages. Today's attacks are personalized, polished, and nearly indistinguishable from legitimate communication. Digital safety education is no longer a nice-to-have. It is a necessity.
+                    These are not made-up stories. They are happening right now. The warning signs people used to rely on, like bad spelling, obvious fakes, and generic messages, are gone. Today's scams are personal, polished, and almost impossible to tell apart from the real thing. Knowing how to stay safe online is no longer a nice-to-have. It is a necessity.
                   </p>
                   <p>
-                    GetCyberRight was started by a family that experienced these threats firsthand. Hacked social media accounts, impersonation scams targeting relatives, and repeated phone fraud that drained a family member's savings. That experience made one thing clear: the people who need cybersecurity the most have the fewest resources to protect themselves.
+                    GetCyberRight was started by a family that went through this firsthand. Hacked social media accounts, scammers pretending to be relatives, and repeated phone scams that drained a family member's savings. That experience made one thing clear: the people who need protection the most have the fewest resources.
                   </p>
                   <blockquote className="border-l-4 border-accent pl-5 py-2 text-foreground font-medium bg-accent/5 text-lg rounded-r-lg">
-                    No family should have to learn cybersecurity the hard way.
+                    No family should have to learn online safety the hard way.
                   </blockquote>
                   <p>
-                    That is the mission: make digital safety simple, practical, and accessible so that a teenager, a grandparent, and a small business owner can all protect themselves without technical expertise.
+                    That is the mission: make online safety simple, practical, and available to everyone so that a teenager, a grandparent, and a small business owner can all protect themselves without needing a technical background.
                   </p>
                 </div>
               </div>
@@ -322,10 +322,10 @@ export default function About() {
                 <span className="text-sm font-semibold text-primary uppercase tracking-wider">Our Philosophy</span>
               </div>
               <h2 id="philosophy-heading" className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-philosophy-heading">
-                Cybersecurity Should Not Require a Degree
+                Staying Safe Online Should Not Be Complicated
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                The biggest gap in cybersecurity is not technology. It is accessibility. The knowledge exists to prevent most scams, but it is locked behind corporate firewalls and technical jargon. We are changing that.
+                The knowledge to prevent most scams already exists, but it has been locked away in technical language and expensive tools built for large companies. We believe everyone deserves access to it, in words they can understand.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -344,7 +344,7 @@ export default function About() {
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">Transparent and Trustworthy</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  We never sell your data. We never use fear-based marketing. Our tools are powered by verified, public threat intelligence sources that anyone can audit.
+                  We never sell your data. We never use scare tactics to pressure you. Our tools use trusted, public security sources and we are upfront about how everything works.
                 </p>
               </div>
               <div className="bg-card border border-border rounded-xl p-6 text-center" data-testid="philosophy-community">

@@ -167,8 +167,8 @@ function HeroScamChecker() {
         <div className="flex items-center justify-between mt-4 gap-3">
           <div className="hidden sm:flex items-center gap-3 text-[11px] text-white/30">
             <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> Private</span>
-            <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> AI-Powered</span>
-            <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 8 Threat Feeds</span>
+            <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Instant Results</span>
+            <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 8 Security Databases</span>
           </div>
           <Button
             onClick={handleAnalyze}
@@ -228,15 +228,15 @@ function HeroScamChecker() {
 }
 
 const trustPoints = [
-  { icon: ShieldCheck, text: "Scans against PhishTank, URLhaus, VirusTotal, and 5 more live threat feeds" },
-  { icon: Zap, text: "Detects phishing, deepfakes, social engineering, and AI-generated scam patterns" },
+  { icon: ShieldCheck, text: "Checks 8 trusted security databases used by professionals worldwide" },
+  { icon: Zap, text: "Spots fake emails, cloned voices, manipulation tactics, and new scam patterns" },
   { icon: Eye, text: "No account required. Your data is never stored or sold." },
 ];
 
 const stats = [
   { value: 500, suffix: "+", label: "Data Brokers Tracked", duration: 1400 },
   { value: 406, suffix: "+", label: "AI Safety Prompts", duration: 1200 },
-  { value: 8, suffix: "", label: "Live Threat Feeds", duration: 600 },
+  { value: 8, suffix: "", label: "Security Databases", duration: 600 },
   { value: 125, suffix: "+", label: "Safety Guides", duration: 1000 },
 ];
 
