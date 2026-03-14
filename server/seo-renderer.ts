@@ -709,6 +709,159 @@ function renderStaticToolPage(pagePath: string): string | null {
 </body></html>`;
 }
 
+function renderHomePage(): string {
+  const head = buildHead({
+    title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
+    description: "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training. Trusted by thousands of families worldwide.",
+    url: "/",
+    type: "website",
+  });
+
+  const orgSchema = buildJsonLd({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "GetCyberRight",
+    url: "https://www.getcyberright.com",
+    logo: "https://www.getcyberright.com/og-image.png",
+    description: "A free, family-focused cybersecurity education platform providing practical safety tools and training to protect families, parents, kids, seniors, and small businesses from online threats.",
+    sameAs: [
+      "https://www.facebook.com/getcyberright",
+      "https://www.linkedin.com/company/getcyberright",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      email: "tips@getcyberright.com",
+      contactType: "customer support",
+    },
+  });
+
+  const websiteSchema = buildJsonLd({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "GetCyberRight",
+    url: "https://www.getcyberright.com",
+    description: "Free cybersecurity education platform for families, parents, kids, and seniors. Tools and training to protect against scams, data brokers, and online threats.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://www.getcyberright.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  });
+
+  const faqSchema = buildFaqSchema([
+    { question: "What is GetCyberRight?", answer: "GetCyberRight is a free cybersecurity education platform designed for families, parents, kids, seniors, and everyday people. We provide practical tools, training, and guides to help you stay safe online." },
+    { question: "Is GetCyberRight really free?", answer: "Yes, GetCyberRight is free to get started. Our core tools, guides, and training resources are available at no cost." },
+    { question: "What tools does GetCyberRight offer?", answer: "We offer an AI Scam Checker that analyzes URLs, emails, and QR codes; a Data Broker Removal tool covering 501+ sites; a Password Generator; a Cyber Threat Radar; and more." },
+    { question: "Who is GetCyberRight for?", answer: "GetCyberRight is for everyone, including families, parents, kids, seniors, educators, and small businesses. We provide audience-specific content tailored to different experience levels." },
+    { question: "How does the AI Scam Checker work?", answer: "Our AI Scam Checker uses multiple security databases including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score." },
+  ]);
+
+  return `${head}
+<body style="font-family:Inter,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+  ${orgSchema}
+  ${websiteSchema}
+  ${faqSchema}
+
+  <header>
+    <h1>GetCyberRight: Free Cybersecurity Education for Families</h1>
+    <p style="font-size:18px;color:#444;">Protect your family online with free cybersecurity tools, AI-powered scam detection, and practical safety training. Trusted by thousands of families worldwide.</p>
+  </header>
+
+  <section>
+    <h2>Free Cybersecurity Tools</h2>
+    <ul>
+      <li><a href="/scam-checker">AI Scam Checker</a> - Analyze suspicious URLs, emails, text messages, and QR codes with real-time threat intelligence</li>
+      <li><a href="/data-removal">Data Broker Removal</a> - Remove your personal information from 501+ data broker sites</li>
+      <li><a href="/password-generator">Password Generator</a> - Create strong, unique passwords instantly</li>
+      <li><a href="/cyber-threat-radar">Cyber Threat Radar</a> - Real-time cybersecurity threat monitoring dashboard</li>
+      <li><a href="/breach-dashboard">Breach Monitor</a> - Check if your data has been exposed in known breaches</li>
+      <li><a href="/ai-prompts">AI Prompt Library</a> - 406+ cybersecurity prompts for AI assistants</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Cybersecurity Education for Every Audience</h2>
+    <ul>
+      <li><a href="/kids">Kids Digital Safety Hub</a> - Age-appropriate cybersecurity lessons and activities</li>
+      <li><a href="/seniors">Senior Safety Center</a> - Protection against scams targeting older adults</li>
+      <li><a href="/parents">Parents Guide</a> - Tools to keep your children safe online</li>
+      <li><a href="/educators">Educator Resources</a> - Cybersecurity curriculum and teaching materials</li>
+      <li><a href="/small-business">Small Business Security</a> - Affordable cybersecurity for small businesses</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Cyber Safety Guides &amp; Training</h2>
+    <ul>
+      <li><a href="/guides">Cyber Safety Guides</a> - Step-by-step guides to protect yourself online</li>
+      <li><a href="/training">Training Academy</a> - Structured learning paths for all skill levels</li>
+      <li><a href="/awareness-hub">Awareness Hub</a> - Visual safety guides, checklists, and resources</li>
+      <li><a href="/checklists">Security Checklists</a> - Printable checklists for digital safety</li>
+      <li><a href="/ai-safety">AI Safety Guide</a> - Understanding and defending against AI-powered threats</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Scam Intelligence &amp; Threat Alerts</h2>
+    <ul>
+      <li><a href="/scam-intel">Scam Intelligence Center</a> - Region-aware scam database with risk assessments</li>
+      <li><a href="/alerts">Threat Alerts</a> - Real-time alerts about active cyber threats</li>
+      <li><a href="/threat-trends">Threat Trends</a> - Emerging cybersecurity trends and analysis</li>
+      <li><a href="/report-scam">Report a Scam</a> - Help the community by reporting scam attempts</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Common Scams to Watch For</h2>
+    <ul>
+      <li><a href="/scams/phishing">Phishing Scams</a> - How to spot and avoid phishing attacks</li>
+      <li><a href="/scams/romance-scam">Romance Scams</a> - Protecting yourself from online romance fraud</li>
+      <li><a href="/scams/tech-support-scam">Tech Support Scams</a> - Recognizing fake tech support calls</li>
+      <li><a href="/scams/ai-deepfake-scam">AI Deepfake Scams</a> - Defending against AI-generated fraud</li>
+      <li><a href="/scams/grandparent-scam">Grandparent Scams</a> - Protecting seniors from family emergency scams</li>
+      <li><a href="/scams/identity-theft">Identity Theft</a> - Prevention and recovery guide</li>
+      <li><a href="/scams/crypto-scam">Cryptocurrency Scams</a> - Avoiding crypto fraud and fake investments</li>
+      <li><a href="/scams/amazon-scam">Amazon Scams</a> - Spotting fake Amazon communications</li>
+    </ul>
+    <p><a href="/tools">View all 52 scam guides</a></p>
+  </section>
+
+  <section>
+    <h2>Cybersecurity Topics</h2>
+    <ul>
+      <li><a href="/topics/identity-theft">Identity Theft Prevention</a></li>
+      <li><a href="/topics/online-scams">Online Scams</a></li>
+      <li><a href="/topics/phishing-attacks">Phishing Attacks</a></li>
+      <li><a href="/topics/cyber-safety-seniors">Cyber Safety for Seniors</a></li>
+      <li><a href="/topics/cyber-safety-kids">Cyber Safety for Kids</a></li>
+      <li><a href="/topics/password-security">Password Security</a></li>
+      <li><a href="/topics/privacy-protection">Privacy Protection</a></li>
+      <li><a href="/topics/device-security">Device Security</a></li>
+      <li><a href="/topics/data-breaches">Data Breaches</a></li>
+      <li><a href="/topics/social-media-security">Social Media Security</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Frequently Asked Questions</h2>
+    <h3>What is GetCyberRight?</h3>
+    <p>GetCyberRight is a free cybersecurity education platform designed for families, parents, kids, seniors, and everyday people. We provide practical tools, training, and guides to help you stay safe online.</p>
+    <h3>Is GetCyberRight really free?</h3>
+    <p>Yes, GetCyberRight is free to get started. Our core tools, guides, and training resources are available at no cost.</p>
+    <h3>What tools does GetCyberRight offer?</h3>
+    <p>We offer an AI Scam Checker that analyzes URLs, emails, and QR codes; a Data Broker Removal tool covering 501+ sites; a Password Generator; a Cyber Threat Radar; and more.</p>
+    <h3>Who is GetCyberRight for?</h3>
+    <p>GetCyberRight is for everyone, including families, parents, kids, seniors, educators, and small businesses. We provide audience-specific content tailored to different experience levels.</p>
+    <h3>How does the AI Scam Checker work?</h3>
+    <p>Our AI Scam Checker uses multiple security databases including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score.</p>
+  </section>
+
+  ${buildFooter()}
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body></html>`;
+}
+
 export function seoMiddleware() {
   return async (req: Request, res: Response, next: NextFunction) => {
     const ua = req.get("User-Agent");
@@ -718,8 +871,12 @@ export function seoMiddleware() {
     let html: string | null = null;
 
     try {
+      if (path === "/") {
+        html = renderHomePage();
+      }
+
       const guideMatch = path.match(/^\/guides\/([a-z0-9-]+)$/);
-      if (guideMatch) {
+      if (!html && guideMatch) {
         html = await renderGuidePage(guideMatch[1]);
       }
 
