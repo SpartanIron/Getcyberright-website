@@ -93,11 +93,16 @@ export function AudiencePaths() {
           ))}
 
           <Link href="/resources">
-            <div className="group relative rounded-2xl overflow-hidden cursor-pointer h-72 sm:h-80 bg-slate-900 flex items-center justify-center" data-testid="card-audience-resources">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
+            <div className="group relative rounded-2xl overflow-hidden cursor-pointer h-72 sm:h-80 bg-gradient-to-br from-[#00293C] to-[#001C48] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" data-testid="card-audience-resources">
+              <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(circle at 20% 80%, hsl(var(--primary)) 0%, transparent 50%), radial-gradient(circle at 80% 20%, hsl(var(--accent)) 0%, transparent 50%)" }} />
+              <div className="absolute bottom-0 right-0 w-32 h-32 rounded-tl-[80px] bg-white/[0.03]" />
               <div className="relative text-center px-6">
-                <div className="text-lg font-semibold text-white mb-3">Explore all resources</div>
-                <span className="inline-flex items-center gap-2 text-base font-medium text-primary group-hover:gap-3 transition-all" data-testid="link-more-resources">
+                <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-5">
+                  <ArrowRight className="w-6 h-6 text-primary" />
+                </div>
+                <div className="text-xl font-bold text-white mb-2">Explore All Resources</div>
+                <p className="text-sm text-white/60 mb-5">Guides, tools, and training for everyone</p>
+                <span className="inline-flex items-center gap-2 text-base font-semibold text-primary group-hover:gap-3 transition-all" data-testid="link-more-resources">
                   See everything <ArrowRight className="w-5 h-5 cta-arrow-right" />
                 </span>
               </div>
