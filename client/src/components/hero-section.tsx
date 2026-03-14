@@ -101,19 +101,34 @@ export function HeroSection() {
           style={{
             top: 0,
             right: 0,
-            width: "55%",
+            width: "58%",
             height: "100%",
             overflow: "hidden",
+            maskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
           }}
         >
           <div
             style={{
               position: "absolute",
-              top: "-30%",
-              right: "2%",
-              width: "80px",
-              height: "200%",
-              background: "#00293C",
+              top: "-40%",
+              right: "1%",
+              width: "75px",
+              height: "220%",
+              background: "linear-gradient(180deg, #00293C 0%, #0A3A4F 50%, #00293C 100%)",
+              transform: "rotate(20deg)",
+              transformOrigin: "top center",
+              filter: "drop-shadow(0 0 20px rgba(13, 148, 136, 0.15))",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: "-40%",
+              right: "8%",
+              width: "3px",
+              height: "220%",
+              background: "linear-gradient(180deg, transparent 10%, rgba(20, 184, 166, 0.4) 50%, transparent 90%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
             }}
@@ -121,27 +136,41 @@ export function HeroSection() {
           <div
             style={{
               position: "absolute",
-              top: "-30%",
+              top: "-35%",
               right: "16%",
-              width: "65px",
-              height: "200%",
-              background: "linear-gradient(180deg, #14b8a6 0%, #0d9488 100%)",
+              width: "55px",
+              height: "220%",
+              background: "linear-gradient(180deg, #2dd4bf 0%, #14b8a6 40%, #0d9488 100%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
-              opacity: 0.7,
+              opacity: 0.65,
+              filter: "drop-shadow(0 0 28px rgba(20, 184, 166, 0.3))",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: "-35%",
+              right: "24%",
+              width: "3px",
+              height: "220%",
+              background: "linear-gradient(180deg, transparent 10%, hsla(16, 90%, 55%, 0.35) 50%, transparent 90%)",
+              transform: "rotate(20deg)",
+              transformOrigin: "top center",
             }}
           />
           <div
             style={{
               position: "absolute",
               top: "-30%",
-              right: "28%",
-              width: "50px",
-              height: "200%",
-              background: "linear-gradient(180deg, hsl(16, 95%, 55%) 0%, hsl(16, 90%, 45%) 100%)",
+              right: "30%",
+              width: "45px",
+              height: "220%",
+              background: "linear-gradient(180deg, hsl(16, 95%, 58%) 0%, hsl(16, 90%, 48%) 40%, hsl(16, 85%, 38%) 100%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
-              opacity: 0.6,
+              opacity: 0.55,
+              filter: "drop-shadow(0 0 24px hsla(16, 90%, 50%, 0.25))",
             }}
           />
         </div>
