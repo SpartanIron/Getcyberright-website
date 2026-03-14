@@ -84,10 +84,7 @@ export function TrustStrip() {
             </span>
           </div>
 
-          <div className="relative">
-            <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-slate-50 dark:from-slate-800/50 to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-slate-50 dark:from-slate-800/50 to-transparent z-10 pointer-events-none" />
-
+          <div className="overflow-hidden">
             <div className="flex animate-marquee motion-reduce:animate-none motion-reduce:justify-center motion-reduce:flex-wrap motion-reduce:gap-8">
               {[...sources, ...sources].map((source, i) => (
                 <span
