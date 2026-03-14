@@ -101,10 +101,11 @@ export function registerAuthRoutes(app: Express) {
   const isReplit = !!process.env.REPLIT_DOMAINS || !!process.env.REPL_SLUG;
   
   if (!sessionSecret) {
-    if (isProduction) {
-      throw new Error("SESSION_SECRET must be set in production environment");
-    }
-    console.warn("SESSION_SECRET not set, using fallback secret (NOT for production!)");
+    throw new Error("SESSION_SECRET environment variable must be set. Generate one with: node -e \"console.log(require('crypto').randomBytes(64).toString('hex'))\"");
+  }
+  
+  if (sessionSecret.length < 32) {
+    console.warn("[Auth] WARNING: SESSION_SECRET is shorter than 32 characters. Use a longer, random value for better security.");
   }
   
   // On Replit, always use secure cookies since it serves over HTTPS
@@ -116,7 +117,7 @@ export function registerAuthRoutes(app: Express) {
       createTableIfMissing: true,
       tableName: "sessions",
     }),
-    secret: sessionSecret || "dev-fallback-secret-change-me",
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     proxy: true,
