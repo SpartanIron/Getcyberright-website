@@ -110,8 +110,8 @@ export function HeroSection() {
             style={{
               position: "absolute",
               top: "-30%",
-              right: "12%",
-              width: "90px",
+              right: "2%",
+              width: "80px",
               height: "200%",
               background: "#00293C",
               transform: "rotate(20deg)",
@@ -122,26 +122,26 @@ export function HeroSection() {
             style={{
               position: "absolute",
               top: "-30%",
-              right: "22%",
-              width: "70px",
+              right: "16%",
+              width: "65px",
               height: "200%",
-              background: "linear-gradient(180deg, #0d9488 0%, #0f766e 100%)",
+              background: "linear-gradient(180deg, #14b8a6 0%, #0d9488 100%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
-              opacity: 0.55,
+              opacity: 0.7,
             }}
           />
           <div
             style={{
               position: "absolute",
               top: "-30%",
-              right: "30%",
+              right: "28%",
               width: "50px",
               height: "200%",
-              background: "linear-gradient(180deg, hsl(16, 90%, 50%) 0%, hsl(16, 85%, 40%) 100%)",
+              background: "linear-gradient(180deg, hsl(16, 95%, 55%) 0%, hsl(16, 90%, 45%) 100%)",
               transform: "rotate(20deg)",
               transformOrigin: "top center",
-              opacity: 0.45,
+              opacity: 0.6,
             }}
           />
         </div>
