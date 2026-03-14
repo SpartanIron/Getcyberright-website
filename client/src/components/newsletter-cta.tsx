@@ -71,7 +71,7 @@ export function NewsletterCTA() {
 
   return (
     <section
-      className="relative py-20 sm:py-28 lg:py-32 overflow-hidden bg-[#0A2A3C]"
+      className="relative py-14 sm:py-18 lg:py-20 overflow-hidden bg-[#0A2A3C]"
       data-testid="section-newsletter-cta"
       aria-labelledby="newsletter-heading"
     >
@@ -80,19 +80,55 @@ export function NewsletterCTA() {
         <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent/[0.04] rounded-full blur-3xl" />
       </div>
 
+      <div
+        className="absolute pointer-events-none hidden lg:block"
+        aria-hidden="true"
+        style={{
+          top: 0,
+          left: 0,
+          width: "20%",
+          height: "100%",
+          overflow: "hidden",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
+        }}
+      >
+        <div style={{ position: "absolute", top: "-40%", left: "15%", width: "60px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(-20deg)", transformOrigin: "top center", filter: "drop-shadow(0 0 20px rgba(13,148,136,0.15))" }} />
+        <div style={{ position: "absolute", top: "-35%", left: "40%", width: "40px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(-20deg)", transformOrigin: "top center", opacity: 0.5, filter: "drop-shadow(0 0 24px rgba(45,212,191,0.3))" }} />
+        <div style={{ position: "absolute", top: "-30%", left: "62%", width: "30px", height: "220%", background: "linear-gradient(180deg, hsl(16,100%,62%) 0%, hsl(16,95%,52%) 40%, hsl(16,90%,42%) 100%)", transform: "rotate(-20deg)", transformOrigin: "top center", opacity: 0.4, filter: "drop-shadow(0 0 20px hsla(16,95%,55%,0.25))" }} />
+      </div>
+
+      <div
+        className="absolute pointer-events-none hidden lg:block"
+        aria-hidden="true"
+        style={{
+          top: 0,
+          right: 0,
+          width: "20%",
+          height: "100%",
+          overflow: "hidden",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
+        }}
+      >
+        <div style={{ position: "absolute", top: "-40%", right: "15%", width: "60px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center", filter: "drop-shadow(0 0 20px rgba(13,148,136,0.15))" }} />
+        <div style={{ position: "absolute", top: "-35%", right: "40%", width: "40px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.5, filter: "drop-shadow(0 0 24px rgba(45,212,191,0.3))" }} />
+        <div style={{ position: "absolute", top: "-30%", right: "62%", width: "30px", height: "220%", background: "linear-gradient(180deg, hsl(16,100%,62%) 0%, hsl(16,95%,52%) 40%, hsl(16,90%,42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.4, filter: "drop-shadow(0 0 20px hsla(16,95%,55%,0.25))" }} />
+      </div>
+
       <div className="relative max-w-2xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-8">
-          <Mail className="w-8 h-8 text-primary" />
+        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+          <Mail className="w-7 h-7 text-primary" />
         </div>
 
-        <h2 id="newsletter-heading" className="text-4xl sm:text-5xl font-extrabold text-white mb-5" data-testid="text-newsletter-heading">
+        <h2 id="newsletter-heading" className="text-3xl sm:text-4xl font-extrabold text-white mb-4" data-testid="text-newsletter-heading">
           Stay One Step Ahead
         </h2>
-        <p className="text-xl text-white/80 mb-8 leading-relaxed">
+        <p className="text-lg text-white/80 mb-6 leading-relaxed">
           Join families who get weekly scam alerts, safety tips, and tool updates delivered to their inbox. Free, no spam, unsubscribe anytime.
         </p>
 
-        <div className="flex flex-wrap justify-center gap-5 sm:gap-6 mb-10">
+        <div className="flex flex-wrap justify-center gap-5 sm:gap-6 mb-8">
           {benefits.map((benefit) => (
             <span key={benefit} className="flex items-center gap-2 text-base text-white/70">
               <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
