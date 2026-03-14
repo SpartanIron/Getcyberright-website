@@ -203,7 +203,7 @@ function StatBar() {
             <div className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold text-white tabular-nums leading-none">
               {count}{stat.suffix}
             </div>
-            <div className="text-sm sm:text-base text-white/40 font-medium mt-3 leading-tight">{stat.label}</div>
+            <div className="text-sm sm:text-base text-white/55 font-medium mt-3 leading-tight">{stat.label}</div>
           </div>
         );
       })}
@@ -214,8 +214,8 @@ function StatBar() {
 export function HeroSection() {
   return (
     <section className="relative w-full" data-testid="section-hero">
-      <div className="bg-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800" />
+      <div className="bg-[#001C48] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#001C48] via-[#001C48] to-[#00293C]" />
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/[0.04] to-transparent" />
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-primary/[0.02] rounded-full blur-3xl" />
 
@@ -230,16 +230,18 @@ export function HeroSection() {
                 className="text-[2.75rem] sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.05] mb-8"
                 data-testid="text-hero-heading"
               >
-                Got a Suspicious Message?
+                Your Family Is
                 <br />
-                <span className="hero-gradient-text">AI Checks It in Seconds.</span>
+                the Target.
+                <br />
+                <span className="hero-gradient-text">We Are the Shield.</span>
               </h1>
 
               <p
                 className="text-xl sm:text-[1.35rem] text-white/50 leading-relaxed mb-10 max-w-lg"
                 data-testid="text-hero-subtext"
               >
-                Paste any text, email, link, or phone number. We check it against 8 trusted security databases and tell you exactly what to watch for.
+                Scams cost families $12.5 billion last year. Paste any suspicious message, link, or phone number and our AI checks it against 8 trusted security databases in seconds.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mb-10">
@@ -253,7 +255,7 @@ export function HeroSection() {
                     <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
                   </Button>
                 </Link>
-                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/40 hover:text-white/60 transition-colors group font-medium">
+                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/55 hover:text-white/70 transition-colors group font-medium">
                   Explore all free tools
                   <ArrowRight className="w-4 h-4 cta-arrow-right" />
                 </Link>
@@ -274,7 +276,7 @@ export function HeroSection() {
                     className="w-full h-auto object-cover"
                     loading="eager"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent rounded-2xl" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#001C48]/60 via-transparent to-transparent rounded-2xl" />
                 </div>
 
                 <div className="absolute -bottom-6 -left-6 bg-white/[0.06] backdrop-blur-md border border-white/[0.1] rounded-xl px-5 py-4 shadow-xl">
@@ -284,7 +286,7 @@ export function HeroSection() {
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-white">Trusted by families worldwide</div>
-                      <div className="text-xs text-white/40">Backed by FBI, CISA, INTERPOL data</div>
+                      <div className="text-xs text-white/55">Backed by FBI, CISA, INTERPOL data</div>
                     </div>
                   </div>
                 </div>

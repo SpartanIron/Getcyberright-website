@@ -71,7 +71,7 @@ export function NewsletterCTA() {
 
   return (
     <section
-      className="relative py-20 sm:py-28 lg:py-32 bg-slate-900 overflow-hidden"
+      className="relative py-20 sm:py-28 lg:py-32 bg-[#001C48] overflow-hidden"
       data-testid="section-newsletter-cta"
       aria-labelledby="newsletter-heading"
     >

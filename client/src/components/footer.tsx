@@ -44,7 +44,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-300" role="contentinfo" aria-label="Site footer">
+    <footer className="bg-[#001028] text-slate-300" role="contentinfo" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-10">
           <div className="col-span-2 md:col-span-1">
@@ -159,7 +159,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500">
+          <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-400">
             <p data-testid="text-copyright">
               &copy; {new Date().getFullYear()} GetCyberRight. All rights reserved.
             </p>
@@ -170,7 +170,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="mt-4 text-center text-xs text-slate-500">
+          <div className="mt-4 text-center text-xs text-slate-400">
             <span>www.GetCyberRight.com is powered by </span>
             <a 
               href="https://colorcodesolutions.com" 
