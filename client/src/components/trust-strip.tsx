@@ -56,10 +56,10 @@ function StatItem({ value, suffix, label }: { value: number; suffix: string; lab
   const count = useAnimatedCounter(value, value > 100 ? 1400 : 600);
   return (
     <div className="text-center" data-testid={`stat-hero-${label.toLowerCase().replace(/[,\s]+/g, "-")}`}>
-      <div className="text-2xl sm:text-3xl font-extrabold text-foreground tabular-nums leading-none">
+      <div className="text-2xl sm:text-3xl font-extrabold text-primary tabular-nums leading-none">
         {count}{suffix}
       </div>
-      <div className="text-xs sm:text-sm text-muted-foreground font-medium mt-1.5 leading-tight">{label}</div>
+      <div className="text-xs sm:text-sm text-foreground/70 font-semibold mt-1.5 leading-tight">{label}</div>
     </div>
   );
 }

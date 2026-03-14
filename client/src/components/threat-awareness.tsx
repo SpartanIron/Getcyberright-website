@@ -60,10 +60,10 @@ export function ThreatAwareness() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
             {threats.map((threat) => (
-              <div key={threat.stat} className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-5" data-testid={`stat-threat-${threat.stat.replace(/[^a-z0-9]/gi, "").toLowerCase()}`}>
-                <threat.icon className="w-5 h-5 text-primary/70 mb-3" />
-                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{threat.stat}</div>
-                <div className="text-sm text-white/50 leading-snug">{threat.label}</div>
+              <div key={threat.stat} className="bg-white/[0.05] border border-white/[0.10] rounded-xl p-5 hover:bg-white/[0.08] hover:border-primary/20 transition-all duration-300" data-testid={`stat-threat-${threat.stat.replace(/[^a-z0-9]/gi, "").toLowerCase()}`}>
+                <threat.icon className="w-5 h-5 text-primary mb-3" />
+                <div className="text-2xl sm:text-3xl font-extrabold text-primary mb-1">{threat.stat}</div>
+                <div className="text-sm text-white/55 leading-snug">{threat.label}</div>
                 <div className="text-[11px] text-white/30 mt-2 uppercase tracking-wider font-medium">{threat.source}</div>
               </div>
             ))}
@@ -72,7 +72,7 @@ export function ThreatAwareness() {
           <Button
             asChild
             size="lg"
-            className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold text-base shadow-lg shadow-accent/20 hover:shadow-accent/30"
+            className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold text-base shadow-[0_4px_24px_-4px] shadow-accent/40 hover:shadow-[0_6px_32px_-4px] hover:shadow-accent/50 hover:scale-[1.02] transition-all duration-300"
             data-testid="button-threat-cta"
           >
             <Link href="/scam-checker">

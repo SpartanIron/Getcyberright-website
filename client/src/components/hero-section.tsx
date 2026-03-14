@@ -94,8 +94,9 @@ export function HeroSection() {
     <section className="relative w-full" data-testid="section-hero">
       <div className="bg-[#0A2A3C] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/[0.04] to-transparent" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-primary/[0.02] rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-primary/[0.06] to-transparent" />
+        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-primary/[0.05] rounded-full blur-[120px]" />
+        <div className="absolute -top-20 right-1/4 w-[400px] h-[400px] bg-accent/[0.04] rounded-full blur-[100px]" />
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
           <div className="pt-8 sm:pt-10 lg:pt-12 pb-4">
@@ -126,7 +127,7 @@ export function HeroSection() {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 text-base shadow-lg shadow-accent/20 hover:shadow-accent/30"
+                  className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 text-base shadow-[0_4px_24px_-4px] shadow-accent/40 hover:shadow-[0_6px_32px_-4px] hover:shadow-accent/50 hover:scale-[1.02] transition-all duration-300"
                   data-testid="button-hero-primary-cta"
                 >
                   <Link href="/scam-checker">

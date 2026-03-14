@@ -30,7 +30,7 @@
 
   --sidebar-border: 180 10% 88%;
 
-  --sidebar-primary: 174 65% 42%;
+  --sidebar-primary: 174 72% 46%;
 
   --sidebar-primary-foreground: 0 0% 100%;
 
@@ -38,7 +38,7 @@
 
   --sidebar-accent-foreground: 220 40% 18%;
 
-  --sidebar-ring: 174 65% 42%;
+  --sidebar-ring: 174 72% 46%;
 
   --popover: 0 0% 100%;
 
@@ -46,7 +46,7 @@
 
   --popover-border: 180 10% 88%;
 
-  --primary: 174 65% 42%;
+  --primary: 174 72% 46%;
 
   --primary-foreground: 0 0% 100%;
 
@@ -58,7 +58,7 @@
 
   --muted-foreground: 220 18% 38%;
 
-  --accent: 32 95% 52%;
+  --accent: 16 88% 54%;
 
   --accent-foreground: 0 0% 100%;
 
@@ -67,9 +67,9 @@
   --destructive-foreground: 0 0% 100%;
 
   --input: 180 10% 82%;
-  --ring: 174 65% 42%;
-  --chart-1: 174 65% 42%;
-  --chart-2: 32 95% 52%;
+  --ring: 174 72% 46%;
+  --chart-1: 174 72% 46%;
+  --chart-2: 16 88% 54%;
   --chart-3: 220 45% 35%;
   --chart-4: 280 60% 55%;
   --chart-5: 0 72% 51%;
@@ -154,7 +154,7 @@
 
   --sidebar-border: 200 30% 18%;
 
-  --sidebar-primary: 174 70% 48%;
+  --sidebar-primary: 174 72% 50%;
 
   --sidebar-primary-foreground: 0 0% 100%;
 
@@ -162,7 +162,7 @@
 
   --sidebar-accent-foreground: 180 15% 92%;
 
-  --sidebar-ring: 174 70% 48%;
+  --sidebar-ring: 174 72% 50%;
 
   --popover: 200 30% 13%;
 
@@ -170,7 +170,7 @@
 
   --popover-border: 200 25% 20%;
 
-  --primary: 174 70% 48%;
+  --primary: 174 72% 50%;
 
   --primary-foreground: 0 0% 100%;
 
@@ -182,7 +182,7 @@
 
   --muted-foreground: 200 20% 68%;
 
-  --accent: 32 95% 55%;
+  --accent: 16 88% 58%;
 
   --accent-foreground: 0 0% 100%;
 
@@ -191,9 +191,9 @@
   --destructive-foreground: 0 0% 100%;
 
   --input: 200 25% 22%;
-  --ring: 174 70% 48%;
-  --chart-1: 174 70% 48%;
-  --chart-2: 32 95% 55%;
+  --ring: 174 72% 50%;
+  --chart-1: 174 72% 50%;
+  --chart-2: 16 88% 58%;
   --chart-3: 200 40% 50%;
   --chart-4: 280 60% 60%;
   --chart-5: 0 72% 55%;
@@ -422,12 +422,12 @@ button:hover .cta-arrow-right {
 }
 
 .hero-gradient-text {
-  background: linear-gradient(135deg, hsl(174 65% 55%), hsl(174 65% 42%), hsl(32 95% 52%), hsl(174 65% 55%));
-  background-size: 300% 300%;
+  background: linear-gradient(135deg, hsl(174 80% 58%), hsl(174 72% 46%), hsl(16 88% 54%), hsl(40 95% 55%), hsl(174 80% 58%));
+  background-size: 400% 400%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradient-shift 5s ease-in-out infinite;
+  animation: gradient-shift 6s ease-in-out infinite;
 }
 
 @keyframes gradient-shift {

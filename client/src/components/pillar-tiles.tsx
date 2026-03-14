@@ -67,7 +67,7 @@ export function PillarTiles() {
           {features.map((feature) => (
             <div
               key={feature.id}
-              className="group relative rounded-2xl overflow-hidden bg-white/[0.06] border border-white/10 hover:bg-white/[0.10] hover:border-white/20 hover:shadow-2xl transition-all duration-300"
+              className="group relative rounded-2xl overflow-hidden bg-white/[0.06] border border-white/10 hover:bg-white/[0.10] hover:border-primary/30 hover:shadow-[0_8px_40px_-12px_rgba(32,205,190,0.25)] transition-all duration-300"
               data-testid={`card-feature-${feature.id}`}
             >
               <div className="relative h-48 overflow-hidden">

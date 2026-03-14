@@ -66,7 +66,7 @@ export function AudiencePaths() {
           {paths.map((path) => (
             <Link key={path.id} href={path.href}>
               <div
-                className="group relative rounded-2xl overflow-hidden cursor-pointer h-72 sm:h-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                className="group relative rounded-2xl overflow-hidden cursor-pointer h-72 sm:h-80 border-2 border-transparent hover:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all duration-300"
                 data-testid={`card-audience-${path.id}`}
               >
                 <img
