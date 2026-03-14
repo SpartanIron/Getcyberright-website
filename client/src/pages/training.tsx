@@ -155,46 +155,55 @@ export default function Training() {
       <Navigation />
       
       <main id="main-content" className="flex-1" tabIndex={-1}>
-        <section className="relative py-16 md:py-24 overflow-hidden">
-          <div className="absolute inset-0">
-            <img 
-              src={bannerImage} 
-              alt="Cybersecurity and AI Training Academy - diverse people learning together" 
-              className="w-full h-full object-cover"
-              loading="eager"
-              decoding="async"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/70" />
-          </div>
-          
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <div className="max-w-2xl">
-              <Badge variant="secondary" className="mb-4" data-testid="badge-training-header">
-                <GraduationCap className="w-3 h-3 mr-1" />
-                AI-Powered Curriculum
-              </Badge>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6" data-testid="text-training-title">
-                Cybersecurity and AI Training Academy
-              </h1>
-              <p className="text-xl text-muted-foreground mb-8" data-testid="text-training-subtitle">
-                Master digital safety with structured learning paths, interactive lessons, 
-                and industry-recognized certifications tailored to your needs.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Button size="lg" data-testid="button-start-learning" onClick={() => {
-                  document.getElementById("learning-paths")?.scrollIntoView({ behavior: "smooth" });
-                }}>
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  Start Learning
-                </Button>
-                <Button size="lg" variant="outline" data-testid="button-view-paths" onClick={() => {
-                  document.getElementById("learning-paths")?.scrollIntoView({ behavior: "smooth" });
-                }}>
-                  <Target className="w-4 h-4 mr-2" />
-                  Explore Paths
-                </Button>
+        <section className="relative overflow-hidden bg-[#0A2A3C]">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-[45%_55%]">
+              <div className="px-5 sm:px-6 lg:pl-8 lg:pr-12 py-16 md:py-24 flex flex-col justify-center">
+                <Badge variant="secondary" className="mb-4 w-fit" data-testid="badge-training-header">
+                  <GraduationCap className="w-3 h-3 mr-1" />
+                  AI-Powered Curriculum
+                </Badge>
+                <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight" data-testid="text-training-title">
+                  Cybersecurity and AI Training Academy
+                </h1>
+                <p className="text-lg sm:text-xl text-white/75 mb-8 leading-relaxed" data-testid="text-training-subtitle">
+                  Master digital safety with structured learning paths, interactive lessons, 
+                  and industry-recognized certifications tailored to your needs.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Button size="lg" className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold" data-testid="button-start-learning" onClick={() => {
+                    document.getElementById("learning-paths")?.scrollIntoView({ behavior: "smooth" });
+                  }}>
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Start Learning
+                  </Button>
+                  <Button size="lg" variant="outline" className="rounded-full border-white/20 text-white bg-white/[0.05] hover:bg-white/[0.10]" data-testid="button-view-paths" onClick={() => {
+                    document.getElementById("learning-paths")?.scrollIntoView({ behavior: "smooth" });
+                  }}>
+                    <Target className="w-4 h-4 mr-2" />
+                    Explore Paths
+                  </Button>
+                </div>
+              </div>
+
+              <div className="hidden lg:block">
+                <img
+                  src={bannerImage}
+                  alt="Diverse people learning cybersecurity together"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
               </div>
             </div>
+          </div>
+
+          <div className="lg:hidden">
+            <img
+              src={bannerImage}
+              alt="Diverse people learning cybersecurity together"
+              className="w-full h-64 sm:h-80 object-cover"
+              loading="eager"
+            />
           </div>
         </section>
 
