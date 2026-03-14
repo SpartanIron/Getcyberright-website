@@ -120,7 +120,7 @@ export function HeroSection() {
                 className="text-lg sm:text-xl text-white/80 leading-relaxed mb-10 max-w-lg"
                 data-testid="text-hero-subtext"
               >
-                Scams cost families $12.5 billion last year. Paste any suspicious message, link, or phone number and our AI checks it against 8 trusted security databases in seconds.
+                Scams cost families $12.5 billion last year. Paste any suspicious message, link, or phone number and we check it against 8 trusted security databases in seconds.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mb-10">
