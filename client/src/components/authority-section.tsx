@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import authorityImg from "@/assets/images/feature-family-learning-diverse.png";
 
 const trustPoints = [
   "Safety data sourced from FBI IC3, CISA, INTERPOL, Europol, and FTC",
@@ -15,17 +16,42 @@ export function AuthoritySection() {
   return (
     <section className="py-20 sm:py-28 lg:py-32 bg-muted/30" data-testid="section-authority" aria-labelledby="authority-heading">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-14 lg:gap-24 items-start">
+        <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+          <div className="hidden lg:block">
+            <div className="relative">
+              <div className="rounded-2xl overflow-hidden shadow-xl">
+                <img
+                  src={authorityImg}
+                  alt="Diverse family learning about online safety together"
+                  className="w-full h-auto object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/10 rounded-2xl -z-10" />
+              <div className="absolute -top-4 -left-4 w-24 h-24 bg-accent/10 rounded-2xl -z-10" />
+            </div>
+          </div>
+
           <div>
             <h2 id="authority-heading" className="text-4xl sm:text-5xl font-extrabold text-foreground mb-6" data-testid="text-authority-heading">
               Why People Trust GetCyberRight
             </h2>
-            <p className="text-xl text-muted-foreground leading-relaxed mb-5">
+            <p className="text-xl text-muted-foreground leading-relaxed mb-10">
               Online safety should not be complicated or expensive. We turn the same data that large organizations use into simple, everyday guidance anyone can follow.
             </p>
-            <p className="text-xl text-muted-foreground leading-relaxed mb-10">
-              Our tools and content are backed by the same government and industry sources that professionals rely on. The difference is we make it accessible to everyone.
-            </p>
+
+            <div className="space-y-0 mb-10">
+              {trustPoints.map((point, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-4 py-4 border-b border-border last:border-b-0"
+                  data-testid={`text-trust-point-${index}`}
+                >
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                  <span className="text-base text-foreground leading-relaxed">{point}</span>
+                </div>
+              ))}
+            </div>
 
             <Link href="/about">
               <Button
@@ -37,19 +63,6 @@ export function AuthoritySection() {
                 About Our Mission <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
               </Button>
             </Link>
-          </div>
-
-          <div className="space-y-0">
-            {trustPoints.map((point, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-4 py-5 border-b border-border last:border-b-0"
-                data-testid={`text-trust-point-${index}`}
-              >
-                <CheckCircle className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
-                <span className="text-lg text-foreground leading-relaxed">{point}</span>
-              </div>
-            ))}
           </div>
         </div>
       </div>

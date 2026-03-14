@@ -4,6 +4,7 @@ import { ArrowRight, ChevronRight, Radio, MapPin, Shield, Search, Trash2, Gradua
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { TrendingThreat } from "@shared/schema";
+import heroFamilyImg from "@/assets/images/hero-family-diverse.png";
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
   "America/New_York": "US", "America/Chicago": "US", "America/Denver": "US",
@@ -181,57 +182,9 @@ function HeroScamChecker() {
           </Button>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-        <Link href="/data-removal">
-          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3.5 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-data-removal">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-teal-500/10 flex items-center justify-center flex-shrink-0">
-                <Trash2 className="w-4 h-4 text-teal-400" />
-              </div>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-white group-hover:text-teal-400 transition-colors truncate">Data Broker Removal</div>
-                <div className="text-[11px] text-white/30 mt-0.5 truncate">501+ brokers</div>
-              </div>
-            </div>
-          </div>
-        </Link>
-        <Link href="/training">
-          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3.5 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-training">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                <GraduationCap className="w-4 h-4 text-blue-400" />
-              </div>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors truncate">Training Academy</div>
-                <div className="text-[11px] text-white/30 mt-0.5 truncate">All skill levels</div>
-              </div>
-            </div>
-          </div>
-        </Link>
-        <Link href="/ai-prompts">
-          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3.5 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-ai-prompts">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                <Zap className="w-4 h-4 text-amber-400" />
-              </div>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors truncate">AI Prompt Library</div>
-                <div className="text-[11px] text-white/30 mt-0.5 truncate">406+ prompts</div>
-              </div>
-            </div>
-          </div>
-        </Link>
-      </div>
     </div>
   );
 }
-
-const trustPoints = [
-  { icon: ShieldCheck, text: "Checks 8 trusted security databases used by professionals worldwide" },
-  { icon: Zap, text: "Spots fake emails, cloned voices, manipulation tactics, and new scam patterns" },
-  { icon: Eye, text: "No account required. Your data is never stored or sold." },
-];
 
 const stats = [
   { value: 500, suffix: "+", label: "Data Brokers Tracked", duration: 1400 },
@@ -271,8 +224,8 @@ export function HeroSection() {
             <ThreatAlertBar />
           </div>
 
-          <div className="grid lg:grid-cols-[1fr_minmax(0,500px)] gap-12 lg:gap-16 items-start pb-12 sm:pb-16 lg:pb-20">
-            <div className="max-w-2xl pt-2 lg:pt-8">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center pb-12 sm:pb-16 lg:pb-20">
+            <div className="max-w-xl pt-2 lg:pt-4">
               <h1
                 className="text-[2.75rem] sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.05] mb-8"
                 data-testid="text-hero-heading"
@@ -283,36 +236,68 @@ export function HeroSection() {
               </h1>
 
               <p
-                className="text-xl sm:text-2xl text-white/50 leading-relaxed mb-10 max-w-xl"
+                className="text-xl sm:text-[1.35rem] text-white/50 leading-relaxed mb-10 max-w-lg"
                 data-testid="text-hero-subtext"
               >
                 Paste any text, email, link, or phone number. We check it against 8 trusted security databases and tell you exactly what to watch for.
               </p>
 
-              <div className="space-y-5 mb-10">
-                {trustPoints.map((point) => (
-                  <div key={point.text} className="flex items-start gap-3.5">
-                    <point.icon className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-lg text-white/45 leading-snug">{point.text}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="lg:hidden mt-4 mb-4">
-                <HeroScamChecker />
-              </div>
-
-              <div className="hidden lg:block">
-                <Link href="/tools" className="inline-flex items-center gap-2.5 text-lg text-white/40 hover:text-white/60 transition-colors group">
+              <div className="flex flex-wrap items-center gap-4 mb-10">
+                <Link href="/scam-checker">
+                  <Button
+                    size="lg"
+                    className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 text-base shadow-lg shadow-accent/20 hover:shadow-accent/30"
+                    data-testid="button-hero-primary-cta"
+                  >
+                    Check a Scam Now
+                    <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
+                  </Button>
+                </Link>
+                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/40 hover:text-white/60 transition-colors group font-medium">
                   Explore all free tools
-                  <ArrowRight className="w-5 h-5 cta-arrow-right" />
+                  <ArrowRight className="w-4 h-4 cta-arrow-right" />
                 </Link>
               </div>
+
+              <div className="flex items-center gap-6 text-sm text-white/50">
+                <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary/60" /> No account needed</span>
+                <span className="flex items-center gap-2"><Eye className="w-4 h-4 text-primary/60" /> Nothing stored</span>
+              </div>
             </div>
 
-            <div className="hidden lg:block pt-4">
-              <HeroScamChecker />
+            <div className="hidden lg:block">
+              <div className="relative">
+                <div className="rounded-2xl overflow-hidden shadow-2xl shadow-black/30">
+                  <img
+                    src={heroFamilyImg}
+                    alt="Diverse family learning together on a laptop"
+                    className="w-full h-auto object-cover"
+                    loading="eager"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent rounded-2xl" />
+                </div>
+
+                <div className="absolute -bottom-6 -left-6 bg-white/[0.06] backdrop-blur-md border border-white/[0.1] rounded-xl px-5 py-4 shadow-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Shield className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-white">Trusted by families worldwide</div>
+                      <div className="text-xs text-white/40">Backed by FBI, CISA, INTERPOL data</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div className="lg:hidden mb-8">
+            <HeroScamChecker />
+          </div>
+
+          <div className="hidden lg:block max-w-2xl mb-8">
+            <HeroScamChecker />
           </div>
 
           <div className="border-t border-white/[0.06] py-12 sm:py-14 lg:py-16">

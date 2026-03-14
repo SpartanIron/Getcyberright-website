@@ -1,6 +1,9 @@
 import { Link } from "wouter";
 import { ArrowRight, Search, Trash2, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import heroFamilyImg from "@/assets/images/hero-family-diverse.png";
+import seniorImg from "@/assets/images/about-seniors-learning.png";
+import businessImg from "@/assets/images/business-security-training.png";
 
 const features = [
   {
@@ -11,8 +14,9 @@ const features = [
     href: "/scam-checker",
     cta: "Check a Scam",
     icon: Search,
+    image: heroFamilyImg,
+    imageAlt: "Family using computer together to check online safety",
     accent: "bg-red-500",
-    accentLight: "bg-red-50 dark:bg-red-500/10",
     accentText: "text-red-600 dark:text-red-400",
     borderAccent: "border-red-200 dark:border-red-500/20",
   },
@@ -24,8 +28,9 @@ const features = [
     href: "/data-removal",
     cta: "Protect Your Data",
     icon: Trash2,
+    image: seniorImg,
+    imageAlt: "Seniors learning to protect their personal data online",
     accent: "bg-teal-500",
-    accentLight: "bg-teal-50 dark:bg-teal-500/10",
     accentText: "text-teal-600 dark:text-teal-400",
     borderAccent: "border-teal-200 dark:border-teal-500/20",
   },
@@ -37,8 +42,9 @@ const features = [
     href: "/training",
     cta: "Start Learning",
     icon: GraduationCap,
+    image: businessImg,
+    imageAlt: "Diverse team participating in cybersecurity training",
     accent: "bg-blue-500",
-    accentLight: "bg-blue-50 dark:bg-blue-500/10",
     accentText: "text-blue-600 dark:text-blue-400",
     borderAccent: "border-blue-200 dark:border-blue-500/20",
   },
@@ -57,32 +63,40 @@ export function PillarTiles() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8 lg:gap-10">
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-8">
           {features.map((feature) => (
             <div
               key={feature.id}
-              className={`relative border ${feature.borderAccent} rounded-2xl overflow-hidden bg-card`}
+              className="group relative rounded-2xl overflow-hidden bg-card border border-border hover:shadow-xl transition-shadow duration-300"
               data-testid={`card-feature-${feature.id}`}
             >
-              <div className={`h-1.5 ${feature.accent}`} />
-              <div className="p-8 sm:p-10">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className={`w-14 h-14 rounded-xl ${feature.accentLight} flex items-center justify-center`}>
-                    <feature.icon className={`w-7 h-7 ${feature.accentText}`} />
-                  </div>
-                  <span className={`text-xs font-semibold uppercase tracking-wider ${feature.accentText}`}>
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={feature.image}
+                  alt={feature.imageAlt}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div className="absolute top-4 left-4">
+                  <span className={`inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white bg-black/30 backdrop-blur-sm rounded-full px-3 py-1.5`}>
                     {feature.label}
                   </span>
                 </div>
+              </div>
 
-                <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">{feature.title}</h3>
-                <p className="text-lg text-muted-foreground leading-relaxed mb-8">{feature.description}</p>
+              <div className="p-7 sm:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <feature.icon className={`w-6 h-6 ${feature.accentText}`} />
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">{feature.title}</h3>
+                </div>
+                <p className="text-base text-muted-foreground leading-relaxed mb-6">{feature.description}</p>
 
                 <Link href={feature.href}>
                   <Button
                     size="lg"
                     variant="outline"
-                    className="rounded-full font-semibold text-base px-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    className="rounded-full font-semibold text-base px-8 w-full sm:w-auto"
                     data-testid={`button-feature-${feature.id}`}
                   >
                     {feature.cta}

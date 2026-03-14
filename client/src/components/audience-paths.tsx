@@ -1,12 +1,52 @@
 import { Link } from "wouter";
-import { ArrowRight, Users, Heart, Briefcase, GraduationCap, Baby } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import familyImg from "@/assets/images/about-family-together.png";
+import seniorsImg from "@/assets/images/about-seniors-learning.png";
+import kidsImg from "@/assets/images/kids-safety-banner.jpg";
+import educatorImg from "@/assets/images/feature-family-learning-diverse.png";
+import businessImg from "@/assets/images/business-security-training.png";
 
 const paths = [
-  { id: "families", title: "Parents & Families", description: "Age-appropriate guides, device monitoring tips, and conversation starters.", icon: Users, href: "/parents" },
-  { id: "seniors", title: "Seniors", description: "Spot phone scams, protect your identity, and use technology with confidence.", icon: Heart, href: "/seniors" },
-  { id: "kids", title: "Kids & Teens", description: "Interactive safety lessons designed for ages 8 to 16.", icon: Baby, href: "/kids" },
-  { id: "educators", title: "Educators", description: "Curriculum resources and classroom-ready cybersecurity materials.", icon: GraduationCap, href: "/educators" },
-  { id: "business", title: "Small Businesses", description: "Free awareness training your whole team can finish in a lunch break.", icon: Briefcase, href: "/small-business" },
+  {
+    id: "families",
+    title: "Parents & Families",
+    description: "Age-appropriate guides, device monitoring tips, and conversation starters.",
+    href: "/parents",
+    image: familyImg,
+    alt: "Diverse family together at home",
+  },
+  {
+    id: "seniors",
+    title: "Seniors",
+    description: "Spot phone scams, protect your identity, and use technology with confidence.",
+    href: "/seniors",
+    image: seniorsImg,
+    alt: "Seniors learning about online safety with a younger guide",
+  },
+  {
+    id: "kids",
+    title: "Kids & Teens",
+    description: "Interactive safety lessons designed for ages 8 to 16.",
+    href: "/kids",
+    image: kidsImg,
+    alt: "Diverse children using computers in a classroom",
+  },
+  {
+    id: "educators",
+    title: "Educators",
+    description: "Curriculum resources and classroom-ready cybersecurity materials.",
+    href: "/educators",
+    image: educatorImg,
+    alt: "Family learning together with educational materials",
+  },
+  {
+    id: "business",
+    title: "Small Businesses",
+    description: "Free awareness training your whole team can finish in a lunch break.",
+    href: "/small-business",
+    image: businessImg,
+    alt: "Diverse business team in a cybersecurity training session",
+  },
 ];
 
 export function AudiencePaths() {
@@ -22,35 +62,47 @@ export function AudiencePaths() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border rounded-2xl overflow-hidden border border-border">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {paths.map((path) => (
             <Link key={path.id} href={path.href}>
               <div
-                className="group bg-card p-8 sm:p-10 cursor-pointer hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 transition-colors h-full"
+                className="group relative rounded-2xl overflow-hidden cursor-pointer h-72 sm:h-80 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 data-testid={`card-audience-${path.id}`}
               >
-                <path.icon className="w-7 h-7 text-muted-foreground mb-4" aria-hidden="true" />
-                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                  {path.title}
-                </h3>
-                <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-                  {path.description}
-                </p>
-                <span className="inline-flex items-center gap-1.5 text-base font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                  Explore <ArrowRight className="w-4 h-4" />
-                </span>
+                <img
+                  src={path.image}
+                  alt={path.alt}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 group-hover:from-black/85 transition-colors duration-300" />
+
+                <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-7">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                    {path.title}
+                  </h3>
+                  <p className="text-base text-white/70 leading-relaxed mb-4 line-clamp-2">
+                    {path.description}
+                  </p>
+                  <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 group-focus-visible:translate-y-0">
+                    Explore <ArrowRight className="w-4 h-4 cta-arrow-right" />
+                  </span>
+                </div>
               </div>
             </Link>
           ))}
-          <div className="hidden lg:block bg-card p-8 sm:p-10">
-            <div className="flex items-center justify-center h-full">
-              <Link href="/resources">
-                <span className="text-base font-medium text-primary hover:underline flex items-center gap-2 cursor-pointer" data-testid="link-more-resources">
-                  See all resources <ArrowRight className="w-4 h-4" />
+
+          <Link href="/resources">
+            <div className="group relative rounded-2xl overflow-hidden cursor-pointer h-72 sm:h-80 bg-slate-900 flex items-center justify-center" data-testid="card-audience-resources">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
+              <div className="relative text-center px-6">
+                <div className="text-lg font-semibold text-white mb-3">Explore all resources</div>
+                <span className="inline-flex items-center gap-2 text-base font-medium text-primary group-hover:gap-3 transition-all" data-testid="link-more-resources">
+                  See everything <ArrowRight className="w-5 h-5 cta-arrow-right" />
                 </span>
-              </Link>
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </section>
