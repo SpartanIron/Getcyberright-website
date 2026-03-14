@@ -37,12 +37,12 @@ export function ThreatAwareness() {
         <img
           src={seniorsImg}
           alt=""
-          className="absolute right-0 top-0 w-[50%] h-full object-cover object-center"
+          className="absolute right-0 top-0 w-[55%] h-full object-cover object-center"
           loading="lazy"
           aria-hidden="true"
         />
-        <div className="absolute right-0 top-0 w-[50%] h-full" style={{ background: "linear-gradient(to right, #0A2A3C 0%, rgba(10,42,60,0.6) 20%, transparent 40%)" }} />
-        <div className="absolute right-0 bottom-0 w-[50%] h-[30%]" style={{ background: "linear-gradient(to top, #0A2A3C 0%, transparent 100%)" }} />
+        <div className="absolute right-0 top-0 w-[55%] h-full" style={{ background: "linear-gradient(to right, #0A2A3C 0%, rgba(10,42,60,0.6) 20%, transparent 40%)" }} />
+        <div className="absolute right-0 bottom-0 w-[55%] h-[30%]" style={{ background: "linear-gradient(to top, #0A2A3C 0%, transparent 100%)" }} />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
@@ -60,13 +60,17 @@ export function ThreatAwareness() {
           </p>
 
           <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-10">
-            {threats.map((threat) => (
-              <div key={threat.stat} className="relative bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 sm:p-5 hover:bg-white/[0.07] hover:border-primary/25 transition-all duration-300 group" data-testid={`stat-threat-${threat.stat.replace(/[^a-z0-9]/gi, "").toLowerCase()}`}>
-                <div className="absolute top-0 left-0 w-full h-[2px] rounded-t-xl bg-gradient-to-r from-primary/40 via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <threat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary/70 mb-2 sm:mb-3" />
-                <div className="text-xl sm:text-2xl font-extrabold text-primary mb-0.5">{threat.stat}</div>
-                <div className="text-xs sm:text-sm text-white/70 leading-snug">{threat.label}</div>
-                <div className="text-[10px] sm:text-[11px] text-white/40 mt-1.5 uppercase tracking-wider font-medium">{threat.source}</div>
+            {threats.map((threat, i) => (
+              <div
+                key={threat.stat}
+                className="bg-white/[0.06] rounded-xl p-4 sm:p-5 border-l-[3px]"
+                style={{ borderLeftColor: i % 2 === 0 ? "hsl(16, 90%, 52%)" : "#14b8a6" }}
+                data-testid={`stat-threat-${threat.stat.replace(/[^a-z0-9]/gi, "").toLowerCase()}`}
+              >
+                <threat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white/40 mb-2" />
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{threat.stat}</div>
+                <div className="text-xs sm:text-sm text-white/65 leading-snug">{threat.label}</div>
+                <div className="text-[10px] sm:text-[11px] text-white/35 mt-1.5 uppercase tracking-wider font-medium">{threat.source}</div>
               </div>
             ))}
           </div>
