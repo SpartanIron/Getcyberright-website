@@ -416,12 +416,26 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradient-shift 6s ease-in-out infinite;
+  animation: gradient-shift 4s ease-in-out infinite;
 }
 
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+}
+
+.hero-mesh-bg {
+  background:
+    radial-gradient(ellipse at 20% 50%, hsl(174 65% 42% / 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, hsl(32 95% 52% / 0.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 60% 80%, hsl(174 65% 42% / 0.06) 0%, transparent 40%);
+}
+
+.hero-grid-overlay {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
 }
 
 .hero-glow-bg {
@@ -435,17 +449,6 @@
   50% { opacity: 0.5; }
 }
 
-.hero-ken-burns {
-  animation: ken-burns 25s ease-in-out infinite alternate;
-  transform-origin: center center;
-}
-
-@keyframes ken-burns {
-  0% { transform: scale(1) translate(0, 0); }
-  50% { transform: scale(1.08) translate(-1%, -1%); }
-  100% { transform: scale(1.04) translate(1%, 0.5%); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .hero-gradient-text {
     animation: none;
@@ -454,9 +457,5 @@
   .hero-glow-bg {
     animation: none;
     opacity: 0.3;
-  }
-  .hero-ken-burns {
-    animation: none;
-    transform: scale(1);
   }
 }

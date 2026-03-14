@@ -1,13 +1,8 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
-import { TrustStats } from "@/components/trust-stats";
-import { TrendingThreats } from "@/components/trending-threats";
 import { PillarTiles } from "@/components/pillar-tiles";
-import { HeroTools } from "@/components/hero-tools";
 import { ContentPreview } from "@/components/content-preview";
-import { FeaturesGrid } from "@/components/features-grid";
-import { RegionalScams } from "@/components/regional-scams";
-import { AudienceShowcase } from "@/components/audience-showcase";
+import { AudiencePaths } from "@/components/audience-paths";
 import { AuthoritySection } from "@/components/authority-section";
 import { NewsletterCTA } from "@/components/newsletter-cta";
 import { CTAFooter } from "@/components/cta-footer";
@@ -43,14 +38,9 @@ export default function Home() {
       <Navigation />
       <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
         <HeroSection />
-        <TrustStats />
-        <TrendingThreats />
         <PillarTiles />
-        <HeroTools />
         <ContentPreview />
-        <FeaturesGrid />
-        <RegionalScams />
-        <AudienceShowcase />
+        <AudiencePaths />
         <AuthoritySection />
         <NewsletterCTA />
         <CTAFooter />
