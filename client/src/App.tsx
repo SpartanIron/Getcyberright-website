@@ -8,7 +8,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { DeziAssistant } from "@/components/dezi-assistant";
 import { FeedbackWidget } from "@/components/feedback-widget";
 import { AnnouncementBanner } from "@/components/announcement-banner";
-import { WelcomeOverlay } from "@/components/welcome-overlay";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { initGA, trackPageView } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
@@ -231,7 +230,6 @@ function App() {
             <ScrollToTop />
             <AnnouncementBanner />
             <Toaster />
-            <WelcomeOverlay />
             <ErrorBoundary>
               <Router />
             </ErrorBoundary>
