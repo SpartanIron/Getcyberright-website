@@ -75,45 +75,27 @@ export function NewsletterCTA() {
       data-testid="section-newsletter-cta"
       aria-labelledby="newsletter-heading"
     >
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/[0.06] rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent/[0.04] rounded-full blur-3xl" />
-      </div>
-
-      <div
-        className="absolute pointer-events-none hidden lg:block"
-        aria-hidden="true"
-        style={{
-          top: 0,
-          left: 0,
-          width: "20%",
-          height: "100%",
-          overflow: "hidden",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
-        }}
-      >
-        <div style={{ position: "absolute", top: "-40%", left: "15%", width: "60px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(-20deg)", transformOrigin: "top center", filter: "drop-shadow(0 0 20px rgba(13,148,136,0.15))" }} />
-        <div style={{ position: "absolute", top: "-35%", left: "40%", width: "40px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(-20deg)", transformOrigin: "top center", opacity: 0.5, filter: "drop-shadow(0 0 24px rgba(45,212,191,0.3))" }} />
-        <div style={{ position: "absolute", top: "-30%", left: "62%", width: "30px", height: "220%", background: "linear-gradient(180deg, hsl(16,100%,62%) 0%, hsl(16,95%,52%) 40%, hsl(16,90%,42%) 100%)", transform: "rotate(-20deg)", transformOrigin: "top center", opacity: 0.4, filter: "drop-shadow(0 0 20px hsla(16,95%,55%,0.25))" }} />
-      </div>
-
-      <div
-        className="absolute pointer-events-none hidden lg:block"
-        aria-hidden="true"
-        style={{
-          top: 0,
-          right: 0,
-          width: "20%",
-          height: "100%",
-          overflow: "hidden",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
-        }}
-      >
-        <div style={{ position: "absolute", top: "-40%", right: "15%", width: "60px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center", filter: "drop-shadow(0 0 20px rgba(13,148,136,0.15))" }} />
-        <div style={{ position: "absolute", top: "-35%", right: "40%", width: "40px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.5, filter: "drop-shadow(0 0 24px rgba(45,212,191,0.3))" }} />
-        <div style={{ position: "absolute", top: "-30%", right: "62%", width: "30px", height: "220%", background: "linear-gradient(180deg, hsl(16,100%,62%) 0%, hsl(16,95%,52%) 40%, hsl(16,90%,42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.4, filter: "drop-shadow(0 0 20px hsla(16,95%,55%,0.25))" }} />
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div
+          className="absolute rounded-full blur-[100px]"
+          style={{ top: "-20%", left: "-5%", width: "450px", height: "450px", background: "radial-gradient(circle, rgba(20,184,166,0.12) 0%, transparent 70%)" }}
+        />
+        <div
+          className="absolute rounded-full blur-[120px]"
+          style={{ bottom: "-25%", right: "-5%", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(20,184,166,0.10) 0%, transparent 70%)" }}
+        />
+        <div
+          className="absolute rounded-full blur-[90px]"
+          style={{ top: "10%", right: "15%", width: "350px", height: "350px", background: "radial-gradient(circle, hsla(16,90%,50%,0.07) 0%, transparent 70%)" }}
+        />
+        <div
+          className="absolute rounded-full blur-[80px]"
+          style={{ bottom: "5%", left: "20%", width: "300px", height: "300px", background: "radial-gradient(circle, hsla(16,90%,50%,0.06) 0%, transparent 70%)" }}
+        />
+        <div
+          className="absolute rounded-full blur-[140px]"
+          style={{ top: "30%", left: "40%", width: "400px", height: "400px", background: "radial-gradient(circle, rgba(13,148,136,0.08) 0%, transparent 60%)" }}
+        />
       </div>
 
       <div className="relative max-w-2xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
