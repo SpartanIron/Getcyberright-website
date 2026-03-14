@@ -46,46 +46,47 @@ const features = [
 
 export function PillarTiles() {
   return (
-    <section className="py-16 sm:py-20 bg-background" data-testid="section-pillar-tiles" aria-labelledby="pillars-heading">
+    <section className="py-20 sm:py-28 lg:py-32 bg-background" data-testid="section-pillar-tiles" aria-labelledby="pillars-heading">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mb-10 sm:mb-14">
-          <h2 id="pillars-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-pillars-heading">
+        <div className="max-w-3xl mb-14 sm:mb-20">
+          <h2 id="pillars-heading" className="text-4xl sm:text-5xl font-extrabold text-foreground mb-5" data-testid="text-pillars-heading">
             What We Do
           </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Three core tools that give everyday people the same level of cyber protection that large organizations have. All free to get started.
+          <p className="text-xl text-muted-foreground leading-relaxed">
+            Three core tools that give everyday people the same level of protection that large organizations have. All free to get started.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-10">
           {features.map((feature) => (
             <div
               key={feature.id}
-              className={`relative border ${feature.borderAccent} rounded-xl overflow-hidden bg-card`}
+              className={`relative border ${feature.borderAccent} rounded-2xl overflow-hidden bg-card`}
               data-testid={`card-feature-${feature.id}`}
             >
-              <div className={`h-1 ${feature.accent}`} />
-              <div className="p-6 sm:p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-10 h-10 rounded-lg ${feature.accentLight} flex items-center justify-center`}>
-                    <feature.icon className={`w-5 h-5 ${feature.accentText}`} />
+              <div className={`h-1.5 ${feature.accent}`} />
+              <div className="p-8 sm:p-10">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className={`w-14 h-14 rounded-xl ${feature.accentLight} flex items-center justify-center`}>
+                    <feature.icon className={`w-7 h-7 ${feature.accentText}`} />
                   </div>
-                  <span className={`text-[11px] font-semibold uppercase tracking-wider ${feature.accentText}`}>
+                  <span className={`text-xs font-semibold uppercase tracking-wider ${feature.accentText}`}>
                     {feature.label}
                   </span>
                 </div>
 
-                <h3 className="text-2xl font-bold text-foreground mb-3">{feature.title}</h3>
-                <p className="text-base text-muted-foreground leading-relaxed mb-6">{feature.description}</p>
+                <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">{feature.title}</h3>
+                <p className="text-lg text-muted-foreground leading-relaxed mb-8">{feature.description}</p>
 
                 <Link href={feature.href}>
                   <Button
+                    size="lg"
                     variant="outline"
-                    className="rounded-lg font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    className="rounded-xl font-semibold text-base px-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                     data-testid={`button-feature-${feature.id}`}
                   >
                     {feature.cta}
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
               </div>

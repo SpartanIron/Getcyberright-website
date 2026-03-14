@@ -71,57 +71,58 @@ export function NewsletterCTA() {
 
   return (
     <section
-      className="py-16 sm:py-20 bg-slate-900"
+      className="py-20 sm:py-28 lg:py-32 bg-slate-900"
       data-testid="section-newsletter-cta"
       aria-labelledby="newsletter-heading"
     >
       <div className="max-w-2xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-        <Mail className="w-8 h-8 text-primary mx-auto mb-5" />
+        <Mail className="w-10 h-10 text-primary mx-auto mb-6" />
 
-        <h2 id="newsletter-heading" className="text-3xl sm:text-4xl font-bold text-white mb-4" data-testid="text-newsletter-heading">
+        <h2 id="newsletter-heading" className="text-4xl sm:text-5xl font-extrabold text-white mb-5" data-testid="text-newsletter-heading">
           Stay One Step Ahead
         </h2>
-        <p className="text-lg text-white/60 mb-6 leading-relaxed">
+        <p className="text-xl text-white/60 mb-8 leading-relaxed">
           Join families who get weekly scam alerts, safety tips, and tool updates delivered to their inbox. Free, no spam, unsubscribe anytime.
         </p>
 
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
+        <div className="flex flex-wrap justify-center gap-5 sm:gap-6 mb-10">
           {benefits.map((benefit) => (
-            <span key={benefit} className="flex items-center gap-2 text-base text-white/50">
-              <CheckCircle className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+            <span key={benefit} className="flex items-center gap-2 text-lg text-white/50">
+              <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
               {benefit}
             </span>
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto mb-4">
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto mb-5">
           <Input
             type="email"
             placeholder="Enter your email"
             aria-label="Email address for newsletter"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="flex-1 bg-white/[0.06] border-white/10 text-white placeholder:text-white/30 focus:ring-2 focus:ring-primary rounded-lg"
+            className="flex-1 h-12 text-base bg-white/[0.06] border-white/10 text-white placeholder:text-white/30 focus:ring-2 focus:ring-primary rounded-xl"
             disabled={subscribeMutation.isPending}
             data-testid="input-newsletter-email"
           />
           <Button
             type="submit"
             disabled={subscribeMutation.isPending}
-            className="bg-accent text-accent-foreground border-accent-border rounded-lg px-6 font-medium"
+            size="lg"
+            className="bg-accent text-accent-foreground border-accent-border rounded-xl px-8 font-semibold text-base h-12"
             data-testid="button-newsletter-subscribe"
           >
             {subscribeMutation.isPending ? "Subscribing..." : "Subscribe"}
-            <ArrowRight className="ml-1 w-4 h-4" />
+            <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </form>
 
-        <div className="flex items-center justify-center gap-2 text-white/30 text-xs">
-          <Shield className="w-3 h-3" />
+        <div className="flex items-center justify-center gap-2 text-white/30 text-sm">
+          <Shield className="w-3.5 h-3.5" />
           <span>Your email is never shared or sold.</span>
         </div>
 
-        <p className="text-white/20 text-[10px] mt-3">
+        <p className="text-white/20 text-[11px] mt-4">
           This site is protected by reCAPTCHA and the Google{' '}
           <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-white/40">Privacy Policy</a> and{' '}
           <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-white/40">Terms of Service</a> apply.

@@ -140,14 +140,14 @@ function HeroScamChecker() {
 
   return (
     <div className="relative" data-testid="hero-scam-checker">
-      <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 sm:p-6 backdrop-blur-sm">
-        <div className="flex items-center gap-2.5 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
-            <ScanLine className="w-4 h-4 text-primary" />
+      <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 sm:p-7 backdrop-blur-sm">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center">
+            <ScanLine className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <span className="text-sm font-semibold text-white">AI Scam Checker</span>
-            <span className="text-[10px] text-primary/80 font-semibold uppercase tracking-widest ml-2">Free</span>
+            <span className="text-base font-semibold text-white">AI Scam Checker</span>
+            <span className="text-[11px] text-primary/80 font-semibold uppercase tracking-widest ml-2">Free</span>
           </div>
         </div>
 
@@ -158,22 +158,22 @@ function HeroScamChecker() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={'Paste a suspicious message, email, URL, or phone number...\n\nExample: "URGENT: Your account has been locked. Click here to verify: bit.ly/acct-verify"'}
-            className="w-full min-h-[120px] sm:min-h-[140px] bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-white/25 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/30 transition-all"
+            className="w-full min-h-[130px] sm:min-h-[150px] bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-[15px] text-white placeholder:text-white/25 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/30 transition-all"
             aria-label="Paste suspicious content to analyze"
             data-testid="input-hero-scam-checker"
           />
         </div>
 
-        <div className="flex items-center justify-between mt-4 gap-3">
-          <div className="hidden sm:flex items-center gap-3 text-[11px] text-white/30">
-            <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> Private</span>
-            <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Instant Results</span>
-            <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 8 Security Databases</span>
+        <div className="flex items-center justify-between mt-5 gap-3">
+          <div className="hidden sm:flex items-center gap-4 text-xs text-white/30">
+            <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5" /> Private</span>
+            <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Instant Results</span>
+            <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> 8 Security Databases</span>
           </div>
           <Button
             onClick={handleAnalyze}
             disabled={!input.trim()}
-            className="bg-accent text-accent-foreground border-accent-border font-semibold px-6 py-2.5 rounded-lg shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all disabled:opacity-40 disabled:shadow-none"
+            className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 py-3 text-base rounded-xl shadow-lg shadow-accent/20 hover:shadow-accent/30 transition-all disabled:opacity-40 disabled:shadow-none"
             data-testid="button-hero-analyze"
           >
             <Search className="w-4 h-4 mr-2" />
@@ -182,42 +182,42 @@ function HeroScamChecker() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mt-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
         <Link href="/data-removal">
-          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-3.5 py-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-data-removal">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center flex-shrink-0">
+          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3.5 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-data-removal">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-teal-500/10 flex items-center justify-center flex-shrink-0">
                 <Trash2 className="w-4 h-4 text-teal-400" />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-semibold text-white group-hover:text-teal-400 transition-colors truncate">Data Broker Removal</div>
-                <div className="text-[10px] text-white/30 mt-0.5 truncate">501+ brokers</div>
+                <div className="text-sm font-semibold text-white group-hover:text-teal-400 transition-colors truncate">Data Broker Removal</div>
+                <div className="text-[11px] text-white/30 mt-0.5 truncate">501+ brokers</div>
               </div>
             </div>
           </div>
         </Link>
         <Link href="/training">
-          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-3.5 py-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-training">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3.5 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-training">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
                 <GraduationCap className="w-4 h-4 text-blue-400" />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-semibold text-white group-hover:text-blue-400 transition-colors truncate">Training Academy</div>
-                <div className="text-[10px] text-white/30 mt-0.5 truncate">All skill levels</div>
+                <div className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors truncate">Training Academy</div>
+                <div className="text-[11px] text-white/30 mt-0.5 truncate">All skill levels</div>
               </div>
             </div>
           </div>
         </Link>
         <Link href="/ai-prompts">
-          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-3.5 py-3 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-ai-prompts">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+          <div className="group bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3.5 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.10] transition-all" data-testid="hero-tool-ai-prompts">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
                 <Zap className="w-4 h-4 text-amber-400" />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-semibold text-white group-hover:text-amber-400 transition-colors truncate">AI Prompt Library</div>
-                <div className="text-[10px] text-white/30 mt-0.5 truncate">406+ prompts</div>
+                <div className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors truncate">AI Prompt Library</div>
+                <div className="text-[11px] text-white/30 mt-0.5 truncate">406+ prompts</div>
               </div>
             </div>
           </div>
@@ -242,15 +242,15 @@ const stats = [
 
 function StatBar() {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8" data-testid="hero-stat-bar">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 lg:gap-16" data-testid="hero-stat-bar">
       {stats.map((stat) => {
         const count = useAnimatedCounter(stat.value, stat.duration);
         return (
           <div key={stat.label} className="text-center" data-testid={`stat-hero-${stat.label.toLowerCase().replace(/[,\s]+/g, "-")}`}>
-            <div className="text-3xl sm:text-4xl font-bold text-white tabular-nums leading-none">
+            <div className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold text-white tabular-nums leading-none">
               {count}{stat.suffix}
             </div>
-            <div className="text-xs sm:text-sm text-white/35 font-medium mt-2 leading-tight">{stat.label}</div>
+            <div className="text-sm sm:text-base text-white/40 font-medium mt-3 leading-tight">{stat.label}</div>
           </div>
         );
       })}
@@ -267,14 +267,14 @@ export function HeroSection() {
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-primary/[0.02] rounded-full blur-3xl" />
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="pt-8 sm:pt-10 lg:pt-12 pb-4">
+          <div className="pt-8 sm:pt-10 lg:pt-14 pb-4">
             <ThreatAlertBar />
           </div>
 
-          <div className="grid lg:grid-cols-[1fr_minmax(0,480px)] gap-10 lg:gap-14 items-start pb-10 sm:pb-12 lg:pb-14">
-            <div className="max-w-xl pt-2 lg:pt-6">
+          <div className="grid lg:grid-cols-[1fr_minmax(0,500px)] gap-12 lg:gap-16 items-start pb-12 sm:pb-16 lg:pb-20">
+            <div className="max-w-2xl pt-2 lg:pt-8">
               <h1
-                className="text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold tracking-tight text-white leading-[1.1] mb-6"
+                className="text-[2.75rem] sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.05] mb-8"
                 data-testid="text-hero-heading"
               >
                 Got a Suspicious Message?
@@ -283,39 +283,39 @@ export function HeroSection() {
               </h1>
 
               <p
-                className="text-lg sm:text-xl text-white/50 leading-relaxed mb-8 max-w-lg"
+                className="text-xl sm:text-2xl text-white/50 leading-relaxed mb-10 max-w-xl"
                 data-testid="text-hero-subtext"
               >
                 Paste any text, email, link, or phone number. We check it against 8 trusted security databases and tell you exactly what to watch for.
               </p>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-5 mb-10">
                 {trustPoints.map((point) => (
-                  <div key={point.text} className="flex items-start gap-3">
-                    <point.icon className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-base text-white/45 leading-snug">{point.text}</span>
+                  <div key={point.text} className="flex items-start gap-3.5">
+                    <point.icon className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-lg text-white/45 leading-snug">{point.text}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="lg:hidden mt-2 mb-2">
+              <div className="lg:hidden mt-4 mb-4">
                 <HeroScamChecker />
               </div>
 
               <div className="hidden lg:block">
-                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/40 hover:text-white/60 transition-colors group">
+                <Link href="/tools" className="inline-flex items-center gap-2.5 text-lg text-white/40 hover:text-white/60 transition-colors group">
                   Explore all free tools
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
             </div>
 
-            <div className="hidden lg:block">
+            <div className="hidden lg:block pt-4">
               <HeroScamChecker />
             </div>
           </div>
 
-          <div className="border-t border-white/[0.06] py-8 sm:py-10">
+          <div className="border-t border-white/[0.06] py-12 sm:py-14 lg:py-16">
             <StatBar />
           </div>
         </div>
