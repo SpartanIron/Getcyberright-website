@@ -106,7 +106,7 @@ export function HeroSection() {
           <div className="grid lg:grid-cols-[42%_58%] gap-8 lg:gap-10 items-center pb-16 sm:pb-20 lg:pb-28">
             <div className="max-w-xl pt-4 lg:pt-8">
               <h1
-                className="text-[2.75rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-white leading-[1.02] mb-8"
+                className="text-[2.25rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-white leading-[1.02] mb-8"
                 data-testid="text-hero-heading"
               >
                 Your Family Is

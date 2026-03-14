@@ -85,8 +85,8 @@ export function TrustStrip() {
           </div>
 
           <div className="overflow-hidden">
-            <div className="flex animate-marquee motion-reduce:animate-none motion-reduce:justify-center motion-reduce:flex-wrap motion-reduce:gap-8">
-              {[...sources, ...sources].map((source, i) => (
+            <div className="flex w-max animate-marquee motion-reduce:animate-none motion-reduce:justify-center motion-reduce:flex-wrap motion-reduce:gap-8 motion-reduce:w-auto">
+              {[...sources, ...sources, ...sources, ...sources].map((source, i) => (
                 <span
                   key={`${source}-${i}`}
                   className="text-lg sm:text-xl font-bold text-foreground/60 whitespace-nowrap mx-6 sm:mx-10 flex-shrink-0"
