@@ -56,7 +56,7 @@ export default function ThreatIntelligence() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Hero Section */}
-      <section className="bg-[#001C48] py-12 md:py-16">
+      <section className="bg-[#0A2A3C] py-12 md:py-16">
         <div className="container mx-auto px-4">
           <motion.div 
             className="text-center max-w-3xl mx-auto"
@@ -118,7 +118,7 @@ export default function ThreatIntelligence() {
       </div>
 
       {/* Full-Width Kaspersky Cyber Attack Map */}
-      <section className="bg-[#001C48] pb-8">
+      <section className="bg-[#0A2A3C] pb-8">
         <div className="container mx-auto px-4">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -181,7 +181,7 @@ export default function ThreatIntelligence() {
       </section>
 
       {/* Global Cybercrime Statistics */}
-      <section className="py-16 md:py-20 bg-gradient-to-br from-[#00293C] via-[#001C48] to-[#00293C]">
+      <section className="py-16 md:py-20 bg-gradient-to-br from-[#00293C] via-[#0A2A3C] to-[#00293C]">
         <div className="container mx-auto px-4">
           <motion.div 
             className="text-center mb-12"

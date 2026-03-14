@@ -32,7 +32,7 @@ const threats = [
 
 export function ThreatAwareness() {
   return (
-    <section className="relative overflow-hidden bg-[#001C48]" data-testid="section-threat-awareness" aria-labelledby="threat-heading">
+    <section className="relative overflow-hidden bg-[#0A2A3C]" data-testid="section-threat-awareness" aria-labelledby="threat-heading">
       <div className="absolute inset-0 hidden lg:block">
         <img
           src={seniorsImg}
@@ -41,7 +41,7 @@ export function ThreatAwareness() {
           loading="lazy"
           aria-hidden="true"
         />
-        <div className="absolute right-0 top-0 w-[55%] h-full bg-gradient-to-r from-[#001C48] via-[#001C48]/70 to-transparent" />
+        <div className="absolute right-0 top-0 w-[55%] h-full bg-gradient-to-r from-[#0A2A3C] via-[#0A2A3C]/70 to-transparent" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-28">

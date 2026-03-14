@@ -92,8 +92,8 @@ function ThreatAlertBar() {
 export function HeroSection() {
   return (
     <section className="relative w-full" data-testid="section-hero">
-      <div className="bg-[#001C48] relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#001C48] via-[#001C48] to-[#00293C]" />
+      <div className="bg-[#0A2A3C] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/[0.04] to-transparent" />
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-primary/[0.02] rounded-full blur-3xl" />
 
@@ -155,7 +155,7 @@ export function HeroSection() {
                     className="w-full h-[480px] object-cover"
                     loading="eager"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#001C48]/50 via-transparent to-transparent rounded-2xl" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C]/50 via-transparent to-transparent rounded-2xl" />
                 </div>
 
                 <div className="absolute -bottom-5 -left-5 bg-white/[0.07] backdrop-blur-md border border-white/[0.12] rounded-xl px-5 py-4 shadow-xl">
@@ -180,7 +180,7 @@ export function HeroSection() {
                   className="w-full h-64 sm:h-80 object-cover"
                   loading="eager"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#001C48]/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C]/60 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 flex items-center gap-2.5 bg-white/[0.07] backdrop-blur-md border border-white/[0.12] rounded-lg px-4 py-3">
                   <Shield className="w-4 h-4 text-primary" />
                   <span className="text-xs font-semibold text-white">Backed by FBI, CISA, INTERPOL data</span>

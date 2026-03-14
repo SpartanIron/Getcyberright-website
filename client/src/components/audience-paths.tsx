@@ -93,7 +93,7 @@ export function AudiencePaths() {
           ))}
 
           <Link href="/resources">
-            <div className="group relative rounded-2xl overflow-hidden cursor-pointer h-72 sm:h-80 bg-gradient-to-br from-[#00293C] to-[#001C48] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" data-testid="card-audience-resources">
+            <div className="group relative rounded-2xl overflow-hidden cursor-pointer h-72 sm:h-80 bg-gradient-to-br from-[#00293C] to-[#0A2A3C] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" data-testid="card-audience-resources">
               <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: "radial-gradient(circle at 20% 80%, hsl(var(--primary)) 0%, transparent 50%), radial-gradient(circle at 80% 20%, hsl(var(--accent)) 0%, transparent 50%)" }} />
               <div className="absolute bottom-0 right-0 w-32 h-32 rounded-tl-[80px] bg-white/[0.03]" />
               <div className="relative text-center px-6">

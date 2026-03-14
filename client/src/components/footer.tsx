@@ -44,7 +44,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-[#001028] text-slate-300" role="contentinfo" aria-label="Site footer">
+    <footer className="bg-[#081C26] text-slate-300" role="contentinfo" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-10">
           <div className="col-span-2 md:col-span-1">

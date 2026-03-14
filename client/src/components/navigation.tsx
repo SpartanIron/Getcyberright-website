@@ -73,8 +73,8 @@ export function Navigation() {
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
           isScrolled
-            ? "bg-[#001C48]/98 backdrop-blur-md border-b border-white/10 shadow-lg"
-            : "bg-[#001C48]"
+            ? "bg-[#0A2A3C]/98 backdrop-blur-md border-b border-white/10 shadow-lg"
+            : "bg-[#0A2A3C]"
         }`}
         data-testid="header-navigation"
         role="banner"

@@ -84,7 +84,7 @@ export function NewsletterCTA() {
           loading="lazy"
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-[#001C48]/90" />
+        <div className="absolute inset-0 bg-[#0A2A3C]/90" />
       </div>
 
       <div className="absolute inset-0">
