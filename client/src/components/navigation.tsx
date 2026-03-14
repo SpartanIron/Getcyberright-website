@@ -73,8 +73,8 @@ export function Navigation() {
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 ${
           isScrolled
-            ? "bg-background/95 backdrop-blur-md border-b shadow-sm"
-            : "bg-background"
+            ? "bg-[#001C48]/98 backdrop-blur-md border-b border-white/10 shadow-lg"
+            : "bg-[#001C48]"
         }`}
         data-testid="header-navigation"
         role="banner"
@@ -83,7 +83,7 @@ export function Navigation() {
         <div className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2" data-testid="link-logo">
             <img src={logoImage} alt="GetCyberRight" className="w-10 h-10 object-contain" />
-            <span className="font-semibold text-lg text-foreground">
+            <span className="font-semibold text-lg text-white">
               GetCyberRight
             </span>
           </Link>
@@ -91,7 +91,7 @@ export function Navigation() {
           <NavigationMenu className="hidden lg:flex" aria-label="Main navigation">
             <NavigationMenuList className="gap-1">
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-who-we-help">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white" data-testid="nav-who-we-help">
                   Who We Help
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -130,7 +130,7 @@ export function Navigation() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-tools">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white" data-testid="nav-tools">
                   Tools
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -181,7 +181,7 @@ export function Navigation() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent" data-testid="nav-learn">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white" data-testid="nav-learn">
                   Learn
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -237,7 +237,7 @@ export function Navigation() {
                 <NavigationMenuLink asChild>
                   <Link
                     href="/about"
-                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate ${location === '/about' ? 'text-primary' : ''}`}
+                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/about' ? 'text-primary' : ''}`}
                     data-testid="nav-about"
                   >
                     About Us
@@ -249,7 +249,7 @@ export function Navigation() {
                 <NavigationMenuLink asChild>
                   <Link
                     href="/contact"
-                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate ${location === '/contact' ? 'text-primary' : ''}`}
+                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/contact' ? 'text-primary' : ''}`}
                     data-testid="nav-contact"
                   >
                     Contact
@@ -259,7 +259,7 @@ export function Navigation() {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3 text-white">
             <ThemeToggle />
             <Link href="/tools">
               <Button variant="default" size="default" data-testid="button-get-protection">
@@ -269,8 +269,8 @@ export function Navigation() {
           </div>
 
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild className="lg:hidden">
-              <Button variant="ghost" size="icon" aria-label="Open navigation menu" data-testid="button-mobile-menu">
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Open navigation menu" data-testid="button-mobile-menu" className="lg:hidden text-white hover:bg-white/10">
                 <Menu className="h-5 w-5" aria-hidden="true" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
