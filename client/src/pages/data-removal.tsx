@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { PageBanner } from "@/components/page-banner";
 import { SEOHead } from "@/components/seo-head";
+import bannerImage from "@/assets/images/tool-data-scan-diverse.png";
 import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -325,45 +327,13 @@ export default function DataRemoval() {
       <Navigation />
 
       <main id="main-content" tabIndex={-1}>
-        <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-            <div
-              className="absolute rounded-full"
-              style={{
-                width: "clamp(300px, 40vw, 500px)",
-                height: "clamp(300px, 40vw, 500px)",
-                bottom: "-40%",
-                right: "-10%",
-                backgroundColor: "rgba(59, 130, 246, 0.15)",
-              }}
-            />
-            <div
-              className="absolute rounded-full"
-              style={{
-                width: "clamp(200px, 25vw, 350px)",
-                height: "clamp(200px, 25vw, 350px)",
-                top: "-20%",
-                left: "-5%",
-                backgroundColor: "rgba(139, 92, 246, 0.1)",
-              }}
-            />
-          </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 relative z-10">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 rounded-lg bg-white/10">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-white">
-                  Data Broker Removal
-                </h1>
-                <p className="text-white/70 mt-1 max-w-2xl">
-                  Find your public profiles on people-search sites, send opt-out requests, and track removal progress across 500+ data brokers.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <PageBanner
+          title="Data Broker Removal"
+          subtitle="Find your public profiles on people-search sites, send opt-out requests, and track removal progress across 500+ data brokers."
+          imageSrc={bannerImage}
+          imageAlt="Person scanning for personal data exposure on data broker sites"
+          imagePosition="left"
+        />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {isAuthenticated ? <AuthenticatedJourney /> : <GuestScanForm />}
