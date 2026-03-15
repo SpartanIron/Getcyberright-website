@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { getAllScamSlugs } from "@shared/scam-content";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -251,6 +251,7 @@ export async function registerRoutes(
       { path: '/accessibility', changefreq: 'yearly', priority: '0.4' },
       { path: '/advertise', changefreq: 'monthly', priority: '0.4' },
       { path: '/partner-deck', changefreq: 'monthly', priority: '0.4' },
+      { path: '/experience', changefreq: 'weekly', priority: '0.6' },
     ];
 
     const scamSlugs = getAllScamSlugs();
@@ -427,6 +428,38 @@ export async function registerRoutes(
         res.status(400).json({ error: "Invalid email address", details: (error as any).issues });
       } else {
         res.status(500).json({ error: "Failed to subscribe" });
+      }
+    }
+  });
+
+  app.post("/api/experience/waitlist", strictRateLimit, async (req, res) => {
+    try {
+      const validatedData = insertExperienceWaitlistSchema.parse(req.body);
+      const normalizedEmail = validatedData.email.toLowerCase().trim();
+      const waitlistType = validatedData.type || "family";
+
+      const existing = await db.select().from(experienceWaitlist)
+        .where(and(
+          eq(experienceWaitlist.email, normalizedEmail),
+          eq(experienceWaitlist.type, waitlistType)
+        ));
+      if (existing.length > 0) {
+        res.json({ success: true, message: "This email is already on the waitlist" });
+        return;
+      }
+      await db.insert(experienceWaitlist).values({
+        ...validatedData,
+        email: normalizedEmail,
+        type: waitlistType,
+      });
+      securityLogger.info("Experience waitlist signup", { email: normalizedEmail, type: waitlistType });
+      res.json({ success: true, message: "Successfully joined the waitlist" });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid data", details: (error as any).issues });
+      } else {
+        console.error("Experience waitlist error:", error);
+        res.status(500).json({ error: "Something went wrong. Please try again." });
       }
     }
   });

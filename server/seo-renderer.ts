@@ -827,6 +827,11 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Explore partnership opportunities with GetCyberRight. Learn how your organization can collaborate with us to advance cybersecurity education for families and communities.",
     path: "/partner-deck",
   },
+  "/experience": {
+    title: "The GetCyberRight Experience: Where Families Take Back Their Digital Safety",
+    description: "A first-of-its-kind family event where digital safety meets real fun. Interactive stations, vetted experts, and activities for every age. Join the waitlist to be the first to know.",
+    path: "/experience",
+  },
   "/threat-trends": {
     title: "Cybersecurity Threat Trends: Current Attack Patterns & Statistics",
     description: "Track the latest cybersecurity threat trends and attack patterns. Data-driven insights on emerging scams, malware campaigns, and security threats affecting families and businesses.",

@@ -80,6 +80,7 @@ const Accessibility = lazy(() => import("@/pages/accessibility"));
 const Advertise = lazy(() => import("@/pages/advertise"));
 const PartnerDeck = lazy(() => import("@/pages/partner-deck"));
 const Feedback = lazy(() => import("@/pages/feedback"));
+const Experience = lazy(() => import("@/pages/experience"));
 const CheckoutSuccess = lazy(() => import("@/pages/checkout-success"));
 const Preferences = lazy(() => import("@/pages/preferences"));
 const PrintableGuides = lazy(() => import("@/pages/printable-guides"));
@@ -165,6 +166,7 @@ function Router() {
         <Route path="/advertise" component={Advertise} />
         <Route path="/partner-deck" component={PartnerDeck} />
         <Route path="/feedback" component={Feedback} />
+        <Route path="/experience" component={Experience} />
         <Route path="/checkout-success" component={CheckoutSuccess} />
         <Route path="/preferences" component={Preferences} />
         <Route path="/printable-guides" component={PrintableGuides} />

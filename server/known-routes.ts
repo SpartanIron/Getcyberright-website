@@ -38,6 +38,7 @@ export const KNOWN_CLIENT_ROUTES = new Set([
   "/advertise",
   "/partner-deck",
   "/feedback",
+  "/experience",
   "/checkout-success",
   "/preferences",
   "/printable-guides",

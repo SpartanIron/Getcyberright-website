@@ -112,6 +112,26 @@ export const insertNewsletterSubscriberSchema = createInsertSchema(newsletterSub
 export type InsertNewsletterSubscriber = z.infer<typeof insertNewsletterSubscriberSchema>;
 export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
 
+export const experienceWaitlist = pgTable("experience_waitlist", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull(),
+  name: text("name"),
+  type: text("type").notNull().default("family"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertExperienceWaitlistSchema = createInsertSchema(experienceWaitlist).pick({
+  email: true,
+  name: true,
+  type: true,
+}).extend({
+  email: z.string().email("Please enter a valid email address"),
+  type: z.enum(["family", "vendor"]).default("family"),
+});
+
+export type InsertExperienceWaitlist = z.infer<typeof insertExperienceWaitlistSchema>;
+export type ExperienceWaitlist = typeof experienceWaitlist.$inferSelect;
+
 export const newsletterIssues = pgTable("newsletter_issues", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   subject: text("subject").notNull(),

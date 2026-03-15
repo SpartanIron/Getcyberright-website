@@ -164,6 +164,10 @@ export const pageSEO = {
     title: "Partnership Deck",
     description: "Explore how partnering with GetCyberRight connects your brand with safety-conscious families worldwide. Mission-aligned sponsorship with full editorial independence.",
   },
+  experience: {
+    title: "The GetCyberRight Experience: Where Families Take Back Their Digital Safety",
+    description: "A first-of-its-kind family event where digital safety meets real fun. Interactive stations, vetted experts, and activities for every age. Join the waitlist.",
+  },
   security: {
     title: "Our Security Practices",
     description: "Learn how GetCyberRight keeps your data safe. Our security measures and certifications explained.",
