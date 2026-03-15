@@ -171,12 +171,11 @@ export function HeroSection() {
         <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-primary/[0.05] rounded-full blur-[120px]" />
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="pt-8 sm:pt-10 lg:pt-12 pb-4 overflow-hidden">
-            <ThreatAlertBar />
-          </div>
-
           <div className="grid lg:grid-cols-[42%_58%] gap-8 lg:gap-10 items-center pb-16 sm:pb-20 lg:pb-28">
-            <div className="max-w-xl pt-4 lg:pt-8">
+            <div className="max-w-xl pt-8 sm:pt-10 lg:pt-14">
+              <div className="mb-6 overflow-hidden">
+                <ThreatAlertBar />
+              </div>
               <h1
                 className="text-[2.25rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-white leading-[1.02] mb-8"
                 data-testid="text-hero-heading"
