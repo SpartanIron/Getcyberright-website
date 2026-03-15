@@ -72,7 +72,7 @@ export function useSEO({
     }
 
     return () => {
-      document.title = "GetCyberRight.com - Protecting Families Online | Cyber Safety for All Ages";
+      document.title = "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors";
     };
   }, [title, description, ogTitle, ogDescription, ogType, ogImage, keywords, canonicalUrl]);
 }

@@ -9,7 +9,7 @@ interface SEOHeadProps {
   canonical?: string;
 }
 
-const defaultTitle = "GetCyberRight - Cybersecurity Education for Everyone";
+const defaultTitle = "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors";
 const defaultDescription = "Cybersecurity tools and education for families, parents, kids, and seniors. Protect yourself from scams, data brokers, and online threats.";
 const defaultKeywords = "cybersecurity, online safety, phishing protection, scam prevention, identity theft, security training";
 
