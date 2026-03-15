@@ -232,11 +232,10 @@ export function HeroSection() {
                   <img
                     src={heroFamilyImg}
                     alt="Diverse family learning together on a laptop"
-                    className="w-full h-[520px] object-cover"
+                    className="w-full h-[620px] object-cover"
                     loading="eager"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#0A2A3C]/80 via-[#0A2A3C]/20 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C]/40 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0A2A3C]/70 via-transparent to-transparent" style={{ width: '35%' }} />
                 </div>
 
                 <div className="absolute bottom-8 left-8 flex items-center gap-3 bg-white/[0.08] backdrop-blur-md border border-white/[0.12] rounded-xl px-5 py-3.5">
