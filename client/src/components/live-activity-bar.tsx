@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Shield, Activity, AlertTriangle, BookOpen } from "lucide-react";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface PlatformStats {
   scansPerformed: number;
@@ -11,34 +11,33 @@ interface PlatformStats {
   last24hThreats: number;
 }
 
-function useAnimatedCounter(target: number, duration: number = 1600) {
+function useCountUp(target: number, duration: number = 1600) {
   const [count, setCount] = useState(0);
-  const hasStarted = useRef(false);
+  const prevTarget = useRef(0);
 
-  const startAnimation = useCallback(() => {
-    if (hasStarted.current) return;
-    hasStarted.current = true;
+  useEffect(() => {
+    if (target === 0 || target === prevTarget.current) return;
+    prevTarget.current = target;
 
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced || target === 0) {
+    if (prefersReduced) {
       setCount(target);
       return;
     }
 
     const startTime = performance.now();
+    let rafId: number;
     const step = (now: number) => {
       const progress = Math.min((now - startTime) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * target));
-      if (progress < 1) requestAnimationFrame(step);
+      if (progress < 1) {
+        rafId = requestAnimationFrame(step);
+      }
     };
-    requestAnimationFrame(step);
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
   }, [target, duration]);
-
-  useEffect(() => {
-    const timer = setTimeout(startAnimation, 200);
-    return () => clearTimeout(timer);
-  }, [startAnimation]);
 
   return count;
 }
@@ -54,9 +53,10 @@ export function LiveActivityBar() {
     staleTime: 60 * 1000,
   });
 
-  const scans = useAnimatedCounter(data?.scansPerformed || 0, 2000);
-  const threats = useAnimatedCounter(data?.threatsDetected || 0, 1200);
-  const activeAlerts = useAnimatedCounter(data?.activeAlerts || 0, 800);
+  const scans = useCountUp(data?.scansPerformed || 0, 2000);
+  const threats = useCountUp(data?.threatsDetected || 0, 1200);
+  const activeAlerts = useCountUp(data?.activeAlerts || 0, 800);
+  const guides = useCountUp(data?.guidesPublished || 0, 800);
 
   if (!data) return null;
 
@@ -92,7 +92,7 @@ export function LiveActivityBar() {
 
           <div className="flex items-center gap-2" data-testid="stat-live-guides">
             <BookOpen className="w-4 h-4 text-teal-400 flex-shrink-0" />
-            <span className="text-sm font-bold text-white tabular-nums">{data.guidesPublished}</span>
+            <span className="text-sm font-bold text-white tabular-nums">{guides}</span>
             <span className="text-xs text-white/50 font-medium">safety guides</span>
           </div>
         </div>
