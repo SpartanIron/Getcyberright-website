@@ -170,8 +170,16 @@ export default function PrintableGuides() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-teal-600 via-teal-700 to-cyan-700 text-white py-12 md:py-16 overflow-hidden">
-        <div className="container mx-auto px-4">
+      <section className="bg-[#0A2A3C] text-white py-12 md:py-16 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+        <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: "-40%", right: "2%", width: "50px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-40%", right: "10%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 10%, rgba(45, 212, 191, 0.4) 50%, transparent 90%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-35%", right: "18%", width: "35px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.55 }} />
+          <div style={{ position: "absolute", top: "-35%", right: "26%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 15%, hsla(16, 95%, 58%, 0.35) 50%, transparent 85%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-30%", right: "32%", width: "50px", height: "220%", background: "linear-gradient(180deg, hsl(16, 100%, 62%) 0%, hsl(16, 95%, 52%) 40%, hsl(16, 90%, 42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.5 }} />
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div 
             className="max-w-3xl mx-auto text-center"
             initial="hidden"
@@ -186,13 +194,13 @@ export default function PrintableGuides() {
               <span className="text-sm">Free Downloads</span>
             </motion.div>
             <motion.h1 
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
+              className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 tracking-[-0.025em]"
               variants={fadeInUp}
             >
               Printable Safety Checklists
             </motion.h1>
             <motion.p 
-              className="text-lg md:text-xl text-teal-100 leading-relaxed"
+              className="text-lg md:text-xl text-white/70 leading-relaxed"
               variants={fadeInUp}
             >
               Print these checklists and share them with family members. Perfect for seniors who prefer paper guides, or to post on the fridge for everyone to see.

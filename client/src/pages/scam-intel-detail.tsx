@@ -165,9 +165,17 @@ export default function ScamIntelDetailPage() {
       <StructuredData data={structuredData} />
       <Navigation />
 
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-        <div className="container mx-auto px-4 py-12">
-          <Link href="/scam-intel" className="inline-flex items-center text-slate-300 hover:text-white text-sm mb-6 transition-colors" data-testid="link-back-scam-intel">
+      <div className="bg-[#0A2A3C] text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+        <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: "-40%", right: "2%", width: "50px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-40%", right: "10%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 10%, rgba(45, 212, 191, 0.4) 50%, transparent 90%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-35%", right: "18%", width: "35px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.55 }} />
+          <div style={{ position: "absolute", top: "-35%", right: "26%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 15%, hsla(16, 95%, 58%, 0.35) 50%, transparent 85%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-30%", right: "32%", width: "50px", height: "220%", background: "linear-gradient(180deg, hsl(16, 100%, 62%) 0%, hsl(16, 95%, 52%) 40%, hsl(16, 90%, 42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.5 }} />
+        </div>
+        <div className="container mx-auto px-4 py-12 relative z-10">
+          <Link href="/scam-intel" className="inline-flex items-center text-white/60 hover:text-white text-sm mb-6 transition-colors" data-testid="link-back-scam-intel">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Scam Intelligence
           </Link>
@@ -181,16 +189,16 @@ export default function ScamIntelDetailPage() {
                 <Badge className={`${scam.riskLevel === "high" ? "bg-red-600" : scam.riskLevel === "medium" ? "bg-orange-600" : "bg-green-600"} text-white`}>
                   {risk.label}
                 </Badge>
-                {scam.scamCategory && <Badge variant="outline" className="border-slate-500 text-slate-300">{scam.scamCategory}</Badge>}
+                {scam.scamCategory && <Badge variant="outline" className="border-white/20 text-white/70">{scam.scamCategory}</Badge>}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold" data-testid="text-scam-title">{scam.scamName}</h1>
-              <p className="text-slate-300 mt-2">{scam.metaDescription}</p>
+              <h1 className="text-[1.75rem] sm:text-3xl md:text-4xl font-extrabold tracking-[-0.025em]" data-testid="text-scam-title">{scam.scamName}</h1>
+              <p className="text-white/60 mt-2">{scam.metaDescription}</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-4 mt-4 text-sm text-slate-300">
+          <div className="flex flex-wrap gap-4 mt-4 text-sm text-white/60">
             {scam.platformUsed?.map((p) => (
-              <Badge key={p} variant="outline" className="border-slate-500 text-slate-300">{p}</Badge>
+              <Badge key={p} variant="outline" className="border-white/20 text-white/70">{p}</Badge>
             ))}
             {scam.targetAudience?.length > 0 && (
               <span className="flex items-center gap-1"><Users className="h-4 w-4" /> Targets: {scam.targetAudience.join(", ")}</span>
@@ -209,7 +217,7 @@ export default function ScamIntelDetailPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-4 mt-6 pt-4 border-t border-slate-700">
-            <div className="[&_span]:text-slate-300 [&_button]:border-slate-600 [&_button]:text-slate-300" data-testid="share-buttons-header">
+            <div className="[&_span]:text-white/60 [&_button]:border-white/20 [&_button]:text-white/60" data-testid="share-buttons-header">
               <ShareButtons
                 url={shareUrl}
                 title={`${scam.scamName} - Scam Alert`}

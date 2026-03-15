@@ -124,9 +124,17 @@ export default function AlertDetailPage() {
       <StructuredData data={[blogPosting, breadcrumbs]} />
       <Navigation />
 
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-        <div className="container mx-auto px-4 py-12">
-          <Link href="/alerts" className="inline-flex items-center text-slate-300 hover:text-white text-sm mb-6 transition-colors" data-testid="link-back-alerts">
+      <div className="bg-[#0A2A3C] text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+        <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: "-40%", right: "2%", width: "50px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-40%", right: "10%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 10%, rgba(45, 212, 191, 0.4) 50%, transparent 90%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-35%", right: "18%", width: "35px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.55 }} />
+          <div style={{ position: "absolute", top: "-35%", right: "26%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 15%, hsla(16, 95%, 58%, 0.35) 50%, transparent 85%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-30%", right: "32%", width: "50px", height: "220%", background: "linear-gradient(180deg, hsl(16, 100%, 62%) 0%, hsl(16, 95%, 52%) 40%, hsl(16, 90%, 42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.5 }} />
+        </div>
+        <div className="container mx-auto px-4 py-12 relative z-10">
+          <Link href="/alerts" className="inline-flex items-center text-white/60 hover:text-white text-sm mb-6 transition-colors" data-testid="link-back-alerts">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Alerts
           </Link>
@@ -140,10 +148,10 @@ export default function AlertDetailPage() {
                 <Badge className={`${alert.riskLevel === "high" ? "bg-red-600" : alert.riskLevel === "medium" ? "bg-orange-600" : "bg-green-600"} text-white`}>
                   {alert.riskLevel?.toUpperCase()} RISK
                 </Badge>
-                {alert.threatCategory && <Badge variant="outline" className="border-slate-500 text-slate-300">{alert.threatCategory}</Badge>}
+                {alert.threatCategory && <Badge variant="outline" className="border-white/20 text-white/70">{alert.threatCategory}</Badge>}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold" data-testid="text-alert-title">{alert.threatName}</h1>
-              <div className="flex flex-wrap items-center gap-4 mt-3 text-slate-300 text-sm">
+              <h1 className="text-[1.75rem] sm:text-3xl md:text-4xl font-extrabold tracking-[-0.025em]" data-testid="text-alert-title">{alert.threatName}</h1>
+              <div className="flex flex-wrap items-center gap-4 mt-3 text-white/60 text-sm">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   {new Date(alert.publishedAt || alert.dateDetected).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
@@ -160,10 +168,10 @@ export default function AlertDetailPage() {
 
           <div className="flex flex-wrap gap-2 mt-4">
             {alert.cveIds?.map((cve) => (
-              <Badge key={cve} variant="outline" className="border-slate-500 text-slate-300 font-mono">{cve}</Badge>
+              <Badge key={cve} variant="outline" className="border-white/20 text-white/70 font-mono">{cve}</Badge>
             ))}
             {alert.affectedPlatforms?.map((p) => (
-              <Badge key={p} variant="outline" className="border-slate-500 text-slate-300">{p}</Badge>
+              <Badge key={p} variant="outline" className="border-white/20 text-white/70">{p}</Badge>
             ))}
           </div>
         </div>

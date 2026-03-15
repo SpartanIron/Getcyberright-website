@@ -216,21 +216,21 @@ export default function TravelSafety() {
   const selectedEmbassy = countriesForRegion.find(c => c.country === selectedCountry);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-[#0A2A3C]">
       <div className="max-w-6xl mx-auto px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Plane className="h-4 w-4" />
             Pre-Travel Security Guide
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-[-0.025em]">
             Travel Safety Checklist
           </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+          <p className="text-xl text-white/70 max-w-2xl mx-auto">
             Protect yourself and your family before you travel. Complete these steps to stay safe from cyber threats abroad.
           </p>
         </motion.div>

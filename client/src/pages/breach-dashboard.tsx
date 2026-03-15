@@ -212,7 +212,7 @@ export default function BreachDashboard() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+      <div className="min-h-screen bg-[#0A2A3C] text-white">
         <div className="container mx-auto px-4 py-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -223,10 +223,10 @@ export default function BreachDashboard() {
               <AlertTriangle className="w-5 h-5" />
               Access Required
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-4 tracking-[-0.025em]">
               Family Breach Dashboard
             </h1>
-            <p className="text-slate-400 mb-8">
+            <p className="text-white/60 mb-8">
               To access your breach monitoring dashboard, you need a secure access link. 
               This link is sent to you when you sign up for breach monitoring.
             </p>
@@ -265,7 +265,7 @@ export default function BreachDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A2A3C] text-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-500" />
           <p className="text-slate-400">Loading your dashboard...</p>
@@ -275,7 +275,7 @@ export default function BreachDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+    <div className="min-h-screen bg-[#0A2A3C] text-white">
       <div className="container mx-auto px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -283,7 +283,7 @@ export default function BreachDashboard() {
           className="max-w-4xl mx-auto"
         >
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 px-4 py-2 rounded-full mb-4">
+            <div className="inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full mb-4">
               <Users className="w-5 h-5" />
               Family Breach Dashboard
             </div>

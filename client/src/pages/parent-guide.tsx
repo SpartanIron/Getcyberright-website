@@ -163,8 +163,16 @@ export default function ParentGuide() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 text-white py-12 md:py-20 overflow-hidden">
-        <div className="container mx-auto px-4">
+      <section className="bg-[#0A2A3C] text-white py-12 md:py-20 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+        <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: "-40%", right: "2%", width: "50px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-40%", right: "10%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 10%, rgba(45, 212, 191, 0.4) 50%, transparent 90%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-35%", right: "18%", width: "35px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.55 }} />
+          <div style={{ position: "absolute", top: "-35%", right: "26%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 15%, hsla(16, 95%, 58%, 0.35) 50%, transparent 85%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-30%", right: "32%", width: "50px", height: "220%", background: "linear-gradient(180deg, hsl(16, 100%, 62%) 0%, hsl(16, 95%, 52%) 40%, hsl(16, 90%, 42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.5 }} />
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div 
             className="max-w-3xl mx-auto text-center"
             initial="hidden"
@@ -180,14 +188,14 @@ export default function ParentGuide() {
               <span className="text-sm">Guide for Parents & Guardians</span>
             </motion.div>
             <motion.h1 
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
+              className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 tracking-[-0.025em]"
               variants={fadeInUp}
               transition={{ duration: 0.6 }}
             >
               Keeping Your Children Safe Online
             </motion.h1>
             <motion.p 
-              className="text-lg md:text-xl text-indigo-100 leading-relaxed"
+              className="text-lg md:text-xl text-white/70 leading-relaxed"
               variants={fadeInUp}
               transition={{ duration: 0.6 }}
             >
@@ -568,7 +576,7 @@ export default function ParentGuide() {
       </section>
 
       {/* Related Pages */}
-      <section className="py-16 bg-gradient-to-r from-indigo-600 to-purple-700">
+      <section className="py-16 bg-[#0A2A3C]">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center text-white">
             <Users className="h-12 w-12 mx-auto mb-6" />
