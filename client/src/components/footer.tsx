@@ -1,4 +1,4 @@
-import { Mail } from "lucide-react";
+import { Mail, Shield, Lock, FileCheck } from "lucide-react";
 import { SiLinkedin, SiFacebook, SiYoutube } from "react-icons/si";
 import { Link } from "wouter";
 import logoImage from "@/assets/logo.png";
@@ -142,6 +142,25 @@ export function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-slate-800">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-6" data-testid="footer-compliance-badges">
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <Shield className="w-3.5 h-3.5" />
+              <span>OWASP Aligned</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <FileCheck className="w-3.5 h-3.5" />
+              <span>NIST Framework</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <Lock className="w-3.5 h-3.5" />
+              <span>SSL Encrypted</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <Shield className="w-3.5 h-3.5" />
+              <span>No Data Sold</span>
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-400">
             <p data-testid="text-copyright">
               &copy; {new Date().getFullYear()} GetCyberRight. All rights reserved.

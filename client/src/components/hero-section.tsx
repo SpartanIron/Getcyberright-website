@@ -212,9 +212,10 @@ export function HeroSection() {
                 </Link>
               </div>
 
-              <div className="flex items-center gap-4 sm:gap-6 text-sm text-white/60">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-white/60">
                 <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /> No account needed</span>
                 <span className="flex items-center gap-2"><Eye className="w-4 h-4 text-primary" /> Nothing stored</span>
+                <span className="flex items-center gap-2"><Shield className="w-4 h-4 text-primary" /> Free to get started</span>
               </div>
             </div>
 

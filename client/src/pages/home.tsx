@@ -1,6 +1,8 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
+import { LiveActivityBar } from "@/components/live-activity-bar";
 import { TrustStrip } from "@/components/trust-strip";
+import { HowItWorks } from "@/components/how-it-works";
 import { PillarTiles } from "@/components/pillar-tiles";
 import { ThreatAwareness } from "@/components/threat-awareness";
 import { ContentPreview } from "@/components/content-preview";
@@ -41,7 +43,9 @@ export default function Home() {
       <Navigation />
       <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
         <HeroSection />
+        <LiveActivityBar />
         <TrustStrip />
+        <HowItWorks />
         <ThreatAwareness />
         <PillarTiles />
         <AudiencePaths />
