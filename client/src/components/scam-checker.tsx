@@ -2146,7 +2146,7 @@ export function ScamChecker() {
                                   )}
                                 </div>
 
-                                <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs">
                                   <div className={`p-1.5 rounded ${
                                     reputation.phishTank.isPhishing
                                       ? 'bg-red-100 dark:bg-red-950/50'
@@ -2234,9 +2234,61 @@ export function ScamChecker() {
                                                 : 'Pending'}
                                     </div>
                                   </div>
+
+                                  {reputation.googleSafeBrowsing && (
+                                    <div className={`p-1.5 rounded ${
+                                      reputation.googleSafeBrowsing.isThreat
+                                        ? 'bg-red-100 dark:bg-red-950/50'
+                                        : reputation.googleSafeBrowsing.checked
+                                          ? 'bg-green-100 dark:bg-green-950/50'
+                                          : 'bg-gray-100 dark:bg-gray-800'
+                                    }`}>
+                                      <div className="font-medium flex items-center gap-1">
+                                        {reputation.googleSafeBrowsing.isThreat ? (
+                                          <XCircle className="w-3 h-3 text-red-500" />
+                                        ) : reputation.googleSafeBrowsing.checked ? (
+                                          <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                        ) : (
+                                          <Info className="w-3 h-3 text-gray-400" />
+                                        )}
+                                        Google
+                                      </div>
+                                      <div className="text-muted-foreground">
+                                        {reputation.googleSafeBrowsing.isThreat
+                                          ? 'FLAGGED'
+                                          : reputation.googleSafeBrowsing.checked
+                                            ? 'Clean'
+                                            : 'N/A'}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {reputation.domainAge && (
+                                    <div className={`p-1.5 rounded ${
+                                      reputation.domainAge.isNew
+                                        ? 'bg-yellow-100 dark:bg-yellow-950/50'
+                                        : 'bg-green-100 dark:bg-green-950/50'
+                                    }`}>
+                                      <div className="font-medium flex items-center gap-1">
+                                        {reputation.domainAge.isNew ? (
+                                          <AlertTriangle className="w-3 h-3 text-yellow-500" />
+                                        ) : (
+                                          <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                        )}
+                                        Age
+                                      </div>
+                                      <div className="text-muted-foreground">
+                                        {reputation.domainAge.isNew
+                                          ? 'New domain'
+                                          : reputation.domainAge.ageInDays
+                                            ? `${Math.floor(reputation.domainAge.ageInDays / 365)}+ yrs`
+                                            : 'Established'}
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
 
-                                {(reputation.phishTank.isPhishing || reputation.urlhaus.isMalware) && (
+                                {(reputation.phishTank.isPhishing || reputation.urlhaus.isMalware || reputation.googleSafeBrowsing?.isThreat) && (
                                   <div className="text-xs text-red-600 dark:text-red-400 font-medium p-1 bg-red-100/50 dark:bg-red-900/30 rounded">
                                     This URL is in known threat databases. Do NOT visit this link.
                                   </div>
@@ -2253,8 +2305,8 @@ export function ScamChecker() {
                 <div className="text-xs text-muted-foreground p-2 bg-muted/30 rounded flex items-start gap-2">
                   <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
                   <span>
-                    Links are checked against security databases for phishing, malware, and connection safety.
-                    Note: New threats take time to be reported. Always exercise caution with unfamiliar links.
+                    Links are checked against multiple security databases including VirusTotal, Google Safe Browsing,
+                    and domain registration records. New threats take time to be reported. Always exercise caution with unfamiliar links.
                   </span>
                 </div>
               </div>

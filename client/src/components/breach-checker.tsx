@@ -881,9 +881,16 @@ export function BreachChecker() {
           ]
         });
       } else {
-        // Fallback to simulated check if API fails
-        const checkResult = simulateBreachCheck(email);
-        setEmailResult(checkResult);
+        setEmailResult({
+          status: "warning",
+          message: "We were unable to check this email right now. Our breach database may be temporarily unavailable. Please try again in a few minutes.",
+          recommendations: [
+            "Try again in a few minutes",
+            "In the meantime, use strong unique passwords for every account",
+            "Enable two-factor authentication on all important accounts",
+            "Consider signing up for breach monitoring alerts"
+          ]
+        });
       }
     }
     

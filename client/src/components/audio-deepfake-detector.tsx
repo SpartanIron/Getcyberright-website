@@ -315,8 +315,8 @@ export function AudioDeepfakeDetector() {
         </div>
         <CardTitle className="text-2xl">Voice Clone Detector</CardTitle>
         <CardDescription className="text-base max-w-lg mx-auto">
-          Upload a suspicious voicemail or audio recording to check if it might be 
-          AI-generated. Protect yourself from voice cloning scams.
+          Learn what AI-generated voice clones sound like and the warning signs to watch for.
+          This educational demo shows what professional detection tools analyze.
         </CardDescription>
         <div className="flex flex-wrap justify-center gap-2 mt-2">
           <Badge variant="secondary">

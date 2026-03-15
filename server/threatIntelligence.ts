@@ -172,7 +172,15 @@ export async function checkGoogleSafeBrowsing(url: string): Promise<GoogleSafeBr
     );
 
     if (!response.ok) {
-      throw new Error(`Google Safe Browsing API error: ${response.status}`);
+      const errorBody = await response.text().catch(() => "");
+      const isKeyIssue = response.status === 400 || response.status === 403;
+      console.error(`Google Safe Browsing API error: ${response.status}`, errorBody);
+      return {
+        checked: false,
+        isThreat: false,
+        threats: [],
+        error: isKeyIssue ? "API key configuration issue" : "Service temporarily unavailable"
+      };
     }
 
     const data = await response.json();

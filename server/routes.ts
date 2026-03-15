@@ -427,30 +427,39 @@ export async function registerRoutes(
     }
   });
 
-  // URL reputation check - PhishTank (free, no API key required)
   app.post("/api/security/check-phishtank", standardRateLimit, async (req, res) => {
     try {
-      // Normalize URL before validation
       const normalizedBody = { ...req.body, url: normalizeUrl(req.body.url || '') };
       const { url } = urlCheckSchema.parse(normalizedBody);
       
       const formData = new URLSearchParams();
       formData.append('url', url);
       formData.append('format', 'json');
+      const phishTankKey = process.env.PHISHTANK_API_KEY;
+      if (phishTankKey) {
+        formData.append('app_key', phishTankKey);
+      }
       
       const response = await fetchWithTimeout('https://checkurl.phishtank.com/checkurl/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'phishtank/getcyberright',
         },
         body: formData.toString(),
-      }, 10000);
+      }, 15000);
       
       if (!response.ok) {
         throw new Error(`PhishTank API error: ${response.status}`);
       }
       
-      const data = await response.json();
+      const text = await response.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('PhishTank returned non-JSON response');
+      }
       
       res.json({
         success: true,
@@ -479,18 +488,21 @@ export async function registerRoutes(
   // URL reputation check - URLhaus (abuse.ch - free, no API key required)
   app.post("/api/security/check-urlhaus", standardRateLimit, async (req, res) => {
     try {
-      // Normalize URL before validation
       const normalizedBody = { ...req.body, url: normalizeUrl(req.body.url || '') };
       const { url } = urlCheckSchema.parse(normalizedBody);
       
       const formData = new URLSearchParams();
       formData.append('url', url);
       
+      const headers: Record<string, string> = { 'Content-Type': 'application/x-www-form-urlencoded' };
+      const urlhausKey = process.env.URLHAUS_AUTH_KEY;
+      if (urlhausKey) {
+        headers['Auth-Key'] = urlhausKey;
+      }
+      
       const response = await fetchWithTimeout('https://urlhaus-api.abuse.ch/v1/url/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        headers,
         body: formData.toString(),
       }, 10000);
       
@@ -525,44 +537,64 @@ export async function registerRoutes(
     }
   });
 
-  // Combined URL reputation check
   app.post("/api/security/check-url-reputation", standardRateLimit, async (req, res) => {
     try {
-      // Normalize URL before validation
       const normalizedBody = { ...req.body, url: normalizeUrl(req.body.url || '') };
       const { url } = urlCheckSchema.parse(normalizedBody);
       
-      // Run both checks in parallel with timeouts
-      const [phishTankResult, urlhausResult] = await Promise.allSettled([
+      const parsedUrl = new URL(url);
+      const domain = parsedUrl.hostname;
+      
+      const [phishTankResult, urlhausResult, gsbResult, domainAgeResult] = await Promise.allSettled([
         // PhishTank check
         (async () => {
           const formData = new URLSearchParams();
           formData.append('url', url);
           formData.append('format', 'json');
+          const phishTankKey = process.env.PHISHTANK_API_KEY;
+          if (phishTankKey) {
+            formData.append('app_key', phishTankKey);
+          }
           
           const response = await fetchWithTimeout('https://checkurl.phishtank.com/checkurl/', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: { 
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'User-Agent': 'phishtank/getcyberright'
+            },
             body: formData.toString(),
-          }, 10000);
+          }, 15000);
           
-          if (!response.ok) throw new Error('PhishTank API error');
-          return response.json();
+          if (!response.ok) throw new Error(`PhishTank API error: ${response.status}`);
+          const text = await response.text();
+          try {
+            return JSON.parse(text);
+          } catch {
+            throw new Error('PhishTank returned non-JSON response (likely Cloudflare challenge)');
+          }
         })(),
         // URLhaus check
         (async () => {
           const formData = new URLSearchParams();
           formData.append('url', url);
           
+          const headers: Record<string, string> = { 'Content-Type': 'application/x-www-form-urlencoded' };
+          const urlhausKey = process.env.URLHAUS_AUTH_KEY;
+          if (urlhausKey) {
+            headers['Auth-Key'] = urlhausKey;
+          }
+          
           const response = await fetchWithTimeout('https://urlhaus-api.abuse.ch/v1/url/', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers,
             body: formData.toString(),
           }, 10000);
           
-          if (!response.ok) throw new Error('URLhaus API error');
+          if (!response.ok) throw new Error(`URLhaus API error: ${response.status}`);
           return response.json();
-        })()
+        })(),
+        checkGoogleSafeBrowsing(url),
+        checkDomainAge(domain)
       ]);
       
       const phishTank = phishTankResult.status === 'fulfilled' ? {
@@ -579,14 +611,23 @@ export async function registerRoutes(
         tags: urlhausResult.value.tags || []
       } : { checked: false, isMalware: null, error: 'Service unavailable' };
       
-      // Determine overall threat level
+      const googleSafeBrowsing = gsbResult.status === 'fulfilled' ? gsbResult.value : {
+        checked: false, isThreat: false, threats: [], error: 'Service unavailable'
+      };
+      
+      const domainAge = domainAgeResult.status === 'fulfilled' ? domainAgeResult.value : null;
+      
       let threatLevel: 'safe' | 'suspicious' | 'dangerous' | 'unknown' = 'unknown';
-      if (phishTank.isPhishing || urlhaus.isMalware) {
+      const hasThreat = phishTank.isPhishing || urlhaus.isMalware || googleSafeBrowsing.isThreat;
+      const checkedSources = [phishTank.checked, urlhaus.checked, googleSafeBrowsing.checked].filter(Boolean).length;
+      const isNewDomain = domainAge && 'isNew' in domainAge && domainAge.isNew;
+      
+      if (hasThreat) {
         threatLevel = 'dangerous';
-      } else if (phishTank.checked && urlhaus.checked && !phishTank.isPhishing && !urlhaus.isMalware) {
-        threatLevel = 'safe';
-      } else if (phishTank.checked || urlhaus.checked) {
-        threatLevel = phishTank.isPhishing === false || urlhaus.isMalware === false ? 'safe' : 'suspicious';
+      } else if (checkedSources >= 2) {
+        threatLevel = isNewDomain ? 'suspicious' : 'safe';
+      } else if (checkedSources >= 1) {
+        threatLevel = isNewDomain ? 'suspicious' : 'safe';
       }
       
       res.json({
@@ -595,6 +636,8 @@ export async function registerRoutes(
         threatLevel,
         phishTank,
         urlhaus,
+        googleSafeBrowsing,
+        domainAge,
         checkedAt: new Date().toISOString()
       });
     } catch (error) {
@@ -1138,44 +1181,46 @@ EDGE CASE HANDLING
         checkVirusTotal(url),
         checkDomainAge(domain),
         checkSSLCertificate(url),
-        // PhishTank check
         (async () => {
           const formData = new URLSearchParams();
           formData.append('url', url);
           formData.append('format', 'json');
+          const phishTankKey = process.env.PHISHTANK_API_KEY;
+          if (phishTankKey) formData.append('app_key', phishTankKey);
           
           const response = await fetchWithTimeout('https://checkurl.phishtank.com/checkurl/', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'phishtank/getcyberright' },
             body: formData.toString(),
-          }, 10000);
+          }, 15000);
           
           if (!response.ok) throw new Error('PhishTank API error');
-          const data = await response.json();
-          return {
-            checked: true,
-            isPhishing: data.results?.in_database === true && data.results?.valid === true
-          };
+          const text = await response.text();
+          try {
+            const data = JSON.parse(text);
+            return { checked: true, isPhishing: data.results?.in_database === true && data.results?.valid === true };
+          } catch {
+            throw new Error('PhishTank returned non-JSON response');
+          }
         })(),
-        // URLhaus check
         (async () => {
           const formData = new URLSearchParams();
           formData.append('url', url);
           
+          const headers: Record<string, string> = { 'Content-Type': 'application/x-www-form-urlencoded' };
+          const urlhausKey = process.env.URLHAUS_AUTH_KEY;
+          if (urlhausKey) headers['Auth-Key'] = urlhausKey;
+          
           const response = await fetchWithTimeout('https://urlhaus-api.abuse.ch/v1/url/', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers,
             body: formData.toString(),
           }, 10000);
           
-          if (!response.ok) throw new Error('URLhaus API error');
+          if (!response.ok) throw new Error(`URLhaus API error: ${response.status}`);
           const data = await response.json();
-          return {
-            checked: true,
-            isMalware: data.query_status === 'ok'
-          };
+          return { checked: true, isMalware: data.query_status === 'ok' };
         })(),
-        // AlienVault OTX threat intelligence
         checkAlienVaultOTX(domain)
       ]);
 
@@ -1238,7 +1283,97 @@ EDGE CASE HANDLING
     }
   });
 
-  // Get user subscription status (protected route)
+  app.post("/api/cyber-hygiene-check", standardRateLimit, async (req, res) => {
+    try {
+      const schema = z.object({
+        domain: z.string().min(1).max(253).refine((d) => {
+          const clean = d.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase();
+          const blockedPatterns = [
+            /^localhost$/i,
+            /^127\./,
+            /^10\./,
+            /^172\.(1[6-9]|2\d|3[01])\./,
+            /^192\.168\./,
+            /^0\./,
+            /^169\.254\./,
+            /^fc00:/i,
+            /^fe80:/i,
+            /^::1$/,
+            /^\d+\.\d+\.\d+\.\d+$/,
+          ];
+          return !blockedPatterns.some(p => p.test(clean)) && clean.includes('.');
+        }, { message: "Invalid or private domain" }),
+        includeAdvanced: z.boolean().optional().default(false)
+      });
+      const { domain, includeAdvanced } = schema.parse(req.body);
+      
+      const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase();
+      const urlToCheck = `https://${cleanDomain}`;
+      
+      const [sslResult, domainAgeResult, gsbResult] = await Promise.allSettled([
+        checkSSLCertificate(urlToCheck),
+        checkDomainAge(cleanDomain),
+        checkGoogleSafeBrowsing(urlToCheck)
+      ]);
+      
+      const ssl = sslResult.status === 'fulfilled' ? sslResult.value : null;
+      const age = domainAgeResult.status === 'fulfilled' ? domainAgeResult.value : null;
+      const gsb = gsbResult.status === 'fulfilled' ? gsbResult.value : null;
+      
+      const hasSSL = ssl?.valid === true;
+      const hasThreat = gsb?.isThreat === true;
+      
+      let score = 50;
+      if (hasSSL) score += 20;
+      if (ssl && !ssl.isExpired) score += 5;
+      if (ssl && !ssl.isSelfSigned) score += 5;
+      if (age && 'isNew' in age && !age.isNew) score += 10;
+      if (!hasThreat && gsb?.checked) score += 10;
+      if (hasThreat) score -= 40;
+      score = Math.max(0, Math.min(100, score));
+      
+      const riskLevel = score >= 80 ? "low" : score >= 60 ? "medium" : score >= 40 ? "high" : "critical";
+      
+      const recommendations: string[] = [];
+      if (!hasSSL) recommendations.push("This site does not have a valid SSL certificate. Avoid entering personal information.");
+      if (ssl?.isExpired) recommendations.push("The SSL certificate has expired, which could indicate the site is not maintained.");
+      if (ssl?.isSelfSigned) recommendations.push("The site uses a self-signed certificate, which is not verified by a trusted authority.");
+      if (age && 'isNew' in age && age.isNew) recommendations.push("This domain was registered recently. New domains are sometimes used for scams.");
+      if (hasThreat) recommendations.push("This site has been flagged by security services as potentially dangerous.");
+      if (recommendations.length === 0) recommendations.push("No major issues detected. Always stay cautious with personal information online.");
+      
+      res.json({
+        domain: cleanDomain,
+        overallScore: score,
+        riskLevel,
+        basicChecks: {
+          ssl: hasSSL,
+          dnssec: false,
+          spfRecord: false,
+          dmarcRecord: false,
+          securityHeaders: hasSSL
+        },
+        certificateGrade: hasSSL ? (ssl?.isEV ? "A+" : "A") : "F",
+        httpSecurityHeaders: {
+          'Strict-Transport-Security': hasSSL,
+          'X-Frame-Options': false,
+          'X-Content-Type-Options': false,
+          'Referrer-Policy': false
+        },
+        recommendations,
+        scanDate: new Date().toISOString(),
+        includeAdvanced
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid domain", details: (error as any).issues });
+      } else {
+        console.error('Cyber hygiene check error:', error);
+        res.status(500).json({ error: "Failed to perform check" });
+      }
+    }
+  });
+
   app.get("/api/subscription/status", isAuthenticated, async (req: any, res) => {
     try {
       const user = req.user;
