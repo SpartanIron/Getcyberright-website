@@ -550,6 +550,7 @@ function CollapsibleSteps({ steps, platform }: { steps: string[]; platform: stri
       {hasMore && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
+          aria-expanded={isExpanded}
           className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mt-4 ml-9"
           data-testid={`button-toggle-steps-${platform.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`}
         >

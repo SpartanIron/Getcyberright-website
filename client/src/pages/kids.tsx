@@ -7,12 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import kidsBannerImage from "@/assets/images/kids-safety-banner.jpg";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Shield, Lock, Eye, MessageCircle, Gamepad2, Users, 
   CheckCircle, Star, Trophy, BookOpen, Heart, 
   Smartphone, AlertCircle, ThumbsUp, ArrowRight,
   GraduationCap, Home, Lightbulb, Target, Sparkles,
-  CalendarDays
+  CalendarDays, ChevronDown, ChevronUp
 } from "lucide-react";
 
 import kidsYoungLearnersImg from "@/assets/images/kids-young-learners.png";
@@ -51,6 +52,11 @@ function FloatingShapes() {
 type AgeGroup = "8-11" | "12-16" | null;
 type ActiveModule = string | null;
 
+interface PlatformGuide {
+  platform: string;
+  steps: string[];
+}
+
 interface LearningModule {
   id: string;
   title: string;
@@ -62,6 +68,8 @@ interface LearningModule {
     intro: string;
     tips: string[];
     remember: string;
+    platformGuides?: PlatformGuide[];
+    checklist?: string[];
   };
   quiz: {
     question: string;
@@ -82,13 +90,24 @@ const foundationsModules: LearningModule[] = [
     content: {
       intro: "Personal information is anything that tells people who you are or where to find you. Just like you would not give your house key to a stranger, you should not share personal details online with people you do not know.",
       tips: [
-        "Your full name, address, and phone number are private.",
-        "Never share your school name or where you hang out.",
-        "Do not tell anyone your passwords, not even friends.",
-        "Photos can reveal where you are, so be careful what you share.",
-        "Ask a trusted adult before filling out any online forms."
+        "Your full name, address, and phone number are private. These are things only trusted adults need to know.",
+        "Never share your school name, what team you play on, or where you hang out after school.",
+        "Do not tell anyone your passwords, not even your best friend. Passwords are just for you and your parents.",
+        "Photos can reveal where you are. Check the background of photos before sharing. Look for street signs, school logos, or house numbers.",
+        "Ask a trusted adult before filling out any online forms. Even fun quizzes can collect personal information.",
+        "Your birthday is personal information too. Do not share the full date online because it can be used to access accounts.",
+        "Location features on apps can show people exactly where you are. Ask a parent to turn these off on your devices.",
+        "If a website or game asks for your real name, use a nickname or ask your parent what to enter instead."
       ],
-      remember: "If someone online asks for personal information, tell a trusted adult right away. Real friends and safe websites will never pressure you to share private details."
+      remember: "If someone online asks for personal information, tell a trusted adult right away. Real friends and safe websites will never pressure you to share private details.",
+      checklist: [
+        "I know the difference between personal and non-personal information.",
+        "My online accounts do not show my real full name.",
+        "I have checked that my photos do not reveal my location.",
+        "I always ask a trusted adult before filling out forms online.",
+        "Location sharing is turned off on my devices.",
+        "I never share my birthday, address, or phone number online."
+      ]
     },
     quiz: {
       question: "Which of these is safe to share with someone you met online?",
@@ -112,13 +131,25 @@ const foundationsModules: LearningModule[] = [
     content: {
       intro: "Passwords are like secret codes that protect your accounts. A strong password keeps your games, photos, and messages safe from people who should not see them.",
       tips: [
-        "Use at least 8 characters in your password.",
-        "Mix uppercase letters, lowercase letters, and numbers.",
-        "Never use your name, birthday, or pet's name.",
-        "Do not share your password with friends.",
-        "Use different passwords for different accounts."
+        "Use at least 8 characters in your password. Longer is even better.",
+        "Try the three random words method: pick three unrelated words and put them together, like SunFlowerRainTiger.",
+        "Add a number or two between your words to make it even stronger, like Sun7Flower9Rain.",
+        "Never use your name, birthday, pet's name, or your favorite sports team. These are too easy to guess.",
+        "Do not share your password with friends. Even best friends can accidentally share it with others.",
+        "Use a different password for every account. If someone figures out one, the rest stay safe.",
+        "Write your passwords down in a notebook kept in a safe place at home, never on your device or in your backpack.",
+        "If you think someone knows your password, change it right away and tell a trusted adult.",
+        "When you need to change a password, do not just add a number to the end. Create a whole new one."
       ],
-      remember: "A good password is like a secret superhero code. Make it long, make it tricky, and keep it to yourself."
+      remember: "A good password is like a secret superhero code. Make it long, make it tricky, and keep it to yourself.",
+      checklist: [
+        "My passwords are at least 8 characters long.",
+        "I do not use my name, birthday, or pet's name in any password.",
+        "I use different passwords for different accounts.",
+        "I have not shared my passwords with any friends.",
+        "My passwords are written in a safe place only my parents and I know about.",
+        "I know how to change my password if I need to."
+      ]
     },
     quiz: {
       question: "Which password is the strongest?",
@@ -142,13 +173,25 @@ const foundationsModules: LearningModule[] = [
     content: {
       intro: "Some people online try to trick kids. They might pretend to be someone they are not or offer things that seem too good to be true. Learning to spot these tricks keeps you safe.",
       tips: [
-        "If someone offers free games or prizes, it might be a trick.",
-        "Pop-ups that say you won something are usually not real.",
-        "Strangers who want to be your best friend right away may not be safe.",
-        "Messages asking you to click strange links could be harmful.",
-        "If something feels wrong, it probably is. Trust your feelings."
+        "If someone offers free games, prizes, or gift cards, it is almost always a trick to get your information.",
+        "Pop-ups that say you won something are not real. Real prizes do not come from random pop-ups on websites.",
+        "Strangers who want to be your best friend right away and ask lots of questions may not be safe.",
+        "Messages asking you to click strange links could put harmful software on your device. Do not click them.",
+        "If something feels wrong, it probably is. Trust your gut feeling and walk away.",
+        "Check the website address (URL) carefully. Fake websites often have misspelled names or extra letters.",
+        "Scary messages that say your device has a virus are usually fake. Close the window without clicking anything.",
+        "To close a fake pop-up safely, do not click the X on the pop-up itself. Instead, close the whole browser tab or window.",
+        "If you accidentally clicked something suspicious, tell a trusted adult right away. The sooner the better."
       ],
-      remember: "When in doubt, do not click. Ask a parent or trusted adult to help you figure out if something is real or a trick."
+      remember: "When in doubt, do not click. Ask a parent or trusted adult to help you figure out if something is real or a trick.",
+      checklist: [
+        "I know that free prize offers online are usually tricks.",
+        "I know how to close a fake pop-up without clicking on it.",
+        "I check website addresses for misspellings before entering information.",
+        "I do not click on links in messages from people I do not know.",
+        "I tell a trusted adult when something online seems suspicious.",
+        "I know the difference between real warnings and fake scary messages."
+      ]
     },
     quiz: {
       question: "You see a pop-up that says you won a free gaming console. What should you do?",
@@ -172,13 +215,24 @@ const foundationsModules: LearningModule[] = [
     content: {
       intro: "Your devices are valuable tools for learning and fun. Taking care of them means keeping them physically safe and making sure the information on them stays protected.",
       tips: [
-        "Always lock your device with a PIN or password.",
-        "Only download apps your parents have approved.",
-        "Keep your device updated when it asks you to.",
-        "Do not click on links or ads you do not recognize.",
-        "Tell a parent if your device starts acting strange."
+        "Always lock your device with a PIN, password, or fingerprint. This keeps others from getting into your stuff.",
+        "To set a lock screen PIN: go to your device's Settings, look for Security or Lock Screen, and choose a PIN that is at least 6 numbers.",
+        "Only download apps your parents have approved. Before downloading, show the app to your parent and let them check it.",
+        "To check if an app is safe: look at the number of downloads and reviews. Apps with very few downloads or bad reviews may not be safe.",
+        "Keep your device updated when it asks you to. Updates fix problems and keep your device secure. Ask a parent to help you update.",
+        "Do not click on links or ads you do not recognize. They could download harmful software onto your device.",
+        "If your device starts acting strange, like running slowly, showing pop-ups, or opening things by itself, tell a parent right away.",
+        "Never leave your device unlocked and unattended. Always lock it before you walk away, even at home."
       ],
-      remember: "Treat your device like a treasure. Lock it up, keep it clean, and only let trusted things inside."
+      remember: "Treat your device like a treasure. Lock it up, keep it clean, and only let trusted things inside.",
+      checklist: [
+        "My device has a lock screen PIN, password, or fingerprint set up.",
+        "I only download apps my parents have approved.",
+        "My device is up to date with the latest updates.",
+        "I know not to click on ads or links I do not recognize.",
+        "I lock my device before walking away from it.",
+        "I know to tell a parent if my device starts acting strange."
+      ]
     },
     quiz: {
       question: "What should you do before downloading a new app?",
@@ -202,13 +256,23 @@ const foundationsModules: LearningModule[] = [
     content: {
       intro: "Trusted adults are people who care about you and want to keep you safe. They can be parents, grandparents, teachers, or other family members you know well. You can always go to them when something online makes you uncomfortable.",
       tips: [
-        "Make a list of trusted adults you can talk to.",
-        "You will never get in trouble for asking for help.",
-        "Tell an adult if someone online makes you uncomfortable.",
-        "Share anything that confuses or scares you online.",
-        "Adults want to help you stay safe, not punish you."
+        "Make a list of at least three trusted adults you can talk to. Include people at home and at school.",
+        "You will never get in trouble for asking for help. Your adults want to know when something is wrong.",
+        "Tell an adult if someone online makes you uncomfortable, even if it seems small.",
+        "Share anything that confuses or scares you online. There is no silly question when it comes to safety.",
+        "Adults want to help you stay safe, not punish you. They are on your team.",
+        "If something bad happens online, take a screenshot first. This helps your trusted adult understand what happened.",
+        "To take a screenshot: on most devices, press the power button and volume down button at the same time.",
+        "Practice what you would say: try saying 'Something happened online and I need your help looking at it.' This makes it easier when you really need to say it."
       ],
-      remember: "No question is too small and no worry is too silly. Your trusted adults are on your team."
+      remember: "No question is too small and no worry is too silly. Your trusted adults are on your team.",
+      checklist: [
+        "I have a list of at least three trusted adults I can talk to.",
+        "I know how to take a screenshot on my device.",
+        "I have practiced what I would say if I needed help.",
+        "I know that I will not get in trouble for telling a trusted adult about something online.",
+        "I know where to find my trusted adults when I need them."
+      ]
     },
     quiz: {
       question: "Someone online said something that made you feel uncomfortable. What should you do?",
@@ -236,12 +300,55 @@ const smartSafeModules: LearningModule[] = [
       intro: "Social media can be a great way to connect with friends and share your interests. But it is important to use it wisely. What you post online can stay there forever and be seen by more people than you expect.",
       tips: [
         "Set your accounts to private so only approved followers see your posts.",
-        "Think before you post. Would you be okay if everyone saw this?",
-        "Do not accept friend requests from people you do not know in real life.",
-        "Be kind in your comments. Treat others how you want to be treated.",
-        "Take breaks from social media if it starts making you feel bad."
+        "Think before you post. Would you be okay if a teacher, coach, or college admissions officer saw this?",
+        "Do not accept friend requests or follow requests from people you do not know in real life.",
+        "Be kind in your comments. Treat others how you want to be treated. Mean comments can have real consequences.",
+        "Take breaks from social media if it starts making you feel bad about yourself.",
+        "Turn off direct messages from strangers. This prevents unknown people from contacting you privately.",
+        "Never share your location in real time. Wait until you have left a place before posting about it.",
+        "Review your followers and following lists regularly. Remove anyone you do not actually know."
       ],
-      remember: "Your online reputation is part of your real reputation. Everything you share reflects who you are."
+      remember: "Your online reputation is part of your real reputation. Everything you share reflects who you are.",
+      platformGuides: [
+        {
+          platform: "Making Your Account Private",
+          steps: [
+            "On Instagram: go to Settings and Privacy, then Account Privacy, and turn on Private Account.",
+            "On TikTok: go to Settings and Privacy, then Privacy, and set your account to Private.",
+            "On Snapchat: go to Settings, then Contact Me, and set it to My Friends. Also turn on Ghost Mode in Snap Map.",
+            "On any platform: look for Privacy or Account Settings and switch from Public to Private or Friends Only.",
+            "After making your account private, review your current followers and remove anyone you do not know."
+          ]
+        },
+        {
+          platform: "What to Do About Strangers",
+          steps: [
+            "If a stranger sends you a message, do not reply. Block them immediately.",
+            "To block someone: go to their profile, tap the three dots or menu icon, and select Block.",
+            "Report the account to the platform. Look for a Report option in the same menu where you found Block.",
+            "Tell a trusted adult that a stranger tried to contact you, even if you already blocked them.",
+            "Never agree to meet someone in person that you only know online."
+          ]
+        },
+        {
+          platform: "Before You Post",
+          steps: [
+            "The Screenshot Rule: before posting, assume someone will screenshot it and show it to everyone. Are you still okay with it?",
+            "The Future Self Rule: imagine yourself five years from now. Would future you be proud of this post?",
+            "Check the background of photos for personal details like your address, school name, or location.",
+            "If you are posting about someone else, ask their permission first.",
+            "If you are angry, upset, or emotional, wait at least one hour before posting anything."
+          ]
+        }
+      ],
+      checklist: [
+        "All my social media accounts are set to Private.",
+        "Direct messages from strangers are turned off.",
+        "I have reviewed my followers and removed anyone I do not know.",
+        "I think before every post using the Screenshot Rule and Future Self Rule.",
+        "Location sharing is turned off on all my social apps.",
+        "I know how to block and report someone on every platform I use."
+      ]
     },
     quiz: {
       question: "Before posting a photo, what should you consider?",
@@ -265,13 +372,57 @@ const smartSafeModules: LearningModule[] = [
     content: {
       intro: "Online bullying, sometimes called cyberbullying, happens when someone uses technology to hurt, embarrass, or threaten others. It can happen through texts, social media, games, or any online platform. Knowing how to handle it helps you and your friends stay safe.",
       tips: [
-        "Do not respond to mean messages. Responding often makes things worse.",
-        "Save evidence by taking screenshots of hurtful messages.",
-        "Block people who are being cruel to you.",
-        "Tell a trusted adult about what is happening.",
-        "Be an upstander, not a bystander. Support friends who are being bullied."
+        "Do not respond to mean messages. Responding often makes things worse and gives the bully what they want.",
+        "Save evidence by taking screenshots of hurtful messages. This proof helps adults take action.",
+        "Block people who are being cruel to you on every platform where they can reach you.",
+        "Tell a trusted adult about what is happening. You are not being a snitch. You are protecting yourself.",
+        "Be an upstander, not a bystander. If you see someone being bullied, support them and report it.",
+        "Remember that online bullying is never your fault. No matter what anyone says, you do not deserve it.",
+        "If the bullying is happening at school, report it to a teacher or school counselor. Most schools have anti-bullying policies.",
+        "Take care of your mental health. It is okay to take a break from social media or games if they are making you feel bad."
       ],
-      remember: "Online bullying is never your fault. No one deserves to be treated badly. Speaking up takes courage and helps everyone."
+      remember: "Online bullying is never your fault. No one deserves to be treated badly. Speaking up takes courage and helps everyone.",
+      platformGuides: [
+        {
+          platform: "If It Is Happening to You",
+          steps: [
+            "Do not respond to the bully. Do not reply, react, or engage in any way.",
+            "Take screenshots of every hurtful message, post, or comment. Save them in a folder.",
+            "Block the person on the platform where the bullying is happening.",
+            "Report the content to the platform. On most apps, tap the three dots on the message or post and select Report.",
+            "Tell a trusted adult what is happening. Show them the screenshots.",
+            "If the bullying includes threats of violence, tell a parent immediately. They may need to contact school or police."
+          ]
+        },
+        {
+          platform: "If You See It Happening to Someone Else",
+          steps: [
+            "Support the person being bullied. Send them a kind private message letting them know you care.",
+            "Do not like, share, or comment on bullying posts. This only spreads the harm.",
+            "Report the bullying content to the platform, even if it is not about you.",
+            "Tell a trusted adult that you saw someone being bullied online.",
+            "If you feel safe doing so, stand up publicly. Sometimes a simple 'That is not okay' can help."
+          ]
+        },
+        {
+          platform: "Getting Help",
+          steps: [
+            "Talk to a parent, guardian, or another trusted adult in your family.",
+            "Tell a teacher or school counselor. They are trained to handle bullying situations.",
+            "If you are in the United States, text HOME to 741741 to reach the Crisis Text Line.",
+            "Visit StopBullying.gov for more resources and advice.",
+            "Remember that asking for help is a sign of strength, not weakness."
+          ]
+        }
+      ],
+      checklist: [
+        "I know not to respond to mean messages online.",
+        "I know how to take screenshots to save evidence.",
+        "I know how to block and report someone on the platforms I use.",
+        "I have a trusted adult I can talk to about online bullying.",
+        "I know how to support a friend who is being bullied.",
+        "I know that online bullying is never my fault."
+      ]
     },
     quiz: {
       question: "If someone is being mean to you online, what should you do first?",
@@ -295,13 +446,59 @@ const smartSafeModules: LearningModule[] = [
     content: {
       intro: "Online gaming is fun, but it comes with some risks. Some players are not who they say they are, and some games try to get you to spend money. Knowing how to game safely means you can enjoy playing while protecting yourself.",
       tips: [
-        "Use a gaming name that does not reveal your real identity.",
-        "Never share personal information with other players.",
-        "Be careful about in-game purchases and always ask a parent first.",
-        "Mute or block players who are being rude or inappropriate.",
-        "Take regular breaks and balance gaming with other activities."
+        "Use a gaming name (gamertag) that does not reveal your real name, age, location, or school.",
+        "Never share personal information with other players, even ones who seem friendly.",
+        "Be careful about in-game purchases. Virtual currency like V-Bucks and Robux costs real money. Always ask a parent first.",
+        "Mute or block players who are being rude, using bad language, or making you uncomfortable.",
+        "Take regular breaks and balance gaming with other activities like sports, reading, and spending time with friends.",
+        "Be skeptical of free item offers. Messages saying 'Free V-Bucks' or 'Free Robux' are almost always scams.",
+        "Never download mods or hacks from unknown websites. They often contain harmful software.",
+        "If someone in a game makes you feel uncomfortable or asks to talk outside the game, tell a trusted adult."
       ],
-      remember: "Real gaming skills do not require sharing personal info. Stay anonymous and stay safe while having fun."
+      remember: "Real gaming skills do not require sharing personal info. Stay anonymous and stay safe while having fun.",
+      platformGuides: [
+        {
+          platform: "Setting Up a Safe Gaming Profile",
+          steps: [
+            "Choose a username that does not include your real name, birth year, or location. Use something creative and fun instead.",
+            "On PlayStation: go to Settings, then Account Management, then Privacy Settings. Set your profile to Friends Only.",
+            "On Xbox: go to Settings, then Account, then Privacy and Online Safety. Set communication to Friends Only.",
+            "On Nintendo Switch: use the Nintendo Switch Parental Controls app to set communication restrictions.",
+            "On Roblox: go to Settings, then Privacy. Set each option to Friends or No One.",
+            "On PC (Steam, Epic, etc.): go to your Profile Settings and set your profile to Friends Only.",
+            "Never use a real photo of yourself as your gaming profile picture."
+          ]
+        },
+        {
+          platform: "Dealing with Toxic Players",
+          steps: [
+            "If someone is being mean or rude, do not argue back. It rarely helps and usually makes things worse.",
+            "Mute them: in most games, open the player list or scoreboard and select Mute next to their name.",
+            "Block them: on PlayStation, go to their profile and select Block. On Xbox, select their gamertag and choose Block.",
+            "Report them: most games have a Report Player option in the pause menu or player list. Use it.",
+            "If someone threatens you with real-world violence, tell a parent immediately.",
+            "Remember that toxic players are trying to make you upset. Muting them takes away their power."
+          ]
+        },
+        {
+          platform: "Safe In-Game Purchases",
+          steps: [
+            "Always ask a parent before buying anything in a game, even if it seems small.",
+            "Check the real-world price before purchasing. 1000 V-Bucks costs about 8 real dollars.",
+            "Watch out for tricks that pressure you to buy, like limited-time offers and countdown timers.",
+            "Never enter your parent's credit card information without permission.",
+            "Be wary of third-party websites selling cheap game currency. These are usually scams that steal your account."
+          ]
+        }
+      ],
+      checklist: [
+        "My gaming username does not reveal my real name or personal details.",
+        "My gaming profile is set to Friends Only on all platforms.",
+        "I know how to mute, block, and report players on my gaming platforms.",
+        "I always ask a parent before making in-game purchases.",
+        "I do not download mods or hacks from unknown websites.",
+        "I take regular breaks from gaming."
+      ]
     },
     quiz: {
       question: "Someone in an online game asks for your real name and where you live. What should you do?",
@@ -316,22 +513,67 @@ const smartSafeModules: LearningModule[] = [
     }
   },
   {
-    id: "phishing-scams",
-    title: "Spotting Phishing Scams",
-    description: "Identify fake messages designed to steal information.",
+    id: "fake-messages",
+    title: "Spotting Fake Messages",
+    description: "Identify trick messages designed to steal information.",
     icon: AlertCircle,
     color: "bg-orange-600",
     image: kidsPhishingImg,
     content: {
-      intro: "Phishing is when someone sends fake messages that look real to trick you into giving up passwords or personal information. These can come as emails, texts, or messages in apps. Scammers have become very good at making these look legitimate.",
+      intro: "Sometimes scammers send fake messages that look real to trick you into giving up passwords or personal information. These can come as emails, texts, or messages in apps. Scammers have become very good at making these look legitimate.",
       tips: [
-        "Check the sender's email address carefully for misspellings.",
-        "Be suspicious of urgent messages saying your account will be closed.",
-        "Do not click links in unexpected messages. Go directly to the website instead.",
-        "Look for spelling and grammar mistakes in messages.",
-        "When in doubt, ask a parent or do not click."
+        "Check the sender's email address carefully. Fake emails often come from addresses with misspellings, like support@amaz0n.com instead of support@amazon.com.",
+        "Be suspicious of urgent messages saying your account will be closed or you will lose something unless you act right now.",
+        "Do not click links in unexpected messages. Instead, open the real app or website directly by typing the address yourself.",
+        "Look for spelling and grammar mistakes in messages. Real companies usually do not make these errors.",
+        "Hover over links (without clicking) to see where they really go. On a phone, press and hold the link to preview it.",
+        "Never enter your password on a page you reached by clicking a link in a message. Always go directly to the website.",
+        "If a message offers something too good to be true, like free items or money, it is almost certainly a scam.",
+        "When in doubt, ask a parent or trusted adult before clicking anything."
       ],
-      remember: "Legitimate companies will never ask for your password through email or messages. When something seems urgent or too good to be true, slow down and verify."
+      remember: "Legitimate companies will never ask for your password through email or messages. When something seems urgent or too good to be true, slow down and verify.",
+      platformGuides: [
+        {
+          platform: "Checking a Suspicious Email",
+          steps: [
+            "Look at the sender's email address. Click on the name to see the full address. Is it from the real company?",
+            "Check for spelling mistakes in the email address. Scammers use addresses like paypa1@email.com (with a number 1 instead of the letter l).",
+            "Read the email carefully. Does it use your real name, or does it say 'Dear User' or 'Dear Customer'?",
+            "Hover over any links without clicking. Does the link address match the company it claims to be from?",
+            "Look for pressure language like 'Act now!' or 'Your account will be deleted in 24 hours!' Real companies do not threaten you.",
+            "If you are unsure, do not click anything. Open a new browser window and go directly to the real website."
+          ]
+        },
+        {
+          platform: "Suspicious Message in an App",
+          steps: [
+            "If you get a message from someone you do not know in an app, do not click any links in it.",
+            "Check the sender's profile. Is it a real person? New accounts with no posts or friends are red flags.",
+            "If someone claims to be from the app's support team and asks for your password, it is a scam. Support teams never ask for passwords through messages.",
+            "Report the message using the app's report feature. Usually tap and hold the message, then select Report.",
+            "Block the sender so they cannot message you again."
+          ]
+        },
+        {
+          platform: "What to Do If You Clicked",
+          steps: [
+            "Do not panic. Tell a trusted adult right away about what happened.",
+            "If you entered a password on a suspicious page, change that password immediately.",
+            "If you use the same password on other accounts, change those too.",
+            "Check your accounts for anything strange, like messages you did not send or purchases you did not make.",
+            "Ask your parent to run a security scan on your device.",
+            "Learn from it. Now you know what to look for next time."
+          ]
+        }
+      ],
+      checklist: [
+        "I know how to check a sender's real email address.",
+        "I do not click links in unexpected messages.",
+        "I know how to hover over a link to check where it goes.",
+        "I recognize pressure language as a red flag.",
+        "I know to go directly to websites instead of clicking links in emails.",
+        "I know what to do if I accidentally click a suspicious link."
+      ]
     },
     quiz: {
       question: "You get an email saying your gaming account will be deleted unless you click a link right now. What should you do?",
@@ -355,13 +597,56 @@ const smartSafeModules: LearningModule[] = [
     content: {
       intro: "Your digital footprint is the trail of information you leave behind online. Every post, comment, photo, and search adds to it. This footprint can be seen by friends, family, schools, and even future employers. Managing it wisely is an important life skill.",
       tips: [
-        "Search your own name to see what others can find about you.",
-        "Think about how posts might look to a future college or employer.",
-        "Remember that screenshots last forever, even if you delete a post.",
-        "Be intentional about building a positive online presence.",
-        "Review your privacy settings on all platforms regularly."
+        "Search your own name on Google to see what others can find about you. Do this regularly.",
+        "Think about how posts might look to a future college admissions officer or employer.",
+        "Remember that screenshots last forever. Even if you delete a post, someone may have already saved it.",
+        "Be intentional about building a positive online presence. Share achievements, creative projects, and things you are proud of.",
+        "Review your privacy settings on all platforms at least once a month.",
+        "Be careful about what others tag you in. Review tagged photos and posts and remove tags on anything you do not want associated with you.",
+        "Old accounts you no longer use still have your information. Delete or deactivate accounts you do not need anymore.",
+        "Everything you like, comment on, and share contributes to your digital footprint, not just your own posts."
       ],
-      remember: "Your digital footprint is part of your personal brand. Make it something you are proud of."
+      remember: "Your digital footprint is part of your personal brand. Make it something you are proud of.",
+      platformGuides: [
+        {
+          platform: "Checking Your Footprint",
+          steps: [
+            "Open a private or incognito browser window. Search your full name on Google.",
+            "Look at the results. Are there photos, posts, or accounts you did not expect?",
+            "Search your name on Google Images to see if any photos of you have been indexed.",
+            "Check your social media profiles from a logged-out browser to see what strangers can see.",
+            "Review your comment history on platforms like YouTube, TikTok, and Reddit."
+          ]
+        },
+        {
+          platform: "Cleaning Up",
+          steps: [
+            "Go through your old posts on every platform. Delete anything you would not want a teacher or future employer to see.",
+            "Remove tags from photos or posts that do not represent you well.",
+            "Delete old accounts you no longer use. If you cannot delete them, change the profile information and make them private.",
+            "On Instagram: go to Your Activity, then Photos and Videos, then Posts to review and delete old posts.",
+            "On TikTok: go to your profile, review your videos, and delete any you no longer want public."
+          ]
+        },
+        {
+          platform: "Building a Good Reputation",
+          steps: [
+            "Share positive content: achievements, volunteer work, creative projects, and things you are learning.",
+            "Be kind and thoughtful in every comment you make. Your comments are part of your footprint.",
+            "Set your privacy settings so only friends can see personal posts, but consider keeping some positive posts public.",
+            "Think of your online presence as a portfolio. What would you want someone to see?",
+            "Review your privacy settings on all platforms at least once a month to make sure nothing has changed."
+          ]
+        }
+      ],
+      checklist: [
+        "I have searched my own name on Google and reviewed the results.",
+        "I have deleted or updated old posts I no longer want public.",
+        "I have removed tags from photos I do not want associated with me.",
+        "My privacy settings are up to date on all platforms.",
+        "I have deleted or deactivated old accounts I no longer use.",
+        "I am intentionally building a positive online presence."
+      ]
     },
     quiz: {
       question: "What is true about your digital footprint?",
@@ -451,6 +736,10 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
             <Card 
               className="relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 border-teal-200 dark:border-teal-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
               onClick={() => onSelectAge("8-11")}
+              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onSelectAge("8-11"))}
+              tabIndex={0}
+              role="button"
+              aria-label="Start learning for ages 8 to 11"
               data-testid="card-age-8-11"
             >
               <div className="relative h-48 overflow-hidden">
@@ -492,6 +781,10 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
             <Card 
               className="relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 border-purple-200 dark:border-purple-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
               onClick={() => onSelectAge("12-16")}
+              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onSelectAge("12-16"))}
+              tabIndex={0}
+              role="button"
+              aria-label="Start learning for ages 12 to 16"
               data-testid="card-age-12-16"
             >
               <div className="relative h-48 overflow-hidden">
@@ -570,6 +863,41 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function CollapsibleSteps({ steps, platform }: { steps: string[]; platform: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const previewCount = 3;
+  const hasMore = steps.length > previewCount;
+
+  return (
+    <div>
+      <ol className="space-y-3">
+        {(isExpanded ? steps : steps.slice(0, previewCount)).map((step, index) => (
+          <li key={index} className="flex items-start gap-3">
+            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center mt-0.5">
+              {index + 1}
+            </span>
+            <span className="text-foreground leading-relaxed text-[0.95rem]">{step}</span>
+          </li>
+        ))}
+      </ol>
+      {hasMore && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          aria-expanded={isExpanded}
+          className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mt-4 ml-9"
+          data-testid={`button-toggle-steps-${platform.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`}
+        >
+          {isExpanded ? (
+            <>Show less <ChevronUp className="w-4 h-4" /></>
+          ) : (
+            <>Show all {steps.length} steps <ChevronDown className="w-4 h-4" /></>
+          )}
+        </button>
+      )}
     </div>
   );
 }
@@ -659,6 +987,10 @@ function LearningTrack({
                     key={module.id}
                     className={`cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-white/80 dark:bg-card/80 backdrop-blur-sm border-2 overflow-hidden ${isCompleted ? 'border-green-400 dark:border-green-600 ring-2 ring-green-200 dark:ring-green-800' : 'border-white/50 dark:border-white/10'}`}
                     onClick={() => setActiveModule(module.id)}
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setActiveModule(module.id))}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Start lesson: ${module.title}`}
                     data-testid={`card-module-${module.id}`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
@@ -802,6 +1134,56 @@ function ModuleContent({
                   ))}
                 </ul>
               </div>
+
+              {module.content.platformGuides && module.content.platformGuides.length > 0 && (
+                <div>
+                  <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-primary" />
+                    Step-by-Step Guides
+                  </h4>
+                  <Tabs defaultValue={module.content.platformGuides[0].platform} className="mb-2">
+                    <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-4">
+                      {module.content.platformGuides.map((guide) => (
+                        <TabsTrigger
+                          key={guide.platform}
+                          value={guide.platform}
+                          className="text-sm px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                          data-testid={`tab-${guide.platform.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`}
+                        >
+                          {guide.platform}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                    {module.content.platformGuides.map((guide) => (
+                      <TabsContent key={guide.platform} value={guide.platform}>
+                        <Card>
+                          <CardContent className="p-5 sm:p-6">
+                            <h5 className="font-bold text-base text-foreground mb-4">{guide.platform}</h5>
+                            <CollapsibleSteps steps={guide.steps} platform={guide.platform} />
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                </div>
+              )}
+
+              {module.content.checklist && module.content.checklist.length > 0 && (
+                <div className="bg-green-50 dark:bg-green-950/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
+                  <h4 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-4 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    Safety Checklist
+                  </h4>
+                  <ul className="space-y-3">
+                    {module.content.checklist.map((item, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <div className="w-5 h-5 rounded border-2 border-green-400 dark:border-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-green-700 dark:text-green-300">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
                 <h4 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2 flex items-center gap-2">
@@ -1111,7 +1493,7 @@ function ParentSection() {
                   <li>Safe social media practices and privacy settings</li>
                   <li>Understanding and responding to online bullying</li>
                   <li>Gaming safety and protecting online identity</li>
-                  <li>Identifying phishing scams and fake messages</li>
+                  <li>Identifying fake scam messages and trick emails</li>
                   <li>Building a positive digital footprint</li>
                 </ul>
               </div>
