@@ -172,12 +172,12 @@ export function HeroSection() {
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-[42%_58%] gap-8 lg:gap-10 items-center py-12 sm:py-16 lg:py-20">
-            <div className="max-w-xl">
+            <div className="max-w-xl min-w-0">
               <div className="mb-6 overflow-hidden">
                 <ThreatAlertBar />
               </div>
               <h1
-                className="text-[2.25rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-white leading-[1.02] mb-8"
+                className="text-[2rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-white leading-[1.05] mb-6 sm:mb-8"
                 data-testid="text-hero-heading"
               >
                 Your Family Is
@@ -188,17 +188,17 @@ export function HeroSection() {
               </h1>
 
               <p
-                className="text-lg sm:text-xl text-white/80 leading-relaxed mb-10 max-w-lg"
+                className="text-base sm:text-xl text-white/80 leading-relaxed mb-8 sm:mb-10"
                 data-testid="text-hero-subtext"
               >
                 Scams cost families $12.5 billion last year. GetCyberRight gives your family the same protection that organizations pay thousands for. Check any suspicious message, link, or phone number against 8 trusted security databases in seconds.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 mb-10">
+              <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 mb-8 sm:mb-10">
                 <Button
                   asChild
                   size="lg"
-                  className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 text-base shadow-[0_4px_24px_-4px] shadow-accent/40 hover:shadow-[0_6px_32px_-4px] hover:shadow-accent/50 hover:scale-[1.02] transition-all duration-300"
+                  className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 text-base shadow-[0_4px_24px_-4px] shadow-accent/40 hover:shadow-[0_6px_32px_-4px] hover:shadow-accent/50 hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
                   data-testid="button-hero-primary-cta"
                 >
                   <Link href="/scam-checker">
@@ -212,7 +212,7 @@ export function HeroSection() {
                 </Link>
               </div>
 
-              <div className="flex items-center gap-6 text-sm text-white/60">
+              <div className="flex items-center gap-4 sm:gap-6 text-sm text-white/60">
                 <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /> No account needed</span>
                 <span className="flex items-center gap-2"><Eye className="w-4 h-4 text-primary" /> Nothing stored</span>
               </div>
