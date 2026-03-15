@@ -458,23 +458,28 @@ export function registerToolTrackingRoutes(app: Express) {
         )
         .orderBy(desc(platformAnnouncements.createdAt));
 
-      const recentAlerts = await storage.getPublishedThreatAlerts(undefined, 5);
-      const alertAnnouncements = recentAlerts
-        .filter(alert => alert.riskLevel === 'critical' || alert.riskLevel === 'high')
-        .slice(0, 3)
-        .map(alert => ({
-          id: `alert-${alert.id}`,
-          title: alert.threatName,
-          content: alert.metaDescription || alert.description?.slice(0, 120) || '',
-          type: 'scam_alert' as const,
-          priority: alert.riskLevel === 'critical' ? 'urgent' as const : 'normal' as const,
-          isActive: true,
-          linkUrl: `/alerts/${alert.slug}`,
-          linkText: 'View details',
-          startsAt: alert.publishedAt || alert.createdAt,
-          expiresAt: null,
-          createdAt: alert.publishedAt || alert.createdAt,
-        }));
+      let alertAnnouncements: any[] = [];
+      try {
+        const recentAlerts = await storage.getPublishedThreatAlerts(undefined, 5);
+        alertAnnouncements = recentAlerts
+          .filter(alert => alert.riskLevel === 'critical' || alert.riskLevel === 'high')
+          .slice(0, 3)
+          .map(alert => ({
+            id: `alert-${alert.id}`,
+            title: alert.threatName,
+            content: alert.metaDescription || alert.description?.slice(0, 120) || '',
+            type: 'scam_alert' as const,
+            priority: alert.riskLevel === 'critical' ? 'urgent' as const : 'normal' as const,
+            isActive: true,
+            linkUrl: `/alerts/${alert.slug}`,
+            linkText: 'View details',
+            startsAt: alert.publishedAt || alert.createdAt,
+            expiresAt: null,
+            createdAt: alert.publishedAt || alert.createdAt,
+          }));
+      } catch (alertErr) {
+        console.error("Failed to fetch threat alerts for announcements:", alertErr);
+      }
 
       const allAnnouncements = [...manualAnnouncements, ...alertAnnouncements];
 
