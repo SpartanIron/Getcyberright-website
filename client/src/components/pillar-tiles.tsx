@@ -56,10 +56,10 @@ export function PillarTiles() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-14 sm:mb-20">
           <h2 id="pillars-heading" className="text-4xl sm:text-5xl font-extrabold text-white mb-5" data-testid="text-pillars-heading">
-            What We Do
+            Your Protection Starts Here
           </h2>
           <p className="text-xl text-white/75 leading-relaxed">
-            Three core tools that give everyday people the same level of protection that large organizations have. All free to get started.
+            The same protection that large organizations rely on, built for your family. Pick a tool and take action in under a minute.
           </p>
         </div>
 

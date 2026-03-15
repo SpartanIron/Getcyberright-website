@@ -55,7 +55,7 @@ export function AudiencePaths() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-14 sm:mb-20">
           <h2 id="audience-paths-heading" className="text-4xl sm:text-5xl font-extrabold text-foreground mb-5" data-testid="text-audience-paths-heading">
-            Built for People Like You
+            Protection Built for the Way You Live
           </h2>
           <p className="text-xl text-muted-foreground leading-relaxed">
             Pick the path that fits your life. Every guide is written for real people, not IT departments.

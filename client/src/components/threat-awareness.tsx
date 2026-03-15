@@ -43,10 +43,10 @@ export function ThreatAwareness() {
           </div>
 
           <h2 id="threat-heading" className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-5" data-testid="text-threat-heading">
-            Online scams have changed. Most people have not caught up.
+            The threats your family faces have changed. Your protection should too.
           </h2>
           <p className="text-lg text-white/75 leading-relaxed mb-8">
-            Scam messages now look identical to real ones from your bank, employer, or favorite stores. Criminals can copy someone's voice to make phone calls. And your personal data is being collected and sold at a massive scale.
+            Scam messages now look identical to real ones from your bank or favorite stores. Criminals can copy a loved one's voice to make phone calls. And your personal data is being collected and sold without your permission.
           </p>
 
           <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-10">

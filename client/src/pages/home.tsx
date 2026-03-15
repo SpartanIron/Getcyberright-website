@@ -41,11 +41,11 @@ export default function Home() {
       <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
         <HeroSection />
         <TrustStrip />
-        <PillarTiles />
         <ThreatAwareness />
-        <ContentPreview />
+        <PillarTiles />
         <AudiencePaths />
         <AuthoritySection />
+        <ContentPreview />
         <NewsletterCTA />
         <CTAFooter />
       </main>
