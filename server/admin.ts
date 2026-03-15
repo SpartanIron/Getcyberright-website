@@ -1,5 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
+import { storage } from "./storage";
 import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
@@ -439,7 +440,7 @@ export function registerToolTrackingRoutes(app: Express) {
   app.get("/api/announcements", async (_req, res) => {
     try {
       const now = new Date();
-      const announcements = await db
+      const manualAnnouncements = await db
         .select()
         .from(platformAnnouncements)
         .where(
@@ -457,7 +458,27 @@ export function registerToolTrackingRoutes(app: Express) {
         )
         .orderBy(desc(platformAnnouncements.createdAt));
 
-      res.json({ announcements });
+      const recentAlerts = await storage.getPublishedThreatAlerts(undefined, 5);
+      const alertAnnouncements = recentAlerts
+        .filter(alert => alert.riskLevel === 'critical' || alert.riskLevel === 'high')
+        .slice(0, 3)
+        .map(alert => ({
+          id: `alert-${alert.id}`,
+          title: alert.threatName,
+          content: alert.metaDescription || alert.description?.slice(0, 120) || '',
+          type: 'scam_alert' as const,
+          priority: alert.riskLevel === 'critical' ? 'urgent' as const : 'normal' as const,
+          isActive: true,
+          linkUrl: `/alerts/${alert.slug}`,
+          linkText: 'View details',
+          startsAt: alert.publishedAt || alert.createdAt,
+          expiresAt: null,
+          createdAt: alert.publishedAt || alert.createdAt,
+        }));
+
+      const allAnnouncements = [...manualAnnouncements, ...alertAnnouncements];
+
+      res.json({ announcements: allAnnouncements });
     } catch (error) {
       console.error("Fetch announcements error:", error);
       res.status(500).json({ error: "Failed to fetch announcements" });
