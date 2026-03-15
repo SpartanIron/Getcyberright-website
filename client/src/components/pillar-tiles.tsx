@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { ArrowRight, Search, Trash2, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroFamilyImg from "@/assets/images/hero-family-diverse.png";
+import scamCheckerImg from "@/assets/images/card-scam-checker.png";
 import seniorImg from "@/assets/images/about-seniors-learning.png";
 import businessImg from "@/assets/images/business-security-training.png";
 
@@ -14,8 +14,8 @@ const features = [
     href: "/scam-checker",
     cta: "Check a Scam",
     icon: Search,
-    image: heroFamilyImg,
-    imageAlt: "Family using computer together to check online safety",
+    image: scamCheckerImg,
+    imageAlt: "Woman checking her phone for suspicious messages",
     accent: "bg-red-500",
     accentText: "text-red-600 dark:text-red-400",
     borderAccent: "border-red-200 dark:border-red-500/20",
