@@ -171,8 +171,8 @@ export function HeroSection() {
         <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-primary/[0.05] rounded-full blur-[120px]" />
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-[42%_58%] gap-8 lg:gap-10 items-start pb-16 sm:pb-20 lg:pb-24">
-            <div className="max-w-xl pt-10 sm:pt-12 lg:pt-16">
+          <div className="grid lg:grid-cols-[42%_58%] gap-8 lg:gap-10 items-center py-12 sm:py-16 lg:py-20">
+            <div className="max-w-xl">
               <div className="mb-6 overflow-hidden">
                 <ThreatAlertBar />
               </div>
@@ -218,7 +218,7 @@ export function HeroSection() {
               </div>
             </div>
 
-            <div className="hidden lg:block pt-10">
+            <div className="hidden lg:block">
               <div className="relative -mr-8 xl:-mr-16">
                 <div className="relative overflow-hidden rounded-l-3xl">
                   <img
