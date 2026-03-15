@@ -1,4 +1,4 @@
-import { Mail, MapPin, Shield } from "lucide-react";
+import { Mail } from "lucide-react";
 import { SiLinkedin, SiFacebook, SiYoutube } from "react-icons/si";
 import { Link } from "wouter";
 import logoImage from "@/assets/logo.png";
@@ -142,31 +142,15 @@ export function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-slate-800">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs text-slate-400">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3" aria-hidden="true" /> United States
-              </span>
-              <span className="flex items-center gap-1">
-                <Shield className="w-3 h-3" aria-hidden="true" /> Built for Families
-              </span>
-              <span>Trusted by families in 50+ countries</span>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
-              <Link href="/support" className="hover:text-white transition-colors">Support</Link>
-              <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-400">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-400">
             <p data-testid="text-copyright">
               &copy; {new Date().getFullYear()} GetCyberRight. All rights reserved.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
-              <span>Sources: FBI IC3, CISA, INTERPOL, FTC</span>
+              <Link href="/support" className="hover:text-slate-300 transition-colors">Support</Link>
+              <Link href="/contact" className="hover:text-slate-300 transition-colors">Contact</Link>
             </div>
           </div>
 
