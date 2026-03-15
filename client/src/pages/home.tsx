@@ -6,6 +6,7 @@ import { ThreatAwareness } from "@/components/threat-awareness";
 import { ContentPreview } from "@/components/content-preview";
 import { AudiencePaths } from "@/components/audience-paths";
 import { AuthoritySection } from "@/components/authority-section";
+import { Testimonials } from "@/components/testimonials";
 import { NewsletterCTA } from "@/components/newsletter-cta";
 import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
@@ -45,6 +46,7 @@ export default function Home() {
         <PillarTiles />
         <AudiencePaths />
         <AuthoritySection />
+        <Testimonials />
         <ContentPreview />
         <NewsletterCTA />
         <CTAFooter />

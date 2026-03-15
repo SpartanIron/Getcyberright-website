@@ -1,245 +1,119 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Quote, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Quote } from "lucide-react";
 
 const testimonials = [
   {
     quote:
-      "My mom almost sent $5,000 to a 'grandchild' who was supposedly in jail. Thanks to what I learned here, I recognized it as a scam and stopped her in time.",
+      "I got a text saying my bank account was locked. I was about to click the link, but I pasted it into the Scam Checker first. It flagged it instantly. That one check saved me from handing over my login.",
     name: "Sarah M.",
-    role: "Protecting her parents",
+    context: "Protecting her parents",
     initials: "SM",
-    rating: 5,
   },
   {
     quote:
-      "The Scam Checker saved me. I got a text about a package delivery and was about to click. Checked it here first and found out it was a phishing link.",
+      "I ran the Data Broker Removal tool and found my home address, phone number, and email listed on 14 different sites I had never heard of. I removed myself from all of them in a weekend.",
     name: "Marcus T.",
-    role: "First-time user",
+    context: "Father of two",
     initials: "MT",
-    rating: 5,
   },
   {
     quote:
-      "Finally, safety advice I can actually understand! No confusing tech jargon. I set up parental controls on all my kids' devices in one afternoon.",
+      "My 72-year-old mom was getting calls from someone pretending to be her grandson. The guides here helped me explain what was happening without making her feel embarrassed. That matters.",
     name: "Jennifer L.",
-    role: "Mom of 3",
+    context: "Looking out for her mom",
     initials: "JL",
-    rating: 5,
   },
   {
     quote:
-      "My 75-year-old father was being targeted by romance scammers. GetCyberRight helped us recognize the warning signs and protect him from financial ruin.",
-    name: "Michael T.",
-    role: "Son & Caregiver",
-    initials: "MT",
-    rating: 5,
+      "We use the training materials at our community center for a weekly class with older adults. The content is respectful and doesn't talk down to anyone. That's rare.",
+    name: "David R.",
+    context: "Community center volunteer",
+    initials: "DR",
   },
   {
     quote:
-      "We use GetCyberRight materials in our community center to educate seniors. The content is clear, respectful, and doesn't make anyone feel stupid for not knowing tech.",
-    name: "Linda W.",
-    role: "Community Center Director",
-    initials: "LW",
-    rating: 5,
-  },
-  {
-    quote:
-      "After clicking a suspicious link, I panicked. The 'What To Do Next' guide walked me through exactly what steps to take. Invaluable resource!",
-    name: "David K.",
-    role: "College Student",
-    initials: "DK",
-    rating: 5,
+      "I thought I was careful online until I ran a quick check on my password. Turns out it had already been exposed in a breach. Changed everything that same night.",
+    name: "Angela K.",
+    context: "Small business owner",
+    initials: "AK",
   },
 ];
 
 export function Testimonials() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(3);
-
-  useEffect(() => {
-    const updateItemsPerPage = () => {
-      if (window.innerWidth < 768) {
-        setItemsPerPage(1);
-      } else if (window.innerWidth < 1024) {
-        setItemsPerPage(2);
-      } else {
-        setItemsPerPage(3);
-      }
-    };
-
-    updateItemsPerPage();
-    window.addEventListener("resize", updateItemsPerPage);
-    return () => window.removeEventListener("resize", updateItemsPerPage);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => 
-        prev + itemsPerPage >= testimonials.length ? 0 : prev + 1
-      );
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [itemsPerPage]);
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) =>
-      prev + itemsPerPage >= testimonials.length ? 0 : prev + 1
-    );
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? Math.max(0, testimonials.length - itemsPerPage) : prev - 1
-    );
-  };
-
-  const visibleTestimonials = testimonials.slice(
-    currentIndex,
-    currentIndex + itemsPerPage
-  );
-
-  if (visibleTestimonials.length < itemsPerPage) {
-    visibleTestimonials.push(
-      ...testimonials.slice(0, itemsPerPage - visibleTestimonials.length)
-    );
-  }
-
   return (
-    <section className="py-16 sm:py-24 bg-muted/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center max-w-3xl mx-auto mb-12"
-        >
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
-            Success Stories
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Trusted by Families and Organizations
+    <section
+      className="py-20 sm:py-28 lg:py-32 bg-[#0A2A3C] relative overflow-hidden"
+      data-testid="section-testimonials"
+      aria-labelledby="testimonials-heading"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+
+      <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mb-14 sm:mb-20">
+          <h2
+            id="testimonials-heading"
+            className="text-4xl sm:text-5xl font-extrabold text-white mb-5"
+            data-testid="text-testimonials-heading"
+          >
+            What People Are Saying
           </h2>
-          <p className="text-lg text-muted-foreground">
-            See how GetCyberRight has helped people just like you stay safe
-            online.
+          <p className="text-xl text-white/70 leading-relaxed">
+            Real situations where the right tool or the right information made the difference.
           </p>
-        </motion.div>
-
-        <div className="relative">
-          <div className="flex gap-4 justify-center">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={prevSlide}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex"
-              data-testid="button-testimonial-prev"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-              <AnimatePresence mode="popLayout">
-                {visibleTestimonials.map((testimonial, index) => (
-                  <motion.div
-                    key={`${testimonial.name}-${currentIndex}-${index}`}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <Card
-                      className="h-full"
-                      data-testid={`testimonial-card-${index}`}
-                    >
-                      <CardContent className="p-6 flex flex-col h-full">
-                        <div className="flex gap-1 mb-4">
-                          {[...Array(testimonial.rating)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className="w-4 h-4 fill-primary text-primary"
-                            />
-                          ))}
-                        </div>
-                        <Quote className="w-8 h-8 text-primary/20 mb-4" />
-                        <blockquote className="text-foreground mb-6 leading-relaxed flex-1">
-                          "{testimonial.quote}"
-                        </blockquote>
-                        <div className="flex items-center gap-3 mt-auto">
-                          <Avatar className="border-2 border-primary/20">
-                            <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-                              {testimonial.initials}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium text-foreground">
-                              {testimonial.name}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {testimonial.role}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={nextSlide}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex"
-              data-testid="button-testimonial-next"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <div className="flex justify-center gap-2 mt-6">
-            {Array.from({ length: Math.ceil(testimonials.length / itemsPerPage) }).map(
-              (_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index * itemsPerPage)}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    Math.floor(currentIndex / itemsPerPage) === index
-                      ? "bg-primary"
-                      : "bg-muted-foreground/30"
-                  }`}
-                  data-testid={`carousel-dot-${index}`}
-                />
-              )
-            )}
-          </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex justify-center gap-8 mt-12 pt-8 border-t"
-        >
-          <div className="text-center">
-            <p className="text-3xl font-bold text-primary">50,000+</p>
-            <p className="text-sm text-muted-foreground">Families Helped</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-primary">4.9/5</p>
-            <p className="text-sm text-muted-foreground">Average Rating</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-primary">Global</p>
-            <p className="text-sm text-muted-foreground">Reach</p>
-          </div>
-        </motion.div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testimonials.slice(0, 3).map((testimonial) => (
+            <div
+              key={testimonial.initials}
+              className="bg-white/[0.06] border border-white/10 rounded-2xl p-7 sm:p-8 flex flex-col"
+              data-testid={`testimonial-card-${testimonial.initials.toLowerCase()}`}
+            >
+              <Quote className="w-8 h-8 text-white/15 mb-5 flex-shrink-0" aria-hidden="true" />
+              <blockquote className="text-white/85 leading-relaxed mb-8 flex-1">
+                {testimonial.quote}
+              </blockquote>
+              <div className="flex items-center gap-3 mt-auto">
+                <div
+                  className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-sm font-semibold text-white/70"
+                  aria-hidden="true"
+                >
+                  {testimonial.initials}
+                </div>
+                <div>
+                  <p className="font-semibold text-white text-sm">{testimonial.name}</p>
+                  <p className="text-sm text-white/50">{testimonial.context}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6 mt-6 lg:max-w-[calc(66.666%+0.75rem)]">
+          {testimonials.slice(3, 5).map((testimonial) => (
+            <div
+              key={testimonial.initials}
+              className="bg-white/[0.06] border border-white/10 rounded-2xl p-7 sm:p-8 flex flex-col"
+              data-testid={`testimonial-card-${testimonial.initials.toLowerCase()}`}
+            >
+              <Quote className="w-8 h-8 text-white/15 mb-5 flex-shrink-0" aria-hidden="true" />
+              <blockquote className="text-white/85 leading-relaxed mb-8 flex-1">
+                {testimonial.quote}
+              </blockquote>
+              <div className="flex items-center gap-3 mt-auto">
+                <div
+                  className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-sm font-semibold text-white/70"
+                  aria-hidden="true"
+                >
+                  {testimonial.initials}
+                </div>
+                <div>
+                  <p className="font-semibold text-white text-sm">{testimonial.name}</p>
+                  <p className="text-sm text-white/50">{testimonial.context}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
