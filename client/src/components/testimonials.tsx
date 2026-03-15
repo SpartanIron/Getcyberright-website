@@ -3,38 +3,38 @@ import { Quote } from "lucide-react";
 const testimonials = [
   {
     quote:
-      "I got a text saying my bank account was locked. I was about to click the link, but I pasted it into the Scam Checker first. It flagged it instantly. That one check saved me from handing over my login.",
-    name: "Sarah M.",
-    context: "Protecting her parents",
-    initials: "SM",
+      "My father received a WhatsApp message offering a job that paid in advance. He was ready to send his ID and bank details. I checked the link here and it came back as a known fraud site. That one check protected our whole family's savings.",
+    name: "Amina O.",
+    context: "Lagos, Nigeria",
+    initials: "AO",
   },
   {
     quote:
-      "I ran the Data Broker Removal tool and found my home address, phone number, and email listed on 14 different sites I had never heard of. I removed myself from all of them in a weekend.",
-    name: "Marcus T.",
-    context: "Father of two",
-    initials: "MT",
+      "Someone contacted my grandmother on LINE pretending to be a government tax officer, saying she owed money. The guides here explained exactly how that scam works. We reported it and she never sent a single yen.",
+    name: "Kenji T.",
+    context: "Osaka, Japan",
+    initials: "KT",
   },
   {
     quote:
-      "My 72-year-old mom was getting calls from someone pretending to be her grandson. The guides here helped me explain what was happening without making her feel embarrassed. That matters.",
-    name: "Jennifer L.",
-    context: "Looking out for her mom",
-    initials: "JL",
+      "I got a parcel delivery text with a tracking link that looked exactly like Royal Mail. I pasted it into the Scam Checker and it flagged it immediately. I would have clicked that link without thinking twice.",
+    name: "Rachel D.",
+    context: "Manchester, UK",
+    initials: "RD",
   },
   {
     quote:
-      "We use the training materials at our community center for a weekly class with older adults. The content is respectful and doesn't talk down to anyone. That's rare.",
-    name: "David R.",
-    context: "Community center volunteer",
-    initials: "DR",
+      "After a data breach at a local retailer, I used the password tool and found three of my accounts were using the same exposed password. I changed them all that evening. Simple tool, but it caught something I missed for years.",
+    name: "Carlos M.",
+    context: "Bogota, Colombia",
+    initials: "CM",
   },
   {
     quote:
-      "I thought I was careful online until I ran a quick check on my password. Turns out it had already been exposed in a breach. Changed everything that same night.",
-    name: "Angela K.",
-    context: "Small business owner",
-    initials: "AK",
+      "My son's school had no safety curriculum for kids online. I shared the training materials from here with his teacher and they now use them every term. Finally, something that speaks to parents and kids at the same level.",
+    name: "Priya S.",
+    context: "Mumbai, India",
+    initials: "PS",
   },
 ];
 
