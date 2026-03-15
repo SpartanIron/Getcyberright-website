@@ -24,6 +24,7 @@ import {
   type InsertGrowthTask,
   type PlatformMetric,
   users,
+  // WebAuthn tables and types are defined in database-storage.ts (legacy)
   contactMessages,
   newsletterSubscribers,
   aiPrompts,

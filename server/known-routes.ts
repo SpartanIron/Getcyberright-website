@@ -80,6 +80,7 @@ export const DYNAMIC_ROUTE_PREFIXES = [
   "/scam-intel/",
   "/scams/",
   "/topics/",
+  "/admin/",
 ];
 
 export function isKnownRoute(url: string): boolean {

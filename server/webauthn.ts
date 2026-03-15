@@ -50,8 +50,8 @@ export function registerWebAuthnRoutes(app: Express) {
         rpName: RP_NAME,
         rpID: RP_ID,
         userID: userIdBytes,
-        userName: user.username,
-        userDisplayName: user.username,
+        userName: user.email,
+        userDisplayName: user.email,
         attestationType: 'none',
         excludeCredentials: existingCredentials.map(cred => ({
           id: cred.credentialId,
@@ -102,7 +102,7 @@ export function registerWebAuthnRoutes(app: Express) {
       if (!pendingChallenges || pendingChallenges.length === 0) {
         await storage.createAuditLog({
           userId: user.id,
-          username: user.username,
+          username: user.email,
           action: 'PASSKEY_REGISTRATION_FAILED',
           details: 'No pending registration challenge found',
           ipAddress: req.ip || req.socket.remoteAddress,
@@ -117,7 +117,7 @@ export function registerWebAuthnRoutes(app: Express) {
         await storage.deleteWebauthnChallenge(latestChallenge.challenge);
         await storage.createAuditLog({
           userId: user.id,
-          username: user.username,
+          username: user.email,
           action: 'PASSKEY_REGISTRATION_FAILED',
           details: 'Registration challenge expired',
           ipAddress: req.ip || req.socket.remoteAddress,
@@ -138,7 +138,7 @@ export function registerWebAuthnRoutes(app: Express) {
         await storage.deleteWebauthnChallenge(latestChallenge.challenge);
         await storage.createAuditLog({
           userId: user.id,
-          username: user.username,
+          username: user.email,
           action: 'PASSKEY_REGISTRATION_FAILED',
           details: `Verification error: ${verifyError.message}`,
           ipAddress: req.ip || req.socket.remoteAddress,
@@ -151,7 +151,7 @@ export function registerWebAuthnRoutes(app: Express) {
         await storage.deleteWebauthnChallenge(latestChallenge.challenge);
         await storage.createAuditLog({
           userId: user.id,
-          username: user.username,
+          username: user.email,
           action: 'PASSKEY_REGISTRATION_FAILED',
           details: 'Credential verification returned false',
           ipAddress: req.ip || req.socket.remoteAddress,
@@ -177,7 +177,7 @@ export function registerWebAuthnRoutes(app: Express) {
 
       await storage.createAuditLog({
         userId: user.id,
-        username: user.username,
+        username: user.email,
         action: 'PASSKEY_REGISTERED',
         details: `Registered new passkey: ${deviceName || 'Security Key'}`,
         ipAddress: req.ip || req.socket.remoteAddress,
@@ -190,7 +190,7 @@ export function registerWebAuthnRoutes(app: Express) {
       try {
         await storage.createAuditLog({
           userId: req.user?.id || null,
-          username: req.user?.username || 'unknown',
+          username: req.user?.email || 'unknown',
           action: 'PASSKEY_REGISTRATION_FAILED',
           details: `Server error: ${error.message || 'Unknown error'}`,
           ipAddress: req.ip || req.socket.remoteAddress,
@@ -343,11 +343,11 @@ export function registerWebAuthnRoutes(app: Express) {
         return res.status(400).json({ message: 'User not found' });
       }
 
-      const token = generateToken({ id: user.id, username: user.username, role: user.role || 'user' });
+      const token = generateToken({ id: user.id, username: user.email, role: user.isAdmin ? 'admin' : 'user' });
 
       await storage.createAuditLog({
         userId: user.id,
-        username: user.username,
+        username: user.email,
         action: 'PASSKEY_LOGIN',
         details: 'User logged in with passkey',
         ipAddress: req.ip || req.socket.remoteAddress,
@@ -359,8 +359,8 @@ export function registerWebAuthnRoutes(app: Express) {
         token,
         user: {
           id: user.id,
-          username: user.username,
-          role: user.role,
+          email: user.email,
+          isAdmin: user.isAdmin,
         },
       });
     } catch (error: any) {
@@ -395,7 +395,7 @@ export function registerWebAuthnRoutes(app: Express) {
 
       await storage.createAuditLog({
         userId: req.user!.id,
-        username: req.user!.username,
+        username: req.user!.email || 'unknown',
         action: 'PASSKEY_DELETED',
         details: `Deleted passkey: ${credential.deviceName || 'Security Key'}`,
         ipAddress: req.ip || req.socket.remoteAddress,

@@ -1225,8 +1225,9 @@ export function seoMiddleware() {
     const ua = req.get("User-Agent");
     if (!isBot(ua)) return next();
 
-    const path = req.path;
+    const path = req.originalUrl.split("?")[0].split("#")[0];
     let html: string | null = null;
+    let isDynamicRoute = false;
 
     try {
       if (path === "/") {
@@ -1239,26 +1240,31 @@ export function seoMiddleware() {
 
       const guideMatch = path.match(/^\/guides\/([a-z0-9-]+)$/);
       if (!html && guideMatch) {
+        isDynamicRoute = true;
         html = await renderGuidePage(guideMatch[1]);
       }
 
       const alertMatch = path.match(/^\/alerts\/([a-z0-9-]+)$/);
       if (!html && alertMatch) {
+        isDynamicRoute = true;
         html = await renderAlertPage(alertMatch[1]);
       }
 
       const scamIntelMatch = path.match(/^\/scam-intel\/([a-z0-9-]+)$/);
       if (!html && scamIntelMatch) {
+        isDynamicRoute = true;
         html = await renderScamIntelPage(scamIntelMatch[1]);
       }
 
       const scamMatch = path.match(/^\/scams\/([a-z0-9-]+)$/);
       if (!html && scamMatch) {
+        isDynamicRoute = true;
         html = renderScamPage(scamMatch[1]);
       }
 
       const topicMatch = path.match(/^\/topics\/([a-z0-9-]+)$/);
       if (!html && topicMatch) {
+        isDynamicRoute = true;
         html = await renderTopicHub(topicMatch[1]);
       }
 
@@ -1278,6 +1284,11 @@ export function seoMiddleware() {
 
       if (html) {
         res.status(200).set({ "Content-Type": "text/html" }).end(html);
+        return;
+      }
+
+      if (isDynamicRoute && !html) {
+        res.status(404).set({ "Content-Type": "text/html" }).end("<html><head><title>Not Found</title></head><body><h1>404 - Page Not Found</h1></body></html>");
         return;
       }
     } catch (error: any) {

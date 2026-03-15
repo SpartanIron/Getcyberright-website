@@ -317,6 +317,10 @@ export async function registerRoutes(
     }
   });
 
+  app.get('/api/health', (_req: Request, res: Response) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
   // SSL Health Check Endpoint for external monitoring services
   app.get('/api/health/ssl', standardRateLimit, async (_req: Request, res: Response) => {
     try {
