@@ -13,12 +13,12 @@ const footerLinks = {
     { name: "Resource Library", href: "/resources" },
   ],
   tools: [
-    { name: "Scam Checker", href: "/tools" },
+    { name: "Scam Checker", href: "/scam-checker" },
     { name: "Data Broker Removal", href: "/data-removal" },
     { name: "Password Generator", href: "/password-generator" },
     { name: "AI Prompt Library", href: "/ai-prompts" },
     { name: "Breach Monitor", href: "/breach-dashboard" },
-    { name: "Deepfake Detector", href: "/deepfake-detector" },
+    { name: "Voice Clone Detector", href: "/tools" },
   ],
   forYou: [
     { name: "Parents & Families", href: "/parents" },
