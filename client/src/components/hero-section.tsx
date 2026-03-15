@@ -225,7 +225,7 @@ export function HeroSection() {
                   <img
                     src={heroFamilyImg}
                     alt="Diverse family learning together on a laptop"
-                    className="w-full h-[700px] object-cover"
+                    className="w-full h-[640px] object-cover"
                     loading="eager"
                   />
                 </div>
