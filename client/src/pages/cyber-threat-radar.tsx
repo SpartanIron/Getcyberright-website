@@ -104,17 +104,27 @@ export default function CyberThreatRadar() {
       <StructuredData data={[breadcrumbs]} />
       <Navigation />
 
-      <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(20,184,166,0.08),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(239,68,68,0.06),transparent_50%)]" />
-        <div className="container mx-auto px-4 py-16 relative">
+      <div className="bg-[#0A2A3C] text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+
+        <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: "-40%", right: "2%", width: "50px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center", filter: "drop-shadow(0 0 18px rgba(13, 148, 136, 0.15))" }} />
+          <div style={{ position: "absolute", top: "-40%", right: "10%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 10%, rgba(45, 212, 191, 0.4) 50%, transparent 90%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-35%", right: "18%", width: "35px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.55, filter: "drop-shadow(0 0 24px rgba(45, 212, 191, 0.3))" }} />
+          <div style={{ position: "absolute", top: "-35%", right: "26%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 15%, hsla(16, 95%, 58%, 0.35) 50%, transparent 85%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+          <div style={{ position: "absolute", top: "-30%", right: "32%", width: "50px", height: "220%", background: "linear-gradient(180deg, hsl(16, 100%, 62%) 0%, hsl(16, 95%, 52%) 40%, hsl(16, 90%, 42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.5, filter: "drop-shadow(0 0 22px hsla(16, 95%, 55%, 0.25))" }} />
+        </div>
+
+        <div className="absolute -bottom-24 -left-16 w-[400px] h-[400px] bg-primary/[0.04] rounded-full blur-[100px]" />
+
+        <div className="container mx-auto px-4 py-12 md:py-16 relative z-10">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-teal-500/20 rounded-xl">
-              <Radar className="h-8 w-8 text-teal-400" />
+            <div className="p-3 bg-primary/20 rounded-xl">
+              <Radar className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold" data-testid="heading-threat-radar">Cyber Threat Radar</h1>
-              <p className="text-slate-400 mt-1">Real-time monitoring of active cyber threats</p>
+              <h1 className="text-[1.75rem] sm:text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold tracking-[-0.025em] leading-[1.08]" data-testid="heading-threat-radar">Cyber Threat Radar</h1>
+              <p className="text-white/60 mt-1">Real-time monitoring of active cyber threats</p>
             </div>
           </div>
 
@@ -125,13 +135,13 @@ export default function CyberThreatRadar() {
             <ThreatLevelIndicator level="low" count={riskCounts.low || 0} />
           </div>
 
-          <div className="mt-8 flex items-center gap-4 p-4 rounded-xl bg-slate-800/50 border border-slate-700">
+          <div className="mt-8 flex flex-wrap items-center gap-4 p-4 rounded-xl bg-white/[0.05] border border-white/10">
             <Activity className={`h-6 w-6 ${overallColor}`} />
             <div>
-              <span className="text-sm text-slate-400">Overall Threat Level: </span>
+              <span className="text-sm text-white/50">Overall Threat Level: </span>
               <span className={`font-bold text-lg ${overallColor}`} data-testid="text-overall-threat-level">{overallThreatLevel}</span>
             </div>
-            <div className="ml-auto text-xs text-slate-500 flex items-center gap-1">
+            <div className="ml-auto text-xs text-white/40 flex items-center gap-1">
               <Clock className="h-3 w-3" />
               Updated {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </div>
