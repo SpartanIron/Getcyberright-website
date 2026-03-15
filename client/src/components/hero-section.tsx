@@ -60,27 +60,22 @@ function ThreatAlertBar() {
   return (
     <Link href="/alerts">
       <div
-        className="inline-flex items-center gap-2.5 bg-red-500/[0.08] border border-red-500/20 rounded-full px-4 py-2 cursor-pointer hover:bg-red-500/[0.12] transition-colors group"
+        className="inline-flex items-center gap-2 sm:gap-2.5 bg-red-500/[0.08] border border-red-500/20 rounded-full px-3 sm:px-4 py-2 cursor-pointer hover:bg-red-500/[0.12] transition-colors group max-w-full"
         data-testid="badge-live-threat"
       >
         <div className="relative flex-shrink-0">
           <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
         </div>
-        <span className="flex items-center gap-1.5">
+        <span className="flex items-center gap-1.5 flex-shrink-0">
           <span className="relative flex h-2 w-2 flex-shrink-0">
             <span className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
           </span>
           <span className="text-xs font-semibold text-red-400 uppercase tracking-wider">Active</span>
         </span>
-        <span className="text-sm text-white/70 font-medium truncate max-w-[220px] sm:max-w-xs group-hover:text-white transition-colors">
+        <span className="text-sm text-white/70 font-medium truncate min-w-0 group-hover:text-white transition-colors">
           {threat.title}
         </span>
-        {region !== "GLOBAL" && (
-          <span className="text-[10px] text-white/30 flex items-center gap-0.5 flex-shrink-0">
-            <MapPin className="w-2.5 h-2.5" />{regionLabel}
-          </span>
-        )}
         <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border flex-shrink-0 ${sevClass}`}>
           {threat.severity}
         </span>
@@ -176,7 +171,7 @@ export function HeroSection() {
         <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-primary/[0.05] rounded-full blur-[120px]" />
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="pt-8 sm:pt-10 lg:pt-12 pb-4">
+          <div className="pt-8 sm:pt-10 lg:pt-12 pb-4 overflow-hidden">
             <ThreatAlertBar />
           </div>
 
