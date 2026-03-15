@@ -50,6 +50,7 @@ VITE_RECAPTCHA_SITE_KEY = "6Lcy8UksAAAAACOcToKZXSP_d8xUAiJhSha7bdFD"
 EMAIL_FROM_ADDRESS = "tips@getcyberright.com"
 EMAIL_FROM_NAME = "GetCyberRight"
 BUFFER_ORG_ID = "69b48dd8282d615a79db2ab3"
+GOOGLE_SAFE_BROWSING_API_KEY = "AIzaSyDFtrssQ2Fe-uOiGa5RwUasHRrwwhduZgk"
 
 [agent]
 integrations = ["javascript_anthropic_ai_integrations:2.0.0", "javascript_log_in_with_replit:2.0.0"]
