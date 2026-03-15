@@ -18,7 +18,7 @@ const footerLinks = {
     { name: "Password Generator", href: "/password-generator" },
     { name: "AI Prompt Library", href: "/ai-prompts" },
     { name: "Breach Monitor", href: "/breach-dashboard" },
-    { name: "Voice Clone Detector", href: "/tools" },
+    { name: "All Tools", href: "/tools" },
   ],
   forYou: [
     { name: "Parents & Families", href: "/parents" },
