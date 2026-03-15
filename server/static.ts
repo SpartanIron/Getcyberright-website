@@ -16,9 +16,9 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
-
   app.use(seoMiddleware());
+
+  app.use(express.static(distPath));
 
   app.use("/{*path}", (req, res) => {
     const statusCode = isKnownRoute(req.path) ? 200 : 404;

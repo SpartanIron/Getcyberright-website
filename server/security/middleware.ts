@@ -435,15 +435,13 @@ export const antiScrapingHeaders = (req: Request, res: Response, next: NextFunct
 
 // Bot detection middleware - blocks known scraper user agents
 const blockedBots = [
-  /GPTBot/i,
-  /ChatGPT-User/i,
   /CCBot/i,
-  /anthropic-ai/i,
-  /Claude-Web/i,
-  /Google-Extended/i,
   /Bytespider/i,
   /PetalBot/i,
-  /FacebookBot/i,
+  /SemrushBot/i,
+  /AhrefsBot/i,
+  /MJ12bot/i,
+  /DotBot/i,
 ];
 
 export const botProtection = (req: Request, res: Response, next: NextFunction) => {
