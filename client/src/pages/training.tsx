@@ -155,18 +155,45 @@ export default function Training() {
       <Navigation />
       
       <main id="main-content" className="flex-1" tabIndex={-1}>
-        <section className="relative overflow-hidden bg-[#0A2A3C]">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-[45%_55%]">
-              <div className="px-5 sm:px-6 lg:pl-8 lg:pr-12 py-16 md:py-24 flex flex-col justify-center">
+        <section className="relative overflow-hidden bg-[#0A2A3C] h-[320px] sm:h-[360px] md:h-[400px] lg:h-[420px]">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+
+          <div className="absolute inset-0 hidden lg:block" aria-hidden="true">
+            <img
+              src={bannerImage}
+              alt=""
+              className="w-full h-full object-cover"
+              loading="eager"
+            />
+            <div className="absolute inset-0 bg-[#0A2A3C]/75" />
+          </div>
+
+          <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: "-40%", right: "2%", width: "50px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center", filter: "drop-shadow(0 0 18px rgba(13, 148, 136, 0.15))" }} />
+            <div style={{ position: "absolute", top: "-40%", right: "10%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 10%, rgba(45, 212, 191, 0.4) 50%, transparent 90%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+            <div style={{ position: "absolute", top: "-35%", right: "18%", width: "35px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.55, filter: "drop-shadow(0 0 24px rgba(45, 212, 191, 0.3))" }} />
+            <div style={{ position: "absolute", top: "-35%", right: "26%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 15%, hsla(16, 95%, 58%, 0.35) 50%, transparent 85%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
+            <div style={{ position: "absolute", top: "-30%", right: "32%", width: "50px", height: "220%", background: "linear-gradient(180deg, hsl(16, 100%, 62%) 0%, hsl(16, 95%, 52%) 40%, hsl(16, 90%, 42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.5, filter: "drop-shadow(0 0 22px hsla(16, 95%, 55%, 0.25))" }} />
+          </div>
+
+          <div className="max-w-7xl mx-auto relative z-10 h-full">
+            <div className="flex flex-col h-full">
+              <div className="lg:hidden">
+                <div className="relative h-[130px] sm:h-[150px] overflow-hidden">
+                  <img src={bannerImage} alt="Diverse people learning cybersecurity together" className="w-full h-full object-cover" loading="eager" />
+                  <div className="absolute inset-0 bg-[#0A2A3C]/60" />
+                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0A2A3C] to-transparent" />
+                </div>
+              </div>
+              <div className="flex-1 flex flex-col justify-center px-5 sm:px-6 lg:px-8 py-6 lg:py-0 lg:max-w-[55%]">
                 <Badge variant="secondary" className="mb-4 w-fit" data-testid="badge-training-header">
                   <GraduationCap className="w-3 h-3 mr-1" />
                   AI-Powered Curriculum
                 </Badge>
-                <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight" data-testid="text-training-title">
+                <h1 className="text-[1.75rem] sm:text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold text-white mb-5 leading-[1.08] tracking-[-0.025em]" data-testid="text-training-title">
                   Cybersecurity and AI Training Academy
                 </h1>
-                <p className="text-lg sm:text-xl text-white/75 mb-8 leading-relaxed" data-testid="text-training-subtitle">
+                <p className="text-[0.95rem] sm:text-lg text-white/70 mb-7 leading-relaxed max-w-lg" data-testid="text-training-subtitle">
                   Master digital safety with structured learning paths, interactive lessons, 
                   and industry-recognized certifications tailored to your needs.
                 </p>
@@ -185,25 +212,7 @@ export default function Training() {
                   </Button>
                 </div>
               </div>
-
-              <div className="hidden lg:block">
-                <img
-                  src={bannerImage}
-                  alt="Diverse people learning cybersecurity together"
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                />
-              </div>
             </div>
-          </div>
-
-          <div className="lg:hidden">
-            <img
-              src={bannerImage}
-              alt="Diverse people learning cybersecurity together"
-              className="w-full h-64 sm:h-80 object-cover"
-              loading="eager"
-            />
           </div>
         </section>
 
