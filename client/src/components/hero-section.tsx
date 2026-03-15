@@ -104,8 +104,6 @@ export function HeroSection() {
             width: "58%",
             height: "100%",
             overflow: "hidden",
-            maskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
           }}
         >
           <div
@@ -235,7 +233,6 @@ export function HeroSection() {
                     className="w-full h-[620px] object-cover"
                     loading="eager"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#0A2A3C]/70 via-transparent to-transparent" style={{ width: '35%' }} />
                 </div>
 
                 <div className="absolute bottom-8 left-8 flex items-center gap-3 bg-white/[0.08] backdrop-blur-md border border-white/[0.12] rounded-xl px-5 py-3.5">
