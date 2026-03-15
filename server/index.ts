@@ -89,6 +89,15 @@ export function log(message: string, source = "express") {
 }
 
 app.use((req, res, next) => {
+  const p = req.path;
+  if (p !== "/" && p.endsWith("/") && !p.startsWith("/api/")) {
+    const query = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
+    return res.redirect(301, p.slice(0, -1) + query);
+  }
+  next();
+});
+
+app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;

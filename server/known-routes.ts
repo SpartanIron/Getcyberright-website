@@ -45,6 +45,8 @@ export const KNOWN_CLIENT_ROUTES = new Set([
   "/safety-score",
   "/scam-checker",
   "/faq",
+  "/resources/glossary",
+  "/resources/cheat-sheets",
   "/guides",
   "/alerts",
   "/scam-intel",
@@ -63,6 +65,11 @@ export const KNOWN_CLIENT_ROUTES = new Set([
   "/admin/content-governance",
   "/admin/compliance",
   "/admin/newsletter",
+  "/admin/prompt-management",
+  "/admin/announcements",
+  "/admin/trending-threats",
+  "/admin/feedback",
+  "/admin/content",
   "/admin/change-password",
 ]);
 
@@ -76,7 +83,10 @@ export const DYNAMIC_ROUTE_PREFIXES = [
 ];
 
 export function isKnownRoute(url: string): boolean {
-  const pathname = url.split("?")[0].split("#")[0];
+  let pathname = url.split("?")[0].split("#")[0];
+  if (pathname !== "/" && pathname.endsWith("/")) {
+    pathname = pathname.slice(0, -1);
+  }
   if (KNOWN_CLIENT_ROUTES.has(pathname)) {
     return true;
   }

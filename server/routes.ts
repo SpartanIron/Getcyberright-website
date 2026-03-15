@@ -220,6 +220,8 @@ export async function registerRoutes(
       { path: '/privacy', changefreq: 'yearly', priority: '0.4' },
       { path: '/terms', changefreq: 'yearly', priority: '0.4' },
       { path: '/accessibility', changefreq: 'yearly', priority: '0.4' },
+      { path: '/advertise', changefreq: 'monthly', priority: '0.4' },
+      { path: '/partner-deck', changefreq: 'monthly', priority: '0.4' },
     ];
 
     const scamSlugs = getAllScamSlugs();

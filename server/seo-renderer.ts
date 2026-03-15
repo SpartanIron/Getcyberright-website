@@ -747,6 +747,117 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { question: "Who are the checklists designed for?", answer: "We have checklists for everyone including families, seniors, parents, students, and small business owners. Each one is written in plain language with clear action steps." },
     ],
   },
+  "/news": {
+    title: "Cybersecurity News & Updates",
+    description: "Stay informed with the latest cybersecurity news, data breach reports, emerging threats, and security advisories. Curated updates for families, seniors, and small businesses.",
+    path: "/news",
+  },
+  "/cyber-hygiene": {
+    title: "Cyber Hygiene: Daily Habits for Better Online Safety",
+    description: "Learn essential cyber hygiene practices to protect yourself daily. Simple, actionable habits for passwords, software updates, safe browsing, and device security.",
+    path: "/cyber-hygiene",
+  },
+  "/privacy": {
+    title: "Privacy Policy",
+    description: "Read the GetCyberRight privacy policy. Learn how we collect, use, and protect your personal information when you use our cybersecurity education platform and tools.",
+    path: "/privacy",
+  },
+  "/terms": {
+    title: "Terms of Service",
+    description: "Review the GetCyberRight terms of service. Understand the rules and guidelines for using our cybersecurity education platform, tools, and resources.",
+    path: "/terms",
+  },
+  "/report-scam": {
+    title: "Report a Scam: Help Protect Your Community",
+    description: "Report a scam to GetCyberRight and help protect others. Submit details about suspicious emails, phone calls, text messages, or websites. Your reports strengthen our threat intelligence.",
+    path: "/report-scam",
+  },
+  "/travel-safety": {
+    title: "Travel Cybersecurity: Stay Safe Online While Traveling",
+    description: "Protect your digital life while traveling. Tips for secure Wi-Fi use, device protection, avoiding travel scams, and keeping your data safe on the road.",
+    path: "/travel-safety",
+  },
+  "/printable-guides": {
+    title: "Printable Cybersecurity Guides: Download Free Safety Resources",
+    description: "Download and print free cybersecurity guides for your family, classroom, or business. Visual safety checklists, tip sheets, and reference cards you can keep handy.",
+    path: "/printable-guides",
+  },
+  "/support-the-mission": {
+    title: "Support the Mission: Help Keep Families Safe Online",
+    description: "Support GetCyberRight's mission to make cybersecurity education accessible to everyone. Help us protect families, seniors, and small businesses from online threats.",
+    path: "/support-the-mission",
+  },
+  "/our-mission": {
+    title: "Our Mission: Making Online Safety Accessible to Everyone",
+    description: "GetCyberRight's mission is to make cybersecurity education simple, practical, and available to every family. Learn why we started and where we are headed.",
+    path: "/our-mission",
+  },
+  "/pricing": {
+    title: "Plans & Pricing: Free Cybersecurity Tools for Everyone",
+    description: "GetCyberRight is free to get started. Access AI-powered scam checking, data broker removal, safety training, and more. See what is included and how to support the mission.",
+    path: "/pricing",
+  },
+  "/feedback": {
+    title: "Share Your Feedback: Help Us Improve GetCyberRight",
+    description: "Tell us what you think about GetCyberRight. Your feedback helps us build better cybersecurity education tools and resources for families and communities.",
+    path: "/feedback",
+  },
+  "/parent-guide": {
+    title: "Parent's Guide to Online Safety: Protect Your Children Online",
+    description: "A complete guide for parents to keep children safe online. Covers parental controls, age-appropriate conversations, device setup, social media safety, and more.",
+    path: "/parent-guide",
+  },
+  "/search": {
+    title: "Search GetCyberRight: Find Cybersecurity Resources",
+    description: "Search across all GetCyberRight resources including guides, tools, training courses, scam alerts, and safety checklists. Find exactly what you need to stay safe online.",
+    path: "/search",
+  },
+  "/accessibility": {
+    title: "Accessibility Statement",
+    description: "GetCyberRight is committed to digital accessibility. Learn about our efforts to make cybersecurity education accessible to all users, including those with disabilities.",
+    path: "/accessibility",
+  },
+  "/advertise": {
+    title: "Advertise with GetCyberRight: Reach Security-Conscious Families",
+    description: "Partner with GetCyberRight to reach families, parents, seniors, and small businesses who care about online safety. Learn about advertising and sponsorship opportunities.",
+    path: "/advertise",
+  },
+  "/partner-deck": {
+    title: "Partnership Opportunities: Collaborate with GetCyberRight",
+    description: "Explore partnership opportunities with GetCyberRight. Learn how your organization can collaborate with us to advance cybersecurity education for families and communities.",
+    path: "/partner-deck",
+  },
+  "/threat-trends": {
+    title: "Cybersecurity Threat Trends: Current Attack Patterns & Statistics",
+    description: "Track the latest cybersecurity threat trends and attack patterns. Data-driven insights on emerging scams, malware campaigns, and security threats affecting families and businesses.",
+    path: "/threat-trends",
+  },
+  "/support": {
+    title: "Support & Help Center",
+    description: "Get help with GetCyberRight tools and resources. Find answers to common questions, troubleshooting guides, and contact information for our support team.",
+    path: "/support",
+  },
+  "/security": {
+    title: "Security at GetCyberRight: How We Protect Your Data",
+    description: "Learn how GetCyberRight protects your data with enterprise-grade security measures including encryption, secure authentication, and privacy-first design principles.",
+    path: "/security",
+  },
+  "/parents/child-safety-scanner": {
+    title: "Child Safety Scanner: Check Your Family's Online Safety",
+    description: "Use our free child safety scanner to evaluate your family's online security. Get personalized recommendations for parental controls, device settings, and conversation topics.",
+    path: "/parents/child-safety-scanner",
+    schemaType: "WebApplication",
+  },
+  "/resources/glossary": {
+    title: "Cybersecurity Glossary: Simple Definitions for Common Terms",
+    description: "A plain-language glossary of cybersecurity terms. Understand common security concepts without the technical jargon. Perfect for beginners and families.",
+    path: "/resources/glossary",
+  },
+  "/resources/cheat-sheets": {
+    title: "Cybersecurity Cheat Sheets: Quick Reference Security Guides",
+    description: "Quick-reference cybersecurity cheat sheets covering passwords, safe browsing, email safety, social media privacy, and more. Print-friendly and easy to follow.",
+    path: "/resources/cheat-sheets",
+  },
 };
 
 function renderStaticToolPage(pagePath: string): string | null {
