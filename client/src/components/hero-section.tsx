@@ -225,7 +225,7 @@ export function HeroSection() {
                   <img
                     src={heroFamilyImg}
                     alt="Diverse family learning together on a laptop"
-                    className="w-full h-[620px] object-cover"
+                    className="w-full h-[700px] object-cover"
                     loading="eager"
                   />
                 </div>
@@ -242,10 +242,6 @@ export function HeroSection() {
                   loading="eager"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C]/60 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 flex items-center gap-2.5 bg-white/[0.07] backdrop-blur-md border border-white/[0.12] rounded-lg px-4 py-3">
-                  <Shield className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-semibold text-white">Backed by FBI, CISA, INTERPOL data</span>
-                </div>
               </div>
             </div>
           </div>
