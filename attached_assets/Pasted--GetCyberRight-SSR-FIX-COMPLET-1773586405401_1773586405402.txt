@@ -1,0 +1,387 @@
+// ============================================================
+// GetCyberRight – SSR FIX: COMPLETE IMPLEMENTATION GUIDE
+// React + Vite + Express + TypeScript + Tailwind + shadcn/ui
+// Prepared by ColorCode Solutions LLC | March 2026
+// ============================================================
+
+// ── STEP 0: REPLIT SHELL – INSTALL DEPENDENCIES ─────────────
+// Run this in the Replit shell before touching any files:
+
+npm install react-helmet-async react-router-dom compression
+npm install -D @types/compression sirv
+
+
+// ── STEP 1: package.json ─────────────────────────────────────
+// MODIFY your existing package.json scripts section only.
+// Do not replace the entire file. Just update "scripts":
+
+"scripts": {
+  "dev": "tsx server/index.ts",
+  "build": "npm run build:client && npm run build:server",
+  "build:client": "vite build --outDir dist/client",
+  "build:server": "vite build --ssr client/src/entry-server.tsx --outDir dist/server",
+  "start": "NODE_ENV=production node dist/server/index.js"
+}
+
+
+// ── STEP 2: vite.config.ts ───────────────────────────────────
+// REPLACE entire file
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './client/src'),
+    },
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'client/index.html'),
+      },
+    },
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
+  },
+})
+
+
+// ── STEP 3: client/index.html ────────────────────────────────
+// REPLACE entire file.
+// The HTML comment placeholders are injection points for SSR.
+// Do NOT remove them.
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!--ssr-head-->
+  </head>
+  <body>
+    <div id="root"><!--ssr-outlet--></div>
+    <script type="module" src="/src/entry-client.tsx"></script>
+  </body>
+</html>
+
+
+// ── STEP 4: client/src/entry-client.tsx ──────────────────────
+// REPLACE your existing main.tsx or index.tsx with this file.
+// Rename the file to entry-client.tsx.
+
+import React from 'react'
+import { hydrateRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
+import App from './App'
+import './index.css'
+
+hydrateRoot(
+  document.getElementById('root')!,
+  <React.StrictMode>
+    <HelmetProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </HelmetProvider>
+  </React.StrictMode>
+)
+
+
+// ── STEP 5: client/src/entry-server.tsx ──────────────────────
+// CREATE this new file at this exact path.
+
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import { StaticRouter } from 'react-router-dom/server'
+import { HelmetProvider, HelmetServerState } from 'react-helmet-async'
+import App from './App'
+
+export function render(url: string) {
+  const helmetContext: { helmet?: HelmetServerState } = {}
+
+  const html = renderToString(
+    <React.StrictMode>
+      <HelmetProvider context={helmetContext}>
+        <StaticRouter location={url}>
+          <App />
+        </StaticRouter>
+      </HelmetProvider>
+    </React.StrictMode>
+  )
+
+  const { helmet } = helmetContext
+
+  const headTags = helmet
+    ? [
+        helmet.title.toString(),
+        helmet.meta.toString(),
+        helmet.link.toString(),
+        helmet.script.toString(),
+      ]
+        .filter(Boolean)
+        .join('\n    ')
+    : ''
+
+  return { html, headTags }
+}
+
+
+// ── STEP 6: client/src/seo/SEOHead.tsx ───────────────────────
+// CREATE this new file. Drop <SEOHead> into any page component.
+
+import { Helmet } from 'react-helmet-async'
+
+interface SEOHeadProps {
+  title?: string
+  description?: string
+  canonical?: string
+  ogImage?: string
+  ogType?: 'website' | 'article'
+  noIndex?: boolean
+}
+
+const SITE_NAME = 'GetCyberRight'
+const BASE_URL = 'https://www.getcyberright.com'
+const DEFAULT_OG_IMAGE = `${BASE_URL}/og-default.jpg`
+
+export function SEOHead({
+  title,
+  description = 'GetCyberRight protects families from online scams with simple, actionable cybersecurity education. Trusted by thousands across the U.S. and beyond.',
+  canonical,
+  ogImage = DEFAULT_OG_IMAGE,
+  ogType = 'website',
+  noIndex = false,
+}: SEOHeadProps) {
+  const fullTitle = title
+    ? `${title} | ${SITE_NAME}`
+    : `${SITE_NAME} – Cybersecurity Made Simple`
+  const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : BASE_URL
+
+  return (
+    <Helmet>
+      <title>{fullTitle}</title>
+      <meta name="description" content={description} />
+      <link rel="canonical" href={canonicalUrl} />
+      {noIndex && <meta name="robots" content="noindex, nofollow" />}
+
+      <meta property="og:type" content={ogType} />
+      <meta property="og:title" content={fullTitle} />
+      <meta property="og:description" content={description} />
+      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:locale" content="en_US" />
+
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={fullTitle} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:site" content="@GetCyberRight" />
+
+      <script type="application/ld+json">{JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: SITE_NAME,
+        url: BASE_URL,
+        logo: `${BASE_URL}/logo.png`,
+        description,
+        foundingDate: '2024',
+        sameAs: [
+          'https://www.facebook.com/getcyberright',
+          'https://www.instagram.com/getcyberright',
+          'https://www.linkedin.com/company/getcyberright',
+        ],
+      })}</script>
+    </Helmet>
+  )
+}
+
+
+// ── STEP 7: server/index.ts ───────────────────────────────────
+// MODIFY your existing server/index.ts.
+// Keep all your existing /api routes.
+// Add the SSR renderer, sitemap, and robots.txt sections.
+
+import express from 'express'
+import compression from 'compression'
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const isProduction = process.env.NODE_ENV === 'production'
+const PORT = process.env.PORT || 3000
+
+async function createServer() {
+  const app = express()
+  app.use(compression())
+  app.use(express.json())
+
+  // ── PASTE YOUR EXISTING API ROUTES HERE ──────────────────
+  // app.use('/api/v1', yourRouter)
+  // ─────────────────────────────────────────────────────────
+
+  // DYNAMIC SITEMAP
+  app.get('/sitemap.xml', (_req, res) => {
+    const baseUrl = 'https://www.getcyberright.com'
+    const today = new Date().toISOString().split('T')[0]
+
+    const pages = [
+      { url: '/', priority: '1.0', changefreq: 'weekly' },
+      { url: '/about', priority: '0.8', changefreq: 'monthly' },
+      { url: '/how-it-works', priority: '0.8', changefreq: 'monthly' },
+      { url: '/pricing', priority: '0.9', changefreq: 'weekly' },
+      { url: '/learn', priority: '0.9', changefreq: 'weekly' },
+      { url: '/contact', priority: '0.6', changefreq: 'monthly' },
+    ]
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages
+  .map(
+    (p) => `  <url>
+    <loc>${baseUrl}${p.url}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`
+  )
+  .join('\n')}
+</urlset>`
+
+    res.header('Content-Type', 'application/xml')
+    res.send(xml)
+  })
+
+  // ROBOTS.TXT
+  app.get('/robots.txt', (_req, res) => {
+    res.type('text/plain')
+    res.send(`User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_dev/
+
+Sitemap: https://www.getcyberright.com/sitemap.xml`)
+  })
+
+  let vite: import('vite').ViteDevServer | undefined
+  let template: string
+  let renderFn: (url: string) => { html: string; headTags: string }
+
+  if (!isProduction) {
+    const { createServer: createViteServer } = await import('vite')
+    vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'custom',
+    })
+    app.use(vite.middlewares)
+
+    renderFn = async (url: string) => {
+      const entry = await vite!.ssrLoadModule('/client/src/entry-server.tsx')
+      return entry.render(url)
+    }
+  } else {
+    const { default: sirv } = await import('sirv')
+    app.use(sirv(path.resolve(__dirname, '../dist/client'), { extensions: [] }))
+
+    template = fs.readFileSync(
+      path.resolve(__dirname, '../dist/client/index.html'),
+      'utf-8'
+    )
+
+    const serverEntry = await import(
+      path.resolve(__dirname, '../dist/server/entry-server.js')
+    )
+    renderFn = serverEntry.render
+  }
+
+  // SSR CATCH-ALL – must be last
+  app.use('*', async (req, res, next) => {
+    const url = req.originalUrl
+
+    try {
+      let html: string
+
+      if (!isProduction && vite) {
+        html = fs.readFileSync(
+          path.resolve(__dirname, '../client/index.html'),
+          'utf-8'
+        )
+        html = await vite.transformIndexHtml(url, html)
+      } else {
+        html = template
+      }
+
+      const { html: appHtml, headTags } = await (renderFn as any)(url)
+
+      html = html
+        .replace('<!--ssr-head-->', headTags)
+        .replace('<!--ssr-outlet-->', appHtml)
+
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
+    } catch (e: any) {
+      vite?.ssrFixStacktrace(e)
+      next(e)
+    }
+  })
+
+  app.listen(PORT, () => {
+    console.log(`GetCyberRight server running on port ${PORT}`)
+  })
+}
+
+createServer()
+
+
+// ── STEP 8: USE SEOHead IN YOUR PAGE COMPONENTS ──────────────
+// Add <SEOHead> to each page. Example for the homepage:
+
+// client/src/pages/HomePage.tsx
+import { SEOHead } from '../seo/SEOHead'
+
+export function HomePage() {
+  return (
+    <>
+      <SEOHead
+        title="Protect Your Family from Online Scams"
+        description="GetCyberRight helps families recognize and avoid online scams with simple, actionable cybersecurity education. Start for free."
+        canonical="/"
+      />
+      {/* rest of your existing homepage JSX */}
+    </>
+  )
+}
+
+
+// ── STEP 9: VERIFY IT WORKS ───────────────────────────────────
+// In Replit shell, run: npm run dev
+// Then open a new shell tab and run:
+//   curl http://localhost:3000
+// You should see full HTML with <title>, <meta>, and page content
+// in the curl output. If you see only <div id="root"></div>,
+// SSR is not working yet. Check the console for errors.
+
+
+// ── STEP 10: AFTER DEPLOYING ──────────────────────────────────
+// 1. Go to https://search.google.com/search-console
+// 2. Add property for https://www.getcyberright.com
+// 3. Submit https://www.getcyberright.com/sitemap.xml
+// 4. Request indexing for the homepage URL
+// 5. Test OG tags at https://developers.facebook.com/tools/debug/
+// 6. Test Twitter cards at https://cards-dev.twitter.com/validator
+// 7. Test schema at https://search.google.com/test/rich-results
