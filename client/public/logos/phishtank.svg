@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 60" fill="none">
+  <g>
+    <path d="M14 30c0-8 7-16 16-16s16 8 16 16-7 16-16 16" stroke="#999" stroke-width="3" fill="none"/>
+    <path d="M30 20c4 0 8 4 8 10s-4 10-8 10" stroke="#999" stroke-width="2" fill="none"/>
+    <circle cx="24" cy="26" r="2" fill="#999"/>
+    <path d="M10 32h24" stroke="#999" stroke-width="2"/>
+    <text x="50" y="38" font-family="Arial,sans-serif" font-weight="800" font-size="24" fill="#888">PhishTank</text>
+  </g>
+</svg>

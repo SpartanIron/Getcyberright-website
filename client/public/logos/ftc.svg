@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" fill="none">
+  <g>
+    <rect x="10" y="12" width="36" height="36" rx="4" fill="none" stroke="#999" stroke-width="3"/>
+    <path d="M18 22h20M18 28h14M18 34h18M18 40h10" stroke="#999" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="54" y="38" font-family="Arial,sans-serif" font-weight="800" font-size="28" fill="#888">FTC</text>
+  </g>
+</svg>

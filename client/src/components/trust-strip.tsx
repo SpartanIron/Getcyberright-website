@@ -2,14 +2,14 @@ import { Shield } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 const sources = [
-  { name: "CISA", type: "gov" },
-  { name: "INTERPOL", type: "intl" },
-  { name: "Europol", type: "intl" },
-  { name: "FTC", type: "gov" },
-  { name: "NIST", type: "gov" },
-  { name: "PhishTank", type: "private" },
-  { name: "VirusTotal", type: "private" },
-  { name: "FBI IC3", type: "gov" },
+  { name: "CISA", logo: "/logos/cisa.svg" },
+  { name: "INTERPOL", logo: "/logos/interpol.svg" },
+  { name: "Europol", logo: "/logos/europol.svg" },
+  { name: "FTC", logo: "/logos/ftc.svg" },
+  { name: "NIST", logo: "/logos/nist.svg" },
+  { name: "PhishTank", logo: "/logos/phishtank.svg" },
+  { name: "VirusTotal", logo: "/logos/virustotal.svg" },
+  { name: "FBI IC3", logo: "/logos/fbi-ic3.svg" },
 ];
 
 const stats = [
@@ -64,39 +64,6 @@ function StatItem({ value, suffix, label }: { value: number; suffix: string; lab
   );
 }
 
-function SourceLogo({ name, type }: { name: string; type: string }) {
-  const isGov = type === "gov";
-  const isIntl = type === "intl";
-
-  return (
-    <div className="flex items-center gap-2 flex-shrink-0 mx-6 sm:mx-10 select-none">
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-        isGov ? "bg-slate-200 dark:bg-slate-700" :
-        isIntl ? "bg-slate-200 dark:bg-slate-700" :
-        "bg-slate-200 dark:bg-slate-700"
-      }`}>
-        {isGov && (
-          <svg viewBox="0 0 24 24" className="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3" />
-          </svg>
-        )}
-        {isIntl && (
-          <svg viewBox="0 0 24 24" className="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-          </svg>
-        )}
-        {!isGov && !isIntl && (
-          <Shield className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-        )}
-      </div>
-      <span className="text-base sm:text-lg font-bold text-foreground/40 dark:text-foreground/30 whitespace-nowrap tracking-wide uppercase">
-        {name}
-      </span>
-    </div>
-  );
-}
-
 export function TrustStrip() {
   return (
     <section className="bg-slate-50 dark:bg-slate-800/50 border-y border-border" data-testid="section-trust-strip">
@@ -120,11 +87,15 @@ export function TrustStrip() {
           <div className="overflow-hidden">
             <div className="flex w-max items-center animate-marquee motion-reduce:animate-none motion-reduce:justify-center motion-reduce:flex-wrap motion-reduce:gap-8 motion-reduce:w-auto">
               {[...sources, ...sources, ...sources, ...sources].map((source, i) => (
-                <SourceLogo
+                <img
                   key={`${source.name}-${i}`}
-                  name={source.name}
-                  type={source.type}
-                  />
+                  src={source.logo}
+                  alt={source.name}
+                  className="h-8 sm:h-10 w-auto flex-shrink-0 mx-6 sm:mx-10 opacity-40 dark:opacity-30 dark:invert grayscale select-none"
+                  loading="lazy"
+                  draggable={false}
+                  data-testid={i < sources.length ? `logo-trust-source-${source.name.toLowerCase().replace(/\s+/g, "-")}` : undefined}
+                />
               ))}
             </div>
           </div>

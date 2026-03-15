@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <g>
+    <path d="M10 30a20 20 0 1 1 40 0 20 20 0 0 1-40 0z" fill="#999"/>
+    <path d="M30 14l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4z" fill="#fff"/>
+    <path d="M22 28h16v2H22zm0 4h16v2H22zm0 4h12v2H22z" fill="#fff"/>
+    <text x="58" y="38" font-family="Arial,sans-serif" font-weight="800" font-size="28" fill="#888">CISA</text>
+  </g>
+</svg>

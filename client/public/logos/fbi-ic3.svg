@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 60" fill="none">
+  <g>
+    <circle cx="28" cy="30" r="20" fill="none" stroke="#999" stroke-width="3"/>
+    <path d="M28 14l3 6h6l-5 4 2 6-6-4-6 4 2-6-5-4h6z" fill="#999"/>
+    <path d="M20 36h16v2H20z" fill="#999"/>
+    <path d="M22 40h12v2H22z" fill="#999"/>
+    <text x="54" y="38" font-family="Arial,sans-serif" font-weight="800" font-size="26" fill="#888">FBI IC3</text>
+  </g>
+</svg>

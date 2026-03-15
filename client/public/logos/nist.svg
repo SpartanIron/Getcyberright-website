@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" fill="none">
+  <g>
+    <path d="M14 46V18l14-6 14 6v12c0 10-6 18-14 22-8-4-14-12-14-22z" fill="none" stroke="#999" stroke-width="3"/>
+    <path d="M28 25l-5 5 3 3 5-5 5 5 3-3z" fill="#999"/>
+    <text x="52" y="38" font-family="Arial,sans-serif" font-weight="800" font-size="28" fill="#888">NIST</text>
+  </g>
+</svg>

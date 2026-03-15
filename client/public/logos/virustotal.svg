@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 60" fill="none">
+  <g>
+    <path d="M10 16l20 28 20-28z" fill="#999" opacity="0.3"/>
+    <path d="M16 18l14 20 14-20z" fill="#999" opacity="0.6"/>
+    <path d="M22 20l8 12 8-12z" fill="#999"/>
+    <text x="56" y="38" font-family="Arial,sans-serif" font-weight="800" font-size="24" fill="#888">VirusTotal</text>
+  </g>
+</svg>

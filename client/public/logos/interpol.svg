@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" fill="none">
+  <g>
+    <circle cx="30" cy="30" r="20" stroke="#999" stroke-width="3" fill="none"/>
+    <path d="M10 30h40M30 10v40" stroke="#999" stroke-width="2"/>
+    <path d="M14 18a24 24 0 0 1 32 0M14 42a24 24 0 0 0 32 0" stroke="#999" stroke-width="1.5" fill="none"/>
+    <text x="58" y="38" font-family="Arial,sans-serif" font-weight="800" font-size="26" fill="#888">INTERPOL</text>
+  </g>
+</svg>
