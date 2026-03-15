@@ -235,15 +235,6 @@ export function HeroSection() {
                   />
                 </div>
 
-                <div className="absolute bottom-8 left-8 flex items-center gap-3 bg-white/[0.08] backdrop-blur-md border border-white/[0.12] rounded-xl px-5 py-3.5">
-                  <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Shield className="w-[18px] h-[18px] text-primary" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-white">Trusted by families worldwide</div>
-                    <div className="text-xs text-white/65">Backed by FBI, CISA, INTERPOL data</div>
-                  </div>
-                </div>
               </div>
             </div>
 
