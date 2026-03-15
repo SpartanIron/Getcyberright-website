@@ -345,7 +345,13 @@ async function runRealVerification(
         }
 
         if (!evidenceTier) {
-          return null;
+          if (overlap.length >= 2 && (broker.riskLevel === "critical" || broker.riskLevel === "high")) {
+            evidenceTier = "verified_broker";
+            verificationMethod = "data_overlap_analysis";
+            facts.push(`${broker.name} is a known ${broker.riskLevel}-risk data broker that collects: ${overlap.join(", ")}. Based on the information you provided, your data is likely listed here.`);
+          } else {
+            return null;
+          }
         }
 
         if (overlap.length > 0) {
@@ -475,10 +481,16 @@ async function runRealVerification(
 
   findings.sort((a, b) => {
     const tierOrder: Record<EvidenceTier, number> = { confirmed: 3, profile_found: 2, verified_broker: 1 };
-    return (tierOrder[b.evidenceTier] ?? 0) - (tierOrder[a.evidenceTier] ?? 0);
+    const tierDiff = (tierOrder[b.evidenceTier] ?? 0) - (tierOrder[a.evidenceTier] ?? 0);
+    if (tierDiff !== 0) return tierDiff;
+    return (b.dataTypesExposed?.length ?? 0) - (a.dataTypesExposed?.length ?? 0);
   });
 
-  return { findings, brokersChecked: brokersToCheck.length, profilesFound: profilesFoundCount, searchStats, breachResults };
+  const confirmedAndProfile = findings.filter(f => f.evidenceTier !== "verified_broker");
+  const verifiedBroker = findings.filter(f => f.evidenceTier === "verified_broker").slice(0, 25);
+  const cappedFindings = [...confirmedAndProfile, ...verifiedBroker];
+
+  return { findings: cappedFindings, brokersChecked: brokersToCheck.length, profilesFound: profilesFoundCount, searchStats, breachResults };
 }
 
 interface BrokerCatalogFilters {

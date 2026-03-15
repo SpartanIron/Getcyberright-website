@@ -256,14 +256,17 @@ export function GuestScanForm() {
       {result && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           {(() => {
+            const confirmedFindings = result.findings.filter(f => f.evidenceTier === "confirmed");
             const profileFindings = result.findings.filter(f => f.evidenceTier === "profile_found");
-            const profileCount = profileFindings.length;
+            const brokerFindings = result.findings.filter(f => f.evidenceTier === "verified_broker");
+            const directFindings = [...confirmedFindings, ...profileFindings];
+            const totalExposed = result.findings.length;
             return (
               <>
                 <Card>
                   <CardContent className="pt-6 pb-6">
                     <div className="flex items-center gap-4">
-                      {profileCount > 0 ? (
+                      {totalExposed > 0 ? (
                         <div className="h-12 w-12 rounded-md bg-red-100 dark:bg-red-950/40 flex items-center justify-center shrink-0">
                           <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
                         </div>
@@ -274,24 +277,30 @@ export function GuestScanForm() {
                       )}
                       <div>
                         <p className="text-lg font-semibold" data-testid="text-scan-headline">
-                          {profileCount > 0
-                            ? `Your name was found on ${profileCount} site${profileCount !== 1 ? "s" : ""}`
-                            : "No profiles found"}
+                          {totalExposed > 0
+                            ? `Your data is likely exposed on ${totalExposed} site${totalExposed !== 1 ? "s" : ""}`
+                            : "No exposures found"}
                         </p>
                         <p className="text-sm text-muted-foreground" data-testid="text-scan-subline">
-                          {profileCount > 0
-                            ? "You can view each listing and request removal below."
-                            : `We searched ${result.totalBrokersScanned.toLocaleString()} people-search sites and didn't find any public profiles matching your information.`}
+                          {totalExposed > 0
+                            ? `We scanned ${result.totalBrokersScanned.toLocaleString()} data broker sites.${directFindings.length > 0 ? ` ${directFindings.length} confirmed match${directFindings.length !== 1 ? "es" : ""}.` : ""} ${brokerFindings.length > 0 ? `${brokerFindings.length} high-risk broker${brokerFindings.length !== 1 ? "s" : ""} likely have your data.` : ""}`
+                            : `We searched ${result.totalBrokersScanned.toLocaleString()} data broker sites and didn't find exposures matching your information.`}
                         </p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {profileCount > 0 && (
+                {directFindings.length > 0 && (
                   <Card>
-                    <CardContent className="pt-6 space-y-3">
-                      {profileFindings.map((finding, idx) => (
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        Confirmed Exposures
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {directFindings.map((finding, idx) => (
                         <div key={idx} className="p-4 border border-red-200 dark:border-red-900 rounded-md bg-red-50/30 dark:bg-red-950/10" data-testid={`profile-finding-${idx}`}>
                           <div className="flex items-center justify-between gap-2 flex-wrap">
                             <div className="flex items-center gap-2 flex-wrap">
@@ -377,6 +386,57 @@ export function GuestScanForm() {
                               )}
                             </div>
                           )}
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {brokerFindings.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-orange-500" />
+                        High-Risk Brokers Likely Holding Your Data
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        These data brokers are known to collect the types of information you provided. We recommend requesting removal from each one.
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {brokerFindings.map((finding, idx) => (
+                        <div key={`broker-${idx}`} className="p-4 border border-orange-200 dark:border-orange-900 rounded-md bg-orange-50/30 dark:bg-orange-950/10" data-testid={`broker-finding-${idx}`}>
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium">{finding.broker.name}</span>
+                              <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800 no-default-hover-elevate no-default-active-elevate">
+                                Likely Exposed
+                              </Badge>
+                              {finding.dataTypesExposed.length > 0 && (
+                                <span className="text-xs text-muted-foreground">
+                                  Collects: {finding.dataTypesExposed.join(", ")}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {walkthroughMap[finding.broker.id] && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setWalkthroughDialogBrokerId(finding.broker.id)}
+                                >
+                                  <BookOpen className="h-3 w-3 mr-1" />
+                                  How to Remove
+                                </Button>
+                              )}
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={finding.broker.optOutUrl || `https://${finding.broker.domain}`} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  Request Removal
+                                </a>
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </CardContent>
