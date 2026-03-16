@@ -13,6 +13,7 @@ import { embedFingerprint } from "./content-fingerprint";
 import { registerAuthRoutes, isAuthenticated, isAdmin, seedAdminUser } from "./auth";
 import { registerAdminRoutes, registerToolTrackingRoutes } from "./admin";
 import { registerPlatformRoutes } from "./platformRoutes";
+import { registerChatRoutes } from "./replit_integrations/chat";
 import { 
   checkGoogleSafeBrowsing, 
   checkVirusTotal, 
@@ -392,6 +393,8 @@ export async function registerRoutes(
 
   // Register platform module routes (guides, scam intel, alerts, social, growth)
   registerPlatformRoutes(app);
+
+  registerChatRoutes(app);
 
   // Contact form - strict rate limiting (10 req/min)
   app.post("/api/contact", strictRateLimit, async (req, res) => {

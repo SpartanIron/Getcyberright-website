@@ -318,8 +318,7 @@ export function registerChatRoutes(app: Express): void {
         return res.status(400).json({ error: "Message content is empty after sanitization" });
       }
 
-      const sessionId = getSessionId(req);
-      const conversation = await chatStorage.getConversation(conversationId, sessionId);
+      const conversation = await chatStorage.getConversation(conversationId);
       if (!conversation) {
         return res.status(404).json({ error: "Conversation not found" });
       }
@@ -387,8 +386,7 @@ export function registerChatRoutes(app: Express): void {
         return res.status(400).json({ error: "Invalid conversation ID" });
       }
 
-      const sessionId = getSessionId(req);
-      const conversation = await chatStorage.getConversation(conversationId, sessionId);
+      const conversation = await chatStorage.getConversation(conversationId);
       if (!conversation) {
         return res.status(404).json({ error: "Conversation not found" });
       }
