@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import authorityImg from "@/assets/images/feature-family-learning-diverse.png";
 
 const trustPoints = [
-  "Protection powered by FBI IC3, CISA, INTERPOL, Europol, and FTC data",
-  "Every scan checks 8 verified security databases in real time",
-  "Built on U.S. government cybersecurity standards",
+  "Backed by the same data that law enforcement and security agencies worldwide rely on",
+  "Every scan checks 8 trusted sources to tell you if something is safe",
+  "Built to internationally recognized safety standards",
   "Designed for families, not IT departments",
   "Free to get started, no account required",
   "Trusted by families, educators, and small businesses",
@@ -37,7 +37,7 @@ export function AuthoritySection() {
               Built on the Same Data the Experts Use
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed mb-10">
-              GetCyberRight connects to the same security databases and intelligence sources that governments and large organizations rely on, and makes them accessible to everyone.
+              GetCyberRight uses the same safety tools that protect banks and government agencies worldwide, now available to your family.
             </p>
 
             <div className="space-y-0 mb-10">

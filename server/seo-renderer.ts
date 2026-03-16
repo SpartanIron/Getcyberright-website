@@ -1037,7 +1037,7 @@ function renderAboutPage(): string {
       <li><strong>13</strong> Regions Covered - Scam alerts localized for regions worldwide</li>
       <li><strong>52+</strong> Scam Categories - Detailed guides on specific scam types</li>
     </ul>
-    <p>Every tool is powered by the same threat intelligence that enterprise security teams rely on, including data from FBI IC3, CISA, INTERPOL, Europol, NIST, PhishTank, and VirusTotal.</p>
+    <p>Every tool is powered by the same safety data that law enforcement and security agencies worldwide rely on, including trusted sources like PhishTank, VirusTotal, and government threat databases.</p>
   </section>
 
   <section>
