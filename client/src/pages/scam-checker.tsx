@@ -22,7 +22,7 @@ interface ScamTrend {
 const scamCheckerApp: WebApplicationData = {
   type: "WebApplication",
   name: "Scam Checker",
-  description: "Free AI-powered scam detection tool. Check suspicious URLs, emails, phone numbers, QR codes, and messages for fraud. Uses multiple security engines for comprehensive threat analysis.",
+  description: "Free AI-powered scam detection tool. Check suspicious URLs, emails, phone numbers, QR codes, and messages for fraud. Checked against multiple trusted safety sources for a comprehensive safety report.",
   url: "https://www.getcyberright.com/scam-checker",
   applicationCategory: "SecurityApplication",
   provider: "GetCyberRight",
@@ -31,7 +31,7 @@ const scamCheckerApp: WebApplicationData = {
 const scamCheckerFaq: FAQData = {
   type: "FAQPage",
   items: [
-    { question: "How does the Scam Checker work?", answer: "The Scam Checker analyzes URLs, emails, phone numbers, QR codes, and messages using multiple security engines including AI analysis, threat intelligence databases, and domain reputation checks to determine if something is a scam." },
+    { question: "How does the Scam Checker work?", answer: "The Scam Checker analyzes URLs, emails, phone numbers, QR codes, and messages using multiple safety checks including AI analysis, trusted data sources, and domain reputation checks to determine if something is a scam." },
     { question: "Is the Scam Checker free to use?", answer: "Yes, the Scam Checker is completely free to use. No account or sign-up is required. Just paste a suspicious link, message, or phone number and get instant results." },
     { question: "What types of scams can it detect?", answer: "The tool can detect phishing links, fraudulent websites, scam phone numbers, suspicious email content, malicious QR codes, and social engineering attempts across multiple categories of online fraud." },
   ],

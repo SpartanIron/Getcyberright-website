@@ -150,7 +150,7 @@ export function ContentPreview() {
             </div>
             <div className="bg-card rounded-xl border border-border p-6 text-center">
               <p className="text-base font-semibold text-foreground mb-2">Got a suspicious message?</p>
-              <p className="text-sm text-muted-foreground mb-5">Check it in seconds against 8 trusted security databases.</p>
+              <p className="text-sm text-muted-foreground mb-5">Check it in seconds against 8 trusted safety sources.</p>
               <Button asChild className="rounded-full font-semibold px-6 w-full" data-testid="button-content-scam-check">
                 <Link href="/scam-checker">
                   Check It Now <ArrowRight className="ml-2 w-4 h-4 cta-arrow-right" />

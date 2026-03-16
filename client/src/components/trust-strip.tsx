@@ -15,7 +15,7 @@ const sources = [
 const stats = [
   { value: 500, suffix: "+", label: "Data Brokers Tracked" },
   { value: 406, suffix: "+", label: "AI Safety Prompts" },
-  { value: 8, suffix: "", label: "Security Databases" },
+  { value: 8, suffix: "", label: "Trusted Safety Sources" },
   { value: 125, suffix: "+", label: "Safety Guides" },
 ];
 
@@ -80,7 +80,7 @@ export function TrustStrip() {
           <div className="flex items-center justify-center gap-3 mb-4">
             <Shield className="w-5 h-5 text-primary" />
             <span className="text-sm font-bold text-muted-foreground uppercase tracking-[0.15em]">
-              Trusted Data Sources
+              Trusted Safety Sources
             </span>
           </div>
 

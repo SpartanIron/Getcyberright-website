@@ -13,8 +13,8 @@ const steps = [
   {
     number: "2",
     icon: Shield,
-    title: "We check 8 security databases instantly",
-    description: "Your submission is scanned across FBI IC3, CISA, VirusTotal, PhishTank, and more in real time.",
+    title: "We check 8 trusted sources instantly",
+    description: "Your submission is scanned across multiple safety sources including VirusTotal, PhishTank, and more in real time.",
     color: "bg-accent/10 text-accent",
   },
   {

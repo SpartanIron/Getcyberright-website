@@ -510,15 +510,15 @@ interface StaticPageDef {
 const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
   "/scam-checker": {
     title: "AI Scam Checker: Analyze URLs, Emails, Messages & QR Codes",
-    description: "Use our free AI-powered scam checker to analyze suspicious URLs, emails, text messages, and QR codes. Get instant safety reports with real-time threat intelligence from multiple security databases.",
+    description: "Use our free AI-powered scam checker to analyze suspicious URLs, emails, text messages, and QR codes. Get instant safety reports checked against multiple trusted safety sources.",
     path: "/scam-checker",
     schemaType: "WebApplication",
-    features: ["URL safety analysis", "Email scam detection", "QR code scanning", "Real-time threat intelligence", "Multi-database verification"],
+    features: ["URL safety analysis", "Email scam detection", "QR code scanning", "Real-time safety checks", "Multi-source verification"],
     faqs: [
-      { question: "How does the AI Scam Checker work?", answer: "Our scam checker uses multiple security databases including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages. It cross-references threat intelligence data to give you a safety score." },
+      { question: "How does the AI Scam Checker work?", answer: "Our scam checker uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages. It cross-references safety data to give you a safety score." },
       { question: "Is the Scam Checker free to use?", answer: "Yes, the Scam Checker is free to get started. You can analyze URLs, emails, text messages, and QR codes without any cost." },
       { question: "What types of scams can it detect?", answer: "Our tool can detect phishing links, malware-hosting URLs, fake websites, social engineering attempts, tech support scams, romance scams, and many other common online scams." },
-      { question: "How accurate is the scam detection?", answer: "We use multiple verified threat intelligence sources and AI analysis for high accuracy. However, no tool is 100% accurate. Always exercise caution with suspicious communications." },
+      { question: "How accurate is the scam detection?", answer: "We use multiple verified safety sources and AI analysis for high accuracy. However, no tool is 100% accurate. Always exercise caution with suspicious communications." },
     ],
   },
   "/password-generator": {
@@ -556,7 +556,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     faqs: [
       { question: "How do data breaches happen?", answer: "Data breaches occur when hackers exploit vulnerabilities in a company's systems to steal user data. This can happen through phishing attacks, malware, unpatched software, or insider threats." },
       { question: "What should I do if my email was found in a breach?", answer: "Immediately change your password for the affected service and any other accounts using the same password. Enable two-factor authentication where possible and monitor your accounts for suspicious activity." },
-      { question: "How often are breach databases updated?", answer: "We continuously monitor multiple threat intelligence sources for new breach data. Our databases are updated regularly to ensure you receive timely alerts about new compromises." },
+      { question: "How often are breach databases updated?", answer: "We continuously monitor multiple trusted sources for new breach data. Our records are updated regularly to ensure you receive timely alerts about new compromises." },
     ],
   },
   "/faq": {
@@ -597,7 +597,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Monitor live cybersecurity threats with our real-time Cyber Threat Radar. See active threat alerts, trending attack vectors, and security advisories from trusted intelligence sources.",
     path: "/cyber-threat-radar",
     faqs: [
-      { question: "What data sources does the Threat Radar use?", answer: "Our Threat Radar aggregates real-time data from trusted sources including CISA advisories, US-CERT alerts, and curated RSS feeds from major cybersecurity organizations." },
+      { question: "What data sources does the Threat Radar use?", answer: "Our Threat Radar aggregates real-time data from trusted sources including government advisories, security alerts, and curated feeds from major safety organizations worldwide." },
       { question: "How often is the threat data updated?", answer: "Threat data is refreshed automatically every 6 hours. Critical alerts may appear sooner as they are published by our intelligence sources." },
       { question: "Can I get alerts for specific types of threats?", answer: "Yes. You can subscribe to receive email notifications when new high-severity or critical threat alerts are published that match your interests." },
     ],
@@ -693,7 +693,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/contact",
     faqs: [
       { question: "How can I contact GetCyberRight?", answer: "You can reach us through our contact form on this page or email us at tips@getcyberright.com. We aim to respond within 24 to 48 hours." },
-      { question: "How do I report a scam?", answer: "Use our Report a Scam page to submit details about scam attempts. Your reports help us update our threat intelligence and protect others in the community." },
+      { question: "How do I report a scam?", answer: "Use our Report a Scam page to submit details about scam attempts. Your reports help us improve our safety data and protect others in the community." },
     ],
   },
   "/resources": {
@@ -769,7 +769,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
   },
   "/report-scam": {
     title: "Report a Scam: Help Protect Your Community",
-    description: "Report a scam to GetCyberRight and help protect others. Submit details about suspicious emails, phone calls, text messages, or websites. Your reports strengthen our threat intelligence.",
+    description: "Report a scam to GetCyberRight and help protect others. Submit details about suspicious emails, phone calls, text messages, or websites. Your reports help keep everyone safer.",
     path: "/report-scam",
   },
   "/travel-safety": {
@@ -977,7 +977,7 @@ function renderAboutPage(): string {
   const faqSchema = buildFaqSchema([
     { question: "What is GetCyberRight?", answer: "GetCyberRight is an online safety platform that helps families, seniors, students, and small businesses protect themselves from scams, identity theft, and data exposure. It combines simple protection tools with easy-to-understand guides and training." },
     { question: "Why is online safety more important now?", answer: "New technology has made scams harder to spot than ever. Fake emails now look perfect, criminals can copy someone's voice to make phone calls, and personal data is being collected and sold at a massive scale. Knowing how to protect yourself online is now essential for everyone." },
-    { question: "How does the Scam Checker work?", answer: "Paste any suspicious message, email, link, or phone number into the Scam Checker. It checks 8 trusted security databases and looks for common scam tactics to tell you whether it is safe or dangerous." },
+    { question: "How does the Scam Checker work?", answer: "Paste any suspicious message, email, link, or phone number into the Scam Checker. It checks 8 trusted safety sources and looks for common scam tactics to tell you whether it is safe or dangerous." },
     { question: "What tools does GetCyberRight offer?", answer: "GetCyberRight offers a Scam Checker, Data Broker Removal covering 501+ companies, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ safety guides, and scam alerts covering 13 regions worldwide." },
     { question: "Is GetCyberRight free to use?", answer: "GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and training content are available at no cost and do not require an account." },
     { question: "Why was GetCyberRight created?", answer: "GetCyberRight was started by a family that experienced scams, impersonation, and phone fraud firsthand. The mission is to make online safety simple and available to everyone, because no family should have to learn these lessons the hard way." },
@@ -1012,7 +1012,7 @@ function renderAboutPage(): string {
     <h2>The Solution: Simple Tools. Clear Guidance. Real Protection.</h2>
     <p>GetCyberRight was built because the people who need online safety the most have the fewest resources. We put scam checking, data removal, and safety training all in one place, designed for everyday people.</p>
     <ul>
-      <li><a href="/scam-checker"><strong>Scam Checker</strong></a> - Paste any suspicious message, email, link, or phone number. We check it against 8 trusted security databases and tell you whether it is safe or a scam.</li>
+      <li><a href="/scam-checker"><strong>Scam Checker</strong></a> - Paste any suspicious message, email, link, or phone number. We check it against 8 trusted safety sources and tell you whether it is safe or a scam.</li>
       <li><a href="/data-removal"><strong>Data Broker Removal</strong></a> - We track 501+ companies that collect and sell your personal information. Get step-by-step instructions to remove yourself from each one.</li>
       <li><a href="/training"><strong>Training Academy</strong></a> - Easy-to-follow courses that teach you how modern scams work and how to spot them, no technical background needed.</li>
       <li><a href="/ai-prompts"><strong>AI Safety Prompt Library</strong></a> - 406+ ready-to-use prompts that help you use AI tools like ChatGPT safely, without accidentally sharing private information.</li>
@@ -1033,7 +1033,7 @@ function renderAboutPage(): string {
       <li><strong>501+</strong> Data Brokers Tracked - Companies monitored for selling personal data</li>
       <li><strong>406+</strong> AI Safety Prompts - Ready-to-use prompts for secure AI usage</li>
       <li><strong>125+</strong> Safety Guides - Plain-language cybersecurity resources</li>
-      <li><strong>8</strong> Threat Intelligence Feeds - Real-time data from PhishTank, URLhaus, VirusTotal, and more</li>
+      <li><strong>8</strong> Trusted Safety Sources - Real-time data from PhishTank, URLhaus, VirusTotal, and more</li>
       <li><strong>13</strong> Regions Covered - Scam alerts localized for regions worldwide</li>
       <li><strong>52+</strong> Scam Categories - Detailed guides on specific scam types</li>
     </ul>
@@ -1057,7 +1057,7 @@ function renderAboutPage(): string {
     <h3>Why is online safety more important now?</h3>
     <p>New technology has made scams harder to spot than ever. Fake emails now look perfect, criminals can copy someone's voice to make phone calls, and personal data is being collected and sold at a massive scale. Knowing how to protect yourself online is now essential for everyone.</p>
     <h3>How does the Scam Checker work?</h3>
-    <p>Paste any suspicious message, email, link, or phone number into the Scam Checker. It checks 8 trusted security databases and looks for common scam tactics to tell you whether it is safe or dangerous.</p>
+    <p>Paste any suspicious message, email, link, or phone number into the Scam Checker. It checks 8 trusted safety sources and looks for common scam tactics to tell you whether it is safe or dangerous.</p>
     <h3>What tools does GetCyberRight offer?</h3>
     <p>GetCyberRight offers a Scam Checker, Data Broker Removal covering 501+ companies, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ safety guides, and scam alerts covering 13 regions worldwide.</p>
     <h3>Is GetCyberRight free to use?</h3>
@@ -1116,7 +1116,7 @@ function renderHomePage(): string {
     { question: "Is GetCyberRight really free?", answer: "Yes, GetCyberRight is free to get started. Our core tools, guides, and training resources are available at no cost." },
     { question: "What tools does GetCyberRight offer?", answer: "We offer an AI Scam Checker that analyzes URLs, emails, and QR codes; a Data Broker Removal tool covering 501+ sites; a Password Generator; a Cyber Threat Radar; and more." },
     { question: "Who is GetCyberRight for?", answer: "GetCyberRight is for everyone, including families, parents, kids, seniors, educators, and small businesses. We provide audience-specific content tailored to different experience levels." },
-    { question: "How does the AI Scam Checker work?", answer: "Our AI Scam Checker uses multiple security databases including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score." },
+    { question: "How does the AI Scam Checker work?", answer: "Our AI Scam Checker uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score." },
   ]);
 
   return `${head}
@@ -1127,13 +1127,13 @@ function renderHomePage(): string {
 
   <header>
     <h1>GetCyberRight: Free Cybersecurity Tools for Families, Seniors &amp; Small Businesses</h1>
-    <p style="font-size:18px;color:#444;">Got a suspicious message? Check it in seconds. Scam detection across 8 live threat intelligence feeds, data broker removal, and practical safety training for families, seniors, and small businesses.</p>
+    <p style="font-size:18px;color:#444;">Got a suspicious message? Check it in seconds. Scam detection across 8 trusted safety sources, data broker removal, and practical safety training for families, seniors, and small businesses.</p>
   </header>
 
   <section>
     <h2>Free Cybersecurity Tools</h2>
     <ul>
-      <li><a href="/scam-checker">AI Scam Checker</a> - Analyze suspicious URLs, emails, text messages, and QR codes with real-time threat intelligence</li>
+      <li><a href="/scam-checker">AI Scam Checker</a> - Analyze suspicious URLs, emails, text messages, and QR codes against 8 trusted safety sources</li>
       <li><a href="/data-removal">Data Broker Removal</a> - Remove your personal information from 501+ data broker sites</li>
       <li><a href="/password-generator">Password Generator</a> - Create strong, unique passwords instantly</li>
       <li><a href="/cyber-threat-radar">Cyber Threat Radar</a> - Real-time cybersecurity threat monitoring dashboard</li>
@@ -1216,7 +1216,7 @@ function renderHomePage(): string {
     <h3>Who is GetCyberRight for?</h3>
     <p>GetCyberRight is for everyone, including families, parents, kids, seniors, educators, and small businesses. We provide audience-specific content tailored to different experience levels.</p>
     <h3>How does the AI Scam Checker work?</h3>
-    <p>Our AI Scam Checker uses multiple security databases including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score.</p>
+    <p>Our AI Scam Checker uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score.</p>
   </section>
 
   ${buildFooter()}

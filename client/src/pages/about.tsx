@@ -47,7 +47,7 @@ const platformTools = [
   {
     icon: ScanLine,
     title: "Scam Checker",
-    description: "Paste any suspicious message, email, link, or phone number. We check it against 8 trusted security databases and tell you whether it is safe or a scam.",
+    description: "Paste any suspicious message, email, link, or phone number. We check it against 8 trusted safety sources and tell you whether it is safe or a scam.",
     href: "/scam-checker",
     color: "text-red-400",
     bg: "bg-red-500/10",
@@ -95,7 +95,7 @@ const credibilityStats = [
   { value: "501+", label: "Data Brokers Tracked", detail: "Companies we monitor that sell your personal information" },
   { value: "406+", label: "AI Safety Prompts", detail: "Ready-to-use prompts for using AI tools safely" },
   { value: "125+", label: "Safety Guides", detail: "Easy-to-read guides on staying safe online" },
-  { value: "8", label: "Security Databases", detail: "Trusted sources we check to verify if something is a scam" },
+  { value: "8", label: "Trusted Safety Sources", detail: "Where we check to verify if something is a scam" },
   { value: "13", label: "Regions Covered", detail: "Scam alerts tailored for regions around the world" },
   { value: "52+", label: "Scam Types Covered", detail: "Detailed guides on specific kinds of scams" },
 ];
@@ -337,7 +337,7 @@ export default function About() {
                 Built on Trusted Sources. Measured in Results.
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Every tool on GetCyberRight uses the same trusted security sources that professionals rely on, including data from FBI IC3, CISA, INTERPOL, and more.
+                Every tool on GetCyberRight uses the same trusted safety sources that professionals and law enforcement agencies worldwide rely on.
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

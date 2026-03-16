@@ -23,7 +23,7 @@ const faqCategories = [
       },
       {
         q: "Who creates the content on GetCyberRight?",
-        a: "Our content is created by cybersecurity professionals and educators who specialize in making complex security topics accessible to everyday families. We reference authoritative sources like the FBI, CISA, and INTERPOL to ensure accuracy."
+        a: "Our content is created by online safety professionals and educators who specialize in making complex topics accessible to everyday families. We reference authoritative sources from law enforcement and security agencies worldwide to ensure accuracy."
       },
       {
         q: "How is GetCyberRight different from other cybersecurity sites?",

@@ -158,7 +158,7 @@ export const pageSEO = {
   },
   threatTrends: {
     title: "Threat Trends",
-    description: "Stay informed about the latest cyber threats and scam trends. Real-time threat intelligence updates.",
+    description: "Stay informed about the latest cyber threats and scam trends. Real-time safety updates from trusted sources.",
   },
   partnerships: {
     title: "Partnership Deck",

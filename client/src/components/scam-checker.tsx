@@ -2305,7 +2305,7 @@ export function ScamChecker() {
                 <div className="text-xs text-muted-foreground p-2 bg-muted/30 rounded flex items-start gap-2">
                   <Info className="w-3 h-3 flex-shrink-0 mt-0.5" />
                   <span>
-                    Links are checked against multiple security databases including VirusTotal, Google Safe Browsing,
+                    Links are checked against multiple trusted safety sources including VirusTotal, Google Safe Browsing,
                     and domain registration records. New threats take time to be reported. Always exercise caution with unfamiliar links.
                   </span>
                 </div>
