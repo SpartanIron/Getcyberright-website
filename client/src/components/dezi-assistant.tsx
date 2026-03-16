@@ -47,14 +47,122 @@ function generatePassword(length: number = 16): string {
   return password.split("").sort(() => Math.random() - 0.5).join("");
 }
 
-function isPasswordRequest(text: string): boolean {
-  const lower = text.toLowerCase();
-  return lower.includes("password") && (lower.includes("generate") || lower.includes("create") || lower.includes("make") || lower.includes("new") || lower.includes("strong"));
+interface LocalMatch {
+  pattern: (text: string) => boolean;
+  responses: string[];
 }
 
-function getLocalPasswordResponse(): string {
-  const password = generatePassword(16);
-  return `Here's a strong, randomly generated password for you:\n\n${password}\n\nIt's 16 characters with uppercase, lowercase, numbers, and symbols. Copy it somewhere safe. Want another one, or would you prefer to use our Password Generator tool for more options?`;
+const localResponses: LocalMatch[] = [
+  {
+    pattern: (t) => /password/.test(t) && /(generate|create|make|new|strong|need)/.test(t),
+    responses: ["__PASSWORD__"],
+  },
+  {
+    pattern: (t) => /(hello|hi |hey|howdy|good morning|good afternoon|good evening)/.test(t) && t.length < 30,
+    responses: [
+      "Hey there! I'm Dezi, your safety assistant here at GetCyberRight. What can I help you with today?",
+      "Hi! I'm Dezi. I help families stay safe online. What's on your mind?",
+      "Hello! I'm Dezi, happy to help with any online safety questions you have.",
+    ],
+  },
+  {
+    pattern: (t) => /(what can you do|what do you do|how can you help|who are you|what are you)/.test(t),
+    responses: [
+      "I can help you figure out if a message or email is a scam, explain how to protect yourself and your family online, generate strong passwords, and point you to the right tools on our site. Just ask me anything about online safety!",
+    ],
+  },
+  {
+    pattern: (t) => /(clicked a bad link|clicked.*(link|url)|accidentally clicked|opened a link|visited a bad)/.test(t),
+    responses: [
+      "First, don't panic. Close the page immediately if it's still open. Run a scan with your device's built-in security (Windows Defender, etc.). Change the password for any account you were logged into. Watch your bank and email for anything unusual over the next few days. If you entered any personal info on the page, that's more urgent and you should change those passwords right away.",
+      "Good that you're asking. Close the page right away if it's still open. If you didn't enter any personal info, the risk is lower, but run a device scan to be safe. If you did type in a password or personal details, change that password immediately and turn on two-factor authentication. Keep an eye on your accounts for a few days.",
+    ],
+  },
+  {
+    pattern: (t) => /(spot.*(scam|fake)|tell.*(scam|fake|real)|how.*(know|tell).*(scam|fake|legit)|recognize.*(scam|fraud))/.test(t),
+    responses: [
+      "Most scams share a few red flags: they create urgency (\"act now or else\"), ask for personal info or money, come from an unexpected source, and the offer seems too good to be true. Legitimate companies won't pressure you to act immediately or ask for gift cards, wire transfers, or cryptocurrency as payment.",
+      "Look for these warning signs: pressure to act fast, requests for unusual payment methods (gift cards, crypto, wire transfers), spelling and grammar mistakes, and a sender you don't recognize or that looks slightly off. When in doubt, contact the company directly using a number from their official website, not from the message.",
+    ],
+  },
+  {
+    pattern: (t) => /(protect.*(kids|child|children|family)|keep.*(kids|child|children|family).*(safe)|child.*(safe|protect|online)|parental control)/.test(t),
+    responses: [
+      "Great question. Start with open conversations about online safety rather than just rules. Set up parental controls on their devices. Know what apps and games they use. Teach them never to share personal info or talk to strangers online. Check out our Parents Guide at /parent-guide for age-specific tips and our Family Safety Score quiz at /safety-score for a personalized assessment.",
+    ],
+  },
+  {
+    pattern: (t) => /(senior|elderly|older.*(parent|adult|person)|grandparent|aging parent)/.test(t),
+    responses: [
+      "Seniors are often targeted by phone scams, Medicare fraud, tech support scams, and romance scams. The best approach is setting up fraud alerts with their bank, enabling caller ID, and having regular check-ins about any unusual calls or emails they've received. Our Senior Safety Guide at /senior-safety has practical, step-by-step advice.",
+    ],
+  },
+  {
+    pattern: (t) => /(two.?factor|2fa|mfa|multi.?factor|authenticat)/.test(t) && !/(what is a scam|analyze|check this)/.test(t),
+    responses: [
+      "Two-factor authentication adds a second step when you log in, so even if someone steals your password, they still can't get into your account. Most services offer it in their security settings. An authenticator app (like Google Authenticator or Authy) is more secure than text message codes. Turn it on for email, banking, and social media first since those are the most important.",
+    ],
+  },
+  {
+    pattern: (t) => /(data.*(breach|leak|stolen|exposed)|been hacked|account.*(hacked|compromised|breached))/.test(t),
+    responses: [
+      "If your data was in a breach, change the password for that account immediately and anywhere else you used the same password. Turn on two-factor authentication. Watch your bank statements and credit report for unusual activity. You can check if your email has been in known breaches using our Breach Monitor tool. If financial accounts are involved, consider a credit freeze with the three major bureaus.",
+    ],
+  },
+  {
+    pattern: (t) => /(vpn|virtual private network)/.test(t),
+    responses: [
+      "A VPN encrypts your internet connection so others can't see what you're doing online. It's especially useful on public Wi-Fi (coffee shops, airports, hotels). Look for a reputable paid VPN, as free ones often sell your data. That said, a VPN doesn't make you completely anonymous or protect against every threat. It's one layer of protection, not a silver bullet.",
+    ],
+  },
+  {
+    pattern: (t) => /(public wi-?fi|free wi-?fi|hotel wi-?fi|coffee shop|airport.*(wi-?fi|internet))/.test(t),
+    responses: [
+      "Public Wi-Fi is convenient but risky. Avoid logging into banking or sensitive accounts on it. If you must, use a VPN. Make sure websites show the padlock icon (HTTPS) before entering any info. Turn off auto-connect for Wi-Fi on your phone so it doesn't join random networks. And never do financial transactions on public networks if you can avoid it.",
+    ],
+  },
+  {
+    pattern: (t) => /(social media.*(safe|privacy|protect|setting)|facebook.*(privacy|safe)|instagram.*(privacy|safe)|tiktok.*(privacy|safe))/.test(t),
+    responses: [
+      "Start by reviewing the privacy settings on each platform: set your profile to private or friends-only, turn off location sharing, and limit who can message you. Be careful about what personal details you share in posts (birthdays, vacation plans, school names). Don't accept friend requests from people you don't know. Check out our safety guides at /awareness-hub for platform-specific tips.",
+    ],
+  },
+  {
+    pattern: (t) => /(what is getcyberright|about.*(this|your).*(site|website|platform)|what.*(this|your) (site|website))/.test(t),
+    responses: [
+      "GetCyberRight is a free family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like the Scam Checker to analyze suspicious messages, a Password Generator, Data Broker Removal to get your personal info off the internet, and lots of guides tailored to different family members. Everything is free to get started.",
+    ],
+  },
+  {
+    pattern: (t) => /(thank|thanks|thx|ty |appreciate)/.test(t),
+    responses: [
+      "You're welcome! I'm always here if you have more questions about staying safe online.",
+      "Happy to help! Feel free to come back anytime you need safety advice.",
+      "Glad I could help! Stay safe out there.",
+    ],
+  },
+  {
+    pattern: (t) => /(bye|goodbye|see you|gotta go|that's all)/.test(t),
+    responses: [
+      "Take care! Remember, I'm always here if you need help with online safety.",
+      "Goodbye! Stay safe out there, and don't hesitate to come back if anything seems off.",
+    ],
+  },
+];
+
+function getLocalResponse(text: string): string | null {
+  const lower = text.toLowerCase().trim();
+  for (const match of localResponses) {
+    if (match.pattern(lower)) {
+      const chosen = match.responses[Math.floor(Math.random() * match.responses.length)];
+      if (chosen === "__PASSWORD__") {
+        const pw = generatePassword(16);
+        return `Here's a strong password for you:\n\n${pw}\n\nIt's 16 characters with uppercase, lowercase, numbers, and symbols. Copy it somewhere safe before leaving this chat. Want another one?`;
+      }
+      return chosen;
+    }
+  }
+  return null;
 }
 
 function getContextualPrompts(pathname: string): { text: string; icon: typeof Shield }[] {
@@ -323,16 +431,27 @@ export function DeziAssistant() {
     setInputValue("");
     setIsTyping(true);
 
-    if (isPasswordRequest(text)) {
-      await new Promise(r => setTimeout(r, 300));
-      const response = getLocalPasswordResponse();
+    const localAnswer = getLocalResponse(text);
+    if (localAnswer) {
+      const words = localAnswer.split(" ");
+      const msgId = (Date.now() + 1).toString();
       setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
+        id: msgId,
         role: "assistant",
-        content: response,
+        content: "",
+        isStreaming: true,
         timestamp: new Date(),
       }]);
       setIsTyping(false);
+
+      let current = "";
+      for (let i = 0; i < words.length; i++) {
+        current += (i === 0 ? "" : " ") + words[i];
+        const snap = current;
+        setMessages(prev => prev.map(m => m.id === msgId ? { ...m, content: snap } : m));
+        await new Promise(r => setTimeout(r, 15 + Math.random() * 20));
+      }
+      setMessages(prev => prev.map(m => m.id === msgId ? { ...m, isStreaming: false } : m));
       return;
     }
 
