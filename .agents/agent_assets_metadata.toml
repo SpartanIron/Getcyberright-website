@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "rZqQKOOCV-y0ksJa4V7mQ"
+uri = "file://.local/traffic-growth-analysis.md"
+type = "text"
+title = "GetCyberRight Traffic Growth Analysis & Action Plan"
