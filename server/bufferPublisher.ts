@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 
 const BUFFER_GRAPHQL_URL = "https://api.buffer.com/graphql";
-const BUFFER_ORG_ID = process.env.BUFFER_ORG_ID || "";
+const BUFFER_ORG_ID = process.env.BUFFER_ORG_ID || "69b48dd8282d615a79db2ab3";
 
 function getPublicImageUrl(localImagePath: string): string | null {
   if (!localImagePath) return null;

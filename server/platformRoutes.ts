@@ -534,7 +534,7 @@ export function registerPlatformRoutes(app: Express): void {
       }
       res.set("Content-Type", "image/webp");
       res.set("Cache-Control", "public, max-age=86400");
-      res.sendFile(filepath);
+      res.sendFile(filepath, { dotfiles: "allow" });
     } catch (error: any) {
       res.status(500).send("Failed to serve image");
     }

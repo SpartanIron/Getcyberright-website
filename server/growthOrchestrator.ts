@@ -1,6 +1,7 @@
 import { storage } from "./storage";
 import { runContentAutomationBatch, getContentAutomationStats, optimizeGuideInternalLinks } from "./contentAutomationService";
 import { distributeGuideContent, distributeThreatAlertContent, getSocialDistributionStats } from "./socialDistributionService";
+import { isBufferConfigured, publishAllDraftsViaBuffer } from "./bufferPublisher";
 import type { InsertGrowthTask } from "@shared/schema";
 
 const TASK_TYPES = {
@@ -104,6 +105,7 @@ async function executeTask(taskId: string, taskType: string, payload: Record<str
           console.error(`[GrowthOrchestrator] Failed to auto-publish guide ${guide.id}:`, err.message);
         }
       }
+      await publishPendingDraftsViaBuffer();
       return { published, total: draftGuides.length };
     }
 
@@ -193,15 +195,28 @@ export async function scheduleWeeklyContentGeneration(): Promise<void> {
 
   for (const day of days) {
     if (currentDay === day) {
-      await scheduleTask(
-        TASK_TYPES.GENERATE_ARTICLES,
-        `Weekly article generation (Day ${day})`,
-        { count: 2 },
-        undefined,
-        "high"
-      );
+      const allRecentTasks = await storage.getGrowthTasks(undefined, 20);
+      const todayTasks = allRecentTasks.filter(t => {
+        const created = new Date(t.createdAt);
+        return created.getFullYear() === now.getFullYear() &&
+               created.getMonth() === now.getMonth() &&
+               created.getDate() === now.getDate();
+      });
 
-      if (autoPublishEnabled) {
+      const hasArticleTask = todayTasks.some(t => t.taskType === TASK_TYPES.GENERATE_ARTICLES);
+      const hasPublishTask = todayTasks.some(t => t.taskType === TASK_TYPES.AUTO_PUBLISH);
+
+      if (!hasArticleTask) {
+        await scheduleTask(
+          TASK_TYPES.GENERATE_ARTICLES,
+          `Weekly article generation (Day ${day})`,
+          { count: 2 },
+          undefined,
+          "high"
+        );
+      }
+
+      if (autoPublishEnabled && !hasPublishTask) {
         await scheduleTask(
           TASK_TYPES.AUTO_PUBLISH,
           `Auto-publish drafts (Day ${day})`,
@@ -283,6 +298,24 @@ export async function getOrchestratorDashboard() {
   };
 }
 
+async function publishPendingDraftsViaBuffer(): Promise<void> {
+  if (!isBufferConfigured()) return;
+
+  try {
+    const drafts = await storage.getSocialPosts("draft", 50);
+    const publishable = drafts.filter(d => d.platform !== "alert");
+    if (publishable.length === 0) return;
+
+    console.log(`[GrowthOrchestrator] Publishing ${publishable.length} draft social posts via Buffer...`);
+    const results = await publishAllDraftsViaBuffer();
+    const succeeded = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+    console.log(`[GrowthOrchestrator] Buffer publish complete: ${succeeded} queued, ${failed} failed`);
+  } catch (error: any) {
+    console.error("[GrowthOrchestrator] Buffer publish batch error:", error.message);
+  }
+}
+
 let orchestratorInterval: ReturnType<typeof setInterval> | null = null;
 let schedulerInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -294,13 +327,36 @@ export function startGrowthOrchestrator(): void {
   autoPublishEnabled = loadAutoPublishSetting();
   console.log(`[GrowthOrchestrator] Auto-publish: ${autoPublishEnabled ? "enabled" : "disabled"}`);
 
-  processPendingTasks().catch((e) => console.error("[GrowthOrchestrator] Initial run error:", e));
+  setTimeout(async () => {
+    try {
+      await scheduleWeeklyContentGeneration();
+      await scheduleDailyMetrics();
+      console.log("[GrowthOrchestrator] Initial scheduling check complete");
+    } catch (error) {
+      console.error("[GrowthOrchestrator] Initial scheduling error:", error);
+    }
+    try {
+      await processPendingTasks();
+    } catch (e) {
+      console.error("[GrowthOrchestrator] Initial run error:", e);
+    }
+    try {
+      await publishPendingDraftsViaBuffer();
+    } catch (e) {
+      console.error("[GrowthOrchestrator] Initial Buffer publish error:", e);
+    }
+  }, 30_000);
 
   orchestratorInterval = setInterval(async () => {
     try {
       await processPendingTasks();
     } catch (error) {
       console.error("[GrowthOrchestrator] Periodic run error:", error);
+    }
+    try {
+      await publishPendingDraftsViaBuffer();
+    } catch (error) {
+      console.error("[GrowthOrchestrator] Buffer publish error:", error);
     }
   }, 15 * 60 * 1000);
 
