@@ -304,9 +304,11 @@ async function renderScamIntelPage(slug: string): Promise<string | null> {
       <span style="background:#f5f3ff;color:#6d28d9;padding:4px 12px;border-radius:16px;font-size:13px;">${escapeHtml(scam.scamCategory || "")}</span>
     </div>
     ${scam.metaDescription ? `<p style="font-size:18px;color:#444;">${escapeHtml(scam.metaDescription)}</p>` : ""}
-    ${scam.howItWorks ? `<section><h2>How This Scam Works</h2><p>${escapeHtml(scam.howItWorks)}</p></section>` : ""}
-    ${scam.redFlags && scam.redFlags.length > 0 ? `<section><h2>Warning Signs</h2><ul>${scam.redFlags.map(f => `<li>${escapeHtml(f)}</li>`).join("")}</ul></section>` : ""}
-    ${scam.protectionSteps && scam.protectionSteps.length > 0 ? `<section><h2>How to Protect Yourself</h2><ul>${scam.protectionSteps.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ul></section>` : ""}
+    ${scam.howItWorks && Array.isArray(scam.howItWorks) ? `<section><h2>How This Scam Works</h2><ol>${(scam.howItWorks as any[]).map(step => `<li><strong>${escapeHtml(step.title || "")}</strong>: ${escapeHtml(step.description || "")}</li>`).join("")}</ol></section>` : typeof scam.howItWorks === "string" ? `<section><h2>How This Scam Works</h2><p>${escapeHtml(scam.howItWorks)}</p></section>` : ""}
+    ${scam.warningSigns && scam.warningSigns.length > 0 ? `<section><h2>Warning Signs</h2><ul>${scam.warningSigns.map(f => `<li>${escapeHtml(f)}</li>`).join("")}</ul></section>` : ""}
+    ${scam.preventionTips && scam.preventionTips.length > 0 ? `<section><h2>How to Protect Yourself</h2><ul>${scam.preventionTips.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ul></section>` : ""}
+    ${scam.exampleMessages && Array.isArray(scam.exampleMessages) && scam.exampleMessages.length > 0 ? `<section><h2>Example Scam Messages</h2><ul>${(scam.exampleMessages as any[]).map(m => `<li><strong>${escapeHtml(m.context || "")}</strong>: "${escapeHtml(m.message || "")}"</li>`).join("")}</ul></section>` : ""}
+    ${scam.faq && Array.isArray(scam.faq) && scam.faq.length > 0 ? `<section><h2>Frequently Asked Questions</h2>${(scam.faq as any[]).map(f => `<h3>${escapeHtml(f.question || "")}</h3><p>${escapeHtml(f.answer || "")}</p>`).join("")}</section>` : ""}
     ${scam.targetAudience && scam.targetAudience.length > 0 ? `<p>Who is targeted: ${scam.targetAudience.map(t => escapeHtml(t)).join(", ")}</p>` : ""}
     ${scam.platformUsed && scam.platformUsed.length > 0 ? `<p>Platforms used: ${scam.platformUsed.map(p => escapeHtml(p)).join(", ")}</p>` : ""}
   </article>
@@ -874,6 +876,10 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Search across all GetCyberRight resources including guides, tools, training courses, scam alerts, and safety checklists. Find exactly what you need to stay safe online.",
     path: "/search",
     features: ["Search guides and articles", "Find specific scam types", "Locate tools and features", "Browse training courses", "Discover safety checklists"],
+    faqs: [
+      { question: "What can I search for on GetCyberRight?", answer: "You can search for cybersecurity guides, scam alerts, safety tools, training courses, checklists, scam intelligence reports, and any topic related to online safety for families, seniors, kids, and small businesses." },
+      { question: "How do I find help for a specific scam?", answer: "Type the name of the scam or a description of what happened into the search box. You can also browse our Scam Intelligence Center or use the AI Scam Checker to analyze suspicious links and messages directly." },
+    ],
   },
   "/accessibility": {
     title: "Accessibility Statement",
