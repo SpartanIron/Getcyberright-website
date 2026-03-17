@@ -1,5 +1,6 @@
 import { storage } from "./storage";
 import { SCAM_PAGES, getAllScamSlugs } from "@shared/scam-content";
+import { isKnownRoute } from "./known-routes";
 import type { Request, Response, NextFunction } from "express";
 
 const BOT_PATTERN = /googlebot|bingbot|yandexbot|duckduckbot|baiduspider|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|ia_archiver|msnbot|semrushbot|ahrefsbot|mj12bot|rogerbot|dotbot|petalbot|bytespider|gptbot|anthropic-ai|claude-web|claudebot|google-extended|chatgpt-user|oai-searchbot|perplexitybot|cohere-ai|youbot|amazonbot|meta-externalagent|meta-externalfetcher|iaskspider|phind-search/i;
@@ -1294,6 +1295,11 @@ export function seoMiddleware() {
 
       if (isDynamicRoute && !html) {
         res.status(404).set({ "Content-Type": "text/html" }).end("<html><head><title>Not Found</title></head><body><h1>404 - Page Not Found</h1></body></html>");
+        return;
+      }
+
+      if (!html && !isKnownRoute(path)) {
+        res.status(404).set({ "Content-Type": "text/html" }).end("<html><head><title>Not Found</title></head><body><h1>404 - Page Not Found</h1><p>The page you are looking for does not exist.</p><p><a href='/'>Return to GetCyberRight</a></p></body></html>");
         return;
       }
     } catch (error: any) {
