@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { z } from "zod";
 import { storage } from "./storage";
 import type { CyberSafetyGuide, CyberThreatAlert, ScamIntelligence, InsertSocialPost } from "@shared/schema";
 import { generateBrandedImage, serveImagePath } from "./socialImageService";
@@ -9,6 +10,15 @@ const anthropic = new Anthropic({
 });
 
 type ContentItem = CyberSafetyGuide | CyberThreatAlert | ScamIntelligence;
+
+const socialPostSetSchema = z.object({
+  linkedin: z.string().min(100),
+  facebook: z.string().min(50),
+  xThread: z.array(z.string().min(10)).min(3),
+  instagram: z.string().min(80),
+  shortAlert: z.string().min(20).max(200),
+  hashtags: z.array(z.string()).min(3),
+});
 
 interface SocialPostSet {
   linkedin: string;
@@ -24,47 +34,85 @@ async function generateSocialPosts(
   title: string,
   description: string,
   url: string,
-  tags: string[]
+  tags: string[],
+  educationalContext: string
 ): Promise<SocialPostSet | null> {
   try {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
-      max_tokens: 2048,
+      max_tokens: 3000,
+      system: `You are the educational voice of GetCyberRight, a family-focused cybersecurity education platform. Your mission is to TEACH, not just promote. Every post you write should leave the reader genuinely smarter and safer than before they read it.
+
+Your voice is:
+- Warm, clear, and accessible (no jargon, no fear-mongering)
+- Backed by specific facts, real numbers, and concrete steps
+- Empowering, never condescending
+- Focused on everyday families, parents, seniors, and kids
+
+Writing principles:
+- Lead with an insight or surprising fact that makes people stop scrolling
+- Always include at least one specific, actionable step someone can do right now
+- Use real-world examples and relatable scenarios (e.g. "Your child downloads a free game..." not "Threat actors deploy malicious payloads")
+- Replace jargon with plain language: "suspicious links" not "phishing vectors", "online scams" not "social engineering attacks"
+- Never use em dashes
+- Use emojis sparingly and purposefully (1-3 per post)
+- Reference GetCyberRight naturally, not as a sales pitch
+- Write like you are helping a friend, not writing corporate marketing copy`,
       messages: [
         {
           role: "user",
-          content: `You are a social media manager for GetCyberRight, a cybersecurity education platform protecting families and everyday people online.
+          content: `Create social media posts for this ${contentType}:
 
-Generate social media posts for this new ${contentType}:
+TITLE: ${title}
+SUMMARY: ${description}
+LINK: ${url}
+TOPICS: ${tags.join(", ")}
 
-Title: ${title}
-Description: ${description}
-URL: ${url}
-Tags: ${tags.join(", ")}
+EDUCATIONAL SOURCE MATERIAL (use this to write genuinely informative posts):
+${educationalContext}
 
-Create:
-1. LinkedIn post (200-300 words, professional tone, actionable insights, end with CTA)
-2. Facebook post (100-200 words, conversational and warm tone, ask a question to encourage comments, include CTA)
-3. X/Twitter thread (3-5 tweets, each under 280 chars, first tweet hooks attention, last has CTA)
-4. Instagram caption (150-250 words, engaging visual storytelling tone, include line breaks for readability, end with CTA and hashtags section)
-5. Short alert message (under 160 chars, urgent/informative, for email/SMS)
-6. 5-8 relevant hashtags
+Create posts for each platform. Every post must teach something specific and valuable:
 
-Rules:
-- Do NOT use em dashes
-- Use clear, simple language
-- Include relevant emojis sparingly
-- Make content shareable and educational
-- Always reference GetCyberRight as the source
-- Instagram caption should be visual and educational with a hook in the first line
+1. LINKEDIN (250-350 words)
+- Open with a compelling data point, real-world incident, or counterintuitive insight
+- Share 3-4 specific, actionable lessons in a structured format (numbered or bullet points work well)
+- Include a "most people don't realize..." moment
+- Close with a thought-provoking question or clear next step
+- Professional but human tone
+
+2. FACEBOOK (120-200 words)
+- Start with a relatable scenario ("Picture this:" or "True story:")
+- Share 2-3 practical tips someone can act on today
+- End with a question that invites discussion (make it specific, not generic)
+- Warm, conversational, like advising a neighbor
+
+3. X/TWITTER THREAD (4-6 tweets, each under 270 chars)
+- Tweet 1: A hook that teaches something surprising or alarming (a stat, a "did you know")
+- Tweets 2-4: One clear lesson per tweet with a specific tip or insight
+- Tweet 5: A common myth debunked OR the single most important takeaway
+- Final tweet: Where to learn more (mention GetCyberRight and link)
+- Each tweet should be independently shareable and educational
+
+4. INSTAGRAM (180-280 words)
+- Hook in the first line that creates curiosity
+- Use line breaks and short paragraphs for scannability
+- Include a mini-tutorial or step-by-step (e.g. "Here's exactly what to do:")
+- End with a save-worthy call to action ("Save this for later" or "Share with someone who needs this")
+- Include 8-12 relevant hashtags at the end, separated by a line break
+
+5. SHORT ALERT (under 150 chars)
+- Urgent, specific, informative
+- Include the key takeaway or action needed
+
+6. HASHTAGS: 6-10 relevant hashtags
 
 Format as JSON:
 {
-  "linkedin": "Full LinkedIn post text",
-  "facebook": "Full Facebook post text",
-  "xThread": ["Tweet 1", "Tweet 2", "Tweet 3"],
-  "instagram": "Full Instagram caption text",
-  "shortAlert": "Short alert message",
+  "linkedin": "Full post text",
+  "facebook": "Full post text",
+  "xThread": ["Tweet 1", "Tweet 2", "Tweet 3", "Tweet 4", "Tweet 5"],
+  "instagram": "Full caption with hashtags",
+  "shortAlert": "Alert text",
   "hashtags": ["hashtag1", "hashtag2"]
 }`,
         },
@@ -75,13 +123,138 @@ Format as JSON:
     if (!textContent || textContent.type !== "text") return null;
 
     const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
+    if (!jsonMatch) {
+      console.error("[SocialDistribution] No JSON found in AI response");
+      return null;
+    }
 
-    return JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(jsonMatch[0]);
+    const validated = socialPostSetSchema.safeParse(parsed);
+
+    if (!validated.success) {
+      console.warn("[SocialDistribution] AI output validation issues:", validated.error.issues.map(i => `${i.path}: ${i.message}`).join(", "));
+      return {
+        linkedin: parsed.linkedin || "",
+        facebook: parsed.facebook || parsed.linkedin || "",
+        xThread: Array.isArray(parsed.xThread) ? parsed.xThread : [],
+        instagram: parsed.instagram || "",
+        shortAlert: parsed.shortAlert || "",
+        hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
+      };
+    }
+
+    return validated.data;
   } catch (error) {
     console.error("[SocialDistribution] Failed to generate social posts:", error);
     return null;
   }
+}
+
+function buildGuideContext(guide: CyberSafetyGuide): string {
+  const parts: string[] = [];
+
+  if (guide.content) {
+    const plainText = guide.content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    parts.push(`FULL ARTICLE CONTENT (extract key insights, stats, and tips from this):\n${plainText.substring(0, 2500)}`);
+  }
+
+  if (guide.headings && Array.isArray(guide.headings) && guide.headings.length > 0) {
+    parts.push(`KEY SECTIONS COVERED:\n${guide.headings.map((h: any) => `- ${h.text}`).join("\n")}`);
+  }
+
+  if (guide.faq && Array.isArray(guide.faq) && guide.faq.length > 0) {
+    parts.push(`COMMON QUESTIONS ANSWERED:\n${guide.faq.map((f: any) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n")}`);
+  }
+
+  if (guide.category) {
+    parts.push(`CATEGORY: ${guide.category}`);
+  }
+
+  if (guide.readingTimeMinutes) {
+    parts.push(`READING TIME: ${guide.readingTimeMinutes} minutes`);
+  }
+
+  return parts.join("\n\n");
+}
+
+function buildAlertContext(alert: CyberThreatAlert): string {
+  const parts: string[] = [];
+
+  if (alert.detailedAnalysis) {
+    parts.push(`DETAILED ANALYSIS:\n${alert.detailedAnalysis.substring(0, 2000)}`);
+  }
+
+  if (alert.mitigationSteps && alert.mitigationSteps.length > 0) {
+    parts.push(`PROTECTION STEPS (use these to give specific advice):\n${alert.mitigationSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`);
+  }
+
+  if (alert.indicators && Array.isArray(alert.indicators) && alert.indicators.length > 0) {
+    parts.push(`WARNING SIGNS TO WATCH FOR:\n${alert.indicators.map((ind: any) => `- ${ind.description || ind.value}`).join("\n")}`);
+  }
+
+  if (alert.riskLevel) {
+    parts.push(`RISK LEVEL: ${alert.riskLevel.toUpperCase()}`);
+  }
+
+  if (alert.affectedPlatforms && alert.affectedPlatforms.length > 0) {
+    parts.push(`AFFECTED PLATFORMS: ${alert.affectedPlatforms.join(", ")}`);
+  }
+
+  if (alert.regions && alert.regions.length > 0) {
+    parts.push(`REGIONS AFFECTED: ${alert.regions.join(", ")}`);
+  }
+
+  if (alert.targetAudience) {
+    parts.push(`WHO IS MOST AT RISK: ${alert.targetAudience}`);
+  }
+
+  return parts.join("\n\n");
+}
+
+function buildScamContext(scam: ScamIntelligence): string {
+  const parts: string[] = [];
+
+  if (scam.howItWorks && Array.isArray(scam.howItWorks) && scam.howItWorks.length > 0) {
+    parts.push(`HOW THIS SCAM WORKS (step by step):\n${scam.howItWorks.map((s: any) => `Step ${s.step}: ${s.title} - ${s.description}`).join("\n")}`);
+  }
+
+  if (scam.warningSigns && scam.warningSigns.length > 0) {
+    parts.push(`RED FLAGS TO WATCH FOR:\n${scam.warningSigns.map((s) => `- ${s}`).join("\n")}`);
+  }
+
+  if (scam.preventionTips && scam.preventionTips.length > 0) {
+    parts.push(`SPECIFIC PROTECTION TIPS:\n${scam.preventionTips.map((t, i) => `${i + 1}. ${t}`).join("\n")}`);
+  }
+
+  if (scam.exampleMessages && Array.isArray(scam.exampleMessages) && scam.exampleMessages.length > 0) {
+    parts.push(`REAL EXAMPLES OF SCAM MESSAGES (use to illustrate the scam):\n${scam.exampleMessages.map((e: any) => `[${e.context}]: "${e.message}"`).join("\n")}`);
+  }
+
+  if (scam.averageLoss) {
+    parts.push(`AVERAGE FINANCIAL LOSS PER VICTIM: ${scam.averageLoss}`);
+  }
+
+  if (scam.riskLevel) {
+    parts.push(`RISK LEVEL: ${scam.riskLevel.toUpperCase()}`);
+  }
+
+  if (scam.targetAudience && scam.targetAudience.length > 0) {
+    parts.push(`PRIMARY TARGETS: ${scam.targetAudience.join(", ")}`);
+  }
+
+  if (scam.platformUsed && scam.platformUsed.length > 0) {
+    parts.push(`PLATFORMS WHERE THIS SCAM APPEARS: ${scam.platformUsed.join(", ")}`);
+  }
+
+  if (scam.scamCategory) {
+    parts.push(`SCAM CATEGORY: ${scam.scamCategory}`);
+  }
+
+  if (scam.faq && Array.isArray(scam.faq) && scam.faq.length > 0) {
+    parts.push(`FREQUENTLY ASKED QUESTIONS:\n${scam.faq.map((f: any) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n")}`);
+  }
+
+  return parts.join("\n\n");
 }
 
 async function generateImageForPost(title: string, contentType: string, platform: string): Promise<string | null> {
@@ -96,12 +269,14 @@ async function generateImageForPost(title: string, contentType: string, platform
 
 export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<string[]> {
   const url = `https://getcyberright.com/guides/${guide.slug}`;
+  const context = buildGuideContext(guide);
   const posts = await generateSocialPosts(
     "cybersecurity guide",
     guide.title,
     guide.metaDescription,
     url,
-    guide.tags || []
+    guide.tags || [],
+    context
   );
 
   if (!posts) return [];
@@ -140,12 +315,14 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 
 export async function distributeThreatAlertContent(alert: CyberThreatAlert): Promise<string[]> {
   const url = `https://getcyberright.com/alerts/${alert.slug}`;
+  const context = buildAlertContext(alert);
   const posts = await generateSocialPosts(
     "cyber threat alert",
     alert.threatName,
     alert.description,
     url,
-    alert.affectedPlatforms || []
+    alert.affectedPlatforms || [],
+    context
   );
 
   if (!posts) return [];
@@ -184,12 +361,14 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
 
 export async function distributeScamIntelContent(scam: ScamIntelligence): Promise<string[]> {
   const url = `https://getcyberright.com/scam-intel/${scam.slug}`;
+  const context = buildScamContext(scam);
   const posts = await generateSocialPosts(
     "scam intelligence report",
     scam.scamName,
     scam.metaDescription || `New ${scam.scamCategory} scam detected targeting ${(scam.targetAudience || []).join(", ")}`,
     url,
-    scam.platformUsed || []
+    scam.platformUsed || [],
+    context
   );
 
   if (!posts) return [];
