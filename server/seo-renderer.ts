@@ -752,117 +752,230 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     title: "Cybersecurity News & Updates",
     description: "Stay informed with the latest cybersecurity news, data breach reports, emerging threats, and security advisories. Curated updates for families, seniors, and small businesses.",
     path: "/news",
+    features: ["Latest scam alerts and warnings", "Data breach notifications", "New threat advisories", "Security tips and updates", "Weekly safety roundups"],
+    faqs: [
+      { question: "How often is the news updated?", answer: "We publish new cybersecurity news and scam alerts multiple times per week, with breaking alerts published as soon as significant threats are identified." },
+      { question: "Can I get news alerts by email?", answer: "Yes. Subscribe to our free newsletter to receive the most important cybersecurity news and scam alerts delivered to your inbox weekly." },
+    ],
   },
   "/cyber-hygiene": {
     title: "Cyber Hygiene: Daily Habits for Better Online Safety",
     description: "Learn essential cyber hygiene practices to protect yourself daily. Simple, actionable habits for passwords, software updates, safe browsing, and device security.",
     path: "/cyber-hygiene",
+    features: ["Password strength assessment", "Software update reminders", "Safe browsing habits", "Device security checks", "Privacy settings review"],
+    faqs: [
+      { question: "What is cyber hygiene?", answer: "Cyber hygiene refers to simple daily habits that keep you safe online, like using strong passwords, keeping software updated, and being careful about what you click. Think of it like brushing your teeth, but for your digital life." },
+      { question: "What are the most important cyber hygiene habits?", answer: "The top habits are: use unique passwords for every account, turn on two-factor authentication, keep your devices and apps updated, be cautious with links and attachments, and regularly review your privacy settings." },
+      { question: "How often should I practice cyber hygiene?", answer: "Some habits are daily (being careful with emails and links), some are weekly (checking for software updates), and some are monthly or quarterly (reviewing account settings and removing unused apps)." },
+    ],
   },
   "/privacy": {
     title: "Privacy Policy",
     description: "Read the GetCyberRight privacy policy. Learn how we collect, use, and protect your personal information when you use our cybersecurity education platform and tools.",
     path: "/privacy",
+    faqs: [
+      { question: "What personal information does GetCyberRight collect?", answer: "We collect minimal information needed to provide our services. This includes email addresses for newsletter subscribers, account information for registered users, and anonymous usage data to improve our tools." },
+      { question: "Does GetCyberRight sell user data?", answer: "No. We never sell, rent, or trade your personal information to third parties. Your privacy is fundamental to our mission." },
+      { question: "How can I delete my data?", answer: "You can request deletion of your account and associated data at any time by contacting us at tips@getcyberright.com. We will process your request promptly." },
+    ],
   },
   "/terms": {
     title: "Terms of Service",
     description: "Review the GetCyberRight terms of service. Understand the rules and guidelines for using our cybersecurity education platform, tools, and resources.",
     path: "/terms",
+    faqs: [
+      { question: "Is GetCyberRight free to use?", answer: "Yes, GetCyberRight is free to get started. Our core tools, guides, and educational resources are available at no cost." },
+      { question: "Can I use GetCyberRight content for educational purposes?", answer: "Yes, educators and organizations are welcome to reference and share our educational content for non-commercial purposes with proper attribution." },
+    ],
   },
   "/report-scam": {
     title: "Report a Scam: Help Protect Your Community",
     description: "Report a scam to GetCyberRight and help protect others. Submit details about suspicious emails, phone calls, text messages, or websites. Your reports help keep everyone safer.",
     path: "/report-scam",
+    features: ["Easy scam reporting form", "Anonymous submission option", "Multiple scam categories", "Community protection", "Pattern identification"],
+    faqs: [
+      { question: "Why should I report a scam?", answer: "Reporting scams helps protect others in your community. When we receive reports, we can issue warnings, update our scam detection tools, and help identify new scam patterns before more people are affected." },
+      { question: "What information should I include in a scam report?", answer: "Include as much detail as possible: the type of scam, how you were contacted (email, phone, text, social media), what the scammer said or asked for, any phone numbers or email addresses used, and screenshots if available." },
+      { question: "Is my scam report anonymous?", answer: "Yes. You can submit a scam report without providing any personal contact information. Your report will still help protect others." },
+    ],
   },
   "/travel-safety": {
     title: "Travel Cybersecurity: Stay Safe Online While Traveling",
     description: "Protect your digital life while traveling. Tips for secure Wi-Fi use, device protection, avoiding travel scams, and keeping your data safe on the road.",
     path: "/travel-safety",
+    features: ["Public Wi-Fi safety guide", "Device protection tips", "Travel scam alerts", "Secure banking abroad", "Emergency contact prep"],
+    faqs: [
+      { question: "Is it safe to use hotel Wi-Fi?", answer: "Hotel Wi-Fi can be risky because it is often unencrypted and shared with many guests. Use a VPN when connecting to hotel Wi-Fi, avoid accessing sensitive accounts like banking, and verify the network name with hotel staff before connecting." },
+      { question: "How do I protect my phone while traveling?", answer: "Enable screen lock with a strong passcode, turn off automatic Wi-Fi and Bluetooth connections, back up your data before your trip, keep your device updated, and avoid charging at public USB stations (use your own charger and wall outlet)." },
+      { question: "What are the most common travel scams?", answer: "Common travel scams include fake Wi-Fi networks, booking website impostors, ATM skimming, fake travel deal emails, QR code scams at restaurants and tourist spots, and social media vacation monitoring by burglars." },
+    ],
   },
   "/printable-guides": {
     title: "Printable Cybersecurity Guides: Download Free Safety Resources",
     description: "Download and print free cybersecurity guides for your family, classroom, or business. Visual safety checklists, tip sheets, and reference cards you can keep handy.",
     path: "/printable-guides",
+    features: ["Family safety checklists", "Password best practices card", "Scam red flags reference sheet", "Device security setup guide", "Social media privacy checklist"],
+    faqs: [
+      { question: "Are the printable guides free?", answer: "Yes, all printable guides are completely free to download, print, and share. No signup required." },
+      { question: "Can I share these guides with my school or organization?", answer: "Absolutely. Our guides are designed to be shared. Teachers, librarians, community organizations, and employers are encouraged to print and distribute them." },
+    ],
   },
   "/support-the-mission": {
     title: "Support the Mission: Help Keep Families Safe Online",
     description: "Support GetCyberRight's mission to make cybersecurity education accessible to everyone. Help us protect families, seniors, and small businesses from online threats.",
     path: "/support-the-mission",
+    faqs: [
+      { question: "How can I support GetCyberRight?", answer: "You can support us by sharing our tools and guides with your family and friends, reporting scams you encounter, providing feedback on our platform, and spreading the word about digital safety education." },
+      { question: "Is GetCyberRight a non-profit?", answer: "GetCyberRight is a mission-driven organization focused on making digital safety accessible to everyone. Our core tools and educational content are free to get started." },
+    ],
   },
   "/our-mission": {
     title: "Our Mission: Making Online Safety Accessible to Everyone",
     description: "GetCyberRight's mission is to make cybersecurity education simple, practical, and available to every family. Learn why we started and where we are headed.",
     path: "/our-mission",
+    faqs: [
+      { question: "Why was GetCyberRight created?", answer: "GetCyberRight was started by a family that experienced scams, impersonation, and phone fraud firsthand. We built the platform we wished existed: simple tools and clear guidance that anyone can use to protect themselves and their family." },
+      { question: "What makes GetCyberRight different?", answer: "We focus on families and everyday people, not businesses or tech experts. Our tools are free to get started, our guides are written in plain language, and our content is tailored for specific audiences like kids, seniors, and parents." },
+    ],
   },
   "/pricing": {
     title: "Plans & Pricing: Free Cybersecurity Tools for Everyone",
     description: "GetCyberRight is free to get started. Access AI-powered scam checking, data broker removal, safety training, and more. See what is included and how to support the mission.",
     path: "/pricing",
+    features: ["AI Scam Checker", "Data Broker Removal tool", "Password Generator", "Safety training courses", "Printable guides and checklists", "Scam alerts and notifications"],
+    faqs: [
+      { question: "Is GetCyberRight really free?", answer: "Yes, GetCyberRight is free to get started. Our core tools including the Scam Checker, Password Generator, safety guides, and training content are available at no cost and do not require an account." },
+      { question: "What is included for free?", answer: "Free access includes the AI Scam Checker, Password Generator, 501+ Data Broker Removal guides, 406+ AI Safety Prompts, 125+ Safety Guides, Training Academy courses, and weekly scam alerts." },
+      { question: "Will GetCyberRight always be free?", answer: "Our core tools and educational content will always be free to get started. We believe everyone deserves access to basic digital safety tools regardless of their budget." },
+    ],
   },
   "/feedback": {
     title: "Share Your Feedback: Help Us Improve GetCyberRight",
     description: "Tell us what you think about GetCyberRight. Your feedback helps us build better cybersecurity education tools and resources for families and communities.",
     path: "/feedback",
+    faqs: [
+      { question: "How is my feedback used?", answer: "Every piece of feedback is reviewed by our team. We use your suggestions to prioritize new features, fix issues, improve existing tools, and create content that better serves your needs." },
+      { question: "Can I suggest new features?", answer: "Yes, we welcome feature suggestions. Use the feedback form to describe what you would like to see on GetCyberRight and how it would help you or your family stay safer online." },
+    ],
   },
   "/parent-guide": {
     title: "Parent's Guide to Online Safety: Protect Your Children Online",
     description: "A complete guide for parents to keep children safe online. Covers parental controls, age-appropriate conversations, device setup, social media safety, and more.",
     path: "/parent-guide",
+    features: ["Age-appropriate safety conversations", "Parental control setup guides", "Social media monitoring tips", "Gaming safety guidelines", "Screen time management"],
+    faqs: [
+      { question: "At what age should I start teaching my child about online safety?", answer: "Start as soon as your child begins using any connected device. For younger children (ages 4-7), focus on basic rules like not sharing personal information. As they grow, introduce more concepts about privacy, scams, and responsible online behavior." },
+      { question: "What parental controls should I use?", answer: "The best approach combines built-in device controls (screen time limits, content filters, app restrictions) with regular conversations about online safety. No single tool replaces open communication with your child about what they encounter online." },
+      { question: "How do I talk to my teenager about online safety without seeming overbearing?", answer: "Focus on real examples and news stories rather than lectures. Ask questions about what they see online, share your own experiences, and frame safety as empowerment rather than restriction. Show them that staying safe online is a life skill, not a punishment." },
+    ],
   },
   "/search": {
     title: "Search GetCyberRight: Find Cybersecurity Resources",
     description: "Search across all GetCyberRight resources including guides, tools, training courses, scam alerts, and safety checklists. Find exactly what you need to stay safe online.",
     path: "/search",
+    features: ["Search guides and articles", "Find specific scam types", "Locate tools and features", "Browse training courses", "Discover safety checklists"],
   },
   "/accessibility": {
     title: "Accessibility Statement",
     description: "GetCyberRight is committed to digital accessibility. Learn about our efforts to make cybersecurity education accessible to all users, including those with disabilities.",
     path: "/accessibility",
+    faqs: [
+      { question: "What accessibility standards does GetCyberRight follow?", answer: "We strive to conform to WCAG 2.1 Level AA guidelines. This includes providing text alternatives for images, keyboard navigation support, sufficient color contrast, and screen reader compatibility." },
+      { question: "How can I report an accessibility issue?", answer: "If you encounter any accessibility barriers on our site, please contact us at tips@getcyberright.com with a description of the issue and the page where you encountered it. We take all accessibility reports seriously." },
+    ],
   },
   "/advertise": {
     title: "Advertise with GetCyberRight: Reach Security-Conscious Families",
     description: "Partner with GetCyberRight to reach families, parents, seniors, and small businesses who care about online safety. Learn about advertising and sponsorship opportunities.",
     path: "/advertise",
+    features: ["Targeted audience of safety-conscious families", "Multiple sponsorship tiers", "Brand-safe environment", "Content sponsorship options", "Newsletter sponsorship"],
+    faqs: [
+      { question: "What kind of audience does GetCyberRight reach?", answer: "Our audience consists of families, parents, seniors, educators, and small business owners who are actively interested in protecting themselves and their loved ones online. They are engaged, trust-focused, and looking for reliable solutions." },
+      { question: "What advertising formats are available?", answer: "We offer content sponsorship, newsletter sponsorship, tool sponsorship, and display placements. All advertising is clearly labeled and must align with our mission of protecting families online." },
+    ],
   },
   "/partner-deck": {
     title: "Partnership Opportunities: Collaborate with GetCyberRight",
     description: "Explore partnership opportunities with GetCyberRight. Learn how your organization can collaborate with us to advance cybersecurity education for families and communities.",
     path: "/partner-deck",
+    features: ["Educational content partnerships", "Technology integrations", "Community outreach programs", "Co-branded safety campaigns", "Research collaborations"],
+    faqs: [
+      { question: "What types of partnerships does GetCyberRight offer?", answer: "We offer content partnerships, technology integrations, community outreach collaborations, co-branded campaigns, and research partnerships. All partnerships must align with our mission of making digital safety accessible to everyone." },
+      { question: "How do I propose a partnership?", answer: "Contact us at tips@getcyberright.com with details about your organization, the type of partnership you are interested in, and how it would benefit families and communities. We review all proposals and respond within one week." },
+    ],
   },
   "/experience": {
     title: "The GetCyberRight Experience: Where Families Take Back Their Digital Safety",
     description: "A first-of-its-kind family event where digital safety meets real fun. Interactive stations, vetted experts, and activities for every age. Join the waitlist to be the first to know.",
     path: "/experience",
+    features: ["Interactive safety stations", "Expert-led workshops", "Activities for all ages", "Take-home safety kits", "Family and vendor waitlist"],
+    faqs: [
+      { question: "What is The GetCyberRight Experience?", answer: "The GetCyberRight Experience is a first-of-its-kind family event where digital safety meets real fun. Interactive stations, vetted experts, and activities for every age group, designed to give families the tools and knowledge to take back their digital safety." },
+      { question: "How can I join the waitlist?", answer: "Sign up on this page with your name and email. You will be the first to know when details are announced, including dates, locations, and what to expect." },
+      { question: "Is this event for families only?", answer: "The event is designed for families of all sizes, but we also welcome educators, community leaders, and vendors who want to support family digital safety. There is a separate vendor waitlist for organizations interested in participating." },
+    ],
   },
   "/threat-trends": {
     title: "Cybersecurity Threat Trends: Current Attack Patterns & Statistics",
     description: "Track the latest cybersecurity threat trends and attack patterns. Data-driven insights on emerging scams, malware campaigns, and security threats affecting families and businesses.",
     path: "/threat-trends",
+    features: ["Real-time threat statistics", "Regional scam patterns", "Trend analysis charts", "Risk group breakdowns", "Source citations from trusted agencies"],
+    faqs: [
+      { question: "Where does the threat trend data come from?", answer: "Our data comes from trusted global sources including government cybercrime agencies, law enforcement reports, industry security reports, and our own platform data from scam reports and scan results." },
+      { question: "How often are threat trends updated?", answer: "Threat trend data is updated regularly as new reports and statistics become available from our sources. Major data refreshes happen quarterly when new agency reports are published." },
+      { question: "What can I do with threat trend information?", answer: "Use threat trends to understand which scams are most common in your region, which groups are most at risk, and what types of attacks are increasing. This helps you focus your safety efforts where they matter most." },
+    ],
   },
   "/support": {
     title: "Support & Help Center",
     description: "Get help with GetCyberRight tools and resources. Find answers to common questions, troubleshooting guides, and contact information for our support team.",
     path: "/support",
+    features: ["Frequently asked questions", "Tool troubleshooting guides", "Contact support team", "Account help", "Feature request submission"],
+    faqs: [
+      { question: "How do I contact GetCyberRight support?", answer: "You can reach our support team by emailing tips@getcyberright.com. We aim to respond to all inquiries within 24 to 48 hours." },
+      { question: "I found a bug. How do I report it?", answer: "Please email tips@getcyberright.com with a description of the issue, the page where it occurred, and any screenshots if possible. We appreciate your help in making the platform better." },
+    ],
   },
   "/security": {
     title: "Security at GetCyberRight: How We Protect Your Data",
     description: "Learn how GetCyberRight protects your data with enterprise-grade security measures including encryption, secure authentication, and privacy-first design principles.",
     path: "/security",
+    features: ["End-to-end encryption", "Secure authentication with multi-factor options", "Regular security audits", "Privacy-first architecture", "No data selling policy"],
+    faqs: [
+      { question: "How does GetCyberRight protect my data?", answer: "We use industry-standard encryption for all data in transit and at rest, implement secure authentication with optional multi-factor authentication, conduct regular security audits, and follow privacy-first design principles. We never sell or share your personal data." },
+      { question: "Is my scam check data stored?", answer: "Scam check submissions are processed in real time and not permanently stored in a way that links back to you. We may retain anonymous, aggregated statistics to improve our detection accuracy." },
+    ],
   },
   "/parents/child-safety-scanner": {
     title: "Child Safety Scanner: Check Your Family's Online Safety",
     description: "Use our free child safety scanner to evaluate your family's online security. Get personalized recommendations for parental controls, device settings, and conversation topics.",
     path: "/parents/child-safety-scanner",
     schemaType: "WebApplication",
+    features: ["Family safety assessment", "Device security check", "Parental control recommendations", "Age-appropriate settings guide", "Personalized safety plan"],
+    faqs: [
+      { question: "What does the Child Safety Scanner check?", answer: "The scanner evaluates your family's online safety across key areas including device settings, parental controls, social media exposure, and communication habits. It then provides personalized recommendations based on your children's ages." },
+      { question: "Is the scanner free to use?", answer: "Yes, the Child Safety Scanner is completely free and does not require an account. Your responses are used only to generate your personalized safety recommendations." },
+    ],
   },
   "/resources/glossary": {
     title: "Cybersecurity Glossary: Simple Definitions for Common Terms",
     description: "A plain-language glossary of cybersecurity terms. Understand common security concepts without the technical jargon. Perfect for beginners and families.",
     path: "/resources/glossary",
+    features: ["Plain-language definitions", "Alphabetical browsing", "Common terms explained", "Real-world examples", "Family-friendly explanations"],
+    faqs: [
+      { question: "Who is this glossary for?", answer: "This glossary is for anyone who has encountered cybersecurity terms they do not understand. We explain technical concepts in plain, everyday language so families, seniors, students, and beginners can follow along." },
+      { question: "How many terms are in the glossary?", answer: "Our glossary covers the most common cybersecurity terms you will encounter in everyday life, from basic concepts like passwords and updates to more advanced topics. We add new terms regularly." },
+    ],
   },
   "/resources/cheat-sheets": {
     title: "Cybersecurity Cheat Sheets: Quick Reference Security Guides",
     description: "Quick-reference cybersecurity cheat sheets covering passwords, safe browsing, email safety, social media privacy, and more. Print-friendly and easy to follow.",
     path: "/resources/cheat-sheets",
+    features: ["Password security cheat sheet", "Safe browsing quick reference", "Email safety checklist", "Social media privacy guide", "Print-friendly format"],
+    faqs: [
+      { question: "Can I print the cheat sheets?", answer: "Yes, all cheat sheets are designed to be print-friendly. Print them out and keep them near your computer, share them with family members, or post them in your office or classroom." },
+      { question: "What topics do the cheat sheets cover?", answer: "Our cheat sheets cover essential topics including password best practices, safe browsing habits, email safety, social media privacy settings, device security, and what to do if you suspect a scam." },
+    ],
   },
 };
 
