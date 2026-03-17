@@ -191,7 +191,7 @@ export function HeroSection() {
                 className="text-base sm:text-xl text-white/80 leading-relaxed mb-8 sm:mb-10"
                 data-testid="text-hero-subtext"
               >
-                Scams cost families $12.5 billion last year. GetCyberRight gives your family the same protection that organizations pay thousands for. Check any suspicious message, link, or phone number against 8 trusted safety sources in seconds.
+                GetCyberRight is the most powerful free digital protection platform for families and everyday people. Spot scams before they trick you, remove your personal data from hundreds of sites, and learn to stay safe online with simple guides anyone can follow. Everything you need, all in one place.
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 mb-8 sm:mb-10">

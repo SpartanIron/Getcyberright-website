@@ -1128,7 +1128,7 @@ function renderHomePage(): string {
 
   <header>
     <h1>GetCyberRight: Free Cybersecurity Tools for Families, Seniors &amp; Small Businesses</h1>
-    <p style="font-size:18px;color:#444;">Got a suspicious message? Check it in seconds. Scam detection across 8 trusted safety sources, data broker removal, and practical safety training for families, seniors, and small businesses.</p>
+    <p style="font-size:18px;color:#444;">GetCyberRight is the most powerful free digital protection platform for families and everyday people. Spot scams before they trick you, remove your personal data from hundreds of sites, and learn to stay safe online with simple guides anyone can follow. Everything you need, all in one place.</p>
   </header>
 
   <section>
