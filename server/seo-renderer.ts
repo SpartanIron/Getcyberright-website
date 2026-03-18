@@ -508,6 +508,8 @@ interface StaticPageDef {
   schemaType?: string;
   faqs?: { question: string; answer: string }[];
   features?: string[];
+  bodyContent?: string;
+  relatedLinks?: { text: string; href: string }[];
 }
 
 const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
@@ -517,6 +519,19 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/scam-checker",
     schemaType: "WebApplication",
     features: ["URL safety analysis", "Email scam detection", "QR code scanning", "Real-time safety checks", "Multi-source verification"],
+    bodyContent: `<p>According to the FBI's Internet Crime Complaint Center (IC3), Americans lost over $10.3 billion to online scams in 2023 alone. Many of these scams start with a single suspicious link in an email, text message, or social media post. Our AI Scam Checker helps you verify whether a link, email, or message is safe before you click.</p>
+    <h2>How the Scam Checker Works</h2>
+    <p>When you submit a suspicious URL, email, or message, our system runs it through multiple trusted safety databases simultaneously. We check Google Safe Browsing, VirusTotal, URLhaus, and other sources to cross-reference threat data. The tool also examines the domain age, SSL certificate status, and known hosting patterns to identify newly created scam sites that other tools might miss.</p>
+    <h2>What You Can Check</h2>
+    <ul><li><strong>Suspicious URLs</strong> - Paste any link to see if it leads to a known scam, malware, or fake website</li><li><strong>Email messages</strong> - Copy the text of suspicious emails to check for common scam patterns</li><li><strong>Text messages (SMS)</strong> - Analyze those "urgent" texts claiming to be from your bank or delivery service</li><li><strong>QR codes</strong> - Upload an image of a QR code to reveal and check the hidden URL before scanning it with your phone</li></ul>
+    <h2>Why Multiple Sources Matter</h2>
+    <p>No single safety database catches every threat. A URL might be flagged by VirusTotal but not yet reported to Google Safe Browsing, or vice versa. By checking multiple sources at once, our scam checker gives you a more complete picture of a link's safety. This multi-source approach catches threats that single-source checkers miss.</p>`,
+    relatedLinks: [
+      { text: "Report a Scam", href: "/report-scam" },
+      { text: "Scam Intelligence Center", href: "/scam-intel" },
+      { text: "Emergency Help If You Were Scammed", href: "/emergency-help" },
+      { text: "Password Generator", href: "/password-generator" },
+    ],
     faqs: [
       { question: "How does the AI Scam Checker work?", answer: "Our scam checker uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages. It cross-references safety data to give you a safety score." },
       { question: "Is the Scam Checker free to use?", answer: "Yes, the Scam Checker is free to get started. You can analyze URLs, emails, text messages, and QR codes without any cost." },
@@ -530,6 +545,17 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/password-generator",
     schemaType: "WebApplication",
     features: ["Custom password length", "Special character options", "Uppercase and lowercase mixing", "Number inclusion", "Password strength meter"],
+    bodyContent: `<p>Weak passwords remain the number one way accounts get compromised. According to Verizon's Data Breach Investigations Report, over 80% of hacking-related breaches involve stolen or weak passwords. Our password generator creates strong, random passwords that are virtually impossible to guess.</p>
+    <h2>How It Works</h2>
+    <p>Our generator runs entirely in your browser. No passwords are ever sent to our servers or stored anywhere. You choose the length and character types (uppercase, lowercase, numbers, symbols), and the tool uses cryptographically secure randomness to create a password that would take millions of years to crack by brute force.</p>
+    <h2>Tips for Better Password Security</h2>
+    <ul><li>Use a unique password for every account. If one site gets breached, your other accounts stay safe.</li><li>Make passwords at least 14 characters long. Longer passwords are exponentially harder to crack.</li><li>Use a password manager to store your passwords securely. You only need to remember one master password.</li><li>Turn on two-factor authentication wherever it is available for an extra layer of protection.</li></ul>`,
+    relatedLinks: [
+      { text: "Breach Monitor", href: "/breach-dashboard" },
+      { text: "Cyber Hygiene Guide", href: "/cyber-hygiene" },
+      { text: "Security Checklists", href: "/checklists" },
+      { text: "AI Scam Checker", href: "/scam-checker" },
+    ],
     faqs: [
       { question: "What makes a strong password?", answer: "A strong password is at least 12 characters long and includes a mix of uppercase letters, lowercase letters, numbers, and special characters. It should not contain personal information or common words." },
       { question: "How often should I change my passwords?", answer: "Security experts now recommend changing passwords only when there is evidence of a breach. Using unique, strong passwords for each account with a password manager is more important than frequent changes." },
@@ -543,6 +569,19 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/data-removal",
     schemaType: "WebApplication",
     features: ["501+ data broker database", "Automated removal requests", "Progress tracking", "Privacy score assessment", "Continuous monitoring"],
+    bodyContent: `<p>Your personal information, including your name, home address, phone number, email, and even family members' names, is likely listed on dozens of data broker websites right now. These sites collect and sell personal data from public records, social media, purchase history, and other sources. Anyone can search for you and find sensitive details in seconds.</p>
+    <h2>The Scale of the Problem</h2>
+    <p>There are over 4,000 data broker companies operating worldwide. The data brokerage industry is worth an estimated $250 billion per year. Our database covers 501+ of the most common data broker sites, including people-search engines like Spokeo, WhitePages, BeenVerified, and Intelius, as well as marketing data aggregators and background check services.</p>
+    <h2>How Data Removal Works</h2>
+    <ol><li><strong>Search</strong> - Enter your name and we identify which data broker sites have your information listed</li><li><strong>Generate opt-out requests</strong> - We create customized removal requests for each site following their specific opt-out procedures</li><li><strong>Submit and track</strong> - Follow the guided removal process and track which sites have processed your request</li><li><strong>Monitor</strong> - Check back periodically since data brokers often re-acquire your information over time</li></ol>
+    <h2>Why Data Removal Matters</h2>
+    <p>Having your personal information freely available online increases your risk of identity theft, targeted scams, stalking, and unwanted marketing. Removing your data from these sites is one of the most effective steps you can take to protect your privacy and your family's safety.</p>`,
+    relatedLinks: [
+      { text: "Breach Monitor", href: "/breach-dashboard" },
+      { text: "Privacy Policy", href: "/privacy" },
+      { text: "Cyber Hygiene", href: "/cyber-hygiene" },
+      { text: "AI Scam Checker", href: "/scam-checker" },
+    ],
     faqs: [
       { question: "What are data brokers?", answer: "Data brokers are companies that collect, aggregate, and sell personal information. They gather data from public records, social media, purchase history, and other sources, then sell it to marketers, employers, and anyone willing to pay." },
       { question: "How does the data removal tool work?", answer: "Our tool searches 501+ known data broker sites for your personal information and generates opt-out requests. We guide you through the removal process for each site that has your data." },
@@ -556,6 +595,17 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/breach-dashboard",
     schemaType: "WebApplication",
     features: ["Email breach monitoring", "Real-time alerts", "Breach history tracking", "Security recommendations", "Multiple email support"],
+    bodyContent: `<p>Data breaches exposed over 22 billion records in 2023, according to security researchers. If you have used the internet for more than a few years, there is a high chance that at least one of your accounts has been compromised in a breach. Our Breach Monitor lets you check if your email address appears in any known data breaches.</p>
+    <h2>What Gets Exposed in a Data Breach</h2>
+    <p>When a company gets breached, attackers typically steal email addresses, passwords (sometimes in plain text), names, phone numbers, and in more serious cases, financial information like credit card numbers. Even "minor" breaches that only expose your email and password can be dangerous if you reuse that same password on other accounts.</p>
+    <h2>What to Do If Your Email Is Found</h2>
+    <ol><li>Change the password for the breached account immediately</li><li>Change that same password anywhere else you used it</li><li>Turn on two-factor authentication for all important accounts</li><li>Watch your bank statements and credit reports for unusual activity</li><li>Consider placing a fraud alert or credit freeze with the three major credit bureaus</li></ol>`,
+    relatedLinks: [
+      { text: "Password Generator", href: "/password-generator" },
+      { text: "Data Broker Removal", href: "/data-removal" },
+      { text: "Emergency Help", href: "/emergency-help" },
+      { text: "Cyber Hygiene", href: "/cyber-hygiene" },
+    ],
     faqs: [
       { question: "How do data breaches happen?", answer: "Data breaches occur when hackers exploit vulnerabilities in a company's systems to steal user data. This can happen through phishing attacks, malware, unpatched software, or insider threats." },
       { question: "What should I do if my email was found in a breach?", answer: "Immediately change your password for the affected service and any other accounts using the same password. Enable two-factor authentication where possible and monitor your accounts for suspicious activity." },
@@ -639,6 +689,17 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, protect your identity, avoid romance fraud, and use technology with confidence.",
     path: "/seniors",
     features: ["Phone scam detection tips", "Identity theft prevention", "Romance scam awareness", "Medicare and government scam alerts", "Technology confidence guides", "Emergency help contacts"],
+    bodyContent: `<p>Adults over 60 lost $3.4 billion to online scams in 2023, according to the FBI's Internet Crime Report. Scammers often target seniors because they may be less familiar with online tricks and tend to have more savings. But knowledge is your best defense. Our Senior Safety Center is designed specifically for older adults who want straightforward, no-jargon guidance on staying safe online.</p>
+    <h2>The Most Common Scams Targeting Seniors</h2>
+    <ul><li><strong>Phone scams</strong> - Callers pretending to be the IRS, Medicare, Social Security, or a grandchild in trouble</li><li><strong>Romance scams</strong> - Fake romantic interests on dating sites or social media who eventually ask for money</li><li><strong>Tech support scams</strong> - Pop-ups or calls claiming your computer has a virus and demanding payment to fix it</li><li><strong>Investment scams</strong> - Promises of guaranteed returns or "risk-free" investments, especially in cryptocurrency</li><li><strong>Impersonation scams</strong> - Emails or calls pretending to be from Amazon, your bank, or a government agency</li></ul>
+    <h2>Simple Steps to Stay Protected</h2>
+    <p>You do not need to be a technology expert to stay safe. Start with these basics: never give personal information to someone who contacts you unexpectedly, hang up on suspicious phone calls, verify requests by calling the company directly using a number from their official website, and establish a family code word that only you and your loved ones know for verifying emergency calls.</p>`,
+    relatedLinks: [
+      { text: "Emergency Help", href: "/emergency-help" },
+      { text: "AI Scam Checker", href: "/scam-checker" },
+      { text: "Scam Intelligence Center", href: "/scam-intel" },
+      { text: "Parents Hub", href: "/parents" },
+    ],
     faqs: [
       { question: "What types of scams target seniors?", answer: "Seniors are commonly targeted by phone scams, Medicare fraud, romance scams, tech support scams, grandparent scams, lottery and prize scams, and investment fraud. Our guides cover each type with real examples and warning signs." },
       { question: "How can I help an older family member stay safe online?", answer: "Start with open conversations about common scams. Set up their devices with security basics, bookmark trusted sites, and establish a family code word for verifying emergency calls. Our Parents hub has resources for helping family members." },
@@ -651,6 +712,17 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Free cybersecurity guides for parents. Learn about parental controls, age-appropriate device settings, conversation starters about online safety, and how to protect your children from online threats.",
     path: "/parents",
     features: ["Parental control setup guides", "Age-appropriate safety conversations", "Device monitoring tips", "Social media safety", "Online predator awareness", "Gaming safety for kids"],
+    bodyContent: `<p>Children today go online earlier than ever. The average child gets their first smartphone at age 10, and most teens spend more than 7 hours per day on screens outside of schoolwork. As a parent, it can feel overwhelming to keep up with every app, game, and website your kids use. Our Parents Hub gives you practical, actionable guidance to help protect your family without needing to become a tech expert.</p>
+    <h2>Building Online Safety by Age Group</h2>
+    <ul><li><strong>Ages 4 to 7</strong> - Focus on basic rules: never share your name, school, or address online. Use devices together whenever possible.</li><li><strong>Ages 8 to 12</strong> - Introduce the idea that not everyone online is who they say they are. Set up parental controls and safe search. Talk about what to do if something makes them uncomfortable.</li><li><strong>Ages 13 and up</strong> - Discuss social media privacy settings, the permanence of what they post, and how to recognize scams and manipulation. Shift from restriction to education.</li></ul>
+    <h2>Practical Steps You Can Take Today</h2>
+    <p>Set up device-level parental controls, review your child's app permissions, establish screen time boundaries that work for your family, create an open environment where kids feel safe telling you about uncomfortable online encounters, and consider a family code word for verifying unexpected requests or emergencies.</p>`,
+    relatedLinks: [
+      { text: "Kids Digital Safety Hub", href: "/kids" },
+      { text: "Safety Score Assessment", href: "/safety-score" },
+      { text: "Security Checklists", href: "/checklists" },
+      { text: "Senior Safety Center", href: "/seniors" },
+    ],
     faqs: [
       { question: "At what age should I start teaching my kids about online safety?", answer: "Start as early as they begin using devices. For children ages 5 to 7, focus on basic rules like not sharing personal information. For ages 8 to 12, introduce concepts about stranger danger online and safe browsing. Teens need guidance on social media privacy and recognizing scams." },
       { question: "What parental controls should I set up?", answer: "Set up content filters on browsers and apps, enable screen time limits, turn on safe search, review app permissions, and consider family sharing settings. Our guides walk you through setup on every major platform." },
@@ -662,6 +734,17 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Interactive cybersecurity lessons designed for kids and teens ages 8 to 16. Learn about password safety, spotting scams, protecting personal information, and being a good digital citizen through fun activities.",
     path: "/kids",
     features: ["Age-appropriate lessons (8-11 and 12-16)", "Interactive safety activities", "Password security games", "Social media awareness", "Cyberbullying prevention", "Digital citizenship skills"],
+    bodyContent: `<p>Kids and teens are spending more time online than ever, often on apps and platforms their parents have never used. While the internet is full of amazing resources for learning and connecting, it also has real risks. Our Kids Digital Safety Hub teaches young people how to protect themselves online through age-appropriate lessons that are actually engaging, not boring lectures.</p>
+    <h2>What Kids Will Learn</h2>
+    <ul><li><strong>Password power</strong> - How to create strong passwords and why using the same password everywhere is risky</li><li><strong>Spotting fakes</strong> - How to tell if a message, profile, or website is not what it pretends to be</li><li><strong>Protecting personal info</strong> - Why sharing your real name, school, location, or photos with strangers is dangerous</li><li><strong>Being a good digital citizen</strong> - How to treat others online, handle cyberbullying, and think before posting</li><li><strong>Gaming safety</strong> - How to stay safe in online games, avoid scams in virtual marketplaces, and handle strangers in chat</li></ul>
+    <h2>Two Learning Tracks</h2>
+    <p>Our lessons are split into two age groups. The 8 to 11 track uses simpler language and relatable scenarios like gaming and YouTube. The 12 to 16 track covers more advanced topics like social media privacy, identity protection, and recognizing manipulation tactics.</p>`,
+    relatedLinks: [
+      { text: "Parents Hub", href: "/parents" },
+      { text: "Educator Resources", href: "/educators" },
+      { text: "Password Generator", href: "/password-generator" },
+      { text: "AI Scam Checker", href: "/scam-checker" },
+    ],
     faqs: [
       { question: "What age group are these lessons designed for?", answer: "Our lessons are designed for two age groups: ages 8 to 11 (foundational concepts with fun activities) and ages 12 to 16 (more advanced topics including social media safety, privacy, and recognizing scams)." },
       { question: "Can teachers use these materials in the classroom?", answer: "Absolutely. Our lessons are designed to work both at home and in classroom settings. Visit our Educators hub for curriculum-ready materials and lesson plans." },
@@ -673,6 +756,17 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Free cybersecurity teaching resources for educators. Access lesson plans, classroom activities, printable guides, and curriculum materials to teach students about online safety.",
     path: "/educators",
     features: ["Ready-made lesson plans", "Classroom activity guides", "Printable safety worksheets", "Age-graded curriculum", "Assessment tools", "Professional development resources"],
+    bodyContent: `<p>With students spending more time online and cyberbullying, scams, and privacy violations affecting younger age groups every year, teaching digital safety in the classroom has never been more important. Our Educator Resources provide ready-to-use lesson plans, activities, and printable materials that make it easy to incorporate online safety into your existing curriculum.</p>
+    <h2>What Is Included</h2>
+    <ul><li><strong>Lesson plans</strong> - Structured, age-appropriate lessons covering topics from password safety to social media privacy, designed to fit into a single class period</li><li><strong>Classroom activities</strong> - Interactive exercises and group discussions that get students actively thinking about online safety</li><li><strong>Printable worksheets</strong> - Take-home materials students can share with their families to extend the learning beyond the classroom</li><li><strong>Assessment tools</strong> - Quizzes and evaluation rubrics to measure student understanding</li></ul>
+    <h2>Cross-Curricular Connections</h2>
+    <p>Our materials connect naturally to language arts (analyzing persuasive scam messages), math (understanding probability of password cracking), social studies (exploring global privacy laws), and technology classes. This makes it easy to teach online safety without sacrificing existing curriculum time.</p>`,
+    relatedLinks: [
+      { text: "Kids Digital Safety Hub", href: "/kids" },
+      { text: "Printable Guides", href: "/printable-guides" },
+      { text: "Training Academy", href: "/training" },
+      { text: "Security Checklists", href: "/checklists" },
+    ],
     faqs: [
       { question: "What grade levels do the materials cover?", answer: "Our materials cover elementary through high school levels, with content specifically designed for different developmental stages and learning objectives." },
       { question: "How do I integrate cybersecurity into my existing curriculum?", answer: "Our resources are designed to complement existing curricula. We provide cross-curricular connections to subjects like math, language arts, and social studies, making it easy to weave cybersecurity concepts into your teaching." },
@@ -684,6 +778,17 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Free cybersecurity resources for small businesses. Employee awareness training, security policy templates, incident response guides, and practical steps to protect your business from cyber threats.",
     path: "/small-business",
     features: ["Employee awareness training", "Security policy templates", "Incident response planning", "Phishing simulation guidance", "Data backup strategies", "Compliance basics"],
+    bodyContent: `<p>Over 43% of cyber attacks target small businesses, and 60% of small companies that experience a major breach go out of business within six months. Yet many small business owners assume they are too small to be a target. The reality is that attackers specifically seek out small businesses because they often have weaker security than large corporations but still hold valuable customer data and financial information.</p>
+    <h2>Where to Start</h2>
+    <p>You do not need a dedicated IT department or a large budget to significantly improve your security. The three most impactful steps any small business can take are: train employees to recognize suspicious emails and messages, enable two-factor authentication on all business accounts, and ensure you have regular, tested backups of your critical data.</p>
+    <h2>Common Small Business Threats</h2>
+    <ul><li><strong>Business email compromise</strong> - Attackers impersonate vendors, clients, or executives to trick employees into sending money or sensitive data</li><li><strong>Ransomware</strong> - Malicious software that locks your files and demands payment to unlock them</li><li><strong>Customer data theft</strong> - Breaches that expose your customers' personal and payment information, leading to legal liability and loss of trust</li><li><strong>Invoice fraud</strong> - Scammers send fake invoices that look like they come from legitimate vendors your business regularly pays</li></ul>`,
+    relatedLinks: [
+      { text: "Training Academy", href: "/training" },
+      { text: "AI Scam Checker", href: "/scam-checker" },
+      { text: "Security Checklists", href: "/checklists" },
+      { text: "Scam Intelligence Center", href: "/scam-intel" },
+    ],
     faqs: [
       { question: "How much does cybersecurity cost for a small business?", answer: "Many effective cybersecurity measures are free or low-cost. Employee training, strong password policies, multi-factor authentication, and regular software updates cost nothing but significantly reduce risk. Our free resources help you build a strong security foundation." },
       { question: "What are the biggest cybersecurity risks for small businesses?", answer: "The top risks include phishing emails, ransomware, weak passwords, outdated software, and employee mistakes. Over 43% of cyber attacks target small businesses, making awareness training essential." },
@@ -694,6 +799,16 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     title: "Contact GetCyberRight: Get in Touch | GetCyberRight",
     description: "Contact the GetCyberRight team for questions about cybersecurity education, partnership opportunities, or to report a scam. We are here to help families, seniors, and small businesses stay safe online.",
     path: "/contact",
+    bodyContent: `<p>We would love to hear from you. Whether you have a question about online safety, want to report a scam, or are interested in partnering with us, our team is here to help.</p>
+    <h2>How to Reach Us</h2>
+    <ul><li><strong>General questions:</strong> Use the contact form below or email us at tips@getcyberright.com</li><li><strong>Report a scam:</strong> Visit our <a href="/report-scam">Report a Scam</a> page to submit details that help protect the community</li><li><strong>Partnership inquiries:</strong> Email tips@getcyberright.com with "Partnership" in the subject line</li><li><strong>Media inquiries:</strong> Contact us at tips@getcyberright.com for interviews, expert commentary, or press-related requests</li></ul>
+    <p>We aim to respond to all messages within 24 to 48 hours.</p>`,
+    relatedLinks: [
+      { text: "Report a Scam", href: "/report-scam" },
+      { text: "FAQ", href: "/faq" },
+      { text: "About GetCyberRight", href: "/about" },
+      { text: "Support", href: "/support" },
+    ],
     faqs: [
       { question: "How can I contact GetCyberRight?", answer: "You can reach us through our contact form on this page or email us at tips@getcyberright.com. We aim to respond within 24 to 48 hours." },
       { question: "How do I report a scam?", answer: "Use our Report a Scam page to submit details about scam attempts. Your reports help us improve our safety data and protect others in the community." },
@@ -714,6 +829,18 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Immediate steps to take if you have been scammed online. Emergency contacts, account recovery guidance, financial protection steps, and reporting resources for cyber crime victims.",
     path: "/emergency-help",
     features: ["Immediate action checklist", "Emergency contact numbers by country", "Account recovery steps", "Financial protection guidance", "Scam reporting resources", "Identity theft recovery"],
+    bodyContent: `<p>If you think you have been scammed, acting quickly can make the difference between losing money and recovering it. This page walks you through exactly what to do, step by step, in plain language.</p>
+    <h2>Immediate Steps (Do These First)</h2>
+    <ol><li><strong>Stop all contact with the scammer.</strong> Do not reply to messages, answer calls, or click any more links.</li><li><strong>Contact your bank or credit card company.</strong> Tell them what happened and ask to freeze or reverse any transactions. The sooner you call, the better your chances of getting money back.</li><li><strong>Change your passwords.</strong> Start with the compromised account, then change it everywhere you used that same password. Use our <a href="/password-generator">Password Generator</a> to create new strong passwords.</li><li><strong>Turn on two-factor authentication.</strong> Add this extra layer of protection to your email, banking, and social media accounts.</li></ol>
+    <h2>Where to Report the Scam</h2>
+    <ul><li><strong>United States:</strong> FTC at reportfraud.ftc.gov, FBI IC3 at ic3.gov</li><li><strong>United Kingdom:</strong> Action Fraud at actionfraud.police.uk</li><li><strong>Canada:</strong> Canadian Anti-Fraud Centre at antifraudcentre-centreantifraude.ca</li><li><strong>Australia:</strong> Scamwatch at scamwatch.gov.au</li></ul>
+    <p>Also report the scam to us using our <a href="/report-scam">Report a Scam</a> page so we can warn others and update our detection systems.</p>`,
+    relatedLinks: [
+      { text: "AI Scam Checker", href: "/scam-checker" },
+      { text: "Report a Scam", href: "/report-scam" },
+      { text: "Password Generator", href: "/password-generator" },
+      { text: "Breach Monitor", href: "/breach-dashboard" },
+    ],
     faqs: [
       { question: "What should I do first if I have been scammed?", answer: "Stop all communication with the scammer immediately. Contact your bank to freeze affected accounts, change passwords for compromised accounts, and report the incident to local authorities and the FTC." },
       { question: "Can I get my money back after being scammed?", answer: "It depends on the payment method. Credit card payments have the best recovery chances through chargebacks. Bank transfers and wire transfers are harder to recover. Contact your financial institution as soon as possible." },
@@ -725,6 +852,19 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/tools",
     schemaType: "WebApplication",
     features: ["AI Scam Checker", "Secure Password Generator", "Data Broker Removal", "Breach Monitor", "Voice Deepfake Detector", "QR Code Scanner"],
+    bodyContent: `<p>Most cybersecurity tools are built for IT professionals and large corporations. We built ours for everyday people. Every tool on GetCyberRight is designed to be simple enough for anyone to use, with no technical knowledge required and no signup needed for core features.</p>
+    <h2>Our Free Security Toolkit</h2>
+    <ul><li><a href="/scam-checker"><strong>AI Scam Checker</strong></a> - Paste a suspicious URL, email, or text message to check it against multiple trusted safety databases including Google Safe Browsing, VirusTotal, and URLhaus. You can also upload QR code images to reveal hidden links.</li>
+    <li><a href="/password-generator"><strong>Password Generator</strong></a> - Create strong, unique passwords instantly. Everything runs in your browser and nothing is sent to our servers.</li>
+    <li><a href="/data-removal"><strong>Data Broker Removal</strong></a> - Find and remove your personal information from 501+ data broker and people-search websites.</li>
+    <li><a href="/breach-dashboard"><strong>Breach Monitor</strong></a> - Check if your email address has been exposed in any known data breaches.</li>
+    <li><a href="/cyber-threat-radar"><strong>Cyber Threat Radar</strong></a> - Monitor real-time cybersecurity threats and active scam campaigns.</li></ul>`,
+    relatedLinks: [
+      { text: "Cyber Safety Guides", href: "/guides" },
+      { text: "Training Academy", href: "/training" },
+      { text: "Scam Intelligence Center", href: "/scam-intel" },
+      { text: "Emergency Help", href: "/emergency-help" },
+    ],
     faqs: [
       { question: "Are these cybersecurity tools free?", answer: "Yes, our core security tools are free to get started. You can use the Scam Checker, Password Generator, and other tools without creating an account." },
       { question: "Do I need to sign up to use the tools?", answer: "No signup is required for our core tools. You can start checking suspicious links, generating passwords, and scanning for data brokers immediately." },
@@ -1049,14 +1189,24 @@ function renderStaticToolPage(pagePath: string): string | null {
     ? `<section><h2>Key Features</h2><ul>${pageDef.features.map(f => `<li>${escapeHtml(f)}</li>`).join("")}</ul></section>`
     : "";
 
+  const bodyContentHtml = pageDef.bodyContent
+    ? `<article>${pageDef.bodyContent}</article>`
+    : "";
+
+  const relatedLinksHtml = pageDef.relatedLinks && pageDef.relatedLinks.length > 0
+    ? `<section><h2>Related Resources</h2><nav><ul>${pageDef.relatedLinks.map(link => `<li><a href="${link.href}">${escapeHtml(link.text)}</a></li>`).join("")}</ul></nav></section>`
+    : "";
+
   return `${head}
 <body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
   ${breadcrumbs}
   ${jsonLdItems.join("\n")}
   <h1>${escapeHtml(pageDef.title.split("|")[0].trim())}</h1>
   <p style="font-size:18px;color:#444;">${escapeHtml(pageDef.description)}</p>
+  ${bodyContentHtml}
   ${featuresHtml}
   ${faqHtml}
+  ${relatedLinksHtml}
   ${buildFooter()}
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
