@@ -114,6 +114,7 @@ export async function createBufferPost(
     mode?: "addToQueue" | "shareNow" | "shareNext" | "customScheduled" | "recommendedTime";
     dueAt?: string;
     imageUrl?: string;
+    platform?: string;
   } = {}
 ): Promise<BufferPublishResult> {
   try {
@@ -129,6 +130,10 @@ export async function createBufferPost(
 
     if (options.dueAt) {
       input.dueAt = options.dueAt;
+    }
+
+    if (options.platform === "facebook") {
+      input.metadata = { facebook: { type: "post" } };
     }
 
     if (options.imageUrl) {
@@ -248,6 +253,7 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
   const result = await createBufferPost(channel.id, post.postContent, {
     mode: "addToQueue",
     imageUrl,
+    platform: post.platform,
   });
 
   if (result.success) {
