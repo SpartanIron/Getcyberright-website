@@ -21,7 +21,7 @@ function getPublicImageUrl(localImagePath: string): string | null {
     return `https://${domain}/api/social-images/${filename}`;
   }
 
-  return null;
+  return `https://www.getcyberright.com/api/social-images/${filename}`;
 }
 
 interface BufferChannel {
@@ -35,6 +35,7 @@ interface BufferPublishResult {
   platform: string;
   bufferId?: string;
   error?: string;
+  limitReached?: boolean;
 }
 
 function getBufferToken(): string | undefined {
@@ -145,6 +146,7 @@ export async function createBufferPost(
     const data = await graphql<{ createPost: any }>(
       `mutation CreatePost($input: CreatePostInput!) {
         createPost(input: $input) {
+          __typename
           ... on PostActionSuccess {
             post { id status text dueAt channelService }
           }
@@ -172,10 +174,12 @@ export async function createBufferPost(
     }
 
     if (result?.message) {
+      const isLimitReached = result.__typename === "LimitReachedError" || result.message?.toLowerCase().includes("limit reached");
       return {
         success: false,
         platform: "buffer",
         error: result.message,
+        limitReached: isLimitReached,
       };
     }
 
@@ -274,12 +278,19 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
   const channels = await getBufferChannelsByPlatform();
   const connectedPlatforms = new Set(Object.keys(channels));
 
+  let limitReached = false;
   for (const draft of drafts) {
+    if (limitReached) break;
     if (draft.platform === "alert") continue;
     if (!connectedPlatforms.has(draft.platform)) continue;
 
     const result = await publishPostViaBuffer(draft.id);
     results.push(result);
+
+    if (!result.success && (result.limitReached || result.error?.toLowerCase().includes("limit reached"))) {
+      console.log("[Buffer] Scheduled posts limit reached, stopping batch");
+      limitReached = true;
+    }
 
     await new Promise(resolve => setTimeout(resolve, 500));
   }

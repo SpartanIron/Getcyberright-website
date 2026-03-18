@@ -532,7 +532,9 @@ export function registerPlatformRoutes(app: Express): void {
       if (!fs.existsSync(filepath)) {
         return res.status(404).send("Image not found");
       }
-      res.set("Content-Type", "image/webp");
+      const ext = path.extname(filename).toLowerCase();
+      const mimeTypes: Record<string, string> = { ".jpeg": "image/jpeg", ".jpg": "image/jpeg", ".webp": "image/webp", ".png": "image/png" };
+      res.set("Content-Type", mimeTypes[ext] || "image/jpeg");
       res.set("Cache-Control", "public, max-age=86400");
       res.sendFile(filepath, { dotfiles: "allow" });
     } catch (error: any) {

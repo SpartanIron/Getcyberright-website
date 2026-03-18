@@ -334,15 +334,15 @@ export async function generateBrandedImage(
       }
     }
 
-    const hash = crypto.createHash("md5").update(title + platform + "v2").digest("hex").substring(0, 12);
-    const filename = `social-${platform}-${hash}.webp`;
+    const hash = crypto.createHash("md5").update(title + platform + "v3").digest("hex").substring(0, 12);
+    const filename = `social-${platform}-${hash}.jpeg`;
     const filepath = path.join(SOCIAL_IMAGES_DIR, filename);
 
     let pipeline = sharp(Buffer.from(svg)).resize(dims.width, dims.height);
     if (composites.length > 0) {
       pipeline = pipeline.composite(composites);
     }
-    await pipeline.webp({ quality: 88 }).toFile(filepath);
+    await pipeline.jpeg({ quality: 90 }).toFile(filepath);
 
     return filepath;
   } catch (error: any) {
@@ -360,11 +360,11 @@ export async function resizeImageForPlatform(
     const dims = PLATFORM_DIMENSIONS[platform] || PLATFORM_DIMENSIONS.facebook;
     const ext = path.extname(inputPath);
     const base = path.basename(inputPath, ext);
-    const outputPath = path.join(SOCIAL_IMAGES_DIR, `${base}-${platform}.webp`);
+    const outputPath = path.join(SOCIAL_IMAGES_DIR, `${base}-${platform}.jpeg`);
 
     await sharp(inputPath)
       .resize(dims.width, dims.height, { fit: "cover", position: "center" })
-      .webp({ quality: 85 })
+      .jpeg({ quality: 90 })
       .toFile(outputPath);
 
     return outputPath;
@@ -395,7 +395,9 @@ export function getImageAsBase64(filepath: string): string | null {
   try {
     if (!fs.existsSync(filepath)) return null;
     const buffer = fs.readFileSync(filepath);
-    return `data:image/webp;base64,${buffer.toString("base64")}`;
+    const ext = path.extname(filepath).toLowerCase();
+    const mime = ext === ".jpeg" || ext === ".jpg" ? "image/jpeg" : ext === ".png" ? "image/png" : "image/webp";
+    return `data:${mime};base64,${buffer.toString("base64")}`;
   } catch {
     return null;
   }
