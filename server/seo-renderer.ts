@@ -525,7 +525,9 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     <h2>What You Can Check</h2>
     <ul><li><strong>Suspicious URLs</strong> - Paste any link to see if it leads to a known scam, malware, or fake website</li><li><strong>Email messages</strong> - Copy the text of suspicious emails to check for common scam patterns</li><li><strong>Text messages (SMS)</strong> - Analyze those "urgent" texts claiming to be from your bank or delivery service</li><li><strong>QR codes</strong> - Upload an image of a QR code to reveal and check the hidden URL before scanning it with your phone</li></ul>
     <h2>Why Multiple Sources Matter</h2>
-    <p>No single safety database catches every threat. A URL might be flagged by VirusTotal but not yet reported to Google Safe Browsing, or vice versa. By checking multiple sources at once, our scam checker gives you a more complete picture of a link's safety. This multi-source approach catches threats that single-source checkers miss.</p>`,
+    <p>No single safety database catches every threat. A URL might be flagged by VirusTotal but not yet reported to Google Safe Browsing, or vice versa. By checking multiple sources at once, our scam checker gives you a more complete picture of a link's safety. This multi-source approach catches threats that single-source checkers miss.</p>
+    <h2>Related Safety Guides</h2>
+    <ul><li><a href="/guides/how-to-tell-if-text-message-is-scam">How to Tell If a Text Message Is a Scam: 9 Warning Signs</a></li><li><a href="/guides/is-this-email-real-how-to-check">Is This Email Real? How to Check If an Email Is Legitimate</a></li><li><a href="/guides/signs-someone-using-ai-to-scam-you">5 Signs Someone Is Using AI to Scam You</a></li><li><a href="/guides/facebook-marketplace-scams-buy-sell-safely">Facebook Marketplace Scams: How to Buy and Sell Safely</a></li><li><a href="/guides/romance-scam-warning-signs">Romance Scam Warning Signs</a></li></ul>`,
     relatedLinks: [
       { text: "Report a Scam", href: "/report-scam" },
       { text: "Scam Intelligence Center", href: "/scam-intel" },
@@ -537,6 +539,9 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { question: "Is the Scam Checker free to use?", answer: "Yes, the Scam Checker is free to get started. You can analyze URLs, emails, text messages, and QR codes without any cost." },
       { question: "What types of scams can it detect?", answer: "Our tool can detect phishing links, malware-hosting URLs, fake websites, social engineering attempts, tech support scams, romance scams, and many other common online scams." },
       { question: "How accurate is the scam detection?", answer: "We use multiple verified safety sources and AI analysis for high accuracy. However, no tool is 100% accurate. Always exercise caution with suspicious communications." },
+      { question: "How do I check if a text message is a scam?", answer: "Copy the text message content and paste it into the Scam Checker. Our tool analyzes the message for common scam patterns, suspicious links, and known fraud tactics. Look for urgency, unknown senders, and requests for personal information." },
+      { question: "Can I check if an email is legitimate?", answer: "Yes. Paste the email content or any links from the email into the Scam Checker. We check sender patterns, link safety, and message content against known scam databases to help you verify if the email is real." },
+      { question: "How do I scan a QR code for safety?", answer: "Upload an image of the QR code to our Scam Checker. We decode the hidden URL and check it against multiple safety databases before you scan it with your phone, protecting you from malicious QR codes." },
     ],
   },
   "/password-generator": {
@@ -549,7 +554,9 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     <h2>How It Works</h2>
     <p>Our generator runs entirely in your browser. No passwords are ever sent to our servers or stored anywhere. You choose the length and character types (uppercase, lowercase, numbers, symbols), and the tool uses cryptographically secure randomness to create a password that would take millions of years to crack by brute force.</p>
     <h2>Tips for Better Password Security</h2>
-    <ul><li>Use a unique password for every account. If one site gets breached, your other accounts stay safe.</li><li>Make passwords at least 14 characters long. Longer passwords are exponentially harder to crack.</li><li>Use a password manager to store your passwords securely. You only need to remember one master password.</li><li>Turn on two-factor authentication wherever it is available for an extra layer of protection.</li></ul>`,
+    <ul><li>Use a unique password for every account. If one site gets breached, your other accounts stay safe.</li><li>Make passwords at least 14 characters long. Longer passwords are exponentially harder to crack.</li><li>Use a password manager to store your passwords securely. You only need to remember one master password.</li><li>Turn on two-factor authentication wherever it is available for an extra layer of protection.</li></ul>
+    <h2>Related Guides</h2>
+    <ul><li><a href="/guides/free-tools-check-passwords-leaked">Free Tools to Check If Your Passwords Were Leaked</a></li><li><a href="/guides/what-to-do-if-identity-stolen">What to Do If Your Identity Is Stolen</a></li></ul>`,
     relatedLinks: [
       { text: "Breach Monitor", href: "/breach-dashboard" },
       { text: "Cyber Hygiene Guide", href: "/cyber-hygiene" },
@@ -561,6 +568,8 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { question: "How often should I change my passwords?", answer: "Security experts now recommend changing passwords only when there is evidence of a breach. Using unique, strong passwords for each account with a password manager is more important than frequent changes." },
       { question: "Is this password generator safe to use?", answer: "Yes. Passwords are generated entirely in your browser and are never sent to our servers or stored anywhere. Your generated passwords remain completely private." },
       { question: "Should I use a password manager?", answer: "Absolutely. A password manager securely stores all your unique passwords so you only need to remember one master password. This is the best way to maintain strong, unique passwords for every account." },
+      { question: "How do I know if my current password has been leaked?", answer: "Use our Breach Monitor to check if your email and associated passwords have appeared in any known data breaches. If your credentials were exposed, change the password immediately using this generator." },
+      { question: "What is the best password length?", answer: "Security experts recommend at least 16 characters for maximum protection. Our generator defaults to strong lengths, and longer passwords are exponentially harder to crack by brute force." },
     ],
   },
   "/data-removal": {
@@ -575,7 +584,9 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     <h2>How Data Removal Works</h2>
     <ol><li><strong>Search</strong> - Enter your name and we identify which data broker sites have your information listed</li><li><strong>Generate opt-out requests</strong> - We create customized removal requests for each site following their specific opt-out procedures</li><li><strong>Submit and track</strong> - Follow the guided removal process and track which sites have processed your request</li><li><strong>Monitor</strong> - Check back periodically since data brokers often re-acquire your information over time</li></ol>
     <h2>Why Data Removal Matters</h2>
-    <p>Having your personal information freely available online increases your risk of identity theft, targeted scams, stalking, and unwanted marketing. Removing your data from these sites is one of the most effective steps you can take to protect your privacy and your family's safety.</p>`,
+    <p>Having your personal information freely available online increases your risk of identity theft, targeted scams, stalking, and unwanted marketing. Removing your data from these sites is one of the most effective steps you can take to protect your privacy and your family's safety.</p>
+    <h2>Related Guides</h2>
+    <ul><li><a href="/guides/how-to-remove-personal-information-from-internet">How to Remove Your Personal Information from the Internet</a></li><li><a href="/guides/what-to-do-if-identity-stolen">What to Do If Your Identity Is Stolen</a></li></ul>`,
     relatedLinks: [
       { text: "Breach Monitor", href: "/breach-dashboard" },
       { text: "Privacy Policy", href: "/privacy" },
@@ -587,6 +598,9 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { question: "How does the data removal tool work?", answer: "Our tool searches 501+ known data broker sites for your personal information and generates opt-out requests. We guide you through the removal process for each site that has your data." },
       { question: "How long does data removal take?", answer: "Most data brokers process removal requests within 30 to 45 days, though some may take longer. Our tool tracks the status of each request so you can monitor progress." },
       { question: "Will my data stay removed permanently?", answer: "Data brokers may re-acquire your information over time. We recommend periodic checks and re-submissions. Our monitoring feature helps you stay on top of new listings." },
+      { question: "Can removing my data prevent identity theft?", answer: "Yes. Reducing the amount of personal information available online makes it significantly harder for criminals to steal your identity, open fraudulent accounts, or target you with personalized scams." },
+      { question: "How do data brokers get my personal information?", answer: "Data brokers collect information from public records, social media profiles, online purchases, surveys, loyalty programs, and other data brokers. Much of this happens without your knowledge or consent." },
+      { question: "Is it free to remove my data from broker sites?", answer: "Yes, you have the right to request removal from most data broker sites for free. Our tool automates this process across 501+ broker sites at no cost to get started." },
     ],
   },
   "/breach-dashboard": {
@@ -599,7 +613,9 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     <h2>What Gets Exposed in a Data Breach</h2>
     <p>When a company gets breached, attackers typically steal email addresses, passwords (sometimes in plain text), names, phone numbers, and in more serious cases, financial information like credit card numbers. Even "minor" breaches that only expose your email and password can be dangerous if you reuse that same password on other accounts.</p>
     <h2>What to Do If Your Email Is Found</h2>
-    <ol><li>Change the password for the breached account immediately</li><li>Change that same password anywhere else you used it</li><li>Turn on two-factor authentication for all important accounts</li><li>Watch your bank statements and credit reports for unusual activity</li><li>Consider placing a fraud alert or credit freeze with the three major credit bureaus</li></ol>`,
+    <ol><li>Change the password for the breached account immediately</li><li>Change that same password anywhere else you used it</li><li>Turn on two-factor authentication for all important accounts</li><li>Watch your bank statements and credit reports for unusual activity</li><li>Consider placing a fraud alert or credit freeze with the three major credit bureaus</li></ol>
+    <h2>Related Guides</h2>
+    <ul><li><a href="/guides/free-tools-check-passwords-leaked">Free Tools to Check If Your Passwords Were Leaked</a></li><li><a href="/guides/what-to-do-if-identity-stolen">What to Do If Your Identity Is Stolen: Step-by-Step Recovery Guide</a></li></ul>`,
     relatedLinks: [
       { text: "Password Generator", href: "/password-generator" },
       { text: "Data Broker Removal", href: "/data-removal" },
@@ -610,6 +626,9 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { question: "How do data breaches happen?", answer: "Data breaches occur when hackers exploit vulnerabilities in a company's systems to steal user data. This can happen through phishing attacks, malware, unpatched software, or insider threats." },
       { question: "What should I do if my email was found in a breach?", answer: "Immediately change your password for the affected service and any other accounts using the same password. Enable two-factor authentication where possible and monitor your accounts for suspicious activity." },
       { question: "How often are breach databases updated?", answer: "We continuously monitor multiple trusted sources for new breach data. Our records are updated regularly to ensure you receive timely alerts about new compromises." },
+      { question: "How do I check if my password was leaked?", answer: "Enter your email address in our Breach Monitor. If your email appears in any known breaches, any passwords associated with that account should be considered compromised. Change affected passwords immediately and enable two-factor authentication." },
+      { question: "Can I get hacked from a data breach?", answer: "Yes. If your password was exposed in a breach and you use the same password on other accounts, attackers can access those accounts too. This is called credential stuffing and is one of the most common attack methods." },
+      { question: "What is the dark web and how does it relate to data breaches?", answer: "The dark web is a hidden part of the internet where stolen data is bought and sold. After a data breach, your email, passwords, and personal information may be listed for sale on dark web marketplaces." },
     ],
   },
   "/faq": {
@@ -1457,6 +1476,23 @@ function renderHomePage(): string {
       <li><a href="/scams/amazon-scam">Amazon Scams</a> - Spotting fake Amazon communications</li>
     </ul>
     <p><a href="/tools">View all 52 scam guides</a></p>
+  </section>
+
+  <section>
+    <h2>Latest Cybersecurity Guides</h2>
+    <ul>
+      <li><a href="/guides/how-to-tell-if-text-message-is-scam">How to Tell If a Text Message Is a Scam: 9 Warning Signs</a></li>
+      <li><a href="/guides/signs-someone-using-ai-to-scam-you">5 Signs Someone Is Using AI to Scam You</a></li>
+      <li><a href="/guides/how-to-remove-personal-information-from-internet">How to Remove Your Personal Information from the Internet</a></li>
+      <li><a href="/guides/is-this-email-real-how-to-check">Is This Email Real? How to Check If an Email Is Legitimate</a></li>
+      <li><a href="/guides/how-to-protect-seniors-parents-from-scams">How to Protect Your Parents and Grandparents from Online Scams</a></li>
+      <li><a href="/guides/what-to-do-if-identity-stolen">What to Do If Your Identity Is Stolen: Step-by-Step Recovery Guide</a></li>
+      <li><a href="/guides/free-tools-check-passwords-leaked">Free Tools to Check If Your Passwords Were Leaked</a></li>
+      <li><a href="/guides/facebook-marketplace-scams-buy-sell-safely">Facebook Marketplace Scams: How to Buy and Sell Safely</a></li>
+      <li><a href="/guides/how-to-set-up-parental-controls-every-device">How to Set Up Parental Controls on Every Device</a></li>
+      <li><a href="/guides/romance-scam-warning-signs">Romance Scam Warning Signs: Protect Your Heart and Your Money</a></li>
+    </ul>
+    <p><a href="/guides">View all cybersecurity guides</a></p>
   </section>
 
   <section>
