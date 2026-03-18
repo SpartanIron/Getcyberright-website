@@ -341,8 +341,9 @@ export async function publishAllDrafts(): Promise<PublishResult[]> {
       error: r.error,
     }));
 
-    const failedPlatforms = new Set(bufferResults.filter(r => !r.success).map(r => r.platform));
-    if (failedPlatforms.size > 0) {
+    const hasLimitReached = bufferResults.some(r => r.limitReached);
+    const failedPlatforms = new Set(bufferResults.filter(r => !r.success && !r.limitReached).map(r => r.platform));
+    if (failedPlatforms.size > 0 && !hasLimitReached) {
       console.log(`[SocialPublisher] Buffer failed for some posts, falling back to direct API for remaining drafts`);
       const remainingDrafts = await storage.getSocialPosts("draft", 50);
       const platforms = getConnectedPlatforms();

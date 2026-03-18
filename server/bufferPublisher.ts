@@ -12,13 +12,8 @@ function getPublicImageUrl(localImagePath: string): string | null {
 
   const baseUrl = process.env.PUBLIC_IMAGE_BASE_URL;
   if (baseUrl) {
-    return `${baseUrl}/api/social-images/${filename}`;
-  }
-
-  const replitDomains = process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN;
-  if (replitDomains) {
-    const domain = replitDomains.split(",")[0].trim();
-    return `https://${domain}/api/social-images/${filename}`;
+    const cleanBase = baseUrl.replace(/\/+$/, "");
+    return `${cleanBase}/api/social-images/${filename}`;
   }
 
   return `https://www.getcyberright.com/api/social-images/${filename}`;
@@ -261,6 +256,8 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
       publishedAt: new Date(),
     });
     console.log(`[Buffer] Queued ${post.platform} post: ${postId} (Buffer ID: ${result.bufferId})`);
+  } else if (result.limitReached) {
+    console.warn(`[Buffer] Limit reached, keeping ${post.platform} post ${postId} as draft for retry`);
   } else {
     await storage.updateSocialPost(postId, {
       status: "failed",
