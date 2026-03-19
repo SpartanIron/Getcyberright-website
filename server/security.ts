@@ -558,7 +558,7 @@ export function configureHelmet(app: Express) {
           objectSrc: ["'none'"],
           baseUri: ["'self'"],
           formAction: ["'self'"],
-          upgradeInsecureRequests: [],
+          upgradeInsecureRequests: null,
         },
       },
       // Strict Transport Security (HSTS)

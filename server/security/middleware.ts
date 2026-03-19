@@ -49,7 +49,6 @@ export const securityHeaders = helmet({
       baseUri: ["'self'"],
       formAction: ["'self'"],
       frameAncestors: ["'self'"],
-      upgradeInsecureRequests: [],
       workerSrc: ["'self'", "blob:"],
       manifestSrc: ["'self'"],
       mediaSrc: ["'self'", "https:"],

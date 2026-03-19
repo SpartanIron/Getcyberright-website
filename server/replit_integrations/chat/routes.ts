@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import Anthropic from "@anthropic-ai/sdk";
 import multer from "multer";
 import Tesseract from "tesseract.js";
-import rateLimit from "express-rate-limit";
+import rateLimit, { type Options } from "express-rate-limit";
 import { chatStorage } from "./storage";
 import { recordSecurityEvent } from "../../security/security-monitor";
 
@@ -26,9 +26,6 @@ const chatRateLimit = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: Request) => {
-    return (req as any).session?.id || req.ip || "anonymous";
-  },
   handler: (req: any, res: Response) => {
     recordSecurityEvent({
       type: "rate_limit_exceeded",
@@ -50,9 +47,6 @@ const chatReadRateLimit = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: Request) => {
-    return (req as any).session?.id || req.ip || "anonymous";
-  },
 });
 
 const imageUpload = multer({

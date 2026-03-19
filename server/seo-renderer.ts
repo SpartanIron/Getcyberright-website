@@ -204,7 +204,7 @@ async function renderGuidePage(slug: string): Promise<string | null> {
   </nav>
   ${buildFooter()}
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
 </body></html>`;
 }
 
@@ -261,7 +261,7 @@ async function renderAlertPage(slug: string): Promise<string | null> {
   </nav>
   ${buildFooter()}
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
 </body></html>`;
 }
 
@@ -322,7 +322,7 @@ async function renderScamIntelPage(slug: string): Promise<string | null> {
   </nav>
   ${buildFooter()}
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
 </body></html>`;
 }
 
@@ -380,7 +380,7 @@ function renderScamPage(slug: string): string | null {
   </nav>
   ${buildFooter()}
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
 </body></html>`;
 }
 
@@ -455,7 +455,7 @@ async function renderTopicHub(cluster: string): Promise<string | null> {
   
   ${buildFooter()}
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
 </body></html>`;
 }
 
@@ -497,7 +497,7 @@ async function renderListingPage(type: "guides" | "scam-intel" | "alerts"): Prom
   <ul style="list-style:none;padding:0;">${listItems}</ul>
   ${buildFooter()}
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
 </body></html>`;
 }
 
@@ -1228,7 +1228,7 @@ function renderStaticToolPage(pagePath: string): string | null {
   ${relatedLinksHtml}
   ${buildFooter()}
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
 </body></html>`;
 }
 
@@ -1357,7 +1357,7 @@ function renderAboutPage(): string {
 
   ${buildFooter()}
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
 </body></html>`;
 }
 
@@ -1527,7 +1527,7 @@ function renderHomePage(): string {
 
   ${buildFooter()}
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
 </body></html>`;
 }
 
@@ -1594,7 +1594,11 @@ export function seoMiddleware() {
       }
 
       if (html) {
-        res.status(200).set({ "Content-Type": "text/html" }).end(html);
+        res.status(200).set({
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "public, max-age=3600, s-maxage=86400",
+          "X-Robots-Tag": "index, follow",
+        }).end(html);
         return;
       }
 
