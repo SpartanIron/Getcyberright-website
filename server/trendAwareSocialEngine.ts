@@ -1,8 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { storage } from "./storage";
 import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
-import { generateBrandedImage } from "./socialImageService";
-import { createBufferPost, getBufferChannelsByPlatform, getPublicImageUrl } from "./bufferPublisher";
+import { createBufferPost, getBufferChannelsByPlatform } from "./bufferPublisher";
 import type { InsertSocialPost } from "@shared/schema";
 
 const anthropic = new Anthropic({
@@ -59,25 +58,32 @@ async function generateTrendAwarePost(
       : "";
 
   const angleInstructions: Record<ContentAngle, string> = {
-    trending_threat_reaction: `ANGLE: React to the most impactful trending news story. Explain what happened, why it matters to families, and what people should do right now. Position GetCyberRight as the trusted source that breaks down complex threats into clear action steps.`,
-    educational_deep_dive: `ANGLE: Pick a topic from the trending news and go deep on the underlying concept. For example, if there's a phishing attack in the news, teach people the fundamentals of recognizing phishing. Reference the news as the hook, then deliver real educational value. Link to a relevant GetCyberRight guide.`,
-    timely_safety_tip: `ANGLE: Share a specific, immediately actionable safety tip inspired by what's trending in cybersecurity news. Make it something people can do in under 5 minutes to be safer. Frame it as "With [trending topic] in the news, here's something you should do today..."`,
-    myth_buster: `ANGLE: Bust a common cybersecurity myth that's relevant to current events. Start with what most people believe, then reveal the truth with evidence from current news. Make people feel smarter for following GetCyberRight.`,
-    real_world_case_study: `ANGLE: Tell a story inspired by current threats. Create a realistic (but anonymized) scenario showing how a family member, parent, senior, or child could be affected by threats currently in the news. Walk through what happened and what they should have done differently.`,
+    trending_threat_reaction: `ANGLE: React to the most impactful news story from the feed below. Only state facts that appear in the provided news items. Explain what happened, why it matters to families, and what people should do right now.`,
+    educational_deep_dive: `ANGLE: Pick a topic from the news feed below and teach the underlying concept. Use the news as the hook, then deliver educational value. Only reference facts, numbers, and details that appear in the provided news items or are widely established public knowledge.`,
+    timely_safety_tip: `ANGLE: Share a specific, immediately actionable safety tip connected to one of the news stories below. Frame it as "With [specific news event from feed] in the news, here is something you should do today..." Only cite facts from the feed.`,
+    myth_buster: `ANGLE: Bust a common cybersecurity myth that is relevant to one of the news stories below. Only use facts from the provided feed or widely established public knowledge. Do not invent statistics.`,
+    real_world_case_study: `ANGLE: Walk through how one of the real threats from the news feed below could affect an everyday family. Stick strictly to the facts in the feed. Describe what the threat does, who it targets, and exactly what steps people should take based on the provided details.`,
   };
 
   try {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
       max_tokens: 3000,
-      system: `You are the editorial voice of GetCyberRight, a trusted family-focused cybersecurity education platform. You write social media content that positions GetCyberRight as the go-to authority on protecting families online.
+      system: `You are the editorial voice of GetCyberRight, a trusted family-focused cybersecurity education platform.
 
-Your content philosophy:
-- Every post must demonstrate DEPTH OF KNOWLEDGE, not surface-level tips
-- Connect current events to practical family safety
+ABSOLUTE RULES:
+- NEVER fabricate statistics, numbers, percentages, dollar amounts, or data points
+- NEVER invent incidents, breaches, or events that are not in the provided news feed
+- ONLY state facts that appear in the news feed provided to you, or that are widely established public knowledge (e.g. "use strong passwords", "enable two-factor authentication")
+- If you are unsure whether something is factual, do not include it
+- When referencing a news story, attribute it to the source (e.g. "according to CISA", "as reported by Krebs on Security")
+- You may reference hot topics, trending events, and current affairs, but only based on what is in the news feed
+
+Content philosophy:
+- Demonstrate DEPTH OF KNOWLEDGE through intelligent analysis, not invented data
+- Connect real current events to practical family safety
 - Show you are monitoring threats in real-time and translating them for everyday people
 - Mix urgency with empowerment (never fear-mongering)
-- Reference specific data, real incidents, and concrete actions
 - Write like a knowledgeable friend who happens to be a cybersecurity expert
 
 Your voice:
@@ -91,7 +97,7 @@ Brand integrity signals:
 - Reference GetCyberRight's free tools and guides naturally (not as ads)
 - Show awareness of the broader cybersecurity landscape
 - Demonstrate that you care about people, not clicks
-- Include specific, verifiable facts and actionable steps`,
+- Your credibility depends on accuracy. Never guess.`,
       messages: [
         {
           role: "user",
@@ -108,19 +114,23 @@ GETCYBERRIGHT GUIDES YOU CAN REFERENCE (link to these when relevant):
 ${guideContext}
 ${recentPostsContext}
 
+IMPORTANT: Every claim, fact, and reference in your posts MUST come directly from the news feed above or be widely established public knowledge. Do not invent any statistics or incidents.
+
 Create posts for TWO platforms:
 
 1. LINKEDIN POST (250-400 words):
-- Open with a hook tied to something happening RIGHT NOW in cybersecurity
-- Demonstrate expert-level understanding while keeping language accessible
-- Include 2-3 specific, actionable takeaways
-- Reference a GetCyberRight guide or tool naturally
+- Open with a hook tied to a specific story from the news feed above
+- Attribute the news to its source (e.g. "CISA just issued an advisory about..." or "According to Krebs on Security...")
+- Demonstrate expert-level analysis while keeping language accessible
+- Include 2-3 specific, actionable takeaways grounded in the actual threat details
+- Reference a relevant GetCyberRight guide naturally when one fits
 - End with a thought-provoking question or clear call to action
 - Professional but approachable tone
+- You may connect the news to broader hot topics and current affairs when relevant
 
 2. FACEBOOK POST (120-200 words):
-- Start with a relatable scenario or attention-grabbing fact from current news
-- Share 2-3 practical tips someone can act on immediately
+- Start with the real-world impact of a story from the news feed
+- Share 2-3 practical tips someone can act on immediately, grounded in the actual threat
 - Conversational and warm, like helping a neighbor
 - End with a question that invites engagement
 
@@ -231,13 +241,6 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
 
     for (const { platform, content } of platformPosts) {
       try {
-        const imagePath = await generateBrandedImage(posts.title, "trend_insight", platform);
-        let imageUrl: string | undefined;
-        if (imagePath) {
-          const publicUrl = getPublicImageUrl(imagePath);
-          if (publicUrl) imageUrl = publicUrl;
-        }
-
         const socialPost: InsertSocialPost = {
           contentType: "trend_insight",
           contentId: `trend-${Date.now()}-${platform}`,
@@ -245,7 +248,6 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
           platform,
           postContent: content,
           hashtags: posts.hashtags,
-          imageUrl: imagePath || undefined,
           status: "published",
           publishedAt: new Date(),
         };
@@ -253,19 +255,10 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
         const created = await storage.createSocialPost(socialPost);
 
         const channel = channels[platform];
-        let bufferResult = await createBufferPost(channel.id, content, {
+        const bufferResult = await createBufferPost(channel.id, content, {
           mode: "shareNow",
-          imageUrl,
           platform,
         });
-
-        if (!bufferResult.success && imageUrl && bufferResult.error?.includes("image")) {
-          console.log(`[TrendEngine] Retrying ${platform} without image...`);
-          bufferResult = await createBufferPost(channel.id, content, {
-            mode: "shareNow",
-            platform,
-          });
-        }
 
         if (bufferResult.success) {
           console.log(
