@@ -16,7 +16,7 @@ const rssParser = new Parser({
   },
 });
 
-interface RawFeedItem {
+export interface RawFeedItem {
   title: string;
   link: string;
   summary: string;
@@ -86,7 +86,7 @@ const AUDIENCE_DEFINITIONS: Record<string, string> = {
   "general": "All internet users regardless of age or background",
 };
 
-async function fetchRealThreats(): Promise<RawFeedItem[]> {
+export async function fetchRealThreats(): Promise<RawFeedItem[]> {
   const allItems: RawFeedItem[] = [];
 
   const feedPromises = TRUSTED_FEEDS.map(async (feed) => {
