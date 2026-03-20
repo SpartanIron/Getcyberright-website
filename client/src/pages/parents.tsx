@@ -578,7 +578,7 @@ function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
 
       <div className="py-16 sm:py-20 bg-background">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6 mb-12">
             {parentTopics.map((topic) => (
               <Card
                 key={topic.id}

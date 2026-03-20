@@ -168,7 +168,7 @@ export default function CyberThreatRadar() {
                   </Button>
                 </Link>
               </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-4">
                 {recentAlerts.map((alert) => {
                   const config = riskConfig[alert.riskLevel] || riskConfig.low;
                   return (

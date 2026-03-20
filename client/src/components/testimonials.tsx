@@ -61,7 +61,7 @@ export function Testimonials() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6">
           {testimonials.slice(0, 3).map((testimonial) => (
             <div
               key={testimonial.initials}
@@ -86,9 +86,30 @@ export function Testimonials() {
               </div>
             </div>
           ))}
+          <div
+            className="hidden 3xl:flex bg-white/[0.06] border border-white/10 rounded-2xl p-7 sm:p-8 flex-col"
+            data-testid={`testimonial-card-${testimonials[3].initials.toLowerCase()}`}
+          >
+            <Quote className="w-8 h-8 text-white/15 mb-5 flex-shrink-0" aria-hidden="true" />
+            <blockquote className="text-white/85 leading-relaxed mb-8 flex-1">
+              {testimonials[3].quote}
+            </blockquote>
+            <div className="flex items-center gap-3 mt-auto">
+              <div
+                className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-sm font-semibold text-white/70"
+                aria-hidden="true"
+              >
+                {testimonials[3].initials}
+              </div>
+              <div>
+                <p className="font-semibold text-white text-sm">{testimonials[3].name}</p>
+                <p className="text-sm text-white/50">{testimonials[3].context}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mt-6 lg:max-w-[calc(66.666%+0.75rem)]">
+        <div className="grid md:grid-cols-2 gap-6 mt-6 lg:max-w-[calc(66.666%+0.75rem)] 3xl:hidden">
           {testimonials.slice(3, 5).map((testimonial) => (
             <div
               key={testimonial.initials}

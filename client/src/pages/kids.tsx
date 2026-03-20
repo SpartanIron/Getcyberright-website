@@ -979,7 +979,7 @@ function LearningTrack({
             isCompleted={completedModules.includes(activeModule)}
           />
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-5">
               {modules.map((module, index) => {
                 const isCompleted = completedModules.includes(module.id);
                 return (

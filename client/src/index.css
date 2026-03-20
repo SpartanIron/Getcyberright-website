@@ -454,3 +454,30 @@ button:hover .cta-arrow-right {
     opacity: 0;
   }
 }
+
+@media (min-width: 1920px) {
+  .max-w-7xl {
+    max-width: 1600px;
+  }
+  .max-w-6xl {
+    max-width: 1400px;
+  }
+  .max-w-5xl {
+    max-width: 1200px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .max-w-7xl {
+    max-width: 1920px;
+  }
+  .max-w-6xl {
+    max-width: 1700px;
+  }
+  .max-w-5xl {
+    max-width: 1500px;
+  }
+  .max-w-4xl {
+    max-width: 1200px;
+  }
+}

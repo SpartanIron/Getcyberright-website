@@ -267,7 +267,7 @@ function EducatorsLanding({ onSelectResource }: { onSelectResource: (id: string)
         
         <div className="max-w-5xl mx-auto px-4 relative z-10">
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6 mb-12">
             {educatorResources.map((resource) => (
               <Card 
                 key={resource.id}

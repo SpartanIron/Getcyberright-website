@@ -319,7 +319,7 @@ export default function Training() {
 
               <TabsContent value="paths">
                 {isLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6">
                     {[1, 2, 3].map(i => (
                       <Card key={i} className="animate-pulse">
                         <CardHeader>
@@ -333,7 +333,7 @@ export default function Training() {
                     ))}
                   </div>
                 ) : filteredPaths && filteredPaths.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6">
                     {filteredPaths.map(path => {
                       const info = audienceInfo[path.audience as keyof typeof audienceInfo];
                       const Icon = info?.icon || BookOpen;

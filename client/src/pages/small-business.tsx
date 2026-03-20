@@ -254,7 +254,7 @@ function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) =
       <div className="py-12 bg-background">
         <div className="max-w-5xl mx-auto px-4">
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6 mb-12">
             {businessTopics.map((topic) => (
               <Card 
                 key={topic.id}

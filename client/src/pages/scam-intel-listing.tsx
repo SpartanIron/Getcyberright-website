@@ -361,7 +361,7 @@ export default function ScamIntelListing() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="grid-scam-intel">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6" data-testid="grid-scam-intel">
             {filtered.map((scam) => (
               <Link key={scam.id} href={`/scam-intel/${scam.slug}`}>
                 <Card className={`h-full hover:shadow-lg transition-shadow cursor-pointer border-t-4 ${riskBorder[scam.riskLevel] || "border-t-gray-300"}`} data-testid={`card-scam-${scam.slug}`}>

@@ -209,7 +209,7 @@ export default function AwarenessHub() {
           <p className="text-center text-muted-foreground mb-8 max-w-xl mx-auto">
             Step-by-step visual guides to protect yourself from the most common cyber threats
           </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6">
             {infographicBlocks.map((block) => (
               <Card key={block.title} className={`bg-gradient-to-br ${block.color} border-0 shadow-md hover:shadow-lg transition-shadow`} data-testid={`card-infographic-${block.title.toLowerCase().replace(/\s/g, "-")}`}>
                 <CardHeader className="pb-3">
