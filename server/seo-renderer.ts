@@ -124,9 +124,103 @@ function buildArticleSchema(data: {
   return buildJsonLd(schema);
 }
 
+function buildSiteNav(): string {
+  return `
+<nav aria-label="Main navigation" style="background:#f8fffe;border:1px solid #e0f2f1;border-radius:8px;padding:24px;margin-top:30px;font-family:Sora,sans-serif;font-size:14px;color:#333;">
+  <h2 style="font-size:16px;margin:0 0 16px;color:#0A2A3C;">Explore GetCyberRight</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:24px;">
+    <div style="min-width:180px;">
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.05em;color:#666;margin:0 0 8px;">Security Tools</h3>
+      <ul style="list-style:none;padding:0;margin:0;line-height:2;">
+        <li><a href="/tools" style="color:#0d9488;">All Tools</a></li>
+        <li><a href="/scam-checker" style="color:#0d9488;">AI Scam Checker</a></li>
+        <li><a href="/password-generator" style="color:#0d9488;">Password Generator</a></li>
+        <li><a href="/data-removal" style="color:#0d9488;">Data Broker Removal</a></li>
+        <li><a href="/breach-dashboard" style="color:#0d9488;">Breach Monitor</a></li>
+        <li><a href="/cyber-threat-radar" style="color:#0d9488;">Cyber Threat Radar</a></li>
+        <li><a href="/quick-assessment" style="color:#0d9488;">Quick Assessment</a></li>
+        <li><a href="/safety-score" style="color:#0d9488;">Safety Score</a></li>
+        <li><a href="/cyber-hygiene" style="color:#0d9488;">Cyber Hygiene</a></li>
+        <li><a href="/parents/child-safety-scanner" style="color:#0d9488;">Child Safety Scanner</a></li>
+      </ul>
+    </div>
+    <div style="min-width:180px;">
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.05em;color:#666;margin:0 0 8px;">Safety Hubs</h3>
+      <ul style="list-style:none;padding:0;margin:0;line-height:2;">
+        <li><a href="/kids" style="color:#0d9488;">Kids Safety</a></li>
+        <li><a href="/seniors" style="color:#0d9488;">Seniors Safety</a></li>
+        <li><a href="/parents" style="color:#0d9488;">Parents Hub</a></li>
+        <li><a href="/parent-guide" style="color:#0d9488;">Parent's Guide</a></li>
+        <li><a href="/educators" style="color:#0d9488;">Educator Resources</a></li>
+        <li><a href="/small-business" style="color:#0d9488;">Small Business</a></li>
+        <li><a href="/ai-safety" style="color:#0d9488;">AI Safety</a></li>
+        <li><a href="/travel-safety" style="color:#0d9488;">Travel Safety</a></li>
+        <li><a href="/emergency-help" style="color:#0d9488;">Emergency Help</a></li>
+        <li><a href="/report-scam" style="color:#0d9488;">Report a Scam</a></li>
+      </ul>
+    </div>
+    <div style="min-width:180px;">
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.05em;color:#666;margin:0 0 8px;">Learn & Train</h3>
+      <ul style="list-style:none;padding:0;margin:0;line-height:2;">
+        <li><a href="/training" style="color:#0d9488;">Training Academy</a></li>
+        <li><a href="/guides" style="color:#0d9488;">Safety Guides</a></li>
+        <li><a href="/alerts" style="color:#0d9488;">Threat Alerts</a></li>
+        <li><a href="/scam-intel" style="color:#0d9488;">Scam Intelligence</a></li>
+        <li><a href="/threat-trends" style="color:#0d9488;">Threat Trends</a></li>
+        <li><a href="/news" style="color:#0d9488;">Cybersecurity News</a></li>
+        <li><a href="/ai-prompts" style="color:#0d9488;">AI Prompt Library</a></li>
+        <li><a href="/awareness-hub" style="color:#0d9488;">Awareness Hub</a></li>
+        <li><a href="/checklists" style="color:#0d9488;">Security Checklists</a></li>
+        <li><a href="/printable-guides" style="color:#0d9488;">Printable Guides</a></li>
+        <li><a href="/resources" style="color:#0d9488;">All Resources</a></li>
+        <li><a href="/resources/glossary" style="color:#0d9488;">Glossary</a></li>
+        <li><a href="/resources/cheat-sheets" style="color:#0d9488;">Cheat Sheets</a></li>
+      </ul>
+    </div>
+    <div style="min-width:180px;">
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.05em;color:#666;margin:0 0 8px;">Topic Hubs</h3>
+      <ul style="list-style:none;padding:0;margin:0;line-height:2;">
+        <li><a href="/topics/identity-theft" style="color:#0d9488;">Identity Theft</a></li>
+        <li><a href="/topics/online-scams" style="color:#0d9488;">Online Scams</a></li>
+        <li><a href="/topics/phishing-attacks" style="color:#0d9488;">Phishing Attacks</a></li>
+        <li><a href="/topics/cyber-safety-seniors" style="color:#0d9488;">Senior Cyber Safety</a></li>
+        <li><a href="/topics/cyber-safety-kids" style="color:#0d9488;">Kids Cyber Safety</a></li>
+        <li><a href="/topics/password-security" style="color:#0d9488;">Password Security</a></li>
+        <li><a href="/topics/privacy-protection" style="color:#0d9488;">Privacy Protection</a></li>
+        <li><a href="/topics/device-security" style="color:#0d9488;">Device Security</a></li>
+        <li><a href="/topics/data-breaches" style="color:#0d9488;">Data Breaches</a></li>
+        <li><a href="/topics/social-media-security" style="color:#0d9488;">Social Media Security</a></li>
+      </ul>
+    </div>
+    <div style="min-width:180px;">
+      <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.05em;color:#666;margin:0 0 8px;">Company</h3>
+      <ul style="list-style:none;padding:0;margin:0;line-height:2;">
+        <li><a href="/about" style="color:#0d9488;">About Us</a></li>
+        <li><a href="/our-mission" style="color:#0d9488;">Our Mission</a></li>
+        <li><a href="/contact" style="color:#0d9488;">Contact</a></li>
+        <li><a href="/support" style="color:#0d9488;">Support</a></li>
+        <li><a href="/faq" style="color:#0d9488;">FAQ</a></li>
+        <li><a href="/feedback" style="color:#0d9488;">Feedback</a></li>
+        <li><a href="/support-the-mission" style="color:#0d9488;">Support the Mission</a></li>
+        <li><a href="/pricing" style="color:#0d9488;">Plans & Pricing</a></li>
+        <li><a href="/experience" style="color:#0d9488;">The Experience</a></li>
+        <li><a href="/advertise" style="color:#0d9488;">Advertise</a></li>
+        <li><a href="/partner-deck" style="color:#0d9488;">Partnerships</a></li>
+        <li><a href="/security" style="color:#0d9488;">Security Practices</a></li>
+        <li><a href="/privacy" style="color:#0d9488;">Privacy Policy</a></li>
+        <li><a href="/terms" style="color:#0d9488;">Terms of Service</a></li>
+        <li><a href="/accessibility" style="color:#0d9488;">Accessibility</a></li>
+        <li><a href="/search" style="color:#0d9488;">Search</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>`;
+}
+
 function buildFooter(): string {
   return `
-<footer style="padding:40px 20px;text-align:center;color:#666;font-family:Sora,sans-serif;font-size:14px;border-top:1px solid #e5e7eb;margin-top:40px;">
+${buildSiteNav()}
+<footer style="padding:40px 20px;text-align:center;color:#666;font-family:Sora,sans-serif;font-size:14px;border-top:1px solid #e5e7eb;margin-top:20px;">
   <nav style="margin-bottom:20px;">
     <a href="/" style="margin:0 12px;color:#0d9488;">Home</a>
     <a href="/guides" style="margin:0 12px;color:#0d9488;">Guides</a>
