@@ -281,6 +281,20 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
   const channels = await getBufferChannelsByPlatform();
   const connectedPlatforms = new Set(Object.keys(channels));
 
+  const nonAlertDrafts = drafts.filter(d => d.platform !== "alert");
+  if (connectedPlatforms.size === 0) {
+    console.warn(`[Buffer] No connected channels found. Cannot publish ${nonAlertDrafts.length} draft posts. Run channel check.`);
+    return results;
+  }
+
+  const platformCounts: Record<string, number> = {};
+  let skippedCount = 0;
+  for (const d of nonAlertDrafts) {
+    platformCounts[d.platform] = (platformCounts[d.platform] || 0) + 1;
+    if (!connectedPlatforms.has(d.platform)) skippedCount++;
+  }
+  console.log(`[Buffer] Connected platforms: ${[...connectedPlatforms].join(", ")}. Draft platforms: ${Object.entries(platformCounts).map(([p, c]) => `${p}(${c})`).join(", ")}. Skipping ${skippedCount} posts with no matching channel.`);
+
   let limitReached = false;
   for (const draft of drafts) {
     if (limitReached) break;
