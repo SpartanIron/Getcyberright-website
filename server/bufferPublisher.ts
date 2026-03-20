@@ -251,7 +251,7 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
   }
 
   const result = await createBufferPost(channel.id, post.postContent, {
-    mode: "addToQueue",
+    mode: "shareNow",
     imageUrl,
     platform: post.platform,
   });
@@ -275,6 +275,8 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
   return result;
 }
 
+const DAILY_POSTS_PER_PLATFORM = 1;
+
 export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]> {
   const drafts = await storage.getSocialPosts("draft", 50);
   const results: BufferPublishResult[] = [];
@@ -295,21 +297,33 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
   }
   console.log(`[Buffer] Connected platforms: ${[...connectedPlatforms].join(", ")}. Draft platforms: ${Object.entries(platformCounts).map(([p, c]) => `${p}(${c})`).join(", ")}. Skipping ${skippedCount} posts with no matching channel.`);
 
-  let limitReached = false;
+  const publishedPerPlatform: Record<string, number> = {};
+
   for (const draft of drafts) {
-    if (limitReached) break;
     if (draft.platform === "alert") continue;
     if (!connectedPlatforms.has(draft.platform)) continue;
+
+    const alreadyPublished = publishedPerPlatform[draft.platform] || 0;
+    if (alreadyPublished >= DAILY_POSTS_PER_PLATFORM) continue;
 
     const result = await publishPostViaBuffer(draft.id);
     results.push(result);
 
-    if (!result.success && (result.limitReached || result.error?.toLowerCase().includes("limit reached"))) {
-      console.log("[Buffer] Scheduled posts limit reached, stopping batch");
-      limitReached = true;
+    if (result.success) {
+      publishedPerPlatform[draft.platform] = alreadyPublished + 1;
     }
 
-    await new Promise(resolve => setTimeout(resolve, 500));
+    if (!result.success && (result.limitReached || result.error?.toLowerCase().includes("limit reached"))) {
+      console.log("[Buffer] API limit reached, stopping batch");
+      break;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  const remaining = nonAlertDrafts.length - results.filter(r => r.success).length;
+  if (remaining > 0) {
+    console.log(`[Buffer] Daily limit applied (${DAILY_POSTS_PER_PLATFORM}/platform). ${remaining} drafts remaining for future runs.`);
   }
 
   return results;

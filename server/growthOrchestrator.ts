@@ -298,19 +298,25 @@ export async function getOrchestratorDashboard() {
   };
 }
 
+let lastBufferPublishDate = "";
+
 async function publishPendingDraftsViaBuffer(): Promise<void> {
   if (!isBufferConfigured()) return;
+
+  const today = new Date().toISOString().split("T")[0];
+  if (lastBufferPublishDate === today) return;
 
   try {
     const drafts = await storage.getSocialPosts("draft", 50);
     const publishable = drafts.filter(d => d.platform !== "alert");
     if (publishable.length === 0) return;
 
-    console.log(`[GrowthOrchestrator] Publishing ${publishable.length} draft social posts via Buffer...`);
+    console.log(`[GrowthOrchestrator] Daily publish: ${publishable.length} draft social posts via Buffer...`);
     const results = await publishAllDraftsViaBuffer();
     const succeeded = results.filter(r => r.success).length;
     const failed = results.filter(r => !r.success).length;
-    console.log(`[GrowthOrchestrator] Buffer publish complete: ${succeeded} queued, ${failed} failed`);
+    console.log(`[GrowthOrchestrator] Buffer publish complete: ${succeeded} published, ${failed} failed`);
+    lastBufferPublishDate = today;
   } catch (error: any) {
     console.error("[GrowthOrchestrator] Buffer publish batch error:", error.message);
   }
