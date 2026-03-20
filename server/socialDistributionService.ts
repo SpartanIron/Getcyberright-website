@@ -11,6 +11,21 @@ const anthropic = new Anthropic({
 
 type ContentItem = CyberSafetyGuide | CyberThreatAlert | ScamIntelligence;
 
+function sanitizePostContent(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^[-*]\s+/gm, "")
+    .replace(/\u2014/g, ", ")
+    .replace(/\u2013/g, ", ")
+    .replace(/—/g, ", ")
+    .replace(/–/g, ", ")
+    .replace(/\s{2,}/g, " ")
+    .replace(/ ,/g, ",")
+    .trim();
+}
+
 const socialPostSetSchema = z.object({
   linkedin: z.string().min(100),
   facebook: z.string().min(50),
@@ -50,19 +65,28 @@ ABSOLUTE RULES:
 - If you are unsure whether something is factual, do not include it
 - Your credibility depends on accuracy. Never guess.
 
+Formatting rules (STRICT):
+- NEVER use markdown formatting. No ** bold **, no * italics *, no ## headings, no bullet markers
+- NEVER use em dashes. Use commas, periods, colons, or semicolons instead
+- Use proper sentence structure with correct grammar and punctuation throughout
+- Use line breaks and short paragraphs to organize thoughts, not markdown symbols
+- Use numbered lists (1. 2. 3.) when listing steps, but never markdown bullet points
+
 Your voice is:
-- Warm, clear, and accessible (no jargon, no fear-mongering)
+- Professional, knowledgeable, and approachable
+- Sound like a cybersecurity expert who explains complex topics simply
+- No jargon. If a technical term is necessary, immediately explain what it means in plain language
 - Backed by verifiable facts and concrete steps from the provided source material
 - Empowering, never condescending
 - Focused on everyday families, parents, seniors, and kids
+- Every sentence should be clear enough that a non-technical person understands it on the first read
 
 Writing principles:
 - Lead with a real insight from the source material that makes people stop scrolling
 - Always include at least one specific, actionable step someone can do right now
 - Use real-world examples and relatable scenarios (e.g. "Your child downloads a free game..." not "Threat actors deploy malicious payloads")
 - Replace jargon with plain language: "suspicious links" not "phishing vectors", "online scams" not "social engineering attacks"
-- Never use em dashes
-- Use emojis sparingly and purposefully (1-3 per post)
+- Use emojis sparingly and purposefully (1-3 per post, only where they add clarity)
 - Reference GetCyberRight naturally, not as a sales pitch
 - Write like you are helping a friend, not writing corporate marketing copy`,
       messages: [
@@ -141,16 +165,24 @@ Format as JSON:
     if (!validated.success) {
       console.warn("[SocialDistribution] AI output validation issues:", validated.error.issues.map(i => `${i.path}: ${i.message}`).join(", "));
       return {
-        linkedin: parsed.linkedin || "",
-        facebook: parsed.facebook || parsed.linkedin || "",
-        xThread: Array.isArray(parsed.xThread) ? parsed.xThread : [],
-        instagram: parsed.instagram || "",
-        shortAlert: parsed.shortAlert || "",
+        linkedin: sanitizePostContent(parsed.linkedin || ""),
+        facebook: sanitizePostContent(parsed.facebook || parsed.linkedin || ""),
+        xThread: Array.isArray(parsed.xThread) ? parsed.xThread.map(sanitizePostContent) : [],
+        instagram: sanitizePostContent(parsed.instagram || ""),
+        shortAlert: sanitizePostContent(parsed.shortAlert || ""),
         hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
       };
     }
 
-    return validated.data;
+    const data = validated.data;
+    return {
+      linkedin: sanitizePostContent(data.linkedin),
+      facebook: sanitizePostContent(data.facebook),
+      xThread: data.xThread.map(sanitizePostContent),
+      instagram: sanitizePostContent(data.instagram),
+      shortAlert: sanitizePostContent(data.shortAlert),
+      hashtags: data.hashtags,
+    };
   } catch (error) {
     console.error("[SocialDistribution] Failed to generate social posts:", error);
     return null;

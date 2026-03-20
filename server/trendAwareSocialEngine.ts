@@ -26,6 +26,21 @@ function getTodaysContentAngle(): ContentAngle {
   return CONTENT_MIX[dayOfYear % CONTENT_MIX.length];
 }
 
+function sanitizePostContent(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^[-*]\s+/gm, "")
+    .replace(/\u2014/g, ", ")
+    .replace(/\u2013/g, ", ")
+    .replace(/—/g, ", ")
+    .replace(/–/g, ", ")
+    .replace(/\s{2,}/g, " ")
+    .replace(/ ,/g, ",")
+    .trim();
+}
+
 interface TrendAwarePostResult {
   linkedin: string;
   facebook: string;
@@ -86,12 +101,20 @@ Content philosophy:
 - Mix urgency with empowerment (never fear-mongering)
 - Write like a knowledgeable friend who happens to be a cybersecurity expert
 
+Formatting rules (STRICT):
+- NEVER use markdown formatting. No ** bold **, no * italics *, no ## headings, no bullet markers
+- NEVER use em dashes. Use commas, periods, colons, or semicolons instead
+- Use proper sentence structure with correct grammar and punctuation throughout
+- Use line breaks and short paragraphs to organize thoughts, not markdown symbols
+- Use numbered lists (1. 2. 3.) when listing steps, but never markdown bullet points
+
 Your voice:
-- Warm, authoritative, and accessible
-- No jargon (translate technical terms to plain language)
-- Never use em dashes
-- Use emojis sparingly (1-3 per post)
+- Professional, knowledgeable, and approachable
+- Sound like a cybersecurity expert who knows how to explain complex topics simply
+- No jargon. If a technical term is necessary, immediately explain what it means in plain language
+- Use emojis sparingly (1-3 per post, only where they add clarity)
 - Speak directly to families, parents, seniors, and everyday internet users
+- Every sentence should be clear enough that a non-technical person understands it on the first read
 
 Brand integrity signals:
 - Reference GetCyberRight's free tools and guides naturally (not as ads)
@@ -165,9 +188,9 @@ Format as JSON:
     }
 
     return {
-      linkedin: parsed.linkedin,
-      facebook: parsed.facebook,
-      title: parsed.title,
+      linkedin: sanitizePostContent(parsed.linkedin),
+      facebook: sanitizePostContent(parsed.facebook),
+      title: sanitizePostContent(parsed.title),
       hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
     };
   } catch (error: any) {
