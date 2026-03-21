@@ -118,7 +118,7 @@ export async function createBufferPost(
   } = {}
 ): Promise<BufferPublishResult> {
   try {
-    const mode = options.mode || "addToQueue";
+    const mode = options.mode || "shareNow";
 
     const input: Record<string, any> = {
       channelId,
