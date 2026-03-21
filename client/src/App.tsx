@@ -8,8 +8,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { DeziAssistant } from "@/components/dezi-assistant";
 import { FeedbackWidget } from "@/components/feedback-widget";
 import { AnnouncementBanner } from "@/components/announcement-banner";
+import { CookieConsent } from "@/components/cookie-consent";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { initGA, trackPageView } from "./lib/analytics";
+import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { Loader2 } from "lucide-react";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
@@ -114,7 +115,6 @@ function ScrollToTop() {
   
   useEffect(() => {
     window.scrollTo(0, 0);
-    trackPageView(location);
   }, [location]);
   
   return null;
@@ -213,13 +213,18 @@ function Router() {
 }
 
 function App() {
-  // Initialize Google Analytics when app loads
   useEffect(() => {
-    if (!import.meta.env.VITE_GA_MEASUREMENT_ID) {
-      console.warn('Missing Google Analytics Measurement ID');
-    } else {
+    if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
       initGA();
     }
+
+    const handleConsentUpdate = () => {
+      if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
+        initGA();
+      }
+    };
+    window.addEventListener("cookie-consent-updated", handleConsentUpdate);
+    return () => window.removeEventListener("cookie-consent-updated", handleConsentUpdate);
   }, []);
 
   const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
@@ -237,6 +242,7 @@ function App() {
             </ErrorBoundary>
             <DeziAssistant />
             <FeedbackWidget />
+            <CookieConsent />
           </TooltipProvider>
         </ThemeProvider>
       </GoogleReCaptchaProvider>

@@ -170,6 +170,13 @@ export function Footer() {
               <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
               <Link href="/support" className="hover:text-slate-300 transition-colors">Support</Link>
               <Link href="/contact" className="hover:text-slate-300 transition-colors">Contact</Link>
+              <button
+                onClick={() => { localStorage.removeItem("gcr_cookie_consent"); window.dispatchEvent(new CustomEvent("cookie-consent-reopen", { detail: null })); }}
+                className="hover:text-slate-300 transition-colors cursor-pointer"
+                data-testid="link-cookie-settings"
+              >
+                Cookie Settings
+              </button>
             </div>
           </div>
 

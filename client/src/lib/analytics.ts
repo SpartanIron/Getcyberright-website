@@ -1,5 +1,5 @@
-// Google Analytics integration
-// Define the gtag function globally
+import { hasAnalyticsConsent } from "@/components/cookie-consent";
+
 declare global {
   interface Window {
     dataLayer: any[];
@@ -7,22 +7,26 @@ declare global {
   }
 }
 
-// Initialize Google Analytics
-export const initGA = () => {
-  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+let gaInitialized = false;
 
+export const initGA = () => {
+  if (gaInitialized) return;
+
+  if (!hasAnalyticsConsent()) {
+    return;
+  }
+
+  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
   if (!measurementId) {
     console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
     return;
   }
 
-  // Add Google Analytics script to the head
   const script1 = document.createElement('script');
   script1.async = true;
   script1.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
   document.head.appendChild(script1);
 
-  // Initialize gtag
   const script2 = document.createElement('script');
   script2.textContent = `
     window.dataLayer = window.dataLayer || [];
@@ -31,29 +35,31 @@ export const initGA = () => {
     gtag('config', '${measurementId}');
   `;
   document.head.appendChild(script2);
+
+  gaInitialized = true;
 };
 
-// Track page views - useful for single-page applications
 export const trackPageView = (url: string) => {
+  if (!hasAnalyticsConsent()) return;
   if (typeof window === 'undefined' || !window.gtag) return;
-  
+
   const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
   if (!measurementId) return;
-  
+
   window.gtag('config', measurementId, {
     page_path: url
   });
 };
 
-// Track events
 export const trackEvent = (
-  action: string, 
-  category?: string, 
-  label?: string, 
+  action: string,
+  category?: string,
+  label?: string,
   value?: number
 ) => {
+  if (!hasAnalyticsConsent()) return;
   if (typeof window === 'undefined' || !window.gtag) return;
-  
+
   window.gtag('event', action, {
     event_category: category,
     event_label: label,
@@ -61,7 +67,6 @@ export const trackEvent = (
   });
 };
 
-// Generate or retrieve session ID for anonymous tracking
 const getSessionId = (): string => {
   const key = 'gcr_session_id';
   let sessionId = sessionStorage.getItem(key);
@@ -72,15 +77,16 @@ const getSessionId = (): string => {
   return sessionId;
 };
 
-// Track tool usage for internal analytics
 export const trackToolUsage = async (
-  toolName: string, 
-  completed: boolean = false, 
+  toolName: string,
+  completed: boolean = false,
   metadata?: Record<string, any>
 ) => {
+  if (!hasAnalyticsConsent()) return;
+
   try {
     const sessionId = getSessionId();
-    
+
     await fetch('/api/track/tool', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -92,10 +98,8 @@ export const trackToolUsage = async (
       }),
     });
 
-    // Also track as GA event
     trackEvent('tool_usage', 'tools', toolName);
   } catch (error) {
-    // Silently fail - tracking shouldn't break the app
     console.debug('Tool tracking failed:', error);
   }
 };
