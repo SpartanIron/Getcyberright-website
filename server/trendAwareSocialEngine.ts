@@ -280,6 +280,55 @@ interface TrendAwarePostResult {
   sourceValidation: { tier1Count: number; tier2Count: number; tier3Count: number; highestTier: 1 | 2 | 3 };
 }
 
+function enforcePostFormatting(text: string, platform: string): string {
+  let cleaned = text.replace(/\*\*/g, "").replace(/\*/g, "").replace(/^#+\s/gm, "").replace(/^[-•]\s/gm, "");
+  cleaned = cleaned.replace(/\u2014/g, ",").replace(/\u2013/g, ",");
+
+  const paragraphs = cleaned.split(/\n\n+/).filter(p => p.trim());
+
+  if (paragraphs.length < 3) {
+    const sentences = cleaned.replace(/\n/g, " ").split(/(?<=[.!?])\s+/).filter(s => s.trim());
+    const reformatted: string[] = [];
+
+    if (platform === "linkedin") {
+      if (sentences.length >= 2) {
+        reformatted.push(sentences.slice(0, 2).join(" "));
+      } else if (sentences.length === 1) {
+        reformatted.push(sentences[0]);
+      }
+      for (let i = 2; i < sentences.length; i += 2) {
+        reformatted.push(sentences.slice(i, i + 2).join(" "));
+      }
+    } else {
+      for (let i = 0; i < sentences.length; i += 3) {
+        reformatted.push(sentences.slice(i, i + 3).join(" "));
+      }
+    }
+
+    cleaned = reformatted.join("\n\n");
+    console.log(`[TrendEngine] Reformatted ${platform} post: split wall of text into ${reformatted.length} paragraphs`);
+  }
+
+  if (platform === "linkedin") {
+    const words = cleaned.split(/\s+/).length;
+    if (words > 220) {
+      const allParagraphs = cleaned.split(/\n\n+/);
+      let wordCount = 0;
+      const trimmed: string[] = [];
+      for (const p of allParagraphs) {
+        const pWords = p.split(/\s+/).length;
+        if (wordCount + pWords > 200 && trimmed.length >= 3) break;
+        trimmed.push(p);
+        wordCount += pWords;
+      }
+      cleaned = trimmed.join("\n\n");
+      console.log(`[TrendEngine] Trimmed ${platform} post from ${words} to ~${wordCount} words`);
+    }
+  }
+
+  return cleaned.trim();
+}
+
 async function generateTrendAwarePost(
   trendingNews: RawFeedItem[],
   relevantGuides: { title: string; slug: string; category: string; tags: string[] }[],
@@ -421,13 +470,17 @@ VOICE AND PERSONALITY:
 - Write like a trusted human, not a marketer
 - Emphasize behavior over technology. Build trust, not fear
 
-FORMATTING (CRITICAL):
+FORMATTING (CRITICAL, STRICTLY ENFORCED):
 - NEVER use markdown: no ** bold **, no * italics *, no ## headings, no bullet markers (- or *)
 - NEVER use em dashes (use commas, colons, semicolons, or periods instead)
-- Use blank lines between paragraphs for visual breathing room
-- Keep paragraphs to 1-3 sentences
-- If using numbered items, put each on its OWN line
-- White space is critical. Never write a wall of text
+- Every post MUST have multiple \\n\\n paragraph breaks in the JSON output
+- LinkedIn: Maximum 5-7 short paragraphs, each 1-2 sentences. NEVER a single block of text
+- The first 2 lines MUST stand alone as a hook (before LinkedIn's "see more" cutoff)
+- After the hook, insert a \\n\\n break
+- Keep paragraphs to 1-2 sentences maximum. One sentence per paragraph is preferred
+- If using numbered items, put each on its OWN line with a \\n\\n between them
+- White space is critical. A wall of text = automatic failure. If you produce a single unbroken paragraph, you have failed
+- LinkedIn posts that exceed 200 words = failure. Be concise. Cut ruthlessly
 
 WHAT NOT TO DO:
 - Do not end every post with a question. Sometimes end with a strong statement
@@ -462,16 +515,20 @@ ${performanceContext}
 
 Execute ALL steps of your intelligence pipeline (Signal Interpretation, Source Validation, Relevance Filter, Risk Scoring, Insight Generation, Content Mode Selection, Content Creation, Visual Planning, Product Mapping, Validation, Confidence Scoring), then output:
 
-LINKEDIN POST (100-200 words max):
+LINKEDIN POST (120-180 words max, STRICTLY ENFORCED):
 - Professional audience, both technical and non-technical
-- Concise, sharp, insight-driven
-- Strong opening line
-- 2-4 specific actionable steps
+- Structure MUST be: Hook (1-2 punchy lines) \\n\\n Body (3-4 short paragraphs) \\n\\n CTA or closing thought
+- First 2 lines are everything. They appear before "see more". Make them count
+- Each paragraph: 1-2 sentences MAX. Break after every thought
+- Include 2-3 actionable steps, each on its own line
+- End with either a question OR a strong statement (vary this)
+- The post MUST contain at least 4 paragraph breaks (\\n\\n)
 
 FACEBOOK POST (60-120 words max):
 - Conversational, like talking to a neighbor
 - Warmer tone, slightly longer storytelling
 - 2-3 specific actionable steps
+- Use paragraph breaks between thoughts
 
 Format your complete output as this strict JSON with \\n for line breaks within post text:
 {
@@ -521,6 +578,9 @@ Format your complete output as this strict JSON with \\n for line breaks within 
       console.error("[TrendEngine] Missing required fields in AI response");
       return null;
     }
+
+    parsed.linkedin = enforcePostFormatting(parsed.linkedin, "linkedin");
+    parsed.facebook = enforcePostFormatting(parsed.facebook, "facebook");
 
     const trendAnalysis: TrendAnalysis = parsed.trend_analysis
       ? {
