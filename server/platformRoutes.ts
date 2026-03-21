@@ -35,6 +35,15 @@ import {
   isLinkedInDirectConfigured,
   publishDirectToLinkedIn,
 } from "./linkedinDirectPublisher";
+import {
+  getFacebookAuthUrl,
+  validateFBOAuthState,
+  exchangeFBCodeForToken,
+  getLongLivedToken,
+  getUserPages,
+  isFacebookDirectConfigured,
+  publishDirectToFacebook,
+} from "./facebookDirectPublisher";
 import { serveImagePath } from "./socialImageService";
 import * as fs from "fs";
 import * as path from "path";
@@ -887,6 +896,140 @@ a { color: #E8732A; }
       res.json(result);
     } catch (error: any) {
       console.error("[LinkedIn] Test post error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/auth/facebook/authorize", (req, res) => {
+    const key = req.query.key;
+    if (key !== process.env.FACEBOOK_SETUP_KEY && key !== "gcr-facebook-setup-2026") {
+      return res.status(401).send("Add ?key=gcr-facebook-setup-2026 to authorize");
+    }
+    const authUrl = getFacebookAuthUrl();
+    res.redirect(authUrl);
+  });
+
+  app.get("/api/auth/facebook/callback", async (req, res) => {
+    try {
+      const { code, state, error: oauthError, error_description } = req.query;
+
+      if (oauthError) {
+        return res.status(400).send(`Facebook OAuth error: ${oauthError} - ${error_description}`);
+      }
+
+      if (!code || !state) {
+        return res.status(400).send("Missing code or state parameter");
+      }
+
+      if (!validateFBOAuthState(state as string)) {
+        return res.status(400).send("Invalid OAuth state. Please try again.");
+      }
+
+      const shortToken = await exchangeFBCodeForToken(code as string);
+      const longToken = await getLongLivedToken(shortToken.access_token);
+      const pages = await getUserPages(longToken.access_token);
+
+      const expiresAt = longToken.expires_in
+        ? new Date(Date.now() + longToken.expires_in * 1000).toISOString()
+        : "Never (permanent page token)";
+
+      const pagesHtml = pages.map(p => `
+        <div style="background:#0d2230;border:1px solid #1a4a5e;border-radius:8px;padding:16px;margin:12px 0;">
+          <p style="color:#4ade80;font-size:16px;margin:0 0 8px"><strong>${p.name}</strong> (${p.category})</p>
+          <p class="label">Page ID:</p>
+          <div class="token-box">${p.id}</div>
+          <p class="label">Page Access Token:</p>
+          <div class="token-box">${p.access_token}</div>
+          <form method="POST" action="/api/auth/facebook/save-token">
+            <input type="hidden" name="page_id" value="${p.id}" />
+            <input type="hidden" name="page_name" value="${p.name}" />
+            <input type="hidden" name="page_access_token" value="${p.access_token}" />
+            <input type="hidden" name="user_access_token" value="${longToken.access_token}" />
+            <button type="submit">Use This Page</button>
+          </form>
+        </div>
+      `).join("");
+
+      const html = `<!DOCTYPE html>
+<html><head><title>Facebook Connected</title>
+<style>
+body { font-family: system-ui, sans-serif; max-width: 600px; margin: 80px auto; padding: 20px; background: #0A2A3C; color: #fff; }
+.card { background: #133a4f; border-radius: 12px; padding: 32px; }
+h1 { color: #E8732A; margin-top: 0; }
+.token-box { background: #0d2230; border: 1px solid #1a4a5e; border-radius: 8px; padding: 12px; margin: 8px 0; word-break: break-all; font-family: monospace; font-size: 12px; }
+.label { color: #8ab4c7; font-size: 14px; margin-bottom: 4px; }
+.success { color: #4ade80; }
+.info { color: #94a3b8; font-size: 14px; margin-top: 12px; }
+button { background: #E8732A; color: white; border: none; padding: 10px 20px; border-radius: 24px; cursor: pointer; font-size: 14px; margin-top: 8px; }
+</style></head>
+<body><div class="card">
+<h1>Facebook Connected Successfully</h1>
+<p class="info">User token expires: ${expiresAt}</p>
+${pages.length > 0
+  ? `<p class="success">Found ${pages.length} page(s) you manage. Select the one to use for posting:</p>${pagesHtml}`
+  : '<p style="color:#fbbf24">No pages found. Make sure you are an admin of the GetCyberRight Facebook page.</p>'
+}
+</div></body></html>`;
+
+      res.send(html);
+    } catch (error: any) {
+      console.error("[Facebook OAuth] Callback error:", error);
+      res.status(500).send(`Facebook OAuth failed: ${error.message}`);
+    }
+  });
+
+  app.post("/api/auth/facebook/save-token", async (req, res) => {
+    try {
+      const { page_id, page_name, page_access_token, user_access_token } = req.body;
+
+      if (!page_id || !page_access_token) {
+        return res.status(400).json({ error: "Missing page ID or token" });
+      }
+
+      process.env.FACEBOOK_PAGE_ID = page_id;
+      process.env.FACEBOOK_PAGE_ACCESS_TOKEN = page_access_token;
+      if (user_access_token) process.env.FACEBOOK_USER_ACCESS_TOKEN = user_access_token;
+
+      console.log(`[Facebook] Page saved: ${page_name} (${page_id})`);
+
+      res.send(`<!DOCTYPE html>
+<html><head><title>Facebook Page Saved</title>
+<style>
+body { font-family: system-ui, sans-serif; max-width: 600px; margin: 80px auto; padding: 20px; background: #0A2A3C; color: #fff; text-align: center; }
+h1 { color: #4ade80; }
+p { color: #94a3b8; }
+a { color: #E8732A; }
+</style></head>
+<body>
+<h1>Facebook Page Connected</h1>
+<p>${page_name} is now set up for direct publishing.</p>
+<p>Important: Add FACEBOOK_PAGE_ID and FACEBOOK_PAGE_ACCESS_TOKEN as environment variables in Replit Secrets for persistence across restarts.</p>
+<p><a href="/admin">Go to Admin Dashboard</a></p>
+</body></html>`);
+    } catch (error: any) {
+      console.error("[Facebook] Save token error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/facebook/status", isAuthenticated, isAdminMiddleware, (_req, res) => {
+    res.json({
+      configured: isFacebookDirectConfigured(),
+      hasPageToken: !!process.env.FACEBOOK_PAGE_ACCESS_TOKEN,
+      hasPageId: !!process.env.FACEBOOK_PAGE_ID,
+      pageId: process.env.FACEBOOK_PAGE_ID || null,
+    });
+  });
+
+  app.post("/api/facebook/test-post", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const { text } = req.body;
+      if (!text) return res.status(400).json({ error: "Missing text" });
+
+      const result = await publishDirectToFacebook(text);
+      res.json(result);
+    } catch (error: any) {
+      console.error("[Facebook] Test post error:", error);
       res.status(500).json({ error: error.message });
     }
   });
