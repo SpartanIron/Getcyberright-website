@@ -3,19 +3,19 @@ const API_BASE = "https://www.getcyberright.com";
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "gcr-scan-link",
-    title: "Scan this link with GetCyberRight",
+    title: "Scan with GCR Guard",
     contexts: ["link"]
   });
 
   chrome.contextMenus.create({
     id: "gcr-scan-page",
-    title: "Scan this page with GetCyberRight",
+    title: "Scan this page with GCR Guard",
     contexts: ["page"]
   });
 
   chrome.contextMenus.create({
     id: "gcr-scan-selection",
-    title: "Scan selected text with GetCyberRight",
+    title: "Scan selected text with GCR Guard",
     contexts: ["selection"]
   });
 

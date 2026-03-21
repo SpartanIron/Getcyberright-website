@@ -4183,11 +4183,11 @@ EDGE CASE HANDLING
       }
 
       res.setHeader("Content-Type", "application/zip");
-      res.setHeader("Content-Disposition", "attachment; filename=getcyberright-scam-shield.zip");
+      res.setHeader("Content-Disposition", "attachment; filename=gcr-guard-extension.zip");
 
       const archive = archiver("zip", { zlib: { level: 9 } });
       archive.pipe(res);
-      archive.directory(extensionDir, "getcyberright-scam-shield");
+      archive.directory(extensionDir, "gcr-guard-extension");
       await archive.finalize();
     } catch (error) {
       console.error("Extension download error:", error);

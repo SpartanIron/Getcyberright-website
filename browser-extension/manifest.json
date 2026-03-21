@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "GetCyberRight - Scam Shield",
+  "name": "GCR Guard by GetCyberRight",
   "version": "1.0.0",
-  "description": "Real-time scam protection powered by AI. Scan links, check pages, and stay safe from phishing, fraud, and online scams.",
+  "description": "Real-time scam protection powered by AI. Scan links, check pages, and stay safe from phishing, fraud, and online scams. By GetCyberRight.",
   "permissions": [
     "activeTab",
     "contextMenus",

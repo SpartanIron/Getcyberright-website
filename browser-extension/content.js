@@ -199,7 +199,7 @@
       <div class="gcr-banner-content">
         <span class="gcr-banner-icon">⚠️</span>
         <div class="gcr-banner-text">
-          <strong>GetCyberRight Warning:</strong> This content has been flagged as <strong>${capitalize(risk)} Risk</strong>.
+          <strong>GCR Guard Warning:</strong> This content has been flagged as <strong>${capitalize(risk)} Risk</strong>.
           ${result.summary ? `<p>${result.summary}</p>` : ""}
         </div>
         <button class="gcr-banner-close" id="gcr-banner-close">✕</button>

@@ -13,8 +13,8 @@ import {
 
 const extensionApp: WebApplicationData = {
   type: "WebApplication",
-  name: "GetCyberRight Scam Shield Browser Extension",
-  description: "Free Chrome browser extension for real-time scam protection. Scan links, detect phishing sites, and stay safe while browsing.",
+  name: "GCR Guard Browser Extension by GetCyberRight",
+  description: "Free Chrome browser extension for real-time scam protection. Scan links, detect phishing sites, and stay safe while browsing. By GetCyberRight.",
   url: "https://www.getcyberright.com/browser-extension",
   applicationCategory: "SecurityApplication",
   provider: "GetCyberRight",
@@ -81,9 +81,9 @@ const installSteps = [
 
 export default function BrowserExtensionPage() {
   useSEO({
-    title: "Scam Shield Browser Extension - Free Chrome Protection | GetCyberRight",
-    description: "Download the free GetCyberRight Scam Shield browser extension for Chrome. Real-time link scanning, AI-powered scam detection, and community threat alerts.",
-    keywords: "browser extension, chrome extension, scam protection, phishing detector, link scanner, safe browsing, anti-scam extension"
+    title: "GCR Guard Browser Extension - Free Chrome Protection | GetCyberRight",
+    description: "Download the free GCR Guard browser extension for Chrome by GetCyberRight. Real-time link scanning, AI-powered scam detection, and community threat alerts.",
+    keywords: "browser extension, chrome extension, scam protection, phishing detector, link scanner, safe browsing, gcr guard, getcyberright"
   });
 
   return (
@@ -106,7 +106,7 @@ export default function BrowserExtensionPage() {
                 Free Download
               </Badge>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight" style={{ letterSpacing: "-0.025em" }}>
-                Scam Shield
+                GCR Guard
                 <span className="block text-orange-400">Browser Extension</span>
               </h1>
               <p className="text-lg text-white/80 max-w-lg leading-relaxed">
@@ -131,7 +131,7 @@ export default function BrowserExtensionPage() {
                     <Shield className="w-5 h-5 text-orange-400" />
                   </div>
                   <div>
-                    <p className="font-bold text-sm">Scam Shield</p>
+                    <p className="font-bold text-sm">GCR Guard</p>
                     <p className="text-xs text-white/50">by GetCyberRight</p>
                   </div>
                 </div>
@@ -237,7 +237,7 @@ export default function BrowserExtensionPage() {
               { q: "Does it track my browsing activity?", a: "No. The extension only scans content when you explicitly trigger a scan or when auto-scan is enabled. No browsing history is stored or transmitted." },
               { q: "What browsers does it work with?", a: "It works with any Chromium-based browser including Google Chrome, Brave, Microsoft Edge, Opera, and Vivaldi." },
               { q: "Why isn't it on the Chrome Web Store?", a: "We're working on Chrome Web Store approval. In the meantime, you can install it manually using Developer Mode, which takes about 30 seconds." },
-              { q: "How accurate is the scanning?", a: "The extension uses the same AI-powered analysis and multi-source threat intelligence (VirusTotal, PhishTank, Google Safe Browsing, and more) as our web-based Scam Checker." },
+              { q: "How accurate is the scanning?", a: "GCR Guard uses the same AI-powered analysis and multi-source threat intelligence (VirusTotal, PhishTank, Google Safe Browsing, and more) as our web-based Scam Checker." },
             ].map((faq, i) => (
               <Card key={i} className="border shadow-sm" data-testid={`faq-${i}`}>
                 <CardContent className="p-5">
