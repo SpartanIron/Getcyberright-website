@@ -540,6 +540,19 @@ export function registerPlatformRoutes(app: Express): void {
     res.json(status);
   });
 
+  app.post("/api/admin/social/test-publish", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { generateAndPublishTrendAwarePosts } = await import("./trendAwareSocialEngine");
+      const platform = req.body.platform || "linkedin";
+      console.log(`[TestPublish] Manual test publish triggered for ${platform}`);
+      const result = await generateAndPublishTrendAwarePosts({ skipRateLimit: true, platformFilter: platform });
+      res.json({ success: true, ...result });
+    } catch (error: any) {
+      console.error("[TestPublish] Error:", error.message);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   app.get("/api/social-images/:filename", async (req: Request, res: Response) => {
     try {
       const filename = req.params.filename;

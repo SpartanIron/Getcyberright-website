@@ -840,17 +840,21 @@ function adjustColor(hex: string, amount: number): string {
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }
 
-export async function generateAndPublishTrendAwarePosts(): Promise<{
+export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimit?: boolean; platformFilter?: string }): Promise<{
   published: number;
   platforms: string[];
 }> {
   const result = { published: 0, platforms: [] as string[] };
 
   try {
-    const withinRateLimit = await checkRateLimit();
-    if (!withinRateLimit) {
-      console.log("[TrendEngine] Rate limit reached (max 1 post per platform per day), skipping");
-      return result;
+    if (!options?.skipRateLimit) {
+      const withinRateLimit = await checkRateLimit();
+      if (!withinRateLimit) {
+        console.log("[TrendEngine] Rate limit reached (max 1 post per platform per day), skipping");
+        return result;
+      }
+    } else {
+      console.log("[TrendEngine] Rate limit bypassed (manual trigger)");
     }
 
     const channels = await getBufferChannelsByPlatform();
@@ -957,9 +961,10 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
       console.log(`[TrendEngine] Image URL: ${imageUrl}`);
     }
 
+    const platformFilter = options?.platformFilter;
     const platformPosts: { platform: string; content: string }[] = [];
-    if (channels.linkedin) platformPosts.push({ platform: "linkedin", content: posts.linkedin });
-    if (channels.facebook) platformPosts.push({ platform: "facebook", content: posts.facebook });
+    if (channels.linkedin && (!platformFilter || platformFilter === "linkedin")) platformPosts.push({ platform: "linkedin", content: posts.linkedin });
+    if (channels.facebook && (!platformFilter || platformFilter === "facebook")) platformPosts.push({ platform: "facebook", content: posts.facebook });
 
     for (const { platform, content } of platformPosts) {
       try {
