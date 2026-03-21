@@ -468,7 +468,16 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
     return next();
   }
 
+  const extensionSafeRoutes = [
+    '/api/security/ai-scam-analyze',
+    '/api/security/check-url-reputation',
+    '/api/community-reports'
+  ];
   const origin = req.headers.origin;
+  if (origin && origin.startsWith('chrome-extension://') && extensionSafeRoutes.some(r => req.path.startsWith(r))) {
+    return next();
+  }
+
   const referer = req.headers.referer;
   const host = req.headers.host;
   const ip = getClientIP(req);

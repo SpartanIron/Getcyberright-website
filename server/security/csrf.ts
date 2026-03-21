@@ -103,7 +103,10 @@ export function csrfMiddlewareForAuthRoutes(req: Request, res: Response, next: N
     '/api/contact',
     '/api/scam-check',
     '/api/url-check',
-    '/api/report-scam'
+    '/api/report-scam',
+    '/api/security/ai-scam-analyze',
+    '/api/security/check-url-reputation',
+    '/api/community-reports'
   ];
   
   const isExemptRoute = csrfExemptRoutes.some(route => req.path.startsWith(route));

@@ -127,7 +127,13 @@ document.addEventListener("DOMContentLoaded", () => {
       result.keyRedFlags.forEach((flag) => {
         const div = document.createElement("div");
         div.className = "flag-item";
-        div.innerHTML = `<span class="flag-icon">●</span><span>${escapeHtml(flag)}</span>`;
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "flag-icon";
+        iconSpan.textContent = "\u25CF";
+        const textSpan = document.createElement("span");
+        textSpan.textContent = flag;
+        div.appendChild(iconSpan);
+        div.appendChild(textSpan);
         flagsEl.appendChild(div);
       });
     }
