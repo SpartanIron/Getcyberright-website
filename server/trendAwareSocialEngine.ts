@@ -36,7 +36,8 @@ function sanitizePostContent(text: string): string {
     .replace(/\u2013/g, ", ")
     .replace(/—/g, ", ")
     .replace(/–/g, ", ")
-    .replace(/\s{2,}/g, " ")
+    .replace(/[^\S\n]{2,}/g, " ")
+    .replace(/\n{4,}/g, "\n\n\n")
     .replace(/ ,/g, ",")
     .trim();
 }
@@ -105,8 +106,11 @@ Formatting rules (STRICT):
 - NEVER use markdown formatting. No ** bold **, no * italics *, no ## headings, no bullet markers
 - NEVER use em dashes. Use commas, periods, colons, or semicolons instead
 - Use proper sentence structure with correct grammar and punctuation throughout
-- Use line breaks and short paragraphs to organize thoughts, not markdown symbols
-- Use numbered lists (1. 2. 3.) when listing steps, but never markdown bullet points
+- Use BLANK LINES (\\n\\n) between paragraphs to create visual breathing room
+- Keep paragraphs to 2-3 sentences MAX. Break up long blocks of text
+- Put each numbered step on its OWN line with a blank line before the list
+- The post should have clear visual sections: hook, context, actionable tips, closing
+- NEVER write a wall of text. White space is critical for readability on social media
 
 Your voice:
 - Professional, knowledgeable, and approachable
@@ -141,30 +145,34 @@ IMPORTANT: Every claim, fact, and reference in your posts MUST come directly fro
 
 Create posts for TWO platforms:
 
-1. LINKEDIN POST (250-400 words):
-- Open with a hook tied to a specific story from the news feed above
-- Attribute the news to its source (e.g. "CISA just issued an advisory about..." or "According to Krebs on Security...")
-- Demonstrate expert-level analysis while keeping language accessible
-- Include 2-3 specific, actionable takeaways grounded in the actual threat details
-- Reference a relevant GetCyberRight guide naturally when one fits
-- End with a thought-provoking question or clear call to action
+1. LINKEDIN POST (150-250 words, NOT more):
+- Open with a 1-2 sentence hook tied to a specific story from the news feed
+- Leave a BLANK LINE after the hook
+- 1-2 short paragraphs of context/analysis (2-3 sentences each, separated by blank lines)
+- Then a blank line before actionable tips
+- Number each tip on its OWN line (1. tip one\\n2. tip two\\n3. tip three)
+- Leave a blank line after the tips
+- End with a 1-sentence question or call to action
+- Reference a relevant GetCyberRight guide link when one fits
 - Professional but approachable tone
-- You may connect the news to broader hot topics and current affairs when relevant
+- STRICT: Keep it under 250 words. Shorter posts get more engagement
 
-2. FACEBOOK POST (120-200 words):
-- Start with the real-world impact of a story from the news feed
-- Share 2-3 practical tips someone can act on immediately, grounded in the actual threat
-- Conversational and warm, like helping a neighbor
+2. FACEBOOK POST (80-150 words, NOT more):
+- Start with a 1-sentence hook about real-world impact
+- Leave blank lines between paragraphs
+- 2-3 practical tips, each on its own line
 - End with a question that invites engagement
+- Conversational and warm
+- STRICT: Keep it under 150 words
 
 Also provide:
 - A short, compelling TITLE (under 80 chars) for internal tracking
 - 6-8 relevant HASHTAGS
 
-Format as JSON:
+Format as JSON. Use \\n for line breaks within post text to preserve formatting:
 {
-  "linkedin": "Full LinkedIn post text",
-  "facebook": "Full Facebook post text",
+  "linkedin": "Hook line here.\\n\\nContext paragraph here.\\n\\nWhat you can do right now:\\n\\n1. First tip\\n2. Second tip\\n3. Third tip\\n\\nClosing question?",
+  "facebook": "Hook here.\\n\\nTips:\\n1. First tip\\n2. Second tip\\n\\nClosing question?",
   "title": "Short tracking title",
   "hashtags": ["hashtag1", "hashtag2"]
 }`,
