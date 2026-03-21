@@ -4170,6 +4170,31 @@ EDGE CASE HANDLING
     }
   });
 
+  app.get("/api/extension/download", async (_req, res) => {
+    try {
+      const path = await import("path");
+      const fs = await import("fs");
+      const archiver = (await import("archiver")).default;
+      const extensionDir = path.default.join(process.cwd(), "browser-extension");
+
+      if (!fs.existsSync(extensionDir)) {
+        res.status(404).json({ error: "Extension not found" });
+        return;
+      }
+
+      res.setHeader("Content-Type", "application/zip");
+      res.setHeader("Content-Disposition", "attachment; filename=getcyberright-scam-shield.zip");
+
+      const archive = archiver("zip", { zlib: { level: 9 } });
+      archive.pipe(res);
+      archive.directory(extensionDir, "getcyberright-scam-shield");
+      await archive.finalize();
+    } catch (error) {
+      console.error("Extension download error:", error);
+      res.status(500).json({ error: "Failed to create extension download" });
+    }
+  });
+
   app.post("/api/security/analyze-image", standardRateLimit, async (req, res) => {
     try {
       const { imageData } = req.body;

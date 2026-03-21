@@ -45,6 +45,7 @@ export const KNOWN_CLIENT_ROUTES = new Set([
   "/quick-assessment",
   "/safety-score",
   "/scam-checker",
+  "/browser-extension",
   "/faq",
   "/resources/glossary",
   "/resources/cheat-sheets",

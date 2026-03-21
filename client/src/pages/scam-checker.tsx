@@ -389,34 +389,60 @@ export default function ScamCheckerPage() {
                 <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mx-auto mb-4">
                   <Chrome className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-2">Browser Extension Coming Soon</h3>
-                <p className="text-blue-700 dark:text-blue-300 mb-6 max-w-md mx-auto">
-                  Right-click any link to check it instantly. Get real-time warnings as you browse. Be the first to know when it launches.
+                <h3 className="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-2">Scam Shield Browser Extension</h3>
+                <p className="text-blue-700 dark:text-blue-300 mb-4 max-w-lg mx-auto">
+                  Protect yourself while you browse. Right-click any link to scan it instantly, get real-time warnings on suspicious pages, and receive Scam of the Week alerts right in your browser.
                 </p>
-                <form
-                  className="flex gap-2 max-w-sm mx-auto"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (extensionEmail) extensionSignup.mutate(extensionEmail);
-                  }}
-                >
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={extensionEmail}
-                    onChange={(e) => setExtensionEmail(e.target.value)}
-                    className="bg-white dark:bg-slate-800"
-                    data-testid="input-extension-email"
-                  />
-                  <Button
-                    type="submit"
-                    disabled={!extensionEmail || extensionSignup.isPending}
-                    data-testid="button-extension-notify"
+                <div className="grid sm:grid-cols-3 gap-3 max-w-lg mx-auto mb-6 text-left">
+                  <div className="bg-white/80 dark:bg-slate-800/80 rounded-lg p-3 border border-blue-100 dark:border-blue-800">
+                    <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-1">Real-time Scanning</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400">Hover over links to see instant safety ratings</p>
+                  </div>
+                  <div className="bg-white/80 dark:bg-slate-800/80 rounded-lg p-3 border border-blue-100 dark:border-blue-800">
+                    <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-1">AI-Powered Analysis</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400">Right-click to deep scan any URL, text, or page</p>
+                  </div>
+                  <div className="bg-white/80 dark:bg-slate-800/80 rounded-lg p-3 border border-blue-100 dark:border-blue-800">
+                    <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-1">Threat Alerts</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400">Weekly scam alerts and community reports</p>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4">
+                  <Link href="/browser-extension">
+                    <Button className="gap-2 rounded-full" data-testid="button-extension-download">
+                      <Chrome className="w-4 h-4" />
+                      Get the Extension
+                    </Button>
+                  </Link>
+                </div>
+                <div className="border-t border-blue-200 dark:border-blue-700 pt-4 mt-4">
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mb-2">Get notified about extension updates:</p>
+                  <form
+                    className="flex gap-2 max-w-sm mx-auto"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (extensionEmail) extensionSignup.mutate(extensionEmail);
+                    }}
                   >
-                    <Bell className="w-4 h-4 mr-1" />
-                    Notify Me
-                  </Button>
-                </form>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      value={extensionEmail}
+                      onChange={(e) => setExtensionEmail(e.target.value)}
+                      className="bg-white dark:bg-slate-800"
+                      data-testid="input-extension-email"
+                    />
+                    <Button
+                      type="submit"
+                      variant="outline"
+                      disabled={!extensionEmail || extensionSignup.isPending}
+                      data-testid="button-extension-notify"
+                    >
+                      <Bell className="w-4 h-4 mr-1" />
+                      Notify Me
+                    </Button>
+                  </form>
+                </div>
               </CardContent>
             </Card>
           </section>
