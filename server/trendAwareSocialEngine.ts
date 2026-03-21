@@ -77,8 +77,8 @@ const SOURCE_TIERS: Record<string, 1 | 2 | 3> = {
   "cisa": 1, "us-cert": 1, "nist": 1, "fbi": 1, "ftc": 1, "dhs": 1, "nsa": 1,
   "europol": 1, "ncsc": 1, "interpol": 1, "acsc": 1, "microsoft": 1, "google": 1,
   "apple": 1, "amazon": 1, "meta": 1, "cisco": 1, "palo alto": 1,
-  "krebs on security": 2, "bleepingcomputer": 2, "the hacker news": 2,
-  "dark reading": 2, "threatpost": 2, "securityweek": 2, "ars technica": 2,
+  "krebs on security": 2, "securityweek": 2, "the hacker news": 2,
+  "dark reading": 2, "threatpost": 2, "ars technica": 2,
   "wired": 2, "zdnet": 2, "techcrunch": 2, "the record": 2, "cyberscoop": 2,
   "mandiant": 2, "crowdstrike": 2, "sophos": 2, "kaspersky": 2, "sentinelone": 2,
 };
@@ -238,8 +238,8 @@ async function checkRateLimit(): Promise<boolean> {
       platformCounts[post.platform] = (platformCounts[post.platform] || 0) + 1;
     }
     const overLimit = Object.entries(platformCounts).some(([platform, count]) => {
-      if (count >= 2) {
-        console.log(`[TrendEngine] Rate limit: ${platform} already has ${count} posts today, skipping`);
+      if (count >= 1) {
+        console.log(`[TrendEngine] Rate limit: ${platform} already has ${count} post(s) today (max 1/day), skipping`);
         return true;
       }
       return false;
@@ -849,7 +849,7 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
   try {
     const withinRateLimit = await checkRateLimit();
     if (!withinRateLimit) {
-      console.log("[TrendEngine] Rate limit reached (max 2 posts per platform per day), skipping");
+      console.log("[TrendEngine] Rate limit reached (max 1 post per platform per day), skipping");
       return result;
     }
 

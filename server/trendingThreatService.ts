@@ -42,9 +42,9 @@ const TRUSTED_FEEDS = [
     fallbackUrl: "https://www.cisa.gov/news-events/cybersecurity-advisories",
   },
   {
-    url: "https://www.bleepingcomputer.com/feed/",
-    source: "BleepingComputer",
-    fallbackUrl: "https://www.bleepingcomputer.com/",
+    url: "https://www.securityweek.com/feed/",
+    source: "SecurityWeek",
+    fallbackUrl: "https://www.securityweek.com/",
   },
   {
     url: "https://feeds.feedburner.com/TheHackersNews",
