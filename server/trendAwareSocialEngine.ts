@@ -63,6 +63,90 @@ function sanitizePostContent(text: string): string {
     .trim();
 }
 
+const GCR_TOOLS: Record<string, { tool_name: string; how_it_connects: string; url: string }> = {
+  phishing: {
+    tool_name: "AI Scam Analyzer",
+    how_it_connects: "Scans suspicious links and messages in real time to detect phishing attempts before you click",
+    url: "https://www.getcyberright.com/scam-analyzer",
+  },
+  scam: {
+    tool_name: "Scam Checker",
+    how_it_connects: "Checks URLs, QR codes, and messages against multiple threat intelligence databases",
+    url: "https://www.getcyberright.com/scam-checker",
+  },
+  password: {
+    tool_name: "Password Generator",
+    how_it_connects: "Creates strong, unique passwords that resist brute-force and credential stuffing attacks",
+    url: "https://www.getcyberright.com/password-generator",
+  },
+  breach: {
+    tool_name: "Breach Monitor",
+    how_it_connects: "Monitors your email addresses against known data breaches so you can act fast",
+    url: "https://www.getcyberright.com/breach-monitor",
+  },
+  data_broker: {
+    tool_name: "Data Broker Removal",
+    how_it_connects: "Finds and removes your personal information from data broker databases to reduce exposure",
+    url: "https://www.getcyberright.com/data-broker-removal",
+  },
+  kids: {
+    tool_name: "Kids Safety Hub",
+    how_it_connects: "Age-appropriate cybersecurity education and parental controls guidance",
+    url: "https://www.getcyberright.com/kids-safety",
+  },
+  identity: {
+    tool_name: "Identity Theft Recovery Guide",
+    how_it_connects: "Step-by-step recovery plan if your identity has been compromised",
+    url: "https://www.getcyberright.com/guides/identity-theft-recovery",
+  },
+  malware: {
+    tool_name: "Cyber Threat Radar",
+    how_it_connects: "Real-time threat intelligence dashboard showing active malware campaigns and advisories",
+    url: "https://www.getcyberright.com/cyber-threat-radar",
+  },
+  senior: {
+    tool_name: "Senior Safety Hub",
+    how_it_connects: "Tailored cybersecurity guidance for older adults, the most targeted demographic",
+    url: "https://www.getcyberright.com/seniors-safety",
+  },
+};
+
+function mapTopicToGCRTool(title: string, content: string): { tool_name: string; how_it_connects: string; url: string } | null {
+  const combined = (title + " " + content).toLowerCase();
+  const keywords: Record<string, string[]> = {
+    phishing: ["phishing", "phish", "spear-phishing", "smishing", "vishing", "social engineering", "fake email", "spoofed"],
+    scam: ["scam", "fraud", "fake website", "impersonat", "romance scam", "pig butcher"],
+    password: ["password", "credential", "brute force", "credential stuffing", "passkey", "authentication"],
+    breach: ["breach", "leak", "exposed data", "compromised accounts", "data dump"],
+    data_broker: ["data broker", "personal data", "privacy", "tracking", "surveillance"],
+    kids: ["kids", "children", "child", "parental", "minor", "teen", "youth", "predator"],
+    identity: ["identity theft", "identity fraud", "stolen identity", "synthetic identity"],
+    malware: ["malware", "ransomware", "trojan", "worm", "botnet", "exploit", "zero-day", "vulnerability", "cve-"],
+    senior: ["senior", "elderly", "older adult", "grandparent", "retirement", "medicare"],
+  };
+
+  for (const [category, terms] of Object.entries(keywords)) {
+    if (terms.some((t) => combined.includes(t))) {
+      return GCR_TOOLS[category];
+    }
+  }
+  return null;
+}
+
+interface TrendAnalysis {
+  summary: string;
+  category: string;
+  urgency_score: number;
+  impact_level: "low" | "medium" | "high";
+  audience: string;
+}
+
+interface Visual {
+  type: "story" | "educational" | "product_ui";
+  description: string;
+  text_overlay: string;
+}
+
 interface TrendAwarePostResult {
   linkedin: string;
   facebook: string;
@@ -70,6 +154,9 @@ interface TrendAwarePostResult {
   hashtags: string[];
   imageHeadline: string;
   imageSubtext: string;
+  trendAnalysis: TrendAnalysis;
+  visuals: Visual[];
+  gcrToolReference: { tool_name: string; how_it_connects: string; url: string } | null;
 }
 
 async function generateTrendAwarePost(
@@ -115,8 +202,54 @@ async function generateTrendAwarePost(
   try {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
-      max_tokens: 2000,
-      system: `You are the voice of GetCyberRight, a cybersecurity education platform founded by a CISM-certified security professional.
+      max_tokens: 3000,
+      system: `You are an autonomous Cyber Intelligence Content Engine for GetCyberRight, a trusted family-focused cybersecurity education platform founded by a CISM-certified security professional.
+
+Your job is to monitor, interpret, and transform cybersecurity trends into high-quality, trustworthy social media content. You must operate with precision, restraint, and authority.
+
+INTELLIGENCE PIPELINE (execute all steps internally before writing):
+
+STEP 1 - SIGNAL INTERPRETATION:
+- Summarize what is happening in simple terms
+- Classify as: phishing_scam, data_breach, malware, ai_threat, social_engineering, privacy, vulnerability, or general_awareness
+
+STEP 2 - RELEVANCE FILTER:
+- Is this relevant to everyday users, families, seniors, or small businesses?
+- If NOT relevant to these audiences, select a different story from the feed that IS relevant
+
+STEP 3 - RISK SCORING:
+- Assign urgency_score (1-5) and impact_level (low/medium/high)
+- Identify the primary affected_audience: families, kids, seniors, professionals, or small_businesses
+- Only create content if urgency_score >= 3 OR high relevance to target audience
+
+STEP 4 - INSIGHT GENERATION:
+- What actually matters here for real people?
+- What are people likely to misunderstand about this?
+- Where is the real risk that most coverage misses?
+- Translate the event into human meaning without jargon
+
+STEP 5 - CONTENT CREATION:
+- Follow the specific STYLE instruction provided below
+- Post structure should flow naturally through: hook (urgent but credible, no clickbait) > what happened (clear explanation) > why it matters (real-world translation) > what to do (specific, actionable) > GetCyberRight connection (natural, only if relevant) > calm closing (build trust, not fear)
+- Not every post needs all six elements. The STYLE instruction takes priority over this structure
+
+STEP 6 - VISUAL PLANNING:
+- Suggest 1-2 visuals with type (story, educational, or product_ui), a description, and optional text overlay
+- story = real-life scenario illustration
+- educational = simple concept breakdown
+- product_ui = GetCyberRight feature screenshot/mockup
+
+STEP 7 - PRODUCT MAPPING:
+- Map the topic to the most relevant GetCyberRight tool/feature if one genuinely fits
+- Available tools: AI Scam Analyzer, Scam Checker, Password Generator, Breach Monitor, Data Broker Removal, Kids Safety Hub, Senior Safety Hub, Cyber Threat Radar, Identity Theft Recovery Guide
+- Only include if it genuinely connects. Never force it
+
+STEP 8 - VALIDATION (check before output):
+- Is every claim verified or from the news feed?
+- Does it avoid panic language?
+- Does it provide a clear user action?
+- Does it maintain trust and credibility?
+- If any check fails, revise before outputting
 
 WHO YOU ARE:
 - A real cybersecurity expert with hands-on experience in threat analysis, incident response, and security architecture
@@ -129,7 +262,7 @@ ABSOLUTE RULES:
 - NEVER fabricate statistics, numbers, percentages, dollar amounts, or data points
 - NEVER invent incidents, breaches, or events not in the provided news feed
 - ONLY state facts from the news feed or widely established public knowledge
-- When referencing news, attribute it (e.g. "CISA just flagged...", "Krebs reported...")
+- When referencing news, attribute it naturally (e.g. "CISA just flagged...", "Krebs reported...")
 - If unsure whether something is factual, leave it out
 
 VOICE AND PERSONALITY:
@@ -149,57 +282,71 @@ FORMATTING (CRITICAL):
 - Keep paragraphs to 1-3 sentences
 - If using numbered items, put each on its OWN line
 - White space is critical. Never write a wall of text
+- Clean spacing throughout. No exaggeration. No speculation
 
 WHAT NOT TO DO:
 - Do not end every post with a question. Sometimes end with a strong statement
 - Do not say "Here are 3 things you can do right now" every time
 - Do not use "Stay safe out there" or similar platitudes
-- Do not start posts with "Breaking:" or use fake urgency
+- Do not start posts with "Breaking:" or use fake urgency or clickbait
 - Do not use emojis excessively (0-2 per post max, and only if they genuinely add clarity)
-- Do not use the phrases "game-changer", "wake-up call", "in today's digital landscape", or "cyber hygiene"`,
+- Do not use the phrases "game-changer", "wake-up call", "in today's digital landscape", or "cyber hygiene"
+
+GOAL: Position GetCyberRight as the most trusted, human-centered cybersecurity voice for real-world users. Content must be immediately publishable to Buffer without edits.`,
       messages: [
         {
           role: "user",
-          content: `Write today's social media posts for GetCyberRight.
+          content: `Run the full intelligence pipeline and create today's social media content for GetCyberRight.
 
 DATE: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
 
 ${styleInstructions[postStyle]}
 
-CURRENT CYBERSECURITY NEWS (from trusted sources):
+CURRENT CYBERSECURITY NEWS FEED (from trusted sources):
 ${newsContext}
 
-GETCYBERRIGHT GUIDES (link when naturally relevant, not forced):
+GETCYBERRIGHT GUIDES (reference when naturally relevant):
 ${guideContext}
 ${recentPostsContext}
 
-Create posts for TWO platforms:
+Execute Steps 1-8 of your intelligence pipeline, then output:
 
-LINKEDIN (100-200 words max):
-- Write for a professional audience that includes both technical and non-technical people
+LINKEDIN POST (100-200 words max):
+- Professional audience, both technical and non-technical
 - Show expertise through specificity, not length
-- Reference specific technical details but keep the overall message accessible
 - One clear takeaway, not a laundry list
 
-FACEBOOK (60-120 words max):
+FACEBOOK POST (60-120 words max):
 - Conversational, like talking to a neighbor
 - One key point, made simply
 - Warm but authoritative
 
-Also provide:
-- TITLE: Short tracking title (under 60 chars)
-- HASHTAGS: 4-6 relevant hashtags (not generic ones like #cybersecurity every time)
-- IMAGE_HEADLINE: A short punchy headline for the branded image card (under 8 words). This is the main text that appears on the image. Make it attention-grabbing and specific to this post's topic.
-- IMAGE_SUBTEXT: A one-line supporting detail or stat for the image card (under 15 words). This appears smaller below the headline.
-
-Format as JSON with \\n for line breaks:
+Format your complete output as this JSON structure with \\n for line breaks within post text:
 {
   "linkedin": "Post text with \\n\\n between paragraphs",
   "facebook": "Post text with \\n\\n between paragraphs",
-  "title": "Tracking title",
-  "hashtags": ["tag1", "tag2"],
-  "imageHeadline": "Short Punchy Headline",
-  "imageSubtext": "Supporting detail or statistic"
+  "title": "Short tracking title under 60 chars",
+  "hashtags": ["tag1", "tag2", "tag3", "tag4"],
+  "imageHeadline": "Under 8 words for branded image card",
+  "imageSubtext": "Supporting detail under 15 words",
+  "trend_analysis": {
+    "summary": "One-sentence summary of the signal",
+    "category": "phishing_scam | data_breach | malware | ai_threat | social_engineering | privacy | vulnerability | general_awareness",
+    "urgency_score": 3,
+    "impact_level": "low | medium | high",
+    "audience": "families | kids | seniors | professionals | small_businesses"
+  },
+  "visuals": [
+    {
+      "type": "story | educational | product_ui",
+      "description": "What the visual shows",
+      "text_overlay": "Optional short text for the visual"
+    }
+  ],
+  "gcr_tool_reference": {
+    "tool_name": "Name of relevant GetCyberRight tool",
+    "how_it_connects": "One sentence on why this tool helps"
+  }
 }`,
         },
       ],
@@ -220,6 +367,31 @@ Format as JSON with \\n for line breaks:
       return null;
     }
 
+    const trendAnalysis: TrendAnalysis = parsed.trend_analysis
+      ? {
+          summary: String(parsed.trend_analysis.summary || ""),
+          category: String(parsed.trend_analysis.category || "general_awareness"),
+          urgency_score: Math.min(5, Math.max(1, Number(parsed.trend_analysis.urgency_score) || 3)),
+          impact_level: (["low", "medium", "high"].includes(parsed.trend_analysis.impact_level)
+            ? parsed.trend_analysis.impact_level
+            : "medium") as "low" | "medium" | "high",
+          audience: String(parsed.trend_analysis.audience || "families"),
+        }
+      : { summary: parsed.title, category: "general_awareness", urgency_score: 3, impact_level: "medium" as const, audience: "families" };
+
+    if (trendAnalysis.urgency_score < 3 && trendAnalysis.impact_level === "low") {
+      console.log(`[TrendEngine] Signal below threshold: urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}. Skipping low-value content.`);
+      return null;
+    }
+
+    const visuals: Visual[] = Array.isArray(parsed.visuals)
+      ? parsed.visuals.slice(0, 2).map((v: any) => ({
+          type: (["story", "educational", "product_ui"].includes(v.type) ? v.type : "educational") as Visual["type"],
+          description: String(v.description || ""),
+          text_overlay: String(v.text_overlay || ""),
+        }))
+      : [];
+
     let imageHeadline = sanitizePostContent(parsed.imageHeadline || parsed.title);
     if (imageHeadline.length > 50) imageHeadline = imageHeadline.slice(0, 47) + "...";
 
@@ -228,13 +400,41 @@ Format as JSON with \\n for line breaks:
 
     const hashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags.slice(0, 8) : [];
 
+    const linkedinContent = sanitizePostContent(parsed.linkedin);
+    const facebookContent = sanitizePostContent(parsed.facebook);
+
+    let gcrToolReference = parsed.gcr_tool_reference
+      ? {
+          tool_name: String(parsed.gcr_tool_reference.tool_name || ""),
+          how_it_connects: String(parsed.gcr_tool_reference.how_it_connects || ""),
+          url: "",
+        }
+      : null;
+
+    if (!gcrToolReference) {
+      gcrToolReference = mapTopicToGCRTool(parsed.title, linkedinContent);
+    }
+    if (gcrToolReference && !gcrToolReference.url) {
+      const matched = Object.values(GCR_TOOLS).find(
+        (t) => t.tool_name.toLowerCase() === gcrToolReference!.tool_name.toLowerCase()
+      );
+      if (matched) gcrToolReference.url = matched.url;
+    }
+
+    console.log(
+      `[TrendEngine] Intelligence pipeline complete: category=${trendAnalysis.category}, urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}, audience=${trendAnalysis.audience}${gcrToolReference ? `, tool=${gcrToolReference.tool_name}` : ""}`
+    );
+
     return {
-      linkedin: sanitizePostContent(parsed.linkedin),
-      facebook: sanitizePostContent(parsed.facebook),
+      linkedin: linkedinContent,
+      facebook: facebookContent,
       title: sanitizePostContent(parsed.title).slice(0, 80),
       hashtags,
       imageHeadline,
       imageSubtext,
+      trendAnalysis,
+      visuals,
+      gcrToolReference,
     };
   } catch (error: any) {
     console.error("[TrendEngine] AI generation failed:", error.message);
@@ -273,6 +473,19 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
   }
   if (current) lines.push(current.trim());
   return lines;
+}
+
+function selectTemplateForTrend(trendAnalysis: TrendAnalysis, fallback: TemplateStyle): TemplateStyle {
+  if (trendAnalysis.urgency_score >= 4 || trendAnalysis.impact_level === "high") {
+    return "alert_card";
+  }
+  if (trendAnalysis.category === "general_awareness" || trendAnalysis.category === "privacy") {
+    return "insight_card";
+  }
+  if (trendAnalysis.category === "data_breach" || trendAnalysis.category === "vulnerability") {
+    return "stat_card";
+  }
+  return fallback;
 }
 
 async function generatePostImage(
@@ -369,7 +582,7 @@ async function generatePostImage(
       const row = Math.floor(i / 10);
       const x = 800 + col * 45;
       const y = 30 + row * 75;
-      const opacity = 0.03 + Math.random() * 0.05;
+      const opacity = 0.03 + (i % 7) * 0.01;
       return `<circle cx="${x}" cy="${y}" r="2" fill="${tmpl.accent}" opacity="${opacity}"/>`;
     }).join("\n");
 
@@ -459,8 +672,8 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
     }
 
     const postStyle = getTodaysPostStyle();
-    const templateStyle = getTodaysTemplate();
-    console.log(`[TrendEngine] Today's style: ${postStyle}, template: ${templateStyle}`);
+    const defaultTemplate = getTodaysTemplate();
+    console.log(`[TrendEngine] Today's style: ${postStyle}, default template: ${defaultTemplate}`);
 
     const [trendingNews, guides, recentPosts] = await Promise.all([
       fetchRealThreats(),
@@ -489,7 +702,7 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
     }));
 
     console.log(
-      `[TrendEngine] Generating posts from ${trendingNews.length} news items, ${relevantGuides.length} guides`
+      `[TrendEngine] Running intelligence pipeline: ${trendingNews.length} signals, ${relevantGuides.length} guides`
     );
 
     const posts = await generateTrendAwarePost(
@@ -500,9 +713,12 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
     );
 
     if (!posts) {
-      console.error("[TrendEngine] Failed to generate trend-aware posts");
+      console.error("[TrendEngine] Intelligence pipeline produced no publishable content");
       return result;
     }
+
+    const templateStyle = selectTemplateForTrend(posts.trendAnalysis, defaultTemplate);
+    console.log(`[TrendEngine] Selected template: ${templateStyle} (urgency: ${posts.trendAnalysis.urgency_score}, category: ${posts.trendAnalysis.category})`);
 
     let imageUrl: string | null = null;
     const imagePath = await generatePostImage(posts.imageHeadline, posts.imageSubtext, templateStyle);
@@ -539,7 +755,7 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
 
         if (bufferResult.success) {
           console.log(
-            `[TrendEngine] Published ${platform}: "${posts.title}" (Buffer ID: ${bufferResult.bufferId})`
+            `[TrendEngine] Published ${platform}: "${posts.title}" [${posts.trendAnalysis.category}, urgency:${posts.trendAnalysis.urgency_score}] (Buffer ID: ${bufferResult.bufferId})`
           );
           result.published++;
           result.platforms.push(platform);
@@ -558,7 +774,7 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
     }
 
     console.log(
-      `[TrendEngine] Daily publish complete: ${result.published}/${platformPosts.length} published (style: ${postStyle})`
+      `[TrendEngine] Pipeline complete: ${result.published}/${platformPosts.length} published | style: ${postStyle} | signal: ${posts.trendAnalysis.summary.slice(0, 60)}...`
     );
   } catch (error: any) {
     console.error("[TrendEngine] Trend-aware generation error:", error.message);
