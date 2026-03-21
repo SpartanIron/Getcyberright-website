@@ -11,21 +11,40 @@ const anthropic = new Anthropic({
   baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
 });
 
-const CONTENT_MIX = [
-  "trending_threat_reaction",
-  "educational_deep_dive",
-  "timely_safety_tip",
-  "myth_buster",
-  "real_world_case_study",
+const POST_STYLES = [
+  "expert_reaction",
+  "one_insight",
+  "myth_vs_reality",
+  "story_based",
+  "hot_take",
+  "quick_breakdown",
+  "did_you_know",
 ] as const;
 
-type ContentAngle = (typeof CONTENT_MIX)[number];
+type PostStyle = (typeof POST_STYLES)[number];
 
-function getTodaysContentAngle(): ContentAngle {
+function getTodaysPostStyle(): PostStyle {
   const dayOfYear = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
   );
-  return CONTENT_MIX[dayOfYear % CONTENT_MIX.length];
+  return POST_STYLES[dayOfYear % POST_STYLES.length];
+}
+
+const TEMPLATE_STYLES = [
+  "stat_card",
+  "tip_card",
+  "alert_card",
+  "insight_card",
+  "quote_card",
+] as const;
+
+type TemplateStyle = (typeof TEMPLATE_STYLES)[number];
+
+function getTodaysTemplate(): TemplateStyle {
+  const dayOfYear = Math.floor(
+    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+  );
+  return TEMPLATE_STYLES[dayOfYear % TEMPLATE_STYLES.length];
 }
 
 function sanitizePostContent(text: string): string {
@@ -49,14 +68,15 @@ interface TrendAwarePostResult {
   facebook: string;
   title: string;
   hashtags: string[];
-  imagePrompt: string;
+  imageHeadline: string;
+  imageSubtext: string;
 }
 
 async function generateTrendAwarePost(
   trendingNews: RawFeedItem[],
   relevantGuides: { title: string; slug: string; category: string; tags: string[] }[],
   recentlyPublishedTitles: string[],
-  contentAngle: ContentAngle
+  postStyle: PostStyle
 ): Promise<TrendAwarePostResult | null> {
   const newsContext = trendingNews
     .slice(0, 8)
@@ -73,113 +93,113 @@ async function generateTrendAwarePost(
 
   const recentPostsContext =
     recentlyPublishedTitles.length > 0
-      ? `\nPOSTS PUBLISHED IN THE LAST 7 DAYS (do NOT repeat these topics):\n${recentlyPublishedTitles.map((t) => `- ${t}`).join("\n")}`
+      ? `\nPOSTS PUBLISHED IN THE LAST 7 DAYS (do NOT repeat these topics or use similar structures):\n${recentlyPublishedTitles.map((t) => `- ${t}`).join("\n")}`
       : "";
 
-  const angleInstructions: Record<ContentAngle, string> = {
-    trending_threat_reaction: `ANGLE: React to the most impactful news story from the feed below. Only state facts that appear in the provided news items. Explain what happened, why it matters to families, and what people should do right now.`,
-    educational_deep_dive: `ANGLE: Pick a topic from the news feed below and teach the underlying concept. Use the news as the hook, then deliver educational value. Only reference facts, numbers, and details that appear in the provided news items or are widely established public knowledge.`,
-    timely_safety_tip: `ANGLE: Share a specific, immediately actionable safety tip connected to one of the news stories below. Frame it as "With [specific news event from feed] in the news, here is something you should do today..." Only cite facts from the feed.`,
-    myth_buster: `ANGLE: Bust a common cybersecurity myth that is relevant to one of the news stories below. Only use facts from the provided feed or widely established public knowledge. Do not invent statistics.`,
-    real_world_case_study: `ANGLE: Walk through how one of the real threats from the news feed below could affect an everyday family. Stick strictly to the facts in the feed. Describe what the threat does, who it targets, and exactly what steps people should take based on the provided details.`,
+  const styleInstructions: Record<PostStyle, string> = {
+    expert_reaction: `STYLE: Expert Reaction. React to the biggest story as a CISM-certified professional would. Use first person ("As someone who works in cybersecurity..."). Share a specific professional insight that a layperson wouldn't know. Be direct and confident. Reference the specific technical details (CVE numbers, attack vectors, affected systems) but explain them in plain language. NO numbered tips list. Instead, give ONE concrete recommendation that shows deep expertise.`,
+
+    one_insight: `STYLE: One Powerful Insight. Pick the most interesting story and share a SINGLE non-obvious insight about it. This post should be SHORT (3-5 sentences for LinkedIn, 2-3 for Facebook). The insight should be something surprising or counterintuitive. Think "Here is what everyone is missing about this story..." No tips, no lists, just one sharp observation that makes people think.`,
+
+    myth_vs_reality: `STYLE: Myth vs Reality. Take a common misconception related to today's news and demolish it with specific facts. Structure it as: "Most people believe [myth]. The reality is [truth with evidence]." Be slightly provocative. Show expertise by citing the specific technical reason the myth is wrong. End with a strong declarative statement, NOT a question.`,
+
+    story_based: `STYLE: Real Scenario Walkthrough. Take one of the threats from the news and walk through exactly how it would hit a real family. Use a specific scenario ("Imagine you get a text message that looks like it is from your bank..."). Make it vivid and concrete. Show the attack chain step by step. Then show how to break that chain with one specific action. Write like you are explaining this to a friend over coffee.`,
+
+    hot_take: `STYLE: Strong Professional Opinion. Take a clear stance on something in the news. Be direct and slightly opinionated. Examples: "Stop telling people to change passwords every 90 days. Here is why that advice is outdated." or "This breach was entirely preventable. Here is the one thing they should have done." Show conviction backed by expertise. This is NOT about being controversial for clicks. It is about having a real expert opinion that goes against common wisdom.`,
+
+    quick_breakdown: `STYLE: Quick Technical Breakdown. Take a complex threat from the news and break it down into the simplest possible explanation. Use an analogy from everyday life. Structure: "What happened (1 sentence). How it works (analogy). Why you should care (1 sentence). What to do (1 specific action)." Keep it extremely concise. LinkedIn under 150 words. Facebook under 80 words.`,
+
+    did_you_know: `STYLE: Surprising Fact. Lead with a genuinely surprising fact from the news feed. Something that makes people stop scrolling. Then connect it to practical relevance. Keep it short and punchy. The fact MUST come directly from the news feed or be verifiable public knowledge. End with a brief actionable takeaway, not a question.`,
   };
 
   try {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
-      max_tokens: 3000,
-      system: `You are the editorial voice of GetCyberRight, a trusted family-focused cybersecurity education platform.
+      max_tokens: 2000,
+      system: `You are the voice of GetCyberRight, a cybersecurity education platform founded by a CISM-certified security professional.
+
+WHO YOU ARE:
+- A real cybersecurity expert with hands-on experience in threat analysis, incident response, and security architecture
+- CISM certified, deeply familiar with NIST, MITRE ATT&CK, and enterprise security frameworks
+- You translate complex technical threats into language families can act on
+- You have strong opinions backed by real expertise
+- You care deeply about protecting everyday people, not just enterprises
 
 ABSOLUTE RULES:
 - NEVER fabricate statistics, numbers, percentages, dollar amounts, or data points
-- NEVER invent incidents, breaches, or events that are not in the provided news feed
-- ONLY state facts that appear in the news feed provided to you, or that are widely established public knowledge (e.g. "use strong passwords", "enable two-factor authentication")
-- If you are unsure whether something is factual, do not include it
-- When referencing a news story, attribute it to the source (e.g. "according to CISA", "as reported by Krebs on Security")
-- You may reference hot topics, trending events, and current affairs, but only based on what is in the news feed
+- NEVER invent incidents, breaches, or events not in the provided news feed
+- ONLY state facts from the news feed or widely established public knowledge
+- When referencing news, attribute it (e.g. "CISA just flagged...", "Krebs reported...")
+- If unsure whether something is factual, leave it out
 
-Content philosophy:
-- Demonstrate DEPTH OF KNOWLEDGE through intelligent analysis, not invented data
-- Connect real current events to practical family safety
-- Show you are monitoring threats in real-time and translating them for everyday people
-- Mix urgency with empowerment (never fear-mongering)
-- Write like a knowledgeable friend who happens to be a cybersecurity expert
+VOICE AND PERSONALITY:
+- Confident and direct, never wishy-washy
+- Occasionally use first person ("In my experience...", "What I find concerning is...")
+- Have opinions. Do not hedge everything with "might" and "could"
+- Sound like a real person, not a content generator
+- Vary your sentence length. Mix short punchy sentences with longer explanations
+- NO formulaic structures. Each post should feel different from the last
+- Reference specific technical details (CVE numbers, attack vectors, protocol names) casually, then explain them simply
+- Use industry shorthand naturally ("IOCs", "TTPs", "lateral movement") but always clarify for the audience
 
-Formatting rules (STRICT):
-- NEVER use markdown formatting. No ** bold **, no * italics *, no ## headings, no bullet markers
-- NEVER use em dashes. Use commas, periods, colons, or semicolons instead
-- Use proper sentence structure with correct grammar and punctuation throughout
-- Use BLANK LINES (\\n\\n) between paragraphs to create visual breathing room
-- Keep paragraphs to 2-3 sentences MAX. Break up long blocks of text
-- Put each numbered step on its OWN line with a blank line before the list
-- The post should have clear visual sections: hook, context, actionable tips, closing
-- NEVER write a wall of text. White space is critical for readability on social media
+FORMATTING (CRITICAL):
+- NEVER use markdown: no ** bold **, no * italics *, no ## headings, no bullet markers (- or *)
+- NEVER use em dashes (use commas, colons, semicolons, or periods instead)
+- Use blank lines between paragraphs for visual breathing room
+- Keep paragraphs to 1-3 sentences
+- If using numbered items, put each on its OWN line
+- White space is critical. Never write a wall of text
 
-Your voice:
-- Professional, knowledgeable, and approachable
-- Sound like a cybersecurity expert who knows how to explain complex topics simply
-- No jargon. If a technical term is necessary, immediately explain what it means in plain language
-- Use emojis sparingly (1-3 per post, only where they add clarity)
-- Speak directly to families, parents, seniors, and everyday internet users
-- Every sentence should be clear enough that a non-technical person understands it on the first read
-
-Brand integrity signals:
-- Reference GetCyberRight's free tools and guides naturally (not as ads)
-- Show awareness of the broader cybersecurity landscape
-- Demonstrate that you care about people, not clicks
-- Your credibility depends on accuracy. Never guess.`,
+WHAT NOT TO DO:
+- Do not end every post with a question. Sometimes end with a strong statement
+- Do not say "Here are 3 things you can do right now" every time
+- Do not use "Stay safe out there" or similar platitudes
+- Do not start posts with "Breaking:" or use fake urgency
+- Do not use emojis excessively (0-2 per post max, and only if they genuinely add clarity)
+- Do not use the phrases "game-changer", "wake-up call", "in today's digital landscape", or "cyber hygiene"`,
       messages: [
         {
           role: "user",
-          content: `Create today's social media posts for GetCyberRight.
+          content: `Write today's social media posts for GetCyberRight.
 
-TODAY'S DATE: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+DATE: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
 
-${angleInstructions[contentAngle]}
+${styleInstructions[postStyle]}
 
-CURRENT CYBERSECURITY NEWS (from trusted sources, published in the last 24-48 hours):
+CURRENT CYBERSECURITY NEWS (from trusted sources):
 ${newsContext}
 
-GETCYBERRIGHT GUIDES YOU CAN REFERENCE (link to these when relevant):
+GETCYBERRIGHT GUIDES (link when naturally relevant, not forced):
 ${guideContext}
 ${recentPostsContext}
 
-IMPORTANT: Every claim, fact, and reference in your posts MUST come directly from the news feed above or be widely established public knowledge. Do not invent any statistics or incidents.
-
 Create posts for TWO platforms:
 
-1. LINKEDIN POST (150-250 words, NOT more):
-- Open with a 1-2 sentence hook tied to a specific story from the news feed
-- Leave a BLANK LINE after the hook
-- 1-2 short paragraphs of context/analysis (2-3 sentences each, separated by blank lines)
-- Then a blank line before actionable tips
-- Number each tip on its OWN line (1. tip one\\n2. tip two\\n3. tip three)
-- Leave a blank line after the tips
-- End with a 1-sentence question or call to action
-- Reference a relevant GetCyberRight guide link when one fits
-- Professional but approachable tone
-- STRICT: Keep it under 250 words. Shorter posts get more engagement
+LINKEDIN (100-200 words max):
+- Write for a professional audience that includes both technical and non-technical people
+- Show expertise through specificity, not length
+- Reference specific technical details but keep the overall message accessible
+- One clear takeaway, not a laundry list
 
-2. FACEBOOK POST (80-150 words, NOT more):
-- Start with a 1-sentence hook about real-world impact
-- Leave blank lines between paragraphs
-- 2-3 practical tips, each on its own line
-- End with a question that invites engagement
-- Conversational and warm
-- STRICT: Keep it under 150 words
+FACEBOOK (60-120 words max):
+- Conversational, like talking to a neighbor
+- One key point, made simply
+- Warm but authoritative
 
 Also provide:
-- A short, compelling TITLE (under 80 chars) for internal tracking
-- 6-8 relevant HASHTAGS
-- An IMAGE_PROMPT: A detailed visual description for AI image generation to create an eye-catching social media graphic. The image should be conceptual and relevant to the post topic. Describe a clean, professional cybersecurity-themed illustration. Include colors (dark teal #0A2A3C, orange #E8732A accents), mood, and visual elements. NO text in the image. Think abstract/conceptual visuals: shields, locks, networks, digital elements, families, devices. The image should work at 1200x630 for social sharing.
+- TITLE: Short tracking title (under 60 chars)
+- HASHTAGS: 4-6 relevant hashtags (not generic ones like #cybersecurity every time)
+- IMAGE_HEADLINE: A short punchy headline for the branded image card (under 8 words). This is the main text that appears on the image. Make it attention-grabbing and specific to this post's topic.
+- IMAGE_SUBTEXT: A one-line supporting detail or stat for the image card (under 15 words). This appears smaller below the headline.
 
-Format as JSON. Use \\n for line breaks within post text to preserve formatting:
+Format as JSON with \\n for line breaks:
 {
-  "linkedin": "Hook line here.\\n\\nContext paragraph here.\\n\\nWhat you can do right now:\\n\\n1. First tip\\n2. Second tip\\n3. Third tip\\n\\nClosing question?",
-  "facebook": "Hook here.\\n\\nTips:\\n1. First tip\\n2. Second tip\\n\\nClosing question?",
-  "title": "Short tracking title",
-  "hashtags": ["hashtag1", "hashtag2"],
-  "imagePrompt": "Detailed image generation prompt here"
+  "linkedin": "Post text with \\n\\n between paragraphs",
+  "facebook": "Post text with \\n\\n between paragraphs",
+  "title": "Tracking title",
+  "hashtags": ["tag1", "tag2"],
+  "imageHeadline": "Short Punchy Headline",
+  "imageSubtext": "Supporting detail or statistic"
 }`,
         },
       ],
@@ -200,12 +220,21 @@ Format as JSON. Use \\n for line breaks within post text to preserve formatting:
       return null;
     }
 
+    let imageHeadline = sanitizePostContent(parsed.imageHeadline || parsed.title);
+    if (imageHeadline.length > 50) imageHeadline = imageHeadline.slice(0, 47) + "...";
+
+    let imageSubtext = sanitizePostContent(parsed.imageSubtext || "getcyberright.com");
+    if (imageSubtext.length > 80) imageSubtext = imageSubtext.slice(0, 77) + "...";
+
+    const hashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags.slice(0, 8) : [];
+
     return {
       linkedin: sanitizePostContent(parsed.linkedin),
       facebook: sanitizePostContent(parsed.facebook),
-      title: sanitizePostContent(parsed.title),
-      hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
-      imagePrompt: parsed.imagePrompt || "",
+      title: sanitizePostContent(parsed.title).slice(0, 80),
+      hashtags,
+      imageHeadline,
+      imageSubtext,
     };
   } catch (error: any) {
     console.error("[TrendEngine] AI generation failed:", error.message);
@@ -221,111 +250,6 @@ function ensureSocialImagesDir(): void {
   }
 }
 
-async function generatePostImage(
-  title: string,
-  imagePrompt: string
-): Promise<string | null> {
-  try {
-    ensureSocialImagesDir();
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
-    const filename = `trend-${slug}-${Date.now()}.png`;
-    const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
-
-    const sharp = (await import("sharp")).default;
-
-    const topicIcons: Record<string, string> = {
-      phishing: "M12 2L2 7v10l10 5 10-5V7L12 2z",
-      ransomware: "M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z",
-      malware: "M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-2 .9-2 2v3.8h1.5c1.52 0 2.75 1.23 2.75 2.75S5.02 16.3 3.5 16.3H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.52 1.23-2.75 2.75-2.75s2.75 1.23 2.75 2.75V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z",
-      privacy: "M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z",
-      scam: "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z",
-      default: "M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z",
-    };
-
-    const promptLower = (imagePrompt + " " + title).toLowerCase();
-    let iconPath = topicIcons.default;
-    for (const [key, val] of Object.entries(topicIcons)) {
-      if (key !== "default" && promptLower.includes(key)) {
-        iconPath = val;
-        break;
-      }
-    }
-
-    const accentColors = ["#E8732A", "#4ECDC4", "#FF6B6B", "#45B7D1", "#96CEB4"];
-    const accent = accentColors[Date.now() % accentColors.length];
-
-    const displayTitle = title.length > 60 ? title.slice(0, 57) + "..." : title;
-    const words = displayTitle.split(" ");
-    const lines: string[] = [];
-    let currentLine = "";
-    for (const word of words) {
-      if ((currentLine + " " + word).trim().length > 28) {
-        if (currentLine) lines.push(currentLine.trim());
-        currentLine = word;
-      } else {
-        currentLine = currentLine ? currentLine + " " + word : word;
-      }
-    }
-    if (currentLine) lines.push(currentLine.trim());
-
-    const titleY = 280;
-    const titleSvg = lines
-      .map((line, i) => `<text x="80" y="${titleY + i * 52}" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="bold" fill="white">${escapeXml(line)}</text>`)
-      .join("\n");
-
-    const circleElements = Array.from({ length: 12 }, (_, i) => {
-      const cx = 200 + Math.cos(i * 0.52) * (400 + i * 30);
-      const cy = 150 + Math.sin(i * 0.73) * (200 + i * 20);
-      const r = 3 + (i % 5) * 2;
-      const opacity = 0.08 + (i % 4) * 0.04;
-      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${accent}" opacity="${opacity}"/>`;
-    }).join("\n");
-
-    const lineElements = Array.from({ length: 6 }, (_, i) => {
-      const x1 = 800 + i * 60;
-      const y1 = 50 + i * 80;
-      const x2 = x1 + 120;
-      const y2 = y1 + 60;
-      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${accent}" stroke-width="1" opacity="0.1"/>`;
-    }).join("\n");
-
-    const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0A2A3C"/>
-      <stop offset="50%" stop-color="#0D3347"/>
-      <stop offset="100%" stop-color="#071A24"/>
-    </linearGradient>
-    <linearGradient id="accentGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${accent}"/>
-      <stop offset="100%" stop-color="${accent}" stop-opacity="0.6"/>
-    </linearGradient>
-  </defs>
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  ${circleElements}
-  ${lineElements}
-  <rect x="0" y="0" width="6" height="630" fill="url(#accentGrad)"/>
-  <g transform="translate(80, 80) scale(3)">
-    <path d="${iconPath}" fill="${accent}" opacity="0.9"/>
-  </g>
-  ${titleSvg}
-  <text x="80" y="${titleY + lines.length * 52 + 40}" font-family="Arial,Helvetica,sans-serif" font-size="20" fill="#8AB4C7">getcyberright.com</text>
-  <rect x="80" y="${titleY + lines.length * 52 + 60}" width="120" height="3" rx="1.5" fill="${accent}"/>
-  <rect x="0" y="624" width="1200" height="6" fill="${accent}" opacity="0.8"/>
-</svg>`;
-
-    await sharp(Buffer.from(svg))
-      .png({ quality: 90 })
-      .toFile(outputPath);
-
-    console.log(`[TrendEngine] Generated post image: ${filename}`);
-    return outputPath;
-  } catch (error: any) {
-    console.error("[TrendEngine] Image generation failed:", error.message);
-    return null;
-  }
-}
-
 function escapeXml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
@@ -333,6 +257,191 @@ function escapeXml(text: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
+}
+
+function wrapText(text: string, maxCharsPerLine: number): string[] {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    if ((current + " " + word).trim().length > maxCharsPerLine) {
+      if (current) lines.push(current.trim());
+      current = word;
+    } else {
+      current = current ? current + " " + word : word;
+    }
+  }
+  if (current) lines.push(current.trim());
+  return lines;
+}
+
+async function generatePostImage(
+  headline: string,
+  subtext: string,
+  templateStyle: TemplateStyle
+): Promise<string | null> {
+  try {
+    ensureSocialImagesDir();
+    const slug = headline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
+    const filename = `trend-${slug}-${Date.now()}.png`;
+    const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
+    const sharp = (await import("sharp")).default;
+
+    const logoPath = path.join(process.cwd(), "client", "public", "lock-logo-transparent.png");
+    let logoBase64 = "";
+    if (fs.existsSync(logoPath)) {
+      const logoBuffer = fs.readFileSync(logoPath);
+      logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
+    }
+
+    const templates: Record<TemplateStyle, { bg: string; accent: string; accentLight: string; layout: string }> = {
+      stat_card: {
+        bg: "#0A2A3C",
+        accent: "#E8732A",
+        accentLight: "#F5A66D",
+        layout: "center",
+      },
+      tip_card: {
+        bg: "#071A24",
+        accent: "#4ECDC4",
+        accentLight: "#7EDDD6",
+        layout: "left",
+      },
+      alert_card: {
+        bg: "#1A0A0A",
+        accent: "#FF4444",
+        accentLight: "#FF7777",
+        layout: "center",
+      },
+      insight_card: {
+        bg: "#0D1B2A",
+        accent: "#E8732A",
+        accentLight: "#F5A66D",
+        layout: "left",
+      },
+      quote_card: {
+        bg: "#0A2A3C",
+        accent: "#45B7D1",
+        accentLight: "#7DD3E8",
+        layout: "center",
+      },
+    };
+
+    const tmpl = templates[templateStyle];
+    let headlineLines = wrapText(headline, 22);
+    if (headlineLines.length > 3) {
+      headlineLines = headlineLines.slice(0, 3);
+      headlineLines[2] = headlineLines[2].slice(0, -3) + "...";
+    }
+    let subtextLines = wrapText(subtext, 40);
+    if (subtextLines.length > 2) {
+      subtextLines = subtextLines.slice(0, 2);
+      subtextLines[1] = subtextLines[1].slice(0, -3) + "...";
+    }
+
+    const headlineFontSize = headlineLines.length > 2 ? 48 : 56;
+    const headlineLineHeight = headlineFontSize + 12;
+
+    const totalHeadlineHeight = headlineLines.length * headlineLineHeight;
+    const subtextHeight = subtextLines.length * 30;
+    const contentHeight = totalHeadlineHeight + subtextHeight + 60;
+    const startY = Math.max(180, (630 - contentHeight) / 2 + 40);
+
+    const headlineSvg = headlineLines
+      .map((line, i) => {
+        const x = tmpl.layout === "center" ? 600 : 90;
+        const anchor = tmpl.layout === "center" ? "middle" : "start";
+        return `<text x="${x}" y="${startY + i * headlineLineHeight}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="${headlineFontSize}" font-weight="800" fill="white" text-anchor="${anchor}" letter-spacing="-1">${escapeXml(line)}</text>`;
+      })
+      .join("\n");
+
+    const subtextY = startY + totalHeadlineHeight + 30;
+    const subtextSvg = subtextLines
+      .map((line, i) => {
+        const x = tmpl.layout === "center" ? 600 : 90;
+        const anchor = tmpl.layout === "center" ? "middle" : "start";
+        return `<text x="${x}" y="${subtextY + i * 30}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="22" fill="${tmpl.accentLight}" text-anchor="${anchor}" opacity="0.9">${escapeXml(line)}</text>`;
+      })
+      .join("\n");
+
+    const gridDots = Array.from({ length: 80 }, (_, i) => {
+      const col = i % 10;
+      const row = Math.floor(i / 10);
+      const x = 800 + col * 45;
+      const y = 30 + row * 75;
+      const opacity = 0.03 + Math.random() * 0.05;
+      return `<circle cx="${x}" cy="${y}" r="2" fill="${tmpl.accent}" opacity="${opacity}"/>`;
+    }).join("\n");
+
+    const accentShapes = templateStyle === "alert_card"
+      ? `<polygon points="600,40 620,75 580,75" fill="${tmpl.accent}" opacity="0.15"/>
+         <polygon points="600,50 612,70 588,70" fill="${tmpl.accent}" opacity="0.1"/>`
+      : templateStyle === "tip_card"
+      ? `<circle cx="1100" cy="100" r="80" fill="none" stroke="${tmpl.accent}" stroke-width="2" opacity="0.12"/>
+         <circle cx="1100" cy="100" r="50" fill="none" stroke="${tmpl.accent}" stroke-width="1.5" opacity="0.08"/>`
+      : `<rect x="1050" y="80" width="100" height="100" rx="8" fill="none" stroke="${tmpl.accent}" stroke-width="2" opacity="0.1" transform="rotate(15 1100 130)"/>`;
+
+    const logoElement = logoBase64
+      ? `<image href="${logoBase64}" x="${tmpl.layout === 'center' ? 555 : 90}" y="45" width="45" height="45" opacity="0.95"/>`
+      : "";
+
+    const brandX = tmpl.layout === "center" ? 600 : 90;
+    const brandAnchor = tmpl.layout === "center" ? "middle" : "start";
+    const brandTextX = logoBase64 ? (tmpl.layout === "center" ? 600 : 145) : brandX;
+
+    const dividerX = tmpl.layout === "center" ? 540 : 90;
+
+    const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${tmpl.bg}"/>
+      <stop offset="100%" stop-color="${adjustColor(tmpl.bg, -15)}"/>
+    </linearGradient>
+    <linearGradient id="accentBar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${tmpl.accent}"/>
+      <stop offset="100%" stop-color="${tmpl.accent}" stop-opacity="0.4"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  ${gridDots}
+  ${accentShapes}
+
+  <rect x="0" y="0" width="5" height="630" fill="url(#accentBar)"/>
+
+  ${logoElement}
+  <text x="${brandTextX}" y="${logoBase64 ? 78 : 75}" font-family="'Segoe UI',Arial,sans-serif" font-size="18" font-weight="600" fill="${tmpl.accent}" text-anchor="${brandAnchor}" letter-spacing="2">GETCYBERRIGHT</text>
+
+  <rect x="${dividerX}" y="${startY - 50}" width="120" height="3" rx="1.5" fill="${tmpl.accent}" opacity="0.6"/>
+
+  ${headlineSvg}
+  ${subtextSvg}
+
+  <rect x="0" y="622" width="1200" height="8" fill="${tmpl.accent}" opacity="0.85"/>
+
+  <text x="${tmpl.layout === 'center' ? 600 : 90}" y="600" font-family="'Segoe UI',Arial,sans-serif" font-size="15" fill="#6B8FA3" text-anchor="${brandAnchor}">getcyberright.com</text>
+</svg>`;
+
+    await sharp(Buffer.from(svg)).png({ quality: 95 }).toFile(outputPath);
+    console.log(`[TrendEngine] Generated branded image: ${filename} (template: ${templateStyle})`);
+    return outputPath;
+  } catch (error: any) {
+    console.error("[TrendEngine] Image generation failed:", error.message);
+    return null;
+  }
+}
+
+function adjustColor(hex: string, amount: number): string {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const r = Math.min(255, Math.max(0, ((num >> 16) & 0xff) + amount));
+  const g = Math.min(255, Math.max(0, ((num >> 8) & 0xff) + amount));
+  const b = Math.min(255, Math.max(0, (num & 0xff) + amount));
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }
 
 export async function generateAndPublishTrendAwarePosts(): Promise<{
@@ -349,8 +458,9 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
       return result;
     }
 
-    const contentAngle = getTodaysContentAngle();
-    console.log(`[TrendEngine] Today's content angle: ${contentAngle}`);
+    const postStyle = getTodaysPostStyle();
+    const templateStyle = getTodaysTemplate();
+    console.log(`[TrendEngine] Today's style: ${postStyle}, template: ${templateStyle}`);
 
     const [trendingNews, guides, recentPosts] = await Promise.all([
       fetchRealThreats(),
@@ -386,7 +496,7 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
       trendingNews,
       relevantGuides,
       recentTitles,
-      contentAngle
+      postStyle
     );
 
     if (!posts) {
@@ -395,12 +505,10 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
     }
 
     let imageUrl: string | null = null;
-    if (posts.imagePrompt) {
-      const imagePath = await generatePostImage(posts.title, posts.imagePrompt);
-      if (imagePath) {
-        imageUrl = getPublicImageUrl(imagePath);
-        console.log(`[TrendEngine] Image URL for posts: ${imageUrl}`);
-      }
+    const imagePath = await generatePostImage(posts.imageHeadline, posts.imageSubtext, templateStyle);
+    if (imagePath) {
+      imageUrl = getPublicImageUrl(imagePath);
+      console.log(`[TrendEngine] Image URL: ${imageUrl}`);
     }
 
     const platformPosts: { platform: string; content: string }[] = [];
@@ -450,7 +558,7 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
     }
 
     console.log(
-      `[TrendEngine] Daily trend-aware publish complete: ${result.published}/${platformPosts.length} published`
+      `[TrendEngine] Daily publish complete: ${result.published}/${platformPosts.length} published (style: ${postStyle})`
     );
   } catch (error: any) {
     console.error("[TrendEngine] Trend-aware generation error:", error.message);
