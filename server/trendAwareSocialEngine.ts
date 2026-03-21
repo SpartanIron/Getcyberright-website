@@ -1,8 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { storage } from "./storage";
 import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
-import { createBufferPost, getBufferChannelsByPlatform } from "./bufferPublisher";
+import { createBufferPost, getBufferChannelsByPlatform, getPublicImageUrl } from "./bufferPublisher";
 import type { InsertSocialPost } from "@shared/schema";
+import * as fs from "fs";
+import * as path from "path";
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -47,6 +49,7 @@ interface TrendAwarePostResult {
   facebook: string;
   title: string;
   hashtags: string[];
+  imagePrompt: string;
 }
 
 async function generateTrendAwarePost(
@@ -168,13 +171,15 @@ Create posts for TWO platforms:
 Also provide:
 - A short, compelling TITLE (under 80 chars) for internal tracking
 - 6-8 relevant HASHTAGS
+- An IMAGE_PROMPT: A detailed visual description for AI image generation to create an eye-catching social media graphic. The image should be conceptual and relevant to the post topic. Describe a clean, professional cybersecurity-themed illustration. Include colors (dark teal #0A2A3C, orange #E8732A accents), mood, and visual elements. NO text in the image. Think abstract/conceptual visuals: shields, locks, networks, digital elements, families, devices. The image should work at 1200x630 for social sharing.
 
 Format as JSON. Use \\n for line breaks within post text to preserve formatting:
 {
   "linkedin": "Hook line here.\\n\\nContext paragraph here.\\n\\nWhat you can do right now:\\n\\n1. First tip\\n2. Second tip\\n3. Third tip\\n\\nClosing question?",
   "facebook": "Hook here.\\n\\nTips:\\n1. First tip\\n2. Second tip\\n\\nClosing question?",
   "title": "Short tracking title",
-  "hashtags": ["hashtag1", "hashtag2"]
+  "hashtags": ["hashtag1", "hashtag2"],
+  "imagePrompt": "Detailed image generation prompt here"
 }`,
         },
       ],
@@ -200,11 +205,134 @@ Format as JSON. Use \\n for line breaks within post text to preserve formatting:
       facebook: sanitizePostContent(parsed.facebook),
       title: sanitizePostContent(parsed.title),
       hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
+      imagePrompt: parsed.imagePrompt || "",
     };
   } catch (error: any) {
     console.error("[TrendEngine] AI generation failed:", error.message);
     return null;
   }
+}
+
+const SOCIAL_IMAGES_DIR = path.join(process.cwd(), ".local", "social-images");
+
+function ensureSocialImagesDir(): void {
+  if (!fs.existsSync(SOCIAL_IMAGES_DIR)) {
+    fs.mkdirSync(SOCIAL_IMAGES_DIR, { recursive: true });
+  }
+}
+
+async function generatePostImage(
+  title: string,
+  imagePrompt: string
+): Promise<string | null> {
+  try {
+    ensureSocialImagesDir();
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
+    const filename = `trend-${slug}-${Date.now()}.png`;
+    const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
+
+    const sharp = (await import("sharp")).default;
+
+    const topicIcons: Record<string, string> = {
+      phishing: "M12 2L2 7v10l10 5 10-5V7L12 2z",
+      ransomware: "M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z",
+      malware: "M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-2 .9-2 2v3.8h1.5c1.52 0 2.75 1.23 2.75 2.75S5.02 16.3 3.5 16.3H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.52 1.23-2.75 2.75-2.75s2.75 1.23 2.75 2.75V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z",
+      privacy: "M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z",
+      scam: "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z",
+      default: "M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z",
+    };
+
+    const promptLower = (imagePrompt + " " + title).toLowerCase();
+    let iconPath = topicIcons.default;
+    for (const [key, val] of Object.entries(topicIcons)) {
+      if (key !== "default" && promptLower.includes(key)) {
+        iconPath = val;
+        break;
+      }
+    }
+
+    const accentColors = ["#E8732A", "#4ECDC4", "#FF6B6B", "#45B7D1", "#96CEB4"];
+    const accent = accentColors[Date.now() % accentColors.length];
+
+    const displayTitle = title.length > 60 ? title.slice(0, 57) + "..." : title;
+    const words = displayTitle.split(" ");
+    const lines: string[] = [];
+    let currentLine = "";
+    for (const word of words) {
+      if ((currentLine + " " + word).trim().length > 28) {
+        if (currentLine) lines.push(currentLine.trim());
+        currentLine = word;
+      } else {
+        currentLine = currentLine ? currentLine + " " + word : word;
+      }
+    }
+    if (currentLine) lines.push(currentLine.trim());
+
+    const titleY = 280;
+    const titleSvg = lines
+      .map((line, i) => `<text x="80" y="${titleY + i * 52}" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="bold" fill="white">${escapeXml(line)}</text>`)
+      .join("\n");
+
+    const circleElements = Array.from({ length: 12 }, (_, i) => {
+      const cx = 200 + Math.cos(i * 0.52) * (400 + i * 30);
+      const cy = 150 + Math.sin(i * 0.73) * (200 + i * 20);
+      const r = 3 + (i % 5) * 2;
+      const opacity = 0.08 + (i % 4) * 0.04;
+      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${accent}" opacity="${opacity}"/>`;
+    }).join("\n");
+
+    const lineElements = Array.from({ length: 6 }, (_, i) => {
+      const x1 = 800 + i * 60;
+      const y1 = 50 + i * 80;
+      const x2 = x1 + 120;
+      const y2 = y1 + 60;
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${accent}" stroke-width="1" opacity="0.1"/>`;
+    }).join("\n");
+
+    const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A2A3C"/>
+      <stop offset="50%" stop-color="#0D3347"/>
+      <stop offset="100%" stop-color="#071A24"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${accent}"/>
+      <stop offset="100%" stop-color="${accent}" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  ${circleElements}
+  ${lineElements}
+  <rect x="0" y="0" width="6" height="630" fill="url(#accentGrad)"/>
+  <g transform="translate(80, 80) scale(3)">
+    <path d="${iconPath}" fill="${accent}" opacity="0.9"/>
+  </g>
+  ${titleSvg}
+  <text x="80" y="${titleY + lines.length * 52 + 40}" font-family="Arial,Helvetica,sans-serif" font-size="20" fill="#8AB4C7">getcyberright.com</text>
+  <rect x="80" y="${titleY + lines.length * 52 + 60}" width="120" height="3" rx="1.5" fill="${accent}"/>
+  <rect x="0" y="624" width="1200" height="6" fill="${accent}" opacity="0.8"/>
+</svg>`;
+
+    await sharp(Buffer.from(svg))
+      .png({ quality: 90 })
+      .toFile(outputPath);
+
+    console.log(`[TrendEngine] Generated post image: ${filename}`);
+    return outputPath;
+  } catch (error: any) {
+    console.error("[TrendEngine] Image generation failed:", error.message);
+    return null;
+  }
+}
+
+function escapeXml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
 
 export async function generateAndPublishTrendAwarePosts(): Promise<{
@@ -266,6 +394,15 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
       return result;
     }
 
+    let imageUrl: string | null = null;
+    if (posts.imagePrompt) {
+      const imagePath = await generatePostImage(posts.title, posts.imagePrompt);
+      if (imagePath) {
+        imageUrl = getPublicImageUrl(imagePath);
+        console.log(`[TrendEngine] Image URL for posts: ${imageUrl}`);
+      }
+    }
+
     const platformPosts: { platform: string; content: string }[] = [];
     if (channels.linkedin) platformPosts.push({ platform: "linkedin", content: posts.linkedin });
     if (channels.facebook) platformPosts.push({ platform: "facebook", content: posts.facebook });
@@ -289,6 +426,7 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
         const bufferResult = await createBufferPost(channel.id, content, {
           mode: "shareNow",
           platform,
+          imageUrl: imageUrl || undefined,
         });
 
         if (bufferResult.success) {
