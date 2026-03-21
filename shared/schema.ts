@@ -1468,3 +1468,69 @@ export const regionalAttackTypes = pgTable("regional_attack_types", {
 export const insertRegionalAttackTypeSchema = createInsertSchema(regionalAttackTypes).omit({ id: true });
 export type RegionalAttackType = typeof regionalAttackTypes.$inferSelect;
 export type InsertRegionalAttackType = z.infer<typeof insertRegionalAttackTypeSchema>;
+
+export const scanHistory = pgTable("scan_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  contentSnippet: text("content_snippet").notNull(),
+  contentType: text("content_type").notNull(),
+  riskLevel: text("risk_level").notNull(),
+  riskScore: integer("risk_score").default(0),
+  resultSummary: text("result_summary"),
+  flagsFound: integer("flags_found").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertScanHistorySchema = createInsertSchema(scanHistory).omit({ id: true, createdAt: true });
+export type ScanHistoryEntry = typeof scanHistory.$inferSelect;
+export type InsertScanHistory = z.infer<typeof insertScanHistorySchema>;
+
+export const communityScamReports = pgTable("community_scam_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  content: text("content").notNull(),
+  reportType: text("report_type").notNull(),
+  url: text("url"),
+  votes: integer("votes").default(1),
+  status: text("status").default("pending"),
+  reporterSessionId: varchar("reporter_session_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCommunityScamReportSchema = createInsertSchema(communityScamReports).omit({ id: true, votes: true, status: true, createdAt: true });
+export type CommunityScamReport = typeof communityScamReports.$inferSelect;
+export type InsertCommunityScamReport = z.infer<typeof insertCommunityScamReportSchema>;
+
+export const scanReports = pgTable("scan_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  shareId: varchar("share_id").notNull(),
+  contentSnippet: text("content_snippet").notNull(),
+  contentType: text("content_type").notNull(),
+  riskLevel: text("risk_level").notNull(),
+  riskScore: integer("risk_score").default(0),
+  resultSummary: text("result_summary"),
+  flagsFound: integer("flags_found").default(0),
+  flagDetails: text("flag_details"),
+  aiAnalysis: text("ai_analysis"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertScanReportSchema = createInsertSchema(scanReports).omit({ id: true, createdAt: true });
+export type ScanReport = typeof scanReports.$inferSelect;
+export type InsertScanReport = z.infer<typeof insertScanReportSchema>;
+
+export const scamOfWeek = pgTable("scam_of_week", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  scamType: text("scam_type").notNull(),
+  tips: text("tips").notNull(),
+  exampleMessage: text("example_message"),
+  severity: text("severity").default("high"),
+  weekStart: timestamp("week_start").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertScamOfWeekSchema = createInsertSchema(scamOfWeek).omit({ id: true, createdAt: true });
+export type ScamOfWeek = typeof scamOfWeek.$inferSelect;
+export type InsertScamOfWeek = z.infer<typeof insertScamOfWeekSchema>;

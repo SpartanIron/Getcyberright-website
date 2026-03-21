@@ -23,8 +23,15 @@ import {
   type GrowthTask,
   type InsertGrowthTask,
   type PlatformMetric,
+  type ScanHistoryEntry,
+  type InsertScanHistory,
+  type CommunityScamReport,
+  type InsertCommunityScamReport,
+  type ScanReport,
+  type InsertScanReport,
+  type ScamOfWeek,
+  type InsertScamOfWeek,
   users,
-  // WebAuthn tables and types are defined in database-storage.ts (legacy)
   contactMessages,
   newsletterSubscribers,
   aiPrompts,
@@ -37,6 +44,10 @@ import {
   socialPosts,
   growthTasks,
   platformMetrics,
+  scanHistory,
+  communityScamReports,
+  scanReports,
+  scamOfWeek,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, gte, lte, ilike, or } from "drizzle-orm";
@@ -114,6 +125,20 @@ export interface IStorage {
 
   recordPlatformMetrics(metrics: Partial<PlatformMetric>): Promise<PlatformMetric>;
   getLatestPlatformMetrics(days?: number): Promise<PlatformMetric[]>;
+
+  createScanHistory(entry: InsertScanHistory): Promise<ScanHistoryEntry>;
+  getScanHistory(userId: string, limit?: number): Promise<ScanHistoryEntry[]>;
+
+  createCommunityReport(report: InsertCommunityScamReport): Promise<CommunityScamReport>;
+  getCommunityReports(status?: string, limit?: number): Promise<CommunityScamReport[]>;
+  voteCommunityReport(id: string): Promise<CommunityScamReport | undefined>;
+
+  createScanReport(report: InsertScanReport): Promise<ScanReport>;
+  getScanReportByShareId(shareId: string): Promise<ScanReport | undefined>;
+
+  createScamOfWeek(entry: InsertScamOfWeek): Promise<ScamOfWeek>;
+  getActiveScamOfWeek(): Promise<ScamOfWeek | undefined>;
+  getAllScamOfWeek(limit?: number): Promise<ScamOfWeek[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -518,6 +543,73 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(platformMetrics)
       .where(gte(platformMetrics.metricDate, cutoff))
       .orderBy(desc(platformMetrics.metricDate));
+  }
+
+  async createScanHistory(entry: InsertScanHistory): Promise<ScanHistoryEntry> {
+    const result = await db.insert(scanHistory).values(entry).returning();
+    return result[0];
+  }
+
+  async getScanHistory(userId: string, limit = 20): Promise<ScanHistoryEntry[]> {
+    return await db.select().from(scanHistory)
+      .where(eq(scanHistory.userId, userId))
+      .orderBy(desc(scanHistory.createdAt))
+      .limit(limit);
+  }
+
+  async createCommunityReport(report: InsertCommunityScamReport): Promise<CommunityScamReport> {
+    const result = await db.insert(communityScamReports).values(report).returning();
+    return result[0];
+  }
+
+  async getCommunityReports(status?: string, limit = 20): Promise<CommunityScamReport[]> {
+    if (status) {
+      return await db.select().from(communityScamReports)
+        .where(eq(communityScamReports.status, status))
+        .orderBy(desc(communityScamReports.votes))
+        .limit(limit);
+    }
+    return await db.select().from(communityScamReports)
+      .orderBy(desc(communityScamReports.votes))
+      .limit(limit);
+  }
+
+  async voteCommunityReport(id: string): Promise<CommunityScamReport | undefined> {
+    const result = await db.update(communityScamReports)
+      .set({ votes: sql`${communityScamReports.votes} + 1` })
+      .where(eq(communityScamReports.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async createScanReport(report: InsertScanReport): Promise<ScanReport> {
+    const result = await db.insert(scanReports).values(report).returning();
+    return result[0];
+  }
+
+  async getScanReportByShareId(shareId: string): Promise<ScanReport | undefined> {
+    const result = await db.select().from(scanReports)
+      .where(eq(scanReports.shareId, shareId));
+    return result[0];
+  }
+
+  async createScamOfWeek(entry: InsertScamOfWeek): Promise<ScamOfWeek> {
+    const result = await db.insert(scamOfWeek).values(entry).returning();
+    return result[0];
+  }
+
+  async getActiveScamOfWeek(): Promise<ScamOfWeek | undefined> {
+    const result = await db.select().from(scamOfWeek)
+      .where(eq(scamOfWeek.isActive, true))
+      .orderBy(desc(scamOfWeek.weekStart))
+      .limit(1);
+    return result[0];
+  }
+
+  async getAllScamOfWeek(limit = 10): Promise<ScamOfWeek[]> {
+    return await db.select().from(scamOfWeek)
+      .orderBy(desc(scamOfWeek.weekStart))
+      .limit(limit);
   }
 }
 

@@ -88,6 +88,7 @@ const PrintableGuides = lazy(() => import("@/pages/printable-guides"));
 const QuickAssessment = lazy(() => import("@/pages/quick-assessment"));
 const SafetyScore = lazy(() => import("@/pages/safety-score"));
 const ScamChecker = lazy(() => import("@/pages/scam-checker"));
+const ScanReportPage = lazy(() => import("@/pages/scan-report"));
 const ScamPage = lazy(() => import("@/pages/scam-page"));
 const TopicHub = lazy(() => import("@/pages/topic-hub"));
 const FAQ = lazy(() => import("@/pages/faq"));
@@ -173,6 +174,7 @@ function Router() {
         <Route path="/quick-assessment" component={QuickAssessment} />
         <Route path="/safety-score" component={SafetyScore} />
         <Route path="/scam-checker" component={ScamChecker} />
+        <Route path="/report/:shareId" component={ScanReportPage} />
         <Route path="/scams/:scamType" component={ScamPage} />
         <Route path="/topics/:cluster" component={TopicHub} />
         <Route path="/faq" component={FAQ} />

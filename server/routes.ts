@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { getAllScamSlugs } from "@shared/scam-content";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -3985,6 +3985,233 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("[cyber-hygiene-guide] Error:", error);
       res.status(500).json({ error: "Failed to send the guide. Please try again." });
+    }
+  });
+
+  app.post("/api/scan-history", isAuthenticated, standardRateLimit, async (req: any, res) => {
+    try {
+      const data = insertScanHistorySchema.parse({
+        ...req.body,
+        userId: req.user.id,
+      });
+      const entry = await storage.createScanHistory(data);
+      res.json(entry);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid data", details: (error as any).issues });
+      } else {
+        console.error("Scan history save error:", error);
+        res.status(500).json({ error: "Failed to save scan history" });
+      }
+    }
+  });
+
+  app.get("/api/scan-history", isAuthenticated, async (req: any, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const history = await storage.getScanHistory(req.user.id, limit);
+      res.json(history);
+    } catch (error) {
+      console.error("Scan history fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch scan history" });
+    }
+  });
+
+  app.post("/api/community-reports", standardRateLimit, async (req: any, res) => {
+    try {
+      const data = insertCommunityScamReportSchema.parse(req.body);
+      const sessionId = req.user?.id || req.sessionID || req.ip || "anonymous";
+      const report = await storage.createCommunityReport({
+        ...data,
+        reporterSessionId: sessionId,
+      });
+      res.json(report);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid report data", details: (error as any).issues });
+      } else {
+        console.error("Community report error:", error);
+        res.status(500).json({ error: "Failed to submit community report" });
+      }
+    }
+  });
+
+  app.get("/api/community-reports", async (req, res) => {
+    try {
+      const status = (req.query.status as string) || "confirmed";
+      const limit = parseInt(req.query.limit as string) || 20;
+      const reports = await storage.getCommunityReports(status, limit);
+      res.json(reports);
+    } catch (error) {
+      console.error("Community reports fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch community reports" });
+    }
+  });
+
+  app.post("/api/community-reports/:id/vote", strictRateLimit, async (req, res) => {
+    try {
+      const report = await storage.voteCommunityReport(req.params.id);
+      if (!report) {
+        res.status(404).json({ error: "Report not found" });
+        return;
+      }
+      res.json(report);
+    } catch (error) {
+      console.error("Vote error:", error);
+      res.status(500).json({ error: "Failed to vote" });
+    }
+  });
+
+  app.patch("/api/admin/community-reports/:id/status", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { status } = req.body;
+      if (!["pending", "confirmed", "rejected"].includes(status)) {
+        res.status(400).json({ error: "Invalid status. Must be pending, confirmed, or rejected." });
+        return;
+      }
+      const result = await db.update(communityScamReports)
+        .set({ status })
+        .where(eq(communityScamReports.id, req.params.id))
+        .returning();
+      if (!result[0]) {
+        res.status(404).json({ error: "Report not found" });
+        return;
+      }
+      res.json(result[0]);
+    } catch (error) {
+      console.error("Status update error:", error);
+      res.status(500).json({ error: "Failed to update status" });
+    }
+  });
+
+  app.get("/api/admin/community-reports", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const reports = await storage.getCommunityReports(status, limit);
+      res.json(reports);
+    } catch (error) {
+      console.error("Admin community reports error:", error);
+      res.status(500).json({ error: "Failed to fetch reports" });
+    }
+  });
+
+  app.post("/api/scan-reports", standardRateLimit, async (req, res) => {
+    try {
+      const crypto = await import("crypto");
+      const shareId = crypto.randomBytes(8).toString("hex");
+      const data = insertScanReportSchema.parse({
+        ...req.body,
+        shareId,
+      });
+      const report = await storage.createScanReport(data);
+      res.json({ shareId: report.shareId, id: report.id });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid report data", details: (error as any).issues });
+      } else {
+        console.error("Scan report error:", error);
+        res.status(500).json({ error: "Failed to create shareable report" });
+      }
+    }
+  });
+
+  app.get("/api/scan-reports/:shareId", async (req, res) => {
+    try {
+      const report = await storage.getScanReportByShareId(req.params.shareId);
+      if (!report) {
+        res.status(404).json({ error: "Report not found" });
+        return;
+      }
+      res.json(report);
+    } catch (error) {
+      console.error("Scan report fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch report" });
+    }
+  });
+
+  app.get("/api/scam-of-week", async (_req, res) => {
+    try {
+      const entry = await storage.getActiveScamOfWeek();
+      res.json(entry || null);
+    } catch (error) {
+      console.error("Scam of week error:", error);
+      res.status(500).json({ error: "Failed to fetch scam of the week" });
+    }
+  });
+
+  app.post("/api/admin/scam-of-week", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const data = insertScamOfWeekSchema.parse(req.body);
+      const entry = await storage.createScamOfWeek(data);
+      res.json(entry);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid data", details: (error as any).issues });
+      } else {
+        console.error("Scam of week create error:", error);
+        res.status(500).json({ error: "Failed to create scam of the week" });
+      }
+    }
+  });
+
+  app.get("/api/scam-feed", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const reports = await storage.getCommunityReports("confirmed", limit);
+      const scamOfWeekEntry = await storage.getActiveScamOfWeek();
+      res.json({
+        communityReports: reports,
+        scamOfWeek: scamOfWeekEntry || null,
+      });
+    } catch (error) {
+      console.error("Scam feed error:", error);
+      res.status(500).json({ error: "Failed to fetch scam feed" });
+    }
+  });
+
+  app.post("/api/security/analyze-image", standardRateLimit, async (req, res) => {
+    try {
+      const { imageData } = req.body;
+      if (!imageData) {
+        res.status(400).json({ error: "No image data provided" });
+        return;
+      }
+
+      const Anthropic = (await import("@anthropic-ai/sdk")).default;
+      const anthropic = new Anthropic();
+
+      const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
+      const mediaTypeMatch = imageData.match(/^data:(image\/\w+);base64,/);
+      const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/png";
+
+      const response = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1500,
+        messages: [{
+          role: "user",
+          content: [
+            {
+              type: "image",
+              source: { type: "base64", media_type: mediaType as any, data: base64Data },
+            },
+            {
+              type: "text",
+              text: "Extract ALL text visible in this image. This may be a screenshot of a suspicious message, email, text, or website. Return ONLY the extracted text, preserving the original formatting as much as possible. If no text is found, respond with 'NO_TEXT_FOUND'.",
+            },
+          ],
+        }],
+      });
+
+      const extractedText = (response.content[0] as any).text || "";
+      if (extractedText === "NO_TEXT_FOUND") {
+        res.json({ text: "", message: "No text was found in the image" });
+        return;
+      }
+      res.json({ text: extractedText });
+    } catch (error) {
+      console.error("Image analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze image" });
     }
   });
 

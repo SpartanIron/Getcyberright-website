@@ -1,10 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { trackToolUsage } from "@/lib/analytics";
 import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Search, 
   AlertTriangle, 
@@ -19,7 +23,18 @@ import {
   FileText,
   Lock,
   Bot,
-  Loader2
+  Loader2,
+  QrCode,
+  ImagePlus,
+  History,
+  Share2,
+  ThumbsUp,
+  Flag,
+  MessageSquareWarning,
+  Smartphone,
+  Video,
+  Copy,
+  Check
 } from "lucide-react";
 
 type ThreatCategory = {
@@ -1456,6 +1471,36 @@ function analyzeUrl(url: string): URLAnalysis {
   return { url, isSuspicious, reasons };
 }
 
+const deepfakePatterns = [
+  { pattern: /(?:boss|ceo|manager|supervisor|director).*(?:called|phoned|video)/i, label: "Authority figure impersonation call" },
+  { pattern: /(?:grandma|grandpa|grandchild|grandson|granddaughter|family member).*(?:called|said|told|begged)/i, label: "Family emergency voice scam" },
+  { pattern: /(?:voice|video|face).*(?:sounded? (?:just )?like|looked? (?:just )?like|identical)/i, label: "Identity mimicry description" },
+  { pattern: /(?:ai|artificial|deep\s?fake|cloned?).*(?:voice|video|call|face)/i, label: "AI-generated media reference" },
+  { pattern: /(?:wire|transfer|send|zelle|venmo|cashapp).*(?:immediately|right now|urgent|asap)/i, label: "Urgent money transfer request" },
+  { pattern: /(?:don't tell|keep.*secret|between us|don't mention)/i, label: "Secrecy demand" },
+  { pattern: /(?:kidnapped|arrested|hospital|accident|jail|emergency).*(?:need money|wire|transfer|bail)/i, label: "Emergency money extraction" },
+  { pattern: /(?:verify|confirm).*(?:it's really me|my voice|identity)/i, label: "False identity verification" },
+];
+
+const smsShortCodeDb: Record<string, string> = {
+  "722733": "T-Mobile", "73304": "AT&T", "611611": "T-Mobile",
+  "22395": "USPS", "28818": "FedEx", "32665": "Facebook",
+  "89203": "Google", "40404": "Twitter/X", "47272": "Apple",
+  "78156": "Chase Bank", "56278": "Bank of America", "97781": "Citibank",
+  "20575": "Wells Fargo", "95577": "Walmart", "234567": "Amazon",
+  "277365": "Amazon", "72788": "Costco",
+};
+
+const smsScamPatterns = [
+  { pattern: /(?:toll|parking|ez\s?pass).*(?:unpaid|overdue|balance)/i, label: "Toll/parking fee scam" },
+  { pattern: /(?:package|parcel|shipment).*(?:could not be delivered|delivery failed|reschedule)/i, label: "Delivery notification scam" },
+  { pattern: /(?:irs|tax|refund).*(?:claim|pending|verify)/i, label: "Tax/IRS impersonation" },
+  { pattern: /(?:account|card).*(?:suspended|locked|unusual activity|verify)/i, label: "Account suspension scam" },
+  { pattern: /(?:won|winner|prize|lottery|selected|congratulations).*(?:claim|click|visit|redeem)/i, label: "Prize/lottery scam" },
+  { pattern: /(?:bit\.ly|tinyurl|t\.co|goo\.gl|short\.io|is\.gd|rebrand\.ly)\/\w+/i, label: "Shortened URL in SMS" },
+  { pattern: /txt\s*(?:stop|help|cancel)\s*to\s*\d+/i, label: "Legitimate opt-out language" },
+];
+
 function analyzeContent(content: string): AnalysisResult {
   if (!content.trim()) {
     return {
@@ -1745,6 +1790,184 @@ export function ScamChecker() {
   const [isCheckingSSL, setIsCheckingSSL] = useState<Record<string, boolean>>({});
 
   const autoScanRef = useRef(false);
+  const qrInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [isProcessingQR, setIsProcessingQR] = useState(false);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [copiedShareLink, setCopiedShareLink] = useState(false);
+  const [shareId, setShareId] = useState<string | null>(null);
+  const [deepfakeWarnings, setDeepfakeWarnings] = useState<string[]>([]);
+  const [smsAnalysis, setSmsAnalysis] = useState<{ shortCode?: string; service?: string; patterns: string[]; isLegitOptOut: boolean } | null>(null);
+
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const scanHistoryQuery = useQuery({
+    queryKey: ["/api/scan-history"],
+    enabled: !!user && showHistory,
+  });
+
+  const communityReportsQuery = useQuery({
+    queryKey: ["/api/community-reports", "confirmed"],
+    queryFn: () => fetch("/api/community-reports?status=confirmed&limit=5").then(r => r.json()),
+  });
+
+  const saveScanHistory = useMutation({
+    mutationFn: (data: any) => apiRequest("POST", "/api/scan-history", data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/scan-history"] }),
+  });
+
+  const createShareReport = useMutation({
+    mutationFn: (data: any) => apiRequest("POST", "/api/scan-reports", data),
+    onSuccess: async (response: any) => {
+      const data = await response.json();
+      setShareId(data.shareId);
+    },
+  });
+
+  const submitCommunityReport = useMutation({
+    mutationFn: (data: any) => apiRequest("POST", "/api/community-reports", data),
+    onSuccess: () => {
+      toast({ title: "Report submitted", description: "Thank you for helping keep the community safe!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/community-reports"] });
+    },
+  });
+
+  const voteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("POST", `/api/community-reports/${id}/vote`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/community-reports"] }),
+  });
+
+  const handleQRUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsProcessingQR(true);
+    try {
+      const jsQR = (await import("jsqr")).default;
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        URL.revokeObjectURL(url);
+        if (code) {
+          setContent(code.data);
+          toast({ title: "QR Code decoded", description: "Content extracted. Click 'Scan for Threats' to analyze." });
+        } else {
+          toast({ title: "No QR code found", description: "Could not detect a QR code in the image.", variant: "destructive" });
+        }
+        setIsProcessingQR(false);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        toast({ title: "Error", description: "Could not read the image file.", variant: "destructive" });
+        setIsProcessingQR(false);
+      };
+      img.src = url;
+    } catch {
+      toast({ title: "Error", description: "Failed to process QR code.", variant: "destructive" });
+      setIsProcessingQR(false);
+    }
+    if (qrInputRef.current) qrInputRef.current.value = "";
+  }, [toast]);
+
+  const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsProcessingImage(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const response = await fetch("/api/security/analyze-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ imageData: reader.result }),
+          });
+          if (!response.ok) throw new Error("Failed to analyze image");
+          const data = await response.json();
+          if (data.text) {
+            setContent(data.text);
+            toast({ title: "Text extracted", description: "Content extracted from image. Click 'Scan for Threats' to analyze." });
+          } else {
+            toast({ title: "No text found", description: "Could not find readable text in the image.", variant: "destructive" });
+          }
+        } catch {
+          toast({ title: "Error", description: "Failed to analyze the image.", variant: "destructive" });
+        }
+        setIsProcessingImage(false);
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      toast({ title: "Error", description: "Failed to read the image file.", variant: "destructive" });
+      setIsProcessingImage(false);
+    }
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  }, [toast]);
+
+  const handleShareReport = useCallback(() => {
+    if (!result) return;
+    createShareReport.mutate({
+      contentSnippet: content.substring(0, 200),
+      contentType: "text",
+      riskLevel: result.overallRisk,
+      riskScore: result.confidenceScore,
+      resultSummary: result.summary,
+      flagsFound: result.threats.length,
+      flagDetails: JSON.stringify(result.threats.slice(0, 5).map(t => t.category)),
+      aiAnalysis: aiResult ? JSON.stringify({ riskLevel: aiResult.scamRiskLevel, keyFindings: aiResult.keyRedFlags?.slice(0, 3) }) : null,
+    });
+  }, [result, content, aiResult, createShareReport]);
+
+  const handleCopyShareLink = useCallback(() => {
+    if (!shareId) return;
+    const link = `${window.location.origin}/report/${shareId}`;
+    navigator.clipboard.writeText(link);
+    setCopiedShareLink(true);
+    setTimeout(() => setCopiedShareLink(false), 2000);
+  }, [shareId]);
+
+  const analyzeDeepfakePatterns = useCallback((text: string) => {
+    const warnings: string[] = [];
+    for (const dp of deepfakePatterns) {
+      if (dp.pattern.test(text)) {
+        warnings.push(dp.label);
+      }
+    }
+    setDeepfakeWarnings(warnings);
+  }, []);
+
+  const analyzeSmsContent = useCallback((text: string) => {
+    const shortCodeMatch = text.match(/(?:from|sender|sent by)[:\s]*(\d{4,6})/i);
+    const patterns: string[] = [];
+    let isLegitOptOut = false;
+    for (const sp of smsScamPatterns) {
+      if (sp.pattern.test(text)) {
+        if (sp.label === "Legitimate opt-out language") {
+          isLegitOptOut = true;
+        } else {
+          patterns.push(sp.label);
+        }
+      }
+    }
+    if (shortCodeMatch || patterns.length > 0) {
+      const code = shortCodeMatch?.[1];
+      setSmsAnalysis({
+        shortCode: code,
+        service: code ? smsShortCodeDb[code] : undefined,
+        patterns,
+        isLegitOptOut,
+      });
+    } else {
+      setSmsAnalysis(null);
+    }
+  }, []);
 
   const handleScan = () => {
     if (!content.trim()) return;
@@ -1756,12 +1979,30 @@ export function ScamChecker() {
     setAiError(null);
     setUrlReputations({});
     setSslResults({});
+    setShareId(null);
+    setDeepfakeWarnings([]);
+    setSmsAnalysis(null);
+
+    analyzeDeepfakePatterns(content);
+    analyzeSmsContent(content);
 
     setTimeout(() => {
       const patternResult = analyzeContent(content);
       setResult(patternResult);
       setIsChecking(false);
       trackToolUsage('scam-checker', true, { type: 'content-analysis' });
+
+      if (user) {
+        saveScanHistory.mutate({
+          userId: user.id,
+          contentSnippet: content.substring(0, 200),
+          contentType: "text",
+          riskLevel: patternResult.overallRisk,
+          riskScore: patternResult.confidenceScore,
+          resultSummary: patternResult.summary,
+          flagsFound: patternResult.threats.length,
+        });
+      }
     }, 1200);
 
     if (detectEmailHeaders(content)) {
@@ -1815,6 +2056,9 @@ export function ScamChecker() {
     setSslResults({});
     setIsCheckingReputation({});
     setIsCheckingSSL({});
+    setShareId(null);
+    setDeepfakeWarnings([]);
+    setSmsAnalysis(null);
   };
 
   const checkUrlReputation = async (url: string) => {
@@ -1944,6 +2188,45 @@ export function ScamChecker() {
           data-testid="input-scan-content"
         />
 
+        <div className="flex flex-wrap gap-2 -mt-2">
+          <input ref={qrInputRef} type="file" accept="image/*" className="hidden" onChange={handleQRUpload} data-testid="input-qr-upload" />
+          <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} data-testid="input-image-upload" />
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 text-xs"
+            onClick={() => qrInputRef.current?.click()}
+            disabled={isProcessingQR}
+            data-testid="button-upload-qr"
+          >
+            {isProcessingQR ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <QrCode className="w-3.5 h-3.5" />}
+            Scan QR Code
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 text-xs"
+            onClick={() => imageInputRef.current?.click()}
+            disabled={isProcessingImage}
+            data-testid="button-upload-screenshot"
+          >
+            {isProcessingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImagePlus className="w-3.5 h-3.5" />}
+            Scan Screenshot
+          </Button>
+          {user && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs ml-auto"
+              onClick={() => setShowHistory(!showHistory)}
+              data-testid="button-toggle-history"
+            >
+              <History className="w-3.5 h-3.5" />
+              {showHistory ? "Hide History" : "Scan History"}
+            </Button>
+          )}
+        </div>
+
         <div className="flex gap-3">
           <Button
             className="flex-1 gap-2"
@@ -1977,6 +2260,47 @@ export function ScamChecker() {
             </Button>
           )}
         </div>
+
+        {showHistory && user && (
+          <div className="space-y-3" data-testid="section-scan-history">
+            <h4 className="font-semibold flex items-center gap-2 text-sm">
+              <History className="w-4 h-4" />
+              Recent Scans
+            </h4>
+            {scanHistoryQuery.isLoading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading history...
+              </div>
+            ) : (scanHistoryQuery.data as any[])?.length > 0 ? (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {(scanHistoryQuery.data as any[]).map((entry: any) => (
+                  <div
+                    key={entry.id}
+                    className="p-3 bg-muted/50 rounded-lg border cursor-pointer hover:bg-muted/80 transition-colors"
+                    onClick={() => { setContent(entry.contentSnippet); setShowHistory(false); }}
+                    data-testid={`history-entry-${entry.id}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm truncate flex-1 mr-3">{entry.contentSnippet}</p>
+                      <Badge className={
+                        entry.riskLevel === "critical" || entry.riskLevel === "high" ? "bg-red-500 text-white" :
+                        entry.riskLevel === "medium" ? "bg-yellow-500 text-black" :
+                        "bg-green-500 text-white"
+                      }>
+                        {entry.riskLevel}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {new Date(entry.createdAt).toLocaleDateString()} &middot; {entry.flagsFound} flags found
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No scan history yet. Your scans will appear here.</p>
+            )}
+          </div>
+        )}
 
         {result && result.overallRisk && (
           <div className="space-y-4" role="region" aria-label="Pattern analysis results" aria-live="polite" data-testid="result-pattern-analysis">
@@ -2564,6 +2888,155 @@ export function ScamChecker() {
               </CardContent>
             </Card>
           </div>
+        )}
+
+        {deepfakeWarnings.length > 0 && (
+          <Card className="border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/20" data-testid="section-deepfake-warning">
+            <CardContent className="pt-4 space-y-3">
+              <h4 className="font-semibold flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                <Video className="w-5 h-5" />
+                Deepfake / AI Voice Scam Warning
+              </h4>
+              <p className="text-sm text-purple-600 dark:text-purple-400">
+                This content contains patterns commonly seen in AI voice cloning and deepfake video scams. Criminals use AI to mimic the voice or appearance of people you trust.
+              </p>
+              <div className="space-y-2">
+                {deepfakeWarnings.map((w, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm">
+                    <AlertTriangle className="w-4 h-4 text-purple-500 flex-shrink-0" />
+                    <span>{w}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                <p className="text-sm font-medium text-purple-800 dark:text-purple-200 mb-1">How to protect yourself:</p>
+                <ul className="text-xs text-purple-700 dark:text-purple-300 space-y-1">
+                  <li>&bull; Hang up and call the person back using a number you already have saved</li>
+                  <li>&bull; Use your family's pre-agreed codeword to verify identity</li>
+                  <li>&bull; Never send money based on a phone or video call alone</li>
+                  <li>&bull; AI can now clone voices from just a few seconds of audio</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {smsAnalysis && (smsAnalysis.patterns.length > 0 || smsAnalysis.shortCode) && (
+          <Card className="border-cyan-200 dark:border-cyan-800 bg-cyan-50/50 dark:bg-cyan-950/20" data-testid="section-sms-analysis">
+            <CardContent className="pt-4 space-y-3">
+              <h4 className="font-semibold flex items-center gap-2 text-cyan-700 dark:text-cyan-300">
+                <Smartphone className="w-5 h-5" />
+                SMS / Text Message Analysis
+              </h4>
+              {smsAnalysis.shortCode && (
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm">
+                    <span className="text-muted-foreground">Short code:</span>{" "}
+                    <span className="font-mono font-semibold">{smsAnalysis.shortCode}</span>
+                    {smsAnalysis.service ? (
+                      <Badge className="ml-2 bg-green-500 text-white">{smsAnalysis.service} (Verified)</Badge>
+                    ) : (
+                      <Badge className="ml-2 bg-yellow-500 text-black">Unrecognized</Badge>
+                    )}
+                  </p>
+                </div>
+              )}
+              {smsAnalysis.patterns.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm text-cyan-600 dark:text-cyan-400">Detected SMS scam patterns:</p>
+                  {smsAnalysis.patterns.map((p, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm">
+                      <AlertTriangle className="w-4 h-4 text-cyan-500 flex-shrink-0" />
+                      <span>{p}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {smsAnalysis.isLegitOptOut && (
+                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Contains standard opt-out language (common in legitimate messages)
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {result && (
+          <div className="flex flex-wrap gap-2" data-testid="section-result-actions">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={handleShareReport}
+              disabled={createShareReport.isPending || !!shareId}
+              data-testid="button-share-report"
+            >
+              {createShareReport.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Share2 className="w-3.5 h-3.5" />}
+              {shareId ? "Report Created" : "Share Report"}
+            </Button>
+            {shareId && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={handleCopyShareLink}
+                data-testid="button-copy-share-link"
+              >
+                {copiedShareLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedShareLink ? "Copied!" : "Copy Link"}
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => submitCommunityReport.mutate({
+                content: content.substring(0, 500),
+                reportType: result.overallRisk === "critical" || result.overallRisk === "high" ? "confirmed_scam" : "suspicious",
+                url: result.urls?.[0]?.url || null,
+              })}
+              disabled={submitCommunityReport.isPending}
+              data-testid="button-report-community"
+            >
+              {submitCommunityReport.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Flag className="w-3.5 h-3.5" />}
+              Report to Community
+            </Button>
+          </div>
+        )}
+
+        {Array.isArray(communityReportsQuery.data) && communityReportsQuery.data.length > 0 && (
+          <Card data-testid="section-community-reports">
+            <CardContent className="pt-4 space-y-3">
+              <h4 className="font-semibold flex items-center gap-2 text-sm">
+                <MessageSquareWarning className="w-4 h-4 text-orange-500" />
+                Recent Community-Reported Scams
+              </h4>
+              <div className="space-y-2">
+                {(communityReportsQuery.data as any[]).slice(0, 5).map((report: any) => (
+                  <div key={report.id} className="p-3 bg-muted/50 rounded-lg border flex items-start justify-between gap-3" data-testid={`community-report-${report.id}`}>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm truncate">{report.content}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="text-xs">{report.reportType}</Badge>
+                        <span className="text-xs text-muted-foreground">{new Date(report.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1 text-xs flex-shrink-0"
+                      onClick={() => voteMutation.mutate(report.id)}
+                      data-testid={`button-vote-${report.id}`}
+                    >
+                      <ThumbsUp className="w-3 h-3" />
+                      {report.votes}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         <SignupEncouragementBanner

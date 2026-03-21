@@ -3,15 +3,19 @@ import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, FAQData, BreadcrumbData } from "@/components/structured-data";
 import { ScamChecker } from "@/components/scam-checker";
 import { ShareCallToAction } from "@/components/social-share";
-import { AlertTriangle, Shield, Phone, Link2, MessageSquare, CheckCircle, TrendingUp, TrendingDown, Minus, ArrowLeft } from "lucide-react";
+import { AlertTriangle, Shield, Phone, Link2, MessageSquare, CheckCircle, TrendingUp, TrendingDown, Minus, ArrowLeft, Megaphone, Globe, Bell, Chrome, ThumbsUp, Rss } from "lucide-react";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { detectUserRegion, getRegionInfo, type Region } from "@/lib/region-detect";
 import { TechPatternBg } from "@/components/tech-pattern-bg";
+import { useToast } from "@/hooks/use-toast";
 
 interface ScamTrend {
   scamType: string;
@@ -53,6 +57,9 @@ export default function ScamCheckerPage() {
     keywords: "scam checker, fraud detection, phishing detector, link checker, URL scanner, is it a scam, verify message, free scam checker"
   });
 
+  const { toast } = useToast();
+  const [extensionEmail, setExtensionEmail] = useState("");
+
   const [userRegion, setUserRegion] = useState<Region | null>(null);
   
   useEffect(() => {
@@ -64,6 +71,26 @@ export default function ScamCheckerPage() {
   }, []);
 
   const regionInfo = getRegionInfo(userRegion || 'global');
+
+  const { data: scamOfWeekData } = useQuery({
+    queryKey: ["/api/scam-of-week"],
+  });
+
+  const { data: scamFeed } = useQuery({
+    queryKey: ["/api/scam-feed"],
+    queryFn: () => fetch("/api/scam-feed?limit=5").then(r => r.json()),
+  });
+
+  const extensionSignup = useMutation({
+    mutationFn: (email: string) => apiRequest("POST", "/api/newsletter", { email }),
+    onSuccess: () => {
+      toast({ title: "You're on the list!", description: "We'll notify you when the browser extension launches." });
+      setExtensionEmail("");
+    },
+    onError: () => {
+      toast({ title: "Already subscribed", description: "This email is already on our notification list." });
+    },
+  });
 
   const { data: trends, isLoading: trendsLoading } = useQuery<ScamTrend[]>({
     queryKey: [`/api/scam-trends?region=${userRegion}`],
@@ -295,6 +322,104 @@ export default function ScamCheckerPage() {
               </div>
             </section>
           )}
+
+          {scamOfWeekData && (
+            <section className="mt-16" data-testid="section-scam-of-week">
+              <Card className="border-2 border-orange-200 dark:border-orange-800 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/50 flex items-center justify-center flex-shrink-0">
+                      <Megaphone className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold text-lg text-orange-900 dark:text-orange-100">Scam of the Week</h3>
+                        <Badge className="bg-orange-500 text-white">{(scamOfWeekData as any).scamType}</Badge>
+                      </div>
+                      <h4 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">{(scamOfWeekData as any).title}</h4>
+                      <p className="text-sm text-orange-700 dark:text-orange-300 mb-3">{(scamOfWeekData as any).description}</p>
+                      {(scamOfWeekData as any).exampleMessage && (
+                        <div className="p-3 bg-white/60 dark:bg-black/20 rounded-lg border border-orange-200 dark:border-orange-700 mb-3">
+                          <p className="text-xs text-muted-foreground mb-1">Example message:</p>
+                          <p className="text-sm italic">"{(scamOfWeekData as any).exampleMessage}"</p>
+                        </div>
+                      )}
+                      <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+                        <p className="text-xs font-semibold text-green-800 dark:text-green-200 mb-1">Tips to stay safe:</p>
+                        <p className="text-sm text-green-700 dark:text-green-300">{(scamOfWeekData as any).tips}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          )}
+
+          {scamFeed && (scamFeed as any).communityReports?.length > 0 && (
+            <section className="mt-16" data-testid="section-live-scam-feed">
+              <h2 className="text-2xl font-bold text-center text-slate-900 dark:text-white mb-4">
+                <Rss className="w-6 h-6 inline-block mr-2 text-orange-500" />
+                Live Scam Feed
+              </h2>
+              <p className="text-center text-muted-foreground mb-8 text-sm">
+                Recent scams reported by the community. Stay informed about the latest threats.
+              </p>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(scamFeed as any).communityReports.slice(0, 6).map((report: any) => (
+                  <Card key={report.id} className="bg-white dark:bg-slate-800 border-0 shadow-md" data-testid={`feed-report-${report.id}`}>
+                    <CardContent className="p-4">
+                      <p className="text-sm line-clamp-2 mb-2">{report.content}</p>
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs">{report.reportType}</Badge>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <ThumbsUp className="w-3 h-3" />
+                          {report.votes} confirms
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section className="mt-16" data-testid="section-browser-extension">
+            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mx-auto mb-4">
+                  <Chrome className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-2">Browser Extension Coming Soon</h3>
+                <p className="text-blue-700 dark:text-blue-300 mb-6 max-w-md mx-auto">
+                  Right-click any link to check it instantly. Get real-time warnings as you browse. Be the first to know when it launches.
+                </p>
+                <form
+                  className="flex gap-2 max-w-sm mx-auto"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (extensionEmail) extensionSignup.mutate(extensionEmail);
+                  }}
+                >
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={extensionEmail}
+                    onChange={(e) => setExtensionEmail(e.target.value)}
+                    className="bg-white dark:bg-slate-800"
+                    data-testid="input-extension-email"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={!extensionEmail || extensionSignup.isPending}
+                    data-testid="button-extension-notify"
+                  >
+                    <Bell className="w-4 h-4 mr-1" />
+                    Notify Me
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </section>
 
           {/* Share CTA */}
           <div className="mt-12">
