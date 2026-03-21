@@ -26,6 +26,15 @@ import {
 } from "./socialDistributionService";
 import { publishPost, getConnectedPlatforms, publishAllDrafts } from "./socialPublisher";
 import { getBufferStatus, isBufferConfigured } from "./bufferPublisher";
+import {
+  getLinkedInAuthUrl,
+  validateOAuthState,
+  exchangeCodeForToken,
+  getLinkedInProfile,
+  findOrganizationId,
+  isLinkedInDirectConfigured,
+  publishDirectToLinkedIn,
+} from "./linkedinDirectPublisher";
 import { serveImagePath } from "./socialImageService";
 import * as fs from "fs";
 import * as path from "path";
@@ -744,6 +753,136 @@ export function registerPlatformRoutes(app: Express): void {
     } catch (error) {
       console.error("Growth task stats error:", error);
       res.status(500).json({ error: "Failed to fetch task stats" });
+    }
+  });
+
+  app.get("/api/auth/linkedin/authorize", isAuthenticated, isAdminMiddleware, (_req, res) => {
+    const authUrl = getLinkedInAuthUrl();
+    res.redirect(authUrl);
+  });
+
+  app.get("/api/auth/linkedin/callback", async (req, res) => {
+    try {
+      const { code, state, error: oauthError } = req.query;
+
+      if (oauthError) {
+        return res.status(400).send(`LinkedIn OAuth error: ${oauthError}`);
+      }
+
+      if (!code || !state) {
+        return res.status(400).send("Missing code or state parameter");
+      }
+
+      if (!validateOAuthState(state as string)) {
+        return res.status(400).send("Invalid OAuth state. Please try again.");
+      }
+
+      const tokenData = await exchangeCodeForToken(code as string);
+      const profile = await getLinkedInProfile(tokenData.access_token);
+      const orgId = await findOrganizationId(tokenData.access_token);
+
+      const expiresAt = new Date(Date.now() + tokenData.expires_in * 1000).toISOString();
+
+      const html = `<!DOCTYPE html>
+<html><head><title>LinkedIn Connected</title>
+<style>
+body { font-family: system-ui, sans-serif; max-width: 600px; margin: 80px auto; padding: 20px; background: #0A2A3C; color: #fff; }
+.card { background: #133a4f; border-radius: 12px; padding: 32px; }
+h1 { color: #E8732A; margin-top: 0; }
+.token-box { background: #0d2230; border: 1px solid #1a4a5e; border-radius: 8px; padding: 16px; margin: 16px 0; word-break: break-all; font-family: monospace; font-size: 13px; }
+.label { color: #8ab4c7; font-size: 14px; margin-bottom: 4px; }
+.success { color: #4ade80; }
+.info { color: #94a3b8; font-size: 14px; margin-top: 12px; }
+button { background: #E8732A; color: white; border: none; padding: 12px 24px; border-radius: 24px; cursor: pointer; font-size: 16px; margin-top: 16px; }
+</style></head>
+<body><div class="card">
+<h1>LinkedIn Connected Successfully</h1>
+<p class="success">Authenticated as: ${profile.name}</p>
+${orgId ? `<p class="success">Organization ID found: ${orgId}</p>` : '<p style="color:#fbbf24">No organization admin access found. You may need to add the app to your LinkedIn Company Page.</p>'}
+<div>
+<p class="label">Access Token (save this as LINKEDIN_ACCESS_TOKEN):</p>
+<div class="token-box">${tokenData.access_token}</div>
+</div>
+${orgId ? `<div>
+<p class="label">Organization ID (save this as LINKEDIN_ORGANIZATION_ID):</p>
+<div class="token-box">${orgId}</div>
+</div>` : ""}
+<p class="info">Token expires: ${expiresAt}</p>
+${tokenData.refresh_token ? `<div>
+<p class="label">Refresh Token (save this as LINKEDIN_REFRESH_TOKEN):</p>
+<div class="token-box">${tokenData.refresh_token}</div>
+</div>` : ""}
+<p class="info">Copy the values above and add them as environment variables, or click below to save automatically.</p>
+<form method="POST" action="/api/auth/linkedin/save-token">
+<input type="hidden" name="access_token" value="${tokenData.access_token}" />
+<input type="hidden" name="expires_at" value="${expiresAt}" />
+${orgId ? `<input type="hidden" name="organization_id" value="${orgId}" />` : ""}
+${tokenData.refresh_token ? `<input type="hidden" name="refresh_token" value="${tokenData.refresh_token}" />` : ""}
+<button type="submit">Save Token Automatically</button>
+</form>
+</div></body></html>`;
+
+      res.send(html);
+    } catch (error: any) {
+      console.error("[LinkedIn OAuth] Callback error:", error);
+      res.status(500).send(`LinkedIn OAuth failed: ${error.message}`);
+    }
+  });
+
+  app.post("/api/auth/linkedin/save-token", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const { access_token, organization_id, refresh_token, expires_at } = req.body;
+
+      if (!access_token) {
+        return res.status(400).json({ error: "Missing access token" });
+      }
+
+      process.env.LINKEDIN_ACCESS_TOKEN = access_token;
+      if (organization_id) process.env.LINKEDIN_ORGANIZATION_ID = organization_id;
+      if (refresh_token) process.env.LINKEDIN_REFRESH_TOKEN = refresh_token;
+
+      console.log("[LinkedIn] Token saved to process.env. Org ID:", organization_id || "not found");
+      console.log("[LinkedIn] Token expires:", expires_at);
+
+      res.send(`<!DOCTYPE html>
+<html><head><title>Token Saved</title>
+<style>
+body { font-family: system-ui, sans-serif; max-width: 600px; margin: 80px auto; padding: 20px; background: #0A2A3C; color: #fff; text-align: center; }
+h1 { color: #4ade80; }
+p { color: #94a3b8; }
+a { color: #E8732A; }
+</style></head>
+<body>
+<h1>Token Saved Successfully</h1>
+<p>LinkedIn direct publishing is now active for this session.</p>
+<p>Important: Add LINKEDIN_ACCESS_TOKEN${organization_id ? " and LINKEDIN_ORGANIZATION_ID" : ""} as environment variables in Replit Secrets for persistence across restarts.</p>
+<p><a href="/admin">Go to Admin Dashboard</a></p>
+</body></html>`);
+    } catch (error: any) {
+      console.error("[LinkedIn] Save token error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/linkedin/status", isAuthenticated, isAdminMiddleware, (_req, res) => {
+    res.json({
+      configured: isLinkedInDirectConfigured(),
+      hasToken: !!process.env.LINKEDIN_ACCESS_TOKEN,
+      hasOrgId: !!process.env.LINKEDIN_ORGANIZATION_ID,
+      hasRefreshToken: !!process.env.LINKEDIN_REFRESH_TOKEN,
+    });
+  });
+
+  app.post("/api/linkedin/test-post", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const { text } = req.body;
+      if (!text) return res.status(400).json({ error: "Missing text" });
+
+      const result = await publishDirectToLinkedIn(text);
+      res.json(result);
+    } catch (error: any) {
+      console.error("[LinkedIn] Test post error:", error);
+      res.status(500).json({ error: error.message });
     }
   });
 }
