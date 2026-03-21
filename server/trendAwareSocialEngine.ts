@@ -11,6 +11,16 @@ const anthropic = new Anthropic({
   baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
 });
 
+const CONTENT_MODES = [
+  "breaking_insight",
+  "preventative_education",
+  "myth_debunking",
+  "scenario_simulation",
+  "tool_highlight",
+] as const;
+
+type ContentMode = (typeof CONTENT_MODES)[number];
+
 const POST_STYLES = [
   "expert_reaction",
   "one_insight",
@@ -61,6 +71,36 @@ function sanitizePostContent(text: string): string {
     .replace(/\n{4,}/g, "\n\n\n")
     .replace(/ ,/g, ",")
     .trim();
+}
+
+const SOURCE_TIERS: Record<string, 1 | 2 | 3> = {
+  "cisa": 1, "us-cert": 1, "nist": 1, "fbi": 1, "ftc": 1, "dhs": 1, "nsa": 1,
+  "europol": 1, "ncsc": 1, "interpol": 1, "acsc": 1, "microsoft": 1, "google": 1,
+  "apple": 1, "amazon": 1, "meta": 1, "cisco": 1, "palo alto": 1,
+  "krebs on security": 2, "bleepingcomputer": 2, "the hacker news": 2,
+  "dark reading": 2, "threatpost": 2, "securityweek": 2, "ars technica": 2,
+  "wired": 2, "zdnet": 2, "techcrunch": 2, "the record": 2, "cyberscoop": 2,
+  "mandiant": 2, "crowdstrike": 2, "sophos": 2, "kaspersky": 2, "sentinelone": 2,
+};
+
+function getSourceTier(sourceName: string): 1 | 2 | 3 {
+  const lower = sourceName.toLowerCase();
+  for (const [key, tier] of Object.entries(SOURCE_TIERS)) {
+    if (lower.includes(key)) return tier;
+  }
+  return 3;
+}
+
+function assessSourceCredibility(news: RawFeedItem[]): { tier1Count: number; tier2Count: number; tier3Count: number; highestTier: 1 | 2 | 3 } {
+  let tier1Count = 0, tier2Count = 0, tier3Count = 0;
+  let highestTier: 1 | 2 | 3 = 3;
+  for (const item of news) {
+    const tier = getSourceTier(item.source);
+    if (tier === 1) { tier1Count++; if (highestTier > 1) highestTier = 1; }
+    else if (tier === 2) { tier2Count++; if (highestTier > 2) highestTier = 2; }
+    else tier3Count++;
+  }
+  return { tier1Count, tier2Count, tier3Count, highestTier };
 }
 
 const GCR_TOOLS: Record<string, { tool_name: string; how_it_connects: string; url: string }> = {
@@ -133,6 +173,83 @@ function mapTopicToGCRTool(title: string, content: string): { tool_name: string;
   return null;
 }
 
+const PERFORMANCE_LOG_PATH = path.join(process.cwd(), ".local", "social-performance.json");
+
+interface PerformanceEntry {
+  date: string;
+  title: string;
+  category: string;
+  contentMode: string;
+  postStyle: string;
+  urgencyScore: number;
+  confidenceScore: number;
+  recommendedAction: string;
+  platforms: string[];
+  published: boolean;
+}
+
+function loadPerformanceLog(): PerformanceEntry[] {
+  try {
+    if (fs.existsSync(PERFORMANCE_LOG_PATH)) {
+      return JSON.parse(fs.readFileSync(PERFORMANCE_LOG_PATH, "utf-8"));
+    }
+  } catch {}
+  return [];
+}
+
+function savePerformanceEntry(entry: PerformanceEntry): void {
+  try {
+    const log = loadPerformanceLog();
+    log.push(entry);
+    const trimmed = log.slice(-90);
+    const dir = path.dirname(PERFORMANCE_LOG_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(PERFORMANCE_LOG_PATH, JSON.stringify(trimmed, null, 2));
+  } catch (err: any) {
+    console.error("[TrendEngine] Failed to save performance log:", err.message);
+  }
+}
+
+function getRecentPerformanceSummary(): string {
+  const log = loadPerformanceLog();
+  if (log.length < 5) return "";
+  const last30 = log.slice(-30);
+  const categories: Record<string, number> = {};
+  const modes: Record<string, number> = {};
+  for (const entry of last30) {
+    categories[entry.category] = (categories[entry.category] || 0) + 1;
+    modes[entry.contentMode] = (modes[entry.contentMode] || 0) + 1;
+  }
+  const topCategories = Object.entries(categories).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k]) => k);
+  const topModes = Object.entries(modes).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k]) => k);
+  return `\nLEARNING CONTEXT (recent 30 posts): Most covered categories: ${topCategories.join(", ")}. Most used modes: ${topModes.join(", ")}. Consider varying from these for freshness.`;
+}
+
+async function checkRateLimit(): Promise<boolean> {
+  try {
+    const recentPosts = await storage.getSocialPosts("published", 10);
+    const today = new Date().toDateString();
+    const todaysPosts = recentPosts.filter((p) => {
+      if (!p.publishedAt) return false;
+      return new Date(p.publishedAt).toDateString() === today;
+    });
+    const platformCounts: Record<string, number> = {};
+    for (const post of todaysPosts) {
+      platformCounts[post.platform] = (platformCounts[post.platform] || 0) + 1;
+    }
+    const overLimit = Object.entries(platformCounts).some(([platform, count]) => {
+      if (count >= 2) {
+        console.log(`[TrendEngine] Rate limit: ${platform} already has ${count} posts today, skipping`);
+        return true;
+      }
+      return false;
+    });
+    return !overLimit;
+  } catch {
+    return true;
+  }
+}
+
 interface TrendAnalysis {
   summary: string;
   category: string;
@@ -157,20 +274,26 @@ interface TrendAwarePostResult {
   trendAnalysis: TrendAnalysis;
   visuals: Visual[];
   gcrToolReference: { tool_name: string; how_it_connects: string; url: string } | null;
+  contentMode: ContentMode;
+  confidenceScore: number;
+  recommendedAction: "auto_publish" | "review";
+  sourceValidation: { tier1Count: number; tier2Count: number; tier3Count: number; highestTier: 1 | 2 | 3 };
 }
 
 async function generateTrendAwarePost(
   trendingNews: RawFeedItem[],
   relevantGuides: { title: string; slug: string; category: string; tags: string[] }[],
   recentlyPublishedTitles: string[],
-  postStyle: PostStyle
+  postStyle: PostStyle,
+  sourceCredibility: { tier1Count: number; tier2Count: number; tier3Count: number; highestTier: 1 | 2 | 3 }
 ): Promise<TrendAwarePostResult | null> {
   const newsContext = trendingNews
     .slice(0, 8)
-    .map(
-      (item, i) =>
-        `[${i + 1}] ${item.source}: "${item.title}"\n   ${item.summary}\n   Published: ${item.pubDate || "recent"}`
-    )
+    .map((item, i) => {
+      const tier = getSourceTier(item.source);
+      const tierLabel = tier === 1 ? "Tier 1 (gov/official)" : tier === 2 ? "Tier 2 (established pub)" : "Tier 3 (unverified)";
+      return `[${i + 1}] ${item.source} [${tierLabel}]: "${item.title}"\n   ${item.summary}\n   Published: ${item.pubDate || "recent"}`;
+    })
     .join("\n\n");
 
   const guideContext = relevantGuides
@@ -183,73 +306,94 @@ async function generateTrendAwarePost(
       ? `\nPOSTS PUBLISHED IN THE LAST 7 DAYS (do NOT repeat these topics or use similar structures):\n${recentlyPublishedTitles.map((t) => `- ${t}`).join("\n")}`
       : "";
 
+  const performanceContext = getRecentPerformanceSummary();
+
+  const sourceValidationContext = `\nSOURCE CREDIBILITY SUMMARY: ${sourceCredibility.tier1Count} Tier 1 (government/official), ${sourceCredibility.tier2Count} Tier 2 (established publications), ${sourceCredibility.tier3Count} Tier 3 (unverified). ${sourceCredibility.highestTier === 3 ? "WARNING: No high-credibility sources available. Downgrade urgency and frame claims as emerging/unverified." : ""}`;
+
   const styleInstructions: Record<PostStyle, string> = {
-    expert_reaction: `STYLE: Expert Reaction. React to the biggest story as a CISM-certified professional would. Use first person ("As someone who works in cybersecurity..."). Share a specific professional insight that a layperson wouldn't know. Be direct and confident. Reference the specific technical details (CVE numbers, attack vectors, affected systems) but explain them in plain language. NO numbered tips list. Instead, give ONE concrete recommendation that shows deep expertise.`,
+    expert_reaction: `WRITING STYLE: Expert Reaction. React to the biggest story as a CISM-certified professional would. Use first person ("As someone who works in cybersecurity..."). Share a specific professional insight that a layperson wouldn't know. Be direct and confident. Reference the specific technical details (CVE numbers, attack vectors, affected systems) but explain them in plain language. NO numbered tips list. Instead, give ONE concrete recommendation that shows deep expertise.`,
 
-    one_insight: `STYLE: One Powerful Insight. Pick the most interesting story and share a SINGLE non-obvious insight about it. This post should be SHORT (3-5 sentences for LinkedIn, 2-3 for Facebook). The insight should be something surprising or counterintuitive. Think "Here is what everyone is missing about this story..." No tips, no lists, just one sharp observation that makes people think.`,
+    one_insight: `WRITING STYLE: One Powerful Insight. Pick the most interesting story and share a SINGLE non-obvious insight about it. This post should be SHORT (3-5 sentences for LinkedIn, 2-3 for Facebook). The insight should be something surprising or counterintuitive. Think "Here is what everyone is missing about this story..." No tips, no lists, just one sharp observation that makes people think.`,
 
-    myth_vs_reality: `STYLE: Myth vs Reality. Take a common misconception related to today's news and demolish it with specific facts. Structure it as: "Most people believe [myth]. The reality is [truth with evidence]." Be slightly provocative. Show expertise by citing the specific technical reason the myth is wrong. End with a strong declarative statement, NOT a question.`,
+    myth_vs_reality: `WRITING STYLE: Myth vs Reality. Take a common misconception related to today's news and demolish it with specific facts. Structure it as: "Most people believe [myth]. The reality is [truth with evidence]." Be slightly provocative. Show expertise by citing the specific technical reason the myth is wrong. End with a strong declarative statement, NOT a question.`,
 
-    story_based: `STYLE: Real Scenario Walkthrough. Take one of the threats from the news and walk through exactly how it would hit a real family. Use a specific scenario ("Imagine you get a text message that looks like it is from your bank..."). Make it vivid and concrete. Show the attack chain step by step. Then show how to break that chain with one specific action. Write like you are explaining this to a friend over coffee.`,
+    story_based: `WRITING STYLE: Real Scenario Walkthrough. Take one of the threats from the news and walk through exactly how it would hit a real family. Use a specific scenario ("Imagine you get a text message that looks like it is from your bank..."). Make it vivid and concrete. Show the attack chain step by step. Then show how to break that chain with one specific action. Write like you are explaining this to a friend over coffee.`,
 
-    hot_take: `STYLE: Strong Professional Opinion. Take a clear stance on something in the news. Be direct and slightly opinionated. Examples: "Stop telling people to change passwords every 90 days. Here is why that advice is outdated." or "This breach was entirely preventable. Here is the one thing they should have done." Show conviction backed by expertise. This is NOT about being controversial for clicks. It is about having a real expert opinion that goes against common wisdom.`,
+    hot_take: `WRITING STYLE: Strong Professional Opinion. Take a clear stance on something in the news. Be direct and slightly opinionated. Examples: "Stop telling people to change passwords every 90 days. Here is why that advice is outdated." or "This breach was entirely preventable. Here is the one thing they should have done." Show conviction backed by expertise. This is NOT about being controversial for clicks. It is about having a real expert opinion that goes against common wisdom.`,
 
-    quick_breakdown: `STYLE: Quick Technical Breakdown. Take a complex threat from the news and break it down into the simplest possible explanation. Use an analogy from everyday life. Structure: "What happened (1 sentence). How it works (analogy). Why you should care (1 sentence). What to do (1 specific action)." Keep it extremely concise. LinkedIn under 150 words. Facebook under 80 words.`,
+    quick_breakdown: `WRITING STYLE: Quick Technical Breakdown. Take a complex threat from the news and break it down into the simplest possible explanation. Use an analogy from everyday life. Structure: "What happened (1 sentence). How it works (analogy). Why you should care (1 sentence). What to do (1 specific action)." Keep it extremely concise. LinkedIn under 150 words. Facebook under 80 words.`,
 
-    did_you_know: `STYLE: Surprising Fact. Lead with a genuinely surprising fact from the news feed. Something that makes people stop scrolling. Then connect it to practical relevance. Keep it short and punchy. The fact MUST come directly from the news feed or be verifiable public knowledge. End with a brief actionable takeaway, not a question.`,
+    did_you_know: `WRITING STYLE: Surprising Fact. Lead with a genuinely surprising fact from the news feed. Something that makes people stop scrolling. Then connect it to practical relevance. Keep it short and punchy. The fact MUST come directly from the news feed or be verifiable public knowledge. End with a brief actionable takeaway, not a question.`,
   };
 
   try {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
-      max_tokens: 3000,
+      max_tokens: 3500,
       system: `You are an autonomous Cyber Intelligence Content Engine for GetCyberRight, a trusted family-focused cybersecurity education platform founded by a CISM-certified security professional.
 
-Your job is to monitor, interpret, and transform cybersecurity trends into high-quality, trustworthy social media content. You must operate with precision, restraint, and authority.
+Your role is to monitor, interpret, validate, and transform cybersecurity trends into high-quality, trustworthy, and actionable social media content. You must prioritize accuracy, clarity, and trust over speed.
 
-INTELLIGENCE PIPELINE (execute all steps internally before writing):
+FULL INTELLIGENCE PIPELINE (execute every step internally before writing):
 
 STEP 1 - SIGNAL INTERPRETATION:
 - Summarize what is happening in simple terms
-- Classify as: phishing_scam, data_breach, malware, ai_threat, social_engineering, privacy, vulnerability, or general_awareness
+- Classify into: phishing_scam, data_breach, malware, ai_threat, social_engineering, privacy, vulnerability, or general_awareness
 
-STEP 2 - RELEVANCE FILTER:
-- Is this relevant to everyday users, families, seniors, or small businesses?
-- If NOT relevant to these audiences, select a different story from the feed that IS relevant
+STEP 2 - SOURCE VALIDATION (CRITICAL):
+- Each news item is labeled with its source credibility tier
+- Tier 1 (highest trust): Government agencies (CISA, FBI, NIST), official company statements
+- Tier 2: Established cybersecurity publications (Krebs, BleepingComputer, Dark Reading)
+- Tier 3: Social media, unverified reports, unknown sources
+- RULES: Require at least 2 independent sources for high-risk claims. If only Tier 3 sources exist, frame as emerging/unverified, not confirmed fact. If confidence is low, downgrade urgency_score
 
-STEP 3 - RISK SCORING:
+STEP 3 - RELEVANCE FILTER:
+- Is this relevant to families, seniors, kids, everyday users, or small businesses?
+- If NOT relevant to these audiences, select a different story from the feed
+
+STEP 4 - RISK SCORING:
 - Assign urgency_score (1-5) and impact_level (low/medium/high)
-- Identify the primary affected_audience: families, kids, seniors, professionals, or small_businesses
-- Only create content if urgency_score >= 3 OR high relevance to target audience
+- Identify ONE primary affected_audience: families, kids, seniors, professionals, or small_businesses
+- Only proceed if urgency_score >= 3 OR strong relevance to target audience
 
-STEP 4 - INSIGHT GENERATION:
+STEP 5 - INSIGHT GENERATION:
 - What actually matters here for real people?
-- What are people likely to misunderstand about this?
-- Where is the real risk that most coverage misses?
-- Translate the event into human meaning without jargon
+- What will people misunderstand?
+- Where is the real behavioral risk?
+- Focus on human consequences, not technical details
+- Prioritize clarity over completeness
 
-STEP 5 - CONTENT CREATION:
-- Follow the specific STYLE instruction provided below
-- Post structure should flow naturally through: hook (urgent but credible, no clickbait) > what happened (clear explanation) > why it matters (real-world translation) > what to do (specific, actionable) > GetCyberRight connection (natural, only if relevant) > calm closing (build trust, not fear)
-- Not every post needs all six elements. The STYLE instruction takes priority over this structure
+STEP 6 - CONTENT MODE SELECTION:
+- Select the most appropriate mode: breaking_insight, preventative_education, myth_debunking, scenario_simulation, or tool_highlight
+- If urgency_score >= 4, force breaking_insight mode
+- The WRITING STYLE instruction determines HOW to write. The content mode determines WHAT angle to take
 
-STEP 6 - VISUAL PLANNING:
-- Suggest 1-2 visuals with type (story, educational, or product_ui), a description, and optional text overlay
-- story = real-life scenario illustration
-- educational = simple concept breakdown
-- product_ui = GetCyberRight feature screenshot/mockup
+STEP 7 - CONTENT CREATION:
+- Follow the specific WRITING STYLE instruction provided below
+- Post structure should flow naturally: hook (urgent but credible, no clickbait) > what happened (clear explanation) > why it matters (real-world impact) > what to do (2-4 specific, executable actions, no vague advice) > GetCyberRight connection (natural, only if relevant) > calm closing (reassuring, confident)
+- Not every post needs all elements. The WRITING STYLE takes priority
+- EVERY post must include at least 2 specific, practical, immediately actionable steps. No vague advice like "be careful" or "stay vigilant"
 
-STEP 7 - PRODUCT MAPPING:
-- Map the topic to the most relevant GetCyberRight tool/feature if one genuinely fits
-- Available tools: AI Scam Analyzer, Scam Checker, Password Generator, Breach Monitor, Data Broker Removal, Kids Safety Hub, Senior Safety Hub, Cyber Threat Radar, Identity Theft Recovery Guide
-- Only include if it genuinely connects. Never force it
+STEP 8 - VISUAL PLANNING:
+- Suggest 1-2 visuals: story (real-life situation), educational (simple breakdown), or product_ui (GetCyberRight feature)
+- Keep visuals simple, realistic, not cluttered
 
-STEP 8 - VALIDATION (check before output):
-- Is every claim verified or from the news feed?
-- Does it avoid panic language?
-- Does it provide a clear user action?
-- Does it maintain trust and credibility?
-- If any check fails, revise before outputting
+STEP 9 - PRODUCT MAPPING:
+- Map to a relevant GetCyberRight feature ONLY if genuinely justified
+- Available: AI Scam Analyzer, Scam Checker, Password Generator, Breach Monitor, Data Broker Removal, Kids Safety Hub, Senior Safety Hub, Cyber Threat Radar, Identity Theft Recovery Guide
+- Do NOT force product mentions
+
+STEP 10 - VALIDATION LAYER:
+- Is the information credible and supported by reliable sources?
+- Does the post avoid panic and fear tactics?
+- Does it provide clear, actionable guidance?
+- Is it understandable by a non-technical audience?
+- If ANY check fails, revise before output
+
+STEP 11 - CONFIDENCE SCORING:
+- Score 0-100 based on: source reliability, completeness of information, clarity of risk
+- If confidence_score < 70: set recommended_action to "review" (do NOT auto-publish)
+- If confidence_score >= 70: set recommended_action to "auto_publish"
 
 WHO YOU ARE:
 - A real cybersecurity expert with hands-on experience in threat analysis, incident response, and security architecture
@@ -264,6 +408,7 @@ ABSOLUTE RULES:
 - ONLY state facts from the news feed or widely established public knowledge
 - When referencing news, attribute it naturally (e.g. "CISA just flagged...", "Krebs reported...")
 - If unsure whether something is factual, leave it out
+- No em dashes. No speculation presented as fact. No hype or exaggeration
 
 VOICE AND PERSONALITY:
 - Confident and direct, never wishy-washy
@@ -272,8 +417,9 @@ VOICE AND PERSONALITY:
 - Sound like a real person, not a content generator
 - Vary your sentence length. Mix short punchy sentences with longer explanations
 - NO formulaic structures. Each post should feel different from the last
-- Reference specific technical details (CVE numbers, attack vectors, protocol names) casually, then explain them simply
-- Use industry shorthand naturally ("IOCs", "TTPs", "lateral movement") but always clarify for the audience
+- Reference specific technical details casually, then explain them simply
+- Write like a trusted human, not a marketer
+- Emphasize behavior over technology. Build trust, not fear
 
 FORMATTING (CRITICAL):
 - NEVER use markdown: no ** bold **, no * italics *, no ## headings, no bullet markers (- or *)
@@ -282,46 +428,52 @@ FORMATTING (CRITICAL):
 - Keep paragraphs to 1-3 sentences
 - If using numbered items, put each on its OWN line
 - White space is critical. Never write a wall of text
-- Clean spacing throughout. No exaggeration. No speculation
 
 WHAT NOT TO DO:
 - Do not end every post with a question. Sometimes end with a strong statement
 - Do not say "Here are 3 things you can do right now" every time
 - Do not use "Stay safe out there" or similar platitudes
 - Do not start posts with "Breaking:" or use fake urgency or clickbait
-- Do not use emojis excessively (0-2 per post max, and only if they genuinely add clarity)
-- Do not use the phrases "game-changer", "wake-up call", "in today's digital landscape", or "cyber hygiene"
+- Do not use emojis excessively (0-2 per post max)
+- Do not use: "game-changer", "wake-up call", "in today's digital landscape", "cyber hygiene"
 
-GOAL: Position GetCyberRight as the most trusted, human-centered cybersecurity voice for real-world users. Content must be immediately publishable to Buffer without edits.`,
+PLATFORM OPTIMIZATION:
+- LinkedIn: concise, sharp, insight-driven. Strong opening lines. Tighter structure
+- Facebook: more conversational, slightly longer storytelling, warmer tone
+
+GOAL: Position GetCyberRight as the most trusted, human-centered cybersecurity authority for everyday users navigating modern digital risks. Content must be immediately publishable to Buffer without edits.`,
       messages: [
         {
           role: "user",
-          content: `Run the full intelligence pipeline and create today's social media content for GetCyberRight.
+          content: `Run the full 11-step intelligence pipeline and create today's social media content for GetCyberRight.
 
 DATE: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
 
 ${styleInstructions[postStyle]}
 
-CURRENT CYBERSECURITY NEWS FEED (from trusted sources):
+CURRENT CYBERSECURITY NEWS FEED (with source credibility tiers):
 ${newsContext}
+${sourceValidationContext}
 
 GETCYBERRIGHT GUIDES (reference when naturally relevant):
 ${guideContext}
 ${recentPostsContext}
+${performanceContext}
 
-Execute Steps 1-8 of your intelligence pipeline, then output:
+Execute ALL steps of your intelligence pipeline (Signal Interpretation, Source Validation, Relevance Filter, Risk Scoring, Insight Generation, Content Mode Selection, Content Creation, Visual Planning, Product Mapping, Validation, Confidence Scoring), then output:
 
 LINKEDIN POST (100-200 words max):
 - Professional audience, both technical and non-technical
-- Show expertise through specificity, not length
-- One clear takeaway, not a laundry list
+- Concise, sharp, insight-driven
+- Strong opening line
+- 2-4 specific actionable steps
 
 FACEBOOK POST (60-120 words max):
 - Conversational, like talking to a neighbor
-- One key point, made simply
-- Warm but authoritative
+- Warmer tone, slightly longer storytelling
+- 2-3 specific actionable steps
 
-Format your complete output as this JSON structure with \\n for line breaks within post text:
+Format your complete output as this strict JSON with \\n for line breaks within post text:
 {
   "linkedin": "Post text with \\n\\n between paragraphs",
   "facebook": "Post text with \\n\\n between paragraphs",
@@ -329,6 +481,7 @@ Format your complete output as this JSON structure with \\n for line breaks with
   "hashtags": ["tag1", "tag2", "tag3", "tag4"],
   "imageHeadline": "Under 8 words for branded image card",
   "imageSubtext": "Supporting detail under 15 words",
+  "content_mode": "breaking_insight | preventative_education | myth_debunking | scenario_simulation | tool_highlight",
   "trend_analysis": {
     "summary": "One-sentence summary of the signal",
     "category": "phishing_scam | data_breach | malware | ai_threat | social_engineering | privacy | vulnerability | general_awareness",
@@ -346,7 +499,9 @@ Format your complete output as this JSON structure with \\n for line breaks with
   "gcr_tool_reference": {
     "tool_name": "Name of relevant GetCyberRight tool",
     "how_it_connects": "One sentence on why this tool helps"
-  }
+  },
+  "confidence_score": 85,
+  "recommended_action": "auto_publish | review"
 }`,
         },
       ],
@@ -380,9 +535,27 @@ Format your complete output as this JSON structure with \\n for line breaks with
       : { summary: parsed.title, category: "general_awareness", urgency_score: 3, impact_level: "medium" as const, audience: "families" };
 
     if (trendAnalysis.urgency_score < 3 && trendAnalysis.impact_level === "low") {
-      console.log(`[TrendEngine] Signal below threshold: urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}. Skipping low-value content.`);
+      console.log(`[TrendEngine] Signal below threshold: urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}. Skipping.`);
       return null;
     }
+
+    let confidenceScore = Math.min(100, Math.max(0, Number(parsed.confidence_score) || 75));
+    if (sourceCredibility.highestTier === 3) {
+      confidenceScore = Math.min(confidenceScore, 60);
+    }
+    if (sourceCredibility.tier1Count === 0 && sourceCredibility.tier2Count <= 1) {
+      confidenceScore = Math.min(confidenceScore, 65);
+    }
+
+    const recommendedAction: "auto_publish" | "review" =
+      confidenceScore >= 70 ? "auto_publish" : "review";
+
+    const contentMode: ContentMode =
+      trendAnalysis.urgency_score >= 4
+        ? "breaking_insight"
+        : (CONTENT_MODES.includes(parsed.content_mode as ContentMode)
+            ? (parsed.content_mode as ContentMode)
+            : "preventative_education");
 
     const visuals: Visual[] = Array.isArray(parsed.visuals)
       ? parsed.visuals.slice(0, 2).map((v: any) => ({
@@ -422,7 +595,7 @@ Format your complete output as this JSON structure with \\n for line breaks with
     }
 
     console.log(
-      `[TrendEngine] Intelligence pipeline complete: category=${trendAnalysis.category}, urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}, audience=${trendAnalysis.audience}${gcrToolReference ? `, tool=${gcrToolReference.tool_name}` : ""}`
+      `[TrendEngine] Pipeline complete: mode=${contentMode}, category=${trendAnalysis.category}, urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}, confidence=${confidenceScore}, action=${recommendedAction}${gcrToolReference ? `, tool=${gcrToolReference.tool_name}` : ""}`
     );
 
     return {
@@ -435,6 +608,10 @@ Format your complete output as this JSON structure with \\n for line breaks with
       trendAnalysis,
       visuals,
       gcrToolReference,
+      contentMode,
+      confidenceScore,
+      recommendedAction,
+      sourceValidation: sourceCredibility,
     };
   } catch (error: any) {
     console.error("[TrendEngine] AI generation failed:", error.message);
@@ -475,15 +652,21 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
   return lines;
 }
 
-function selectTemplateForTrend(trendAnalysis: TrendAnalysis, fallback: TemplateStyle): TemplateStyle {
+function selectTemplateForTrend(trendAnalysis: TrendAnalysis, contentMode: ContentMode, fallback: TemplateStyle): TemplateStyle {
   if (trendAnalysis.urgency_score >= 4 || trendAnalysis.impact_level === "high") {
     return "alert_card";
   }
-  if (trendAnalysis.category === "general_awareness" || trendAnalysis.category === "privacy") {
-    return "insight_card";
+  if (contentMode === "myth_debunking" || contentMode === "tool_highlight") {
+    return "quote_card";
   }
   if (trendAnalysis.category === "data_breach" || trendAnalysis.category === "vulnerability") {
     return "stat_card";
+  }
+  if (contentMode === "preventative_education" || contentMode === "scenario_simulation") {
+    return "tip_card";
+  }
+  if (trendAnalysis.category === "general_awareness" || trendAnalysis.category === "privacy") {
+    return "insight_card";
   }
   return fallback;
 }
@@ -664,6 +847,12 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
   const result = { published: 0, platforms: [] as string[] };
 
   try {
+    const withinRateLimit = await checkRateLimit();
+    if (!withinRateLimit) {
+      console.log("[TrendEngine] Rate limit reached (max 2 posts per platform per day), skipping");
+      return result;
+    }
+
     const channels = await getBufferChannelsByPlatform();
     const connectedPlatforms = Object.keys(channels);
     if (connectedPlatforms.length === 0) {
@@ -682,9 +871,14 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
     ]);
 
     if (trendingNews.length === 0) {
-      console.warn("[TrendEngine] No trending news available, falling back to drafts");
+      console.warn("[TrendEngine] No trending news available");
       return result;
     }
+
+    const sourceCredibility = assessSourceCredibility(trendingNews);
+    console.log(
+      `[TrendEngine] Source credibility: Tier 1=${sourceCredibility.tier1Count}, Tier 2=${sourceCredibility.tier2Count}, Tier 3=${sourceCredibility.tier3Count}`
+    );
 
     const recentTitles = recentPosts
       .filter((p) => {
@@ -702,23 +896,59 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
     }));
 
     console.log(
-      `[TrendEngine] Running intelligence pipeline: ${trendingNews.length} signals, ${relevantGuides.length} guides`
+      `[TrendEngine] Running 11-step pipeline: ${trendingNews.length} signals, ${relevantGuides.length} guides`
     );
 
     const posts = await generateTrendAwarePost(
       trendingNews,
       relevantGuides,
       recentTitles,
-      postStyle
+      postStyle,
+      sourceCredibility
     );
 
     if (!posts) {
-      console.error("[TrendEngine] Intelligence pipeline produced no publishable content");
+      console.error("[TrendEngine] Pipeline produced no publishable content");
       return result;
     }
 
-    const templateStyle = selectTemplateForTrend(posts.trendAnalysis, defaultTemplate);
-    console.log(`[TrendEngine] Selected template: ${templateStyle} (urgency: ${posts.trendAnalysis.urgency_score}, category: ${posts.trendAnalysis.category})`);
+    if (posts.recommendedAction === "review") {
+      console.warn(
+        `[TrendEngine] Content flagged for review (confidence: ${posts.confidenceScore}). Saving as draft instead of publishing.`
+      );
+      for (const platform of ["linkedin", "facebook"] as const) {
+        if (!channels[platform]) continue;
+        const content = platform === "linkedin" ? posts.linkedin : posts.facebook;
+        await storage.createSocialPost({
+          contentType: "trend_insight",
+          contentId: `trend-${Date.now()}-${platform}-review`,
+          contentTitle: `[REVIEW] ${posts.title}`,
+          platform,
+          postContent: content,
+          hashtags: posts.hashtags,
+          status: "draft",
+        });
+      }
+
+      savePerformanceEntry({
+        date: new Date().toISOString(),
+        title: posts.title,
+        category: posts.trendAnalysis.category,
+        contentMode: posts.contentMode,
+        postStyle,
+        urgencyScore: posts.trendAnalysis.urgency_score,
+        confidenceScore: posts.confidenceScore,
+        recommendedAction: "review",
+        platforms: [],
+        published: false,
+      });
+
+      console.log(`[TrendEngine] Draft saved for review: "${posts.title}" (confidence: ${posts.confidenceScore})`);
+      return result;
+    }
+
+    const templateStyle = selectTemplateForTrend(posts.trendAnalysis, posts.contentMode, defaultTemplate);
+    console.log(`[TrendEngine] Template: ${templateStyle} (mode: ${posts.contentMode}, urgency: ${posts.trendAnalysis.urgency_score})`);
 
     let imageUrl: string | null = null;
     const imagePath = await generatePostImage(posts.imageHeadline, posts.imageSubtext, templateStyle);
@@ -755,7 +985,7 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
 
         if (bufferResult.success) {
           console.log(
-            `[TrendEngine] Published ${platform}: "${posts.title}" [${posts.trendAnalysis.category}, urgency:${posts.trendAnalysis.urgency_score}] (Buffer ID: ${bufferResult.bufferId})`
+            `[TrendEngine] Published ${platform}: "${posts.title}" [${posts.contentMode}|${posts.trendAnalysis.category}|urgency:${posts.trendAnalysis.urgency_score}|confidence:${posts.confidenceScore}] (Buffer ID: ${bufferResult.bufferId})`
           );
           result.published++;
           result.platforms.push(platform);
@@ -773,11 +1003,24 @@ export async function generateAndPublishTrendAwarePosts(): Promise<{
       }
     }
 
+    savePerformanceEntry({
+      date: new Date().toISOString(),
+      title: posts.title,
+      category: posts.trendAnalysis.category,
+      contentMode: posts.contentMode,
+      postStyle,
+      urgencyScore: posts.trendAnalysis.urgency_score,
+      confidenceScore: posts.confidenceScore,
+      recommendedAction: "auto_publish",
+      platforms: result.platforms,
+      published: result.published > 0,
+    });
+
     console.log(
-      `[TrendEngine] Pipeline complete: ${result.published}/${platformPosts.length} published | style: ${postStyle} | signal: ${posts.trendAnalysis.summary.slice(0, 60)}...`
+      `[TrendEngine] Pipeline complete: ${result.published}/${platformPosts.length} published | mode: ${posts.contentMode} | confidence: ${posts.confidenceScore} | signal: ${posts.trendAnalysis.summary.slice(0, 60)}...`
     );
   } catch (error: any) {
-    console.error("[TrendEngine] Trend-aware generation error:", error.message);
+    console.error("[TrendEngine] Generation error:", error.message);
   }
 
   return result;
