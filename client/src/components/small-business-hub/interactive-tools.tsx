@@ -19,6 +19,7 @@ const STORAGE_KEY = "small-business-hub-progress";
 
 interface BusinessProgress {
   assessmentScores: Record<string, number>;
+  assessmentChecked: Record<string, boolean>;
   phishingScores: Record<string, boolean>;
   policiesCompleted: string[];
   incidentsExplored: string[];
@@ -31,7 +32,7 @@ function loadProgress(): BusinessProgress {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) return JSON.parse(stored);
   } catch {}
-  return { assessmentScores: {}, phishingScores: {}, policiesCompleted: [], incidentsExplored: [], budgetCalculated: false, lastActivity: "" };
+  return { assessmentScores: {}, assessmentChecked: {}, phishingScores: {}, policiesCompleted: [], incidentsExplored: [], budgetCalculated: false, lastActivity: "" };
 }
 
 function saveProgress(progress: BusinessProgress) {
@@ -68,11 +69,22 @@ function getLetterGrade(pct: number): { grade: string; color: string; label: str
 
 export function SecurityPostureAssessment({ items }: { items: AssessmentItem[] }) {
   const [progress, setProgress] = useState<BusinessProgress>(loadProgress);
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
-  const [showResults, setShowResults] = useState(false);
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => loadProgress().assessmentChecked || {});
+  const [showResults, setShowResults] = useState(() => {
+    const saved = loadProgress();
+    return Object.keys(saved.assessmentScores).length > 0;
+  });
 
   const toggle = (id: string) => {
-    setChecked(prev => ({ ...prev, [id]: !prev[id] }));
+    setChecked(prev => {
+      const next = { ...prev, [id]: !prev[id] };
+      setProgress(p => {
+        const updated = { ...p, assessmentChecked: next, lastActivity: new Date().toISOString() };
+        saveProgress(updated);
+        return updated;
+      });
+      return next;
+    });
   };
 
   const calculateResults = () => {
@@ -99,6 +111,11 @@ export function SecurityPostureAssessment({ items }: { items: AssessmentItem[] }
   const reset = () => {
     setChecked({});
     setShowResults(false);
+    setProgress(prev => {
+      const next = { ...prev, assessmentScores: {}, assessmentChecked: {}, lastActivity: new Date().toISOString() };
+      saveProgress(next);
+      return next;
+    });
   };
 
   const totalWeight = items.reduce((s, i) => s + i.weight, 0);
@@ -933,9 +950,37 @@ export function SecurityBudgetCalculator({ tools }: { tools: SecurityTool[] }) {
 
   const categories = Array.from(new Set(tools.map(t => t.category)));
 
+  const parseRange = (priceStr: string): { low: number; high: number; unit: string } => {
+    const isYearly = priceStr.includes("/yr");
+    const cleaned = priceStr.replace(/[^0-9\-.,]/g, "");
+    const parts = cleaned.split("-").map(s => parseFloat(s.replace(",", "")) || 0);
+    return { low: parts[0] || 0, high: parts[1] || parts[0] || 0, unit: isYearly ? "yr" : "mo" };
+  };
+
+  const employeeCount = companySize === "small" ? 10 : companySize === "medium" ? 50 : 200;
+
+  const estimateMonthly = (tool: SecurityTool): { low: number; high: number } => {
+    const price = getPrice(tool);
+    const { low, high, unit } = parseRange(price);
+    const isPerUnit = price.includes("/user") || price.includes("/device");
+    const multiplier = isPerUnit ? employeeCount : 1;
+    const monthlyLow = unit === "yr" ? (low * multiplier) / 12 : low * multiplier;
+    const monthlyHigh = unit === "yr" ? (high * multiplier) / 12 : high * multiplier;
+    return { low: Math.round(monthlyLow), high: Math.round(monthlyHigh) };
+  };
+
   if (showResults) {
     const selected = tools.filter(t => selectedTools.includes(t.id));
     const recommended = tools.filter(t => t.priority === "essential" && !selectedTools.includes(t.id));
+
+    const totalMonthly = selected.reduce((acc, t) => {
+      const est = estimateMonthly(t);
+      return { low: acc.low + est.low, high: acc.high + est.high };
+    }, { low: 0, high: 0 });
+
+    const totalAnnual = { low: totalMonthly.low * 12, high: totalMonthly.high * 12 };
+
+    const formatCurrency = (n: number) => n >= 1000 ? `$${(n / 1000).toFixed(1)}k` : `$${n}`;
 
     return (
       <div className="space-y-6">
@@ -947,26 +992,46 @@ export function SecurityBudgetCalculator({ tools }: { tools: SecurityTool[] }) {
               </div>
               <div>
                 <CardTitle>Security Budget Summary</CardTitle>
-                <p className="text-sm text-muted-foreground mt-0.5">{sizeLabel} · {industry}</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{sizeLabel} · {industry} · ~{employeeCount} employees estimated</p>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
             {selected.length > 0 && (
-              <div>
-                <h4 className="font-semibold text-foreground mb-3">Your Selected Security Stack</h4>
-                <div className="space-y-2">
-                  {selected.map(tool => (
-                    <div key={tool.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/30" data-testid={`budget-tool-${tool.id}`}>
-                      <div className="flex-1 min-w-0">
-                        <span className="font-medium text-foreground text-sm">{tool.name}</span>
-                        <p className="text-xs text-muted-foreground">{tool.category}</p>
-                      </div>
-                      <Badge variant="outline" className="text-sm font-semibold ml-2">{getPrice(tool)}</Badge>
-                    </div>
-                  ))}
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-green-50 dark:bg-green-950/20 rounded-xl p-4 border border-green-200 dark:border-green-800 text-center" data-testid="budget-monthly-estimate">
+                    <p className="text-xs text-green-600 dark:text-green-400 font-medium mb-1">Estimated Monthly</p>
+                    <p className="text-xl font-bold text-green-700 dark:text-green-300">{formatCurrency(totalMonthly.low)} - {formatCurrency(totalMonthly.high)}</p>
+                  </div>
+                  <div className="bg-blue-50 dark:bg-blue-950/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800 text-center" data-testid="budget-annual-estimate">
+                    <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">Estimated Annual</p>
+                    <p className="text-xl font-bold text-blue-700 dark:text-blue-300">{formatCurrency(totalAnnual.low)} - {formatCurrency(totalAnnual.high)}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground text-center">Estimates based on ~{employeeCount} users/devices. Per-unit costs are multiplied accordingly. Flat-rate tools are counted once.</p>
+
+                <div>
+                  <h4 className="font-semibold text-foreground mb-3">Your Selected Security Stack</h4>
+                  <div className="space-y-2">
+                    {selected.map(tool => {
+                      const est = estimateMonthly(tool);
+                      return (
+                        <div key={tool.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/30" data-testid={`budget-tool-${tool.id}`}>
+                          <div className="flex-1 min-w-0">
+                            <span className="font-medium text-foreground text-sm">{tool.name}</span>
+                            <p className="text-xs text-muted-foreground">{tool.category}</p>
+                          </div>
+                          <div className="text-right ml-2 flex-shrink-0">
+                            <Badge variant="outline" className="text-sm font-semibold">{getPrice(tool)}</Badge>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">~${est.low}-${est.high}/mo total</p>
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
+              </>
             )}
 
             {recommended.length > 0 && (
