@@ -392,15 +392,19 @@
     const hasEmailField = form.querySelector('input[type="email"], input[name*="email"]') !== null;
     const hasSensitiveData = hasPasswordField || hasCreditCardField || hasEmailField;
 
-    const isRisky = pageRiskLevel === "critical" || pageRiskLevel === "high" || pageRiskLevel === "medium";
+    const isHighRisk = pageRiskLevel === "critical" || pageRiskLevel === "high";
+    const isMediumRisk = pageRiskLevel === "medium";
     const hostname = window.location.hostname;
-    const isUnfamiliar = !isDomainFamiliar(hostname) && pageRiskLevel === "unknown";
+    const isUnfamiliar = !isDomainFamiliar(hostname) && (pageRiskLevel === "unknown" || pageRiskLevel === "low");
 
-    if (!isRisky && !(isUnfamiliar && hasSensitiveData)) return;
+    if (isHighRisk) {
+    } else if (isMediumRisk && hasSensitiveData) {
+    } else if (isUnfamiliar && hasSensitiveData) {
+    } else {
+      return;
+    }
 
-    if (pageRiskLevel === "medium" && !hasSensitiveData) return;
-
-    const effectiveRisk = isRisky ? pageRiskLevel : "low";
+    const effectiveRisk = isHighRisk ? pageRiskLevel : isMediumRisk ? "medium" : "low";
 
     e.preventDefault();
     e.stopPropagation();
