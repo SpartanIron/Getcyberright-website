@@ -86,22 +86,35 @@
           <span class="result-icon" id="result-icon"></span>
           <div>
             <div class="result-risk" id="result-risk"></div>
-            <div class="result-type" id="result-type"></div>
+            <div class="result-verdict" id="result-verdict"></div>
           </div>
         </div>
+        <div class="result-explainer" id="result-explainer"></div>
         <div class="result-summary" id="result-summary"></div>
-        <div class="result-flags" id="result-flags"></div>
-        <div class="result-actions-row" id="result-actions-row">
+        <div id="result-warnings-section" class="result-warnings-section">
+          <div class="result-section-label" id="warnings-label"></div>
+          <div class="result-flags" id="result-flags"></div>
+        </div>
+        <div id="result-safety-tips-section" class="result-safety-tips-section">
+          <div class="result-section-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            What You Should Do
+          </div>
           <div class="result-recs" id="result-recs"></div>
         </div>
+        <div class="result-type-tag" id="result-type"></div>
         <div class="result-footer">
           <button id="btn-report" class="btn btn-outline btn-sm" data-testid="btn-report">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-            Report Scam
+            Report This
           </button>
           <a id="btn-full-report" href="https://www.getcyberright.com/scam-checker" target="_blank" class="btn btn-outline btn-sm" data-testid="link-full-report">
-            Full Report
+            Learn More
           </a>
+          <button id="btn-share-result" class="btn btn-outline btn-sm" data-testid="btn-share-result">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Share
+          </button>
         </div>
       </div>
 

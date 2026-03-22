@@ -1622,28 +1622,28 @@ function analyzeContent(content: string): AnalysisResult {
   if (totalScore === 0) {
     overallRisk = "safe";
     confidenceScore = 75;
-    title = "No Obvious Threats Detected";
-    summary = "We did not detect common scam patterns. This does not guarantee safety so always verify unexpected messages through official channels.";
+    title = "Looks Safe!";
+    summary = "We didn't find any common scam patterns. It's always smart to double-check unexpected messages through official channels, but this looks okay.";
   } else if (totalScore <= 2) {
     overallRisk = "low";
     confidenceScore = 60;
-    title = "Low Risk with Minor Concerns";
-    summary = "A few elements warrant attention, but this may be legitimate. Verify through official channels if unsure.";
+    title = "Mostly Safe";
+    summary = "A couple of things caught our eye, but this is probably fine. If you're unsure, check with the official source before acting.";
   } else if (totalScore <= 5) {
     overallRisk = "medium";
     confidenceScore = 70;
-    title = "Medium Risk. Proceed with Caution";
-    summary = "This content contains multiple warning signs. We recommend verifying through official channels before taking any action.";
+    title = "Looks Suspicious";
+    summary = "We found several things that don't look right. Be careful — don't click links or share personal info until you've verified this is real.";
   } else if (totalScore <= 10) {
     overallRisk = "high";
     confidenceScore = 85;
-    title = "High Risk. Likely a Scam";
-    summary = "This content contains several major red flags commonly found in scams. Do not engage with this message.";
+    title = "Be Careful!";
+    summary = "This has multiple warning signs that scammers commonly use. We recommend you don't engage with this message.";
   } else {
     overallRisk = "critical";
     confidenceScore = 95;
-    title = "Critical Risk. Almost Certainly a Scam";
-    summary = "This content matches multiple known scam patterns. Delete immediately and do not respond, click links, or provide any information.";
+    title = "Danger — Stay Away!";
+    summary = "This matches known scam patterns. Do not reply, click any links, or share any information. Delete it right away to stay safe.";
   }
   
   // Generate recommendations based on threats
@@ -1764,6 +1764,59 @@ function getAIRiskIcon(level: string) {
     case "Critical": return <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />;
     default: return <Shield className="w-6 h-6 text-muted-foreground" />;
   }
+}
+
+function getFriendlyRiskTitle(level: string) {
+  switch (level) {
+    case "Critical": return "Danger — Stay Away!";
+    case "High": return "Be Careful!";
+    case "Moderate": return "Looks Suspicious";
+    case "Low": return "Mostly Safe";
+    default: return "Looks Suspicious";
+  }
+}
+
+function getFriendlyVerdict(level: string) {
+  switch (level) {
+    case "Critical": return "This looks very dangerous. Do not click, reply, or share any personal info.";
+    case "High": return "This has several red flags. We recommend you avoid it.";
+    case "Moderate": return "Something seems off. Proceed with caution.";
+    case "Low": return "We didn't find anything alarming. You can feel confident here.";
+    default: return "Take a closer look before you trust this.";
+  }
+}
+
+function getFriendlyWarningsLabel(level: string) {
+  switch (level) {
+    case "Critical": return "Warning Signs We Found";
+    case "High": return "What Caught Our Attention";
+    case "Moderate": return "Things That Look Off";
+    case "Low": return "Minor Notes";
+    default: return "Things We Noticed";
+  }
+}
+
+function getFriendlyFlagIcon(level: string) {
+  switch (level) {
+    case "Critical": return <XCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />;
+    case "High": return <XCircle className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />;
+    case "Moderate": return <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />;
+    case "Low": return <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />;
+    default: return <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />;
+  }
+}
+
+function getFriendlyContentType(type: string) {
+  const map: Record<string, string> = {
+    "URL": "Website Link",
+    "email": "Email Message",
+    "phone": "Phone Number",
+    "sms": "Text Message",
+    "message": "Message",
+    "text": "Text Content",
+  };
+  const first = type.split(" ")[0];
+  return map[first] || type;
 }
 
 export function ScamChecker() {
@@ -2358,16 +2411,17 @@ export function ScamChecker() {
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-2">
                               <h3 className={`text-lg font-bold ${getAIRiskColor(aiResult.scamRiskLevel)}`}>
-                                {aiResult.scamRiskLevel} Risk
+                                {getFriendlyRiskTitle(aiResult.scamRiskLevel)}
                               </h3>
                               <Badge variant="outline" className="text-xs">
-                                {aiResult.contentTypeDetected}
+                                {getFriendlyContentType(aiResult.contentTypeDetected)}
                               </Badge>
                               <Badge variant="secondary" className="text-xs font-mono">
                                 {aiResult.confidenceLevel}
                               </Badge>
                             </div>
-                            <p className="text-sm text-foreground">{aiResult.summary}</p>
+                            <p className="text-sm font-medium text-foreground mb-1">{getFriendlyVerdict(aiResult.scamRiskLevel)}</p>
+                            <p className="text-sm text-muted-foreground">{aiResult.summary}</p>
                           </div>
                         </div>
                       </div>
@@ -2376,12 +2430,12 @@ export function ScamChecker() {
                         <div>
                           <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
                             <AlertTriangle className="w-4 h-4 text-amber-500" />
-                            Key Red Flags
+                            {getFriendlyWarningsLabel(aiResult.scamRiskLevel)}
                           </h4>
                           <ul className="space-y-1.5">
                             {aiResult.keyRedFlags.map((flag, i) => (
                               <li key={i} className="flex items-start gap-2 text-sm">
-                                <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                                {getFriendlyFlagIcon(aiResult.scamRiskLevel)}
                                 <span className="text-foreground">{flag}</span>
                               </li>
                             ))}
@@ -2397,8 +2451,8 @@ export function ScamChecker() {
                           </h4>
                           <ul className="space-y-1.5">
                             {aiResult.recommendedActions.map((action, i) => (
-                              <li key={i} className="flex items-start gap-2 text-sm">
-                                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                              <li key={i} className="flex items-start gap-2 text-sm p-2 bg-green-50 dark:bg-green-950/30 rounded-md border border-green-200 dark:border-green-800">
+                                <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                                 <span className="text-foreground">{action}</span>
                               </li>
                             ))}

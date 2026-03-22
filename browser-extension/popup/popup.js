@@ -125,6 +125,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  document.getElementById("btn-share-result").addEventListener("click", () => {
+    if (!lastScanResult) return;
+    const risk = (lastScanResult.scamRiskLevel || "Unknown");
+    const friendlyTitles = {
+      critical: "Danger - Stay Away!",
+      high: "Be Careful!",
+      moderate: "Looks Suspicious",
+      medium: "Looks Suspicious",
+      low: "Mostly Safe",
+      safe: "Looks Safe!"
+    };
+    const title = friendlyTitles[risk.toLowerCase()] || risk;
+    const summary = lastScanResult.summary || "";
+    const url = extractUrl(lastScanContent) || "";
+    const text = `GCR Guard scanned this and says: "${title}"\n\n${summary}\n\n${url ? "Link: " + url + "\n\n" : ""}Stay safe online! Get GCR Guard at getcyberright.com`;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById("btn-share-result");
+        btn.textContent = "Copied!";
+        setTimeout(() => {
+          btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share`;
+        }, 2000);
+      });
+    }
+  });
+
   btnReportPage.addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (!tabs[0]?.url) return;
@@ -188,8 +215,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (cached && cached.riskLevel) {
           const riskLevel = cached.riskLevel;
-          const iconMap = { critical: "\uD83D\uDEA8", high: "\u26A0\uFE0F", medium: "\u26A1", low: "\uD83D\uDD35", safe: "\u2705" };
-          const labelMap = { critical: "Critical Risk", high: "High Risk", medium: "Medium Risk", low: "Low Risk", safe: "Page Looks Safe" };
+          const iconMap = { critical: "\uD83D\uDEA8", high: "\u26A0\uFE0F", medium: "\uD83E\uDD14", low: "\uD83D\uDC4D", safe: "\u2705" };
+          const labelMap = { critical: "Danger \u2014 Stay Away!", high: "Be Careful!", medium: "Looks Suspicious", low: "Mostly Safe", safe: "Looks Safe!" };
 
           pageStatus.classList.remove("hidden");
           pageStatus.className = `page-status page-status-${riskLevel}`;
@@ -217,12 +244,12 @@ document.addEventListener("DOMContentLoaded", () => {
           let riskLabel = "Safe";
           let iconText = "\u2705";
 
-          if (text === "!!!") { riskLevel = "critical"; riskLabel = "Critical Risk"; iconText = "\uD83D\uDEA8"; }
-          else if (text === "!!") { riskLevel = "high"; riskLabel = "High Risk"; iconText = "\u26A0\uFE0F"; }
-          else if (text === "!") { riskLevel = "medium"; riskLabel = "Medium Risk"; iconText = "\u26A1"; }
-          else if (text === "OK") { riskLevel = "low"; riskLabel = "Low Risk"; iconText = "\uD83D\uDD35"; }
-          else if (text === "\u2713") { riskLevel = "safe"; riskLabel = "Page Looks Safe"; iconText = "\u2705"; }
-          else if (text === "...") { riskLevel = "scanning"; riskLabel = "Scanning..."; iconText = "\uD83D\uDD0D"; }
+          if (text === "!!!") { riskLevel = "critical"; riskLabel = "Danger \u2014 Stay Away!"; iconText = "\uD83D\uDEA8"; }
+          else if (text === "!!") { riskLevel = "high"; riskLabel = "Be Careful!"; iconText = "\u26A0\uFE0F"; }
+          else if (text === "!") { riskLevel = "medium"; riskLabel = "Looks Suspicious"; iconText = "\uD83E\uDD14"; }
+          else if (text === "OK") { riskLevel = "low"; riskLabel = "Mostly Safe"; iconText = "\uD83D\uDC4D"; }
+          else if (text === "\u2713") { riskLevel = "safe"; riskLabel = "Looks Safe!"; iconText = "\u2705"; }
+          else if (text === "...") { riskLevel = "scanning"; riskLabel = "Checking this page..."; iconText = "\uD83D\uDD0D"; }
 
           pageStatus.classList.remove("hidden");
           pageStatus.className = `page-status page-status-${riskLevel}`;
@@ -266,51 +293,119 @@ document.addEventListener("DOMContentLoaded", () => {
     const header = document.getElementById("result-header");
     const icon = document.getElementById("result-icon");
     const riskEl = document.getElementById("result-risk");
+    const verdictEl = document.getElementById("result-verdict");
+    const explainerEl = document.getElementById("result-explainer");
     const typeEl = document.getElementById("result-type");
     const summaryEl = document.getElementById("result-summary");
     const flagsEl = document.getElementById("result-flags");
     const recsEl = document.getElementById("result-recs");
+    const warningsSection = document.getElementById("result-warnings-section");
+    const warningsLabel = document.getElementById("warnings-label");
+    const safetyTipsSection = document.getElementById("result-safety-tips-section");
 
     header.className = `result-header risk-${risk}`;
 
-    const iconMap = {
-      critical: "\uD83D\uDEA8",
-      high: "\u26A0\uFE0F",
-      moderate: "\u26A1",
-      medium: "\u26A1",
-      low: "\uD83D\uDD35",
-      safe: "\u2705"
+    const friendlyData = {
+      critical: {
+        icon: "\uD83D\uDEA8",
+        title: "Danger \u2014 Stay Away!",
+        verdict: "This looks very dangerous. Do not click, reply, or share any personal info.",
+        explainer: "We found serious warning signs that this is a scam or harmful content. Please protect yourself and your family.",
+        warningsLabel: "\u26A0\uFE0F Warning Signs We Found"
+      },
+      high: {
+        icon: "\u26A0\uFE0F",
+        title: "Be Careful!",
+        verdict: "This has several red flags. We recommend you avoid it.",
+        explainer: "We spotted some concerning signs. When in doubt, don\u2019t click links or share personal information.",
+        warningsLabel: "\u26A0\uFE0F What Caught Our Attention"
+      },
+      moderate: {
+        icon: "\uD83E\uDD14",
+        title: "Looks Suspicious",
+        verdict: "Something seems off. Proceed with caution.",
+        explainer: "There are a few things that don\u2019t look right. Take a closer look before you trust this.",
+        warningsLabel: "\uD83D\uDD0D Things That Look Off"
+      },
+      medium: {
+        icon: "\uD83E\uDD14",
+        title: "Looks Suspicious",
+        verdict: "Something seems off. Proceed with caution.",
+        explainer: "There are a few things that don\u2019t look right. Take a closer look before you trust this.",
+        warningsLabel: "\uD83D\uDD0D Things That Look Off"
+      },
+      low: {
+        icon: "\uD83D\uDC4D",
+        title: "Mostly Safe",
+        verdict: "This looks okay, but always stay alert online.",
+        explainer: "We didn\u2019t find anything alarming, but it\u2019s always smart to be careful with your personal info.",
+        warningsLabel: "\u2139\uFE0F Minor Notes"
+      },
+      safe: {
+        icon: "\u2705",
+        title: "Looks Safe!",
+        verdict: "We didn\u2019t find any threats here.",
+        explainer: "This appears to be legitimate. You can feel confident browsing here.",
+        warningsLabel: ""
+      }
     };
-    icon.textContent = iconMap[risk] || "\uD83D\uDD0D";
-    riskEl.textContent = `${capitalize(result.scamRiskLevel || "Unknown")} Risk`;
-    typeEl.textContent = result.contentTypeDetected || "";
+
+    const data = friendlyData[risk] || friendlyData.moderate;
+    icon.textContent = data.icon;
+    riskEl.textContent = data.title;
+    verdictEl.textContent = data.verdict;
+    explainerEl.textContent = data.explainer;
+
+    if (result.contentTypeDetected) {
+      const friendlyTypes = {
+        "URL": "Website Link",
+        "email": "Email Message",
+        "phone": "Phone Number",
+        "sms": "Text Message",
+        "message": "Message",
+        "text": "Text Content"
+      };
+      const detected = result.contentTypeDetected.split(" ")[0];
+      typeEl.textContent = "Scanned: " + (friendlyTypes[detected] || result.contentTypeDetected);
+      typeEl.classList.remove("hidden");
+    } else {
+      typeEl.classList.add("hidden");
+    }
 
     summaryEl.textContent = result.summary || "";
 
     flagsEl.innerHTML = "";
     if (result.keyRedFlags && result.keyRedFlags.length > 0) {
+      warningsSection.classList.remove("hidden");
+      warningsLabel.innerHTML = data.warningsLabel;
       result.keyRedFlags.forEach((flag) => {
         const div = document.createElement("div");
         div.className = "flag-item";
         const iconSpan = document.createElement("span");
         iconSpan.className = "flag-icon";
-        iconSpan.textContent = "\u25CF";
+        const flagIcons = { critical: "\uD83D\uDED1", high: "\uD83D\uDD34", moderate: "\uD83D\uDFE1", medium: "\uD83D\uDFE1", low: "\uD83D\uDD35", safe: "\u2705" };
+        iconSpan.textContent = flagIcons[risk] || "\uD83D\uDFE1";
         const textSpan = document.createElement("span");
         textSpan.textContent = flag;
         div.appendChild(iconSpan);
         div.appendChild(textSpan);
         flagsEl.appendChild(div);
       });
+    } else {
+      warningsSection.classList.add("hidden");
     }
 
     recsEl.innerHTML = "";
     if (result.recommendedActions && result.recommendedActions.length > 0) {
+      safetyTipsSection.classList.remove("hidden");
       result.recommendedActions.slice(0, 3).forEach((rec) => {
         const div = document.createElement("div");
         div.className = "rec-item";
         div.textContent = rec;
         recsEl.appendChild(div);
       });
+    } else {
+      safetyTipsSection.classList.add("hidden");
     }
 
     scanResult.classList.remove("hidden");
@@ -320,18 +415,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const header = document.getElementById("result-header");
     const icon = document.getElementById("result-icon");
     const riskEl = document.getElementById("result-risk");
+    const verdictEl = document.getElementById("result-verdict");
+    const explainerEl = document.getElementById("result-explainer");
     const typeEl = document.getElementById("result-type");
     const summaryEl = document.getElementById("result-summary");
     const flagsEl = document.getElementById("result-flags");
     const recsEl = document.getElementById("result-recs");
+    const warningsSection = document.getElementById("result-warnings-section");
+    const safetyTipsSection = document.getElementById("result-safety-tips-section");
 
     header.className = "result-header";
     icon.textContent = "\u274C";
-    riskEl.textContent = "Analysis Error";
+    riskEl.textContent = "Something Went Wrong";
+    verdictEl.textContent = "We couldn\u2019t complete the scan. Please try again.";
+    explainerEl.textContent = "";
     typeEl.textContent = "";
+    typeEl.classList.add("hidden");
     summaryEl.textContent = message;
     flagsEl.innerHTML = "";
     recsEl.innerHTML = "";
+    warningsSection.classList.add("hidden");
+    safetyTipsSection.classList.add("hidden");
     scanResult.classList.remove("hidden");
   }
 
