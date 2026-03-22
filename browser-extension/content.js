@@ -558,7 +558,7 @@
   async function quickLinkCheck(url, linkEl) {
     try {
       const suspicious = quickSuspicionCheck(url);
-      const lookalike = detectLookalike(url);
+      const lookalike = settings.lookalikeDetection ? detectLookalike(url) : null;
 
       if (lookalike) {
         suspicious.score += 3;

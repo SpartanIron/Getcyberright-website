@@ -260,6 +260,16 @@ async function handleAutoScan(message, sender) {
     }
   } catch (e) {}
 
+  if (result.riskScore > 0 || result.lookalikeMatch) {
+    let interimLevel = "safe";
+    if (result.riskScore >= 70) interimLevel = "critical";
+    else if (result.riskScore >= 50) interimLevel = "high";
+    else if (result.riskScore >= 30) interimLevel = "medium";
+    else if (result.riskScore >= 10) interimLevel = "low";
+    result.riskLevel = interimLevel;
+    updateBadgeFromResult(result, tabId);
+  }
+
   if (result.riskScore >= 30 || result.lookalikeMatch) {
     try {
       const pageContent = message.pageInfo ? buildPageContentString(url, message.pageInfo) : url;
