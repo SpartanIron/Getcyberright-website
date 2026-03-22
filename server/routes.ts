@@ -4099,6 +4099,17 @@ EDGE CASE HANDLING
   const hexHashRegex = /^[0-9a-f]{64}$/;
   const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
 
+  const cryptoModule = await import("crypto");
+  function computeDomainHash(domain: string): string {
+    const normalized = domain.toLowerCase().replace(/^www\./, "");
+    return cryptoModule.createHash("sha256").update(normalized).digest("hex");
+  }
+  function maskDomain(domain: string): string {
+    const parts = domain.split(".");
+    if (parts.length <= 2) return `***.${parts[parts.length - 1]}`;
+    return `***.${parts.slice(-2).join(".")}`;
+  }
+
   app.get("/api/extension/site-reputation", standardRateLimit, async (req, res) => {
     try {
       const domainHash = req.query.domainHash as string;
@@ -4130,9 +4141,15 @@ EDGE CASE HANDLING
         res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
         return;
       }
+      const serverHash = computeDomainHash(domain);
+      if (serverHash !== domainHash) {
+        res.status(400).json({ error: "Domain hash mismatch" });
+        return;
+      }
+      const masked = maskDomain(domain);
       await db.execute(sql`
         INSERT INTO site_reputation (id, domain_hash, domain, visit_count, safe_count, flag_count, community_score, last_visited, created_at, updated_at)
-        VALUES (gen_random_uuid(), ${domainHash}, ${domain}, 1, 0, 0, 50, NOW(), NOW(), NOW())
+        VALUES (gen_random_uuid(), ${domainHash}, ${masked}, 1, 0, 0, 50, NOW(), NOW(), NOW())
         ON CONFLICT (domain_hash) DO UPDATE SET
           visit_count = site_reputation.visit_count + 1,
           last_visited = NOW(),
@@ -4152,9 +4169,15 @@ EDGE CASE HANDLING
         res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
         return;
       }
+      const serverHash = computeDomainHash(domain);
+      if (serverHash !== domainHash) {
+        res.status(400).json({ error: "Domain hash mismatch" });
+        return;
+      }
+      const masked = maskDomain(domain);
       await db.execute(sql`
         INSERT INTO site_reputation (id, domain_hash, domain, visit_count, safe_count, flag_count, community_score, last_flagged, created_at, updated_at)
-        VALUES (gen_random_uuid(), ${domainHash}, ${domain}, 0, 0, 1, 0, NOW(), NOW(), NOW())
+        VALUES (gen_random_uuid(), ${domainHash}, ${masked}, 0, 0, 1, 0, NOW(), NOW(), NOW())
         ON CONFLICT (domain_hash) DO UPDATE SET
           flag_count = site_reputation.flag_count + 1,
           community_score = GREATEST(0, ROUND((site_reputation.safe_count::numeric / GREATEST(1, site_reputation.safe_count + site_reputation.flag_count + 1)) * 100)),
@@ -4179,14 +4202,19 @@ EDGE CASE HANDLING
         res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
         return;
       }
+      const serverHash = computeDomainHash(domain);
+      if (serverHash !== domainHash) {
+        res.status(400).json({ error: "Domain hash mismatch" });
+        return;
+      }
+      const masked = maskDomain(domain);
       await db.execute(sql`
         INSERT INTO site_reputation (id, domain_hash, domain, visit_count, safe_count, flag_count, community_score, created_at, updated_at)
-        VALUES (gen_random_uuid(), ${domainHash}, ${domain}, 1, 1, 0, 100, NOW(), NOW())
+        VALUES (gen_random_uuid(), ${domainHash}, ${masked}, 1, 1, 0, 100, NOW(), NOW())
         ON CONFLICT (domain_hash) DO UPDATE SET
           safe_count = site_reputation.safe_count + 1,
           community_score = LEAST(100, ROUND(((site_reputation.safe_count + 1)::numeric / GREATEST(1, site_reputation.safe_count + 1 + site_reputation.flag_count)) * 100)),
           updated_at = NOW()
-        RETURNING community_score, safe_count
       `);
       res.json({ success: true });
     } catch (error) {

@@ -299,6 +299,25 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("stat-links").textContent = stats.linksChecked || 0;
       }
     });
+    chrome.runtime.sendMessage({ type: "GET_WEEKLY_STATS" }, (weeklyStats) => {
+      const scoreEl = document.getElementById("stat-safety-score");
+      if (!scoreEl || !weeklyStats) return;
+      const scans = (weeklyStats.scansPerDay || []).reduce((a, b) => a + b, 0);
+      const threats = (weeklyStats.threatsPerDay || []).reduce((a, b) => a + b, 0);
+      if (scans === 0) {
+        scoreEl.textContent = "--";
+        return;
+      }
+      const safetyScore = Math.round(((scans - threats) / scans) * 100);
+      scoreEl.textContent = safetyScore;
+      if (safetyScore >= 90) {
+        scoreEl.style.color = "#16a34a";
+      } else if (safetyScore >= 70) {
+        scoreEl.style.color = "#ca8a04";
+      } else {
+        scoreEl.style.color = "#dc2626";
+      }
+    });
   }
 
   function loadScamOfWeek() {

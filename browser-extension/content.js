@@ -978,51 +978,103 @@
 
       const links = row.querySelectorAll("a[href]");
       const suspiciousLinks = [];
+      const domainsToCheck = new Set();
       links.forEach(link => {
         const href = link.getAttribute("href") || "";
         if (!href.startsWith("http")) return;
         try {
           const hostname = new URL(href).hostname;
+          domainsToCheck.add(hostname);
           const lookalikeResult = detectLookalikeHostname(hostname);
           if (lookalikeResult) {
-            suspiciousLinks.push({ href, match: lookalikeResult });
+            suspiciousLinks.push({ href, match: lookalikeResult, reason: "lookalike" });
           }
         } catch (e) {}
       });
 
-      if (suspiciousLinks.length > 0) {
-        const indicator = document.createElement("span");
-        indicator.className = "gcr-inbox-risk-indicator";
-        indicator.title = `GCR Guard: ${suspiciousLinks.length} suspicious link(s) detected`;
-        indicator.style.cssText = `
-          display: inline-flex;
-          align-items: center;
-          gap: 3px;
-          background: #fef2f2;
-          border: 1px solid #fca5a5;
-          border-radius: 4px;
-          padding: 1px 6px;
-          font-size: 10px;
-          font-weight: 600;
-          color: #dc2626;
-          margin-left: 6px;
-          cursor: help;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        `;
-        indicator.textContent = "\u26A0\uFE0F " + suspiciousLinks.length + " risky";
-
-        const providerName = provider.name.toLowerCase();
-        const subjectCell = providerName === "gmail"
-          ? row.querySelector(".bog, .bqe, .y6")
-          : row.querySelector("[data-testid='subjectLine'], .hcptT");
-        if (subjectCell) {
-          subjectCell.appendChild(indicator);
-        } else {
-          const firstCell = row.querySelector("td:nth-child(3), td:nth-child(4)") || row.firstElementChild;
-          if (firstCell) firstCell.appendChild(indicator);
+      const senderEl = row.querySelector(provider.senderSelector);
+      const senderEmail = senderEl?.getAttribute("email") || senderEl?.textContent || "";
+      const senderDomainMatch = senderEmail.match(/@([a-zA-Z0-9.-]+)/);
+      if (senderDomainMatch) {
+        const senderDomain = senderDomainMatch[1];
+        domainsToCheck.add(senderDomain);
+        const senderLookalike = detectLookalikeHostname(senderDomain);
+        if (senderLookalike) {
+          suspiciousLinks.push({ href: senderEmail, match: senderLookalike, reason: "sender-lookalike" });
         }
       }
+
+      const uniqueDomains = [...domainsToCheck];
+      let trustChecksComplete = 0;
+      const riskyDomains = [];
+
+      if (uniqueDomains.length === 0 && suspiciousLinks.length === 0) return;
+
+      if (suspiciousLinks.length > 0) {
+        addInboxIndicator(row, provider, suspiciousLinks.length, "lookalike", suspiciousLinks);
+      }
+
+      uniqueDomains.forEach(domain => {
+        chrome.runtime.sendMessage({ type: "GET_COMMUNITY_TRUST", domain }, (data) => {
+          trustChecksComplete++;
+          if (data && data.communityScore < 30 && data.visitCount > 0) {
+            riskyDomains.push({ domain, score: data.communityScore, flagCount: data.flagCount });
+          }
+          if (trustChecksComplete === uniqueDomains.length && riskyDomains.length > 0) {
+            addInboxIndicator(row, provider, riskyDomains.length, "community", riskyDomains);
+          }
+        });
+      });
     });
+  }
+
+  function addInboxIndicator(row, provider, count, type, details) {
+    const existingClass = type === "lookalike" ? ".gcr-inbox-lookalike" : ".gcr-inbox-community";
+    if (row.querySelector(existingClass)) return;
+
+    const indicator = document.createElement("span");
+    indicator.className = `gcr-inbox-risk-indicator ${type === "lookalike" ? "gcr-inbox-lookalike" : "gcr-inbox-community"}`;
+
+    const tooltipParts = [];
+    if (type === "lookalike") {
+      tooltipParts.push(`${count} suspicious link(s) with lookalike domains detected`);
+    } else {
+      details.forEach(d => tooltipParts.push(`${d.domain}: community score ${d.score}/100, flagged ${d.flagCount} times`));
+    }
+    indicator.title = `GCR Guard: ${tooltipParts.join("; ")}`;
+
+    const bgColor = type === "lookalike" ? "#fef2f2" : "#fffbeb";
+    const borderColor = type === "lookalike" ? "#fca5a5" : "#fcd34d";
+    const textColor = type === "lookalike" ? "#dc2626" : "#b45309";
+    const icon = type === "lookalike" ? "\u26A0\uFE0F" : "\uD83D\uDEE1\uFE0F";
+
+    indicator.style.cssText = `
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: ${bgColor};
+      border: 1px solid ${borderColor};
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      color: ${textColor};
+      margin-left: 6px;
+      cursor: help;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    `;
+    indicator.textContent = `${icon} ${count} ${type === "lookalike" ? "risky" : "flagged"}`;
+
+    const providerLower = provider.name.toLowerCase();
+    const subjectCell = providerLower === "gmail"
+      ? row.querySelector(".bog, .bqe, .y6")
+      : row.querySelector("[data-testid='subjectLine'], .hcptT");
+    if (subjectCell) {
+      subjectCell.appendChild(indicator);
+    } else {
+      const firstCell = row.querySelector("td:nth-child(3), td:nth-child(4)") || row.firstElementChild;
+      if (firstCell) firstCell.appendChild(indicator);
+    }
   }
 
   function detectLookalikeHostname(hostname) {
