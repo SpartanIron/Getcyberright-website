@@ -89,7 +89,28 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
+const CANONICAL_HOST = "www.getcyberright.com";
+const PRODUCTION_DOMAIN = process.env.PRODUCTION_DOMAIN || CANONICAL_HOST;
+
 app.use((req, res, next) => {
+  if (process.env.NODE_ENV === "production" || process.env.REPL_SLUG) {
+    const host = (req.hostname || req.headers.host || "").replace(/:\d+$/, "");
+    const proto = req.protocol || (req.headers["x-forwarded-proto"] as string) || "https";
+
+    if (host === PRODUCTION_DOMAIN || host === CANONICAL_HOST) {
+      if (proto !== "https") {
+        const target = `https://${CANONICAL_HOST}${req.originalUrl}`;
+        return res.redirect(301, target);
+      }
+    } else if (
+      host === "getcyberright.com" ||
+      host === PRODUCTION_DOMAIN.replace(/^www\./, "")
+    ) {
+      const target = `https://${CANONICAL_HOST}${req.originalUrl}`;
+      return res.redirect(301, target);
+    }
+  }
+
   const p = req.path;
   if (p !== "/" && p.endsWith("/") && !p.startsWith("/api/")) {
     const query = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
