@@ -8,11 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { FAQData, BreadcrumbData } from "@/components/structured-data";
-import { 
-  Shield, Lock, Mail, Users, Building, Briefcase,
+import {
+  Shield, Lock, Mail, Users, Building,
   CheckCircle, Star, AlertTriangle, FileText,
   ArrowRight, Lightbulb, DollarSign, Server,
-  Smartphone, Key, Eye, CalendarDays
+  Key, Eye, CalendarDays, BarChart3, Globe
 } from "lucide-react";
 import bannerImage from "@/assets/banners/small-business-banner.png";
 import imgEmployeeTraining from "@/assets/images/card-employee-training.png";
@@ -21,6 +21,20 @@ import imgPasswordManagement from "@/assets/images/card-password-management.png"
 import imgDataProtection from "@/assets/images/card-data-protection.png";
 import imgCyberInsurance from "@/assets/images/card-cyber-insurance.png";
 import imgIncidentResponse from "@/assets/images/card-incident-response-biz.png";
+import {
+  SecurityPostureAssessment,
+  PhishingSimulationTrainer,
+  PolicyTemplateBuilder,
+  IncidentResponseFlowchart,
+  SecurityBudgetCalculator
+} from "@/components/small-business-hub/interactive-tools";
+import {
+  assessmentItems,
+  phishingScenarios,
+  policyTemplates,
+  incidentTypes,
+  securityTools
+} from "@/components/small-business-hub/assessment-data";
 
 interface BusinessTopic {
   id: string;
@@ -240,208 +254,166 @@ const businessTopics: BusinessTopic[] = [
   }
 ];
 
-function SmallBusinessLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void }) {
-  return (
-    <>
-      <PageBanner
-        title="Protect Your Business"
-        subtitle="Practical, cost-effective security guidance designed for small businesses. Build resilience against cyber threats without breaking your budget."
-        imageSrc={bannerImage}
-        imageAlt="Small business team working on cybersecurity"
-        colorVariant="slate"
-      />
-      
-      <div className="py-12 bg-background">
-        <div className="max-w-5xl mx-auto px-4">
+type TabId = "guides" | "assessment" | "phishing" | "policies" | "incidents" | "budget";
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6 mb-12">
-            {businessTopics.map((topic) => (
-              <Card 
-                key={topic.id}
-                className="cursor-pointer transition-shadow hover:shadow-lg border overflow-hidden"
-                onClick={() => onSelectTopic(topic.id)}
-                onKeyDown={(e) => e.key === 'Enter' && onSelectTopic(topic.id)}
-                tabIndex={0}
-                role="button"
-                aria-label={`Learn about ${topic.title}`}
-                data-testid={`card-topic-${topic.id}`}
+const tabs: { id: TabId; label: string; icon: typeof Shield }[] = [
+  { id: "guides", label: "Guides", icon: Lightbulb },
+  { id: "assessment", label: "Assessment", icon: BarChart3 },
+  { id: "phishing", label: "Phishing Sim", icon: Mail },
+  { id: "policies", label: "Policies", icon: FileText },
+  { id: "incidents", label: "Incident Response", icon: AlertTriangle },
+  { id: "budget", label: "Budget", icon: DollarSign }
+];
+
+function TopicGuides({ topics }: { topics: BusinessTopic[] }) {
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const current = selectedTopic ? topics.find(t => t.id === selectedTopic) : null;
+
+  if (current) {
+    return (
+      <div>
+        <Button
+          variant="ghost"
+          onClick={() => setSelectedTopic(null)}
+          className="mb-6"
+          data-testid="button-back-to-topics"
+        >
+          <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+          Back to All Topics
+        </Button>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-16 h-16 rounded-xl ${current.color} flex items-center justify-center shadow-lg`}>
+                  <current.icon className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl">{current.title}</CardTitle>
+                  <CardDescription className="text-base">{current.description}</CardDescription>
+                </div>
+              </div>
+              <Badge
+                className={current.priority === 'Critical' ? 'bg-red-500 text-white' : current.priority === 'Essential' ? 'bg-blue-500 text-white' : 'bg-amber-500 text-white'}
               >
-                <div className="relative h-48 sm:h-56 w-full">
-                  <img
-                    src={topic.image}
-                    alt={topic.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    data-testid={`img-topic-${topic.id}`}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <Badge 
-                    className={`absolute top-3 right-3 ${topic.priority === 'Critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300' : topic.priority === 'Essential' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'}`}
-                  >
-                    {topic.priority}
-                  </Badge>
-                </div>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-10 h-10 rounded-lg ${topic.color} flex items-center justify-center flex-shrink-0`}>
-                      <topic.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-lg text-foreground">{topic.title}</h3>
-                  </div>
-                  <p className="text-muted-foreground text-sm">{topic.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <Card className="border">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row items-center gap-6">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                </div>
-                <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-lg font-semibold text-foreground mb-1">
-                    Cost-Effective Security
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    Each topic includes practical quick wins and cost considerations to help you budget effectively.
-                  </p>
-                </div>
-                <Button variant="outline" onClick={() => {
-                  window.location.href = '/tools';
-                }} data-testid="button-security-tools">
-                  Security Tools
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="mt-6 p-4 bg-muted/50 rounded-lg border">
-            <div className="flex items-start gap-3">
-              <Lightbulb className="w-5 h-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-foreground">Start With the Basics</p>
-                <p className="text-sm text-muted-foreground">
-                  Focus on the fundamentals: strong passwords, multi-factor authentication, regular backups, and employee awareness.
-                </p>
-              </div>
+                {current.priority}
+              </Badge>
             </div>
-          </div>
-        </div>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            <div>
+              <p className="text-lg text-foreground leading-relaxed">{current.content.intro}</p>
+            </div>
+
+            <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-6 border border-red-200 dark:border-red-800">
+              <h4 className="font-semibold text-lg text-red-800 dark:text-red-200 mb-4 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5" />
+                Key Risks
+              </h4>
+              <ul className="space-y-3">
+                {current.content.risks.map((risk, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <Eye className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-red-700 dark:text-red-300">{risk}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+              <h4 className="font-semibold text-lg text-blue-800 dark:text-blue-200 mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Best Practices
+              </h4>
+              <ul className="space-y-3">
+                {current.content.bestPractices.map((practice, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-blue-700 dark:text-blue-300">{practice}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
+              <h4 className="font-semibold text-lg text-green-800 dark:text-green-200 mb-4 flex items-center gap-2">
+                <Star className="w-5 h-5" />
+                Quick Wins
+              </h4>
+              <ul className="space-y-3">
+                {current.content.quickWins.map((win, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-sm flex-shrink-0">{index + 1}</span>
+                    <span className="text-green-700 dark:text-green-300">{win}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800">
+              <h4 className="font-semibold text-lg text-amber-800 dark:text-amber-200 mb-3 flex items-center gap-2">
+                <DollarSign className="w-5 h-5" />
+                Cost Considerations
+              </h4>
+              <p className="text-amber-700 dark:text-amber-300">{current.content.costConsiderations}</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </>
-  );
-}
+    );
+  }
 
-function TopicContent({ 
-  topic, 
-  onBack 
-}: { 
-  topic: BusinessTopic;
-  onBack: () => void;
-}) {
   return (
-    <div className="relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950/30 dark:via-blue-950/30 dark:to-indigo-950/30" />
-      
-      <div className="relative py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <Button 
-            variant="ghost" 
-            onClick={onBack} 
-            className="mb-6"
-            data-testid="button-back-to-topics"
+    <div className="space-y-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {topics.map((topic) => (
+          <Card
+            key={topic.id}
+            className="cursor-pointer transition-shadow hover:shadow-lg border overflow-hidden"
+            onClick={() => setSelectedTopic(topic.id)}
+            onKeyDown={(e) => e.key === 'Enter' && setSelectedTopic(topic.id)}
+            tabIndex={0}
+            role="button"
+            aria-label={`Learn about ${topic.title}`}
+            data-testid={`card-topic-${topic.id}`}
           >
-            <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-            Back to All Topics
-          </Button>
-
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className={`w-16 h-16 rounded-xl ${topic.color} flex items-center justify-center shadow-lg`}>
-                    <topic.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-2xl">{topic.title}</CardTitle>
-                    <CardDescription className="text-base">{topic.description}</CardDescription>
-                  </div>
+            <div className="relative h-48 sm:h-56 w-full">
+              <img
+                src={topic.image}
+                alt={topic.title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                data-testid={`img-topic-${topic.id}`}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <Badge
+                className={`absolute top-3 right-3 ${topic.priority === 'Critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300' : topic.priority === 'Essential' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'}`}
+              >
+                {topic.priority}
+              </Badge>
+            </div>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`w-10 h-10 rounded-lg ${topic.color} flex items-center justify-center flex-shrink-0`}>
+                  <topic.icon className="w-5 h-5 text-white" />
                 </div>
-                <Badge 
-                  className={topic.priority === 'Critical' ? 'bg-red-500 text-white' : topic.priority === 'Essential' ? 'bg-blue-500 text-white' : 'bg-amber-500 text-white'}
-                >
-                  {topic.priority}
-                </Badge>
+                <h3 className="font-semibold text-lg text-foreground">{topic.title}</h3>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              <div>
-                <p className="text-lg text-foreground leading-relaxed">{topic.content.intro}</p>
-              </div>
-
-              <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-6 border border-red-200 dark:border-red-800">
-                <h4 className="font-semibold text-lg text-red-800 dark:text-red-200 mb-4 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5" />
-                  Key Risks
-                </h4>
-                <ul className="space-y-3">
-                  {topic.content.risks.map((risk, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <Eye className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-red-700 dark:text-red-300">{risk}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
-                <h4 className="font-semibold text-lg text-blue-800 dark:text-blue-200 mb-4 flex items-center gap-2">
-                  <Shield className="w-5 h-5" />
-                  Best Practices
-                </h4>
-                <ul className="space-y-3">
-                  {topic.content.bestPractices.map((practice, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-blue-700 dark:text-blue-300">{practice}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
-                <h4 className="font-semibold text-lg text-green-800 dark:text-green-200 mb-4 flex items-center gap-2">
-                  <Star className="w-5 h-5" />
-                  Quick Wins
-                </h4>
-                <ul className="space-y-3">
-                  {topic.content.quickWins.map((win, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-sm flex-shrink-0">{index + 1}</span>
-                      <span className="text-green-700 dark:text-green-300">{win}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800">
-                <h4 className="font-semibold text-lg text-amber-800 dark:text-amber-200 mb-3 flex items-center gap-2">
-                  <DollarSign className="w-5 h-5" />
-                  Cost Considerations
-                </h4>
-                <p className="text-amber-700 dark:text-amber-300">{topic.content.costConsiderations}</p>
-              </div>
+              <p className="text-muted-foreground text-sm">{topic.description}</p>
             </CardContent>
           </Card>
+        ))}
+      </div>
 
-          <div className="flex justify-center">
-            <Button onClick={onBack} variant="outline" data-testid="button-explore-more">
-              Explore More Topics
-            </Button>
+      <div className="p-4 bg-muted/50 rounded-lg border">
+        <div className="flex items-start gap-3">
+          <Lightbulb className="w-5 h-5 text-muted-foreground mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-foreground">Start With the Basics</p>
+            <p className="text-sm text-muted-foreground">
+              Focus on the fundamentals: strong passwords, multi-factor authentication, regular backups, and employee awareness.
+            </p>
           </div>
         </div>
       </div>
@@ -450,11 +422,7 @@ function TopicContent({
 }
 
 export default function SmallBusiness() {
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
-
-  const currentTopic = selectedTopic 
-    ? businessTopics.find(t => t.id === selectedTopic) 
-    : null;
+  const [activeTab, setActiveTab] = useState<TabId>("guides");
 
   const businessFaqSchema: FAQData = {
     type: "FAQPage",
@@ -477,16 +445,48 @@ export default function SmallBusiness() {
       <SEOHead {...pageSEO.smallBusiness} />
       <StructuredData data={[businessFaqSchema, businessBreadcrumbs]} />
       <Navigation />
-      
+
       <main id="main-content" tabIndex={-1}>
-        {currentTopic ? (
-          <TopicContent 
-            topic={currentTopic}
-            onBack={() => setSelectedTopic(null)}
-          />
-        ) : (
-          <SmallBusinessLanding onSelectTopic={setSelectedTopic} />
-        )}
+        <PageBanner
+          title="Protect Your Business"
+          subtitle="Practical, cost-effective security guidance designed for small businesses. Build resilience against cyber threats without breaking your budget."
+          imageSrc={bannerImage}
+          imageAlt="Small business team working on cybersecurity"
+          colorVariant="slate"
+        />
+
+        <div className="py-8 bg-background">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex flex-wrap gap-2 mb-8 bg-muted/50 p-2 rounded-xl border" data-testid="hub-tabs">
+              {tabs.map(tab => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === tab.id
+                        ? "bg-background shadow-sm text-foreground border"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    }`}
+                    data-testid={`tab-${tab.id}`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {activeTab === "guides" && <TopicGuides topics={businessTopics} />}
+            {activeTab === "assessment" && <SecurityPostureAssessment items={assessmentItems} />}
+            {activeTab === "phishing" && <PhishingSimulationTrainer scenarios={phishingScenarios} />}
+            {activeTab === "policies" && <PolicyTemplateBuilder templates={policyTemplates} />}
+            {activeTab === "incidents" && <IncidentResponseFlowchart incidents={incidentTypes} />}
+            {activeTab === "budget" && <SecurityBudgetCalculator tools={securityTools} />}
+          </div>
+        </div>
+
         <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
           <CalendarDays className="w-3 h-3" />
           <span>Content last reviewed: February 2026</span>
