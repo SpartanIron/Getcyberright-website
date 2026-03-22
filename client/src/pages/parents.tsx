@@ -14,7 +14,9 @@ import {
   Shield, Eye, MessageCircle, Gamepad2,
   CheckCircle, Users, AlertTriangle,
   ArrowRight, Settings, Clock, BookOpen,
-  CalendarDays, ChevronDown, ChevronUp
+  CalendarDays, ChevronDown, ChevronUp,
+  ClipboardCheck, Brain, Smartphone, Scale,
+  Sparkles, BarChart3, Globe
 } from "lucide-react";
 import bannerImage from "@/assets/banners/parents-banner.png";
 import cardParentalControls from "@/assets/images/card-parental-controls.png";
@@ -23,6 +25,17 @@ import cardScreenTime from "@/assets/images/card-screen-time.png";
 import cardGamingSafety from "@/assets/images/card-gaming-safety.png";
 import cardOnlinePredators from "@/assets/images/card-online-predators.png";
 import cardFirstDevice from "@/assets/images/card-first-device.png";
+
+import {
+  DeviceAuditChecklist, ParentingQuiz, AppSafetyReview,
+  LegalAwarenessModule, ConversationGenerator, ISPControlGuides,
+  FamilyStatsInfographic, MicroTransactionAwareness
+} from "@/components/parents-hub/interactive-tools";
+import {
+  parentingQuizQuestions, appSafetyCards, legalInfoData,
+  conversationScripts, familyStats, deviceAudits, ispGuides,
+  microTransactionStats
+} from "@/components/parents-hub/quiz-data";
 
 interface PlatformGuide {
   platform: string;
@@ -364,139 +377,164 @@ const parentTopics: ParentTopic[] = [
           platform: "Roblox",
           steps: [
             "Log in to your child's Roblox account at roblox.com. Go to Settings, then Privacy.",
-            "Under Contact Settings, set each option to No One or Friends. This controls who can message, chat, and invite your child.",
-            "Under Other Settings, turn off Chat to disable in-game text chat entirely (recommended for younger children).",
-            "Go to Settings, then Parental Controls. Turn on Account Restrictions. This limits your child to a curated list of age-appropriate games only.",
-            "Set a monthly spending limit or remove the ability to purchase Robux. Go to Settings, then Billing. Make sure no payment method is saved.",
-            "Set a PIN: go to Settings, then Security, then Account PIN. This prevents your child from changing any parental control settings.",
-            "Roblox has an Age Verification system. Games rated 17+ are only available to verified users. Make sure your child's account birthday is accurate."
+            "Under Contact Settings, set each option based on your child's age. For younger children (under 10), set everything to No One. For older children, Friends is appropriate.",
+            "Under Other Settings, turn off: Who can invite me to VIP servers, Who can join me, and Who can see my inventory.",
+            "Go to Settings, then Security. Enable the Account PIN. This prevents your child from changing privacy settings without the PIN.",
+            "Go to Settings, then Parental Controls. Turn on Account Restrictions. This limits your child to a curated list of games and disables chat.",
+            "To prevent unauthorized purchases: go to Settings, then Security. Enable 2-Step Verification. Only add Robux through gift cards you purchase, not a linked credit card.",
+            "Regularly check the Transactions page (My Transactions under Robux) to see what your child has bought."
           ]
         }
       ],
       quickChecklist: [
-        "Parental controls are set up on every gaming device and platform.",
-        "Voice and text chat with strangers is restricted or disabled.",
-        "In-game purchases require my approval or have a spending cap.",
-        "Game age ratings are set to match my child's age.",
-        "I know what games my child plays and have tried at least one.",
-        "Play time limits are set with a clear end-of-time behavior."
+        "All gaming accounts have parental controls enabled.",
+        "Voice chat with strangers is turned off or set to Friends only.",
+        "Purchase approvals or spending limits are set.",
+        "Game age ratings are configured correctly for my child's age.",
+        "I check what games my child is playing and who they play with.",
+        "The family has agreed on gaming time limits."
       ],
       conversationStarters: [
-        "Tell me about the game you are playing. What do you like about it?",
-        "Do you ever talk to people you don't know while gaming?",
-        "Has anyone ever said something mean or made you uncomfortable in a game?"
+        "What games are you playing right now? Can you show me how they work?",
+        "Has anyone ever said something mean or scary to you in a game?",
+        "Do any of your games have stores where you can buy things?"
       ],
-      warningSign: "If your child becomes secretive about who they play with online, resists any conversation about gaming habits, or you notice unfamiliar charges on your account, it is time for a direct conversation."
+      warningSign: "If your child becomes extremely angry or emotional when asked to stop playing, or if they are skipping meals, losing sleep, or declining in school performance because of gaming, it may be time to reassess their gaming time and seek professional guidance."
     }
   },
   {
     id: "online-predators",
     title: "Protecting Against Online Predators",
-    description: "Recognize grooming behaviors and know exactly what to do.",
-    icon: AlertTriangle,
+    description: "Warning signs, prevention strategies, and what to do if it happens.",
+    icon: Eye,
     color: "bg-red-500",
     image: cardOnlinePredators,
     content: {
-      intro: "Online predators use technology to target and manipulate children. They often spend weeks or months building trust before attempting to exploit. Understanding the tactics they use and maintaining open communication with your child are the strongest defenses. This guide covers what to watch for and exactly what to do if something happens.",
+      intro: "Online predators use social media, gaming platforms, and messaging apps to contact children. They build trust slowly through a process called grooming. Understanding how this works is the best way to protect your child.",
       keyPoints: [
-        "Predators often pose as peers. They create fake profiles, use young-sounding language, and claim to be the same age.",
-        "Grooming follows a pattern: they select a target, build trust through flattery and gifts, isolate the child from parents, then push boundaries.",
-        "Secrecy is the biggest warning sign. Predators will say things like 'Don't tell your parents, they wouldn't understand.'",
-        "Any adult asking a child to keep secrets from parents is a red flag, regardless of context.",
-        "Children often blame themselves and fear getting in trouble, which keeps them silent. Make it clear they will never be punished for telling you."
+        "Grooming follows a pattern: identifying a target, gaining trust, filling a need (attention, gifts, compliments), isolating the child from parents, and then exploiting the relationship.",
+        "Predators often pretend to be younger than they are. They are not always strangers; they can be people the child knows.",
+        "The most dangerous feature on any platform is private direct messaging. If a stranger can message your child directly, the risk increases significantly.",
+        "Children who are lonely, going through family difficulties, or seeking attention are more vulnerable. Building a strong relationship with your child is the best protection.",
+        "If you suspect your child is being groomed, do not confront the child or the predator directly. Contact law enforcement and preserve all evidence."
       ],
       platformGuides: [
         {
-          platform: "Warning Signs to Watch For",
+          platform: "Warning Signs of Grooming",
           steps: [
-            "Your child receives gifts, game credits, or online currency from someone you don't know.",
+            "Your child receives gifts, money, or game items from someone you do not know.",
             "They become secretive about who they are talking to online.",
-            "They switch screens or close apps quickly when you walk by.",
-            "An older person or someone you don't recognize contacts them through social media, games, or messaging apps.",
-            "They mention a new 'friend' who 'really understands them' but whom they have never met in person.",
-            "They receive messages late at night from someone you don't know.",
-            "They start using sexual language or have knowledge beyond their age."
+            "They use a device late at night or in private.",
+            "There is a new 'friend' or 'mentor' who is significantly older.",
+            "They have multiple social media accounts, including ones you did not know about.",
+            "Their behavior changes: withdrawal, mood swings, or anxiety.",
+            "They have sexual content, explicit messages, or inappropriate images on their device.",
+            "An adult is contacting them through multiple platforms.",
+            "They are being asked to keep the relationship secret."
           ]
         },
         {
-          platform: "Immediate Steps If You Suspect Contact",
+          platform: "If You Suspect Grooming",
           steps: [
-            "Stay calm. If you react with anger or panic, your child may shut down and stop sharing.",
-            "Tell your child clearly: 'This is not your fault. You are not in trouble. I need to know what happened so I can protect you.'",
-            "Do not delete any messages or conversations. Take screenshots of everything as evidence.",
-            "Block the person on all platforms your child uses.",
-            "Report to the platform: every social media service and gaming platform has a reporting tool for predatory behavior. Use it.",
-            "File a report with the National Center for Missing and Exploited Children (NCMEC) at CyberTipline.org.",
-            "In the United States, report to the FBI at tips.fbi.gov. In the UK, report to CEOP at ceop.police.uk. In other countries, contact your national cybercrime reporting center.",
-            "If your child is in immediate danger, call your local emergency number (911 in the US, 999 in the UK, 112 in Europe).",
-            "Consider professional counseling for your child. Organizations like NCMEC can provide referrals."
+            "Stay calm. Do not confront your child or the suspected predator.",
+            "Do not delete any messages, images, or chat logs. These are evidence.",
+            "Take screenshots of all conversations, profile pages, and any gifts or items received.",
+            "Report to your local law enforcement. Ask to speak with their Internet Crimes Against Children (ICAC) unit.",
+            "In the US, file a report with the National Center for Missing & Exploited Children (NCMEC) CyberTipline: CyberTipline.org or call 1-800-THE-LOST.",
+            "In the UK, report to CEOP (Child Exploitation and Online Protection) at ceop.police.uk.",
+            "Report the account on the platform where the contact is happening.",
+            "Consider seeking professional support for your child from a counselor experienced in online exploitation."
           ]
         },
         {
-          platform: "How to Lock Down Every Platform",
+          platform: "Prevention Strategies",
           steps: [
-            "On every social media platform: set the account to Private and disable direct messages from strangers (see the Social Media Safety guide above for step-by-step instructions).",
-            "In games: disable voice chat and text chat with strangers. Use the platform-specific steps in the Gaming Safety guide above.",
-            "On messaging apps (WhatsApp, Telegram, Discord): set it so only contacts can message your child. In Discord, go to Settings, then Privacy & Safety, then turn off Allow Direct Messages from Server Members.",
-            "Review your child's friend lists and followers regularly. Ask about anyone you don't recognize.",
-            "Turn off location sharing on all apps. In Instagram: Settings, then Privacy, then Activity Status (turn off). In Snapchat: turn on Ghost Mode.",
-            "Know the apps on your child's device. Some apps are specifically designed for anonymous communication (Whisper, Yik Yak, Omegle). These should not be on a child's device."
+            "Keep communication open. Children who feel safe talking to parents are more likely to report concerning behavior.",
+            "Ensure all messaging apps are set to block messages from strangers.",
+            "Teach your child that real friends do not ask them to keep secrets from their parents.",
+            "Discuss the concept of grooming in age-appropriate language so they can recognize it.",
+            "Keep devices in common areas of the house, especially for younger children.",
+            "Know your child's online friends and encourage in-person friendships.",
+            "Regularly review their friend lists and contacts on all platforms.",
+            "Install your child's apps on your own phone so you understand how they work."
           ]
         }
       ],
       quickChecklist: [
-        "My child knows they will never be punished for telling me about uncomfortable online interactions.",
-        "All social media accounts are Private with messages from strangers disabled.",
-        "Voice chat with strangers is turned off in games.",
+        "My child knows they can tell me anything without getting in trouble.",
+        "Direct messages from strangers are turned off on all platforms.",
         "I know who my child's online friends are.",
-        "I know how to report to NCMEC, the FBI, or my country's cybercrime center.",
-        "I have had the conversation about secrets: real friends never ask you to hide things from your parents."
+        "Devices are used in common areas, not behind closed doors (for younger children).",
+        "My child understands that adults should not ask children to keep secrets.",
+        "I know how to report suspicious activity to NCMEC, CEOP, or local law enforcement."
       ],
       conversationStarters: [
-        "You can tell me anything and you will never be in trouble for being honest with me.",
-        "Has anyone online ever asked you to keep a secret from me?",
-        "What would you do if someone online made you feel uncomfortable?"
+        "If someone online made you feel uncomfortable, what would you do?",
+        "Has anyone online ever asked you to keep something secret from me?",
+        "Do you know anyone online that you have never met in person? Tell me about them."
       ],
-      warningSign: "If your child suddenly becomes withdrawn, anxious, or upset after using their device, do not dismiss it. Sit down calmly and ask open-ended questions. The most important thing is that they know the door is always open."
+      warningSign: "If your child has received gifts, money, or special attention from someone online, or if they are communicating with someone they met online through private channels, take immediate action. Contact NCMEC CyberTipline or local law enforcement. Do not delete evidence."
     }
   },
   {
-    id: "digital-footprint",
-    title: "Building a Positive Digital Footprint",
-    description: "Teach your child that what goes online stays online. Here is how to protect them.",
-    icon: Eye,
-    color: "bg-teal-500",
+    id: "first-device",
+    title: "Your Child's First Device",
+    description: "A complete guide to preparing your family for the first phone, tablet, or computer.",
+    icon: Shield,
+    color: "bg-orange-500",
     image: cardFirstDevice,
     content: {
-      intro: "Everything posted online creates a trail. Photos, comments, likes, and even deleted posts can be screenshotted and saved. Colleges, employers, and scholarship committees regularly search applicants online. Teaching your child to think before they post is one of the most valuable digital skills you can give them.",
+      intro: "Giving your child their first device is a milestone. Whether it is a phone, tablet, or laptop, the preparation you do before handing it over determines how safe and positive the experience will be. Here is a complete framework for getting it right.",
       keyPoints: [
-        "Deleted does not mean gone. Screenshots, cached pages, and platform backups can preserve content indefinitely.",
-        "59% of hiring managers in the U.S. have rejected a candidate based on their social media presence.",
-        "A positive digital footprint can actually help. Sharing achievements, volunteer work, and creative projects builds a reputation.",
-        "Metadata in photos (location, time, device information) can reveal more than the image itself.",
-        "Group photos and tagged posts mean your child's image can appear online without their consent."
+        "There is no universally right age for a first device. It depends on your child's maturity, your family's needs, and how much preparation you do.",
+        "Setting up the device together is more important than any single setting. It teaches your child that safety is a partnership, not surveillance.",
+        "Start with more restrictions and gradually loosen them as your child demonstrates responsibility. It is harder to add restrictions after they have had unrestricted access.",
+        "A written family agreement that everyone signs creates shared ownership of the rules. It is more effective than verbal rules that are easily forgotten.",
+        "The first few weeks are the most important. Check in regularly, review the settings, and adjust based on what you learn together."
       ],
       platformGuides: [
         {
-          platform: "Privacy Audit (Do This Today)",
+          platform: "Before You Buy",
           steps: [
-            "Search your child's full name on Google. Look at the results together and discuss what comes up.",
-            "Search their name on Google Images to see if any photos have been indexed.",
-            "Check their social media profiles from a logged-out browser (private/incognito window) to see what strangers can see.",
-            "On Instagram: go to Settings, then Account, then Posts You've Liked to review their activity history.",
-            "On TikTok: check their Liked Videos (visible to others by default unless turned off in Privacy settings).",
-            "On YouTube: check their comment history and liked videos. Delete anything concerning.",
-            "Review any old accounts they no longer use. Deactivate or delete them."
+            "Decide what the device is for: staying in touch, homework, entertainment, or all of the above. This affects which device you choose.",
+            "Consider starting with a device that has fewer risks: a basic phone with no apps, a tablet used only at home, or a laptop in a shared space.",
+            "Research parental control options for the device you are considering. Apple and Google both have robust built-in tools.",
+            "Have a conversation with your child about why they want a device and what they plan to use it for. Listen without judgment.",
+            "Talk to other parents about their experiences. What worked, what did not, and what they wish they had done differently.",
+            "Set a budget for the device and any recurring costs (data plan, app purchases, game subscriptions)."
           ]
         },
         {
-          platform: "The Posting Rules",
+          platform: "Setting Up Together",
           steps: [
-            "The Grandma Rule: Don't post anything you wouldn't want your grandmother to read out loud at dinner.",
-            "The Screenshot Rule: Before posting, assume everyone will see it, including teachers, coaches, and future employers.",
-            "The Permanence Rule: Even if you delete it in 10 seconds, someone may have already saved it.",
-            "The Context Rule: Jokes and sarcasm do not always translate online. What seems funny to you may look offensive to others.",
-            "The Consent Rule: Never post photos or videos of other people without their permission.",
+            "Unbox the device together. This sends the message that this is a shared project, not a secret tool.",
+            "Create their account together. Use their real age so that built-in protections apply correctly.",
+            "Walk through each parental control setting and explain why it exists. This is an educational moment, not a restrictive one.",
+            "Set up a passcode they will use and a separate parental passcode for settings changes.",
+            "Install only the apps you both agree on at first. More apps can be added later as trust builds.",
+            "Set up a family charging station where all devices (including yours) charge overnight, outside of bedrooms.",
+            "Take a photo of the settings you have configured in case you need to reference them later."
+          ]
+        },
+        {
+          platform: "The Family Agreement",
+          steps: [
+            "Write a simple agreement that covers: when the device can be used, where it can be used, what apps are allowed, and what is off limits.",
+            "Include consequences that are proportional and agreed upon in advance. For example: breaking a rule means the device stays in the common area for a week.",
+            "Include your commitments as a parent: you will not read their private messages without cause, you will discuss concerns calmly, and you will adjust rules as they grow.",
+            "Both parent and child sign the agreement. Post it somewhere visible.",
+            "Schedule a monthly family meeting to review how things are going and adjust rules if needed.",
+            "Remember: the agreement is a living document. It should evolve as your child matures and demonstrates responsibility."
+          ]
+        },
+        {
+          platform: "The Digital Reputation Talk",
+          steps: [
+            "Explain the Grandma Rule: if you would not want your grandma to see it, do not post it.",
+            "Explain that everything posted online can be screenshotted, shared, and found later, even if it is deleted.",
+            "Teach the 24-Hour Rule: if a post is emotional, wait 24 hours before posting. If it still seems like a good idea, go ahead.",
+            "Help them understand that future schools, employers, and colleges may search their name online.",
+            "The Audience Rule: before posting, imagine that your teacher, your best friend's parent, and a college admissions officer will all see it.",
             "The Location Rule: Never post in real time with your location visible. Wait until you have left before sharing.",
             "The Emotion Rule: If you are angry, upset, or have been drinking, do not post. Wait 24 hours."
           ]
@@ -565,12 +603,12 @@ function CollapsibleSteps({ steps, platform }: { steps: string[]; platform: stri
   );
 }
 
-function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void }) {
+function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: string) => void; onSwitchTab: (tab: string) => void }) {
   return (
     <>
       <PageBanner
         title="Protect Your Family Online"
-        subtitle="Step-by-step guides for every device, every platform, and every age. Built for parents who want clear answers, not tech jargon."
+        subtitle="Step-by-step guides, interactive tools, scenario quizzes, and region-specific resources. Built for parents who want clear answers, not tech jargon."
         imageSrc={bannerImage}
         imageAlt="Family learning about digital safety together"
         colorVariant="blue"
@@ -578,41 +616,136 @@ function ParentsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
 
       <div className="py-16 sm:py-20 bg-background">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6 mb-12">
-            {parentTopics.map((topic) => (
-              <Card
-                key={topic.id}
-                className="cursor-pointer transition-all duration-300 hover:shadow-xl hover:border-primary/30 overflow-hidden"
-                onClick={() => onSelectTopic(topic.id)}
-                onKeyDown={(e) => e.key === 'Enter' && onSelectTopic(topic.id)}
-                tabIndex={0}
-                role="button"
-                aria-label={`Learn about ${topic.title}`}
-                data-testid={`card-topic-${topic.id}`}
-              >
-                <div className="relative h-48 sm:h-56 overflow-hidden">
-                  <img
-                    src={topic.image}
-                    alt={topic.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                    data-testid={`img-topic-${topic.id}`}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className={`absolute bottom-3 left-3 w-10 h-10 rounded-md ${topic.color} flex items-center justify-center shadow-lg`}>
-                    <topic.icon className="w-5 h-5 text-white" />
-                  </div>
+          <Tabs defaultValue="guides" className="mb-12">
+            <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-8">
+              <TabsTrigger value="guides" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-guides">
+                <BookOpen className="w-4 h-4" /> Guides
+              </TabsTrigger>
+              <TabsTrigger value="activities" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-activities">
+                <Brain className="w-4 h-4" /> Activities
+              </TabsTrigger>
+              <TabsTrigger value="tools" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-tools">
+                <Sparkles className="w-4 h-4" /> Tools
+              </TabsTrigger>
+              <TabsTrigger value="legal" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-legal">
+                <Scale className="w-4 h-4" /> Legal
+              </TabsTrigger>
+              <TabsTrigger value="stats" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-stats">
+                <BarChart3 className="w-4 h-4" /> Stats
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="guides">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6">
+                {parentTopics.map((topic) => (
+                  <Card
+                    key={topic.id}
+                    className="cursor-pointer transition-all duration-300 hover:shadow-xl hover:border-primary/30 overflow-hidden"
+                    onClick={() => onSelectTopic(topic.id)}
+                    onKeyDown={(e) => e.key === 'Enter' && onSelectTopic(topic.id)}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Learn about ${topic.title}`}
+                    data-testid={`card-topic-${topic.id}`}
+                  >
+                    <div className="relative h-48 sm:h-56 overflow-hidden">
+                      <img
+                        src={topic.image}
+                        alt={topic.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                        data-testid={`img-topic-${topic.id}`}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className={`absolute bottom-3 left-3 w-10 h-10 rounded-md ${topic.color} flex items-center justify-center shadow-lg`}>
+                        <topic.icon className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    <CardContent className="p-5">
+                      <h3 className="font-bold text-lg text-foreground mb-1.5">{topic.title}</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">{topic.description}</p>
+                      <span className="inline-flex items-center gap-1 text-sm font-medium text-primary mt-3">
+                        View full guide <ArrowRight className="w-3.5 h-3.5" />
+                      </span>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="activities" className="space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <ClipboardCheck className="w-5 h-5 text-blue-600" />
+                  <h2 className="text-xl font-bold text-foreground">Device Safety Audit</h2>
                 </div>
-                <CardContent className="p-5">
-                  <h3 className="font-bold text-lg text-foreground mb-1.5">{topic.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{topic.description}</p>
-                  <span className="inline-flex items-center gap-1 text-sm font-medium text-primary mt-3">
-                    View full guide <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                <p className="text-muted-foreground mb-5">Walk through each device your family uses and check that all safety settings are properly configured. Your progress is saved automatically.</p>
+                <DeviceAuditChecklist audits={deviceAudits} />
+              </div>
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Brain className="w-5 h-5 text-purple-600" />
+                  <h2 className="text-xl font-bold text-foreground">Parenting Scenario Quiz</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Test your knowledge with real-world parenting scenarios. Each question includes detailed feedback explaining the best approach.</p>
+                <ParentingQuiz questions={parentingQuizQuestions} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="tools" className="space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <MessageCircle className="w-5 h-5 text-purple-600" />
+                  <h2 className="text-xl font-bold text-foreground">Conversation Starter Generator</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Select your child's age group and a topic to get a tailored conversation script with opening lines, dos and don'ts, and follow-up questions.</p>
+                <ConversationGenerator scripts={conversationScripts} />
+              </div>
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Smartphone className="w-5 h-5 text-pink-600" />
+                  <h2 className="text-xl font-bold text-foreground">App Safety Reviews</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Detailed safety reviews of popular apps and platforms your child may use. Filter by region to see locally relevant platforms.</p>
+                <AppSafetyReview apps={appSafetyCards} />
+              </div>
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Globe className="w-5 h-5 text-teal-600" />
+                  <h2 className="text-xl font-bold text-foreground">ISP Parental Control Guides</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Step-by-step instructions for setting up parental controls at the internet provider level. These controls apply to all devices on your home network.</p>
+                <ISPControlGuides guides={ispGuides} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="legal" className="space-y-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Scale className="w-5 h-5 text-indigo-600" />
+                <h2 className="text-xl font-bold text-foreground">Children's Online Privacy Laws</h2>
+              </div>
+              <p className="text-muted-foreground mb-5">Know your rights as a parent. These laws protect your child's personal data online. Each entry includes practical actions you can take and a quick knowledge check.</p>
+              <LegalAwarenessModule laws={legalInfoData} />
+            </TabsContent>
+
+            <TabsContent value="stats" className="space-y-8">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
+                  <h2 className="text-xl font-bold text-foreground">Family Cybersecurity Statistics</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Key statistics every parent should know about children's online safety.</p>
+                <FamilyStatsInfographic stats={familyStats} />
+              </div>
+
+              <div className="border-t pt-8">
+                <MicroTransactionAwareness stats={microTransactionStats} />
+              </div>
+            </TabsContent>
+          </Tabs>
 
           <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border border-purple-200 dark:border-purple-800 mb-6">
             <CardContent className="p-8">
@@ -815,6 +948,7 @@ function TopicContent({
 
 export default function Parents() {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [activeMainTab, setActiveMainTab] = useState("guides");
 
   const currentTopic = selectedTopic
     ? parentTopics.find(t => t.id === selectedTopic)
@@ -849,7 +983,7 @@ export default function Parents() {
             onBack={() => setSelectedTopic(null)}
           />
         ) : (
-          <ParentsLanding onSelectTopic={setSelectedTopic} />
+          <ParentsLanding onSelectTopic={setSelectedTopic} onSwitchTab={setActiveMainTab} />
         )}
         <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
           <CalendarDays className="w-3 h-3" />
