@@ -7,7 +7,8 @@ import {
   CheckCircle, Circle, RotateCcw, ChevronRight, ChevronDown, ChevronUp,
   Shield, AlertTriangle, Star, BookOpen, Clock, Users,
   GraduationCap, ClipboardList, FileText, Search, Key,
-  Footprints, Mail, Lightbulb, ArrowRight, XCircle, Filter
+  Footprints, Mail, Lightbulb, ArrowRight, XCircle, Filter,
+  Printer, LayoutGrid, List, TrendingUp, TrendingDown, Target
 } from "lucide-react";
 import type {
   LessonPlanTemplate, ClassroomActivity, AssessmentQuestion,
@@ -547,6 +548,63 @@ export function AssessmentQuizBuilder({ questions }: { questions: AssessmentQues
               </div>
             </div>
 
+            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-xl p-4 mb-6 text-left border border-blue-200 dark:border-blue-800" data-testid="class-level-insights">
+              <div className="flex items-center gap-2 mb-3">
+                <Target className="w-5 h-5 text-blue-600" />
+                <h4 className="font-semibold text-foreground">Class-Level Insights</h4>
+              </div>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start gap-2">
+                  <span className="font-medium text-foreground min-w-[120px]">Mastery Level:</span>
+                  <span className={pct >= 80 ? "text-green-700 dark:text-green-300" : pct >= 50 ? "text-amber-700 dark:text-amber-300" : "text-red-700 dark:text-red-300"}>
+                    {pct >= 90 ? "Advanced" : pct >= 80 ? "Proficient" : pct >= 60 ? "Developing" : "Beginning"} — {pct >= 80 ? "students are ready to move to the next topic" : pct >= 60 ? "review missed concepts before advancing" : "recommend re-teaching core concepts"}
+                  </span>
+                </div>
+                {answers.some(a => !a) && (
+                  <div className="flex items-start gap-2">
+                    <span className="font-medium text-foreground min-w-[120px] flex items-center gap-1"><TrendingDown className="w-3.5 h-3.5 text-red-500" /> Reteach Focus:</span>
+                    <span className="text-muted-foreground">
+                      {topicQuestions.filter((_, i) => !answers[i]).map(q => q.question.length > 60 ? q.question.slice(0, 57) + "..." : q.question).join("; ")}
+                    </span>
+                  </div>
+                )}
+                {answers.some(a => a) && (
+                  <div className="flex items-start gap-2">
+                    <span className="font-medium text-foreground min-w-[120px] flex items-center gap-1"><TrendingUp className="w-3.5 h-3.5 text-green-500" /> Strengths:</span>
+                    <span className="text-muted-foreground">
+                      {topicQuestions.filter((_, i) => answers[i]).length} of {topicQuestions.length} concepts mastered
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-start gap-2">
+                  <span className="font-medium text-foreground min-w-[120px]">Recommendation:</span>
+                  <span className="text-muted-foreground">
+                    {pct >= 90 ? "Assign enrichment activities or peer tutoring roles." : pct >= 70 ? "Use targeted review for missed concepts, then reassess." : pct >= 50 ? "Small group intervention recommended. Focus on missed areas before proceeding." : "Full class reteach recommended using alternative instructional strategies."}
+                  </span>
+                </div>
+                {Object.keys(progress.quizScores).length > 1 && (
+                  <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Target className="w-4 h-4 text-blue-600" />
+                      <span className="font-medium text-foreground">Cross-Topic Summary</span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {Object.entries(progress.quizScores).map(([topic, topScore]) => {
+                        const topicCount = questions.filter(q => q.topic === topic).length;
+                        const topicPct = Math.round((topScore / topicCount) * 100);
+                        return (
+                          <div key={topic} className="bg-white dark:bg-gray-900 rounded-lg p-2 text-center">
+                            <div className="text-xs text-muted-foreground truncate">{topic}</div>
+                            <div className={`text-sm font-bold ${topicPct >= 80 ? "text-green-600" : topicPct >= 50 ? "text-amber-600" : "text-red-600"}`}>{topicPct}%</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="flex flex-wrap gap-3 justify-center">
               <Button onClick={() => startQuiz(selectedTopic)} data-testid="button-retry-quiz">
                 <RotateCcw className="w-4 h-4 mr-2" /> Retry Quiz
@@ -631,6 +689,7 @@ export function CurriculumAlignmentGuide({ standards }: { standards: CurriculumS
   const [activeFramework, setActiveFramework] = useState<string>("all");
   const [activeTopic, setActiveTopic] = useState<string>("all");
   const [expandedStandard, setExpandedStandard] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"list" | "matrix">("list");
 
   const frameworks = Array.from(new Set(standards.map(s => s.framework)));
 
@@ -646,16 +705,43 @@ export function CurriculumAlignmentGuide({ standards }: { standards: CurriculumS
     "Common Core": "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200"
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 rounded-xl p-5 border border-teal-200 dark:border-teal-800">
-        <div className="flex items-center gap-2 mb-3">
-          <BookOpen className="w-5 h-5 text-teal-600" />
-          <span className="font-semibold text-foreground">Curriculum Standards Alignment</span>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-teal-600" />
+            <span className="font-semibold text-foreground">Curriculum Standards Alignment</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex bg-muted rounded-lg p-0.5">
+              <button
+                onClick={() => setViewMode("list")}
+                className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${viewMode === "list" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                data-testid="button-list-view"
+              >
+                <List className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setViewMode("matrix")}
+                className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${viewMode === "matrix" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                data-testid="button-matrix-view"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <Button variant="outline" size="sm" onClick={handlePrint} className="print:hidden" data-testid="button-print-curriculum">
+              <Printer className="w-3.5 h-3.5 mr-1" /> Print
+            </Button>
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground mb-4">Map cybersecurity topics to education standards. Filter by framework and topic to find relevant alignments.</p>
+        <p className="text-sm text-muted-foreground mb-4">Map cybersecurity topics to education standards. Filter by framework and topic, or switch to matrix view for a full alignment overview.</p>
 
-        <div className="grid sm:grid-cols-2 gap-3">
+        <div className="grid sm:grid-cols-2 gap-3 print:hidden">
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">Framework</label>
             <select
@@ -683,41 +769,84 @@ export function CurriculumAlignmentGuide({ standards }: { standards: CurriculumS
         </div>
       </div>
 
-      <div className="text-sm text-muted-foreground">{filtered.length} standard{filtered.length !== 1 ? "s" : ""} found</div>
-
-      <div className="space-y-3">
-        {filtered.map(standard => {
-          const expanded = expandedStandard === standard.standardId;
-          return (
-            <Card key={standard.standardId} className="overflow-hidden">
-              <button
-                onClick={() => setExpandedStandard(expanded ? null : standard.standardId)}
-                className="w-full p-4 flex items-center justify-between text-left hover:bg-muted/20 transition-colors"
-                data-testid={`standard-${standard.standardId.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`}
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <Badge className={`text-xs flex-shrink-0 ${frameworkColors[standard.framework] || ""}`}>{standard.framework}</Badge>
-                  <span className="font-medium text-foreground text-sm">{standard.standardId}</span>
-                </div>
-                {expanded ? <ChevronUp className="w-4 h-4 text-muted-foreground flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
-              </button>
-              {expanded && (
-                <div className="px-4 pb-4 border-t pt-4 space-y-3">
-                  <p className="text-sm text-foreground leading-relaxed">{standard.description}</p>
-                  <div>
-                    <span className="text-xs font-medium text-muted-foreground">Aligned Topics:</span>
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {standard.topics.map(t => (
-                        <Badge key={t} className={`text-xs ${topicColors[t] || "bg-gray-500"} text-white`}>{t}</Badge>
-                      ))}
+      {viewMode === "matrix" ? (
+        <div className="overflow-x-auto" data-testid="curriculum-matrix">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr>
+                <th className="border border-muted p-2 bg-muted/50 text-left font-semibold text-foreground min-w-[200px]">Standard</th>
+                {topicsList.map(topic => (
+                  <th key={topic} className="border border-muted p-2 bg-muted/50 text-center font-medium text-foreground text-xs min-w-[100px]">
+                    {topic}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(standard => (
+                <tr key={standard.standardId} className="hover:bg-muted/20">
+                  <td className="border border-muted p-2">
+                    <div className="flex items-center gap-2">
+                      <Badge className={`text-[10px] flex-shrink-0 ${frameworkColors[standard.framework] || ""}`}>{standard.framework}</Badge>
+                      <span className="font-medium text-foreground text-xs">{standard.standardId}</span>
                     </div>
-                  </div>
-                </div>
-              )}
-            </Card>
-          );
-        })}
-      </div>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{standard.description}</p>
+                  </td>
+                  {topicsList.map(topic => (
+                    <td key={topic} className="border border-muted p-2 text-center">
+                      {standard.topics.includes(topic) ? (
+                        <CheckCircle className="w-4 h-4 text-green-500 mx-auto" />
+                      ) : (
+                        <span className="text-muted-foreground/30">—</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="mt-3 text-xs text-muted-foreground print:block">
+            {filtered.length} standard{filtered.length !== 1 ? "s" : ""} × {topicsList.length} topics
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="text-sm text-muted-foreground">{filtered.length} standard{filtered.length !== 1 ? "s" : ""} found</div>
+          <div className="space-y-3">
+            {filtered.map(standard => {
+              const expanded = expandedStandard === standard.standardId;
+              return (
+                <Card key={standard.standardId} className="overflow-hidden">
+                  <button
+                    onClick={() => setExpandedStandard(expanded ? null : standard.standardId)}
+                    className="w-full p-4 flex items-center justify-between text-left hover:bg-muted/20 transition-colors"
+                    data-testid={`standard-${standard.standardId.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <Badge className={`text-xs flex-shrink-0 ${frameworkColors[standard.framework] || ""}`}>{standard.framework}</Badge>
+                      <span className="font-medium text-foreground text-sm">{standard.standardId}</span>
+                    </div>
+                    {expanded ? <ChevronUp className="w-4 h-4 text-muted-foreground flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
+                  </button>
+                  {expanded && (
+                    <div className="px-4 pb-4 border-t pt-4 space-y-3">
+                      <p className="text-sm text-foreground leading-relaxed">{standard.description}</p>
+                      <div>
+                        <span className="text-xs font-medium text-muted-foreground">Aligned Topics:</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          {standard.topics.map(t => (
+                            <Badge key={t} className={`text-xs ${topicColors[t] || "bg-gray-500"} text-white`}>{t}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }
