@@ -12,7 +12,7 @@ import {
   Shield, BookOpen, Users, Presentation, FileText,
   CheckCircle, Star, AlertTriangle, MessageCircle,
   ArrowRight, Lightbulb, GraduationCap, School,
-  ClipboardList, Download, CalendarDays, Gamepad2
+  ClipboardList, Download, CalendarDays
 } from "lucide-react";
 import bannerImage from "@/assets/banners/educators-banner.png";
 import digitalCitizenshipImg from "@/assets/images/card-digital-citizenship.png";

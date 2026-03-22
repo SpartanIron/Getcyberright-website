@@ -410,6 +410,110 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     extensions: "Analyze real news stories about posts that had serious consequences."
   },
   {
+    id: "cb-k2-15",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "K-2",
+    duration: "15-min",
+    title: "Kind Words, Mean Words",
+    objectives: ["Distinguish between kind and unkind words", "Understand that words online can hurt just like words in person"],
+    materials: ["Two baskets labeled 'Kind' and 'Unkind'", "Word cards with example phrases"],
+    procedure: [
+      "Read example phrases aloud: 'I like your drawing' vs 'That is the worst drawing ever'",
+      "Students sort phrases into Kind or Unkind baskets",
+      "Explain: 'These words can be said face-to-face OR typed on a screen — they feel the same'",
+      "Each student says one kind thing they could type to a friend"
+    ],
+    assessment: "Students can identify kind vs. unkind messages.",
+    extensions: "Create a 'Kind Messages' jar for the classroom."
+  },
+  {
+    id: "cb-k2-30",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "K-2",
+    duration: "30-min",
+    title: "The Feelings Thermometer",
+    objectives: ["Recognize how mean online messages make people feel", "Practice telling a trusted adult when something makes them sad or scared online"],
+    materials: ["Feelings thermometer poster", "Scenario cards", "Emotion face cards"],
+    procedure: [
+      "Introduce the feelings thermometer: happy (green) to sad/scared (red)",
+      "Read 6 simple online scenarios (e.g., 'Someone sends you a nice message' vs 'Someone calls you a mean name in a game')",
+      "Students place emotion face cards on the thermometer for each scenario",
+      "Practice saying: 'That made me feel [emotion]. I need to tell [trusted adult]'",
+      "Role-play telling a teacher or parent about something that made them feel bad online"
+    ],
+    assessment: "Students can identify emotions caused by online interactions and know to tell an adult.",
+    extensions: "Draw a picture of your 'trusted adults' team."
+  },
+  {
+    id: "cb-68-15",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "6-8",
+    duration: "15-min",
+    title: "The Amplification Effect",
+    objectives: ["Understand how quickly content spreads online", "Recognize the scale of harm from sharing hurtful content"],
+    materials: ["Whiteboard", "Calculator"],
+    procedure: [
+      "Scenario: 'You share an embarrassing photo with 5 friends. Each shares with 5 more. How many people see it after 4 rounds?'",
+      "Calculate together: 5 → 25 → 125 → 625 people in just 4 shares",
+      "Discuss: 'Once you share something, you lose control of it forever'",
+      "Key takeaway: sharing hurtful content makes you part of the problem, even if you did not create it"
+    ],
+    assessment: "Students can explain the amplification effect of sharing content online.",
+    extensions: "Research a real example of content going viral and its consequences."
+  },
+  {
+    id: "cb-68-45",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "6-8",
+    duration: "45-min",
+    title: "Creating a Cyberbullying Response Plan",
+    objectives: ["Develop a personal cyberbullying response plan", "Identify reporting resources at school and online"],
+    materials: ["Response plan template", "School reporting info sheet", "Platform reporting guides"],
+    procedure: [
+      "Review: what is cyberbullying and why does it matter? (5 min)",
+      "Identify the 3 steps: Save evidence, Do not respond, Report (5 min)",
+      "Learn platform-specific reporting for 4 major platforms (10 min)",
+      "Students fill out their personal Response Plan template: who to tell, how to report, what to save (15 min)",
+      "Pair share: exchange plans and give each other feedback (10 min)"
+    ],
+    assessment: "Students complete a comprehensive response plan with specific contacts and steps.",
+    extensions: "Create response plan cards to share with younger students."
+  },
+  {
+    id: "cb-912-15",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "9-12",
+    duration: "15-min",
+    title: "Digital Harassment vs. Free Speech",
+    objectives: ["Distinguish between protected speech and harassment online", "Understand where the legal line is drawn"],
+    materials: ["Scenario cards", "Discussion prompts"],
+    procedure: [
+      "Present the question: 'Is posting a mean opinion about someone online free speech or harassment?'",
+      "Show 4 scenarios that range from opinion to clear harassment",
+      "Quick class vote on each: free speech or harassment?",
+      "Discuss: the line is crossed when it becomes targeted, repeated, and threatening"
+    ],
+    assessment: "Students can articulate the difference between expressing opinions and digital harassment.",
+    extensions: "Research your school's harassment policy and how it applies online."
+  },
+  {
+    id: "cb-912-30",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "9-12",
+    duration: "30-min",
+    title: "Restorative Justice for Online Harm",
+    objectives: ["Explore restorative justice approaches to cyberbullying", "Practice accountability-focused dialogue"],
+    materials: ["Restorative justice overview handout", "Circle discussion guidelines", "Case scenarios"],
+    procedure: [
+      "Introduce restorative justice: focus on repairing harm, not just punishment (5 min)",
+      "Present a cyberbullying case study (5 min)",
+      "Restorative circle: students discuss impact on victim, responsibility of perpetrator, and steps to repair (15 min)",
+      "Reflection: write about how restorative approaches differ from traditional discipline (5 min)"
+    ],
+    assessment: "Students can explain restorative justice principles and apply them to a cyberbullying scenario.",
+    extensions: "Propose a restorative justice program for your school's cyberbullying policy."
+  },
+  {
     id: "cb-912-45",
     topic: "Cyberbullying Prevention",
     gradeBand: "9-12",
@@ -425,6 +529,401 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     ],
     assessment: "Students can identify at least one relevant law and explain potential legal consequences.",
     extensions: "Draft a school anti-cyberbullying policy proposal."
+  },
+  {
+    id: "ps-k2-15",
+    topic: "Privacy & Security",
+    gradeBand: "K-2",
+    duration: "15-min",
+    title: "My Secret Superhero Name",
+    objectives: ["Understand that some information should be kept private", "Learn the concept of a 'secret identity' online"],
+    materials: ["Superhero mask cutouts", "Markers"],
+    procedure: [
+      "Ask: 'Do superheroes tell everyone their real name? Why not?'",
+      "Explain: 'Online, we can use a special name — like a superhero identity — to stay safe'",
+      "Each student creates a superhero name (not their real name) and decorates a mask",
+      "Practice: 'If someone online asks your real name, what do you say? I use my superhero name!'"
+    ],
+    assessment: "Students understand why they should not share their real name with strangers online.",
+    extensions: "Create a class display of superhero identities."
+  },
+  {
+    id: "ps-k2-30",
+    topic: "Privacy & Security",
+    gradeBand: "K-2",
+    duration: "30-min",
+    title: "Lock It Up! Keeping Information Safe",
+    objectives: ["Identify personal information that should stay private", "Practice the concept of keeping secrets safe"],
+    materials: ["Paper lock and key cutouts", "Information cards", "Treasure chest box"],
+    procedure: [
+      "Show a treasure chest: 'We keep valuable things locked up. What information is valuable?'",
+      "Sort information cards: some go in the treasure chest (private), some can be shared",
+      "Private info: full name, address, phone, birthday, school name, passwords",
+      "Shareable info: favorite color, favorite animal, favorite food",
+      "Students decorate their own paper lock with 'Things I Keep Private'",
+      "Practice: 'If a website asks for my address, what do I do? Ask a grown-up!'"
+    ],
+    assessment: "Students can identify at least 4 types of private information.",
+    extensions: "Play 'Private or Shareable?' as a quick daily warm-up game."
+  },
+  {
+    id: "ps-68-15",
+    topic: "Privacy & Security",
+    gradeBand: "6-8",
+    duration: "15-min",
+    title: "What Does Your App Know About You?",
+    objectives: ["Recognize the data apps collect", "Question app permission requests"],
+    materials: ["Projected phone permission screenshots", "Discussion prompts"],
+    procedure: [
+      "Show app permission screenshots: 'Why does a flashlight app need access to your contacts?'",
+      "Quick survey: how many students check app permissions before installing?",
+      "Review 4 common permission types: camera, location, contacts, microphone — when are these reasonable?",
+      "Takeaway: if the permission does not match the app's purpose, be suspicious"
+    ],
+    assessment: "Students can identify at least 2 unreasonable app permission requests.",
+    extensions: "Audit the permissions on your own phone and disable unnecessary ones."
+  },
+  {
+    id: "ps-68-45",
+    topic: "Privacy & Security",
+    gradeBand: "6-8",
+    duration: "45-min",
+    title: "Build Your Privacy Fortress",
+    objectives: ["Implement a complete personal privacy plan", "Configure privacy settings across multiple platforms"],
+    materials: ["Privacy fortress worksheet", "Platform settings guides", "Checklist cards"],
+    procedure: [
+      "Introduce the metaphor: your online privacy is like a fortress with multiple walls (10 min)",
+      "Wall 1 — Passwords: create strong passphrases for 3 key accounts (10 min)",
+      "Wall 2 — Privacy settings: audit one social media platform using the checklist (10 min)",
+      "Wall 3 — Data awareness: list what data you have shared and with whom (10 min)",
+      "Assemble your fortress: combine all three walls into a complete privacy plan (5 min)"
+    ],
+    assessment: "Students complete a privacy fortress plan covering passwords, settings, and data awareness.",
+    extensions: "Schedule a monthly 'Privacy Fortress Check' on your calendar."
+  },
+  {
+    id: "ps-912-15",
+    topic: "Privacy & Security",
+    gradeBand: "9-12",
+    duration: "15-min",
+    title: "The Business of Your Data",
+    objectives: ["Understand how companies monetize personal data", "Question the 'free service' business model"],
+    materials: ["Data economy infographic", "Discussion prompts"],
+    procedure: [
+      "Ask: 'If the product is free, what is the real product?' Answer: you are",
+      "Quick facts: how much your data is worth to advertisers (show infographic)",
+      "Discuss: what data does Google/Facebook/TikTok have about you?",
+      "Key question: 'Is the trade-off worth it? What would you change?'"
+    ],
+    assessment: "Students can explain how free services monetize user data.",
+    extensions: "Download your data from one service and analyze what they have collected."
+  },
+  {
+    id: "ps-912-30",
+    topic: "Privacy & Security",
+    gradeBand: "9-12",
+    duration: "30-min",
+    title: "Encryption for Everyone",
+    objectives: ["Understand basic encryption concepts", "Implement encrypted communication practices"],
+    materials: ["Caesar cipher worksheets", "Encryption concept slides", "App comparison chart"],
+    procedure: [
+      "Interactive demo: students encode messages using a simple Caesar cipher (5 min)",
+      "Explain how modern encryption works at a high level: locking a box vs. sending a postcard (10 min)",
+      "Compare messaging apps: which use end-to-end encryption? (5 min)",
+      "Practical steps: enable encryption features on services students actually use (10 min)"
+    ],
+    assessment: "Students can explain what encryption does and identify at least 2 encrypted services they use.",
+    extensions: "Research the debate between encryption and law enforcement access."
+  },
+  {
+    id: "ml-k2-15",
+    topic: "Media Literacy",
+    gradeBand: "K-2",
+    duration: "15-min",
+    title: "Is It Real or Make-Believe?",
+    objectives: ["Distinguish between real and fictional content", "Understand that not everything on a screen is real"],
+    materials: ["Projected images (mix of real photos and cartoon/animated images)", "Real/Make-Believe paddles"],
+    procedure: [
+      "Show 8 images: mix of real photos, cartoons, and simple edited images",
+      "Students hold up 'Real' or 'Make-Believe' paddle for each image",
+      "Discuss: 'How did you know? What clues helped you decide?'",
+      "Key lesson: 'Just because it is on a screen does not mean it is real'"
+    ],
+    assessment: "Students can correctly identify most real vs. fictional images.",
+    extensions: "Play 'Real or Make-Believe?' during morning meeting all week."
+  },
+  {
+    id: "ml-35-15",
+    topic: "Media Literacy",
+    gradeBand: "3-5",
+    duration: "15-min",
+    title: "Who Made This and Why?",
+    objectives: ["Ask critical questions about media creators' intentions", "Identify the purpose behind online content"],
+    materials: ["Sample ads, articles, and social posts (projected)", "Question chart"],
+    procedure: [
+      "Introduce 3 key questions: Who made this? Why did they make it? What do they want me to do?",
+      "Show 4 examples: a toy ad, a news article, a social media influencer post, a PSA",
+      "Students answer the 3 questions for each example",
+      "Takeaway: everything online was made by someone with a purpose — always ask why"
+    ],
+    assessment: "Students can apply the 3 questions to at least 2 different types of media.",
+    extensions: "Find one example each of media that wants to inform, persuade, and entertain."
+  },
+  {
+    id: "ml-68-15",
+    topic: "Media Literacy",
+    gradeBand: "6-8",
+    duration: "15-min",
+    title: "Headline vs. Reality",
+    objectives: ["Recognize clickbait headlines", "Understand how headlines can misrepresent article content"],
+    materials: ["10 headline/article pairs (projected)", "True/Misleading voting cards"],
+    procedure: [
+      "Show 10 headlines one at a time — students vote: accurate or clickbait?",
+      "Reveal the actual article content for each headline",
+      "Discuss: what techniques make a headline misleading? (exaggeration, missing context, emotional language)",
+      "Challenge: rewrite 2 clickbait headlines to be accurate"
+    ],
+    assessment: "Students can identify clickbait characteristics and rewrite headlines accurately.",
+    extensions: "Collect clickbait headlines for a week and create a 'Wall of Clickbait.'"
+  },
+  {
+    id: "ml-912-15",
+    topic: "Media Literacy",
+    gradeBand: "9-12",
+    duration: "15-min",
+    title: "AI-Generated Content Detection",
+    objectives: ["Recognize signs of AI-generated text and images", "Develop healthy skepticism about content authenticity"],
+    materials: ["Sample AI-generated vs. human-created content pairs", "Detection clue card"],
+    procedure: [
+      "Show 4 pairs of content: students guess which is AI-generated",
+      "Discuss detection clues: unusual phrasing, too-perfect images, lack of specific details, generic tone",
+      "Key question: if AI can create this convincingly, how should we verify what is real?",
+      "Takeaway: verification matters more than ever in the age of AI-generated content"
+    ],
+    assessment: "Students can identify at least 2 signs of AI-generated content.",
+    extensions: "Test an AI detection tool and evaluate its accuracy."
+  },
+  {
+    id: "ml-912-45",
+    topic: "Media Literacy",
+    gradeBand: "9-12",
+    duration: "45-min",
+    title: "Propaganda Techniques in Modern Media",
+    objectives: ["Identify classic propaganda techniques in modern digital content", "Analyze how social media amplifies propaganda"],
+    materials: ["Propaganda technique reference cards", "Modern media examples", "Analysis worksheets"],
+    procedure: [
+      "Introduce 7 propaganda techniques: bandwagon, fear appeal, testimonial, plain folks, card stacking, name calling, glittering generalities (10 min)",
+      "Show 8 modern examples (ads, political posts, influencer content) — students identify which techniques are used (15 min)",
+      "Group analysis: how does social media make propaganda more effective than traditional media? (10 min)",
+      "Create a 'Propaganda Detector' pocket guide for personal use (10 min)"
+    ],
+    assessment: "Students can identify at least 4 propaganda techniques in modern media examples.",
+    extensions: "Analyze a political campaign's social media for propaganda techniques."
+  },
+  {
+    id: "rg-k2-15",
+    topic: "Responsible Gaming",
+    gradeBand: "K-2",
+    duration: "15-min",
+    title: "Screen Time Traffic Light",
+    objectives: ["Understand that screen time needs limits", "Practice the idea of balancing screen time with other activities"],
+    materials: ["Traffic light cutout (red/yellow/green)", "Activity picture cards"],
+    procedure: [
+      "Green light: time to play games or watch videos!",
+      "Yellow light: you have been playing for a while — take a break soon!",
+      "Red light: time to stop and do something else — play outside, read, or draw!",
+      "Sort activity cards: which activities are screen time? Which are break activities?"
+    ],
+    assessment: "Students can name 3 non-screen activities to do during 'red light' time.",
+    extensions: "Create a personal 'Traffic Light Schedule' for the weekend."
+  },
+  {
+    id: "rg-k2-30",
+    topic: "Responsible Gaming",
+    gradeBand: "K-2",
+    duration: "30-min",
+    title: "Safe Gaming Choices for Little Players",
+    objectives: ["Identify safe vs. unsafe situations in games", "Practice asking for help from a grown-up"],
+    materials: ["Game scenario cards", "Smiley/frowny face paddles", "Chart paper"],
+    procedure: [
+      "Discuss: what games do you like to play on tablets? (5 min)",
+      "Read 8 game scenarios: 'A stranger asks you to be friends' vs 'You play your favorite learning game'",
+      "Students hold up smiley (safe) or frowny (unsafe) face for each scenario (10 min)",
+      "Create class rules for safe gaming: never talk to strangers, ask before downloading, take breaks (10 min)",
+      "Practice: role-play asking a grown-up for help when something feels wrong (5 min)"
+    ],
+    assessment: "Students correctly identify safe vs. unsafe gaming situations.",
+    extensions: "Share gaming safety rules with families."
+  },
+  {
+    id: "rg-35-15",
+    topic: "Responsible Gaming",
+    gradeBand: "3-5",
+    duration: "15-min",
+    title: "The Break Timer Challenge",
+    objectives: ["Understand the importance of breaks during gaming", "Create a personal break strategy"],
+    materials: ["Timer", "Break activity cards"],
+    procedure: [
+      "Discuss: how does your body feel after playing games for a long time? (eyes, neck, mood)",
+      "Introduce the 20-20-20 rule: every 20 minutes, look at something 20 feet away for 20 seconds",
+      "Break activity brainstorm: 5 things to do during a game break",
+      "Challenge: try the 20-20-20 rule during the next computer time"
+    ],
+    assessment: "Students can explain the 20-20-20 rule and name 3 break activities.",
+    extensions: "Create a break timer reminder to post near the family computer."
+  },
+  {
+    id: "rg-68-15",
+    topic: "Responsible Gaming",
+    gradeBand: "6-8",
+    duration: "15-min",
+    title: "Recognizing Manipulative Game Design",
+    objectives: ["Identify game design patterns that encourage overspending or overplaying", "Develop awareness of psychological manipulation in games"],
+    materials: ["Game design pattern examples (projected)", "Discussion prompts"],
+    procedure: [
+      "Show 4 manipulative design patterns: countdown timers, limited-time offers, social pressure notifications, energy systems",
+      "For each: explain how it creates urgency or FOMO",
+      "Ask: 'Have you ever felt pressured by a game to spend money or play longer?'",
+      "Takeaway: when a game makes you feel anxious about missing out, that is by design — recognize it"
+    ],
+    assessment: "Students can identify at least 2 manipulative game design patterns.",
+    extensions: "Identify these patterns in games you currently play."
+  },
+  {
+    id: "rg-912-30",
+    topic: "Responsible Gaming",
+    gradeBand: "9-12",
+    duration: "30-min",
+    title: "Gaming Wellness Self-Assessment",
+    objectives: ["Evaluate personal gaming habits honestly", "Develop a balanced gaming plan"],
+    materials: ["Self-assessment questionnaire", "Wellness plan template", "Balance wheel worksheet"],
+    procedure: [
+      "Complete the gaming wellness self-assessment: hours per day, impact on sleep/grades/relationships (10 min)",
+      "Score and interpret results: healthy, caution zone, or concern area (5 min)",
+      "Create a personal balance wheel: gaming, school, exercise, social, sleep, hobbies (10 min)",
+      "Write 3 specific action items for better gaming balance (5 min)"
+    ],
+    assessment: "Students complete an honest self-assessment and create an actionable wellness plan.",
+    extensions: "Track actual gaming time for one week and compare to self-assessment."
+  },
+  {
+    id: "rg-912-45",
+    topic: "Responsible Gaming",
+    gradeBand: "9-12",
+    duration: "45-min",
+    title: "The Ethics of Game Monetization",
+    objectives: ["Analyze ethical concerns with modern game monetization", "Form evidence-based opinions on regulation"],
+    materials: ["Monetization case studies", "Ethics framework", "Debate preparation sheets"],
+    procedure: [
+      "Overview: how games make money — from $60 purchases to free-to-play microtransactions (10 min)",
+      "Case studies: loot boxes in children's games, pay-to-win mechanics, cosmetic-only vs. gameplay advantages (15 min)",
+      "Ethical analysis: apply fairness, transparency, and harm principles to each case (10 min)",
+      "Mini-debate: 'Should loot boxes be classified as gambling and regulated by law?' (10 min)"
+    ],
+    assessment: "Students can articulate ethical arguments for and against current monetization practices.",
+    extensions: "Write a persuasive essay on game monetization regulation."
+  },
+  {
+    id: "st-k2-15",
+    topic: "School Technology Safety",
+    gradeBand: "K-2",
+    duration: "15-min",
+    title: "Computer Helpers, Not Computer Breakers",
+    objectives: ["Learn basic rules for using school computers", "Understand gentle, careful technology use"],
+    materials: ["Computer rules poster", "Thumbs-up/down cards"],
+    procedure: [
+      "Show pictures of right and wrong ways to use a computer (gentle clicking vs. banging keyboard)",
+      "Students give thumbs up or down for each picture",
+      "Introduce 4 simple rules: clean hands, gentle touches, ask for help, only approved websites",
+      "Practice: pretend to sit at a computer and follow all 4 rules"
+    ],
+    assessment: "Students can state the 4 computer rules.",
+    extensions: "Earn 'Computer Helper' stickers by following rules all week."
+  },
+  {
+    id: "st-35-15",
+    topic: "School Technology Safety",
+    gradeBand: "3-5",
+    duration: "15-min",
+    title: "What Belongs at School and What Does Not",
+    objectives: ["Distinguish between appropriate and inappropriate technology use at school", "Understand the school Acceptable Use Policy in simple terms"],
+    materials: ["Activity cards with technology use examples", "'At School' and 'Not at School' sorting bins"],
+    procedure: [
+      "Sort activity cards: is this something you should do on school computers? (10 min)",
+      "Appropriate: research for class, educational games, typing practice",
+      "Not appropriate: personal social media, downloading random games, sharing passwords",
+      "Introduce the idea of school rules for technology — just like playground rules (5 min)"
+    ],
+    assessment: "Students can identify 3 appropriate and 3 inappropriate school technology uses.",
+    extensions: "Create a 'School Tech Do's and Don'ts' poster."
+  },
+  {
+    id: "st-35-30",
+    topic: "School Technology Safety",
+    gradeBand: "3-5",
+    duration: "30-min",
+    title: "Keeping School Accounts Safe",
+    objectives: ["Understand why school accounts need protection", "Practice safe login habits"],
+    materials: ["Login safety checklist", "Partner practice cards", "Badge cutouts"],
+    procedure: [
+      "Discuss: what is in your school account? (documents, grades, messages) — all worth protecting (5 min)",
+      "Teach 5 safe login habits: strong password, never share it, log out when done, cover your screen, tell a teacher if something is wrong (10 min)",
+      "Partner practice: role-play safe login scenarios (10 min)",
+      "Safe Login Badge: students earn a badge when they demonstrate all 5 habits (5 min)"
+    ],
+    assessment: "Students demonstrate at least 4 of 5 safe login habits.",
+    extensions: "Become a 'Login Safety Monitor' for the class."
+  },
+  {
+    id: "st-68-15",
+    topic: "School Technology Safety",
+    gradeBand: "6-8",
+    duration: "15-min",
+    title: "Why Schools Are Cyber Targets",
+    objectives: ["Understand why schools are targeted by cyberattacks", "Recognize the value of school data"],
+    materials: ["Statistics on school cyberattacks", "Discussion prompts"],
+    procedure: [
+      "Surprising fact: schools are one of the most targeted sectors for cyberattacks",
+      "Discussion: what data does your school have? (grades, addresses, SSNs, medical records)",
+      "Why attackers want it: identity theft (children's clean credit histories), ransomware, data sale",
+      "Student role: you are part of the defense — following safety rules protects everyone"
+    ],
+    assessment: "Students can explain why schools are attractive targets for cyberattacks.",
+    extensions: "Research a real school district cyberattack and its impact."
+  },
+  {
+    id: "st-912-15",
+    topic: "School Technology Safety",
+    gradeBand: "9-12",
+    duration: "15-min",
+    title: "BYOD Security Essentials",
+    objectives: ["Secure personal devices used on school networks", "Understand risks of connecting personal devices to institutional networks"],
+    materials: ["BYOD security checklist", "Discussion prompts"],
+    procedure: [
+      "Quick poll: how many of you connect personal devices to school Wi-Fi?",
+      "3 risks: unsecured devices can be entry points, personal data exposed on shared networks, malware spread",
+      "3 protections: keep OS updated, use strong device lock, avoid sensitive activities on school Wi-Fi",
+      "Distribute BYOD security checklist for self-audit"
+    ],
+    assessment: "Students can list 3 security practices for personal devices on school networks.",
+    extensions: "Audit your own device against the BYOD security checklist."
+  },
+  {
+    id: "st-912-30",
+    topic: "School Technology Safety",
+    gradeBand: "9-12",
+    duration: "30-min",
+    title: "Incident Response Simulation",
+    objectives: ["Practice responding to a simulated security incident", "Understand the steps in an incident response plan"],
+    materials: ["Incident scenario cards", "Response flowchart template", "Team role cards"],
+    procedure: [
+      "Introduction: what happens when a school is hacked? Walk through real examples (5 min)",
+      "Assign team roles: detector, reporter, responder, communicator (5 min)",
+      "Scenario: your school email system has been compromised — run through the response (15 min)",
+      "Debrief: what went well? What would you do differently? (5 min)"
+    ],
+    assessment: "Teams can execute a structured response to a simulated security incident.",
+    extensions: "Create an incident response poster for your school's computer lab."
   },
   {
     id: "ps-35-30",
