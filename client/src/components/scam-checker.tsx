@@ -1622,28 +1622,28 @@ function analyzeContent(content: string): AnalysisResult {
   if (totalScore === 0) {
     overallRisk = "safe";
     confidenceScore = 75;
-    title = "Looks Safe!";
-    summary = "We didn't find any common scam patterns. It's always smart to double-check unexpected messages through official channels, but this looks okay.";
+    title = "Verified Safe";
+    summary = "Our scan checked for known scam patterns, suspicious links, and deceptive tactics — none were found. As always, verify unexpected messages through official channels.";
   } else if (totalScore <= 2) {
     overallRisk = "low";
     confidenceScore = 60;
-    title = "Mostly Safe";
-    summary = "A couple of things caught our eye, but this is probably fine. If you're unsure, check with the official source before acting.";
+    title = "Low Risk";
+    summary = "We found a couple of minor items worth noting, but nothing that indicates a scam. If anything feels off, verify through the official source.";
   } else if (totalScore <= 5) {
     overallRisk = "medium";
     confidenceScore = 70;
-    title = "Looks Suspicious";
-    summary = "We found several things that don't look right. Be careful — don't click links or share personal info until you've verified this is real.";
+    title = "Caution Advised";
+    summary = "Our analysis found several warning signs. Don't click links or share personal information until you've confirmed this is legitimate through official channels.";
   } else if (totalScore <= 10) {
     overallRisk = "high";
     confidenceScore = 85;
-    title = "Be Careful!";
-    summary = "This has multiple warning signs that scammers commonly use. We recommend you don't engage with this message.";
+    title = "High Risk Detected";
+    summary = "This content contains multiple red flags commonly found in scams. We strongly recommend you do not engage with this message or click any links.";
   } else {
     overallRisk = "critical";
     confidenceScore = 95;
-    title = "Danger — Stay Away!";
-    summary = "This matches known scam patterns. Do not reply, click any links, or share any information. Delete it right away to stay safe.";
+    title = "Confirmed Threat";
+    summary = "This matches known scam patterns in our database. Do not reply, click any links, or enter any information. Delete it immediately.";
   }
   
   // Generate recommendations based on threats
@@ -1768,31 +1768,31 @@ function getAIRiskIcon(level: string) {
 
 function getFriendlyRiskTitle(level: string) {
   switch (level) {
-    case "Critical": return "Danger — Stay Away!";
-    case "High": return "Be Careful!";
-    case "Moderate": return "Looks Suspicious";
-    case "Low": return "Mostly Safe";
-    default: return "Looks Suspicious";
+    case "Critical": return "Confirmed Threat";
+    case "High": return "High Risk Detected";
+    case "Moderate": return "Caution Advised";
+    case "Low": return "Low Risk";
+    default: return "Caution Advised";
   }
 }
 
 function getFriendlyVerdict(level: string) {
   switch (level) {
-    case "Critical": return "This looks very dangerous. Do not click, reply, or share any personal info.";
-    case "High": return "This has several red flags. We recommend you avoid it.";
-    case "Moderate": return "Something seems off. Proceed with caution.";
-    case "Low": return "We didn't find anything alarming. You can feel confident here.";
-    default: return "Take a closer look before you trust this.";
+    case "Critical": return "Our scan identified this as a known scam. Do not interact with it.";
+    case "High": return "This shows strong indicators of a scam. We recommend you avoid it entirely.";
+    case "Moderate": return "We found some warning signs. Verify through official channels before you trust it.";
+    case "Low": return "Nothing alarming detected. This appears legitimate.";
+    default: return "Verify through official channels before taking action.";
   }
 }
 
 function getFriendlyWarningsLabel(level: string) {
   switch (level) {
-    case "Critical": return "Warning Signs We Found";
-    case "High": return "What Caught Our Attention";
-    case "Moderate": return "Things That Look Off";
+    case "Critical": return "What Our Scan Found";
+    case "High": return "Red Flags Detected";
+    case "Moderate": return "Warning Signs";
     case "Low": return "Minor Notes";
-    default: return "Things We Noticed";
+    default: return "What We Found";
   }
 }
 
@@ -2447,7 +2447,7 @@ export function ScamChecker() {
                         <div>
                           <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
                             <Shield className="w-4 h-4 text-primary" />
-                            What You Should Do
+                            Recommended Actions
                           </h4>
                           <ul className="space-y-1.5">
                             {aiResult.recommendedActions.map((action, i) => (
@@ -2800,12 +2800,12 @@ export function ScamChecker() {
             <div className="space-y-3">
               <h4 className="font-semibold flex items-center gap-2">
                 <Shield className="w-4 h-4 text-green-500" />
-                What You Should Do
+                Recommended Actions
               </h4>
               <ul className="space-y-2">
                 {result.recommendations.map((rec, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <li key={idx} className="flex items-start gap-2 text-sm p-2 bg-green-50 dark:bg-green-950/30 rounded-md border border-green-200 dark:border-green-800">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                     <span>{rec}</span>
                   </li>
                 ))}

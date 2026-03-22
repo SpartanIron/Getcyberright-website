@@ -128,18 +128,18 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-share-result").addEventListener("click", () => {
     if (!lastScanResult) return;
     const risk = (lastScanResult.scamRiskLevel || "Unknown");
-    const friendlyTitles = {
-      critical: "Danger - Stay Away!",
-      high: "Be Careful!",
-      moderate: "Looks Suspicious",
-      medium: "Looks Suspicious",
-      low: "Mostly Safe",
-      safe: "Looks Safe!"
+    const titles = {
+      critical: "Confirmed Threat",
+      high: "High Risk Detected",
+      moderate: "Caution Advised",
+      medium: "Caution Advised",
+      low: "Low Risk",
+      safe: "Verified Safe"
     };
-    const title = friendlyTitles[risk.toLowerCase()] || risk;
+    const title = titles[risk.toLowerCase()] || risk;
     const summary = lastScanResult.summary || "";
     const url = extractUrl(lastScanContent) || "";
-    const text = `GCR Guard scanned this and says: "${title}"\n\n${summary}\n\n${url ? "Link: " + url + "\n\n" : ""}Stay safe online! Get GCR Guard at getcyberright.com`;
+    const text = `GCR Guard Scan Result: ${title}\n\n${summary}\n\n${url ? "Link scanned: " + url + "\n\n" : ""}Protect yourself and your family \u2014 getcyberright.com`;
 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
@@ -215,8 +215,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (cached && cached.riskLevel) {
           const riskLevel = cached.riskLevel;
-          const iconMap = { critical: "\uD83D\uDEA8", high: "\u26A0\uFE0F", medium: "\uD83E\uDD14", low: "\uD83D\uDC4D", safe: "\u2705" };
-          const labelMap = { critical: "Danger \u2014 Stay Away!", high: "Be Careful!", medium: "Looks Suspicious", low: "Mostly Safe", safe: "Looks Safe!" };
+          const iconMap = { critical: "\uD83D\uDED1", high: "\uD83D\uDD34", medium: "\uD83D\uDFE1", low: "\uD83D\uDD35", safe: "\u2705" };
+          const labelMap = { critical: "Confirmed Threat", high: "High Risk Detected", medium: "Caution Advised", low: "Low Risk", safe: "Verified Safe" };
 
           pageStatus.classList.remove("hidden");
           pageStatus.className = `page-status page-status-${riskLevel}`;
@@ -244,12 +244,12 @@ document.addEventListener("DOMContentLoaded", () => {
           let riskLabel = "Safe";
           let iconText = "\u2705";
 
-          if (text === "!!!") { riskLevel = "critical"; riskLabel = "Danger \u2014 Stay Away!"; iconText = "\uD83D\uDEA8"; }
-          else if (text === "!!") { riskLevel = "high"; riskLabel = "Be Careful!"; iconText = "\u26A0\uFE0F"; }
-          else if (text === "!") { riskLevel = "medium"; riskLabel = "Looks Suspicious"; iconText = "\uD83E\uDD14"; }
-          else if (text === "OK") { riskLevel = "low"; riskLabel = "Mostly Safe"; iconText = "\uD83D\uDC4D"; }
-          else if (text === "\u2713") { riskLevel = "safe"; riskLabel = "Looks Safe!"; iconText = "\u2705"; }
-          else if (text === "...") { riskLevel = "scanning"; riskLabel = "Checking this page..."; iconText = "\uD83D\uDD0D"; }
+          if (text === "!!!") { riskLevel = "critical"; riskLabel = "Confirmed Threat"; iconText = "\uD83D\uDED1"; }
+          else if (text === "!!") { riskLevel = "high"; riskLabel = "High Risk Detected"; iconText = "\uD83D\uDD34"; }
+          else if (text === "!") { riskLevel = "medium"; riskLabel = "Caution Advised"; iconText = "\uD83D\uDFE1"; }
+          else if (text === "OK") { riskLevel = "low"; riskLabel = "Low Risk"; iconText = "\uD83D\uDD35"; }
+          else if (text === "\u2713") { riskLevel = "safe"; riskLabel = "Verified Safe"; iconText = "\u2705"; }
+          else if (text === "...") { riskLevel = "scanning"; riskLabel = "Scanning..."; iconText = "\uD83D\uDD0D"; }
 
           pageStatus.classList.remove("hidden");
           pageStatus.className = `page-status page-status-${riskLevel}`;
@@ -307,45 +307,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const friendlyData = {
       critical: {
-        icon: "\uD83D\uDEA8",
-        title: "Danger \u2014 Stay Away!",
-        verdict: "This looks very dangerous. Do not click, reply, or share any personal info.",
-        explainer: "We found serious warning signs that this is a scam or harmful content. Please protect yourself and your family.",
-        warningsLabel: "\u26A0\uFE0F Warning Signs We Found"
+        icon: "\uD83D\uDED1",
+        title: "Confirmed Threat",
+        verdict: "Our scan identified this as a known scam. Do not interact with it.",
+        explainer: "This matches multiple scam patterns in our database. Close it, don\u2019t click anything, and don\u2019t enter any information.",
+        warningsLabel: "\uD83D\uDED1 What Our Scan Found"
       },
       high: {
-        icon: "\u26A0\uFE0F",
-        title: "Be Careful!",
-        verdict: "This has several red flags. We recommend you avoid it.",
-        explainer: "We spotted some concerning signs. When in doubt, don\u2019t click links or share personal information.",
-        warningsLabel: "\u26A0\uFE0F What Caught Our Attention"
+        icon: "\uD83D\uDD34",
+        title: "High Risk Detected",
+        verdict: "This shows strong indicators of a scam. We recommend you avoid it entirely.",
+        explainer: "Our analysis flagged several red flags commonly used in scams. Here\u2019s exactly what we found.",
+        warningsLabel: "\uD83D\uDD34 Red Flags Detected"
       },
       moderate: {
-        icon: "\uD83E\uDD14",
-        title: "Looks Suspicious",
-        verdict: "Something seems off. Proceed with caution.",
-        explainer: "There are a few things that don\u2019t look right. Take a closer look before you trust this.",
-        warningsLabel: "\uD83D\uDD0D Things That Look Off"
+        icon: "\uD83D\uDFE1",
+        title: "Caution Advised",
+        verdict: "We found some warning signs. Verify this through official channels before you trust it.",
+        explainer: "This isn\u2019t clearly a scam, but some elements don\u2019t check out. Here\u2019s what to watch for.",
+        warningsLabel: "\uD83D\uDFE1 Warning Signs"
       },
       medium: {
-        icon: "\uD83E\uDD14",
-        title: "Looks Suspicious",
-        verdict: "Something seems off. Proceed with caution.",
-        explainer: "There are a few things that don\u2019t look right. Take a closer look before you trust this.",
-        warningsLabel: "\uD83D\uDD0D Things That Look Off"
+        icon: "\uD83D\uDFE1",
+        title: "Caution Advised",
+        verdict: "We found some warning signs. Verify this through official channels before you trust it.",
+        explainer: "This isn\u2019t clearly a scam, but some elements don\u2019t check out. Here\u2019s what to watch for.",
+        warningsLabel: "\uD83D\uDFE1 Warning Signs"
       },
       low: {
-        icon: "\uD83D\uDC4D",
-        title: "Mostly Safe",
-        verdict: "This looks okay, but always stay alert online.",
-        explainer: "We didn\u2019t find anything alarming, but it\u2019s always smart to be careful with your personal info.",
-        warningsLabel: "\u2139\uFE0F Minor Notes"
+        icon: "\uD83D\uDD35",
+        title: "Low Risk",
+        verdict: "Nothing alarming here, but we noted a few minor items.",
+        explainer: "This appears legitimate. We found some small details worth mentioning, but nothing that indicates a threat.",
+        warningsLabel: "\uD83D\uDD35 Minor Notes"
       },
       safe: {
         icon: "\u2705",
-        title: "Looks Safe!",
-        verdict: "We didn\u2019t find any threats here.",
-        explainer: "This appears to be legitimate. You can feel confident browsing here.",
+        title: "Verified Safe",
+        verdict: "No threats detected. You\u2019re good to go.",
+        explainer: "Our scan checked for scam patterns, malicious links, and known threats \u2014 this came back clean.",
         warningsLabel: ""
       }
     };
