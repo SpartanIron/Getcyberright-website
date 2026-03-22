@@ -8,6 +8,7 @@
   let linkCache = {};
   let pageRiskLevel = "unknown";
   let pageRiskScore = 0;
+  let userSafeList = [];
   let settings = {
     autoScan: true,
     notifications: true,
@@ -95,9 +96,12 @@
   });
 
   function loadSettingsAndInit() {
-    chrome.storage.local.get(["settings"], (result) => {
+    chrome.storage.local.get(["settings", "userSafeList"], (result) => {
       if (result.settings) {
         settings = { ...settings, ...result.settings };
+      }
+      if (result.userSafeList && Array.isArray(result.userSafeList)) {
+        userSafeList = result.userSafeList;
       }
       init();
     });
@@ -374,7 +378,9 @@
       "dropbox.com", "salesforce.com", "adobe.com", "spotify.com"
     ];
     const registrable = getRegistrableDomain(hostname);
-    return wellKnown.includes(registrable);
+    if (wellKnown.includes(registrable)) return true;
+    if (userSafeList.some(d => getRegistrableDomain(d) === registrable)) return true;
+    return false;
   }
 
   function handleFormSubmit(e) {
@@ -465,11 +471,30 @@
       }
     });
 
+    const trustBtn = document.createElement("button");
+    trustBtn.className = "gcr-form-btn gcr-form-btn-trust";
+    trustBtn.textContent = "Trust This Site";
+    trustBtn.addEventListener("click", () => {
+      const domain = getRegistrableDomain(window.location.hostname);
+      if (domain && !userSafeList.includes(domain)) {
+        userSafeList.push(domain);
+        chrome.storage.local.set({ userSafeList });
+      }
+      overlay.remove();
+      form.__gcrAllowed = true;
+      if (form.requestSubmit) {
+        form.requestSubmit();
+      } else {
+        form.submit();
+      }
+    });
+
     const brandFooter = document.createElement("div");
     brandFooter.className = "gcr-form-brand";
     brandFooter.textContent = "Protected by GCR Guard \u2022 GetCyberRight";
 
     btnRow.appendChild(cancelBtn);
+    btnRow.appendChild(trustBtn);
     btnRow.appendChild(proceedBtn);
     box.appendChild(iconDiv);
     box.appendChild(title);
