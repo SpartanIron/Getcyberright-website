@@ -6,15 +6,97 @@
   let currentHoverLink = null;
   let hoverTimeout = null;
   let linkCache = {};
-  let settings = { autoScan: true, notifications: true, hoverCheck: true, blockDangerous: false };
+  let pageRiskLevel = "unknown";
+  let pageRiskScore = 0;
+  let settings = {
+    autoScan: true,
+    notifications: true,
+    hoverCheck: true,
+    blockDangerous: false,
+    formWarnings: true,
+    lookalikeDetection: true
+  };
+
+  const LOOKALIKE_BRANDS = {
+    "paypal": { domain: "paypal.com", registrable: "paypal.com", variants: ["paypa1", "paypai", "paypaI", "paypall", "paypl", "peypal", "paypol", "paypa-l", "p\u0430ypal", "payp\u0430l"] },
+    "amazon": { domain: "amazon.com", registrable: "amazon.com", variants: ["amaz0n", "arnazon", "amaazon", "amazom", "am\u0430zon", "\u0430mazon"] },
+    "apple": { domain: "apple.com", registrable: "apple.com", variants: ["app1e", "appie", "appIe", "aple", "applle", "\u0430pple", "appl\u0435"] },
+    "microsoft": { domain: "microsoft.com", registrable: "microsoft.com", variants: ["micros0ft", "mircosoft", "microsft", "microsoftt", "micr0soft", "m1crosoft"] },
+    "google": { domain: "google.com", registrable: "google.com", variants: ["g00gle", "googIe", "gogle", "googlee", "go0gle", "g\u043Cogle"] },
+    "facebook": { domain: "facebook.com", registrable: "facebook.com", variants: ["faceb00k", "facebok", "faceboook", "f\u0430cebook", "faceb\u043Cook"] },
+    "instagram": { domain: "instagram.com", registrable: "instagram.com", variants: ["instagr\u0430m", "1nstagram", "instaqram", "lnstagram", "instragram", "instagran"] },
+    "netflix": { domain: "netflix.com", registrable: "netflix.com", variants: ["netf1ix", "netfIix", "netfilx", "nettflix", "n\u0435tflix"] },
+    "chase": { domain: "chase.com", registrable: "chase.com", variants: ["chas3", "chasse", "ch\u0430se"] },
+    "wellsfargo": { domain: "wellsfargo.com", registrable: "wellsfargo.com", variants: ["wellsfarg0", "welIsfargo", "w\u0435llsfargo"] },
+    "bankofamerica": { domain: "bankofamerica.com", registrable: "bankofamerica.com", variants: ["bank0famerica", "bankofarnerica", "b\u0430nkofamerica"] },
+    "citibank": { domain: "citibank.com", registrable: "citibank.com", variants: ["c1tibank", "citlbank", "cit1bank"] },
+    "usbank": { domain: "usbank.com", registrable: "usbank.com", variants: ["u5bank"] },
+    "dropbox": { domain: "dropbox.com", registrable: "dropbox.com", variants: ["dr0pbox", "dropb0x", "drropbox", "dr\u043Cpbox"] },
+    "linkedin": { domain: "linkedin.com", registrable: "linkedin.com", variants: ["1inkedin", "linkedln", "linkdin", "l1nkedin", "linked1n"] },
+    "twitter": { domain: "twitter.com", registrable: "twitter.com", variants: ["tw1tter", "twtter", "twltter", "tw\u0456tter"] },
+    "walmart": { domain: "walmart.com", registrable: "walmart.com", variants: ["wa1mart", "walmrat", "walm\u0430rt", "walmort"] },
+    "ebay": { domain: "ebay.com", registrable: "ebay.com", variants: ["3bay", "ebav", "eebay", "\u0435bay"] },
+    "dhl": { domain: "dhl.com", registrable: "dhl.com", variants: ["dh1", "dhI"] },
+    "fedex": { domain: "fedex.com", registrable: "fedex.com", variants: ["f3dex", "fed3x", "f\u0435dex"] },
+    "ups": { domain: "ups.com", registrable: "ups.com", variants: ["up5"] },
+    "usps": { domain: "usps.com", registrable: "usps.com", variants: ["u5ps"] },
+    "steam": { domain: "store.steampowered.com", registrable: "steampowered.com", variants: ["steamcommunlty", "stearnpowered", "st3am", "stearn"] },
+    "discord": { domain: "discord.com", registrable: "discord.com", variants: ["disc0rd", "dlscord", "discrod", "d1scord"] },
+    "twitch": { domain: "twitch.tv", registrable: "twitch.tv", variants: ["tw1tch", "twitcch", "twltch"] },
+    "coinbase": { domain: "coinbase.com", registrable: "coinbase.com", variants: ["c0inbase", "coinbas3", "co1nbase"] },
+    "binance": { domain: "binance.com", registrable: "binance.com", variants: ["b1nance", "blnance", "bin\u0430nce"] },
+    "metamask": { domain: "metamask.io", registrable: "metamask.io", variants: ["m3tamask", "metarnask", "met\u0430mask"] },
+    "stripe": { domain: "stripe.com", registrable: "stripe.com", variants: ["str1pe", "strlpe", "str\u0456pe"] },
+    "venmo": { domain: "venmo.com", registrable: "venmo.com", variants: ["v3nmo", "venrno", "v\u0435nmo"] },
+    "zelle": { domain: "zellepay.com", registrable: "zellepay.com", variants: ["z3lle", "zele", "z\u0435lle"] },
+    "att": { domain: "att.com", registrable: "att.com", variants: [] },
+    "verizon": { domain: "verizon.com", registrable: "verizon.com", variants: ["ver1zon", "verlzon", "veriz0n"] },
+    "tmobile": { domain: "t-mobile.com", registrable: "t-mobile.com", variants: ["tmob1le", "t-mob1le", "t-mobil\u0435"] },
+    "costco": { domain: "costco.com", registrable: "costco.com", variants: ["c0stco", "costc0"] },
+    "target": { domain: "target.com", registrable: "target.com", variants: ["t\u0430rget", "targ3t"] },
+    "bestbuy": { domain: "bestbuy.com", registrable: "bestbuy.com", variants: ["b3stbuy", "bestbuv"] },
+    "homedepot": { domain: "homedepot.com", registrable: "homedepot.com", variants: ["h0medepot", "hom3depot"] },
+    "capitalone": { domain: "capitalone.com", registrable: "capitalone.com", variants: ["capita1one", "capitalon3", "capit\u0430lone"] },
+    "americanexpress": { domain: "americanexpress.com", registrable: "americanexpress.com", variants: ["american3xpress"] },
+    "irs": { domain: "irs.gov", registrable: "irs.gov", variants: ["1rs"] },
+    "docusign": { domain: "docusign.com", registrable: "docusign.com", variants: ["d0cusign", "docuslgn"] },
+    "adobe": { domain: "adobe.com", registrable: "adobe.com", variants: ["ad0be", "adobee", "\u0430dobe"] },
+    "zoom": { domain: "zoom.us", registrable: "zoom.us", variants: ["z00m", "zo0m", "zoorn"] },
+    "outlook": { domain: "outlook.com", registrable: "outlook.com", variants: ["0utlook", "outl00k", "out1ook"] },
+    "yahoo": { domain: "yahoo.com", registrable: "yahoo.com", variants: ["yah00", "yaho0", "yah\u043Co"] },
+    "citi": { domain: "citi.com", registrable: "citi.com", variants: ["c1ti", "citl"] },
+    "hsbc": { domain: "hsbc.com", registrable: "hsbc.com", variants: ["h5bc", "hs8c"] },
+    "barclays": { domain: "barclays.co.uk", registrable: "barclays.co.uk", variants: ["barcl\u0430ys", "barc1ays", "barclay5"] }
+  };
+
+  function getRegistrableDomain(hostname) {
+    const parts = hostname.toLowerCase().replace(/^www\./, "").split(".");
+    if (parts.length <= 2) return parts.join(".");
+    const knownCcTlds = ["co.uk", "com.au", "co.nz", "co.za", "com.br", "co.jp", "co.in"];
+    const lastTwo = parts.slice(-2).join(".");
+    if (knownCcTlds.includes(lastTwo)) {
+      return parts.slice(-3).join(".");
+    }
+    return parts.slice(-2).join(".");
+  }
+
+  function isLegitSubdomainOf(hostname, brandRegistrable) {
+    const hostRegistrable = getRegistrableDomain(hostname);
+    return hostRegistrable === brandRegistrable;
+  }
 
   chrome.storage.local.get(["settings"], (result) => {
-    if (result.settings) settings = result.settings;
+    if (result.settings) {
+      settings = { ...settings, ...result.settings };
+    }
   });
 
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === "SCAN_RESULT") {
       showPageBanner(message.result, message.url);
+    }
+    if (message.type === "AUTO_SCAN_RESULT") {
+      handleAutoScanResult(message.result);
     }
   });
 
@@ -31,6 +113,350 @@
     if (settings.autoScan) {
       scanVisibleLinks();
     }
+
+    if (settings.lookalikeDetection) {
+      checkLookalikeDomain();
+    }
+
+    if (settings.formWarnings) {
+      setupFormInterception();
+    }
+
+    triggerAutoScan();
+  }
+
+  function triggerAutoScan() {
+    const url = window.location.href;
+    if (!url || url === "about:blank") return;
+
+    const lookalikeMatch = settings.lookalikeDetection ? detectLookalike(url) : null;
+
+    let pageInfo = null;
+    try {
+      const title = document.title || "";
+      const meta = document.querySelector('meta[name="description"]')?.content || "";
+      const headings = Array.from(document.querySelectorAll("h1, h2")).slice(0, 5).map(h => h.textContent.trim()).join(" | ");
+      const forms = document.querySelectorAll("form").length;
+      const passwordFields = document.querySelectorAll('input[type="password"]').length;
+      const bodyText = document.body?.innerText?.substring(0, 1000) || "";
+      const links = Array.from(document.querySelectorAll("a[href]")).slice(0, 15).map(a => a.href);
+      const pageHost = new URL(url).hostname;
+      const externalLinks = links.filter(l => { try { return new URL(l).hostname !== pageHost; } catch { return false; } }).slice(0, 8).join(", ");
+
+      pageInfo = { title, meta, headings, forms, passwordFields, bodyText, externalLinks };
+    } catch (e) {}
+
+    chrome.runtime.sendMessage({
+      type: "PAGE_LOADED",
+      url: url,
+      pageInfo: pageInfo,
+      lookalikeMatch: lookalikeMatch
+    });
+  }
+
+  function handleAutoScanResult(result) {
+    if (!result) return;
+    pageRiskLevel = result.riskLevel || "unknown";
+    pageRiskScore = result.riskScore || 0;
+
+    if (result.riskLevel === "critical" || result.riskLevel === "high") {
+      showAutoScanBanner(result);
+    }
+  }
+
+  function showAutoScanBanner(result) {
+    const existing = document.getElementById("gcr-autoscan-banner");
+    if (existing) existing.remove();
+
+    const banner = document.createElement("div");
+    banner.id = "gcr-autoscan-banner";
+    banner.className = `gcr-banner gcr-banner-${result.riskLevel === "critical" ? "critical" : "high"}`;
+
+    const content = document.createElement("div");
+    content.className = "gcr-banner-content";
+
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "gcr-banner-icon";
+    iconSpan.textContent = result.riskLevel === "critical" ? "\uD83D\uDEA8" : "\u26A0\uFE0F";
+
+    const textDiv = document.createElement("div");
+    textDiv.className = "gcr-banner-text";
+
+    const strong1 = document.createElement("strong");
+    strong1.textContent = "GCR Guard Auto-Scan:";
+    const riskSpan = document.createElement("strong");
+    riskSpan.textContent = ` ${capitalize(result.riskLevel)} Risk`;
+    textDiv.appendChild(strong1);
+    textDiv.appendChild(riskSpan);
+
+    const sources = [];
+    if (result.lookalikeMatch) sources.push("Lookalike domain detected");
+    if (result.reputation?.phishTank?.isPhishing) sources.push("PhishTank flagged");
+    if (result.reputation?.urlhaus?.isMalware) sources.push("Malware database flagged");
+    if (result.reputation?.googleSafeBrowsing?.isMalicious) sources.push("Google Safe Browsing flagged");
+    if (result.aiScan?.summary) sources.push(result.aiScan.summary);
+
+    if (sources.length > 0) {
+      const p = document.createElement("p");
+      p.textContent = sources.join(" \u2022 ");
+      textDiv.appendChild(p);
+    }
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "gcr-banner-close";
+    closeBtn.textContent = "\u2715";
+    closeBtn.addEventListener("click", () => banner.remove());
+
+    content.appendChild(iconSpan);
+    content.appendChild(textDiv);
+    content.appendChild(closeBtn);
+    banner.appendChild(content);
+    document.body.prepend(banner);
+  }
+
+  function detectLookalike(url) {
+    try {
+      const hostname = new URL(url).hostname.toLowerCase();
+      const hostRegistrable = getRegistrableDomain(hostname);
+
+      for (const [brandName, brandInfo] of Object.entries(LOOKALIKE_BRANDS)) {
+        if (isLegitSubdomainOf(hostname, brandInfo.registrable)) continue;
+
+        const hostBase = hostRegistrable.split(".")[0];
+
+        for (const variant of brandInfo.variants) {
+          if (variant.length < 4) continue;
+          if (hostBase === variant.toLowerCase() || hostRegistrable.startsWith(variant.toLowerCase() + ".")) {
+            return {
+              brand: brandName,
+              realDomain: brandInfo.domain,
+              matchedVariant: variant,
+              message: `This domain looks like it's impersonating ${capitalize(brandName)} (${brandInfo.domain}). The real site is ${brandInfo.domain}.`
+            };
+          }
+        }
+
+        const brandDomainBase = brandInfo.registrable.split(".")[0];
+        if (hostBase.length > 4 && brandDomainBase.length > 4) {
+          const similarity = calculateSimilarity(hostBase, brandDomainBase);
+          if (similarity >= 0.8 && similarity < 1.0 && hostBase !== brandDomainBase) {
+            return {
+              brand: brandName,
+              realDomain: brandInfo.domain,
+              matchedVariant: hostBase,
+              similarity: similarity,
+              message: `This domain "${hostname}" is suspiciously similar to ${capitalize(brandName)} (${brandInfo.domain}).`
+            };
+          }
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function calculateSimilarity(a, b) {
+    if (a === b) return 1.0;
+    const len = Math.max(a.length, b.length);
+    if (len === 0) return 1.0;
+    const dist = levenshteinDistance(a, b);
+    return 1 - dist / len;
+  }
+
+  function levenshteinDistance(a, b) {
+    const m = a.length;
+    const n = b.length;
+    const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+      }
+    }
+    return dp[m][n];
+  }
+
+  function checkLookalikeDomain() {
+    const match = detectLookalike(window.location.href);
+    if (match) {
+      showLookalikeBanner(match);
+    }
+  }
+
+  function showLookalikeBanner(match) {
+    const existing = document.getElementById("gcr-lookalike-banner");
+    if (existing) existing.remove();
+
+    const banner = document.createElement("div");
+    banner.id = "gcr-lookalike-banner";
+    banner.className = "gcr-banner gcr-banner-critical";
+
+    const content = document.createElement("div");
+    content.className = "gcr-banner-content";
+
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "gcr-banner-icon";
+    iconSpan.textContent = "\uD83D\uDEA8";
+
+    const textDiv = document.createElement("div");
+    textDiv.className = "gcr-banner-text";
+
+    const strong1 = document.createElement("strong");
+    strong1.textContent = "Lookalike Domain Detected!";
+    textDiv.appendChild(strong1);
+
+    const msgP = document.createElement("p");
+    msgP.textContent = match.message;
+    textDiv.appendChild(msgP);
+
+    const linkP = document.createElement("p");
+    const safeLink = document.createElement("a");
+    safeLink.href = `https://${match.realDomain}`;
+    safeLink.textContent = `Go to the real ${capitalize(match.brand)} site \u2192`;
+    safeLink.style.cssText = "color: #93c5fd; text-decoration: underline; font-weight: 600;";
+    linkP.appendChild(safeLink);
+    textDiv.appendChild(linkP);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "gcr-banner-close";
+    closeBtn.textContent = "\u2715";
+    closeBtn.addEventListener("click", () => banner.remove());
+
+    content.appendChild(iconSpan);
+    content.appendChild(textDiv);
+    content.appendChild(closeBtn);
+    banner.appendChild(content);
+    document.body.prepend(banner);
+  }
+
+  function setupFormInterception() {
+    document.addEventListener("submit", handleFormSubmit, true);
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (node.nodeType === 1) {
+            const forms = node.tagName === "FORM" ? [node] : node.querySelectorAll ? Array.from(node.querySelectorAll("form")) : [];
+            forms.forEach(form => {
+              if (!form.dataset.gcrMonitored) {
+                form.dataset.gcrMonitored = "true";
+                form.addEventListener("submit", handleFormSubmit, true);
+              }
+            });
+          }
+        }
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    document.querySelectorAll("form").forEach(form => {
+      if (!form.dataset.gcrMonitored) {
+        form.dataset.gcrMonitored = "true";
+        form.addEventListener("submit", handleFormSubmit, true);
+      }
+    });
+  }
+
+  function handleFormSubmit(e) {
+    if (e.target.__gcrAllowed) return;
+
+    const shouldWarn = pageRiskLevel === "critical" || pageRiskLevel === "high" || pageRiskLevel === "medium";
+    if (!shouldWarn) return;
+
+    const form = e.target;
+    const hasPasswordField = form.querySelector('input[type="password"]') !== null;
+    const hasCreditCardField = form.querySelector('input[autocomplete*="cc-"], input[name*="card"], input[name*="credit"], input[name*="cvv"], input[name*="cvc"]') !== null;
+    const hasEmailField = form.querySelector('input[type="email"], input[name*="email"]') !== null;
+    const hasSensitiveData = hasPasswordField || hasCreditCardField || hasEmailField;
+
+    if (pageRiskLevel === "medium" && !hasSensitiveData) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    showFormWarning(form, pageRiskLevel, pageRiskScore, { hasPasswordField, hasCreditCardField, hasEmailField });
+  }
+
+  function showFormWarning(form, riskLevel, riskScore, sensitiveFields) {
+    const existing = document.getElementById("gcr-form-overlay");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "gcr-form-overlay";
+    overlay.className = "gcr-form-overlay";
+
+    const box = document.createElement("div");
+    box.className = "gcr-form-warning-box";
+
+    const iconDiv = document.createElement("div");
+    iconDiv.className = "gcr-form-warning-icon";
+    iconDiv.textContent = riskLevel === "critical" ? "\uD83D\uDEA8" : "\u26A0\uFE0F";
+
+    const title = document.createElement("h2");
+    title.className = "gcr-form-warning-title";
+    title.textContent = "Hold On \u2014 This Page Is Flagged";
+
+    const riskTag = document.createElement("span");
+    riskTag.className = `gcr-form-risk-tag gcr-form-risk-${riskLevel}`;
+    riskTag.textContent = `${capitalize(riskLevel)} Risk`;
+
+    const desc = document.createElement("p");
+    desc.className = "gcr-form-warning-desc";
+
+    let warningText = "GCR Guard has flagged this page as potentially dangerous. ";
+    if (sensitiveFields.hasPasswordField) {
+      warningText += "You're about to submit a password on this page. ";
+    }
+    if (sensitiveFields.hasCreditCardField) {
+      warningText += "You're about to submit payment information on this page. ";
+    }
+    if (sensitiveFields.hasEmailField) {
+      warningText += "You're about to submit your email address on this page. ";
+    }
+    warningText += "Are you sure you want to proceed?";
+    desc.textContent = warningText;
+
+    const urlDisplay = document.createElement("div");
+    urlDisplay.className = "gcr-form-url-display";
+    urlDisplay.textContent = window.location.hostname;
+
+    const btnRow = document.createElement("div");
+    btnRow.className = "gcr-form-btn-row";
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "gcr-form-btn gcr-form-btn-safe";
+    cancelBtn.textContent = "Don't Submit (Safe)";
+    cancelBtn.addEventListener("click", () => overlay.remove());
+
+    const proceedBtn = document.createElement("button");
+    proceedBtn.className = "gcr-form-btn gcr-form-btn-proceed";
+    proceedBtn.textContent = "Submit Anyway";
+    proceedBtn.addEventListener("click", () => {
+      overlay.remove();
+      form.__gcrAllowed = true;
+      if (form.requestSubmit) {
+        form.requestSubmit();
+      } else {
+        form.submit();
+      }
+    });
+
+    const brandFooter = document.createElement("div");
+    brandFooter.className = "gcr-form-brand";
+    brandFooter.textContent = "Protected by GCR Guard \u2022 GetCyberRight";
+
+    btnRow.appendChild(cancelBtn);
+    btnRow.appendChild(proceedBtn);
+    box.appendChild(iconDiv);
+    box.appendChild(title);
+    box.appendChild(riskTag);
+    box.appendChild(desc);
+    box.appendChild(urlDisplay);
+    box.appendChild(btnRow);
+    box.appendChild(brandFooter);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
   }
 
   function handleDangerousLinkClick(e) {
@@ -51,37 +477,37 @@
 
     const overlay = document.createElement("div");
     overlay.id = "gcr-block-overlay";
-    overlay.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;";
+    overlay.className = "gcr-form-overlay";
 
     const box = document.createElement("div");
-    box.style.cssText = "background:#fff;border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);";
+    box.className = "gcr-form-warning-box";
 
     const icon = document.createElement("div");
-    icon.style.cssText = "font-size:48px;margin-bottom:16px;";
+    icon.className = "gcr-form-warning-icon";
     icon.textContent = "\u26A0\uFE0F";
 
     const title = document.createElement("h2");
-    title.style.cssText = "font-size:20px;font-weight:700;color:#dc2626;margin:0 0 8px;";
+    title.className = "gcr-form-warning-title";
     title.textContent = "Dangerous Link Blocked";
 
     const desc = document.createElement("p");
-    desc.style.cssText = "font-size:14px;color:#4b5563;margin:0 0 8px;line-height:1.5;";
+    desc.className = "gcr-form-warning-desc";
     desc.textContent = "GCR Guard has blocked this link because it was flagged as potentially dangerous.";
 
-    const urlDisplay = document.createElement("p");
-    urlDisplay.style.cssText = "font-size:12px;color:#9ca3af;word-break:break-all;margin:0 0 20px;padding:8px;background:#f3f4f6;border-radius:8px;";
+    const urlDisplay = document.createElement("div");
+    urlDisplay.className = "gcr-form-url-display";
     urlDisplay.textContent = url;
 
     const btnRow = document.createElement("div");
-    btnRow.style.cssText = "display:flex;gap:12px;justify-content:center;";
+    btnRow.className = "gcr-form-btn-row";
 
     const goBack = document.createElement("button");
-    goBack.style.cssText = "padding:10px 24px;background:#0A2A3C;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;";
+    goBack.className = "gcr-form-btn gcr-form-btn-safe";
     goBack.textContent = "Go Back (Safe)";
     goBack.addEventListener("click", () => overlay.remove());
 
     const proceed = document.createElement("button");
-    proceed.style.cssText = "padding:10px 24px;background:#fff;color:#6b7280;border:1px solid #d1d5db;border-radius:8px;font-size:14px;cursor:pointer;";
+    proceed.className = "gcr-form-btn gcr-form-btn-proceed";
     proceed.textContent = "Proceed Anyway";
     proceed.addEventListener("click", () => {
       overlay.remove();
@@ -127,11 +553,19 @@
   async function quickLinkCheck(url, linkEl) {
     try {
       const suspicious = quickSuspicionCheck(url);
+      const lookalike = detectLookalike(url);
+
+      if (lookalike) {
+        suspicious.score += 3;
+        suspicious.flags.push(`Impersonates ${capitalize(lookalike.brand)} (${lookalike.realDomain})`);
+      }
+
       if (suspicious.score > 0) {
         const result = {
           risk: suspicious.score >= 3 ? "high" : suspicious.score >= 2 ? "medium" : "low",
           flags: suspicious.flags,
-          quick: true
+          quick: true,
+          lookalike: lookalike
         };
         linkCache[url] = result;
         showTooltip(linkEl, result);
@@ -184,10 +618,17 @@
       const href = link.href;
       if (!href || href.startsWith("javascript:") || href.startsWith("#") || href.startsWith("mailto:")) return;
 
+      const lookalike = settings.lookalikeDetection ? detectLookalike(href) : null;
       const check = quickSuspicionCheck(href);
+
+      if (lookalike) {
+        check.score += 3;
+        check.flags.push(`Impersonates ${capitalize(lookalike.brand)}`);
+      }
+
       if (check.score >= 2) {
         markLink(link, check.score >= 3 ? "high" : "medium");
-        linkCache[href] = { risk: check.score >= 3 ? "high" : "medium", flags: check.flags, quick: true };
+        linkCache[href] = { risk: check.score >= 3 ? "high" : "medium", flags: check.flags, quick: true, lookalike: lookalike };
         flagged++;
       }
     });
@@ -231,6 +672,14 @@
     riskSpan.textContent = `${capitalize(result.risk)} Risk`;
     header.appendChild(iconSpan);
     header.appendChild(riskSpan);
+
+    if (result.lookalike) {
+      const lookalikeBadge = document.createElement("span");
+      lookalikeBadge.className = "gcr-tooltip-lookalike-badge";
+      lookalikeBadge.textContent = "LOOKALIKE";
+      header.appendChild(lookalikeBadge);
+    }
+
     tooltipEl.appendChild(header);
 
     if (result.flags && result.flags.length > 0) {
@@ -276,13 +725,6 @@
       tooltipEl.remove();
       tooltipEl = null;
     }
-  }
-
-  function sanitizeText(str) {
-    if (!str) return "";
-    const div = document.createElement("div");
-    div.textContent = str;
-    return div.innerHTML;
   }
 
   function showPageBanner(result, url) {

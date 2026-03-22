@@ -1,5 +1,41 @@
 const API_BASE = "https://www.getcyberright.com";
 
+const tabCache = new Map();
+
+const SKIP_SCAN_PATTERNS = [
+  /^chrome/,
+  /^about:/,
+  /^chrome-extension:/,
+  /^moz-extension:/,
+  /^edge:/,
+  /^brave:/,
+  /^opera:/,
+  /^vivaldi:/,
+  /^file:/,
+  /^data:/,
+  /^blob:/,
+  /^javascript:/
+];
+
+const TRUSTED_DOMAINS = new Set([
+  "google.com", "www.google.com", "google.co.uk", "google.ca",
+  "youtube.com", "www.youtube.com",
+  "github.com", "www.github.com",
+  "stackoverflow.com", "www.stackoverflow.com",
+  "wikipedia.org", "en.wikipedia.org",
+  "reddit.com", "www.reddit.com",
+  "amazon.com", "www.amazon.com",
+  "microsoft.com", "www.microsoft.com",
+  "apple.com", "www.apple.com",
+  "facebook.com", "www.facebook.com",
+  "twitter.com", "www.twitter.com", "x.com",
+  "linkedin.com", "www.linkedin.com",
+  "instagram.com", "www.instagram.com",
+  "netflix.com", "www.netflix.com",
+  "getcyberright.com", "www.getcyberright.com",
+  "replit.com", "www.replit.com"
+]);
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "gcr-scan-link",
@@ -44,6 +80,17 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
+chrome.tabs.onRemoved.addListener((tabId) => {
+  tabCache.delete(tabId);
+});
+
+chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+  if (details.frameId === 0) {
+    tabCache.delete(details.tabId);
+    updateBadge("", "#16a34a", details.tabId);
+  }
+});
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "SCAN_URL") {
     performScan(message.content).then(sendResponse);
@@ -85,7 +132,213 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
+  if (message.type === "PAGE_LOADED") {
+    handleAutoScan(message, sender).then(sendResponse);
+    return true;
+  }
+  if (message.type === "GET_TAB_SCAN_RESULT") {
+    const tabId = message.tabId || sender.tab?.id;
+    if (tabId && tabCache.has(tabId)) {
+      sendResponse(tabCache.get(tabId));
+    } else {
+      sendResponse(null);
+    }
+    return true;
+  }
+  if (message.type === "GET_PAGE_RISK") {
+    const tabId = message.tabId || sender.tab?.id;
+    if (tabId && tabCache.has(tabId)) {
+      const cached = tabCache.get(tabId);
+      sendResponse({ riskLevel: cached.riskLevel, riskScore: cached.riskScore });
+    } else {
+      sendResponse({ riskLevel: "unknown", riskScore: 0 });
+    }
+    return true;
+  }
 });
+
+function shouldSkipUrl(url) {
+  if (!url) return true;
+  return SKIP_SCAN_PATTERNS.some(p => p.test(url));
+}
+
+function isTrustedDomain(url) {
+  try {
+    const hostname = new URL(url).hostname;
+    if (TRUSTED_DOMAINS.has(hostname)) return true;
+    const parts = hostname.split(".");
+    if (parts.length > 2) {
+      const rootDomain = parts.slice(-2).join(".");
+      if (TRUSTED_DOMAINS.has(rootDomain)) return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+async function isTabStillOnUrl(tabId, url) {
+  try {
+    const tab = await chrome.tabs.get(tabId);
+    return tab && tab.url === url;
+  } catch {
+    return false;
+  }
+}
+
+async function handleAutoScan(message, sender) {
+  const tabId = sender.tab?.id;
+  const url = message.url;
+
+  if (!tabId || !url || shouldSkipUrl(url)) {
+    return { skipped: true };
+  }
+
+  const settings = await getSettings();
+  if (!settings.autoScan) {
+    return { skipped: true, reason: "disabled" };
+  }
+
+  if (tabCache.has(tabId)) {
+    const cached = tabCache.get(tabId);
+    if (cached.url === url && Date.now() - cached.timestamp < 300000) {
+      updateBadgeFromResult(cached, tabId);
+      return cached;
+    }
+  }
+
+  updateBadge("...", "#666", tabId);
+
+  const result = {
+    url,
+    timestamp: Date.now(),
+    riskLevel: "safe",
+    riskScore: 0,
+    reputation: null,
+    aiScan: null,
+    lookalikeMatch: null,
+    sources: []
+  };
+
+  if (message.lookalikeMatch) {
+    result.lookalikeMatch = message.lookalikeMatch;
+    result.riskLevel = "high";
+    result.riskScore = Math.max(result.riskScore, 80);
+    result.sources.push("lookalike-detection");
+  }
+
+  if (isTrustedDomain(url)) {
+    if (!result.lookalikeMatch) {
+      result.riskLevel = "safe";
+      result.riskScore = 0;
+      result.sources.push("trusted-domain");
+      tabCache.set(tabId, result);
+      updateBadgeFromResult(result, tabId);
+      return result;
+    }
+  }
+
+  try {
+    const repResult = await checkUrlReputation(url);
+
+    if (!await isTabStillOnUrl(tabId, url)) return { skipped: true, reason: "navigated" };
+
+    result.reputation = repResult;
+    result.sources.push("reputation-api");
+
+    if (repResult.success) {
+      const rep = repResult;
+      let repScore = 0;
+
+      if (rep.phishTank?.isPhishing) repScore += 40;
+      if (rep.urlhaus?.isMalware) repScore += 40;
+      if (rep.googleSafeBrowsing?.isMalicious) repScore += 40;
+      if (rep.domainAge?.isNewDomain) repScore += 15;
+      if (rep.domainAge?.ageInDays !== null && rep.domainAge.ageInDays < 30) repScore += 10;
+
+      result.riskScore = Math.max(result.riskScore, Math.min(repScore, 100));
+    }
+  } catch (e) {}
+
+  if (result.riskScore >= 30 || result.lookalikeMatch) {
+    try {
+      const pageContent = message.pageInfo ? buildPageContentString(url, message.pageInfo) : url;
+      const aiResult = await performScan(pageContent);
+
+      if (!await isTabStillOnUrl(tabId, url)) return { skipped: true, reason: "navigated" };
+
+      if (aiResult.success && aiResult.result) {
+        result.aiScan = aiResult.result;
+        result.sources.push("ai-scan");
+
+        const aiRisk = (aiResult.result.scamRiskLevel || "").toLowerCase();
+        let aiScore = 0;
+        if (aiRisk === "critical") aiScore = 95;
+        else if (aiRisk === "high") aiScore = 75;
+        else if (aiRisk === "moderate" || aiRisk === "medium") aiScore = 50;
+        else if (aiRisk === "low") aiScore = 20;
+
+        result.riskScore = Math.max(result.riskScore, aiScore);
+      }
+    } catch (e) {}
+  }
+
+  if (!await isTabStillOnUrl(tabId, url)) return { skipped: true, reason: "navigated" };
+
+  if (result.riskScore >= 70) result.riskLevel = "critical";
+  else if (result.riskScore >= 50) result.riskLevel = "high";
+  else if (result.riskScore >= 30) result.riskLevel = "medium";
+  else if (result.riskScore >= 10) result.riskLevel = "low";
+  else result.riskLevel = "safe";
+
+  tabCache.set(tabId, result);
+  updateBadgeFromResult(result, tabId);
+  incrementStats(result.riskLevel);
+
+  if (settings.notifications && (result.riskLevel === "critical" || result.riskLevel === "high")) {
+    const summary = result.aiScan?.summary || result.lookalikeMatch?.message || "This page has been flagged as potentially dangerous.";
+    chrome.notifications.create({
+      type: "basic",
+      iconUrl: "icons/icon-128.png",
+      title: `${capitalize(result.riskLevel)} Risk Detected`,
+      message: summary,
+      priority: 2
+    });
+  }
+
+  try {
+    chrome.tabs.sendMessage(tabId, {
+      type: "AUTO_SCAN_RESULT",
+      result: result
+    });
+  } catch (e) {}
+
+  return result;
+}
+
+function buildPageContentString(url, pageInfo) {
+  const parts = [`URL: ${url}`];
+  if (pageInfo.title) parts.push(`Page Title: ${pageInfo.title}`);
+  if (pageInfo.meta) parts.push(`Description: ${pageInfo.meta}`);
+  if (pageInfo.headings) parts.push(`Headings: ${pageInfo.headings}`);
+  if (pageInfo.forms !== undefined) parts.push(`Forms on page: ${pageInfo.forms}`);
+  if (pageInfo.passwordFields !== undefined) parts.push(`Password fields: ${pageInfo.passwordFields}`);
+  if (pageInfo.externalLinks) parts.push(`External links (sample): ${pageInfo.externalLinks}`);
+  if (pageInfo.bodyText) parts.push(`Page content excerpt: ${pageInfo.bodyText.substring(0, 800)}`);
+  return parts.join("\n");
+}
+
+function updateBadgeFromResult(result, tabId) {
+  const badges = {
+    critical: { text: "!!!", color: "#dc2626" },
+    high: { text: "!!", color: "#ea580c" },
+    medium: { text: "!", color: "#ca8a04" },
+    low: { text: "OK", color: "#2563eb" },
+    safe: { text: "\u2713", color: "#16a34a" }
+  };
+  const badge = badges[result.riskLevel] || badges.safe;
+  updateBadge(badge.text, badge.color, tabId);
+}
 
 async function extractAndScanPage(tab) {
   if (!tab?.id || !tab?.url) return;
@@ -138,7 +391,9 @@ function getDefaultSettings() {
     autoScan: true,
     notifications: true,
     hoverCheck: true,
-    blockDangerous: false
+    blockDangerous: false,
+    formWarnings: true,
+    lookalikeDetection: true
   };
 }
 
@@ -282,7 +537,7 @@ function getBadgeForRisk(risk) {
   if (normalized === "high") return { text: "!!", color: "#ea580c" };
   if (normalized === "moderate" || normalized === "medium") return { text: "!", color: "#ca8a04" };
   if (normalized === "low") return { text: "OK", color: "#2563eb" };
-  return { text: "OK", color: "#16a34a" };
+  return { text: "\u2713", color: "#16a34a" };
 }
 
 function updateBadge(text, color, tabId) {
@@ -310,4 +565,8 @@ function getSettings() {
       resolve(result.settings || getDefaultSettings());
     });
   });
+}
+
+function capitalize(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 }

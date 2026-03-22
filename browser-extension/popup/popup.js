@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadStats();
   loadScamOfWeek();
   loadSettings();
+  loadPageStatus();
 
   btnScan.addEventListener("click", () => {
     const content = scanInput.value.trim();
@@ -110,6 +111,75 @@ document.addEventListener("DOMContentLoaded", () => {
     toggle.addEventListener("change", saveSettings);
   });
 
+  function loadPageStatus() {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (!tabs[0]?.id) return;
+      const tab = tabs[0];
+      const tabId = tab.id;
+
+      const pageStatus = document.getElementById("page-status");
+      const pageStatusIcon = document.getElementById("page-status-icon");
+      const pageStatusRisk = document.getElementById("page-status-risk");
+      const pageStatusUrl = document.getElementById("page-status-url");
+      const pageStatusSources = document.getElementById("page-status-sources");
+
+      chrome.runtime.sendMessage({ type: "GET_TAB_SCAN_RESULT", tabId: tabId }, (cached) => {
+        if (chrome.runtime.lastError) {}
+
+        if (cached && cached.riskLevel) {
+          const riskLevel = cached.riskLevel;
+          const iconMap = { critical: "\uD83D\uDEA8", high: "\u26A0\uFE0F", medium: "\u26A1", low: "\uD83D\uDD35", safe: "\u2705" };
+          const labelMap = { critical: "Critical Risk", high: "High Risk", medium: "Medium Risk", low: "Low Risk", safe: "Page Looks Safe" };
+
+          pageStatus.classList.remove("hidden");
+          pageStatus.className = `page-status page-status-${riskLevel}`;
+          pageStatusIcon.textContent = iconMap[riskLevel] || "\u2705";
+          pageStatusRisk.textContent = labelMap[riskLevel] || "Safe";
+          pageStatusSources.textContent = (cached.sources || []).join(", ") || "Auto-scan";
+
+          try {
+            pageStatusUrl.textContent = new URL(tab.url).hostname;
+          } catch {
+            pageStatusUrl.textContent = tab.url?.substring(0, 40) || "";
+          }
+          return;
+        }
+
+        chrome.action.getBadgeText({ tabId: tabId }, (text) => {
+          if (chrome.runtime.lastError) return;
+
+          if (!text || text === "") {
+            pageStatus.classList.add("hidden");
+            return;
+          }
+
+          let riskLevel = "safe";
+          let riskLabel = "Safe";
+          let iconText = "\u2705";
+
+          if (text === "!!!") { riskLevel = "critical"; riskLabel = "Critical Risk"; iconText = "\uD83D\uDEA8"; }
+          else if (text === "!!") { riskLevel = "high"; riskLabel = "High Risk"; iconText = "\u26A0\uFE0F"; }
+          else if (text === "!") { riskLevel = "medium"; riskLabel = "Medium Risk"; iconText = "\u26A1"; }
+          else if (text === "OK") { riskLevel = "low"; riskLabel = "Low Risk"; iconText = "\uD83D\uDD35"; }
+          else if (text === "\u2713") { riskLevel = "safe"; riskLabel = "Page Looks Safe"; iconText = "\u2705"; }
+          else if (text === "...") { riskLevel = "scanning"; riskLabel = "Scanning..."; iconText = "\uD83D\uDD0D"; }
+
+          pageStatus.classList.remove("hidden");
+          pageStatus.className = `page-status page-status-${riskLevel}`;
+          pageStatusIcon.textContent = iconText;
+          pageStatusRisk.textContent = riskLabel;
+
+          try {
+            pageStatusUrl.textContent = new URL(tab.url).hostname;
+          } catch {
+            pageStatusUrl.textContent = tab.url?.substring(0, 40) || "";
+          }
+          pageStatusSources.textContent = "Auto-scan";
+        });
+      });
+    });
+  }
+
   function performScan(content) {
     lastScanContent = content;
     lastScanResult = null;
@@ -144,14 +214,14 @@ document.addEventListener("DOMContentLoaded", () => {
     header.className = `result-header risk-${risk}`;
 
     const iconMap = {
-      critical: "🚨",
-      high: "⚠️",
-      moderate: "⚡",
-      medium: "⚡",
-      low: "🔵",
-      safe: "✅"
+      critical: "\uD83D\uDEA8",
+      high: "\u26A0\uFE0F",
+      moderate: "\u26A1",
+      medium: "\u26A1",
+      low: "\uD83D\uDD35",
+      safe: "\u2705"
     };
-    icon.textContent = iconMap[risk] || "🔍";
+    icon.textContent = iconMap[risk] || "\uD83D\uDD0D";
     riskEl.textContent = `${capitalize(result.scamRiskLevel || "Unknown")} Risk`;
     typeEl.textContent = result.contentTypeDetected || "";
 
@@ -196,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const recsEl = document.getElementById("result-recs");
 
     header.className = "result-header";
-    icon.textContent = "❌";
+    icon.textContent = "\u274C";
     riskEl.textContent = "Analysis Error";
     typeEl.textContent = "";
     summaryEl.textContent = message;
@@ -228,10 +298,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function loadSettings() {
     chrome.runtime.sendMessage({ type: "GET_SETTINGS" }, (settings) => {
       if (settings) {
-        document.getElementById("setting-autoscan").checked = settings.autoScan;
-        document.getElementById("setting-hover").checked = settings.hoverCheck;
-        document.getElementById("setting-notifications").checked = settings.notifications;
-        document.getElementById("setting-block").checked = settings.blockDangerous;
+        document.getElementById("setting-autoscan").checked = settings.autoScan !== false;
+        document.getElementById("setting-hover").checked = settings.hoverCheck !== false;
+        document.getElementById("setting-notifications").checked = settings.notifications !== false;
+        document.getElementById("setting-block").checked = settings.blockDangerous || false;
+        document.getElementById("setting-formwarnings").checked = settings.formWarnings !== false;
+        document.getElementById("setting-lookalike").checked = settings.lookalikeDetection !== false;
       }
     });
   }
@@ -241,7 +313,9 @@ document.addEventListener("DOMContentLoaded", () => {
       autoScan: document.getElementById("setting-autoscan").checked,
       hoverCheck: document.getElementById("setting-hover").checked,
       notifications: document.getElementById("setting-notifications").checked,
-      blockDangerous: document.getElementById("setting-block").checked
+      blockDangerous: document.getElementById("setting-block").checked,
+      formWarnings: document.getElementById("setting-formwarnings").checked,
+      lookalikeDetection: document.getElementById("setting-lookalike").checked
     };
     chrome.runtime.sendMessage({ type: "SAVE_SETTINGS", settings });
   }
@@ -253,11 +327,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function capitalize(s) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
-  }
-
-  function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
   }
 });

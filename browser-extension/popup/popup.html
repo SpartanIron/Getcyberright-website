@@ -22,6 +22,15 @@
     </header>
 
     <div id="view-main" class="view active">
+      <div id="page-status" class="page-status hidden">
+        <div class="page-status-icon" id="page-status-icon"></div>
+        <div class="page-status-info">
+          <div class="page-status-risk" id="page-status-risk"></div>
+          <div class="page-status-url" id="page-status-url"></div>
+        </div>
+        <div class="page-status-sources" id="page-status-sources"></div>
+      </div>
+
       <div class="stats-bar">
         <div class="stat">
           <span class="stat-value" id="stat-scans">0</span>
@@ -115,12 +124,27 @@
         <h2>Settings</h2>
       </div>
       <div class="settings-list">
+        <div class="settings-group-title">Protection</div>
         <label class="setting-item">
           <div>
-            <div class="setting-title">Auto-scan page links</div>
-            <div class="setting-desc">Automatically check links on every page you visit</div>
+            <div class="setting-title">Auto-scan pages</div>
+            <div class="setting-desc">Automatically scan every page you visit for threats</div>
           </div>
           <input type="checkbox" id="setting-autoscan" class="toggle">
+        </label>
+        <label class="setting-item">
+          <div>
+            <div class="setting-title">Lookalike detection</div>
+            <div class="setting-desc">Detect fake domains impersonating trusted brands</div>
+          </div>
+          <input type="checkbox" id="setting-lookalike" class="toggle">
+        </label>
+        <label class="setting-item">
+          <div>
+            <div class="setting-title">Form warnings</div>
+            <div class="setting-desc">Warn before submitting forms on suspicious pages</div>
+          </div>
+          <input type="checkbox" id="setting-formwarnings" class="toggle">
         </label>
         <label class="setting-item">
           <div>
@@ -131,17 +155,18 @@
         </label>
         <label class="setting-item">
           <div>
-            <div class="setting-title">Threat notifications</div>
-            <div class="setting-desc">Get alerts for high-risk threats and Scam of the Week</div>
-          </div>
-          <input type="checkbox" id="setting-notifications" class="toggle">
-        </label>
-        <label class="setting-item">
-          <div>
             <div class="setting-title">Block dangerous links</div>
             <div class="setting-desc">Show a warning page before opening high-risk links</div>
           </div>
           <input type="checkbox" id="setting-block" class="toggle">
+        </label>
+        <div class="settings-group-title">Notifications</div>
+        <label class="setting-item">
+          <div>
+            <div class="setting-title">Threat notifications</div>
+            <div class="setting-desc">Get alerts for high-risk threats and Scam of the Week</div>
+          </div>
+          <input type="checkbox" id="setting-notifications" class="toggle">
         </label>
       </div>
     </div>

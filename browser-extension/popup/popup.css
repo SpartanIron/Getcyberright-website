@@ -14,7 +14,7 @@ body {
 }
 
 .popup-container {
-  max-height: 520px;
+  max-height: 560px;
   overflow-y: auto;
 }
 
@@ -66,6 +66,70 @@ body {
 
 .icon-btn:hover {
   background: rgba(255,255,255,0.2);
+}
+
+.page-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.page-status-safe {
+  background: #f0fdf4;
+}
+
+.page-status-low {
+  background: #f0f9ff;
+}
+
+.page-status-medium {
+  background: #fffbeb;
+}
+
+.page-status-high {
+  background: #fff7ed;
+}
+
+.page-status-critical {
+  background: #fef2f2;
+}
+
+.page-status-scanning {
+  background: #f3f4f6;
+}
+
+.page-status-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.page-status-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.page-status-risk {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.page-status-url {
+  font-size: 11px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page-status-sources {
+  font-size: 10px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
 }
 
 .stats-bar {
@@ -319,7 +383,7 @@ body {
 }
 
 .rec-item::before {
-  content: "→";
+  content: "\2192";
   position: absolute;
   left: 0;
   color: #0A2A3C;
@@ -428,6 +492,15 @@ body {
 
 .settings-list {
   padding: 8px 0;
+}
+
+.settings-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 8px 16px 4px;
 }
 
 .setting-item {

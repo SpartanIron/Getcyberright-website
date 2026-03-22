@@ -6,7 +6,7 @@
 }
 
 .gcr-link-danger::after {
-  content: "⚠";
+  content: "\26A0";
   position: absolute;
   top: -8px;
   right: -8px;
@@ -82,6 +82,17 @@
 
 .gcr-tooltip-risk {
   font-size: 14px;
+}
+
+.gcr-tooltip-lookalike-badge {
+  background: #dc2626;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  margin-left: auto;
 }
 
 .gcr-tooltip-flags {
@@ -185,4 +196,135 @@
 
 .gcr-banner-close:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+.gcr-form-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: gcrFadeIn 0.2s ease-out;
+}
+
+.gcr-form-warning-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 440px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: gcrScaleIn 0.25s ease-out;
+}
+
+@keyframes gcrScaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.gcr-form-warning-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.gcr-form-warning-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+}
+
+.gcr-form-risk-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.gcr-form-risk-critical {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.gcr-form-risk-high {
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
+}
+
+.gcr-form-risk-medium {
+  background: #fffbeb;
+  color: #ca8a04;
+  border: 1px solid #fde68a;
+}
+
+.gcr-form-warning-desc {
+  font-size: 14px;
+  color: #4b5563;
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+.gcr-form-url-display {
+  font-size: 12px;
+  color: #9ca3af;
+  word-break: break-all;
+  margin: 0 0 20px;
+  padding: 8px 12px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  font-family: monospace;
+}
+
+.gcr-form-btn-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.gcr-form-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gcr-form-btn-safe {
+  background: #0A2A3C;
+  color: #fff;
+}
+
+.gcr-form-btn-safe:hover {
+  background: #0d3a52;
+  box-shadow: 0 4px 12px rgba(10, 42, 60, 0.3);
+}
+
+.gcr-form-btn-proceed {
+  background: #fff;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.gcr-form-btn-proceed:hover {
+  border-color: #9ca3af;
+  color: #4b5563;
+}
+
+.gcr-form-brand {
+  font-size: 11px;
+  color: #9ca3af;
+  text-align: center;
 }
