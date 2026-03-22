@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import compression from "compression";
+import { runMigrations } from "./migrate";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -128,6 +129,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Run database migrations before any routes or queries
+  await runMigrations();
+
   // Register security testing endpoints
   registerSecurityEndpoints(app);
   
