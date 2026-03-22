@@ -267,7 +267,8 @@ async function handleAutoScan(message, sender) {
     updateBadgeFromResult(result, tabId);
   }
 
-  if (result.riskScore >= 30 || result.lookalikeMatch) {
+  const hasReputationSignal = result.riskScore > 0 || result.lookalikeMatch;
+  if (hasReputationSignal) {
     try {
       const pageContent = message.pageInfo ? buildPageContentString(url, message.pageInfo) : url;
       const aiResult = await performScan(pageContent);
