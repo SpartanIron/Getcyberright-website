@@ -630,7 +630,7 @@ const ageGroupConfig = {
     image: kidsYoungLearnersImg,
     imageAlt: "Young children learning about internet safety together",
     icon: Star,
-    badges: ["Beginner Friendly", "5 Lessons", "Fun Activities"],
+    badges: ["Beginner Friendly", "6 Lessons", "Fun Activities"],
   },
   "11-13": {
     title: "Smart and Safe Online",
@@ -643,7 +643,7 @@ const ageGroupConfig = {
     image: kidsTeenLearnersImg,
     imageAlt: "Preteens confidently using devices with security shields",
     icon: Trophy,
-    badges: ["Intermediate", "5 Lessons", "Real Scenarios"],
+    badges: ["Intermediate", "6 Lessons", "Real Scenarios"],
   },
   "14-16": {
     title: "Cyber Champion",
