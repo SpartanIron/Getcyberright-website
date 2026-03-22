@@ -1790,6 +1790,8 @@ export function ScamChecker() {
   const [isCheckingSSL, setIsCheckingSSL] = useState<Record<string, boolean>>({});
 
   const autoScanRef = useRef(false);
+  const scanTokenRef = useRef(0);
+  const aiAbortRef = useRef<AbortController | null>(null);
   const qrInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [isProcessingQR, setIsProcessingQR] = useState(false);
@@ -1972,6 +1974,13 @@ export function ScamChecker() {
   const handleScan = () => {
     if (!content.trim()) return;
 
+    if (aiAbortRef.current) {
+      aiAbortRef.current.abort();
+    }
+    const currentToken = ++scanTokenRef.current;
+    const abortController = new AbortController();
+    aiAbortRef.current = abortController;
+
     setIsChecking(true);
     setResult(null);
     setHeaderResult(null);
@@ -1987,6 +1996,7 @@ export function ScamChecker() {
     analyzeSmsContent(content);
 
     setTimeout(() => {
+      if (scanTokenRef.current !== currentToken) return;
       const patternResult = analyzeContent(content);
       setResult(patternResult);
       setIsChecking(false);
@@ -2007,6 +2017,7 @@ export function ScamChecker() {
 
     if (detectEmailHeaders(content)) {
       setTimeout(() => {
+        if (scanTokenRef.current !== currentToken) return;
         setHeaderResult(analyzeEmailHeaders(content));
       }, 800);
     }
@@ -2016,8 +2027,10 @@ export function ScamChecker() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content, contentType: "auto" }),
+      signal: abortController.signal,
     })
       .then(async (response) => {
+        if (scanTokenRef.current !== currentToken) return;
         if (!response.ok) {
           throw new Error("AI analysis failed");
         }
@@ -2028,10 +2041,13 @@ export function ScamChecker() {
           throw new Error("AI analysis returned no results");
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        if (scanTokenRef.current !== currentToken) return;
+        if (err.name === 'AbortError') return;
         setAiError("AI analysis is currently unavailable. Pattern-based results are shown above.");
       })
       .finally(() => {
+        if (scanTokenRef.current !== currentToken) return;
         setIsAiAnalyzing(false);
       });
   };
@@ -2304,22 +2320,113 @@ export function ScamChecker() {
 
         {result && result.overallRisk && (
           <div className="space-y-4" role="region" aria-label="Pattern analysis results" aria-live="polite" data-testid="result-pattern-analysis">
-            <div className={`p-6 rounded-xl border-2 ${getRiskColor(result.overallRisk)}`} role="alert">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  {getRiskIcon(result.overallRisk)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-bold text-lg">{result.title}</h3>
-                    <Badge variant="secondary" className="font-mono">
-                      {result.confidenceScore}% confidence
-                    </Badge>
+            {(!aiResult || isAiAnalyzing) && (
+              <div className={`p-6 rounded-xl border-2 ${getRiskColor(result.overallRisk)}`} role="alert">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    {getRiskIcon(result.overallRisk)}
                   </div>
-                  <p className="text-sm opacity-90">{result.summary}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-bold text-lg">{result.title}</h3>
+                      <Badge variant="secondary" className="font-mono">
+                        {result.confidenceScore}% confidence
+                      </Badge>
+                    </div>
+                    <p className="text-sm opacity-90">{result.summary}</p>
+                    {isAiAnalyzing && (
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        AI deep analysis in progress, this is a preliminary result...
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {aiResult && !isAiAnalyzing && (
+              <div data-testid="result-ai-analysis-inline">
+                <Card className="border-2">
+                  <CardContent className="pt-5">
+                    <div className="space-y-4">
+                      <div className={`p-4 rounded-lg border ${getAIRiskBg(aiResult.scamRiskLevel)}`}>
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 mt-0.5">
+                            {getAIRiskIcon(aiResult.scamRiskLevel)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <h3 className={`text-lg font-bold ${getAIRiskColor(aiResult.scamRiskLevel)}`}>
+                                {aiResult.scamRiskLevel} Risk
+                              </h3>
+                              <Badge variant="outline" className="text-xs">
+                                {aiResult.contentTypeDetected}
+                              </Badge>
+                              <Badge variant="secondary" className="text-xs font-mono">
+                                {aiResult.confidenceLevel}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-foreground">{aiResult.summary}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {aiResult.keyRedFlags.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
+                            <AlertTriangle className="w-4 h-4 text-amber-500" />
+                            Key Red Flags
+                          </h4>
+                          <ul className="space-y-1.5">
+                            {aiResult.keyRedFlags.map((flag, i) => (
+                              <li key={i} className="flex items-start gap-2 text-sm">
+                                <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                                <span className="text-foreground">{flag}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {aiResult.recommendedActions.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
+                            <Shield className="w-4 h-4 text-primary" />
+                            What You Should Do
+                          </h4>
+                          <ul className="space-y-1.5">
+                            {aiResult.recommendedActions.map((action, i) => (
+                              <li key={i} className="flex items-start gap-2 text-sm">
+                                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                                <span className="text-foreground">{action}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {aiResult.technicalObservations.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
+                            <Eye className="w-4 h-4 text-blue-500" />
+                            Technical Observations
+                          </h4>
+                          <ul className="space-y-1.5">
+                            {aiResult.technicalObservations.map((obs, i) => (
+                              <li key={i} className="flex items-start gap-2 text-sm">
+                                <FileText className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                                <span className="text-foreground">{obs}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
 
             {result.urgencyAnalysis && result.urgencyAnalysis.score > 0 && (
               <div className="p-4 bg-muted/50 rounded-lg border">
@@ -2653,7 +2760,7 @@ export function ScamChecker() {
           </div>
         )}
 
-        {(isAiAnalyzing || aiResult || aiError) && (
+        {(isAiAnalyzing || aiError) && !aiResult && (
           <div data-testid="result-ai-analysis">
             <Card>
               <CardHeader className="pb-3">
@@ -2677,84 +2784,6 @@ export function ScamChecker() {
                   <div className="flex items-start gap-2 text-sm text-muted-foreground">
                     <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
                     <p>{aiError}</p>
-                  </div>
-                )}
-
-                {aiResult && !isAiAnalyzing && (
-                  <div className="space-y-4">
-                    <div className={`p-4 rounded-lg border ${getAIRiskBg(aiResult.scamRiskLevel)}`}>
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-0.5">
-                          {getAIRiskIcon(aiResult.scamRiskLevel)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <h3 className={`text-lg font-bold ${getAIRiskColor(aiResult.scamRiskLevel)}`}>
-                              {aiResult.scamRiskLevel} Risk
-                            </h3>
-                            <Badge variant="outline" className="text-xs">
-                              {aiResult.contentTypeDetected}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-foreground">{aiResult.summary}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {aiResult.keyRedFlags.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
-                          <AlertTriangle className="w-4 h-4 text-amber-500" />
-                          Key Red Flags
-                        </h4>
-                        <ul className="space-y-1.5">
-                          {aiResult.keyRedFlags.map((flag, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm">
-                              <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                              <span className="text-foreground">{flag}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {aiResult.technicalObservations.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
-                          <Eye className="w-4 h-4 text-blue-500" />
-                          Technical Observations
-                        </h4>
-                        <ul className="space-y-1.5">
-                          {aiResult.technicalObservations.map((obs, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm">
-                              <FileText className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                              <span className="text-foreground">{obs}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {aiResult.recommendedActions.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
-                          <Shield className="w-4 h-4 text-primary" />
-                          Recommended Actions
-                        </h4>
-                        <ul className="space-y-1.5">
-                          {aiResult.recommendedActions.map((action, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm">
-                              <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                              <span className="text-foreground">{action}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    <div className="text-xs text-muted-foreground">
-                      <span className="font-medium">Confidence:</span> {aiResult.confidenceLevel}
-                    </div>
                   </div>
                 )}
               </CardContent>
