@@ -6,9 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import {
   AlertCircle, CheckCircle, ThumbsUp, ArrowRight,
   Trophy, Star, Lightbulb, Sparkles, Shield, Lock,
-  BookOpen, Zap, XCircle
+  BookOpen, Zap, XCircle, Target
 } from "lucide-react";
-import type { QuizQuestion, SpotTheScamItem, StoryScenario } from "./quiz-data";
+import type { QuizQuestion, SpotTheScamItem, StoryScenario, DecisionTree } from "./quiz-data";
 
 export function MultiQuiz({
   questions,
@@ -57,7 +57,7 @@ export function MultiQuiz({
       setShowResult(false);
     } else {
       setComplete(true);
-      onComplete(score + (isCorrect ? 0 : 0), questions.length);
+      onComplete(score, questions.length);
     }
   };
 
@@ -198,7 +198,7 @@ export function SpotTheScamGame({
       setSelectedAnswer(null);
     } else {
       setGameComplete(true);
-      onComplete?.(score + (isCorrect ? 0 : 0), scenarios.length);
+      onComplete?.(score, scenarios.length);
     }
   };
 
@@ -478,6 +478,139 @@ export function PasswordStrengthBuilder() {
               <li>Use a different password for every account</li>
             </ul>
           </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+export function WhatWouldYouDo({
+  tree,
+  onComplete,
+}: {
+  tree: DecisionTree;
+  onComplete?: () => void;
+}) {
+  const [currentNodeId, setCurrentNodeId] = useState("start");
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [goodChoices, setGoodChoices] = useState(0);
+  const [totalChoices, setTotalChoices] = useState(0);
+  const [isFinished, setIsFinished] = useState(false);
+
+  const currentNode = tree.nodes.find((n) => n.id === currentNodeId);
+  if (!currentNode && !isFinished) return null;
+
+  const handleSelect = (index: number) => {
+    if (showFeedback) return;
+    setSelectedOption(index);
+    setShowFeedback(true);
+    setTotalChoices((c) => c + 1);
+    if (currentNode!.options[index].isGoodChoice) {
+      setGoodChoices((c) => c + 1);
+    }
+  };
+
+  const handleContinue = () => {
+    const option = currentNode!.options[selectedOption!];
+    if (option.nextNodeId) {
+      setCurrentNodeId(option.nextNodeId);
+      setSelectedOption(null);
+      setShowFeedback(false);
+    } else {
+      setIsFinished(true);
+      onComplete?.();
+    }
+  };
+
+  const handleRestart = () => {
+    setCurrentNodeId("start");
+    setSelectedOption(null);
+    setShowFeedback(false);
+    setGoodChoices(0);
+    setTotalChoices(0);
+    setIsFinished(false);
+  };
+
+  if (isFinished) {
+    const allGood = goodChoices === totalChoices;
+    return (
+      <Card className="border-2 border-emerald-200 dark:border-emerald-800" data-testid={`decision-tree-complete-${tree.id}`}>
+        <CardContent className="p-6 text-center">
+          <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg">
+            {allGood ? <Trophy className="w-8 h-8 text-white" /> : <Lightbulb className="w-8 h-8 text-white" />}
+          </div>
+          <h3 className="text-lg font-bold text-foreground mb-2">
+            {allGood ? "Perfect Decision Making!" : "Scenario Complete!"}
+          </h3>
+          <p className="text-muted-foreground mb-4">
+            You made {goodChoices} good {goodChoices === 1 ? "choice" : "choices"} out of {totalChoices}.
+          </p>
+          <Button variant="outline" onClick={handleRestart} data-testid={`button-restart-${tree.id}`}>
+            Try Again
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const option = selectedOption !== null ? currentNode!.options[selectedOption] : null;
+  const stepIndex = tree.nodes.findIndex((n) => n.id === currentNodeId);
+
+  return (
+    <Card className="border-2 border-emerald-200 dark:border-emerald-800" data-testid={`decision-tree-${tree.id}`}>
+      <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md">
+              <Target className="w-5 h-5 text-white" />
+            </div>
+            {tree.title}
+          </CardTitle>
+          <Badge variant="secondary" className="text-xs">Step {stepIndex + 1} of {tree.nodes.length}</Badge>
+        </div>
+        <CardDescription>{tree.description}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5 pt-5">
+        <div className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-900/50 dark:to-gray-900/50 rounded-xl p-5 border">
+          <p className="text-foreground leading-relaxed">{currentNode!.situation}</p>
+        </div>
+        <h4 className="font-semibold text-foreground flex items-center gap-2">
+          <Target className="w-4 h-4 text-emerald-500" /> What would you do?
+        </h4>
+        <div className="grid gap-3">
+          {currentNode!.options.map((opt, idx) => {
+            let cls = "w-full text-left p-4 rounded-lg border-2 transition-all text-sm ";
+            if (showFeedback) {
+              if (opt.isGoodChoice) cls += "border-green-500 bg-green-50 dark:bg-green-900/20";
+              else if (idx === selectedOption && !opt.isGoodChoice) cls += "border-red-500 bg-red-50 dark:bg-red-900/20";
+              else cls += "border-muted opacity-50";
+            } else {
+              cls += "border-muted hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 cursor-pointer";
+            }
+            return (
+              <button key={idx} className={cls} onClick={() => handleSelect(idx)} disabled={showFeedback} data-testid={`button-decision-${tree.id}-${idx}`}>
+                {opt.text}
+              </button>
+            );
+          })}
+        </div>
+        {showFeedback && option && (
+          <>
+            <div className={`p-4 rounded-lg ${option.isGoodChoice ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" : "bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"}`}>
+              <div className="flex items-start gap-3">
+                {option.isGoodChoice ? <ThumbsUp className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" /> : <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />}
+                <p className={`text-sm ${option.isGoodChoice ? "text-green-700 dark:text-green-300" : "text-orange-700 dark:text-orange-300"}`}>
+                  {option.feedback}
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <Button onClick={handleContinue} data-testid={`button-continue-${tree.id}`}>
+                {option.nextNodeId ? "Continue the Story" : "See Results"} <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>

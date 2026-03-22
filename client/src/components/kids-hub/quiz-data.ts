@@ -343,6 +343,135 @@ export const storyScenarios: Record<string, StoryScenario[]> = {
   ],
 };
 
+export interface DecisionTreeNode {
+  id: string;
+  situation: string;
+  options: {
+    text: string;
+    feedback: string;
+    isGoodChoice: boolean;
+    nextNodeId?: string;
+  }[];
+}
+
+export interface DecisionTree {
+  id: string;
+  title: string;
+  description: string;
+  nodes: DecisionTreeNode[];
+}
+
+export const decisionTrees: Record<string, DecisionTree[]> = {
+  "6-10": [
+    {
+      id: "dt-stranger-message",
+      title: "The Mystery Message",
+      description: "A stranger sends you a message online. Navigate through the decisions!",
+      nodes: [
+        { id: "start", situation: "You are playing your favorite online game when you get a message from someone you do not know. They say 'Hi! Want to be friends? What is your name?'", options: [
+          { text: "Tell them your real name and start chatting", feedback: "Sharing your real name with strangers online is risky. They could use it to find out more about you.", isGoodChoice: false },
+          { text: "Ignore the message and keep playing", feedback: "Ignoring messages from strangers is a safe choice! You do not owe anyone a response.", isGoodChoice: true },
+          { text: "Reply with just your game nickname", feedback: "Using your game nickname is safer than your real name, but be careful about continuing the conversation.", isGoodChoice: true, nextNodeId: "step2" },
+        ]},
+        { id: "step2", situation: "The person says 'Cool! What school do you go to? Maybe we live near each other!'", options: [
+          { text: "Tell them your school name", feedback: "Never share your school name with someone online. This tells them where to find you in person!", isGoodChoice: false },
+          { text: "Say 'I do not share that' and stop replying", feedback: "Great boundary setting! You recognized this was too personal to share.", isGoodChoice: true },
+          { text: "Tell a parent about this conversation", feedback: "Excellent! When strangers ask personal questions, telling a trusted adult is always the right move.", isGoodChoice: true },
+        ]},
+      ],
+    },
+    {
+      id: "dt-pop-up-prize",
+      title: "The Pop-Up Prize",
+      description: "A pop-up appears on your screen claiming you won something!",
+      nodes: [
+        { id: "start", situation: "While watching videos, a colorful pop-up appears: 'CONGRATULATIONS! You are the 1,000,000th visitor! Click here to claim your FREE tablet!'", options: [
+          { text: "Click the link to claim the prize", feedback: "This is a common trick! Real prizes do not appear as pop-ups. Clicking could install something harmful on your device.", isGoodChoice: false },
+          { text: "Close the pop-up without clicking anything on it", feedback: "Smart move! Closing the pop-up without clicking is exactly right.", isGoodChoice: true, nextNodeId: "step2" },
+          { text: "Ask a parent about it first", feedback: "Great instinct! A parent can help you understand that this is a scam.", isGoodChoice: true },
+        ]},
+        { id: "step2", situation: "The pop-up comes back again, this time saying 'Last chance! Click now or lose your prize forever!'", options: [
+          { text: "Click it this time since it keeps coming back", feedback: "Scammers use urgency to pressure you. The fact that it keeps coming back is actually another warning sign!", isGoodChoice: false },
+          { text: "Tell a parent that pop-ups keep appearing", feedback: "Perfect! A parent can help check if your device has any unwanted software causing these pop-ups.", isGoodChoice: true },
+          { text: "Close the entire browser window", feedback: "Good thinking! Closing the browser stops the pop-up completely.", isGoodChoice: true },
+        ]},
+      ],
+    },
+  ],
+  "11-13": [
+    {
+      id: "dt-social-pressure",
+      title: "The Group Chat Dilemma",
+      description: "Your friends are sharing something in a group chat that does not feel right.",
+      nodes: [
+        { id: "start", situation: "In your class group chat, someone shares an embarrassing photo of a classmate who is not in the chat. Everyone is laughing and adding mean comments. Your friend DMs you: 'Did you see that photo? LOL'", options: [
+          { text: "Add a laughing emoji to fit in with everyone", feedback: "Adding reactions to mean content makes you part of the bullying, even if you did not start it.", isGoodChoice: false },
+          { text: "Do not react to the photo and privately message the classmate to check on them", feedback: "Being an upstander! Checking on the person being targeted shows real character.", isGoodChoice: true, nextNodeId: "step2" },
+          { text: "Take a screenshot and report the photo to an adult", feedback: "Saving evidence and reporting is exactly what should be done. This protects the person being targeted.", isGoodChoice: true, nextNodeId: "step2" },
+        ]},
+        { id: "step2", situation: "Your friend says 'Why are you being so serious? It is just a joke. Everyone else thinks it is funny.' They seem annoyed at you.", options: [
+          { text: "Give in and react to the photo to keep your friend happy", feedback: "Peer pressure is hard, but doing the right thing matters more than fitting in. Real friends would not pressure you.", isGoodChoice: false },
+          { text: "Say 'It would not be funny if it was your photo. I do not want to be part of it.'", feedback: "Standing firm while explaining your reasoning is brave and exactly right. This might even make your friend think twice.", isGoodChoice: true },
+          { text: "Leave the group chat and tell a trusted adult", feedback: "Removing yourself from the situation and getting help is a completely valid choice.", isGoodChoice: true },
+        ]},
+      ],
+    },
+    {
+      id: "dt-account-hack",
+      title: "The Suspicious Login",
+      description: "You notice something strange with your social media account.",
+      nodes: [
+        { id: "start", situation: "You try to log into your social media account but your password does not work. You then get a text message: 'Someone logged into your account from a new device. If this was not you, click here to secure your account.'", options: [
+          { text: "Click the link in the text message right away", feedback: "Scammers send fake security alerts to steal your new password too! Always go directly to the app or website instead.", isGoodChoice: false },
+          { text: "Open the app directly (not through the link) and try 'Forgot Password'", feedback: "Smart! Going directly to the official app ensures you are not falling for a phishing link.", isGoodChoice: true, nextNodeId: "step2" },
+          { text: "Tell a parent immediately", feedback: "Great instinct! A parent can help you handle this situation safely and check if any personal info was exposed.", isGoodChoice: true, nextNodeId: "step2" },
+        ]},
+        { id: "step2", situation: "After resetting your password, you notice that some DMs were sent from your account that you did not write. These messages ask your friends to 'check out this link.'", options: [
+          { text: "Just change the password and hope nobody clicked the links", feedback: "Changing the password is important but you also need to warn your friends about the fake messages.", isGoodChoice: false },
+          { text: "Message your friends on a different platform to warn them not to click those links, and report the incident", feedback: "Thorough response! Warning friends prevents the hack from spreading, and reporting creates a record.", isGoodChoice: true },
+          { text: "Delete all the fake messages and enable two-factor authentication", feedback: "Enabling 2FA is great for future protection, but your friends also need to be warned about those links.", isGoodChoice: false },
+        ]},
+      ],
+    },
+  ],
+  "14-16": [
+    {
+      id: "dt-investment-scam",
+      title: "The Crypto Opportunity",
+      description: "A too-good-to-be-true investment opportunity appears in your feed.",
+      nodes: [
+        { id: "start", situation: "A popular social media influencer you follow posts: 'I just doubled my money with this new crypto platform! Use my link and get a $500 bonus! I was skeptical too but it really works.' Several friends have commented that they are trying it.", options: [
+          { text: "Use the link since the influencer has millions of followers", feedback: "Influencer promotion does not mean legitimacy. Many influencers are paid to promote scams, and follower counts can be bought.", isGoodChoice: false },
+          { text: "Research the platform independently: check for regulation, reviews from financial experts, and red flags", feedback: "Critical thinking at its finest! Researching independently is exactly what you should do before any financial decision.", isGoodChoice: true, nextNodeId: "step2" },
+          { text: "Try it with just a small amount to test", feedback: "Scammers often let you 'win' small amounts first to build trust, then encourage larger deposits that vanish.", isGoodChoice: false },
+        ]},
+        { id: "step2", situation: "Your research reveals the platform is not registered with any financial regulator. However, your best friend just invested $200 and says they have already 'made $50 in profit' they can see in their account dashboard.", options: [
+          { text: "Maybe it is legitimate since your friend is making money", feedback: "Showing fake profits on a dashboard is a classic Ponzi scheme tactic. The 'profits' are not real until you can actually withdraw them.", isGoodChoice: false },
+          { text: "Warn your friend that unregulated platforms showing guaranteed returns are classic scam signs, and suggest they try to withdraw their money immediately", feedback: "You could be saving your friend from losing their money. The inability to withdraw is often how victims discover the scam.", isGoodChoice: true },
+          { text: "Report the influencer's post to the platform as a potential scam", feedback: "Reporting helps protect others from falling for the same scam. Combine this with warning your friend.", isGoodChoice: true },
+        ]},
+      ],
+    },
+    {
+      id: "dt-deepfake-blackmail",
+      title: "The Fake Video Threat",
+      description: "Someone sends you a threatening message about a fake video.",
+      nodes: [
+        { id: "start", situation: "You receive a DM from an unknown account: 'I have created a video that looks like you doing something embarrassing. If you do not send me $200 in gift cards, I will send it to everyone at your school. I have your school name and your class list.'", options: [
+          { text: "Pay them to make it go away", feedback: "Paying extortionists never works. They will keep demanding more money, and they may not even have what they claim.", isGoodChoice: false },
+          { text: "Tell a parent or trusted adult immediately and do not respond to the message", feedback: "This is a crime (extortion). Adults need to be involved, and law enforcement may need to investigate.", isGoodChoice: true, nextNodeId: "step2" },
+          { text: "Reply and ask them to prove they have the video", feedback: "Engaging with the person gives them more information and confirms you received their message. Do not respond.", isGoodChoice: false },
+        ]},
+        { id: "step2", situation: "Your parent helps you report the account. But the next day at school, a friend asks: 'Someone said there is a video of you. Is it real?' You feel embarrassed and anxious.", options: [
+          { text: "Deny everything and hope it goes away", feedback: "Keeping it bottled up can increase anxiety. Having a plan to address it is healthier and more effective.", isGoodChoice: false },
+          { text: "Tell your friend the truth: someone tried to blackmail you with a fake video, and you reported it", feedback: "Being honest takes courage but it removes the scammer's power. Your real friends will support you.", isGoodChoice: true },
+          { text: "Talk to a school counselor about the situation for support and to help address any rumors", feedback: "Professional support is valuable here. School counselors can help manage the social situation and your wellbeing.", isGoodChoice: true },
+        ]},
+      ],
+    },
+  ],
+};
+
 export const platformSafetyData: Record<string, { platform: string; icon: string; region: string; tips: string[]; dangers: string[] }[]> = {
   global: [
     { platform: "TikTok", icon: "video", region: "Global", tips: ["Set your account to Private", "Turn off DMs from strangers", "Use Family Pairing with a parent", "Review who can duet or stitch your videos", "Disable location tagging on posts"], dangers: ["Strangers can message minors if DMs are open", "Location data can be embedded in videos", "Dangerous challenges go viral quickly", "Algorithm can show age-inappropriate content"] },

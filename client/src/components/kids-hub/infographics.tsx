@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Wifi, Lock, Eye, AlertTriangle, Users, Globe, Smartphone } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Shield, Wifi, Lock, Eye, AlertTriangle, Users, Globe, Smartphone, CheckCircle, XCircle, MapPin } from "lucide-react";
+import { platformSafetyData } from "./quiz-data";
 
 interface StatItem {
   value: number;
@@ -156,5 +158,110 @@ export function SafetyTipCarousel({ ageGroup }: { ageGroup: string }) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+const regionLabels: Record<string, string> = {
+  global: "Global Platforms",
+  americas: "Americas",
+  africa: "Africa",
+  asia: "Asia",
+};
+
+const platformIcons: Record<string, typeof Shield> = {
+  video: Smartphone,
+  camera: Eye,
+  play: Globe,
+  headphones: Users,
+  gamepad: Smartphone,
+  message: AlertTriangle,
+  "message-circle": Globe,
+};
+
+export function PlatformSafetyGuide({ ageGroup }: { ageGroup: string }) {
+  const regions = Object.keys(platformSafetyData);
+  const [activeRegion, setActiveRegion] = useState("global");
+
+  return (
+    <div data-testid="platform-safety-guide">
+      <div className="text-center mb-6">
+        <Badge className="mb-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white">
+          <MapPin className="w-3 h-3 mr-1" /> Region-Aware Safety
+        </Badge>
+        <h3 className="text-xl font-bold text-foreground">Platform Safety Guide</h3>
+        <p className="text-sm text-muted-foreground mt-1">
+          Learn how to stay safe on popular apps and platforms used{" "}
+          {ageGroup === "6-10" ? "by kids" : ageGroup === "11-13" ? "by teens" : "by young adults"} around the world
+        </p>
+      </div>
+
+      <Tabs value={activeRegion} onValueChange={setActiveRegion}>
+        <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-4">
+          {regions.map((region) => (
+            <TabsTrigger
+              key={region}
+              value={region}
+              className="text-sm px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              data-testid={`tab-region-${region}`}
+            >
+              {regionLabels[region] || region}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {regions.map((region) => (
+          <TabsContent key={region} value={region}>
+            <div className="space-y-4">
+              {(platformSafetyData[region] || []).map((platform) => {
+                const Icon = platformIcons[platform.icon] || Shield;
+                return (
+                  <Card key={platform.platform} className="overflow-hidden" data-testid={`card-platform-${platform.platform.toLowerCase().replace(/\s/g, "-")}`}>
+                    <CardHeader className="pb-3 bg-gradient-to-r from-primary/5 to-primary/10">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-base">{platform.platform}</CardTitle>
+                          <CardDescription className="text-xs">{platform.region}</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-4 space-y-4">
+                      <div>
+                        <h5 className="text-sm font-semibold text-green-700 dark:text-green-300 flex items-center gap-2 mb-2">
+                          <CheckCircle className="w-4 h-4" /> Safety Tips
+                        </h5>
+                        <ul className="space-y-1.5">
+                          {platform.tips.map((tip, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                              <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h5 className="text-sm font-semibold text-red-700 dark:text-red-300 flex items-center gap-2 mb-2">
+                          <AlertTriangle className="w-4 h-4" /> Watch Out For
+                        </h5>
+                        <ul className="space-y-1.5">
+                          {platform.dangers.map((danger, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                              <XCircle className="w-3.5 h-3.5 text-red-500 flex-shrink-0 mt-0.5" />
+                              <span>{danger}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
   );
 }

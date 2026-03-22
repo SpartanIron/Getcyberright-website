@@ -33,9 +33,9 @@ import kidsGamingSmartImg from "@/assets/images/kids-gaming-smart.png";
 import kidsPhishingImg from "@/assets/images/kids-phishing.png";
 import kidsDigitalFootprintImg from "@/assets/images/kids-digital-footprint.png";
 
-import { quizBanks, spotTheScamScenarios, storyScenarios } from "@/components/kids-hub/quiz-data";
-import { MultiQuiz, SpotTheScamGame, StoryActivity, PasswordStrengthBuilder, ProgressDashboard } from "@/components/kids-hub/interactive-games";
-import { CyberStatsInfographic, SafetyTipCarousel } from "@/components/kids-hub/infographics";
+import { quizBanks, spotTheScamScenarios, storyScenarios, decisionTrees } from "@/components/kids-hub/quiz-data";
+import { MultiQuiz, SpotTheScamGame, StoryActivity, PasswordStrengthBuilder, ProgressDashboard, WhatWouldYouDo } from "@/components/kids-hub/interactive-games";
+import { CyberStatsInfographic, SafetyTipCarousel, PlatformSafetyGuide } from "@/components/kids-hub/infographics";
 import { loadProgress, completeModule, saveQuizScore, completeActivity } from "@/components/kids-hub/progress";
 
 function FloatingShapes() {
@@ -739,6 +739,7 @@ function LearningTrack({
   const quizzes = quizBanks[ageGroup];
   const scamScenarios = spotTheScamScenarios[ageGroup];
   const stories = storyScenarios[ageGroup];
+  const trees = decisionTrees[ageGroup] || [];
   const completedModules = progress.completedModules[ageGroup] || [];
   const quizScores = progress.quizScores[ageGroup] || {};
   const activitiesCompleted = progress.activitiesCompleted[ageGroup] || [];
@@ -928,6 +929,24 @@ function LearningTrack({
                   </div>
                 )}
 
+                {trees.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                      <Target className="w-5 h-5 text-emerald-500" /> What Would You Do?
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">Navigate through real-life scenarios step by step. Your choices lead to different outcomes!</p>
+                    <div className="space-y-6">
+                      {trees.map((tree) => (
+                        <WhatWouldYouDo
+                          key={tree.id}
+                          tree={tree}
+                          onComplete={() => handleActivityComplete(tree.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {ageGroup === "6-10" && (
                   <div>
                     <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
@@ -953,6 +972,7 @@ function LearningTrack({
             <TabsContent value="stats">
               <div className="space-y-8">
                 <CyberStatsInfographic ageGroup={ageGroup} />
+                <PlatformSafetyGuide ageGroup={ageGroup} />
               </div>
             </TabsContent>
           </Tabs>
