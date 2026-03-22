@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const pageStatusSources = document.getElementById("page-status-sources");
 
       chrome.runtime.sendMessage({ type: "GET_TAB_SCAN_RESULT", tabId: tabId }, (cached) => {
-        if (chrome.runtime.lastError) {}
+        if (chrome.runtime.lastError) { console.warn("[gcr-guard] popup cache query:", chrome.runtime.lastError.message); }
 
         if (cached && cached.riskLevel) {
           const riskLevel = cached.riskLevel;

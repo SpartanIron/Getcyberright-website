@@ -203,6 +203,9 @@ async function handleAutoScan(message, sender) {
     const cached = tabCache.get(tabId);
     if (cached.url === url && Date.now() - cached.timestamp < 300000) {
       updateBadgeFromResult(cached, tabId);
+      try {
+        chrome.tabs.sendMessage(tabId, { type: "AUTO_SCAN_RESULT", result: cached });
+      } catch (e) { console.warn("[gcr-guard] Failed to send cached result to tab:", e.message); }
       return cached;
     }
   }
@@ -227,15 +230,9 @@ async function handleAutoScan(message, sender) {
     result.sources.push("lookalike-detection");
   }
 
-  if (isTrustedDomain(url)) {
-    if (!result.lookalikeMatch) {
-      result.riskLevel = "safe";
-      result.riskScore = 0;
-      result.sources.push("trusted-domain");
-      tabCache.set(tabId, result);
-      updateBadgeFromResult(result, tabId);
-      return result;
-    }
+  const trusted = isTrustedDomain(url);
+  if (trusted) {
+    result.sources.push("trusted-domain");
   }
 
   try {
@@ -258,7 +255,7 @@ async function handleAutoScan(message, sender) {
 
       result.riskScore = Math.max(result.riskScore, Math.min(repScore, 100));
     }
-  } catch (e) {}
+  } catch (e) { console.warn("[gcr-guard] Reputation check failed:", e.message); }
 
   if (result.riskScore > 0 || result.lookalikeMatch) {
     let interimLevel = "safe";
@@ -290,7 +287,7 @@ async function handleAutoScan(message, sender) {
 
         result.riskScore = Math.max(result.riskScore, aiScore);
       }
-    } catch (e) {}
+    } catch (e) { console.warn("[gcr-guard] AI scan failed:", e.message); }
   }
 
   if (!await isTabStillOnUrl(tabId, url)) return { skipped: true, reason: "navigated" };
@@ -321,7 +318,7 @@ async function handleAutoScan(message, sender) {
       type: "AUTO_SCAN_RESULT",
       result: result
     });
-  } catch (e) {}
+  } catch (e) { console.warn("[gcr-guard] Failed to send scan result to tab:", e.message); }
 
   return result;
 }

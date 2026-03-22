@@ -364,11 +364,21 @@
     });
   }
 
+  function isDomainFamiliar(hostname) {
+    const wellKnown = [
+      "google.com", "youtube.com", "facebook.com", "amazon.com", "apple.com",
+      "microsoft.com", "github.com", "stackoverflow.com", "wikipedia.org",
+      "twitter.com", "x.com", "linkedin.com", "reddit.com", "instagram.com",
+      "netflix.com", "paypal.com", "ebay.com", "yahoo.com", "bing.com",
+      "outlook.com", "live.com", "office.com", "zoom.us", "slack.com",
+      "dropbox.com", "salesforce.com", "adobe.com", "spotify.com"
+    ];
+    const registrable = getRegistrableDomain(hostname);
+    return wellKnown.includes(registrable);
+  }
+
   function handleFormSubmit(e) {
     if (e.target.__gcrAllowed) return;
-
-    const shouldWarn = pageRiskLevel === "critical" || pageRiskLevel === "high" || pageRiskLevel === "medium";
-    if (!shouldWarn) return;
 
     const form = e.target;
     const hasPasswordField = form.querySelector('input[type="password"]') !== null;
@@ -376,11 +386,19 @@
     const hasEmailField = form.querySelector('input[type="email"], input[name*="email"]') !== null;
     const hasSensitiveData = hasPasswordField || hasCreditCardField || hasEmailField;
 
+    const isRisky = pageRiskLevel === "critical" || pageRiskLevel === "high" || pageRiskLevel === "medium";
+    const hostname = window.location.hostname;
+    const isUnfamiliar = !isDomainFamiliar(hostname) && pageRiskLevel === "unknown";
+
+    if (!isRisky && !(isUnfamiliar && hasSensitiveData)) return;
+
     if (pageRiskLevel === "medium" && !hasSensitiveData) return;
+
+    const effectiveRisk = isRisky ? pageRiskLevel : "low";
 
     e.preventDefault();
     e.stopPropagation();
-    showFormWarning(form, pageRiskLevel, pageRiskScore, { hasPasswordField, hasCreditCardField, hasEmailField });
+    showFormWarning(form, effectiveRisk, pageRiskScore, { hasPasswordField, hasCreditCardField, hasEmailField });
   }
 
   function showFormWarning(form, riskLevel, riskScore, sensitiveFields) {
