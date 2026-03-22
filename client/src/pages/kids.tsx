@@ -1,19 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import kidsBannerImage from "@/assets/images/kids-safety-banner.jpg";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Shield, Lock, Eye, MessageCircle, Gamepad2, Users, 
-  CheckCircle, Star, Trophy, BookOpen, Heart, 
+import { Progress } from "@/components/ui/progress";
+import kidsBannerImage from "@/assets/images/kids-safety-banner.jpg";
+import {
+  Shield, Lock, Eye, MessageCircle, Gamepad2, Users,
+  CheckCircle, Star, Trophy, BookOpen, Heart,
   Smartphone, AlertCircle, ThumbsUp, ArrowRight,
   GraduationCap, Home, Lightbulb, Target, Sparkles,
-  CalendarDays, ChevronDown, ChevronUp
+  CalendarDays, ChevronDown, ChevronUp, Brain, Zap,
+  DollarSign, Globe, Fingerprint
 } from "lucide-react";
 
 import kidsYoungLearnersImg from "@/assets/images/kids-young-learners.png";
@@ -31,17 +33,18 @@ import kidsGamingSmartImg from "@/assets/images/kids-gaming-smart.png";
 import kidsPhishingImg from "@/assets/images/kids-phishing.png";
 import kidsDigitalFootprintImg from "@/assets/images/kids-digital-footprint.png";
 
-// Floating decorative shapes component for kid-friendly design
+import { quizBanks, spotTheScamScenarios, storyScenarios } from "@/components/kids-hub/quiz-data";
+import { MultiQuiz, SpotTheScamGame, StoryActivity, PasswordStrengthBuilder, ProgressDashboard } from "@/components/kids-hub/interactive-games";
+import { CyberStatsInfographic, SafetyTipCarousel } from "@/components/kids-hub/infographics";
+import { loadProgress, completeModule, saveQuizScore, completeActivity } from "@/components/kids-hub/progress";
+
 function FloatingShapes() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Subtle decorative circles - no animation for cleaner look */}
       <div className="absolute top-20 left-10 w-16 h-16 rounded-full bg-teal-300/15 dark:bg-teal-500/10" />
       <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-purple-300/15 dark:bg-purple-500/10" />
       <div className="absolute bottom-32 left-1/4 w-12 h-12 rounded-full bg-pink-300/15 dark:bg-pink-500/10" />
       <div className="absolute bottom-20 right-1/3 w-20 h-20 rounded-full bg-blue-300/15 dark:bg-blue-500/10" />
-      
-      {/* Single subtle star */}
       <div className="absolute top-32 left-1/3 text-yellow-400/30 dark:text-yellow-500/15">
         <Star className="w-8 h-8 fill-current" />
       </div>
@@ -49,15 +52,11 @@ function FloatingShapes() {
   );
 }
 
-type AgeGroup = "8-11" | "12-16" | null;
+type AgeGroup = "6-10" | "11-13" | "14-16" | null;
 type ActiveModule = string | null;
+type ActiveTab = "lessons" | "activities" | "stats";
 
-interface PlatformGuide {
-  platform: string;
-  steps: string[];
-}
-
-interface LearningModule {
+interface LessonTopic {
   id: string;
   title: string;
   description: string;
@@ -68,655 +67,545 @@ interface LearningModule {
     intro: string;
     tips: string[];
     remember: string;
-    platformGuides?: PlatformGuide[];
+    platformGuides?: { platform: string; steps: string[] }[];
     checklist?: string[];
   };
-  quiz: {
-    question: string;
-    options: string[];
-    correctIndex: number;
-    explanation: string;
-  };
 }
 
-const foundationsModules: LearningModule[] = [
-  {
-    id: "personal-info",
-    title: "What is Personal Information?",
-    description: "Learn what information to keep private online.",
-    icon: Eye,
-    color: "bg-blue-500",
-    image: kidsPersonalInfoImg,
-    content: {
-      intro: "Personal information is anything that tells people who you are or where to find you. Just like you would not give your house key to a stranger, you should not share personal details online with people you do not know.",
-      tips: [
-        "Your full name, address, and phone number are private. These are things only trusted adults need to know.",
-        "Never share your school name, what team you play on, or where you hang out after school.",
-        "Do not tell anyone your passwords, not even your best friend. Passwords are just for you and your parents.",
-        "Photos can reveal where you are. Check the background of photos before sharing. Look for street signs, school logos, or house numbers.",
-        "Ask a trusted adult before filling out any online forms. Even fun quizzes can collect personal information.",
-        "Your birthday is personal information too. Do not share the full date online because it can be used to access accounts.",
-        "Location features on apps can show people exactly where you are. Ask a parent to turn these off on your devices.",
-        "If a website or game asks for your real name, use a nickname or ask your parent what to enter instead."
-      ],
-      remember: "If someone online asks for personal information, tell a trusted adult right away. Real friends and safe websites will never pressure you to share private details.",
-      checklist: [
-        "I know the difference between personal and non-personal information.",
-        "My online accounts do not show my real full name.",
-        "I have checked that my photos do not reveal my location.",
-        "I always ask a trusted adult before filling out forms online.",
-        "Location sharing is turned off on my devices.",
-        "I never share my birthday, address, or phone number online."
-      ]
+const lessonTopics: Record<string, LessonTopic[]> = {
+  "6-10": [
+    {
+      id: "personal-info",
+      title: "What is Personal Information?",
+      description: "Learn what information to keep private online.",
+      icon: Eye,
+      color: "bg-blue-500",
+      image: kidsPersonalInfoImg,
+      content: {
+        intro: "Personal information is anything that tells people who you are or where to find you. Just like you would not give your house key to a stranger, you should not share personal details online with people you do not know.",
+        tips: [
+          "Your full name, address, and phone number are private. These are things only trusted adults need to know.",
+          "Never share your school name, what team you play on, or where you hang out after school.",
+          "Do not tell anyone your passwords, not even your best friend. Passwords are just for you and your parents.",
+          "Photos can reveal where you are. Check the background of photos before sharing.",
+          "Ask a trusted adult before filling out any online forms.",
+          "Your birthday is personal information too. Do not share the full date online.",
+          "Location features on apps can show people exactly where you are. Ask a parent to turn these off.",
+          "If a website or game asks for your real name, use a nickname or ask your parent what to enter."
+        ],
+        remember: "Personal information is like a key to your life. Keep it safe and only share with people you trust in real life.",
+        checklist: [
+          "I know what personal information is and why it is private.",
+          "I never share my full name, address, or school name online.",
+          "I always ask a trusted adult before entering information on websites.",
+          "I check photos for location clues before posting.",
+          "I use nicknames instead of my real name online."
+        ]
+      }
     },
-    quiz: {
-      question: "Which of these is safe to share with someone you met online?",
-      options: [
-        "Your home address",
-        "Your favorite color",
-        "Your school name",
-        "Your phone number"
-      ],
-      correctIndex: 1,
-      explanation: "Your favorite color is safe to share because it does not reveal where you are or how to find you. Your address, school, and phone number should stay private."
-    }
-  },
-  {
-    id: "password-basics",
-    title: "Password Power",
-    description: "Create strong passwords that keep you safe.",
-    icon: Lock,
-    color: "bg-purple-500",
-    image: kidsPasswordPowerImg,
-    content: {
-      intro: "Passwords are like secret codes that protect your accounts. A strong password keeps your games, photos, and messages safe from people who should not see them.",
-      tips: [
-        "Use at least 8 characters in your password. Longer is even better.",
-        "Try the three random words method: pick three unrelated words and put them together, like SunFlowerRainTiger.",
-        "Add a number or two between your words to make it even stronger, like Sun7Flower9Rain.",
-        "Never use your name, birthday, pet's name, or your favorite sports team. These are too easy to guess.",
-        "Do not share your password with friends. Even best friends can accidentally share it with others.",
-        "Use a different password for every account. If someone figures out one, the rest stay safe.",
-        "Write your passwords down in a notebook kept in a safe place at home, never on your device or in your backpack.",
-        "If you think someone knows your password, change it right away and tell a trusted adult.",
-        "When you need to change a password, do not just add a number to the end. Create a whole new one."
-      ],
-      remember: "A good password is like a secret superhero code. Make it long, make it tricky, and keep it to yourself.",
-      checklist: [
-        "My passwords are at least 8 characters long.",
-        "I do not use my name, birthday, or pet's name in any password.",
-        "I use different passwords for different accounts.",
-        "I have not shared my passwords with any friends.",
-        "My passwords are written in a safe place only my parents and I know about.",
-        "I know how to change my password if I need to."
-      ]
+    {
+      id: "password-power",
+      title: "Password Power",
+      description: "Create super-strong passwords to protect your accounts.",
+      icon: Lock,
+      color: "bg-green-600",
+      image: kidsPasswordPowerImg,
+      content: {
+        intro: "Passwords are like secret codes that keep your accounts safe. A strong password is one that is hard for others to guess but easy for you to remember. Let us learn how to make super-strong passwords!",
+        tips: [
+          "Make passwords at least 8 characters long. Longer is better!",
+          "Mix letters, numbers, and symbols to make it harder to guess.",
+          "Try the three random words method: pick three random words and combine them, like Sun7Flower9Rain.",
+          "Never use your name, birthday, or pet's name as a password.",
+          "Use a different password for each account.",
+          "Never share your password with friends. Only your parents should know.",
+          "If you think someone knows your password, change it right away and tell a parent.",
+          "Do not write passwords on sticky notes or in plain text files."
+        ],
+        remember: "A strong password is your first line of defense. Treat it like a secret that only you and your parents know.",
+        platformGuides: [
+          {
+            platform: "Creating a Strong Password",
+            steps: [
+              "Think of three random words that are not related to each other.",
+              "Combine them together: for example, Cloud, Tiger, and Lamp.",
+              "Add a number somewhere: Cloud7TigerLamp.",
+              "Check that it is at least 8 characters long.",
+              "Make sure it does not include your name, birthday, or other personal info."
+            ]
+          }
+        ],
+        checklist: [
+          "I use strong passwords with letters and numbers.",
+          "I never share my passwords with friends.",
+          "I use different passwords for different accounts.",
+          "I know to change my password if someone might know it."
+        ]
+      }
     },
-    quiz: {
-      question: "Which password is the strongest?",
-      options: [
-        "password123",
-        "MyDogSpot",
-        "Sun7Flower9Rain",
-        "12345678"
-      ],
-      correctIndex: 2,
-      explanation: "Sun7Flower9Rain is the strongest because it mixes words with numbers and is hard to guess. The others are too simple or use common words."
-    }
-  },
-  {
-    id: "spotting-tricks",
-    title: "Spotting Online Tricks",
-    description: "Learn to recognize when something seems wrong.",
-    icon: AlertCircle,
-    color: "bg-orange-500",
-    image: kidsSpottingTricksImg,
-    content: {
-      intro: "Some people online try to trick kids. They might pretend to be someone they are not or offer things that seem too good to be true. Learning to spot these tricks keeps you safe.",
-      tips: [
-        "If someone offers free games, prizes, or gift cards, it is almost always a trick to get your information.",
-        "Pop-ups that say you won something are not real. Real prizes do not come from random pop-ups on websites.",
-        "Strangers who want to be your best friend right away and ask lots of questions may not be safe.",
-        "Messages asking you to click strange links could put harmful software on your device. Do not click them.",
-        "If something feels wrong, it probably is. Trust your gut feeling and walk away.",
-        "Check the website address (URL) carefully. Fake websites often have misspelled names or extra letters.",
-        "Scary messages that say your device has a virus are usually fake. Close the window without clicking anything.",
-        "To close a fake pop-up safely, do not click the X on the pop-up itself. Instead, close the whole browser tab or window.",
-        "If you accidentally clicked something suspicious, tell a trusted adult right away. The sooner the better."
-      ],
-      remember: "When in doubt, do not click. Ask a parent or trusted adult to help you figure out if something is real or a trick.",
-      checklist: [
-        "I know that free prize offers online are usually tricks.",
-        "I know how to close a fake pop-up without clicking on it.",
-        "I check website addresses for misspellings before entering information.",
-        "I do not click on links in messages from people I do not know.",
-        "I tell a trusted adult when something online seems suspicious.",
-        "I know the difference between real warnings and fake scary messages."
-      ]
+    {
+      id: "online-tricks",
+      title: "Spotting Online Tricks",
+      description: "Recognize scams, tricks, and fake messages.",
+      icon: AlertCircle,
+      color: "bg-orange-600",
+      image: kidsSpottingTricksImg,
+      content: {
+        intro: "Some people try to trick you online by offering fake prizes, sending scary messages, or pretending to be someone they are not. Learning to spot these tricks keeps you safe!",
+        tips: [
+          "If something seems too good to be true (like winning a free phone), it is probably a trick.",
+          "Never click on links in messages from people you do not know.",
+          "Fake virus warnings try to scare you. Close the tab without clicking anything.",
+          "Real game companies never ask for your password through chat.",
+          "Check website addresses carefully. Fake sites often have misspelled names.",
+          "Pop-ups that say you won something are almost always tricks.",
+          "If you click a strange link by accident, close it right away and tell an adult.",
+          "Never go to outside websites to trade game items."
+        ],
+        remember: "Scammers use excitement and fear to trick you. Slow down, think, and ask a trusted adult if something seems wrong.",
+        checklist: [
+          "I know that prize pop-ups are tricks.",
+          "I do not click links from strangers.",
+          "I can spot fake website addresses.",
+          "I tell an adult if I see something suspicious."
+        ]
+      }
     },
-    quiz: {
-      question: "You see a pop-up that says you won a free gaming console. What should you do?",
-      options: [
-        "Click it right away to claim your prize",
-        "Enter your address so they can send it",
-        "Close it and tell a trusted adult",
-        "Share the link with friends so they can win too"
-      ],
-      correctIndex: 2,
-      explanation: "Close it and tell a trusted adult. These pop-ups are almost always tricks to get your personal information or put harmful software on your device."
-    }
-  },
-  {
-    id: "device-safety",
-    title: "Taking Care of Your Devices",
-    description: "Keep your phone, tablet, and computer safe.",
-    icon: Smartphone,
-    color: "bg-teal-500",
-    image: kidsDeviceSafetyImg,
-    content: {
-      intro: "Your devices are valuable tools for learning and fun. Taking care of them means keeping them physically safe and making sure the information on them stays protected.",
-      tips: [
-        "Always lock your device with a PIN, password, or fingerprint. This keeps others from getting into your stuff.",
-        "To set a lock screen PIN: go to your device's Settings, look for Security or Lock Screen, and choose a PIN that is at least 6 numbers.",
-        "Only download apps your parents have approved. Before downloading, show the app to your parent and let them check it.",
-        "To check if an app is safe: look at the number of downloads and reviews. Apps with very few downloads or bad reviews may not be safe.",
-        "Keep your device updated when it asks you to. Updates fix problems and keep your device secure. Ask a parent to help you update.",
-        "Do not click on links or ads you do not recognize. They could download harmful software onto your device.",
-        "If your device starts acting strange, like running slowly, showing pop-ups, or opening things by itself, tell a parent right away.",
-        "Never leave your device unlocked and unattended. Always lock it before you walk away, even at home."
-      ],
-      remember: "Treat your device like a treasure. Lock it up, keep it clean, and only let trusted things inside.",
-      checklist: [
-        "My device has a lock screen PIN, password, or fingerprint set up.",
-        "I only download apps my parents have approved.",
-        "My device is up to date with the latest updates.",
-        "I know not to click on ads or links I do not recognize.",
-        "I lock my device before walking away from it.",
-        "I know to tell a parent if my device starts acting strange."
-      ]
+    {
+      id: "device-safety",
+      title: "Keeping Your Devices Safe",
+      description: "Protect your tablet, phone, and computer.",
+      icon: Smartphone,
+      color: "bg-teal-600",
+      image: kidsDeviceSafetyImg,
+      content: {
+        intro: "Your devices are like treasure chests full of your personal stuff. Keeping them safe means keeping you safe. Let us learn how to protect your tablet, phone, and computer!",
+        tips: [
+          "Always lock your device when you are done using it.",
+          "Ask a parent before downloading any new apps.",
+          "Updates fix security problems — ask a parent to help install them.",
+          "Only download apps from official app stores.",
+          "Check what permissions an app is asking for. A flashlight app should not need your contacts!",
+          "Be careful on public Wi-Fi. Do not log into important accounts on it.",
+          "If your device starts showing unexpected pop-ups, tell a parent right away.",
+          "Verify files from friends before downloading them."
+        ],
+        remember: "Treat your devices like you would a diary. Lock them, protect them, and only let trusted people use them.",
+        checklist: [
+          "I lock my device when I am not using it.",
+          "I ask a parent before downloading apps.",
+          "I keep my device updated.",
+          "I am careful about app permissions."
+        ]
+      }
     },
-    quiz: {
-      question: "What should you do before downloading a new app?",
-      options: [
-        "Download it right away if it looks fun",
-        "Ask a parent or trusted adult first",
-        "Share it with all your friends",
-        "Give it your email address"
-      ],
-      correctIndex: 1,
-      explanation: "Always ask a parent or trusted adult before downloading new apps. They can help make sure the app is safe and appropriate for you."
+    {
+      id: "trusted-adults",
+      title: "Trusted Adults and Getting Help",
+      description: "Know who to turn to and when to ask for help.",
+      icon: Heart,
+      color: "bg-pink-600",
+      image: kidsTrustedAdultsImg,
+      content: {
+        intro: "Having trusted adults in your life is one of the best ways to stay safe online. These are people you can turn to when something online makes you feel scared, confused, or uncomfortable.",
+        tips: [
+          "A trusted adult can be a parent, teacher, school counselor, or another family member.",
+          "You will never get in trouble for telling a trusted adult about something that happened online.",
+          "If someone online asks you to keep a secret from your parents, that is a big warning sign.",
+          "If you see something upsetting online, tell an adult right away.",
+          "It is okay to write a note if speaking feels too hard.",
+          "If your friend is being bullied online, help them tell an adult too.",
+          "Trusted adults set screen time rules because they care about you.",
+          "You can always come back to talk about something later if you need time to think."
+        ],
+        remember: "Trusted adults are your safety net. They want to help you, not punish you. You are never alone.",
+        checklist: [
+          "I know who my trusted adults are.",
+          "I know I will not get in trouble for telling an adult about online problems.",
+          "I know the warning signs of someone trying to keep secrets.",
+          "I help my friends get help when they need it."
+        ]
+      }
     }
-  },
-  {
-    id: "trusted-adults",
-    title: "Talking to Trusted Adults",
-    description: "Know who to ask for help and when.",
-    icon: Heart,
-    color: "bg-pink-500",
-    image: kidsTrustedAdultsImg,
-    content: {
-      intro: "Trusted adults are people who care about you and want to keep you safe. They can be parents, grandparents, teachers, or other family members you know well. You can always go to them when something online makes you uncomfortable.",
-      tips: [
-        "Make a list of at least three trusted adults you can talk to. Include people at home and at school.",
-        "You will never get in trouble for asking for help. Your adults want to know when something is wrong.",
-        "Tell an adult if someone online makes you uncomfortable, even if it seems small.",
-        "Share anything that confuses or scares you online. There is no silly question when it comes to safety.",
-        "Adults want to help you stay safe, not punish you. They are on your team.",
-        "If something bad happens online, take a screenshot first. This helps your trusted adult understand what happened.",
-        "To take a screenshot: on most devices, press the power button and volume down button at the same time.",
-        "Practice what you would say: try saying 'Something happened online and I need your help looking at it.' This makes it easier when you really need to say it."
-      ],
-      remember: "No question is too small and no worry is too silly. Your trusted adults are on your team.",
-      checklist: [
-        "I have a list of at least three trusted adults I can talk to.",
-        "I know how to take a screenshot on my device.",
-        "I have practiced what I would say if I needed help.",
-        "I know that I will not get in trouble for telling a trusted adult about something online.",
-        "I know where to find my trusted adults when I need them."
-      ]
+  ],
+  "11-13": [
+    {
+      id: "social-media",
+      title: "Social Media Safety",
+      description: "Navigate social platforms safely and responsibly.",
+      icon: Users,
+      color: "bg-purple-600",
+      image: kidsSocialMediaImg,
+      content: {
+        intro: "Social media can be great for connecting with friends and sharing your interests. But it also comes with risks if you are not careful about your privacy, the people you interact with, and the content you share.",
+        tips: [
+          "Set your accounts to private so only people you approve can see your content.",
+          "Think before you post. Would you be comfortable if your teacher or grandparent saw this?",
+          "Real giveaways never ask for your personal info through DMs.",
+          "Do not post vacation photos in real time — wait until you are back home.",
+          "Always get permission before sharing content that includes other people.",
+          "Take breaks from social media if it starts affecting how you feel.",
+          "Report harmful content and support friends who are targeted.",
+          "Be suspicious of follow requests from people with new accounts and no mutual friends."
+        ],
+        remember: "Social media is a tool. Use it wisely to connect, create, and share — but always protect your privacy and wellbeing.",
+        platformGuides: [
+          { platform: "Instagram Safety", steps: ["Go to Settings > Privacy and set your account to Private", "Turn off Activity Status so people cannot see when you are online", "Review tagged photos in Settings > Privacy > Tags before they appear on your profile", "Block or restrict accounts that make you uncomfortable", "Report inappropriate content by tapping the three dots on any post"] },
+          { platform: "TikTok Safety", steps: ["Go to Settings > Privacy and set your account to Private", "Turn off 'Suggest your account to others'", "Disable DMs from everyone or set to Friends Only", "Turn off 'Allow your videos to be downloaded'", "Set up Family Pairing with a parent for additional controls"] },
+        ],
+        checklist: [
+          "My social media accounts are set to private.",
+          "I think before I post and check for personal information.",
+          "I do not share my location in real-time posts.",
+          "I report harmful content when I see it."
+        ]
+      }
     },
-    quiz: {
-      question: "Someone online said something that made you feel uncomfortable. What should you do?",
-      options: [
-        "Keep it a secret so you do not get in trouble",
-        "Reply to them and tell them to stop",
-        "Tell a trusted adult what happened",
-        "Just ignore it and hope it goes away"
-      ],
-      correctIndex: 2,
-      explanation: "Tell a trusted adult what happened. You will never get in trouble for reporting something that made you uncomfortable. Adults are there to help keep you safe."
+    {
+      id: "cyberbullying",
+      title: "Dealing with Cyberbullying",
+      description: "Recognize, respond to, and prevent online bullying.",
+      icon: Shield,
+      color: "bg-red-600",
+      image: kidsCyberbullyingImg,
+      content: {
+        intro: "Cyberbullying is when someone uses technology to hurt, embarrass, or threaten another person. It can happen through texts, social media, gaming, or any online platform. Knowing how to handle it is an important skill.",
+        tips: [
+          "Cyberbullying includes spreading rumors, sharing embarrassing photos, sending mean messages, or excluding someone online.",
+          "If you are being bullied, save evidence by taking screenshots.",
+          "Do not respond to bullies — it often makes things worse.",
+          "Report cyberbullying to the platform and tell a trusted adult.",
+          "Forwarding mean content makes you part of the problem, even if you did not create it.",
+          "Be an upstander, not a bystander. Support people who are being bullied.",
+          "Think before you type. If you would not say it face-to-face, do not post it.",
+          "Remember that people cannot always tell tone online — what seems like a joke might hurt someone."
+        ],
+        remember: "Everyone deserves to feel safe online. Being an upstander means using your voice to support others and stop harm.",
+        checklist: [
+          "I know what cyberbullying looks like.",
+          "I know to save evidence and report bullying.",
+          "I do not forward or share hurtful content.",
+          "I support friends who are being bullied."
+        ]
+      }
+    },
+    {
+      id: "gaming-safety",
+      title: "Gaming Safety",
+      description: "Stay safe while gaming online.",
+      icon: Gamepad2,
+      color: "bg-indigo-600",
+      image: kidsGamingSmartImg,
+      content: {
+        intro: "Online gaming is fun, but it comes with risks like scam offers, predators, and spending traps. Learn how to enjoy gaming while staying safe.",
+        tips: [
+          "Only share your game name, never your real name or location.",
+          "Never share your login for 'account boosting' — it is a scam to steal your account.",
+          "All 'free V-Bucks/Robux generators' are scams. Only use official stores.",
+          "Be cautious of older players who want to chat privately outside the game.",
+          "Set a gaming budget with your parents and stick to it.",
+          "Take breaks from gaming. Long sessions affect your health.",
+          "Report players who use hateful language or harass others.",
+          "If you stream, use a screen name and never share personal details."
+        ],
+        remember: "Gaming should be fun. Protect your accounts, your money, and your personal information while you play.",
+        checklist: [
+          "I only share my game name online.",
+          "I never enter my login on outside websites.",
+          "I have a gaming budget I stick to.",
+          "I report toxic players and take breaks."
+        ]
+      }
+    },
+    {
+      id: "phishing",
+      title: "Spotting Fake Messages",
+      description: "Identify phishing emails, texts, and DMs.",
+      icon: AlertCircle,
+      color: "bg-orange-600",
+      image: kidsPhishingImg,
+      content: {
+        intro: "Phishing is when scammers send fake messages that look real to trick you into sharing passwords, personal information, or clicking dangerous links. These can come as emails, texts, or social media messages.",
+        tips: [
+          "Check the sender's email address carefully. Scammers use addresses like 'amaz0n.com' with a zero.",
+          "Be suspicious of urgent messages saying your account will be deleted or closed.",
+          "Never click links in unexpected messages. Go directly to the real website.",
+          "Legitimate companies never ask for your password through messages.",
+          "Watch out for job offers via messaging apps promising easy money.",
+          "If a friend's account sends a suspicious link, verify with them through another channel.",
+          "Fake virus pop-ups are designed to scare you into installing malware.",
+          "Brand deals that ask for bank details through Instagram DMs are scams."
+        ],
+        remember: "When in doubt, do not click. Go directly to the official website or app, and ask a trusted adult if you are unsure.",
+        platformGuides: [
+          { platform: "Checking a Suspicious Email", steps: ["Look at the sender's full email address, not just the name", "Check for spelling mistakes in the address", "Look for pressure language like 'Act now!' or 'Your account will be deleted'", "Hover over links without clicking to see where they really go", "If unsure, go directly to the website by typing the address yourself"] },
+          { platform: "Suspicious Message in an App", steps: ["Do not click any links from people you do not know", "Check the sender's profile for red flags (new account, no posts)", "Support teams never ask for passwords through messages", "Report and block the sender", "Tell a trusted adult about the message"] }
+        ],
+        checklist: [
+          "I know how to check a sender's real email address.",
+          "I do not click links in unexpected messages.",
+          "I recognize urgency and pressure as red flags.",
+          "I know to verify suspicious messages through another channel."
+        ]
+      }
+    },
+    {
+      id: "digital-footprint",
+      title: "Your Digital Footprint",
+      description: "Understand how your online actions follow you.",
+      icon: Target,
+      color: "bg-purple-600",
+      image: kidsDigitalFootprintImg,
+      content: {
+        intro: "Your digital footprint is the trail of information you leave behind online. Every post, comment, photo, and search adds to it. This footprint can be seen by friends, schools, and even future employers.",
+        tips: [
+          "Search your name on Google to see what others can find about you.",
+          "Think about how posts might look to a future college or employer.",
+          "Screenshots last forever — even deleted posts may have been saved.",
+          "Be intentional about building a positive online presence.",
+          "Review privacy settings on all platforms regularly.",
+          "Remove tags from photos you do not want associated with you.",
+          "Delete or deactivate old accounts you no longer use.",
+          "Your likes, comments, and shares are all part of your footprint too."
+        ],
+        remember: "Your digital footprint is part of your personal brand. Make it something you are proud of.",
+        platformGuides: [
+          { platform: "Checking Your Footprint", steps: ["Open a private browser and search your full name", "Check Google Images for any indexed photos", "View your profiles from a logged-out browser", "Review your comment history on YouTube, TikTok, and Reddit"] },
+          { platform: "Building a Good Reputation", steps: ["Share achievements, creative projects, and volunteer work", "Be thoughtful in every comment you make", "Keep personal posts private and positive posts public", "Review privacy settings monthly"] }
+        ],
+        checklist: [
+          "I have searched my name and reviewed the results.",
+          "I have cleaned up old posts I no longer want public.",
+          "My privacy settings are up to date.",
+          "I am building a positive digital footprint."
+        ]
+      }
     }
-  }
-];
+  ],
+  "14-16": [
+    {
+      id: "advanced-privacy",
+      title: "Advanced Privacy and Security",
+      description: "Master privacy controls, encryption, and data protection.",
+      icon: Fingerprint,
+      color: "bg-indigo-700",
+      image: kidsPersonalInfoImg,
+      content: {
+        intro: "As you use more apps and services, your digital privacy becomes increasingly important. Understanding how your data is collected, stored, and used empowers you to make informed decisions about your online presence.",
+        tips: [
+          "Review app permissions regularly. A calculator should not need your camera or contacts.",
+          "Only accept necessary cookies — tracking cookies follow your activity across the web.",
+          "Use messaging apps with end-to-end encryption for private conversations.",
+          "Read privacy policies before signing up. Free VPNs that sell data defeat their purpose.",
+          "Use a password manager to create and store unique passwords for every account.",
+          "Enable two-factor authentication on every account that supports it.",
+          "Check if your email has been in a data breach using HaveIBeenPwned.",
+          "Be cautious with social logins — they share your profile data with third-party services."
+        ],
+        remember: "Privacy is a right, not a luxury. The more you understand about data collection, the better you can protect yourself.",
+        platformGuides: [
+          { platform: "Privacy Audit Checklist", steps: ["Review and revoke unnecessary app permissions on your phone", "Check which apps have access to your location, camera, and microphone", "Review connected apps in your Google/Apple account settings", "Clear browser cookies and review cookie settings for sites you visit", "Check HaveIBeenPwned.com to see if any of your accounts were in data breaches"] },
+          { platform: "Setting Up 2FA", steps: ["Go to Security settings on your important accounts (email, social media, gaming)", "Look for 'Two-Factor Authentication' or 'Two-Step Verification'", "Choose an authenticator app (more secure) over SMS where possible", "Save backup codes in a safe place in case you lose your phone", "Test the 2FA by logging out and back in"] }
+        ],
+        checklist: [
+          "I review app permissions regularly.",
+          "I use two-factor authentication on important accounts.",
+          "I use unique passwords for every account.",
+          "I understand how cookies and tracking work."
+        ]
+      }
+    },
+    {
+      id: "social-engineering",
+      title: "Social Engineering Attacks",
+      description: "Recognize manipulation tactics used by cybercriminals.",
+      icon: Brain,
+      color: "bg-red-700",
+      image: kidsPhishingImg,
+      content: {
+        intro: "Social engineering is when attackers manipulate people instead of hacking computers. They use psychology — urgency, authority, fear, and trust — to trick you into revealing information or taking dangerous actions.",
+        tips: [
+          "Vishing (voice phishing) uses phone calls to create urgency and trick you.",
+          "Never plug in unknown USB drives — they can contain malware.",
+          "No legitimate administrator asks for credentials via email.",
+          "Never share your Social Security Number before being officially hired.",
+          "Free textbook sites requiring special software downloads often bundle malware.",
+          "Online acquaintances asking for money is one of the most common scam patterns.",
+          "Surveys asking for personal financial data beyond opinions are scams.",
+          "If a friend sends a suspicious 'Is this you?' link, their account may be hacked."
+        ],
+        remember: "Social engineers exploit trust and emotions. Always verify independently before acting on any request for information or money.",
+        checklist: [
+          "I can identify social engineering tactics.",
+          "I verify unexpected requests through official channels.",
+          "I never provide sensitive info to incoming callers.",
+          "I am cautious of emotional manipulation online."
+        ]
+      }
+    },
+    {
+      id: "digital-wellness",
+      title: "Digital Wellness",
+      description: "Build a healthy relationship with technology.",
+      icon: Heart,
+      color: "bg-pink-700",
+      image: kidsSocialMediaImg,
+      content: {
+        intro: "Technology is a powerful tool, but it can affect your mental health if not managed well. Building healthy digital habits helps you enjoy the benefits while avoiding the downsides.",
+        tips: [
+          "Set screen time limits and use app timers to manage usage.",
+          "Create phone-free zones like your bedroom at night.",
+          "If you feel anxious when away from your phone, that is a sign to take a break.",
+          "Remember that social media shows curated, filtered versions of life — not reality.",
+          "Unfollow accounts that consistently make you feel bad about yourself.",
+          "It is okay to set boundaries and not be available online 24/7.",
+          "Cyberstalking is serious — help friends report it and tell trusted adults.",
+          "Build positive online communities through authenticity and kindness."
+        ],
+        remember: "Your mental health matters more than any notification. Technology should serve you, not control you.",
+        checklist: [
+          "I have screen time limits set up.",
+          "I take regular breaks from screens.",
+          "I curate my social media feed for positive content.",
+          "I have phone-free times during my day."
+        ]
+      }
+    },
+    {
+      id: "online-identity",
+      title: "Online Identity and Reputation",
+      description: "Build and protect your digital identity.",
+      icon: Globe,
+      color: "bg-blue-700",
+      image: kidsDigitalFootprintImg,
+      content: {
+        intro: "Your online identity is more than your social media profile — it is how the digital world sees you. From deepfakes to data brokers, understanding threats to your identity helps you protect and build a positive presence.",
+        tips: [
+          "Deepfakes are AI-generated fake media. Report them immediately and preserve evidence.",
+          "Build your personal brand around your work, not personal details.",
+          "Viral content is permanent. What seems edgy now could hurt future opportunities.",
+          "Request data removal from data broker sites that list your information.",
+          "Age restrictions exist for safety — bypassing them removes legal protections for minors.",
+          "Employers and schools regularly check social media profiles.",
+          "Address privacy violations directly and involve trusted adults when needed.",
+          "Share opinions respectfully and remember comments are permanent."
+        ],
+        remember: "Your online identity is your digital resume. Build it intentionally, protect it actively, and remember that everything online is permanent.",
+        checklist: [
+          "I can identify deepfake content.",
+          "I know how to request data removal.",
+          "I am building a positive professional presence.",
+          "I think about long-term impact before posting."
+        ]
+      }
+    },
+    {
+      id: "financial-safety",
+      title: "Financial Safety Online",
+      description: "Protect your money and avoid financial scams.",
+      icon: DollarSign,
+      color: "bg-green-700",
+      image: kidsSpottingTricksImg,
+      content: {
+        intro: "As you start managing your own money — whether through allowance, part-time jobs, or gift cards — knowing how to protect it online becomes crucial. Financial scams increasingly target young people.",
+        tips: [
+          "Prices 90% lower than competitors are a red flag for scam stores.",
+          "Enable biometric authentication and transaction alerts for mobile payments.",
+          "Beware of 'accidental' payments that ask you to send money back — the original is reversed but yours stays gone.",
+          "Legitimate age verification never requires payment card details.",
+          "No investment is 'guaranteed.' Crypto scams targeting young people are extremely common.",
+          "Never share gift card numbers and PINs — once shared, the funds can be stolen.",
+          "Use platform payment systems for online marketplace transactions.",
+          "Money flipping posts on social media are always scams."
+        ],
+        remember: "If someone promises guaranteed returns with urgency, it is a scam. Protect your financial information as carefully as your personal information.",
+        checklist: [
+          "I can spot financial scams online.",
+          "I use secure payment methods.",
+          "I know that 'guaranteed returns' means scam.",
+          "I never share gift card codes or PINs."
+        ]
+      }
+    },
+    {
+      id: "critical-thinking",
+      title: "Critical Thinking Online",
+      description: "Evaluate information, spot misinformation, and think critically.",
+      icon: Zap,
+      color: "bg-amber-700",
+      image: kidsGamingSmartImg,
+      content: {
+        intro: "In the age of AI, deepfakes, and viral misinformation, critical thinking is your most powerful tool. Learning to evaluate information before believing or sharing it protects you and your community.",
+        tips: [
+          "Verify breaking news through at least 3 reputable sources before sharing.",
+          "AI can generate convincing but incorrect information — always verify.",
+          "Check petition creators and their data collection practices before signing.",
+          "Health claims need support from medical professionals, not social media views.",
+          "Seek multiple perspectives and consider publication biases.",
+          "Unverifiable claims without citations should be treated skeptically.",
+          "Use reverse image search to check if images are manipulated or out of context.",
+          "Be extra cautious of information that perfectly confirms what you already believe."
+        ],
+        remember: "Critical thinking means questioning everything — including things you agree with. The truth can withstand scrutiny.",
+        checklist: [
+          "I verify information before sharing it.",
+          "I check multiple sources for important claims.",
+          "I know how to use reverse image search.",
+          "I am aware of my own confirmation bias."
+        ]
+      }
+    }
+  ]
+};
 
-const smartSafeModules: LearningModule[] = [
-  {
-    id: "social-media-safety",
-    title: "Smart Social Media Use",
-    description: "Navigate social platforms safely and wisely.",
-    icon: MessageCircle,
-    color: "bg-blue-600",
-    image: kidsSocialMediaImg,
-    content: {
-      intro: "Social media can be a great way to connect with friends and share your interests. But it is important to use it wisely. What you post online can stay there forever and be seen by more people than you expect.",
-      tips: [
-        "Set your accounts to private so only approved followers see your posts.",
-        "Think before you post. Would you be okay if a teacher, coach, or college admissions officer saw this?",
-        "Do not accept friend requests or follow requests from people you do not know in real life.",
-        "Be kind in your comments. Treat others how you want to be treated. Mean comments can have real consequences.",
-        "Take breaks from social media if it starts making you feel bad about yourself.",
-        "Turn off direct messages from strangers. This prevents unknown people from contacting you privately.",
-        "Never share your location in real time. Wait until you have left a place before posting about it.",
-        "Review your followers and following lists regularly. Remove anyone you do not actually know."
-      ],
-      remember: "Your online reputation is part of your real reputation. Everything you share reflects who you are.",
-      platformGuides: [
-        {
-          platform: "Making Your Account Private",
-          steps: [
-            "On Instagram: go to Settings and Privacy, then Account Privacy, and turn on Private Account.",
-            "On TikTok: go to Settings and Privacy, then Privacy, and set your account to Private.",
-            "On Snapchat: go to Settings, then Contact Me, and set it to My Friends. Also turn on Ghost Mode in Snap Map.",
-            "On any platform: look for Privacy or Account Settings and switch from Public to Private or Friends Only.",
-            "After making your account private, review your current followers and remove anyone you do not know."
-          ]
-        },
-        {
-          platform: "What to Do About Strangers",
-          steps: [
-            "If a stranger sends you a message, do not reply. Block them immediately.",
-            "To block someone: go to their profile, tap the three dots or menu icon, and select Block.",
-            "Report the account to the platform. Look for a Report option in the same menu where you found Block.",
-            "Tell a trusted adult that a stranger tried to contact you, even if you already blocked them.",
-            "Never agree to meet someone in person that you only know online."
-          ]
-        },
-        {
-          platform: "Before You Post",
-          steps: [
-            "The Screenshot Rule: before posting, assume someone will screenshot it and show it to everyone. Are you still okay with it?",
-            "The Future Self Rule: imagine yourself five years from now. Would future you be proud of this post?",
-            "Check the background of photos for personal details like your address, school name, or location.",
-            "If you are posting about someone else, ask their permission first.",
-            "If you are angry, upset, or emotional, wait at least one hour before posting anything."
-          ]
-        }
-      ],
-      checklist: [
-        "All my social media accounts are set to Private.",
-        "Direct messages from strangers are turned off.",
-        "I have reviewed my followers and removed anyone I do not know.",
-        "I think before every post using the Screenshot Rule and Future Self Rule.",
-        "Location sharing is turned off on all my social apps.",
-        "I know how to block and report someone on every platform I use."
-      ]
-    },
-    quiz: {
-      question: "Before posting a photo, what should you consider?",
-      options: [
-        "Just post it quickly before anyone notices",
-        "Whether it could embarrass you or someone else later",
-        "Only how many likes it might get",
-        "Nothing, posts can always be deleted"
-      ],
-      correctIndex: 1,
-      explanation: "Consider whether the photo could embarrass you or someone else later. Even deleted posts can be screenshotted and shared, so think carefully before posting."
-    }
+const ageGroupConfig = {
+  "6-10": {
+    title: "Foundations",
+    subtitle: "Ages 6 to 10",
+    description: "Start your internet safety journey with fun lessons about passwords, personal information, and staying safe online.",
+    gradient: "from-teal-500 to-blue-500",
+    bgGradient: "from-teal-50 via-cyan-50 to-blue-50 dark:from-teal-950/30 dark:via-cyan-950/30 dark:to-blue-950/30",
+    borderColor: "border-teal-200 dark:border-teal-800",
+    badgeColor: "bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-300",
+    image: kidsYoungLearnersImg,
+    imageAlt: "Young children learning about internet safety together",
+    icon: Star,
+    badges: ["Beginner Friendly", "5 Lessons", "Fun Activities"],
   },
-  {
-    id: "cyberbullying",
-    title: "Understanding Online Bullying",
-    description: "Recognize bullying and know how to respond.",
-    icon: Users,
-    color: "bg-red-500",
-    image: kidsCyberbullyingImg,
-    content: {
-      intro: "Online bullying, sometimes called cyberbullying, happens when someone uses technology to hurt, embarrass, or threaten others. It can happen through texts, social media, games, or any online platform. Knowing how to handle it helps you and your friends stay safe.",
-      tips: [
-        "Do not respond to mean messages. Responding often makes things worse and gives the bully what they want.",
-        "Save evidence by taking screenshots of hurtful messages. This proof helps adults take action.",
-        "Block people who are being cruel to you on every platform where they can reach you.",
-        "Tell a trusted adult about what is happening. You are not being a snitch. You are protecting yourself.",
-        "Be an upstander, not a bystander. If you see someone being bullied, support them and report it.",
-        "Remember that online bullying is never your fault. No matter what anyone says, you do not deserve it.",
-        "If the bullying is happening at school, report it to a teacher or school counselor. Most schools have anti-bullying policies.",
-        "Take care of your mental health. It is okay to take a break from social media or games if they are making you feel bad."
-      ],
-      remember: "Online bullying is never your fault. No one deserves to be treated badly. Speaking up takes courage and helps everyone.",
-      platformGuides: [
-        {
-          platform: "If It Is Happening to You",
-          steps: [
-            "Do not respond to the bully. Do not reply, react, or engage in any way.",
-            "Take screenshots of every hurtful message, post, or comment. Save them in a folder.",
-            "Block the person on the platform where the bullying is happening.",
-            "Report the content to the platform. On most apps, tap the three dots on the message or post and select Report.",
-            "Tell a trusted adult what is happening. Show them the screenshots.",
-            "If the bullying includes threats of violence, tell a parent immediately. They may need to contact school or police."
-          ]
-        },
-        {
-          platform: "If You See It Happening to Someone Else",
-          steps: [
-            "Support the person being bullied. Send them a kind private message letting them know you care.",
-            "Do not like, share, or comment on bullying posts. This only spreads the harm.",
-            "Report the bullying content to the platform, even if it is not about you.",
-            "Tell a trusted adult that you saw someone being bullied online.",
-            "If you feel safe doing so, stand up publicly. Sometimes a simple 'That is not okay' can help."
-          ]
-        },
-        {
-          platform: "Getting Help",
-          steps: [
-            "Talk to a parent, guardian, or another trusted adult in your family.",
-            "Tell a teacher or school counselor. They are trained to handle bullying situations.",
-            "If you are in the United States, text HOME to 741741 to reach the Crisis Text Line.",
-            "Visit StopBullying.gov for more resources and advice.",
-            "Remember that asking for help is a sign of strength, not weakness."
-          ]
-        }
-      ],
-      checklist: [
-        "I know not to respond to mean messages online.",
-        "I know how to take screenshots to save evidence.",
-        "I know how to block and report someone on the platforms I use.",
-        "I have a trusted adult I can talk to about online bullying.",
-        "I know how to support a friend who is being bullied.",
-        "I know that online bullying is never my fault."
-      ]
-    },
-    quiz: {
-      question: "If someone is being mean to you online, what should you do first?",
-      options: [
-        "Send them a mean message back",
-        "Do not respond, save evidence, and tell a trusted adult",
-        "Create a new account to respond anonymously",
-        "Just delete your account and give up"
-      ],
-      correctIndex: 1,
-      explanation: "Do not respond, save evidence, and tell a trusted adult. Responding to bullies often makes things worse, but keeping evidence and getting help can stop the bullying."
-    }
+  "11-13": {
+    title: "Smart and Safe Online",
+    subtitle: "Ages 11 to 13",
+    description: "Level up with lessons on social media, gaming safety, spotting scams, and building a positive digital reputation.",
+    gradient: "from-purple-500 to-pink-500",
+    bgGradient: "from-purple-50 via-pink-50 to-rose-50 dark:from-purple-950/30 dark:via-pink-950/30 dark:to-rose-950/30",
+    borderColor: "border-purple-200 dark:border-purple-800",
+    badgeColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300",
+    image: kidsTeenLearnersImg,
+    imageAlt: "Preteens confidently using devices with security shields",
+    icon: Trophy,
+    badges: ["Intermediate", "5 Lessons", "Real Scenarios"],
   },
-  {
-    id: "gaming-safety",
-    title: "Gaming Smart",
-    description: "Stay safe while having fun in online games.",
-    icon: Gamepad2,
-    color: "bg-green-600",
-    image: kidsGamingSmartImg,
-    content: {
-      intro: "Online gaming is fun, but it comes with some risks. Some players are not who they say they are, and some games try to get you to spend money. Knowing how to game safely means you can enjoy playing while protecting yourself.",
-      tips: [
-        "Use a gaming name (gamertag) that does not reveal your real name, age, location, or school.",
-        "Never share personal information with other players, even ones who seem friendly.",
-        "Be careful about in-game purchases. Virtual currency like V-Bucks and Robux costs real money. Always ask a parent first.",
-        "Mute or block players who are being rude, using bad language, or making you uncomfortable.",
-        "Take regular breaks and balance gaming with other activities like sports, reading, and spending time with friends.",
-        "Be skeptical of free item offers. Messages saying 'Free V-Bucks' or 'Free Robux' are almost always scams.",
-        "Never download mods or hacks from unknown websites. They often contain harmful software.",
-        "If someone in a game makes you feel uncomfortable or asks to talk outside the game, tell a trusted adult."
-      ],
-      remember: "Real gaming skills do not require sharing personal info. Stay anonymous and stay safe while having fun.",
-      platformGuides: [
-        {
-          platform: "Setting Up a Safe Gaming Profile",
-          steps: [
-            "Choose a username that does not include your real name, birth year, or location. Use something creative and fun instead.",
-            "On PlayStation: go to Settings, then Account Management, then Privacy Settings. Set your profile to Friends Only.",
-            "On Xbox: go to Settings, then Account, then Privacy and Online Safety. Set communication to Friends Only.",
-            "On Nintendo Switch: use the Nintendo Switch Parental Controls app to set communication restrictions.",
-            "On Roblox: go to Settings, then Privacy. Set each option to Friends or No One.",
-            "On PC (Steam, Epic, etc.): go to your Profile Settings and set your profile to Friends Only.",
-            "Never use a real photo of yourself as your gaming profile picture."
-          ]
-        },
-        {
-          platform: "Dealing with Toxic Players",
-          steps: [
-            "If someone is being mean or rude, do not argue back. It rarely helps and usually makes things worse.",
-            "Mute them: in most games, open the player list or scoreboard and select Mute next to their name.",
-            "Block them: on PlayStation, go to their profile and select Block. On Xbox, select their gamertag and choose Block.",
-            "Report them: most games have a Report Player option in the pause menu or player list. Use it.",
-            "If someone threatens you with real-world violence, tell a parent immediately.",
-            "Remember that toxic players are trying to make you upset. Muting them takes away their power."
-          ]
-        },
-        {
-          platform: "Safe In-Game Purchases",
-          steps: [
-            "Always ask a parent before buying anything in a game, even if it seems small.",
-            "Check the real-world price before purchasing. 1000 V-Bucks costs about 8 real dollars.",
-            "Watch out for tricks that pressure you to buy, like limited-time offers and countdown timers.",
-            "Never enter your parent's credit card information without permission.",
-            "Be wary of third-party websites selling cheap game currency. These are usually scams that steal your account."
-          ]
-        }
-      ],
-      checklist: [
-        "My gaming username does not reveal my real name or personal details.",
-        "My gaming profile is set to Friends Only on all platforms.",
-        "I know how to mute, block, and report players on my gaming platforms.",
-        "I always ask a parent before making in-game purchases.",
-        "I do not download mods or hacks from unknown websites.",
-        "I take regular breaks from gaming."
-      ]
-    },
-    quiz: {
-      question: "Someone in an online game asks for your real name and where you live. What should you do?",
-      options: [
-        "Tell them because they seem friendly",
-        "Trade personal info for in-game items",
-        "Politely decline and only share your game name",
-        "Give them fake information to trick them"
-      ],
-      correctIndex: 2,
-      explanation: "Politely decline and only share your game name. Real friends in games do not need to know your personal details. Keep your real identity private."
-    }
+  "14-16": {
+    title: "Cyber Champion",
+    subtitle: "Ages 14 to 16",
+    description: "Master advanced topics like social engineering, financial safety, AI deepfakes, and critical thinking online.",
+    gradient: "from-indigo-600 to-violet-600",
+    bgGradient: "from-indigo-50 via-violet-50 to-purple-50 dark:from-indigo-950/30 dark:via-violet-950/30 dark:to-purple-950/30",
+    borderColor: "border-indigo-200 dark:border-indigo-800",
+    badgeColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300",
+    image: kidsTeenLearnersImg,
+    imageAlt: "Teenagers mastering advanced cybersecurity concepts",
+    icon: Shield,
+    badges: ["Advanced", "6 Lessons", "Expert Challenges"],
   },
-  {
-    id: "fake-messages",
-    title: "Spotting Fake Messages",
-    description: "Identify trick messages designed to steal information.",
-    icon: AlertCircle,
-    color: "bg-orange-600",
-    image: kidsPhishingImg,
-    content: {
-      intro: "Sometimes scammers send fake messages that look real to trick you into giving up passwords or personal information. These can come as emails, texts, or messages in apps. Scammers have become very good at making these look legitimate.",
-      tips: [
-        "Check the sender's email address carefully. Fake emails often come from addresses with misspellings, like support@amaz0n.com instead of support@amazon.com.",
-        "Be suspicious of urgent messages saying your account will be closed or you will lose something unless you act right now.",
-        "Do not click links in unexpected messages. Instead, open the real app or website directly by typing the address yourself.",
-        "Look for spelling and grammar mistakes in messages. Real companies usually do not make these errors.",
-        "Hover over links (without clicking) to see where they really go. On a phone, press and hold the link to preview it.",
-        "Never enter your password on a page you reached by clicking a link in a message. Always go directly to the website.",
-        "If a message offers something too good to be true, like free items or money, it is almost certainly a scam.",
-        "When in doubt, ask a parent or trusted adult before clicking anything."
-      ],
-      remember: "Legitimate companies will never ask for your password through email or messages. When something seems urgent or too good to be true, slow down and verify.",
-      platformGuides: [
-        {
-          platform: "Checking a Suspicious Email",
-          steps: [
-            "Look at the sender's email address. Click on the name to see the full address. Is it from the real company?",
-            "Check for spelling mistakes in the email address. Scammers use addresses like paypa1@email.com (with a number 1 instead of the letter l).",
-            "Read the email carefully. Does it use your real name, or does it say 'Dear User' or 'Dear Customer'?",
-            "Hover over any links without clicking. Does the link address match the company it claims to be from?",
-            "Look for pressure language like 'Act now!' or 'Your account will be deleted in 24 hours!' Real companies do not threaten you.",
-            "If you are unsure, do not click anything. Open a new browser window and go directly to the real website."
-          ]
-        },
-        {
-          platform: "Suspicious Message in an App",
-          steps: [
-            "If you get a message from someone you do not know in an app, do not click any links in it.",
-            "Check the sender's profile. Is it a real person? New accounts with no posts or friends are red flags.",
-            "If someone claims to be from the app's support team and asks for your password, it is a scam. Support teams never ask for passwords through messages.",
-            "Report the message using the app's report feature. Usually tap and hold the message, then select Report.",
-            "Block the sender so they cannot message you again."
-          ]
-        },
-        {
-          platform: "What to Do If You Clicked",
-          steps: [
-            "Do not panic. Tell a trusted adult right away about what happened.",
-            "If you entered a password on a suspicious page, change that password immediately.",
-            "If you use the same password on other accounts, change those too.",
-            "Check your accounts for anything strange, like messages you did not send or purchases you did not make.",
-            "Ask your parent to run a security scan on your device.",
-            "Learn from it. Now you know what to look for next time."
-          ]
-        }
-      ],
-      checklist: [
-        "I know how to check a sender's real email address.",
-        "I do not click links in unexpected messages.",
-        "I know how to hover over a link to check where it goes.",
-        "I recognize pressure language as a red flag.",
-        "I know to go directly to websites instead of clicking links in emails.",
-        "I know what to do if I accidentally click a suspicious link."
-      ]
-    },
-    quiz: {
-      question: "You get an email saying your gaming account will be deleted unless you click a link right now. What should you do?",
-      options: [
-        "Click the link immediately to save your account",
-        "Reply with your password to prove it is you",
-        "Do not click, and log into your account directly through the app or website",
-        "Forward it to all your friends so they know about the problem"
-      ],
-      correctIndex: 2,
-      explanation: "Do not click, and log into your account directly through the app or website. Real companies do not ask you to click urgent links. Always go directly to the official site to check your account."
-    }
-  },
-  {
-    id: "digital-footprint",
-    title: "Your Digital Footprint",
-    description: "Understand how your online actions follow you.",
-    icon: Target,
-    color: "bg-purple-600",
-    image: kidsDigitalFootprintImg,
-    content: {
-      intro: "Your digital footprint is the trail of information you leave behind online. Every post, comment, photo, and search adds to it. This footprint can be seen by friends, family, schools, and even future employers. Managing it wisely is an important life skill.",
-      tips: [
-        "Search your own name on Google to see what others can find about you. Do this regularly.",
-        "Think about how posts might look to a future college admissions officer or employer.",
-        "Remember that screenshots last forever. Even if you delete a post, someone may have already saved it.",
-        "Be intentional about building a positive online presence. Share achievements, creative projects, and things you are proud of.",
-        "Review your privacy settings on all platforms at least once a month.",
-        "Be careful about what others tag you in. Review tagged photos and posts and remove tags on anything you do not want associated with you.",
-        "Old accounts you no longer use still have your information. Delete or deactivate accounts you do not need anymore.",
-        "Everything you like, comment on, and share contributes to your digital footprint, not just your own posts."
-      ],
-      remember: "Your digital footprint is part of your personal brand. Make it something you are proud of.",
-      platformGuides: [
-        {
-          platform: "Checking Your Footprint",
-          steps: [
-            "Open a private or incognito browser window. Search your full name on Google.",
-            "Look at the results. Are there photos, posts, or accounts you did not expect?",
-            "Search your name on Google Images to see if any photos of you have been indexed.",
-            "Check your social media profiles from a logged-out browser to see what strangers can see.",
-            "Review your comment history on platforms like YouTube, TikTok, and Reddit."
-          ]
-        },
-        {
-          platform: "Cleaning Up",
-          steps: [
-            "Go through your old posts on every platform. Delete anything you would not want a teacher or future employer to see.",
-            "Remove tags from photos or posts that do not represent you well.",
-            "Delete old accounts you no longer use. If you cannot delete them, change the profile information and make them private.",
-            "On Instagram: go to Your Activity, then Photos and Videos, then Posts to review and delete old posts.",
-            "On TikTok: go to your profile, review your videos, and delete any you no longer want public."
-          ]
-        },
-        {
-          platform: "Building a Good Reputation",
-          steps: [
-            "Share positive content: achievements, volunteer work, creative projects, and things you are learning.",
-            "Be kind and thoughtful in every comment you make. Your comments are part of your footprint.",
-            "Set your privacy settings so only friends can see personal posts, but consider keeping some positive posts public.",
-            "Think of your online presence as a portfolio. What would you want someone to see?",
-            "Review your privacy settings on all platforms at least once a month to make sure nothing has changed."
-          ]
-        }
-      ],
-      checklist: [
-        "I have searched my own name on Google and reviewed the results.",
-        "I have deleted or updated old posts I no longer want public.",
-        "I have removed tags from photos I do not want associated with me.",
-        "My privacy settings are up to date on all platforms.",
-        "I have deleted or deactivated old accounts I no longer use.",
-        "I am intentionally building a positive online presence."
-      ]
-    },
-    quiz: {
-      question: "What is true about your digital footprint?",
-      options: [
-        "Deleting posts erases them completely",
-        "Only your friends can see your online activity",
-        "Your online actions can affect real life opportunities",
-        "It only includes things you post yourself"
-      ],
-      correctIndex: 2,
-      explanation: "Your online actions can affect real life opportunities. Colleges and employers often search for applicants online, so what you post today can impact your future."
-    }
-  }
-];
-
-interface SpotTheScamItem {
-  id: number;
-  scenario: string;
-  isScam: boolean;
-  explanation: string;
-}
-
-const spotTheScamItems: SpotTheScamItem[] = [
-  {
-    id: 1,
-    scenario: "A pop-up says you won a free iPhone and just need to enter your address to receive it.",
-    isScam: true,
-    explanation: "This is a scam. Real prizes do not come from random pop-ups. They want your personal information."
-  },
-  {
-    id: 2,
-    scenario: "Your school sends an email through the official school portal about a field trip next week.",
-    isScam: false,
-    explanation: "This is legitimate. Official school communications through known portals are typically safe."
-  },
-  {
-    id: 3,
-    scenario: "Someone you never met in a game offers to give you their account for free if you share your password.",
-    isScam: true,
-    explanation: "This is a scam. No one should ever need your password. They are trying to steal your account."
-  },
-  {
-    id: 4,
-    scenario: "Your grandmother video calls you using the app your family always uses.",
-    isScam: false,
-    explanation: "This is safe. A video call from a known family member through a trusted app is legitimate."
-  },
-  {
-    id: 5,
-    scenario: "An email claims your streaming account will be deleted in 24 hours unless you click a link to verify your password.",
-    isScam: true,
-    explanation: "This is a scam. Legitimate companies do not send urgent password requests via email. Log in directly through the official app."
-  },
-  {
-    id: 6,
-    scenario: "A friend at school shares a funny video link in person during lunch.",
-    isScam: false,
-    explanation: "This is likely safe. A friend you know in person sharing something face to face is different from online strangers."
-  }
-];
+};
 
 function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) {
   return (
     <div className="relative">
-      {/* Colorful gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-teal-50 via-purple-50 to-pink-50 dark:from-teal-950/30 dark:via-purple-950/30 dark:to-pink-950/30" />
-      
       <div className="relative py-12">
         <FloatingShapes />
-        
         <div className="max-w-5xl mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-500 to-blue-500 text-white px-5 py-2.5 rounded-full mb-6 shadow-lg">
@@ -724,104 +613,56 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
               <span className="font-semibold">Kids Digital Safety Hub</span>
               <Sparkles className="w-4 h-4" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Learn to Stay Safe Online
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Learn to Stay Safe Online</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Fun and easy lessons to help you become a smart and safe internet explorer. Choose your age group to get started.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <Card 
-              className="relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 border-teal-200 dark:border-teal-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
-              onClick={() => onSelectAge("8-11")}
-              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onSelectAge("8-11"))}
-              tabIndex={0}
-              role="button"
-              aria-label="Start learning for ages 8 to 11"
-              data-testid="card-age-8-11"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={kidsYoungLearnersImg}
-                  alt="Young children learning about internet safety together"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  data-testid="img-age-8-11"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-teal-900/60 via-teal-800/20 to-transparent" />
-                <div className="absolute bottom-3 left-4 right-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center shadow-lg">
-                      <Star className="w-5 h-5 text-white fill-current" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-white drop-shadow-md">Ages 8 to 11</h3>
-                      <p className="text-teal-100 text-sm font-medium">Foundations</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <CardContent className="text-center pt-5 pb-5">
-                <p className="text-muted-foreground mb-4 text-sm">
-                  Start your internet safety journey with fun lessons about passwords, personal information, and staying safe online.
-                </p>
-                <div className="flex flex-wrap justify-center gap-2 mb-4">
-                  <Badge className="bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-300">Beginner Friendly</Badge>
-                  <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">5 Lessons</Badge>
-                  <Badge className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300">Fun Quizzes</Badge>
-                </div>
-                <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-500 shadow-md" data-testid="button-start-8-11">
-                  Start Learning <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card 
-              className="relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 border-purple-200 dark:border-purple-800 bg-white/80 dark:bg-card/80 backdrop-blur-sm"
-              onClick={() => onSelectAge("12-16")}
-              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onSelectAge("12-16"))}
-              tabIndex={0}
-              role="button"
-              aria-label="Start learning for ages 12 to 16"
-              data-testid="card-age-12-16"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={kidsTeenLearnersImg}
-                  alt="Teenagers confidently using devices with security shields"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  data-testid="img-age-12-16"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 via-purple-800/20 to-transparent" />
-                <div className="absolute bottom-3 left-4 right-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg">
-                      <Trophy className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-white drop-shadow-md">Ages 12 to 16</h3>
-                      <p className="text-purple-100 text-sm font-medium">Smart and Safe Online</p>
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            {(["6-10", "11-13", "14-16"] as const).map((age) => {
+              const config = ageGroupConfig[age];
+              const IconComp = config.icon;
+              return (
+                <Card
+                  key={age}
+                  className={`relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 ${config.borderColor} bg-white/80 dark:bg-card/80 backdrop-blur-sm`}
+                  onClick={() => onSelectAge(age)}
+                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onSelectAge(age))}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Start learning for ${config.subtitle}`}
+                  data-testid={`card-age-${age}`}
+                >
+                  <div className="relative h-40 overflow-hidden">
+                    <img src={config.image} alt={config.imageAlt} className="w-full h-full object-cover" loading="lazy" data-testid={`img-age-${age}`} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-lg`}>
+                          <IconComp className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-white drop-shadow-md">{config.subtitle}</h3>
+                          <p className="text-white/80 text-xs font-medium">{config.title}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <CardContent className="text-center pt-5 pb-5">
-                <p className="text-muted-foreground mb-4 text-sm">
-                  Level up your digital skills with lessons on social media, gaming safety, spotting scams, and building a positive online reputation.
-                </p>
-                <div className="flex flex-wrap justify-center gap-2 mb-4">
-                  <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300">Intermediate</Badge>
-                  <Badge className="bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-300">5 Lessons</Badge>
-                  <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">Real Scenarios</Badge>
-                </div>
-                <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-md" data-testid="button-start-12-16">
-                  Start Learning <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </CardContent>
-            </Card>
+                  <CardContent className="text-center pt-4 pb-4">
+                    <p className="text-muted-foreground mb-3 text-sm">{config.description}</p>
+                    <div className="flex flex-wrap justify-center gap-1.5 mb-3">
+                      {config.badges.map((b) => (
+                        <Badge key={b} className={`${config.badgeColor} text-xs`}>{b}</Badge>
+                      ))}
+                    </div>
+                    <Button className={`w-full bg-gradient-to-r ${config.gradient} shadow-md`} data-testid={`button-start-${age}`}>
+                      Start Learning <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border-2 border-blue-200 dark:border-blue-800">
@@ -833,17 +674,10 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
                   </div>
                 </div>
                 <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
-                    For Parents and Educators
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Learn how this section works, what your kids will learn, and get conversation starters to discuss online safety together.
-                  </p>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">For Parents and Educators</h3>
+                  <p className="text-muted-foreground">Learn how this section works, what your kids will learn, and get conversation starters to discuss online safety together.</p>
                 </div>
-                <Button variant="outline" className="border-blue-300 dark:border-blue-700" onClick={() => {
-                  const element = document.getElementById('parent-section');
-                  element?.scrollIntoView({ behavior: 'smooth' });
-                }} data-testid="button-parent-info">
+                <Button variant="outline" className="border-blue-300 dark:border-blue-700" onClick={() => document.getElementById("parent-section")?.scrollIntoView({ behavior: "smooth" })} data-testid="button-parent-info">
                   Learn More
                 </Button>
               </div>
@@ -855,9 +689,7 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
               <Shield className="w-5 h-5 text-teal-600 dark:text-teal-400 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-teal-800 dark:text-teal-200">Built for Learning, Not Data Collection</p>
-                <p className="text-sm text-teal-600 dark:text-teal-400">
-                  This section does not collect any personal information from children. No accounts required, no ads. Just safe learning.
-                </p>
+                <p className="text-sm text-teal-600 dark:text-teal-400">This section does not collect any personal information from children. No accounts required, no ads. Just safe learning.</p>
               </div>
             </div>
           </div>
@@ -877,212 +709,277 @@ function CollapsibleSteps({ steps, platform }: { steps: string[]; platform: stri
       <ol className="space-y-3">
         {(isExpanded ? steps : steps.slice(0, previewCount)).map((step, index) => (
           <li key={index} className="flex items-start gap-3">
-            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center mt-0.5">
-              {index + 1}
-            </span>
+            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center mt-0.5">{index + 1}</span>
             <span className="text-foreground leading-relaxed text-[0.95rem]">{step}</span>
           </li>
         ))}
       </ol>
       {hasMore && (
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          aria-expanded={isExpanded}
-          className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mt-4 ml-9"
-          data-testid={`button-toggle-steps-${platform.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`}
-        >
-          {isExpanded ? (
-            <>Show less <ChevronUp className="w-4 h-4" /></>
-          ) : (
-            <>Show all {steps.length} steps <ChevronDown className="w-4 h-4" /></>
-          )}
+        <button onClick={() => setIsExpanded(!isExpanded)} aria-expanded={isExpanded} className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors mt-4 ml-9" data-testid={`button-toggle-steps-${platform.replace(/[^a-z0-9]/gi, "-").toLowerCase()}`}>
+          {isExpanded ? <>Show less <ChevronUp className="w-4 h-4" /></> : <>Show all {steps.length} steps <ChevronDown className="w-4 h-4" /></>}
         </button>
       )}
     </div>
   );
 }
 
-function LearningTrack({ 
-  ageGroup, 
+function LearningTrack({
+  ageGroup,
   onBack,
-  activeModule,
-  setActiveModule,
-  completedModules,
-  setCompletedModules
-}: { 
-  ageGroup: AgeGroup;
+}: {
+  ageGroup: NonNullable<AgeGroup>;
   onBack: () => void;
-  activeModule: ActiveModule;
-  setActiveModule: (id: ActiveModule) => void;
-  completedModules: string[];
-  setCompletedModules: (modules: string[]) => void;
 }) {
-  const modules = ageGroup === "8-11" ? foundationsModules : smartSafeModules;
-  const trackTitle = ageGroup === "8-11" ? "Foundations" : "Smart and Safe Online";
-  const trackColor = ageGroup === "8-11" ? "teal" : "purple";
+  const [activeModule, setActiveModule] = useState<ActiveModule>(null);
+  const [activeTab, setActiveTab] = useState<ActiveTab>("lessons");
+  const [progress, setProgress] = useState(loadProgress());
 
-  const bgGradient = ageGroup === "8-11" 
-    ? "from-teal-50 via-cyan-50 to-blue-50 dark:from-teal-950/30 dark:via-cyan-950/30 dark:to-blue-950/30"
-    : "from-purple-50 via-pink-50 to-rose-50 dark:from-purple-950/30 dark:via-pink-950/30 dark:to-rose-950/30";
+  const config = ageGroupConfig[ageGroup];
+  const topics = lessonTopics[ageGroup];
+  const quizzes = quizBanks[ageGroup];
+  const scamScenarios = spotTheScamScenarios[ageGroup];
+  const stories = storyScenarios[ageGroup];
+  const completedModules = progress.completedModules[ageGroup] || [];
+  const quizScores = progress.quizScores[ageGroup] || {};
+  const activitiesCompleted = progress.activitiesCompleted[ageGroup] || [];
+
+  const handleModuleComplete = (moduleId: string) => {
+    const updated = completeModule(ageGroup, moduleId);
+    setProgress(updated);
+    setActiveModule(null);
+  };
+
+  const handleQuizComplete = (moduleId: string, score: number, total: number) => {
+    const pct = Math.round((score / total) * 100);
+    const updated = saveQuizScore(ageGroup, moduleId, pct);
+    if (pct >= 70) {
+      const updated2 = completeModule(ageGroup, moduleId);
+      setProgress(updated2);
+    } else {
+      setProgress(updated);
+    }
+  };
+
+  const handleActivityComplete = (activityId: string) => {
+    const updated = completeActivity(ageGroup, activityId);
+    setProgress(updated);
+  };
+
+  if (activeModule) {
+    const topic = topics.find((t) => t.id === activeModule);
+    if (!topic) return null;
+    const moduleQuizzes = quizzes?.[activeModule] || [];
+    const isCompleted = completedModules.includes(activeModule);
+
+    return (
+      <div className="relative">
+        <div className={`absolute inset-0 bg-gradient-to-br ${config.bgGradient}`} />
+        <FloatingShapes />
+        <div className="relative py-8">
+          <div className="max-w-5xl mx-auto px-4">
+            <ModuleContent
+              topic={topic}
+              quizQuestions={moduleQuizzes}
+              isCompleted={isCompleted}
+              onComplete={() => handleModuleComplete(activeModule)}
+              onQuizComplete={(s, t) => handleQuizComplete(activeModule, s, t)}
+              onBack={() => setActiveModule(null)}
+              ageGroup={ageGroup}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
-      <div className={`absolute inset-0 bg-gradient-to-br ${bgGradient}`} />
+      <div className={`absolute inset-0 bg-gradient-to-br ${config.bgGradient}`} />
       <FloatingShapes />
-      
       <div className="relative py-8">
         <div className="max-w-5xl mx-auto px-4">
-          <Button 
-            variant="ghost" 
-            onClick={onBack} 
-            className="mb-6"
-            data-testid="button-back-to-ages"
-          >
+          <Button variant="ghost" onClick={onBack} className="mb-6" data-testid="button-back-to-ages">
             <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
             Back to Age Selection
           </Button>
 
-          <div className="mb-8 p-6 bg-white/60 dark:bg-card/60 backdrop-blur-sm rounded-xl border border-white/50 dark:border-white/10">
-            <div className="flex items-center gap-3 mb-4">
-              <Badge className={`${trackColor === 'teal' ? 'bg-gradient-to-r from-teal-500 to-blue-500' : 'bg-gradient-to-r from-purple-500 to-pink-500'} text-white shadow-md`}>
-                Ages {ageGroup}
-              </Badge>
-              <div className="flex gap-1">
-                {[...Array(completedModules.length)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-500 fill-current" />
-                ))}
-              </div>
-            </div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">{trackTitle}</h2>
-            <p className="text-muted-foreground">
-              Complete each lesson and quiz to earn your safety badges. You have completed {completedModules.length} of {modules.length} lessons.
-            </p>
-            
-            <div className="mt-4 w-full bg-muted rounded-full h-4 overflow-hidden">
-              <div 
-                className={`h-4 rounded-full transition-all duration-500 ${trackColor === 'teal' ? 'bg-gradient-to-r from-teal-400 to-blue-500' : 'bg-gradient-to-r from-purple-400 to-pink-500'}`}
-                style={{ width: `${(completedModules.length / modules.length) * 100}%` }}
-              />
-            </div>
+          <ProgressDashboard
+            ageGroup={ageGroup}
+            completedModules={completedModules}
+            totalModules={topics.length}
+            quizScores={quizScores}
+            activitiesCompleted={activitiesCompleted}
+            totalStars={progress.totalStars}
+          />
+
+          <div className="mt-6 mb-6">
+            <SafetyTipCarousel ageGroup={ageGroup} />
           </div>
 
-        {activeModule ? (
-          <ModuleContent 
-            module={modules.find(m => m.id === activeModule)!}
-            onComplete={() => {
-              if (!completedModules.includes(activeModule)) {
-                setCompletedModules([...completedModules, activeModule]);
-              }
-              setActiveModule(null);
-            }}
-            onBack={() => setActiveModule(null)}
-            isCompleted={completedModules.includes(activeModule)}
-          />
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-5">
-              {modules.map((module, index) => {
-                const isCompleted = completedModules.includes(module.id);
-                return (
-                  <Card 
-                    key={module.id}
-                    className={`cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-white/80 dark:bg-card/80 backdrop-blur-sm border-2 overflow-hidden ${isCompleted ? 'border-green-400 dark:border-green-600 ring-2 ring-green-200 dark:ring-green-800' : 'border-white/50 dark:border-white/10'}`}
-                    onClick={() => setActiveModule(module.id)}
-                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setActiveModule(module.id))}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={`Start lesson: ${module.title}`}
-                    data-testid={`card-module-${module.id}`}
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <div className="relative h-36 overflow-hidden">
-                      <img
-                        src={module.image}
-                        alt={module.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      <div className={`absolute inset-0 bg-gradient-to-t from-black/50 to-transparent`} />
-                      {isCompleted && (
-                        <div className="absolute top-2 right-2 flex items-center gap-1 bg-green-500 text-white rounded-full px-2.5 py-1 shadow-md">
-                          <CheckCircle className="w-3.5 h-3.5" />
-                          <span className="text-xs font-semibold">Done</span>
-                        </div>
-                      )}
-                      <div className="absolute bottom-2 left-3">
-                        <div className={`w-9 h-9 rounded-lg ${module.color} flex items-center justify-center shadow-md`}>
-                          <module.icon className="w-5 h-5 text-white" />
-                        </div>
-                      </div>
-                    </div>
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-base text-foreground leading-tight">{module.title}</h3>
-                        {isCompleted && (
-                          <Star className="w-4 h-4 text-yellow-500 fill-current flex-shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-muted-foreground text-sm mb-2">{module.description}</p>
-                      {!isCompleted && (
-                        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 text-xs">
-                          Ready to start
-                        </Badge>
-                      )}
-                      {isCompleted && (
-                        <Badge className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 text-xs">
-                          Completed
-                        </Badge>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ActiveTab)} className="mt-6">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="lessons" className="flex items-center gap-2" data-testid="tab-lessons">
+                <BookOpen className="w-4 h-4" /> Lessons
+              </TabsTrigger>
+              <TabsTrigger value="activities" className="flex items-center gap-2" data-testid="tab-activities">
+                <Sparkles className="w-4 h-4" /> Activities
+              </TabsTrigger>
+              <TabsTrigger value="stats" className="flex items-center gap-2" data-testid="tab-stats">
+                <Zap className="w-4 h-4" /> Facts
+              </TabsTrigger>
+            </TabsList>
 
-          {completedModules.length === modules.length && !activeModule && (
-            <Card className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-300 dark:border-yellow-700 shadow-xl">
-              <CardContent className="p-8 text-center">
-                <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
-                  <Trophy className="w-12 h-12 text-white" />
+            <TabsContent value="lessons">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {topics.map((topic) => {
+                  const isCompleted = completedModules.includes(topic.id);
+                  const score = quizScores[topic.id];
+                  return (
+                    <Card
+                      key={topic.id}
+                      className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 ${isCompleted ? "ring-2 ring-green-400/50" : ""}`}
+                      onClick={() => setActiveModule(topic.id)}
+                      data-testid={`card-module-${topic.id}`}
+                    >
+                      <div className="relative h-32 overflow-hidden rounded-t-lg">
+                        <img src={topic.image} alt={topic.title} className="w-full h-full object-cover" loading="lazy" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                        {isCompleted && (
+                          <div className="absolute top-2 right-2 flex items-center gap-1 bg-green-500 text-white rounded-full px-2.5 py-1 shadow-md">
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            <span className="text-xs font-semibold">Done</span>
+                          </div>
+                        )}
+                        <div className="absolute bottom-2 left-3">
+                          <div className={`w-9 h-9 rounded-lg ${topic.color} flex items-center justify-center shadow-md`}>
+                            <topic.icon className="w-5 h-5 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-sm text-foreground leading-tight">{topic.title}</h3>
+                          {isCompleted && <Star className="w-4 h-4 text-yellow-500 fill-current flex-shrink-0" />}
+                        </div>
+                        <p className="text-muted-foreground text-xs mb-2">{topic.description}</p>
+                        {score !== undefined && (
+                          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 text-xs">Best: {score}%</Badge>
+                        )}
+                        {!isCompleted && !score && (
+                          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 text-xs">Ready to start</Badge>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {completedModules.length === topics.length && (
+                <Card className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-300 dark:border-yellow-700 shadow-xl">
+                  <CardContent className="p-8 text-center">
+                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
+                      <Trophy className="w-12 h-12 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">Congratulations!</h3>
+                    <p className="text-muted-foreground text-lg mb-4">
+                      You have completed all the lessons in the {config.title} track. You are now a certified internet safety champion.
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-md">All Lessons Complete</Badge>
+                      <Badge className="bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md">Safety Champion</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+
+            <TabsContent value="activities">
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-orange-500" /> Spot the Scam Challenge
+                  </h3>
+                  <div className="mb-4">
+                    <img src={kidsSpotScamImg} alt="Fun detective character examining suspicious messages" className="w-24 h-24 mx-auto rounded-xl shadow-md object-cover" loading="lazy" data-testid="img-spot-scam" />
+                  </div>
+                  <SpotTheScamGame
+                    scenarios={scamScenarios}
+                    onComplete={(s, t) => {
+                      handleActivityComplete("spot-the-scam");
+                    }}
+                  />
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-2">Congratulations!</h3>
-                <p className="text-muted-foreground text-lg mb-4">
-                  You have completed all the lessons in the {trackTitle} track. You are now a certified internet safety champion.
-                </p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white shadow-md">All Lessons Complete</Badge>
-                  <Badge className="bg-gradient-to-r from-orange-400 to-orange-500 text-white shadow-md">Safety Champion</Badge>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+
+                {stories && stories.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-indigo-500" /> Story Scenarios
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">Read each scenario and make a decision. See what happens based on your choice!</p>
+                    <div className="space-y-6">
+                      {stories.map((story) => (
+                        <StoryActivity
+                          key={story.id}
+                          story={story}
+                          onComplete={() => handleActivityComplete(story.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {ageGroup === "6-10" && (
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                      <Lock className="w-5 h-5 text-purple-500" /> Password Builder
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">Practice creating strong passwords and see how they score!</p>
+                    <PasswordStrengthBuilder />
+                  </div>
+                )}
+
+                {(ageGroup === "11-13" || ageGroup === "14-16") && (
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                      <Lock className="w-5 h-5 text-purple-500" /> Password Strength Tester
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">Test how strong different password styles are. Remember: never type a real password!</p>
+                    <PasswordStrengthBuilder />
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="stats">
+              <div className="space-y-8">
+                <CyberStatsInfographic ageGroup={ageGroup} />
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
   );
 }
 
-function ModuleContent({ 
-  module, 
-  onComplete, 
+function ModuleContent({
+  topic,
+  quizQuestions,
+  isCompleted,
+  onComplete,
+  onQuizComplete,
   onBack,
-  isCompleted 
-}: { 
-  module: LearningModule;
-  onComplete: () => void;
-  onBack: () => void;
+  ageGroup,
+}: {
+  topic: LessonTopic;
+  quizQuestions: import("@/components/kids-hub/quiz-data").QuizQuestion[];
   isCompleted: boolean;
+  onComplete: () => void;
+  onQuizComplete: (score: number, total: number) => void;
+  onBack: () => void;
+  ageGroup: string;
 }) {
   const [showQuiz, setShowQuiz] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-
-  const handleAnswerSelect = (index: number) => {
-    setSelectedAnswer(index);
-    setShowResult(true);
-  };
-
-  const isCorrect = selectedAnswer === module.quiz.correctIndex;
 
   return (
     <div className="space-y-6">
@@ -1093,20 +990,16 @@ function ModuleContent({
 
       <Card className="overflow-hidden">
         <div className="relative h-44 sm:h-52 overflow-hidden">
-          <img
-            src={module.image}
-            alt={module.title}
-            className="w-full h-full object-cover"
-          />
+          <img src={topic.image} alt={topic.title} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           <div className="absolute bottom-4 left-5 right-5">
             <div className="flex items-center gap-3">
-              <div className={`w-12 h-12 rounded-xl ${module.color} flex items-center justify-center shadow-lg`}>
-                <module.icon className="w-6 h-6 text-white" />
+              <div className={`w-12 h-12 rounded-xl ${topic.color} flex items-center justify-center shadow-lg`}>
+                <topic.icon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white drop-shadow-md">{module.title}</h3>
-                <p className="text-white/80 text-sm">{module.description}</p>
+                <h3 className="text-xl sm:text-2xl font-bold text-white drop-shadow-md">{topic.title}</h3>
+                <p className="text-white/80 text-sm">{topic.description}</p>
               </div>
             </div>
           </div>
@@ -1115,7 +1008,7 @@ function ModuleContent({
           {!showQuiz ? (
             <>
               <div className="bg-muted/50 rounded-lg p-6">
-                <p className="text-lg text-foreground leading-relaxed">{module.content.intro}</p>
+                <p className="text-lg text-foreground leading-relaxed">{topic.content.intro}</p>
               </div>
 
               <div>
@@ -1124,7 +1017,7 @@ function ModuleContent({
                   Important Tips
                 </h4>
                 <ul className="space-y-3">
-                  {module.content.tips.map((tip, index) => (
+                  {topic.content.tips.map((tip, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <CheckCircle className="w-4 h-4 text-primary" />
@@ -1135,26 +1028,21 @@ function ModuleContent({
                 </ul>
               </div>
 
-              {module.content.platformGuides && module.content.platformGuides.length > 0 && (
+              {topic.content.platformGuides && topic.content.platformGuides.length > 0 && (
                 <div>
                   <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-primary" />
                     Step-by-Step Guides
                   </h4>
-                  <Tabs defaultValue={module.content.platformGuides[0].platform} className="mb-2">
+                  <Tabs defaultValue={topic.content.platformGuides[0].platform} className="mb-2">
                     <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-4">
-                      {module.content.platformGuides.map((guide) => (
-                        <TabsTrigger
-                          key={guide.platform}
-                          value={guide.platform}
-                          className="text-sm px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"
-                          data-testid={`tab-${guide.platform.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`}
-                        >
+                      {topic.content.platformGuides.map((guide) => (
+                        <TabsTrigger key={guide.platform} value={guide.platform} className="text-sm px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid={`tab-${guide.platform.replace(/[^a-z0-9]/gi, "-").toLowerCase()}`}>
                           {guide.platform}
                         </TabsTrigger>
                       ))}
                     </TabsList>
-                    {module.content.platformGuides.map((guide) => (
+                    {topic.content.platformGuides.map((guide) => (
                       <TabsContent key={guide.platform} value={guide.platform}>
                         <Card>
                           <CardContent className="p-5 sm:p-6">
@@ -1168,14 +1056,14 @@ function ModuleContent({
                 </div>
               )}
 
-              {module.content.checklist && module.content.checklist.length > 0 && (
+              {topic.content.checklist && topic.content.checklist.length > 0 && (
                 <div className="bg-green-50 dark:bg-green-950/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
                   <h4 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-4 flex items-center gap-2">
                     <CheckCircle className="w-5 h-5" />
                     Safety Checklist
                   </h4>
                   <ul className="space-y-3">
-                    {module.content.checklist.map((item, index) => (
+                    {topic.content.checklist.map((item, index) => (
                       <li key={index} className="flex items-start gap-3">
                         <div className="w-5 h-5 rounded border-2 border-green-400 dark:border-green-600 flex-shrink-0 mt-0.5" />
                         <span className="text-green-700 dark:text-green-300">{item}</span>
@@ -1190,250 +1078,40 @@ function ModuleContent({
                   <BookOpen className="w-5 h-5" />
                   Remember This
                 </h4>
-                <p className="text-blue-700 dark:text-blue-300">{module.content.remember}</p>
+                <p className="text-blue-700 dark:text-blue-300">{topic.content.remember}</p>
               </div>
 
               <div className="flex justify-center pt-4">
                 <Button onClick={() => setShowQuiz(true)} data-testid="button-take-quiz">
-                  Take the Quiz <ArrowRight className="ml-2 w-4 h-4" />
+                  Take the Quiz ({quizQuestions.length} questions) <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             </>
           ) : (
-            <div className="space-y-6">
-              <div className="text-center mb-6">
-                <Badge className="mb-2">Quiz Time</Badge>
-                <h4 className="text-xl font-semibold text-foreground">{module.quiz.question}</h4>
-              </div>
-
-              <div className="grid gap-3">
-                {module.quiz.options.map((option, index) => {
-                  let buttonClass = "w-full text-left p-4 rounded-lg border-2 transition-all ";
-                  
-                  if (showResult) {
-                    if (index === module.quiz.correctIndex) {
-                      buttonClass += "border-green-500 bg-green-50 dark:bg-green-900/20";
-                    } else if (index === selectedAnswer && !isCorrect) {
-                      buttonClass += "border-red-500 bg-red-50 dark:bg-red-900/20";
-                    } else {
-                      buttonClass += "border-muted opacity-50";
-                    }
-                  } else {
-                    buttonClass += "border-muted hover:border-primary hover:bg-primary/5 cursor-pointer";
-                  }
-
-                  return (
-                    <button
-                      key={index}
-                      className={buttonClass}
-                      onClick={() => !showResult && handleAnswerSelect(index)}
-                      disabled={showResult}
-                      data-testid={`button-answer-${index}`}
-                    >
-                      <span className="text-foreground">{option}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {showResult && (
-                <div className={`p-6 rounded-lg ${isCorrect ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800'}`}>
-                  <div className="flex items-start gap-3">
-                    {isCorrect ? (
-                      <ThumbsUp className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0" />
-                    ) : (
-                      <Lightbulb className="w-6 h-6 text-orange-600 dark:text-orange-400 flex-shrink-0" />
-                    )}
-                    <div>
-                      <h5 className={`font-semibold mb-1 ${isCorrect ? 'text-green-800 dark:text-green-200' : 'text-orange-800 dark:text-orange-200'}`}>
-                        {isCorrect ? "Great job!" : "Good try!"}
-                      </h5>
-                      <p className={isCorrect ? 'text-green-700 dark:text-green-300' : 'text-orange-700 dark:text-orange-300'}>
-                        {module.quiz.explanation}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {showResult && (
-                <div className="flex justify-center pt-4">
+            <div className="space-y-4">
+              <MultiQuiz
+                questions={quizQuestions}
+                title={`${topic.title} Quiz`}
+                onComplete={(score, total) => {
+                  onQuizComplete(score, total);
+                }}
+                ageGroup={ageGroup}
+              />
+              <div className="flex justify-center gap-3 pt-2">
+                <Button variant="outline" onClick={() => setShowQuiz(false)} data-testid="button-back-to-lesson">
+                  Back to Lesson
+                </Button>
+                {isCompleted && (
                   <Button onClick={onComplete} data-testid="button-complete-lesson">
-                    {isCompleted ? "Review Complete" : "Complete Lesson"} <CheckCircle className="ml-2 w-4 h-4" />
+                    Review Complete <CheckCircle className="ml-2 w-4 h-4" />
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-function SpotTheScamGame() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [answered, setAnswered] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
-  const [gameComplete, setGameComplete] = useState(false);
-
-  const currentItem = spotTheScamItems[currentIndex];
-  const isCorrect = selectedAnswer === currentItem.isScam;
-
-  const handleAnswer = (answer: boolean) => {
-    setSelectedAnswer(answer);
-    setAnswered(true);
-    if (answer === currentItem.isScam) {
-      setScore(score + 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentIndex < spotTheScamItems.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setAnswered(false);
-      setSelectedAnswer(null);
-    } else {
-      setGameComplete(true);
-    }
-  };
-
-  const resetGame = () => {
-    setCurrentIndex(0);
-    setScore(0);
-    setAnswered(false);
-    setSelectedAnswer(null);
-    setGameComplete(false);
-  };
-
-  if (gameComplete) {
-    return (
-      <Card className="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20 border-2 border-purple-200 dark:border-purple-800 shadow-xl">
-        <CardContent className="p-8 text-center">
-          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-400 via-pink-500 to-orange-400 flex items-center justify-center shadow-lg">
-            <Trophy className="w-12 h-12 text-white" />
-          </div>
-          <h3 className="text-2xl font-bold text-foreground mb-2">Game Complete!</h3>
-          <div className="flex justify-center gap-1 mb-4">
-            {[...Array(score)].map((_, i) => (
-              <Star key={i} className="w-6 h-6 text-yellow-500 fill-current" />
-            ))}
-            {[...Array(spotTheScamItems.length - score)].map((_, i) => (
-              <Star key={i} className="w-6 h-6 text-gray-300 dark:text-gray-600" />
-            ))}
-          </div>
-          <p className="text-xl text-muted-foreground mb-4">
-            You scored {score} out of {spotTheScamItems.length}
-          </p>
-          {score === spotTheScamItems.length ? (
-            <Badge className="bg-gradient-to-r from-green-400 to-emerald-500 text-white mb-4 shadow-md">Perfect Score! Scam Spotter Expert!</Badge>
-          ) : score >= spotTheScamItems.length / 2 ? (
-            <Badge className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white mb-4 shadow-md">Great Job! Keep Learning!</Badge>
-          ) : (
-            <Badge className="bg-gradient-to-r from-orange-400 to-amber-500 text-white mb-4 shadow-md">Good Try! Practice Makes Perfect!</Badge>
-          )}
-          <div className="pt-4">
-            <Button onClick={resetGame} className="bg-gradient-to-r from-purple-500 to-pink-500" data-testid="button-play-again">
-              <Sparkles className="w-4 h-4 mr-2" />
-              Play Again
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="border-2 border-orange-200 dark:border-orange-800 shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/30 dark:to-yellow-950/30">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-yellow-500 flex items-center justify-center shadow-md">
-              <AlertCircle className="w-5 h-5 text-white" />
-            </div>
-            Spot the Scam
-          </CardTitle>
-          <Badge className="bg-gradient-to-r from-orange-400 to-yellow-500 text-white shadow-md">
-            {currentIndex + 1} of {spotTheScamItems.length}
-          </Badge>
-        </div>
-        <CardDescription>
-          Read the scenario and decide if it is a scam or legitimate.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6 pt-6">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-6 border border-blue-100 dark:border-blue-900">
-          <p className="text-lg text-foreground">{currentItem.scenario}</p>
-        </div>
-
-        {!answered ? (
-          <div className="flex justify-center gap-4">
-            <Button 
-              variant="outline" 
-              className="flex-1 max-w-40 border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/20"
-              onClick={() => handleAnswer(true)}
-              data-testid="button-scam"
-            >
-              <AlertCircle className="w-4 h-4 mr-2" />
-              Scam
-            </Button>
-            <Button 
-              variant="outline"
-              className="flex-1 max-w-40 border-green-300 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-300 dark:hover:bg-green-900/20"
-              onClick={() => handleAnswer(false)}
-              data-testid="button-safe"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Safe
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div className={`p-6 rounded-lg ${isCorrect ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800'}`}>
-              <div className="flex items-start gap-3">
-                {isCorrect ? (
-                  <ThumbsUp className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0" />
-                ) : (
-                  <Lightbulb className="w-6 h-6 text-orange-600 dark:text-orange-400 flex-shrink-0" />
-                )}
-                <div>
-                  <h5 className={`font-semibold mb-1 ${isCorrect ? 'text-green-800 dark:text-green-200' : 'text-orange-800 dark:text-orange-200'}`}>
-                    {isCorrect ? "Correct!" : "Not quite!"}
-                  </h5>
-                  <p className={isCorrect ? 'text-green-700 dark:text-green-300' : 'text-orange-700 dark:text-orange-300'}>
-                    {currentItem.explanation}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-center">
-              <Button onClick={handleNext} data-testid="button-next-scenario">
-                {currentIndex < spotTheScamItems.length - 1 ? "Next Scenario" : "See Results"}
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </div>
-          </>
-        )}
-
-        <div className="flex justify-center">
-          <div className="flex gap-1">
-            {spotTheScamItems.map((_, index) => (
-              <div 
-                key={index}
-                className={`w-2 h-2 rounded-full ${
-                  index === currentIndex 
-                    ? 'bg-primary' 
-                    : index < currentIndex 
-                      ? 'bg-green-500' 
-                      : 'bg-muted'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 
@@ -1451,18 +1129,10 @@ function ParentSection() {
       <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-12">
           <div className="mb-6">
-            <img
-              src={kidsFamilyTogetherImg}
-              alt="Diverse family learning about online safety together on a tablet"
-              className="w-36 h-36 sm:w-44 sm:h-44 mx-auto rounded-2xl shadow-lg object-cover"
-              loading="lazy"
-              data-testid="img-parent-section-hero"
-            />
+            <img src={kidsFamilyTogetherImg} alt="Diverse family learning about online safety together on a tablet" className="w-36 h-36 sm:w-44 sm:h-44 mx-auto rounded-2xl shadow-lg object-cover" loading="lazy" data-testid="img-parent-section-hero" />
           </div>
           <Badge className="mb-4">For Parents and Educators</Badge>
-          <h2 className="text-3xl font-bold text-foreground mb-4">
-            Partnering with You for Online Safety
-          </h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">Partnering with You for Online Safety</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             This section is designed to be used together or independently. Here is everything you need to know about what your children will learn.
           </p>
@@ -1478,8 +1148,8 @@ function ParentSection() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="font-semibold text-foreground mb-2">Ages 8 to 11 (Foundations)</h4>
-                <ul className="text-muted-foreground space-y-1">
+                <h4 className="font-semibold text-foreground mb-2">Ages 6 to 10 (Foundations)</h4>
+                <ul className="text-muted-foreground space-y-1 text-sm">
                   <li>Understanding personal information and privacy</li>
                   <li>Creating and managing strong passwords</li>
                   <li>Recognizing online tricks and scams</li>
@@ -1488,13 +1158,24 @@ function ParentSection() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-foreground mb-2">Ages 12 to 16 (Smart and Safe)</h4>
-                <ul className="text-muted-foreground space-y-1">
+                <h4 className="font-semibold text-foreground mb-2">Ages 11 to 13 (Smart and Safe)</h4>
+                <ul className="text-muted-foreground space-y-1 text-sm">
                   <li>Safe social media practices and privacy settings</li>
-                  <li>Understanding and responding to online bullying</li>
+                  <li>Understanding and responding to cyberbullying</li>
                   <li>Gaming safety and protecting online identity</li>
-                  <li>Identifying fake scam messages and trick emails</li>
+                  <li>Identifying phishing messages and scam tactics</li>
                   <li>Building a positive digital footprint</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-foreground mb-2">Ages 14 to 16 (Cyber Champion)</h4>
+                <ul className="text-muted-foreground space-y-1 text-sm">
+                  <li>Advanced privacy controls and encryption</li>
+                  <li>Recognizing social engineering attacks</li>
+                  <li>Digital wellness and healthy tech habits</li>
+                  <li>Online identity and deepfake awareness</li>
+                  <li>Financial safety and investment scam prevention</li>
+                  <li>Critical thinking and misinformation detection</li>
                 </ul>
               </div>
             </CardContent>
@@ -1508,18 +1189,11 @@ function ParentSection() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-muted-foreground">
-              <p>
-                <strong className="text-foreground">Sit together:</strong> Go through lessons as a team activity. This opens natural conversations about online experiences.
-              </p>
-              <p>
-                <strong className="text-foreground">Play the games:</strong> The Spot the Scam game is designed for families. Take turns guessing and discuss why each answer is correct.
-              </p>
-              <p>
-                <strong className="text-foreground">Celebrate progress:</strong> When your child completes a lesson, acknowledge their achievement. Building good habits deserves recognition.
-              </p>
-              <p>
-                <strong className="text-foreground">Keep the dialogue open:</strong> Use the conversation starters below to continue discussions beyond the lessons.
-              </p>
+              <p><strong className="text-foreground">Sit together:</strong> Go through lessons as a team activity. This opens natural conversations about online experiences.</p>
+              <p><strong className="text-foreground">Play the games:</strong> The Spot the Scam game and Story Scenarios are designed for families. Take turns and discuss why each answer is correct.</p>
+              <p><strong className="text-foreground">Test passwords together:</strong> Use the Password Builder to practice creating strong passwords as a family exercise.</p>
+              <p><strong className="text-foreground">Celebrate progress:</strong> When your child completes a lesson or quiz, acknowledge their achievement. Building good habits deserves recognition.</p>
+              <p><strong className="text-foreground">Keep the dialogue open:</strong> Use the conversation starters below to continue discussions beyond the lessons.</p>
             </CardContent>
           </Card>
         </div>
@@ -1530,9 +1204,7 @@ function ParentSection() {
               <MessageCircle className="w-5 h-5 text-purple-500" />
               Conversation Starters
             </CardTitle>
-            <CardDescription>
-              Use these questions to start meaningful discussions about online safety.
-            </CardDescription>
+            <CardDescription>Use these questions to start meaningful discussions about online safety.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-3">
@@ -1547,14 +1219,10 @@ function ParentSection() {
             </div>
           </CardContent>
         </Card>
-
       </div>
 
       <div className="relative overflow-hidden py-12">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${kidsFamilyTogetherImg})` }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${kidsFamilyTogetherImg})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-rose-400/90 via-red-400/90 to-orange-400/90 dark:from-rose-600/90 dark:via-red-600/90 dark:to-orange-600/90" />
         <div className="relative z-10 max-w-5xl mx-auto px-4">
           <div className="text-center mb-8">
@@ -1569,23 +1237,17 @@ function ParentSection() {
             <Card className="text-center p-6">
               <Shield className="w-10 h-10 text-teal-500 mx-auto mb-4" />
               <h4 className="font-semibold text-foreground mb-2">Child Privacy First</h4>
-              <p className="text-sm text-muted-foreground">
-                We do not collect any personal information from children. No accounts required, no profiles, no ads.
-              </p>
+              <p className="text-sm text-muted-foreground">We do not collect any personal information from children. No accounts required, no profiles, no ads.</p>
             </Card>
             <Card className="text-center p-6">
               <Lock className="w-10 h-10 text-blue-500 mx-auto mb-4" />
               <h4 className="font-semibold text-foreground mb-2">No External Links</h4>
-              <p className="text-sm text-muted-foreground">
-                All learning happens on this page. Children are never directed to external websites.
-              </p>
+              <p className="text-sm text-muted-foreground">All learning happens on this page. Children are never directed to external websites.</p>
             </Card>
             <Card className="text-center p-6">
               <Heart className="w-10 h-10 text-pink-500 mx-auto mb-4" />
               <h4 className="font-semibold text-foreground mb-2">Child Safety First</h4>
-              <p className="text-sm text-muted-foreground">
-                Content is designed to empower, not frighten. We use positive, encouraging language throughout.
-              </p>
+              <p className="text-sm text-muted-foreground">Content is designed to empower, not frighten. We use positive, encouraging language throughout.</p>
             </Card>
           </div>
         </div>
@@ -1596,12 +1258,6 @@ function ParentSection() {
 
 export default function Kids() {
   const [selectedAge, setSelectedAge] = useState<AgeGroup>(null);
-  const [activeModule, setActiveModule] = useState<ActiveModule>(null);
-  const [completedModules8to11, setCompletedModules8to11] = useState<string[]>([]);
-  const [completedModules12to16, setCompletedModules12to16] = useState<string[]>([]);
-
-  const completedModules = selectedAge === "8-11" ? completedModules8to11 : completedModules12to16;
-  const setCompletedModules = selectedAge === "8-11" ? setCompletedModules8to11 : setCompletedModules12to16;
 
   return (
     <div className="min-h-screen bg-background">
@@ -1619,45 +1275,16 @@ export default function Kids() {
         {selectedAge === null ? (
           <KidsLanding onSelectAge={setSelectedAge} />
         ) : (
-          <LearningTrack 
+          <LearningTrack
             ageGroup={selectedAge}
-            onBack={() => {
-              setSelectedAge(null);
-              setActiveModule(null);
-            }}
-            activeModule={activeModule}
-            setActiveModule={setActiveModule}
-            completedModules={completedModules}
-            setCompletedModules={setCompletedModules}
+            onBack={() => setSelectedAge(null)}
           />
         )}
-
-        <div className="py-12 bg-gradient-to-b from-background to-muted/30">
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="text-center mb-8">
-              <div className="mb-6">
-                <img
-                  src={kidsSpotScamImg}
-                  alt="Fun detective character examining suspicious messages"
-                  className="w-32 h-32 sm:w-40 sm:h-40 mx-auto rounded-2xl shadow-lg object-cover"
-                  loading="lazy"
-                  data-testid="img-spot-scam-hero"
-                />
-              </div>
-              <Badge className="mb-4 bg-orange-500">Interactive Game</Badge>
-              <h2 className="text-3xl font-bold text-foreground mb-2">Spot the Scam Challenge</h2>
-              <p className="text-muted-foreground">
-                Test your scam-spotting skills with real-world scenarios. Can you tell what is safe and what is not?
-              </p>
-            </div>
-            <SpotTheScamGame />
-          </div>
-        </div>
 
         <ParentSection />
         <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
           <CalendarDays className="w-3 h-3" />
-          <span>Content last reviewed: February 2026</span>
+          <span>Content last reviewed: March 2026</span>
         </div>
       </main>
       <Footer />
