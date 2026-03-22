@@ -16,7 +16,7 @@
           <p class="header-subtitle">by GetCyberRight</p>
         </div>
       </div>
-      <button id="btn-settings" class="icon-btn" title="Settings">
+      <button id="btn-settings" class="icon-btn" title="Settings" data-testid="btn-settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/></svg>
       </button>
     </header>
@@ -33,29 +33,43 @@
 
       <div class="stats-bar">
         <div class="stat">
-          <span class="stat-value" id="stat-scans">0</span>
+          <span class="stat-value" id="stat-scans" data-testid="stat-scans">0</span>
           <span class="stat-label">Scans</span>
         </div>
         <div class="stat">
-          <span class="stat-value" id="stat-threats">0</span>
+          <span class="stat-value" id="stat-threats" data-testid="stat-threats">0</span>
           <span class="stat-label">Threats</span>
         </div>
         <div class="stat">
-          <span class="stat-value" id="stat-links">0</span>
+          <span class="stat-value" id="stat-links" data-testid="stat-links">0</span>
           <span class="stat-label">Links</span>
+        </div>
+      </div>
+
+      <div class="weekly-chart-section" id="weekly-chart-section">
+        <div class="section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Weekly Trends</span>
+        </div>
+        <div class="chart-container" id="chart-container">
+          <svg id="weekly-chart" viewBox="0 0 320 80" class="weekly-chart"></svg>
+        </div>
+        <div class="chart-legend">
+          <span class="chart-legend-item"><span class="chart-dot chart-dot-scans"></span>Scans</span>
+          <span class="chart-legend-item"><span class="chart-dot chart-dot-threats"></span>Threats</span>
         </div>
       </div>
 
       <div class="scan-section">
         <div class="scan-input-wrap">
-          <textarea id="scan-input" placeholder="Paste a URL, email, phone number, or suspicious message..." rows="3"></textarea>
+          <textarea id="scan-input" placeholder="Paste a URL, email, phone number, or suspicious message..." rows="3" data-testid="input-scan"></textarea>
         </div>
         <div class="scan-actions">
-          <button id="btn-scan" class="btn btn-primary">
+          <button id="btn-scan" class="btn btn-primary" data-testid="btn-scan">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Scan for Threats
           </button>
-          <button id="btn-scan-page" class="btn btn-secondary">
+          <button id="btn-scan-page" class="btn btn-secondary" data-testid="btn-scan-page">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             Scan This Page
           </button>
@@ -76,11 +90,11 @@
           <div class="result-recs" id="result-recs"></div>
         </div>
         <div class="result-footer">
-          <button id="btn-report" class="btn btn-outline btn-sm">
+          <button id="btn-report" class="btn btn-outline btn-sm" data-testid="btn-report">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
             Report Scam
           </button>
-          <a id="btn-full-report" href="https://www.getcyberright.com/scam-checker" target="_blank" class="btn btn-outline btn-sm">
+          <a id="btn-full-report" href="https://www.getcyberright.com/scam-checker" target="_blank" class="btn btn-outline btn-sm" data-testid="link-full-report">
             Full Report
           </a>
         </div>
@@ -89,6 +103,14 @@
       <div id="loading-indicator" class="loading hidden">
         <div class="spinner"></div>
         <span>Analyzing content...</span>
+      </div>
+
+      <div id="scan-history-section" class="scan-history-section hidden">
+        <div class="section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Recent Scans</span>
+        </div>
+        <div id="scan-history-list" class="scan-history-list" data-testid="scan-history-list"></div>
       </div>
 
       <div id="scam-of-week" class="sotw-section hidden">
@@ -100,16 +122,23 @@
         <div class="sotw-desc" id="sotw-desc"></div>
       </div>
 
+      <div class="report-page-section">
+        <button id="btn-report-page" class="btn btn-outline btn-full" data-testid="btn-report-page">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          Report This Page
+        </button>
+      </div>
+
       <div class="quick-links">
-        <a href="https://www.getcyberright.com/scam-checker" target="_blank" class="quick-link">
+        <a href="https://www.getcyberright.com/scam-checker" target="_blank" class="quick-link" data-testid="link-scam-checker">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           Scam Checker
         </a>
-        <a href="https://www.getcyberright.com/cyber-threat-radar" target="_blank" class="quick-link">
+        <a href="https://www.getcyberright.com/cyber-threat-radar" target="_blank" class="quick-link" data-testid="link-threat-radar">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
           Threat Radar
         </a>
-        <a href="https://www.getcyberright.com/guides" target="_blank" class="quick-link">
+        <a href="https://www.getcyberright.com/guides" target="_blank" class="quick-link" data-testid="link-guides">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
           Safety Guides
         </a>
@@ -118,7 +147,7 @@
 
     <div id="view-settings" class="view">
       <div class="settings-header">
-        <button id="btn-back" class="icon-btn">
+        <button id="btn-back" class="icon-btn" data-testid="btn-back">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>
         <h2>Settings</h2>
@@ -130,35 +159,49 @@
             <div class="setting-title">Auto-scan pages</div>
             <div class="setting-desc">Automatically scan every page you visit for threats</div>
           </div>
-          <input type="checkbox" id="setting-autoscan" class="toggle">
+          <input type="checkbox" id="setting-autoscan" class="toggle" data-testid="toggle-autoscan">
         </label>
         <label class="setting-item">
           <div>
             <div class="setting-title">Lookalike detection</div>
             <div class="setting-desc">Detect fake domains impersonating trusted brands</div>
           </div>
-          <input type="checkbox" id="setting-lookalike" class="toggle">
+          <input type="checkbox" id="setting-lookalike" class="toggle" data-testid="toggle-lookalike">
         </label>
         <label class="setting-item">
           <div>
             <div class="setting-title">Form warnings</div>
             <div class="setting-desc">Warn before submitting forms on suspicious pages</div>
           </div>
-          <input type="checkbox" id="setting-formwarnings" class="toggle">
+          <input type="checkbox" id="setting-formwarnings" class="toggle" data-testid="toggle-formwarnings">
         </label>
         <label class="setting-item">
           <div>
             <div class="setting-title">Link hover check</div>
             <div class="setting-desc">Show safety tooltip when hovering over links</div>
           </div>
-          <input type="checkbox" id="setting-hover" class="toggle">
+          <input type="checkbox" id="setting-hover" class="toggle" data-testid="toggle-hover">
         </label>
         <label class="setting-item">
           <div>
             <div class="setting-title">Block dangerous links</div>
             <div class="setting-desc">Show a warning page before opening high-risk links</div>
           </div>
-          <input type="checkbox" id="setting-block" class="toggle">
+          <input type="checkbox" id="setting-block" class="toggle" data-testid="toggle-block">
+        </label>
+        <label class="setting-item">
+          <div>
+            <div class="setting-title">Webmail scanning</div>
+            <div class="setting-desc">Add scan buttons to emails in Gmail and Outlook</div>
+          </div>
+          <input type="checkbox" id="setting-webmail" class="toggle" data-testid="toggle-webmail">
+        </label>
+        <label class="setting-item">
+          <div>
+            <div class="setting-title">Community trust scores</div>
+            <div class="setting-desc">Show community-sourced trust badges on pages</div>
+          </div>
+          <input type="checkbox" id="setting-community" class="toggle" data-testid="toggle-community">
         </label>
         <div class="settings-group-title">Notifications</div>
         <label class="setting-item">
@@ -166,7 +209,14 @@
             <div class="setting-title">Threat notifications</div>
             <div class="setting-desc">Get alerts for high-risk threats and Scam of the Week</div>
           </div>
-          <input type="checkbox" id="setting-notifications" class="toggle">
+          <input type="checkbox" id="setting-notifications" class="toggle" data-testid="toggle-notifications">
+        </label>
+        <label class="setting-item">
+          <div>
+            <div class="setting-title">Weekly safety digest</div>
+            <div class="setting-desc">Get a weekly summary of your browsing safety</div>
+          </div>
+          <input type="checkbox" id="setting-digest" class="toggle" data-testid="toggle-digest">
         </label>
       </div>
     </div>

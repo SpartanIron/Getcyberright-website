@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSettings = document.getElementById("btn-settings");
   const btnBack = document.getElementById("btn-back");
   const btnReport = document.getElementById("btn-report");
+  const btnReportPage = document.getElementById("btn-report-page");
   const loadingIndicator = document.getElementById("loading-indicator");
   const scanResult = document.getElementById("scan-result");
   const viewMain = document.getElementById("view-main");
@@ -17,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadScamOfWeek();
   loadSettings();
   loadPageStatus();
+  loadWeeklyChart();
+  loadScanHistory();
 
   btnScan.addEventListener("click", () => {
     const content = scanInput.value.trim();
@@ -104,6 +107,14 @@ document.addEventListener("DOMContentLoaded", () => {
           btnReport.disabled = false;
         }, 2000);
       }
+    });
+  });
+
+  btnReportPage.addEventListener("click", () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (!tabs[0]?.url) return;
+      chrome.tabs.sendMessage(tabs[0].id, { type: "SHOW_REPORT_FORM", url: tabs[0].url });
+      window.close();
     });
   });
 
@@ -295,6 +306,102 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function loadWeeklyChart() {
+    chrome.runtime.sendMessage({ type: "GET_WEEKLY_STATS" }, (stats) => {
+      if (!stats) return;
+      renderWeeklyChart(stats);
+    });
+  }
+
+  function renderWeeklyChart(stats) {
+    const svg = document.getElementById("weekly-chart");
+    if (!svg) return;
+
+    const days = stats.days || ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const scans = stats.scansPerDay || [0, 0, 0, 0, 0, 0, 0];
+    const threats = stats.threatsPerDay || [0, 0, 0, 0, 0, 0, 0];
+    const maxVal = Math.max(...scans, ...threats, 1);
+
+    const chartW = 320;
+    const chartH = 80;
+    const barW = 16;
+    const gap = (chartW - 7 * barW * 2 - 7 * 4) / 8;
+    const bottomPad = 14;
+    const topPad = 4;
+    const availH = chartH - bottomPad - topPad;
+
+    let svgContent = "";
+
+    for (let i = 0; i < 7; i++) {
+      const x = gap + i * (barW * 2 + 4 + gap);
+      const scanH = scans[i] > 0 ? Math.max(2, (scans[i] / maxVal) * availH) : 0;
+      const threatH = threats[i] > 0 ? Math.max(2, (threats[i] / maxVal) * availH) : 0;
+
+      svgContent += `<rect x="${x}" y="${topPad + availH - scanH}" width="${barW}" height="${scanH}" rx="3" fill="#0A2A3C" opacity="0.7"/>`;
+      svgContent += `<rect x="${x + barW + 2}" y="${topPad + availH - threatH}" width="${barW}" height="${threatH}" rx="3" fill="#dc2626" opacity="0.7"/>`;
+      svgContent += `<text x="${x + barW}" y="${chartH - 2}" text-anchor="middle" font-size="9" fill="#9ca3af" font-family="-apple-system,sans-serif">${days[i]}</text>`;
+    }
+
+    svg.innerHTML = svgContent;
+  }
+
+  function loadScanHistory() {
+    chrome.runtime.sendMessage({ type: "GET_SCAN_HISTORY" }, (history) => {
+      if (!history || history.length === 0) return;
+
+      const section = document.getElementById("scan-history-section");
+      const list = document.getElementById("scan-history-list");
+      section.classList.remove("hidden");
+      list.innerHTML = "";
+
+      const recent = history.slice(0, 5);
+      const riskIcons = { critical: "\uD83D\uDEA8", high: "\u26A0\uFE0F", medium: "\u26A1", low: "\uD83D\uDD35", safe: "\u2705" };
+
+      recent.forEach((entry) => {
+        const item = document.createElement("div");
+        item.className = `scan-history-item scan-history-${entry.riskLevel || "safe"}`;
+
+        const icon = document.createElement("span");
+        icon.className = "scan-history-icon";
+        icon.textContent = riskIcons[entry.riskLevel] || "\u2705";
+
+        const info = document.createElement("div");
+        info.className = "scan-history-info";
+
+        const hostEl = document.createElement("div");
+        hostEl.className = "scan-history-host";
+        hostEl.textContent = entry.hostname || "Unknown";
+
+        const timeEl = document.createElement("div");
+        timeEl.className = "scan-history-time";
+        timeEl.textContent = formatTimeAgo(entry.timestamp);
+
+        info.appendChild(hostEl);
+        info.appendChild(timeEl);
+
+        const riskBadge = document.createElement("span");
+        riskBadge.className = `scan-history-badge scan-history-badge-${entry.riskLevel || "safe"}`;
+        riskBadge.textContent = capitalize(entry.riskLevel || "safe");
+
+        item.appendChild(icon);
+        item.appendChild(info);
+        item.appendChild(riskBadge);
+        list.appendChild(item);
+      });
+    });
+  }
+
+  function formatTimeAgo(timestamp) {
+    const diff = Date.now() - timestamp;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  }
+
   function loadSettings() {
     chrome.runtime.sendMessage({ type: "GET_SETTINGS" }, (settings) => {
       if (settings) {
@@ -304,6 +411,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("setting-block").checked = settings.blockDangerous || false;
         document.getElementById("setting-formwarnings").checked = settings.formWarnings !== false;
         document.getElementById("setting-lookalike").checked = settings.lookalikeDetection !== false;
+        document.getElementById("setting-webmail").checked = settings.webmailScan !== false;
+        document.getElementById("setting-community").checked = settings.communityTrust !== false;
+        document.getElementById("setting-digest").checked = settings.weeklyDigest !== false;
       }
     });
   }
@@ -315,7 +425,10 @@ document.addEventListener("DOMContentLoaded", () => {
       notifications: document.getElementById("setting-notifications").checked,
       blockDangerous: document.getElementById("setting-block").checked,
       formWarnings: document.getElementById("setting-formwarnings").checked,
-      lookalikeDetection: document.getElementById("setting-lookalike").checked
+      lookalikeDetection: document.getElementById("setting-lookalike").checked,
+      webmailScan: document.getElementById("setting-webmail").checked,
+      communityTrust: document.getElementById("setting-community").checked,
+      weeklyDigest: document.getElementById("setting-digest").checked
     };
     chrome.runtime.sendMessage({ type: "SAVE_SETTINGS", settings });
   }

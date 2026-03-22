@@ -55,8 +55,15 @@ chrome.runtime.onInstalled.addListener(() => {
     contexts: ["selection"]
   });
 
+  chrome.contextMenus.create({
+    id: "gcr-report-site",
+    title: "Report this site to GCR Guard",
+    contexts: ["page"]
+  });
+
   chrome.alarms.create("check-scam-of-week", { periodInMinutes: 360 });
   chrome.alarms.create("refresh-threat-feed", { periodInMinutes: 60 });
+  chrome.alarms.create("weekly-safety-digest", { periodInMinutes: 10080 });
 
   fetchScamOfWeek();
 });
@@ -68,6 +75,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "refresh-threat-feed") {
     fetchThreatFeed();
   }
+  if (alarm.name === "weekly-safety-digest") {
+    generateWeeklyDigest();
+  }
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -77,6 +87,8 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     extractAndScanPage(tab);
   } else if (info.menuItemId === "gcr-scan-selection") {
     scanContent(info.selectionText, tab);
+  } else if (info.menuItemId === "gcr-report-site") {
+    handleContextMenuReport(tab);
   }
 });
 
@@ -104,6 +116,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     reportScam(message.data).then(sendResponse);
     return true;
   }
+  if (message.type === "REPORT_SCAM_STRUCTURED") {
+    reportScamStructured(message.data).then(sendResponse);
+    return true;
+  }
   if (message.type === "GET_SCAM_OF_WEEK") {
     chrome.storage.local.get(["scamOfWeek"], (result) => {
       sendResponse(result.scamOfWeek || null);
@@ -113,6 +129,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "GET_SCAN_STATS") {
     chrome.storage.local.get(["scanStats"], (result) => {
       sendResponse(result.scanStats || { totalScans: 0, threatsBlocked: 0, linksChecked: 0 });
+    });
+    return true;
+  }
+  if (message.type === "GET_WEEKLY_STATS") {
+    chrome.storage.local.get(["weeklyStats"], (result) => {
+      sendResponse(result.weeklyStats || getEmptyWeeklyStats());
+    });
+    return true;
+  }
+  if (message.type === "GET_SCAN_HISTORY") {
+    chrome.storage.local.get(["scanHistory"], (result) => {
+      sendResponse(result.scanHistory || []);
     });
     return true;
   }
@@ -153,6 +181,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } else {
       sendResponse({ riskLevel: "unknown", riskScore: 0 });
     }
+    return true;
+  }
+  if (message.type === "GET_COMMUNITY_TRUST") {
+    getCommunityTrust(message.domain).then(sendResponse);
+    return true;
+  }
+  if (message.type === "FLAG_DOMAIN") {
+    flagDomain(message.domain).then(sendResponse);
+    return true;
+  }
+  if (message.type === "SCAN_WEBMAIL") {
+    performScan(message.content).then(sendResponse);
     return true;
   }
 });
@@ -302,6 +342,12 @@ async function handleAutoScan(message, sender) {
   tabCache.set(tabId, result);
   updateBadgeFromResult(result, tabId);
   incrementStats(result.riskLevel);
+  addToScanHistory(result);
+  recordVisit(url);
+
+  if (result.riskLevel === "safe" || result.riskLevel === "low") {
+    recordSafeVisit(url);
+  }
 
   if (settings.notifications && (result.riskLevel === "critical" || result.riskLevel === "high")) {
     const summary = result.aiScan?.summary || result.lookalikeMatch?.message || "This page has been flagged as potentially dangerous.";
@@ -401,7 +447,10 @@ function getDefaultSettings() {
     hoverCheck: true,
     blockDangerous: false,
     formWarnings: true,
-    lookalikeDetection: true
+    lookalikeDetection: true,
+    communityTrust: true,
+    webmailScan: true,
+    weeklyDigest: true
   };
 }
 
@@ -484,6 +533,173 @@ async function reportScam(data) {
   }
 }
 
+async function reportScamStructured(data) {
+  try {
+    const reportData = {
+      content: data.description || `Reported: ${data.url}`,
+      reportType: data.scamType || "suspicious",
+      url: data.url
+    };
+    const response = await fetch(`${API_BASE}/api/community-reports`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reportData)
+    });
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+    if (data.url) {
+      try {
+        const domainHash = await hashDomain(new URL(data.url).hostname);
+        await flagDomain(new URL(data.url).hostname);
+      } catch (e) { console.warn("[gcr-guard] Failed to flag domain after report:", e.message); }
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+async function handleContextMenuReport(tab) {
+  if (!tab?.id || !tab?.url) return;
+  try {
+    chrome.tabs.sendMessage(tab.id, { type: "SHOW_REPORT_FORM", url: tab.url });
+  } catch (e) { console.warn("[gcr-guard] Failed to show report form:", e.message); }
+}
+
+async function hashDomain(domain) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(domain.toLowerCase().replace(/^www\./, ""));
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function getCommunityTrust(domain) {
+  try {
+    const domainHash = await hashDomain(domain);
+    const response = await fetch(`${API_BASE}/api/extension/site-reputation?domainHash=${domainHash}`);
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    return { communityScore: 50, visitCount: 0, flagCount: 0, safeCount: 0 };
+  }
+}
+
+async function recordVisit(url) {
+  try {
+    const hostname = new URL(url).hostname;
+    const domainHash = await hashDomain(hostname);
+    await fetch(`${API_BASE}/api/extension/site-reputation/visit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ domainHash, domain: hostname })
+    });
+  } catch (e) { console.warn("[gcr-guard] Failed to record visit:", e.message); }
+}
+
+async function flagDomain(domain) {
+  try {
+    const domainHash = await hashDomain(domain);
+    const response = await fetch(`${API_BASE}/api/extension/site-reputation/flag`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ domainHash, domain })
+    });
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+async function recordSafeVisit(url) {
+  try {
+    const hostname = new URL(url).hostname;
+    const domainHash = await hashDomain(hostname);
+    await fetch(`${API_BASE}/api/extension/site-reputation/safe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ domainHash, domain: hostname })
+    });
+  } catch (e) { console.warn("[gcr-guard] Failed to record safe visit:", e.message); }
+}
+
+async function addToScanHistory(result) {
+  try {
+    const { scanHistory = [] } = await chrome.storage.local.get(["scanHistory"]);
+    let hostname = "";
+    try { hostname = new URL(result.url).hostname; } catch {}
+
+    const entry = {
+      url: result.url,
+      hostname,
+      riskLevel: result.riskLevel,
+      riskScore: result.riskScore,
+      timestamp: result.timestamp || Date.now(),
+      sources: result.sources || []
+    };
+
+    scanHistory.unshift(entry);
+    const trimmed = scanHistory.slice(0, 20);
+    await chrome.storage.local.set({ scanHistory: trimmed });
+  } catch (e) { console.warn("[gcr-guard] Failed to add to scan history:", e.message); }
+}
+
+function getEmptyWeeklyStats() {
+  return {
+    days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    scansPerDay: [0, 0, 0, 0, 0, 0, 0],
+    threatsPerDay: [0, 0, 0, 0, 0, 0, 0],
+    weekStart: Date.now()
+  };
+}
+
+async function incrementStats(risk, linkCount) {
+  const { scanStats = { totalScans: 0, threatsBlocked: 0, linksChecked: 0 } } =
+    await chrome.storage.local.get(["scanStats"]);
+
+  scanStats.totalScans += 1;
+  if (linkCount) scanStats.linksChecked += linkCount;
+  const r = (risk || "").toLowerCase();
+  if (r === "high" || r === "critical") scanStats.threatsBlocked += 1;
+
+  chrome.storage.local.set({ scanStats });
+
+  const { weeklyStats = getEmptyWeeklyStats() } = await chrome.storage.local.get(["weeklyStats"]);
+  const dayIndex = new Date().getDay();
+  const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
+  weeklyStats.scansPerDay[adjustedIndex] = (weeklyStats.scansPerDay[adjustedIndex] || 0) + 1;
+  if (r === "high" || r === "critical") {
+    weeklyStats.threatsPerDay[adjustedIndex] = (weeklyStats.threatsPerDay[adjustedIndex] || 0) + 1;
+  }
+  chrome.storage.local.set({ weeklyStats });
+}
+
+async function generateWeeklyDigest() {
+  try {
+    const settings = await getSettings();
+    if (!settings.weeklyDigest) return;
+
+    const { scanStats = { totalScans: 0, threatsBlocked: 0, linksChecked: 0 } } =
+      await chrome.storage.local.get(["scanStats"]);
+    const { weeklyStats = getEmptyWeeklyStats() } = await chrome.storage.local.get(["weeklyStats"]);
+
+    const weekScans = weeklyStats.scansPerDay.reduce((a, b) => a + b, 0);
+    const weekThreats = weeklyStats.threatsPerDay.reduce((a, b) => a + b, 0);
+
+    chrome.notifications.create("weekly-digest", {
+      type: "basic",
+      iconUrl: "icons/icon-128.png",
+      title: "GCR Guard Weekly Safety Digest",
+      message: `This week: ${weekScans} pages scanned, ${weekThreats} threats blocked. Total: ${scanStats.totalScans} scans all-time. Stay safe online!`,
+      priority: 1
+    });
+
+    chrome.storage.local.set({ weeklyStats: getEmptyWeeklyStats() });
+  } catch (e) { console.warn("[gcr-guard] Weekly digest error:", e.message); }
+}
+
 async function fetchScamOfWeek() {
   try {
     const response = await fetch(`${API_BASE}/api/scam-of-week`);
@@ -553,18 +769,6 @@ function updateBadge(text, color, tabId) {
   if (tabId) opts.tabId = tabId;
   chrome.action.setBadgeText(opts);
   chrome.action.setBadgeBackgroundColor({ color, ...(tabId ? { tabId } : {}) });
-}
-
-async function incrementStats(risk, linkCount) {
-  const { scanStats = { totalScans: 0, threatsBlocked: 0, linksChecked: 0 } } =
-    await chrome.storage.local.get(["scanStats"]);
-
-  scanStats.totalScans += 1;
-  if (linkCount) scanStats.linksChecked += linkCount;
-  const r = (risk || "").toLowerCase();
-  if (r === "high" || r === "critical") scanStats.threatsBlocked += 1;
-
-  chrome.storage.local.set({ scanStats });
 }
 
 function getSettings() {

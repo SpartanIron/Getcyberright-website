@@ -4,9 +4,9 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { getAllScamSlugs } from "@shared/scam-content";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports, siteReputation } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
 import { embedFingerprint } from "./content-fingerprint";
@@ -4093,6 +4093,103 @@ EDGE CASE HANDLING
     } catch (error) {
       console.error("Admin community reports error:", error);
       res.status(500).json({ error: "Failed to fetch reports" });
+    }
+  });
+
+  const hexHashRegex = /^[0-9a-f]{64}$/;
+  const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+
+  app.get("/api/extension/site-reputation", standardRateLimit, async (req, res) => {
+    try {
+      const domainHash = req.query.domainHash as string;
+      if (!domainHash || !hexHashRegex.test(domainHash)) {
+        res.status(400).json({ error: "Valid domainHash required (64-char lowercase hex)" });
+        return;
+      }
+      const [existing] = await db.select().from(siteReputation).where(eq(siteReputation.domainHash, domainHash)).limit(1);
+      if (existing) {
+        res.json({
+          communityScore: existing.communityScore,
+          visitCount: existing.visitCount,
+          flagCount: existing.flagCount,
+          safeCount: existing.safeCount,
+        });
+      } else {
+        res.json({ communityScore: 50, visitCount: 0, flagCount: 0, safeCount: 0 });
+      }
+    } catch (error) {
+      console.error("Site reputation fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch site reputation" });
+    }
+  });
+
+  app.post("/api/extension/site-reputation/visit", standardRateLimit, async (req, res) => {
+    try {
+      const { domainHash, domain } = req.body;
+      if (!domainHash || !hexHashRegex.test(domainHash) || !domain || !domainRegex.test(domain)) {
+        res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
+        return;
+      }
+      await db.execute(sql`
+        INSERT INTO site_reputation (id, domain_hash, domain, visit_count, safe_count, flag_count, community_score, last_visited, created_at, updated_at)
+        VALUES (gen_random_uuid(), ${domainHash}, ${domain}, 1, 0, 0, 50, NOW(), NOW(), NOW())
+        ON CONFLICT (domain_hash) DO UPDATE SET
+          visit_count = site_reputation.visit_count + 1,
+          last_visited = NOW(),
+          updated_at = NOW()
+      `);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Site reputation visit error:", error);
+      res.status(500).json({ error: "Failed to record visit" });
+    }
+  });
+
+  app.post("/api/extension/site-reputation/flag", strictRateLimit, async (req, res) => {
+    try {
+      const { domainHash, domain } = req.body;
+      if (!domainHash || !hexHashRegex.test(domainHash) || !domain || !domainRegex.test(domain)) {
+        res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
+        return;
+      }
+      const result = await db.execute(sql`
+        INSERT INTO site_reputation (id, domain_hash, domain, visit_count, safe_count, flag_count, community_score, last_flagged, created_at, updated_at)
+        VALUES (gen_random_uuid(), ${domainHash}, ${domain}, 0, 0, 1, 0, NOW(), NOW(), NOW())
+        ON CONFLICT (domain_hash) DO UPDATE SET
+          flag_count = site_reputation.flag_count + 1,
+          community_score = GREATEST(0, ROUND((site_reputation.safe_count::numeric / GREATEST(1, site_reputation.safe_count + site_reputation.flag_count + 1)) * 100)),
+          last_flagged = NOW(),
+          updated_at = NOW()
+        RETURNING community_score, flag_count
+      `);
+      const row = (result as any).rows?.[0] || { community_score: 0, flag_count: 1 };
+      res.json({ communityScore: row.community_score, flagCount: row.flag_count });
+    } catch (error) {
+      console.error("Site reputation flag error:", error);
+      res.status(500).json({ error: "Failed to flag site" });
+    }
+  });
+
+  app.post("/api/extension/site-reputation/safe", standardRateLimit, async (req, res) => {
+    try {
+      const { domainHash, domain } = req.body;
+      if (!domainHash || !hexHashRegex.test(domainHash) || !domain || !domainRegex.test(domain)) {
+        res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
+        return;
+      }
+      await db.execute(sql`
+        INSERT INTO site_reputation (id, domain_hash, domain, visit_count, safe_count, flag_count, community_score, created_at, updated_at)
+        VALUES (gen_random_uuid(), ${domainHash}, ${domain}, 1, 1, 0, 100, NOW(), NOW())
+        ON CONFLICT (domain_hash) DO UPDATE SET
+          safe_count = site_reputation.safe_count + 1,
+          community_score = LEAST(100, ROUND(((site_reputation.safe_count + 1)::numeric / GREATEST(1, site_reputation.safe_count + 1 + site_reputation.flag_count)) * 100)),
+          updated_at = NOW()
+        RETURNING community_score, safe_count
+      `);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Site reputation safe error:", error);
+      res.status(500).json({ error: "Failed to mark site as safe" });
     }
   });
 

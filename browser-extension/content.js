@@ -15,7 +15,10 @@
     hoverCheck: true,
     blockDangerous: false,
     formWarnings: true,
-    lookalikeDetection: true
+    lookalikeDetection: true,
+    communityTrust: true,
+    webmailScan: true,
+    weeklyDigest: true
   };
 
   const LOOKALIKE_BRANDS = {
@@ -70,6 +73,11 @@
     "barclays": { domain: "barclays.co.uk", registrable: "barclays.co.uk", variants: ["barcl\u0430ys", "barc1ays", "barclay5"] }
   };
 
+  const WEBMAIL_PATTERNS = [
+    { pattern: /mail\.google\.com/, name: "Gmail", emailSelector: ".a3s.aiL, .ii.gt", subjectSelector: "h2.hP", senderSelector: ".gD" },
+    { pattern: /outlook\.live\.com|outlook\.office\.com|outlook\.office365\.com/, name: "Outlook", emailSelector: "[role='document'] .XbIp4, .wide-content-host", subjectSelector: "[role='heading']", senderSelector: ".lDdSm" }
+  ];
+
   function getRegistrableDomain(hostname) {
     const parts = hostname.toLowerCase().replace(/^www\./, "").split(".");
     if (parts.length <= 2) return parts.join(".");
@@ -92,6 +100,9 @@
     }
     if (message.type === "AUTO_SCAN_RESULT") {
       handleAutoScanResult(message.result);
+    }
+    if (message.type === "SHOW_REPORT_FORM") {
+      showReportForm(message.url);
     }
   });
 
@@ -131,6 +142,14 @@
 
     if (settings.autoScan) {
       triggerAutoScan();
+    }
+
+    if (settings.communityTrust) {
+      showCommunityTrustBadge();
+    }
+
+    if (settings.webmailScan) {
+      initWebmailScanning();
     }
   }
 
@@ -820,6 +839,323 @@
     content.appendChild(closeBtn);
     banner.appendChild(content);
     document.body.prepend(banner);
+  }
+
+  function showCommunityTrustBadge() {
+    const hostname = window.location.hostname;
+    if (!hostname) return;
+
+    chrome.runtime.sendMessage({ type: "GET_COMMUNITY_TRUST", domain: hostname }, (data) => {
+      if (chrome.runtime.lastError) return;
+      if (!data || data.visitCount === 0) return;
+
+      const existing = document.getElementById("gcr-trust-badge");
+      if (existing) existing.remove();
+
+      const badge = document.createElement("div");
+      badge.id = "gcr-trust-badge";
+      badge.className = "gcr-trust-badge";
+
+      let scoreColor = "#16a34a";
+      let scoreLabel = "Trusted";
+      if (data.communityScore < 30) {
+        scoreColor = "#dc2626";
+        scoreLabel = "Risky";
+      } else if (data.communityScore < 60) {
+        scoreColor = "#ca8a04";
+        scoreLabel = "Caution";
+      }
+
+      badge.style.cssText = `
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        z-index: 2147483646;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 8px 14px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: opacity 0.3s;
+        opacity: 0.85;
+      `;
+
+      badge.addEventListener("mouseenter", () => { badge.style.opacity = "1"; });
+      badge.addEventListener("mouseleave", () => { badge.style.opacity = "0.85"; });
+
+      const dot = document.createElement("span");
+      dot.style.cssText = `width: 8px; height: 8px; border-radius: 50%; background: ${scoreColor}; flex-shrink: 0;`;
+
+      const text = document.createElement("span");
+      text.style.cssText = `color: #374151; font-weight: 600;`;
+      text.textContent = `${scoreLabel} (${data.communityScore}/100)`;
+
+      const brandEl = document.createElement("span");
+      brandEl.style.cssText = "color: #9ca3af; font-size: 10px;";
+      brandEl.textContent = "GCR";
+
+      badge.appendChild(dot);
+      badge.appendChild(text);
+      badge.appendChild(brandEl);
+
+      let dismissTimeout;
+      badge.addEventListener("click", () => {
+        badge.style.opacity = "0";
+        setTimeout(() => badge.remove(), 300);
+      });
+
+      document.body.appendChild(badge);
+
+      dismissTimeout = setTimeout(() => {
+        if (badge.parentNode) {
+          badge.style.opacity = "0";
+          setTimeout(() => { if (badge.parentNode) badge.remove(); }, 300);
+        }
+      }, 8000);
+    });
+  }
+
+  function initWebmailScanning() {
+    const url = window.location.href;
+    const matchedProvider = WEBMAIL_PATTERNS.find(p => p.pattern.test(url));
+    if (!matchedProvider) return;
+
+    const observer = new MutationObserver(() => {
+      injectWebmailScanButtons(matchedProvider);
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+    setTimeout(() => injectWebmailScanButtons(matchedProvider), 2000);
+  }
+
+  function injectWebmailScanButtons(provider) {
+    const emailBodies = document.querySelectorAll(provider.emailSelector);
+    emailBodies.forEach(body => {
+      if (body.dataset.gcrWebmailScanned) return;
+      body.dataset.gcrWebmailScanned = "true";
+
+      const container = body.closest("[role='listitem']") || body.parentElement;
+      if (!container) return;
+
+      const existing = container.querySelector(".gcr-webmail-scan-btn");
+      if (existing) return;
+
+      const btn = document.createElement("button");
+      btn.className = "gcr-webmail-scan-btn";
+      btn.textContent = "Scan with GCR";
+      btn.style.cssText = `
+        background: linear-gradient(135deg, #0A2A3C, #0d3a52);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 4px 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        transition: all 0.2s;
+      `;
+
+      btn.addEventListener("mouseenter", () => {
+        btn.style.background = "linear-gradient(135deg, #0d3a52, #0f4a6a)";
+        btn.style.transform = "translateY(-1px)";
+      });
+      btn.addEventListener("mouseleave", () => {
+        btn.style.background = "linear-gradient(135deg, #0A2A3C, #0d3a52)";
+        btn.style.transform = "translateY(0)";
+      });
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const emailText = body.innerText?.substring(0, 2000) || "";
+        let subject = "";
+        let sender = "";
+        try {
+          const subjectEl = container.querySelector(provider.subjectSelector);
+          subject = subjectEl?.textContent?.trim() || "";
+          const senderEl = container.querySelector(provider.senderSelector);
+          sender = senderEl?.textContent?.trim() || senderEl?.getAttribute("email") || "";
+        } catch (err) {}
+
+        const content = [
+          subject ? `Subject: ${subject}` : "",
+          sender ? `From: ${sender}` : "",
+          `Email Body: ${emailText}`
+        ].filter(Boolean).join("\n");
+
+        btn.textContent = "Scanning...";
+        btn.disabled = true;
+
+        chrome.runtime.sendMessage({ type: "SCAN_WEBMAIL", content }, (response) => {
+          btn.disabled = false;
+          if (response?.success && response.result) {
+            const risk = (response.result.scamRiskLevel || "").toLowerCase();
+            showWebmailResult(btn, response.result, risk);
+          } else {
+            btn.textContent = "Scan Failed";
+            setTimeout(() => { btn.textContent = "Scan with GCR"; }, 2000);
+          }
+        });
+      });
+
+      const insertTarget = body.parentElement || body;
+      insertTarget.insertBefore(btn, body);
+    });
+  }
+
+  function showWebmailResult(btn, result, risk) {
+    const riskColors = { critical: "#dc2626", high: "#ea580c", moderate: "#ca8a04", medium: "#ca8a04", low: "#2563eb", safe: "#16a34a" };
+    const riskIcons = { critical: "\uD83D\uDEA8", high: "\u26A0\uFE0F", moderate: "\u26A1", medium: "\u26A1", low: "\uD83D\uDD35", safe: "\u2705" };
+
+    const color = riskColors[risk] || "#16a34a";
+    const icon = riskIcons[risk] || "\u2705";
+
+    btn.textContent = `${icon} ${capitalize(risk)} Risk`;
+    btn.style.background = color;
+
+    const existingBadge = btn.parentElement?.querySelector(".gcr-webmail-result-badge");
+    if (existingBadge) existingBadge.remove();
+
+    if (result.summary) {
+      const badge = document.createElement("div");
+      badge.className = "gcr-webmail-result-badge";
+      badge.style.cssText = `
+        background: ${color}10;
+        border: 1px solid ${color}30;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin: 6px 0;
+        font-size: 12px;
+        color: #374151;
+        line-height: 1.5;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      `;
+
+      const summaryText = document.createElement("div");
+      summaryText.textContent = result.summary;
+      badge.appendChild(summaryText);
+
+      if (result.keyRedFlags && result.keyRedFlags.length > 0) {
+        const flagsList = document.createElement("div");
+        flagsList.style.cssText = "margin-top: 4px; font-size: 11px; color: #6b7280;";
+        flagsList.textContent = result.keyRedFlags.slice(0, 2).join(" \u2022 ");
+        badge.appendChild(flagsList);
+      }
+
+      btn.parentElement.insertBefore(badge, btn.nextSibling);
+    }
+  }
+
+  function showReportForm(url) {
+    const existing = document.getElementById("gcr-report-overlay");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "gcr-report-overlay";
+    overlay.className = "gcr-form-overlay";
+
+    const box = document.createElement("div");
+    box.className = "gcr-form-warning-box";
+    box.style.textAlign = "left";
+
+    const title = document.createElement("h2");
+    title.className = "gcr-form-warning-title";
+    title.style.textAlign = "center";
+    title.textContent = "Report Suspicious Site";
+
+    const urlDisplay = document.createElement("div");
+    urlDisplay.className = "gcr-form-url-display";
+    urlDisplay.textContent = url;
+
+    const typeLabel = document.createElement("label");
+    typeLabel.textContent = "Scam Type";
+    typeLabel.style.cssText = "display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px;";
+
+    const typeSelect = document.createElement("select");
+    typeSelect.style.cssText = "width: 100%; padding: 8px 10px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 13px; margin-bottom: 12px; background: white; color: #1a1a1a;";
+    const scamTypes = [
+      { value: "phishing", label: "Phishing / Fake Login" },
+      { value: "shopping_scam", label: "Shopping Scam / Fake Store" },
+      { value: "tech_support", label: "Tech Support Scam" },
+      { value: "malware", label: "Malware / Virus" },
+      { value: "investment", label: "Investment / Crypto Scam" },
+      { value: "impersonation", label: "Impersonation / Fake Brand" },
+      { value: "suspicious", label: "Other / Suspicious" }
+    ];
+    scamTypes.forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t.value;
+      opt.textContent = t.label;
+      typeSelect.appendChild(opt);
+    });
+
+    const descLabel = document.createElement("label");
+    descLabel.textContent = "Description (optional)";
+    descLabel.style.cssText = "display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px;";
+
+    const descInput = document.createElement("textarea");
+    descInput.placeholder = "Describe what made this site suspicious...";
+    descInput.rows = 3;
+    descInput.style.cssText = "width: 100%; padding: 8px 10px; border: 1.5px solid #e5e7eb; border-radius: 8px; font-size: 13px; font-family: inherit; resize: none; margin-bottom: 16px; box-sizing: border-box;";
+
+    const btnRow = document.createElement("div");
+    btnRow.className = "gcr-form-btn-row";
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "gcr-form-btn gcr-form-btn-proceed";
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.addEventListener("click", () => overlay.remove());
+
+    const submitBtn = document.createElement("button");
+    submitBtn.className = "gcr-form-btn gcr-form-btn-safe";
+    submitBtn.textContent = "Submit Report";
+    submitBtn.addEventListener("click", () => {
+      submitBtn.textContent = "Submitting...";
+      submitBtn.disabled = true;
+      chrome.runtime.sendMessage({
+        type: "REPORT_SCAM_STRUCTURED",
+        data: {
+          url: url,
+          scamType: typeSelect.value,
+          description: descInput.value.trim() || `Reported as ${typeSelect.options[typeSelect.selectedIndex].text}`
+        }
+      }, (response) => {
+        if (response?.success) {
+          submitBtn.textContent = "Reported!";
+          setTimeout(() => overlay.remove(), 1500);
+        } else {
+          submitBtn.textContent = "Failed - Try Again";
+          submitBtn.disabled = false;
+          setTimeout(() => { submitBtn.textContent = "Submit Report"; }, 2000);
+        }
+      });
+    });
+
+    const brandFooter = document.createElement("div");
+    brandFooter.className = "gcr-form-brand";
+    brandFooter.style.marginTop = "8px";
+    brandFooter.textContent = "Reports help protect the community \u2022 GCR Guard";
+
+    btnRow.appendChild(cancelBtn);
+    btnRow.appendChild(submitBtn);
+    box.appendChild(title);
+    box.appendChild(urlDisplay);
+    box.appendChild(typeLabel);
+    box.appendChild(typeSelect);
+    box.appendChild(descLabel);
+    box.appendChild(descInput);
+    box.appendChild(btnRow);
+    box.appendChild(brandFooter);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
   }
 
   function capitalize(s) {

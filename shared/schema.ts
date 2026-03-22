@@ -1534,3 +1534,19 @@ export const scamOfWeek = pgTable("scam_of_week", {
 export const insertScamOfWeekSchema = createInsertSchema(scamOfWeek).omit({ id: true, createdAt: true });
 export type ScamOfWeek = typeof scamOfWeek.$inferSelect;
 export type InsertScamOfWeek = z.infer<typeof insertScamOfWeekSchema>;
+
+export const siteReputation = pgTable("site_reputation", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  domainHash: varchar("domain_hash", { length: 64 }).notNull().unique(),
+  domain: text("domain").notNull(),
+  visitCount: integer("visit_count").default(0),
+  flagCount: integer("flag_count").default(0),
+  safeCount: integer("safe_count").default(0),
+  communityScore: integer("community_score").default(50),
+  lastVisited: timestamp("last_visited").defaultNow(),
+  lastFlagged: timestamp("last_flagged"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type SiteReputation = typeof siteReputation.$inferSelect;
