@@ -15,7 +15,8 @@ import {
   CheckCircle, BookOpen, AlertTriangle,
   Users, ArrowRight,
   MessageCircle, BadgeCheck,
-  ExternalLink, Wallet, UserX, ChevronDown, ChevronUp
+  ExternalLink, Wallet, UserX, ChevronDown, ChevronUp,
+  Search, BarChart3, TreeDeciduous, Handshake
 } from "lucide-react";
 import bannerImage from "@/assets/banners/seniors-banner.png";
 import cardRomanceScams from "@/assets/images/card-romance-scams.png";
@@ -26,6 +27,23 @@ import cardIdentityTheft from "@/assets/images/card-identity-theft-seniors.png";
 import cardOnlineShopping from "@/assets/images/card-online-shopping-seniors.png";
 import cardGovernmentScams from "@/assets/images/card-government-scams.png";
 import cardInvestmentFraud from "@/assets/images/card-investment-fraud.png";
+
+import {
+  ScamScenarioExercise,
+  SafetyChecklist,
+  ScamDeepDive,
+  EmergencyFlowchart,
+  ScamStatsInfographic,
+  FamilyCommunicationToolkit
+} from "@/components/seniors-hub/interactive-tools";
+import {
+  scamScenarios,
+  safetyChecklists,
+  deepDiveModules,
+  emergencyFlowSteps,
+  scamStats,
+  familyConversations
+} from "@/components/seniors-hub/scenario-data";
 
 interface PlatformGuide {
   platform: string;
@@ -299,204 +317,203 @@ const seniorSafetyTopics: SafetyTopic[] = [
         "Remember, you should never give your Medicare number to someone who calls you. If you are unsure, call me first.",
         "Would you like me to help you review your Medicare Summary Notice for anything that looks wrong?"
       ],
-      warningSign: "If someone calls offering free medical equipment, genetic testing, or a new Medicare card and asks for your Medicare number, hang up. Medicare does not operate this way."
+      warningSign: "If someone calls offering free medical equipment, genetic testing, or a new Medicare card, and asks for your Medicare number, it is a scam. Medicare never calls to sell or ask for your number."
     }
   },
   {
     id: "phone-email-scams",
     title: "Phone and Email Scams",
-    description: "Identify fraudulent calls, texts, and emails.",
+    description: "Spot phishing emails and suspicious phone calls.",
     icon: Mail,
-    color: "bg-purple-500",
+    color: "bg-cyan-500",
     image: cardPhoneEmailScams,
     content: {
-      intro: "Scammers use phones and email to impersonate banks, government agencies, delivery services, and family members. They create urgency to prevent you from thinking clearly. These scams are becoming more sophisticated, sometimes using technology to make calls appear to come from legitimate numbers.",
+      intro: "Phishing emails and scam phone calls are the most common ways criminals target seniors. These messages are designed to look or sound like they come from banks, shipping companies, government agencies, or other trusted organizations. Their goal is to trick you into clicking a link, sharing personal information, or sending money.",
       keyPoints: [
-        "Caller ID can be faked. A call that shows 'IRS', your bank's name, or even a family member's number can still be a scammer.",
-        "Urgency is the number one manipulation tactic. Any message that says 'act now or else' is designed to prevent you from thinking clearly.",
-        "Government agencies (IRS, Social Security) initiate contact through postal mail, never through phone calls, emails, or texts.",
-        "The 'grandparent scam' is one of the fastest-growing frauds. Scammers call pretending to be a grandchild in trouble, asking for money immediately.",
-        "Fake scam emails have become extremely sophisticated. They can look identical to emails from your bank, Amazon, or Medicare."
+        "Phishing emails are responsible for over 90% of all data breaches. Learning to spot them is one of the most important things you can do online.",
+        "Scammers can make emails look almost identical to real ones from companies you trust. Always check the sender's actual email address, not just the display name.",
+        "Phone scammers can fake caller ID to show any name or number. Seeing 'Bank of America' or 'Medicare' on your caller ID does not mean the call is real.",
+        "Urgency is the most common manipulation tactic. If a message says you must act immediately, it is very likely a scam.",
+        "When in doubt, do not click any links. Instead, go directly to the company's website by typing the address into your browser."
       ],
       platformGuides: [
         {
-          platform: "Suspicious Phone Call",
+          platform: "Checking Suspicious Emails",
           steps: [
-            "If the caller creates urgency ('You must act now', 'Your account will be closed today'), this is the biggest red flag. Hang up.",
-            "Do not press any buttons if an automated message asks you to 'press 1 to speak with an agent'. This confirms your number is active and leads to more scam calls.",
-            "If the caller claims to be from your bank, the IRS, Social Security, or law enforcement, say: 'I will call you back on your official number.' Then hang up and look up the real number yourself.",
-            "Never give personal information over the phone to someone who called you. This includes your Social Security number, bank account number, Medicare number, or passwords.",
-            "If the caller threatens arrest, deportation, or legal action, it is a scam. No government agency threatens you over the phone.",
-            "If they ask for payment via gift cards, wire transfer, or cryptocurrency, it is 100% a scam. No legitimate organization accepts payment through these methods.",
-            "Write down the phone number and what the caller said. Report the call to the FTC at reportfraud.ftc.gov."
+            "Look at the sender's full email address, not just the name. Click or hover over the sender's name to reveal the actual address. If it says 'Amazon' but the address is something@amaz0n-alerts.com, it is fake.",
+            "Check for poor grammar, spelling errors, and unusual formatting. While scam emails are getting better, many still have obvious mistakes that legitimate companies would not make.",
+            "Hover over any links WITHOUT clicking them. At the bottom of your browser or in a tooltip, you will see the actual website address. If it does not match the company's real website, do not click.",
+            "Be suspicious of any email that asks you to verify your identity, confirm your password, or update payment information through a link.",
+            "Look at how the email addresses you. Generic greetings like 'Dear Customer' or 'Dear Account Holder' are suspicious. Companies you have accounts with usually address you by name.",
+            "Check if you were expecting this email. Unexpected emails about packages, purchases, or account problems you are not aware of are likely scams.",
+            "If you are unsure about an email, do not click any links. Instead, open a new browser window and go directly to the company's website to check your account."
           ]
         },
         {
-          platform: "Suspicious Email",
+          platform: "Handling Phone Calls",
           steps: [
-            "Check the sender's email address carefully. Hover over or tap the sender's name to see the actual email address. Scam emails often use addresses like 'support@amaz0n-security.com' instead of the real 'amazon.com'.",
-            "Look for spelling and grammar errors. While some scam emails are well-written, many contain mistakes that legitimate companies would not make.",
-            "Do NOT click any links in the email. Instead, open your web browser and go directly to the company's website by typing the address yourself.",
-            "Hover over links (without clicking) to see where they actually go. On a computer, the real URL will appear in the bottom left corner of your browser. If it does not match the company's real website, it is a scam.",
-            "Be suspicious of emails about problems with your account, package delivery issues, or prize winnings. These are the most common scam email themes.",
-            "Never download attachments from unexpected emails. These can contain viruses or malware.",
-            "If you are unsure whether an email is real, call the company directly using the phone number on their official website (not the number in the email) and ask them about it.",
-            "Forward scam emails to reportphishing@apwg.org (the Anti-Fraud Working Group), then delete them."
+            "Let unknown calls go to voicemail. Legitimate callers will leave a message. Scammers often do not.",
+            "If you answer and the caller creates urgency ('Your account will be closed!', 'You must pay now!'), hang up. Urgency is the top manipulation tactic.",
+            "Never give personal information to someone who called you. If they say they are from your bank, hang up and call your bank directly using the number on your card.",
+            "Be cautious of robocalls (recorded messages). If a recording asks you to press a button, hang up. Pressing a button may connect you to a scammer or confirm your number is active.",
+            "If a caller asks you to install software, visit a website, or go to your computer, it is a scam. Hang up immediately.",
+            "Write down the caller's claims. Call the real company directly to verify. This one step prevents most phone scams.",
+            "Do not feel obligated to stay on the line. You can always hang up, and you should if something feels wrong."
           ]
         },
         {
-          platform: "Suspicious Text Message",
+          platform: "Common Email Scams to Know",
           steps: [
-            "Do NOT click any links in unexpected text messages, even if they appear to come from your bank, a delivery service (UPS, FedEx, USPS), or a government agency.",
-            "Do not reply to suspicious texts, even to say 'STOP'. Replying confirms your number is active.",
-            "If a text says there is a problem with a delivery, your bank account, or a subscription, do not use the link in the text. Open the company's app or website directly to check.",
-            "Watch for texts with shortened URLs (like bit.ly links). These hide the real destination and are commonly used in scams.",
-            "Block the sender's number. On iPhone: tap the number at the top of the conversation, then 'info', then 'Block this Caller'. On Android: tap the three dots in the conversation, then 'Block'.",
-            "Report scam texts by forwarding them to 7726 (SPAM). This reports the number to your phone carrier.",
-            "Delete the text after blocking and reporting."
+            "Package delivery scams: 'Your UPS/FedEx package could not be delivered. Click here to reschedule.' Go to the shipping company's real website instead.",
+            "Bank alerts: 'Suspicious activity detected on your account. Verify your identity.' Call your bank directly using the number on your card or statement.",
+            "Subscription renewal: 'Your Norton/McAfee subscription is renewing for $399. Call to cancel.' This is a fake charge designed to get you to call a scam number.",
+            "Prize winnings: 'You have won!' You cannot win a contest you did not enter. Delete immediately.",
+            "Friend in trouble: An email from a friend saying they are stranded and need money. Their email may have been hacked. Call them on the phone to verify.",
+            "Tax refund: 'The IRS has calculated your refund.' The IRS does not communicate via email. Delete immediately.",
+            "Password reset: 'Someone tried to access your account. Reset your password here.' Go to the website directly instead of clicking the link."
           ]
         },
         {
-          platform: "Grandparent Scam",
+          platform: "Setting Up Email Protection",
           steps: [
-            "If someone calls claiming to be your grandchild and says they are in trouble (arrested, in an accident, stuck in another country), stay calm. This is likely a scam, even if the voice sounds familiar.",
-            "The caller will say 'Don't tell Mom and Dad' or 'Please keep this between us.' This is designed to isolate you from people who could help you recognize the scam.",
-            "Ask a question only your real grandchild would know the answer to, such as 'What is the name of your pet?' or 'What did we do last Thanksgiving?' A scammer will not know these answers.",
-            "Hang up and call your grandchild directly on their known phone number. If they do not answer, call their parent to verify the story.",
-            "Create a family code word that only family members know. If someone calls claiming to be family, ask for the code word before taking any action.",
-            "Never send money based on a phone call alone. Even if the voice sounds exactly like your grandchild, AI technology can now clone voices from just a few seconds of audio.",
-            "If you already sent money, contact your bank or the payment service immediately. Report to the FTC at reportfraud.ftc.gov and file a police report."
+            "Most email providers have built-in spam filters. Make sure yours is enabled. In Gmail: go to Settings and ensure 'Filtered mail' is not delivering spam to your inbox.",
+            "Mark scam emails as spam or phishing. This trains your email provider's filters. In Gmail: click the three dots, then 'Report phishing'. In Outlook: right-click, then 'Report as phishing'.",
+            "Never unsubscribe from emails you did not sign up for. The 'unsubscribe' link in a scam email may be a phishing link. Just mark it as spam.",
+            "Enable two-factor authentication on your email account. This is the single most effective protection against email account theft.",
+            "Keep your email password unique. Do not use the same password for your email and any other account.",
+            "Regularly check your email's 'Sent' folder. If you see emails you did not send, your account may be compromised.",
+            "Consider creating a separate email for online shopping and subscriptions. This protects your main email from data breaches."
           ]
         }
       ],
       quickChecklist: [
-        "I let unknown calls go to voicemail.",
-        "I never click links in unexpected emails or texts.",
-        "I verify urgent requests by calling back on a known number.",
-        "My family has a code word for emergency verification.",
-        "I know that government agencies never call demanding immediate payment.",
-        "I have call-blocking enabled on my phone."
+        "I always check the sender's actual email address before responding.",
+        "I never click links in emails that create urgency or ask for personal information.",
+        "I let unknown phone calls go to voicemail.",
+        "My email has two-factor authentication enabled.",
+        "I know that caller ID can be faked.",
+        "I verify claims by contacting companies directly through their official website or phone number."
       ],
       familyTalkingPoints: [
-        "Let's create a family code word that only we know. If anyone calls claiming to be family, ask for the code word first.",
-        "Have you gotten any calls lately from people claiming to be from the IRS or Social Security? Those are always scams.",
-        "If you ever get a call from someone claiming to be me or one of the grandkids saying we are in trouble, hang up and call us directly.",
-        "Remember, no one legitimate will ever ask you to pay with gift cards. That is always a scam."
+        "Have you been getting any suspicious emails or phone calls? I can help you figure out which ones are real.",
+        "If you ever get an email that worries you about your bank account, forward it to me before clicking anything.",
+        "Would you like me to help set up better spam filtering on your email?",
+        "Remember, you can always hang up on a phone call. It is never rude to protect yourself."
       ],
-      warningSign: "Any phone call, email, or text that demands immediate action, threatens legal consequences, or asks for payment via gift cards, wire transfers, or cryptocurrency is a scam. Hang up, delete it, and verify through official channels."
+      warningSign: "If an email or phone call creates a sense of urgency, claims something terrible will happen unless you act immediately, or asks for personal information or payment, it is almost certainly a scam. Stop, take a breath, and verify independently."
     }
   },
   {
-    id: "financial-scams",
-    title: "Financial and Investment Scams",
-    description: "Protect your savings from fraudulent schemes.",
-    icon: CreditCard,
-    color: "bg-amber-500",
+    id: "identity-theft",
+    title: "Identity Theft Protection",
+    description: "Safeguard your personal information and credit.",
+    icon: Lock,
+    color: "bg-purple-500",
     image: cardIdentityTheft,
     content: {
-      intro: "Financial scammers target seniors because they often have retirement savings and own their homes. Scams range from fake investment opportunities promising high returns to predatory lending and contractor fraud. Protecting your finances requires skepticism about unsolicited offers.",
+      intro: "Identity theft occurs when someone uses your personal information without your permission to commit fraud or other crimes. For seniors, identity theft can be devastating, leading to drained bank accounts, unauthorized credit cards, fraudulent tax returns, and even medical identity theft where someone uses your health insurance.",
       keyPoints: [
-        "Adults over 60 lose more money to financial fraud than any other age group. The average loss is over $33,000 per incident.",
-        "Legitimate investments always carry risk. Anyone who guarantees returns with no risk is lying.",
-        "High-pressure sales tactics ('This deal expires today', 'Only a few spots left') are designed to prevent you from consulting others.",
-        "Contractor and home repair fraud is one of the most common financial scams targeting seniors. Scammers show up offering unsolicited work, demand cash upfront, then disappear.",
-        "Financial exploitation often comes from people the victim knows, including family members, caregivers, or trusted advisors."
+        "Identity theft affected 1.4 million adults over 60 in 2023, with total losses exceeding $1.6 billion.",
+        "The most commonly stolen information: Social Security numbers, credit card numbers, bank account numbers, Medicare numbers, and dates of birth.",
+        "Data breaches at companies you have accounts with can expose your information even if you do everything right. Monitoring your credit is essential.",
+        "Medical identity theft is growing: someone uses your insurance to get medical care. This can affect your medical records and future coverage.",
+        "Identity thieves may file tax returns in your name to steal your refund. Filing early each year helps prevent this."
       ],
       platformGuides: [
         {
-          platform: "Unsolicited Investment Offer",
+          platform: "Protecting Your Information",
           steps: [
-            "If someone contacts you with an investment opportunity you did not seek out, treat it as a red flag regardless of how promising it sounds.",
-            "Ask for the investment in writing. Legitimate investment professionals will provide a prospectus or written materials. If they refuse or pressure you to decide immediately, walk away.",
-            "Verify the person and the company. Go to brokercheck.finra.org and search for the individual's name. You can see their registration, employment history, and any disciplinary actions.",
-            "Check the investment with the SEC. Go to sec.gov/edgar and search for the company. Legitimate publicly traded companies and funds are registered with the SEC.",
-            "Contact your state's securities regulator. The North American Securities Administrators Association (NASAA) lists all state regulators at nasaa.org. They can tell you if an investment is registered in your state.",
-            "Discuss any investment opportunity with a trusted family member or independent financial advisor before committing any money.",
-            "Red flags that indicate fraud: guaranteed returns, pressure to act quickly, 'exclusive' or 'secret' opportunities, complex strategies you do not understand, difficulty getting clear answers."
+            "Guard your Social Security number. Never carry your Social Security card in your wallet. Only give your SSN when absolutely necessary (for tax purposes, employment, or opening a bank account).",
+            "Shred all documents containing personal information before throwing them away. This includes bank statements, credit card offers, medical bills, and any mail with your account numbers.",
+            "Do not share personal information on social media. Your birthday, mother's maiden name, pet's name, and high school are common security question answers that thieves can use.",
+            "Be cautious with mail. If you are going on vacation, have the post office hold your mail. Consider a locking mailbox to prevent mail theft.",
+            "Review your credit report for free at annualcreditreport.com at least once a year. Look for accounts you did not open or addresses you have never lived at.",
+            "Consider placing a credit freeze with all three credit bureaus. This is free and prevents anyone from opening new credit accounts in your name.",
+            "Opt out of pre-approved credit card offers by calling 1-888-567-8688 or visiting optoutprescreen.com. This reduces the chance of these offers being stolen from your mailbox."
           ]
         },
         {
-          platform: "Home Repair / Contractor",
+          platform: "Monitoring for Theft",
           steps: [
-            "Never hire a contractor who shows up at your door offering unsolicited work (driveway sealing, roof repair, tree removal). Legitimate contractors are busy and do not go door to door.",
-            "Get at least three written estimates for any repair work. Each estimate should include a detailed description of the work, materials, timeline, and total cost.",
-            "Check the contractor's license. Go to your state's contractor licensing board website. You can verify their license number, insurance, and any complaints filed.",
-            "Ask for and verify references. Call at least two previous customers and ask about their experience.",
-            "Never pay the full amount upfront. A reasonable payment schedule is: no more than one-third down, one-third at the midpoint, and the final third after the work is complete and you are satisfied.",
-            "Never pay in cash. Use a check or credit card so you have a record of payment. If a contractor insists on cash only, this is a red flag.",
-            "Get everything in writing before work begins. The contract should include: start and end dates, total cost, payment schedule, detailed description of work, warranty information, and the contractor's license number."
+            "Check your bank and credit card statements every month. Look for any charges you do not recognize, no matter how small. Thieves often test with small charges first.",
+            "Set up account alerts with your bank. Most banks can send you text or email alerts for every transaction over a certain amount (even $1).",
+            "Review your credit report from each bureau. Go to annualcreditreport.com to get your free reports.",
+            "Check your Social Security statement at ssa.gov/myaccount. Make sure your reported earnings are correct. Incorrect earnings could mean someone is using your SSN for employment.",
+            "Monitor your Medicare statements. Look for services, equipment, or visits you do not recognize.",
+            "Watch for unexpected medical bills or explanation of benefits from your health insurance for treatments you did not receive.",
+            "If you get a notice from the IRS about a tax return you did not file, or if your e-filed return is rejected as a duplicate, someone may have filed using your SSN."
           ]
         },
         {
-          platform: "If You Already Sent Money",
+          platform: "If Your Identity Is Stolen",
           steps: [
-            "Contact your bank or credit card company immediately. Tell them you believe you have been a victim of fraud. They may be able to reverse charges or freeze your account to prevent further losses.",
-            "If you sent money via wire transfer, contact the wire transfer company (Western Union: 1-800-448-1492, MoneyGram: 1-800-926-9400) and ask to reverse or recall the transfer. Act quickly, as recovery becomes harder with time.",
-            "If you paid by check, contact your bank to place a stop payment on the check.",
-            "Report to the FTC at reportfraud.ftc.gov. Include all details about the scammer, the investment or service offered, and how much money you lost.",
-            "File a police report with your local law enforcement. You will need this report for insurance claims and financial institution disputes.",
-            "If it was an investment scam, file a complaint with the SEC at sec.gov/tcr and with FINRA at finra.org/investors/have-problem.",
-            "Contact your state attorney general's office. They have consumer protection divisions that investigate fraud.",
-            "Contact your local Area Agency on Aging at eldercare.acl.gov or call 1-800-677-1116. They can connect you with legal services and victim assistance programs."
+            "Go to identitytheft.gov immediately. This is the FTC's official recovery website. It will create a personalized recovery plan based on what happened.",
+            "Place a fraud alert on your credit reports by contacting any one of the three credit bureaus. They must notify the other two.",
+            "Consider a credit freeze with all three bureaus: Equifax (1-800-525-6285), Experian (1-888-397-3742), TransUnion (1-800-680-7289).",
+            "Close any accounts that were opened fraudulently. Contact the fraud department of each company where accounts were misused.",
+            "File a report with your local police department. Get a copy of the report. You may need it when disputing fraudulent charges.",
+            "If your Social Security number was stolen, contact the Social Security Administration at 1-800-772-1213.",
+            "If your Medicare number was used, call 1-800-MEDICARE and report it to the HHS Inspector General at 1-800-447-8477.",
+            "Keep detailed records of all your communications: who you called, what they said, and reference numbers for every report."
           ]
         },
         {
-          platform: "Working with a Financial Advisor",
+          platform: "Preventing Medical Identity Theft",
           steps: [
-            "Verify credentials before working with any financial advisor. Check their registration on brokercheck.finra.org or adviserinfo.sec.gov.",
-            "Understand the difference: a 'fiduciary' is legally required to act in your best interest. A 'broker' may recommend products that earn them higher commissions. Ask: 'Are you a fiduciary?'",
-            "Ask how they are compensated. Fee-only advisors charge a flat fee or percentage. Commission-based advisors earn money when you buy products they recommend. Fee-only advisors generally have fewer conflicts of interest.",
-            "Never give a financial advisor full control of your accounts. You should always have direct access to view your accounts independently at the financial institution.",
-            "Be suspicious if an advisor discourages you from telling family members about your investments or from getting a second opinion.",
-            "Set up account alerts with your bank and investment firm. Many institutions can send you text or email notifications for any transaction over a certain amount.",
-            "Have a trusted family member or friend available to consult before making major financial decisions. There is never a legitimate reason to rush."
+            "Review every Explanation of Benefits (EOB) statement from your health insurer carefully. Look for doctors, procedures, or dates that do not match your actual care.",
+            "Request a copy of your medical records from your doctors periodically. Check for treatments or conditions that are not yours.",
+            "Protect your health insurance card the same way you protect credit cards. Do not share your member ID number with anyone who calls you.",
+            "Be cautious at health fairs and community events where people offer free screenings in exchange for your insurance information.",
+            "If you receive bills for medical services you did not receive, contact the provider immediately. Do not pay them. Report to your insurance company.",
+            "Keep a personal health journal noting all doctor visits and treatments. This makes it easy to spot discrepancies on statements.",
+            "If you suspect medical identity theft, request a statement of all claims filed under your insurance from your provider."
           ]
         }
       ],
       quickChecklist: [
-        "I never invest in anything I do not fully understand.",
-        "I always get at least three estimates for home repair work.",
-        "I verify investment professionals through FINRA BrokerCheck.",
-        "I never pay contractors the full amount upfront.",
-        "I consult a trusted person before making major financial decisions.",
-        "I know that guaranteed returns with no risk means fraud."
+        "My Social Security card is stored safely at home, not in my wallet.",
+        "I shred documents with personal information before discarding.",
+        "I review my credit report at least once a year.",
+        "My bank accounts have transaction alerts enabled.",
+        "I have considered or placed a credit freeze.",
+        "I check my Medicare and health insurance statements for unfamiliar charges."
       ],
       familyTalkingPoints: [
-        "Has anyone contacted you recently about an investment opportunity? Let me help you research it before you decide.",
-        "If anyone comes to your door offering home repairs, please do not agree to anything on the spot. Call me first and we can find a licensed contractor together.",
-        "Would you feel comfortable sharing your financial advisor's information with me so I can verify their credentials?",
-        "Remember, any investment that guarantees returns with no risk is always a scam. Please call me before sending money to any new investment."
+        "Have you checked your credit report recently? I can help you access it for free at annualcreditreport.com.",
+        "Would you like help setting up a credit freeze? It is free and prevents anyone from opening accounts in your name.",
+        "Let me help you set up transaction alerts on your bank account. You will get a text every time money moves.",
+        "If you ever get mail about accounts you did not open, please let me know right away."
       ],
-      warningSign: "If an investment sounds too good to be true, it probably is. If anyone pressures you to invest immediately, promises guaranteed returns, or discourages you from consulting family or getting a second opinion, walk away."
+      warningSign: "If you receive bills for things you did not buy, notice accounts you did not open on your credit report, or get rejected for a credit application you did not make, your identity may have been stolen. Act immediately."
     }
   },
   {
-    id: "online-safety-basics",
-    title: "Online Safety Basics",
-    description: "Essential skills for safe internet use.",
-    icon: Shield,
+    id: "online-shopping-safety",
+    title: "Online Shopping and Banking Safety",
+    description: "Shop and bank online securely with confidence.",
+    icon: CreditCard,
     color: "bg-teal-500",
     image: cardOnlineShopping,
     content: {
-      intro: "The internet offers wonderful ways to stay connected, learn new things, and manage daily tasks. With some basic precautions, you can enjoy these benefits while staying safe. These fundamental practices will help protect you from most online threats.",
+      intro: "Online shopping and banking can be safe and convenient when you know how to protect yourself. The key is knowing what to look for before entering your personal and financial information online. Most online shopping fraud is preventable with a few simple habits.",
       keyPoints: [
-        "Strong, unique passwords are your first line of defense. Using the same password for multiple accounts means if one is compromised, they all are.",
-        "Two-factor authentication (2FA) adds a second layer of security beyond your password. Even if someone steals your password, they cannot access your account without the second factor.",
-        "Software updates are not just about new features. They fix security vulnerabilities that hackers exploit. Delaying updates leaves you exposed.",
-        "Public Wi-Fi (at coffee shops, airports, libraries) is not secure. Anyone on the same network can potentially intercept your data.",
-        "If a website asks for personal information, look for 'https' and a padlock icon in the browser address bar. The 's' stands for 'secure'."
+        "Online shopping fraud resulted in over $5.8 billion in losses in 2023. Adults over 60 are particularly targeted with fake online stores.",
+        "Always look for 'https' and a padlock icon in your browser's address bar before entering any payment information.",
+        "Use credit cards instead of debit cards for online purchases. Credit cards offer stronger fraud protections and are easier to dispute.",
+        "Fake online stores often appear in social media ads offering incredible deals. If the price seems too good to be true, it probably is.",
+        "Public Wi-Fi (at coffee shops, airports, libraries) is not secure for shopping or banking. Use your home Wi-Fi or phone's cellular data instead."
       ],
       platformGuides: [
         {
-          platform: "Setting Up Strong Passwords",
+          platform: "Creating Strong Passwords",
           steps: [
-            "A strong password is at least 12 characters long and includes a mix of uppercase letters, lowercase letters, numbers, and symbols. Example method: pick three random words and a number, like 'SunflowerBridge42Rain!'",
-            "Never use personal information in passwords: no birthdays, names of family members, pet names, addresses, or phone numbers.",
-            "Use a different password for every important account. At minimum, your email, bank, Social Security, and Medicare accounts should each have unique passwords.",
-            "Consider using a password manager to keep track of all your passwords. A password manager is like a digital safe that remembers all your passwords. You only need to remember one master password.",
-            "To set up a password manager: Download a reputable one like 1Password, Bitwarden, or LastPass. Create one very strong master password you can remember. The app will offer to save passwords as you log in to websites.",
-            "Write down your master password and store it in a physical safe or locked drawer. Do not store it on your computer or phone.",
-            "Change passwords immediately if you receive a notification that a website you use has been breached. You can check if your email has been in a breach at haveibeenpwned.com."
+            "Use a different password for every account. This is the single most important password rule. If one account is breached, your other accounts stay safe.",
+            "Make passwords at least 12 characters long. Use a mix of uppercase letters, lowercase letters, numbers, and symbols.",
+            "Consider using a passphrase: a string of random words. For example, 'BlueHorse!Rain42Sunshine' is strong and easier to remember than 'Bh!r42S'.",
+            "Never use personal information in passwords: no birthdays, pet names, addresses, or family names. These are easy for thieves to guess.",
+            "Consider a password manager like 1Password, Dashlane, or the free one built into your browser (Chrome or Safari). It creates and remembers strong passwords for you.",
+            "Enable two-factor authentication (2FA) wherever available. This adds a second step (usually a text message code) when logging in.",
+            "Never share your passwords with anyone who contacts you. Your bank, email provider, and other services will never ask for your password."
           ]
         },
         {
@@ -769,7 +786,7 @@ function CollapsibleSteps({ steps, platform }: { steps: string[]; platform: stri
   );
 }
 
-function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void }) {
+function SeniorsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: string) => void; onSwitchTab: (tab: string) => void }) {
   return (
     <>
       <PageBanner
@@ -858,6 +875,48 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
             ))}
           </div>
 
+          <div className="grid sm:grid-cols-3 gap-4 mb-8">
+            <Card
+              className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary/30"
+              onClick={() => onSwitchTab("exercises")}
+              data-testid="card-cta-exercises"
+            >
+              <CardContent className="p-5 text-center">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                  <Search className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1">Is This a Scam?</h3>
+                <p className="text-sm text-muted-foreground">Practice identifying real scams with interactive exercises</p>
+              </CardContent>
+            </Card>
+            <Card
+              className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary/30"
+              onClick={() => onSwitchTab("emergency")}
+              data-testid="card-cta-emergency"
+            >
+              <CardContent className="p-5 text-center">
+                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-3">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1">I Think I Was Scammed</h3>
+                <p className="text-sm text-muted-foreground">Get step-by-step help based on what happened</p>
+              </CardContent>
+            </Card>
+            <Card
+              className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary/30"
+              onClick={() => onSwitchTab("checklists")}
+              data-testid="card-cta-checklists"
+            >
+              <CardContent className="p-5 text-center">
+                <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle className="w-6 h-6 text-emerald-600" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1">Safety Checklists</h3>
+                <p className="text-sm text-muted-foreground">Secure your phone, finances, email, and social media</p>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-2 border-amber-200 dark:border-amber-800">
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-center gap-6">
@@ -874,11 +933,9 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
                     If you think you have been scammed or need immediate assistance, our Emergency Guidance section can help you take the right steps.
                   </p>
                 </div>
-                <Link href="/emergency-help">
-                  <Button variant="outline" className="border-amber-300 dark:border-amber-700" data-testid="button-emergency-help">
-                    Get Help
-                  </Button>
-                </Link>
+                <Button variant="outline" className="border-amber-300 dark:border-amber-700" onClick={() => onSwitchTab("emergency")} data-testid="button-emergency-help">
+                  Get Help
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -908,12 +965,10 @@ function SeniorsLanding({ onSelectTopic }: { onSelectTopic: (id: string) => void
                 </div>
               </div>
               <div className="mt-4">
-                <Link href="/emergency-help">
-                  <Button variant="outline" className="border-red-300 dark:border-red-700" data-testid="button-seniors-emergency">
-                    Full Emergency Guidance
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
+                <Button variant="outline" className="border-red-300 dark:border-red-700" onClick={() => onSwitchTab("emergency")} data-testid="button-seniors-emergency">
+                  Full Emergency Guidance
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -1099,10 +1154,17 @@ function TopicContent({
 
 export default function Seniors() {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("guides");
 
   const currentTopic = selectedTopic 
     ? seniorSafetyTopics.find(t => t.id === selectedTopic) 
     : null;
+
+  const handleSwitchTab = (tab: string) => {
+    setActiveTab(tab);
+    setSelectedTopic(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const seniorsFaqSchema: FAQData = {
     type: "FAQPage",
@@ -1133,7 +1195,112 @@ export default function Seniors() {
             onBack={() => setSelectedTopic(null)}
           />
         ) : (
-          <SeniorsLanding onSelectTopic={setSelectedTopic} />
+          <>
+            {activeTab === "guides" && (
+              <SeniorsLanding onSelectTopic={setSelectedTopic} onSwitchTab={handleSwitchTab} />
+            )}
+
+            {activeTab !== "guides" && (
+              <>
+                <PageBanner
+                  title="Stay Safe and Connected Online"
+                  subtitle="Practical guidance to protect yourself from scams and fraud. Learn to recognize warning signs and take simple steps to stay secure."
+                  imageSrc={bannerImage}
+                  imageAlt="Seniors using technology safely"
+                  colorVariant="teal"
+                />
+
+                <div className="max-w-5xl mx-auto px-4 py-8">
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-8">
+                      <TabsTrigger value="guides" className="gap-2 px-4 py-2.5" data-testid="tab-guides">
+                        <BookOpen className="w-4 h-4" />
+                        Guides
+                      </TabsTrigger>
+                      <TabsTrigger value="exercises" className="gap-2 px-4 py-2.5" data-testid="tab-exercises">
+                        <Search className="w-4 h-4" />
+                        Scam Exercises
+                      </TabsTrigger>
+                      <TabsTrigger value="deepdives" className="gap-2 px-4 py-2.5" data-testid="tab-deepdives">
+                        <Shield className="w-4 h-4" />
+                        Deep Dives
+                      </TabsTrigger>
+                      <TabsTrigger value="checklists" className="gap-2 px-4 py-2.5" data-testid="tab-checklists">
+                        <CheckCircle className="w-4 h-4" />
+                        Checklists
+                      </TabsTrigger>
+                      <TabsTrigger value="emergency" className="gap-2 px-4 py-2.5" data-testid="tab-emergency">
+                        <AlertTriangle className="w-4 h-4" />
+                        Emergency
+                      </TabsTrigger>
+                      <TabsTrigger value="stats" className="gap-2 px-4 py-2.5" data-testid="tab-stats">
+                        <BarChart3 className="w-4 h-4" />
+                        Stats
+                      </TabsTrigger>
+                      <TabsTrigger value="family" className="gap-2 px-4 py-2.5" data-testid="tab-family">
+                        <Users className="w-4 h-4" />
+                        Family
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="exercises">
+                      <div className="space-y-6">
+                        <div>
+                          <h2 className="text-2xl font-bold text-foreground mb-2">Is This a Scam?</h2>
+                          <p className="text-muted-foreground">Practice identifying scams with realistic scenarios from your region. Read each scenario carefully and decide if it is a scam or legitimate.</p>
+                        </div>
+                        <ScamScenarioExercise scenarios={scamScenarios} />
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="deepdives">
+                      <div className="space-y-6">
+                        <div>
+                          <h2 className="text-2xl font-bold text-foreground mb-2">Scam Deep Dives</h2>
+                          <p className="text-muted-foreground">Interactive modules that take you deeper into specific scam types. Learn through practice scenarios and build your detection skills.</p>
+                        </div>
+                        <ScamDeepDive modules={deepDiveModules} />
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="checklists">
+                      <div className="space-y-6">
+                        <div>
+                          <h2 className="text-2xl font-bold text-foreground mb-2">Safety Checklists</h2>
+                          <p className="text-muted-foreground">Step-by-step security audits for your phone, finances, social media, and email. Check off each step as you complete it. Your progress is saved automatically.</p>
+                        </div>
+                        <SafetyChecklist checklists={safetyChecklists} />
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="emergency">
+                      <div className="space-y-6">
+                        <div>
+                          <h2 className="text-2xl font-bold text-foreground mb-2">I Think I Have Been Scammed</h2>
+                          <p className="text-muted-foreground">Answer a few questions about what happened and get specific, actionable steps for your situation. Includes reporting contacts for different regions.</p>
+                        </div>
+                        <EmergencyFlowchart steps={emergencyFlowSteps} />
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="stats">
+                      <ScamStatsInfographic stats={scamStats} />
+                    </TabsContent>
+
+                    <TabsContent value="family">
+                      <div className="space-y-6">
+                        <div>
+                          <h2 className="text-2xl font-bold text-foreground mb-2">Family Communication Toolkit</h2>
+                          <p className="text-muted-foreground">Guides for adult children helping aging parents discuss scam risks. Learn how to have these conversations respectfully, without being condescending.</p>
+                        </div>
+                        <FamilyCommunicationToolkit conversations={familyConversations} />
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </div>
+              </>
+            )}
+          </>
         )}
       </main>
 
