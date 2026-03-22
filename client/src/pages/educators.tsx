@@ -8,11 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { FAQData, BreadcrumbData } from "@/components/structured-data";
-import { 
+import {
   Shield, BookOpen, Users, Presentation, FileText,
   CheckCircle, Star, AlertTriangle, MessageCircle,
   ArrowRight, Lightbulb, GraduationCap, School,
-  ClipboardList, Download, CalendarDays
+  ClipboardList, Download, CalendarDays, Gamepad2
 } from "lucide-react";
 import bannerImage from "@/assets/banners/educators-banner.png";
 import digitalCitizenshipImg from "@/assets/images/card-digital-citizenship.png";
@@ -21,6 +21,20 @@ import privacyEducationImg from "@/assets/images/card-privacy-education.png";
 import socialMediaLiteracyImg from "@/assets/images/card-social-media-literacy.png";
 import onlineResearchImg from "@/assets/images/card-online-research.png";
 import passwordEducationImg from "@/assets/images/card-password-education.png";
+import {
+  LessonPlanGenerator,
+  ClassroomActivitySimulator,
+  AssessmentQuizBuilder,
+  CurriculumAlignmentGuide,
+  ClassroomMaterialsGallery
+} from "@/components/educators-hub/interactive-tools";
+import {
+  lessonPlanTemplates,
+  classroomActivities,
+  assessmentQuestions,
+  curriculumStandards,
+  classroomMaterials
+} from "@/components/educators-hub/activity-data";
 
 interface EducatorResource {
   id: string;
@@ -240,6 +254,17 @@ const educatorResources: EducatorResource[] = [
   }
 ];
 
+type TabKey = "guides" | "lessons" | "activities" | "assessments" | "curriculum" | "materials";
+
+const tabs: { key: TabKey; label: string; icon: typeof Shield }[] = [
+  { key: "guides", label: "Topic Guides", icon: BookOpen },
+  { key: "lessons", label: "Lesson Plans", icon: ClipboardList },
+  { key: "activities", label: "Activities", icon: Users },
+  { key: "assessments", label: "Assessments", icon: GraduationCap },
+  { key: "curriculum", label: "Curriculum", icon: FileText },
+  { key: "materials", label: "Materials", icon: Download }
+];
+
 function FloatingShapes() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -251,215 +276,183 @@ function FloatingShapes() {
   );
 }
 
-function EducatorsLanding({ onSelectResource }: { onSelectResource: (id: string) => void }) {
+function TopicGuidesSection({ onSelectResource }: { onSelectResource: (id: string) => void }) {
   return (
-    <>
-      <PageBanner
-        title="Teach Digital Safety"
-        subtitle="Classroom resources, lesson plans, and activities to help students become responsible digital citizens and stay safe online."
-        imageSrc={bannerImage}
-        imageAlt="Classroom teaching cybersecurity education"
-        colorVariant="indigo"
-      />
-      
-      <div className="relative py-12">
-        <FloatingShapes />
-        
-        <div className="max-w-5xl mx-auto px-4 relative z-10">
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6 mb-12">
-            {educatorResources.map((resource) => (
-              <Card 
-                key={resource.id}
-                className="cursor-pointer transition-shadow hover:shadow-xl border-2 border-white/50 dark:border-white/10 bg-white/80 dark:bg-card/80 backdrop-blur-sm overflow-hidden"
-                onClick={() => onSelectResource(resource.id)}
-                onKeyDown={(e) => e.key === 'Enter' && onSelectResource(resource.id)}
-                tabIndex={0}
-                role="button"
-                aria-label={`View ${resource.title} resource`}
-                data-testid={`card-resource-${resource.id}`}
-              >
-                <div className="relative h-48 sm:h-56 w-full">
-                  <img 
-                    src={resource.image} 
-                    alt={resource.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    data-testid={`img-resource-${resource.id}`}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  <Badge variant="secondary" className="absolute top-3 right-3 text-xs">{resource.gradeLevel}</Badge>
+    <div className="space-y-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6">
+        {educatorResources.map((resource) => (
+          <Card
+            key={resource.id}
+            className="cursor-pointer transition-shadow hover:shadow-xl border-2 border-white/50 dark:border-white/10 bg-white/80 dark:bg-card/80 backdrop-blur-sm overflow-hidden"
+            onClick={() => onSelectResource(resource.id)}
+            onKeyDown={(e) => e.key === 'Enter' && onSelectResource(resource.id)}
+            tabIndex={0}
+            role="button"
+            aria-label={`View ${resource.title} resource`}
+            data-testid={`card-resource-${resource.id}`}
+          >
+            <div className="relative h-48 sm:h-56 w-full">
+              <img
+                src={resource.image}
+                alt={resource.title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                data-testid={`img-resource-${resource.id}`}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              <Badge variant="secondary" className="absolute top-3 right-3 text-xs">{resource.gradeLevel}</Badge>
+            </div>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-3 mb-2">
+                <div className={`w-10 h-10 rounded-md ${resource.color} flex items-center justify-center shadow-sm flex-shrink-0`}>
+                  <resource.icon className="w-5 h-5 text-white" />
                 </div>
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-3 mb-2">
-                    <div className={`w-10 h-10 rounded-md ${resource.color} flex items-center justify-center shadow-sm flex-shrink-0`}>
-                      <resource.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-lg text-foreground">{resource.title}</h3>
-                  </div>
-                  <p className="text-muted-foreground text-sm">{resource.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 border-2 border-teal-200 dark:border-teal-800">
-            <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row items-center gap-6">
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center shadow-lg">
-                    <Users className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Kids Digital Safety Hub
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Interactive lessons designed for students ages 8 to 16. Use these self-guided modules as supplementary learning materials.
-                  </p>
-                </div>
-                <Button variant="outline" className="border-teal-300 dark:border-teal-700" onClick={() => {
-                  window.location.href = '/kids';
-                }} data-testid="button-kids-hub">
-                  View Student Resources
-                </Button>
+                <h3 className="font-semibold text-lg text-foreground">{resource.title}</h3>
               </div>
+              <p className="text-muted-foreground text-sm">{resource.description}</p>
             </CardContent>
           </Card>
+        ))}
+      </div>
 
-          <div className="mt-8 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
-            <div className="flex items-start gap-3">
-              <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Integrate Into Your Curriculum</p>
-                <p className="text-sm text-indigo-600 dark:text-indigo-400">
-                  These resources are designed to be flexible. Adapt activities to fit your classroom needs and students' developmental levels.
-                </p>
+      <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 border-2 border-teal-200 dark:border-teal-800">
+        <CardContent className="p-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center shadow-lg">
+                <Users className="w-8 h-8 text-white" />
               </div>
             </div>
+            <div className="flex-1 text-center md:text-left">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                Kids Digital Safety Hub
+              </h3>
+              <p className="text-muted-foreground">
+                Interactive lessons designed for students ages 8 to 16. Use these self-guided modules as supplementary learning materials.
+              </p>
+            </div>
+            <Button variant="outline" className="border-teal-300 dark:border-teal-700" onClick={() => {
+              window.location.href = '/kids';
+            }} data-testid="button-kids-hub">
+              View Student Resources
+            </Button>
           </div>
-        </div>
-      </div>
-    </>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
-function ResourceContent({ 
-  resource, 
-  onBack 
-}: { 
+function ResourceContent({
+  resource,
+  onBack
+}: {
   resource: EducatorResource;
   onBack: () => void;
 }) {
   return (
-    <div className="relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-blue-950/30" />
-      
-      <div className="relative py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <Button 
-            variant="ghost" 
-            onClick={onBack} 
-            className="mb-6"
-            data-testid="button-back-to-resources"
-          >
-            <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-            Back to All Resources
-          </Button>
+    <div className="space-y-6">
+      <Button
+        variant="ghost"
+        onClick={onBack}
+        className="mb-2"
+        data-testid="button-back-to-resources"
+      >
+        <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+        Back to All Resources
+      </Button>
 
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className={`w-16 h-16 rounded-xl ${resource.color} flex items-center justify-center shadow-lg`}>
-                    <resource.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-2xl">{resource.title}</CardTitle>
-                    <CardDescription className="text-base">{resource.description}</CardDescription>
-                  </div>
-                </div>
-                <Badge>{resource.gradeLevel}</Badge>
+      <Card className="mb-8">
+        <CardHeader>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className={`w-16 h-16 rounded-xl ${resource.color} flex items-center justify-center shadow-lg`}>
+                <resource.icon className="w-8 h-8 text-white" />
               </div>
-            </CardHeader>
-            <CardContent className="space-y-8">
               <div>
-                <h4 className="font-semibold text-lg text-foreground mb-3">Overview</h4>
-                <p className="text-muted-foreground leading-relaxed">{resource.content.overview}</p>
+                <CardTitle className="text-2xl">{resource.title}</CardTitle>
+                <CardDescription className="text-base">{resource.description}</CardDescription>
               </div>
-
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
-                <h4 className="font-semibold text-lg text-blue-800 dark:text-blue-200 mb-4 flex items-center gap-2">
-                  <Star className="w-5 h-5" />
-                  Learning Objectives
-                </h4>
-                <ul className="space-y-3">
-                  {resource.content.learningObjectives.map((objective, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-blue-700 dark:text-blue-300">{objective}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
-                <h4 className="font-semibold text-lg text-green-800 dark:text-green-200 mb-4 flex items-center gap-2">
-                  <ClipboardList className="w-5 h-5" />
-                  Classroom Activities
-                </h4>
-                <ul className="space-y-4">
-                  {resource.content.classroomActivities.map((activity, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-sm flex-shrink-0">{index + 1}</span>
-                      <span className="text-green-700 dark:text-green-300">{activity}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800">
-                <h4 className="font-semibold text-lg text-purple-800 dark:text-purple-200 mb-4 flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5" />
-                  Discussion Questions
-                </h4>
-                <ul className="space-y-3">
-                  {resource.content.discussionQuestions.map((question, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="text-purple-500 font-bold text-lg">?</span>
-                      <span className="text-purple-700 dark:text-purple-300">{question}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800">
-                <h4 className="font-semibold text-lg text-amber-800 dark:text-amber-200 mb-3 flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5" />
-                  Additional Resources
-                </h4>
-                <p className="text-amber-700 dark:text-amber-300">{resource.content.additionalResources}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex justify-center">
-            <Button onClick={onBack} variant="outline" data-testid="button-explore-more">
-              Explore More Resources
-            </Button>
+            </div>
+            <Badge>{resource.gradeLevel}</Badge>
           </div>
-        </div>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          <div>
+            <h4 className="font-semibold text-lg text-foreground mb-3">Overview</h4>
+            <p className="text-muted-foreground leading-relaxed">{resource.content.overview}</p>
+          </div>
+
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+            <h4 className="font-semibold text-lg text-blue-800 dark:text-blue-200 mb-4 flex items-center gap-2">
+              <Star className="w-5 h-5" />
+              Learning Objectives
+            </h4>
+            <ul className="space-y-3">
+              {resource.content.learningObjectives.map((objective, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-blue-700 dark:text-blue-300">{objective}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
+            <h4 className="font-semibold text-lg text-green-800 dark:text-green-200 mb-4 flex items-center gap-2">
+              <ClipboardList className="w-5 h-5" />
+              Classroom Activities
+            </h4>
+            <ul className="space-y-4">
+              {resource.content.classroomActivities.map((activity, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <span className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-sm flex-shrink-0">{index + 1}</span>
+                  <span className="text-green-700 dark:text-green-300">{activity}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800">
+            <h4 className="font-semibold text-lg text-purple-800 dark:text-purple-200 mb-4 flex items-center gap-2">
+              <MessageCircle className="w-5 h-5" />
+              Discussion Questions
+            </h4>
+            <ul className="space-y-3">
+              {resource.content.discussionQuestions.map((question, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <span className="text-purple-500 font-bold text-lg">?</span>
+                  <span className="text-purple-700 dark:text-purple-300">{question}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 border border-amber-200 dark:border-amber-800">
+            <h4 className="font-semibold text-lg text-amber-800 dark:text-amber-200 mb-3 flex items-center gap-2">
+              <Lightbulb className="w-5 h-5" />
+              Additional Resources
+            </h4>
+            <p className="text-amber-700 dark:text-amber-300">{resource.content.additionalResources}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-center">
+        <Button onClick={onBack} variant="outline" data-testid="button-explore-more">
+          Explore More Resources
+        </Button>
       </div>
     </div>
   );
 }
 
 export default function Educators() {
+  const [activeTab, setActiveTab] = useState<TabKey>("guides");
   const [selectedResource, setSelectedResource] = useState<string | null>(null);
 
-  const currentResource = selectedResource 
-    ? educatorResources.find(r => r.id === selectedResource) 
+  const currentResource = selectedResource
+    ? educatorResources.find(r => r.id === selectedResource)
     : null;
 
   const educatorsFaqSchema: FAQData = {
@@ -483,15 +476,93 @@ export default function Educators() {
       <SEOHead {...pageSEO.educators} />
       <StructuredData data={[educatorsFaqSchema, educatorsBreadcrumbs]} />
       <Navigation />
-      
+
       <main id="main-content" tabIndex={-1}>
         {currentResource ? (
-          <ResourceContent 
-            resource={currentResource}
-            onBack={() => setSelectedResource(null)}
-          />
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-blue-950/30" />
+            <div className="relative py-8">
+              <div className="max-w-4xl mx-auto px-4">
+                <ResourceContent
+                  resource={currentResource}
+                  onBack={() => setSelectedResource(null)}
+                />
+              </div>
+            </div>
+          </div>
         ) : (
-          <EducatorsLanding onSelectResource={setSelectedResource} />
+          <>
+            <PageBanner
+              title="Teach Digital Safety"
+              subtitle="Classroom resources, lesson plans, and activities to help students become responsible digital citizens and stay safe online."
+              imageSrc={bannerImage}
+              imageAlt="Classroom teaching cybersecurity education"
+              colorVariant="indigo"
+            />
+
+            <div className="relative py-8">
+              <FloatingShapes />
+
+              <div className="max-w-5xl mx-auto px-4 relative z-10">
+                <div className="flex flex-wrap gap-2 mb-8 bg-muted/50 p-2 rounded-xl border" data-testid="educator-tabs">
+                  {tabs.map(tab => {
+                    const Icon = tab.icon;
+                    return (
+                      <button
+                        key={tab.key}
+                        onClick={() => setActiveTab(tab.key)}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                          activeTab === tab.key
+                            ? "bg-background text-foreground shadow-sm border"
+                            : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                        }`}
+                        data-testid={`tab-${tab.key}`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="hidden sm:inline">{tab.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {activeTab === "guides" && (
+                  <TopicGuidesSection onSelectResource={setSelectedResource} />
+                )}
+
+                {activeTab === "lessons" && (
+                  <LessonPlanGenerator lessons={lessonPlanTemplates} />
+                )}
+
+                {activeTab === "activities" && (
+                  <ClassroomActivitySimulator activities={classroomActivities} />
+                )}
+
+                {activeTab === "assessments" && (
+                  <AssessmentQuizBuilder questions={assessmentQuestions} />
+                )}
+
+                {activeTab === "curriculum" && (
+                  <CurriculumAlignmentGuide standards={curriculumStandards} />
+                )}
+
+                {activeTab === "materials" && (
+                  <ClassroomMaterialsGallery materials={classroomMaterials} />
+                )}
+
+                <div className="mt-8 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                  <div className="flex items-start gap-3">
+                    <Lightbulb className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-indigo-800 dark:text-indigo-200">Integrate Into Your Curriculum</p>
+                      <p className="text-sm text-indigo-600 dark:text-indigo-400">
+                        These resources are designed to be flexible. Adapt activities to fit your classroom needs and students' developmental levels.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
         )}
         <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
           <CalendarDays className="w-3 h-3" />
