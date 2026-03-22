@@ -38,7 +38,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "gcr-scan-link") {
     scanContent(info.linkUrl, tab);
   } else if (info.menuItemId === "gcr-scan-page") {
-    scanContent(tab.url, tab);
+    extractAndScanPage(tab);
   } else if (info.menuItemId === "gcr-scan-selection") {
     scanContent(info.selectionText, tab);
   }
@@ -86,6 +86,52 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 });
+
+async function extractAndScanPage(tab) {
+  if (!tab?.id || !tab?.url) return;
+  updateBadge("...", "#666", tab.id);
+
+  try {
+    const results = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: () => {
+        const title = document.title || "";
+        const meta = document.querySelector('meta[name="description"]')?.content || "";
+        const headings = Array.from(document.querySelectorAll("h1, h2")).slice(0, 5).map(h => h.textContent.trim()).join(" | ");
+        const links = Array.from(document.querySelectorAll("a[href]")).slice(0, 20).map(a => a.href);
+        const forms = document.querySelectorAll("form").length;
+        const passwordFields = document.querySelectorAll('input[type="password"]').length;
+        const bodyText = document.body?.innerText?.substring(0, 1500) || "";
+        return { title, meta, headings, links, forms, passwordFields, bodyText };
+      }
+    });
+
+    if (results && results[0]?.result) {
+      const page = results[0].result;
+      let externalLinks = [];
+      try {
+        const pageHost = new URL(tab.url).hostname;
+        externalLinks = page.links.filter(l => { try { return new URL(l).hostname !== pageHost; } catch { return false; } }).slice(0, 10);
+      } catch {}
+
+      const content = [
+        `URL: ${tab.url}`,
+        `Page Title: ${page.title}`,
+        `Description: ${page.meta}`,
+        `Headings: ${page.headings}`,
+        `Forms on page: ${page.forms}`,
+        `Password fields: ${page.passwordFields}`,
+        `External links (sample): ${externalLinks.join(", ")}`,
+        `Page content excerpt: ${page.bodyText.substring(0, 800)}`
+      ].join("\n");
+      scanContent(content, tab);
+    } else {
+      scanContent(tab.url, tab);
+    }
+  } catch {
+    scanContent(tab.url, tab);
+  }
+}
 
 function getDefaultSettings() {
   return {

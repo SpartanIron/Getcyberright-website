@@ -32,10 +32,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnScanPage.addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.url) {
-        scanInput.value = tabs[0].url;
-        performScan(tabs[0].url);
-      }
+      if (!tabs[0]) return;
+      const tab = tabs[0];
+      scanInput.value = tab.url;
+      loadingIndicator.classList.remove("hidden");
+      scanResult.classList.add("hidden");
+      btnScan.disabled = true;
+
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          const title = document.title || "";
+          const meta = document.querySelector('meta[name="description"]')?.content || "";
+          const headings = Array.from(document.querySelectorAll("h1, h2")).slice(0, 5).map(h => h.textContent.trim()).join(" | ");
+          const links = Array.from(document.querySelectorAll("a[href]")).slice(0, 20).map(a => a.href);
+          const forms = document.querySelectorAll("form").length;
+          const passwordFields = document.querySelectorAll('input[type="password"]').length;
+          const bodyText = document.body?.innerText?.substring(0, 1500) || "";
+          return { title, meta, headings, links, forms, passwordFields, bodyText };
+        }
+      }).then((results) => {
+        if (results && results[0]?.result) {
+          const page = results[0].result;
+          const scanContent = [
+            `URL: ${tab.url}`,
+            `Page Title: ${page.title}`,
+            `Description: ${page.meta}`,
+            `Headings: ${page.headings}`,
+            `Forms on page: ${page.forms}`,
+            `Password fields: ${page.passwordFields}`,
+            `External links (sample): ${page.links.filter(l => { try { return new URL(l).hostname !== new URL(tab.url).hostname; } catch { return false; } }).slice(0, 10).join(", ")}`,
+            `Page content excerpt: ${page.bodyText.substring(0, 800)}`
+          ].join("\n");
+          performScan(scanContent);
+        } else {
+          performScan(tab.url);
+        }
+      }).catch(() => {
+        performScan(tab.url);
+      });
     });
   });
 
