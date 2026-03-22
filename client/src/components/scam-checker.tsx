@@ -352,13 +352,13 @@ const threatPatterns: { pattern: RegExp; category: string; indicator: string; se
 ];
 
 const suspiciousUrlPatterns = [
-  { pattern: /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/, reason: "IP address instead of domain name" },
-  { pattern: /@/, reason: "@ symbol in URL (credential injection)" },
-  { pattern: /paypal|amazon|apple|google|microsoft|facebook|netflix|bank/i, reason: "Mentions major brand but may be fake" },
-  { pattern: /\.(tk|ml|ga|cf|gq|xyz|top|club|online|site|website|buzz|work|link|click|info|biz|pw|cc|ws)$/i, reason: "Free or suspicious TLD" },
-  { pattern: /-login|-verify|-secure|-account|-update|-confirm/i, reason: "Suspicious subdomain/path pattern" },
-  { pattern: /bit\.ly\/|tinyurl\.com|\/\/t\.co\/|goo\.gl\/|ow\.ly\/|is\.gd\/|buff\.ly\/|adf\.ly\/|shorturl\.at|v\.gd\/|rb\.gy\/|cutt\.ly\/|trib\.al\//i, reason: "URL shortener hiding destination" },
-  { pattern: /\.(exe|zip|rar|scr|bat|cmd|msi|jar|vbs|js)$/i, reason: "Potentially malicious file download" },
+  { pattern: /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/, reason: "Uses a raw number address instead of a real website name" },
+  { pattern: /@/, reason: "Contains a trick character that can redirect you to a different site" },
+  { pattern: /paypal|amazon|apple|google|microsoft|facebook|netflix|bank/i, reason: "Mentions a major brand but may not be the real site" },
+  { pattern: /\.(tk|ml|ga|cf|gq|xyz|top|club|online|site|website|buzz|work|link|click|info|biz|pw|cc|ws)$/i, reason: "Uses a web address type commonly associated with scams" },
+  { pattern: /-login|-verify|-secure|-account|-update|-confirm/i, reason: "Uses words like 'login' or 'verify' in the address to seem official" },
+  { pattern: /bit\.ly\/|tinyurl\.com|\/\/t\.co\/|goo\.gl\/|ow\.ly\/|is\.gd\/|buff\.ly\/|adf\.ly\/|shorturl\.at|v\.gd\/|rb\.gy\/|cutt\.ly\/|trib\.al\//i, reason: "Uses a link shortener to hide where it really goes" },
+  { pattern: /\.(exe|zip|rar|scr|bat|cmd|msi|jar|vbs|js)$/i, reason: "Links to a file download that could contain harmful software" },
 ];
 
 const legitDomains = [
@@ -758,7 +758,7 @@ function analyzeUrlEntropy(url: string): { isHigh: boolean; entropy: number; rea
     return { 
       isHigh: true, 
       entropy, 
-      reason: `High URL randomness detected (entropy: ${entropy.toFixed(2)}) - often indicates malicious links` 
+      reason: `This link contains a suspicious jumble of random characters — a common trick used in scam links` 
     };
   }
   
@@ -777,7 +777,7 @@ function analyzeSubdomainDepth(url: string): { isDeep: boolean; depth: number; r
     return {
       isDeep: true,
       depth,
-      reason: `Excessive subdomain depth (${depth} levels) - often used to hide malicious domains`
+      reason: `The web address has an unusually complex structure — scammers use this to hide the real destination`
     };
   }
   
@@ -796,7 +796,7 @@ function detectBase64Payload(url: string): { found: boolean; reason: string } {
     if (candidate.length % 4 === 0 || candidate.endsWith('=')) {
       return {
         found: true,
-        reason: "Possible encoded/obfuscated payload detected in URL"
+        reason: "This link contains hidden encoded data — often used to bypass security filters"
       };
     }
   }
@@ -813,7 +813,7 @@ function detectPunycode(url: string): { found: boolean; domain: string; reason: 
     return {
       found: true,
       domain,
-      reason: "Internationalized domain (Punycode) detected - may be impersonating a legitimate site"
+      reason: "This address uses special characters to impersonate a real website — a known scam technique"
     };
   }
   
@@ -1089,7 +1089,7 @@ function detectBrandSimilarity(domain: string): { found: boolean; brand: string;
         found: true,
         brand,
         distance,
-        reason: `Domain "${mainDomain}" is suspiciously similar to "${brand}" (${Math.round(similarity * 100)}% match)`
+        reason: `This website name "${mainDomain}" is very close to "${brand}" — it may be a fake version trying to trick you`
       };
     }
   }
@@ -1417,14 +1417,14 @@ function analyzeUrl(url: string): URLAnalysis {
   // Check for typosquatting
   const typosquat = detectTyposquatting(url);
   if (typosquat) {
-    reasons.push(`Possible ${typosquat.brand} typosquatting`);
+    reasons.push(`Fake ${typosquat.brand} website — the address is slightly misspelled to trick you`);
     isSuspicious = true;
   }
   
   // Check for homograph attacks
   const homoglyphs = detectHomoglyphs(url);
   if (homoglyphs.found) {
-    reasons.push(`Lookalike characters detected: ${homoglyphs.examples.join(', ')}`);
+    reasons.push(`Uses deceptive characters that look real but aren't — designed to fool you`);
     isSuspicious = true;
   }
   
@@ -2387,10 +2387,42 @@ export function ScamChecker() {
                       </Badge>
                     </div>
                     <p className="text-sm opacity-90">{result.summary}</p>
+                    {(result.overallRisk === "critical" || result.overallRisk === "high") && !isAiAnalyzing && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="font-semibold"
+                          onClick={() => {
+                            const url = content.match(/https?:\/\/[^\s]+/)?.[0];
+                            navigator.clipboard.writeText(
+                              `GCR Guard Scan Result: ${result.title}\n\n${result.summary}\n\n${url ? "Link scanned: " + url + "\n\n" : ""}Protect yourself and your family — getcyberright.com`
+                            );
+                            toast({ title: "Copied to clipboard", description: "Share this warning with others to keep them safe." });
+                          }}
+                          data-testid="button-warn-others-pattern"
+                        >
+                          <AlertTriangle className="w-4 h-4 mr-1" />
+                          Warn Others
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const reportSection = document.querySelector('[data-testid="button-report-community"]');
+                            if (reportSection) reportSection.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          data-testid="button-report-threat-pattern"
+                        >
+                          <Shield className="w-4 h-4 mr-1" />
+                          Report This Threat
+                        </Button>
+                      </div>
+                    )}
                     {isAiAnalyzing && (
                       <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
                         <Loader2 className="w-3 h-3 animate-spin" />
-                        AI deep analysis in progress, this is a preliminary result...
+                        Running deep AI analysis for more detail...
                       </p>
                     )}
                   </div>
@@ -2422,6 +2454,40 @@ export function ScamChecker() {
                             </div>
                             <p className="text-sm font-medium text-foreground mb-1">{getFriendlyVerdict(aiResult.scamRiskLevel)}</p>
                             <p className="text-sm text-muted-foreground">{aiResult.summary}</p>
+                            {(aiResult.scamRiskLevel === "Critical" || aiResult.scamRiskLevel === "High") && (
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="font-semibold"
+                                  onClick={() => {
+                                    const url = content.match(/https?:\/\/[^\s]+/)?.[0];
+                                    if (url) {
+                                      navigator.clipboard.writeText(
+                                        `GCR Guard Scan Result: ${getFriendlyRiskTitle(aiResult.scamRiskLevel)}\n\n${aiResult.summary}\n\nLink scanned: ${url}\n\nProtect yourself and your family — getcyberright.com`
+                                      );
+                                      toast({ title: "Copied to clipboard", description: "Share this warning with others to keep them safe." });
+                                    }
+                                  }}
+                                  data-testid="button-warn-others"
+                                >
+                                  <AlertTriangle className="w-4 h-4 mr-1" />
+                                  Warn Others
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    const reportSection = document.querySelector('[data-testid="button-report-community"]');
+                                    if (reportSection) reportSection.scrollIntoView({ behavior: 'smooth' });
+                                  }}
+                                  data-testid="button-report-threat"
+                                >
+                                  <Shield className="w-4 h-4 mr-1" />
+                                  Report This Threat
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -2464,7 +2530,7 @@ export function ScamChecker() {
                         <div>
                           <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
                             <Eye className="w-4 h-4 text-blue-500" />
-                            Technical Observations
+                            What We Checked
                           </h4>
                           <ul className="space-y-1.5">
                             {aiResult.technicalObservations.map((obs, i) => (
@@ -2476,6 +2542,11 @@ export function ScamChecker() {
                           </ul>
                         </div>
                       )}
+
+                      <div className="flex items-center gap-2 pt-2 border-t text-xs text-muted-foreground">
+                        <Shield className="w-3.5 h-3.5" />
+                        <span>Scanned against known scam patterns, phishing databases, and deceptive URL techniques</span>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -2487,7 +2558,7 @@ export function ScamChecker() {
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-semibold flex items-center gap-2">
                     <Zap className="w-4 h-4 text-yellow-500" />
-                    Pressure/Urgency Analysis
+                    Pressure Tactics Detected
                   </h4>
                   <Badge className={
                     result.urgencyAnalysis.score >= 70 ? "bg-red-500 text-white" :
@@ -2501,7 +2572,7 @@ export function ScamChecker() {
 
                 <div className="mb-3">
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-muted-foreground">Manipulation Level</span>
+                    <span className="text-muted-foreground">How Hard They're Pushing You</span>
                     <span className="font-medium">{result.urgencyAnalysis.score}/100</span>
                   </div>
                   <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">

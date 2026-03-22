@@ -444,6 +444,21 @@ body {
   font-size: 11px;
 }
 
+.result-checked-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 10px;
+  color: #9ca3af;
+  border-top: 1px solid #f3f4f6;
+}
+
+.result-checked-section svg {
+  flex-shrink: 0;
+  color: #9ca3af;
+}
+
 .result-footer {
   display: flex;
   gap: 6px;
