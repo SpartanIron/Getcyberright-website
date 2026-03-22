@@ -341,23 +341,33 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderDigestSummary(stats) {
     const el = document.getElementById("digest-summary");
     if (!el) return;
-    const sitesCount = (stats.sitesVisited || []).length;
-    const flaggedCount = (stats.sitesFlagged || []).length;
-    const topThreats = (stats.topThreats || []).slice(-3);
-    if (sitesCount === 0 && flaggedCount === 0) return;
 
-    el.classList.remove("hidden");
-    let html = `<span class="digest-stat">${sitesCount} unique site${sitesCount !== 1 ? "s" : ""} visited</span>`;
-    if (flaggedCount > 0) {
-      html += ` <span class="digest-stat digest-stat-warn">${flaggedCount} flagged</span>`;
-    }
-    if (topThreats.length > 0) {
-      const domains = topThreats.map(t => t.domain).filter(Boolean);
-      if (domains.length > 0) {
-        html += `<span class="digest-threats">Top threats: ${domains.join(", ")}</span>`;
+    chrome.storage.local.get(["lastDigest"], (result) => {
+      const digest = result.lastDigest;
+      const sitesCount = (stats.sitesVisited || []).length || (digest?.sitesVisitedCount || 0);
+      const flaggedCount = (stats.sitesFlagged || []).length || (digest?.sitesFlaggedCount || 0);
+      const topThreats = (stats.topThreats || []).slice(-3);
+      const digestThreats = digest?.topThreats || [];
+      const threatDomains = topThreats.length > 0
+        ? topThreats.map(t => t.domain).filter(Boolean)
+        : digestThreats;
+
+      if (sitesCount === 0 && flaggedCount === 0) return;
+
+      el.classList.remove("hidden");
+      let html = `<span class="digest-stat">${sitesCount} unique site${sitesCount !== 1 ? "s" : ""} visited</span>`;
+      if (flaggedCount > 0) {
+        html += ` <span class="digest-stat digest-stat-warn">${flaggedCount} flagged</span>`;
       }
-    }
-    el.innerHTML = html;
+      if (threatDomains.length > 0) {
+        html += `<span class="digest-threats">Top threats: ${threatDomains.join(", ")}</span>`;
+      }
+      if (digest?.generatedAt) {
+        const ago = timeAgo(digest.generatedAt);
+        html += `<span class="digest-threats">Last digest: ${ago}</span>`;
+      }
+      el.innerHTML = html;
+    });
   }
 
   function renderWeeklyChart(stats) {
@@ -478,6 +488,17 @@ document.addEventListener("DOMContentLoaded", () => {
       weeklyDigest: document.getElementById("setting-digest").checked
     };
     chrome.runtime.sendMessage({ type: "SAVE_SETTINGS", settings });
+  }
+
+  function timeAgo(timestamp) {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    if (seconds < 60) return "just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
   }
 
   function extractUrl(text) {
