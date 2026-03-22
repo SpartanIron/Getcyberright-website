@@ -1,6 +1,9 @@
 const API_BASE = "https://www.getcyberright.com";
 
 const tabCache = new Map();
+let cachedSubscription = null;
+let subscriptionCacheTime = 0;
+const SUBSCRIPTION_CACHE_TTL = 10 * 60 * 1000;
 
 const SKIP_SCAN_PATTERNS = [
   /^chrome/,
@@ -195,6 +198,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     performScan(message.content).then(sendResponse);
     return true;
   }
+  if (message.type === "SIGN_IN") {
+    handleSignIn(message.token).then(sendResponse);
+    return true;
+  }
+  if (message.type === "SIGN_OUT") {
+    handleSignOut().then(sendResponse);
+    return true;
+  }
+  if (message.type === "GET_AUTH_STATUS") {
+    getAuthStatus().then(sendResponse);
+    return true;
+  }
+  if (message.type === "CHECK_FEATURE") {
+    checkFeatureAccess(message.feature).then(sendResponse);
+    return true;
+  }
 });
 
 function shouldSkipUrl(url) {
@@ -237,6 +256,11 @@ async function handleAutoScan(message, sender) {
   const settings = await getSettings();
   if (!settings.autoScan) {
     return { skipped: true, reason: "disabled" };
+  }
+
+  const hasAutoScan = await checkFeatureAccess("auto_scan");
+  if (!hasAutoScan) {
+    return { skipped: true, reason: "upgrade_required" };
   }
 
   if (tabCache.has(tabId)) {
@@ -838,4 +862,128 @@ function getSettings() {
 
 function capitalize(s) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
+}
+
+async function handleSignIn(token) {
+  try {
+    if (!token || token.length < 10) {
+      return { success: false, error: "Invalid token" };
+    }
+    const response = await fetch(`${API_BASE}/api/extension/subscription-status`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!response.ok) {
+      return { success: false, error: "Invalid or expired token" };
+    }
+    const data = await response.json();
+    await chrome.storage.local.set({
+      authToken: token,
+      authUser: {
+        email: data.email,
+        firstName: data.firstName,
+        tier: data.tier,
+        features: data.features,
+        isActive: data.isActive,
+        expiresAt: data.expiresAt,
+        lastChecked: Date.now()
+      }
+    });
+    cachedSubscription = data;
+    subscriptionCacheTime = Date.now();
+    return { success: true, tier: data.tier, email: data.email };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+async function handleSignOut() {
+  await chrome.storage.local.remove(["authToken", "authUser"]);
+  cachedSubscription = null;
+  subscriptionCacheTime = 0;
+  return { success: true };
+}
+
+async function getAuthStatus() {
+  const { authToken, authUser } = await chrome.storage.local.get(["authToken", "authUser"]);
+  if (!authToken) {
+    return { signedIn: false, tier: "free", features: ["manual_scan"] };
+  }
+
+  if (authUser && authUser.lastChecked && (Date.now() - authUser.lastChecked < SUBSCRIPTION_CACHE_TTL)) {
+    return {
+      signedIn: true,
+      email: authUser.email,
+      firstName: authUser.firstName,
+      tier: authUser.tier,
+      features: authUser.features || ["manual_scan"],
+      isActive: authUser.isActive,
+      expiresAt: authUser.expiresAt
+    };
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/api/extension/subscription-status`, {
+      headers: { "Authorization": `Bearer ${authToken}` }
+    });
+    if (!response.ok) {
+      await chrome.storage.local.remove(["authToken", "authUser"]);
+      cachedSubscription = null;
+      return { signedIn: false, tier: "free", features: ["manual_scan"], error: "Token expired" };
+    }
+    const data = await response.json();
+    const authUserData = {
+      email: data.email,
+      firstName: data.firstName,
+      tier: data.tier,
+      features: data.features,
+      isActive: data.isActive,
+      expiresAt: data.expiresAt,
+      lastChecked: Date.now()
+    };
+    await chrome.storage.local.set({ authUser: authUserData });
+    cachedSubscription = data;
+    subscriptionCacheTime = Date.now();
+    return {
+      signedIn: true,
+      email: data.email,
+      firstName: data.firstName,
+      tier: data.tier,
+      features: data.features || ["manual_scan"],
+      isActive: data.isActive,
+      expiresAt: data.expiresAt
+    };
+  } catch (error) {
+    if (authUser) {
+      if (authUser.expiresAt && new Date(authUser.expiresAt) < new Date()) {
+        return {
+          signedIn: true,
+          email: authUser.email,
+          firstName: authUser.firstName,
+          tier: "free",
+          features: ["manual_scan"],
+          isActive: false,
+          expiresAt: authUser.expiresAt
+        };
+      }
+      return {
+        signedIn: true,
+        email: authUser.email,
+        firstName: authUser.firstName,
+        tier: authUser.tier,
+        features: authUser.features || ["manual_scan"],
+        isActive: authUser.isActive,
+        expiresAt: authUser.expiresAt
+      };
+    }
+    return { signedIn: false, tier: "free", features: ["manual_scan"] };
+  }
+}
+
+async function checkFeatureAccess(feature) {
+  if (feature === "manual_scan") return true;
+  const auth = await getAuthStatus();
+  if (!auth.signedIn || !auth.isActive) return false;
+  if (auth.expiresAt && new Date(auth.expiresAt) < new Date()) return false;
+  const features = auth.features || ["manual_scan"];
+  return features.includes(feature);
 }

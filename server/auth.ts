@@ -130,30 +130,22 @@ export function registerAuthRoutes(app: Express) {
     name: "gcr.sid",
   }));
   
-  // Register new user - DISABLED (admin-only system)
+  // Register new user
   app.post("/api/auth/register", async (req, res) => {
-    return res.status(403).json({ error: "Public registration is disabled. Please contact an administrator." });
-    
-    // Original registration code disabled:
-    /*
     try {
       const validatedData = registerSchema.parse(req.body);
       
-      // Check if user exists
       const [existing] = await db.select().from(users).where(eq(users.email, validatedData.email.toLowerCase()));
       if (existing) {
         return res.status(400).json({ error: "An account with this email already exists" });
       }
       
-      // Hash password
       const passwordHash = await bcrypt.hash(validatedData.password, SALT_ROUNDS);
       
-      // Generate email verification token
       const emailVerificationToken = generateToken();
       const emailVerificationExpires = new Date();
       emailVerificationExpires.setHours(emailVerificationExpires.getHours() + TOKEN_EXPIRY_HOURS);
       
-      // Create user
       const [newUser] = await db.insert(users).values({
         email: validatedData.email.toLowerCase(),
         passwordHash,
@@ -161,13 +153,10 @@ export function registerAuthRoutes(app: Express) {
         lastName: validatedData.lastName,
         emailVerificationToken,
         emailVerificationExpires,
-        mustChangePassword: true,
       }).returning();
       
       securityLogger.info("New user registered", { userId: newUser.id, email: validatedData.email });
       
-      // In production, send verification email here
-      // For now, auto-verify in development
       if (process.env.NODE_ENV !== "production") {
         await db.update(users).set({ 
           emailVerified: true,
@@ -178,7 +167,7 @@ export function registerAuthRoutes(app: Express) {
       
       res.json({ 
         success: true, 
-        message: "Account created successfully. Please check your email to verify your account.",
+        message: "Account created successfully.",
         requiresVerification: process.env.NODE_ENV === "production"
       });
     } catch (error) {
@@ -188,7 +177,6 @@ export function registerAuthRoutes(app: Express) {
       console.error("Registration error:", error);
       res.status(500).json({ error: "Registration failed" });
     }
-    */
   });
   
   // Login

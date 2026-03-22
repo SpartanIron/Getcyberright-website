@@ -1550,3 +1550,13 @@ export const siteReputation = pgTable("site_reputation", {
 });
 
 export type SiteReputation = typeof siteReputation.$inferSelect;
+
+export const extensionTokens = pgTable("extension_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  token: varchar("token", { length: 128 }).notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type ExtensionToken = typeof extensionTokens.$inferSelect;

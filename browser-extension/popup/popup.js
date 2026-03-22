@@ -11,6 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const viewMain = document.getElementById("view-main");
   const viewSettings = document.getElementById("view-settings");
 
+  const btnConnect = document.getElementById("btn-connect");
+  const btnSignOut = document.getElementById("btn-sign-out");
+  const authTokenInput = document.getElementById("auth-token-input");
+  const authSignedOut = document.getElementById("auth-signed-out");
+  const authSignedIn = document.getElementById("auth-signed-in");
+  const authEmailEl = document.getElementById("auth-email");
+  const authTierEl = document.getElementById("auth-tier");
+  const authError = document.getElementById("auth-error");
+
   let lastScanContent = "";
   let lastScanResult = null;
 
@@ -20,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadPageStatus();
   loadWeeklyChart();
   loadScanHistory();
+  loadAuthStatus();
 
   btnScan.addEventListener("click", () => {
     const content = scanInput.value.trim();
@@ -125,6 +135,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".toggle").forEach((toggle) => {
     toggle.addEventListener("change", saveSettings);
+  });
+
+  btnConnect.addEventListener("click", () => {
+    const token = authTokenInput.value.trim();
+    if (!token) return;
+    authError.classList.add("hidden");
+    btnConnect.disabled = true;
+    btnConnect.textContent = "Connecting...";
+    chrome.runtime.sendMessage({ type: "SIGN_IN", token }, (response) => {
+      btnConnect.disabled = false;
+      btnConnect.textContent = "Connect";
+      if (response?.success) {
+        authTokenInput.value = "";
+        loadAuthStatus();
+        applyFeatureGating();
+      } else {
+        authError.textContent = response?.error || "Connection failed";
+        authError.classList.remove("hidden");
+      }
+    });
+  });
+
+  authTokenInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      btnConnect.click();
+    }
+  });
+
+  btnSignOut.addEventListener("click", () => {
+    chrome.runtime.sendMessage({ type: "SIGN_OUT" }, () => {
+      loadAuthStatus();
+      applyFeatureGating();
+    });
   });
 
   function loadPageStatus() {
@@ -499,6 +543,65 @@ document.addEventListener("DOMContentLoaded", () => {
     if (hours < 24) return `${hours}h ago`;
     const days = Math.floor(hours / 24);
     return `${days}d ago`;
+  }
+
+  function loadAuthStatus() {
+    chrome.runtime.sendMessage({ type: "GET_AUTH_STATUS" }, (status) => {
+      if (!status) return;
+      if (status.signedIn) {
+        authSignedOut.classList.add("hidden");
+        authSignedIn.classList.remove("hidden");
+        authEmailEl.textContent = status.email || "Connected";
+        const tierLabels = { free: "Free", essential: "Pro", professional: "Family" };
+        const tierLabel = tierLabels[status.tier] || "Free";
+        authTierEl.textContent = tierLabel;
+        authTierEl.className = `auth-tier tier-${status.tier || "free"}`;
+      } else {
+        authSignedOut.classList.remove("hidden");
+        authSignedIn.classList.add("hidden");
+      }
+      applyFeatureGating(status);
+    });
+  }
+
+  function applyFeatureGating(status) {
+    if (!status) {
+      chrome.runtime.sendMessage({ type: "GET_AUTH_STATUS" }, (s) => {
+        if (s) applyFeatureGating(s);
+      });
+      return;
+    }
+    const features = status.features || ["manual_scan"];
+    const featureMap = {
+      "setting-autoscan": "auto_scan",
+      "setting-webmail": "webmail_scan",
+      "setting-community": "community_trust",
+      "setting-digest": "weekly_digest",
+      "setting-hover": "auto_scan",
+      "setting-block": "auto_scan",
+      "setting-lookalike": "auto_scan",
+      "setting-formwarnings": "auto_scan"
+    };
+    const familyFeatures = ["weekly_digest"];
+
+    Object.entries(featureMap).forEach(([settingId, feature]) => {
+      const el = document.getElementById(settingId);
+      if (!el) return;
+      const settingItem = el.closest(".setting-item");
+      if (!settingItem) return;
+
+      if (features.includes(feature)) {
+        settingItem.classList.remove("feature-locked", "family-only");
+        el.disabled = false;
+      } else {
+        settingItem.classList.add("feature-locked");
+        if (familyFeatures.includes(feature)) {
+          settingItem.classList.add("family-only");
+        }
+        el.disabled = true;
+        el.checked = false;
+      }
+    });
   }
 
   function extractUrl(text) {

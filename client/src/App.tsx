@@ -83,6 +83,8 @@ const PartnerDeck = lazy(() => import("@/pages/partner-deck"));
 const Feedback = lazy(() => import("@/pages/feedback"));
 const Experience = lazy(() => import("@/pages/experience"));
 const CheckoutSuccess = lazy(() => import("@/pages/checkout-success"));
+const GcrGuardPricing = lazy(() => import("@/pages/gcr-guard-pricing"));
+const ExtensionAuth = lazy(() => import("@/pages/extension-auth"));
 const Preferences = lazy(() => import("@/pages/preferences"));
 const PrintableGuides = lazy(() => import("@/pages/printable-guides"));
 const QuickAssessment = lazy(() => import("@/pages/quick-assessment"));
@@ -144,7 +146,9 @@ function Router() {
         <Route path="/support" component={Support} />
         <Route path="/security" component={Security} />
         <Route path="/our-mission" component={OurMission} />
-        <Route path="/pricing" component={OurMission} />
+        <Route path="/pricing" component={GcrGuardPricing} />
+        <Route path="/gcr-guard-pricing" component={GcrGuardPricing} />
+        <Route path="/extension-auth" component={ExtensionAuth} />
         <Route path="/support-the-mission" component={SupportTheMission} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/threat-trends" component={ThreatTrendsPage} />

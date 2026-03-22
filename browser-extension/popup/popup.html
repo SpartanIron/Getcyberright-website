@@ -157,7 +157,36 @@
         </button>
         <h2>Settings</h2>
       </div>
+
       <div class="settings-list">
+        <div class="settings-group-title">Account</div>
+        <div id="auth-section" class="auth-section">
+          <div id="auth-signed-out" class="auth-state">
+            <div id="auth-token-input-section">
+              <input type="text" id="auth-token-input" placeholder="Paste your account token..." class="auth-token-input" data-testid="input-auth-token" />
+              <button id="btn-connect" class="btn btn-primary btn-sm" data-testid="btn-connect">Connect</button>
+            </div>
+            <div class="auth-help">
+              <a href="https://www.getcyberright.com/extension-auth" target="_blank" class="auth-link" data-testid="link-get-token">Get a token from your account</a>
+            </div>
+          </div>
+          <div id="auth-signed-in" class="auth-state hidden">
+            <div class="auth-user-info">
+              <div class="auth-email" id="auth-email" data-testid="text-auth-email"></div>
+              <div class="auth-tier" id="auth-tier" data-testid="text-auth-tier"></div>
+            </div>
+            <button id="btn-sign-out" class="btn btn-outline btn-sm" data-testid="btn-sign-out">Sign Out</button>
+          </div>
+          <div id="auth-error" class="auth-error hidden" data-testid="text-auth-error"></div>
+        </div>
+        <a href="https://www.getcyberright.com/pricing" target="_blank" class="setting-item setting-link" data-testid="link-upgrade">
+          <div>
+            <div class="setting-title">Upgrade Plan</div>
+            <div class="setting-desc">View pricing and upgrade your protection</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+
         <div class="settings-group-title">Protection</div>
         <label class="setting-item">
           <div>

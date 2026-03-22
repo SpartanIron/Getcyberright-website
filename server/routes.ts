@@ -4367,5 +4367,162 @@ EDGE CASE HANDLING
     }
   });
 
+  // ============================================================
+  // SUBSCRIPTION & EXTENSION AUTH ROUTES
+  // ============================================================
+
+  const TIER_FEATURES: Record<string, string[]> = {
+    free: ["manual_scan"],
+    essential: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous"],
+    professional: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "weekly_digest", "scan_history", "safety_score", "family_profiles"],
+    enterprise: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "weekly_digest", "scan_history", "safety_score", "family_profiles", "priority_support", "api_access"],
+  };
+
+  app.get("/api/subscription/tiers", (_req, res) => {
+    res.json({
+      tiers: [
+        {
+          id: "free",
+          name: "Free",
+          price: 0,
+          interval: null,
+          features: TIER_FEATURES.free,
+          description: "Basic protection with manual scanning",
+        },
+        {
+          id: "essential",
+          name: "Pro",
+          price: 399,
+          interval: "month",
+          features: TIER_FEATURES.essential,
+          description: "Full auto-protection for individuals",
+        },
+        {
+          id: "professional",
+          name: "Family",
+          price: 799,
+          interval: "month",
+          features: TIER_FEATURES.professional,
+          description: "Complete protection for the whole family",
+        },
+      ],
+    });
+  });
+
+  app.get("/api/subscription/status", isAuthenticated, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const tier = user.subscriptionTier || "free";
+      const isActive = tier === "free" ? true : (!user.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
+      const effectiveFeatures = isActive ? (TIER_FEATURES[tier] || TIER_FEATURES.free) : TIER_FEATURES.free;
+
+      res.json({
+        tier: isActive ? tier : "free",
+        isActive,
+        features: effectiveFeatures,
+        expiresAt: user.subscriptionExpiresAt,
+      });
+    } catch (error) {
+      console.error("Subscription status error:", error);
+      res.status(500).json({ error: "Failed to fetch subscription status" });
+    }
+  });
+
+  app.post("/api/subscription/update", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { userId, tier, expiresAt } = req.body;
+      if (!userId || !tier) {
+        return res.status(400).json({ error: "userId and tier are required" });
+      }
+      if (!["free", "essential", "professional", "enterprise"].includes(tier)) {
+        return res.status(400).json({ error: "Invalid tier" });
+      }
+
+      const expiration = tier === "free" ? null : (expiresAt ? new Date(expiresAt) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
+
+      await db.update(users).set({
+        subscriptionTier: tier,
+        subscriptionExpiresAt: expiration,
+        updatedAt: new Date(),
+      }).where(eq(users.id, userId));
+
+      res.json({ success: true, tier, expiresAt: expiration });
+    } catch (error) {
+      console.error("Subscription update error:", error);
+      res.status(500).json({ error: "Failed to update subscription" });
+    }
+  });
+
+  const { extensionTokens } = await import("@shared/schema");
+
+  app.post("/api/extension/auth/token", isAuthenticated, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const tokenValue = cryptoModule.randomBytes(48).toString("hex");
+      const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+
+      await db.delete(extensionTokens).where(eq(extensionTokens.userId, user.id));
+
+      await db.insert(extensionTokens).values({
+        userId: user.id,
+        token: tokenValue,
+        expiresAt,
+      });
+
+      res.json({ token: tokenValue, expiresAt });
+    } catch (error) {
+      console.error("Extension token error:", error);
+      res.status(500).json({ error: "Failed to generate token" });
+    }
+  });
+
+  app.get("/api/extension/subscription-status", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "Missing or invalid authorization header" });
+      }
+
+      const token = authHeader.slice(7);
+      const [tokenRecord] = await db.select().from(extensionTokens).where(eq(extensionTokens.token, token)).limit(1);
+
+      if (!tokenRecord || new Date(tokenRecord.expiresAt) < new Date()) {
+        return res.status(401).json({ error: "Invalid or expired token" });
+      }
+
+      const [user] = await db.select().from(users).where(eq(users.id, tokenRecord.userId)).limit(1);
+      if (!user) {
+        return res.status(401).json({ error: "User not found" });
+      }
+
+      const tier = user.subscriptionTier || "free";
+      const isActive = tier === "free" ? true : (!user.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
+      const effectiveFeatures = isActive ? (TIER_FEATURES[tier] || TIER_FEATURES.free) : TIER_FEATURES.free;
+
+      res.json({
+        tier: isActive ? tier : "free",
+        isActive,
+        features: effectiveFeatures,
+        expiresAt: user.subscriptionExpiresAt,
+        email: user.email,
+        firstName: user.firstName,
+      });
+    } catch (error) {
+      console.error("Extension subscription status error:", error);
+      res.status(500).json({ error: "Failed to fetch subscription status" });
+    }
+  });
+
+  app.post("/api/extension/auth/revoke", isAuthenticated, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      await db.delete(extensionTokens).where(eq(extensionTokens.userId, user.id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Extension token revoke error:", error);
+      res.status(500).json({ error: "Failed to revoke token" });
+    }
+  });
+
   return httpServer;
 }

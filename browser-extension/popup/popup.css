@@ -740,6 +740,148 @@ body {
   color: #dc2626;
 }
 
+.auth-section {
+  padding: 10px 0;
+}
+
+.auth-state {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-state.hidden {
+  display: none;
+}
+
+#auth-token-input-section {
+  display: flex;
+  gap: 6px;
+}
+
+.auth-token-input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  background: white;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.auth-token-input:focus {
+  border-color: #0A2A3C;
+}
+
+.auth-token-input::placeholder {
+  color: #9ca3af;
+}
+
+.auth-help {
+  text-align: center;
+}
+
+.auth-link {
+  font-size: 11px;
+  color: #0A2A3C;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.auth-user-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.auth-email {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.auth-tier {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.auth-tier.tier-free {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.auth-tier.tier-essential {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.auth-tier.tier-professional {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.auth-error {
+  font-size: 11px;
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.auth-error.hidden {
+  display: none;
+}
+
+.setting-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.setting-link:hover {
+  background: #f3f4f6;
+}
+
+.feature-locked {
+  position: relative;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.feature-locked::after {
+  content: "PRO";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  background: #dbeafe;
+  color: #2563eb;
+  padding: 1px 6px;
+  border-radius: 8px;
+  letter-spacing: 0.05em;
+}
+
+.feature-locked.family-only::after {
+  content: "FAMILY";
+  background: #fef3c7;
+  color: #d97706;
+}
+
 .report-page-section {
   padding: 8px 16px 4px;
 }
