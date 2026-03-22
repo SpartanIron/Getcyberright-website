@@ -226,6 +226,34 @@ const lessonTopics: Record<string, LessonTopic[]> = {
           "I help my friends get help when they need it."
         ]
       }
+    },
+    {
+      id: "internet-basics",
+      title: "How the Internet Works",
+      description: "Understand the basics of being online safely.",
+      icon: Globe,
+      color: "bg-cyan-600",
+      image: kidsYoungLearnersImg,
+      content: {
+        intro: "The internet is like a giant library, playground, and mailbox all rolled into one. It connects people all around the world. Knowing how it works helps you use it safely!",
+        tips: [
+          "The internet connects computers, phones, and tablets around the world.",
+          "A web browser is like a window that lets you look at websites.",
+          "The padlock icon next to a website address means it uses a secure connection.",
+          "Not everything you read online is true. Always check facts with trusted sources.",
+          "Use a search engine your parent has set up with safe search turned on.",
+          "Be careful about allowing notifications from websites.",
+          "Only download files from trusted sources and expected file types.",
+          "If something online confuses you, ask a trusted adult to explain."
+        ],
+        remember: "The internet is a powerful tool. Understanding how it works helps you use it safely and wisely.",
+        checklist: [
+          "I know what a web browser is and how to use it safely.",
+          "I look for the padlock icon when visiting websites.",
+          "I do not believe everything I read online without checking.",
+          "I ask a parent before downloading files or allowing notifications."
+        ]
+      }
     }
   ],
   "11-13": [
@@ -378,6 +406,38 @@ const lessonTopics: Record<string, LessonTopic[]> = {
           "I have cleaned up old posts I no longer want public.",
           "My privacy settings are up to date.",
           "I am building a positive digital footprint."
+        ]
+      }
+    },
+    {
+      id: "privacy-settings",
+      title: "Privacy Settings Mastery",
+      description: "Take control of your privacy on apps and devices.",
+      icon: Lock,
+      color: "bg-teal-600",
+      image: kidsPersonalInfoImg,
+      content: {
+        intro: "Every app and device you use has privacy settings that control who can see your information and what data is collected. Learning to find and adjust these settings puts you in control of your digital privacy.",
+        tips: [
+          "Check app permissions before and after installation. Limit access to what the app actually needs.",
+          "Turn off location tracking for apps that do not need it.",
+          "Be cautious with 'Sign in with Google/Facebook' options. Check what permissions the app requests.",
+          "Only save payment information on highly trusted websites.",
+          "Use biometric security (fingerprint or face) when available for an extra layer of protection.",
+          "Do not share streaming or account passwords, even with friends. Shared accounts expose personal data.",
+          "Research VPN providers carefully. Free VPNs often sell your browsing data.",
+          "Review your privacy settings on all apps at least once a month."
+        ],
+        remember: "Privacy settings are your first line of defense. Take a few minutes to review them and you will be much safer online.",
+        platformGuides: [
+          { platform: "Phone Privacy Check", steps: ["Go to Settings and find Privacy or Permissions", "Review which apps have access to your location, camera, and microphone", "Change location access to 'While Using' instead of 'Always' for most apps", "Turn off ad tracking in your privacy settings", "Check which apps can access your contacts and photos"] },
+          { platform: "App Permission Audit", steps: ["Open each app and look for Settings or Privacy", "Review what data the app collects about you", "Turn off any unnecessary features like 'People Nearby' or activity sharing", "Disable read receipts if you prefer privacy", "Check notification settings to avoid accidental information leaks"] }
+        ],
+        checklist: [
+          "I have reviewed my phone's privacy settings.",
+          "I check app permissions before installing new apps.",
+          "I do not share my account passwords with friends.",
+          "I review my privacy settings at least once a month."
         ]
       }
     }
@@ -1175,6 +1235,7 @@ function ParentSection() {
                   <li>Recognizing online tricks and scams</li>
                   <li>Basic device safety practices</li>
                   <li>When and how to ask trusted adults for help</li>
+                  <li>How the internet works and internet basics</li>
                 </ul>
               </div>
               <div>
@@ -1185,6 +1246,7 @@ function ParentSection() {
                   <li>Gaming safety and protecting online identity</li>
                   <li>Identifying phishing messages and scam tactics</li>
                   <li>Building a positive digital footprint</li>
+                  <li>Privacy settings mastery and app permissions</li>
                 </ul>
               </div>
               <div>
