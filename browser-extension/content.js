@@ -85,12 +85,6 @@
     return hostRegistrable === brandRegistrable;
   }
 
-  chrome.storage.local.get(["settings"], (result) => {
-    if (result.settings) {
-      settings = { ...settings, ...result.settings };
-    }
-  });
-
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === "SCAN_RESULT") {
       showPageBanner(message.result, message.url);
@@ -99,6 +93,15 @@
       handleAutoScanResult(message.result);
     }
   });
+
+  function loadSettingsAndInit() {
+    chrome.storage.local.get(["settings"], (result) => {
+      if (result.settings) {
+        settings = { ...settings, ...result.settings };
+      }
+      init();
+    });
+  }
 
   function init() {
     if (settings.hoverCheck) {
@@ -122,7 +125,9 @@
       setupFormInterception();
     }
 
-    triggerAutoScan();
+    if (settings.autoScan) {
+      triggerAutoScan();
+    }
   }
 
   function triggerAutoScan() {
@@ -193,7 +198,7 @@
     if (result.lookalikeMatch) sources.push("Lookalike domain detected");
     if (result.reputation?.phishTank?.isPhishing) sources.push("PhishTank flagged");
     if (result.reputation?.urlhaus?.isMalware) sources.push("Malware database flagged");
-    if (result.reputation?.googleSafeBrowsing?.isMalicious) sources.push("Google Safe Browsing flagged");
+    if (result.reputation?.googleSafeBrowsing?.isThreat) sources.push("Google Safe Browsing flagged");
     if (result.aiScan?.summary) sources.push(result.aiScan.summary);
 
     if (sources.length > 0) {
@@ -779,8 +784,8 @@
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", loadSettingsAndInit);
   } else {
-    init();
+    loadSettingsAndInit();
   }
 })();

@@ -252,9 +252,9 @@ async function handleAutoScan(message, sender) {
 
       if (rep.phishTank?.isPhishing) repScore += 40;
       if (rep.urlhaus?.isMalware) repScore += 40;
-      if (rep.googleSafeBrowsing?.isMalicious) repScore += 40;
-      if (rep.domainAge?.isNewDomain) repScore += 15;
-      if (rep.domainAge?.ageInDays !== null && rep.domainAge.ageInDays < 30) repScore += 10;
+      if (rep.googleSafeBrowsing?.isThreat) repScore += 40;
+      if (rep.domainAge?.isNew) repScore += 15;
+      if (rep.domainAge?.ageInDays !== null && rep.domainAge?.ageInDays !== undefined && rep.domainAge.ageInDays < 30) repScore += 10;
 
       result.riskScore = Math.max(result.riskScore, Math.min(repScore, 100));
     }
