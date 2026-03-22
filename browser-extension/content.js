@@ -847,7 +847,7 @@
 
     chrome.runtime.sendMessage({ type: "GET_COMMUNITY_TRUST", domain: hostname }, (data) => {
       if (chrome.runtime.lastError) return;
-      if (!data || data.visitCount === 0) return;
+      if (!data) return;
 
       const existing = document.getElementById("gcr-trust-badge");
       if (existing) existing.remove();
@@ -856,14 +856,33 @@
       badge.id = "gcr-trust-badge";
       badge.className = "gcr-trust-badge";
 
+      const visitCount = data.visitCount || 0;
+      const flagCount = data.flagCount || 0;
+      const safeCount = data.safeCount || 0;
+      const score = data.communityScore ?? 50;
+
       let scoreColor = "#16a34a";
       let scoreLabel = "Trusted";
-      if (data.communityScore < 30) {
+      if (score < 30) {
         scoreColor = "#dc2626";
         scoreLabel = "Risky";
-      } else if (data.communityScore < 60) {
+      } else if (score < 60) {
         scoreColor = "#ca8a04";
         scoreLabel = "Caution";
+      } else if (visitCount === 0) {
+        scoreColor = "#6b7280";
+        scoreLabel = "New Site";
+      }
+
+      let communityText = "";
+      if (visitCount === 0) {
+        communityText = "No community data yet";
+      } else {
+        const parts = [];
+        if (safeCount > 0) parts.push(`${safeCount} visited safely`);
+        if (flagCount > 0) parts.push(`${flagCount} flagged`);
+        if (parts.length === 0) parts.push(`${visitCount} visit${visitCount !== 1 ? "s" : ""}`);
+        communityText = parts.join(" \u2022 ");
       }
 
       badge.style.cssText = `
@@ -879,30 +898,41 @@
         font-size: 12px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         display: flex;
-        align-items: center;
-        gap: 8px;
+        flex-direction: column;
+        gap: 2px;
         cursor: pointer;
         transition: opacity 0.3s;
         opacity: 0.85;
+        max-width: 220px;
       `;
 
       badge.addEventListener("mouseenter", () => { badge.style.opacity = "1"; });
       badge.addEventListener("mouseleave", () => { badge.style.opacity = "0.85"; });
+
+      const topRow = document.createElement("div");
+      topRow.style.cssText = "display: flex; align-items: center; gap: 8px;";
 
       const dot = document.createElement("span");
       dot.style.cssText = `width: 8px; height: 8px; border-radius: 50%; background: ${scoreColor}; flex-shrink: 0;`;
 
       const text = document.createElement("span");
       text.style.cssText = `color: #374151; font-weight: 600;`;
-      text.textContent = `${scoreLabel} (${data.communityScore}/100)`;
+      text.textContent = `${scoreLabel} (${score}/100)`;
 
       const brandEl = document.createElement("span");
-      brandEl.style.cssText = "color: #9ca3af; font-size: 10px;";
+      brandEl.style.cssText = "color: #9ca3af; font-size: 10px; margin-left: auto;";
       brandEl.textContent = "GCR";
 
-      badge.appendChild(dot);
-      badge.appendChild(text);
-      badge.appendChild(brandEl);
+      topRow.appendChild(dot);
+      topRow.appendChild(text);
+      topRow.appendChild(brandEl);
+
+      const bottomRow = document.createElement("div");
+      bottomRow.style.cssText = "font-size: 10px; color: #6b7280; padding-left: 16px;";
+      bottomRow.textContent = communityText;
+
+      badge.appendChild(topRow);
+      badge.appendChild(bottomRow);
 
       let dismissTimeout;
       badge.addEventListener("click", () => {
@@ -939,7 +969,8 @@
   }
 
   function injectInboxRiskIndicators(provider) {
-    const rowSelector = provider.name === "gmail" ? "tr.zA" : "[role='option'], [data-convid]";
+    const providerLower = provider.name.toLowerCase();
+    const rowSelector = providerLower === "gmail" ? "tr.zA" : "[role='option'], [data-convid]";
     const rows = document.querySelectorAll(rowSelector);
     rows.forEach(row => {
       if (row.dataset.gcrInboxScanned) return;
@@ -980,7 +1011,8 @@
         `;
         indicator.textContent = "\u26A0\uFE0F " + suspiciousLinks.length + " risky";
 
-        const subjectCell = provider.name === "gmail"
+        const providerName = provider.name.toLowerCase();
+        const subjectCell = providerName === "gmail"
           ? row.querySelector(".bog, .bqe, .y6")
           : row.querySelector("[data-testid='subjectLine'], .hcptT");
         if (subjectCell) {
