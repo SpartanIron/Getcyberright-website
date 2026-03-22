@@ -577,13 +577,14 @@ document.addEventListener("DOMContentLoaded", () => {
       "setting-webmail": "webmail_scan",
       "setting-community": "community_trust",
       "setting-digest": "weekly_digest",
-      "setting-hover": "auto_scan",
-      "setting-block": "auto_scan",
-      "setting-lookalike": "auto_scan",
-      "setting-formwarnings": "auto_scan"
+      "setting-hover": "hover_check",
+      "setting-block": "block_dangerous",
+      "setting-lookalike": "lookalike_detection",
+      "setting-formwarnings": "form_warnings"
     };
     const familyFeatures = ["weekly_digest"];
 
+    let settingsChanged = false;
     Object.entries(featureMap).forEach(([settingId, feature]) => {
       const el = document.getElementById(settingId);
       if (!el) return;
@@ -599,9 +600,15 @@ document.addEventListener("DOMContentLoaded", () => {
           settingItem.classList.add("family-only");
         }
         el.disabled = true;
-        el.checked = false;
+        if (el.checked) {
+          el.checked = false;
+          settingsChanged = true;
+        }
       }
     });
+    if (settingsChanged) {
+      saveSettings();
+    }
   }
 
   function extractUrl(text) {

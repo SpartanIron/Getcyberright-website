@@ -10,15 +10,15 @@
   let pageRiskScore = 0;
   let userSafeList = [];
   let settings = {
-    autoScan: true,
+    autoScan: false,
     notifications: true,
-    hoverCheck: true,
+    hoverCheck: false,
     blockDangerous: false,
-    formWarnings: true,
-    lookalikeDetection: true,
-    communityTrust: true,
-    webmailScan: true,
-    weeklyDigest: true
+    formWarnings: false,
+    lookalikeDetection: false,
+    communityTrust: false,
+    webmailScan: false,
+    weeklyDigest: false
   };
 
   const LOOKALIKE_BRANDS = {
@@ -106,6 +106,8 @@
     }
   });
 
+  let allowedFeatures = ["manual_scan"];
+
   function loadSettingsAndInit() {
     chrome.storage.local.get(["settings", "userSafeList"], (result) => {
       if (result.settings) {
@@ -114,41 +116,50 @@
       if (result.userSafeList && Array.isArray(result.userSafeList)) {
         userSafeList = result.userSafeList;
       }
-      init();
+      chrome.runtime.sendMessage({ type: "GET_AUTH_STATUS" }, (status) => {
+        if (status && status.features) {
+          allowedFeatures = status.isActive !== false ? status.features : ["manual_scan"];
+        }
+        init();
+      });
     });
   }
 
+  function hasFeature(feature) {
+    return allowedFeatures.includes(feature);
+  }
+
   function init() {
-    if (settings.hoverCheck) {
+    if (settings.hoverCheck && hasFeature("hover_check")) {
       document.addEventListener("mouseover", handleLinkHover, true);
       document.addEventListener("mouseout", handleLinkLeave, true);
     }
 
-    if (settings.blockDangerous) {
+    if (settings.blockDangerous && hasFeature("block_dangerous")) {
       document.addEventListener("click", handleDangerousLinkClick, true);
     }
 
-    if (settings.autoScan) {
+    if (settings.autoScan && hasFeature("auto_scan")) {
       scanVisibleLinks();
     }
 
-    if (settings.lookalikeDetection) {
+    if (settings.lookalikeDetection && hasFeature("lookalike_detection")) {
       checkLookalikeDomain();
     }
 
-    if (settings.formWarnings) {
+    if (settings.formWarnings && hasFeature("form_warnings")) {
       setupFormInterception();
     }
 
-    if (settings.autoScan) {
+    if (settings.autoScan && hasFeature("auto_scan")) {
       triggerAutoScan();
     }
 
-    if (settings.communityTrust) {
+    if (settings.communityTrust && hasFeature("community_trust")) {
       showCommunityTrustBadge();
     }
 
-    if (settings.webmailScan) {
+    if (settings.webmailScan && hasFeature("webmail_scan")) {
       initWebmailScanning();
     }
   }

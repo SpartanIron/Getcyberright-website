@@ -472,15 +472,15 @@ async function extractAndScanPage(tab) {
 
 function getDefaultSettings() {
   return {
-    autoScan: true,
+    autoScan: false,
     notifications: true,
-    hoverCheck: true,
+    hoverCheck: false,
     blockDangerous: false,
-    formWarnings: true,
-    lookalikeDetection: true,
-    communityTrust: true,
-    webmailScan: true,
-    weeklyDigest: true
+    formWarnings: false,
+    lookalikeDetection: false,
+    communityTrust: false,
+    webmailScan: false,
+    weeklyDigest: false
   };
 }
 
@@ -903,9 +903,37 @@ async function handleSignIn(token) {
     });
     cachedSubscription = data;
     subscriptionCacheTime = Date.now();
+    await syncSettingsWithFeatures(data.features || ["manual_scan"]);
     return { success: true, tier: data.tier, email: data.email };
   } catch (error) {
     return { success: false, error: error.message };
+  }
+}
+
+async function syncSettingsWithFeatures(features) {
+  const currentSettings = await getSettings();
+  const featureSettingsMap = {
+    auto_scan: "autoScan",
+    hover_check: "hoverCheck",
+    block_dangerous: "blockDangerous",
+    form_warnings: "formWarnings",
+    lookalike_detection: "lookalikeDetection",
+    community_trust: "communityTrust",
+    webmail_scan: "webmailScan",
+    weekly_digest: "weeklyDigest"
+  };
+  let changed = false;
+  for (const [feature, settingKey] of Object.entries(featureSettingsMap)) {
+    if (features.includes(feature) && !currentSettings[settingKey]) {
+      currentSettings[settingKey] = true;
+      changed = true;
+    } else if (!features.includes(feature) && currentSettings[settingKey]) {
+      currentSettings[settingKey] = false;
+      changed = true;
+    }
+  }
+  if (changed) {
+    await chrome.storage.local.set({ settings: currentSettings });
   }
 }
 
@@ -913,6 +941,7 @@ async function handleSignOut() {
   await chrome.storage.local.remove(["authToken", "authUser"]);
   cachedSubscription = null;
   subscriptionCacheTime = 0;
+  await syncSettingsWithFeatures(["manual_scan"]);
   return { success: true };
 }
 
