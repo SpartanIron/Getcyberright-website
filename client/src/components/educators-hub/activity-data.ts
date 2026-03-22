@@ -1100,6 +1100,675 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     ],
     assessment: "Students can identify and describe defenses for at least 3 social engineering tactics.",
     extensions: "Research the role of social engineering in major data breaches."
+  },
+  {
+    id: "cb-k2-45",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "K-2",
+    duration: "45-min",
+    title: "Being a Good Online Friend",
+    objectives: ["Practice being kind in digital interactions", "Create a classroom commitment to kindness online"],
+    materials: ["Large poster paper", "Friendship bracelets supplies", "Scenario puppets"],
+    procedure: [
+      "Story time: read a story about online friendship and kindness (10 min)",
+      "Puppet show: teacher uses puppets to show kind vs. unkind online interactions (10 min)",
+      "Students practice with puppets in pairs — each pair shows a kind online moment (10 min)",
+      "Class creates a 'Good Online Friend' poster with illustrated rules (10 min)",
+      "Friendship bracelet activity: students make bracelets as a pledge to be kind online (5 min)"
+    ],
+    assessment: "Students can demonstrate at least 2 ways to be a good friend online.",
+    extensions: "Share the poster with another classroom."
+  },
+  {
+    id: "cb-k2-full",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "K-2",
+    duration: "full-period",
+    title: "Kindness Connection Day",
+    objectives: ["Experience a full day of practicing digital kindness", "Build empathy through multiple activities"],
+    materials: ["Kindness bingo cards", "Drawing supplies", "Video of age-appropriate kindness story", "Stickers"],
+    procedure: [
+      "Morning meeting (10 min): introduce 'Kindness Connection Day' and watch a short video about being kind online",
+      "Station 1 — Draw It (15 min): draw a picture showing someone being kind online",
+      "Station 2 — Sort It (15 min): sort scenario cards into 'kind' and 'unkind' piles",
+      "Station 3 — Say It (10 min): practice saying kind things in a pretend video call role-play",
+      "Kindness Bingo (10 min): mark off kind actions observed during the day",
+      "Closing circle (5 min): each student shares one kind thing they will do online this week"
+    ],
+    assessment: "Students participate in all stations and can describe 3 ways to be kind online.",
+    extensions: "Continue Kindness Bingo for the rest of the week."
+  },
+  {
+    id: "cb-35-45",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "3-5",
+    duration: "45-min",
+    title: "The Ripple Effect of Words Online",
+    objectives: ["Understand the far-reaching impact of online posts", "Develop strategies to stop negative ripples"],
+    materials: ["Bowl of water", "Pebbles", "Ripple effect worksheet", "Scenario cards"],
+    procedure: [
+      "Demonstration: drop a pebble in water and watch the ripples spread — connect to how words spread online (5 min)",
+      "Present 4 scenarios: trace how one mean post affects multiple people (15 min)",
+      "Students map the 'ripple effect' of each scenario on their worksheets (10 min)",
+      "Reverse ripple: for each scenario, students create a kind action that starts a positive ripple (10 min)",
+      "Share: each group presents their positive ripple strategy (5 min)"
+    ],
+    assessment: "Students can trace the ripple effect of online actions and create positive alternatives.",
+    extensions: "Start a 'Positive Ripples' board where students post kind online actions they did."
+  },
+  {
+    id: "cb-35-full",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "3-5",
+    duration: "full-period",
+    title: "Anti-Cyberbullying Campaign Creation",
+    objectives: ["Research cyberbullying effects", "Create and present an anti-cyberbullying campaign"],
+    materials: ["Poster supplies or computer access", "Research fact sheets", "Presentation rubric"],
+    procedure: [
+      "Introduction (10 min): what is cyberbullying and why does it matter?",
+      "Research phase (15 min): groups gather facts about cyberbullying effects using provided fact sheets",
+      "Campaign creation (20 min): each group creates a poster, slogan, or short skit for their campaign",
+      "Presentations (10 min): groups present their anti-cyberbullying campaigns",
+      "Voting and display (5 min): class votes on best campaign, winners displayed in the hallway"
+    ],
+    assessment: "Campaign includes at least 3 accurate facts and a clear positive message.",
+    extensions: "Present winning campaigns to other classes during an assembly."
+  },
+  {
+    id: "cb-68-full",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "6-8",
+    duration: "full-period",
+    title: "Cyberbullying Court: Mock Trial",
+    objectives: ["Analyze cyberbullying from multiple perspectives", "Understand accountability and consequences"],
+    materials: ["Case file packets", "Role cards (judge, lawyers, witnesses, jury)", "Verdict forms"],
+    procedure: [
+      "Case briefing (10 min): present a fictional cyberbullying case with details about what happened",
+      "Role assignment and preparation (10 min): assign roles, teams prepare their arguments",
+      "Trial (20 min): prosecution presents evidence, defense responds, witnesses testify",
+      "Jury deliberation (10 min): jury discusses and reaches a verdict",
+      "Debrief (10 min): discuss the experience — what did you learn from seeing different perspectives?"
+    ],
+    assessment: "Students demonstrate understanding of multiple perspectives and consequences of cyberbullying.",
+    extensions: "Write a reflection essay about what justice means in cyberbullying cases."
+  },
+  {
+    id: "cb-912-full",
+    topic: "Cyberbullying Prevention",
+    gradeBand: "9-12",
+    duration: "full-period",
+    title: "Digital Wellness and Online Conflict Resolution",
+    objectives: ["Develop comprehensive conflict resolution strategies for online spaces", "Create a personal digital wellness plan"],
+    materials: ["Conflict resolution framework", "Digital wellness assessment", "Action plan template"],
+    procedure: [
+      "Self-assessment (10 min): complete a digital wellness survey about online interactions",
+      "Conflict resolution frameworks (10 min): learn de-escalation, mediation, and boundary-setting techniques",
+      "Scenario practice (15 min): apply conflict resolution techniques to realistic online situations",
+      "Digital wellness plan (15 min): create a comprehensive personal plan covering social media use, conflict response, and mental health",
+      "Peer accountability (10 min): partner up to share plans and commit to mutual support"
+    ],
+    assessment: "Students complete a digital wellness plan with specific, actionable strategies.",
+    extensions: "Check in with accountability partners weekly for one month."
+  },
+  {
+    id: "ps-k2-45",
+    topic: "Privacy & Security",
+    gradeBand: "K-2",
+    duration: "45-min",
+    title: "The Privacy Shield",
+    objectives: ["Create a personal privacy shield with private information rules", "Practice refusing to share private information"],
+    materials: ["Shield-shaped cardstock", "Markers and stickers", "Scenario cards", "Privacy rules poster"],
+    procedure: [
+      "Review: what information is private? What information is okay to share? (5 min)",
+      "Introduce the Privacy Shield: 'This shield protects your private information' (5 min)",
+      "Students decorate their shield with drawings of things they keep private (15 min)",
+      "Role-play practice (10 min): teacher pretends to be a website asking for private info, students hold up their shields and say 'That is private!'",
+      "Shield gallery walk (5 min): students walk around and see each other's shields",
+      "Takeaway (5 min): shields go home with a note to families about privacy conversations"
+    ],
+    assessment: "Students can name at least 5 types of private information.",
+    extensions: "Practice the 'shield response' at home with family members."
+  },
+  {
+    id: "ps-k2-full",
+    topic: "Privacy & Security",
+    gradeBand: "K-2",
+    duration: "full-period",
+    title: "Privacy Superheroes Training Academy",
+    objectives: ["Master the concept of private vs. shareable information", "Practice safe responses in multiple scenarios"],
+    materials: ["Superhero capes or badges", "Training station materials", "Certificate templates"],
+    procedure: [
+      "Academy opening (5 min): welcome to Privacy Superhero Training! Review the mission",
+      "Station 1 — Knowledge (15 min): sort information cards into private/shareable categories",
+      "Station 2 — Skills (15 min): role-play refusing to share private info in 6 scenarios",
+      "Station 3 — Powers (15 min): create a superhero identity with a safe username and practice safe computer habits",
+      "Graduation ceremony (10 min): students receive Privacy Superhero certificates and badges"
+    ],
+    assessment: "Students pass all 3 training stations by correctly identifying private info, refusing unsafe requests, and creating safe usernames.",
+    extensions: "Privacy Superheroes help classmates remember privacy rules during computer time."
+  },
+  {
+    id: "ps-35-15",
+    topic: "Privacy & Security",
+    gradeBand: "3-5",
+    duration: "15-min",
+    title: "What Is a Password and Why Does It Matter?",
+    objectives: ["Understand the purpose of passwords", "Learn the basic rules of password safety"],
+    materials: ["Lock and key prop", "Password rules chart"],
+    procedure: [
+      "Analogy: hold up a lock and key — 'A password is like a key to your online house'",
+      "3 rules: never share it, make it hard to guess, use a different key for each door",
+      "Quick quiz: 'Is this a good password?' (show examples: 'dog123' vs. 'BlueFishRunsFast')",
+      "Practice: students create one strong password using the 'silly phrase' method"
+    ],
+    assessment: "Students can state 3 password safety rules.",
+    extensions: "Create a 'Good Password vs. Bad Password' sorting game."
+  },
+  {
+    id: "ps-35-45",
+    topic: "Privacy & Security",
+    gradeBand: "3-5",
+    duration: "45-min",
+    title: "My Digital Privacy Audit",
+    objectives: ["Audit privacy settings on familiar platforms", "Create an action plan for improving privacy"],
+    materials: ["Privacy audit worksheet", "Projected demo account", "Action plan template"],
+    procedure: [
+      "Introduction (5 min): what does privacy mean online? Why does it matter?",
+      "Guided demo (10 min): teacher walks through privacy settings on a demo account (projected)",
+      "Worksheet activity (15 min): students fill out a privacy audit for their most-used platform",
+      "Action plan (10 min): based on the audit, students list 3 changes they will make",
+      "Sharing (5 min): volunteers share one surprising thing they learned"
+    ],
+    assessment: "Students complete a privacy audit and identify at least 3 settings to change.",
+    extensions: "Complete privacy audits on additional platforms at home."
+  },
+  {
+    id: "ps-35-full",
+    topic: "Privacy & Security",
+    gradeBand: "3-5",
+    duration: "full-period",
+    title: "Privacy Detective Agency",
+    objectives: ["Investigate how companies collect and use personal data", "Develop data-savvy habits"],
+    materials: ["Detective badges and notebooks", "Website investigation worksheets", "Evidence collection sheets"],
+    procedure: [
+      "Agency briefing (10 min): students become Privacy Detectives investigating data collection",
+      "Investigation 1 (15 min): examine 4 popular kids' websites and note what data they collect (using worksheets, not actual accounts)",
+      "Investigation 2 (15 min): compare privacy policies of 2 apps — which protects kids better?",
+      "Evidence report (10 min): each detective team presents their findings",
+      "Action plan (10 min): create a 'Smart Data Detective' pledge with personal rules for sharing data"
+    ],
+    assessment: "Students can identify at least 3 types of data collected by websites and explain why it matters.",
+    extensions: "Investigate one new website or app each week as ongoing detective work."
+  },
+  {
+    id: "ps-68-full",
+    topic: "Privacy & Security",
+    gradeBand: "6-8",
+    duration: "full-period",
+    title: "Cybersecurity Challenge Lab",
+    objectives: ["Apply multiple security skills in a hands-on challenge", "Demonstrate mastery of privacy and security concepts"],
+    materials: ["Challenge cards with 5 security tasks", "Score tracking sheet", "Certificates"],
+    procedure: [
+      "Introduction (5 min): welcome to the Cybersecurity Challenge Lab!",
+      "Challenge 1 (10 min): create the strongest password possible and explain your method",
+      "Challenge 2 (10 min): identify all phishing red flags in 6 sample emails",
+      "Challenge 3 (10 min): audit privacy settings on a demo social media account",
+      "Challenge 4 (10 min): explain how to respond to 3 different social engineering attempts",
+      "Challenge 5 (10 min): create a personal security action plan covering passwords, privacy, and phishing defense",
+      "Scoring and recognition (5 min): tally scores and award Cybersecurity Challenge certificates"
+    ],
+    assessment: "Students demonstrate competency across all 5 security skill areas.",
+    extensions: "Students who earn top scores become 'Cybersecurity Ambassadors' for the school."
+  },
+  {
+    id: "ps-912-full",
+    topic: "Privacy & Security",
+    gradeBand: "9-12",
+    duration: "full-period",
+    title: "Data Privacy Legislation Deep Dive",
+    objectives: ["Research and compare global data privacy laws", "Evaluate the effectiveness of current privacy protections"],
+    materials: ["Law comparison worksheets", "Research devices", "Debate preparation materials"],
+    procedure: [
+      "Overview (10 min): why do privacy laws exist? Brief history from FTC Act to GDPR",
+      "Research (15 min): groups research assigned laws — GDPR, CCPA, COPPA, FERPA — using structured worksheets",
+      "Comparison matrix (10 min): groups fill in a comparison chart: who is protected, what data is covered, what rights are granted",
+      "Presentations (15 min): each group presents their law and how it compares",
+      "Debate (10 min): 'Is current privacy legislation sufficient to protect individuals in the age of big data?'"
+    ],
+    assessment: "Students can explain at least 2 privacy laws and compare their protections.",
+    extensions: "Write a policy brief proposing improvements to current privacy legislation."
+  },
+  {
+    id: "ml-k2-30",
+    topic: "Media Literacy",
+    gradeBand: "K-2",
+    duration: "30-min",
+    title: "Ads vs. Shows: What Is Trying to Sell You Something?",
+    objectives: ["Distinguish between entertainment content and advertising", "Recognize when something is trying to sell a product"],
+    materials: ["Video clips of shows and commercials", "Thumbs-up/down cards", "Drawing supplies"],
+    procedure: [
+      "Watch 3 short clips: one cartoon, one toy commercial, one disguised ad (like an unboxing video) (10 min)",
+      "After each clip, ask: 'Is this trying to sell you something? How do you know?'",
+      "Teach 3 clues that something is an ad: it shows a product, it says how great the product is, it tells you to buy or ask your parents (5 min)",
+      "Practice: show 5 more examples, students use thumbs up (ad) or down (not an ad) (10 min)",
+      "Draw: students draw their favorite show character and their favorite ad, labeling the difference (5 min)"
+    ],
+    assessment: "Students can correctly identify ads vs. non-ads in at least 4 of 5 examples.",
+    extensions: "Count the ads you see during one TV show at home."
+  },
+  {
+    id: "ml-k2-45",
+    topic: "Media Literacy",
+    gradeBand: "K-2",
+    duration: "45-min",
+    title: "Storyteller or Truth-Teller?",
+    objectives: ["Understand that stories can be fiction or nonfiction", "Begin developing critical viewing skills"],
+    materials: ["Storybooks (one fiction, one nonfiction)", "Sorting cards", "Chart paper"],
+    procedure: [
+      "Read two short books: one clearly fictional, one nonfiction about animals (15 min)",
+      "Discussion: 'Which book told a real story? Which was make-believe? How do you know?' (5 min)",
+      "Extend to screens: 'Videos and websites can also be real or make-believe' (5 min)",
+      "Sort 10 cards showing content types: cartoons, nature documentaries, fairy tales, news clips (10 min)",
+      "Create a class chart: 'Real' and 'Make-Believe' with examples from books, TV, and the internet (10 min)"
+    ],
+    assessment: "Students can sort most content types correctly and explain their reasoning.",
+    extensions: "During the week, ask 'Is this real or make-believe?' about things you see on screens."
+  },
+  {
+    id: "ml-k2-full",
+    topic: "Media Literacy",
+    gradeBand: "K-2",
+    duration: "full-period",
+    title: "Little Media Detectives Day",
+    objectives: ["Apply multiple media literacy skills through station activities", "Build foundation for critical thinking about media"],
+    materials: ["Station materials: images, videos, sorting cards", "Detective badges", "Magnifying glass props"],
+    procedure: [
+      "Assembly (10 min): welcome Little Media Detectives! Get your badge and magnifying glass",
+      "Station 1 — Real or Fake (15 min): sort pictures into real photos and edited/cartoon images",
+      "Station 2 — Ad Spotter (15 min): watch clips and identify which ones are trying to sell something",
+      "Station 3 — Story Check (10 min): listen to short claims and decide if they could be true or are silly/made up",
+      "Detective report (10 min): draw your favorite clue for spotting something that is not real"
+    ],
+    assessment: "Students participate in all stations and can describe one way to check if something is real.",
+    extensions: "Share detective badges and skills with family members."
+  },
+  {
+    id: "ml-35-45",
+    topic: "Media Literacy",
+    gradeBand: "3-5",
+    duration: "45-min",
+    title: "Become a Fact Checker",
+    objectives: ["Learn basic fact-checking skills", "Practice verifying claims from multiple sources"],
+    materials: ["Claim cards with statements to verify", "Approved fact-checking websites list", "Verification worksheet"],
+    procedure: [
+      "Introduction (5 min): what is a fact checker and why do we need them?",
+      "Teach the 3-step check: (1) who said it? (2) do other sources agree? (3) when was it published? (10 min)",
+      "Practice together: verify one claim as a class using the 3 steps (5 min)",
+      "Independent work: students verify 4 claims using the worksheet and approved websites (15 min)",
+      "Share findings: discuss which claims were true, which were false, and which were tricky (10 min)"
+    ],
+    assessment: "Students correctly verify at least 3 of 4 claims.",
+    extensions: "Start a 'Weekly Fact Check' bulletin board."
+  },
+  {
+    id: "ml-35-full",
+    topic: "Media Literacy",
+    gradeBand: "3-5",
+    duration: "full-period",
+    title: "News Report Investigation",
+    objectives: ["Compare how different sources cover the same event", "Identify perspective and bias at a basic level"],
+    materials: ["3 news articles about the same event (age-appropriate)", "Comparison worksheet", "Presentation supplies"],
+    procedure: [
+      "Introduction (10 min): explain that the same event can be told differently depending on who is telling it",
+      "Read and compare (15 min): read 3 articles about the same event, noting similarities and differences",
+      "Analysis (10 min): which facts are the same in all three? Which details are different? Why might that be?",
+      "Discussion (10 min): introduce the idea that everyone has a perspective, including reporters",
+      "Create (10 min): students write their own short report about a school event, noticing their own perspective choices",
+      "Reflection (5 min): what surprised you about how differently the same event can be reported?"
+    ],
+    assessment: "Students identify at least 2 differences between sources covering the same event.",
+    extensions: "Compare coverage of a current event across 2 different news sources."
+  },
+  {
+    id: "ml-68-30",
+    topic: "Media Literacy",
+    gradeBand: "6-8",
+    duration: "30-min",
+    title: "Source Credibility Evaluation",
+    objectives: ["Evaluate the credibility of online sources", "Apply a structured framework for assessing reliability"],
+    materials: ["5 sample websites/articles (mix of credible and non-credible)", "CRAAP test worksheet"],
+    procedure: [
+      "Introduce the CRAAP test: Currency, Relevance, Authority, Accuracy, Purpose (5 min)",
+      "Model: evaluate one source together using the CRAAP criteria (5 min)",
+      "Students evaluate 4 additional sources independently using the worksheet (15 min)",
+      "Review: compare evaluations and discuss disagreements — credibility is sometimes a judgment call (5 min)"
+    ],
+    assessment: "Students correctly assess the credibility of at least 3 of 4 sources.",
+    extensions: "Apply the CRAAP test to sources used in your next research assignment."
+  },
+  {
+    id: "ml-68-full",
+    topic: "Media Literacy",
+    gradeBand: "6-8",
+    duration: "full-period",
+    title: "Create Your Own Reliable News Source",
+    objectives: ["Apply media literacy principles to content creation", "Demonstrate understanding of journalistic standards"],
+    materials: ["News article template", "Ethics checklist", "Peer review rubric", "Publishing platform access"],
+    procedure: [
+      "Introduction (10 min): what makes a news source reliable? Review journalistic standards: accuracy, fairness, transparency",
+      "Research (15 min): gather facts about a school or community event from multiple sources",
+      "Write (15 min): create a news article following journalistic standards — accurate headline, multiple sources, balanced perspective",
+      "Peer review (10 min): exchange articles and evaluate using the ethics checklist",
+      "Revise and publish (10 min): incorporate feedback and publish to a class blog or newsletter"
+    ],
+    assessment: "Articles demonstrate accuracy, balance, and adherence to at least 4 journalistic standards.",
+    extensions: "Launch a student news publication that follows media literacy principles."
+  },
+  {
+    id: "ml-912-full",
+    topic: "Media Literacy",
+    gradeBand: "9-12",
+    duration: "full-period",
+    title: "Media Literacy Masterclass: Information Ecosystem Analysis",
+    objectives: ["Analyze the modern information ecosystem", "Develop advanced media literacy strategies for the AI age"],
+    materials: ["Information ecosystem map template", "Case study packets", "Strategy development worksheet"],
+    procedure: [
+      "Mapping (10 min): create a personal information ecosystem map — where do you get your news and information?",
+      "Analysis (15 min): identify vulnerabilities in your ecosystem — filter bubbles, single-source dependence, algorithm influence",
+      "Case studies (15 min): analyze 3 examples of misinformation campaigns and how they exploited information ecosystems",
+      "Strategy development (15 min): create a personal 'Media Literacy Toolkit' with verification strategies for text, image, video, and AI-generated content",
+      "Commitment (5 min): write one concrete change you will make to your information consumption habits"
+    ],
+    assessment: "Students produce a comprehensive information ecosystem analysis and personal media literacy toolkit.",
+    extensions: "Present findings to underclassmen as part of a media literacy awareness program."
+  },
+  {
+    id: "rg-k2-45",
+    topic: "Responsible Gaming",
+    gradeBand: "K-2",
+    duration: "45-min",
+    title: "My Balanced Day",
+    objectives: ["Plan a balanced day with different activities including limited screen time", "Practice transitioning away from screens"],
+    materials: ["Daily schedule template with picture slots", "Activity picture cards", "Clock prop"],
+    procedure: [
+      "Discussion (5 min): what are all the things you do in a day? (eat, play, learn, sleep, screen time)",
+      "Sorting (10 min): sort activity cards into groups — physical play, creative play, learning, screen time, rest",
+      "Schedule building (15 min): students create their ideal balanced day using picture cards on the template",
+      "Check: is there too much of one thing? Adjust for balance (5 min)",
+      "Practice (10 min): role-play stopping a game when the timer goes off — practice saying 'Time for something else!'"
+    ],
+    assessment: "Students create a balanced daily schedule with limited screen time.",
+    extensions: "Try following your balanced schedule for one day and draw how it went."
+  },
+  {
+    id: "rg-k2-full",
+    topic: "Responsible Gaming",
+    gradeBand: "K-2",
+    duration: "full-period",
+    title: "Screen-Free Fun Discovery",
+    objectives: ["Discover enjoyable non-screen activities", "Build intrinsic motivation for balanced play"],
+    materials: ["Station supplies: art materials, building blocks, outdoor play equipment, books, music instruments"],
+    procedure: [
+      "Introduction (5 min): today we are discovering how much fun we can have without screens!",
+      "Station 1 — Create (15 min): art, building, or craft activity",
+      "Station 2 — Move (15 min): physical games, dance, or outdoor play",
+      "Station 3 — Imagine (15 min): storytelling, pretend play, or music",
+      "Reflection (10 min): which station was most fun? Draw your favorite non-screen activity",
+      "Commitment (5 min): name one screen-free activity you want to try at home this week"
+    ],
+    assessment: "Students engage enthusiastically in non-screen activities and identify at least 2 favorites.",
+    extensions: "Start a 'Screen-Free Fun Ideas' jar at home."
+  },
+  {
+    id: "rg-35-45",
+    topic: "Responsible Gaming",
+    gradeBand: "3-5",
+    duration: "45-min",
+    title: "The In-Game Spending Tracker",
+    objectives: ["Track and calculate in-game spending", "Develop awareness of micro-transaction costs"],
+    materials: ["Spending tracker worksheets", "Calculator", "Play money", "Game purchase scenario cards"],
+    procedure: [
+      "Discussion (5 min): have you ever bought something in a game? How much did it cost?",
+      "Scenario activity (15 min): using play money, students 'purchase' items from game store cards and track spending",
+      "Calculation (10 min): add up the total spent — compare to real things that money could buy",
+      "Reflection (10 min): create a 'Before I Buy' checklist for in-game purchases",
+      "Sharing (5 min): what surprised you about how quickly spending adds up?"
+    ],
+    assessment: "Students can calculate total spending from multiple small purchases and create a spending checklist.",
+    extensions: "Track actual in-game spending for one month using the tracker worksheet."
+  },
+  {
+    id: "rg-35-full",
+    topic: "Responsible Gaming",
+    gradeBand: "3-5",
+    duration: "full-period",
+    title: "Game Designer for a Day",
+    objectives: ["Understand game design techniques that affect player behavior", "Design a game concept that is fun AND fair"],
+    materials: ["Game design template", "Example game mechanic cards", "Art supplies for game boards"],
+    procedure: [
+      "Introduction (10 min): how do game designers make games fun? Introduce reward systems, challenges, social features",
+      "Analysis (10 min): look at 3 popular games — which design choices keep you playing? Which are fair? Which might be manipulative?",
+      "Design phase (20 min): students design their own simple game concept using the template — must be fun without spending money",
+      "Presentation (15 min): each student pitches their game to the class",
+      "Discussion (5 min): what did you learn about game design that changes how you think about the games you play?"
+    ],
+    assessment: "Students create a game concept that demonstrates understanding of fair design principles.",
+    extensions: "Build a playable prototype of your game design."
+  },
+  {
+    id: "rg-68-30",
+    topic: "Responsible Gaming",
+    gradeBand: "6-8",
+    duration: "30-min",
+    title: "Online Gaming Communication Safety",
+    objectives: ["Identify safe vs. unsafe communication in gaming", "Develop personal rules for interacting with strangers in games"],
+    materials: ["Chat log examples (teacher-created)", "Safety rules template", "Scenario cards"],
+    procedure: [
+      "Review (5 min): why is communicating with strangers in games risky?",
+      "Analyze (10 min): review 6 example in-game chat logs — identify safe and unsafe interactions",
+      "Create (10 min): develop personal gaming communication rules covering: what to share, what to never share, when to report, when to mute",
+      "Scenario practice (5 min): apply your rules to 3 quick scenarios"
+    ],
+    assessment: "Students create a comprehensive set of gaming communication safety rules.",
+    extensions: "Share gaming safety rules with a parent or guardian for discussion."
+  },
+  {
+    id: "rg-68-full",
+    topic: "Responsible Gaming",
+    gradeBand: "6-8",
+    duration: "full-period",
+    title: "Gaming Industry Investigation",
+    objectives: ["Research the gaming industry's business practices", "Form informed opinions about responsible gaming"],
+    materials: ["Research packets", "Investigation worksheets", "Debate preparation sheets"],
+    procedure: [
+      "Introduction (5 min): the gaming industry makes billions — how?",
+      "Research stations (20 min): groups investigate assigned topics — loot boxes, pay-to-win, advertising to kids, gaming addiction research, esports",
+      "Findings report (15 min): each group presents key findings with evidence",
+      "Debate (15 min): 'Should the government regulate how games are designed and monetized?'",
+      "Personal reflection (5 min): write your position on responsible gaming practices"
+    ],
+    assessment: "Students present evidence-based findings and articulate informed positions.",
+    extensions: "Write a letter to a game company with suggestions for fairer practices."
+  },
+  {
+    id: "rg-912-15",
+    topic: "Responsible Gaming",
+    gradeBand: "9-12",
+    duration: "15-min",
+    title: "Gaming and Mental Health: The Research",
+    objectives: ["Examine research on gaming's effects on mental health", "Distinguish between correlation and causation in gaming studies"],
+    materials: ["Research summary handouts", "Discussion prompts"],
+    procedure: [
+      "Present 3 research findings about gaming and mental health: one positive, one negative, one nuanced",
+      "Discuss: which findings are correlational? Which show causation? Why does the distinction matter?",
+      "Key insight: the relationship between gaming and mental health is complex and individual",
+      "Personal check: does your gaming support or hinder your mental well-being?"
+    ],
+    assessment: "Students can distinguish between correlation and causation in gaming research.",
+    extensions: "Find and evaluate one gaming research study on your own."
+  },
+  {
+    id: "rg-912-full",
+    topic: "Responsible Gaming",
+    gradeBand: "9-12",
+    duration: "full-period",
+    title: "Gaming Culture and Digital Well-Being Summit",
+    objectives: ["Analyze gaming culture from multiple perspectives", "Develop comprehensive digital well-being strategies"],
+    materials: ["Summit planning materials", "Panel discussion format guide", "Resolution template"],
+    procedure: [
+      "Opening (5 min): welcome to the Digital Well-Being Summit on Gaming Culture",
+      "Panel 1 — Benefits (10 min): students present research on positive aspects of gaming (skill development, community, creativity)",
+      "Panel 2 — Concerns (10 min): students present research on risks (addiction, spending, toxic communities)",
+      "Panel 3 — Solutions (10 min): students present strategies for healthy gaming (time management, spending limits, community standards)",
+      "Small group discussions (15 min): groups draft 'Gaming Well-Being Resolutions' with specific action items",
+      "Summit closing (10 min): groups present resolutions and class votes on which to adopt"
+    ],
+    assessment: "Students contribute to a balanced discussion and produce actionable well-being resolutions.",
+    extensions: "Publish the summit resolutions as a student-led gaming well-being guide."
+  },
+  {
+    id: "st-k2-30",
+    topic: "School Technology Safety",
+    gradeBand: "K-2",
+    duration: "30-min",
+    title: "Our Classroom Computer Rules",
+    objectives: ["Co-create classroom technology rules", "Practice following rules during computer time"],
+    materials: ["Large poster paper", "Markers", "Computer or tablet for practice"],
+    procedure: [
+      "Discussion (5 min): why do we have rules for the playground? We need rules for computers too!",
+      "Brainstorm (10 min): students suggest rules — teacher writes them on poster paper, guiding toward 5-6 key rules",
+      "Illustrate (10 min): students help draw pictures for each rule on the poster",
+      "Practice (5 min): supervised computer time where students demonstrate following the rules"
+    ],
+    assessment: "Students help create and can follow at least 4 classroom technology rules.",
+    extensions: "Post the rules near classroom computers and revisit weekly."
+  },
+  {
+    id: "st-k2-45",
+    topic: "School Technology Safety",
+    gradeBand: "K-2",
+    duration: "45-min",
+    title: "The Safe Website Song and Dance",
+    objectives: ["Learn to identify approved websites at school", "Practice asking for help before visiting new websites"],
+    materials: ["Website cards (approved and not approved)", "Song lyrics chart", "Green/red signs"],
+    procedure: [
+      "Teach the Safe Website Song: a simple song about asking first and sticking to approved sites (10 min)",
+      "Green Light / Red Light game (10 min): show website cards, students move forward for approved sites, freeze for unapproved",
+      "Role-play (10 min): practice asking the teacher 'Is this website okay to visit?'",
+      "Practice on computers (10 min): navigate only to approved sites with teacher supervision",
+      "Review and sing (5 min): sing the Safe Website Song one more time"
+    ],
+    assessment: "Students can identify approved school websites and know to ask before visiting new ones.",
+    extensions: "Teach the Safe Website Song to students in another class."
+  },
+  {
+    id: "st-k2-full",
+    topic: "School Technology Safety",
+    gradeBand: "K-2",
+    duration: "full-period",
+    title: "Technology Helper Training Day",
+    objectives: ["Master all basic school technology safety rules", "Earn a Technology Helper certification"],
+    materials: ["Training station materials", "Checklist cards", "Certificate templates", "Stickers"],
+    procedure: [
+      "Welcome (5 min): today you will earn your Technology Helper certificate!",
+      "Station 1 — Clean Hands (10 min): wash hands before using computers, practice gentle keyboard and mouse use",
+      "Station 2 — Safe Websites (10 min): practice navigating only to approved websites using a checklist",
+      "Station 3 — Tell a Teacher (10 min): role-play 4 situations where you need to tell a teacher (pop-up, mean message, broken equipment, confusing website)",
+      "Station 4 — Log Out (10 min): practice logging in and out of student accounts properly",
+      "Certification (15 min): students who pass all stations receive Technology Helper certificates"
+    ],
+    assessment: "Students demonstrate competency at all 4 stations.",
+    extensions: "Technology Helpers assist classmates with computer procedures for one week."
+  },
+  {
+    id: "st-35-45",
+    topic: "School Technology Safety",
+    gradeBand: "3-5",
+    duration: "45-min",
+    title: "School Network Safety Detectives",
+    objectives: ["Understand what a school network is and why it needs protection", "Practice safe behaviors that protect the school network"],
+    materials: ["Network diagram poster", "Scenario investigation cards", "Safety checklist"],
+    procedure: [
+      "Introduction (10 min): what is a school network? Draw a simple diagram showing how school devices connect",
+      "Why it matters (5 min): explain that when one person does something unsafe, it can affect everyone on the network",
+      "Detective investigation (15 min): groups investigate 6 scenario cards and determine if each action is safe or unsafe for the school network",
+      "Create (10 min): groups write 3 'Network Safety Rules' based on their investigations",
+      "Share (5 min): each group presents their top rule"
+    ],
+    assessment: "Students can explain why school network safety matters and identify safe network behaviors.",
+    extensions: "Interview the school IT person about network safety challenges."
+  },
+  {
+    id: "st-35-full",
+    topic: "School Technology Safety",
+    gradeBand: "3-5",
+    duration: "full-period",
+    title: "School Cybersecurity Awareness Fair",
+    objectives: ["Demonstrate comprehensive school technology safety knowledge", "Teach others about safe technology use"],
+    materials: ["Poster supplies", "Activity station materials", "Presentation rubric", "Visitor feedback forms"],
+    procedure: [
+      "Planning (10 min): each group chooses a topic — passwords, phishing, safe websites, reporting problems, logging out",
+      "Creating (20 min): groups create an interactive display with a poster and a hands-on activity for visitors",
+      "Practice (10 min): rehearse presenting and running the activity",
+      "Fair time (15 min): groups rotate visiting each other's stations, completing each activity",
+      "Feedback (5 min): visitors write positive feedback for each station"
+    ],
+    assessment: "Groups create accurate, engaging displays and can explain their topic to visitors.",
+    extensions: "Host the fair for another grade level or for parents during an open house."
+  },
+  {
+    id: "st-68-45",
+    topic: "School Technology Safety",
+    gradeBand: "6-8",
+    duration: "45-min",
+    title: "Data Breach Simulation",
+    objectives: ["Experience the impact of a data breach through simulation", "Develop understanding of data protection importance"],
+    materials: ["Simulation scenario packets", "Role assignment cards", "Impact analysis worksheets"],
+    procedure: [
+      "Scenario setup (5 min): 'Your school's student database has been hacked. Student names, grades, and addresses are exposed'",
+      "Impact analysis (10 min): groups analyze what this breach means for students, teachers, parents, and the school",
+      "Response planning (10 min): teams develop a response plan — who to notify, what steps to take, how to prevent it next time",
+      "What could have prevented this? (10 min): trace the breach to its cause and identify preventive measures",
+      "Commitment (10 min): each student writes 3 things they will do to help protect school data"
+    ],
+    assessment: "Students can analyze breach impacts and propose specific preventive measures.",
+    extensions: "Research a real school district data breach and its aftermath."
+  },
+  {
+    id: "st-68-full",
+    topic: "School Technology Safety",
+    gradeBand: "6-8",
+    duration: "full-period",
+    title: "School Cybersecurity Assessment Project",
+    objectives: ["Conduct a mock security assessment of school technology practices", "Propose improvements based on findings"],
+    materials: ["Assessment rubric", "Interview question templates", "Report template", "Presentation materials"],
+    procedure: [
+      "Introduction (10 min): what is a cybersecurity assessment and why do organizations do them?",
+      "Assessment design (10 min): teams design their assessment plan — what to evaluate and how",
+      "Assessment execution (15 min): teams assess school technology practices using observation and their rubric (no actual testing of systems)",
+      "Report writing (15 min): teams write up findings and recommendations in a structured report",
+      "Presentation (10 min): teams present their top 3 findings and recommendations"
+    ],
+    assessment: "Teams produce a structured assessment report with evidence-based recommendations.",
+    extensions: "Submit recommendations to the school administration or IT department."
+  },
+  {
+    id: "st-912-full",
+    topic: "School Technology Safety",
+    gradeBand: "9-12",
+    duration: "full-period",
+    title: "Cybersecurity Policy Workshop",
+    objectives: ["Analyze existing school technology policies", "Draft improved policies based on current threats"],
+    materials: ["School AUP copies", "Policy analysis framework", "Drafting template", "Peer review rubric"],
+    procedure: [
+      "Policy review (10 min): read and analyze the school's current Acceptable Use Policy — what works? What is missing?",
+      "Threat landscape (10 min): identify current cybersecurity threats specific to schools (ransomware, phishing, data breaches, social engineering)",
+      "Gap analysis (10 min): compare current policy against identified threats — where are the gaps?",
+      "Policy drafting (20 min): groups draft policy improvements addressing identified gaps, including student responsibilities",
+      "Peer review and presentation (10 min): exchange drafts for feedback and present top recommendations"
+    ],
+    assessment: "Students produce policy recommendations that address real gaps in school cybersecurity.",
+    extensions: "Present final policy recommendations to school administration for consideration."
   }
 ];
 
