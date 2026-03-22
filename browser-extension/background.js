@@ -195,7 +195,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message.type === "SCAN_WEBMAIL") {
-    performScan(message.content).then(sendResponse);
+    checkFeatureAccess("webmail_scan").then(allowed => {
+      if (!allowed) {
+        sendResponse({ success: false, error: "Upgrade to Pro to use webmail scanning" });
+      } else {
+        performScan(message.content).then(sendResponse);
+      }
+    });
     return true;
   }
   if (message.type === "SIGN_IN") {
@@ -604,6 +610,10 @@ const TRUST_CACHE_TTL = 5 * 60 * 1000;
 
 async function getCommunityTrust(domain) {
   try {
+    const hasCommunityTrust = await checkFeatureAccess("community_trust");
+    if (!hasCommunityTrust) {
+      return { communityScore: 50, visitCount: 0, flagCount: 0, safeCount: 0, locked: true };
+    }
     const domainHash = await hashDomain(domain);
     const cached = communityTrustCache.get(domainHash);
     if (cached && (Date.now() - cached.timestamp < TRUST_CACHE_TTL)) {
@@ -739,6 +749,9 @@ async function generateWeeklyDigest() {
   try {
     const settings = await getSettings();
     if (!settings.weeklyDigest) return;
+
+    const hasDigest = await checkFeatureAccess("weekly_digest");
+    if (!hasDigest) return;
 
     const { scanStats = { totalScans: 0, threatsBlocked: 0, linksChecked: 0 } } =
       await chrome.storage.local.get(["scanStats"]);
