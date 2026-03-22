@@ -396,13 +396,9 @@
     const isMediumRisk = pageRiskLevel === "medium";
     const hostname = window.location.hostname;
     const isUnfamiliar = !isDomainFamiliar(hostname) && (pageRiskLevel === "unknown" || pageRiskLevel === "low");
+    const shouldWarn = isHighRisk || (isMediumRisk && hasSensitiveData) || (isUnfamiliar && hasSensitiveData);
 
-    if (isHighRisk) {
-    } else if (isMediumRisk && hasSensitiveData) {
-    } else if (isUnfamiliar && hasSensitiveData) {
-    } else {
-      return;
-    }
+    if (!shouldWarn) return;
 
     const effectiveRisk = isHighRisk ? pageRiskLevel : isMediumRisk ? "medium" : "low";
 
