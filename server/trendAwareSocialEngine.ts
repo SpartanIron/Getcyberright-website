@@ -347,8 +347,21 @@ async function generateTrendAwarePost(
 
   const guideContext = relevantGuides
     .slice(0, 10)
-    .map((g) => `- "${g.title}" (${g.category}) https://www.getcyberright.com/guides/${g.slug}`)
+    .map((g) => `- "${g.title}" (${g.category}) https://getcyberright.com/guides/${g.slug}`)
     .join("\n");
+
+  let alertsContext = "";
+  let scamIntelContext = "";
+  try {
+    const recentAlerts = await storage.getPublishedThreatAlerts(undefined, 5);
+    if (recentAlerts.length > 0) {
+      alertsContext = `\nGETCYBERRIGHT ALERTS (link to these when covering related threats):\n${recentAlerts.map(a => `- "${a.threatName}" (${a.threatCategory}) https://getcyberright.com/alerts/${a.slug}`).join("\n")}`;
+    }
+    const recentScams = await storage.getPublishedScamIntel(undefined, 5);
+    if (recentScams.length > 0) {
+      scamIntelContext = `\nGETCYBERRIGHT SCAM INTEL (link to these when covering related scam types):\n${recentScams.map(s => `- "${s.scamName}" (${s.scamCategory}) https://getcyberright.com/scam-intel/${s.slug}`).join("\n")}`;
+    }
+  } catch (e) {}
 
   const recentPostsContext =
     recentlyPublishedTitles.length > 0
@@ -419,9 +432,11 @@ STEP 6 - CONTENT MODE SELECTION:
 
 STEP 7 - CONTENT CREATION:
 - Follow the specific WRITING STYLE instruction provided below
-- Post structure should flow naturally: hook (urgent but credible, no clickbait) > what happened (clear explanation) > why it matters (real-world impact) > what to do (2-4 specific, executable actions, no vague advice) > GetCyberRight connection (natural, only if relevant) > calm closing (reassuring, confident)
-- Not every post needs all elements. The WRITING STYLE takes priority
-- EVERY post must include at least 2 specific, practical, immediately actionable steps. No vague advice like "be careful" or "stay vigilant"
+- EXCERPT STRATEGY: Posts are teasers, NOT full articles. Share the most compelling insight to hook readers, then drive them to the relevant GetCyberRight page for the full breakdown
+- Post structure: hook (the most compelling insight) > brief context (1-2 sentences on why it matters) > 1-2 actionable tips as a preview > CTA linking to the most relevant GetCyberRight page (guide, alert, scam intel, or tool)
+- ALWAYS end with a link to a relevant GetCyberRight page. Match the topic to: getcyberright.com/guides/[slug], getcyberright.com/alerts/[slug], getcyberright.com/scam-intel/[slug], getcyberright.com/scam-checker, getcyberright.com/cyber-threat-radar, or getcyberright.com/awareness-hub
+- If no specific page matches, link to getcyberright.com with a general CTA
+- The link MUST appear on its own line before any hashtags
 
 STEP 8 - VISUAL PLANNING:
 - Suggest 1-2 visuals: story (real-life situation), educational (simple breakdown), or product_ui (GetCyberRight feature)
@@ -508,8 +523,19 @@ CURRENT CYBERSECURITY NEWS FEED (with source credibility tiers):
 ${newsContext}
 ${sourceValidationContext}
 
-GETCYBERRIGHT GUIDES (reference when naturally relevant):
+GETCYBERRIGHT CONTENT (link to the most relevant page in your CTA):
+
+GUIDES:
 ${guideContext}
+${alertsContext}
+${scamIntelContext}
+
+KEY TOOL PAGES:
+- Scam Checker: https://getcyberright.com/scam-checker
+- Cyber Threat Radar: https://getcyberright.com/cyber-threat-radar
+- Awareness Hub: https://getcyberright.com/awareness-hub
+- Data Broker Removal: https://getcyberright.com/data-broker-removal
+- GCR Guard Extension: https://getcyberright.com/browser-extension
 ${recentPostsContext}
 ${performanceContext}
 
@@ -517,17 +543,17 @@ Execute ALL steps of your intelligence pipeline (Signal Interpretation, Source V
 
 LINKEDIN POST (120-180 words max, STRICTLY ENFORCED):
 - Professional audience, both technical and non-technical
-- Structure MUST be: Hook (1-2 punchy lines) \\n\\n Body (3-4 short paragraphs) \\n\\n CTA or closing thought
+- Structure MUST be: Hook (1-2 punchy lines) \\n\\n Brief insight (1-2 paragraphs) \\n\\n 1-2 actionable tips as preview \\n\\n CTA with link to relevant GetCyberRight page
 - First 2 lines are everything. They appear before "see more". Make them count
 - Each paragraph: 1-2 sentences MAX. Break after every thought
-- Include 2-3 actionable steps, each on its own line
-- End with either a question OR a strong statement (vary this)
+- End with a clear CTA driving to the relevant GetCyberRight page (e.g. "Full breakdown and protection steps:" followed by the link on its own line)
 - The post MUST contain at least 4 paragraph breaks (\\n\\n)
 
 FACEBOOK POST (60-120 words max):
 - Conversational, like talking to a neighbor
-- Warmer tone, slightly longer storytelling
-- 2-3 specific actionable steps
+- Share the most surprising or relatable insight from the topic
+- Give 1-2 quick tips as a preview
+- End with a conversational CTA and link (e.g. "We put together a full guide on this. Check it out:" followed by the link)
 - Use paragraph breaks between thoughts
 
 Format your complete output as this strict JSON with \\n for line breaks within post text:
@@ -557,6 +583,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
     "tool_name": "Name of relevant GetCyberRight tool",
     "how_it_connects": "One sentence on why this tool helps"
   },
+  "gcr_link": "https://getcyberright.com/relevant-page-slug (the link used in the CTA)",
   "confidence_score": 85,
   "recommended_action": "auto_publish | review"
 }`,
@@ -1036,10 +1063,10 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
           postContent: content,
           hashtags: posts.hashtags,
           status: "published",
-          publishedAt: new Date(),
         };
 
         const created = await storage.createSocialPost(socialPost);
+        await storage.updateSocialPost(created.id, { publishedAt: new Date() });
 
         const channel = channels[platform];
         const bufferResult = await createBufferPost(channel.id, content, {
