@@ -928,10 +928,86 @@
 
     const observer = new MutationObserver(() => {
       injectWebmailScanButtons(matchedProvider);
+      injectInboxRiskIndicators(matchedProvider);
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
-    setTimeout(() => injectWebmailScanButtons(matchedProvider), 2000);
+    setTimeout(() => {
+      injectWebmailScanButtons(matchedProvider);
+      injectInboxRiskIndicators(matchedProvider);
+    }, 2000);
+  }
+
+  function injectInboxRiskIndicators(provider) {
+    const rowSelector = provider.name === "gmail" ? "tr.zA" : "[role='option'], [data-convid]";
+    const rows = document.querySelectorAll(rowSelector);
+    rows.forEach(row => {
+      if (row.dataset.gcrInboxScanned) return;
+      row.dataset.gcrInboxScanned = "true";
+
+      const links = row.querySelectorAll("a[href]");
+      const suspiciousLinks = [];
+      links.forEach(link => {
+        const href = link.getAttribute("href") || "";
+        if (!href.startsWith("http")) return;
+        try {
+          const hostname = new URL(href).hostname;
+          const lookalikeResult = detectLookalikeHostname(hostname);
+          if (lookalikeResult) {
+            suspiciousLinks.push({ href, match: lookalikeResult });
+          }
+        } catch (e) {}
+      });
+
+      if (suspiciousLinks.length > 0) {
+        const indicator = document.createElement("span");
+        indicator.className = "gcr-inbox-risk-indicator";
+        indicator.title = `GCR Guard: ${suspiciousLinks.length} suspicious link(s) detected`;
+        indicator.style.cssText = `
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+          background: #fef2f2;
+          border: 1px solid #fca5a5;
+          border-radius: 4px;
+          padding: 1px 6px;
+          font-size: 10px;
+          font-weight: 600;
+          color: #dc2626;
+          margin-left: 6px;
+          cursor: help;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        `;
+        indicator.textContent = "\u26A0\uFE0F " + suspiciousLinks.length + " risky";
+
+        const subjectCell = provider.name === "gmail"
+          ? row.querySelector(".bog, .bqe, .y6")
+          : row.querySelector("[data-testid='subjectLine'], .hcptT");
+        if (subjectCell) {
+          subjectCell.appendChild(indicator);
+        } else {
+          const firstCell = row.querySelector("td:nth-child(3), td:nth-child(4)") || row.firstElementChild;
+          if (firstCell) firstCell.appendChild(indicator);
+        }
+      }
+    });
+  }
+
+  function detectLookalikeHostname(hostname) {
+    const cleanDomain = hostname.toLowerCase().replace(/^www\./, "");
+    for (const [brand, info] of Object.entries(LOOKALIKE_BRANDS)) {
+      if (cleanDomain === info.domain || cleanDomain === info.registrable) continue;
+      if (cleanDomain.endsWith("." + info.registrable)) continue;
+      for (const variant of info.variants) {
+        if (cleanDomain.includes(variant)) {
+          return { brand, variant, legitimateDomain: info.domain };
+        }
+      }
+      if (cleanDomain.includes(brand) && !cleanDomain.endsWith(info.registrable)) {
+        return { brand, variant: brand, legitimateDomain: info.domain };
+      }
+    }
+    return null;
   }
 
   function injectWebmailScanButtons(provider) {

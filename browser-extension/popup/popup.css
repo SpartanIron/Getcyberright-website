@@ -622,6 +622,39 @@ body {
   opacity: 0.7;
 }
 
+.digest-summary {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #374151;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.digest-stat {
+  font-weight: 600;
+  color: #0A2A3C;
+}
+
+.digest-stat-warn {
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid #fca5a5;
+}
+
+.digest-threats {
+  font-size: 10px;
+  color: #6b7280;
+  width: 100%;
+}
+
 .scan-history-section {
   padding: 12px 16px;
   background: white;

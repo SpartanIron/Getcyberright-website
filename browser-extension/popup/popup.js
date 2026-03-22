@@ -91,12 +91,17 @@ document.addEventListener("DOMContentLoaded", () => {
   btnReport.addEventListener("click", () => {
     if (!lastScanContent) return;
     const risk = lastScanResult?.scamRiskLevel || "Unknown";
+    const extractedUrl = extractUrl(lastScanContent);
+    const scamType = (risk === "Critical" || risk === "High") ? "phishing" : "suspicious";
+    const description = lastScanResult?.summary || `Scanned content flagged as ${risk} risk`;
     chrome.runtime.sendMessage({
-      type: "REPORT_SCAM",
+      type: "REPORT_SCAM_STRUCTURED",
       data: {
         content: lastScanContent.substring(0, 500),
-        reportType: risk === "Critical" || risk === "High" ? "confirmed_scam" : "suspicious",
-        url: extractUrl(lastScanContent)
+        reportType: (risk === "Critical" || risk === "High") ? "confirmed_scam" : "suspicious",
+        url: extractedUrl,
+        scamType,
+        description
       }
     }, (response) => {
       if (response?.success) {
@@ -310,7 +315,30 @@ document.addEventListener("DOMContentLoaded", () => {
     chrome.runtime.sendMessage({ type: "GET_WEEKLY_STATS" }, (stats) => {
       if (!stats) return;
       renderWeeklyChart(stats);
+      renderDigestSummary(stats);
     });
+  }
+
+  function renderDigestSummary(stats) {
+    const el = document.getElementById("digest-summary");
+    if (!el) return;
+    const sitesCount = (stats.sitesVisited || []).length;
+    const flaggedCount = (stats.sitesFlagged || []).length;
+    const topThreats = (stats.topThreats || []).slice(-3);
+    if (sitesCount === 0 && flaggedCount === 0) return;
+
+    el.classList.remove("hidden");
+    let html = `<span class="digest-stat">${sitesCount} unique site${sitesCount !== 1 ? "s" : ""} visited</span>`;
+    if (flaggedCount > 0) {
+      html += ` <span class="digest-stat digest-stat-warn">${flaggedCount} flagged</span>`;
+    }
+    if (topThreats.length > 0) {
+      const domains = topThreats.map(t => t.domain).filter(Boolean);
+      if (domains.length > 0) {
+        html += `<span class="digest-threats">Top threats: ${domains.join(", ")}</span>`;
+      }
+    }
+    el.innerHTML = html;
   }
 
   function renderWeeklyChart(stats) {

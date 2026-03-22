@@ -341,7 +341,7 @@ async function handleAutoScan(message, sender) {
 
   tabCache.set(tabId, result);
   updateBadgeFromResult(result, tabId);
-  incrementStats(result.riskLevel);
+  incrementStats(result.riskLevel, undefined, result.url);
   addToScanHistory(result);
   recordVisit(url);
 
@@ -575,12 +575,25 @@ async function hashDomain(domain) {
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+const communityTrustCache = new Map();
+const TRUST_CACHE_TTL = 5 * 60 * 1000;
+
 async function getCommunityTrust(domain) {
   try {
     const domainHash = await hashDomain(domain);
+    const cached = communityTrustCache.get(domainHash);
+    if (cached && (Date.now() - cached.timestamp < TRUST_CACHE_TTL)) {
+      return cached.data;
+    }
     const response = await fetch(`${API_BASE}/api/extension/site-reputation?domainHash=${domainHash}`);
     if (!response.ok) throw new Error(`API error: ${response.status}`);
-    return await response.json();
+    const data = await response.json();
+    communityTrustCache.set(domainHash, { data, timestamp: Date.now() });
+    if (communityTrustCache.size > 200) {
+      const oldest = [...communityTrustCache.entries()].sort((a, b) => a[1].timestamp - b[1].timestamp)[0];
+      if (oldest) communityTrustCache.delete(oldest[0]);
+    }
+    return data;
   } catch (error) {
     return { communityScore: 50, visitCount: 0, flagCount: 0, safeCount: 0 };
   }
@@ -651,29 +664,51 @@ function getEmptyWeeklyStats() {
     days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     scansPerDay: [0, 0, 0, 0, 0, 0, 0],
     threatsPerDay: [0, 0, 0, 0, 0, 0, 0],
+    sitesVisited: [],
+    sitesFlagged: [],
+    topThreats: [],
     weekStart: Date.now()
   };
 }
 
-async function incrementStats(risk, linkCount) {
-  const { scanStats = { totalScans: 0, threatsBlocked: 0, linksChecked: 0 } } =
-    await chrome.storage.local.get(["scanStats"]);
+let statsWriteQueue = Promise.resolve();
+async function incrementStats(risk, linkCount, url) {
+  statsWriteQueue = statsWriteQueue.then(async () => {
+    const { scanStats = { totalScans: 0, threatsBlocked: 0, linksChecked: 0 } } =
+      await chrome.storage.local.get(["scanStats"]);
 
-  scanStats.totalScans += 1;
-  if (linkCount) scanStats.linksChecked += linkCount;
-  const r = (risk || "").toLowerCase();
-  if (r === "high" || r === "critical") scanStats.threatsBlocked += 1;
+    scanStats.totalScans += 1;
+    if (linkCount) scanStats.linksChecked += linkCount;
+    const r = (risk || "").toLowerCase();
+    if (r === "high" || r === "critical") scanStats.threatsBlocked += 1;
 
-  chrome.storage.local.set({ scanStats });
+    const { weeklyStats = getEmptyWeeklyStats() } = await chrome.storage.local.get(["weeklyStats"]);
+    const dayIndex = new Date().getDay();
+    const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
+    weeklyStats.scansPerDay[adjustedIndex] = (weeklyStats.scansPerDay[adjustedIndex] || 0) + 1;
+    if (r === "high" || r === "critical") {
+      weeklyStats.threatsPerDay[adjustedIndex] = (weeklyStats.threatsPerDay[adjustedIndex] || 0) + 1;
+    }
 
-  const { weeklyStats = getEmptyWeeklyStats() } = await chrome.storage.local.get(["weeklyStats"]);
-  const dayIndex = new Date().getDay();
-  const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
-  weeklyStats.scansPerDay[adjustedIndex] = (weeklyStats.scansPerDay[adjustedIndex] || 0) + 1;
-  if (r === "high" || r === "critical") {
-    weeklyStats.threatsPerDay[adjustedIndex] = (weeklyStats.threatsPerDay[adjustedIndex] || 0) + 1;
-  }
-  chrome.storage.local.set({ weeklyStats });
+    if (url) {
+      try {
+        const hostname = new URL(url).hostname;
+        if (!weeklyStats.sitesVisited.includes(hostname)) {
+          weeklyStats.sitesVisited.push(hostname);
+          if (weeklyStats.sitesVisited.length > 100) weeklyStats.sitesVisited = weeklyStats.sitesVisited.slice(-100);
+        }
+        if (r === "high" || r === "critical") {
+          if (!weeklyStats.sitesFlagged.includes(hostname)) {
+            weeklyStats.sitesFlagged.push(hostname);
+          }
+          weeklyStats.topThreats.push({ domain: hostname, risk: r, time: Date.now() });
+          if (weeklyStats.topThreats.length > 20) weeklyStats.topThreats = weeklyStats.topThreats.slice(-20);
+        }
+      } catch (e) {}
+    }
+
+    await chrome.storage.local.set({ scanStats, weeklyStats });
+  }).catch(e => console.warn("[gcr-guard] Stats write error:", e.message));
 }
 
 async function generateWeeklyDigest() {
@@ -687,12 +722,34 @@ async function generateWeeklyDigest() {
 
     const weekScans = weeklyStats.scansPerDay.reduce((a, b) => a + b, 0);
     const weekThreats = weeklyStats.threatsPerDay.reduce((a, b) => a + b, 0);
+    const sitesVisitedCount = (weeklyStats.sitesVisited || []).length;
+    const sitesFlaggedCount = (weeklyStats.sitesFlagged || []).length;
+    const topThreats = (weeklyStats.topThreats || []).slice(-3).map(t => t.domain).filter(Boolean);
+
+    const digestData = {
+      weekScans,
+      weekThreats,
+      sitesVisitedCount,
+      sitesFlaggedCount,
+      topThreats,
+      generatedAt: Date.now()
+    };
+    await chrome.storage.local.set({ lastDigest: digestData });
+
+    let message = `This week: ${weekScans} pages scanned across ${sitesVisitedCount} sites, ${weekThreats} threats blocked.`;
+    if (sitesFlaggedCount > 0) {
+      message += ` ${sitesFlaggedCount} site(s) flagged as dangerous.`;
+    }
+    if (topThreats.length > 0) {
+      message += ` Top threats: ${topThreats.join(", ")}.`;
+    }
+    message += " Stay safe online!";
 
     chrome.notifications.create("weekly-digest", {
       type: "basic",
       iconUrl: "icons/icon-128.png",
       title: "GCR Guard Weekly Safety Digest",
-      message: `This week: ${weekScans} pages scanned, ${weekThreats} threats blocked. Total: ${scanStats.totalScans} scans all-time. Stay safe online!`,
+      message,
       priority: 1
     });
 

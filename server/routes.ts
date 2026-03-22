@@ -4152,7 +4152,7 @@ EDGE CASE HANDLING
         res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
         return;
       }
-      const result = await db.execute(sql`
+      await db.execute(sql`
         INSERT INTO site_reputation (id, domain_hash, domain, visit_count, safe_count, flag_count, community_score, last_flagged, created_at, updated_at)
         VALUES (gen_random_uuid(), ${domainHash}, ${domain}, 0, 0, 1, 0, NOW(), NOW(), NOW())
         ON CONFLICT (domain_hash) DO UPDATE SET
@@ -4160,10 +4160,12 @@ EDGE CASE HANDLING
           community_score = GREATEST(0, ROUND((site_reputation.safe_count::numeric / GREATEST(1, site_reputation.safe_count + site_reputation.flag_count + 1)) * 100)),
           last_flagged = NOW(),
           updated_at = NOW()
-        RETURNING community_score, flag_count
       `);
-      const row = (result as any).rows?.[0] || { community_score: 0, flag_count: 1 };
-      res.json({ communityScore: row.community_score, flagCount: row.flag_count });
+      const [updated] = await db.select({
+        communityScore: siteReputation.communityScore,
+        flagCount: siteReputation.flagCount,
+      }).from(siteReputation).where(eq(siteReputation.domainHash, domainHash)).limit(1);
+      res.json({ communityScore: updated?.communityScore ?? 0, flagCount: updated?.flagCount ?? 1 });
     } catch (error) {
       console.error("Site reputation flag error:", error);
       res.status(500).json({ error: "Failed to flag site" });
