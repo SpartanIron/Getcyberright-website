@@ -1,43 +1,18 @@
-const API_BASE = "https://www.getcyberright.com";
+import { logInfo, logWarn, logError } from "../utils/logger.js";
+import { shouldSkipUrl, isTrustedDomain, hashDomain, calculateRiskLevel } from "../utils/security.js";
+import {
+  isValidTab, isScannableTab, getValidTab, safeSendMessage,
+  isTabStillOnUrl, getCachedResult, setCachedResult, clearCachedResult,
+  initTabLifecycleHandlers, updateBadge, updateBadgeFromResult, getBadgeForRisk
+} from "./tabManager.js";
+import { setupMessageHandlers } from "./messaging.js";
 
-const tabCache = new Map();
+const API_BASE = "https://www.getcyberright.com";
+const SUBSCRIPTION_CACHE_TTL = 10 * 60 * 1000;
 let cachedSubscription = null;
 let subscriptionCacheTime = 0;
-const SUBSCRIPTION_CACHE_TTL = 10 * 60 * 1000;
-
-const SKIP_SCAN_PATTERNS = [
-  /^chrome/,
-  /^about:/,
-  /^chrome-extension:/,
-  /^moz-extension:/,
-  /^edge:/,
-  /^brave:/,
-  /^opera:/,
-  /^vivaldi:/,
-  /^file:/,
-  /^data:/,
-  /^blob:/,
-  /^javascript:/
-];
-
-const TRUSTED_DOMAINS = new Set([
-  "google.com", "www.google.com", "google.co.uk", "google.ca",
-  "youtube.com", "www.youtube.com",
-  "github.com", "www.github.com",
-  "stackoverflow.com", "www.stackoverflow.com",
-  "wikipedia.org", "en.wikipedia.org",
-  "reddit.com", "www.reddit.com",
-  "amazon.com", "www.amazon.com",
-  "microsoft.com", "www.microsoft.com",
-  "apple.com", "www.apple.com",
-  "facebook.com", "www.facebook.com",
-  "twitter.com", "www.twitter.com", "x.com",
-  "linkedin.com", "www.linkedin.com",
-  "instagram.com", "www.instagram.com",
-  "netflix.com", "www.netflix.com",
-  "getcyberright.com", "www.getcyberright.com",
-  "replit.com", "www.replit.com"
-]);
+const communityTrustCache = new Map();
+const TRUST_CACHE_TTL = 5 * 60 * 1000;
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -69,36 +44,14 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.create("weekly-safety-digest", { periodInMinutes: 10080 });
 
   fetchScamOfWeek();
+  logInfo("core", "Extension installed and initialized");
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "check-scam-of-week") {
-    fetchScamOfWeek();
-  }
-  if (alarm.name === "refresh-threat-feed") {
-    fetchThreatFeed();
-  }
-  if (alarm.name === "weekly-safety-digest") {
-    generateWeeklyDigest();
-  }
+  if (alarm.name === "check-scam-of-week") fetchScamOfWeek();
+  if (alarm.name === "refresh-threat-feed") fetchThreatFeed();
+  if (alarm.name === "weekly-safety-digest") generateWeeklyDigest();
 });
-
-function isValidTab(tab) {
-  return tab && typeof tab.id === "number" && tab.id !== chrome.tabs.TAB_ID_NONE;
-}
-
-function isScannableTab(tab) {
-  return isValidTab(tab) && tab.url && !shouldSkipUrl(tab.url);
-}
-
-async function getValidTab(tabId) {
-  try {
-    const tab = await chrome.tabs.get(tabId);
-    return isValidTab(tab) ? tab : null;
-  } catch {
-    return null;
-  }
-}
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (!isValidTab(tab)) return;
@@ -115,106 +68,102 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-chrome.tabs.onRemoved.addListener((tabId) => {
-  tabCache.delete(tabId);
-});
+initTabLifecycleHandlers();
 
-chrome.webNavigation.onBeforeNavigate.addListener((details) => {
-  if (details.frameId === 0 && details.tabId && details.tabId !== chrome.tabs.TAB_ID_NONE) {
-    tabCache.delete(details.tabId);
-    updateBadge("", "#16a34a", details.tabId);
-  }
-});
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "SCAN_URL") {
+setupMessageHandlers({
+  SCAN_URL: (message, _sender, sendResponse) => {
     performScan(message.content).then(sendResponse);
     return true;
-  }
-  if (message.type === "CHECK_URL_REPUTATION") {
+  },
+  CHECK_URL_REPUTATION: (message, _sender, sendResponse) => {
     checkUrlReputation(message.url).then(sendResponse);
     return true;
-  }
-  if (message.type === "REPORT_SCAM") {
+  },
+  REPORT_SCAM: (message, _sender, sendResponse) => {
     reportScam(message.data).then(sendResponse);
     return true;
-  }
-  if (message.type === "REPORT_SCAM_STRUCTURED") {
+  },
+  REPORT_SCAM_STRUCTURED: (message, _sender, sendResponse) => {
     reportScamStructured(message.data).then(sendResponse);
     return true;
-  }
-  if (message.type === "GET_SCAM_OF_WEEK") {
+  },
+  GET_SCAM_OF_WEEK: (_message, _sender, sendResponse) => {
     chrome.storage.local.get(["scamOfWeek"], (result) => {
       sendResponse(result.scamOfWeek || null);
     });
     return true;
-  }
-  if (message.type === "GET_SCAN_STATS") {
+  },
+  GET_SCAN_STATS: (_message, _sender, sendResponse) => {
     chrome.storage.local.get(["scanStats"], (result) => {
       sendResponse(result.scanStats || { totalScans: 0, threatsBlocked: 0, linksChecked: 0 });
     });
     return true;
-  }
-  if (message.type === "GET_WEEKLY_STATS") {
+  },
+  GET_WEEKLY_STATS: (_message, _sender, sendResponse) => {
     chrome.storage.local.get(["weeklyStats"], (result) => {
       sendResponse(result.weeklyStats || getEmptyWeeklyStats());
     });
     return true;
-  }
-  if (message.type === "GET_SCAN_HISTORY") {
+  },
+  GET_SCAN_HISTORY: (_message, _sender, sendResponse) => {
     chrome.storage.local.get(["scanHistory"], (result) => {
       sendResponse(result.scanHistory || []);
     });
     return true;
-  }
-  if (message.type === "SCAN_PAGE_LINKS") {
+  },
+  SCAN_PAGE_LINKS: (message, sender, sendResponse) => {
     handlePageLinksScan(message.links, sender.tab).then(sendResponse);
     return true;
-  }
-  if (message.type === "GET_SETTINGS") {
+  },
+  GET_SETTINGS: (_message, _sender, sendResponse) => {
     chrome.storage.local.get(["settings"], (result) => {
       sendResponse(result.settings || getDefaultSettings());
     });
     return true;
-  }
-  if (message.type === "SAVE_SETTINGS") {
+  },
+  SAVE_SETTINGS: (message, _sender, sendResponse) => {
     chrome.storage.local.set({ settings: message.settings }, () => {
       sendResponse({ success: true });
     });
     return true;
-  }
-  if (message.type === "PAGE_LOADED") {
+  },
+  PAGE_LOADED: (message, sender, sendResponse) => {
     handleAutoScan(message, sender).then(sendResponse);
     return true;
-  }
-  if (message.type === "GET_TAB_SCAN_RESULT") {
+  },
+  GET_TAB_SCAN_RESULT: (message, sender, sendResponse) => {
     const tabId = message.tabId || sender.tab?.id;
-    if (tabId && tabCache.has(tabId)) {
-      sendResponse(tabCache.get(tabId));
+    if (tabId) {
+      const cached = getCachedResult(tabId);
+      sendResponse(cached);
     } else {
       sendResponse(null);
     }
     return true;
-  }
-  if (message.type === "GET_PAGE_RISK") {
+  },
+  GET_PAGE_RISK: (message, sender, sendResponse) => {
     const tabId = message.tabId || sender.tab?.id;
-    if (tabId && tabCache.has(tabId)) {
-      const cached = tabCache.get(tabId);
-      sendResponse({ riskLevel: cached.riskLevel, riskScore: cached.riskScore });
+    if (tabId) {
+      const cached = getCachedResult(tabId);
+      if (cached) {
+        sendResponse({ riskLevel: cached.riskLevel, riskScore: cached.riskScore });
+      } else {
+        sendResponse({ riskLevel: "unknown", riskScore: 0 });
+      }
     } else {
       sendResponse({ riskLevel: "unknown", riskScore: 0 });
     }
     return true;
-  }
-  if (message.type === "GET_COMMUNITY_TRUST") {
+  },
+  GET_COMMUNITY_TRUST: (message, _sender, sendResponse) => {
     getCommunityTrust(message.domain).then(sendResponse);
     return true;
-  }
-  if (message.type === "FLAG_DOMAIN") {
+  },
+  FLAG_DOMAIN: (message, _sender, sendResponse) => {
     flagDomain(message.domain).then(sendResponse);
     return true;
-  }
-  if (message.type === "SCAN_WEBMAIL") {
+  },
+  SCAN_WEBMAIL: (message, _sender, sendResponse) => {
     checkFeatureAccess("webmail_scan").then(allowed => {
       if (!allowed) {
         sendResponse({ success: false, error: "Upgrade to Pro to use webmail scanning" });
@@ -223,50 +172,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     });
     return true;
-  }
-  if (message.type === "SIGN_IN") {
+  },
+  SIGN_IN: (message, _sender, sendResponse) => {
     handleSignIn(message.token).then(sendResponse);
     return true;
-  }
-  if (message.type === "SIGN_OUT") {
+  },
+  SIGN_OUT: (_message, _sender, sendResponse) => {
     handleSignOut().then(sendResponse);
     return true;
-  }
-  if (message.type === "GET_AUTH_STATUS") {
+  },
+  GET_AUTH_STATUS: (_message, _sender, sendResponse) => {
     getAuthStatus().then(sendResponse);
     return true;
-  }
-  if (message.type === "CHECK_FEATURE") {
+  },
+  CHECK_FEATURE: (message, _sender, sendResponse) => {
     checkFeatureAccess(message.feature).then(sendResponse);
     return true;
   }
 });
-
-function shouldSkipUrl(url) {
-  if (!url) return true;
-  return SKIP_SCAN_PATTERNS.some(p => p.test(url));
-}
-
-function isTrustedDomain(url) {
-  try {
-    const hostname = new URL(url).hostname;
-    if (TRUSTED_DOMAINS.has(hostname)) return true;
-    const parts = hostname.split(".");
-    if (parts.length > 2) {
-      const rootDomain = parts.slice(-2).join(".");
-      if (TRUSTED_DOMAINS.has(rootDomain)) return true;
-    }
-    return false;
-  } catch {
-    return false;
-  }
-}
-
-async function isTabStillOnUrl(tabId, url) {
-  if (!tabId || tabId === chrome.tabs.TAB_ID_NONE) return false;
-  const tab = await getValidTab(tabId);
-  return tab !== null && tab.url === url;
-}
 
 async function handleAutoScan(message, sender) {
   const senderTab = sender.tab;
@@ -287,18 +210,11 @@ async function handleAutoScan(message, sender) {
     return { skipped: true, reason: "upgrade_required" };
   }
 
-  if (tabCache.has(tabId)) {
-    const cached = tabCache.get(tabId);
-    if (cached.url === url && Date.now() - cached.timestamp < 300000) {
-      updateBadgeFromResult(cached, tabId);
-      const cachedTab = await getValidTab(tabId);
-      if (cachedTab) {
-        try {
-          chrome.tabs.sendMessage(tabId, { type: "AUTO_SCAN_RESULT", result: cached });
-        } catch (e) { console.warn("[gcr-guard] Failed to send cached result to tab:", e.message); }
-      }
-      return cached;
-    }
+  const cached = getCachedResult(tabId);
+  if (cached && cached.url === url && Date.now() - cached.timestamp < 300000) {
+    updateBadgeFromResult(cached, tabId);
+    await safeSendMessage(tabId, { type: "AUTO_SCAN_RESULT", result: cached });
+    return cached;
   }
 
   updateBadge("...", "#666", tabId);
@@ -328,32 +244,24 @@ async function handleAutoScan(message, sender) {
 
   try {
     const repResult = await checkUrlReputation(url);
-
     if (!await isTabStillOnUrl(tabId, url)) return { skipped: true, reason: "navigated" };
 
     result.reputation = repResult;
     result.sources.push("reputation-api");
 
     if (repResult.success) {
-      const rep = repResult;
       let repScore = 0;
-
-      if (rep.phishTank?.isPhishing) repScore += 40;
-      if (rep.urlhaus?.isMalware) repScore += 40;
-      if (rep.googleSafeBrowsing?.isThreat) repScore += 40;
-      if (rep.domainAge?.isNew) repScore += 15;
-      if (rep.domainAge?.ageInDays !== null && rep.domainAge?.ageInDays !== undefined && rep.domainAge.ageInDays < 30) repScore += 10;
-
+      if (repResult.phishTank?.isPhishing) repScore += 40;
+      if (repResult.urlhaus?.isMalware) repScore += 40;
+      if (repResult.googleSafeBrowsing?.isThreat) repScore += 40;
+      if (repResult.domainAge?.isNew) repScore += 15;
+      if (repResult.domainAge?.ageInDays !== null && repResult.domainAge?.ageInDays !== undefined && repResult.domainAge.ageInDays < 30) repScore += 10;
       result.riskScore = Math.max(result.riskScore, Math.min(repScore, 100));
     }
-  } catch (e) { console.warn("[gcr-guard] Reputation check failed:", e.message); }
+  } catch (e) { logWarn("core", "Reputation check failed:", e.message); }
 
   if (result.riskScore > 0 || result.lookalikeMatch) {
-    let interimLevel = "safe";
-    if (result.riskScore >= 70) interimLevel = "critical";
-    else if (result.riskScore >= 50) interimLevel = "high";
-    else if (result.riskScore >= 30) interimLevel = "medium";
-    else if (result.riskScore >= 10) interimLevel = "low";
+    let interimLevel = calculateRiskLevel(result.riskScore);
     result.riskLevel = interimLevel;
     updateBadgeFromResult(result, tabId);
   }
@@ -363,34 +271,26 @@ async function handleAutoScan(message, sender) {
     try {
       const pageContent = message.pageInfo ? buildPageContentString(url, message.pageInfo) : url;
       const aiResult = await performScan(pageContent);
-
       if (!await isTabStillOnUrl(tabId, url)) return { skipped: true, reason: "navigated" };
 
       if (aiResult.success && aiResult.result) {
         result.aiScan = aiResult.result;
         result.sources.push("ai-scan");
-
         const aiRisk = (aiResult.result.scamRiskLevel || "").toLowerCase();
         let aiScore = 0;
         if (aiRisk === "critical") aiScore = 95;
         else if (aiRisk === "high") aiScore = 75;
         else if (aiRisk === "moderate" || aiRisk === "medium") aiScore = 50;
         else if (aiRisk === "low") aiScore = 20;
-
         result.riskScore = Math.max(result.riskScore, aiScore);
       }
-    } catch (e) { console.warn("[gcr-guard] AI scan failed:", e.message); }
+    } catch (e) { logWarn("core", "AI scan failed:", e.message); }
   }
 
   if (!await isTabStillOnUrl(tabId, url)) return { skipped: true, reason: "navigated" };
 
-  if (result.riskScore >= 70) result.riskLevel = "critical";
-  else if (result.riskScore >= 50) result.riskLevel = "high";
-  else if (result.riskScore >= 30) result.riskLevel = "medium";
-  else if (result.riskScore >= 10) result.riskLevel = "low";
-  else result.riskLevel = "safe";
-
-  tabCache.set(tabId, result);
+  result.riskLevel = calculateRiskLevel(result.riskScore);
+  setCachedResult(tabId, result);
   updateBadgeFromResult(result, tabId);
   incrementStats(result.riskLevel, undefined, result.url);
   addToScanHistory(result);
@@ -411,16 +311,7 @@ async function handleAutoScan(message, sender) {
     });
   }
 
-  const finalTab = await getValidTab(tabId);
-  if (finalTab) {
-    try {
-      chrome.tabs.sendMessage(tabId, {
-        type: "AUTO_SCAN_RESULT",
-        result: result
-      });
-    } catch (e) { console.warn("[gcr-guard] Failed to send scan result to tab:", e.message); }
-  }
-
+  await safeSendMessage(tabId, { type: "AUTO_SCAN_RESULT", result });
   return result;
 }
 
@@ -434,18 +325,6 @@ function buildPageContentString(url, pageInfo) {
   if (pageInfo.externalLinks) parts.push(`External links (sample): ${pageInfo.externalLinks}`);
   if (pageInfo.bodyText) parts.push(`Page content excerpt: ${pageInfo.bodyText.substring(0, 800)}`);
   return parts.join("\n");
-}
-
-function updateBadgeFromResult(result, tabId) {
-  const badges = {
-    critical: { text: "!!!", color: "#dc2626" },
-    high: { text: "!!", color: "#ea580c" },
-    medium: { text: "!", color: "#ca8a04" },
-    low: { text: "OK", color: "#2563eb" },
-    safe: { text: "\u2713", color: "#16a34a" }
-  };
-  const badge = badges[result.riskLevel] || badges.safe;
-  updateBadge(badge.text, badge.color, tabId);
 }
 
 async function extractAndScanPage(tab) {
@@ -496,23 +375,8 @@ async function extractAndScanPage(tab) {
   }
 }
 
-function getDefaultSettings() {
-  return {
-    autoScan: false,
-    notifications: true,
-    hoverCheck: false,
-    blockDangerous: false,
-    formWarnings: false,
-    lookalikeDetection: false,
-    communityTrust: false,
-    webmailScan: false,
-    weeklyDigest: false
-  };
-}
-
 async function scanContent(content, tab) {
   if (!content) return;
-
   const tabId = isValidTab(tab) ? tab.id : null;
   updateBadge("...", "#666", tabId);
 
@@ -536,19 +400,15 @@ async function scanContent(content, tab) {
       }
 
       if (tabId) {
-        const validTab = await getValidTab(tabId);
-        if (validTab) {
-          try {
-            chrome.tabs.sendMessage(tabId, {
-              type: "SCAN_RESULT",
-              result: result.result,
-              url: content
-            });
-          } catch (e) { console.warn("[gcr-guard] Failed to send scan result:", e.message); }
-        }
+        await safeSendMessage(tabId, {
+          type: "SCAN_RESULT",
+          result: result.result,
+          url: content
+        });
       }
     }
   } catch (error) {
+    logError("core", "Scan content failed:", error.message);
     updateBadge("!", "#999", tabId);
   }
 }
@@ -563,6 +423,7 @@ async function performScan(content) {
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     return await response.json();
   } catch (error) {
+    logError("core", "Perform scan failed:", error.message);
     return { success: false, error: error.message };
   }
 }
@@ -577,6 +438,7 @@ async function checkUrlReputation(url) {
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     return await response.json();
   } catch (error) {
+    logError("core", "URL reputation check failed:", error.message);
     return { success: false, error: error.message };
   }
 }
@@ -591,6 +453,7 @@ async function reportScam(data) {
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     return { success: true };
   } catch (error) {
+    logError("core", "Report scam failed:", error.message);
     return { success: false, error: error.message };
   }
 }
@@ -611,13 +474,13 @@ async function reportScamStructured(data) {
 
     if (data.url) {
       try {
-        const domainHash = await hashDomain(new URL(data.url).hostname);
         await flagDomain(new URL(data.url).hostname);
-      } catch (e) { console.warn("[gcr-guard] Failed to flag domain after report:", e.message); }
+      } catch (e) { logWarn("core", "Failed to flag domain after report:", e.message); }
     }
 
     return { success: true };
   } catch (error) {
+    logError("core", "Structured report failed:", error.message);
     return { success: false, error: error.message };
   }
 }
@@ -626,21 +489,8 @@ async function handleContextMenuReport(tab) {
   if (!isScannableTab(tab)) return;
   const freshTab = await getValidTab(tab.id);
   if (!freshTab || !freshTab.url) return;
-  try {
-    chrome.tabs.sendMessage(freshTab.id, { type: "SHOW_REPORT_FORM", url: freshTab.url });
-  } catch (e) { console.warn("[gcr-guard] Failed to show report form:", e.message); }
+  await safeSendMessage(freshTab.id, { type: "SHOW_REPORT_FORM", url: freshTab.url });
 }
-
-async function hashDomain(domain) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(domain.toLowerCase().replace(/^www\./, ""));
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
-const communityTrustCache = new Map();
-const TRUST_CACHE_TTL = 5 * 60 * 1000;
 
 async function getCommunityTrust(domain) {
   try {
@@ -663,6 +513,7 @@ async function getCommunityTrust(domain) {
     }
     return data;
   } catch (error) {
+    logWarn("core", "Community trust check failed:", error.message);
     return { communityScore: 50, visitCount: 0, flagCount: 0, safeCount: 0 };
   }
 }
@@ -676,7 +527,7 @@ async function recordVisit(url) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ domainHash, domain: hostname })
     });
-  } catch (e) { console.warn("[gcr-guard] Failed to record visit:", e.message); }
+  } catch (e) { logWarn("core", "Failed to record visit:", e.message); }
 }
 
 async function flagDomain(domain) {
@@ -690,6 +541,7 @@ async function flagDomain(domain) {
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     return await response.json();
   } catch (error) {
+    logError("core", "Flag domain failed:", error.message);
     return { success: false, error: error.message };
   }
 }
@@ -703,7 +555,7 @@ async function recordSafeVisit(url) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ domainHash, domain: hostname })
     });
-  } catch (e) { console.warn("[gcr-guard] Failed to record safe visit:", e.message); }
+  } catch (e) { logWarn("core", "Failed to record safe visit:", e.message); }
 }
 
 async function addToScanHistory(result) {
@@ -724,13 +576,13 @@ async function addToScanHistory(result) {
     scanHistory.unshift(entry);
     const trimmed = scanHistory.slice(0, 20);
     await chrome.storage.local.set({ scanHistory: trimmed });
-  } catch (e) { console.warn("[gcr-guard] Failed to add to scan history:", e.message); }
+  } catch (e) { logWarn("core", "Failed to add to scan history:", e.message); }
 }
 
 function getEmptyWeeklyStats() {
   return {
-    days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     scansPerDay: [0, 0, 0, 0, 0, 0, 0],
+    days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     threatsPerDay: [0, 0, 0, 0, 0, 0, 0],
     sitesVisited: [],
     sitesFlagged: [],
@@ -772,11 +624,11 @@ async function incrementStats(risk, linkCount, url) {
           weeklyStats.topThreats.push({ domain: hostname, risk: r, time: Date.now() });
           if (weeklyStats.topThreats.length > 20) weeklyStats.topThreats = weeklyStats.topThreats.slice(-20);
         }
-      } catch (e) {}
+      } catch {}
     }
 
     await chrome.storage.local.set({ scanStats, weeklyStats });
-  }).catch(e => console.warn("[gcr-guard] Stats write error:", e.message));
+  }).catch(e => logWarn("core", "Stats write error:", e.message));
 }
 
 async function generateWeeklyDigest() {
@@ -825,7 +677,7 @@ async function generateWeeklyDigest() {
     });
 
     chrome.storage.local.set({ weeklyStats: getEmptyWeeklyStats() });
-  } catch (e) { console.warn("[gcr-guard] Weekly digest error:", e.message); }
+  } catch (e) { logError("core", "Weekly digest error:", e.message); }
 }
 
 async function fetchScamOfWeek() {
@@ -853,7 +705,7 @@ async function fetchScamOfWeek() {
         }
       }
     }
-  } catch (error) {}
+  } catch (e) { logWarn("core", "Scam of week fetch failed:", e.message); }
 }
 
 async function fetchThreatFeed() {
@@ -863,7 +715,7 @@ async function fetchThreatFeed() {
       const data = await response.json();
       chrome.storage.local.set({ threatFeed: data });
     }
-  } catch (error) {}
+  } catch (e) { logWarn("core", "Threat feed fetch failed:", e.message); }
 }
 
 async function handlePageLinksScan(links, tab) {
@@ -883,25 +735,18 @@ async function handlePageLinksScan(links, tab) {
   return results;
 }
 
-function getBadgeForRisk(risk) {
-  const normalized = risk.toLowerCase();
-  if (normalized === "critical") return { text: "!!!", color: "#dc2626" };
-  if (normalized === "high") return { text: "!!", color: "#ea580c" };
-  if (normalized === "moderate" || normalized === "medium") return { text: "!", color: "#ca8a04" };
-  if (normalized === "low") return { text: "OK", color: "#2563eb" };
-  return { text: "\u2713", color: "#16a34a" };
-}
-
-function updateBadge(text, color, tabId) {
-  if (tabId && tabId === chrome.tabs.TAB_ID_NONE) return;
-  try {
-    const opts = { text };
-    if (tabId && typeof tabId === "number") opts.tabId = tabId;
-    chrome.action.setBadgeText(opts);
-    chrome.action.setBadgeBackgroundColor({ color, ...(tabId && typeof tabId === "number" ? { tabId } : {}) });
-  } catch (e) {
-    console.warn("[gcr-guard] Badge update failed:", e.message);
-  }
+function getDefaultSettings() {
+  return {
+    autoScan: false,
+    notifications: true,
+    hoverCheck: false,
+    blockDangerous: false,
+    formWarnings: false,
+    lookalikeDetection: false,
+    communityTrust: false,
+    webmailScan: false,
+    weeklyDigest: false
+  };
 }
 
 function getSettings() {
@@ -918,7 +763,7 @@ function capitalize(s) {
 
 async function handleSignIn(token) {
   try {
-    if (!token || token.length < 10) {
+    if (!token || typeof token !== "string" || token.length < 10) {
       return { success: false, error: "Invalid token" };
     }
     const response = await fetch(`${API_BASE}/api/extension/subscription-status`, {
@@ -943,8 +788,10 @@ async function handleSignIn(token) {
     cachedSubscription = data;
     subscriptionCacheTime = Date.now();
     await syncSettingsWithFeatures(data.features || ["manual_scan"]);
+    logInfo("core", "User signed in:", data.email, "tier:", data.tier);
     return { success: true, tier: data.tier, email: data.email };
   } catch (error) {
+    logError("core", "Sign-in failed:", error.message);
     return { success: false, error: error.message };
   }
 }
@@ -981,6 +828,7 @@ async function handleSignOut() {
   cachedSubscription = null;
   subscriptionCacheTime = 0;
   await syncSettingsWithFeatures(["manual_scan"]);
+  logInfo("core", "User signed out");
   return { success: true };
 }
 
@@ -1034,6 +882,7 @@ async function getAuthStatus() {
       expiresAt: data.expiresAt
     };
   } catch (error) {
+    logWarn("core", "Auth status check failed (offline?):", error.message);
     if (authUser) {
       if (authUser.expiresAt && new Date(authUser.expiresAt) < new Date()) {
         return {
@@ -1068,3 +917,5 @@ async function checkFeatureAccess(feature) {
   const features = auth.features || ["manual_scan"];
   return features.includes(feature);
 }
+
+logInfo("core", "GCR Guard background service worker loaded");

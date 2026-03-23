@@ -1,0 +1,170 @@
+You are a senior Chrome Extension engineer and cybersecurity architect.
+
+Your task is to build a production-grade Chrome Extension called "GetCyberRight" that acts as a real-time browser security assistant.
+
+This is NOT a prototype. This must follow best practices for security, scalability, and Chrome Manifest V3.
+
+---
+
+CORE OBJECTIVE:
+Build a secure, performant Chrome extension that:
+
+* Safely interacts with browser tabs
+* Detects suspicious/phishing behavior on web pages
+* Scans forms and URLs for risk signals
+* Uses a hardened messaging system
+* Avoids common extension vulnerabilities
+
+---
+
+REQUIREMENTS:
+
+1. MANIFEST (Manifest V3)
+
+* Use minimal permissions:
+
+  * "activeTab"
+  * "scripting"
+  * "storage"
+* Use strict host_permissions (no <all_urls>, instead use placeholders like https://*/* but structure for restriction)
+* Define background service worker
+* Define action (popup optional)
+
+---
+
+2. ARCHITECTURE (MANDATORY STRUCTURE)
+
+Organize code exactly like this:
+
+/background
+core.js
+messaging.js
+tabManager.js
+
+/content
+scanner.js
+
+/utils
+logger.js
+security.js
+
+manifest.json
+
+---
+
+3. TAB SAFETY LAYER (CRITICAL)
+
+Implement a tabManager module that:
+
+* Safely retrieves active tab
+* Validates tab existence before use
+* Handles tab lifecycle (removed, updated)
+
+Expose:
+
+* getSafeActiveTab()
+* safeSendMessage(tabId, message)
+
+Must prevent:
+"Error: No tab with id"
+
+---
+
+4. SECURE MESSAGING SYSTEM
+
+Implement a messaging layer that:
+
+* Validates sender (only allow expected origins)
+* Validates message schema (must include action string)
+* Rejects malformed or unauthorized messages
+
+---
+
+5. CONTENT SECURITY SCANNER
+
+scanner.js must:
+
+* Detect insecure forms (non-HTTPS actions)
+* Flag suspicious URLs using heuristics:
+
+  * contains "login", "verify", "secure", etc.
+  * not HTTPS
+* Log findings clearly
+* Return results to background script
+
+---
+
+6. THREAT DETECTION ENGINE
+
+Create utility functions:
+
+* isSuspiciousURL(url)
+* analyzeForms()
+
+Return a simple risk score (low, medium, high)
+
+---
+
+7. LOGGING SYSTEM
+
+Centralized logger:
+
+* logInfo
+* logWarn
+* logError
+
+All modules must use this (no raw console.log)
+
+---
+
+8. SECURITY HARDENING
+
+* Never trust tabId without validation
+* Never trust incoming messages
+* Wrap all async operations in try/catch
+* Avoid storing sensitive data in chrome.storage
+* Use least privilege principle
+
+---
+
+9. PERFORMANCE
+
+* Do NOT inject scripts globally
+* Only inject scanner.js when user clicks extension icon
+
+---
+
+10. UX SIGNAL (MINIMAL BUT FUNCTIONAL)
+
+* Set extension badge:
+
+  * "SAFE"
+  * "WARN"
+  * "RISK"
+
+Based on scan results
+
+---
+
+DELIVERABLES:
+
+* Full file-by-file implementation
+* Clean, readable, production-quality code
+* Comments explaining critical security decisions
+* No placeholders or pseudo-code
+
+---
+
+CONSTRAINTS:
+
+* No unnecessary dependencies
+* No overengineering
+* Must run in Chrome immediately after loading unpacked
+
+---
+
+GOAL:
+
+The final result should feel like a lightweight cybersecurity product, not a demo.
+
+Build it clean. Build it secure. Build it right.

@@ -129,6 +129,112 @@
     return allowedFeatures.includes(feature);
   }
 
+  const SUSPICIOUS_KEYWORDS = [
+    "login", "verify", "secure", "account", "update", "confirm",
+    "signin", "sign-in", "banking", "password", "credential",
+    "wallet", "suspend", "unlock", "restore", "validate"
+  ];
+
+  function isSuspiciousURL(url) {
+    if (!url) return { suspicious: false, score: 0, reasons: [] };
+    try {
+      const parsed = new URL(url);
+      const reasons = [];
+      let score = 0;
+
+      if (parsed.protocol !== "https:") {
+        reasons.push("Non-HTTPS connection");
+        score += 30;
+      }
+
+      const fullUrl = parsed.hostname + parsed.pathname;
+      for (const keyword of SUSPICIOUS_KEYWORDS) {
+        if (fullUrl.toLowerCase().includes(keyword)) {
+          const hostname = parsed.hostname.toLowerCase();
+          const isWellKnown = isDomainFamiliar(hostname);
+          if (!isWellKnown) {
+            reasons.push(`Contains suspicious keyword: "${keyword}"`);
+            score += 15;
+            break;
+          }
+        }
+      }
+
+      if (parsed.hostname.split(".").length > 4) {
+        reasons.push("Excessive subdomains");
+        score += 20;
+      }
+
+      if (/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(parsed.hostname)) {
+        reasons.push("IP address instead of domain");
+        score += 25;
+      }
+
+      return { suspicious: score > 0, score: Math.min(score, 100), reasons };
+    } catch {
+      return { suspicious: false, score: 0, reasons: [] };
+    }
+  }
+
+  function analyzeForms() {
+    const forms = document.querySelectorAll("form");
+    const results = [];
+
+    forms.forEach((form, index) => {
+      const action = form.getAttribute("action") || "";
+      const method = (form.getAttribute("method") || "GET").toUpperCase();
+      const hasPassword = form.querySelector('input[type="password"]') !== null;
+      const hasCreditCard = form.querySelector('input[autocomplete*="cc-"], input[name*="card"], input[name*="credit"], input[name*="cvv"], input[name*="cvc"]') !== null;
+      const hasEmail = form.querySelector('input[type="email"], input[name*="email"]') !== null;
+      const hasSensitiveData = hasPassword || hasCreditCard || hasEmail;
+      const risks = [];
+      let riskScore = 0;
+
+      if (action && action.startsWith("http://")) {
+        risks.push("Form submits over insecure HTTP");
+        riskScore += 40;
+      }
+
+      if (action) {
+        const urlCheck = isSuspiciousURL(action);
+        if (urlCheck.suspicious) {
+          risks.push(...urlCheck.reasons.map(r => `Form action: ${r}`));
+          riskScore += urlCheck.score;
+        }
+      }
+
+      if (hasSensitiveData && action && action.startsWith("http://")) {
+        risks.push("Sensitive data submitted over insecure connection");
+        riskScore += 30;
+      }
+
+      if (hasPassword && !window.location.protocol.startsWith("https")) {
+        risks.push("Password field on non-HTTPS page");
+        riskScore += 35;
+      }
+
+      let riskLevel = "safe";
+      if (riskScore >= 70) riskLevel = "high";
+      else if (riskScore >= 30) riskLevel = "medium";
+      else if (riskScore > 0) riskLevel = "low";
+
+      results.push({
+        index,
+        action: action || "(same page)",
+        method,
+        hasPassword,
+        hasCreditCard,
+        hasEmail,
+        hasSensitiveData,
+        risks,
+        riskScore: Math.min(riskScore, 100),
+        riskLevel
+      });
+    });
+
+    return results;
+  }
+
   function init() {
     if (settings.hoverCheck && hasFeature("hover_check")) {
       document.addEventListener("mouseover", handleLinkHover, true);
@@ -182,7 +288,16 @@
       const pageHost = new URL(url).hostname;
       const externalLinks = links.filter(l => { try { return new URL(l).hostname !== pageHost; } catch { return false; } }).slice(0, 8).join(", ");
 
-      pageInfo = { title, meta, headings, forms, passwordFields, bodyText, externalLinks };
+      const formAnalysis = analyzeForms();
+      const riskyForms = formAnalysis.filter(f => f.riskLevel !== "safe");
+      const urlAnalysis = isSuspiciousURL(url);
+
+      pageInfo = {
+        title, meta, headings, forms, passwordFields, bodyText, externalLinks,
+        riskyForms: riskyForms.length,
+        urlSuspicious: urlAnalysis.suspicious,
+        urlReasons: urlAnalysis.reasons
+      };
     } catch (e) {}
 
     chrome.runtime.sendMessage({
