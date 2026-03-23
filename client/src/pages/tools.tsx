@@ -121,9 +121,9 @@ export default function Tools() {
     },
     {
       type: "WebApplication",
-      name: "Data Broker Removal Tool",
-      description: "Find and remove your personal data from 501+ data broker sites. Automated opt-out and privacy protection for individuals and families.",
-      url: "https://www.getcyberright.com/data-removal",
+      name: "GCR Shield - Personal Data Exposure Scanner",
+      description: "Scan for your exposed personal information across data broker sites and breach databases. Free exposure scan with actionable results.",
+      url: "https://www.getcyberright.com/shield",
       applicationCategory: "SecurityApplication",
       provider: "GetCyberRight",
     },

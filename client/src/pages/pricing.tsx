@@ -28,7 +28,7 @@ import bannerImage from "@/assets/banners/pricing-banner.png";
 
 const whatWeOffer = [
   { icon: Search, name: "Scam Checker", description: "Check suspicious emails, texts, URLs, QR codes, and phone numbers" },
-  { icon: Trash2, name: "Data Broker Removal", description: "Scan and remove your info from 500+ data broker sites" },
+  { icon: Shield, name: "GCR Shield", description: "Scan for your exposed personal data across broker sites and breach databases" },
   { icon: Mic, name: "Deepfake Voice Detector", description: "Detect AI-generated voice clones in suspicious calls" },
   { icon: Key, name: "Password Generator", description: "Create strong, unique passwords for every account" },
   { icon: Shield, name: "Family Safety Codewords", description: "Secret phrases to verify your family's identity during suspicious calls" },

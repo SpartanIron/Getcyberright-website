@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowRight, Search, Trash2, GraduationCap } from "lucide-react";
+import { ArrowRight, Search, Trash2, GraduationCap, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import scamCheckerImg from "@/assets/images/card-scam-checker.png";
 import seniorImg from "@/assets/images/about-seniors-learning.png";
@@ -23,11 +23,11 @@ const features = [
   {
     id: "data-removal",
     label: "Privacy",
-    title: "Data Broker Removal",
-    description: "Your personal information is for sale on 500+ data broker websites. Our removal tool identifies where you're exposed and walks you through removing it.",
-    href: "/data-removal",
-    cta: "Protect Your Data",
-    icon: Trash2,
+    title: "GCR Shield",
+    description: "Your personal information may be exposed on data broker sites and in data breaches. GCR Shield scans for your exposure and shows you how to protect yourself.",
+    href: "/shield",
+    cta: "Scan Your Exposure",
+    icon: ShieldCheck,
     image: seniorImg,
     imageAlt: "Seniors learning to protect their personal data online",
     accent: "bg-teal-500",

@@ -14,7 +14,7 @@ const footerLinks = {
   ],
   tools: [
     { name: "Scam Checker", href: "/scam-checker" },
-    { name: "Data Broker Removal", href: "/data-removal" },
+    { name: "GCR Shield", href: "/shield" },
     { name: "Password Generator", href: "/password-generator" },
     { name: "AI Prompt Library", href: "/ai-prompts" },
     { name: "Breach Monitor", href: "/breach-dashboard" },

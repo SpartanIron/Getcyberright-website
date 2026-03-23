@@ -121,7 +121,7 @@ const checklists = [
 
 const quickLinks = [
   { title: "Scam Checker Tool", description: "Analyze suspicious URLs, emails, and messages", href: "/tools", icon: Eye },
-  { title: "Data Broker Removal", description: "Remove your personal data from 500+ brokers", href: "/data-removal", icon: Shield },
+  { title: "GCR Shield", description: "Scan for your exposed personal data", href: "/shield", icon: Shield },
   { title: "Training Academy", description: "Structured courses with certificates", href: "/training", icon: GraduationCap },
   { title: "Threat Radar", description: "Real-time cyber threat monitoring", href: "/cyber-threat-radar", icon: AlertTriangle },
   { title: "Printable Guides", description: "Download and share safety guides", href: "/printable-guides", icon: FileText },

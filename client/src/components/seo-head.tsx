@@ -189,8 +189,8 @@ export const pageSEO = {
     description: "Learn cybersecurity through structured courses with quizzes and certificates. Paths for kids, parents, seniors, educators, and businesses.",
   },
   dataRemoval: {
-    title: "Data Broker Removal",
-    description: "Remove your personal information from 500+ data brokers. Scan, track, and automate data removal requests.",
+    title: "GCR Shield - Personal Data Exposure Scanner",
+    description: "Scan for your exposed personal information across data broker sites and breach databases. Free exposure scan, no account required.",
   },
   childSafetyScanner: {
     title: "Child Safety Conversation Scanner",

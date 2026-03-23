@@ -130,7 +130,7 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(what is getcyberright|about.*(this|your).*(site|website|platform)|what.*(this|your) (site|website))/.test(t),
     responses: [
-      "GetCyberRight is a free family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like the Scam Checker to analyze suspicious messages, a Password Generator, Data Broker Removal to get your personal info off the internet, and lots of guides tailored to different family members. Everything is free to get started.",
+      "GetCyberRight is a free family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like the Scam Checker to analyze suspicious messages, a Password Generator, GCR Shield to scan for your exposed personal data, and lots of guides tailored to different family members. Everything is free to get started.",
     ],
   },
   {
@@ -190,7 +190,7 @@ function getContextualPrompts(pathname: string): { text: string; icon: typeof Sh
       { text: "Someone wants my Social Security number", icon: AlertTriangle },
     ];
   }
-  if (pathname.includes("data-removal")) {
+  if (pathname.includes("data-removal") || pathname.includes("shield")) {
     return [
       { text: "How do data brokers get my info?", icon: HelpCircle },
       { text: "What information is being sold about me?", icon: AlertTriangle },
