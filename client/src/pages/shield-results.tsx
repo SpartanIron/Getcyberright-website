@@ -167,7 +167,7 @@ function ShieldResultsPage() {
   if (loading) {
     return (
       <>
-        <SEOHead title="Loading Results... | GetCyberRight Shield" />
+        <SEOHead title="Loading Results... | GCR Shield" />
         <Navigation />
         <main className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center space-y-4">
@@ -184,7 +184,7 @@ function ShieldResultsPage() {
   if (error) {
     return (
       <>
-        <SEOHead title="Scan Error | GetCyberRight Shield" />
+        <SEOHead title="Scan Error | GCR Shield" />
         <Navigation />
         <main className="min-h-screen bg-background flex items-center justify-center">
           <Card className="max-w-md">
@@ -242,8 +242,8 @@ function ShieldResultsPage() {
   return (
     <>
       <SEOHead
-        title={`Your Exposure Results | GetCyberRight Shield`}
-        description="View your personal data exposure scan results from GetCyberRight Shield."
+        title={`Your Exposure Results | GCR Shield`}
+        description="View your personal data exposure scan results from GCR Shield."
       />
       <Navigation />
       <main className="min-h-screen bg-background py-12">
