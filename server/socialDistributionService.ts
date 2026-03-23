@@ -314,7 +314,7 @@ async function generateImageForPost(title: string, contentType: string, platform
 }
 
 export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<string[]> {
-  const url = `https://getcyberright.com/guides/${guide.slug}`;
+  const url = `https://www.getcyberright.com/guides/${guide.slug}`;
   const context = buildGuideContext(guide);
   const posts = await generateSocialPosts(
     "cybersecurity guide",
@@ -360,7 +360,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 }
 
 export async function distributeThreatAlertContent(alert: CyberThreatAlert): Promise<string[]> {
-  const url = `https://getcyberright.com/alerts/${alert.slug}`;
+  const url = `https://www.getcyberright.com/alerts/${alert.slug}`;
   const context = buildAlertContext(alert);
   const posts = await generateSocialPosts(
     "cyber threat alert",
@@ -406,7 +406,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
 }
 
 export async function distributeScamIntelContent(scam: ScamIntelligence): Promise<string[]> {
-  const url = `https://getcyberright.com/scam-intel/${scam.slug}`;
+  const url = `https://www.getcyberright.com/scam-intel/${scam.slug}`;
   const context = buildScamContext(scam);
   const posts = await generateSocialPosts(
     "scam intelligence report",

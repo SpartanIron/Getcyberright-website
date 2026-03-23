@@ -178,7 +178,7 @@ export function generateDailyTipEmail(tip: DailyTip, subscriberEmail: string, su
   <div style="max-width: 600px; margin: 0 auto; padding: 24px;">
     <!-- Header -->
     <div style="background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%); padding: 36px 30px; border-radius: 16px 16px 0 0; text-align: center;">
-      <img src="https://getcyberright.com/lock-logo.png" alt="GetCyberRight" style="width: 70px; height: 70px; border-radius: 14px; margin-bottom: 16px;" />
+      <img src="https://www.getcyberright.com/lock-logo.png" alt="GetCyberRight" style="width: 70px; height: 70px; border-radius: 14px; margin-bottom: 16px;" />
       <h1 style="color: white; margin: 0; font-size: 26px; font-weight: 700;">GetCyberRight</h1>
       <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 15px;">Digital Safety Tip</p>
     </div>
@@ -209,10 +209,10 @@ export function generateDailyTipEmail(tip: DailyTip, subscriberEmail: string, su
       
       <!-- CTA Section -->
       <div style="text-align: center; padding-top: 8px;">
-        <a href="https://getcyberright.com/scam-checker" style="display: inline-block; background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; margin-right: 12px;">
+        <a href="https://www.getcyberright.com/scam-checker" style="display: inline-block; background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; margin-right: 12px;">
           Check a Scam →
         </a>
-        <a href="https://getcyberright.com" style="display: inline-block; background: #1e293b; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
+        <a href="https://www.getcyberright.com" style="display: inline-block; background: #1e293b; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
           More Tips
         </a>
       </div>
@@ -228,7 +228,7 @@ export function generateDailyTipEmail(tip: DailyTip, subscriberEmail: string, su
     <!-- Footer -->
     <div style="text-align: center; padding: 24px 20px; color: #64748b; font-size: 13px;">
       <p style="margin: 0 0 8px;">You're receiving this because you subscribed to Digital Safety Tips.</p>
-      <p style="margin: 0 0 12px;"><a href="https://getcyberright.com/unsubscribe?email=${encodeURIComponent(subscriberEmail)}" style="color: #0d9488; text-decoration: underline;">Unsubscribe</a> · <a href="https://getcyberright.com/preferences" style="color: #0d9488; text-decoration: underline;">Manage Preferences</a></p>
+      <p style="margin: 0 0 12px;"><a href="https://www.getcyberright.com/unsubscribe?email=${encodeURIComponent(subscriberEmail)}" style="color: #0d9488; text-decoration: underline;">Unsubscribe</a> · <a href="https://www.getcyberright.com/preferences" style="color: #0d9488; text-decoration: underline;">Manage Preferences</a></p>
       <p style="margin: 0; color: #94a3b8;">© ${new Date().getFullYear()} GetCyberRight. Protecting families online.</p>
     </div>
   </div>
@@ -296,10 +296,10 @@ export function generateQuizResultsEmail(result: QuizResult, subscriberEmail: st
       ${recommendationsHtml}
       
       <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 25px; text-align: center;">
-        <a href="https://getcyberright.com/safety-score" style="display: inline-block; background: linear-gradient(135deg, #0891b2, #10b981); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-right: 10px;">
+        <a href="https://www.getcyberright.com/safety-score" style="display: inline-block; background: linear-gradient(135deg, #0891b2, #10b981); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-right: 10px;">
           Retake Quiz
         </a>
-        <a href="https://getcyberright.com/resources" style="display: inline-block; background: #1e293b; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+        <a href="https://www.getcyberright.com/resources" style="display: inline-block; background: #1e293b; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
           Explore Resources
         </a>
       </div>

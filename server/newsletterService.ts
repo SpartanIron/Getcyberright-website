@@ -219,15 +219,15 @@ Generate a JSON response with:
 
       <div class="cta">
         <p style="margin: 0 0 16px; color: #9a3412; font-weight: 500;">Want to learn more? Visit our platform for in-depth guides and tools.</p>
-        <a href="https://getcyberright.com" class="cta-button">Explore GetCyberRight</a>
+        <a href="https://www.getcyberright.com" class="cta-button">Explore GetCyberRight</a>
       </div>
     </div>
 
     <div class="footer">
       <p>You are receiving this email because you subscribed to GetCyberRight updates.</p>
       <p style="margin-top: 12px;">
-        <a href="https://getcyberright.com/unsubscribe">Unsubscribe</a> | 
-        <a href="https://getcyberright.com/privacy">Privacy Policy</a>
+        <a href="https://www.getcyberright.com/unsubscribe">Unsubscribe</a> | 
+        <a href="https://www.getcyberright.com/privacy">Privacy Policy</a>
       </p>
       <p style="margin-top: 16px; color: #6b7280;">&copy; ${new Date().getFullYear()} ColorCode Solutions LLC. All rights reserved.</p>
     </div>
@@ -268,10 +268,10 @@ QUICK SECURITY WINS
 ${content.quickWins.map((win, i) => `${i + 1}. ${win}`).join("\n")}
 
 -------------------------------------
-Visit https://getcyberright.com for more resources and tools.
+Visit https://www.getcyberright.com for more resources and tools.
 
-To unsubscribe: https://getcyberright.com/unsubscribe
-Privacy Policy: https://getcyberright.com/privacy
+To unsubscribe: https://www.getcyberright.com/unsubscribe
+Privacy Policy: https://www.getcyberright.com/privacy
 
 (c) ${new Date().getFullYear()} ColorCode Solutions LLC. All rights reserved.`;
   }
@@ -422,7 +422,7 @@ export async function sendAlertToSubscribers(threatName: string, description: st
     return;
   }
 
-  const siteUrl = "https://getcyberright.com";
+  const siteUrl = "https://www.getcyberright.com";
   const alertUrl = `${siteUrl}${alertPath}`;
   const subject = `Security Alert: ${threatName}`;
   const html = `

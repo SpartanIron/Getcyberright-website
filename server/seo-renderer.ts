@@ -1343,17 +1343,17 @@ function renderAboutPage(): string {
     description: "Online scams have changed. GetCyberRight gives families, seniors, and small businesses the simple tools and clear guidance they need to stay safe online.",
     datePublished: "2024-01-15",
     dateModified: "2026-03-01",
-    author: { "@type": "Organization", name: "GetCyberRight", url: "https://getcyberright.com" },
-    publisher: { "@type": "Organization", name: "GetCyberRight", logo: { "@type": "ImageObject", url: "https://getcyberright.com/og-image.png" } },
-    mainEntityOfPage: { "@type": "WebPage", "@id": "https://getcyberright.com/about" },
+    author: { "@type": "Organization", name: "GetCyberRight", url: "https://www.getcyberright.com" },
+    publisher: { "@type": "Organization", name: "GetCyberRight", logo: { "@type": "ImageObject", url: "https://www.getcyberright.com/og-image.png" } },
+    mainEntityOfPage: { "@type": "WebPage", "@id": "https://www.getcyberright.com/about" },
   });
 
   const breadcrumbs = buildJsonLd({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://getcyberright.com/" },
-      { "@type": "ListItem", position: 2, name: "About", item: "https://getcyberright.com/about" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.getcyberright.com/" },
+      { "@type": "ListItem", position: 2, name: "About", item: "https://www.getcyberright.com/about" },
     ],
   });
 

@@ -353,7 +353,7 @@ class NewsAggregator {
         
         const response = await fetch(url, {
           headers: { 
-            'User-Agent': 'Mozilla/5.0 (compatible; GetCyberRight/1.0; +https://getcyberright.com)',
+            'User-Agent': 'Mozilla/5.0 (compatible; GetCyberRight/1.0; +https://www.getcyberright.com)',
             'Accept': 'application/rss+xml, application/xml, text/xml, */*'
           },
           signal: controller.signal

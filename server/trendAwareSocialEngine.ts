@@ -347,7 +347,7 @@ async function generateTrendAwarePost(
 
   const guideContext = relevantGuides
     .slice(0, 10)
-    .map((g) => `- "${g.title}" (${g.category}) https://getcyberright.com/guides/${g.slug}`)
+    .map((g) => `- "${g.title}" (${g.category}) https://www.getcyberright.com/guides/${g.slug}`)
     .join("\n");
 
   let alertsContext = "";
@@ -355,11 +355,11 @@ async function generateTrendAwarePost(
   try {
     const recentAlerts = await storage.getPublishedThreatAlerts(undefined, 5);
     if (recentAlerts.length > 0) {
-      alertsContext = `\nGETCYBERRIGHT ALERTS (link to these when covering related threats):\n${recentAlerts.map(a => `- "${a.threatName}" (${a.threatCategory}) https://getcyberright.com/alerts/${a.slug}`).join("\n")}`;
+      alertsContext = `\nGETCYBERRIGHT ALERTS (link to these when covering related threats):\n${recentAlerts.map(a => `- "${a.threatName}" (${a.threatCategory}) https://www.getcyberright.com/alerts/${a.slug}`).join("\n")}`;
     }
     const recentScams = await storage.getPublishedScamIntel(undefined, 5);
     if (recentScams.length > 0) {
-      scamIntelContext = `\nGETCYBERRIGHT SCAM INTEL (link to these when covering related scam types):\n${recentScams.map(s => `- "${s.scamName}" (${s.scamCategory}) https://getcyberright.com/scam-intel/${s.slug}`).join("\n")}`;
+      scamIntelContext = `\nGETCYBERRIGHT SCAM INTEL (link to these when covering related scam types):\n${recentScams.map(s => `- "${s.scamName}" (${s.scamCategory}) https://www.getcyberright.com/scam-intel/${s.slug}`).join("\n")}`;
     }
   } catch (e) {}
 
@@ -434,8 +434,9 @@ STEP 7 - CONTENT CREATION:
 - Follow the specific WRITING STYLE instruction provided below
 - EXCERPT STRATEGY: Posts are teasers, NOT full articles. Share the most compelling insight to hook readers, then drive them to the relevant GetCyberRight page for the full breakdown
 - Post structure: hook (the most compelling insight) > brief context (1-2 sentences on why it matters) > 1-2 actionable tips as a preview > CTA linking to the most relevant GetCyberRight page (guide, alert, scam intel, or tool)
-- ALWAYS end with a link to a relevant GetCyberRight page. Match the topic to: getcyberright.com/guides/[slug], getcyberright.com/alerts/[slug], getcyberright.com/scam-intel/[slug], getcyberright.com/scam-checker, getcyberright.com/cyber-threat-radar, or getcyberright.com/awareness-hub
-- If no specific page matches, link to getcyberright.com with a general CTA
+- ALWAYS end with a link to a relevant GetCyberRight page. Match the topic to: www.getcyberright.com/guides/[slug], www.getcyberright.com/alerts/[slug], www.getcyberright.com/scam-intel/[slug], www.getcyberright.com/scam-checker, www.getcyberright.com/cyber-threat-radar, or www.getcyberright.com/awareness-hub
+- ALL links MUST use the www subdomain (https://www.getcyberright.com/...). Never use https://getcyberright.com without www
+- If no specific page matches, link to www.getcyberright.com with a general CTA
 - The link MUST appear on its own line before any hashtags
 
 STEP 8 - VISUAL PLANNING:
@@ -531,11 +532,11 @@ ${alertsContext}
 ${scamIntelContext}
 
 KEY TOOL PAGES:
-- Scam Checker: https://getcyberright.com/scam-checker
-- Cyber Threat Radar: https://getcyberright.com/cyber-threat-radar
-- Awareness Hub: https://getcyberright.com/awareness-hub
-- Data Broker Removal: https://getcyberright.com/data-broker-removal
-- GCR Guard Extension: https://getcyberright.com/browser-extension
+- Scam Checker: https://www.getcyberright.com/scam-checker
+- Cyber Threat Radar: https://www.getcyberright.com/cyber-threat-radar
+- Awareness Hub: https://www.getcyberright.com/awareness-hub
+- Data Broker Removal: https://www.getcyberright.com/data-broker-removal
+- GCR Guard Extension: https://www.getcyberright.com/browser-extension
 ${recentPostsContext}
 ${performanceContext}
 
@@ -583,7 +584,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
     "tool_name": "Name of relevant GetCyberRight tool",
     "how_it_connects": "One sentence on why this tool helps"
   },
-  "gcr_link": "https://getcyberright.com/relevant-page-slug (the link used in the CTA)",
+  "gcr_link": "https://www.getcyberright.com/relevant-page-slug (the link used in the CTA)",
   "confidence_score": 85,
   "recommended_action": "auto_publish | review"
 }`,

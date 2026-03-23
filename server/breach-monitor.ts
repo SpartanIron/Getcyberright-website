@@ -52,7 +52,7 @@ function generateBreachAlertEmail(
     `<li style="margin-bottom: 8px; color: #334155;">${action}</li>`
   ).join('');
 
-  const unsubscribeUrl = `https://getcyberright.com/unsubscribe/breach-monitor?token=${unsubscribeToken}`;
+  const unsubscribeUrl = `https://www.getcyberright.com/unsubscribe/breach-monitor?token=${unsubscribeToken}`;
 
   const htmlBody = `
 <!DOCTYPE html>
@@ -98,7 +98,7 @@ function generateBreachAlertEmail(
       
       <!-- CTA -->
       <div style="text-align: center; margin-bottom: 24px;">
-        <a href="https://getcyberright.com/breach-dashboard?token=${unsubscribeToken}" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+        <a href="https://www.getcyberright.com/breach-dashboard?token=${unsubscribeToken}" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">
           View Full Breach Report
         </a>
       </div>
@@ -136,7 +136,7 @@ ${b.exposedDataTypes.length > 0 ? `Data exposed: ${b.exposedDataTypes.join(', ')
 WHAT YOU SHOULD DO NOW:
 ${actionItems.map((a, i) => `${i + 1}. ${a}`).join('\n')}
 
-View your full breach report: https://getcyberright.com/breach-dashboard?token=${unsubscribeToken}
+View your full breach report: https://www.getcyberright.com/breach-dashboard?token=${unsubscribeToken}
 
 To unsubscribe: ${unsubscribeUrl}
 

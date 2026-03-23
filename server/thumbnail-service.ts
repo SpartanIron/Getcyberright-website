@@ -47,7 +47,7 @@ export class ThumbnailService {
     try {
       const response = await fetch(url, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; GetCyberRight/1.0; +https://getcyberright.com)',
+          'User-Agent': 'Mozilla/5.0 (compatible; GetCyberRight/1.0; +https://www.getcyberright.com)',
         },
         signal: AbortSignal.timeout(10000),
         redirect: 'manual'
