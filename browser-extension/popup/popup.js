@@ -46,8 +46,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnScanPage.addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (!tabs[0]) return;
+      if (!tabs[0] || !tabs[0].id || !tabs[0].url) return;
       const tab = tabs[0];
+      const skipPatterns = [/^chrome/, /^about:/, /^chrome-extension:/, /^moz-extension:/, /^edge:/, /^brave:/, /^file:/, /^data:/, /^blob:/, /^javascript:/];
+      if (skipPatterns.some(p => p.test(tab.url))) {
+        scanInput.value = "";
+        displayError("Cannot scan this type of page. Try scanning a regular website.");
+        return;
+      }
       scanInput.value = tab.url;
       loadingIndicator.classList.remove("hidden");
       scanResult.classList.add("hidden");
@@ -154,7 +160,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnReportPage.addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (!tabs[0]?.url) return;
+      if (!tabs[0] || !tabs[0].id || !tabs[0].url) return;
+      const skipPatterns = [/^chrome/, /^about:/, /^chrome-extension:/, /^moz-extension:/, /^edge:/, /^brave:/, /^file:/, /^data:/, /^blob:/, /^javascript:/];
+      if (skipPatterns.some(p => p.test(tabs[0].url))) return;
       chrome.tabs.sendMessage(tabs[0].id, { type: "SHOW_REPORT_FORM", url: tabs[0].url });
       window.close();
     });
@@ -200,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function loadPageStatus() {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (!tabs[0]?.id) return;
+      if (!tabs[0] || !tabs[0].id || typeof tabs[0].id !== "number") return;
       const tab = tabs[0];
       const tabId = tab.id;
 

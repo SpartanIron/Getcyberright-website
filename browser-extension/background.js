@@ -83,14 +83,34 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   }
 });
 
+function isValidTab(tab) {
+  return tab && typeof tab.id === "number" && tab.id !== chrome.tabs.TAB_ID_NONE;
+}
+
+function isScannableTab(tab) {
+  return isValidTab(tab) && tab.url && !shouldSkipUrl(tab.url);
+}
+
+async function getValidTab(tabId) {
+  try {
+    const tab = await chrome.tabs.get(tabId);
+    return isValidTab(tab) ? tab : null;
+  } catch {
+    return null;
+  }
+}
+
 chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (!isValidTab(tab)) return;
   if (info.menuItemId === "gcr-scan-link") {
     scanContent(info.linkUrl, tab);
   } else if (info.menuItemId === "gcr-scan-page") {
+    if (!isScannableTab(tab)) return;
     extractAndScanPage(tab);
   } else if (info.menuItemId === "gcr-scan-selection") {
     scanContent(info.selectionText, tab);
   } else if (info.menuItemId === "gcr-report-site") {
+    if (!isScannableTab(tab)) return;
     handleContextMenuReport(tab);
   }
 });
@@ -100,7 +120,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
-  if (details.frameId === 0) {
+  if (details.frameId === 0 && details.tabId && details.tabId !== chrome.tabs.TAB_ID_NONE) {
     tabCache.delete(details.tabId);
     updateBadge("", "#16a34a", details.tabId);
   }
@@ -243,19 +263,17 @@ function isTrustedDomain(url) {
 }
 
 async function isTabStillOnUrl(tabId, url) {
-  try {
-    const tab = await chrome.tabs.get(tabId);
-    return tab && tab.url === url;
-  } catch {
-    return false;
-  }
+  if (!tabId || tabId === chrome.tabs.TAB_ID_NONE) return false;
+  const tab = await getValidTab(tabId);
+  return tab !== null && tab.url === url;
 }
 
 async function handleAutoScan(message, sender) {
-  const tabId = sender.tab?.id;
+  const senderTab = sender.tab;
+  const tabId = senderTab?.id;
   const url = message.url;
 
-  if (!tabId || !url || shouldSkipUrl(url)) {
+  if (!tabId || tabId === chrome.tabs.TAB_ID_NONE || !url || shouldSkipUrl(url)) {
     return { skipped: true };
   }
 
@@ -273,9 +291,12 @@ async function handleAutoScan(message, sender) {
     const cached = tabCache.get(tabId);
     if (cached.url === url && Date.now() - cached.timestamp < 300000) {
       updateBadgeFromResult(cached, tabId);
-      try {
-        chrome.tabs.sendMessage(tabId, { type: "AUTO_SCAN_RESULT", result: cached });
-      } catch (e) { console.warn("[gcr-guard] Failed to send cached result to tab:", e.message); }
+      const cachedTab = await getValidTab(tabId);
+      if (cachedTab) {
+        try {
+          chrome.tabs.sendMessage(tabId, { type: "AUTO_SCAN_RESULT", result: cached });
+        } catch (e) { console.warn("[gcr-guard] Failed to send cached result to tab:", e.message); }
+      }
       return cached;
     }
   }
@@ -390,12 +411,15 @@ async function handleAutoScan(message, sender) {
     });
   }
 
-  try {
-    chrome.tabs.sendMessage(tabId, {
-      type: "AUTO_SCAN_RESULT",
-      result: result
-    });
-  } catch (e) { console.warn("[gcr-guard] Failed to send scan result to tab:", e.message); }
+  const finalTab = await getValidTab(tabId);
+  if (finalTab) {
+    try {
+      chrome.tabs.sendMessage(tabId, {
+        type: "AUTO_SCAN_RESULT",
+        result: result
+      });
+    } catch (e) { console.warn("[gcr-guard] Failed to send scan result to tab:", e.message); }
+  }
 
   return result;
 }
@@ -425,12 +449,14 @@ function updateBadgeFromResult(result, tabId) {
 }
 
 async function extractAndScanPage(tab) {
-  if (!tab?.id || !tab?.url) return;
-  updateBadge("...", "#666", tab.id);
+  if (!isScannableTab(tab)) return;
+  const freshTab = await getValidTab(tab.id);
+  if (!freshTab || !freshTab.url || shouldSkipUrl(freshTab.url)) return;
+  updateBadge("...", "#666", freshTab.id);
 
   try {
     const results = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
+      target: { tabId: freshTab.id },
       func: () => {
         const title = document.title || "";
         const meta = document.querySelector('meta[name="description"]')?.content || "";
@@ -447,12 +473,12 @@ async function extractAndScanPage(tab) {
       const page = results[0].result;
       let externalLinks = [];
       try {
-        const pageHost = new URL(tab.url).hostname;
+        const pageHost = new URL(freshTab.url).hostname;
         externalLinks = page.links.filter(l => { try { return new URL(l).hostname !== pageHost; } catch { return false; } }).slice(0, 10);
       } catch {}
 
       const content = [
-        `URL: ${tab.url}`,
+        `URL: ${freshTab.url}`,
         `Page Title: ${page.title}`,
         `Description: ${page.meta}`,
         `Headings: ${page.headings}`,
@@ -461,12 +487,12 @@ async function extractAndScanPage(tab) {
         `External links (sample): ${externalLinks.join(", ")}`,
         `Page content excerpt: ${page.bodyText.substring(0, 800)}`
       ].join("\n");
-      scanContent(content, tab);
+      scanContent(content, freshTab);
     } else {
-      scanContent(tab.url, tab);
+      scanContent(freshTab.url, freshTab);
     }
   } catch {
-    scanContent(tab.url, tab);
+    scanContent(freshTab.url, freshTab);
   }
 }
 
@@ -487,14 +513,15 @@ function getDefaultSettings() {
 async function scanContent(content, tab) {
   if (!content) return;
 
-  updateBadge("...", "#666", tab?.id);
+  const tabId = isValidTab(tab) ? tab.id : null;
+  updateBadge("...", "#666", tabId);
 
   try {
     const result = await performScan(content);
     if (result.success) {
       const risk = result.result.scamRiskLevel || "Unknown";
       const badgeInfo = getBadgeForRisk(risk);
-      updateBadge(badgeInfo.text, badgeInfo.color, tab?.id);
+      updateBadge(badgeInfo.text, badgeInfo.color, tabId);
       incrementStats(risk);
 
       const settings = await getSettings();
@@ -508,16 +535,21 @@ async function scanContent(content, tab) {
         });
       }
 
-      if (tab?.id) {
-        chrome.tabs.sendMessage(tab.id, {
-          type: "SCAN_RESULT",
-          result: result.result,
-          url: content
-        });
+      if (tabId) {
+        const validTab = await getValidTab(tabId);
+        if (validTab) {
+          try {
+            chrome.tabs.sendMessage(tabId, {
+              type: "SCAN_RESULT",
+              result: result.result,
+              url: content
+            });
+          } catch (e) { console.warn("[gcr-guard] Failed to send scan result:", e.message); }
+        }
       }
     }
   } catch (error) {
-    updateBadge("!", "#999", tab?.id);
+    updateBadge("!", "#999", tabId);
   }
 }
 
@@ -591,9 +623,11 @@ async function reportScamStructured(data) {
 }
 
 async function handleContextMenuReport(tab) {
-  if (!tab?.id || !tab?.url) return;
+  if (!isScannableTab(tab)) return;
+  const freshTab = await getValidTab(tab.id);
+  if (!freshTab || !freshTab.url) return;
   try {
-    chrome.tabs.sendMessage(tab.id, { type: "SHOW_REPORT_FORM", url: tab.url });
+    chrome.tabs.sendMessage(freshTab.id, { type: "SHOW_REPORT_FORM", url: freshTab.url });
   } catch (e) { console.warn("[gcr-guard] Failed to show report form:", e.message); }
 }
 
@@ -859,10 +893,15 @@ function getBadgeForRisk(risk) {
 }
 
 function updateBadge(text, color, tabId) {
-  const opts = { text };
-  if (tabId) opts.tabId = tabId;
-  chrome.action.setBadgeText(opts);
-  chrome.action.setBadgeBackgroundColor({ color, ...(tabId ? { tabId } : {}) });
+  if (tabId && tabId === chrome.tabs.TAB_ID_NONE) return;
+  try {
+    const opts = { text };
+    if (tabId && typeof tabId === "number") opts.tabId = tabId;
+    chrome.action.setBadgeText(opts);
+    chrome.action.setBadgeBackgroundColor({ color, ...(tabId && typeof tabId === "number" ? { tabId } : {}) });
+  } catch (e) {
+    console.warn("[gcr-guard] Badge update failed:", e.message);
+  }
 }
 
 function getSettings() {
