@@ -61,6 +61,61 @@ const TRUSTED_FEEDS = [
     source: "Dark Reading",
     fallbackUrl: "https://www.darkreading.com/",
   },
+  {
+    url: "https://grahamcluley.com/feed/",
+    source: "Graham Cluley",
+    fallbackUrl: "https://grahamcluley.com/",
+  },
+  {
+    url: "https://therecord.media/feed",
+    source: "The Record by Recorded Future",
+    fallbackUrl: "https://therecord.media/",
+  },
+  {
+    url: "https://www.wired.com/feed/category/security/latest/rss",
+    source: "WIRED Security",
+    fallbackUrl: "https://www.wired.com/category/security/",
+  },
+  {
+    url: "https://techcrunch.com/category/security/feed/",
+    source: "TechCrunch Security",
+    fallbackUrl: "https://techcrunch.com/category/security/",
+  },
+  {
+    url: "https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml",
+    source: "UK NCSC",
+    fallbackUrl: "https://www.ncsc.gov.uk/",
+  },
+  {
+    url: "https://www.europol.europa.eu/rss.xml",
+    source: "Europol",
+    fallbackUrl: "https://www.europol.europa.eu/media-press/newsroom/news",
+  },
+  {
+    url: "https://arstechnica.com/tag/security/feed/",
+    source: "Ars Technica Security",
+    fallbackUrl: "https://arstechnica.com/tag/security/",
+  },
+  {
+    url: "https://cyberscoop.com/feed/",
+    source: "CyberScoop",
+    fallbackUrl: "https://cyberscoop.com/",
+  },
+  {
+    url: "https://www.schneier.com/feed/atom/",
+    source: "Schneier on Security",
+    fallbackUrl: "https://www.schneier.com/",
+  },
+  {
+    url: "https://blog.google/threat-analysis-group/rss/",
+    source: "Google Threat Analysis Group",
+    fallbackUrl: "https://blog.google/threat-analysis-group/",
+  },
+  {
+    url: "https://www.microsoft.com/en-us/security/blog/feed/",
+    source: "Microsoft Security Blog",
+    fallbackUrl: "https://www.microsoft.com/en-us/security/blog/",
+  },
 ];
 
 const REGION_DEFINITIONS: Record<string, string> = {
@@ -92,7 +147,7 @@ export async function fetchRealThreats(): Promise<RawFeedItem[]> {
   const feedPromises = TRUSTED_FEEDS.map(async (feed) => {
     try {
       const parsed = await rssParser.parseURL(feed.url);
-      const recent = (parsed.items || []).slice(0, 5);
+      const recent = (parsed.items || []).slice(0, 3);
       return recent.map((item) => ({
         title: item.title || "Untitled",
         link: item.link || feed.fallbackUrl,
@@ -107,11 +162,15 @@ export async function fetchRealThreats(): Promise<RawFeedItem[]> {
   });
 
   const results = await Promise.allSettled(feedPromises);
+  let successCount = 0;
   for (const result of results) {
-    if (result.status === "fulfilled") {
+    if (result.status === "fulfilled" && result.value.length > 0) {
       allItems.push(...result.value);
+      successCount++;
     }
   }
+
+  console.log(`Fetched ${allItems.length} items from ${successCount} feeds`);
 
   return allItems
     .sort((a, b) => {
@@ -119,7 +178,7 @@ export async function fetchRealThreats(): Promise<RawFeedItem[]> {
       const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
       return dateB - dateA;
     })
-    .slice(0, 15);
+    .slice(0, 20);
 }
 
 async function simplifyForAudience(

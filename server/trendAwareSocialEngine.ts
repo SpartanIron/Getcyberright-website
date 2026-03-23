@@ -17,6 +17,8 @@ const CONTENT_MODES = [
   "myth_debunking",
   "scenario_simulation",
   "tool_highlight",
+  "industry_analysis",
+  "ai_landscape",
 ] as const;
 
 type ContentMode = (typeof CONTENT_MODES)[number];
@@ -75,12 +77,15 @@ function sanitizePostContent(text: string): string {
 
 const SOURCE_TIERS: Record<string, 1 | 2 | 3> = {
   "cisa": 1, "us-cert": 1, "nist": 1, "fbi": 1, "ftc": 1, "dhs": 1, "nsa": 1,
-  "europol": 1, "ncsc": 1, "interpol": 1, "acsc": 1, "microsoft": 1, "google": 1,
-  "apple": 1, "amazon": 1, "meta": 1, "cisco": 1, "palo alto": 1,
+  "europol": 1, "ncsc": 1, "interpol": 1, "acsc": 1, "enisa": 1,
+  "microsoft": 1, "google": 1, "apple": 1, "amazon": 1, "meta": 1,
+  "cisco": 1, "palo alto": 1,
   "krebs on security": 2, "securityweek": 2, "the hacker news": 2,
   "dark reading": 2, "threatpost": 2, "ars technica": 2,
   "wired": 2, "zdnet": 2, "techcrunch": 2, "the record": 2, "cyberscoop": 2,
+  "bleepingcomputer": 2, "schneier": 2,
   "mandiant": 2, "crowdstrike": 2, "sophos": 2, "kaspersky": 2, "sentinelone": 2,
+  "recorded future": 2, "checkpoint": 2, "trendmicro": 2, "trend micro": 2,
 };
 
 function getSourceTier(sourceName: string): 1 | 2 | 3 {
@@ -163,6 +168,7 @@ function mapTopicToGCRTool(title: string, content: string): { tool_name: string;
     identity: ["identity theft", "identity fraud", "stolen identity", "synthetic identity"],
     malware: ["malware", "ransomware", "trojan", "worm", "botnet", "exploit", "zero-day", "vulnerability", "cve-"],
     senior: ["senior", "elderly", "older adult", "grandparent", "retirement", "medicare"],
+    scam: [...([] as string[]), "deepfake", "ai fraud", "ai-generated", "voice clone", "ai safety", "artificial intelligence", "generative ai", "llm", "regulation", "eu ai act", "gdpr", "privacy law"],
   };
 
   for (const [category, terms] of Object.entries(keywords)) {
@@ -400,7 +406,8 @@ FULL INTELLIGENCE PIPELINE (execute every step internally before writing):
 
 STEP 1 - SIGNAL INTERPRETATION:
 - Summarize what is happening in simple terms
-- Classify into: phishing_scam, data_breach, malware, ai_threat, social_engineering, privacy, vulnerability, or general_awareness
+- Classify into: phishing_scam, data_breach, malware, ai_threat, social_engineering, privacy, vulnerability, industry_development, ai_innovation, regulatory_update, or general_awareness
+- Consider the FULL landscape: not just active attacks, but also industry trends, AI developments affecting security, regulatory changes, new research findings, and notable corporate security events
 
 STEP 2 - SOURCE VALIDATION (CRITICAL):
 - Each news item is labeled with its source credibility tier
@@ -417,7 +424,9 @@ SOURCE DIVERSITY RULE:
 
 STEP 3 - RELEVANCE FILTER:
 - Is this relevant to families, seniors, kids, everyday users, or small businesses?
-- If NOT relevant to these audiences, select a different story from the feed
+- ALSO consider: Does this represent a major industry shift, AI development, or regulatory change that will affect how everyday people use technology?
+- Breaking news about major breaches, AI safety developments, new regulations (EU AI Act, privacy laws), and industry-shaping events ARE relevant even if not a direct consumer threat
+- If NOT relevant to any of these criteria, select a different story from the feed
 
 STEP 4 - RISK SCORING:
 - Assign urgency_score (1-5) and impact_level (low/medium/high)
@@ -434,7 +443,9 @@ STEP 5 - INSIGHT GENERATION:
 STEP 6 - CONTENT MODE SELECTION:
 - Select the most appropriate mode: breaking_insight, preventative_education, myth_debunking, scenario_simulation, or tool_highlight
 - If urgency_score >= 4, force breaking_insight mode
+- For AI developments, regulatory changes, and industry news: breaking_insight or myth_debunking work well
 - The WRITING STYLE instruction determines HOW to write. The content mode determines WHAT angle to take
+- Aim for VARIETY: if recent posts have been threat-focused, lean toward AI developments, privacy news, or regulatory updates if available in the feed
 
 STEP 7 - CONTENT CREATION:
 - Follow the specific WRITING STYLE instruction provided below
