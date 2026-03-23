@@ -48,3 +48,15 @@ id = "Aon5NqH265xPInHiAYFDq"
 uri = "file://store-screenshot-3.png"
 type = "image"
 title = "Screenshot 3: Recommended Actions & What We Checked (1280x800, 24-bit PNG)"
+
+[[outputs]]
+id = "3hG7KwjWnZqGNx8GrSbtA"
+uri = "file://small-promo-tile.png"
+type = "image"
+title = "Small Promo Tile (440x280, 24-bit PNG)"
+
+[[outputs]]
+id = "srdRLa_TlNLvso5By0Chb"
+uri = "file://marquee-promo-tile.png"
+type = "image"
+title = "Marquee Promo Tile (1400x560, 24-bit PNG)"
