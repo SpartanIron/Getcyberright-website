@@ -1259,7 +1259,7 @@ export async function searchAllBrokersForProfile(
     brokerStatuses: new Map(),
   };
 
-  console.log(`[broker-adapter] Starting real profile search across ${searchable.length} broker sites for "${params.firstName} ${params.lastName}"`);
+  console.log(`[broker-adapter] Starting real profile search across ${searchable.length} broker sites`);
 
   const coreBrokerIds = new Set(coreAdapters.map(a => a.brokerId));
   const coreBrokers = searchable.filter(a => coreBrokerIds.has(a.brokerId));

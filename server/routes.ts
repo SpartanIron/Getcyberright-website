@@ -4586,7 +4586,7 @@ EDGE CASE HANDLING
       partialResults: report.partialResults,
       brokerCount: report.brokerResults?.length || 0,
       breachCount: report.breachResults?.length || 0,
-      brokerFoundCount: report.brokerResults?.filter((b: any) => b.status === "found" || b.status === "pending_verification").length || 0,
+      brokerFoundCount: report.brokerResults?.filter((b: any) => b.status === "found").length || 0,
       breachResults: undefined,
       brokerResults: undefined,
     };

@@ -121,8 +121,8 @@ function ShieldPage() {
                 GCR Shield
               </h1>
               <p className="text-lg text-muted-foreground max-w-lg mx-auto">
-                Find out if your personal information is on data broker sites or in data breaches.
-                No account needed. Takes about 30 seconds.
+                Find out if your personal information is exposed on 500+ data broker sites or in data breaches.
+                No account needed.
               </p>
             </div>
 
@@ -136,10 +136,10 @@ function ShieldPage() {
                     </div>
                     <div>
                       <p className="text-lg font-semibold mb-2" data-testid="text-scan-progress">
-                        Checking data broker sites...
+                        Scanning 500+ data broker sites...
                       </p>
                       <p className="text-muted-foreground">
-                        This takes about 30 seconds. We are searching people-search sites
+                        This may take up to a minute. We are searching people-search sites
                         and checking breach databases for your information.
                       </p>
                     </div>

@@ -219,7 +219,7 @@ function ShieldResultsPage() {
           <div className="text-center space-y-4">
             <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
             <p className="text-lg font-medium">Loading your results...</p>
-            <p className="text-muted-foreground">Checking data broker sites... this takes about 30 seconds.</p>
+            <p className="text-muted-foreground">Scanning 500+ data broker sites and breach databases... this may take up to a minute.</p>
           </div>
         </main>
         <Footer />
@@ -591,25 +591,20 @@ function generateFreeSummary(report: ExposureReport): string {
   const breachCount = report.breachCount || 0;
   const brokerFoundCount = report.brokerFoundCount || 0;
 
-  const parts: string[] = [];
-
+  let text = `We scanned ${brokerCount} data broker site${brokerCount !== 1 ? "s" : ""}`;
   if (breachCount > 0) {
-    parts.push(`We checked ${breachCount} breach database${breachCount !== 1 ? "s" : ""}`);
+    text += ` and ${breachCount} breach database${breachCount !== 1 ? "s" : ""}`;
   }
-  if (brokerCount > 0) {
-    parts.push(`${brokerCount} data broker site${brokerCount !== 1 ? "s" : ""}`);
-  }
-
-  let text = parts.length > 0
-    ? `We scanned ${parts.join(" and ")}. `
-    : "";
+  text += ". ";
 
   if (report.exposureScore === "critical" || report.exposureScore === "high") {
-    text += "Your personal information has significant exposure online. Unlock the full report to see exactly where your data was found and get removal steps.";
+    text += `Your personal information was found on ${brokerFoundCount} site${brokerFoundCount !== 1 ? "s" : ""}. Unlock the full report to see exactly where and get removal steps.`;
   } else if (report.exposureScore === "medium") {
-    text += "We found some exposure of your personal information. Unlock the full report to see the details and recommended actions.";
+    text += `We found some exposure of your personal information. Unlock the full report to see the details and recommended actions.`;
+  } else if (brokerFoundCount > 0) {
+    text += `Your information appeared on ${brokerFoundCount} site${brokerFoundCount !== 1 ? "s" : ""}, but your overall exposure is low. Unlock the full report for details.`;
   } else {
-    text += "Your exposure level appears low, but unlock the full report to see the complete picture.";
+    text += "Good news — we didn't find your information on the sites we checked. Unlock the full report to see the complete picture.";
   }
 
   return text;

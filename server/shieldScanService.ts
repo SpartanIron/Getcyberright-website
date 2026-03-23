@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { shieldScans, shieldLeads } from "@shared/schema";
 import { eq, and, lte, isNull, sql } from "drizzle-orm";
+import { searchAllBrokersForProfile, type ProfileSearchResult } from "./brokerAdapters";
 
 export type BrokerResult = {
   broker: string;
@@ -126,85 +127,57 @@ async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
   }
 }
 
-async function checkSpokeo(data: ScanInput): Promise<BrokerResult> {
-  return {
-    broker: "Spokeo",
-    status: "pending_verification",
-    url: `https://www.spokeo.com/search?q=${encodeURIComponent(getFullName(data))}`,
-    found: null,
-    dataFound: null,
-  };
-}
+async function runRealBrokerSearch(input: ScanInput): Promise<BrokerResult[]> {
+  try {
+    const { results, stats } = await searchAllBrokersForProfile(
+      {
+        firstName: input.firstName,
+        lastName: input.lastName,
+      },
+      75,
+      150,
+    );
 
-async function checkWhitepages(data: ScanInput): Promise<BrokerResult> {
-  return {
-    broker: "Whitepages",
-    status: "pending_verification",
-    url: `https://www.whitepages.com/name/${encodeURIComponent(data.firstName)}-${encodeURIComponent(data.lastName)}`,
-    found: null,
-    dataFound: null,
-  };
-}
+    const brokerResults: BrokerResult[] = [];
 
-async function checkBeenVerified(data: ScanInput): Promise<BrokerResult> {
-  return {
-    broker: "BeenVerified",
-    status: "pending_verification",
-    url: `https://www.beenverified.com/people/${encodeURIComponent(data.firstName)}-${encodeURIComponent(data.lastName)}/`,
-    found: null,
-    dataFound: null,
-  };
-}
+    for (const [brokerId, brokerStatus] of stats.brokerStatuses.entries()) {
+      const result = results.get(brokerId);
 
-async function checkIntelius(data: ScanInput): Promise<BrokerResult> {
-  return {
-    broker: "Intelius",
-    status: "pending_verification",
-    url: `https://www.intelius.com/people-search/${encodeURIComponent(data.firstName)}-${encodeURIComponent(data.lastName)}`,
-    found: null,
-    dataFound: null,
-  };
-}
+      let status: BrokerResult["status"];
+      if (brokerStatus === "search_blocked") {
+        status = "unavailable";
+      } else if (brokerStatus === "search_failed") {
+        status = "timed_out";
+      } else if (result && result.found && result.nameMatch && result.matchScore >= 40) {
+        status = "found";
+      } else {
+        status = "not_found";
+      }
 
-async function checkFastPeopleSearch(data: ScanInput): Promise<BrokerResult> {
-  return {
-    broker: "FastPeopleSearch",
-    status: "pending_verification",
-    url: `https://www.fastpeoplesearch.com/name/${encodeURIComponent(data.firstName)}-${encodeURIComponent(data.lastName)}`,
-    found: null,
-    dataFound: null,
-  };
-}
+      const dataFound: string[] = [];
+      if (result?.extractedName) dataFound.push("Full Name");
+      if (result?.extractedCity) dataFound.push("City");
+      if (result?.extractedState) dataFound.push("State");
+      if (result?.extractedAge) dataFound.push("Age");
+      if (result?.extractedRelatives?.length && result.extractedRelatives.length > 0) dataFound.push("Known Associates");
 
-async function checkTruthFinder(data: ScanInput): Promise<BrokerResult> {
-  return {
-    broker: "TruthFinder",
-    status: "pending_verification",
-    url: `https://www.truthfinder.com/results/?firstName=${encodeURIComponent(data.firstName)}&lastName=${encodeURIComponent(data.lastName)}`,
-    found: null,
-    dataFound: null,
-  };
-}
+      brokerResults.push({
+        broker: brokerId,
+        status,
+        url: result?.profileUrl || "",
+        found: result ? (result.found && result.nameMatch && result.matchScore >= 40) : false,
+        dataFound: dataFound.length > 0 ? dataFound : null,
+      });
+    }
 
-async function checkRadaris(data: ScanInput): Promise<BrokerResult> {
-  return {
-    broker: "Radaris",
-    status: "pending_verification",
-    url: `https://radaris.com/p/${encodeURIComponent(data.firstName)}/${encodeURIComponent(data.lastName)}/`,
-    found: null,
-    dataFound: null,
-  };
-}
+    console.log(`[shield-scan] Broker search complete: ${stats.found} found, ${stats.notFound} not found, ${stats.blocked} blocked, ${stats.failed} failed across ${stats.searched}/${stats.totalSearchable} sites`);
 
-const BROKER_CHECKS = [
-  checkSpokeo,
-  checkWhitepages,
-  checkBeenVerified,
-  checkIntelius,
-  checkFastPeopleSearch,
-  checkTruthFinder,
-  checkRadaris,
-];
+    return brokerResults;
+  } catch (error: any) {
+    console.error("[shield-scan] Broker search failed:", error?.message);
+    return [];
+  }
+}
 
 function calculateExposureScore(
   breachResults: BreachResult[],
@@ -328,21 +301,7 @@ async function runScanPipeline(scanId: string, input: ScanInput): Promise<void> 
 
     const breachResults = await checkHaveIBeenPwned(input.email);
 
-    const brokerResults = await Promise.all(
-      BROKER_CHECKS.map(async (check) => {
-        try {
-          return await check(input);
-        } catch (error) {
-          return {
-            broker: check.name.replace("check", ""),
-            status: "unavailable" as const,
-            url: "",
-            found: null,
-            dataFound: null,
-          };
-        }
-      }),
-    );
+    const brokerResults = await runRealBrokerSearch(input);
 
     const partialResults =
       breachResults.some((b) => b.breachName.startsWith("__")) ||
