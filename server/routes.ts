@@ -4717,6 +4717,60 @@ EDGE CASE HANDLING
     }
   });
 
+  app.delete("/api/shield/scan/:scanId", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const { scanId } = req.params;
+      if (!scanId) return res.status(400).json({ error: "Scan ID is required" });
+
+      const { softDeleteShieldScan } = await import("./shieldScanService");
+      const result = await softDeleteShieldScan(scanId, req.user.id);
+
+      if (result === "not_found") {
+        return res.status(404).json({ error: "Scan not found" });
+      }
+      if (result === "forbidden") {
+        return res.status(403).json({ error: "You do not have permission to delete this scan" });
+      }
+
+      res.json({ message: "Your scan data has been deleted." });
+    } catch (error) {
+      console.error("[shield] Delete scan error");
+      res.status(500).json({ error: "Could not delete scan data" });
+    }
+  });
+
+  app.get("/api/shield/unsubscribe/:leadId", async (req: Request, res: Response) => {
+    try {
+      const { leadId } = req.params;
+      if (!leadId) return res.status(400).json({ error: "Invalid unsubscribe link" });
+
+      const { unsubscribeLead } = await import("./shieldScanService");
+      const success = await unsubscribeLead(leadId);
+
+      if (!success) {
+        return res.status(404).send(`
+          <!DOCTYPE html><html><head><title>Not Found</title></head>
+          <body style="font-family:system-ui;max-width:500px;margin:60px auto;text-align:center">
+            <h1>Link Not Found</h1>
+            <p>This unsubscribe link is no longer valid.</p>
+          </body></html>
+        `);
+      }
+
+      res.send(`
+        <!DOCTYPE html><html><head><title>Unsubscribed</title></head>
+        <body style="font-family:system-ui;max-width:500px;margin:60px auto;text-align:center">
+          <h1>You have been unsubscribed</h1>
+          <p>You will no longer receive GCR Shield re-scan alerts.</p>
+          <p style="margin-top:20px"><a href="https://www.getcyberright.com" style="color:#0A2A3C">Return to GetCyberRight</a></p>
+        </body></html>
+      `);
+    } catch (error) {
+      console.error("[shield] Unsubscribe error");
+      res.status(500).send("Something went wrong. Please try again.");
+    }
+  });
+
   app.post("/api/scan/:scanId/lead", async (req: Request, res: Response) => {
     try {
       const { scanId } = req.params;

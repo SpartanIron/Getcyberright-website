@@ -283,6 +283,40 @@ app.use((req, res, next) => {
       }).catch(err => {
         console.error("Failed to start growth orchestrator:", err);
       });
+
+      // GCR Shield: 90-day auto-purge (runs daily)
+      import("./shieldScanService").then(({ purgeExpiredScans }) => {
+        async function runPurge() {
+          try {
+            const { purgedCount } = await purgeExpiredScans();
+            if (purgedCount > 0) {
+              console.log(`[shield-purge] Soft-deleted ${purgedCount} scans older than 90 days`);
+            }
+          } catch (err: any) {
+            console.error("[shield-purge] Error:", err?.message || err);
+          }
+        }
+        runPurge();
+        setInterval(runPurge, 24 * 60 * 60 * 1000);
+        console.log("[shield-purge] 90-day auto-purge scheduler started (daily)");
+      }).catch(err => {
+        console.error("Failed to start shield purge scheduler:", err);
+      });
+
+      // GCR Shield: Re-scan scheduler (runs every 6 hours)
+      import("../jobs/rescan.job").then(({ executeRescanJob }) => {
+        async function runRescan() {
+          try {
+            await executeRescanJob();
+          } catch (err: any) {
+            console.error("[rescan-scheduler] Error:", err?.message || err);
+          }
+        }
+        setInterval(runRescan, 6 * 60 * 60 * 1000);
+        console.log("[rescan-scheduler] Re-scan job scheduler started (every 6 hours)");
+      }).catch(err => {
+        console.error("Failed to start rescan scheduler:", err);
+      });
     },
   );
 

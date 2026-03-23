@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { shieldScans, shieldLeads } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, lte, isNull, sql } from "drizzle-orm";
 
 export type BrokerResult = {
   broker: string;
@@ -456,7 +456,12 @@ export async function getShieldScanFromDb(scanId: string) {
   const [scan] = await db
     .select()
     .from(shieldScans)
-    .where(eq(shieldScans.scanId, scanId))
+    .where(
+      and(
+        eq(shieldScans.scanId, scanId),
+        isNull(shieldScans.deletedAt),
+      ),
+    )
     .limit(1);
   return scan || null;
 }
@@ -484,6 +489,188 @@ export async function createShieldLead(
     .returning();
 
   return { leadId: lead.leadId };
+}
+
+export async function softDeleteShieldScan(scanId: string, userId: string): Promise<"deleted" | "not_found" | "forbidden" | "already_deleted"> {
+  const scan = await getShieldScanFromDb(scanId);
+  if (!scan) return "not_found";
+  if (!scan.userId || scan.userId !== userId) return "forbidden";
+  if (scan.deletedAt) return "already_deleted";
+
+  await db
+    .update(shieldScans)
+    .set({ deletedAt: new Date() })
+    .where(eq(shieldScans.scanId, scanId));
+
+  scanJobs.delete(scanId);
+  return "deleted";
+}
+
+export async function purgeExpiredScans(): Promise<{ purgedCount: number }> {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 90);
+
+  const result = await db
+    .update(shieldScans)
+    .set({ deletedAt: new Date() })
+    .where(
+      and(
+        isNull(shieldScans.deletedAt),
+        isNull(shieldScans.userId),
+        lte(shieldScans.createdAt, cutoff),
+      ),
+    )
+    .returning({ scanId: shieldScans.scanId });
+
+  return { purgedCount: result.length };
+}
+
+export async function unsubscribeLead(leadId: string): Promise<boolean> {
+  const [lead] = await db
+    .select()
+    .from(shieldLeads)
+    .where(eq(shieldLeads.leadId, leadId))
+    .limit(1);
+
+  if (!lead) return false;
+
+  await db
+    .update(shieldLeads)
+    .set({ optedIn: false })
+    .where(eq(shieldLeads.leadId, leadId));
+
+  return true;
+}
+
+export async function getDueRescanLeads(): Promise<Array<{
+  leadId: string;
+  scanId: string | null;
+  lastScanId: string | null;
+  email: string;
+  alertEmail: string;
+}>> {
+  const now = new Date();
+  const leads = await db
+    .select()
+    .from(shieldLeads)
+    .where(
+      and(
+        eq(shieldLeads.optedIn, true),
+        lte(shieldLeads.nextScanDue, now),
+      ),
+    );
+
+  return leads.map((l) => ({
+    leadId: l.leadId,
+    scanId: l.scanId,
+    lastScanId: l.lastScanId,
+    email: l.email,
+    alertEmail: l.alertEmail,
+  }));
+}
+
+export async function runRescanForLead(lead: {
+  leadId: string;
+  lastScanId: string | null;
+  email: string;
+  alertEmail: string;
+}): Promise<{
+  newScanId: string;
+  newExposures: string[];
+  previousScore: string | null;
+  newScore: string | null;
+}> {
+  let previousResults: ExposureReport | null = null;
+  let previousScore: string | null = null;
+
+  if (lead.lastScanId) {
+    const prevScan = await getShieldScanFromDb(lead.lastScanId);
+    if (prevScan && prevScan.rawResults) {
+      previousResults = prevScan.rawResults as unknown as ExposureReport;
+      previousScore = prevScan.exposureScore;
+    }
+  }
+
+  const previousScan = lead.lastScanId ? await getShieldScanFromDb(lead.lastScanId) : null;
+  const firstName = previousScan?.firstName || "User";
+  const lastName = previousScan?.lastName || "";
+
+  const { scanId: newScanId } = await startShieldScan(
+    { firstName, lastName, email: lead.email },
+    "system-rescan",
+  );
+
+  await new Promise((resolve) => {
+    const check = setInterval(async () => {
+      const status = getShieldScanStatus(newScanId);
+      if (status.status === "complete" || status.status === "failed") {
+        clearInterval(check);
+        resolve(null);
+      }
+    }, 2000);
+    setTimeout(() => { clearInterval(check); resolve(null); }, 120000);
+  });
+
+  const newScan = await getShieldScanFromDb(newScanId);
+  const scanStatus = getShieldScanStatus(newScanId);
+
+  if (!newScan || scanStatus.status === "failed") {
+    const retryDue = new Date();
+    retryDue.setDate(retryDue.getDate() + 1);
+    await db
+      .update(shieldLeads)
+      .set({ nextScanDue: retryDue })
+      .where(eq(shieldLeads.leadId, lead.leadId));
+    console.log(`[rescan] Scan failed for lead ${lead.leadId}, retrying in 1 day`);
+    return { newScanId, newExposures: [], previousScore, newScore: null };
+  }
+
+  const newResults = newScan.rawResults as unknown as ExposureReport | null;
+  const newScore = newScan.exposureScore || null;
+
+  const newExposures: string[] = [];
+  if (newResults) {
+    if (previousResults) {
+      const prevBrokers = new Set(
+        (previousResults.brokerResults || [])
+          .filter((b) => b.status === "found")
+          .map((b) => b.broker),
+      );
+      for (const broker of (newResults.brokerResults || [])) {
+        if (broker.status === "found" && !prevBrokers.has(broker.broker)) {
+          newExposures.push(broker.broker);
+        }
+      }
+
+      const prevBreaches = new Set(
+        (previousResults.breachResults || []).map((b) => b.breachName),
+      );
+      for (const breach of (newResults.breachResults || [])) {
+        if (!prevBreaches.has(breach.breachName)) {
+          newExposures.push(`Breach: ${breach.breachName}`);
+        }
+      }
+    } else {
+      for (const broker of (newResults.brokerResults || [])) {
+        if (broker.status === "found") {
+          newExposures.push(broker.broker);
+        }
+      }
+      for (const breach of (newResults.breachResults || [])) {
+        newExposures.push(`Breach: ${breach.breachName}`);
+      }
+    }
+  }
+
+  const nextDue = new Date();
+  nextDue.setDate(nextDue.getDate() + 30);
+
+  await db
+    .update(shieldLeads)
+    .set({ lastScanId: newScanId, nextScanDue: nextDue })
+    .where(eq(shieldLeads.leadId, lead.leadId));
+
+  return { newScanId, newExposures, previousScore, newScore };
 }
 
 export { generatePlainLanguageSummary };
