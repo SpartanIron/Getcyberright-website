@@ -278,11 +278,11 @@ export default function TopicHub() {
                     <p className="text-sm text-muted-foreground">Create strong, unique passwords</p>
                   </Card>
                 </Link>
-                <Link href="/data-removal" data-testid="link-data-removal">
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer text-center p-6" data-testid="tool-data-removal">
+                <Link href="/shield" data-testid="link-gcr-shield">
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer text-center p-6" data-testid="tool-gcr-shield">
                     <Shield className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <h3 className="font-semibold">Data Broker Removal</h3>
-                    <p className="text-sm text-muted-foreground">Remove personal data from brokers</p>
+                    <h3 className="font-semibold">GCR Shield</h3>
+                    <p className="text-sm text-muted-foreground">Scan for your exposed personal data</p>
                   </Card>
                 </Link>
                 <Link href="/breach-dashboard" data-testid="link-breach-dashboard">

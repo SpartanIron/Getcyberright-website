@@ -51,11 +51,11 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
     },
     {
       icon: Lock,
-      title: "Remove my data from brokers",
-      description: "Find and remove your personal info from 500+ data broker sites",
-      path: "/data-removal",
-      color: "from-red-500 to-orange-500",
-      bgColor: "bg-red-500/10 hover:bg-red-500/20",
+      title: "Scan my data exposure",
+      description: "Find out if your personal info is exposed on data broker sites or in breaches",
+      path: "/shield",
+      color: "from-teal-500 to-cyan-500",
+      bgColor: "bg-teal-500/10 hover:bg-teal-500/20",
     },
     {
       icon: Users,

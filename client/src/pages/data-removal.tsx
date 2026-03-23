@@ -301,8 +301,8 @@ export default function DataRemoval() {
 
   const dataRemovalApp: WebApplicationData = {
     type: "WebApplication",
-    name: "Data Broker Removal Tool",
-    description: "Find and remove your personal data from 501+ data broker sites. Scan for exposures, generate opt-out requests, and monitor your privacy. Free to get started.",
+    name: "GCR Shield — Removal Center",
+    description: "Track and manage data broker removal requests. Send opt-out requests to 500+ data broker sites, monitor removal progress, and protect your privacy.",
     url: "https://www.getcyberright.com/data-removal",
     applicationCategory: "SecurityApplication",
     provider: "GetCyberRight",
@@ -312,24 +312,24 @@ export default function DataRemoval() {
     type: "BreadcrumbList",
     items: [
       { name: "Home", url: "https://www.getcyberright.com/" },
-      { name: "Tools", url: "https://www.getcyberright.com/tools" },
-      { name: "Data Broker Removal", url: "https://www.getcyberright.com/data-removal" },
+      { name: "GCR Shield", url: "https://www.getcyberright.com/shield" },
+      { name: "Removal Center", url: "https://www.getcyberright.com/data-removal" },
     ],
   };
 
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Data Broker Removal - Protect Your Privacy"
-        description="Check for confirmed data breaches and send opt-out requests to 500+ data broker sites. Honest, fact-based privacy protection tools."
+        title="GCR Shield — Removal Center | GetCyberRight"
+        description="Track and manage data broker removal requests. Send opt-out requests to 500+ data broker sites, monitor removal progress, and protect your privacy."
       />
       <StructuredData data={[dataRemovalApp, dataRemovalBreadcrumbs]} />
       <Navigation />
 
       <main id="main-content" tabIndex={-1}>
         <PageBanner
-          title="Data Broker Removal"
-          subtitle="Find your public profiles on people-search sites, send opt-out requests, and track removal progress across 500+ data brokers."
+          title="GCR Shield — Removal Center"
+          subtitle="Send opt-out requests, track removal progress, and manage your privacy across 500+ data broker sites."
           imageSrc={bannerImage}
           imageAlt="Person scanning for personal data exposure on data broker sites"
           imagePosition="left"

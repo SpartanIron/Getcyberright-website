@@ -10,11 +10,11 @@ const tools = [
   {
     id: "data-scan",
     image: dataScanImg,
-    title: "Scan for Your Exposed Data",
+    title: "GCR Shield — Exposure Scan",
     badge: "Instant Scan",
-    description: "Discover which of 500+ data brokers are selling your personal information. See exactly what's exposed and take action to remove it.",
+    description: "Find out if your personal information is exposed on data broker sites or in data breaches. See your risk level and take action to protect yourself.",
     cta: "Start Your Scan",
-    href: "/data-removal",
+    href: "/shield",
     accentColor: "from-orange-600/90 via-orange-700/80",
   },
   {

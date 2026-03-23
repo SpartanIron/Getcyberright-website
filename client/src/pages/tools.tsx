@@ -172,20 +172,20 @@ export default function Tools() {
                 </div>
               </button>
 
-              <Link href="/data-removal">
+              <Link href="/shield">
                 <div
                   className="flex items-center gap-3 p-4 rounded-md border text-left transition-colors hover-elevate cursor-pointer h-full"
-                  data-testid="category-data-removal"
+                  data-testid="category-gcr-shield"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                    <Trash2 className="w-5 h-5 text-red-500" />
+                  <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-5 h-5 text-teal-500" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-sm">Data Broker Removal</p>
+                      <p className="font-medium text-sm">GCR Shield</p>
                       <Badge variant="outline" className="text-[10px] text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 no-default-hover-elevate no-default-active-elevate">Free</Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">Remove data from 500+ brokers</p>
+                    <p className="text-xs text-muted-foreground">Scan for your exposed personal data</p>
                   </div>
                 </div>
               </Link>
