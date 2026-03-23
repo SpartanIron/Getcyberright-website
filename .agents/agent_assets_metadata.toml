@@ -12,3 +12,21 @@ id = "ytslPZD5HjkVH_kQIzfyG"
 uri = "file://gcr-guard-extension.zip"
 type = "unspecified"
 title = "GCR Guard Chrome Extension (v1.2.0) — Fixed"
+
+[[outputs]]
+id = "8mosEYADTz2kOBjAXM3gw"
+uri = "file://safe-result.png"
+type = "image"
+title = "Screenshot 1: Scam Checker Page (1280x800)"
+
+[[outputs]]
+id = "SqFq9tmfegtmLV0w-38kG"
+uri = "file://threat-detected.png"
+type = "image"
+title = "Screenshot 2: Threat Detected - Confirmed Threat (1280x800)"
+
+[[outputs]]
+id = "dPWQNfqEmUP4ZsVCWaIM5"
+uri = "file://details.png"
+type = "image"
+title = "Screenshot 3: Scan Details & Analysis (1280x800)"
