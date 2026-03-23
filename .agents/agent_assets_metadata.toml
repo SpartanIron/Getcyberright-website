@@ -30,3 +30,21 @@ id = "dPWQNfqEmUP4ZsVCWaIM5"
 uri = "file://details.png"
 type = "image"
 title = "Screenshot 3: Scan Details & Analysis (1280x800)"
+
+[[outputs]]
+id = "CQzL_jDVxNRVhcgkVbeGn"
+uri = "file://store-screenshot-1.png"
+type = "image"
+title = "Screenshot 1: Scam Checker Tool (1280x800, 24-bit PNG)"
+
+[[outputs]]
+id = "fBqqeviu75Hrr7vxeSV3O"
+uri = "file://store-screenshot-2.png"
+type = "image"
+title = "Screenshot 2: Confirmed Threat Detection (1280x800, 24-bit PNG)"
+
+[[outputs]]
+id = "Aon5NqH265xPInHiAYFDq"
+uri = "file://store-screenshot-3.png"
+type = "image"
+title = "Screenshot 3: Recommended Actions & What We Checked (1280x800, 24-bit PNG)"
