@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "GCR Guard by GetCyberRight",
   "version": "1.2.0",
-  "description": "Real-time scam protection powered by AI. Auto-scans pages, detects lookalike domains, warns on risky forms, and keeps you safe from phishing and fraud. By GetCyberRight.",
+  "description": "AI-powered scam protection. Auto-scans pages, detects fake sites, and warns you before phishing attacks.",
   "permissions": [
     "activeTab",
     "contextMenus",
