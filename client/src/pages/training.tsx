@@ -136,15 +136,15 @@ export default function Training() {
     name: "GetCyberRight Cybersecurity and AI Training Academy",
     description: "Cybersecurity training courses with quizzes and certificates. Structured learning paths for kids, parents, seniors, educators, and small businesses.",
     provider: "GetCyberRight",
-    url: "https://getcyberright.com/training",
+    url: "https://www.getcyberright.com/training",
     isAccessibleForFree: true,
   };
 
   const trainingBreadcrumbs: BreadcrumbData = {
     type: "BreadcrumbList",
     items: [
-      { name: "Home", url: "https://getcyberright.com/" },
-      { name: "Training Academy", url: "https://getcyberright.com/training" },
+      { name: "Home", url: "https://www.getcyberright.com/" },
+      { name: "Training Academy", url: "https://www.getcyberright.com/training" },
     ],
   };
 

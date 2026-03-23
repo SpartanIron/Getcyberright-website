@@ -17,7 +17,7 @@ export function ShareButtons({
   variant = "default"
 }: ShareButtonsProps) {
   const { toast } = useToast();
-  const shareUrl = url || (typeof window !== "undefined" ? window.location.href : "https://getcyberright.com");
+  const shareUrl = url || (typeof window !== "undefined" ? window.location.href : "https://www.getcyberright.com");
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(title);
   const encodedDescription = encodeURIComponent(description);

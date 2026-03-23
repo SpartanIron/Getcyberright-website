@@ -22,15 +22,15 @@ const aboutArticleSchema: ArticleData = {
   description: "Online scams have changed. GetCyberRight gives families, seniors, and small businesses the simple tools and clear guidance they need to stay safe online.",
   datePublished: "2024-01-15",
   dateModified: "2026-03-01",
-  author: { name: "GetCyberRight", url: "https://getcyberright.com" },
-  publisher: { name: "GetCyberRight", logo: "https://getcyberright.com/og-image.png" },
+  author: { name: "GetCyberRight", url: "https://www.getcyberright.com" },
+  publisher: { name: "GetCyberRight", logo: "https://www.getcyberright.com/og-image.png" },
 };
 
 const aboutBreadcrumbs: BreadcrumbData = {
   type: "BreadcrumbList",
   items: [
-    { name: "Home", url: "https://getcyberright.com/" },
-    { name: "About", url: "https://getcyberright.com/about" },
+    { name: "Home", url: "https://www.getcyberright.com/" },
+    { name: "About", url: "https://www.getcyberright.com/about" },
   ],
 };
 

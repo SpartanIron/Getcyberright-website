@@ -25,8 +25,8 @@ export default function Checklists() {
       <StructuredData data={{
         type: "BreadcrumbList",
         items: [
-          { name: "Home", url: "https://getcyberright.com/" },
-          { name: "Security Checklists", url: "https://getcyberright.com/checklists" },
+          { name: "Home", url: "https://www.getcyberright.com/" },
+          { name: "Security Checklists", url: "https://www.getcyberright.com/checklists" },
         ],
       } as BreadcrumbData} />
       <div className="print:hidden">

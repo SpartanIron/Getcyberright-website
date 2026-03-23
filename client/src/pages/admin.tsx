@@ -3306,7 +3306,7 @@ function SocialPostGeneratorTab({ token }: { token: string }) {
       return;
     }
 
-    const baseUrl = "https://getcyberright.com";
+    const baseUrl = "https://www.getcyberright.com";
     
     let post = "";
     
@@ -3387,12 +3387,12 @@ function SocialPostGeneratorTab({ token }: { token: string }) {
 
   const openInBuffer = () => {
     if (!generatedPost) return;
-    let link = "https://getcyberright.com";
+    let link = "https://www.getcyberright.com";
     if (selectedContent === "article") {
-      link = `https://getcyberright.com/article/${selectedItem}`;
+      link = `https://www.getcyberright.com/article/${selectedItem}`;
     } else if (selectedContent === "news") {
       const newsItem = latestNews.find((n: any) => n.id?.toString() === selectedItem);
-      link = newsItem?.url || "https://getcyberright.com/news";
+      link = newsItem?.url || "https://www.getcyberright.com/news";
     }
     const bufferUrl = `https://buffer.com/add?text=${encodeURIComponent(generatedPost)}&url=${encodeURIComponent(link)}`;
     window.open(bufferUrl, "_blank", "width=800,height=600");

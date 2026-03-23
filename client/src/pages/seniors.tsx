@@ -1177,8 +1177,8 @@ export default function Seniors() {
   const seniorsBreadcrumbs: BreadcrumbData = {
     type: "BreadcrumbList",
     items: [
-      { name: "Home", url: "https://getcyberright.com/" },
-      { name: "Seniors Safety Hub", url: "https://getcyberright.com/seniors" },
+      { name: "Home", url: "https://www.getcyberright.com/" },
+      { name: "Seniors Safety Hub", url: "https://www.getcyberright.com/seniors" },
     ],
   };
 

@@ -21,8 +21,8 @@ import familiesImage from "@/assets/images/experience-families.png";
 const breadcrumbs: BreadcrumbData = {
   type: "BreadcrumbList",
   items: [
-    { name: "Home", url: "https://getcyberright.com/" },
-    { name: "The GetCyberRight Experience", url: "https://getcyberright.com/experience" },
+    { name: "Home", url: "https://www.getcyberright.com/" },
+    { name: "The GetCyberRight Experience", url: "https://www.getcyberright.com/experience" },
   ],
 };
 

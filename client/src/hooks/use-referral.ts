@@ -65,7 +65,7 @@ export function trackReferralConversion(action: string, metadata?: Record<string
   }
 }
 
-export function generateReferralLink(baseUrl: string = "https://getcyberright.com"): string {
+export function generateReferralLink(baseUrl: string = "https://www.getcyberright.com"): string {
   const userId = localStorage.getItem("user_id") || Math.random().toString(36).substring(2, 10);
   localStorage.setItem("user_id", userId);
   return `${baseUrl}?ref=${userId}`;

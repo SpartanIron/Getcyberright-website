@@ -757,8 +757,8 @@ export default function Resources() {
       <StructuredData data={{
         type: "BreadcrumbList",
         items: [
-          { name: "Home", url: "https://getcyberright.com/" },
-          { name: "Resources", url: "https://getcyberright.com/resources" },
+          { name: "Home", url: "https://www.getcyberright.com/" },
+          { name: "Resources", url: "https://www.getcyberright.com/resources" },
         ],
       } as BreadcrumbData} />
       <Navigation />

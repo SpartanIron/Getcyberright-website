@@ -46,6 +46,8 @@ export const KNOWN_CLIENT_ROUTES = new Set([
   "/safety-score",
   "/scam-checker",
   "/browser-extension",
+  "/extension-auth",
+  "/gcr-guard-pricing",
   "/faq",
   "/resources/glossary",
   "/resources/cheat-sheets",
@@ -82,6 +84,7 @@ export const DYNAMIC_ROUTE_PREFIXES = [
   "/scam-intel/",
   "/scams/",
   "/topics/",
+  "/report/",
   "/admin/",
 ];
 

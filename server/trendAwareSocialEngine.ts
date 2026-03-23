@@ -132,7 +132,7 @@ const GCR_TOOLS: Record<string, { tool_name: string; how_it_connects: string; ur
   kids: {
     tool_name: "Kids Safety Hub",
     how_it_connects: "Age-appropriate cybersecurity education and parental controls guidance",
-    url: "https://www.getcyberright.com/kids-safety",
+    url: "https://www.getcyberright.com/kids",
   },
   identity: {
     tool_name: "Identity Theft Recovery Guide",
@@ -147,7 +147,7 @@ const GCR_TOOLS: Record<string, { tool_name: string; how_it_connects: string; ur
   senior: {
     tool_name: "Senior Safety Hub",
     how_it_connects: "Tailored cybersecurity guidance for older adults, the most targeted demographic",
-    url: "https://www.getcyberright.com/seniors-safety",
+    url: "https://www.getcyberright.com/seniors",
   },
 };
 

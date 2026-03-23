@@ -19,10 +19,10 @@ import type { WebSiteData, OrganizationData } from "@/components/structured-data
 const websiteSchema: WebSiteData = {
   type: "WebSite",
   name: "GetCyberRight",
-  url: "https://getcyberright.com",
+  url: "https://www.getcyberright.com",
   description: "Free cybersecurity education platform for families, parents, kids, and seniors. Tools and training to protect against scams, data brokers, and online threats.",
   potentialAction: {
-    target: "https://getcyberright.com/search?q={search_term_string}",
+    target: "https://www.getcyberright.com/search?q={search_term_string}",
     queryInput: "required name=search_term_string",
   },
 };
@@ -30,8 +30,8 @@ const websiteSchema: WebSiteData = {
 const organizationSchema: OrganizationData = {
   type: "Organization",
   name: "GetCyberRight",
-  url: "https://getcyberright.com",
-  logo: "https://getcyberright.com/og-image.png",
+  url: "https://www.getcyberright.com",
+  logo: "https://www.getcyberright.com/og-image.png",
   description: "A free, family-focused cybersecurity education platform providing practical safety tools and training to protect families, parents, kids, seniors, and small businesses from online threats.",
 };
 
