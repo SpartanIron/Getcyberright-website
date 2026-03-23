@@ -172,7 +172,7 @@ async function seedGuides() {
       tags: ["seniors", "elder fraud", "family safety"],
       targetKeywords: ["protecting seniors from scams", "elder fraud prevention", "scams targeting seniors"],
       content: `<h2 id="why-scammers-target-seniors">Why Scammers Target Seniors</h2>
-<p>Older adults are more frequently targeted by scammers because they tend to be more trusting, may be less familiar with digital technology, and often have accumulated savings. According to the FBI, seniors lost over $3.4 billion to fraud in 2023 alone.</p>
+<p>Older adults are more frequently targeted by scammers because they tend to be more trusting, may be less familiar with digital technology, and often have accumulated savings. According to the FTC, older adults reported losing over $1.9 billion to fraud in 2023, while the FBI IC3 documented $3.4 billion in losses from cyber-enabled fraud targeting people over 60. The UK's Action Fraud service and Australia's ACSC report similar upward trends globally.</p>
 
 <h2 id="common-scams">Common Scams Targeting Seniors</h2>
 <h3>Tech Support Scams</h3>
@@ -222,7 +222,7 @@ async function seedGuides() {
         { text: "What to Do If Scammed", anchor: "what-to-do-if-scammed", level: 2 },
       ],
       faq: [
-        { question: "How much do seniors lose to scams each year?", answer: "According to the FBI IC3 report, Americans over 60 lost more than $3.4 billion to cyber-enabled fraud in 2023." },
+        { question: "How much do seniors lose to scams each year?", answer: "In the US alone, the FTC and FBI IC3 report billions in annual losses for adults over 60. The UK's Action Fraud, Australia's ACSC, and Europol all report similar rising trends worldwide, making elder fraud a global crisis." },
         { question: "What is the most common scam targeting seniors?", answer: "Tech support scams and government impersonation scams are among the most reported. Romance scams cause the highest average financial losses." },
         { question: "How can I help without being patronizing?", answer: "Frame it as something you do together. Share your own experiences with suspicious messages. Make it a family safety practice, not a lecture." },
       ],
@@ -400,7 +400,7 @@ async function seedGuides() {
       faq: [
         { question: "Can AI really clone someone's voice?", answer: "Yes. Modern AI voice cloning technology can create a convincing replica of someone's voice from as little as 3 seconds of recorded audio." },
         { question: "How can I tell if a video is a deepfake?", answer: "Look for subtle signs: unnatural eye movements, mismatched lip sync, inconsistent lighting, blurry edges around the face, or odd hand movements." },
-        { question: "Are AI scams increasing?", answer: "Yes. The FBI reports that AI-enhanced fraud losses increased significantly in 2023-2024, with voice cloning and deepfake scams among the fastest-growing categories." },
+        { question: "Are AI scams increasing?", answer: "Yes. Multiple agencies confirm this trend: EUROPOL's 2024 Internet Organised Crime Threat Assessment highlights AI-generated fraud as a top emerging threat, the UK NCSC warns about AI-enabled social engineering, and the FTC reports a sharp rise in impersonation scams using voice cloning and deepfakes." },
       ],
       wordCount: 580,
       readingTimeMinutes: 4,
@@ -677,7 +677,7 @@ async function seedAlerts() {
       threatName: "AI Voice Cloning Emergency Scam Surge",
       threatCategory: "ai_fraud",
       description: "A significant increase in AI voice cloning scams targeting elderly victims. Scammers use AI to clone the voices of family members and make emergency calls requesting immediate money transfers.",
-      detailedAnalysis: "FBI IC3 reports a 300% increase in AI-assisted voice cloning fraud since 2023. Scammers obtain voice samples from social media videos, voicemails, and phone calls. Using commercial AI tools, they create convincing voice replicas in minutes. Primary targets are seniors who receive calls from supposed grandchildren or children in distress.",
+      detailedAnalysis: "Multiple global agencies have flagged AI voice cloning fraud as a rapidly growing threat. Europol's IOCTA report, the UK NCSC, and the FTC all document significant increases in AI-assisted impersonation scams since 2023. Scammers obtain voice samples from social media videos, voicemails, and phone calls. Using commercial AI tools, they create convincing voice replicas in minutes. Primary targets are seniors who receive calls from supposed grandchildren or children in distress.",
       riskLevel: "critical",
       affectedPlatforms: ["Phone", "VoIP"],
       indicators: [
@@ -690,7 +690,7 @@ async function seedAlerts() {
         "Never wire money based on a single phone call",
         "Be aware that AI can clone voices from just seconds of audio",
         "Limit the amount of voice content shared publicly on social media",
-        "Report incidents to the FBI IC3 at ic3.gov",
+        "Report incidents to the appropriate authority: FBI IC3 (ic3.gov) in the US, Action Fraud in the UK, ACSC in Australia, or your local cybercrime unit",
       ],
       sourceUrls: ["https://www.ic3.gov", "https://www.ftc.gov"],
       regions: ["US", "CA", "GB", "AU", "GLOBAL"],

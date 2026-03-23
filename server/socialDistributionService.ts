@@ -71,6 +71,13 @@ ABSOLUTE RULES:
 - If you are unsure whether something is factual, do not include it
 - Your credibility depends on accuracy. Never guess.
 
+SOURCE DIVERSITY (CRITICAL):
+- Do NOT default to citing the FBI for every statistic. Rotate across trusted global sources
+- Preferred sources to cite (vary across posts): FTC, CISA, UK NCSC, Europol, INTERPOL, Action Fraud (UK), ACSC (Australia), ENISA (EU), Canadian Anti-Fraud Centre, APWG, Identity Theft Resource Center, AARP Fraud Watch Network, Google Threat Analysis Group, Microsoft Digital Defense Report, Verizon DBIR
+- When citing a statistic, prefer the most globally relevant source, not just the US-centric one
+- If the source material references a specific agency, you may cite that agency, but across a set of posts, ensure variety
+- GetCyberRight serves a global audience: reference international agencies and perspectives
+
 Formatting rules (STRICT):
 - NEVER use markdown formatting. No ** bold **, no * italics *, no ## headings, no bullet markers
 - NEVER use em dashes. Use commas, periods, colons, or semicolons instead

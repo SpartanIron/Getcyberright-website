@@ -404,10 +404,16 @@ STEP 1 - SIGNAL INTERPRETATION:
 
 STEP 2 - SOURCE VALIDATION (CRITICAL):
 - Each news item is labeled with its source credibility tier
-- Tier 1 (highest trust): Government agencies (CISA, FBI, NIST), official company statements
-- Tier 2: Established cybersecurity publications (Krebs, BleepingComputer, Dark Reading)
+- Tier 1 (highest trust): Government agencies (CISA, NIST, FBI, FTC, UK NCSC, Europol, INTERPOL, ACSC, ENISA, Canadian Anti-Fraud Centre), official company statements (Google, Microsoft, Apple)
+- Tier 2: Established cybersecurity publications (Krebs, BleepingComputer, Dark Reading, The Record, CyberScoop), research organizations (APWG, Ponemon Institute, ITRC, Verizon DBIR)
 - Tier 3: Social media, unverified reports, unknown sources
 - RULES: Require at least 2 independent sources for high-risk claims. If only Tier 3 sources exist, frame as emerging/unverified, not confirmed fact. If confidence is low, downgrade urgency_score
+
+SOURCE DIVERSITY RULE:
+- Do NOT default to citing the FBI as the authority for every claim. Rotate across global agencies
+- When a statistic can be attributed to multiple agencies, prefer variety: cite Europol for EU-relevant threats, UK NCSC for UK-focused attacks, ACSC for APAC incidents, CISA for infrastructure threats, FTC for consumer fraud data
+- GetCyberRight has a global audience. Posts should reflect international perspectives and agencies, not just US-centric ones
+- Track which sources you have cited recently and prefer different ones for the next post
 
 STEP 3 - RELEVANCE FILTER:
 - Is this relevant to families, seniors, kids, everyday users, or small businesses?

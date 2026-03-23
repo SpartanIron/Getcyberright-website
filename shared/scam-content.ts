@@ -195,7 +195,7 @@ export const SCAM_PAGES: ScamPageContent[] = [
     faq: [
       { question: "How common are romance scams?", answer: "Romance scams are extremely common. The FTC reports that nearly 70,000 Americans reported romance scams in recent years, with losses exceeding $1.3 billion. The actual numbers are likely much higher since many victims do not report due to embarrassment." },
       { question: "Who is most at risk for romance scams?", answer: "While anyone can be targeted, people who are recently divorced, widowed, or lonely are particularly vulnerable. Seniors lose the highest dollar amounts per incident. Scammers specifically target people who appear to be seeking companionship." },
-      { question: "What should I do if I suspect a romance scam?", answer: "Stop all communication with the person immediately. Do not send any more money. Save all messages and evidence. Report the scam to the dating platform, the FTC at reportfraud.ftc.gov, and the FBI's IC3 at ic3.gov. Talk to someone you trust about what happened." },
+      { question: "What should I do if I suspect a romance scam?", answer: "Stop all communication with the person immediately. Do not send any more money. Save all messages and evidence. Report the scam to the dating platform and your national fraud authority: FTC (reportfraud.ftc.gov) in the US, Action Fraud in the UK, ACSC (scamwatch.gov.au) in Australia, or the Canadian Anti-Fraud Centre. Talk to someone you trust about what happened." },
       { question: "Can romance scammers use deepfake video calls?", answer: "Yes, scammers are increasingly using AI deepfake technology to conduct video calls that appear to show a real person. If something seems off about a video call, ask the person to perform unexpected actions like holding up a specific number of fingers or turning their head, which deepfakes may not handle smoothly." }
     ],
     relatedScams: ["social-media-scam", "facebook-scam", "instagram-scam", "identity-theft"],
@@ -240,7 +240,7 @@ export const SCAM_PAGES: ScamPageContent[] = [
     ],
     faq: [
       { question: "What is a pig butchering crypto scam?", answer: "Pig butchering is a scam where criminals build a relationship with victims (the 'fattening' phase) before introducing a fake crypto investment platform. Victims see fake profits and invest more and more until the scammers disappear with all the money. The term comes from the concept of 'fattening the pig before slaughter.'" },
-      { question: "Can I recover money lost to crypto scams?", answer: "Recovery is very difficult because cryptocurrency transactions are irreversible. Report the scam to the FBI's IC3, FTC, and your local authorities. Some recovery firms exist but be cautious, as many of them are also scams." },
+      { question: "Can I recover money lost to crypto scams?", answer: "Recovery is very difficult because cryptocurrency transactions are irreversible. Report the scam to your national cybercrime authority (FTC and IC3 in the US, Action Fraud in the UK, ACSC in Australia) and your local police. Some recovery firms exist but be cautious, as many of them are also scams." },
       { question: "How do I spot a fake crypto exchange?", answer: "Red flags include: no regulatory registration, promises of unusually high returns, difficulty withdrawing funds, pressure to deposit more, professional-looking but recently created websites, and no verifiable company information or leadership team." },
       { question: "Are crypto giveaways legitimate?", answer: "Almost never. Legitimate companies do not ask you to send cryptocurrency first in order to receive more back. Any giveaway requiring you to send crypto is a scam, regardless of who appears to be promoting it." }
     ],
@@ -651,7 +651,7 @@ export const SCAM_PAGES: ScamPageContent[] = [
     faq: [
       { question: "How do grandparent scams find their victims?", answer: "Scammers get information from social media profiles, data breaches, phone directories, and obituaries. They may know a grandchild's name and location from public social media posts. Some simply call random seniors and let the victim fill in details." },
       { question: "Can AI really clone my grandchild's voice?", answer: "Yes. Modern AI voice cloning technology can create a convincing replica of someone's voice from just a few seconds of audio, often taken from social media videos. This makes it crucial to verify any urgent request through independent means." },
-      { question: "What should I do if I already sent money?", answer: "Contact the wire service or gift card company immediately to attempt to stop or reverse the transaction. File a police report, report to the FTC at reportfraud.ftc.gov, and contact your bank. Also report to the FBI's IC3 at ic3.gov." },
+      { question: "What should I do if I already sent money?", answer: "Contact the wire service or gift card company immediately to attempt to stop or reverse the transaction. File a police report, contact your bank, and report to your national fraud authority: FTC (reportfraud.ftc.gov) in the US, Action Fraud (actionfraud.police.uk) in the UK, or Scamwatch (scamwatch.gov.au) in Australia." },
       { question: "How can I protect my grandparents from this scam?", answer: "Set up a family code word, discuss how these scams work, and encourage them to always verify emergency calls by hanging up and calling the grandchild directly. Make sure they know it is safe to call family members to verify, regardless of what the caller says." }
     ],
     relatedScams: ["tech-support-scam", "romance-scam", "identity-theft"],
@@ -1072,7 +1072,7 @@ export const SCAM_PAGES: ScamPageContent[] = [
     faq: [
       { question: "How quickly do SIM swap attacks happen?", answer: "Once a criminal successfully performs a SIM swap, they can access your accounts within minutes. They typically target financial accounts first, draining funds before the victim realizes what has happened." },
       { question: "Can my carrier protect me from SIM swaps?", answer: "Yes. Most carriers offer account PINs, port-out PINs, and SIM lock features. Contact your carrier to enable all available protections. Some carriers also offer number lock features that completely prevent transfers." },
-      { question: "What should I do if I am a victim of SIM swapping?", answer: "Contact your carrier immediately to regain control of your number. Change passwords on all accounts, especially financial ones. Enable non-SMS two-factor authentication. File a report with the FBI IC3 and your local police." }
+      { question: "What should I do if I am a victim of SIM swapping?", answer: "Contact your carrier immediately to regain control of your number. Change passwords on all accounts, especially financial ones. Enable non-SMS two-factor authentication. Report to your national cybercrime authority and local police. In the US, file with the FTC and IC3. In the UK, report to Action Fraud. In Australia, contact the ACSC." }
     ],
     relatedScams: ["identity-theft", "phishing", "bank-scam"],
     lastUpdated: "2026-03-01"
@@ -1151,7 +1151,7 @@ export const SCAM_PAGES: ScamPageContent[] = [
     faq: [
       { question: "How do I check if an investment is legitimate?", answer: "Verify the company and securities are registered with the SEC at sec.gov. Check the seller's license through FINRA BrokerCheck. Research the company independently and be wary of unsolicited investment offers." },
       { question: "What are the signs of a Ponzi scheme?", answer: "Consistently high returns regardless of market conditions, difficulty withdrawing funds, unregistered investments, secretive strategies, and recruitment-focused business models are all red flags of Ponzi schemes." },
-      { question: "Can I recover money lost to an investment scam?", answer: "Recovery is difficult but possible. Report to the SEC, FINRA, and the FBI IC3. Contact a securities attorney. If you paid by credit card, dispute the charges. File a complaint with your state securities regulator." }
+      { question: "Can I recover money lost to an investment scam?", answer: "Recovery is difficult but possible. Report to your financial regulator (SEC and FINRA in the US, FCA in the UK, ASIC in Australia). Contact a securities attorney. If you paid by credit card, dispute the charges. File a complaint with your national fraud authority and local police." }
     ],
     relatedScams: ["crypto-scam", "social-media-scam", "phishing"],
     lastUpdated: "2026-03-01"
@@ -1382,7 +1382,7 @@ export const SCAM_PAGES: ScamPageContent[] = [
       { title: "Verify wire instructions by phone", description: "Always call the recipient using a known phone number (not one from the email) to verbally confirm wire transfer instructions before sending any money." },
       { title: "Be suspicious of last-minute changes", description: "If wire instructions change at the last minute, stop the process and verify through an independent channel. This is a major red flag." },
       { title: "Use multi-person authorization", description: "Implement dual authorization requirements for all wire transfers above a certain threshold at your business." },
-      { title: "Act immediately if you sent a fraudulent wire", description: "Contact your bank within 24 hours to attempt a wire recall. File reports with the FBI IC3 and local law enforcement." }
+      { title: "Act immediately if you sent a fraudulent wire", description: "Contact your bank within 24 hours to attempt a wire recall. File reports with your national cybercrime authority (IC3 in the US, Action Fraud in the UK, ACSC in Australia) and local law enforcement." }
     ],
     faq: [
       { question: "Can I recover money from a fraudulent wire transfer?", answer: "Recovery is possible but time-sensitive. Contact your bank immediately to initiate a wire recall. Banks have limited time to freeze recipient accounts. The sooner you act, the better your chances." },
@@ -1399,7 +1399,7 @@ export const SCAM_PAGES: ScamPageContent[] = [
     metaDescription: "Protect your business from email compromise scams. Learn how BEC attacks work, warning signs, and prevention strategies for corporate email fraud.",
     keywords: ["business email compromise", "BEC scam", "CEO fraud", "corporate email scam", "email spoofing"],
     cluster: "phishing-attacks",
-    overview: "Business Email Compromise (BEC) is one of the costliest forms of cybercrime, with the FBI reporting billions in losses annually. Attackers compromise or spoof corporate email accounts to trick employees, vendors, or partners into making fraudulent wire transfers or sharing sensitive information. Unlike mass phishing, BEC attacks are highly targeted and often involve extensive research into the target organization.",
+    overview: "Business Email Compromise (BEC) is one of the costliest forms of cybercrime. According to Europol and the FBI, BEC causes billions in global losses annually. The UK NCSC and Australia's ACSC have issued similar warnings about its rapid growth. Attackers compromise or spoof corporate email accounts to trick employees, vendors, or partners into making fraudulent wire transfers or sharing sensitive information. Unlike mass phishing, BEC attacks are highly targeted and often involve extensive research into the target organization.",
     howItWorks: [
       "Attackers compromise an executive's email account through phishing or credential stuffing, then use it to send fraudulent requests to employees.",
       "Email spoofing creates messages that appear to come from the CEO, CFO, or a trusted vendor, requesting urgent wire transfers or sensitive data.",
@@ -1425,9 +1425,9 @@ export const SCAM_PAGES: ScamPageContent[] = [
       { title: "Train employees regularly", description: "Conduct regular BEC awareness training with realistic phishing simulations. Ensure all employees, especially those in finance and HR, understand BEC tactics." }
     ],
     faq: [
-      { question: "How much do BEC scams cost businesses?", answer: "The FBI reports that BEC scams cause billions in losses annually, with average losses per incident exceeding $120,000. They affect businesses of all sizes across all industries." },
+      { question: "How much do BEC scams cost businesses?", answer: "According to multiple agencies including Europol, the FBI, and the UK NCSC, BEC scams cause billions in global losses annually, with average losses per incident exceeding $120,000. They affect businesses of all sizes across all industries." },
       { question: "How do attackers choose their targets?", answer: "BEC attackers research companies through LinkedIn, SEC filings, social media, and company websites. They identify key personnel in finance and executive roles, and time their attacks around known events like mergers or travel." },
-      { question: "What should we do if we fall victim to BEC?", answer: "Contact your bank immediately to attempt a wire recall. File a report with the FBI IC3, notify law enforcement, engage a cybersecurity firm to investigate, and implement stronger controls to prevent future attacks." }
+      { question: "What should we do if we fall victim to BEC?", answer: "Contact your bank immediately to attempt a wire recall. Report to your national cybercrime authority (IC3 in the US, Action Fraud in the UK, ACSC in Australia), notify local law enforcement, engage a cybersecurity firm to investigate, and implement stronger controls to prevent future attacks." }
     ],
     relatedScams: ["phishing", "wire-fraud-scam", "identity-theft"],
     lastUpdated: "2026-03-01"
@@ -1581,11 +1581,11 @@ export const SCAM_PAGES: ScamPageContent[] = [
       { title: "Do not respond to mass sextortion emails", description: "These are sent to millions of people and are almost always fake. They use old passwords from data breaches to seem credible. Delete them and change any passwords mentioned." },
       { title: "Never share intimate content online", description: "Once images or videos are shared digitally, you lose control of them. Even with people you trust, relationships can change and content can be stolen." },
       { title: "Cover your webcam when not in use", description: "Use a webcam cover or piece of tape for an extra layer of privacy protection against any potential unauthorized access." },
-      { title: "Report and do not pay", description: "Paying never guarantees the threats will stop. Report sextortion to the FBI IC3 (ic3.gov), the National Center for Missing and Exploited Children (if involving a minor), and local law enforcement." }
+      { title: "Report and do not pay", description: "Paying never guarantees the threats will stop. Report sextortion to your national cybercrime authority (IC3 in the US, CEOP in the UK, ACSC in Australia), the National Center for Missing and Exploited Children or equivalent child protection agency (if involving a minor), and local law enforcement." }
     ],
     faq: [
       { question: "Are mass sextortion emails real?", answer: "Almost never. These emails are sent to millions of people using email lists from data breaches. The old password they include is real (from a breach) but they have not actually hacked your webcam. Change the password mentioned and delete the email." },
-      { question: "What should I do if someone is threatening to share my images?", answer: "Do not pay. Save all communications as evidence. Block the person but do not delete conversations. Report to the platform, FBI IC3, and local police. Contact the Cyber Civil Rights Initiative (cybercivilrights.org) for support." },
+      { question: "What should I do if someone is threatening to share my images?", answer: "Do not pay. Save all communications as evidence. Block the person but do not delete conversations. Report to the platform, your national cybercrime authority, and local police. Contact the Cyber Civil Rights Initiative (cybercivilrights.org) in the US, or the Revenge Porn Helpline (revengepornhelpline.org.uk) in the UK for support." },
       { question: "How can I protect my teenager from sextortion?", answer: "Talk openly about the risks of sharing intimate content online. Explain that sextortion is a crime and that victims should never pay or feel ashamed to ask for help. Ensure they know to report to a trusted adult immediately." }
     ],
     relatedScams: ["catfishing", "romance-scam", "social-media-scam"],
