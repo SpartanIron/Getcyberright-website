@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const scanResult = document.getElementById("scan-result");
   const viewMain = document.getElementById("view-main");
   const viewSettings = document.getElementById("view-settings");
+  const viewWelcome = document.getElementById("view-welcome");
+  const popupHeader = document.getElementById("popup-header");
+  const btnGetStarted = document.getElementById("btn-get-started");
 
   const btnConnect = document.getElementById("btn-connect");
   const btnSignOut = document.getElementById("btn-sign-out");
@@ -22,6 +25,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let lastScanContent = "";
   let lastScanResult = null;
+
+  chrome.storage.local.get(["onboardingComplete"], (result) => {
+    if (result.onboardingComplete) {
+      viewMain.classList.add("active");
+      popupHeader.style.display = "";
+    } else {
+      viewWelcome.classList.add("active");
+    }
+  });
+
+  btnGetStarted.addEventListener("click", () => {
+    chrome.storage.local.set({ onboardingComplete: true }, () => {
+      viewWelcome.classList.remove("active");
+      viewMain.classList.add("active");
+      popupHeader.style.display = "";
+    });
+  });
 
   loadStats();
   loadScamOfWeek();

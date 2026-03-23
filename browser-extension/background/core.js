@@ -9,10 +9,56 @@ import { setupMessageHandlers } from "./messaging.js";
 
 const API_BASE = "https://www.getcyberright.com";
 const SUBSCRIPTION_CACHE_TTL = 10 * 60 * 1000;
+const MAX_RETRIES = 2;
+const RETRY_BASE_DELAY = 1000;
 let cachedSubscription = null;
 let subscriptionCacheTime = 0;
 const communityTrustCache = new Map();
 const TRUST_CACHE_TTL = 5 * 60 * 1000;
+
+async function fetchWithRetry(url, options = {}, retries = MAX_RETRIES) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(15000)
+      });
+      if (response.status === 429) {
+        const retryAfter = parseInt(response.headers.get("Retry-After") || "5", 10);
+        if (attempt < retries) {
+          logWarn("core", `Rate limited, retrying after ${retryAfter}s (attempt ${attempt + 1}/${retries})`);
+          await new Promise(r => setTimeout(r, retryAfter * 1000));
+          continue;
+        }
+        throw new Error("Rate limit exceeded");
+      }
+      if (response.status >= 500 && attempt < retries) {
+        const delay = RETRY_BASE_DELAY * Math.pow(2, attempt);
+        logWarn("core", `Server error ${response.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${retries})`);
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+      return response;
+    } catch (e) {
+      if (e.name === "AbortError" || e.name === "TimeoutError") {
+        if (attempt < retries) {
+          const delay = RETRY_BASE_DELAY * Math.pow(2, attempt);
+          logWarn("core", `Request timeout, retrying in ${delay}ms (attempt ${attempt + 1}/${retries})`);
+          await new Promise(r => setTimeout(r, delay));
+          continue;
+        }
+        throw new Error("Request timed out after retries");
+      }
+      if (attempt < retries && (e.message.includes("Failed to fetch") || e.message.includes("NetworkError"))) {
+        const delay = RETRY_BASE_DELAY * Math.pow(2, attempt);
+        logWarn("core", `Network error, retrying in ${delay}ms (attempt ${attempt + 1}/${retries})`);
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+      throw e;
+    }
+  }
+}
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -415,7 +461,7 @@ async function scanContent(content, tab) {
 
 async function performScan(content) {
   try {
-    const response = await fetch(`${API_BASE}/api/security/ai-scam-analyze`, {
+    const response = await fetchWithRetry(`${API_BASE}/api/security/ai-scam-analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content })
@@ -430,7 +476,7 @@ async function performScan(content) {
 
 async function checkUrlReputation(url) {
   try {
-    const response = await fetch(`${API_BASE}/api/security/check-url-reputation`, {
+    const response = await fetchWithRetry(`${API_BASE}/api/security/check-url-reputation`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url })
@@ -445,7 +491,7 @@ async function checkUrlReputation(url) {
 
 async function reportScam(data) {
   try {
-    const response = await fetch(`${API_BASE}/api/community-reports`, {
+    const response = await fetchWithRetry(`${API_BASE}/api/community-reports`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
@@ -465,7 +511,7 @@ async function reportScamStructured(data) {
       reportType: data.scamType || "suspicious",
       url: data.url
     };
-    const response = await fetch(`${API_BASE}/api/community-reports`, {
+    const response = await fetchWithRetry(`${API_BASE}/api/community-reports`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reportData)
@@ -503,7 +549,7 @@ async function getCommunityTrust(domain) {
     if (cached && (Date.now() - cached.timestamp < TRUST_CACHE_TTL)) {
       return cached.data;
     }
-    const response = await fetch(`${API_BASE}/api/extension/site-reputation?domainHash=${domainHash}`);
+    const response = await fetchWithRetry(`${API_BASE}/api/extension/site-reputation?domainHash=${domainHash}`);
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     const data = await response.json();
     communityTrustCache.set(domainHash, { data, timestamp: Date.now() });
@@ -522,18 +568,18 @@ async function recordVisit(url) {
   try {
     const hostname = new URL(url).hostname;
     const domainHash = await hashDomain(hostname);
-    await fetch(`${API_BASE}/api/extension/site-reputation/visit`, {
+    await fetchWithRetry(`${API_BASE}/api/extension/site-reputation/visit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ domainHash, domain: hostname })
-    });
+    }, 1);
   } catch (e) { logWarn("core", "Failed to record visit:", e.message); }
 }
 
 async function flagDomain(domain) {
   try {
     const domainHash = await hashDomain(domain);
-    const response = await fetch(`${API_BASE}/api/extension/site-reputation/flag`, {
+    const response = await fetchWithRetry(`${API_BASE}/api/extension/site-reputation/flag`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ domainHash, domain })
@@ -550,11 +596,11 @@ async function recordSafeVisit(url) {
   try {
     const hostname = new URL(url).hostname;
     const domainHash = await hashDomain(hostname);
-    await fetch(`${API_BASE}/api/extension/site-reputation/safe`, {
+    await fetchWithRetry(`${API_BASE}/api/extension/site-reputation/safe`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ domainHash, domain: hostname })
-    });
+    }, 1);
   } catch (e) { logWarn("core", "Failed to record safe visit:", e.message); }
 }
 
@@ -682,7 +728,7 @@ async function generateWeeklyDigest() {
 
 async function fetchScamOfWeek() {
   try {
-    const response = await fetch(`${API_BASE}/api/scam-of-week`);
+    const response = await fetchWithRetry(`${API_BASE}/api/scam-of-week`, {}, 1);
     if (response.ok) {
       const data = await response.json();
       if (data && data.title) {
@@ -710,7 +756,7 @@ async function fetchScamOfWeek() {
 
 async function fetchThreatFeed() {
   try {
-    const response = await fetch(`${API_BASE}/api/scam-feed?limit=10`);
+    const response = await fetchWithRetry(`${API_BASE}/api/scam-feed?limit=10`, {}, 1);
     if (response.ok) {
       const data = await response.json();
       chrome.storage.local.set({ threatFeed: data });
@@ -766,7 +812,7 @@ async function handleSignIn(token) {
     if (!token || typeof token !== "string" || token.length < 10) {
       return { success: false, error: "Invalid token" };
     }
-    const response = await fetch(`${API_BASE}/api/extension/subscription-status`, {
+    const response = await fetchWithRetry(`${API_BASE}/api/extension/subscription-status`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
     if (!response.ok) {
@@ -851,7 +897,7 @@ async function getAuthStatus() {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/api/extension/subscription-status`, {
+    const response = await fetchWithRetry(`${API_BASE}/api/extension/subscription-status`, {
       headers: { "Authorization": `Bearer ${authToken}` }
     });
     if (!response.ok) {
