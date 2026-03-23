@@ -30,6 +30,12 @@ export async function executeRescanJob(): Promise<{
         const firstName = previousScanData?.firstName || "User";
         const lastName = previousScanData?.lastName || "";
 
+        const newScanData = await import("../server/shieldScanService").then((m) =>
+          m.getShieldScanFromDb(result.newScanId),
+        );
+        const newReport = newScanData?.rawResults as any;
+        const hasBreachData = Array.isArray(newReport?.breachResults) && newReport.breachResults.length > 0 && !newReport.breachResults.every((b: any) => b.breachName?.startsWith("__"));
+
         const emailContent = buildRescanAlertEmail({
           name: `${firstName} ${lastName}`.trim(),
           newSiteCount: result.newExposures.length,
@@ -43,6 +49,7 @@ export async function executeRescanJob(): Promise<{
           unsubscribeUrl: `${CANONICAL_DOMAIN}/api/shield/unsubscribe/${lead.leadId}`,
           previousScore: result.previousScore,
           newScore: result.newScore,
+          hasBreachData,
         });
 
         await sendAlertEmail(lead.alertEmail, emailContent);

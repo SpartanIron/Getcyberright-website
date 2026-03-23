@@ -501,20 +501,22 @@ function ShieldResultsPage() {
             </Card>
           )}
 
-          <div className="flex items-start gap-2 text-sm text-muted-foreground px-1">
-            <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <p data-testid="text-hibp-attribution">
-              Breach data provided by{" "}
-              <a
-                href="https://haveibeenpwned.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-primary hover:text-primary/80"
-              >
-                Have I Been Pwned
-              </a>
-            </p>
-          </div>
+          {((report.breachResults && report.breachResults.length > 0) || (report.breachCount && report.breachCount > 0)) && (
+            <div className="flex items-start gap-2 text-sm text-muted-foreground px-1">
+              <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <p data-testid="text-hibp-attribution">
+                Breach data provided by{" "}
+                <a
+                  href="https://haveibeenpwned.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-primary hover:text-primary/80"
+                >
+                  Have I Been Pwned
+                </a>
+              </p>
+            </div>
+          )}
 
           {hasFullAccess && (
             <Card>

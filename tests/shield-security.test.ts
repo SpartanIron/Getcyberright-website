@@ -245,9 +245,9 @@ async function testEmailTemplateSecurity() {
     true,
     "Template includes unsubscribeUrl in both HTML and plain text versions");
 
-  record("Email Template", "HIBP attribution included",
+  record("Email Template", "HIBP attribution conditional on breach data",
     true,
-    'Template includes "Breach data provided by Have I Been Pwned" with link');
+    'Template conditionally includes "Breach data provided by Have I Been Pwned" only when hasBreachData is true');
 
   record("Email Template", "Plain text version accompanies HTML",
     true,

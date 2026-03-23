@@ -7,6 +7,7 @@ type RescanAlertProps = {
   unsubscribeUrl: string;
   previousScore: string | null;
   newScore: string | null;
+  hasBreachData?: boolean;
 };
 
 export function buildRescanAlertEmail(props: RescanAlertProps): {
@@ -14,7 +15,7 @@ export function buildRescanAlertEmail(props: RescanAlertProps): {
   html: string;
   text: string;
 } {
-  const { name, newSiteCount, newSites, scanDate, resultsUrl, unsubscribeUrl, previousScore, newScore } = props;
+  const { name, newSiteCount, newSites, scanDate, resultsUrl, unsubscribeUrl, previousScore, newScore, hasBreachData } = props;
 
   const subject = `New exposure detected for your information`;
 
@@ -68,8 +69,7 @@ export function buildRescanAlertEmail(props: RescanAlertProps): {
         </p>
 
         <p style="font-size:12px;color:#9ca3af;line-height:1.5;margin:16px 0 0">
-          Breach data provided by <a href="https://haveibeenpwned.com" style="color:#9ca3af">Have I Been Pwned</a>.
-          Your next automatic scan is scheduled in 30 days.
+          ${hasBreachData ? `Breach data provided by <a href="https://haveibeenpwned.com" style="color:#9ca3af">Have I Been Pwned</a>. ` : ""}Your next automatic scan is scheduled in 30 days.
         </p>
       </div>
 
@@ -101,7 +101,7 @@ export function buildRescanAlertEmail(props: RescanAlertProps): {
     ``,
     `Scan date: ${scanDate}`,
     ``,
-    `Breach data provided by Have I Been Pwned (https://haveibeenpwned.com).`,
+    hasBreachData ? `Breach data provided by Have I Been Pwned (https://haveibeenpwned.com).` : "",
     `Your next automatic scan is scheduled in 30 days.`,
     ``,
     `---`,
