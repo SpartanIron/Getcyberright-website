@@ -19,7 +19,7 @@ const faqCategories = [
       },
       {
         q: "Is GetCyberRight free?",
-        a: "Our educational content, articles, guides, and basic scam checking tools are completely free. We also offer paid subscription plans (Essential and Professional) that unlock advanced features like automatic page scanning, scan history, and family profiles through our GCR Guard browser extension. We believe foundational cybersecurity education should be accessible to everyone."
+        a: "Our educational content, articles, guides, and basic scam checking tools are completely free. We also offer paid subscription plans (Essential and Professional) that unlock advanced features like automatic page scanning, scan history, and family profiles through our GCR Scam Guard browser extension. We believe foundational cybersecurity education should be accessible to everyone."
       },
       {
         q: "Who creates the content on GetCyberRight?",
@@ -54,20 +54,20 @@ const faqCategories = [
     ]
   },
   {
-    title: "GCR Guard Browser Extension",
+    title: "GCR Scam Guard Browser Extension",
     icon: Chrome,
     questions: [
       {
-        q: "What is GCR Guard?",
-        a: "GCR Guard is our Chrome browser extension that protects you from scams in real time as you browse. It can automatically scan pages for threats, detect fake websites, and warn you before you interact with suspicious content."
+        q: "What is GCR Scam Guard?",
+        a: "GCR Scam Guard is our Chrome browser extension that protects you from scams in real time as you browse. It can automatically scan pages for threats, detect fake websites, and warn you before you interact with suspicious content."
       },
       {
-        q: "How do I install and set up GCR Guard?",
-        a: "Install GCR Guard from the Chrome Web Store. Then visit getcyberright.com, log into your account, go to the Extension Auth page to generate a connection token, and paste it into the extension's Settings. This links the extension to your account and subscription."
+        q: "How do I install and set up GCR Scam Guard?",
+        a: "Install GCR Scam Guard from the Chrome Web Store. Then visit getcyberright.com, log into your account, go to the Extension Auth page to generate a connection token, and paste it into the extension's Settings. This links the extension to your account and subscription."
       },
       {
         q: "What features are available on the free plan?",
-        a: "Free users can manually scan any page by right-clicking and selecting 'Scan with GCR Guard' or clicking the extension icon. You get full AI-powered threat analysis on every manual scan at no cost."
+        a: "Free users can manually scan any page by right-clicking and selecting 'Scan with GCR Scam Guard' or clicking the extension icon. You get full AI-powered threat analysis on every manual scan at no cost."
       },
       {
         q: "What does Auto-Protect do?",
@@ -89,7 +89,7 @@ const faqCategories = [
     questions: [
       {
         q: "What subscription plans do you offer?",
-        a: "We offer three tiers: Free (manual scans on the website and extension), Essential (adds Auto-Protect for automatic page scanning), and Professional (adds scan history, safety scores, family profiles, and priority support). Visit our GCR Guard Pricing page for current pricing."
+        a: "We offer three tiers: Free (manual scans on the website and extension), Essential (adds Auto-Protect for automatic page scanning), and Professional (adds scan history, safety scores, family profiles, and priority support). Visit our GCR Scam Guard Pricing page for current pricing."
       },
       {
         q: "How do I upgrade or change my plan?",

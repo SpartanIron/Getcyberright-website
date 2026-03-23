@@ -213,7 +213,7 @@ function ShieldResultsPage() {
   if (loading) {
     return (
       <>
-        <SEOHead title="Loading Results... | GCR Shield" />
+        <SEOHead title="Loading Results... | GCR Data Shield" />
         <Navigation />
         <main className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center space-y-4">
@@ -230,7 +230,7 @@ function ShieldResultsPage() {
   if (error) {
     return (
       <>
-        <SEOHead title="Scan Error | GCR Shield" />
+        <SEOHead title="Scan Error | GCR Data Shield" />
         <Navigation />
         <main className="min-h-screen bg-background flex items-center justify-center">
           <Card className="max-w-md">
@@ -291,8 +291,8 @@ function ShieldResultsPage() {
   return (
     <>
       <SEOHead
-        title={`Your Exposure Results | GCR Shield`}
-        description="View your personal data exposure scan results from GCR Shield."
+        title={`Your Exposure Results | GCR Data Shield`}
+        description="View your personal data exposure scan results from GCR Data Shield."
       />
       <Navigation />
       <main className="min-h-screen bg-background py-12">
@@ -318,7 +318,7 @@ function ShieldResultsPage() {
             >
               <Crown className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
               <p className="text-sm text-green-800 dark:text-green-200 font-medium">
-                Full access — your subscription includes complete GCR Shield reports.
+                Full access — your subscription includes complete GCR Data Shield reports.
               </p>
             </div>
           )}

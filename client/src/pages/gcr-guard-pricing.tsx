@@ -106,9 +106,9 @@ export default function GcrGuardPricing() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="GCR Guard Pricing | GetCyberRight"
-        description="Choose your GCR Guard protection plan. Free manual scanning, Pro auto-protection for $3.99/month, or Family coverage for $7.99/month."
-        keywords="GCR Guard pricing, browser extension subscription, cybersecurity protection plans"
+        title="GCR Scam Guard Pricing | GetCyberRight"
+        description="Choose your GCR Scam Guard protection plan. Free manual scanning, Pro auto-protection for $3.99/month, or Family coverage for $7.99/month."
+        keywords="GCR Scam Guard pricing, browser extension subscription, cybersecurity protection plans"
       />
       <Navigation />
 
@@ -125,7 +125,7 @@ export default function GcrGuardPricing() {
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <Badge className="mb-4 bg-primary/20 text-primary border-primary/50" data-testid="badge-pricing">
               <Shield className="h-3 w-3 mr-1" />
-              GCR Guard
+              GCR Scam Guard
             </Badge>
             <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-[-0.025em]" data-testid="heading-pricing">
               Choose Your Protection
@@ -230,13 +230,13 @@ export default function GcrGuardPricing() {
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4" data-testid="heading-get-extension">Get the Extension</h2>
             <p className="text-muted-foreground mb-6">
-              GCR Guard works as a Chrome browser extension. Install it free and upgrade your plan anytime from within the extension or your account dashboard.
+              GCR Scam Guard works as a Chrome browser extension. Install it free and upgrade your plan anytime from within the extension or your account dashboard.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/browser-extension">
                 <Button size="lg" data-testid="button-download-extension">
                   <Download className="w-4 h-4 mr-2" />
-                  Get GCR Guard
+                  Get GCR Scam Guard
                 </Button>
               </Link>
               <Link href="/our-mission">
@@ -254,7 +254,7 @@ export default function GcrGuardPricing() {
             <div className="space-y-4">
               {[
                 {
-                  q: "Can I use GCR Guard for free?",
+                  q: "Can I use GCR Scam Guard for free?",
                   a: "Yes. The free plan includes manual scanning of URLs, emails, phone numbers, and suspicious messages. You can scan anything anytime without an account."
                 },
                 {
@@ -302,12 +302,12 @@ export default function GcrGuardPricing() {
                 Stay Safe Online. Start Today.
               </h2>
               <p className="text-white/80 max-w-2xl mx-auto mb-8">
-                Join thousands of families who trust GCR Guard to protect them while browsing.
+                Join thousands of families who trust GCR Scam Guard to protect them while browsing.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/browser-extension">
                   <Button size="lg" variant="secondary" data-testid="button-cta-install">
-                    Install GCR Guard
+                    Install GCR Scam Guard
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>

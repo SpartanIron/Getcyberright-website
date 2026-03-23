@@ -553,7 +553,7 @@ KEY TOOL PAGES:
 - Cyber Threat Radar: https://www.getcyberright.com/cyber-threat-radar
 - Awareness Hub: https://www.getcyberright.com/awareness-hub
 - Data Broker Removal: https://www.getcyberright.com/data-broker-removal
-- GCR Guard Extension: https://www.getcyberright.com/browser-extension
+- GCR Scam Guard Extension: https://www.getcyberright.com/browser-extension
 ${recentPostsContext}
 ${performanceContext}
 

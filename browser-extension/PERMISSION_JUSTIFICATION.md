@@ -1,8 +1,8 @@
-# GCR Guard — Chrome Web Store Permission Justifications
+# GCR Scam Guard — Chrome Web Store Permission Justifications
 
 ## Extension Overview
 
-GCR Guard is a family-focused cybersecurity browser extension that scans web pages for phishing, scams, and malicious content. It provides real-time warnings, community-sourced reputation data, and AI-powered scam detection.
+GCR Scam Guard is a family-focused cybersecurity browser extension that scans web pages for phishing, scams, and malicious content. It provides real-time warnings, community-sourced reputation data, and AI-powered scam detection.
 
 ---
 
@@ -14,7 +14,7 @@ GCR Guard is a family-focused cybersecurity browser extension that scans web pag
 
 ### `contextMenus`
 
-**Why needed:** The extension adds right-click context menu items ("Scan with GCR Guard" on links, "Scan this page with GCR Guard" on pages, "Scan selected text with GCR Guard" on selected text) so users can quickly scan content for scam indicators without opening the popup. This is a core user-facing feature for convenient scanning.
+**Why needed:** The extension adds right-click context menu items ("Scan with GCR Scam Guard" on links, "Scan this page with GCR Scam Guard" on pages, "Scan selected text with GCR Scam Guard" on selected text) so users can quickly scan content for scam indicators without opening the popup. This is a core user-facing feature for convenient scanning.
 
 ### `storage`
 

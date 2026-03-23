@@ -281,7 +281,7 @@ export default function TopicHub() {
                 <Link href="/shield" data-testid="link-gcr-shield">
                   <Card className="hover:shadow-md transition-shadow cursor-pointer text-center p-6" data-testid="tool-gcr-shield">
                     <Shield className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <h3 className="font-semibold">GCR Shield</h3>
+                    <h3 className="font-semibold">GCR Data Shield</h3>
                     <p className="text-sm text-muted-foreground">Scan for your exposed personal data</p>
                   </Card>
                 </Link>

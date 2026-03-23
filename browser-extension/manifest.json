@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "GCR Guard by GetCyberRight",
+  "name": "GCR Scam Guard by GetCyberRight",
   "version": "1.3.0",
   "description": "AI-powered scam protection. Auto-scans pages, detects fake sites, and warns you before phishing attacks.",
   "permissions": [

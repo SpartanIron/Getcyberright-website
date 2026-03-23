@@ -4620,7 +4620,7 @@ EDGE CASE HANDLING
         const trialStart = new Date(req.user.shieldTrialStartedAt).getTime();
         const trialEnd = trialStart + 14 * 24 * 60 * 60 * 1000;
         if (Date.now() >= trialEnd) {
-          return res.status(400).json({ error: "Your free trial has already been used. Upgrade to Essential or higher to unlock full GCR Shield reports.", level: "free", trialExpired: true });
+          return res.status(400).json({ error: "Your free trial has already been used. Upgrade to Essential or higher to unlock full GCR Data Shield reports.", level: "free", trialExpired: true });
         }
         return res.json({ message: "Trial already active.", level: "trial", trialDaysLeft: access.trialDaysLeft });
       }
@@ -4761,7 +4761,7 @@ EDGE CASE HANDLING
         <!DOCTYPE html><html><head><title>Unsubscribed</title></head>
         <body style="font-family:system-ui;max-width:500px;margin:60px auto;text-align:center">
           <h1>You have been unsubscribed</h1>
-          <p>You will no longer receive GCR Shield re-scan alerts.</p>
+          <p>You will no longer receive GCR Data Shield re-scan alerts.</p>
           <p style="margin-top:20px"><a href="https://www.getcyberright.com" style="color:#0A2A3C">Return to GetCyberRight</a></p>
         </body></html>
       `);

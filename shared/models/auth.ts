@@ -79,7 +79,7 @@ export const users = pgTable("users", {
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
   stripeCustomerId: varchar("stripe_customer_id"),
   
-  // GCR Shield trial
+  // GCR Data Shield trial
   shieldTrialStartedAt: timestamp("shield_trial_started_at"),
   
   // Admin

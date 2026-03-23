@@ -130,7 +130,7 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(what is getcyberright|about.*(this|your).*(site|website|platform)|what.*(this|your) (site|website))/.test(t),
     responses: [
-      "GetCyberRight is a free family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like the Scam Checker to analyze suspicious messages, a Password Generator, GCR Shield to scan for your exposed personal data, and lots of guides tailored to different family members. Everything is free to get started.",
+      "GetCyberRight is a free family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like the Scam Checker to analyze suspicious messages, a Password Generator, GCR Data Shield to scan for your exposed personal data, and lots of guides tailored to different family members. Everything is free to get started.",
     ],
   },
   {

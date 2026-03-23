@@ -23,7 +23,7 @@ const whoWeHelp = [
 const toolsNav = [
   { title: "Security Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
   { title: "AI Prompt Library", description: "Ready-to-use AI templates for everyday life", href: "/ai-prompts", icon: Zap, badge: "New" },
-  { title: "GCR Shield", description: "Scan for your exposed personal data", href: "/shield", icon: ShieldCheck },
+  { title: "GCR Data Shield", description: "Scan for your exposed personal data", href: "/shield", icon: ShieldCheck },
   { title: "Safety Toolkit", description: "Password generator & voice detector", href: "/tools?tab=safety-toolkit", icon: Shield },
 ];
 

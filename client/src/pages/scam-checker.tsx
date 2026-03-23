@@ -389,7 +389,7 @@ export default function ScamCheckerPage() {
                 <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mx-auto mb-4">
                   <Chrome className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-2">GCR Guard Browser Extension</h3>
+                <h3 className="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-2">GCR Scam Guard Browser Extension</h3>
                 <p className="text-blue-700 dark:text-blue-300 mb-4 max-w-lg mx-auto">
                   Protect yourself while you browse. Right-click any link to scan it instantly, get real-time warnings on suspicious pages, and receive Scam of the Week alerts right in your browser.
                 </p>

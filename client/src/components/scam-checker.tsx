@@ -2396,7 +2396,7 @@ export function ScamChecker() {
                           onClick={() => {
                             const url = content.match(/https?:\/\/[^\s]+/)?.[0];
                             navigator.clipboard.writeText(
-                              `GCR Guard Scan Result: ${result.title}\n\n${result.summary}\n\n${url ? "Link scanned: " + url + "\n\n" : ""}Protect yourself and your family — getcyberright.com`
+                              `GCR Scam Guard Scan Result: ${result.title}\n\n${result.summary}\n\n${url ? "Link scanned: " + url + "\n\n" : ""}Protect yourself and your family — getcyberright.com`
                             );
                             toast({ title: "Copied to clipboard", description: "Share this warning with others to keep them safe." });
                           }}
@@ -2464,7 +2464,7 @@ export function ScamChecker() {
                                     const url = content.match(/https?:\/\/[^\s]+/)?.[0];
                                     if (url) {
                                       navigator.clipboard.writeText(
-                                        `GCR Guard Scan Result: ${getFriendlyRiskTitle(aiResult.scamRiskLevel)}\n\n${aiResult.summary}\n\nLink scanned: ${url}\n\nProtect yourself and your family — getcyberright.com`
+                                        `GCR Scam Guard Scan Result: ${getFriendlyRiskTitle(aiResult.scamRiskLevel)}\n\n${aiResult.summary}\n\nLink scanned: ${url}\n\nProtect yourself and your family — getcyberright.com`
                                       );
                                       toast({ title: "Copied to clipboard", description: "Share this warning with others to keep them safe." });
                                     }

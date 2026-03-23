@@ -63,25 +63,25 @@ async function fetchWithRetry(url, options = {}, retries = MAX_RETRIES) {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "gcr-scan-link",
-    title: "Scan with GCR Guard",
+    title: "Scan with GCR Scam Guard",
     contexts: ["link"]
   });
 
   chrome.contextMenus.create({
     id: "gcr-scan-page",
-    title: "Scan this page with GCR Guard",
+    title: "Scan this page with GCR Scam Guard",
     contexts: ["page"]
   });
 
   chrome.contextMenus.create({
     id: "gcr-scan-selection",
-    title: "Scan selected text with GCR Guard",
+    title: "Scan selected text with GCR Scam Guard",
     contexts: ["selection"]
   });
 
   chrome.contextMenus.create({
     id: "gcr-report-site",
-    title: "Report this site to GCR Guard",
+    title: "Report this site to GCR Scam Guard",
     contexts: ["page"]
   });
 
@@ -717,7 +717,7 @@ async function generateWeeklyDigest() {
     chrome.notifications.create("weekly-digest", {
       type: "basic",
       iconUrl: "icons/icon-128.png",
-      title: "GCR Guard Weekly Safety Digest",
+      title: "GCR Scam Guard Weekly Safety Digest",
       message,
       priority: 1
     });
@@ -964,4 +964,4 @@ async function checkFeatureAccess(feature) {
   return features.includes(feature);
 }
 
-logInfo("core", "GCR Guard background service worker loaded");
+logInfo("core", "GCR Scam Guard background service worker loaded");

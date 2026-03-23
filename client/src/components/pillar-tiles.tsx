@@ -23,8 +23,8 @@ const features = [
   {
     id: "data-removal",
     label: "Privacy",
-    title: "GCR Shield",
-    description: "Your personal information may be exposed on data broker sites and in data breaches. GCR Shield scans for your exposure and shows you how to protect yourself.",
+    title: "GCR Data Shield",
+    description: "Your personal information may be exposed on data broker sites and in data breaches. GCR Data Shield scans for your exposure and shows you how to protect yourself.",
     href: "/shield",
     cta: "Scan Your Exposure",
     icon: ShieldCheck,

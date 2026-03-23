@@ -10,7 +10,7 @@ const tools = [
   {
     id: "data-scan",
     image: dataScanImg,
-    title: "GCR Shield — Exposure Scan",
+    title: "GCR Data Shield — Exposure Scan",
     badge: "Instant Scan",
     description: "Find out if your personal information is exposed on data broker sites or in data breaches. See your risk level and take action to protect yourself.",
     cta: "Start Your Scan",

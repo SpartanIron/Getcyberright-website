@@ -74,7 +74,7 @@ export default function Privacy() {
                     <li><strong className="text-foreground">Contact us:</strong> Name, email address, and message content</li>
                     <li><strong className="text-foreground">Purchase a subscription:</strong> Billing information processed securely through our payment provider (we do not store full payment card details on our servers)</li>
                     <li><strong className="text-foreground">Use our security tools:</strong> URLs, email headers, or other content you submit for analysis (processed in real time and not permanently stored unless you create an account)</li>
-                    <li><strong className="text-foreground">Use the GCR Guard browser extension:</strong> URLs of pages you visit (when Auto-Protect is enabled) or manually scan, page content analyzed for scam indicators, and your extension authentication token. See Section 3.3 for full details on extension data practices.</li>
+                    <li><strong className="text-foreground">Use the GCR Scam Guard browser extension:</strong> URLs of pages you visit (when Auto-Protect is enabled) or manually scan, page content analyzed for scam indicators, and your extension authentication token. See Section 3.3 for full details on extension data practices.</li>
                     <li><strong className="text-foreground">Use our breach monitoring service:</strong> Email addresses you submit to check against known data breaches (used solely for monitoring and alert purposes)</li>
                     <li><strong className="text-foreground">Use our data broker removal service:</strong> Personal information you provide to identify and request removal of your data from data broker databases (used solely for removal requests on your behalf)</li>
                     <li><strong className="text-foreground">Report a scam:</strong> Details about suspected scams to help protect our community</li>
@@ -114,8 +114,8 @@ export default function Privacy() {
                     <li><strong className="text-foreground">Threat Intelligence:</strong> AI processes publicly available cybersecurity news feeds to identify and simplify trending threats for our users. No personal data is involved in this process.</li>
                   </ul>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">3.3 GCR Guard Browser Extension</h3>
-                  <p>Our GCR Guard browser extension provides real-time scam protection while you browse. Here is exactly what data it collects and how it is used:</p>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">3.3 GCR Scam Guard Browser Extension</h3>
+                  <p>Our GCR Scam Guard browser extension provides real-time scam protection while you browse. Here is exactly what data it collects and how it is used:</p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li><strong className="text-foreground">URLs of pages you visit:</strong> When Auto-Protect is enabled, page URLs are sent to our servers for real-time threat analysis against known phishing databases, malware registries, and AI-powered scam detection. URLs are analyzed and discarded immediately for free-tier users. Paid subscribers may have scan history retained for up to 90 days if they opt in.</li>
                     <li><strong className="text-foreground">Page content:</strong> The extension collects page metadata (title, headings, form indicators, external links) and an excerpt of the page text (up to 1,500 characters). This data is sent to our servers for AI-powered threat analysis. The extension does not capture passwords, form inputs you type, or full page content.</li>
@@ -129,7 +129,7 @@ export default function Privacy() {
                   </ul>
 
                   <p className="font-medium text-foreground mt-6 mb-3">Extension Permissions Explained</p>
-                  <p className="mb-3">The GCR Guard extension requests the following browser permissions, each necessary for its security scanning functionality:</p>
+                  <p className="mb-3">The GCR Scam Guard extension requests the following browser permissions, each necessary for its security scanning functionality:</p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li><strong className="text-foreground">Access to all websites (host permissions):</strong> Required to scan any website you visit for scam indicators, phishing attempts, and malicious content. Without this, the extension could only scan a pre-defined list of sites, which would defeat its purpose as a comprehensive security tool.</li>
                     <li><strong className="text-foreground">Active tab and scripting:</strong> Used to analyze page content (titles, links, forms) when you initiate a scan or when Auto-Protect is enabled. This allows the extension to detect suspicious forms, lookalike domains, and phishing indicators on the current page.</li>
@@ -365,7 +365,7 @@ export default function Privacy() {
                     <li><strong className="text-foreground">Breach monitoring data:</strong> Email addresses submitted for breach monitoring are retained as long as you maintain an active monitoring subscription. You can request removal at any time.</li>
                     <li><strong className="text-foreground">AI assistant conversations:</strong> Conversations with Dezi are retained for up to 30 days to improve service quality and then automatically deleted.</li>
                     <li><strong className="text-foreground">Security scan results (server):</strong> Results from scam detection and URL scanning tools are not retained on our servers for free-tier users. Professional subscribers may have server-side scan history retained for up to 90 days.</li>
-                    <li><strong className="text-foreground">Security scan results (extension):</strong> The GCR Guard browser extension stores a local history of recent scans on your device using your browser's storage. This data remains on your device and is never sent to our servers. You can clear it at any time through your browser settings.</li>
+                    <li><strong className="text-foreground">Security scan results (extension):</strong> The GCR Scam Guard browser extension stores a local history of recent scans on your device using your browser's storage. This data remains on your device and is never sent to our servers. You can clear it at any time through your browser settings.</li>
                   </ul>
                 </section>
 

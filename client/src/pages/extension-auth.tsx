@@ -50,7 +50,7 @@ export default function ExtensionAuth() {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="Connect Extension | GetCyberRight"
-        description="Connect your GCR Guard browser extension to your GetCyberRight account."
+        description="Connect your GCR Scam Guard browser extension to your GetCyberRight account."
       />
       <Navigation />
 
@@ -60,7 +60,7 @@ export default function ExtensionAuth() {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Shield className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-2xl font-bold" data-testid="heading-extension-auth">Connect GCR Guard</h1>
+            <h1 className="text-2xl font-bold" data-testid="heading-extension-auth">Connect GCR Scam Guard</h1>
             <p className="text-muted-foreground mt-2">
               Link your browser extension to your GetCyberRight account to unlock premium features.
             </p>
@@ -149,7 +149,7 @@ export default function ExtensionAuth() {
                   <h3 className="font-semibold text-sm mb-2">How to connect:</h3>
                   <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
                     <li>Copy the token above</li>
-                    <li>Open the GCR Guard extension popup</li>
+                    <li>Open the GCR Scam Guard extension popup</li>
                     <li>Click the settings gear icon</li>
                     <li>Scroll to "Account" and click "Sign In"</li>
                     <li>Paste your token and click Connect</li>

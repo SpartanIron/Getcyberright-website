@@ -337,7 +337,7 @@
     textDiv.className = "gcr-banner-text";
 
     const strong1 = document.createElement("strong");
-    strong1.textContent = "GCR Guard Auto-Scan:";
+    strong1.textContent = "GCR Scam Guard Auto-Scan:";
     const riskSpan = document.createElement("strong");
     riskSpan.textContent = ` ${capitalize(result.riskLevel)} Risk`;
     textDiv.appendChild(strong1);
@@ -578,7 +578,7 @@
     const desc = document.createElement("p");
     desc.className = "gcr-form-warning-desc";
 
-    let warningText = "GCR Guard has flagged this page as potentially dangerous. ";
+    let warningText = "GCR Scam Guard has flagged this page as potentially dangerous. ";
     if (sensitiveFields.hasPasswordField) {
       warningText += "You're about to submit a password on this page. ";
     }
@@ -636,7 +636,7 @@
 
     const brandFooter = document.createElement("div");
     brandFooter.className = "gcr-form-brand";
-    brandFooter.textContent = "Protected by GCR Guard \u2022 GetCyberRight";
+    brandFooter.textContent = "Protected by GCR Scam Guard \u2022 GetCyberRight";
 
     btnRow.appendChild(cancelBtn);
     btnRow.appendChild(trustBtn);
@@ -685,7 +685,7 @@
 
     const desc = document.createElement("p");
     desc.className = "gcr-form-warning-desc";
-    desc.textContent = "GCR Guard has blocked this link because it was flagged as potentially dangerous.";
+    desc.textContent = "GCR Scam Guard has blocked this link because it was flagged as potentially dangerous.";
 
     const urlDisplay = document.createElement("div");
     urlDisplay.className = "gcr-form-url-display";
@@ -941,7 +941,7 @@
     const textDiv = document.createElement("div");
     textDiv.className = "gcr-banner-text";
     const strong1 = document.createElement("strong");
-    strong1.textContent = "GCR Guard Warning:";
+    strong1.textContent = "GCR Scam Guard Warning:";
     const riskSpan = document.createElement("strong");
     riskSpan.textContent = `${capitalize(risk)} Risk`;
     textDiv.appendChild(strong1);
@@ -1167,7 +1167,7 @@
     } else {
       details.forEach(d => tooltipParts.push(`${d.domain}: community score ${d.score}/100, flagged ${d.flagCount} times`));
     }
-    indicator.title = `GCR Guard: ${tooltipParts.join("; ")}`;
+    indicator.title = `GCR Scam Guard: ${tooltipParts.join("; ")}`;
 
     const bgColor = type === "lookalike" ? "#fef2f2" : "#fffbeb";
     const borderColor = type === "lookalike" ? "#fca5a5" : "#fcd34d";
@@ -1428,7 +1428,7 @@
     const brandFooter = document.createElement("div");
     brandFooter.className = "gcr-form-brand";
     brandFooter.style.marginTop = "8px";
-    brandFooter.textContent = "Reports help protect the community \u2022 GCR Guard";
+    brandFooter.textContent = "Reports help protect the community \u2022 GCR Scam Guard";
 
     btnRow.appendChild(cancelBtn);
     btnRow.appendChild(submitBtn);

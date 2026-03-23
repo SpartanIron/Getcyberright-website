@@ -121,7 +121,7 @@ export default function Tools() {
     },
     {
       type: "WebApplication",
-      name: "GCR Shield - Personal Data Exposure Scanner",
+      name: "GCR Data Shield - Personal Data Exposure Scanner",
       description: "Scan for your exposed personal information across data broker sites and breach databases. Free exposure scan with actionable results.",
       url: "https://www.getcyberright.com/shield",
       applicationCategory: "SecurityApplication",
@@ -182,7 +182,7 @@ export default function Tools() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-sm">GCR Shield</p>
+                      <p className="font-medium text-sm">GCR Data Shield</p>
                       <Badge variant="outline" className="text-[10px] text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 no-default-hover-elevate no-default-active-elevate">Free</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">Scan for your exposed personal data</p>

@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const title = titles[risk.toLowerCase()] || risk;
     const summary = lastScanResult.summary || "";
     const url = extractUrl(lastScanContent) || "";
-    const text = `GCR Guard Scan Result: ${title}\n\n${summary}\n\n${url ? "Link scanned: " + url + "\n\n" : ""}Protect yourself and your family \u2014 getcyberright.com`;
+    const text = `GCR Scam Guard Scan Result: ${title}\n\n${summary}\n\n${url ? "Link scanned: " + url + "\n\n" : ""}Protect yourself and your family \u2014 getcyberright.com`;
 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {

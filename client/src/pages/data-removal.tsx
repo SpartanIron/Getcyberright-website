@@ -301,7 +301,7 @@ export default function DataRemoval() {
 
   const dataRemovalApp: WebApplicationData = {
     type: "WebApplication",
-    name: "GCR Shield — Removal Center",
+    name: "GCR Data Shield — Removal Center",
     description: "Track and manage data broker removal requests. Send opt-out requests to 500+ data broker sites, monitor removal progress, and protect your privacy.",
     url: "https://www.getcyberright.com/data-removal",
     applicationCategory: "SecurityApplication",
@@ -312,7 +312,7 @@ export default function DataRemoval() {
     type: "BreadcrumbList",
     items: [
       { name: "Home", url: "https://www.getcyberright.com/" },
-      { name: "GCR Shield", url: "https://www.getcyberright.com/shield" },
+      { name: "GCR Data Shield", url: "https://www.getcyberright.com/shield" },
       { name: "Removal Center", url: "https://www.getcyberright.com/data-removal" },
     ],
   };
@@ -320,7 +320,7 @@ export default function DataRemoval() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="GCR Shield — Removal Center | GetCyberRight"
+        title="GCR Data Shield — Removal Center | GetCyberRight"
         description="Track and manage data broker removal requests. Send opt-out requests to 500+ data broker sites, monitor removal progress, and protect your privacy."
       />
       <StructuredData data={[dataRemovalApp, dataRemovalBreadcrumbs]} />
@@ -328,7 +328,7 @@ export default function DataRemoval() {
 
       <main id="main-content" tabIndex={-1}>
         <PageBanner
-          title="GCR Shield — Removal Center"
+          title="GCR Data Shield — Removal Center"
           subtitle="Send opt-out requests, track removal progress, and manage your privacy across 500+ data broker sites."
           imageSrc={bannerImage}
           imageAlt="Person scanning for personal data exposure on data broker sites"

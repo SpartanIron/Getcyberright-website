@@ -75,7 +75,7 @@ export default function Terms() {
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Educational content, articles, and guides on cybersecurity best practices</li>
                     <li>Interactive security assessment tools and threat analysis features</li>
-                    <li>GCR Guard browser extension for real-time scam protection while browsing</li>
+                    <li>GCR Scam Guard browser extension for real-time scam protection while browsing</li>
                     <li>Dezi AI Assistant for personalized security guidance</li>
                     <li>AI-powered scam detection and analysis tools</li>
                     <li>Family Safety Codeword Generator</li>
@@ -141,7 +141,7 @@ export default function Terms() {
                   </p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li><strong className="text-foreground">Free:</strong> Manual scam scanning through the website and browser extension</li>
-                    <li><strong className="text-foreground">Essential:</strong> Includes Auto-Protect (automatic scanning of pages as you browse via the GCR Guard extension)</li>
+                    <li><strong className="text-foreground">Essential:</strong> Includes Auto-Protect (automatic scanning of pages as you browse via the GCR Scam Guard extension)</li>
                     <li><strong className="text-foreground">Professional:</strong> Full protection including scan history, safety scores, family profiles, and priority support</li>
                   </ul>
                   <p className="mt-4">
@@ -149,9 +149,9 @@ export default function Terms() {
                     notice to active subscribers before making material changes to their plan benefits.
                   </p>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.3 GCR Guard Browser Extension</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.3 GCR Scam Guard Browser Extension</h3>
                   <p>
-                    The GCR Guard browser extension is a companion tool that provides real-time scam 
+                    The GCR Scam Guard browser extension is a companion tool that provides real-time scam 
                     protection in your web browser. By installing and using the extension, you agree to 
                     these Terms and acknowledge:
                   </p>
@@ -166,7 +166,7 @@ export default function Terms() {
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.4 Account Features</h3>
                   <p>
                     Creating an account allows you to save your results, track your learning progress, 
-                    manage subscription plans, link the GCR Guard extension, and receive personalized 
+                    manage subscription plans, link the GCR Scam Guard extension, and receive personalized 
                     safety tips. An account is not required to access free educational content.
                   </p>
 
@@ -292,7 +292,7 @@ export default function Terms() {
                   </ul>
 
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">8.2 AI-Powered Scam Detection</h3>
-                  <p>Our Scam Checker and GCR Guard extension use AI to analyze URLs, messages, and page content for potential threats. By using these tools, you acknowledge:</p>
+                  <p>Our Scam Checker and GCR Scam Guard extension use AI to analyze URLs, messages, and page content for potential threats. By using these tools, you acknowledge:</p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Scan results are assessments based on known patterns and AI analysis, not definitive determinations of safety or danger</li>
                     <li>A "Verified Safe" result does not guarantee a site is completely safe, and a threat warning does not guarantee a site is malicious</li>

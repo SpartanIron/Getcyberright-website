@@ -284,7 +284,7 @@ app.use((req, res, next) => {
         console.error("Failed to start growth orchestrator:", err);
       });
 
-      // GCR Shield: 90-day auto-purge (runs daily)
+      // GCR Data Shield: 90-day auto-purge (runs daily)
       import("./shieldScanService").then(({ purgeExpiredScans }) => {
         async function runPurge() {
           try {
@@ -303,7 +303,7 @@ app.use((req, res, next) => {
         console.error("Failed to start shield purge scheduler:", err);
       });
 
-      // GCR Shield: Re-scan scheduler (runs every 6 hours)
+      // GCR Data Shield: Re-scan scheduler (runs every 6 hours)
       import("../jobs/rescan.job").then(({ executeRescanJob }) => {
         async function runRescan() {
           try {

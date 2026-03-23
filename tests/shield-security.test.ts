@@ -278,7 +278,7 @@ async function testTrialBoundary() {
 // ═══════════════════════════════════════════════════
 async function main() {
   console.log("╔══════════════════════════════════════════════════╗");
-  console.log("║     GCR Shield Security Stress Test Suite       ║");
+  console.log("║     GCR Data Shield Security Stress Test Suite       ║");
   console.log("║     NIST / OWASP / GDPR Compliance Check        ║");
   console.log("╚══════════════════════════════════════════════════╝");
 

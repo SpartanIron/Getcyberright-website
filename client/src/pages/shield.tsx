@@ -106,8 +106,8 @@ function ShieldPage() {
   return (
     <>
       <SEOHead
-        title="GCR Shield - Check Your Data Exposure | GetCyberRight"
-        description="GCR Shield scans data broker sites and breach databases to find your exposed personal information. Free, no account required."
+        title="GCR Data Shield - Check Your Data Exposure | GetCyberRight"
+        description="GCR Data Shield scans data broker sites and breach databases to find your exposed personal information. Free, no account required."
       />
       <Navigation />
       <main className="min-h-screen bg-background">
@@ -118,7 +118,7 @@ function ShieldPage() {
                 <Shield className="h-8 w-8 text-primary" />
               </div>
               <h1 className="text-3xl font-bold mb-3" data-testid="text-shield-title">
-                GCR Shield
+                GCR Data Shield
               </h1>
               <p className="text-lg text-muted-foreground max-w-lg mx-auto">
                 Find out if your personal information is exposed on 500+ data broker sites or in data breaches.

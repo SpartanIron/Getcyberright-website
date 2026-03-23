@@ -55,7 +55,7 @@ const platformTools = [
   },
   {
     icon: Shield,
-    title: "GCR Shield",
+    title: "GCR Data Shield",
     description: "Scan for your exposed personal information across data broker sites and breach databases. See your exposure level and take action.",
     href: "/shield",
     color: "text-teal-400",

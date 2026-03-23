@@ -91,7 +91,7 @@ async function sendAlertEmail(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "GCR Shield <shield@getcyberright.com>",
+      from: "GCR Data Shield <shield@getcyberright.com>",
       to: [to],
       subject: content.subject,
       html: content.html,

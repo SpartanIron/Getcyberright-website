@@ -36,7 +36,7 @@ export function buildRescanAlertEmail(props: RescanAlertProps): {
   <div style="max-width:560px;margin:0 auto;padding:40px 20px">
     <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
       <div style="background:linear-gradient(135deg,#0A2A3C,#0d4a6a);padding:24px 32px;text-align:center">
-        <h1 style="color:white;font-size:20px;margin:0;font-weight:700">GCR Shield Alert</h1>
+        <h1 style="color:white;font-size:20px;margin:0;font-weight:700">GCR Data Shield Alert</h1>
         <p style="color:rgba(255,255,255,0.8);font-size:13px;margin:8px 0 0">Personal Data Exposure Monitor</p>
       </div>
 
@@ -75,7 +75,7 @@ export function buildRescanAlertEmail(props: RescanAlertProps): {
 
       <div style="border-top:1px solid #e5e7eb;padding:20px 32px;text-align:center;background:#f9fafb">
         <p style="font-size:12px;color:#9ca3af;margin:0">
-          You are receiving this because you signed up for GCR Shield re-scan alerts.<br>
+          You are receiving this because you signed up for GCR Data Shield re-scan alerts.<br>
           <a href="${escapeHtml(unsubscribeUrl)}" style="color:#9ca3af;text-decoration:underline">Unsubscribe from these alerts</a>
         </p>
         <p style="font-size:11px;color:#d1d5db;margin:12px 0 0">&copy; GetCyberRight. All rights reserved.</p>
@@ -86,7 +86,7 @@ export function buildRescanAlertEmail(props: RescanAlertProps): {
 </html>`.trim();
 
   const text = [
-    `GCR Shield Alert`,
+    `GCR Data Shield Alert`,
     ``,
     `Hi ${name},`,
     ``,
@@ -105,7 +105,7 @@ export function buildRescanAlertEmail(props: RescanAlertProps): {
     `Your next automatic scan is scheduled in 30 days.`,
     ``,
     `---`,
-    `You are receiving this because you signed up for GCR Shield re-scan alerts.`,
+    `You are receiving this because you signed up for GCR Data Shield re-scan alerts.`,
     `Unsubscribe: ${unsubscribeUrl}`,
   ]
     .filter(Boolean)
