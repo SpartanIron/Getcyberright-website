@@ -1077,6 +1077,7 @@ export const shieldScans = pgTable("shield_scans", {
   email: text("email").notNull(),
   phone: text("phone"),
   zip: text("zip"),
+  userId: varchar("user_id"),
   exposureScore: text("exposure_score"),
   rawResults: jsonb("raw_results"),
   status: text("status").notNull().default("pending"),

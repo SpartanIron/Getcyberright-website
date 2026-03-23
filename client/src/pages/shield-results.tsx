@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead } from "@/components/seo-head";
@@ -23,6 +24,9 @@ import {
   Loader2,
   Info,
   Clock,
+  Lock,
+  Unlock,
+  Crown,
 } from "lucide-react";
 
 type BrokerResult = {
@@ -43,8 +47,8 @@ type BreachResult = {
 type ExposureReport = {
   scanId: string;
   completedAt: string;
-  brokerResults: BrokerResult[];
-  breachResults: BreachResult[];
+  brokerResults?: BrokerResult[];
+  breachResults?: BreachResult[];
   exposureScore: "low" | "medium" | "high" | "critical";
   scoreBreakdown: {
     breachPoints: number;
@@ -53,7 +57,12 @@ type ExposureReport = {
     rawTotal: number;
   };
   partialResults: boolean;
+  brokerCount?: number;
+  breachCount?: number;
+  brokerFoundCount?: number;
 };
+
+type AccessLevel = "free" | "trial" | "full";
 
 const SCORE_CONFIG = {
   low: {
@@ -90,6 +99,8 @@ function ShieldResultsPage() {
   const params = useParams<{ scanId: string }>();
   const scanId = params.scanId;
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
 
   const [report, setReport] = useState<ExposureReport | null>(null);
   const [summary, setSummary] = useState<string>("");
@@ -98,6 +109,10 @@ function ShieldResultsPage() {
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [alertEmail, setAlertEmail] = useState("");
   const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>("free");
+  const [trialDaysLeft, setTrialDaysLeft] = useState<number | undefined>();
+  const [trialExpired, setTrialExpired] = useState(false);
+  const [startingTrial, setStartingTrial] = useState(false);
 
   useEffect(() => {
     if (!scanId) return;
@@ -107,8 +122,12 @@ function ShieldResultsPage() {
 
     async function poll() {
       try {
-        const res = await fetch(`/api/scan/${scanId}/status`);
+        const res = await fetch(`/api/scan/${scanId}/status`, { credentials: "include" });
         const data = await res.json();
+
+        if (data.accessLevel) setAccessLevel(data.accessLevel);
+        if (data.trialDaysLeft !== undefined) setTrialDaysLeft(data.trialDaysLeft);
+        if (data.trialExpired) setTrialExpired(true);
 
         if (data.status === "complete" && data.report) {
           setReport(data.report);
@@ -155,6 +174,31 @@ function ShieldResultsPage() {
     },
   });
 
+  async function handleStartTrial() {
+    if (!isAuthenticated) {
+      setLocation(`/login?redirect=/shield/results/${scanId}`);
+      return;
+    }
+
+    setStartingTrial(true);
+    try {
+      const res = await apiRequest("POST", "/api/shield/start-trial", {});
+      const data = await res.json();
+
+      if (data.level === "trial" || data.level === "full") {
+        setAccessLevel(data.level);
+        setTrialDaysLeft(data.trialDaysLeft);
+        toast({ title: "Trial activated!", description: "Your 14-day free trial has started. Refreshing your results..." });
+        setTimeout(() => window.location.reload(), 1000);
+      }
+    } catch (err: any) {
+      const errorData = err?.message || "Could not start trial";
+      toast({ title: "Could not start trial", description: errorData, variant: "destructive" });
+    } finally {
+      setStartingTrial(false);
+    }
+  }
+
   function toggleExpand(idx: number) {
     setExpandedItems((prev) => {
       const next = new Set(prev);
@@ -163,6 +207,8 @@ function ShieldResultsPage() {
       return next;
     });
   }
+
+  const hasFullAccess = accessLevel === "trial" || accessLevel === "full";
 
   if (loading) {
     return (
@@ -207,8 +253,8 @@ function ShieldResultsPage() {
   const scoreConfig = SCORE_CONFIG[report.exposureScore];
   const ScoreIcon = scoreConfig.icon;
 
-  const allSources = [
-    ...report.breachResults.map((b, i) => ({
+  const allSources = hasFullAccess ? [
+    ...(report.breachResults || []).map((b, i) => ({
       type: "breach" as const,
       title: `Data Breach: ${b.breachName}`,
       description: `Your email was found in the ${b.breachName} data breach${b.breachDate ? ` (${b.breachDate})` : ""}. The types of data exposed include: ${b.dataClasses.join(", ")}.`,
@@ -216,7 +262,7 @@ function ShieldResultsPage() {
       url: null,
       idx: i,
     })),
-    ...report.brokerResults.map((b, i) => ({
+    ...(report.brokerResults || []).map((b, i) => ({
       type: "broker" as const,
       title: `Data Broker: ${b.broker}`,
       description:
@@ -233,11 +279,14 @@ function ShieldResultsPage() {
           : `${b.broker} was checked but no matching records were found.`,
       status: b.status,
       url: b.url,
-      idx: report.breachResults.length + i,
+      idx: (report.breachResults?.length || 0) + i,
     })),
-  ];
+  ] : [];
 
   const hasPartialChecks = report.partialResults;
+  const totalSources = hasFullAccess
+    ? allSources.length
+    : (report.brokerCount || 0) + (report.breachCount || 0);
 
   return (
     <>
@@ -248,6 +297,31 @@ function ShieldResultsPage() {
       <Navigation />
       <main className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4 max-w-2xl space-y-6">
+
+          {accessLevel === "trial" && trialDaysLeft !== undefined && (
+            <div
+              className="flex items-center gap-2 p-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30"
+              data-testid="banner-trial-active"
+            >
+              <Unlock className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                <span className="font-medium">Free trial active</span> — {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining.{" "}
+                <Link href="/pricing" className="underline font-medium">Upgrade</Link> for unlimited access.
+              </p>
+            </div>
+          )}
+
+          {accessLevel === "full" && (
+            <div
+              className="flex items-center gap-2 p-3 rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30"
+              data-testid="banner-full-access"
+            >
+              <Crown className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+              <p className="text-sm text-green-800 dark:text-green-200 font-medium">
+                Full access — your subscription includes complete GCR Shield reports.
+              </p>
+            </div>
+          )}
 
           <Card className={`border-2 ${scoreConfig.border}`}>
             <CardContent className="py-8">
@@ -268,7 +342,10 @@ function ShieldResultsPage() {
                     </span>
                   </div>
                   <p className="text-base text-foreground leading-relaxed" data-testid="text-exposure-summary">
-                    {summary || generateClientSummary(report)}
+                    {hasFullAccess
+                      ? (summary || generateClientSummary(report))
+                      : generateFreeSummary(report)
+                    }
                   </p>
                 </div>
               </div>
@@ -288,7 +365,7 @@ function ShieldResultsPage() {
             </div>
           )}
 
-          {allSources.length > 0 && (
+          {hasFullAccess && allSources.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Detailed Findings</CardTitle>
@@ -350,6 +427,80 @@ function ShieldResultsPage() {
             </Card>
           )}
 
+          {!hasFullAccess && totalSources > 0 && (
+            <Card className="relative overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  Detailed Findings
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {Array.from({ length: Math.min(totalSources, 4) }).map((_, i) => (
+                  <div key={i} className="border rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-4 w-4 rounded bg-muted animate-pulse" />
+                      <div className="h-4 rounded bg-muted animate-pulse flex-1 max-w-[200px]" />
+                    </div>
+                  </div>
+                ))}
+                {totalSources > 4 && (
+                  <p className="text-sm text-muted-foreground text-center pt-2">
+                    + {totalSources - 4} more source{totalSources - 4 !== 1 ? "s" : ""} checked
+                  </p>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background flex items-end justify-center pb-8 pointer-events-none">
+                  <div className="pointer-events-auto text-center space-y-3 max-w-sm">
+                    <Lock className="h-8 w-8 text-muted-foreground mx-auto" />
+                    <p className="text-lg font-semibold" data-testid="text-unlock-cta">
+                      {trialExpired
+                        ? "Your free trial has ended"
+                        : "Unlock your full report"
+                      }
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {trialExpired
+                        ? "Upgrade to Essential or higher to continue viewing detailed results, broker names, breach data, and removal guidance."
+                        : "See which broker sites have your data, which breaches exposed your email, and get step-by-step removal guidance."
+                      }
+                    </p>
+                    {trialExpired ? (
+                      <Link href="/pricing">
+                        <Button className="min-h-[44px]" data-testid="button-upgrade">
+                          <Crown className="h-4 w-4 mr-2" />
+                          View Plans
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button
+                        onClick={handleStartTrial}
+                        disabled={startingTrial}
+                        className="min-h-[44px]"
+                        data-testid="button-start-trial"
+                      >
+                        {startingTrial ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <Unlock className="h-4 w-4 mr-2" />
+                        )}
+                        {isAuthenticated
+                          ? "Start 14-Day Free Trial"
+                          : "Sign Up to Start Free Trial"
+                        }
+                      </Button>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {trialExpired
+                        ? "Plans start at just a few dollars per month."
+                        : "No credit card required. Full access for 14 days."
+                      }
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="flex items-start gap-2 text-sm text-muted-foreground px-1">
             <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
             <p data-testid="text-hibp-attribution">
@@ -365,59 +516,61 @@ function ShieldResultsPage() {
             </p>
           </div>
 
-          <Card>
-            <CardContent className="py-8">
-              {leadSubmitted ? (
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <CheckCircle2 className="h-10 w-10 text-green-500" />
-                  <div>
-                    <p className="text-lg font-medium">You're all set!</p>
-                    <p className="text-muted-foreground text-sm">
-                      We will re-scan every 30 days and alert you if your data reappears.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="text-center">
-                    <h2 className="text-lg font-semibold mb-1" data-testid="text-cta-heading">
-                      Start Removing My Data
-                    </h2>
-                    <p className="text-muted-foreground text-sm">
-                      Get notified if your data reappears. We will re-scan every 30 days and alert you.
-                    </p>
-                  </div>
-                  <div className="flex gap-3 max-w-md mx-auto">
-                    <div className="flex-1">
-                      <label htmlFor="alert-email" className="sr-only">Email for alerts</label>
-                      <Input
-                        id="alert-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={alertEmail}
-                        onChange={(e) => setAlertEmail(e.target.value)}
-                        className="min-h-[44px] text-base"
-                        data-testid="input-alert-email"
-                      />
+          {hasFullAccess && (
+            <Card>
+              <CardContent className="py-8">
+                {leadSubmitted ? (
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <CheckCircle2 className="h-10 w-10 text-green-500" />
+                    <div>
+                      <p className="text-lg font-medium">You're all set!</p>
+                      <p className="text-muted-foreground text-sm">
+                        We will re-scan every 30 days and alert you if your data reappears.
+                      </p>
                     </div>
-                    <Button
-                      onClick={() => leadMutation.mutate()}
-                      disabled={!alertEmail.trim() || leadMutation.isPending}
-                      className="min-h-[44px]"
-                      data-testid="button-start-removing"
-                    >
-                      {leadMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Mail className="h-4 w-4 mr-2" />
-                      )}
-                      Sign Up
-                    </Button>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <h2 className="text-lg font-semibold mb-1" data-testid="text-cta-heading">
+                        Start Removing My Data
+                      </h2>
+                      <p className="text-muted-foreground text-sm">
+                        Get notified if your data reappears. We will re-scan every 30 days and alert you.
+                      </p>
+                    </div>
+                    <div className="flex gap-3 max-w-md mx-auto">
+                      <div className="flex-1">
+                        <label htmlFor="alert-email" className="sr-only">Email for alerts</label>
+                        <Input
+                          id="alert-email"
+                          type="email"
+                          placeholder="Enter your email"
+                          value={alertEmail}
+                          onChange={(e) => setAlertEmail(e.target.value)}
+                          className="min-h-[44px] text-base"
+                          data-testid="input-alert-email"
+                        />
+                      </div>
+                      <Button
+                        onClick={() => leadMutation.mutate()}
+                        disabled={!alertEmail.trim() || leadMutation.isPending}
+                        className="min-h-[44px]"
+                        data-testid="button-start-removing"
+                      >
+                        {leadMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Mail className="h-4 w-4 mr-2" />
+                        )}
+                        Sign Up
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           <div className="text-center">
             <Link href="/shield">
@@ -433,23 +586,52 @@ function ShieldResultsPage() {
   );
 }
 
+function generateFreeSummary(report: ExposureReport): string {
+  const brokerCount = report.brokerCount || 0;
+  const breachCount = report.breachCount || 0;
+  const brokerFoundCount = report.brokerFoundCount || 0;
+
+  const parts: string[] = [];
+
+  if (breachCount > 0) {
+    parts.push(`We checked ${breachCount} breach database${breachCount !== 1 ? "s" : ""}`);
+  }
+  if (brokerCount > 0) {
+    parts.push(`${brokerCount} data broker site${brokerCount !== 1 ? "s" : ""}`);
+  }
+
+  let text = parts.length > 0
+    ? `We scanned ${parts.join(" and ")}. `
+    : "";
+
+  if (report.exposureScore === "critical" || report.exposureScore === "high") {
+    text += "Your personal information has significant exposure online. Unlock the full report to see exactly where your data was found and get removal steps.";
+  } else if (report.exposureScore === "medium") {
+    text += "We found some exposure of your personal information. Unlock the full report to see the details and recommended actions.";
+  } else {
+    text += "Your exposure level appears low, but unlock the full report to see the complete picture.";
+  }
+
+  return text;
+}
+
 function generateClientSummary(report: ExposureReport): string {
   const parts: string[] = [];
 
-  if (report.breachResults.length > 0) {
+  if (report.breachResults && report.breachResults.length > 0) {
     parts.push(
       `Your email address appeared in ${report.breachResults.length} data breach${report.breachResults.length !== 1 ? "es" : ""}`,
     );
   }
 
-  const foundBrokers = report.brokerResults.filter((b) => b.status === "found");
+  const foundBrokers = (report.brokerResults || []).filter((b) => b.status === "found");
   if (foundBrokers.length > 0) {
     parts.push(
       `your name was found on ${foundBrokers.length} people-search site${foundBrokers.length !== 1 ? "s" : ""}`,
     );
   }
 
-  const pendingBrokers = report.brokerResults.filter(
+  const pendingBrokers = (report.brokerResults || []).filter(
     (b) => b.status === "pending_verification",
   );
   if (pendingBrokers.length > 0) {

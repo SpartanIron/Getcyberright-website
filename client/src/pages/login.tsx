@@ -46,6 +46,7 @@ type MfaFormData = z.infer<typeof mfaSchema>;
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const redirectTo = new URLSearchParams(window.location.search).get("redirect");
   
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -103,7 +104,7 @@ export default function Login() {
       if (result.user?.mustChangePassword) {
         setLocation("/admin/change-password");
       } else {
-        setLocation("/admin");
+        setLocation(redirectTo || "/admin");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -147,7 +148,7 @@ export default function Login() {
       if (result.user?.mustChangePassword) {
         setLocation("/admin/change-password");
       } else {
-        setLocation("/admin");
+        setLocation(redirectTo || "/admin");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");

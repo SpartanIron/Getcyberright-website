@@ -416,6 +416,7 @@ async function runScanPipeline(scanId: string, input: ScanInput): Promise<void> 
 export async function startShieldScan(
   input: ScanInput,
   consentIp: string,
+  userId?: string,
 ): Promise<{ scanId: string }> {
   const [scan] = await db
     .insert(shieldScans)
@@ -425,6 +426,7 @@ export async function startShieldScan(
       email: input.email,
       phone: input.phone || null,
       zip: input.zip || null,
+      userId: userId || null,
       status: "pending",
       consentGiven: true,
       consentTimestamp: new Date(),

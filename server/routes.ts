@@ -4556,6 +4556,84 @@ EDGE CASE HANDLING
     }),
   });
 
+  function getShieldAccessLevel(user: any): { level: "free" | "trial" | "full"; trialDaysLeft?: number; trialExpired?: boolean } {
+    if (!user) return { level: "free" };
+
+    if (hasTierAccess(user.subscriptionTier || "free", SUBSCRIPTION_TIERS.ESSENTIAL)) {
+      return { level: "full" };
+    }
+
+    if (user.shieldTrialStartedAt) {
+      const trialStart = new Date(user.shieldTrialStartedAt).getTime();
+      const trialEnd = trialStart + 14 * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      if (now < trialEnd) {
+        const daysLeft = Math.ceil((trialEnd - now) / (24 * 60 * 60 * 1000));
+        return { level: "trial", trialDaysLeft: daysLeft };
+      }
+      return { level: "free", trialExpired: true };
+    }
+
+    return { level: "free" };
+  }
+
+  function redactReportForFree(report: any) {
+    return {
+      scanId: report.scanId,
+      completedAt: report.completedAt,
+      exposureScore: report.exposureScore,
+      scoreBreakdown: report.scoreBreakdown,
+      partialResults: report.partialResults,
+      brokerCount: report.brokerResults?.length || 0,
+      breachCount: report.breachResults?.length || 0,
+      brokerFoundCount: report.brokerResults?.filter((b: any) => b.status === "found" || b.status === "pending_verification").length || 0,
+      breachResults: undefined,
+      brokerResults: undefined,
+    };
+  }
+
+  app.get("/api/shield/access", async (req: any, res: Response) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) return res.json({ level: "free", authenticated: false });
+
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      if (!user) return res.json({ level: "free", authenticated: false });
+
+      const access = getShieldAccessLevel(user);
+      return res.json({ ...access, authenticated: true });
+    } catch (error) {
+      res.json({ level: "free", authenticated: false });
+    }
+  });
+
+  app.post("/api/shield/start-trial", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const access = getShieldAccessLevel(req.user);
+
+      if (access.level === "full") {
+        return res.json({ message: "You already have full access.", level: "full" });
+      }
+
+      if (req.user.shieldTrialStartedAt) {
+        const trialStart = new Date(req.user.shieldTrialStartedAt).getTime();
+        const trialEnd = trialStart + 14 * 24 * 60 * 60 * 1000;
+        if (Date.now() >= trialEnd) {
+          return res.status(400).json({ error: "Your free trial has already been used. Upgrade to Essential or higher to unlock full GCR Shield reports.", level: "free", trialExpired: true });
+        }
+        return res.json({ message: "Trial already active.", level: "trial", trialDaysLeft: access.trialDaysLeft });
+      }
+
+      await db.update(users).set({ shieldTrialStartedAt: new Date() }).where(eq(users.id, userId));
+
+      res.json({ message: "Your 14-day free trial has started!", level: "trial", trialDaysLeft: 14 });
+    } catch (error) {
+      console.error("[shield] Trial start error");
+      res.status(500).json({ error: "Could not start trial" });
+    }
+  });
+
   app.post("/api/scan", shieldRateLimit, async (req: Request, res: Response) => {
     try {
       const parsed = shieldScanInputSchema.safeParse(req.body);
@@ -4566,11 +4644,13 @@ EDGE CASE HANDLING
 
       const { firstName, lastName, email, phone, zip } = parsed.data;
       const consentIp = req.ip || req.socket.remoteAddress || "unknown";
+      const userId = (req as any).session?.userId || undefined;
 
       const { startShieldScan } = await import("./shieldScanService");
       const { scanId } = await startShieldScan(
         { firstName, lastName, email, phone: phone || undefined, zip: zip || undefined },
         consentIp,
+        userId,
       );
 
       res.json({ scanId });
@@ -4580,30 +4660,57 @@ EDGE CASE HANDLING
     }
   });
 
-  app.get("/api/scan/:scanId/status", async (req: Request, res: Response) => {
+  app.get("/api/scan/:scanId/status", async (req: any, res: Response) => {
     try {
       const { scanId } = req.params;
       if (!scanId) return res.status(400).json({ error: "Scan ID is required" });
+
+      let user = null;
+      if (req.session?.userId) {
+        const [u] = await db.select().from(users).where(eq(users.id, req.session.userId));
+        user = u || null;
+      }
+      const access = getShieldAccessLevel(user);
 
       const { getShieldScanStatus, getShieldScanFromDb } = await import("./shieldScanService");
       const memStatus = getShieldScanStatus(scanId);
 
       if (memStatus.status !== "pending") {
-        return res.json(memStatus);
+        if (memStatus.status === "complete" && memStatus.report && access.level === "free") {
+          return res.json({
+            ...memStatus,
+            report: redactReportForFree(memStatus.report),
+            accessLevel: access.level,
+            trialExpired: access.trialExpired,
+          });
+        }
+        return res.json({ ...memStatus, accessLevel: access.level, trialDaysLeft: access.trialDaysLeft });
       }
 
       const dbScan = await getShieldScanFromDb(scanId);
       if (!dbScan) return res.status(404).json({ error: "Scan not found" });
 
       if (dbScan.status === "complete" && dbScan.rawResults) {
+        const report = dbScan.rawResults as any;
+        if (access.level === "free") {
+          return res.json({
+            status: "complete",
+            report: redactReportForFree(report),
+            summary: undefined,
+            accessLevel: access.level,
+            trialExpired: access.trialExpired,
+          });
+        }
         return res.json({
           status: "complete",
-          report: dbScan.rawResults,
+          report,
           summary: undefined,
+          accessLevel: access.level,
+          trialDaysLeft: access.trialDaysLeft,
         });
       }
 
-      return res.json({ status: dbScan.status });
+      return res.json({ status: dbScan.status, accessLevel: access.level });
     } catch (error: any) {
       console.error("[shield] Status check error");
       res.status(500).json({ error: "Could not check scan status" });
