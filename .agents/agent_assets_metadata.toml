@@ -6,3 +6,9 @@ id = "rZqQKOOCV-y0ksJa4V7mQ"
 uri = "file://.local/traffic-growth-analysis.md"
 type = "text"
 title = "GetCyberRight Traffic Growth Analysis & Action Plan"
+
+[[outputs]]
+id = "ytslPZD5HjkVH_kQIzfyG"
+uri = "file://gcr-guard-extension.zip"
+type = "unspecified"
+title = "GCR Guard Chrome Extension (v1.2.0)"
