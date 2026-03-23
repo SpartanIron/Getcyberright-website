@@ -253,6 +253,8 @@ export async function registerRoutes(
       { path: '/advertise', changefreq: 'monthly', priority: '0.4' },
       { path: '/partner-deck', changefreq: 'monthly', priority: '0.4' },
       { path: '/experience', changefreq: 'weekly', priority: '0.6' },
+      { path: '/browser-extension', changefreq: 'monthly', priority: '0.7' },
+      { path: '/gcr-guard-pricing', changefreq: 'monthly', priority: '0.6' },
     ];
 
     const scamSlugs = getAllScamSlugs();

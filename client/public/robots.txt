@@ -8,6 +8,7 @@ Disallow: /forgot-password
 Disallow: /dashboard
 Disallow: /preferences
 Disallow: /checkout-success
+Disallow: /extension-auth
 
 User-agent: GPTBot
 Allow: /
