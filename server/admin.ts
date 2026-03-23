@@ -11,6 +11,7 @@ import { z } from "zod";
 const updateUserSchema = z.object({
   isAdmin: z.boolean().optional(),
   subscriptionTier: z.enum(["free", "essential", "professional", "enterprise"]).optional(),
+  emailVerified: z.boolean().optional(),
 });
 
 // Admin middleware - checks if authenticated user has isAdmin = true
@@ -114,11 +115,12 @@ export function registerAdminRoutes(app: Express) {
         return res.status(400).json({ error: "Invalid data", details: validationResult.error.errors });
       }
       
-      const { isAdmin: makeAdmin, subscriptionTier } = validationResult.data;
+      const { isAdmin: makeAdmin, subscriptionTier, emailVerified } = validationResult.data;
       
       const updateData: any = {};
       if (typeof makeAdmin === "boolean") updateData.isAdmin = makeAdmin;
       if (subscriptionTier) updateData.subscriptionTier = subscriptionTier;
+      if (typeof emailVerified === "boolean") updateData.emailVerified = emailVerified;
       
       const [updated] = await db
         .update(users)

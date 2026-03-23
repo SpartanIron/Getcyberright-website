@@ -31,7 +31,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Users, Crown, Trash2, Shield, ShieldOff } from "lucide-react";
+import { Users, Crown, Trash2, Shield, ShieldOff, MailCheck, MailX } from "lucide-react";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -145,6 +145,7 @@ export default function AdminUsers() {
                   <TableRow>
                     <TableHead>User</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>Verified</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Admin</TableHead>
                     <TableHead>Joined</TableHead>
@@ -177,6 +178,31 @@ export default function AdminUsers() {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {u.email || "No email"}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant={u.emailVerified ? "default" : "outline"}
+                          size="sm"
+                          data-testid={`btn-verify-${u.id}`}
+                          onClick={() =>
+                            updateUserMutation.mutate({
+                              id: u.id,
+                              updates: { emailVerified: !u.emailVerified },
+                            })
+                          }
+                        >
+                          {u.emailVerified ? (
+                            <>
+                              <MailCheck className="w-4 h-4 mr-1" />
+                              Yes
+                            </>
+                          ) : (
+                            <>
+                              <MailX className="w-4 h-4 mr-1" />
+                              No
+                            </>
+                          )}
+                        </Button>
                       </TableCell>
                       <TableCell>
                         <Select
