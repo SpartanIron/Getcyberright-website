@@ -8,7 +8,7 @@ import bannerImage from "@/assets/banners/privacy-banner.png";
 
 export default function Privacy() {
   const effectiveDate = "January 31, 2026";
-  const lastUpdated = "March 21, 2026";
+  const lastUpdated = "March 23, 2026";
 
   return (
     <div className="min-h-screen bg-background">
@@ -72,8 +72,9 @@ export default function Privacy() {
                     <li><strong className="text-foreground">Create an account:</strong> Name, email address, password (encrypted), and optional profile information</li>
                     <li><strong className="text-foreground">Subscribe to our newsletter:</strong> Email address and communication preferences</li>
                     <li><strong className="text-foreground">Contact us:</strong> Name, email address, and message content</li>
-                    <li><strong className="text-foreground">Purchase a subscription:</strong> Billing information processed securely through Stripe (we do not store full payment card details)</li>
+                    <li><strong className="text-foreground">Purchase a subscription:</strong> Billing information processed securely through our payment provider (we do not store full payment card details on our servers)</li>
                     <li><strong className="text-foreground">Use our security tools:</strong> URLs, email headers, or other content you submit for analysis (processed in real time and not permanently stored unless you create an account)</li>
+                    <li><strong className="text-foreground">Use the GCR Guard browser extension:</strong> URLs of pages you visit (when Auto-Protect is enabled) or manually scan, page content analyzed for scam indicators, and your extension authentication token. See Section 3.3 for full details on extension data practices.</li>
                     <li><strong className="text-foreground">Use our breach monitoring service:</strong> Email addresses you submit to check against known data breaches (used solely for monitoring and alert purposes)</li>
                     <li><strong className="text-foreground">Use our data broker removal service:</strong> Personal information you provide to identify and request removal of your data from data broker databases (used solely for removal requests on your behalf)</li>
                     <li><strong className="text-foreground">Report a scam:</strong> Details about suspected scams to help protect our community</li>
@@ -95,7 +96,7 @@ export default function Privacy() {
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Biometric data (fingerprints, facial recognition, voiceprints)</li>
                     <li>Precise geolocation data (GPS coordinates)</li>
-                    <li>Financial account numbers (credit card details are processed by Stripe and never stored on our systems)</li>
+                    <li>Financial account numbers (credit card details are processed by our payment provider and never stored on our systems)</li>
                     <li>Social Security numbers or government-issued identification numbers</li>
                     <li>Health or medical information</li>
                   </ul>
@@ -113,7 +114,20 @@ export default function Privacy() {
                     <li><strong className="text-foreground">Threat Intelligence:</strong> AI processes publicly available cybersecurity news feeds to identify and simplify trending threats for our users. No personal data is involved in this process.</li>
                   </ul>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">3.2 Automated Decision-Making</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">3.3 GCR Guard Browser Extension</h3>
+                  <p>Our GCR Guard browser extension provides real-time scam protection while you browse. Here is exactly what data it collects and how it is used:</p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li><strong className="text-foreground">URLs of pages you visit:</strong> When Auto-Protect is enabled, page URLs are sent to our servers for real-time threat analysis. URLs are analyzed and discarded immediately for free-tier users. Paid subscribers may have scan history retained for up to 90 days if they opt in.</li>
+                    <li><strong className="text-foreground">Page content:</strong> The extension collects page metadata (title, headings, form indicators, external links) and an excerpt of the page text. This data is sent to our servers for AI-powered threat analysis. The extension does not capture passwords, form inputs you type, or full page content.</li>
+                    <li><strong className="text-foreground">Authentication token:</strong> A 90-day token is stored locally in your browser to link the extension to your GetCyberRight account. This token can be revoked at any time from your account settings.</li>
+                    <li><strong className="text-foreground">Subscription status:</strong> The extension periodically checks your subscription tier (Free, Essential, or Professional) to determine which features are available. This status is cached locally for up to 10 minutes.</li>
+                    <li><strong className="text-foreground">Extension settings:</strong> Your preferences (Auto-Protect on/off, notification settings) are stored locally in your browser using Chrome's storage API and are never sent to our servers.</li>
+                  </ul>
+                  <p className="mt-4">
+                    The extension does not collect browsing history, passwords, form inputs, or any data from pages you do not scan. It does not track your browsing activity for advertising or analytics purposes. All data sent to our servers is transmitted over encrypted HTTPS connections.
+                  </p>
+
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">3.4 Automated Decision-Making</h3>
                   <p>
                     Our Service does not make automated decisions that produce legal effects or similarly significant 
                     effects on you. AI-powered features such as scam detection provide recommendations and assessments 
@@ -233,7 +247,7 @@ export default function Privacy() {
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-4">6.1 Service Providers</h3>
                   <p>We work with trusted third-party service providers who assist us in operating our Service:</p>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li><strong className="text-foreground">Stripe:</strong> Payment processing (PCI-DSS compliant). Stripe's privacy policy is available at <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">stripe.com/privacy</a>.</li>
+                    <li><strong className="text-foreground">Payment Processors:</strong> Payment processing is handled by PCI-DSS compliant third-party providers. We do not store your full payment card details on our servers.</li>
                     <li><strong className="text-foreground">Google Analytics:</strong> Website analytics and performance measurement</li>
                     <li><strong className="text-foreground">Anthropic:</strong> Powering our Dezi AI assistant. Conversations are processed under our commercial agreement. Anthropic does not use your data to train its models.</li>
                     <li><strong className="text-foreground">Replit:</strong> Application hosting and infrastructure</li>
@@ -327,7 +341,8 @@ export default function Privacy() {
                     <li><strong className="text-foreground">Analytics data:</strong> Retained according to Google Analytics' data retention settings (currently set to 14 months for user-level data).</li>
                     <li><strong className="text-foreground">Breach monitoring data:</strong> Email addresses submitted for breach monitoring are retained as long as you maintain an active monitoring subscription. You can request removal at any time.</li>
                     <li><strong className="text-foreground">AI assistant conversations:</strong> Conversations with Dezi are retained for up to 30 days to improve service quality and then automatically deleted.</li>
-                    <li><strong className="text-foreground">Security scan results:</strong> Results from scam detection and URL scanning tools are retained for up to 90 days for users with accounts and are not retained for anonymous users.</li>
+                    <li><strong className="text-foreground">Security scan results (server):</strong> Results from scam detection and URL scanning tools are not retained on our servers for free-tier users. Professional subscribers may have server-side scan history retained for up to 90 days.</li>
+                    <li><strong className="text-foreground">Security scan results (extension):</strong> The GCR Guard browser extension stores a local history of recent scans on your device using your browser's storage. This data remains on your device and is never sent to our servers. You can clear it at any time through your browser settings.</li>
                   </ul>
                 </section>
 

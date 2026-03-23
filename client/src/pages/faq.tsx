@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays } from "lucide-react";
+import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays, Chrome, CreditCard } from "lucide-react";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { useSEO } from "@/hooks/use-seo";
 import { Link } from "wouter";
@@ -18,8 +18,8 @@ const faqCategories = [
         a: "GetCyberRight is a mission-driven platform dedicated to family cyber safety. We provide educational resources, tools, and guidance to help families navigate the online world safely. Our content is designed for everyone, from children learning about social media to seniors protecting themselves from scams."
       },
       {
-        q: "Is GetCyberRight really free?",
-        a: "Yes, everything on GetCyberRight is free to use. We believe everyone deserves access to cybersecurity education regardless of their financial situation. Our mission is to protect families, not profit from them."
+        q: "Is GetCyberRight free?",
+        a: "Our educational content, articles, guides, and basic scam checking tools are completely free. We also offer paid subscription plans (Essential and Professional) that unlock advanced features like automatic page scanning, scan history, and family profiles through our GCR Guard browser extension. We believe foundational cybersecurity education should be accessible to everyone."
       },
       {
         q: "Who creates the content on GetCyberRight?",
@@ -54,12 +54,68 @@ const faqCategories = [
     ]
   },
   {
+    title: "GCR Guard Browser Extension",
+    icon: Chrome,
+    questions: [
+      {
+        q: "What is GCR Guard?",
+        a: "GCR Guard is our Chrome browser extension that protects you from scams in real time as you browse. It can automatically scan pages for threats, detect fake websites, and warn you before you interact with suspicious content."
+      },
+      {
+        q: "How do I install and set up GCR Guard?",
+        a: "Install GCR Guard from the Chrome Web Store. Then visit getcyberright.com, log into your account, go to the Extension Auth page to generate a connection token, and paste it into the extension's Settings. This links the extension to your account and subscription."
+      },
+      {
+        q: "What features are available on the free plan?",
+        a: "Free users can manually scan any page by right-clicking and selecting 'Scan with GCR Guard' or clicking the extension icon. You get full AI-powered threat analysis on every manual scan at no cost."
+      },
+      {
+        q: "What does Auto-Protect do?",
+        a: "Auto-Protect automatically scans every page you visit in the background without you having to click anything. If a threat is detected, you get an instant notification. Auto-Protect is available on the Essential plan and above."
+      },
+      {
+        q: "What data does the extension collect?",
+        a: "The extension sends page URLs and a summary of page content to our servers for threat analysis. It does not collect your browsing history, passwords, or form data. Your settings are stored locally in your browser. See our Privacy Policy for full details."
+      },
+      {
+        q: "How do I disconnect the extension from my account?",
+        a: "You can revoke your extension token at any time from your account settings on getcyberright.com. You can also uninstall the extension from Chrome at any time."
+      }
+    ]
+  },
+  {
+    title: "Subscriptions and Pricing",
+    icon: CreditCard,
+    questions: [
+      {
+        q: "What subscription plans do you offer?",
+        a: "We offer three tiers: Free (manual scans on the website and extension), Essential (adds Auto-Protect for automatic page scanning), and Professional (adds scan history, safety scores, family profiles, and priority support). Visit our GCR Guard Pricing page for current pricing."
+      },
+      {
+        q: "How do I upgrade or change my plan?",
+        a: "Your subscription is managed through your GetCyberRight account. Contact our support team to change your plan. Your new features will be available immediately after your plan is updated."
+      },
+      {
+        q: "Can I cancel my subscription?",
+        a: "Yes, you can cancel at any time by contacting our support team. After cancellation, you will retain access to paid features until the end of your current billing period, then revert to the free plan."
+      },
+      {
+        q: "Is there a family plan?",
+        a: "Our Professional plan includes family profile support, allowing you to manage protection for multiple family members under one account."
+      }
+    ]
+  },
+  {
     title: "Safety Tools",
     icon: Lock,
     questions: [
       {
         q: "What is the Scam Checker?",
-        a: "The Scam Checker is a free tool that helps you analyze suspicious URLs, phone numbers, and situations. It uses both rule-based analysis and AI to identify potential scams and provide safety recommendations."
+        a: "The Scam Checker is a tool that helps you analyze suspicious URLs, phone numbers, emails, and situations. It uses both pattern-matching analysis and AI to identify potential scams and provide clear safety recommendations in plain language."
+      },
+      {
+        q: "What do the scan results mean?",
+        a: "Scan results use clear labels: 'Verified Safe' means no threats were found, 'Low Risk' means minor concerns, 'Caution Advised' means notable warning signs, 'High Risk Detected' means strong indicators of a scam, and 'Confirmed Threat' means the content matches known scam patterns."
       },
       {
         q: "What is the Safety Score quiz?",
@@ -67,11 +123,11 @@ const faqCategories = [
       },
       {
         q: "Are your tools accurate?",
-        a: "Our tools provide helpful guidance based on known scam patterns and security best practices. However, they should be used as one factor in your decision-making, not as the sole authority. When in doubt, consult official sources or report suspicious activity to authorities."
+        a: "Our tools provide helpful guidance based on known scam patterns and AI analysis. They should be used as one factor in your decision-making, not as the sole authority. When in doubt, consult official sources or report suspicious activity to authorities."
       },
       {
         q: "Do you store the information I submit to your tools?",
-        a: "We do not store personal information you submit to our scam checker or other tools. Your privacy is important to us. See our Privacy Policy for complete details on how we handle data."
+        a: "On our servers, scan content is analyzed in real time and not permanently stored for free users. Professional subscribers may have server-side scan history retained for up to 90 days. The browser extension also keeps a local history of your recent scans on your device (stored in your browser, never sent to our servers). See our Privacy Policy for complete details."
       }
     ]
   },
@@ -131,7 +187,7 @@ const faqCategories = [
   }
 ];
 
-const LAST_REVIEWED = "February 2026";
+const LAST_REVIEWED = "March 2026";
 
 export default function FAQ() {
   useSEO({

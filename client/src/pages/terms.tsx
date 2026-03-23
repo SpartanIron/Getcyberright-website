@@ -8,7 +8,7 @@ import bannerImage from "@/assets/banners/terms-banner.png";
 
 export default function Terms() {
   const effectiveDate = "January 31, 2026";
-  const lastUpdated = "January 31, 2026";
+  const lastUpdated = "March 23, 2026";
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,12 +75,15 @@ export default function Terms() {
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Educational content, articles, and guides on cybersecurity best practices</li>
                     <li>Interactive security assessment tools and threat analysis features</li>
+                    <li>GCR Guard browser extension for real-time scam protection while browsing</li>
                     <li>Dezi AI Assistant for personalized security guidance</li>
+                    <li>AI-powered scam detection and analysis tools</li>
                     <li>Family Safety Codeword Generator</li>
-                    <li>Scam detection and analysis tools</li>
                     <li>Downloadable checklists and resources</li>
                     <li>Newsletter and security alert communications</li>
+                    <li>Breach monitoring and data broker removal services</li>
                     <li>Optional account creation to save progress and results</li>
+                    <li>Paid subscription plans with enhanced protection features</li>
                   </ul>
                   <p className="mt-4">
                     The Service is provided for educational and informational purposes. While we strive to 
@@ -122,25 +125,55 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-foreground mb-4">4. Service Access and Availability</h2>
+                  <h2 className="text-2xl font-bold text-foreground mb-4">4. Service Access, Subscriptions, and Availability</h2>
                   
-                  <h3 className="text-xl font-semibold text-foreground mb-3">4.1 All Tools and Resources</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3">4.1 Free Features</h3>
                   <p>
-                    All tools, educational content, and resources on GetCyberRight are currently provided 
-                    free of charge. Every user has full access to everything we offer.
+                    All educational content, articles, guides, and basic security tools on GetCyberRight are 
+                    available free of charge. Free users can access the Scam Checker with manual scans, 
+                    educational resources, and community features without creating an account or paying.
                   </p>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.2 Account Features</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.2 Subscription Plans</h3>
                   <p>
-                    Creating an account allows you to save your results, track your learning progress, and 
-                    receive personalized safety tips. An account is never required to use our tools, but it 
-                    enhances your experience by keeping your history in one place.
+                    We offer paid subscription plans that provide enhanced protection features. 
+                    Current tiers include:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li><strong className="text-foreground">Free:</strong> Manual scam scanning through the website and browser extension</li>
+                    <li><strong className="text-foreground">Essential:</strong> Includes Auto-Protect (automatic scanning of pages as you browse via the GCR Guard extension)</li>
+                    <li><strong className="text-foreground">Professional:</strong> Full protection including scan history, safety scores, family profiles, and priority support</li>
+                  </ul>
+                  <p className="mt-4">
+                    Subscription features, pricing, and availability are subject to change. We will provide 
+                    notice to active subscribers before making material changes to their plan benefits.
                   </p>
 
-                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.3 Service Changes</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.3 GCR Guard Browser Extension</h3>
+                  <p>
+                    The GCR Guard browser extension is a companion tool that provides real-time scam 
+                    protection in your web browser. By installing and using the extension, you agree to 
+                    these Terms and acknowledge:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>The extension requires an active GetCyberRight account for full functionality</li>
+                    <li>Features available in the extension depend on your subscription tier</li>
+                    <li>The extension sends page URLs and content summaries to our servers for threat analysis</li>
+                    <li>Authentication is managed through a 90-day token that can be revoked at any time</li>
+                    <li>The extension's permissions (accessing page content, web navigation) are necessary for scam detection and are not used for tracking or advertising</li>
+                  </ul>
+
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.4 Account Features</h3>
+                  <p>
+                    Creating an account allows you to save your results, track your learning progress, 
+                    manage subscription plans, link the GCR Guard extension, and receive personalized 
+                    safety tips. An account is not required to access free educational content.
+                  </p>
+
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">4.5 Service Changes</h3>
                   <p>
                     We reserve the right to modify or update features as needed to improve the platform. 
-                    We are committed to keeping cybersecurity education accessible to everyone.
+                    We are committed to keeping foundational cybersecurity education accessible to everyone.
                   </p>
                 </section>
 
@@ -246,14 +279,26 @@ export default function Terms() {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold text-foreground mb-4">8. AI Assistant (Dezi) Terms</h2>
-                  <p>Our AI assistant, Dezi, is powered by OpenAI technology. By using Dezi, you acknowledge:</p>
+                  <h2 className="text-2xl font-bold text-foreground mb-4">8. AI-Powered Features</h2>
+                  
+                  <h3 className="text-xl font-semibold text-foreground mb-3">8.1 AI Assistant (Dezi)</h3>
+                  <p>Our AI assistant, Dezi, is powered by Anthropic's Claude technology. By using Dezi, you acknowledge:</p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li>AI responses are generated based on training data and may not always be accurate or complete</li>
                     <li>Dezi provides general guidance and is not a substitute for professional cybersecurity advice</li>
                     <li>Conversations with Dezi may be analyzed to improve the Service (in anonymized form)</li>
                     <li>You should not share highly sensitive personal information (like passwords or financial account numbers) with Dezi</li>
                     <li>AI responses should be verified before taking significant actions based on them</li>
+                  </ul>
+
+                  <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">8.2 AI-Powered Scam Detection</h3>
+                  <p>Our Scam Checker and GCR Guard extension use AI to analyze URLs, messages, and page content for potential threats. By using these tools, you acknowledge:</p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Scan results are assessments based on known patterns and AI analysis, not definitive determinations of safety or danger</li>
+                    <li>A "Verified Safe" result does not guarantee a site is completely safe, and a threat warning does not guarantee a site is malicious</li>
+                    <li>You remain responsible for your own online safety decisions</li>
+                    <li>Content you submit for scanning may be processed by third-party AI providers under our commercial agreements</li>
+                    <li>Scan results should not be used as the sole basis for legal, financial, or safety decisions</li>
                   </ul>
                 </section>
 
