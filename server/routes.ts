@@ -4527,5 +4527,113 @@ EDGE CASE HANDLING
     }
   });
 
+  const shieldScanLimiter = new Map<string, { count: number; resetAt: number }>();
+  function shieldRateLimit(req: Request, res: Response, next: Function) {
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
+    const now = Date.now();
+    const record = shieldScanLimiter.get(ip);
+    if (record && record.resetAt > now) {
+      if (record.count >= 3) {
+        return res.status(429).json({
+          error: "You have reached the scan limit. Please wait before scanning again.",
+        });
+      }
+      record.count++;
+    } else {
+      shieldScanLimiter.set(ip, { count: 1, resetAt: now + 3600000 });
+    }
+    next();
+  }
+
+  const shieldScanInputSchema = z.object({
+    firstName: z.string().min(1, "First name is required").max(100),
+    lastName: z.string().min(1, "Last name is required").max(100),
+    email: z.string().email("A valid email address is required"),
+    phone: z.string().max(30).optional().or(z.literal("")),
+    zip: z.string().max(20).optional().or(z.literal("")),
+    consentGiven: z.boolean().refine((v) => v === true, {
+      message: "You must confirm this is your own personal information",
+    }),
+  });
+
+  app.post("/api/scan", shieldRateLimit, async (req: Request, res: Response) => {
+    try {
+      const parsed = shieldScanInputSchema.safeParse(req.body);
+      if (!parsed.success) {
+        const messages = parsed.error.issues.map((e) => e.message).join(", ");
+        return res.status(400).json({ error: messages });
+      }
+
+      const { firstName, lastName, email, phone, zip } = parsed.data;
+      const consentIp = req.ip || req.socket.remoteAddress || "unknown";
+
+      const { startShieldScan } = await import("./shieldScanService");
+      const { scanId } = await startShieldScan(
+        { firstName, lastName, email, phone: phone || undefined, zip: zip || undefined },
+        consentIp,
+      );
+
+      res.json({ scanId });
+    } catch (error: any) {
+      console.error("[shield] Scan start error:", error?.message || error);
+      res.status(500).json({ error: "Something went wrong. Please try again in a few minutes." });
+    }
+  });
+
+  app.get("/api/scan/:scanId/status", async (req: Request, res: Response) => {
+    try {
+      const { scanId } = req.params;
+      if (!scanId) return res.status(400).json({ error: "Scan ID is required" });
+
+      const { getShieldScanStatus, getShieldScanFromDb } = await import("./shieldScanService");
+      const memStatus = getShieldScanStatus(scanId);
+
+      if (memStatus.status !== "pending") {
+        return res.json(memStatus);
+      }
+
+      const dbScan = await getShieldScanFromDb(scanId);
+      if (!dbScan) return res.status(404).json({ error: "Scan not found" });
+
+      if (dbScan.status === "complete" && dbScan.rawResults) {
+        return res.json({
+          status: "complete",
+          report: dbScan.rawResults,
+          summary: undefined,
+        });
+      }
+
+      return res.json({ status: dbScan.status });
+    } catch (error: any) {
+      console.error("[shield] Status check error");
+      res.status(500).json({ error: "Could not check scan status" });
+    }
+  });
+
+  app.post("/api/scan/:scanId/lead", async (req: Request, res: Response) => {
+    try {
+      const { scanId } = req.params;
+      const { alertEmail } = req.body;
+
+      if (!alertEmail || typeof alertEmail !== "string") {
+        return res.status(400).json({ error: "A valid email address is required" });
+      }
+
+      const emailSchema = z.string().email();
+      const emailResult = emailSchema.safeParse(alertEmail.trim());
+      if (!emailResult.success) {
+        return res.status(400).json({ error: "Please provide a valid email address" });
+      }
+
+      const { createShieldLead } = await import("./shieldScanService");
+      const { leadId } = await createShieldLead(scanId, emailResult.data);
+
+      res.json({ leadId, message: "You are now signed up for re-scan alerts." });
+    } catch (error: any) {
+      console.error("[shield] Lead capture error");
+      res.status(500).json({ error: "Could not save your alert preferences" });
+    }
+  });
+
   return httpServer;
 }

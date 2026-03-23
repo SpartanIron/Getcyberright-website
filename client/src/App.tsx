@@ -101,6 +101,8 @@ const AlertsListing = lazy(() => import("@/pages/alerts-listing"));
 const AlertDetail = lazy(() => import("@/pages/alert-detail"));
 const ScamIntelListing = lazy(() => import("@/pages/scam-intel-listing"));
 const ScamIntelDetail = lazy(() => import("@/pages/scam-intel-detail"));
+const ShieldPage = lazy(() => import("@/pages/shield"));
+const ShieldResultsPage = lazy(() => import("@/pages/shield-results"));
 
 // Loading fallback component
 function PageLoader() {
@@ -190,6 +192,8 @@ function Router() {
         <Route path="/alerts/:slug" component={AlertDetail} />
         <Route path="/scam-intel" component={ScamIntelListing} />
         <Route path="/scam-intel/:slug" component={ScamIntelDetail} />
+        <Route path="/shield" component={ShieldPage} />
+        <Route path="/shield/results/:scanId" component={ShieldResultsPage} />
         <Route path="/training" component={Training} />
         <Route path="/training/:pathId" component={TrainingPath} />
         <Route path="/training/lesson/:lessonId" component={TrainingLesson} />

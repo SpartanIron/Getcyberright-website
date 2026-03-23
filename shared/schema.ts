@@ -1069,6 +1069,49 @@ export const brokerPerformance = pgTable("broker_performance", {
 
 export type BrokerPerformance = typeof brokerPerformance.$inferSelect;
 
+export const shieldScans = pgTable("shield_scans", {
+  scanId: varchar("scan_id").primaryKey().default(sql`gen_random_uuid()`),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  zip: text("zip"),
+  exposureScore: text("exposure_score"),
+  rawResults: jsonb("raw_results"),
+  status: text("status").notNull().default("pending"),
+  consentGiven: boolean("consent_given").notNull().default(false),
+  consentTimestamp: timestamp("consent_timestamp"),
+  consentIp: text("consent_ip"),
+  deletedAt: timestamp("deleted_at"),
+});
+
+export type ShieldScan = typeof shieldScans.$inferSelect;
+export const insertShieldScanSchema = createInsertSchema(shieldScans).omit({
+  scanId: true,
+  createdAt: true,
+  deletedAt: true,
+});
+export type InsertShieldScan = z.infer<typeof insertShieldScanSchema>;
+
+export const shieldLeads = pgTable("shield_leads", {
+  leadId: varchar("lead_id").primaryKey().default(sql`gen_random_uuid()`),
+  scanId: varchar("scan_id"),
+  lastScanId: varchar("last_scan_id"),
+  email: text("email").notNull(),
+  alertEmail: text("alert_email").notNull(),
+  nextScanDue: timestamp("next_scan_due"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  optedIn: boolean("opted_in").default(true),
+});
+
+export type ShieldLead = typeof shieldLeads.$inferSelect;
+export const insertShieldLeadSchema = createInsertSchema(shieldLeads).omit({
+  leadId: true,
+  createdAt: true,
+});
+export type InsertShieldLead = z.infer<typeof insertShieldLeadSchema>;
+
 // AI Prompt Library - Prompts stored in database
 export const aiPrompts = pgTable("ai_prompts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
