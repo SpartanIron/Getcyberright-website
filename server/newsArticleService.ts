@@ -65,7 +65,15 @@ const anthropic = new Anthropic({
 });
 
 const CATEGORY_MAP: Record<string, string> = {
-  breach: "Cybersecurity",
+  breach: "Breaking",
+  "data leak": "Breaking",
+  "data breach": "Breaking",
+  "records exposed": "Breaking",
+  "records stolen": "Breaking",
+  "million records": "Breaking",
+  "billion records": "Breaking",
+  "zero-day": "Breaking",
+  "actively exploited": "Breaking",
   leak: "Cybersecurity",
   hack: "Cybersecurity",
   ransomware: "Cybersecurity",
@@ -149,14 +157,47 @@ function generateSlug(title: string): string {
 }
 
 interface ProcessedArticle {
+  index: number;
   familyTitle: string;
   excerpt: string;
   content: string;
 }
 
-async function simplifyFeedItems(items: RawFeedItem[]): Promise<ProcessedArticle[]> {
+const BREACH_KEYWORDS = [
+  "breach", "breached", "data leak", "leaked", "exposed", "stolen data",
+  "hack", "hacked", "compromised", "ransomware", "records exposed",
+  "personal data", "customer data", "employee data", "million records",
+  "billion records", "data theft", "identity theft", "credit card",
+  "social security", "passwords stolen", "credentials",
+];
+
+function isBreachArticle(title: string, summary: string): boolean {
+  const text = (title + " " + summary).toLowerCase();
+  return BREACH_KEYWORDS.some(kw => text.includes(kw));
+}
+
+function prioritizeArticles(items: RawFeedItem[]): RawFeedItem[] {
+  const breach: RawFeedItem[] = [];
+  const highUrgency: RawFeedItem[] = [];
+  const rest: RawFeedItem[] = [];
+
+  for (const item of items) {
+    const text = (item.title + " " + item.summary).toLowerCase();
+    if (isBreachArticle(item.title, item.summary)) {
+      breach.push(item);
+    } else if (["zero-day", "critical", "actively exploited", "emergency", "breaking"].some(kw => text.includes(kw))) {
+      highUrgency.push(item);
+    } else {
+      rest.push(item);
+    }
+  }
+
+  return [...breach, ...highUrgency, ...rest];
+}
+
+async function simplifyBatch(items: RawFeedItem[], startIndex: number): Promise<ProcessedArticle[]> {
   const itemsText = items.map((item, i) =>
-    `[${i}] TITLE: ${item.title}\nSOURCE: ${item.source}\nSUMMARY: ${item.summary.substring(0, 400)}`
+    `[${startIndex + i}] TITLE: ${item.title}\nSOURCE: ${item.source}\nSUMMARY: ${item.summary.substring(0, 400)}`
   ).join("\n\n");
 
   try {
@@ -165,18 +206,19 @@ async function simplifyFeedItems(items: RawFeedItem[]): Promise<ProcessedArticle
       max_tokens: 4000,
       messages: [{
         role: "user",
-        content: `You are a cybersecurity journalist writing for families and everyday internet users — NOT for IT professionals.
+        content: `You are a cybersecurity journalist writing for families and everyday internet users, NOT for IT professionals.
 
 For each of the following news items, create a family-friendly article. Use simple, clear language. Explain technical terms. Focus on what this means for regular people and what they should do.
 
 ${itemsText}
 
 For EACH item, output a JSON object with:
-- "index": the item number
+- "index": the item number (MUST match the number in brackets)
 - "familyTitle": a clear, non-sensationalized headline that a parent or grandparent would understand (do NOT just copy the original title)
 - "excerpt": 1-2 sentence summary explaining why this matters to families (max 200 chars)
-- "content": 3-5 paragraph article body. Structure: What happened → Why it matters to you → What you should do now. Use simple language. No jargon.
+- "content": 3-5 paragraph article body. Structure: What happened > Why it matters to you > What you should do now. Use simple language. No jargon.
 
+IMPORTANT: You MUST output exactly ${items.length} objects, one for each input item. Do not skip any.
 Output a JSON array of these objects. Output ONLY the JSON array, no markdown.`
       }]
     });
@@ -186,9 +228,57 @@ Output a JSON array of these objects. Output ONLY the JSON array, no markdown.`
     const parsed = JSON.parse(cleaned);
     return Array.isArray(parsed) ? parsed : [];
   } catch (error: any) {
-    console.error("[NewsService] AI simplification failed:", error.message);
+    console.error(`[NewsService] AI batch simplification failed:`, error.message);
     return [];
   }
+}
+
+function createFallbackArticle(item: RawFeedItem, index: number): ProcessedArticle {
+  const sentences = item.summary.split(/[.!?]+/).filter(s => s.trim().length > 20);
+  const content = sentences.length > 0
+    ? `${item.title}\n\n${sentences.slice(0, 3).map(s => s.trim() + '.').join(' ')}\n\nStay informed and take steps to protect yourself and your family. Visit GetCyberRight for tools and guides to help you stay safe online.`
+    : `${item.title}\n\nThis story is developing. Check back for updates on how this may affect you and your family.\n\nIn the meantime, make sure your passwords are strong and unique, and be cautious of any suspicious emails or messages related to this topic.`;
+
+  return {
+    index,
+    familyTitle: item.title,
+    excerpt: item.summary.substring(0, 200),
+    content,
+  };
+}
+
+async function simplifyFeedItems(items: RawFeedItem[]): Promise<ProcessedArticle[]> {
+  const BATCH_SIZE = 4;
+  const allResults: ProcessedArticle[] = [];
+
+  for (let i = 0; i < items.length; i += BATCH_SIZE) {
+    const chunk = items.slice(i, i + BATCH_SIZE);
+    const results = await simplifyBatch(chunk, i);
+
+    if (results.length > 0) {
+      const returnedIndexes = new Set(results.map(r => r.index));
+      allResults.push(...results);
+
+      for (let j = 0; j < chunk.length; j++) {
+        const expectedIndex = i + j;
+        if (!returnedIndexes.has(expectedIndex)) {
+          console.log(`[NewsService] AI skipped article index ${expectedIndex}, using fallback`);
+          allResults.push(createFallbackArticle(chunk[j], expectedIndex));
+        }
+      }
+    } else {
+      console.log(`[NewsService] AI failed for batch starting at ${i}, using fallbacks for ${chunk.length} articles`);
+      chunk.forEach((item, j) => {
+        allResults.push(createFallbackArticle(item, i + j));
+      });
+    }
+
+    if (i + BATCH_SIZE < items.length) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  return allResults;
 }
 
 async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number> {
@@ -207,8 +297,10 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
     return 0;
   }
 
-  const batch = newItems.slice(0, 8);
-  console.log(`[NewsService] Processing ${batch.length} new articles...`);
+  const prioritized = prioritizeArticles(newItems);
+  const batch = prioritized.slice(0, 12);
+  const breachCount = batch.filter(b => isBreachArticle(b.title, b.summary)).length;
+  console.log(`[NewsService] Processing ${batch.length} new articles (${breachCount} breach-related)...`);
 
   const simplified = await simplifyFeedItems(batch);
   let created = 0;
@@ -290,10 +382,11 @@ export function startNewsScheduler() {
 
   setTimeout(async () => {
     const existingCount = await storage.getNewsArticleCount();
-    if (existingCount > 0) {
+    if (existingCount >= 8) {
       console.log(`[NewsService] ${existingCount} articles already exist, skipping initial fetch`);
       return;
     }
+    console.log(`[NewsService] Only ${existingCount} articles exist, fetching more...`);
     const count = await refreshNewsArticles();
     console.log(`[NewsService] Initial refresh: ${count} articles created`);
   }, 10000);

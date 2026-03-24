@@ -123,6 +123,26 @@ const TRUSTED_FEEDS = [
     source: "Microsoft Security Blog",
     fallbackUrl: "https://www.microsoft.com/en-us/security/blog/",
   },
+  {
+    url: "https://www.bleepingcomputer.com/feed/",
+    source: "BleepingComputer",
+    fallbackUrl: "https://www.bleepingcomputer.com/",
+  },
+  {
+    url: "https://databreaches.net/feed/",
+    source: "DataBreaches.net",
+    fallbackUrl: "https://databreaches.net/",
+  },
+  {
+    url: "https://www.troyhunt.com/rss/",
+    source: "Troy Hunt",
+    fallbackUrl: "https://www.troyhunt.com/",
+  },
+  {
+    url: "https://www.zdnet.com/topic/security/rss.xml",
+    source: "ZDNet Security",
+    fallbackUrl: "https://www.zdnet.com/topic/security/",
+  },
 ];
 
 const REGION_DEFINITIONS: Record<string, string> = {
@@ -225,7 +245,7 @@ export async function fetchRealThreats(): Promise<RawFeedItem[]> {
       const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
       return dateB - dateA;
     })
-    .slice(0, 20);
+    .slice(0, 60);
 }
 
 async function simplifyForAudience(

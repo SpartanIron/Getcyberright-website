@@ -4912,6 +4912,17 @@ EDGE CASE HANDLING
     }
   });
 
+  app.post("/api/news/refresh", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { refreshNewsArticles } = await import("./newsArticleService");
+      const count = await refreshNewsArticles();
+      res.json({ success: true, articlesCreated: count });
+    } catch (error: any) {
+      console.error("[news] Manual refresh failed:", error.message);
+      res.status(500).json({ error: "Failed to refresh news articles" });
+    }
+  });
+
   app.post("/api/news/generate-social", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const { generateSocialPostsForNewsBatch } = await import("./newsSocialEngine");
