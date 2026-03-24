@@ -4838,7 +4838,8 @@ EDGE CASE HANDLING
         cybersecurity: "Cybersecurity",
         ai: "AI",
         tech: "Tech",
-        breaking: "Breaking",
+        "action-needed": "Action Needed",
+        breaking: "Action Needed",
         safety: "Cybersecurity",
       };
       const category = categoryMap[req.params.category.toLowerCase()] || req.params.category;

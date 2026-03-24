@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { NewsFilter } from "@/components/news-filter";
 import { Search, TrendingUp, ChevronLeft, ChevronRight, Newspaper, ExternalLink, Clock, RefreshCw, MapPin, Calendar, Globe, Users, Shield, AlertTriangle } from "lucide-react";
 import { LiveNewsIndicator } from "@/components/live-news-indicator";
+import { NewsPageGuidesSidebar } from "@/components/featured-guides";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { motion } from "framer-motion";
@@ -27,7 +28,7 @@ interface NewsItem {
   title: string;
   excerpt: string;
   content?: string;
-  category: "Cybersecurity" | "AI" | "Tech" | "Conferences" | "Breaking" | "safety";
+  category: "Cybersecurity" | "AI" | "Tech" | "Conferences" | "Action Needed" | "safety";
   author?: string;
   source: string;
   url: string;
@@ -106,7 +107,7 @@ function getCategoryColor(category: string): string {
     case "AI": return "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20";
     case "Tech": return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
     case "Conferences": return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
-    case "Breaking": return "bg-red-600/10 text-red-700 dark:text-red-300 border-red-600/20";
+    case "Action Needed": return "bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/20";
     default: return "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20";
   }
 }
@@ -153,7 +154,7 @@ function getCategoryGradient(category: string): string {
     case "Cybersecurity": return "from-red-900 via-slate-900 to-red-950";
     case "AI": return "from-purple-900 via-slate-900 to-indigo-950";
     case "Tech": return "from-blue-900 via-slate-900 to-cyan-950";
-    case "Breaking": return "from-red-800 via-red-900 to-slate-900";
+    case "Action Needed": return "from-orange-800 via-slate-900 to-orange-950";
     default: return "from-slate-800 via-slate-900 to-slate-950";
   }
 }
@@ -163,7 +164,7 @@ function getCategoryIcon(category: string) {
     case "Cybersecurity": return Shield;
     case "AI": return Newspaper;
     case "Tech": return Globe;
-    case "Breaking": return AlertTriangle;
+    case "Action Needed": return AlertTriangle;
     default: return Shield;
   }
 }
@@ -183,7 +184,7 @@ function NewsCard({ article }: { article: NewsItem }) {
   const hasSlug = !!article.slug;
   const readTime = getEstimatedReadTime(article.content, article.excerpt);
   const urgencyBadge = article.urgencyLevel && article.urgencyLevel >= 4
-    ? { label: "Breaking", className: "bg-red-600 text-white animate-pulse" }
+    ? { label: "Action Needed", className: "bg-orange-600 text-white animate-pulse" }
     : article.urgencyLevel && article.urgencyLevel >= 3
     ? { label: "Important", className: "bg-amber-500 text-white" }
     : null;
@@ -729,6 +730,12 @@ export default function News() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {!isEventsView && (
+          <div className="mt-12 pt-8 border-t">
+            <NewsPageGuidesSidebar />
+          </div>
         )}
       </div>
       <Footer />

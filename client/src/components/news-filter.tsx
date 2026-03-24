@@ -9,7 +9,7 @@ interface NewsFilterProps {
 export function NewsFilter({ activeFilter, onFilterChange }: NewsFilterProps) {
   const filters = [
     { key: "all", label: "All Alerts", icon: AlertTriangle },
-    { key: "breaking", label: "Breaking", icon: Flame },
+    { key: "action-needed", label: "Action Needed", icon: Flame },
     { key: "cybersecurity", label: "Scams & Threats", icon: Shield },
     { key: "ai", label: "AI Safety", icon: Brain },
     { key: "tech", label: "Tech & Privacy", icon: Laptop },

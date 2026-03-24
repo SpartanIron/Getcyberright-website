@@ -6,6 +6,7 @@ import { HowItWorks } from "@/components/how-it-works";
 import { PillarTiles } from "@/components/pillar-tiles";
 import { ThreatAwareness } from "@/components/threat-awareness";
 import { ContentPreview } from "@/components/content-preview";
+import { FeaturedGuide } from "@/components/featured-guides";
 import { AudiencePaths } from "@/components/audience-paths";
 import { AuthoritySection } from "@/components/authority-section";
 import { Testimonials } from "@/components/testimonials";
@@ -52,6 +53,7 @@ export default function Home() {
         <AuthoritySection />
         <Testimonials />
         <ContentPreview />
+        <FeaturedGuide />
         <NewsletterCTA />
         <CTAFooter />
       </main>

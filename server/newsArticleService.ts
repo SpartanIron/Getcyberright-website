@@ -65,15 +65,18 @@ const anthropic = new Anthropic({
 });
 
 const CATEGORY_MAP: Record<string, string> = {
-  breach: "Breaking",
-  "data leak": "Breaking",
-  "data breach": "Breaking",
-  "records exposed": "Breaking",
-  "records stolen": "Breaking",
-  "million records": "Breaking",
-  "billion records": "Breaking",
-  "zero-day": "Breaking",
-  "actively exploited": "Breaking",
+  breach: "Action Needed",
+  "data leak": "Action Needed",
+  "data breach": "Action Needed",
+  "records exposed": "Action Needed",
+  "records stolen": "Action Needed",
+  "million records": "Action Needed",
+  "billion records": "Action Needed",
+  "zero-day": "Action Needed",
+  "actively exploited": "Action Needed",
+  "change your password": "Action Needed",
+  "update now": "Action Needed",
+  "update your": "Action Needed",
   leak: "Cybersecurity",
   hack: "Cybersecurity",
   ransomware: "Cybersecurity",
@@ -176,23 +179,75 @@ function isBreachArticle(title: string, summary: string): boolean {
   return BREACH_KEYWORDS.some(kw => text.includes(kw));
 }
 
+function scoreRelevance(item: RawFeedItem): number {
+  const text = (item.title + " " + item.summary).toLowerCase();
+  let score = 0;
+
+  const actionableKeywords = [
+    "password", "update", "patch", "change", "enable", "disable", "check",
+    "protect", "secure", "warning", "alert", "affected", "impacted",
+    "stolen", "exposed", "leaked", "breach", "compromised",
+  ];
+  const familyKeywords = [
+    "family", "parent", "child", "kid", "teen", "senior", "elder",
+    "phone", "email", "social media", "app", "account", "bank",
+    "identity", "personal", "consumer", "customer", "user",
+    "scam", "phishing", "fraud", "trick", "fake",
+  ];
+  const irrelevantKeywords = [
+    "stock price", "ipo", "earnings", "quarterly", "revenue",
+    "hiring", "layoff", "appointed", "ceo", "board of directors",
+    "geopolitical", "military", "espionage", "nation-state",
+    "defi", "nft", "blockchain", "cryptocurrency mining",
+    "kernel", "compiler", "api endpoint", "sdk", "devops",
+    "immigration", "election", "political", "partisan",
+  ];
+
+  for (const kw of actionableKeywords) {
+    if (text.includes(kw)) score += 3;
+  }
+  for (const kw of familyKeywords) {
+    if (text.includes(kw)) score += 2;
+  }
+  for (const kw of irrelevantKeywords) {
+    if (text.includes(kw)) score -= 5;
+  }
+
+  if (isBreachArticle(item.title, item.summary)) score += 5;
+
+  return score;
+}
+
+function filterByRelevance(items: RawFeedItem[]): RawFeedItem[] {
+  const scored = items.map(item => ({ item, score: scoreRelevance(item) }));
+  scored.sort((a, b) => b.score - a.score);
+
+  const filtered = scored.filter(s => s.score > 0);
+  const dropped = scored.length - filtered.length;
+  if (dropped > 0) {
+    console.log(`[NewsService] Relevance filter: kept ${filtered.length}, dropped ${dropped} irrelevant articles`);
+  }
+
+  return filtered.map(s => s.item);
+}
+
 function prioritizeArticles(items: RawFeedItem[]): RawFeedItem[] {
-  const breach: RawFeedItem[] = [];
+  const actionNeeded: RawFeedItem[] = [];
   const highUrgency: RawFeedItem[] = [];
   const rest: RawFeedItem[] = [];
 
   for (const item of items) {
     const text = (item.title + " " + item.summary).toLowerCase();
     if (isBreachArticle(item.title, item.summary)) {
-      breach.push(item);
-    } else if (["zero-day", "critical", "actively exploited", "emergency", "breaking"].some(kw => text.includes(kw))) {
+      actionNeeded.push(item);
+    } else if (["zero-day", "critical", "actively exploited", "emergency"].some(kw => text.includes(kw))) {
       highUrgency.push(item);
     } else {
       rest.push(item);
     }
   }
 
-  return [...breach, ...highUrgency, ...rest];
+  return [...actionNeeded, ...highUrgency, ...rest];
 }
 
 async function simplifyBatch(items: RawFeedItem[], startIndex: number): Promise<ProcessedArticle[]> {
@@ -206,17 +261,21 @@ async function simplifyBatch(items: RawFeedItem[], startIndex: number): Promise<
       max_tokens: 4000,
       messages: [{
         role: "user",
-        content: `You are a cybersecurity journalist writing for families and everyday internet users, NOT for IT professionals.
+        content: `You are a cybersecurity journalist writing for families and everyday internet users — NOT for IT professionals. Your goal is to help people understand threats AND take action.
 
-For each of the following news items, create a family-friendly article. Use simple, clear language. Explain technical terms. Focus on what this means for regular people and what they should do.
+For each of the following news items, create a family-friendly article. Focus on: Is this something families need to worry about? What should they actually DO?
 
 ${itemsText}
 
 For EACH item, output a JSON object with:
 - "index": the item number (MUST match the number in brackets)
-- "familyTitle": a clear, non-sensationalized headline that a parent or grandparent would understand (do NOT just copy the original title)
+- "familyTitle": a clear, calm headline a parent or grandparent would understand. Frame around what matters to THEM, not the attacker. Example: "Your School Records May Have Been Exposed — Here's What To Do" instead of "Hackers Breach Education Platform"
 - "excerpt": 1-2 sentence summary explaining why this matters to families (max 200 chars)
-- "content": 3-5 paragraph article body. Structure: What happened > Why it matters to you > What you should do now. Use simple language. No jargon.
+- "content": 4-6 paragraph article body with this structure:
+  1. What happened (1 paragraph, simple language, no jargon)
+  2. Who is affected and how (1 paragraph — be specific: "If you use [service], your email and password may have been exposed")
+  3. What you should do RIGHT NOW (1-2 paragraphs — give numbered, specific steps like "1. Change your password on [site] 2. Enable two-factor authentication 3. Watch for suspicious emails")
+  4. How to stay protected long-term (1 paragraph — connect to broader safety habits)
 
 IMPORTANT: You MUST output exactly ${items.length} objects, one for each input item. Do not skip any.
 Output a JSON array of these objects. Output ONLY the JSON array, no markdown.`
@@ -297,10 +356,15 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
     return 0;
   }
 
-  const prioritized = prioritizeArticles(newItems);
-  const batch = prioritized.slice(0, 12);
-  const breachCount = batch.filter(b => isBreachArticle(b.title, b.summary)).length;
-  console.log(`[NewsService] Processing ${batch.length} new articles (${breachCount} breach-related)...`);
+  const relevant = filterByRelevance(newItems);
+  if (relevant.length === 0) {
+    console.log("[NewsService] No relevant articles after filtering");
+    return 0;
+  }
+  const prioritized = prioritizeArticles(relevant);
+  const batch = prioritized.slice(0, 8);
+  const actionCount = batch.filter(b => isBreachArticle(b.title, b.summary)).length;
+  console.log(`[NewsService] Processing ${batch.length} articles (${actionCount} action-needed, ${newItems.length - relevant.length} dropped by relevance filter)...`);
 
   const simplified = await simplifyFeedItems(batch);
   let created = 0;
@@ -378,7 +442,7 @@ export async function refreshNewsArticles(): Promise<number> {
 }
 
 export function startNewsScheduler() {
-  console.log("[NewsService] Starting news article scheduler (every 4 hours)");
+  console.log("[NewsService] Starting news article scheduler (daily refresh)");
 
   setTimeout(async () => {
     const existingCount = await storage.getNewsArticleCount();
@@ -400,5 +464,5 @@ export function startNewsScheduler() {
     } catch (err: any) {
       console.error("[NewsService] Scheduled refresh error:", err.message);
     }
-  }, 4 * 60 * 60 * 1000);
+  }, 24 * 60 * 60 * 1000);
 }
