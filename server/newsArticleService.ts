@@ -207,9 +207,14 @@ export function startNewsScheduler() {
   console.log("[NewsService] Starting news article scheduler (every 4 hours)");
 
   setTimeout(async () => {
+    const existingCount = await storage.getNewsArticleCount();
+    if (existingCount > 0) {
+      console.log(`[NewsService] ${existingCount} articles already exist, skipping initial fetch`);
+      return;
+    }
     const count = await refreshNewsArticles();
     console.log(`[NewsService] Initial refresh: ${count} articles created`);
-  }, 30000);
+  }, 10000);
 
   setInterval(async () => {
     try {

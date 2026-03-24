@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Moon, Sun, Menu, ChevronDown, ShieldCheck, AlertTriangle, Globe, Shield, Search, Key, TrendingUp } from "lucide-react";
+import { Moon, Sun, Menu, ChevronDown, ShieldCheck, AlertTriangle, Globe, Shield, Search, Key, TrendingUp, Newspaper } from "lucide-react";
 import logoImage from "@assets/image_1767834716649.png";
 import { languages } from "@/lib/i18n";
 import { SiteSearch } from "./site-search";
@@ -80,7 +80,7 @@ export function Header() {
       { nameKey: "nav.parentGuide", href: "/parent-guide" },
       { nameKey: "nav.resources", href: "/resources" },
     ]},
-    { nameKey: "nav.news", href: "/news" },
+    { nameKey: "nav.news", href: "/news", icon: <Newspaper className="h-4 w-4" /> },
     { nameKey: "nav.about", href: "/about" },
   ];
 
@@ -173,13 +173,14 @@ export function Header() {
                 <Link
                   key={item.nameKey}
                   to={item.href}
-                  className={`text-base 2xl:text-lg font-medium transition-all duration-200 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg px-4 py-2.5 h-10 2xl:px-5 2xl:h-11 flex items-center whitespace-nowrap ${
+                  className={`text-base 2xl:text-lg font-medium transition-all duration-200 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg px-4 py-2.5 h-10 2xl:px-5 2xl:h-11 flex items-center gap-1.5 whitespace-nowrap ${
                     location === item.href
                       ? "text-foreground bg-slate-100 dark:bg-slate-800"
                       : "text-muted-foreground"
                   }`}
                   data-testid={`nav-${item.nameKey}`}
                 >
+                  {item.icon && item.icon}
                   {t(item.nameKey)}
                 </Link>
               )
@@ -308,12 +309,13 @@ export function Header() {
                       key={item.nameKey}
                       to={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`font-medium min-h-[48px] py-3 px-3 rounded-lg text-base transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 active:bg-slate-200 dark:active:bg-slate-700 ${
+                      className={`flex items-center gap-2 font-medium min-h-[48px] py-3 px-3 rounded-lg text-base transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 active:bg-slate-200 dark:active:bg-slate-700 ${
                         location === item.href
                           ? "text-foreground bg-slate-100 dark:bg-slate-800"
                           : "text-muted-foreground"
                       }`}
                     >
+                      {item.icon && item.icon}
                       {t(item.nameKey)}
                     </Link>
                   )

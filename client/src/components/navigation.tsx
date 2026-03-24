@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap } from "lucide-react";
+import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -236,6 +236,19 @@ export function Navigation() {
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
                   <Link
+                    href="/news"
+                    className={`group inline-flex h-9 w-max items-center justify-center gap-1.5 rounded-md bg-transparent px-4 py-2 text-[15px] font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/news' || location.startsWith('/news/') ? 'text-primary' : ''}`}
+                    data-testid="nav-news"
+                  >
+                    <Newspaper className="w-4 h-4" />
+                    News
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
                     href="/about"
                     className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-[15px] font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/about' ? 'text-primary' : ''}`}
                     data-testid="nav-about"
@@ -344,6 +357,18 @@ export function Navigation() {
                     </Link>
                   ))}
                 </div>
+
+                <div className="h-px bg-border" />
+
+                <Link
+                  href="/news"
+                  className="flex items-center gap-3 py-2 text-foreground transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                  data-testid="mobile-link-news"
+                >
+                  <Newspaper className="w-4 h-4 text-teal-500" />
+                  <span className="font-medium">News</span>
+                </Link>
 
                 <div className="h-px bg-border" />
 
