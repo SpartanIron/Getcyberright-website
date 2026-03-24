@@ -237,7 +237,7 @@ export const pageSEO = {
     description: "Download and print cybersecurity guides for your family. Easy reference cards for passwords, phishing, and more.",
   },
   scamChecker: {
-    title: "Scam Checker",
+    title: "GCR Scam Guard",
     description: "Check suspicious messages, emails, URLs, and phone numbers for scams. AI-powered threat analysis to keep you safe.",
   },
 };

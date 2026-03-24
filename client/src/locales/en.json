@@ -10,7 +10,7 @@
     "learn": "Learn",
     "about": "About",
     "threatIntelligence": "Threat Intel",
-    "scamChecker": "Scam Checker",
+    "scamChecker": "GCR Scam Guard",
     "breachChecker": "Breach Checker",
     "passwordGenerator": "Security Key Generator",
     "threatTrends": "Threat Trends",
@@ -215,7 +215,7 @@
     }
   },
   "scamChecker": {
-    "title": "Scam Checker",
+    "title": "GCR Scam Guard",
     "subtitle": "Check if something is a scam",
     "checkButton": "Check If It's a Scam",
     "passwordButton": "Create Strong Passwords",

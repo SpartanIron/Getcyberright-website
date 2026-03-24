@@ -13,7 +13,7 @@ const footerLinks = {
     { name: "Resource Library", href: "/resources" },
   ],
   tools: [
-    { name: "Scam Checker", href: "/scam-checker" },
+    { name: "GCR Scam Guard", href: "/scam-checker" },
     { name: "GCR Data Shield", href: "/shield" },
     { name: "Password Generator", href: "/password-generator" },
     { name: "AI Prompt Library", href: "/ai-prompts" },

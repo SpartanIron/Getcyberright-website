@@ -9,7 +9,7 @@ const features = [
   {
     id: "scam-checker",
     label: "Most Popular",
-    title: "AI Scam Checker",
+    title: "GCR Scam Guard",
     description: "Paste a suspicious URL, email, phone number, or message and get an instant risk analysis. Checked against 8 trusted safety sources in real time.",
     href: "/scam-checker",
     cta: "Check a Scam",

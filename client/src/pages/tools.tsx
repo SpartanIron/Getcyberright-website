@@ -105,7 +105,7 @@ export default function Tools() {
   const toolsSchemas: WebApplicationData[] = [
     {
       type: "WebApplication",
-      name: "Scam Checker",
+      name: "GCR Scam Guard",
       description: "AI-powered tool to check if URLs, emails, phone numbers, and QR codes are scams. Analyzes threats using multiple security engines.",
       url: "https://www.getcyberright.com/scam-checker",
       applicationCategory: "SecurityApplication",
@@ -167,7 +167,7 @@ export default function Tools() {
                   <Search className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium text-sm">Scam Checker</p>
+                  <p className="font-medium text-sm">GCR Scam Guard</p>
                   <p className="text-xs text-muted-foreground">Scan URLs, emails, phones & more</p>
                 </div>
               </button>

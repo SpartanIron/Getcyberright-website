@@ -379,7 +379,7 @@ export function AdvancedScan() {
                   <pre className="text-sm whitespace-pre-wrap">{extractedText}</pre>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Copy this text to the main Scam Checker tool for detailed analysis.
+                  Copy this text to the main GCR Scam Guard tool for detailed analysis.
                 </p>
               </div>
             )}

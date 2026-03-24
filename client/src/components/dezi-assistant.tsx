@@ -130,7 +130,7 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(what is getcyberright|about.*(this|your).*(site|website|platform)|what.*(this|your) (site|website))/.test(t),
     responses: [
-      "GetCyberRight is a free family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like the Scam Checker to analyze suspicious messages, a Password Generator, GCR Data Shield to scan for your exposed personal data, and lots of guides tailored to different family members. Everything is free to get started.",
+      "GetCyberRight is a free family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like GCR Scam Guard to analyze suspicious messages, a Password Generator, GCR Data Shield to scan for your exposed personal data, and lots of guides tailored to different family members. Everything is free to get started.",
     ],
   },
   {
@@ -461,7 +461,7 @@ export function DeziAssistant() {
       setMessages(prev => [...prev, {
         id: messageId,
         role: "assistant",
-        content: "I'm reconnecting right now. In the meantime, you can use our Scam Checker tool to analyze suspicious messages, or try our Password Generator for a secure password.",
+        content: "I'm reconnecting right now. In the meantime, you can use our GCR Scam Guard tool to analyze suspicious messages, or try our Password Generator for a secure password.",
         timestamp: new Date(),
       }]);
       setIsTyping(false);
@@ -488,7 +488,7 @@ export function DeziAssistant() {
         setMessages(prev =>
           prev.map(msg =>
             msg.id === messageId
-              ? { ...msg, content: "I've reached my message limit for now. Please try again in a little while, or explore our tools like the Scam Checker and Password Generator for immediate help.", isStreaming: false }
+              ? { ...msg, content: "I've reached my message limit for now. Please try again in a little while, or explore our tools like GCR Scam Guard and Password Generator for immediate help.", isStreaming: false }
               : msg
           )
         );
