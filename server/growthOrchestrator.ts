@@ -299,13 +299,39 @@ export async function getOrchestratorDashboard() {
   };
 }
 
-let lastBufferPublishDate = "";
+async function allPlatformsPublishedToday(): Promise<boolean> {
+  try {
+    const { getBufferChannelsByPlatform } = await import("./bufferPublisher");
+    const channels = await getBufferChannelsByPlatform();
+    const connectedPlatforms = Object.keys(channels);
+    if (connectedPlatforms.length === 0) return false;
+
+    const recentPosts = await storage.getSocialPosts("published", 100);
+    const today = new Date().toDateString();
+    const publishedPlatforms = new Set<string>();
+    for (const post of recentPosts) {
+      if (!post.publishedAt) continue;
+      if (new Date(post.publishedAt).toDateString() !== today) continue;
+      publishedPlatforms.add(post.platform);
+    }
+
+    const allDone = connectedPlatforms.every(p => publishedPlatforms.has(p));
+    if (allDone) {
+      console.log(`[GrowthOrchestrator] All connected platforms (${connectedPlatforms.join(", ")}) already published today`);
+    }
+    return allDone;
+  } catch {
+    return false;
+  }
+}
 
 async function dailySocialPublish(): Promise<void> {
   if (!isBufferConfigured()) return;
 
-  const today = new Date().toISOString().split("T")[0];
-  if (lastBufferPublishDate === today) return;
+  const allDone = await allPlatformsPublishedToday();
+  if (allDone) {
+    return;
+  }
 
   try {
     console.log(`[GrowthOrchestrator] Starting daily social publish...`);
@@ -324,8 +350,6 @@ async function dailySocialPublish(): Promise<void> {
       const failed = results.filter(r => !r.success).length;
       console.log(`[GrowthOrchestrator] Draft drain complete: ${succeeded} published, ${failed} failed`);
     }
-
-    lastBufferPublishDate = today;
   } catch (error: any) {
     console.error("[GrowthOrchestrator] Daily social publish error:", error.message);
   }

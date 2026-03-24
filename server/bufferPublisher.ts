@@ -258,11 +258,22 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     }
   }
 
-  const result = await createBufferPost(channel.id, post.postContent, {
+  let result = await createBufferPost(channel.id, post.postContent, {
     mode: "shareNow",
     imageUrl,
     platform: post.platform,
   });
+
+  if (!result.success && imageUrl && result.error?.toLowerCase().includes("image")) {
+    console.warn(`[Buffer] Image rejected for ${post.platform} post ${postId}: ${result.error}. Retrying without image...`);
+    result = await createBufferPost(channel.id, post.postContent, {
+      mode: "shareNow",
+      platform: post.platform,
+    });
+    if (result.success) {
+      console.log(`[Buffer] Retry without image succeeded for ${post.platform} post ${postId}`);
+    }
+  }
 
   if (result.success) {
     await storage.updateSocialPost(postId, {
@@ -285,6 +296,22 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
 
 const DAILY_POSTS_PER_PLATFORM = 1;
 
+async function getTodaysPublishedCountByPlatform(): Promise<Record<string, number>> {
+  const counts: Record<string, number> = {};
+  try {
+    const recentPosts = await storage.getSocialPosts("published", 100);
+    const today = new Date().toDateString();
+    for (const post of recentPosts) {
+      if (!post.publishedAt) continue;
+      if (new Date(post.publishedAt).toDateString() !== today) continue;
+      counts[post.platform] = (counts[post.platform] || 0) + 1;
+    }
+  } catch (err: any) {
+    console.error("[Buffer] Failed to check today's published counts:", err.message);
+  }
+  return counts;
+}
+
 export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]> {
   const drafts = await storage.getSocialPosts("draft", 50);
   const results: BufferPublishResult[] = [];
@@ -305,7 +332,14 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
   }
   console.log(`[Buffer] Connected platforms: ${[...connectedPlatforms].join(", ")}. Draft platforms: ${Object.entries(platformCounts).map(([p, c]) => `${p}(${c})`).join(", ")}. Skipping ${skippedCount} posts with no matching channel.`);
 
-  const publishedPerPlatform: Record<string, number> = {};
+  const publishedPerPlatform = await getTodaysPublishedCountByPlatform();
+  const alreadyPublishedLog = Object.entries(publishedPerPlatform)
+    .filter(([, c]) => c > 0)
+    .map(([p, c]) => `${p}(${c})`)
+    .join(", ");
+  if (alreadyPublishedLog) {
+    console.log(`[Buffer] Already published today (DB check): ${alreadyPublishedLog}`);
+  }
 
   for (const draft of drafts) {
     if (draft.platform === "alert") continue;

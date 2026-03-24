@@ -3,6 +3,7 @@ import { z } from "zod";
 import { storage } from "./storage";
 import type { CyberSafetyGuide, CyberThreatAlert, ScamIntelligence, InsertSocialPost } from "@shared/schema";
 import { generateBrandedImage, serveImagePath } from "./socialImageService";
+import { getBufferChannelsByPlatform } from "./bufferPublisher";
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -310,6 +311,17 @@ function buildScamContext(scam: ScamIntelligence): string {
   return parts.join("\n\n");
 }
 
+async function getConnectedPlatforms(): Promise<Set<string>> {
+  try {
+    const channels = await getBufferChannelsByPlatform();
+    const connected = new Set(Object.keys(channels));
+    connected.add("alert");
+    return connected;
+  } catch {
+    return new Set(["linkedin", "facebook", "alert"]);
+  }
+}
+
 async function generateImageForPost(title: string, contentType: string, platform: string): Promise<string | null> {
   try {
     const imagePath = await generateBrandedImage(title, contentType, platform);
@@ -335,14 +347,21 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
   if (!posts) return [];
 
   const createdIds: string[] = [];
+  const connectedPlatforms = await getConnectedPlatforms();
 
-  const platforms: { platform: string; content: string }[] = [
+  const allPlatforms: { platform: string; content: string }[] = [
     { platform: "linkedin", content: posts.linkedin },
     { platform: "facebook", content: posts.facebook || posts.linkedin },
     { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
+
+  const platforms = allPlatforms.filter(p => connectedPlatforms.has(p.platform));
+  const skipped = allPlatforms.filter(p => !connectedPlatforms.has(p.platform)).map(p => p.platform);
+  if (skipped.length > 0) {
+    console.log(`[SocialDistribution] Skipping disconnected platforms: ${skipped.join(", ")}`);
+  }
 
   for (const { platform, content } of platforms) {
     if (!content) continue;
@@ -381,14 +400,21 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
   if (!posts) return [];
 
   const createdIds: string[] = [];
+  const connectedPlatforms = await getConnectedPlatforms();
 
-  const platforms: { platform: string; content: string }[] = [
+  const allPlatforms: { platform: string; content: string }[] = [
     { platform: "linkedin", content: posts.linkedin },
     { platform: "facebook", content: posts.facebook || posts.linkedin },
     { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
+
+  const platforms = allPlatforms.filter(p => connectedPlatforms.has(p.platform));
+  const skipped = allPlatforms.filter(p => !connectedPlatforms.has(p.platform)).map(p => p.platform);
+  if (skipped.length > 0) {
+    console.log(`[SocialDistribution] Skipping disconnected platforms: ${skipped.join(", ")}`);
+  }
 
   for (const { platform, content } of platforms) {
     if (!content) continue;
@@ -427,14 +453,21 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
   if (!posts) return [];
 
   const createdIds: string[] = [];
+  const connectedPlatforms = await getConnectedPlatforms();
 
-  const platforms: { platform: string; content: string }[] = [
+  const allPlatforms: { platform: string; content: string }[] = [
     { platform: "linkedin", content: posts.linkedin },
     { platform: "facebook", content: posts.facebook || posts.linkedin },
     { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
+
+  const platforms = allPlatforms.filter(p => connectedPlatforms.has(p.platform));
+  const skipped = allPlatforms.filter(p => !connectedPlatforms.has(p.platform)).map(p => p.platform);
+  if (skipped.length > 0) {
+    console.log(`[SocialDistribution] Skipping disconnected platforms: ${skipped.join(", ")}`);
+  }
 
   for (const { platform, content } of platforms) {
     if (!content) continue;

@@ -231,9 +231,9 @@ function getRecentPerformanceSummary(): string {
   return `\nLEARNING CONTEXT (recent 30 posts): Most covered categories: ${topCategories.join(", ")}. Most used modes: ${topModes.join(", ")}. Consider varying from these for freshness.`;
 }
 
-async function checkRateLimit(): Promise<boolean> {
+async function checkRateLimit(): Promise<{ allowed: boolean; availablePlatforms: string[] }> {
   try {
-    const recentPosts = await storage.getSocialPosts("published", 10);
+    const recentPosts = await storage.getSocialPosts("published", 100);
     const today = new Date().toDateString();
     const todaysPosts = recentPosts.filter((p) => {
       if (!p.publishedAt) return false;
@@ -243,16 +243,21 @@ async function checkRateLimit(): Promise<boolean> {
     for (const post of todaysPosts) {
       platformCounts[post.platform] = (platformCounts[post.platform] || 0) + 1;
     }
-    const overLimit = Object.entries(platformCounts).some(([platform, count]) => {
-      if (count >= 1) {
-        console.log(`[TrendEngine] Rate limit: ${platform} already has ${count} post(s) today (max 1/day), skipping`);
-        return true;
-      }
-      return false;
-    });
-    return !overLimit;
+    const channels = await getBufferChannelsByPlatform();
+    const connectedPlatforms = Object.keys(channels);
+    const available = connectedPlatforms.filter(p => (platformCounts[p] || 0) < 1);
+    const atLimit = connectedPlatforms.filter(p => (platformCounts[p] || 0) >= 1);
+    if (atLimit.length > 0) {
+      console.log(`[TrendEngine] Rate limit: ${atLimit.join(", ")} already at daily max (1/day)`);
+    }
+    if (available.length === 0) {
+      console.log("[TrendEngine] All connected platforms at daily limit, skipping");
+      return { allowed: false, availablePlatforms: [] };
+    }
+    console.log(`[TrendEngine] Platforms available for posting: ${available.join(", ")}`);
+    return { allowed: true, availablePlatforms: available };
   } catch {
-    return true;
+    return { allowed: true, availablePlatforms: ["linkedin", "facebook"] };
   }
 }
 
@@ -1018,21 +1023,23 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
   const result = { published: 0, platforms: [] as string[] };
 
   try {
-    if (!options?.skipRateLimit) {
-      const withinRateLimit = await checkRateLimit();
-      if (!withinRateLimit) {
-        console.log("[TrendEngine] Rate limit reached (max 1 post per platform per day), skipping");
-        return result;
-      }
-    } else {
-      console.log("[TrendEngine] Rate limit bypassed (manual trigger)");
-    }
-
     const channels = await getBufferChannelsByPlatform();
     const connectedPlatforms = Object.keys(channels);
     if (connectedPlatforms.length === 0) {
       console.log("[TrendEngine] No Buffer channels connected, skipping");
       return result;
+    }
+
+    let allowedPlatforms = connectedPlatforms;
+    if (!options?.skipRateLimit) {
+      const rateCheck = await checkRateLimit();
+      if (!rateCheck.allowed) {
+        console.log("[TrendEngine] Rate limit reached (max 1 post per platform per day), skipping");
+        return result;
+      }
+      allowedPlatforms = rateCheck.availablePlatforms;
+    } else {
+      console.log("[TrendEngine] Rate limit bypassed (manual trigger)");
     }
 
     const postStyle = getTodaysPostStyle();
@@ -1092,7 +1099,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
         `[TrendEngine] Content flagged for review (confidence: ${posts.confidenceScore}). Saving as draft instead of publishing.`
       );
       for (const platform of ["linkedin", "facebook"] as const) {
-        if (!channels[platform]) continue;
+        if (!channels[platform] || !allowedPlatforms.includes(platform)) continue;
         const content = platform === "linkedin" ? posts.linkedin : posts.facebook;
         await storage.createSocialPost({
           contentType: "trend_insight",
@@ -1137,8 +1144,8 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
 
     const platformFilter = options?.platformFilter;
     const platformPosts: { platform: string; content: string }[] = [];
-    if (channels.linkedin && (!platformFilter || platformFilter === "linkedin")) platformPosts.push({ platform: "linkedin", content: validatedLinkedin });
-    if (channels.facebook && (!platformFilter || platformFilter === "facebook")) platformPosts.push({ platform: "facebook", content: validatedFacebook });
+    if (channels.linkedin && allowedPlatforms.includes("linkedin") && (!platformFilter || platformFilter === "linkedin")) platformPosts.push({ platform: "linkedin", content: validatedLinkedin });
+    if (channels.facebook && allowedPlatforms.includes("facebook") && (!platformFilter || platformFilter === "facebook")) platformPosts.push({ platform: "facebook", content: validatedFacebook });
 
     for (const { platform, content } of platformPosts) {
       try {
@@ -1156,11 +1163,22 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
         await storage.updateSocialPost(created.id, { publishedAt: new Date() });
 
         const channel = channels[platform];
-        const bufferResult = await createBufferPost(channel.id, content, {
+        let bufferResult = await createBufferPost(channel.id, content, {
           mode: "shareNow",
           platform,
           imageUrl: imageUrl || undefined,
         });
+
+        if (!bufferResult.success && imageUrl && bufferResult.error?.toLowerCase().includes("image")) {
+          console.warn(`[TrendEngine] Image rejected for ${platform}: ${bufferResult.error}. Retrying without image...`);
+          bufferResult = await createBufferPost(channel.id, content, {
+            mode: "shareNow",
+            platform,
+          });
+          if (bufferResult.success) {
+            console.log(`[TrendEngine] Retry without image succeeded for ${platform}`);
+          }
+        }
 
         if (bufferResult.success) {
           console.log(
