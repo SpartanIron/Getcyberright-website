@@ -9,7 +9,7 @@ interface LiveNewsIndicatorProps {
 
 export function LiveNewsIndicator({ showRefresh = false, onRefresh }: LiveNewsIndicatorProps) {
   const { data: liveNews, isLoading, refetch } = useQuery({
-    queryKey: ["/api/news/live"],
+    queryKey: ["/api/news/latest"],
     refetchInterval: 300000, // Check for updates every 5 minutes
     staleTime: 240000, // Consider data stale after 4 minutes
   });
@@ -25,9 +25,9 @@ export function LiveNewsIndicator({ showRefresh = false, onRefresh }: LiveNewsIn
         <Zap className="h-3 w-3 mr-1" />
         Live Feed
       </Badge>
-      {liveNews && Array.isArray(liveNews) && (
+      {liveNews && (liveNews as any)?.articles && (
         <span className="text-xs text-muted-foreground">
-          {liveNews.length} fresh articles
+          {(liveNews as any).articles.length} fresh articles
         </span>
       )}
       {showRefresh && (

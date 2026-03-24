@@ -5,34 +5,57 @@ import type { InsertNewsArticle, NewsArticle } from "@shared/schema";
 import { generateSocialPostsForNewsBatch } from "./newsSocialEngine";
 
 async function fetchOgImage(url: string): Promise<string | null> {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; GetCyberRight/1.0; +https://www.getcyberright.com)",
-        "Accept": "text/html",
-      },
-      redirect: "follow",
-    });
-    clearTimeout(timeout);
-    if (!res.ok) return null;
-    const html = await res.text();
-    const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
-      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
-    if (ogMatch?.[1] && !ogMatch[1].includes('1x1') && !ogMatch[1].includes('pixel')) {
-      return ogMatch[1].replace(/^http:\/\//i, 'https://');
+  const userAgents = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+  ];
+
+  for (const ua of userAgents) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          "User-Agent": ua,
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.5",
+          "Cache-Control": "no-cache",
+        },
+        redirect: "follow",
+      });
+      clearTimeout(timeout);
+      if (!res.ok) continue;
+      const html = await res.text();
+
+      if (html.includes('challenge-platform') || html.includes('Just a moment')) {
+        console.log(`[NewsService] Cloudflare challenge detected for: ${url}`);
+        continue;
+      }
+
+      const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+        || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+      if (ogMatch?.[1] && !ogMatch[1].includes('1x1') && !ogMatch[1].includes('pixel')) {
+        return ogMatch[1].replace(/^http:\/\//i, 'https://').replace(/&amp;/g, '&');
+      }
+
+      const twitterMatch = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)
+        || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i);
+      if (twitterMatch?.[1] && !twitterMatch[1].includes('1x1')) {
+        return twitterMatch[1].replace(/^http:\/\//i, 'https://').replace(/&amp;/g, '&');
+      }
+
+      const schemaMatch = html.match(/"image"\s*:\s*"(https?:\/\/[^"]+)"/i);
+      if (schemaMatch?.[1] && !schemaMatch[1].includes('1x1') && !schemaMatch[1].includes('pixel') && !schemaMatch[1].includes('logo')) {
+        return schemaMatch[1].replace(/^http:\/\//i, 'https://');
+      }
+
+      return null; // Page loaded but has no extractable image — no point retrying with different UA
+    } catch {
+      continue;
     }
-    const twitterMatch = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)
-      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i);
-    if (twitterMatch?.[1] && !twitterMatch[1].includes('1x1')) {
-      return twitterMatch[1].replace(/^http:\/\//i, 'https://');
-    }
-    return null;
-  } catch {
-    return null;
   }
+  return null;
 }
 
 const anthropic = new Anthropic({

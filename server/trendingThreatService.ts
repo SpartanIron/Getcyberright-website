@@ -14,6 +14,12 @@ const rssParser = new Parser({
   headers: {
     "User-Agent": "GetCyberRight/1.0 (Cybersecurity Education Platform)",
   },
+  customFields: {
+    item: [
+      ['media:content', 'mediaContent', { keepArray: false }],
+      ['media:thumbnail', 'mediaThumbnail', { keepArray: false }],
+    ],
+  },
 });
 
 export interface RawFeedItem {
@@ -153,16 +159,39 @@ export async function fetchRealThreats(): Promise<RawFeedItem[]> {
         let imageUrl: string | undefined;
         if (item.enclosure?.url && /\.(jpg|jpeg|png|webp|gif)/i.test(item.enclosure.url)) {
           imageUrl = item.enclosure.url;
-        } else if (item['media:content']?.['$']?.url) {
+        }
+
+        if (!imageUrl && item.mediaThumbnail) {
+          const thumb = item.mediaThumbnail;
+          imageUrl = thumb.$?.url || thumb.url || (typeof thumb === 'string' ? thumb : undefined);
+        }
+
+        if (!imageUrl && item.mediaContent) {
+          const mc = item.mediaContent;
+          imageUrl = mc.$?.url || mc.url || (typeof mc === 'string' ? mc : undefined);
+        }
+
+        if (!imageUrl && item['media:content']?.['$']?.url) {
           imageUrl = item['media:content']['$'].url;
-        } else if (item['media:thumbnail']?.['$']?.url) {
+        }
+        if (!imageUrl && item['media:thumbnail']?.['$']?.url) {
           imageUrl = item['media:thumbnail']['$'].url;
-        } else {
-          const contentHtml = item.content || item['content:encoded'] || '';
+        }
+
+        if (!imageUrl && item.itunes?.image) {
+          imageUrl = item.itunes.image;
+        }
+
+        if (!imageUrl) {
+          const contentHtml = item.content || item['content:encoded'] || item.description || '';
           const imgMatch = contentHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
-          if (imgMatch?.[1] && !imgMatch[1].includes('gravatar') && !imgMatch[1].includes('pixel') && !imgMatch[1].includes('1x1')) {
+          if (imgMatch?.[1] && !imgMatch[1].includes('gravatar') && !imgMatch[1].includes('pixel') && !imgMatch[1].includes('1x1') && !imgMatch[1].includes('feedburner')) {
             imageUrl = imgMatch[1];
           }
+        }
+
+        if (imageUrl) {
+          imageUrl = imageUrl.replace(/&amp;/g, '&').replace(/^http:\/\//i, 'https://');
         }
         return {
           title: item.title || "Untitled",
