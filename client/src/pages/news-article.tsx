@@ -66,6 +66,17 @@ export default function NewsArticlePage() {
     enabled: !!slug,
   });
 
+  const { data: latestArticles } = useQuery<NewsArticleData[]>({
+    queryKey: ["/api/news/latest-fallback"],
+    queryFn: async () => {
+      const res = await fetch("/api/news/latest?limit=4");
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.articles || [];
+    },
+    enabled: !!(error || (!isLoading && !article)),
+  });
+
   useSEO({
     title: article ? `${article.title} | GetCyberRight News` : "News | GetCyberRight",
     description: article?.excerpt || "Cybersecurity news simplified for families",
@@ -87,14 +98,36 @@ export default function NewsArticlePage() {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Navigation />
-        <div className="flex flex-col items-center justify-center flex-1 py-32 gap-4">
-          <AlertTriangle className="w-12 h-12 text-muted-foreground" />
-          <h1 className="text-2xl font-bold" data-testid="text-not-found">Article Not Found</h1>
-          <p className="text-muted-foreground">This article may have been removed or the link is incorrect.</p>
+        <div className="flex flex-col items-center justify-center flex-1 py-16 gap-6 px-4">
+          <div className="text-center max-w-md">
+            <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
+            <h1 className="text-2xl font-bold mb-2" data-testid="text-not-found">Article No Longer Available</h1>
+            <p className="text-muted-foreground">This article may have been updated or replaced with newer content. Check out the latest cybersecurity news below.</p>
+          </div>
+          {latestArticles && latestArticles.length > 0 && (
+            <div className="w-full max-w-2xl space-y-3">
+              <h2 className="text-lg font-semibold text-center" data-testid="text-latest-heading">Latest News</h2>
+              {latestArticles.map((a) => (
+                <Link key={a.id} href={`/news/${a.slug}`}>
+                  <Card className="hover:border-primary/30 transition-colors cursor-pointer" data-testid={`card-fallback-article-${a.id}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm line-clamp-2">{a.title}</p>
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{a.excerpt}</p>
+                        </div>
+                        <Badge variant="outline" className={`${getCategoryColor(a.category)} shrink-0 text-xs`}>{a.category}</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
           <Link href="/news">
             <Button variant="outline" data-testid="link-back-to-news">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to News
+              Browse All News
             </Button>
           </Link>
         </div>

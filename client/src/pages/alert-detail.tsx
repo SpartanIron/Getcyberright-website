@@ -75,13 +75,23 @@ export default function AlertDetailPage() {
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 py-20 text-center">
-          <ShieldAlert className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold mb-4" data-testid="text-not-found">Alert Not Found</h1>
-          <p className="text-muted-foreground mb-8">This alert does not exist or has expired.</p>
-          <Link href="/alerts" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-back-alerts">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Browse All Alerts
-          </Link>
+          <ShieldAlert className="h-10 w-10 text-amber-500 mx-auto mb-3" />
+          <h1 className="text-2xl font-bold mb-2" data-testid="text-not-found">Alert No Longer Available</h1>
+          <p className="text-muted-foreground mb-6">This alert may have been updated or replaced with newer threat information.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/alerts">
+              <span className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-back-alerts">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Browse All Alerts
+              </span>
+            </Link>
+            <Link href="/news">
+              <span className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-latest-news">
+                Latest News
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </span>
+            </Link>
+          </div>
         </div>
         <Footer />
       </div>

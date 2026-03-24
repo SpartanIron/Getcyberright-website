@@ -110,13 +110,23 @@ export default function ScamIntelDetailPage() {
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 py-20 text-center">
-          <AlertTriangle className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold mb-4" data-testid="text-not-found">Scam Report Not Found</h1>
-          <p className="text-muted-foreground mb-8">This scam report does not exist or has been removed.</p>
-          <Link href="/scam-intel" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-back-scam-intel">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Browse Scam Intelligence
-          </Link>
+          <AlertTriangle className="h-10 w-10 text-amber-500 mx-auto mb-3" />
+          <h1 className="text-2xl font-bold mb-2" data-testid="text-not-found">Scam Report No Longer Available</h1>
+          <p className="text-muted-foreground mb-6">This scam report may have been updated with newer information.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/scam-intel">
+              <span className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-back-scam-intel">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Browse Scam Intelligence
+              </span>
+            </Link>
+            <Link href="/news">
+              <span className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-latest-news">
+                Latest News
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </span>
+            </Link>
+          </div>
         </div>
         <Footer />
       </div>

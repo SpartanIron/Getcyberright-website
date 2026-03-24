@@ -70,13 +70,22 @@ export default function GuideDetailPage() {
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 py-20 text-center">
-          <BookOpen className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold mb-4" data-testid="text-not-found">Guide Not Found</h1>
-          <p className="text-muted-foreground mb-8">This guide does not exist or has been moved.</p>
-          <Link href="/guides" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-back-guides">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Browse All Guides
-          </Link>
+          <BookOpen className="h-10 w-10 text-amber-500 mx-auto mb-3" />
+          <h1 className="text-2xl font-bold mb-2" data-testid="text-not-found">Guide No Longer Available</h1>
+          <p className="text-muted-foreground mb-6">This guide may have been updated or replaced with newer content.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/guides">
+              <span className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-back-guides">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Browse All Guides
+              </span>
+            </Link>
+            <Link href="/news">
+              <span className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-latest-news">
+                Latest News
+              </span>
+            </Link>
+          </div>
         </div>
         <Footer />
       </div>
