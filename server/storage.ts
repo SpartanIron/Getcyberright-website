@@ -117,6 +117,7 @@ export interface IStorage {
   createSocialPost(post: InsertSocialPost): Promise<SocialPost>;
   getSocialPosts(status?: string, limit?: number): Promise<SocialPost[]>;
   getSocialPostById(id: string): Promise<SocialPost | undefined>;
+  getSocialPostsByContentId(contentType: string, contentId: string): Promise<SocialPost[]>;
   updateSocialPost(id: string, data: Partial<InsertSocialPost & { publishedAt?: Date; publishError?: string }>): Promise<SocialPost | undefined>;
   getSocialPostCount(status?: string): Promise<number>;
 
@@ -471,6 +472,11 @@ export class DatabaseStorage implements IStorage {
   async createSocialPost(post: InsertSocialPost): Promise<SocialPost> {
     const result = await db.insert(socialPosts).values(post).returning();
     return result[0];
+  }
+
+  async getSocialPostsByContentId(contentType: string, contentId: string): Promise<SocialPost[]> {
+    return await db.select().from(socialPosts)
+      .where(and(eq(socialPosts.contentType, contentType), eq(socialPosts.contentId, contentId)));
   }
 
   async getSocialPosts(status?: string, limit = 50): Promise<SocialPost[]> {

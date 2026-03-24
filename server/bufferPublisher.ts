@@ -223,7 +223,10 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
 
   let imageUrl: string | undefined;
   if (post.imageUrl) {
-    if (fs.existsSync(post.imageUrl)) {
+    if (post.imageUrl.startsWith("https://")) {
+      imageUrl = post.imageUrl;
+      console.log(`[Buffer] Using external image URL: ${imageUrl}`);
+    } else if (fs.existsSync(post.imageUrl)) {
       const publicUrl = getPublicImageUrl(post.imageUrl);
       if (publicUrl) {
         imageUrl = publicUrl;

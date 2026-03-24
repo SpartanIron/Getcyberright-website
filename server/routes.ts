@@ -4901,6 +4901,35 @@ EDGE CASE HANDLING
     }
   });
 
+  app.get("/api/news/social-stats", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { getNewsSocialStats } = await import("./newsSocialEngine");
+      const stats = await getNewsSocialStats();
+      res.json(stats);
+    } catch (error: any) {
+      console.error("[news] Social stats failed:", error.message);
+      res.status(500).json({ error: "Failed to fetch social stats" });
+    }
+  });
+
+  app.post("/api/news/generate-social", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { generateSocialPostsForNewsBatch } = await import("./newsSocialEngine");
+      const articles = await storage.getNewsArticles(undefined, 8);
+      if (articles.length === 0) {
+        return res.json({ message: "No news articles available", totalCreated: 0 });
+      }
+      const result = await generateSocialPostsForNewsBatch(articles);
+      res.json({
+        message: `Generated ${result.totalCreated} social posts from ${result.articlesProcessed} articles`,
+        ...result,
+      });
+    } catch (error: any) {
+      console.error("[news] Manual social generation failed:", error.message);
+      res.status(500).json({ error: "Social generation failed" });
+    }
+  });
+
   app.get("/api/news/article/:slug", async (req: Request, res: Response) => {
     try {
       const article = await storage.getNewsArticleBySlug(req.params.slug);

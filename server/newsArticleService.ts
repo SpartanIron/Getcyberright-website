@@ -1,7 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { storage } from "./storage";
 import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
-import type { InsertNewsArticle } from "@shared/schema";
+import type { InsertNewsArticle, NewsArticle } from "@shared/schema";
+import { generateSocialPostsForNewsBatch } from "./newsSocialEngine";
 
 async function fetchOgImage(url: string): Promise<string | null> {
   try {
@@ -187,6 +188,7 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
 
   const simplified = await simplifyFeedItems(batch);
   let created = 0;
+  const createdArticles: NewsArticle[] = [];
 
   const ogImagePromises = batch.map(async (item) => {
     if (item.imageUrl) return item.imageUrl;
@@ -207,7 +209,7 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
     const resolvedImage = rawImage?.replace(/^http:\/\//i, 'https://') || null;
 
     try {
-      await storage.createNewsArticle({
+      const stored = await storage.createNewsArticle({
         title: article.familyTitle || feedItem.title,
         slug,
         excerpt: article.excerpt || feedItem.summary.substring(0, 200),
@@ -224,6 +226,7 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
         publishedAt: feedItem.pubDate ? new Date(feedItem.pubDate) : new Date(),
       });
       created++;
+      createdArticles.push(stored);
     } catch (err: any) {
       if (err.message?.includes("duplicate key")) continue;
       console.error(`[NewsService] Failed to store article: ${err.message}`);
@@ -231,6 +234,19 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
   }
 
   console.log(`[NewsService] Created ${created} new articles`);
+
+  if (createdArticles.length > 0) {
+    setTimeout(async () => {
+      try {
+        console.log(`[NewsService] Triggering social post generation for ${createdArticles.length} new articles...`);
+        const socialResult = await generateSocialPostsForNewsBatch(createdArticles);
+        console.log(`[NewsService] Social generation complete: ${socialResult.totalCreated} posts from ${socialResult.articlesProcessed} articles`);
+      } catch (err: any) {
+        console.error(`[NewsService] Social generation failed:`, err.message);
+      }
+    }, 5000);
+  }
+
   return created;
 }
 
