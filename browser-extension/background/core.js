@@ -324,11 +324,15 @@ async function handleAutoScan(message, sender) {
         result.sources.push("ai-scan");
         const aiRisk = (aiResult.result.scamRiskLevel || "").toLowerCase();
         let aiScore = 0;
-        if (aiRisk === "critical") aiScore = 95;
-        else if (aiRisk === "high") aiScore = 75;
-        else if (aiRisk === "moderate" || aiRisk === "medium") aiScore = 50;
-        else if (aiRisk === "low") aiScore = 20;
-        result.riskScore = Math.max(result.riskScore, aiScore);
+        if (aiRisk === "critical") aiScore = 90;
+        else if (aiRisk === "high") aiScore = 70;
+        else if (aiRisk === "moderate" || aiRisk === "medium") aiScore = 25;
+        else if (aiRisk === "low") aiScore = 5;
+
+        const repWeight = 0.4;
+        const aiWeight = 0.6;
+        const blended = Math.round(result.riskScore * repWeight + aiScore * aiWeight);
+        result.riskScore = Math.max(result.riskScore, blended);
       }
     } catch (e) { logWarn("core", "AI scan failed:", e.message); }
   }
