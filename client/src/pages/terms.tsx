@@ -130,7 +130,7 @@ export default function Terms() {
                   <h3 className="text-xl font-semibold text-foreground mb-3">4.1 Free Features</h3>
                   <p>
                     All educational content, articles, guides, and basic security tools on GetCyberRight are 
-                    available free of charge. Free users can access the Scam Checker with manual scans, 
+                    available free of charge. Free users can access the GCR Scam Guard with manual scans, 
                     educational resources, and community features without creating an account or paying.
                   </p>
 
@@ -292,7 +292,7 @@ export default function Terms() {
                   </ul>
 
                   <h3 className="text-xl font-semibold text-foreground mb-3 mt-6">8.2 AI-Powered Scam Detection</h3>
-                  <p>Our Scam Checker and GCR Scam Guard extension use AI to analyze URLs, messages, and page content for potential threats. By using these tools, you acknowledge:</p>
+                  <p>Our GCR Scam Guard and GCR Scam Guard extension use AI to analyze URLs, messages, and page content for potential threats. By using these tools, you acknowledge:</p>
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Scan results are assessments based on known patterns and AI analysis, not definitive determinations of safety or danger</li>
                     <li>A "Verified Safe" result does not guarantee a site is completely safe, and a threat warning does not guarantee a site is malicious</li>

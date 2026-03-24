@@ -133,7 +133,7 @@ function buildSiteNav(): string {
       <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:0.05em;color:#666;margin:0 0 8px;">Security Tools</h3>
       <ul style="list-style:none;padding:0;margin:0;line-height:2;">
         <li><a href="/tools" style="color:#0d9488;">All Tools</a></li>
-        <li><a href="/scam-checker" style="color:#0d9488;">AI Scam Checker</a></li>
+        <li><a href="/scam-checker" style="color:#0d9488;">GCR Scam Guard</a></li>
         <li><a href="/password-generator" style="color:#0d9488;">Password Generator</a></li>
         <li><a href="/data-removal" style="color:#0d9488;">Data Broker Removal</a></li>
         <li><a href="/breach-dashboard" style="color:#0d9488;">Breach Monitor</a></li>
@@ -291,7 +291,7 @@ async function renderGuidePage(slug: string): Promise<string | null> {
     <h2>Related Resources</h2>
     <ul>
       <li><a href="/guides">Browse All Guides</a></li>
-      <li><a href="/scam-checker">Scam Checker Tool</a></li>
+      <li><a href="/scam-checker">GCR Scam Guard</a></li>
       <li><a href="/tools">Security Tools</a></li>
       <li><a href="/training">Training Academy</a></li>
     </ul>
@@ -533,7 +533,7 @@ async function renderTopicHub(cluster: string): Promise<string | null> {
   <section>
     <h2>Protection Tools</h2>
     <ul>
-      <li><a href="/scam-checker">Scam Checker</a> - Analyze suspicious links and messages</li>
+      <li><a href="/scam-checker">GCR Scam Guard</a> - Analyze suspicious links and messages</li>
       <li><a href="/password-generator">Password Generator</a> - Create strong, unique passwords</li>
       <li><a href="/data-removal">Data Broker Removal</a> - Remove your personal data from brokers</li>
       <li><a href="/breach-dashboard">Breach Dashboard</a> - Check if your data has been exposed</li>
@@ -608,13 +608,13 @@ interface StaticPageDef {
 
 const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
   "/scam-checker": {
-    title: "AI Scam Checker: Analyze URLs, Emails, Messages & QR Codes",
+    title: "GCR Scam Guard: Analyze URLs, Emails, Messages & QR Codes",
     description: "Use our free AI-powered scam checker to analyze suspicious URLs, emails, text messages, and QR codes. Get instant safety reports checked against multiple trusted safety sources.",
     path: "/scam-checker",
     schemaType: "WebApplication",
     features: ["URL safety analysis", "Email scam detection", "QR code scanning", "Real-time safety checks", "Multi-source verification"],
-    bodyContent: `<p>According to the FBI's Internet Crime Complaint Center (IC3), Americans lost over $10.3 billion to online scams in 2023 alone. Many of these scams start with a single suspicious link in an email, text message, or social media post. Our AI Scam Checker helps you verify whether a link, email, or message is safe before you click.</p>
-    <h2>How the Scam Checker Works</h2>
+    bodyContent: `<p>According to the FBI's Internet Crime Complaint Center (IC3), Americans lost over $10.3 billion to online scams in 2023 alone. Many of these scams start with a single suspicious link in an email, text message, or social media post. Our GCR Scam Guard helps you verify whether a link, email, or message is safe before you click.</p>
+    <h2>How the GCR Scam Guard Works</h2>
     <p>When you submit a suspicious URL, email, or message, our system runs it through multiple trusted safety databases simultaneously. We check Google Safe Browsing, VirusTotal, URLhaus, and other sources to cross-reference threat data. The tool also examines the domain age, SSL certificate status, and known hosting patterns to identify newly created scam sites that other tools might miss.</p>
     <h2>What You Can Check</h2>
     <ul><li><strong>Suspicious URLs</strong> - Paste any link to see if it leads to a known scam, malware, or fake website</li><li><strong>Email messages</strong> - Copy the text of suspicious emails to check for common scam patterns</li><li><strong>Text messages (SMS)</strong> - Analyze those "urgent" texts claiming to be from your bank or delivery service</li><li><strong>QR codes</strong> - Upload an image of a QR code to reveal and check the hidden URL before scanning it with your phone</li></ul>
@@ -629,13 +629,13 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { text: "Password Generator", href: "/password-generator" },
     ],
     faqs: [
-      { question: "How does the AI Scam Checker work?", answer: "Our scam checker uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages. It cross-references safety data to give you a safety score." },
-      { question: "Is the Scam Checker free to use?", answer: "Yes, the Scam Checker is free to get started. You can analyze URLs, emails, text messages, and QR codes without any cost." },
+      { question: "How does the GCR Scam Guard work?", answer: "Our scam checker uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages. It cross-references safety data to give you a safety score." },
+      { question: "Is the GCR Scam Guard free to use?", answer: "Yes, the GCR Scam Guard is free to get started. You can analyze URLs, emails, text messages, and QR codes without any cost." },
       { question: "What types of scams can it detect?", answer: "Our tool can detect phishing links, malware-hosting URLs, fake websites, social engineering attempts, tech support scams, romance scams, and many other common online scams." },
       { question: "How accurate is the scam detection?", answer: "We use multiple verified safety sources and AI analysis for high accuracy. However, no tool is 100% accurate. Always exercise caution with suspicious communications." },
-      { question: "How do I check if a text message is a scam?", answer: "Copy the text message content and paste it into the Scam Checker. Our tool analyzes the message for common scam patterns, suspicious links, and known fraud tactics. Look for urgency, unknown senders, and requests for personal information." },
-      { question: "Can I check if an email is legitimate?", answer: "Yes. Paste the email content or any links from the email into the Scam Checker. We check sender patterns, link safety, and message content against known scam databases to help you verify if the email is real." },
-      { question: "How do I scan a QR code for safety?", answer: "Upload an image of the QR code to our Scam Checker. We decode the hidden URL and check it against multiple safety databases before you scan it with your phone, protecting you from malicious QR codes." },
+      { question: "How do I check if a text message is a scam?", answer: "Copy the text message content and paste it into the GCR Scam Guard. Our tool analyzes the message for common scam patterns, suspicious links, and known fraud tactics. Look for urgency, unknown senders, and requests for personal information." },
+      { question: "Can I check if an email is legitimate?", answer: "Yes. Paste the email content or any links from the email into the GCR Scam Guard. We check sender patterns, link safety, and message content against known scam databases to help you verify if the email is real." },
+      { question: "How do I scan a QR code for safety?", answer: "Upload an image of the QR code to our GCR Scam Guard. We decode the hidden URL and check it against multiple safety databases before you scan it with your phone, protecting you from malicious QR codes." },
     ],
   },
   "/password-generator": {
@@ -655,7 +655,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { text: "Breach Monitor", href: "/breach-dashboard" },
       { text: "Cyber Hygiene Guide", href: "/cyber-hygiene" },
       { text: "Security Checklists", href: "/checklists" },
-      { text: "AI Scam Checker", href: "/scam-checker" },
+      { text: "GCR Scam Guard", href: "/scam-checker" },
     ],
     faqs: [
       { question: "What makes a strong password?", answer: "A strong password is at least 12 characters long and includes a mix of uppercase letters, lowercase letters, numbers, and special characters. It should not contain personal information or common words." },
@@ -685,7 +685,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { text: "Breach Monitor", href: "/breach-dashboard" },
       { text: "Privacy Policy", href: "/privacy" },
       { text: "Cyber Hygiene", href: "/cyber-hygiene" },
-      { text: "AI Scam Checker", href: "/scam-checker" },
+      { text: "GCR Scam Guard", href: "/scam-checker" },
     ],
     faqs: [
       { question: "What are data brokers?", answer: "Data brokers are companies that collect, aggregate, and sell personal information. They gather data from public records, social media, purchase history, and other sources, then sell it to marketers, employers, and anyone willing to pay." },
@@ -731,8 +731,8 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/faq",
     faqs: [
       { question: "What is GetCyberRight?", answer: "GetCyberRight is a free-to-start cybersecurity education platform designed for families, seniors, parents, and everyday individuals. We provide practical tools, guides, and AI-powered analysis to help you stay safe online." },
-      { question: "Is GetCyberRight really free?", answer: "GetCyberRight is free to get started. Core tools like the Scam Checker, Password Generator, and educational content are available at no cost." },
-      { question: "How can I protect myself from phishing?", answer: "Never click links in unexpected emails or messages. Verify the sender's email address carefully, look for spelling errors, and go directly to websites by typing the URL. Use our Scam Checker to analyze suspicious links." },
+      { question: "Is GetCyberRight really free?", answer: "GetCyberRight is free to get started. Core tools like the GCR Scam Guard, Password Generator, and educational content are available at no cost." },
+      { question: "How can I protect myself from phishing?", answer: "Never click links in unexpected emails or messages. Verify the sender's email address carefully, look for spelling errors, and go directly to websites by typing the URL. Use our GCR Scam Guard to analyze suspicious links." },
       { question: "What should I do if I think I have been scammed?", answer: "Immediately change passwords for any compromised accounts, contact your bank if financial information was shared, file a report with the FTC at reportfraud.ftc.gov, and visit our Emergency Help page for step-by-step guidance." },
       { question: "How do I create a strong password?", answer: "Use at least 12 characters with a mix of uppercase, lowercase, numbers, and symbols. Never reuse passwords across sites. Use our Password Generator to create strong, unique passwords instantly." },
       { question: "What is two-factor authentication?", answer: "Two-factor authentication (2FA) adds an extra layer of security by requiring a second form of verification beyond your password, such as a code sent to your phone or generated by an authenticator app." },
@@ -809,7 +809,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     <p>You do not need to be a technology expert to stay safe. Start with these basics: never give personal information to someone who contacts you unexpectedly, hang up on suspicious phone calls, verify requests by calling the company directly using a number from their official website, and establish a family code word that only you and your loved ones know for verifying emergency calls.</p>`,
     relatedLinks: [
       { text: "Emergency Help", href: "/emergency-help" },
-      { text: "AI Scam Checker", href: "/scam-checker" },
+      { text: "GCR Scam Guard", href: "/scam-checker" },
       { text: "Scam Intelligence Center", href: "/scam-intel" },
       { text: "Parents Hub", href: "/parents" },
     ],
@@ -856,7 +856,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { text: "Parents Hub", href: "/parents" },
       { text: "Educator Resources", href: "/educators" },
       { text: "Password Generator", href: "/password-generator" },
-      { text: "AI Scam Checker", href: "/scam-checker" },
+      { text: "GCR Scam Guard", href: "/scam-checker" },
     ],
     faqs: [
       { question: "What age group are these lessons designed for?", answer: "Our lessons are designed for two age groups: ages 8 to 11 (foundational concepts with fun activities) and ages 12 to 16 (more advanced topics including social media safety, privacy, and recognizing scams)." },
@@ -898,7 +898,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     <ul><li><strong>Business email compromise</strong> - Attackers impersonate vendors, clients, or executives to trick employees into sending money or sensitive data</li><li><strong>Ransomware</strong> - Malicious software that locks your files and demands payment to unlock them</li><li><strong>Customer data theft</strong> - Breaches that expose your customers' personal and payment information, leading to legal liability and loss of trust</li><li><strong>Invoice fraud</strong> - Scammers send fake invoices that look like they come from legitimate vendors your business regularly pays</li></ul>`,
     relatedLinks: [
       { text: "Training Academy", href: "/training" },
-      { text: "AI Scam Checker", href: "/scam-checker" },
+      { text: "GCR Scam Guard", href: "/scam-checker" },
       { text: "Security Checklists", href: "/checklists" },
       { text: "Scam Intelligence Center", href: "/scam-intel" },
     ],
@@ -933,7 +933,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/resources",
     features: ["125+ safety guides", "Interactive security tools", "Training courses", "Scam alert database", "Printable checklists", "AI prompt library"],
     faqs: [
-      { question: "Are all resources free?", answer: "Our core resources are free to get started. This includes safety guides, scam alerts, the Scam Checker tool, and foundational training content." },
+      { question: "Are all resources free?", answer: "Our core resources are free to get started. This includes safety guides, scam alerts, the GCR Scam Guard tool, and foundational training content." },
       { question: "How often is new content added?", answer: "We publish new content regularly, including updated scam alerts, new safety guides, and training materials. Subscribe to our newsletter to stay informed about new resources." },
     ],
   },
@@ -949,7 +949,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     <ul><li><strong>United States:</strong> FTC at reportfraud.ftc.gov, FBI IC3 at ic3.gov</li><li><strong>United Kingdom:</strong> Action Fraud at actionfraud.police.uk</li><li><strong>Canada:</strong> Canadian Anti-Fraud Centre at antifraudcentre-centreantifraude.ca</li><li><strong>Australia:</strong> Scamwatch at scamwatch.gov.au</li></ul>
     <p>Also report the scam to us using our <a href="/report-scam">Report a Scam</a> page so we can warn others and update our detection systems.</p>`,
     relatedLinks: [
-      { text: "AI Scam Checker", href: "/scam-checker" },
+      { text: "GCR Scam Guard", href: "/scam-checker" },
       { text: "Report a Scam", href: "/report-scam" },
       { text: "Password Generator", href: "/password-generator" },
       { text: "Breach Monitor", href: "/breach-dashboard" },
@@ -960,14 +960,14 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     ],
   },
   "/tools": {
-    title: "Free Cybersecurity Tools: Scam Checker, Password Generator & More | GetCyberRight",
-    description: "Access free cybersecurity tools including an AI-powered Scam Checker, secure Password Generator, Data Broker Removal, and Breach Monitor. No signup required.",
+    title: "Free Cybersecurity Tools: GCR Scam Guard, Password Generator & More | GetCyberRight",
+    description: "Access free cybersecurity tools including an AI-powered GCR Scam Guard, secure Password Generator, Data Broker Removal, and Breach Monitor. No signup required.",
     path: "/tools",
     schemaType: "WebApplication",
-    features: ["AI Scam Checker", "Secure Password Generator", "Data Broker Removal", "Breach Monitor", "Voice Deepfake Detector", "QR Code Scanner"],
+    features: ["GCR Scam Guard", "Secure Password Generator", "Data Broker Removal", "Breach Monitor", "Voice Deepfake Detector", "QR Code Scanner"],
     bodyContent: `<p>Most cybersecurity tools are built for IT professionals and large corporations. We built ours for everyday people. Every tool on GetCyberRight is designed to be simple enough for anyone to use, with no technical knowledge required and no signup needed for core features.</p>
     <h2>Our Free Security Toolkit</h2>
-    <ul><li><a href="/scam-checker"><strong>AI Scam Checker</strong></a> - Paste a suspicious URL, email, or text message to check it against multiple trusted safety databases including Google Safe Browsing, VirusTotal, and URLhaus. You can also upload QR code images to reveal hidden links.</li>
+    <ul><li><a href="/scam-checker"><strong>GCR Scam Guard</strong></a> - Paste a suspicious URL, email, or text message to check it against multiple trusted safety databases including Google Safe Browsing, VirusTotal, and URLhaus. You can also upload QR code images to reveal hidden links.</li>
     <li><a href="/password-generator"><strong>Password Generator</strong></a> - Create strong, unique passwords instantly. Everything runs in your browser and nothing is sent to our servers.</li>
     <li><a href="/data-removal"><strong>Data Broker Removal</strong></a> - Find and remove your personal information from 501+ data broker and people-search websites.</li>
     <li><a href="/breach-dashboard"><strong>Breach Monitor</strong></a> - Check if your email address has been exposed in any known data breaches.</li>
@@ -979,7 +979,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { text: "Emergency Help", href: "/emergency-help" },
     ],
     faqs: [
-      { question: "Are these cybersecurity tools free?", answer: "Yes, our core security tools are free to get started. You can use the Scam Checker, Password Generator, and other tools without creating an account." },
+      { question: "Are these cybersecurity tools free?", answer: "Yes, our core security tools are free to get started. You can use the GCR Scam Guard, Password Generator, and other tools without creating an account." },
       { question: "Do I need to sign up to use the tools?", answer: "No signup is required for our core tools. You can start checking suspicious links, generating passwords, and scanning for data brokers immediately." },
     ],
   },
@@ -1097,10 +1097,10 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     title: "Plans & Pricing: Free Cybersecurity Tools for Everyone",
     description: "GetCyberRight is free to get started. Access AI-powered scam checking, data broker removal, safety training, and more. See what is included and how to support the mission.",
     path: "/pricing",
-    features: ["AI Scam Checker", "Data Broker Removal tool", "Password Generator", "Safety training courses", "Printable guides and checklists", "Scam alerts and notifications"],
+    features: ["GCR Scam Guard", "Data Broker Removal tool", "Password Generator", "Safety training courses", "Printable guides and checklists", "Scam alerts and notifications"],
     faqs: [
-      { question: "Is GetCyberRight really free?", answer: "Yes, GetCyberRight is free to get started. Our core tools including the Scam Checker, Password Generator, safety guides, and training content are available at no cost and do not require an account." },
-      { question: "What is included for free?", answer: "Free access includes the AI Scam Checker, Password Generator, 501+ Data Broker Removal guides, 406+ AI Safety Prompts, 125+ Safety Guides, Training Academy courses, and weekly scam alerts." },
+      { question: "Is GetCyberRight really free?", answer: "Yes, GetCyberRight is free to get started. Our core tools including the GCR Scam Guard, Password Generator, safety guides, and training content are available at no cost and do not require an account." },
+      { question: "What is included for free?", answer: "Free access includes the GCR Scam Guard, Password Generator, 501+ Data Broker Removal guides, 406+ AI Safety Prompts, 125+ Safety Guides, Training Academy courses, and weekly scam alerts." },
       { question: "Will GetCyberRight always be free?", answer: "Our core tools and educational content will always be free to get started. We believe everyone deserves access to basic digital safety tools regardless of their budget." },
     ],
   },
@@ -1131,7 +1131,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     features: ["Search guides and articles", "Find specific scam types", "Locate tools and features", "Browse training courses", "Discover safety checklists"],
     faqs: [
       { question: "What can I search for on GetCyberRight?", answer: "You can search for cybersecurity guides, scam alerts, safety tools, training courses, checklists, scam intelligence reports, and any topic related to online safety for families, seniors, kids, and small businesses." },
-      { question: "How do I find help for a specific scam?", answer: "Type the name of the scam or a description of what happened into the search box. You can also browse our Scam Intelligence Center or use the AI Scam Checker to analyze suspicious links and messages directly." },
+      { question: "How do I find help for a specific scam?", answer: "Type the name of the scam or a description of what happened into the search box. You can also browse our Scam Intelligence Center or use the GCR Scam Guard to analyze suspicious links and messages directly." },
     ],
   },
   "/accessibility": {
@@ -1360,9 +1360,9 @@ function renderAboutPage(): string {
   const faqSchema = buildFaqSchema([
     { question: "What is GetCyberRight?", answer: "GetCyberRight is an online safety platform that helps families, seniors, students, and small businesses protect themselves from scams, identity theft, and data exposure. It combines simple protection tools with easy-to-understand guides and training." },
     { question: "Why is online safety more important now?", answer: "New technology has made scams harder to spot than ever. Fake emails now look perfect, criminals can copy someone's voice to make phone calls, and personal data is being collected and sold at a massive scale. Knowing how to protect yourself online is now essential for everyone." },
-    { question: "How does the Scam Checker work?", answer: "Paste any suspicious message, email, link, or phone number into the Scam Checker. It checks 8 trusted safety sources and looks for common scam tactics to tell you whether it is safe or dangerous." },
-    { question: "What tools does GetCyberRight offer?", answer: "GetCyberRight offers a Scam Checker, Data Broker Removal covering 501+ companies, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ safety guides, and scam alerts covering 13 regions worldwide." },
-    { question: "Is GetCyberRight free to use?", answer: "GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and training content are available at no cost and do not require an account." },
+    { question: "How does the GCR Scam Guard work?", answer: "Paste any suspicious message, email, link, or phone number into the GCR Scam Guard. It checks 8 trusted safety sources and looks for common scam tactics to tell you whether it is safe or dangerous." },
+    { question: "What tools does GetCyberRight offer?", answer: "GetCyberRight offers a GCR Scam Guard, Data Broker Removal covering 501+ companies, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ safety guides, and scam alerts covering 13 regions worldwide." },
+    { question: "Is GetCyberRight free to use?", answer: "GetCyberRight is free to get started. Core tools like the GCR Scam Guard, safety guides, and training content are available at no cost and do not require an account." },
     { question: "Why was GetCyberRight created?", answer: "GetCyberRight was started by a family that experienced scams, impersonation, and phone fraud firsthand. The mission is to make online safety simple and available to everyone, because no family should have to learn these lessons the hard way." },
   ]);
 
@@ -1395,7 +1395,7 @@ function renderAboutPage(): string {
     <h2>The Solution: Simple Tools. Clear Guidance. Real Protection.</h2>
     <p>GetCyberRight was built because the people who need online safety the most have the fewest resources. We put scam checking, data removal, and safety training all in one place, designed for everyday people.</p>
     <ul>
-      <li><a href="/scam-checker"><strong>Scam Checker</strong></a> - Paste any suspicious message, email, link, or phone number. We check it against 8 trusted safety sources and tell you whether it is safe or a scam.</li>
+      <li><a href="/scam-checker"><strong>GCR Scam Guard</strong></a> - Paste any suspicious message, email, link, or phone number. We check it against 8 trusted safety sources and tell you whether it is safe or a scam.</li>
       <li><a href="/data-removal"><strong>Data Broker Removal</strong></a> - We track 501+ companies that collect and sell your personal information. Get step-by-step instructions to remove yourself from each one.</li>
       <li><a href="/training"><strong>Training Academy</strong></a> - Easy-to-follow courses that teach you how modern scams work and how to spot them, no technical background needed.</li>
       <li><a href="/ai-prompts"><strong>AI Safety Prompt Library</strong></a> - 406+ ready-to-use prompts that help you use AI tools like ChatGPT safely, without accidentally sharing private information.</li>
@@ -1439,12 +1439,12 @@ function renderAboutPage(): string {
     <p>GetCyberRight is an online safety platform that helps families, seniors, students, and small businesses protect themselves from scams, identity theft, and data exposure. It combines simple protection tools with easy-to-understand guides and training.</p>
     <h3>Why is online safety more important now?</h3>
     <p>New technology has made scams harder to spot than ever. Fake emails now look perfect, criminals can copy someone's voice to make phone calls, and personal data is being collected and sold at a massive scale. Knowing how to protect yourself online is now essential for everyone.</p>
-    <h3>How does the Scam Checker work?</h3>
-    <p>Paste any suspicious message, email, link, or phone number into the Scam Checker. It checks 8 trusted safety sources and looks for common scam tactics to tell you whether it is safe or dangerous.</p>
+    <h3>How does the GCR Scam Guard work?</h3>
+    <p>Paste any suspicious message, email, link, or phone number into the GCR Scam Guard. It checks 8 trusted safety sources and looks for common scam tactics to tell you whether it is safe or dangerous.</p>
     <h3>What tools does GetCyberRight offer?</h3>
-    <p>GetCyberRight offers a Scam Checker, Data Broker Removal covering 501+ companies, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ safety guides, and scam alerts covering 13 regions worldwide.</p>
+    <p>GetCyberRight offers a GCR Scam Guard, Data Broker Removal covering 501+ companies, a Training Academy, an AI Safety Prompt Library with 406+ prompts, 125+ safety guides, and scam alerts covering 13 regions worldwide.</p>
     <h3>Is GetCyberRight free to use?</h3>
-    <p>GetCyberRight is free to get started. Core tools like the Scam Checker, safety guides, and training content are available at no cost and do not require an account.</p>
+    <p>GetCyberRight is free to get started. Core tools like the GCR Scam Guard, safety guides, and training content are available at no cost and do not require an account.</p>
     <h3>Why was GetCyberRight created?</h3>
     <p>GetCyberRight was started by a family that experienced scams, impersonation, and phone fraud firsthand. The mission is to make online safety simple and available to everyone, because no family should have to learn these lessons the hard way.</p>
   </section>
@@ -1497,9 +1497,9 @@ function renderHomePage(): string {
   const faqSchema = buildFaqSchema([
     { question: "What is GetCyberRight?", answer: "GetCyberRight is a free cybersecurity education platform designed for families, parents, kids, seniors, and everyday people. We provide practical tools, training, and guides to help you stay safe online." },
     { question: "Is GetCyberRight really free?", answer: "Yes, GetCyberRight is free to get started. Our core tools, guides, and training resources are available at no cost." },
-    { question: "What tools does GetCyberRight offer?", answer: "We offer an AI Scam Checker that analyzes URLs, emails, and QR codes; a Data Broker Removal tool covering 501+ sites; a Password Generator; a Cyber Threat Radar; and more." },
+    { question: "What tools does GetCyberRight offer?", answer: "We offer an GCR Scam Guard that analyzes URLs, emails, and QR codes; a Data Broker Removal tool covering 501+ sites; a Password Generator; a Cyber Threat Radar; and more." },
     { question: "Who is GetCyberRight for?", answer: "GetCyberRight is for everyone, including families, parents, kids, seniors, educators, and small businesses. We provide audience-specific content tailored to different experience levels." },
-    { question: "How does the AI Scam Checker work?", answer: "Our AI Scam Checker uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score." },
+    { question: "How does the GCR Scam Guard work?", answer: "Our GCR Scam Guard uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score." },
   ]);
 
   return `${head}
@@ -1516,7 +1516,7 @@ function renderHomePage(): string {
   <section>
     <h2>Free Cybersecurity Tools</h2>
     <ul>
-      <li><a href="/scam-checker">AI Scam Checker</a> - Analyze suspicious URLs, emails, text messages, and QR codes against 8 trusted safety sources</li>
+      <li><a href="/scam-checker">GCR Scam Guard</a> - Analyze suspicious URLs, emails, text messages, and QR codes against 8 trusted safety sources</li>
       <li><a href="/data-removal">Data Broker Removal</a> - Remove your personal information from 501+ data broker sites</li>
       <li><a href="/password-generator">Password Generator</a> - Create strong, unique passwords instantly</li>
       <li><a href="/cyber-threat-radar">Cyber Threat Radar</a> - Real-time cybersecurity threat monitoring dashboard</li>
@@ -1612,11 +1612,11 @@ function renderHomePage(): string {
     <h3>Is GetCyberRight really free?</h3>
     <p>Yes, GetCyberRight is free to get started. Our core tools, guides, and training resources are available at no cost.</p>
     <h3>What tools does GetCyberRight offer?</h3>
-    <p>We offer an AI Scam Checker that analyzes URLs, emails, and QR codes; a Data Broker Removal tool covering 501+ sites; a Password Generator; a Cyber Threat Radar; and more.</p>
+    <p>We offer an GCR Scam Guard that analyzes URLs, emails, and QR codes; a Data Broker Removal tool covering 501+ sites; a Password Generator; a Cyber Threat Radar; and more.</p>
     <h3>Who is GetCyberRight for?</h3>
     <p>GetCyberRight is for everyone, including families, parents, kids, seniors, educators, and small businesses. We provide audience-specific content tailored to different experience levels.</p>
-    <h3>How does the AI Scam Checker work?</h3>
-    <p>Our AI Scam Checker uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score.</p>
+    <h3>How does the GCR Scam Guard work?</h3>
+    <p>Our GCR Scam Guard uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score.</p>
   </section>
 
   ${buildFooter()}

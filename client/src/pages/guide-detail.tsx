@@ -206,7 +206,7 @@ export default function GuideDetailPage() {
                   <CardContent className="pt-4 pb-4">
                     <p className="text-sm font-medium mb-2">Need help?</p>
                     <Link href="/scam-checker" className="text-sm text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1">
-                      Try the Scam Checker
+                      Try GCR Scam Guard
                       <ArrowRight className="h-3 w-3" />
                     </Link>
                   </CardContent>

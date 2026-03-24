@@ -329,7 +329,7 @@ export const SCAM_PAGES: ScamPageContent[] = [
       { title: "Go directly to the source", description: "If you receive an alert about your bank account, subscription, or package, do not use the link in the message. Instead, navigate directly to the official website by typing the URL in your browser." },
       { title: "Enable multi-factor authentication everywhere", description: "MFA protects your accounts even if a phishing attack captures your password. Use an authenticator app rather than SMS for the strongest protection." },
       { title: "Keep software updated", description: "Security updates patch vulnerabilities that phishing attacks exploit. Keep your operating system, browser, and security software up to date." },
-      { title: "Use our Scam Checker tool", description: "Paste any suspicious message, email, or URL into the GetCyberRight Scam Checker for instant AI-powered analysis of potential phishing indicators." }
+      { title: "Use our GCR Scam Guard tool", description: "Paste any suspicious message, email, or URL into the GetCyberRight GCR Scam Guard for instant AI-powered analysis of potential phishing indicators." }
     ],
     faq: [
       { question: "What is the difference between phishing and spear phishing?", answer: "Regular phishing sends generic messages to thousands of people hoping some will respond. Spear phishing targets specific individuals using personal details to create highly convincing, personalized messages that are much harder to detect." },
@@ -2017,11 +2017,11 @@ export const SCAM_PAGES: ScamPageContent[] = [
       { title: "Look for tampered QR codes", description: "Before scanning QR codes in public places, check if the code appears to be a sticker placed over an original code. Tampered codes may have different textures or edges." },
       { title: "Use your phone's built-in camera", description: "Use your phone's native camera app rather than third-party QR scanner apps, as the built-in camera provides better URL previews and security warnings." },
       { title: "Be skeptical of QR codes in emails", description: "QR codes in emails are often used to bypass spam filters. If an email contains a QR code, it is likely more trustworthy to navigate to the company's website directly." },
-      { title: "Use the GetCyberRight Scam Checker", description: "Our scam checker tool can analyze QR code contents and URLs for known phishing indicators before you visit the link." }
+      { title: "Use the GetCyberRight GCR Scam Guard", description: "Our scam checker tool can analyze QR code contents and URLs for known phishing indicators before you visit the link." }
     ],
     faq: [
       { question: "Can scanning a QR code hack my phone?", answer: "Simply scanning a QR code is generally safe. The danger comes from what happens next: visiting a malicious website, downloading malware, or entering personal information. Always check the URL before proceeding." },
-      { question: "How do I check if a QR code is safe?", answer: "Preview the URL that the QR code links to before opening it. Verify the domain matches the expected organization. Use our Scam Checker tool to analyze suspicious URLs. Look for HTTPS and legitimate domain names." },
+      { question: "How do I check if a QR code is safe?", answer: "Preview the URL that the QR code links to before opening it. Verify the domain matches the expected organization. Use our GCR Scam Guard tool to analyze suspicious URLs. Look for HTTPS and legitimate domain names." },
       { question: "Why are QR code scams increasing?", answer: "QR code adoption surged during the pandemic. People are accustomed to scanning codes without thinking about security. Additionally, QR codes bypass email security filters that scan text-based phishing links." }
     ],
     relatedScams: ["phishing", "smishing", "delivery-scam"],

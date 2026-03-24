@@ -267,7 +267,7 @@ export default function TopicHub() {
                 <Link href="/scam-checker" data-testid="link-scam-checker">
                   <Card className="hover:shadow-md transition-shadow cursor-pointer text-center p-6" data-testid="tool-scam-checker">
                     <AlertTriangle className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <h3 className="font-semibold">Scam Checker</h3>
+                    <h3 className="font-semibold">GCR Scam Guard</h3>
                     <p className="text-sm text-muted-foreground">Analyze suspicious links and messages</p>
                   </Card>
                 </Link>

@@ -1059,7 +1059,7 @@ EDGE CASE HANDLING
       res.json({ success: true, result: parsed });
     } catch (error: any) {
       console.error("AI Scam Analyzer error:", error);
-      const errorMessage = "Analysis could not be completed. Please try again or use the pattern-based Scam Checker tool.";
+      const errorMessage = "Analysis could not be completed. Please try again or use the pattern-based GCR Scam Guard tool.";
       res.status(500).json({ success: false, error: errorMessage });
     }
   });

@@ -16,7 +16,7 @@ const helpfulLinks = [
   },
   {
     icon: Search,
-    title: "Scam Checker",
+    title: "GCR Scam Guard",
     description: "Check if something is a scam",
     href: "/tools",
   },

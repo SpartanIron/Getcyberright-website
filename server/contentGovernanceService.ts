@@ -169,7 +169,7 @@ const CONTENT_PAGES_REGISTRY: Array<{
   { id: "ai-safety", title: "AI & Cyber Safety Hub", path: "/ai-safety", section: "general", audience: "all", topics: ["ai-threats", "voice-cloning", "phishing", "social-engineering"] },
   
   // Tools Section
-  { id: "scam-checker", title: "Scam Checker Tool", path: "/tools", section: "tools", audience: "all", topics: ["phishing", "malware", "identity-theft"] },
+  { id: "scam-checker", title: "GCR Scam Guard", path: "/tools", section: "tools", audience: "all", topics: ["phishing", "malware", "identity-theft"] },
   { id: "emergency-help", title: "Emergency Help & Resources", path: "/emergency-help", section: "general", audience: "all", topics: ["identity-theft", "financial-fraud", "romance-scams"] },
   { id: "threat-trends", title: "Current Threat Trends", path: "/threat-trends", section: "general", audience: "all", topics: ["phishing", "malware", "identity-theft", "ai-threats", "voice-cloning"] },
   

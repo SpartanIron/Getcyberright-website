@@ -666,7 +666,7 @@ export default function AISafety() {
               <Card className="hover-elevate cursor-pointer h-full">
                 <CardContent className="p-5 text-center">
                   <Shield className="w-8 h-8 text-primary mx-auto mb-3" />
-                  <h3 className="font-semibold text-sm text-foreground mb-1">Scam Checker</h3>
+                  <h3 className="font-semibold text-sm text-foreground mb-1">GCR Scam Guard</h3>
                   <p className="text-xs text-muted-foreground">Analyze suspicious URLs, emails, and messages for AI-generated threats.</p>
                 </CardContent>
               </Card>

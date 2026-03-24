@@ -7,7 +7,7 @@ const steps = [
     number: "1",
     icon: Search,
     title: "Paste a suspicious link, email, or message",
-    description: "Copy anything that looks suspicious and drop it into our Scam Checker. No signup needed.",
+    description: "Copy anything that looks suspicious and drop it into our GCR Scam Guard. No signup needed.",
     color: "bg-primary/10 text-primary",
   },
   {

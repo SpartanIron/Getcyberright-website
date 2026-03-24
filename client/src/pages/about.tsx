@@ -46,7 +46,7 @@ const threatTypes = [
 const platformTools = [
   {
     icon: ScanLine,
-    title: "Scam Checker",
+    title: "GCR Scam Guard",
     description: "Paste any suspicious message, email, link, or phone number. We check it against 8 trusted safety sources and tell you whether it is safe or a scam.",
     href: "/scam-checker",
     color: "text-red-400",
@@ -149,7 +149,7 @@ export default function About() {
                       className="rounded-lg bg-accent text-accent-foreground border-accent-border shadow-lg shadow-accent/15 font-semibold w-full sm:w-auto"
                       data-testid="button-about-hero-cta"
                     >
-                      Try the Scam Checker
+                      Try the GCR Scam Guard
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
                   </Link>
@@ -413,7 +413,7 @@ export default function About() {
               Start Protecting Yourself Today
             </h2>
             <p className="text-white/80 text-xl max-w-2xl mx-auto mb-8">
-              No account required. Paste a suspicious message into our Scam Checker, browse our guides, or start a training course. Pick a tool and go.
+              No account required. Paste a suspicious message into our GCR Scam Guard, browse our guides, or start a training course. Pick a tool and go.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/scam-checker">

@@ -150,7 +150,7 @@ export default function PartnerDeck() {
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { icon: Shield, label: "AI Scam Checker", desc: "URL, phone, email, QR analysis" },
+                    { icon: Shield, label: "GCR Scam Guard", desc: "URL, phone, email, QR analysis" },
                     { icon: BarChart3, label: "Threat Dashboard", desc: "Real-time global trends" },
                     { icon: Users, label: "Age-Specific Hubs", desc: "Kids, seniors, parents, educators" },
                     { icon: BookOpen, label: "Training Academy", desc: "Courses, quizzes, certificates" },

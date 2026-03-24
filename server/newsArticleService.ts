@@ -107,9 +107,9 @@ const CATEGORY_MAP: Record<string, string> = {
 const TOOL_MAPPING: Record<string, { url: string; name: string }> = {
   breach: { url: "https://www.getcyberright.com/breach-dashboard", name: "Breach Monitor" },
   leak: { url: "https://www.getcyberright.com/shield", name: "GCR Data Shield" },
-  phishing: { url: "https://www.getcyberright.com/scam-checker", name: "Scam Checker" },
-  scam: { url: "https://www.getcyberright.com/scam-checker", name: "Scam Checker" },
-  fraud: { url: "https://www.getcyberright.com/scam-checker", name: "Scam Checker" },
+  phishing: { url: "https://www.getcyberright.com/scam-checker", name: "GCR Scam Guard" },
+  scam: { url: "https://www.getcyberright.com/scam-checker", name: "GCR Scam Guard" },
+  fraud: { url: "https://www.getcyberright.com/scam-checker", name: "GCR Scam Guard" },
   password: { url: "https://www.getcyberright.com/password-generator", name: "Password Generator" },
   malware: { url: "https://www.getcyberright.com/cyber-threat-radar", name: "Cyber Threat Radar" },
   ransomware: { url: "https://www.getcyberright.com/cyber-threat-radar", name: "Cyber Threat Radar" },

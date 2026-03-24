@@ -110,8 +110,8 @@ const faqCategories = [
     icon: Lock,
     questions: [
       {
-        q: "What is the Scam Checker?",
-        a: "The Scam Checker is a tool that helps you analyze suspicious URLs, phone numbers, emails, and situations. It uses both pattern-matching analysis and AI to identify potential scams and provide clear safety recommendations in plain language."
+        q: "What is the GCR Scam Guard?",
+        a: "The GCR Scam Guard is a tool that helps you analyze suspicious URLs, phone numbers, emails, and situations. It uses both pattern-matching analysis and AI to identify potential scams and provide clear safety recommendations in plain language."
       },
       {
         q: "What do the scan results mean?",

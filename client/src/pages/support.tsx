@@ -57,7 +57,7 @@ const quickLinks = [
     urgent: true
   },
   {
-    title: "Scam Checker",
+    title: "GCR Scam Guard",
     description: "Check if a link, email, or message is a scam",
     href: "/tools",
     icon: Shield

@@ -27,7 +27,7 @@ import { Link } from "wouter";
 import bannerImage from "@/assets/banners/pricing-banner.png";
 
 const whatWeOffer = [
-  { icon: Search, name: "Scam Checker", description: "Check suspicious emails, texts, URLs, QR codes, and phone numbers" },
+  { icon: Search, name: "GCR Scam Guard", description: "Check suspicious emails, texts, URLs, QR codes, and phone numbers" },
   { icon: Shield, name: "GCR Data Shield", description: "Scan for your exposed personal data across broker sites and breach databases" },
   { icon: Mic, name: "Deepfake Voice Detector", description: "Detect AI-generated voice clones in suspicious calls" },
   { icon: Key, name: "Password Generator", description: "Create strong, unique passwords for every account" },

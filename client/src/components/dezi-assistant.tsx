@@ -497,7 +497,7 @@ export function DeziAssistant() {
         setMessages(prev =>
           prev.map(msg =>
             msg.id === messageId
-              ? { ...msg, content: "I'm having trouble connecting right now. In the meantime, you can use our Scam Checker tool to analyze suspicious messages, or try our Password Generator for a secure password. I'll be back shortly.", isStreaming: false }
+              ? { ...msg, content: "I'm having trouble connecting right now. In the meantime, you can use our GCR Scam Guard tool to analyze suspicious messages, or try our Password Generator for a secure password. I'll be back shortly.", isStreaming: false }
               : msg
           )
         );

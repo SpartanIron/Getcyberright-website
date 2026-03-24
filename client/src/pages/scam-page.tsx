@@ -49,7 +49,7 @@ export default function ScamPage() {
           <p className="text-muted-foreground mb-8">The scam guide you are looking for does not exist or has been moved.</p>
           <Link href="/scam-checker" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-scam-checker">
             <Search className="h-4 w-4 mr-2" />
-            Try our Scam Checker Tool
+            Try GCR Scam Guard
           </Link>
         </div>
         <Footer />
@@ -79,7 +79,7 @@ export default function ScamPage() {
     type: "BreadcrumbList",
     items: [
       { name: "Home", url: "https://www.getcyberright.com/" },
-      { name: "Scam Checker", url: "https://www.getcyberright.com/scam-checker" },
+      { name: "GCR Scam Guard", url: "https://www.getcyberright.com/scam-checker" },
       { name: scam.title, url: `https://www.getcyberright.com/scams/${scam.slug}` },
     ],
   };
@@ -110,7 +110,7 @@ export default function ScamPage() {
         <div className="container mx-auto px-4 py-12 relative z-10">
           <Link href="/scam-checker" className="inline-flex items-center text-white/60 hover:text-white text-sm mb-6 transition-colors" data-testid="link-back-scam-checker">
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Scam Checker
+            Back to GCR Scam Guard
           </Link>
 
           <div className="flex items-start gap-4 mb-4">
@@ -152,7 +152,7 @@ export default function ScamPage() {
               <div className="mt-6 p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg border border-teal-200 dark:border-teal-800">
                 <Shield className="h-5 w-5 text-teal-600 mb-2" />
                 <h4 className="font-medium text-sm mb-1">Got a suspicious message?</h4>
-                <p className="text-xs text-muted-foreground mb-3">Paste it into our AI-powered Scam Checker for instant analysis.</p>
+                <p className="text-xs text-muted-foreground mb-3">Paste it into our AI-powered GCR Scam Guard for instant analysis.</p>
                 <Link href="/scam-checker" className="text-sm text-teal-600 hover:text-teal-700 font-medium" data-testid="link-sidebar-scam-checker">
                   Check Now →
                 </Link>
@@ -259,7 +259,7 @@ export default function ScamPage() {
             <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg p-6 text-center">
               <Shield className="h-10 w-10 text-teal-600 mx-auto mb-3" />
               <h3 className="text-lg font-bold mb-2">Think you have received a scam like this?</h3>
-              <p className="text-sm text-muted-foreground mb-4">Paste the suspicious message into our free AI-powered Scam Checker for instant analysis.</p>
+              <p className="text-sm text-muted-foreground mb-4">Paste the suspicious message into our free AI-powered GCR Scam Guard for instant analysis.</p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Link href="/scam-checker" className="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium" data-testid="link-cta-scam-checker">
                   <Search className="h-4 w-4 mr-2" />

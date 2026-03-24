@@ -285,7 +285,7 @@ export default function CyberThreatRadar() {
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">Paste any suspicious URL, email, or message to check if it is a scam.</p>
                     <Link href="/tools">
-                      <Button className="w-full" data-testid="link-scam-checker">Use Scam Checker</Button>
+                      <Button className="w-full" data-testid="link-scam-checker">Use GCR Scam Guard</Button>
                     </Link>
                   </CardContent>
                 </Card>

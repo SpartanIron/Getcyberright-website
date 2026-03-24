@@ -17,7 +17,7 @@ const testimonials = [
   },
   {
     quote:
-      "I got a parcel delivery text with a tracking link that looked exactly like Royal Mail. I pasted it into the Scam Checker and it flagged it immediately. I would have clicked that link without thinking twice.",
+      "I got a parcel delivery text with a tracking link that looked exactly like Royal Mail. I pasted it into the GCR Scam Guard and it flagged it immediately. I would have clicked that link without thinking twice.",
     name: "Rachel D.",
     context: "Manchester, UK",
     initials: "RD",

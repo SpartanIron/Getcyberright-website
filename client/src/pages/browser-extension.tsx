@@ -97,7 +97,7 @@ export default function BrowserExtensionPage() {
           <Link href="/scam-checker">
             <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10 mb-6 -ml-2 gap-2" data-testid="link-back-scam-checker">
               <ArrowLeft className="w-4 h-4" />
-              Back to Scam Checker
+              Back to GCR Scam Guard
             </Button>
           </Link>
           <div className="flex flex-col lg:flex-row items-center gap-12">
@@ -171,7 +171,7 @@ export default function BrowserExtensionPage() {
               Protection That Works While You Browse
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Powered by the same AI and multi-source threat intelligence behind the GetCyberRight Scam Checker.
+              Powered by the same AI and multi-source threat intelligence behind the GCR Scam Guard.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -237,7 +237,7 @@ export default function BrowserExtensionPage() {
               { q: "Does it track my browsing activity?", a: "No. The extension only scans content when you explicitly trigger a scan or when auto-scan is enabled. No browsing history is stored or transmitted." },
               { q: "What browsers does it work with?", a: "It works with any Chromium-based browser including Google Chrome, Brave, Microsoft Edge, Opera, and Vivaldi." },
               { q: "Why isn't it on the Chrome Web Store?", a: "We're working on Chrome Web Store approval. In the meantime, you can install it manually using Developer Mode, which takes about 30 seconds." },
-              { q: "How accurate is the scanning?", a: "GCR Scam Guard uses the same AI-powered analysis and multi-source threat intelligence (VirusTotal, PhishTank, Google Safe Browsing, and more) as our web-based Scam Checker." },
+              { q: "How accurate is the scanning?", a: "GCR Scam Guard uses the same AI-powered analysis and multi-source threat intelligence (VirusTotal, PhishTank, Google Safe Browsing, and more) as our web-based GCR Scam Guard." },
             ].map((faq, i) => (
               <Card key={i} className="border shadow-sm" data-testid={`faq-${i}`}>
                 <CardContent className="p-5">

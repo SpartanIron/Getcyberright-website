@@ -25,7 +25,7 @@ interface ScamTrend {
 
 const scamCheckerApp: WebApplicationData = {
   type: "WebApplication",
-  name: "Scam Checker",
+  name: "GCR Scam Guard",
   description: "Free AI-powered scam detection tool. Check suspicious URLs, emails, phone numbers, QR codes, and messages for fraud. Checked against multiple trusted safety sources for a comprehensive safety report.",
   url: "https://www.getcyberright.com/scam-checker",
   applicationCategory: "SecurityApplication",
@@ -35,8 +35,8 @@ const scamCheckerApp: WebApplicationData = {
 const scamCheckerFaq: FAQData = {
   type: "FAQPage",
   items: [
-    { question: "How does the Scam Checker work?", answer: "The Scam Checker analyzes URLs, emails, phone numbers, QR codes, and messages using multiple safety checks including AI analysis, trusted data sources, and domain reputation checks to determine if something is a scam." },
-    { question: "Is the Scam Checker free to use?", answer: "Yes, the Scam Checker is completely free to use. No account or sign-up is required. Just paste a suspicious link, message, or phone number and get instant results." },
+    { question: "How does the GCR Scam Guard work?", answer: "The GCR Scam Guard analyzes URLs, emails, phone numbers, QR codes, and messages using multiple safety checks including AI analysis, trusted data sources, and domain reputation checks to determine if something is a scam." },
+    { question: "Is the GCR Scam Guard free to use?", answer: "Yes, the GCR Scam Guard is completely free to use. No account or sign-up is required. Just paste a suspicious link, message, or phone number and get instant results." },
     { question: "What types of scams can it detect?", answer: "The tool can detect phishing links, fraudulent websites, scam phone numbers, suspicious email content, malicious QR codes, and social engineering attempts across multiple categories of online fraud." },
   ],
 };
@@ -46,13 +46,13 @@ const scamCheckerBreadcrumbs: BreadcrumbData = {
   items: [
     { name: "Home", url: "https://www.getcyberright.com/" },
     { name: "Tools", url: "https://www.getcyberright.com/tools" },
-    { name: "Scam Checker", url: "https://www.getcyberright.com/scam-checker" },
+    { name: "GCR Scam Guard", url: "https://www.getcyberright.com/scam-checker" },
   ],
 };
 
 export default function ScamCheckerPage() {
   useSEO({
-    title: "Scam Checker: Verify Links & Messages | GetCyberRight",
+    title: "GCR Scam Guard: Verify Links & Messages | GetCyberRight",
     description: "Free scam detection tool. Check suspicious links, phone numbers, and messages instantly. Protect your family from fraud.",
     keywords: "scam checker, fraud detection, phishing detector, link checker, URL scanner, is it a scam, verify message, free scam checker"
   });
@@ -137,7 +137,7 @@ export default function ScamCheckerPage() {
             </h1>
             <div className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto space-y-3 text-sm md:text-base">
               <p>
-                Ever clicked a shortened link and hesitated because you weren't sure where it would lead? <strong className="text-slate-700 dark:text-slate-300">Scam Checker reveals the link's true destination</strong> before you open it, helping you avoid malicious sites that can steal your information or infect your device with malware.
+                Ever clicked a shortened link and hesitated because you weren't sure where it would lead? <strong className="text-slate-700 dark:text-slate-300">GCR Scam Guard reveals the link's true destination</strong> before you open it, helping you avoid malicious sites that can steal your information or infect your device with malware.
               </p>
               <p>
                 You can also <strong className="text-slate-700 dark:text-slate-300">check suspicious phone numbers</strong>. Paste the number to see whether it's associated with known scam patterns.
@@ -153,7 +153,7 @@ export default function ScamCheckerPage() {
           {/* What Our Tool Checks Section */}
           <section className="mt-16">
             <h2 className="text-2xl font-bold text-center text-slate-900 dark:text-white mb-8">
-              What Our Scam Checker Analyzes
+              What Our GCR Scam Guard Analyzes
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               <Card className="bg-white dark:bg-slate-800 border-0 shadow-lg">
@@ -255,7 +255,7 @@ export default function ScamCheckerPage() {
           {/* How It Works Section */}
           <section className="mt-16">
             <h2 className="text-2xl font-bold text-center text-slate-900 dark:text-white mb-8">
-              How Our Scam Checker Works
+              How Our GCR Scam Guard Works
             </h2>
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-8">
               <div className="grid md:grid-cols-3 gap-8">

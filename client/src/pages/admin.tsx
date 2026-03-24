@@ -2074,7 +2074,7 @@ function ScamCheckerStatsTab({ token }: { token: string }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">Scam Checker Usage</h2>
+        <h2 className="text-xl font-semibold">GCR Scam Guard Usage</h2>
         <p className="text-sm text-muted-foreground">Track how visitors use the scam checking tools</p>
       </div>
 
@@ -3698,7 +3698,7 @@ export default function AdminPage() {
               <Lightbulb className="w-4 h-4" /> Daily Tips
             </TabsTrigger>
             <TabsTrigger value="scam-checker" className="gap-2" data-testid="tab-scam-checker">
-              <Search className="w-4 h-4" /> Scam Checker
+              <Search className="w-4 h-4" /> Scam Guard
             </TabsTrigger>
             <TabsTrigger value="breach-checker" className="gap-2" data-testid="tab-breach-checker">
               <Lock className="w-4 h-4" /> Breach Checker

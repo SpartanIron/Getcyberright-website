@@ -204,7 +204,7 @@ export default function AlertDetailPage() {
                 <CardContent className="pt-4 pb-4">
                   <p className="text-sm font-medium mb-2">Suspect a scam?</p>
                   <Link href="/scam-checker" className="text-sm text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1">
-                    Use the Scam Checker
+                    Use GCR Scam Guard
                     <ArrowRight className="h-3 w-3" />
                   </Link>
                 </CardContent>

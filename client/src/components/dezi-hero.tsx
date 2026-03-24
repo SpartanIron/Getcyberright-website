@@ -817,7 +817,7 @@ export function DeziHero({ compact = false }: DeziHeroProps) {
               to="/tools" 
               className="inline-flex items-center text-teal-600 hover:text-teal-500 dark:text-teal-400 dark:hover:text-teal-300 text-sm font-medium"
             >
-              Need more options? Use advanced Scam Checker
+              Need more options? Use advanced GCR Scam Guard
               <ChevronDown className="w-4 h-4 ml-1 rotate-[-90deg]" />
             </Link>
           </motion.div>

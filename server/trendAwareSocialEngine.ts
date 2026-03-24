@@ -110,12 +110,12 @@ function assessSourceCredibility(news: RawFeedItem[]): { tier1Count: number; tie
 
 const GCR_TOOLS: Record<string, { tool_name: string; how_it_connects: string; url: string }> = {
   phishing: {
-    tool_name: "Scam Checker",
+    tool_name: "GCR Scam Guard",
     how_it_connects: "Scans suspicious links and messages in real time to detect phishing attempts before you click",
     url: "https://www.getcyberright.com/scam-checker",
   },
   scam: {
-    tool_name: "Scam Checker",
+    tool_name: "GCR Scam Guard",
     how_it_connects: "Checks URLs, QR codes, and messages against multiple threat intelligence databases",
     url: "https://www.getcyberright.com/scam-checker",
   },
@@ -463,7 +463,7 @@ STEP 8 - VISUAL PLANNING:
 
 STEP 9 - PRODUCT MAPPING:
 - Map to a relevant GetCyberRight feature ONLY if genuinely justified
-- Available: AI Scam Analyzer, Scam Checker, Password Generator, Breach Monitor, Data Broker Removal, Kids Safety Hub, Senior Safety Hub, Cyber Threat Radar, Identity Theft Recovery Guide
+- Available: AI Scam Analyzer, GCR Scam Guard, Password Generator, Breach Monitor, Data Broker Removal, Kids Safety Hub, Senior Safety Hub, Cyber Threat Radar, Identity Theft Recovery Guide
 - Do NOT force product mentions
 
 STEP 10 - VALIDATION LAYER:
@@ -550,7 +550,7 @@ ${alertsContext}
 ${scamIntelContext}
 
 KEY TOOL PAGES (ONLY use these exact URLs):
-- Scam Checker: https://www.getcyberright.com/scam-checker
+- GCR Scam Guard: https://www.getcyberright.com/scam-checker
 - Cyber Threat Radar: https://www.getcyberright.com/cyber-threat-radar
 - Awareness Hub: https://www.getcyberright.com/awareness-hub
 - GCR Data Shield: https://www.getcyberright.com/shield

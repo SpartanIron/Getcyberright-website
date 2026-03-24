@@ -55,7 +55,7 @@ export const CLUSTER_TARGET_PAGES: Record<SEOCluster, { path: string; title: str
     { path: "/scams/identity-theft", title: "How Identity Theft Happens" },
   ],
   "online-scams": [
-    { path: "/scam-checker", title: "AI Scam Checker Tool" },
+    { path: "/scam-checker", title: "GCR Scam Guard" },
     { path: "/scams/paypal-scam", title: "PayPal Scam Guide" },
     { path: "/scams/amazon-scam", title: "Amazon Scam Guide" },
     { path: "/scams/romance-scam", title: "Romance Scam Guide" },

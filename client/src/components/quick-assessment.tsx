@@ -70,7 +70,7 @@ function getSkillLevel(score: number): SkillLevel {
       recommendations: [
         { title: "Youth Safety Guide", description: "Learn how to stay safe on social media and apps", link: "/kids", icon: BookOpen },
         { title: "Digital Safety Tips", description: "Learn one tip per day to build habits", link: "/resources", icon: Shield },
-        { title: "Scam Checker", description: "Check if a message or offer is a scam", link: "/tools", icon: Target }
+        { title: "GCR Scam Guard", description: "Check if a message or offer is a scam", link: "/tools", icon: Target }
       ]
     };
   } else if (score <= 10) {
