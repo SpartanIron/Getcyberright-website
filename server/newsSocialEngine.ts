@@ -259,8 +259,7 @@ Generate posts in this EXACT JSON format (output ONLY the JSON, no markdown code
 function validateAndFixLinks(content: string, expectedUrl: string): string {
   let fixed = content;
 
-  fixed = fixed.replace(/getcyberright\.com/g, "www.getcyberright.com");
-  fixed = fixed.replace(/http:\/\/www\.getcyberright\.com/g, "https://www.getcyberright.com");
+  fixed = fixed.replace(/https?:\/\/(www\.)*getcyberright\.com/g, "https://www.getcyberright.com");
 
   if (!fixed.includes(expectedUrl)) {
     fixed = fixed.replace(
@@ -269,11 +268,26 @@ function validateAndFixLinks(content: string, expectedUrl: string): string {
     );
   }
 
+  const newsLinks = fixed.match(/https:\/\/www\.getcyberright\.com\/news\/[^\s)]+/g) || [];
+  if (newsLinks.length > 1) {
+    let foundFirst = false;
+    const lines = fixed.split('\n');
+    const deduped = lines.filter(line => {
+      const trimmed = line.trim();
+      if (/^https:\/\/www\.getcyberright\.com\/news\//.test(trimmed) && !trimmed.replace(/https:\/\/www\.getcyberright\.com\/news\/[^\s)]+/, '').trim()) {
+        if (foundFirst) return false;
+        foundFirst = true;
+      }
+      return true;
+    });
+    fixed = deduped.join('\n');
+  }
+
   if (!fixed.includes(expectedUrl)) {
     fixed += `\n\n${expectedUrl}`;
   }
 
-  return fixed;
+  return fixed.replace(/\n{3,}/g, '\n\n').trim();
 }
 
 export async function generateSocialPostsForArticle(

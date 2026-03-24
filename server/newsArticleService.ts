@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { createHash } from "crypto";
 import { storage } from "./storage";
 import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
 import type { InsertNewsArticle, NewsArticle } from "@shared/schema";
@@ -227,7 +228,8 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
     const urgency = detectUrgency(feedItem.title, feedItem.summary);
     const relatedTool = detectRelatedTool(feedItem.title, feedItem.summary);
     const baseSlug = generateSlug(article.familyTitle || feedItem.title);
-    const slug = `${baseSlug}-${Date.now().toString(36)}`;
+    const urlHash = createHash("md5").update(feedItem.link).digest("hex").slice(0, 8);
+    const slug = `${baseSlug}-${urlHash}`;
     const rawImage = ogImages[article.index] || null;
     const resolvedImage = rawImage?.replace(/^http:\/\//i, 'https://') || null;
 
