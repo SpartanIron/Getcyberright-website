@@ -110,9 +110,9 @@ function assessSourceCredibility(news: RawFeedItem[]): { tier1Count: number; tie
 
 const GCR_TOOLS: Record<string, { tool_name: string; how_it_connects: string; url: string }> = {
   phishing: {
-    tool_name: "AI Scam Analyzer",
+    tool_name: "Scam Checker",
     how_it_connects: "Scans suspicious links and messages in real time to detect phishing attempts before you click",
-    url: "https://www.getcyberright.com/scam-analyzer",
+    url: "https://www.getcyberright.com/scam-checker",
   },
   scam: {
     tool_name: "Scam Checker",
@@ -127,12 +127,12 @@ const GCR_TOOLS: Record<string, { tool_name: string; how_it_connects: string; ur
   breach: {
     tool_name: "Breach Monitor",
     how_it_connects: "Monitors your email addresses against known data breaches so you can act fast",
-    url: "https://www.getcyberright.com/breach-monitor",
+    url: "https://www.getcyberright.com/breach-dashboard",
   },
   data_broker: {
-    tool_name: "Data Broker Removal",
-    how_it_connects: "Finds and removes your personal information from data broker databases to reduce exposure",
-    url: "https://www.getcyberright.com/data-broker-removal",
+    tool_name: "GCR Data Shield",
+    how_it_connects: "Scans 500+ data broker sites and breach databases to find your exposed personal information",
+    url: "https://www.getcyberright.com/shield",
   },
   kids: {
     tool_name: "Kids Safety Hub",
@@ -140,9 +140,9 @@ const GCR_TOOLS: Record<string, { tool_name: string; how_it_connects: string; ur
     url: "https://www.getcyberright.com/kids",
   },
   identity: {
-    tool_name: "Identity Theft Recovery Guide",
-    how_it_connects: "Step-by-step recovery plan if your identity has been compromised",
-    url: "https://www.getcyberright.com/guides/identity-theft-recovery",
+    tool_name: "Awareness Hub",
+    how_it_connects: "Comprehensive cybersecurity awareness resources and learning paths",
+    url: "https://www.getcyberright.com/awareness-hub",
   },
   malware: {
     tool_name: "Cyber Threat Radar",
@@ -451,9 +451,10 @@ STEP 7 - CONTENT CREATION:
 - Follow the specific WRITING STYLE instruction provided below
 - EXCERPT STRATEGY: Posts are teasers, NOT full articles. Share the most compelling insight to hook readers, then drive them to the relevant GetCyberRight page for the full breakdown
 - Post structure: hook (the most compelling insight) > brief context (1-2 sentences on why it matters) > 1-2 actionable tips as a preview > CTA linking to the most relevant GetCyberRight page (guide, alert, scam intel, or tool)
-- ALWAYS end with a link to a relevant GetCyberRight page. Match the topic to: www.getcyberright.com/guides/[slug], www.getcyberright.com/alerts/[slug], www.getcyberright.com/scam-intel/[slug], www.getcyberright.com/scam-checker, www.getcyberright.com/cyber-threat-radar, or www.getcyberright.com/awareness-hub
+- ALWAYS end with a link to a relevant GetCyberRight page
+- CRITICAL: You may ONLY link to URLs that appear in the KEY TOOL PAGES list, or to specific guide/alert/scam-intel slugs listed in the context above. NEVER invent or guess a URL slug. If no specific guide/alert/scam-intel page matches, use the most relevant KEY TOOL PAGE instead
 - ALL links MUST use the www subdomain (https://www.getcyberright.com/...). Never use https://getcyberright.com without www
-- If no specific page matches, link to www.getcyberright.com with a general CTA
+- If no specific page matches, link to https://www.getcyberright.com/awareness-hub as the default fallback
 - The link MUST appear on its own line before any hashtags
 
 STEP 8 - VISUAL PLANNING:
@@ -548,12 +549,17 @@ ${guideContext}
 ${alertsContext}
 ${scamIntelContext}
 
-KEY TOOL PAGES:
+KEY TOOL PAGES (ONLY use these exact URLs):
 - Scam Checker: https://www.getcyberright.com/scam-checker
 - Cyber Threat Radar: https://www.getcyberright.com/cyber-threat-radar
 - Awareness Hub: https://www.getcyberright.com/awareness-hub
-- Data Broker Removal: https://www.getcyberright.com/data-broker-removal
+- GCR Data Shield: https://www.getcyberright.com/shield
+- Breach Monitor: https://www.getcyberright.com/breach-dashboard
+- Password Generator: https://www.getcyberright.com/password-generator
 - GCR Scam Guard Extension: https://www.getcyberright.com/browser-extension
+- Kids Safety Hub: https://www.getcyberright.com/kids
+- Senior Safety Hub: https://www.getcyberright.com/seniors
+- Training Academy: https://www.getcyberright.com/training
 ${recentPostsContext}
 ${performanceContext}
 
@@ -945,6 +951,64 @@ function adjustColor(hex: string, amount: number): string {
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }
 
+const VALID_STATIC_PATHS = new Set([
+  "/", "/tools", "/scam-checker", "/cyber-threat-radar", "/awareness-hub",
+  "/shield", "/breach-dashboard", "/password-generator", "/browser-extension",
+  "/kids", "/seniors", "/parents", "/training", "/ai-prompts", "/data-removal",
+  "/resources", "/about", "/contact", "/pricing", "/report-scam",
+  "/printable-guides", "/news", "/ai-safety", "/faq", "/search",
+  "/small-business", "/educators", "/travel-safety",
+  "/guides", "/alerts", "/scam-intel",
+]);
+
+function normalizePath(raw: string): string {
+  let p = raw.replace(/[.,;:!?)]+$/, "");
+  p = p.split("?")[0].split("#")[0];
+  p = p.replace(/\/+$/, "") || "/";
+  return p;
+}
+
+async function validateAndFixPostLinks(postContent: string): Promise<string> {
+  const linkPattern = /https?:\/\/(?:www\.)?getcyberright\.com(\/[^\s)\]"',]*)/gi;
+  let result = postContent;
+  const matches = [...postContent.matchAll(linkPattern)];
+
+  for (const match of matches) {
+    const path = normalizePath(match[1]);
+    if (VALID_STATIC_PATHS.has(path)) continue;
+
+    const slugMatch = path.match(/^\/(guides|alerts|scam-intel)\/(.+)$/);
+    if (slugMatch) {
+      const [, section, slug] = slugMatch;
+      let exists = false;
+      try {
+        if (section === "guides") {
+          exists = !!(await storage.getGuideBySlug(slug));
+        } else if (section === "alerts") {
+          exists = !!(await storage.getThreatAlertBySlug(slug));
+        } else if (section === "scam-intel") {
+          exists = !!(await storage.getScamIntelBySlug(slug));
+        }
+      } catch {}
+
+      if (exists) continue;
+
+      const fallback = `https://www.getcyberright.com/${section}`;
+      const fullUrl = match[0].replace(/[.,;:!?)]+$/, "");
+      result = result.replace(fullUrl, fallback);
+      console.log(`[TrendEngine] Fixed dead link: ${fullUrl} → ${fallback}`);
+      continue;
+    }
+
+    const fallback = "https://www.getcyberright.com/awareness-hub";
+    const fullUrl = match[0].replace(/[.,;:!?)]+$/, "");
+    result = result.replace(fullUrl, fallback);
+    console.log(`[TrendEngine] Fixed dead link: ${fullUrl} → ${fallback}`);
+  }
+
+  return result;
+}
+
 export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimit?: boolean; platformFilter?: string }): Promise<{
   published: number;
   platforms: string[];
@@ -1066,10 +1130,13 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       console.log(`[TrendEngine] Image URL: ${imageUrl}`);
     }
 
+    const validatedLinkedin = await validateAndFixPostLinks(posts.linkedin);
+    const validatedFacebook = await validateAndFixPostLinks(posts.facebook);
+
     const platformFilter = options?.platformFilter;
     const platformPosts: { platform: string; content: string }[] = [];
-    if (channels.linkedin && (!platformFilter || platformFilter === "linkedin")) platformPosts.push({ platform: "linkedin", content: posts.linkedin });
-    if (channels.facebook && (!platformFilter || platformFilter === "facebook")) platformPosts.push({ platform: "facebook", content: posts.facebook });
+    if (channels.linkedin && (!platformFilter || platformFilter === "linkedin")) platformPosts.push({ platform: "linkedin", content: validatedLinkedin });
+    if (channels.facebook && (!platformFilter || platformFilter === "facebook")) platformPosts.push({ platform: "facebook", content: validatedFacebook });
 
     for (const { platform, content } of platformPosts) {
       try {
