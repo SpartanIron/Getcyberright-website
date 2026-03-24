@@ -3,6 +3,37 @@ import { storage } from "./storage";
 import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
 import type { InsertNewsArticle } from "@shared/schema";
 
+async function fetchOgImage(url: string): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; GetCyberRight/1.0; +https://www.getcyberright.com)",
+        "Accept": "text/html",
+      },
+      redirect: "follow",
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const html = await res.text();
+    const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+    if (ogMatch?.[1] && !ogMatch[1].includes('1x1') && !ogMatch[1].includes('pixel')) {
+      return ogMatch[1].replace(/^http:\/\//i, 'https://');
+    }
+    const twitterMatch = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i);
+    if (twitterMatch?.[1] && !twitterMatch[1].includes('1x1')) {
+      return twitterMatch[1].replace(/^http:\/\//i, 'https://');
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
   baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
@@ -157,6 +188,12 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
   const simplified = await simplifyFeedItems(batch);
   let created = 0;
 
+  const ogImagePromises = batch.map(async (item) => {
+    if (item.imageUrl) return item.imageUrl;
+    return await fetchOgImage(item.link);
+  });
+  const ogImages = await Promise.all(ogImagePromises);
+
   for (const article of simplified) {
     const feedItem = batch[article.index];
     if (!feedItem) continue;
@@ -166,6 +203,8 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
     const relatedTool = detectRelatedTool(feedItem.title, feedItem.summary);
     const baseSlug = generateSlug(article.familyTitle || feedItem.title);
     const slug = `${baseSlug}-${Date.now().toString(36)}`;
+    const rawImage = ogImages[article.index] || null;
+    const resolvedImage = rawImage?.replace(/^http:\/\//i, 'https://') || null;
 
     try {
       await storage.createNewsArticle({
@@ -177,6 +216,8 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
         source: feedItem.source,
         sourceUrl: feedItem.link,
         originalTitle: feedItem.title,
+        imageUrl: resolvedImage,
+        thumbnailUrl: resolvedImage,
         urgencyLevel: urgency,
         relatedToolUrl: relatedTool?.url || null,
         relatedToolName: relatedTool?.name || null,

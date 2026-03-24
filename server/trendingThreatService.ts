@@ -22,6 +22,7 @@ export interface RawFeedItem {
   summary: string;
   source: string;
   pubDate?: string;
+  imageUrl?: string;
 }
 
 interface SimplifiedThreat {
@@ -148,13 +149,30 @@ export async function fetchRealThreats(): Promise<RawFeedItem[]> {
     try {
       const parsed = await rssParser.parseURL(feed.url);
       const recent = (parsed.items || []).slice(0, 3);
-      return recent.map((item) => ({
-        title: item.title || "Untitled",
-        link: item.link || feed.fallbackUrl,
-        summary: (item.contentSnippet || item.content || item.title || "").substring(0, 500),
-        source: feed.source,
-        pubDate: item.pubDate || item.isoDate,
-      }));
+      return recent.map((item: any) => {
+        let imageUrl: string | undefined;
+        if (item.enclosure?.url && /\.(jpg|jpeg|png|webp|gif)/i.test(item.enclosure.url)) {
+          imageUrl = item.enclosure.url;
+        } else if (item['media:content']?.['$']?.url) {
+          imageUrl = item['media:content']['$'].url;
+        } else if (item['media:thumbnail']?.['$']?.url) {
+          imageUrl = item['media:thumbnail']['$'].url;
+        } else {
+          const contentHtml = item.content || item['content:encoded'] || '';
+          const imgMatch = contentHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
+          if (imgMatch?.[1] && !imgMatch[1].includes('gravatar') && !imgMatch[1].includes('pixel') && !imgMatch[1].includes('1x1')) {
+            imageUrl = imgMatch[1];
+          }
+        }
+        return {
+          title: item.title || "Untitled",
+          link: item.link || feed.fallbackUrl,
+          summary: (item.contentSnippet || item.content || item.title || "").substring(0, 500),
+          source: feed.source,
+          pubDate: item.pubDate || item.isoDate,
+          imageUrl,
+        };
+      });
     } catch (error) {
       console.warn(`Failed to fetch RSS from ${feed.source}:`, error instanceof Error ? error.message : error);
       return [];

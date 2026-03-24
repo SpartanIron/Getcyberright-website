@@ -112,6 +112,20 @@ export default function NewsArticlePage() {
             </Link>
           </motion.div>
 
+          {article.imageUrl && (
+            <motion.div variants={fadeInUp} className="mb-6 -mx-4 sm:mx-0">
+              <div className="relative h-56 sm:h-72 md:h-80 overflow-hidden rounded-none sm:rounded-xl">
+                <img
+                  src={article.imageUrl}
+                  alt={article.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              </div>
+            </motion.div>
+          )}
+
           <motion.div variants={fadeInUp} className="mb-6">
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <Badge variant="outline" className={getCategoryColor(article.category)} data-testid="badge-category">

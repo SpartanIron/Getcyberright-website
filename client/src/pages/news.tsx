@@ -146,17 +146,47 @@ function getActionTip(title: string, excerpt: string): string | null {
   return null;
 }
 
+function getCategoryGradient(category: string): string {
+  switch (category) {
+    case "Cybersecurity": return "from-red-900 via-slate-900 to-red-950";
+    case "AI": return "from-purple-900 via-slate-900 to-indigo-950";
+    case "Tech": return "from-blue-900 via-slate-900 to-cyan-950";
+    case "Breaking": return "from-red-800 via-red-900 to-slate-900";
+    default: return "from-slate-800 via-slate-900 to-slate-950";
+  }
+}
+
+function getCategoryIcon(category: string) {
+  switch (category) {
+    case "Cybersecurity": return Shield;
+    case "AI": return Newspaper;
+    case "Tech": return Globe;
+    case "Breaking": return AlertTriangle;
+    default: return Shield;
+  }
+}
+
+function getEstimatedReadTime(content?: string, excerpt?: string): number {
+  const text = content || excerpt || "";
+  const wordCount = text.split(/\s+/).length;
+  return Math.max(2, Math.ceil(wordCount / 200));
+}
+
 function NewsCard({ article }: { article: NewsItem }) {
   const imageUrl = article.imageUrl || article.thumbnailUrl;
+  const [imgError, setImgError] = useState(false);
   const audience = detectAudience(article.title, article.excerpt);
   const actionTip = getActionTip(article.title, article.excerpt);
   const [, navigate] = useLocation();
   const hasSlug = !!article.slug;
+  const readTime = getEstimatedReadTime(article.content, article.excerpt);
   const urgencyBadge = article.urgencyLevel && article.urgencyLevel >= 4
-    ? { label: "Breaking", className: "bg-red-600 text-white" }
+    ? { label: "Breaking", className: "bg-red-600 text-white animate-pulse" }
     : article.urgencyLevel && article.urgencyLevel >= 3
     ? { label: "Important", className: "bg-amber-500 text-white" }
     : null;
+  const showImage = imageUrl && !imgError;
+  const CategoryIcon = getCategoryIcon(article.category);
   
   const handleClick = (e: React.MouseEvent) => {
     if (hasSlug) {
@@ -175,79 +205,80 @@ function NewsCard({ article }: { article: NewsItem }) {
       variants={fadeInUp}
       data-testid={`news-card-${article.id}`}
     >
-      <Card className="h-full hover:shadow-lg transition-all duration-300 hover:border-[var(--cyber-blue)] overflow-hidden">
-        {imageUrl && (
-          <div className="relative h-40 overflow-hidden bg-muted">
-            <img 
-              src={imageUrl} 
-              alt={article.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-            <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-              <Badge 
-                variant="outline" 
-                className={`text-xs ${getCategoryColor(article.category)} bg-white/90 dark:bg-black/70`}
-              >
-                {article.category}
-              </Badge>
-              {urgencyBadge && (
-                <Badge className={`text-xs ${urgencyBadge.className}`}>
-                  <AlertTriangle className="h-3 w-3 mr-0.5" />
-                  {urgencyBadge.label}
-                </Badge>
-              )}
-              {audience && (
-                <Badge className={`text-xs ${audience.color}`}>
-                  {audience.label}
-                </Badge>
-              )}
-            </div>
-          </div>
-        )}
-        <CardContent className={imageUrl ? "p-4" : "p-5"}>
-          {!imageUrl && (
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <div className="flex flex-wrap gap-1.5">
-                <Badge variant="outline" className={`text-xs ${getCategoryColor(article.category)}`}>
-                  {article.category}
-                </Badge>
-                {audience && (
-                  <Badge className={`text-xs ${audience.color}`}>
-                    {audience.label}
-                  </Badge>
-                )}
-              </div>
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {formatTimeAgo(article.publishedAt)}
-              </span>
+      <Card className="h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden border-0 shadow-md dark:shadow-none dark:border dark:border-slate-800">
+        <div className="relative h-48 overflow-hidden">
+          {showImage ? (
+            <>
+              <img 
+                src={imageUrl} 
+                alt={article.title}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                onError={() => setImgError(true)}
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            </>
+          ) : (
+            <div className={`w-full h-full bg-gradient-to-br ${getCategoryGradient(article.category)} flex items-center justify-center`}>
+              <CategoryIcon className="w-16 h-16 text-white/10" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.06),transparent_60%)]" />
             </div>
           )}
           
-          <h3 className="font-semibold text-base mb-2 line-clamp-2 group-hover:text-[var(--cyber-blue)] transition-colors">
+          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+            <Badge className={`text-[10px] font-semibold ${getCategoryColor(article.category)} backdrop-blur-sm bg-white/90 dark:bg-black/70 border`}>
+              {article.category}
+            </Badge>
+            {urgencyBadge && (
+              <Badge className={`text-[10px] font-semibold ${urgencyBadge.className} shadow-lg`}>
+                <AlertTriangle className="h-3 w-3 mr-0.5" />
+                {urgencyBadge.label}
+              </Badge>
+            )}
+            {audience && (
+              <Badge className={`text-[10px] font-semibold ${audience.color} backdrop-blur-sm`}>
+                <Users className="h-3 w-3 mr-0.5" />
+                {audience.label}
+              </Badge>
+            )}
+          </div>
+          
+          <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+            <span className="text-white/90 text-xs font-medium bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md">
+              {article.source}
+            </span>
+            <span className="text-white/80 text-xs flex items-center gap-1 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md">
+              <Clock className="h-3 w-3" />
+              {readTime} min
+            </span>
+          </div>
+        </div>
+
+        <CardContent className="p-4 flex flex-col flex-1">
+          <h3 className="font-bold text-[15px] leading-snug mb-2 line-clamp-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
             {decodeHtmlEntities(article.title)}
           </h3>
           
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
             {decodeHtmlEntities(article.excerpt)}
           </p>
           
           {actionTip && (
-            <div className="flex items-start gap-1.5 mb-3 p-2 rounded bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+            <div className="flex items-start gap-1.5 mb-3 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40">
               <Shield className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-              <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">{actionTip}</span>
+              <span className="text-xs text-amber-700 dark:text-amber-300 font-medium leading-snug">{actionTip}</span>
             </div>
           )}
           
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span className="font-medium truncate max-w-[50%]">{article.source}</span>
-            <div className="flex items-center gap-3">
-              <span>{formatTimeAgo(article.publishedAt)}</span>
-              <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+          <div className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {formatTimeAgo(article.publishedAt)}
+            </span>
+            <span className="flex items-center gap-1 text-teal-600 dark:text-teal-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+              Read more
+              <ChevronRight className="h-3 w-3" />
+            </span>
           </div>
         </CardContent>
       </Card>
