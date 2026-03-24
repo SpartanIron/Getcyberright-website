@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { NewsFilter } from "@/components/news-filter";
 import { Search, TrendingUp, ChevronLeft, ChevronRight, Newspaper, ExternalLink, Clock, RefreshCw, MapPin, Calendar, Globe, Users, Shield, AlertTriangle } from "lucide-react";
 import { LiveNewsIndicator } from "@/components/live-news-indicator";
+import { Navigation } from "@/components/navigation";
+import { Footer } from "@/components/footer";
 import { motion } from "framer-motion";
 import newsBannerImage from "@assets/generated_images/realistic_breaking_news_broadcast_background.png";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
@@ -499,6 +501,7 @@ export default function News() {
 
   return (
     <div className="min-h-screen">
+      <Navigation />
       {/* Hero Section with Background Image */}
       <section className="relative text-white overflow-hidden">
         <div 
@@ -728,6 +731,7 @@ export default function News() {
           </Card>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

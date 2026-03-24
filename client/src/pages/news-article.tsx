@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clock, ExternalLink, Shield, AlertTriangle, Loader2 } from "lucide-react";
+import { Navigation } from "@/components/navigation";
+import { Footer } from "@/components/footer";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
@@ -71,24 +73,32 @@ export default function NewsArticlePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navigation />
+        <div className="flex items-center justify-center flex-1 py-32">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+        <Footer />
       </div>
     );
   }
 
   if (error || !article) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
-        <AlertTriangle className="w-12 h-12 text-muted-foreground" />
-        <h1 className="text-2xl font-bold" data-testid="text-not-found">Article Not Found</h1>
-        <p className="text-muted-foreground">This article may have been removed or the link is incorrect.</p>
-        <Link href="/news">
-          <Button variant="outline" data-testid="link-back-to-news">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to News
-          </Button>
-        </Link>
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navigation />
+        <div className="flex flex-col items-center justify-center flex-1 py-32 gap-4">
+          <AlertTriangle className="w-12 h-12 text-muted-foreground" />
+          <h1 className="text-2xl font-bold" data-testid="text-not-found">Article Not Found</h1>
+          <p className="text-muted-foreground">This article may have been removed or the link is incorrect.</p>
+          <Link href="/news">
+            <Button variant="outline" data-testid="link-back-to-news">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to News
+            </Button>
+          </Link>
+        </div>
+        <Footer />
       </div>
     );
   }
@@ -97,6 +107,7 @@ export default function NewsArticlePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <motion.div
           initial="hidden"
@@ -215,6 +226,7 @@ export default function NewsArticlePage() {
           </motion.div>
         </motion.div>
       </div>
+      <Footer />
     </div>
   );
 }
