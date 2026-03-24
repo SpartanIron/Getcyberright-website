@@ -977,7 +977,7 @@ async function validateAndFixPostLinks(postContent: string): Promise<string> {
     const path = normalizePath(match[1]);
     if (VALID_STATIC_PATHS.has(path)) continue;
 
-    const slugMatch = path.match(/^\/(guides|alerts|scam-intel)\/(.+)$/);
+    const slugMatch = path.match(/^\/(guides|alerts|scam-intel|news)\/(.+)$/);
     if (slugMatch) {
       const [, section, slug] = slugMatch;
       let exists = false;
@@ -988,6 +988,8 @@ async function validateAndFixPostLinks(postContent: string): Promise<string> {
           exists = !!(await storage.getThreatAlertBySlug(slug));
         } else if (section === "scam-intel") {
           exists = !!(await storage.getScamIntelBySlug(slug));
+        } else if (section === "news") {
+          exists = !!(await storage.getNewsArticleBySlug(slug));
         }
       } catch {}
 

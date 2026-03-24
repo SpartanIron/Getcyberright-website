@@ -320,6 +320,12 @@ app.use((req, res, next) => {
     },
   );
 
+  import("./newsArticleService").then(({ startNewsScheduler }) => {
+    startNewsScheduler();
+  }).catch(err => {
+    console.error("Failed to start news scheduler:", err);
+  });
+
   httpServer.keepAliveTimeout = 61000;
   httpServer.headersTimeout = 65000;
 })();

@@ -29,10 +29,14 @@ interface NewsItem {
   author?: string;
   source: string;
   url: string;
+  slug?: string;
   imageUrl?: string | null;
   thumbnailUrl?: string | null;
   publishedAt: string;
   readTime?: number;
+  urgencyLevel?: number;
+  relatedToolUrl?: string | null;
+  relatedToolName?: string | null;
 }
 
 interface NewsResponse {
@@ -146,12 +150,27 @@ function NewsCard({ article }: { article: NewsItem }) {
   const imageUrl = article.imageUrl || article.thumbnailUrl;
   const audience = detectAudience(article.title, article.excerpt);
   const actionTip = getActionTip(article.title, article.excerpt);
+  const [, navigate] = useLocation();
+  const hasSlug = !!article.slug;
+  const urgencyBadge = article.urgencyLevel && article.urgencyLevel >= 4
+    ? { label: "Breaking", className: "bg-red-600 text-white" }
+    : article.urgencyLevel && article.urgencyLevel >= 3
+    ? { label: "Important", className: "bg-amber-500 text-white" }
+    : null;
   
+  const handleClick = (e: React.MouseEvent) => {
+    if (hasSlug) {
+      e.preventDefault();
+      navigate(`/news/${article.slug}`);
+    }
+  };
+
   return (
     <motion.a
-      href={article.url}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={hasSlug ? `/news/${article.slug}` : article.url}
+      target={hasSlug ? undefined : "_blank"}
+      rel={hasSlug ? undefined : "noopener noreferrer"}
+      onClick={handleClick}
       className="block group"
       variants={fadeInUp}
       data-testid={`news-card-${article.id}`}
@@ -175,6 +194,12 @@ function NewsCard({ article }: { article: NewsItem }) {
               >
                 {article.category}
               </Badge>
+              {urgencyBadge && (
+                <Badge className={`text-xs ${urgencyBadge.className}`}>
+                  <AlertTriangle className="h-3 w-3 mr-0.5" />
+                  {urgencyBadge.label}
+                </Badge>
+              )}
               {audience && (
                 <Badge className={`text-xs ${audience.color}`}>
                   {audience.label}

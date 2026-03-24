@@ -1604,3 +1604,30 @@ export const extensionTokens = pgTable("extension_tokens", {
 });
 
 export type ExtensionToken = typeof extensionTokens.$inferSelect;
+
+export const newsArticles = pgTable("news_articles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content"),
+  category: text("category").notNull().default("Cybersecurity"),
+  source: text("source").notNull(),
+  sourceUrl: text("source_url").notNull(),
+  originalTitle: text("original_title"),
+  imageUrl: text("image_url"),
+  thumbnailUrl: text("thumbnail_url"),
+  urgencyLevel: integer("urgency_level").default(1),
+  relatedToolUrl: text("related_tool_url"),
+  relatedToolName: text("related_tool_name"),
+  publishedAt: timestamp("published_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertNewsArticleSchema = createInsertSchema(newsArticles).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type NewsArticle = typeof newsArticles.$inferSelect;
+export type InsertNewsArticle = z.infer<typeof insertNewsArticleSchema>;

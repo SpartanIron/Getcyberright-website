@@ -31,6 +31,8 @@ import {
   type InsertScanReport,
   type ScamOfWeek,
   type InsertScamOfWeek,
+  type NewsArticle,
+  type InsertNewsArticle,
   users,
   contactMessages,
   newsletterSubscribers,
@@ -48,6 +50,7 @@ import {
   communityScamReports,
   scanReports,
   scamOfWeek,
+  newsArticles,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, gte, lte, ilike, or } from "drizzle-orm";
@@ -139,6 +142,13 @@ export interface IStorage {
   createScamOfWeek(entry: InsertScamOfWeek): Promise<ScamOfWeek>;
   getActiveScamOfWeek(): Promise<ScamOfWeek | undefined>;
   getAllScamOfWeek(limit?: number): Promise<ScamOfWeek[]>;
+
+  createNewsArticle(article: InsertNewsArticle): Promise<NewsArticle>;
+  getNewsArticles(category?: string, limit?: number): Promise<NewsArticle[]>;
+  getNewsArticleBySlug(slug: string): Promise<NewsArticle | undefined>;
+  getNewsArticleBySourceUrl(sourceUrl: string): Promise<NewsArticle | undefined>;
+  searchNewsArticles(query: string, limit?: number): Promise<NewsArticle[]>;
+  getNewsArticleCount(): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -610,6 +620,50 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(scamOfWeek)
       .orderBy(desc(scamOfWeek.weekStart))
       .limit(limit);
+  }
+
+  async createNewsArticle(article: InsertNewsArticle): Promise<NewsArticle> {
+    const result = await db.insert(newsArticles).values(article).returning();
+    return result[0];
+  }
+
+  async getNewsArticles(category?: string, limit = 50): Promise<NewsArticle[]> {
+    if (category) {
+      return await db.select().from(newsArticles)
+        .where(eq(newsArticles.category, category))
+        .orderBy(desc(newsArticles.publishedAt))
+        .limit(limit);
+    }
+    return await db.select().from(newsArticles)
+      .orderBy(desc(newsArticles.publishedAt))
+      .limit(limit);
+  }
+
+  async getNewsArticleBySlug(slug: string): Promise<NewsArticle | undefined> {
+    const result = await db.select().from(newsArticles).where(eq(newsArticles.slug, slug));
+    return result[0];
+  }
+
+  async getNewsArticleBySourceUrl(sourceUrl: string): Promise<NewsArticle | undefined> {
+    const result = await db.select().from(newsArticles).where(eq(newsArticles.sourceUrl, sourceUrl));
+    return result[0];
+  }
+
+  async searchNewsArticles(query: string, limit = 30): Promise<NewsArticle[]> {
+    const searchTerm = `%${query}%`;
+    return await db.select().from(newsArticles)
+      .where(or(
+        ilike(newsArticles.title, searchTerm),
+        ilike(newsArticles.excerpt, searchTerm),
+        ilike(newsArticles.source, searchTerm),
+      ))
+      .orderBy(desc(newsArticles.publishedAt))
+      .limit(limit);
+  }
+
+  async getNewsArticleCount(): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` }).from(newsArticles);
+    return Number(result[0].count);
   }
 }
 

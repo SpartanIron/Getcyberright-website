@@ -69,6 +69,7 @@ const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
 const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
 const DataRemoval = lazy(() => import("@/pages/data-removal"));
 const News = lazy(() => import("@/pages/news"));
+const NewsArticle = lazy(() => import("@/pages/news-article"));
 const CyberHygiene = lazy(() => import("@/pages/cyber-hygiene"));
 const PasswordGenerator = lazy(() => import("@/pages/password-generator"));
 const BreachDashboard = lazy(() => import("@/pages/breach-dashboard"));
@@ -162,6 +163,7 @@ function Router() {
         <Route path="/ai-prompts" component={AIPrompts} />
         <Route path="/ai-safety" component={AISafety} />
         <Route path="/news" component={News} />
+        <Route path="/news/:slug" component={NewsArticle} />
         <Route path="/cyber-hygiene" component={CyberHygiene} />
         <Route path="/password-generator" component={PasswordGenerator} />
         <Route path="/breach-dashboard" component={BreachDashboard} />

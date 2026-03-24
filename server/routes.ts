@@ -4796,5 +4796,139 @@ EDGE CASE HANDLING
     }
   });
 
+  app.get("/api/news/latest", async (req: Request, res: Response) => {
+    try {
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+      const articles = await storage.getNewsArticles(undefined, limit);
+      const mapped = articles.map(a => ({
+        id: a.id,
+        title: a.title,
+        excerpt: a.excerpt,
+        content: a.content,
+        category: a.category,
+        source: a.source,
+        url: a.sourceUrl,
+        imageUrl: a.imageUrl,
+        thumbnailUrl: a.thumbnailUrl,
+        publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
+        readTime: a.content ? Math.ceil(a.content.split(/\s+/).length / 200) : 2,
+        slug: a.slug,
+        urgencyLevel: a.urgencyLevel,
+        relatedToolUrl: a.relatedToolUrl,
+        relatedToolName: a.relatedToolName,
+      }));
+      res.json({
+        articles: mapped,
+        lastUpdated: articles[0]?.createdAt?.toISOString() || null,
+        stats: {
+          categories: [...new Set(articles.map(a => a.category))],
+          totalArticles: mapped.length,
+          lastFetch: articles[0]?.createdAt?.toISOString() || null,
+        },
+      });
+    } catch (error: any) {
+      console.error("[news] Failed to fetch articles:", error.message);
+      res.status(500).json({ error: "Failed to fetch news articles" });
+    }
+  });
+
+  app.get("/api/news/category/:category", async (req: Request, res: Response) => {
+    try {
+      const categoryMap: Record<string, string> = {
+        cybersecurity: "Cybersecurity",
+        ai: "AI",
+        tech: "Tech",
+        breaking: "Breaking",
+        safety: "Cybersecurity",
+      };
+      const category = categoryMap[req.params.category.toLowerCase()] || req.params.category;
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+      const articles = await storage.getNewsArticles(category, limit);
+      const mapped = articles.map(a => ({
+        id: a.id,
+        title: a.title,
+        excerpt: a.excerpt,
+        content: a.content,
+        category: a.category,
+        source: a.source,
+        url: a.sourceUrl,
+        imageUrl: a.imageUrl,
+        thumbnailUrl: a.thumbnailUrl,
+        publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
+        readTime: a.content ? Math.ceil(a.content.split(/\s+/).length / 200) : 2,
+        slug: a.slug,
+        urgencyLevel: a.urgencyLevel,
+        relatedToolUrl: a.relatedToolUrl,
+        relatedToolName: a.relatedToolName,
+      }));
+      res.json({
+        category,
+        articles: mapped,
+        lastUpdated: articles[0]?.createdAt?.toISOString() || null,
+      });
+    } catch (error: any) {
+      console.error("[news] Failed to fetch category articles:", error.message);
+      res.status(500).json({ error: "Failed to fetch news articles" });
+    }
+  });
+
+  app.get("/api/news/search", async (req: Request, res: Response) => {
+    try {
+      const query = (req.query.q as string || "").trim();
+      if (query.length < 2) {
+        return res.json({ query, results: [], count: 0 });
+      }
+      const limit = Math.min(parseInt(req.query.limit as string) || 30, 50);
+      const articles = await storage.searchNewsArticles(query, limit);
+      const mapped = articles.map(a => ({
+        id: a.id,
+        title: a.title,
+        excerpt: a.excerpt,
+        content: a.content,
+        category: a.category,
+        source: a.source,
+        url: a.sourceUrl,
+        imageUrl: a.imageUrl,
+        thumbnailUrl: a.thumbnailUrl,
+        publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
+        readTime: a.content ? Math.ceil(a.content.split(/\s+/).length / 200) : 2,
+        slug: a.slug,
+      }));
+      res.json({ query, results: mapped, count: mapped.length });
+    } catch (error: any) {
+      console.error("[news] Search failed:", error.message);
+      res.status(500).json({ error: "Search failed" });
+    }
+  });
+
+  app.get("/api/news/article/:slug", async (req: Request, res: Response) => {
+    try {
+      const article = await storage.getNewsArticleBySlug(req.params.slug);
+      if (!article) {
+        return res.status(404).json({ error: "Article not found" });
+      }
+      res.json({
+        id: article.id,
+        title: article.title,
+        slug: article.slug,
+        excerpt: article.excerpt,
+        content: article.content,
+        category: article.category,
+        source: article.source,
+        sourceUrl: article.sourceUrl,
+        originalTitle: article.originalTitle,
+        imageUrl: article.imageUrl,
+        urgencyLevel: article.urgencyLevel,
+        relatedToolUrl: article.relatedToolUrl,
+        relatedToolName: article.relatedToolName,
+        publishedAt: article.publishedAt?.toISOString() || new Date().toISOString(),
+        readTime: article.content ? Math.ceil(article.content.split(/\s+/).length / 200) : 2,
+      });
+    } catch (error: any) {
+      console.error("[news] Article fetch failed:", error.message);
+      res.status(500).json({ error: "Failed to fetch article" });
+    }
+  });
+
   return httpServer;
 }
