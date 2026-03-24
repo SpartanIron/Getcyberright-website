@@ -234,7 +234,7 @@ export default function About() {
                 Simple Tools. Clear Guidance. Real Protection.
               </h2>
               <p className="text-lg text-white/50 leading-relaxed">
-                GetCyberRight was built because the people who need online safety the most have the fewest resources. We put scam checking, data removal, and safety training all in one place, designed for everyday people. No confusing language, no expensive subscriptions, and no technical knowledge needed to get started.
+                GetCyberRight was built because the people who need online safety the most have the fewest resources. We put scam checking, data removal, and safety training all in one place, designed for everyday people. No confusing language, no technical knowledge needed, and core tools are free to get started.
               </p>
             </div>
 
@@ -373,7 +373,7 @@ export default function About() {
                 </div>
                 <h3 className="font-semibold text-lg text-foreground mb-2">Accessible to Everyone</h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
-                  Every core tool and guide is free to use. No login walls for scam checking. No credit card required. We believe access to safety should not depend on your budget.
+                  Core safety tools and guides are free to use. No login required for scam checking or reading guides. Optional paid plans unlock advanced browser protection for those who want it.
                 </p>
               </div>
               <div className="bg-card border border-border rounded-xl p-7 text-center" data-testid="philosophy-transparent">

@@ -114,7 +114,7 @@ export default function Tools() {
     {
       type: "WebApplication",
       name: "Password Generator",
-      description: "Generate strong, secure passwords with customizable length, complexity, and character types. Free online password generator tool.",
+      description: "Generate strong, secure passwords with customizable length, complexity, and character types. Runs entirely in your browser.",
       url: "https://www.getcyberright.com/password-generator",
       applicationCategory: "SecurityApplication",
       provider: "GetCyberRight",
@@ -122,7 +122,7 @@ export default function Tools() {
     {
       type: "WebApplication",
       name: "GCR Data Shield - Personal Data Exposure Scanner",
-      description: "Scan for your exposed personal information across data broker sites and breach databases. Free exposure scan with actionable results.",
+      description: "Scan for your exposed personal information across data broker sites and breach databases. No account needed to get started.",
       url: "https://www.getcyberright.com/shield",
       applicationCategory: "SecurityApplication",
       provider: "GetCyberRight",
@@ -146,7 +146,7 @@ export default function Tools() {
       <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Your Cyber Protection Arsenal"
-          subtitle="Powerful security tools and utilities designed to protect you and your family. No account required."
+          subtitle="Powerful security tools and utilities designed to protect you and your family. Core tools are free, no account required."
           imageSrc={bannerImage}
           imageAlt="Modern workspace with laptop displaying security checkmarks and password generator in bright natural light"
           imagePosition="left"

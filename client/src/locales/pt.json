@@ -56,7 +56,7 @@
   "resources": {
     "title": "Recursos de Segurança Cibernética",
     "subtitle": "Recursos Confiáveis para Famílias em Todo o Mundo",
-    "description": "Ferramentas e guias gratuitos que você pode realmente usar. Tudo funciona em celular, é fácil de entender e foi projetado para famílias.",
+    "description": "Ferramentas e guias que você pode realmente usar. Tudo funciona em celular, é fácil de entender e foi projetado para famílias. As ferramentas principais são gratuitas para começar.",
     "emergency": {
       "title": "Foi Enganado? Aja Agora!",
       "subtitle": "Denuncie em 24 horas para melhor chance de recuperação",
@@ -66,8 +66,8 @@
     "youthDescription": "Ajude a manter seus filhos seguros online",
     "seniorCenter": "Centro de Proteção de Idosos",
     "seniorDescription": "Fique seguro contra golpes",
-    "securityTools": "Ferramentas de Segurança Gratuitas",
-    "toolsDescription": "Proteja seus dispositivos sem gastar",
+    "securityTools": "Ferramentas de Segurança",
+    "toolsDescription": "Proteja seus dispositivos e contas com ferramentas práticas",
     "emergencyContacts": "Contatos de Emergência por País",
     "emergencyDescription": "Selecione seu país para ver quem ligar",
     "selectCountry": "Selecione seu país...",
@@ -218,7 +218,7 @@
     "subtitle": "Verifique se algo é um golpe",
     "checkButton": "Verificar Se É Golpe",
     "passwordButton": "Criar Senhas Fortes",
-    "alwaysFree": "Sempre Gratuito",
+    "alwaysFree": "Sem Cadastro Necessário",
     "noSignup": "Sem Cadastro",
     "expertSources": "Fontes Especializadas"
   }

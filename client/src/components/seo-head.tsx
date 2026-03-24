@@ -190,7 +190,7 @@ export const pageSEO = {
   },
   dataRemoval: {
     title: "GCR Data Shield - Personal Data Exposure Scanner",
-    description: "Scan for your exposed personal information across data broker sites and breach databases. Free exposure scan, no account required.",
+    description: "Scan for your exposed personal information across data broker sites and breach databases. No account required to get started.",
   },
   childSafetyScanner: {
     title: "Child Safety Conversation Scanner",

@@ -57,7 +57,7 @@
   "resources": {
     "title": "Cyber Safety Resources",
     "subtitle": "Trusted Resources for Families Worldwide",
-    "description": "Free tools and guides you can actually use. Everything here works on mobile, is easy to understand, and was designed with families in mind.",
+    "description": "Tools and guides you can actually use. Everything here works on mobile, is easy to understand, and was designed with families in mind. Core tools are free to get started.",
     "emergency": {
       "title": "Been Scammed? Act Now!",
       "subtitle": "Report within 24 hours for best chance of recovery",
@@ -67,8 +67,8 @@
     "youthDescription": "Help keep your kids safe online",
     "seniorCenter": "Senior Protection Center",
     "seniorDescription": "Stay safe from scams and fraud",
-    "securityTools": "Free Security Tools",
-    "toolsDescription": "Protect your devices without spending money",
+    "securityTools": "Security Tools",
+    "toolsDescription": "Protect your devices and accounts with practical tools",
     "emergencyContacts": "Emergency Contacts by Country",
     "emergencyDescription": "Select your country to see who to call",
     "selectCountry": "Select your country...",
@@ -191,7 +191,7 @@
   "carousel": {
     "slide1": {
       "headline": "Keeping Your Family Safe Online",
-      "subtext": "Free tools and plain-language guides to protect your whole family, from kids on social media to seniors targeted by scammers."
+      "subtext": "Plain-language guides and practical tools to protect your whole family, from kids on social media to seniors targeted by scammers."
     },
     "slide2": {
       "headline": "Bridging Generations Through Digital Safety",

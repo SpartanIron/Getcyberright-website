@@ -609,7 +609,7 @@ interface StaticPageDef {
 const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
   "/scam-checker": {
     title: "GCR Scam Guard: Analyze URLs, Emails, Messages & QR Codes",
-    description: "Use our free AI-powered scam checker to analyze suspicious URLs, emails, text messages, and QR codes. Get instant safety reports checked against multiple trusted safety sources.",
+    description: "Analyze suspicious URLs, emails, text messages, and QR codes with our AI-powered scam checker. Free manual scanning, no account required. Get instant safety reports checked against multiple trusted safety sources.",
     path: "/scam-checker",
     schemaType: "WebApplication",
     features: ["URL safety analysis", "Email scam detection", "QR code scanning", "Real-time safety checks", "Multi-source verification"],
@@ -639,8 +639,8 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     ],
   },
   "/password-generator": {
-    title: "Free Secure Password Generator: Create Strong, Unique Passwords",
-    description: "Generate strong, unique passwords instantly with our free secure password generator. Customize length, character types, and complexity. Never use weak passwords again.",
+    title: "Secure Password Generator: Create Strong, Unique Passwords | GetCyberRight",
+    description: "Generate strong, unique passwords instantly with our secure password generator. Customize length, character types, and complexity. Free to use, runs entirely in your browser.",
     path: "/password-generator",
     schemaType: "WebApplication",
     features: ["Custom password length", "Special character options", "Uppercase and lowercase mixing", "Number inclusion", "Password strength meter"],
@@ -668,7 +668,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
   },
   "/data-removal": {
     title: "Data Broker Removal: Remove Your Personal Information from 501+ Sites",
-    description: "Protect your privacy by removing your personal information from 501+ data broker sites. Our free tool helps you find and remove your data from people-search websites, marketing databases, and data aggregators.",
+    description: "Protect your privacy by removing your personal information from 501+ data broker sites. Scan for your exposed data across people-search websites, marketing databases, and data aggregators. No account needed to get started.",
     path: "/data-removal",
     schemaType: "WebApplication",
     features: ["501+ data broker database", "Automated removal requests", "Progress tracking", "Privacy score assessment", "Continuous monitoring"],
@@ -749,8 +749,8 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     ],
   },
   "/training": {
-    title: "Cybersecurity Training Academy: Free Courses for All Skill Levels",
-    description: "Access free cybersecurity training courses designed for beginners, families, seniors, and small businesses. Learn practical skills to protect yourself from online threats.",
+    title: "Cybersecurity Training Academy: Courses for All Skill Levels | GetCyberRight",
+    description: "Access cybersecurity training courses designed for beginners, families, seniors, and small businesses. Core courses are free to get started. Learn practical skills to protect yourself from online threats.",
     path: "/training",
     faqs: [
       { question: "Who are the training courses designed for?", answer: "Our courses are designed for everyone, from complete beginners to small business owners. We have specialized learning paths for families, seniors, parents, educators, and small business professionals." },
@@ -822,7 +822,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
   },
   "/parents": {
     title: "Parents Hub: Keep Your Family Safe Online | GetCyberRight",
-    description: "Free cybersecurity guides for parents. Learn about parental controls, age-appropriate device settings, conversation starters about online safety, and how to protect your children from online threats.",
+    description: "Cybersecurity guides for parents. Learn about parental controls, age-appropriate device settings, conversation starters about online safety, and how to protect your children from online threats.",
     path: "/parents",
     features: ["Parental control setup guides", "Age-appropriate safety conversations", "Device monitoring tips", "Social media safety", "Online predator awareness", "Gaming safety for kids"],
     bodyContent: `<p>Children today go online earlier than ever. The average child gets their first smartphone at age 10, and most teens spend more than 7 hours per day on screens outside of schoolwork. As a parent, it can feel overwhelming to keep up with every app, game, and website your kids use. Our Parents Hub gives you practical, actionable guidance to help protect your family without needing to become a tech expert.</p>
@@ -866,7 +866,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
   },
   "/educators": {
     title: "Educator Resources: Cybersecurity Curriculum & Teaching Materials | GetCyberRight",
-    description: "Free cybersecurity teaching resources for educators. Access lesson plans, classroom activities, printable guides, and curriculum materials to teach students about online safety.",
+    description: "Cybersecurity teaching resources for educators. Access lesson plans, classroom activities, printable guides, and curriculum materials to teach students about online safety.",
     path: "/educators",
     features: ["Ready-made lesson plans", "Classroom activity guides", "Printable safety worksheets", "Age-graded curriculum", "Assessment tools", "Professional development resources"],
     bodyContent: `<p>With students spending more time online and cyberbullying, scams, and privacy violations affecting younger age groups every year, teaching digital safety in the classroom has never been more important. Our Educator Resources provide ready-to-use lesson plans, activities, and printable materials that make it easy to incorporate online safety into your existing curriculum.</p>
@@ -887,8 +887,8 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     ],
   },
   "/small-business": {
-    title: "Small Business Cybersecurity: Free Security Training & Guides | GetCyberRight",
-    description: "Free cybersecurity resources for small businesses. Employee awareness training, security policy templates, incident response guides, and practical steps to protect your business from cyber threats.",
+    title: "Small Business Cybersecurity: Security Training & Guides | GetCyberRight",
+    description: "Cybersecurity resources for small businesses. Employee awareness training, security policy templates, incident response guides, and practical steps to protect your business from cyber threats.",
     path: "/small-business",
     features: ["Employee awareness training", "Security policy templates", "Incident response planning", "Phishing simulation guidance", "Data backup strategies", "Compliance basics"],
     bodyContent: `<p>Over 43% of cyber attacks target small businesses, and 60% of small companies that experience a major breach go out of business within six months. Yet many small business owners assume they are too small to be a target. The reality is that attackers specifically seek out small businesses because they often have weaker security than large corporations but still hold valuable customer data and financial information.</p>
@@ -903,7 +903,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { text: "Scam Intelligence Center", href: "/scam-intel" },
     ],
     faqs: [
-      { question: "How much does cybersecurity cost for a small business?", answer: "Many effective cybersecurity measures are free or low-cost. Employee training, strong password policies, multi-factor authentication, and regular software updates cost nothing but significantly reduce risk. Our free resources help you build a strong security foundation." },
+      { question: "How much does cybersecurity cost for a small business?", answer: "Many effective cybersecurity measures are free or low-cost. Employee training, strong password policies, multi-factor authentication, and regular software updates cost nothing but significantly reduce risk. Our resources help you build a strong security foundation." },
       { question: "What are the biggest cybersecurity risks for small businesses?", answer: "The top risks include phishing emails, ransomware, weak passwords, outdated software, and employee mistakes. Over 43% of cyber attacks target small businesses, making awareness training essential." },
       { question: "Where should I start with cybersecurity for my business?", answer: "Start with three fundamentals: train your employees to recognize phishing, enable multi-factor authentication on all accounts, and ensure regular data backups. Our guides walk you through each step." },
     ],
@@ -960,13 +960,13 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     ],
   },
   "/tools": {
-    title: "Free Cybersecurity Tools: GCR Scam Guard, Password Generator & More | GetCyberRight",
-    description: "Access free cybersecurity tools including an AI-powered GCR Scam Guard, secure Password Generator, Data Broker Removal, and Breach Monitor. No signup required.",
+    title: "Cybersecurity Tools: GCR Scam Guard, Password Generator & More | GetCyberRight",
+    description: "Access cybersecurity tools including an AI-powered GCR Scam Guard, secure Password Generator, Data Broker Removal, and Breach Monitor. Core tools are free, no signup required.",
     path: "/tools",
     schemaType: "WebApplication",
     features: ["GCR Scam Guard", "Secure Password Generator", "Data Broker Removal", "Breach Monitor", "Voice Deepfake Detector", "QR Code Scanner"],
     bodyContent: `<p>Most cybersecurity tools are built for IT professionals and large corporations. We built ours for everyday people. Every tool on GetCyberRight is designed to be simple enough for anyone to use, with no technical knowledge required and no signup needed for core features.</p>
-    <h2>Our Free Security Toolkit</h2>
+    <h2>Our Security Toolkit</h2>
     <ul><li><a href="/scam-checker"><strong>GCR Scam Guard</strong></a> - Paste a suspicious URL, email, or text message to check it against multiple trusted safety databases including Google Safe Browsing, VirusTotal, and URLhaus. You can also upload QR code images to reveal hidden links.</li>
     <li><a href="/password-generator"><strong>Password Generator</strong></a> - Create strong, unique passwords instantly. Everything runs in your browser and nothing is sent to our servers.</li>
     <li><a href="/data-removal"><strong>Data Broker Removal</strong></a> - Find and remove your personal information from 501+ data broker and people-search websites.</li>

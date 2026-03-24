@@ -26,7 +26,7 @@ interface ScamTrend {
 const scamCheckerApp: WebApplicationData = {
   type: "WebApplication",
   name: "GCR Scam Guard",
-  description: "Free AI-powered scam detection tool. Check suspicious URLs, emails, phone numbers, QR codes, and messages for fraud. Checked against multiple trusted safety sources for a comprehensive safety report.",
+  description: "AI-powered scam detection tool. Check suspicious URLs, emails, phone numbers, QR codes, and messages for fraud. Free manual scanning, no account required. Checked against multiple trusted safety sources.",
   url: "https://www.getcyberright.com/scam-checker",
   applicationCategory: "SecurityApplication",
   provider: "GetCyberRight",
@@ -36,7 +36,7 @@ const scamCheckerFaq: FAQData = {
   type: "FAQPage",
   items: [
     { question: "How does the GCR Scam Guard work?", answer: "The GCR Scam Guard analyzes URLs, emails, phone numbers, QR codes, and messages using multiple safety checks including AI analysis, trusted data sources, and domain reputation checks to determine if something is a scam." },
-    { question: "Is the GCR Scam Guard free to use?", answer: "Yes, the GCR Scam Guard is completely free to use. No account or sign-up is required. Just paste a suspicious link, message, or phone number and get instant results." },
+    { question: "Is the GCR Scam Guard free to use?", answer: "Manual scanning on the website is free and requires no account. Just paste a suspicious link, message, or phone number and get instant results. The browser extension also includes free manual scanning, with optional paid plans for advanced protection." },
     { question: "What types of scams can it detect?", answer: "The tool can detect phishing links, fraudulent websites, scam phone numbers, suspicious email content, malicious QR codes, and social engineering attempts across multiple categories of online fraud." },
   ],
 };
@@ -53,7 +53,7 @@ const scamCheckerBreadcrumbs: BreadcrumbData = {
 export default function ScamCheckerPage() {
   useSEO({
     title: "GCR Scam Guard: Verify Links & Messages | GetCyberRight",
-    description: "Free scam detection tool. Check suspicious links, phone numbers, and messages instantly. Protect your family from fraud.",
+    description: "Scam detection tool with free manual scanning. Check suspicious links, phone numbers, and messages instantly. Protect your family from fraud.",
     keywords: "scam checker, fraud detection, phishing detector, link checker, URL scanner, is it a scam, verify message, free scam checker"
   });
 
@@ -130,7 +130,7 @@ export default function ScamCheckerPage() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-4 py-2 rounded-full mb-4">
               <AlertTriangle className="h-4 w-4" />
-              <span className="text-sm font-medium">Free Scam Detection Tool</span>
+              <span className="text-sm font-medium">AI-Powered Scam Detection</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4">
               Is It a Scam? Check Before You Click

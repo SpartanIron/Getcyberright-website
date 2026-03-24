@@ -56,7 +56,7 @@
   "resources": {
     "title": "Ressources de cybersécurité",
     "subtitle": "Ressources fiables pour les familles du monde entier",
-    "description": "Outils et guides gratuits que vous pouvez réellement utiliser. Tout fonctionne sur mobile, est facile à comprendre et a été conçu pour les familles.",
+    "description": "Outils et guides que vous pouvez réellement utiliser. Tout fonctionne sur mobile, est facile à comprendre et a été conçu pour les familles. Les outils principaux sont gratuits pour commencer.",
     "emergency": {
       "title": "Victime d'arnaque ? Agissez maintenant !",
       "subtitle": "Signalez dans les 24 heures pour de meilleures chances de récupération",
@@ -66,8 +66,8 @@
     "youthDescription": "Protégez vos enfants en ligne",
     "seniorCenter": "Centre de protection des aînés",
     "seniorDescription": "Restez protégé des arnaques",
-    "securityTools": "Outils de sécurité gratuits",
-    "toolsDescription": "Protégez vos appareils sans dépenser",
+    "securityTools": "Outils de Sécurité",
+    "toolsDescription": "Protégez vos appareils et comptes avec des outils pratiques",
     "emergencyContacts": "Contacts d'urgence par pays",
     "emergencyDescription": "Sélectionnez votre pays pour voir qui appeler",
     "selectCountry": "Sélectionnez votre pays...",
@@ -218,7 +218,7 @@
     "subtitle": "Vérifiez si quelque chose est une arnaque",
     "checkButton": "Vérifier Si C'est une Arnaque",
     "passwordButton": "Créer des Mots de Passe Forts",
-    "alwaysFree": "Toujours Gratuit",
+    "alwaysFree": "Aucune Inscription Requise",
     "noSignup": "Sans Inscription",
     "expertSources": "Sources Expertes"
   }

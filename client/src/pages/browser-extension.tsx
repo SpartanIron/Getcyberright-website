@@ -14,7 +14,7 @@ import {
 const extensionApp: WebApplicationData = {
   type: "WebApplication",
   name: "GCR Scam Guard Browser Extension by GetCyberRight",
-  description: "Free Chrome browser extension for real-time scam protection. Scan links, detect phishing sites, and stay safe while browsing. By GetCyberRight.",
+  description: "Chrome browser extension for real-time scam protection. Free manual scanning included. Scan links, detect phishing sites, and stay safe while browsing. By GetCyberRight.",
   url: "https://www.getcyberright.com/browser-extension",
   applicationCategory: "SecurityApplication",
   provider: "GetCyberRight",
@@ -81,8 +81,8 @@ const installSteps = [
 
 export default function BrowserExtensionPage() {
   useSEO({
-    title: "GCR Scam Guard Browser Extension - Free Chrome Protection | GetCyberRight",
-    description: "Download the free GCR Scam Guard browser extension for Chrome by GetCyberRight. Real-time link scanning, AI-powered scam detection, and community threat alerts.",
+    title: "GCR Scam Guard Browser Extension - Chrome Protection | GetCyberRight",
+    description: "Download the GCR Scam Guard browser extension for Chrome by GetCyberRight. Free manual scanning included. Real-time link scanning, AI-powered scam detection, and community threat alerts.",
     keywords: "browser extension, chrome extension, scam protection, phishing detector, link scanner, safe browsing, gcr guard, getcyberright"
   });
 
@@ -103,7 +103,7 @@ export default function BrowserExtensionPage() {
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 space-y-6">
               <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30 text-sm px-3 py-1">
-                Free Download
+                Free to Get Started
               </Badge>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight" style={{ letterSpacing: "-0.025em" }}>
                 GCR Scam Guard
@@ -233,7 +233,7 @@ export default function BrowserExtensionPage() {
           </div>
           <div className="space-y-4 max-w-2xl mx-auto">
             {[
-              { q: "Is the browser extension free?", a: "Yes, completely free. No account required, no subscriptions, no hidden costs." },
+              { q: "Is the browser extension free?", a: "The extension is free to download and includes manual scanning at no cost. Optional paid plans (Pro and Family) unlock advanced features like automatic page scanning, webmail protection, and family profiles." },
               { q: "Does it track my browsing activity?", a: "No. The extension only scans content when you explicitly trigger a scan or when auto-scan is enabled. No browsing history is stored or transmitted." },
               { q: "What browsers does it work with?", a: "It works with any Chromium-based browser including Google Chrome, Brave, Microsoft Edge, Opera, and Vivaldi." },
               { q: "Why isn't it on the Chrome Web Store?", a: "We're working on Chrome Web Store approval. In the meantime, you can install it manually using Developer Mode, which takes about 30 seconds." },

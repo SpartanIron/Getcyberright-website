@@ -56,7 +56,7 @@
   "resources": {
     "title": "Recursos de Ciberseguridad",
     "subtitle": "Recursos Confiables para Familias en Todo el Mundo",
-    "description": "Herramientas y guías gratuitas que realmente puedes usar. Todo funciona en móvil, es fácil de entender y fue diseñado pensando en familias.",
+    "description": "Herramientas y guías que realmente puedes usar. Todo funciona en móvil, es fácil de entender y fue diseñado pensando en familias. Las herramientas principales son gratuitas para comenzar.",
     "emergency": {
       "title": "¿Te Estafaron? ¡Actúa Ahora!",
       "subtitle": "Reporta en 24 horas para mejor oportunidad de recuperación",
@@ -66,8 +66,8 @@
     "youthDescription": "Ayuda a mantener a tus hijos seguros en línea",
     "seniorCenter": "Centro de Protección de Mayores",
     "seniorDescription": "Mantente seguro de estafas",
-    "securityTools": "Herramientas de Seguridad Gratuitas",
-    "toolsDescription": "Protege tus dispositivos sin gastar",
+    "securityTools": "Herramientas de Seguridad",
+    "toolsDescription": "Protege tus dispositivos y cuentas con herramientas prácticas",
     "emergencyContacts": "Contactos de Emergencia por País",
     "emergencyDescription": "Selecciona tu país para ver a quién llamar",
     "selectCountry": "Selecciona tu país...",
@@ -218,7 +218,7 @@
     "subtitle": "Verifica si algo es una estafa",
     "checkButton": "Verificar Si Es Estafa",
     "passwordButton": "Crear Contraseñas Seguras",
-    "alwaysFree": "Siempre Gratis",
+    "alwaysFree": "Sin Registro Necesario",
     "noSignup": "Sin Registro",
     "expertSources": "Fuentes Expertas"
   }

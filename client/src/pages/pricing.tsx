@@ -40,7 +40,7 @@ const whatWeOffer = [
 const ourValues = [
   { icon: Heart, title: "Family First", description: "We exist to protect the people that corporate cybersecurity leaves behind: parents, kids, seniors, and everyday families." },
   { icon: Lock, title: "Your Data Stays Yours", description: "We never sell your personal information. We use analytics to improve your experience, but your data is never shared with advertisers or data brokers." },
-  { icon: Eye, title: "Full Transparency", description: "No hidden fees, no surprise paywalls, no premium tiers. What you see is what you get." },
+  { icon: Eye, title: "Full Transparency", description: "Core safety tools are free to use. Paid plans unlock advanced protection, and we are always upfront about what is included at every level." },
   { icon: Handshake, title: "Trusted Partnerships", description: "We are sustained through partnerships with credible companies and organizations who share our mission to make families safer." },
 ];
 
@@ -123,7 +123,7 @@ export default function OurMission() {
                 What We Offer
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Powerful tools designed to keep your family safe. No sign-up walls, no credit cards required.
+                Powerful tools designed to keep your family safe. Core tools are free to use, no account needed.
               </p>
             </motion.div>
 
@@ -181,8 +181,8 @@ export default function OurMission() {
                   </div>
                   <p className="text-muted-foreground leading-relaxed mb-4">
                     Our partners never influence our content or recommendations. We maintain full editorial 
-                    independence. We never sell user data. And we never put a paywall between families 
-                    and their safety.
+                    independence. We never sell user data. And our core safety tools, including manual scam 
+                    checking and educational content, will always be free.
                   </p>
                   <p className="text-foreground font-medium">
                     If your organization shares this mission, we would love to hear from you.
