@@ -191,7 +191,7 @@ export function HeroSection() {
                 className="text-base sm:text-xl text-white/80 leading-relaxed mb-8 sm:mb-10"
                 data-testid="text-hero-subtext"
               >
-                GetCyberRight is the most powerful free digital protection platform for families and everyday people. Spot scams before they trick you, remove your personal data from hundreds of sites, and learn to stay safe online with simple guides anyone can follow. Everything you need, all in one place.
+                GetCyberRight is the most accessible digital protection platform for families and everyday people. Spot scams before they trick you, find and take control of your personal data across hundreds of sites, and learn to stay safe online with simple guides anyone can follow. Everything you need, all in one place.
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 mb-8 sm:mb-10">

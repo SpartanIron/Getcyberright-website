@@ -19,7 +19,7 @@ const faqCategories = [
       },
       {
         q: "Is GetCyberRight free?",
-        a: "Our educational content, articles, guides, and basic scam checking tools are completely free. We also offer paid subscription plans (Essential and Professional) that unlock advanced features like automatic page scanning, scan history, and family profiles through our GCR Scam Guard browser extension. We believe foundational cybersecurity education should be accessible to everyone."
+        a: "Our educational content, articles, guides, and core scam checking tools are free to use. We also offer paid subscription plans (Essential and Professional) that unlock advanced features like automatic page scanning, scan history, family profiles, and ongoing data monitoring. We believe foundational cybersecurity education should be accessible to everyone."
       },
       {
         q: "Who creates the content on GetCyberRight?",
