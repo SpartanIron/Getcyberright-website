@@ -24,15 +24,15 @@ import {
   Loader2,
   Info,
   Clock,
-  Lock,
-  Unlock,
   Crown,
+  RefreshCw,
+  Bell,
 } from "lucide-react";
 
 type BrokerResult = {
   broker: string;
   status: string;
-  url: string;
+  url?: string;
   found: boolean | null;
   dataFound: string[] | null;
 };
@@ -62,7 +62,7 @@ type ExposureReport = {
   brokerFoundCount?: number;
 };
 
-type AccessLevel = "free" | "trial" | "full";
+type AccessLevel = "free" | "full";
 
 const SCORE_CONFIG = {
   low: {
@@ -70,28 +70,28 @@ const SCORE_CONFIG = {
     bg: "bg-green-100 dark:bg-green-950/40",
     border: "border-green-200 dark:border-green-800",
     icon: CheckCircle2,
-    label: "Low Risk",
+    label: "Low Exposure",
   },
   medium: {
     color: "text-yellow-600 dark:text-yellow-400",
     bg: "bg-yellow-100 dark:bg-yellow-950/40",
     border: "border-yellow-200 dark:border-yellow-800",
     icon: AlertCircle,
-    label: "Medium Risk",
+    label: "Moderate Exposure",
   },
   high: {
     color: "text-orange-600 dark:text-orange-400",
     bg: "bg-orange-100 dark:bg-orange-950/40",
     border: "border-orange-200 dark:border-orange-800",
     icon: ShieldAlert,
-    label: "High Risk",
+    label: "High Exposure",
   },
   critical: {
     color: "text-red-600 dark:text-red-400",
     bg: "bg-red-100 dark:bg-red-950/40",
     border: "border-red-200 dark:border-red-800",
     icon: ShieldX,
-    label: "Critical Risk",
+    label: "Critical Exposure",
   },
 };
 
@@ -110,9 +110,6 @@ function ShieldResultsPage() {
   const [alertEmail, setAlertEmail] = useState("");
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [accessLevel, setAccessLevel] = useState<AccessLevel>("free");
-  const [trialDaysLeft, setTrialDaysLeft] = useState<number | undefined>();
-  const [trialExpired, setTrialExpired] = useState(false);
-  const [startingTrial, setStartingTrial] = useState(false);
 
   useEffect(() => {
     if (!scanId) return;
@@ -126,8 +123,6 @@ function ShieldResultsPage() {
         const data = await res.json();
 
         if (data.accessLevel) setAccessLevel(data.accessLevel);
-        if (data.trialDaysLeft !== undefined) setTrialDaysLeft(data.trialDaysLeft);
-        if (data.trialExpired) setTrialExpired(true);
 
         if (data.status === "complete" && data.report) {
           setReport(data.report);
@@ -174,31 +169,6 @@ function ShieldResultsPage() {
     },
   });
 
-  async function handleStartTrial() {
-    if (!isAuthenticated) {
-      setLocation(`/login?redirect=/shield/results/${scanId}`);
-      return;
-    }
-
-    setStartingTrial(true);
-    try {
-      const res = await apiRequest("POST", "/api/shield/start-trial", {});
-      const data = await res.json();
-
-      if (data.level === "trial" || data.level === "full") {
-        setAccessLevel(data.level);
-        setTrialDaysLeft(data.trialDaysLeft);
-        toast({ title: "Trial activated!", description: "Your 14-day free trial has started. Refreshing your results..." });
-        setTimeout(() => window.location.reload(), 1000);
-      }
-    } catch (err: any) {
-      const errorData = err?.message || "Could not start trial";
-      toast({ title: "Could not start trial", description: errorData, variant: "destructive" });
-    } finally {
-      setStartingTrial(false);
-    }
-  }
-
   function toggleExpand(idx: number) {
     setExpandedItems((prev) => {
       const next = new Set(prev);
@@ -208,7 +178,7 @@ function ShieldResultsPage() {
     });
   }
 
-  const hasFullAccess = accessLevel === "trial" || accessLevel === "full";
+  const hasPaidAccess = accessLevel === "full";
 
   if (loading) {
     return (
@@ -218,8 +188,8 @@ function ShieldResultsPage() {
         <main className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center space-y-4">
             <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
-            <p className="text-lg font-medium">Loading your results...</p>
-            <p className="text-muted-foreground">Scanning 500+ data broker sites and breach databases... this may take up to a minute.</p>
+            <p className="text-lg font-medium" data-testid="text-loading">Scanning your digital footprint...</p>
+            <p className="text-muted-foreground">Checking 500+ data broker sites and breach databases. This may take up to a minute.</p>
           </div>
         </main>
         <Footer />
@@ -253,13 +223,13 @@ function ShieldResultsPage() {
   const scoreConfig = SCORE_CONFIG[report.exposureScore];
   const ScoreIcon = scoreConfig.icon;
 
-  const allSources = hasFullAccess ? [
+  const allSources = [
     ...(report.breachResults || []).map((b, i) => ({
       type: "breach" as const,
       title: `Data Breach: ${b.breachName}`,
       description: `Your email was found in the ${b.breachName} data breach${b.breachDate ? ` (${b.breachDate})` : ""}. The types of data exposed include: ${b.dataClasses.join(", ")}.`,
       status: "found",
-      url: null,
+      url: null as string | null,
       idx: i,
     })),
     ...(report.brokerResults || []).map((b, i) => ({
@@ -269,24 +239,25 @@ function ShieldResultsPage() {
         b.status === "found"
           ? `Your information was found on ${b.broker}. ${b.dataFound ? `Data types found: ${b.dataFound.join(", ")}.` : ""}`
           : b.status === "pending_verification"
-          ? `${b.broker} may have your data. This requires manual verification — automated checking is not available for this site.`
+          ? `${b.broker} may have your data. This requires manual verification.`
           : b.status === "rate_limited"
-          ? `We could not check ${b.broker} because we were rate limited. Try again later for complete results.`
+          ? `We could not check ${b.broker} at this time. Try again later for complete results.`
           : b.status === "timed_out"
-          ? `The check for ${b.broker} timed out. Try again later for complete results.`
+          ? `The check for ${b.broker} timed out. Try again later.`
           : b.status === "unavailable"
-          ? `${b.broker} could not be checked at this time. This does not mean your data is not there.`
-          : `${b.broker} was checked but no matching records were found.`,
+          ? `${b.broker} could not be checked at this time.`
+          : `${b.broker} was checked — no matching records were found.`,
       status: b.status,
-      url: b.url,
+      url: b.url || null,
       idx: (report.breachResults?.length || 0) + i,
     })),
-  ] : [];
+  ];
 
-  const hasPartialChecks = report.partialResults;
-  const totalSources = hasFullAccess
-    ? allSources.length
-    : (report.brokerCount || 0) + (report.breachCount || 0);
+  const foundSources = allSources.filter(s => s.status === "found");
+  const uncheckedSources = allSources.filter(s =>
+    s.status === "rate_limited" || s.status === "timed_out" || s.status === "unavailable"
+  );
+  const hasPartialChecks = report.partialResults || uncheckedSources.length > 0;
 
   return (
     <>
@@ -298,19 +269,6 @@ function ShieldResultsPage() {
       <main className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4 max-w-2xl space-y-6">
 
-          {accessLevel === "trial" && trialDaysLeft !== undefined && (
-            <div
-              className="flex items-center gap-2 p-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30"
-              data-testid="banner-trial-active"
-            >
-              <Unlock className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-              <p className="text-sm text-blue-800 dark:text-blue-200">
-                <span className="font-medium">Free trial active</span> — {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining.{" "}
-                <Link href="/pricing" className="underline font-medium">Upgrade</Link> for unlimited access.
-              </p>
-            </div>
-          )}
-
           {accessLevel === "full" && (
             <div
               className="flex items-center gap-2 p-3 rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30"
@@ -318,7 +276,7 @@ function ShieldResultsPage() {
             >
               <Crown className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
               <p className="text-sm text-green-800 dark:text-green-200 font-medium">
-                Full access — your subscription includes complete GCR Data Shield reports.
+                Ongoing protection active — auto re-scans, alerts, and removal tracking included.
               </p>
             </div>
           )}
@@ -342,10 +300,7 @@ function ShieldResultsPage() {
                     </span>
                   </div>
                   <p className="text-base text-foreground leading-relaxed" data-testid="text-exposure-summary">
-                    {hasFullAccess
-                      ? (summary || generateClientSummary(report))
-                      : generateFreeSummary(report)
-                    }
+                    {summary || generateSummary(report)}
                   </p>
                 </div>
               </div>
@@ -360,15 +315,20 @@ function ShieldResultsPage() {
             >
               <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                Some checks could not be completed. Your results may be incomplete.
+                {uncheckedSources.length > 0
+                  ? `${uncheckedSources.length} site${uncheckedSources.length !== 1 ? "s" : ""} could not be checked due to timeouts or rate limits. Your actual exposure may be higher than shown.`
+                  : "Some checks could not be completed. Your actual exposure may be higher than shown."
+                }
               </p>
             </div>
           )}
 
-          {hasFullAccess && allSources.length > 0 && (
+          {allSources.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Detailed Findings</CardTitle>
+                <CardTitle className="text-lg" data-testid="text-findings-title">
+                  Detailed Findings ({foundSources.length} found across {allSources.length} sources)
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {allSources.map((source) => {
@@ -427,80 +387,6 @@ function ShieldResultsPage() {
             </Card>
           )}
 
-          {!hasFullAccess && totalSources > 0 && (
-            <Card className="relative overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
-                  Detailed Findings
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {Array.from({ length: Math.min(totalSources, 4) }).map((_, i) => (
-                  <div key={i} className="border rounded-lg p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-4 w-4 rounded bg-muted animate-pulse" />
-                      <div className="h-4 rounded bg-muted animate-pulse flex-1 max-w-[200px]" />
-                    </div>
-                  </div>
-                ))}
-                {totalSources > 4 && (
-                  <p className="text-sm text-muted-foreground text-center pt-2">
-                    + {totalSources - 4} more source{totalSources - 4 !== 1 ? "s" : ""} checked
-                  </p>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background flex items-end justify-center pb-8 pointer-events-none">
-                  <div className="pointer-events-auto text-center space-y-3 max-w-sm">
-                    <Lock className="h-8 w-8 text-muted-foreground mx-auto" />
-                    <p className="text-lg font-semibold" data-testid="text-unlock-cta">
-                      {trialExpired
-                        ? "Your free trial has ended"
-                        : "Unlock your full report"
-                      }
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {trialExpired
-                        ? "Upgrade to Essential or higher to continue viewing detailed results, broker names, breach data, and removal guidance."
-                        : "See which broker sites have your data, which breaches exposed your email, and get step-by-step removal guidance."
-                      }
-                    </p>
-                    {trialExpired ? (
-                      <Link href="/pricing">
-                        <Button className="min-h-[44px]" data-testid="button-upgrade">
-                          <Crown className="h-4 w-4 mr-2" />
-                          View Plans
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button
-                        onClick={handleStartTrial}
-                        disabled={startingTrial}
-                        className="min-h-[44px]"
-                        data-testid="button-start-trial"
-                      >
-                        {startingTrial ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : (
-                          <Unlock className="h-4 w-4 mr-2" />
-                        )}
-                        {isAuthenticated
-                          ? "Start 14-Day Free Trial"
-                          : "Sign Up to Start Free Trial"
-                        }
-                      </Button>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      {trialExpired
-                        ? "Plans start at just a few dollars per month."
-                        : "No credit card required. Full access for 14 days."
-                      }
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           {((report.breachResults && report.breachResults.length > 0) || (report.breachCount && report.breachCount > 0)) && (
             <div className="flex items-start gap-2 text-sm text-muted-foreground px-1">
               <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -518,14 +404,108 @@ function ShieldResultsPage() {
             </div>
           )}
 
-          {hasFullAccess && (
+          {!hasPaidAccess && foundSources.length > 0 && (
+            <Card className="border-2 border-primary/20">
+              <CardContent className="py-8">
+                <div className="text-center space-y-4 max-w-md mx-auto">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
+                    <RefreshCw className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold mb-1" data-testid="text-cta-heading">
+                      Keep your data protected
+                    </h2>
+                    <p className="text-muted-foreground text-sm">
+                      Data brokers re-add your information every 30-90 days. With ongoing monitoring, we automatically re-scan and alert you when your data reappears.
+                    </p>
+                  </div>
+                  <div className="text-left space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span>Automatic re-scans every 30 days</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span>Instant alerts when your data reappears</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span>Step-by-step removal tracking</span>
+                    </div>
+                  </div>
+                  <Link href="/pricing">
+                    <Button className="min-h-[44px] w-full" data-testid="button-view-plans">
+                      <Crown className="h-4 w-4 mr-2" />
+                      View Protection Plans
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {!hasPaidAccess && foundSources.length === 0 && (
+            <Card>
+              <CardContent className="py-8">
+                <div className="text-center space-y-4 max-w-md mx-auto">
+                  <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-950/40 flex items-center justify-center mx-auto">
+                    <Bell className="h-6 w-6 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold mb-1" data-testid="text-cta-heading">
+                      Stay ahead of future breaches
+                    </h2>
+                    <p className="text-muted-foreground text-sm">
+                      Your data looks clean today, but new breaches happen constantly. Get alerts if your information appears in future scans.
+                    </p>
+                  </div>
+                  {leadSubmitted ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <CheckCircle2 className="h-8 w-8 text-green-500" />
+                      <p className="text-sm font-medium">You're signed up for monitoring alerts.</p>
+                    </div>
+                  ) : (
+                    <div className="flex gap-3 max-w-md mx-auto">
+                      <div className="flex-1">
+                        <label htmlFor="alert-email" className="sr-only">Email for alerts</label>
+                        <Input
+                          id="alert-email"
+                          type="email"
+                          placeholder="Enter your email for alerts"
+                          value={alertEmail}
+                          onChange={(e) => setAlertEmail(e.target.value)}
+                          className="min-h-[44px] text-base"
+                          data-testid="input-alert-email"
+                        />
+                      </div>
+                      <Button
+                        onClick={() => leadMutation.mutate()}
+                        disabled={!alertEmail.trim() || leadMutation.isPending}
+                        className="min-h-[44px]"
+                        data-testid="button-get-alerts"
+                      >
+                        {leadMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Mail className="h-4 w-4 mr-2" />
+                        )}
+                        Get Alerts
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {hasPaidAccess && (
             <Card>
               <CardContent className="py-8">
                 {leadSubmitted ? (
                   <div className="flex flex-col items-center gap-4 text-center">
                     <CheckCircle2 className="h-10 w-10 text-green-500" />
                     <div>
-                      <p className="text-lg font-medium">You're all set!</p>
+                      <p className="text-lg font-medium">Ongoing monitoring active</p>
                       <p className="text-muted-foreground text-sm">
                         We will re-scan every 30 days and alert you if your data reappears.
                       </p>
@@ -535,10 +515,10 @@ function ShieldResultsPage() {
                   <div className="space-y-4">
                     <div className="text-center">
                       <h2 className="text-lg font-semibold mb-1" data-testid="text-cta-heading">
-                        Start Removing My Data
+                        Set Up Monitoring Alerts
                       </h2>
                       <p className="text-muted-foreground text-sm">
-                        Get notified if your data reappears. We will re-scan every 30 days and alert you.
+                        Get notified when your data reappears. We re-scan every 30 days and send you an alert.
                       </p>
                     </div>
                     <div className="flex gap-3 max-w-md mx-auto">
@@ -558,14 +538,14 @@ function ShieldResultsPage() {
                         onClick={() => leadMutation.mutate()}
                         disabled={!alertEmail.trim() || leadMutation.isPending}
                         className="min-h-[44px]"
-                        data-testid="button-start-removing"
+                        data-testid="button-start-monitoring"
                       >
                         {leadMutation.isPending ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <Mail className="h-4 w-4 mr-2" />
                         )}
-                        Sign Up
+                        Start Monitoring
                       </Button>
                     </div>
                   </div>
@@ -588,72 +568,34 @@ function ShieldResultsPage() {
   );
 }
 
-function generateFreeSummary(report: ExposureReport): string {
-  const brokerCount = report.brokerCount || 0;
-  const breachCount = report.breachCount || 0;
-  const brokerFoundCount = report.brokerFoundCount || 0;
+function generateSummary(report: ExposureReport): string {
+  const brokerResults = report.brokerResults || [];
+  const breachResults = report.breachResults || [];
+  const brokerCount = report.brokerCount || brokerResults.length;
+  const breachCount = report.breachCount || breachResults.length;
+  const foundBrokers = brokerResults.filter(b => b.status === "found");
+  const brokerFoundCount = report.brokerFoundCount || foundBrokers.length;
 
-  let text = `We scanned ${brokerCount} data broker site${brokerCount !== 1 ? "s" : ""}`;
-  if (breachCount > 0) {
-    text += ` and ${breachCount} breach database${breachCount !== 1 ? "s" : ""}`;
-  }
-  text += ". ";
-
-  if (report.exposureScore === "critical" || report.exposureScore === "high") {
-    text += `Your personal information was found on ${brokerFoundCount} site${brokerFoundCount !== 1 ? "s" : ""}. Unlock the full report to see exactly where and get removal steps.`;
-  } else if (report.exposureScore === "medium") {
-    text += `We found some exposure of your personal information. Unlock the full report to see the details and recommended actions.`;
-  } else if (brokerFoundCount > 0) {
-    text += `Your information appeared on ${brokerFoundCount} site${brokerFoundCount !== 1 ? "s" : ""}, but your overall exposure is low. Unlock the full report for details.`;
-  } else {
-    text += "Good news — we didn't find your information on the sites we checked. Unlock the full report to see the complete picture.";
-  }
-
-  return text;
-}
-
-function generateClientSummary(report: ExposureReport): string {
   const parts: string[] = [];
 
-  if (report.breachResults && report.breachResults.length > 0) {
-    parts.push(
-      `Your email address appeared in ${report.breachResults.length} data breach${report.breachResults.length !== 1 ? "es" : ""}`,
-    );
+  parts.push(`We scanned ${brokerCount} data broker site${brokerCount !== 1 ? "s" : ""}`);
+  if (breachCount > 0) {
+    parts[0] += ` and ${breachCount} breach database${breachCount !== 1 ? "s" : ""}`;
   }
 
-  const foundBrokers = (report.brokerResults || []).filter((b) => b.status === "found");
-  if (foundBrokers.length > 0) {
-    parts.push(
-      `your name was found on ${foundBrokers.length} people-search site${foundBrokers.length !== 1 ? "s" : ""}`,
-    );
+  if (breachResults.length > 0 && brokerFoundCount > 0) {
+    return `${parts[0]}. Your email appeared in ${breachResults.length} data breach${breachResults.length !== 1 ? "es" : ""}, and your name was found on ${brokerFoundCount} people-search site${brokerFoundCount !== 1 ? "s" : ""}. Review the details below.`;
   }
 
-  const pendingBrokers = (report.brokerResults || []).filter(
-    (b) => b.status === "pending_verification",
-  );
-  if (pendingBrokers.length > 0) {
-    parts.push(
-      `${pendingBrokers.length} additional broker${pendingBrokers.length !== 1 ? "s" : ""} may also have your data`,
-    );
+  if (breachResults.length > 0) {
+    return `${parts[0]}. Your email appeared in ${breachResults.length} data breach${breachResults.length !== 1 ? "es" : ""}. Review the details below to see what was exposed.`;
   }
 
-  if (parts.length === 0) {
-    return "Good news — we did not find your information on the data broker sites and breach databases we checked.";
+  if (brokerFoundCount > 0) {
+    return `${parts[0]}. Your information was found on ${brokerFoundCount} people-search site${brokerFoundCount !== 1 ? "s" : ""}. Review the details below.`;
   }
 
-  let text = parts[0];
-  for (let i = 1; i < parts.length; i++) {
-    if (i === parts.length - 1) text += `, and ${parts[i]}`;
-    else text += `, ${parts[i]}`;
-  }
-  text += ".";
-
-  if (report.exposureScore === "high" || report.exposureScore === "critical") {
-    text +=
-      " This is likely contributing to the scam calls and texts you are receiving.";
-  }
-
-  return text;
+  return `${parts[0]}. We did not find your information on the sites we checked. This is a good sign, but new breaches and data broker listings happen regularly.`;
 }
 
 export default ShieldResultsPage;

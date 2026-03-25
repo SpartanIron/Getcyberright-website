@@ -4556,28 +4556,17 @@ EDGE CASE HANDLING
     }),
   });
 
-  function getShieldAccessLevel(user: any): { level: "free" | "trial" | "full"; trialDaysLeft?: number; trialExpired?: boolean } {
+  function getShieldAccessLevel(user: any): { level: "free" | "full" } {
     if (!user) return { level: "free" };
 
     if (hasTierAccess(user.subscriptionTier || "free", SUBSCRIPTION_TIERS.ESSENTIAL)) {
       return { level: "full" };
     }
 
-    if (user.shieldTrialStartedAt) {
-      const trialStart = new Date(user.shieldTrialStartedAt).getTime();
-      const trialEnd = trialStart + 14 * 24 * 60 * 60 * 1000;
-      const now = Date.now();
-      if (now < trialEnd) {
-        const daysLeft = Math.ceil((trialEnd - now) / (24 * 60 * 60 * 1000));
-        return { level: "trial", trialDaysLeft: daysLeft };
-      }
-      return { level: "free", trialExpired: true };
-    }
-
     return { level: "free" };
   }
 
-  function redactReportForFree(report: any) {
+  function prepareReportForFree(report: any) {
     return {
       scanId: report.scanId,
       completedAt: report.completedAt,
@@ -4587,8 +4576,14 @@ EDGE CASE HANDLING
       brokerCount: report.brokerResults?.length || 0,
       breachCount: report.breachResults?.length || 0,
       brokerFoundCount: report.brokerResults?.filter((b: any) => b.status === "found").length || 0,
-      breachResults: undefined,
-      brokerResults: undefined,
+      breachResults: report.breachResults || [],
+      brokerResults: (report.brokerResults || []).map((b: any) => ({
+        broker: b.broker,
+        status: b.status,
+        found: b.found,
+        dataFound: b.dataFound,
+        url: undefined,
+      })),
     };
   }
 
@@ -4607,32 +4602,6 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/shield/start-trial", isAuthenticated, async (req: any, res: Response) => {
-    try {
-      const userId = req.user.id;
-      const access = getShieldAccessLevel(req.user);
-
-      if (access.level === "full") {
-        return res.json({ message: "You already have full access.", level: "full" });
-      }
-
-      if (req.user.shieldTrialStartedAt) {
-        const trialStart = new Date(req.user.shieldTrialStartedAt).getTime();
-        const trialEnd = trialStart + 14 * 24 * 60 * 60 * 1000;
-        if (Date.now() >= trialEnd) {
-          return res.status(400).json({ error: "Your free trial has already been used. Upgrade to Essential or higher to unlock full GCR Data Shield reports.", level: "free", trialExpired: true });
-        }
-        return res.json({ message: "Trial already active.", level: "trial", trialDaysLeft: access.trialDaysLeft });
-      }
-
-      await db.update(users).set({ shieldTrialStartedAt: new Date() }).where(eq(users.id, userId));
-
-      res.json({ message: "Your 14-day free trial has started!", level: "trial", trialDaysLeft: 14 });
-    } catch (error) {
-      console.error("[shield] Trial start error");
-      res.status(500).json({ error: "Could not start trial" });
-    }
-  });
 
   app.post("/api/scan", shieldRateLimit, async (req: Request, res: Response) => {
     try {
@@ -4679,12 +4648,11 @@ EDGE CASE HANDLING
         if (memStatus.status === "complete" && memStatus.report && access.level === "free") {
           return res.json({
             ...memStatus,
-            report: redactReportForFree(memStatus.report),
+            report: prepareReportForFree(memStatus.report),
             accessLevel: access.level,
-            trialExpired: access.trialExpired,
           });
         }
-        return res.json({ ...memStatus, accessLevel: access.level, trialDaysLeft: access.trialDaysLeft });
+        return res.json({ ...memStatus, accessLevel: access.level });
       }
 
       const dbScan = await getShieldScanFromDb(scanId);
@@ -4695,10 +4663,9 @@ EDGE CASE HANDLING
         if (access.level === "free") {
           return res.json({
             status: "complete",
-            report: redactReportForFree(report),
+            report: prepareReportForFree(report),
             summary: undefined,
             accessLevel: access.level,
-            trialExpired: access.trialExpired,
           });
         }
         return res.json({
@@ -4706,7 +4673,6 @@ EDGE CASE HANDLING
           report,
           summary: undefined,
           accessLevel: access.level,
-          trialDaysLeft: access.trialDaysLeft,
         });
       }
 
