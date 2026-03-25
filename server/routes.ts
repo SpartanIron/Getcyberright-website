@@ -4567,23 +4567,50 @@ EDGE CASE HANDLING
   }
 
   function prepareReportForFree(report: any) {
+    const allBrokers = report.brokerResults || [];
+    const foundBrokers = allBrokers.filter((b: any) => b.status === "found");
+    const previewCount = 2;
+
+    const previewBrokers = foundBrokers.slice(0, previewCount).map((b: any) => ({
+      broker: b.broker,
+      status: b.status,
+      found: b.found,
+      dataFound: b.dataFound,
+      url: undefined,
+    }));
+
+    const redactedBrokers = foundBrokers.slice(previewCount).map((_b: any, i: number) => ({
+      broker: null,
+      status: "found",
+      found: true,
+      dataFound: null,
+      url: undefined,
+      redacted: true,
+    }));
+
+    const notFoundBrokers = allBrokers
+      .filter((b: any) => b.status !== "found")
+      .slice(0, 3)
+      .map((b: any) => ({
+        broker: b.broker,
+        status: b.status,
+        found: false,
+        dataFound: null,
+        url: undefined,
+      }));
+
     return {
       scanId: report.scanId,
       completedAt: report.completedAt,
       exposureScore: report.exposureScore,
       scoreBreakdown: report.scoreBreakdown,
       partialResults: report.partialResults,
-      brokerCount: report.brokerResults?.length || 0,
+      brokerCount: allBrokers.length,
       breachCount: report.breachResults?.length || 0,
-      brokerFoundCount: report.brokerResults?.filter((b: any) => b.status === "found").length || 0,
+      brokerFoundCount: foundBrokers.length,
       breachResults: report.breachResults || [],
-      brokerResults: (report.brokerResults || []).map((b: any) => ({
-        broker: b.broker,
-        status: b.status,
-        found: b.found,
-        dataFound: b.dataFound,
-        url: undefined,
-      })),
+      brokerResults: [...previewBrokers, ...redactedBrokers, ...notFoundBrokers],
+      brokerPreviewCount: previewCount,
     };
   }
 

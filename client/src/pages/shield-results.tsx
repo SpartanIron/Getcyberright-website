@@ -27,14 +27,16 @@ import {
   Crown,
   RefreshCw,
   Bell,
+  Eye,
 } from "lucide-react";
 
 type BrokerResult = {
-  broker: string;
+  broker: string | null;
   status: string;
   url?: string;
   found: boolean | null;
   dataFound: string[] | null;
+  redacted?: boolean;
 };
 
 type BreachResult = {
@@ -223,6 +225,10 @@ function ShieldResultsPage() {
   const scoreConfig = SCORE_CONFIG[report.exposureScore];
   const ScoreIcon = scoreConfig.icon;
 
+  const brokerResults = report.brokerResults || [];
+  const redactedBrokerCount = brokerResults.filter(b => b.redacted).length;
+  const visibleBrokers = brokerResults.filter(b => !b.redacted);
+
   const allSources = [
     ...(report.breachResults || []).map((b, i) => ({
       type: "breach" as const,
@@ -231,8 +237,9 @@ function ShieldResultsPage() {
       status: "found",
       url: null as string | null,
       idx: i,
+      redacted: false,
     })),
-    ...(report.brokerResults || []).map((b, i) => ({
+    ...visibleBrokers.map((b, i) => ({
       type: "broker" as const,
       title: `Data Broker: ${b.broker}`,
       description:
@@ -250,10 +257,12 @@ function ShieldResultsPage() {
       status: b.status,
       url: b.url || null,
       idx: (report.breachResults?.length || 0) + i,
+      redacted: false,
     })),
   ];
 
   const foundSources = allSources.filter(s => s.status === "found");
+  const totalFoundBrokers = report.brokerFoundCount || 0;
   const uncheckedSources = allSources.filter(s =>
     s.status === "rate_limited" || s.status === "timed_out" || s.status === "unavailable"
   );
@@ -327,7 +336,10 @@ function ShieldResultsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg" data-testid="text-findings-title">
-                  Detailed Findings ({foundSources.length} found across {allSources.length} sources)
+                  {hasPaidAccess
+                    ? `Detailed Findings (${foundSources.length} found across ${allSources.length} sources)`
+                    : `Your Scan Results`
+                  }
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -383,6 +395,26 @@ function ShieldResultsPage() {
                     </div>
                   );
                 })}
+
+                {!hasPaidAccess && redactedBrokerCount > 0 && (
+                  <div className="border-2 border-dashed border-primary/30 rounded-lg p-5 text-center space-y-3" data-testid="card-redacted-brokers">
+                    <div className="flex items-center justify-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span className="font-semibold text-sm">
+                        + {redactedBrokerCount} more site{redactedBrokerCount !== 1 ? "s" : ""} have your personal data
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                      Upgrade to see all broker names, get step-by-step removal instructions, and automatic re-scans.
+                    </p>
+                    <Link href="/pricing">
+                      <Button size="sm" className="min-h-[40px]" data-testid="button-see-all-brokers">
+                        <Crown className="h-4 w-4 mr-2" />
+                        See All {totalFoundBrokers} Sites
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -420,6 +452,16 @@ function ShieldResultsPage() {
                     </p>
                   </div>
                   <div className="text-left space-y-2 text-sm">
+                    {redactedBrokerCount > 0 && (
+                      <div className="flex items-center gap-2">
+                        <Eye className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span>See all {totalFoundBrokers} sites with your data</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span>Step-by-step removal instructions</span>
+                    </div>
                     <div className="flex items-center gap-2">
                       <RefreshCw className="h-4 w-4 text-primary flex-shrink-0" />
                       <span>Automatic re-scans every 30 days</span>
@@ -427,10 +469,6 @@ function ShieldResultsPage() {
                     <div className="flex items-center gap-2">
                       <Bell className="h-4 w-4 text-primary flex-shrink-0" />
                       <span>Instant alerts when your data reappears</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Step-by-step removal tracking</span>
                     </div>
                   </div>
                   <Link href="/pricing">
