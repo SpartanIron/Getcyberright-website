@@ -4285,6 +4285,18 @@ EDGE CASE HANDLING
     }
   });
 
+  app.get("/api/admin/social-schedule", isAuthenticated, isAdmin, async (_req, res) => {
+    try {
+      const { getSocialScheduleStatus, getContentMixStatus } = await import("./trendAwareSocialEngine");
+      const schedule = getSocialScheduleStatus();
+      const contentMix = await getContentMixStatus();
+      res.json({ schedule, contentMix });
+    } catch (error) {
+      console.error("Social schedule error:", error);
+      res.status(500).json({ error: "Failed to get social schedule" });
+    }
+  });
+
   app.get("/api/scam-feed", async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;

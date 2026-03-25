@@ -36,4 +36,32 @@ The frontend uses React 19, TypeScript, and Vite, with Wouter for routing, TanSt
 - **AI Services**: Anthropic API (Claude), OpenAI.
 - **Email Services**: Brevo, MailerSend, SMTP2GO, Resend.
 - **Image Processing**: Tesseract.js (OCR), jsQR (QR code decoding), Sharp.
-- **Social Publishing**: Buffer (Facebook, LinkedIn).
+- **Social Publishing**: Buffer (Facebook, LinkedIn, Instagram).
+
+## Social Posting Schedule & Strategy
+
+### Posting Cadence
+Posts go out on **Tuesday, Wednesday, Thursday, and Sunday** only. All times are Eastern Time (America/New_York IANA timezone). Max 1 post per platform per day.
+
+### Platform-Specific Time Windows
+| Day | LinkedIn | Facebook | Instagram |
+|---|---|---|---|
+| Tuesday | 9:00-10:00 AM ET | 11:30 AM-1:00 PM ET | 12:00-1:00 PM ET |
+| Wednesday | 9:00-10:00 AM ET | 11:30 AM-1:00 PM ET | 12:00-1:00 PM ET |
+| Thursday | 9:00-10:00 AM ET | 11:30 AM-1:00 PM ET | 12:00-1:00 PM ET |
+| Sunday | SKIP | 7:30-8:30 PM ET | 7:00-8:00 PM ET |
+
+### Content Pillars (Rotating by Day)
+- **Tuesday**: Threat Alert — Active threats, scam warnings, vulnerability alerts
+- **Wednesday**: Practical Protection — One specific, actionable protection tip
+- **Thursday**: Myth Buster — Challenge conventional wisdom with expert-backed takes
+- **Sunday**: Family Focus — Relatable family scenarios, personal and protective
+
+### 70/20/10 Content Mix Rule
+- **70%** pure value (education, tips, news analysis — no product mentions)
+- **20%** soft product integration (natural mentions when genuinely relevant)
+- **10%** direct CTA (install extension, run scan, etc.)
+The AI tracks this ratio across recent posts and adjusts instructions automatically.
+
+### Admin Endpoint
+- `GET /api/admin/social-schedule` — Returns current schedule status, posting windows, content pillar, and content mix ratio.

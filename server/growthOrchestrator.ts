@@ -2,7 +2,7 @@ import { storage } from "./storage";
 import { runContentAutomationBatch, getContentAutomationStats, optimizeGuideInternalLinks } from "./contentAutomationService";
 import { distributeGuideContent, distributeThreatAlertContent, getSocialDistributionStats } from "./socialDistributionService";
 import { isBufferConfigured, publishAllDraftsViaBuffer } from "./bufferPublisher";
-import { generateAndPublishTrendAwarePosts } from "./trendAwareSocialEngine";
+import { generateAndPublishTrendAwarePosts, isWithinAnyPostingWindow } from "./trendAwareSocialEngine";
 import type { InsertGrowthTask } from "@shared/schema";
 
 const TASK_TYPES = {
@@ -106,7 +106,7 @@ async function executeTask(taskId: string, taskType: string, payload: Record<str
           console.error(`[GrowthOrchestrator] Failed to auto-publish guide ${guide.id}:`, err.message);
         }
       }
-      await publishPendingDraftsViaBuffer();
+      await publishAllDraftsViaBuffer();
       return { published, total: draftGuides.length };
     }
 
@@ -341,14 +341,18 @@ async function dailySocialPublish(): Promise<void> {
       `[GrowthOrchestrator] Trend-aware posts: ${trendResult.published} published (${trendResult.platforms.join(", ") || "none"})`
     );
 
-    const drafts = await storage.getSocialPosts("draft", 50);
-    const publishable = drafts.filter(d => d.platform !== "alert");
-    if (publishable.length > 0) {
-      console.log(`[GrowthOrchestrator] Also draining ${publishable.length} remaining draft posts...`);
-      const results = await publishAllDraftsViaBuffer();
-      const succeeded = results.filter(r => r.success).length;
-      const failed = results.filter(r => !r.success).length;
-      console.log(`[GrowthOrchestrator] Draft drain complete: ${succeeded} published, ${failed} failed`);
+    if (isWithinAnyPostingWindow()) {
+      const drafts = await storage.getSocialPosts("draft", 50);
+      const publishable = drafts.filter(d => d.platform !== "alert");
+      if (publishable.length > 0) {
+        console.log(`[GrowthOrchestrator] Also draining ${publishable.length} remaining draft posts...`);
+        const results = await publishAllDraftsViaBuffer();
+        const succeeded = results.filter(r => r.success).length;
+        const failed = results.filter(r => !r.success).length;
+        console.log(`[GrowthOrchestrator] Draft drain complete: ${succeeded} published, ${failed} failed`);
+      }
+    } else {
+      console.log("[GrowthOrchestrator] Outside posting windows, skipping draft drain");
     }
   } catch (error: any) {
     console.error("[GrowthOrchestrator] Daily social publish error:", error.message);

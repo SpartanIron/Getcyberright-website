@@ -231,27 +231,214 @@ function getRecentPerformanceSummary(): string {
   return `\nLEARNING CONTEXT (recent 30 posts): Most covered categories: ${topCategories.join(", ")}. Most used modes: ${topModes.join(", ")}. Consider varying from these for freshness.`;
 }
 
-const POSTING_DAYS = [0, 2, 3, 4] as const;
 const POSTING_DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+type ContentPillar = "threat_alert" | "practical_protection" | "myth_buster" | "family_focus";
+
+const CONTENT_PILLARS: Record<number, ContentPillar> = {
+  2: "threat_alert",
+  3: "practical_protection",
+  4: "myth_buster",
+  0: "family_focus",
+};
+
+const PILLAR_LABELS: Record<ContentPillar, string> = {
+  threat_alert: "Threat Alert Tuesday",
+  practical_protection: "Practical Protection Wednesday",
+  myth_buster: "Myth Buster Thursday",
+  family_focus: "Family Focus Sunday",
+};
+
+interface PlatformPostingWindow {
+  hour: number;
+  minute: number;
+  windowMinutes: number;
+}
+
+const PLATFORM_POSTING_WINDOWS: Record<string, Record<number, PlatformPostingWindow | null>> = {
+  linkedin: {
+    2: { hour: 9, minute: 0, windowMinutes: 60 },
+    3: { hour: 9, minute: 0, windowMinutes: 60 },
+    4: { hour: 9, minute: 0, windowMinutes: 60 },
+    0: null,
+  },
+  facebook: {
+    2: { hour: 11, minute: 30, windowMinutes: 90 },
+    3: { hour: 11, minute: 30, windowMinutes: 90 },
+    4: { hour: 11, minute: 30, windowMinutes: 90 },
+    0: { hour: 19, minute: 30, windowMinutes: 60 },
+  },
+  instagram: {
+    2: { hour: 12, minute: 0, windowMinutes: 60 },
+    3: { hour: 12, minute: 0, windowMinutes: 60 },
+    4: { hour: 12, minute: 0, windowMinutes: 60 },
+    0: { hour: 19, minute: 0, windowMinutes: 60 },
+  },
+};
+
+function getETComponents(): { year: number; month: number; day: number; hour: number; minute: number; dayOfWeek: number; dateStr: string } {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+    weekday: "short",
+  });
+  const parts = formatter.formatToParts(now);
+  const get = (type: string) => parts.find(p => p.type === type)?.value || "";
+
+  const weekdayMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  const year = parseInt(get("year"));
+  const month = parseInt(get("month"));
+  const day = parseInt(get("day"));
+  const hour = parseInt(get("hour"));
+  const minute = parseInt(get("minute"));
+  const dayOfWeek = weekdayMap[get("weekday")] ?? new Date().getDay();
+
+  return { year, month, day, hour, minute, dayOfWeek, dateStr: `${year}-${get("month")}-${get("day")}` };
+}
+
 function isPostingDay(): boolean {
-  const dayOfWeek = new Date().getDay();
-  return (POSTING_DAYS as readonly number[]).includes(dayOfWeek);
+  const et = getETComponents();
+  return et.dayOfWeek in CONTENT_PILLARS;
+}
+
+function getTodaysPillar(): ContentPillar | null {
+  const et = getETComponents();
+  return CONTENT_PILLARS[et.dayOfWeek] || null;
+}
+
+function getPillarPromptInstructions(pillar: ContentPillar): string {
+  switch (pillar) {
+    case "threat_alert":
+      return `TODAY'S CONTENT PILLAR: THREAT ALERT TUESDAY
+Focus on the most urgent active threat, scam, or vulnerability from the news feed. This is GCR's "we're watching so you don't have to" authority play. Prioritize breaking_insight or quick_breakdown content modes. The audience expects timely, actionable threat intelligence today.`;
+
+    case "practical_protection":
+      return `TODAY'S CONTENT PILLAR: PRACTICAL PROTECTION WEDNESDAY
+Focus on ONE specific, actionable protection tip. "Change this setting." "Check this site." "Do this tonight." This is the most saveable and shareable content type. Prioritize preventative_education content mode. Keep it concrete and immediately doable. The audience expects a single clear action they can take today.`;
+
+    case "myth_buster":
+      return `TODAY'S CONTENT PILLAR: MYTH BUSTER THURSDAY
+Challenge conventional cybersecurity wisdom. Pick a common misconception related to today's news and demolish it with specific facts. Be slightly provocative. Strong opinions drive engagement because people argue. Prioritize myth_debunking content mode. The audience expects a hot take backed by real expertise today.`;
+
+    case "family_focus":
+      return `TODAY'S CONTENT PILLAR: FAMILY FOCUS SUNDAY
+Use relatable family scenarios. "Your kid got a message that says..." or "Your parent called about a 'Microsoft' call..." These are the most shareable posts because they hit home. Prioritize scenario_simulation content mode. The audience is relaxed, scrolling on a Sunday evening, thinking about the week ahead. Make it personal and protective.`;
+  }
+}
+
+type ContentMixCategory = "value" | "soft_product" | "direct_cta";
+
+function classifyPostMix(postContent: string): ContentMixCategory {
+  const lowerContent = postContent.toLowerCase();
+
+  const directCtaSignals = [
+    "install the extension", "run a free scan", "download now", "sign up",
+    "try it free", "get started today", "start your scan", "install gcr",
+    "get gcr scam guard", "subscribe", "upgrade",
+  ];
+  if (directCtaSignals.some(s => lowerContent.includes(s))) return "direct_cta";
+
+  const softProductSignals = [
+    "we built", "our tool", "gcr scam guard", "gcr data shield",
+    "getcyberright.com/scam-checker", "getcyberright.com/shield",
+    "getcyberright.com/browser-extension", "we created", "our team",
+    "check out our", "we put together",
+  ];
+  if (softProductSignals.some(s => lowerContent.includes(s))) return "soft_product";
+
+  return "value";
+}
+
+async function getContentMixRatio(): Promise<{ value: number; softProduct: number; directCta: number; total: number; recommendation: string }> {
+  try {
+    const recentPosts = await storage.getSocialPosts("published", 60);
+    const last30Posts = recentPosts
+      .filter(p => {
+        if (!p.publishedAt) return false;
+        const daysAgo = (Date.now() - new Date(p.publishedAt).getTime()) / 86400000;
+        return daysAgo <= 30;
+      })
+      .filter(p => p.platform === "linkedin")
+      .slice(0, 30);
+
+    if (last30Posts.length < 5) {
+      return { value: 70, softProduct: 20, directCta: 10, total: last30Posts.length, recommendation: "Not enough data yet. Default to value-first content." };
+    }
+
+    let value = 0, softProduct = 0, directCta = 0;
+    for (const post of last30Posts) {
+      const category = classifyPostMix(post.postContent);
+      if (category === "value") value++;
+      else if (category === "soft_product") softProduct++;
+      else directCta++;
+    }
+
+    const total = last30Posts.length;
+    const valuePct = Math.round((value / total) * 100);
+    const softPct = Math.round((softProduct / total) * 100);
+    const ctaPct = Math.round((directCta / total) * 100);
+
+    let recommendation = "";
+    if (valuePct < 60) {
+      recommendation = "WARNING: Too many product-focused posts. Today's post MUST be pure value (educational, tip-based, or news analysis) with NO product mentions. The 70/20/10 rule means 7 out of 10 posts should be pure education.";
+    } else if (softPct > 30) {
+      recommendation = "Soft product mentions are over target. Today's post should be pure value content with no product references.";
+    } else if (ctaPct > 15) {
+      recommendation = "Direct CTAs are over target. Avoid any direct promotional language today. Focus on insight and education.";
+    } else if (valuePct > 80 && softPct < 10) {
+      recommendation = "Value content is strong. Consider a natural product mention today if it genuinely fits the topic.";
+    } else {
+      recommendation = "Content mix is healthy. Continue with value-first approach.";
+    }
+
+    return { value: valuePct, softProduct: softPct, directCta: ctaPct, total, recommendation };
+  } catch {
+    return { value: 70, softProduct: 20, directCta: 10, total: 0, recommendation: "Could not analyze mix. Default to value-first." };
+  }
+}
+
+function isPlatformInWindow(platform: string): boolean {
+  const et = getETComponents();
+  const windows = PLATFORM_POSTING_WINDOWS[platform];
+  if (!windows) return true;
+
+  const window = windows[et.dayOfWeek];
+  if (window === null) return false;
+  if (window === undefined) return false;
+
+  const currentMinutes = et.hour * 60 + et.minute;
+  const windowStart = window.hour * 60 + window.minute;
+  const windowEnd = windowStart + window.windowMinutes;
+
+  return currentMinutes >= windowStart && currentMinutes < windowEnd;
+}
+
+function getETDateString(): string {
+  return getETComponents().dateStr;
 }
 
 async function checkRateLimit(): Promise<{ allowed: boolean; availablePlatforms: string[] }> {
   try {
+    const et = getETComponents();
+
     if (!isPostingDay()) {
-      const dayName = POSTING_DAY_NAMES[new Date().getDay()];
+      const dayName = POSTING_DAY_NAMES[et.dayOfWeek];
       console.log(`[TrendEngine] ${dayName} is not a posting day (posting days: Tue, Wed, Thu, Sun). Skipping.`);
       return { allowed: false, availablePlatforms: [] };
     }
 
+    const todayET = getETDateString();
     const recentPosts = await storage.getSocialPosts("published", 100);
-    const today = new Date().toDateString();
     const todaysPosts = recentPosts.filter((p) => {
       if (!p.publishedAt) return false;
-      return new Date(p.publishedAt).toDateString() === today;
+      const postET = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        year: "numeric", month: "2-digit", day: "2-digit",
+      }).formatToParts(new Date(p.publishedAt));
+      const postDateStr = `${postET.find(x => x.type === "year")?.value}-${postET.find(x => x.type === "month")?.value}-${postET.find(x => x.type === "day")?.value}`;
+      return postDateStr === todayET;
     });
     const platformCounts: Record<string, number> = {};
     for (const post of todaysPosts) {
@@ -259,16 +446,36 @@ async function checkRateLimit(): Promise<{ allowed: boolean; availablePlatforms:
     }
     const channels = await getBufferChannelsByPlatform();
     const connectedPlatforms = Object.keys(channels);
-    const available = connectedPlatforms.filter(p => (platformCounts[p] || 0) < 1);
+
+    const available = connectedPlatforms.filter(p => {
+      if ((platformCounts[p] || 0) >= 1) return false;
+      if (!isPlatformInWindow(p)) return false;
+      return true;
+    });
+
     const atLimit = connectedPlatforms.filter(p => (platformCounts[p] || 0) >= 1);
+    const outsideWindow = connectedPlatforms.filter(p =>
+      (platformCounts[p] || 0) < 1 && !isPlatformInWindow(p)
+    );
+
+    const etTimeStr = `${et.hour}:${String(et.minute).padStart(2, "0")} ET`;
+
     if (atLimit.length > 0) {
       console.log(`[TrendEngine] Rate limit: ${atLimit.join(", ")} already at daily max (1/day)`);
     }
+    if (outsideWindow.length > 0) {
+      console.log(`[TrendEngine] Outside posting window (${etTimeStr}): ${outsideWindow.join(", ")}`);
+    }
+
     if (available.length === 0) {
-      console.log("[TrendEngine] All connected platforms at daily limit, skipping");
+      if (outsideWindow.length > 0 && atLimit.length === 0) {
+        console.log("[TrendEngine] All platforms outside their posting windows. Will retry later.");
+      } else {
+        console.log("[TrendEngine] All platforms at limit or outside window, skipping");
+      }
       return { allowed: false, availablePlatforms: [] };
     }
-    console.log(`[TrendEngine] Platforms available for posting: ${available.join(", ")}`);
+    console.log(`[TrendEngine] Platforms ready for posting: ${available.join(", ")}`);
     return { allowed: true, availablePlatforms: available };
   } catch {
     return { allowed: true, availablePlatforms: ["linkedin", "facebook", "instagram"] };
@@ -395,6 +602,17 @@ async function generateTrendAwarePost(
       : "";
 
   const performanceContext = getRecentPerformanceSummary();
+
+  const pillar = getTodaysPillar();
+  const pillarContext = pillar
+    ? `\n${getPillarPromptInstructions(pillar)}\n`
+    : "";
+
+  const contentMix = await getContentMixRatio();
+  const mixContext = `\nCONTENT MIX RATIO (70/20/10 RULE):
+Current mix (last ${contentMix.total} posts): ${contentMix.value}% value-first, ${contentMix.softProduct}% soft product, ${contentMix.directCta}% direct CTA.
+Target: 70% pure education, 20% natural product integration, 10% direct CTA.
+${contentMix.recommendation}\n`;
 
   const sourceValidationContext = `\nSOURCE CREDIBILITY SUMMARY: ${sourceCredibility.tier1Count} Tier 1 (government/official), ${sourceCredibility.tier2Count} Tier 2 (established publications), ${sourceCredibility.tier3Count} Tier 3 (unverified). ${sourceCredibility.highestTier === 3 ? "WARNING: No high-credibility sources available. Downgrade urgency and frame claims as emerging/unverified." : ""}`;
 
@@ -556,7 +774,8 @@ GOAL: Position GetCyberRight as the most trusted, human-centered cybersecurity a
           content: `Run the full 11-step intelligence pipeline and create today's social media content for GetCyberRight.
 
 DATE: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-
+${pillarContext}
+${mixContext}
 ${styleInstructions[postStyle]}
 
 CURRENT CYBERSECURITY NEWS FEED (with source credibility tiers):
@@ -1134,6 +1353,51 @@ async function validateAndFixPostLinks(postContent: string): Promise<string> {
   return result;
 }
 
+export function getSocialScheduleStatus(): {
+  isPostingDay: boolean;
+  currentDay: string;
+  currentPillar: string | null;
+  currentTimeET: string;
+  platformWindows: Record<string, { scheduled: string; inWindow: boolean } | { skippedToday: true }>;
+} {
+  const et = getETComponents();
+  const pillar = getTodaysPillar();
+  const etTimeStr = `${et.hour}:${String(et.minute).padStart(2, "0")} ET`;
+
+  const platformWindows: Record<string, { scheduled: string; inWindow: boolean } | { skippedToday: true }> = {};
+  for (const platform of ["linkedin", "facebook", "instagram"]) {
+    const windows = PLATFORM_POSTING_WINDOWS[platform];
+    if (!windows) continue;
+    const window = windows[et.dayOfWeek];
+    if (window === null || window === undefined) {
+      platformWindows[platform] = { skippedToday: true };
+    } else {
+      const scheduledTime = `${window.hour}:${String(window.minute).padStart(2, "0")} ET`;
+      platformWindows[platform] = {
+        scheduled: scheduledTime,
+        inWindow: isPlatformInWindow(platform),
+      };
+    }
+  }
+
+  return {
+    isPostingDay: isPostingDay(),
+    currentDay: POSTING_DAY_NAMES[et.dayOfWeek],
+    currentPillar: pillar ? PILLAR_LABELS[pillar] : null,
+    currentTimeET: etTimeStr,
+    platformWindows,
+  };
+}
+
+export async function getContentMixStatus(): Promise<{ value: number; softProduct: number; directCta: number; total: number; recommendation: string }> {
+  return getContentMixRatio();
+}
+
+export function isWithinAnyPostingWindow(): boolean {
+  if (!isPostingDay()) return false;
+  return ["linkedin", "facebook", "instagram"].some(p => isPlatformInWindow(p));
+}
+
 export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimit?: boolean; platformFilter?: string }): Promise<{
   published: number;
   platforms: string[];
@@ -1162,7 +1426,11 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
 
     const postStyle = getTodaysPostStyle();
     const defaultTemplate = getTodaysTemplate();
-    console.log(`[TrendEngine] Today's style: ${postStyle}, default template: ${defaultTemplate}`);
+    const pillar = getTodaysPillar();
+    const pillarLabel = pillar ? PILLAR_LABELS[pillar] : "none";
+    const et = getETComponents();
+    const etTimeStr = `${et.hour}:${String(et.minute).padStart(2, "0")} ET`;
+    console.log(`[TrendEngine] ${pillarLabel} | style: ${postStyle} | template: ${defaultTemplate} | time: ${etTimeStr}`);
 
     const [trendingNews, guides, recentPosts] = await Promise.all([
       fetchRealThreats(),
@@ -1340,6 +1608,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       recommendedAction: "auto_publish",
       platforms: result.platforms,
       published: result.published > 0,
+      ...(pillar ? { contentPillar: pillar } : {}),
     });
 
     console.log(
