@@ -1398,6 +1398,32 @@ export function isWithinAnyPostingWindow(): boolean {
   return ["linkedin", "facebook", "instagram"].some(p => isPlatformInWindow(p));
 }
 
+const BREAKING_NEWS_URGENCY_THRESHOLD = 4;
+
+async function getAvailablePlatformsForBreaking(): Promise<string[]> {
+  try {
+    const todayET = getETDateString();
+    const recentPosts = await storage.getSocialPosts("published", 100);
+    const todaysPosts = recentPosts.filter((p) => {
+      if (!p.publishedAt) return false;
+      const postET = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        year: "numeric", month: "2-digit", day: "2-digit",
+      }).formatToParts(new Date(p.publishedAt));
+      const postDateStr = `${postET.find(x => x.type === "year")?.value}-${postET.find(x => x.type === "month")?.value}-${postET.find(x => x.type === "day")?.value}`;
+      return postDateStr === todayET;
+    });
+    const platformCounts: Record<string, number> = {};
+    for (const post of todaysPosts) {
+      platformCounts[post.platform] = (platformCounts[post.platform] || 0) + 1;
+    }
+    const channels = await getBufferChannelsByPlatform();
+    return Object.keys(channels).filter(p => (platformCounts[p] || 0) < 1);
+  } catch {
+    return ["linkedin", "facebook", "instagram"];
+  }
+}
+
 export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimit?: boolean; platformFilter?: string }): Promise<{
   published: number;
   platforms: string[];
@@ -1413,13 +1439,15 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     }
 
     let allowedPlatforms = connectedPlatforms;
+    let scheduleBlocked = false;
     if (!options?.skipRateLimit) {
       const rateCheck = await checkRateLimit();
       if (!rateCheck.allowed) {
-        console.log("[TrendEngine] Rate limit reached (max 1 post per platform per day), skipping");
-        return result;
+        scheduleBlocked = true;
+        console.log("[TrendEngine] Outside normal schedule. Checking for breaking news override...");
+      } else {
+        allowedPlatforms = rateCheck.availablePlatforms;
       }
-      allowedPlatforms = rateCheck.availablePlatforms;
     } else {
       console.log("[TrendEngine] Rate limit bypassed (manual trigger)");
     }
@@ -1478,6 +1506,43 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     if (!posts) {
       console.error("[TrendEngine] Pipeline produced no publishable content");
       return result;
+    }
+
+    if (scheduleBlocked) {
+      const isBreaking = posts.trendAnalysis.urgency_score >= BREAKING_NEWS_URGENCY_THRESHOLD
+        && posts.trendAnalysis.impact_level === "high";
+
+      if (isBreaking) {
+        const breakingPlatforms = await getAvailablePlatformsForBreaking();
+        if (breakingPlatforms.length === 0) {
+          console.log("[TrendEngine] BREAKING NEWS detected but all platforms already posted today. Saving as draft.");
+          for (const platform of ["linkedin", "facebook", "instagram"] as const) {
+            if (!channels[platform]) continue;
+            const content = platform === "linkedin" ? posts.linkedin : platform === "instagram" ? posts.instagram : posts.facebook;
+            await storage.createSocialPost({
+              contentType: "trend_insight",
+              contentId: `trend-${Date.now()}-${platform}-breaking-queued`,
+              contentTitle: `[BREAKING-QUEUED] ${posts.title}`,
+              platform,
+              postContent: content,
+              hashtags: posts.hashtags,
+              status: "draft",
+            });
+          }
+          console.log(`[TrendEngine] Breaking news queued as drafts: "${posts.title}" (urgency: ${posts.trendAnalysis.urgency_score}, impact: ${posts.trendAnalysis.impact_level})`);
+          return result;
+        }
+
+        allowedPlatforms = breakingPlatforms;
+        console.log(
+          `[TrendEngine] BREAKING NEWS OVERRIDE: urgency=${posts.trendAnalysis.urgency_score}, impact=${posts.trendAnalysis.impact_level}. Publishing outside normal schedule to: ${allowedPlatforms.join(", ")}`
+        );
+      } else {
+        console.log(
+          `[TrendEngine] Story not urgent enough for breaking override (urgency: ${posts.trendAnalysis.urgency_score}, impact: ${posts.trendAnalysis.impact_level}). Requires urgency >= ${BREAKING_NEWS_URGENCY_THRESHOLD} AND high impact. Skipping.`
+        );
+        return result;
+      }
     }
 
     if (posts.recommendedAction === "review") {
@@ -1597,6 +1662,8 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       }
     }
 
+    const isBreakingOverride = scheduleBlocked && posts.trendAnalysis.urgency_score >= BREAKING_NEWS_URGENCY_THRESHOLD;
+
     savePerformanceEntry({
       date: new Date().toISOString(),
       title: posts.title,
@@ -1609,10 +1676,12 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       platforms: result.platforms,
       published: result.published > 0,
       ...(pillar ? { contentPillar: pillar } : {}),
+      ...(isBreakingOverride ? { breakingNewsOverride: true } : {}),
     });
 
+    const publishLabel = isBreakingOverride ? "BREAKING" : "Pipeline";
     console.log(
-      `[TrendEngine] Pipeline complete: ${result.published}/${platformPosts.length} published | mode: ${posts.contentMode} | confidence: ${posts.confidenceScore} | signal: ${posts.trendAnalysis.summary.slice(0, 60)}...`
+      `[TrendEngine] ${publishLabel} complete: ${result.published}/${platformPosts.length} published | mode: ${posts.contentMode} | confidence: ${posts.confidenceScore} | signal: ${posts.trendAnalysis.summary.slice(0, 60)}...`
     );
   } catch (error: any) {
     console.error("[TrendEngine] Generation error:", error.message);
