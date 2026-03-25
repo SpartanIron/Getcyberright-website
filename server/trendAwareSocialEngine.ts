@@ -231,8 +231,22 @@ function getRecentPerformanceSummary(): string {
   return `\nLEARNING CONTEXT (recent 30 posts): Most covered categories: ${topCategories.join(", ")}. Most used modes: ${topModes.join(", ")}. Consider varying from these for freshness.`;
 }
 
+const POSTING_DAYS = [0, 2, 3, 4] as const;
+const POSTING_DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+function isPostingDay(): boolean {
+  const dayOfWeek = new Date().getDay();
+  return (POSTING_DAYS as readonly number[]).includes(dayOfWeek);
+}
+
 async function checkRateLimit(): Promise<{ allowed: boolean; availablePlatforms: string[] }> {
   try {
+    if (!isPostingDay()) {
+      const dayName = POSTING_DAY_NAMES[new Date().getDay()];
+      console.log(`[TrendEngine] ${dayName} is not a posting day (posting days: Tue, Wed, Thu, Sun). Skipping.`);
+      return { allowed: false, availablePlatforms: [] };
+    }
+
     const recentPosts = await storage.getSocialPosts("published", 100);
     const today = new Date().toDateString();
     const todaysPosts = recentPosts.filter((p) => {
@@ -257,7 +271,7 @@ async function checkRateLimit(): Promise<{ allowed: boolean; availablePlatforms:
     console.log(`[TrendEngine] Platforms available for posting: ${available.join(", ")}`);
     return { allowed: true, availablePlatforms: available };
   } catch {
-    return { allowed: true, availablePlatforms: ["linkedin", "facebook"] };
+    return { allowed: true, availablePlatforms: ["linkedin", "facebook", "instagram"] };
   }
 }
 
@@ -278,6 +292,7 @@ interface Visual {
 interface TrendAwarePostResult {
   linkedin: string;
   facebook: string;
+  instagram: string;
   title: string;
   hashtags: string[];
   imageHeadline: string;
@@ -532,6 +547,7 @@ WHAT NOT TO DO:
 PLATFORM OPTIMIZATION:
 - LinkedIn: concise, sharp, insight-driven. Strong opening lines. Tighter structure
 - Facebook: more conversational, slightly longer storytelling, warmer tone
+- Instagram: punchy, visual-first. The image card carries the headline. Caption is the supporting context. Short, direct, with hashtags at the end. No clickable links. "Link in bio" is the only CTA
 
 GOAL: Position GetCyberRight as the most trusted, human-centered cybersecurity authority for everyday users navigating modern digital risks. Content must be immediately publishable to Buffer without edits.`,
       messages: [
@@ -585,10 +601,20 @@ FACEBOOK POST (60-120 words max):
 - End with a conversational CTA and link (e.g. "We put together a full guide on this. Check it out:" followed by the link)
 - Use paragraph breaks between thoughts
 
+INSTAGRAM POST (40-80 words max, CRITICAL DIFFERENCES):
+- Instagram is IMAGE-FIRST. The caption supports the branded image card, not the other way around
+- Lead with a punchy hook or question that stops the scroll
+- Keep it short and scannable. 2-3 short paragraphs max
+- Do NOT put links in the caption (they are not clickable on Instagram). Instead end with "Link in bio" as CTA
+- Add 8-12 relevant hashtags at the END, separated from the caption by two line breaks
+- Use a slightly more casual, direct tone than LinkedIn
+- Focus on ONE key takeaway, not multiple tips
+
 Format your complete output as this strict JSON with \\n for line breaks within post text:
 {
   "linkedin": "Post text with \\n\\n between paragraphs",
   "facebook": "Post text with \\n\\n between paragraphs",
+  "instagram": "Caption text with \\n\\n between paragraphs, ending with \\n\\n hashtags",
   "title": "Short tracking title under 60 chars",
   "hashtags": ["tag1", "tag2", "tag3", "tag4"],
   "imageHeadline": "Under 8 words for branded image card",
@@ -637,6 +663,11 @@ Format your complete output as this strict JSON with \\n for line breaks within 
 
     parsed.linkedin = enforcePostFormatting(parsed.linkedin, "linkedin");
     parsed.facebook = enforcePostFormatting(parsed.facebook, "facebook");
+    if (parsed.instagram) {
+      parsed.instagram = enforcePostFormatting(parsed.instagram, "instagram");
+    } else {
+      parsed.instagram = parsed.facebook.replace(/https?:\/\/[^\s]+/g, "").trim() + "\n\nLink in bio for the full breakdown.";
+    }
 
     const trendAnalysis: TrendAnalysis = parsed.trend_analysis
       ? {
@@ -691,6 +722,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
 
     const linkedinContent = sanitizePostContent(parsed.linkedin);
     const facebookContent = sanitizePostContent(parsed.facebook);
+    const instagramContent = sanitizePostContent(parsed.instagram);
 
     let gcrToolReference = parsed.gcr_tool_reference
       ? {
@@ -717,6 +749,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
     return {
       linkedin: linkedinContent,
       facebook: facebookContent,
+      instagram: instagramContent,
       title: sanitizePostContent(parsed.title).slice(0, 80),
       hashtags,
       imageHeadline,
@@ -948,6 +981,91 @@ async function generatePostImage(
   }
 }
 
+async function generateInstagramImage(
+  headline: string,
+  subtext: string,
+  templateStyle: TemplateStyle
+): Promise<string | null> {
+  try {
+    ensureSocialImagesDir();
+    const slug = headline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
+    const filename = `ig-${slug}-${Date.now()}.png`;
+    const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
+    const sharp = (await import("sharp")).default;
+
+    const logoPath = path.join(process.cwd(), "client", "public", "lock-logo-transparent.png");
+    let logoBase64 = "";
+    if (fs.existsSync(logoPath)) {
+      const logoBuffer = fs.readFileSync(logoPath);
+      logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
+    }
+
+    const templates: Record<TemplateStyle, { bg: string; accent: string; accentLight: string }> = {
+      stat_card: { bg: "#0A2A3C", accent: "#E8732A", accentLight: "#F5A66D" },
+      tip_card: { bg: "#071A24", accent: "#4ECDC4", accentLight: "#7EDDD6" },
+      alert_card: { bg: "#1A0A0A", accent: "#FF4444", accentLight: "#FF7777" },
+      insight_card: { bg: "#0D1B2A", accent: "#E8732A", accentLight: "#F5A66D" },
+      quote_card: { bg: "#0A2A3C", accent: "#45B7D1", accentLight: "#7DD3E8" },
+    };
+
+    const tmpl = templates[templateStyle];
+    let headlineLines = wrapText(headline, 18);
+    if (headlineLines.length > 4) {
+      headlineLines = headlineLines.slice(0, 4);
+      headlineLines[3] = headlineLines[3].slice(0, -3) + "...";
+    }
+    let subtextLines = wrapText(subtext, 30);
+    if (subtextLines.length > 2) {
+      subtextLines = subtextLines.slice(0, 2);
+    }
+
+    const headlineFontSize = headlineLines.length > 3 ? 52 : 60;
+    const headlineLineHeight = headlineFontSize + 14;
+    const totalHeadlineHeight = headlineLines.length * headlineLineHeight;
+    const subtextHeight = subtextLines.length * 34;
+    const contentHeight = totalHeadlineHeight + subtextHeight + 60;
+    const startY = Math.max(250, (1080 - contentHeight) / 2);
+
+    const headlineSvg = headlineLines
+      .map((line, i) => `<text x="540" y="${startY + i * headlineLineHeight}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="${headlineFontSize}" font-weight="800" fill="white" text-anchor="middle" letter-spacing="-1">${escapeXml(line)}</text>`)
+      .join("\n");
+
+    const subtextY = startY + totalHeadlineHeight + 40;
+    const subtextSvg = subtextLines
+      .map((line, i) => `<text x="540" y="${subtextY + i * 34}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="24" fill="${tmpl.accentLight}" text-anchor="middle" opacity="0.9">${escapeXml(line)}</text>`)
+      .join("\n");
+
+    const logoElement = logoBase64
+      ? `<image href="${logoBase64}" x="495" y="100" width="50" height="50" opacity="0.95"/>`
+      : "";
+
+    const svg = `<svg width="1080" height="1080" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${tmpl.bg}"/>
+      <stop offset="100%" stop-color="${adjustColor(tmpl.bg, -15)}"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#bgGrad)"/>
+  <rect x="0" y="0" width="1080" height="6" fill="${tmpl.accent}" opacity="0.85"/>
+  ${logoElement}
+  <text x="540" y="${logoBase64 ? 170 : 140}" font-family="'Segoe UI',Arial,sans-serif" font-size="20" font-weight="600" fill="${tmpl.accent}" text-anchor="middle" letter-spacing="2">GETCYBERRIGHT</text>
+  <rect x="460" y="${startY - 50}" width="160" height="3" rx="1.5" fill="${tmpl.accent}" opacity="0.6"/>
+  ${headlineSvg}
+  ${subtextSvg}
+  <rect x="0" y="1072" width="1080" height="8" fill="${tmpl.accent}" opacity="0.85"/>
+  <text x="540" y="1040" font-family="'Segoe UI',Arial,sans-serif" font-size="16" fill="#6B8FA3" text-anchor="middle">getcyberright.com</text>
+</svg>`;
+
+    await sharp(Buffer.from(svg)).png({ quality: 95 }).toFile(outputPath);
+    console.log(`[TrendEngine] Generated Instagram image: ${filename} (1080x1080, template: ${templateStyle})`);
+    return outputPath;
+  } catch (error: any) {
+    console.error("[TrendEngine] Instagram image generation failed:", error.message);
+    return null;
+  }
+}
+
 function adjustColor(hex: string, amount: number): string {
   const num = parseInt(hex.replace("#", ""), 16);
   const r = Math.min(255, Math.max(0, ((num >> 16) & 0xff) + amount));
@@ -1098,9 +1216,9 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       console.warn(
         `[TrendEngine] Content flagged for review (confidence: ${posts.confidenceScore}). Saving as draft instead of publishing.`
       );
-      for (const platform of ["linkedin", "facebook"] as const) {
+      for (const platform of ["linkedin", "facebook", "instagram"] as const) {
         if (!channels[platform] || !allowedPlatforms.includes(platform)) continue;
-        const content = platform === "linkedin" ? posts.linkedin : posts.facebook;
+        const content = platform === "linkedin" ? posts.linkedin : platform === "instagram" ? posts.instagram : posts.facebook;
         await storage.createSocialPost({
           contentType: "trend_insight",
           contentId: `trend-${Date.now()}-${platform}-review`,
@@ -1139,15 +1257,26 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       console.log(`[TrendEngine] Image URL: ${imageUrl}`);
     }
 
+    let igImageUrl: string | null = null;
+    if (channels.instagram && allowedPlatforms.includes("instagram")) {
+      const igImagePath = await generateInstagramImage(posts.imageHeadline, posts.imageSubtext, templateStyle);
+      if (igImagePath) {
+        igImageUrl = getPublicImageUrl(igImagePath);
+        console.log(`[TrendEngine] Instagram image URL: ${igImageUrl}`);
+      }
+    }
+
     const validatedLinkedin = await validateAndFixPostLinks(posts.linkedin);
     const validatedFacebook = await validateAndFixPostLinks(posts.facebook);
+    const validatedInstagram = posts.instagram;
 
     const platformFilter = options?.platformFilter;
-    const platformPosts: { platform: string; content: string }[] = [];
-    if (channels.linkedin && allowedPlatforms.includes("linkedin") && (!platformFilter || platformFilter === "linkedin")) platformPosts.push({ platform: "linkedin", content: validatedLinkedin });
-    if (channels.facebook && allowedPlatforms.includes("facebook") && (!platformFilter || platformFilter === "facebook")) platformPosts.push({ platform: "facebook", content: validatedFacebook });
+    const platformPosts: { platform: string; content: string; image: string | null }[] = [];
+    if (channels.linkedin && allowedPlatforms.includes("linkedin") && (!platformFilter || platformFilter === "linkedin")) platformPosts.push({ platform: "linkedin", content: validatedLinkedin, image: imageUrl });
+    if (channels.facebook && allowedPlatforms.includes("facebook") && (!platformFilter || platformFilter === "facebook")) platformPosts.push({ platform: "facebook", content: validatedFacebook, image: imageUrl });
+    if (channels.instagram && allowedPlatforms.includes("instagram") && (!platformFilter || platformFilter === "instagram")) platformPosts.push({ platform: "instagram", content: validatedInstagram, image: igImageUrl || imageUrl });
 
-    for (const { platform, content } of platformPosts) {
+    for (const { platform, content, image } of platformPosts) {
       try {
         const socialPost: InsertSocialPost = {
           contentType: "trend_insight",
@@ -1166,10 +1295,10 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
         let bufferResult = await createBufferPost(channel.id, content, {
           mode: "shareNow",
           platform,
-          imageUrl: imageUrl || undefined,
+          imageUrl: image || undefined,
         });
 
-        if (!bufferResult.success && imageUrl && bufferResult.error?.toLowerCase().includes("image")) {
+        if (!bufferResult.success && image && bufferResult.error?.toLowerCase().includes("image")) {
           console.warn(`[TrendEngine] Image rejected for ${platform}: ${bufferResult.error}. Retrying without image...`);
           bufferResult = await createBufferPost(channel.id, content, {
             mode: "shareNow",

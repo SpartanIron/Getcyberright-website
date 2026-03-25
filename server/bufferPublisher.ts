@@ -141,6 +141,10 @@ export async function createBufferPost(
       input.metadata = { facebook: { type: "post" } };
     }
 
+    if (options.platform === "instagram") {
+      input.metadata = { instagram: { type: "post" } };
+    }
+
     if (options.imageUrl) {
       input.assets = {
         images: [{ url: options.imageUrl }],
