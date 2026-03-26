@@ -362,7 +362,7 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
     return 0;
   }
   const prioritized = prioritizeArticles(relevant);
-  const batch = prioritized.slice(0, 8);
+  const batch = prioritized.slice(0, 15);
   const actionCount = batch.filter(b => isBreachArticle(b.title, b.summary)).length;
   console.log(`[NewsService] Processing ${batch.length} articles (${actionCount} action-needed, ${newItems.length - relevant.length} dropped by relevance filter)...`);
 
@@ -446,7 +446,7 @@ export function startNewsScheduler() {
 
   setTimeout(async () => {
     const existingCount = await storage.getNewsArticleCount();
-    if (existingCount >= 8) {
+    if (existingCount >= 15) {
       console.log(`[NewsService] ${existingCount} articles already exist, skipping initial fetch`);
       return;
     }

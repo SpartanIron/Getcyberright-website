@@ -26,6 +26,9 @@ export async function seedInitialContent() {
   }
 
   await ensureCriticalGuides();
+  await ensureAdditionalScamIntel();
+  await ensureAdditionalAlerts();
+  await ensureAdditionalGuides();
 }
 
 async function seedGuides() {
@@ -813,5 +816,76 @@ async function ensureCriticalGuides() {
 
   if (inserted > 0) {
     console.log(`[content-seed] Ensured ${inserted} critical guide(s) exist`);
+  }
+}
+
+async function ensureAdditionalScamIntel() {
+  const { additionalScamIntel } = await import("./additionalScamIntelData");
+
+  let inserted = 0;
+  for (const scam of additionalScamIntel) {
+    const existing = await db.select({ slug: scamIntelligence.slug }).from(scamIntelligence).where(eq(scamIntelligence.slug, scam.slug));
+    if (existing.length === 0) {
+      await db.insert(scamIntelligence).values({
+        ...scam,
+        status: "published",
+        dateDetected: new Date(),
+        lastUpdated: new Date(),
+      });
+      inserted++;
+    }
+  }
+
+  if (inserted > 0) {
+    console.log(`[content-seed] Inserted ${inserted} additional scam intelligence entries`);
+  }
+}
+
+async function ensureAdditionalAlerts() {
+  const { additionalAlerts } = await import("./additionalAlertsData");
+
+  let inserted = 0;
+  const now = new Date();
+  for (const alert of additionalAlerts) {
+    const existing = await db.select({ slug: cyberThreatAlerts.slug }).from(cyberThreatAlerts).where(eq(cyberThreatAlerts.slug, alert.slug));
+    if (existing.length === 0) {
+      await db.insert(cyberThreatAlerts).values({
+        ...alert,
+        status: "published",
+        publishedAt: now,
+        dateDetected: now,
+      });
+      inserted++;
+    }
+  }
+
+  if (inserted > 0) {
+    console.log(`[content-seed] Inserted ${inserted} additional threat alerts`);
+  }
+}
+
+async function ensureAdditionalGuides() {
+  const { additionalGuides } = await import("./additionalGuidesData");
+
+  let inserted = 0;
+  for (const guide of additionalGuides) {
+    const existing = await db.select({ slug: cyberSafetyGuides.slug }).from(cyberSafetyGuides).where(eq(cyberSafetyGuides.slug, guide.slug));
+    if (existing.length === 0) {
+      await db.insert(cyberSafetyGuides).values({
+        ...guide,
+        status: "published",
+        publishedAt: new Date(),
+        authorName: "GetCyberRight Team",
+        generatedByAi: true,
+        aiModel: "claude-sonnet-4-5",
+        seoScore: 85,
+      });
+      inserted++;
+      console.log(`[content-seed] Inserted guide: "${guide.title}"`);
+    }
+  }
+
+  if (inserted > 0) {
+    console.log(`[content-seed] Inserted ${inserted} additional guides`);
   }
 }
