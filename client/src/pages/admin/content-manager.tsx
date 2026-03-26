@@ -354,9 +354,11 @@ const PLATFORM_LABELS: Record<string, string> = {
 };
 
 function ConnectedPlatforms() {
-  const { data: platforms = [] } = useQuery<any[]>({
+  const { data } = useQuery<{ platforms: any[]; buffer: any }>({
     queryKey: ["/api/admin/social/connected-platforms"],
   });
+
+  const platforms = data?.platforms || [];
 
   return (
     <div className="flex flex-wrap gap-2">
