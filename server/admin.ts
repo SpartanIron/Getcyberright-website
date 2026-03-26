@@ -6,16 +6,43 @@ import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
 import { securityLogger } from "./security";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 
-// Validation schemas for admin operations
+export const ADMIN_ROLES = ["super_admin", "admin", "editor", "viewer"] as const;
+export type AdminRole = typeof ADMIN_ROLES[number];
+
+const ROLE_HIERARCHY: Record<AdminRole, number> = {
+  super_admin: 4,
+  admin: 3,
+  editor: 2,
+  viewer: 1,
+};
+
+export function hasMinimumRole(userRole: string | null | undefined, requiredRole: AdminRole): boolean {
+  if (!userRole) return false;
+  const userLevel = ROLE_HIERARCHY[userRole as AdminRole];
+  const requiredLevel = ROLE_HIERARCHY[requiredRole];
+  if (userLevel === undefined || requiredLevel === undefined) return false;
+  return userLevel >= requiredLevel;
+}
+
 const updateUserSchema = z.object({
   isAdmin: z.boolean().optional(),
   subscriptionTier: z.enum(["free", "essential", "professional", "enterprise"]).optional(),
   emailVerified: z.boolean().optional(),
+  role: z.enum(ADMIN_ROLES).optional(),
 });
 
-// Admin middleware - checks if authenticated user has isAdmin = true
-// Must be used AFTER isAuthenticated middleware
+const createUserSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(12, "Password must be at least 12 characters"),
+  firstName: z.string().min(1, "First name is required").max(50),
+  lastName: z.string().min(1, "Last name is required").max(50),
+  role: z.enum([...ADMIN_ROLES, "user"] as const).default("user"),
+  subscriptionTier: z.enum(["free", "essential", "professional", "enterprise"]).default("free"),
+  mustChangePassword: z.boolean().default(true),
+});
+
 export const isAdminMiddleware = async (req: any, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
@@ -23,7 +50,14 @@ export const isAdminMiddleware = async (req: any, res: Response, next: NextFunct
       return res.status(401).json({ error: "Unauthorized" });
     }
     
-    if (!user.isAdmin) {
+    const hasRoleAccess = hasMinimumRole(user.role, "viewer");
+    
+    if (user.isAdmin && !hasRoleAccess) {
+      await db.update(users).set({ role: "super_admin" }).where(eq(users.id, user.id));
+      user.role = "super_admin";
+    }
+    
+    if (!user.isAdmin && !hasRoleAccess) {
       securityLogger.warn("Unauthorized admin access attempt", { userId: user.id });
       return res.status(403).json({ error: "Admin access required" });
     }
@@ -33,6 +67,24 @@ export const isAdminMiddleware = async (req: any, res: Response, next: NextFunct
     console.error("Admin middleware error:", error);
     res.status(500).json({ error: "Server error" });
   }
+};
+
+export const requireRole = (minimumRole: AdminRole) => {
+  return async (req: any, res: Response, next: NextFunction) => {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    if (!hasMinimumRole(user.role, minimumRole)) {
+      securityLogger.warn("Insufficient role access attempt", { 
+        userId: user.id, 
+        userRole: user.role, 
+        requiredRole: minimumRole 
+      });
+      return res.status(403).json({ error: `${minimumRole} access or higher required` });
+    }
+    next();
+  };
 };
 
 export function registerAdminRoutes(app: Express) {
@@ -95,7 +147,21 @@ export function registerAdminRoutes(app: Express) {
   app.get("/api/admin/users", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
       const allUsers = await db
-        .select()
+        .select({
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          emailVerified: users.emailVerified,
+          isAdmin: users.isAdmin,
+          role: users.role,
+          subscriptionTier: users.subscriptionTier,
+          subscriptionExpiresAt: users.subscriptionExpiresAt,
+          mustChangePassword: users.mustChangePassword,
+          lastLoginAt: users.lastLoginAt,
+          createdAt: users.createdAt,
+        })
         .from(users)
         .orderBy(desc(users.createdAt));
       res.json({ users: allUsers });
@@ -105,22 +171,88 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  app.post("/api/admin/users", isAuthenticated, isAdminMiddleware, requireRole("super_admin"), async (req: any, res) => {
+    try {
+      const validationResult = createUserSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ error: "Invalid data", details: validationResult.error.errors });
+      }
+
+      const { email, password, firstName, lastName, role, subscriptionTier, mustChangePassword } = validationResult.data;
+
+      const [existing] = await db.select().from(users).where(eq(users.email, email.toLowerCase()));
+      if (existing) {
+        return res.status(400).json({ error: "An account with this email already exists" });
+      }
+
+      const passwordHash = await bcrypt.hash(password, 12);
+      const isAdmin = role !== "user" && ADMIN_ROLES.includes(role as AdminRole);
+
+      const [newUser] = await db.insert(users).values({
+        email: email.toLowerCase(),
+        passwordHash,
+        firstName,
+        lastName,
+        role: role,
+        isAdmin,
+        subscriptionTier,
+        mustChangePassword,
+        emailVerified: true,
+      }).returning();
+
+      securityLogger.info("Admin created user", {
+        adminId: req.user.id,
+        newUserId: newUser.id,
+        email: email.toLowerCase(),
+        role,
+      });
+
+      const { passwordHash: _ph, mfaSecret: _ms, mfaBackupCodes: _mbc, emailVerificationToken: _evt, passwordResetToken: _prt, ...safeUser } = newUser;
+      res.json({ user: safeUser });
+    } catch (error) {
+      console.error("Admin create user error:", error);
+      res.status(500).json({ error: "Failed to create user" });
+    }
+  });
+
   app.patch("/api/admin/users/:id", isAuthenticated, isAdminMiddleware, async (req: any, res) => {
     try {
       const { id } = req.params;
+      const requesterRole = req.user.role as AdminRole;
       
-      // Validate request body with Zod
       const validationResult = updateUserSchema.safeParse(req.body);
       if (!validationResult.success) {
         return res.status(400).json({ error: "Invalid data", details: validationResult.error.errors });
       }
       
-      const { isAdmin: makeAdmin, subscriptionTier, emailVerified } = validationResult.data;
+      const { isAdmin: makeAdmin, subscriptionTier, emailVerified, role } = validationResult.data;
+      
+      if ((role || typeof makeAdmin === "boolean") && !hasMinimumRole(requesterRole, "super_admin")) {
+        return res.status(403).json({ error: "Only Super Admins can change user roles or admin status" });
+      }
+      
+      if ((subscriptionTier || typeof emailVerified === "boolean") && !hasMinimumRole(requesterRole, "admin")) {
+        return res.status(403).json({ error: "Admin access or higher required to change subscription or verification" });
+      }
       
       const updateData: any = {};
-      if (typeof makeAdmin === "boolean") updateData.isAdmin = makeAdmin;
-      if (subscriptionTier) updateData.subscriptionTier = subscriptionTier;
-      if (typeof emailVerified === "boolean") updateData.emailVerified = emailVerified;
+      if (typeof makeAdmin === "boolean" && hasMinimumRole(requesterRole, "super_admin")) {
+        updateData.isAdmin = makeAdmin;
+      }
+      if (subscriptionTier && hasMinimumRole(requesterRole, "admin")) {
+        updateData.subscriptionTier = subscriptionTier;
+      }
+      if (typeof emailVerified === "boolean" && hasMinimumRole(requesterRole, "admin")) {
+        updateData.emailVerified = emailVerified;
+      }
+      if (role && hasMinimumRole(requesterRole, "super_admin")) {
+        updateData.role = role;
+        updateData.isAdmin = ADMIN_ROLES.includes(role as AdminRole);
+      }
+      
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ error: "No valid updates provided" });
+      }
       
       const [updated] = await db
         .update(users)
@@ -141,7 +273,7 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/admin/users/:id", isAuthenticated, isAdminMiddleware, async (req: any, res) => {
+  app.delete("/api/admin/users/:id", isAuthenticated, isAdminMiddleware, requireRole("super_admin"), async (req: any, res) => {
     try {
       const { id } = req.params;
       
@@ -265,12 +397,13 @@ export function registerAdminRoutes(app: Express) {
     try {
       const user = req.user;
       if (!user) {
-        return res.json({ isAdmin: false });
+        return res.json({ isAdmin: false, role: null });
       }
       
-      res.json({ isAdmin: user.isAdmin || false });
+      const isAdmin = user.isAdmin || hasMinimumRole(user.role, "viewer");
+      res.json({ isAdmin, role: user.role || "user" });
     } catch (error) {
-      res.json({ isAdmin: false });
+      res.json({ isAdmin: false, role: null });
     }
   });
 
