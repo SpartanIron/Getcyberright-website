@@ -243,9 +243,9 @@ async function checkBreaches(email: string): Promise<BreachResult[]> {
       return hibpResults;
     }
     console.log("[shield-scan] HIBP returned errors, falling through to free sources");
-  } else {
-    console.log("[shield-scan] No HIBP_API_KEY — using free breach sources (XposedOrNot + LeakCheck)");
   }
+
+  console.log("[shield-scan] Using free breach sources (XposedOrNot + LeakCheck)");
 
   const [xonResults, leakResults] = await Promise.allSettled([
     checkXposedOrNot(email),
