@@ -6,8 +6,8 @@ import seniorsImg from "@/assets/images/seniors-diverse.png";
 const threats = [
   {
     icon: DollarSign,
-    stat: "$12.5B",
-    label: "Lost to online scams in 2023",
+    stat: "$16.6B",
+    label: "Lost to cybercrime in 2024",
     source: "FBI IC3",
   },
   {
@@ -18,15 +18,15 @@ const threats = [
   },
   {
     icon: Phone,
-    stat: "70%",
-    label: "Of scams now start via text or email",
+    stat: "90%",
+    label: "Of cyberattacks start with a phishing message",
     source: "CISA",
   },
   {
     icon: CreditCard,
-    stat: "501+",
+    stat: "4,000+",
     label: "Data brokers selling your information",
-    source: "Research",
+    source: "Privacy Rights Clearinghouse",
   },
 ];
 

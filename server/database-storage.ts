@@ -1078,15 +1078,15 @@ export class DatabaseStorage implements IStorage {
       const statsData: InsertThreatStat[] = [
         {
           statKey: "global_losses",
-          value: "$12.5B",
-          label: "Global Losses (2023)",
+          value: "$16.6B",
+          label: "Global Losses (2024)",
           description: "Total reported cybercrime losses worldwide",
           source: "FBI IC3 Report",
-          sourceUrl: "https://www.ic3.gov/Media/PDF/AnnualReport/2023_IC3Report.pdf",
+          sourceUrl: "https://www.ic3.gov/Media/PDF/AnnualReport/2024_IC3Report.pdf",
           category: "financial",
           colorTheme: "teal",
           displayOrder: 1,
-          reportYear: 2023
+          reportYear: 2024
         },
         {
           statKey: "most_targeted_age",

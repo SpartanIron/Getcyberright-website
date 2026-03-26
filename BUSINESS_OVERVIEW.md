@@ -51,7 +51,7 @@ Mobile apps reinforce the service promise (always-on protection) while creating 
 ## Value Proposition
 
 ### The Problem
-- Cybercrime losses exceeded $12.5B globally in 2023 (FBI IC3)
+- Cybercrime losses exceeded $16.6B globally in 2024 (FBI IC3)
 - Seniors lose an average of $35,000+ per scam incident
 - Youth face unprecedented threats from social media, gaming, and mobile platforms
 - Families worldwide lack accessible, culturally relevant cyber safety resources

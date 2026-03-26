@@ -40,7 +40,7 @@ const threatTypes = [
   { icon: Heart, label: "Romance & Trust Scams", description: "Scammers build fake relationships over weeks or months to gain your trust before asking for money. Some use chatbots to target thousands of people at once." },
   { icon: Landmark, label: "Fake Investment Platforms", description: "Fake trading platforms with made-up success stories and celebrity endorsements are designed to look exactly like the real thing." },
   { icon: Phone, label: "Cloned Voice Calls", description: "A family member's voice can now be copied from just a few seconds of audio, then used to call you pretending to be in an emergency." },
-  { icon: Eye, label: "Your Data Being Sold", description: "Over 501 companies collect and sell your personal information to anyone willing to pay, giving scammers the details they need to trick you." },
+  { icon: Eye, label: "Your Data Being Sold", description: "Over 4,000 companies collect and sell your personal information to anyone willing to pay, giving scammers the details they need to trick you." },
 ];
 
 const platformTools = [
@@ -92,7 +92,7 @@ const platformTools = [
 ];
 
 const credibilityStats = [
-  { value: "501+", label: "Data Brokers Tracked", detail: "Companies we monitor that sell your personal information" },
+  { value: "4,000+", label: "Data Brokers Tracked", detail: "Companies we monitor that sell your personal information" },
   { value: "406+", label: "AI Safety Prompts", detail: "Ready-to-use prompts for using AI tools safely" },
   { value: "125+", label: "Safety Guides", detail: "Easy-to-read guides on staying safe online" },
   { value: "8", label: "Trusted Safety Sources", detail: "Where we check to verify if something is a scam" },

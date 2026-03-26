@@ -17,7 +17,7 @@ The platform combines AI-powered threat analysis, gamified learning experiences,
 
 **Cybercrime is on the rise, and everyday people are the primary targets:**
 
-- The FBI's Internet Crime Complaint Center (IC3) reported over $12.5 billion in losses from cybercrime in 2023
+- The FBI's Internet Crime Complaint Center (IC3) reported over $16.6 billion in losses from cybercrime in 2024
 - Seniors lose an estimated $3 billion annually to scams
 - Small businesses are targeted in 43% of all cyberattacks
 - Phishing remains the most common attack vector, with over 500 million attacks reported annually

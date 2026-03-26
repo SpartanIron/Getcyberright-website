@@ -387,7 +387,7 @@ const adapters: Record<string, () => Promise<RawThreatItem[]>> = {
       title: "FBI IC3 2024 Internet Crime Report Highlights",
       summary: "Investment fraud led cybercrime losses at $4.57B in 2023, with romance scams and tech support fraud targeting seniors.",
       content: JSON.stringify({
-        totalLosses: "$12.5 billion",
+        totalLosses: "$16.6 billion",
         topCrimes: ["Investment Fraud", "Business Email Compromise", "Tech Support Fraud"],
         seniorLosses: "$3.4 billion",
         complaints: 880000,
