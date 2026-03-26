@@ -575,10 +575,27 @@ function enforcePostFormatting(text: string, platform: string): string {
   cleaned = cleaned.replace(/\bI'll\b/g, "I will");
   cleaned = cleaned.replace(/\bI'd\b/g, "I would");
   cleaned = cleaned.replace(/\bI'd\b/g, "I would");
-  cleaned = cleaned.replace(/\blet's\b/gi, "let us");
-  cleaned = cleaned.replace(/\blet's\b/gi, "let us");
+  cleaned = cleaned.replace(/\blet's make sure\b/gi, "Make sure");
+  cleaned = cleaned.replace(/\blet's\b/gi, "We should");
+  cleaned = cleaned.replace(/\blet's make sure\b/gi, "Make sure");
+  cleaned = cleaned.replace(/\blet's\b/gi, "We should");
   cleaned = cleaned.replace(/\bwho's\b/gi, "who is");
   cleaned = cleaned.replace(/\bwho's\b/gi, "who is");
+
+  cleaned = cleaned.replace(/(\S)\s+(\d+)\.\s/g, (match, before, num) => {
+    if (parseInt(num) <= 10) {
+      return `${before}\n\n${num}. `;
+    }
+    return match;
+  });
+
+  cleaned = cleaned.replace(/\. ([A-Z])/g, (match, letter, offset) => {
+    const beforeText = cleaned.substring(Math.max(0, offset - 40), offset);
+    if (/\d+\.\s/.test(beforeText.split('\n').pop() || "")) {
+      return `. ${letter}`;
+    }
+    return match;
+  });
 
   const paragraphs = cleaned.split(/\n\n+/).filter(p => p.trim());
 
@@ -593,7 +610,13 @@ function enforcePostFormatting(text: string, platform: string): string {
         reformatted.push(sentences[0]);
       }
       for (let i = 2; i < sentences.length; i += 2) {
-        reformatted.push(sentences.slice(i, i + 2).join(" "));
+        const chunk = sentences.slice(i, i + 2);
+        const numberedItem = chunk[0]?.match(/^\d+\.\s/);
+        if (numberedItem) {
+          reformatted.push(chunk.join(" "));
+        } else {
+          reformatted.push(chunk.join(" "));
+        }
       }
     } else {
       for (let i = 0; i < sentences.length; i += 3) {
@@ -809,6 +832,7 @@ FORMATTING (CRITICAL, STRICTLY ENFORCED):
 - NEVER use markdown: no ** bold **, no * italics *, no ## headings, no bullet markers (- or *)
 - NEVER use em dashes (use commas, colons, semicolons, or periods instead)
 - NEVER use contractions. Write "you are" not "you're", "do not" not "don't", "it is" not "it's", "cannot" not "can't", "will not" not "won't", "here is" not "here's", "that is" not "that's", "what is" not "what's", "we are" not "we're", "they are" not "they're", "there is" not "there's", "is not" not "isn't", "are not" not "aren't", "does not" not "doesn't", "did not" not "didn't", "have not" not "haven't", "has not" not "hasn't", "I am" not "I'm", "I have" not "I've"
+- When avoiding contractions creates awkward phrasing, restructure the sentence instead. For example: Instead of "let us make sure" (from "let's make sure"), write "Make sure your family..." Instead of "what is one thing" (from "what's one thing"), write "What one thing do you wish..."
 - NEVER use hashtags on LinkedIn or Facebook posts. No #CyberSecurity, no #ScamAlert, nothing with #
 - NEVER use ALL CAPS for headers or emphasis. Write "How to protect yourself:" not "HOW TO PROTECT YOURSELF:"
 - Every post MUST have multiple \\n\\n paragraph breaks in the JSON output
