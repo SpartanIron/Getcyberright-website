@@ -517,6 +517,69 @@ function enforcePostFormatting(text: string, platform: string): string {
   let cleaned = text.replace(/\*\*/g, "").replace(/\*/g, "").replace(/^#+\s/gm, "").replace(/^[-•]\s/gm, "");
   cleaned = cleaned.replace(/\u2014/g, ",").replace(/\u2013/g, ",");
 
+  if (platform === "linkedin" || platform === "facebook") {
+    cleaned = cleaned.replace(/\n#\w[\w]*/g, "").replace(/#\w[\w]*/g, "").trim();
+  }
+
+  cleaned = cleaned.replace(/^[A-Z][A-Z ]{4,}:\s*/gm, (match) => {
+    const words = match.trim().replace(/:$/, "");
+    return words.charAt(0) + words.slice(1).toLowerCase() + ": ";
+  });
+
+  cleaned = cleaned.replace(/\byou're\b/gi, "you are");
+  cleaned = cleaned.replace(/\bdon't\b/gi, "do not");
+  cleaned = cleaned.replace(/\bdon't\b/gi, "do not");
+  cleaned = cleaned.replace(/\bcan't\b/gi, "cannot");
+  cleaned = cleaned.replace(/\bcan't\b/gi, "cannot");
+  cleaned = cleaned.replace(/\bwon't\b/gi, "will not");
+  cleaned = cleaned.replace(/\bwon't\b/gi, "will not");
+  cleaned = cleaned.replace(/\bisn't\b/gi, "is not");
+  cleaned = cleaned.replace(/\bisn't\b/gi, "is not");
+  cleaned = cleaned.replace(/\baren't\b/gi, "are not");
+  cleaned = cleaned.replace(/\baren't\b/gi, "are not");
+  cleaned = cleaned.replace(/\bdoesn't\b/gi, "does not");
+  cleaned = cleaned.replace(/\bdoesn't\b/gi, "does not");
+  cleaned = cleaned.replace(/\bdidn't\b/gi, "did not");
+  cleaned = cleaned.replace(/\bdidn't\b/gi, "did not");
+  cleaned = cleaned.replace(/\bwasn't\b/gi, "was not");
+  cleaned = cleaned.replace(/\bwasn't\b/gi, "was not");
+  cleaned = cleaned.replace(/\bhaven't\b/gi, "have not");
+  cleaned = cleaned.replace(/\bhaven't\b/gi, "have not");
+  cleaned = cleaned.replace(/\bhasn't\b/gi, "has not");
+  cleaned = cleaned.replace(/\bhasn't\b/gi, "has not");
+  cleaned = cleaned.replace(/\bcouldn't\b/gi, "could not");
+  cleaned = cleaned.replace(/\bcouldn't\b/gi, "could not");
+  cleaned = cleaned.replace(/\bwouldn't\b/gi, "would not");
+  cleaned = cleaned.replace(/\bwouldn't\b/gi, "would not");
+  cleaned = cleaned.replace(/\bshouldn't\b/gi, "should not");
+  cleaned = cleaned.replace(/\bshouldn't\b/gi, "should not");
+  cleaned = cleaned.replace(/\bthey're\b/gi, "they are");
+  cleaned = cleaned.replace(/\bthey're\b/gi, "they are");
+  cleaned = cleaned.replace(/\bwe're\b/gi, "we are");
+  cleaned = cleaned.replace(/\bwe're\b/gi, "we are");
+  cleaned = cleaned.replace(/\bthere's\b/gi, "there is");
+  cleaned = cleaned.replace(/\bthere's\b/gi, "there is");
+  cleaned = cleaned.replace(/\bhere's\b/gi, "here is");
+  cleaned = cleaned.replace(/\bhere's\b/gi, "here is");
+  cleaned = cleaned.replace(/\bwhat's\b/gi, "what is");
+  cleaned = cleaned.replace(/\bwhat's\b/gi, "what is");
+  cleaned = cleaned.replace(/\bthat's\b/gi, "that is");
+  cleaned = cleaned.replace(/\bthat's\b/gi, "that is");
+  cleaned = cleaned.replace(/\bit's\b/gi, "it is");
+  cleaned = cleaned.replace(/\bit's\b/gi, "it is");
+  cleaned = cleaned.replace(/\bI'm\b/g, "I am");
+  cleaned = cleaned.replace(/\bI'm\b/g, "I am");
+  cleaned = cleaned.replace(/\bI've\b/g, "I have");
+  cleaned = cleaned.replace(/\bI've\b/g, "I have");
+  cleaned = cleaned.replace(/\bI'll\b/g, "I will");
+  cleaned = cleaned.replace(/\bI'll\b/g, "I will");
+  cleaned = cleaned.replace(/\bI'd\b/g, "I would");
+  cleaned = cleaned.replace(/\bI'd\b/g, "I would");
+  cleaned = cleaned.replace(/\blet's\b/gi, "let us");
+  cleaned = cleaned.replace(/\blet's\b/gi, "let us");
+  cleaned = cleaned.replace(/\bwho's\b/gi, "who is");
+  cleaned = cleaned.replace(/\bwho's\b/gi, "who is");
+
   const paragraphs = cleaned.split(/\n\n+/).filter(p => p.trim());
 
   if (paragraphs.length < 3) {
@@ -745,6 +808,9 @@ VOICE AND PERSONALITY:
 FORMATTING (CRITICAL, STRICTLY ENFORCED):
 - NEVER use markdown: no ** bold **, no * italics *, no ## headings, no bullet markers (- or *)
 - NEVER use em dashes (use commas, colons, semicolons, or periods instead)
+- NEVER use contractions. Write "you are" not "you're", "do not" not "don't", "it is" not "it's", "cannot" not "can't", "will not" not "won't", "here is" not "here's", "that is" not "that's", "what is" not "what's", "we are" not "we're", "they are" not "they're", "there is" not "there's", "is not" not "isn't", "are not" not "aren't", "does not" not "doesn't", "did not" not "didn't", "have not" not "haven't", "has not" not "hasn't", "I am" not "I'm", "I have" not "I've"
+- NEVER use hashtags on LinkedIn or Facebook posts. No #CyberSecurity, no #ScamAlert, nothing with #
+- NEVER use ALL CAPS for headers or emphasis. Write "How to protect yourself:" not "HOW TO PROTECT YOURSELF:"
 - Every post MUST have multiple \\n\\n paragraph breaks in the JSON output
 - LinkedIn: Maximum 5-7 short paragraphs, each 1-2 sentences. NEVER a single block of text
 - The first 2 lines MUST stand alone as a hook (before LinkedIn's "see more" cutoff)
@@ -753,6 +819,7 @@ FORMATTING (CRITICAL, STRICTLY ENFORCED):
 - If using numbered items, put each on its OWN line with a \\n\\n between them
 - White space is critical. A wall of text = automatic failure. If you produce a single unbroken paragraph, you have failed
 - LinkedIn posts that exceed 200 words = failure. Be concise. Cut ruthlessly
+- Keep sentences under 35 words. If a sentence exceeds 35 words, split it into two
 
 WHAT NOT TO DO:
 - Do not end every post with a question. Sometimes end with a strong statement
