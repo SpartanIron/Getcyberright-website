@@ -12,7 +12,7 @@ export type BrokerResult = {
 };
 
 export type BreachResult = {
-  source: "haveibeenpwned" | "dehashed";
+  source: "haveibeenpwned" | "dehashed" | "xposedornot" | "leakcheck";
   breachName: string;
   breachDate: string | null;
   dataClasses: string[];
@@ -125,6 +125,157 @@ async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
     console.log("[shield-scan] HIBP check failed");
     return [{ source: "haveibeenpwned" as const, breachName: "__unavailable__", breachDate: null, dataClasses: [] }];
   }
+}
+
+async function checkXposedOrNot(email: string): Promise<BreachResult[]> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const checkResponse = await fetch(
+      `https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'GetCyberRight-ShieldScanner/1.0',
+        },
+        signal: controller.signal,
+      },
+    );
+    clearTimeout(timeoutId);
+
+    if (checkResponse.status === 404) return [];
+    if (!checkResponse.ok) {
+      console.log(`[shield-scan] XposedOrNot returned ${checkResponse.status}`);
+      return [];
+    }
+
+    const checkData = await checkResponse.json() as any;
+    const breachNames: string[] = checkData.breaches
+      ? checkData.breaches.flat().filter((b: string) => b && b.length > 0)
+      : [];
+
+    if (breachNames.length === 0) return [];
+
+    let analyticsData: any = null;
+    try {
+      const analyticsController = new AbortController();
+      const analyticsTimeout = setTimeout(() => analyticsController.abort(), 15000);
+      const analyticsResponse = await fetch(
+        `https://api.xposedornot.com/v1/breach-analytics?email=${encodeURIComponent(email)}`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'GetCyberRight-ShieldScanner/1.0',
+          },
+          signal: analyticsController.signal,
+        },
+      );
+      clearTimeout(analyticsTimeout);
+      if (analyticsResponse.ok) {
+        analyticsData = await analyticsResponse.json();
+      }
+    } catch {
+    }
+
+    const breachDetails = analyticsData?.ExposedBreaches?.breaches_details || [];
+    const detailMap = new Map<string, any>();
+    for (const detail of breachDetails) {
+      if (detail.breach) detailMap.set(detail.breach, detail);
+    }
+
+    return breachNames.map((name) => {
+      const detail = detailMap.get(name);
+      return {
+        source: "xposedornot" as const,
+        breachName: name,
+        breachDate: detail?.xposed_date || null,
+        dataClasses: detail?.xposed_data
+          ? detail.xposed_data.split(';').map((s: string) => s.trim()).filter(Boolean)
+          : [],
+      };
+    });
+  } catch (error: any) {
+    console.log("[shield-scan] XposedOrNot check failed:", error.message);
+    return [];
+  }
+}
+
+async function checkLeakCheck(email: string): Promise<BreachResult[]> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const response = await fetch(
+      `https://leakcheck.io/api/public?check=${encodeURIComponent(email)}`,
+      { signal: controller.signal },
+    );
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        console.log("[shield-scan] LeakCheck rate limited");
+      }
+      return [];
+    }
+
+    const data = await response.json() as any;
+    if (!data.found || data.found === 0) return [];
+
+    const exposedFields: string[] = data.fields || [];
+    return (data.sources || []).map((source: any) => ({
+      source: "leakcheck" as const,
+      breachName: source.name || 'Unknown Breach',
+      breachDate: source.date || null,
+      dataClasses: exposedFields,
+    }));
+  } catch (error: any) {
+    console.log("[shield-scan] LeakCheck check failed:", error.message);
+    return [];
+  }
+}
+
+async function checkBreaches(email: string): Promise<BreachResult[]> {
+  const hibpApiKey = process.env.HIBP_API_KEY;
+
+  if (hibpApiKey) {
+    const hibpResults = await checkHaveIBeenPwned(email);
+    const hasRealData = hibpResults.some(b => !b.breachName.startsWith("__"));
+    if (hasRealData || hibpResults.length === 0) {
+      return hibpResults;
+    }
+    console.log("[shield-scan] HIBP returned errors, falling through to free sources");
+  } else {
+    console.log("[shield-scan] No HIBP_API_KEY — using free breach sources (XposedOrNot + LeakCheck)");
+  }
+
+  const [xonResults, leakResults] = await Promise.allSettled([
+    checkXposedOrNot(email),
+    checkLeakCheck(email),
+  ]);
+
+  const combined: BreachResult[] = [];
+  const seenBreaches = new Set<string>();
+
+  const xon = xonResults.status === 'fulfilled' ? xonResults.value : [];
+  const lc = leakResults.status === 'fulfilled' ? leakResults.value : [];
+
+  for (const breach of xon) {
+    const key = breach.breachName.toLowerCase();
+    if (!seenBreaches.has(key)) {
+      seenBreaches.add(key);
+      combined.push(breach);
+    }
+  }
+
+  for (const breach of lc) {
+    const key = breach.breachName.toLowerCase();
+    if (!seenBreaches.has(key)) {
+      seenBreaches.add(key);
+      combined.push(breach);
+    }
+  }
+
+  console.log(`[shield-scan] Free sources found ${combined.length} breaches (XposedOrNot: ${xon.length}, LeakCheck: ${lc.length})`);
+  return combined;
 }
 
 async function runRealBrokerSearch(input: ScanInput): Promise<BrokerResult[]> {
@@ -299,7 +450,7 @@ async function runScanPipeline(scanId: string, input: ScanInput): Promise<void> 
       .set({ status: "processing" })
       .where(eq(shieldScans.scanId, scanId));
 
-    const breachResults = await checkHaveIBeenPwned(input.email);
+    const breachResults = await checkBreaches(input.email);
 
     const brokerResults = await runRealBrokerSearch(input);
 
