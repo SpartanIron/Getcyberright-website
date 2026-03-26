@@ -38,6 +38,17 @@ import {
   DEFAULT_REGION
 } from "@shared/regions";
 import {
+  analyzeURL as scamCheckURL,
+  analyzePhone as scamCheckPhone,
+  analyzeScamDescription,
+  analyzeImage as scamCheckImage,
+  wrapUrlResult,
+  wrapPhoneResult,
+  wrapDescriptionResult,
+  wrapImageResult,
+  type UnifiedScamResult
+} from "./scam-checker";
+import {
   analyzeSmishing,
   analyzeAIContent,
   analyzeRedirectChain,
@@ -1350,6 +1361,39 @@ EDGE CASE HANDLING
         res.status(400).json({ error: "Invalid URL", details: (error as any).issues });
       } else {
         console.error('Comprehensive scan error:', error);
+        res.status(500).json({ success: false, error: "Scan failed" });
+      }
+    }
+  });
+
+  app.post("/api/security/unified-scan", standardRateLimit, async (req, res) => {
+    try {
+      const schema = z.object({
+        inputType: z.enum(["url", "phone", "description"]),
+        input: z.string().min(1).max(10000),
+        scamType: z.string().optional(),
+      });
+      const { inputType, input, scamType } = schema.parse(req.body);
+
+      let result: UnifiedScamResult;
+
+      if (inputType === "url") {
+        const urlResult = await scamCheckURL(input);
+        result = wrapUrlResult(input, urlResult);
+      } else if (inputType === "phone") {
+        const phoneResult = scamCheckPhone(input);
+        result = wrapPhoneResult(input, phoneResult);
+      } else {
+        const descResult = await analyzeScamDescription(input, scamType);
+        result = wrapDescriptionResult(input, descResult);
+      }
+
+      res.json({ success: true, ...result });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid input", details: (error as any).issues });
+      } else {
+        console.error("Unified scan error:", error);
         res.status(500).json({ success: false, error: "Scan failed" });
       }
     }
@@ -4615,6 +4659,7 @@ EDGE CASE HANDLING
       scanId: report.scanId,
       completedAt: report.completedAt,
       exposureScore: report.exposureScore,
+      numericScore: report.numericScore,
       scoreBreakdown: report.scoreBreakdown,
       partialResults: report.partialResults,
       brokerCount: allBrokers.length,

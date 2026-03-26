@@ -52,9 +52,12 @@ type ExposureReport = {
   brokerResults?: BrokerResult[];
   breachResults?: BreachResult[];
   exposureScore: "low" | "medium" | "high" | "critical";
+  numericScore?: number;
   scoreBreakdown: {
     breachPoints: number;
     brokerPoints: number;
+    recencyPoints?: number;
+    passwordExposurePoints?: number;
     sensitivityMultiplier: number;
     rawTotal: number;
   };
@@ -304,8 +307,8 @@ function ShieldResultsPage() {
                     >
                       {scoreConfig.label}
                     </span>
-                    <span className={`text-sm px-2.5 py-1 rounded-full font-medium ${scoreConfig.bg} ${scoreConfig.color}`}>
-                      Score: {report.scoreBreakdown.rawTotal}
+                    <span className={`text-sm px-2.5 py-1 rounded-full font-medium ${scoreConfig.bg} ${scoreConfig.color}`} data-testid="text-numeric-score">
+                      {report.numericScore !== undefined ? report.numericScore : report.scoreBreakdown.rawTotal}/100
                     </span>
                   </div>
                   <p className="text-base text-foreground leading-relaxed" data-testid="text-exposure-summary">

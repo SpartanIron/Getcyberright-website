@@ -24,9 +24,12 @@ export type ExposureReport = {
   brokerResults: BrokerResult[];
   breachResults: BreachResult[];
   exposureScore: "low" | "medium" | "high" | "critical";
+  numericScore: number;
   scoreBreakdown: {
     breachPoints: number;
     brokerPoints: number;
+    recencyPoints: number;
+    passwordExposurePoints: number;
     sensitivityMultiplier: number;
     rawTotal: number;
   };
@@ -333,7 +336,7 @@ async function runRealBrokerSearch(input: ScanInput): Promise<BrokerResult[]> {
 function calculateExposureScore(
   breachResults: BreachResult[],
   brokerResults: BrokerResult[],
-): { score: "low" | "medium" | "high" | "critical"; breakdown: ExposureReport["scoreBreakdown"] } {
+): { score: "low" | "medium" | "high" | "critical"; numericScore: number; breakdown: ExposureReport["scoreBreakdown"] } {
   const realBreaches = breachResults.filter(
     (b) => !b.breachName.startsWith("__"),
   );
@@ -341,15 +344,29 @@ function calculateExposureScore(
   let breachPoints = 0;
   if (realBreaches.length === 0) breachPoints = 0;
   else if (realBreaches.length <= 2) breachPoints = 10;
-  else if (realBreaches.length <= 5) breachPoints = 25;
-  else breachPoints = 40;
+  else if (realBreaches.length <= 5) breachPoints = 20;
+  else if (realBreaches.length <= 10) breachPoints = 28;
+  else breachPoints = 35;
 
   const confirmedBrokers = brokerResults.filter((b) => b.status === "found");
   let brokerPoints = 0;
   if (confirmedBrokers.length === 0) brokerPoints = 0;
-  else if (confirmedBrokers.length <= 2) brokerPoints = 10;
-  else if (confirmedBrokers.length <= 4) brokerPoints = 20;
-  else brokerPoints = 30;
+  else if (confirmedBrokers.length <= 2) brokerPoints = 8;
+  else if (confirmedBrokers.length <= 4) brokerPoints = 15;
+  else if (confirmedBrokers.length <= 7) brokerPoints = 22;
+  else brokerPoints = 28;
+
+  const now = new Date();
+  let recencyPoints = 0;
+  for (const breach of realBreaches) {
+    if (!breach.breachDate) continue;
+    const breachDate = new Date(breach.breachDate);
+    const daysSince = Math.max(0, Math.floor((now.getTime() - breachDate.getTime()) / (1000 * 60 * 60 * 24)));
+    if (daysSince <= 90) recencyPoints += 5;
+    else if (daysSince <= 365) recencyPoints += 3;
+    else if (daysSince <= 730) recencyPoints += 1;
+  }
+  recencyPoints = Math.min(recencyPoints, 15);
 
   const allDataClasses = new Set(
     realBreaches.flatMap((b) => b.dataClasses.map((c) => c.toLowerCase())),
@@ -359,29 +376,42 @@ function calculateExposureScore(
   );
   const combinedData = new Set([...allDataClasses, ...allBrokerData]);
 
+  const passwordTerms = ["password", "passwords", "password hash", "hashed password"];
+  let passwordExposurePoints = 0;
+  if (passwordTerms.some((t) => [...allDataClasses].some((d) => d.includes(t)))) {
+    passwordExposurePoints = 12;
+  }
+
   let sensitivityMultiplier = 1;
   const financialTerms = ["credit card", "bank account", "financial", "payment"];
   const govIdTerms = ["ssn", "social security", "government id", "passport", "national id", "tax id"];
 
   if (govIdTerms.some((t) => [...combinedData].some((d) => d.includes(t)))) {
-    sensitivityMultiplier = 2;
-  } else if (financialTerms.some((t) => [...combinedData].some((d) => d.includes(t)))) {
     sensitivityMultiplier = 1.5;
+  } else if (financialTerms.some((t) => [...combinedData].some((d) => d.includes(t)))) {
+    sensitivityMultiplier = 1.25;
   }
 
-  const rawTotal = Math.round((breachPoints + brokerPoints) * sensitivityMultiplier);
+  const rawTotal = Math.round(
+    (breachPoints + brokerPoints + recencyPoints + passwordExposurePoints) * sensitivityMultiplier
+  );
+
+  const numericScore = Math.min(100, Math.max(0, rawTotal));
 
   let score: "low" | "medium" | "high" | "critical";
-  if (rawTotal <= 20) score = "low";
-  else if (rawTotal <= 45) score = "medium";
-  else if (rawTotal <= 70) score = "high";
+  if (numericScore <= 20) score = "low";
+  else if (numericScore <= 45) score = "medium";
+  else if (numericScore <= 70) score = "high";
   else score = "critical";
 
   return {
     score,
+    numericScore,
     breakdown: {
       breachPoints,
       brokerPoints,
+      recencyPoints,
+      passwordExposurePoints,
       sensitivityMultiplier,
       rawTotal,
     },
@@ -462,7 +492,7 @@ async function runScanPipeline(scanId: string, input: ScanInput): Promise<void> 
       (b) => !b.breachName.startsWith("__"),
     );
 
-    const { score, breakdown } = calculateExposureScore(breachResults, brokerResults);
+    const { score, numericScore, breakdown } = calculateExposureScore(breachResults, brokerResults);
 
     const report: ExposureReport = {
       scanId,
@@ -470,6 +500,7 @@ async function runScanPipeline(scanId: string, input: ScanInput): Promise<void> 
       brokerResults,
       breachResults: cleanBreaches,
       exposureScore: score,
+      numericScore,
       scoreBreakdown: breakdown,
       partialResults,
     };

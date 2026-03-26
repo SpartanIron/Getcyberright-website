@@ -5,6 +5,9 @@ import dns from "dns";
 import { promisify } from "util";
 import Tesseract from "tesseract.js";
 import { logger } from "./logger";
+import { db } from "./db";
+import { communityScamReports, scamReports } from "@shared/schema";
+import { sql, ilike } from "drizzle-orm";
 
 const log = logger.child('ScamChecker');
 
@@ -1535,6 +1538,37 @@ function analyzeURLInternal(url: string, expandedUrl?: string, redirectChain?: s
   }
 }
 
+async function getCommunityReportCount(urlOrDomain: string): Promise<{ reportCount: number; approvedCount: number }> {
+  try {
+    let domain = urlOrDomain;
+    try {
+      const parsed = new URL(urlOrDomain.startsWith('http') ? urlOrDomain : `https://${urlOrDomain}`);
+      domain = parsed.hostname;
+    } catch {}
+
+    const [communityResults, scamResults] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` })
+        .from(communityScamReports)
+        .where(ilike(communityScamReports.url, `%${domain}%`)),
+      db.select({ count: sql<number>`count(*)` })
+        .from(scamReports)
+        .where(ilike(scamReports.url, `%${domain}%`)),
+    ]);
+
+    const totalReports = Number(communityResults[0]?.count || 0) + Number(scamResults[0]?.count || 0);
+
+    const approvedResults = await db.select({ count: sql<number>`count(*)` })
+      .from(communityScamReports)
+      .where(sql`${communityScamReports.url} ILIKE ${'%' + domain + '%'} AND ${communityScamReports.status} = 'approved'`);
+    const approvedCount = Number(approvedResults[0]?.count || 0);
+
+    return { reportCount: totalReports, approvedCount };
+  } catch (error) {
+    log.warn('Failed to query community reports', { error });
+    return { reportCount: 0, approvedCount: 0 };
+  }
+}
+
 export async function analyzeURL(url: string): Promise<URLAnalysisResult> {
   try {
     const normalizedUrl = url.toLowerCase().startsWith('http') ? url : `https://${url}`;
@@ -1562,12 +1596,42 @@ export async function analyzeURL(url: string): Promise<URLAnalysisResult> {
       result = analyzeURLInternal(url);
     }
     
-    // Run external API checks in parallel
-    const [safeBrowsingResult, phishTankResult, urlhausResult] = await Promise.all([
+    // Run external API checks + community reports in parallel
+    const [safeBrowsingResult, phishTankResult, urlhausResult, communityReportData] = await Promise.all([
       checkGoogleSafeBrowsing(urlToCheck),
       checkPhishTank(urlToCheck),
-      checkURLhaus(urlToCheck)
+      checkURLhaus(urlToCheck),
+      getCommunityReportCount(urlToCheck)
     ]);
+
+    (result as any)._communityReportCount = communityReportData.reportCount;
+
+    if (communityReportData.reportCount > 0) {
+      const approvedNote = communityReportData.approvedCount > 0
+        ? ` (${communityReportData.approvedCount} verified)`
+        : '';
+      result.warnings.push(`${communityReportData.reportCount} community scam report${communityReportData.reportCount !== 1 ? 's' : ''} filed against this domain${approvedNote}`);
+
+      if (communityReportData.approvedCount >= 3) {
+        result.isSuspicious = true;
+        if (result.riskLevel === 'safe' || result.riskLevel === 'low') {
+          result.riskLevel = 'high';
+        } else if (result.riskLevel === 'medium') {
+          result.riskLevel = 'high';
+        }
+      } else if (communityReportData.reportCount >= 2) {
+        result.isSuspicious = true;
+        if (result.riskLevel === 'safe') {
+          result.riskLevel = 'medium';
+        } else if (result.riskLevel === 'low') {
+          result.riskLevel = 'medium';
+        }
+      } else if (communityReportData.reportCount >= 1) {
+        if (result.riskLevel === 'safe') {
+          result.riskLevel = 'low';
+        }
+      }
+    }
     
     // Integrate Google Safe Browsing results
     if (safeBrowsingResult.isMalicious) {
@@ -1742,6 +1806,105 @@ WRITING STYLE (MANDATORY):
       recommendations: ['When in doubt, don\'t share personal information', 'Contact official support channels directly']
     };
   }
+}
+
+export interface UnifiedScamResult {
+  inputType: "url" | "phone" | "description" | "image";
+  input: string;
+  scamLikelihood: "safe" | "low" | "medium" | "high" | "critical";
+  confidenceScore: number;
+  riskLevel: "safe" | "low" | "medium" | "high" | "critical";
+  explanation: string[];
+  recommendedActions: string[];
+  communityReports?: number;
+  scamType?: string;
+  checkedAt: string;
+}
+
+function riskLevelToConfidence(riskLevel: string, warningCount: number): number {
+  const baseScores: Record<string, number> = {
+    safe: 10,
+    low: 25,
+    medium: 50,
+    high: 75,
+    critical: 95,
+  };
+  const base = baseScores[riskLevel] || 50;
+  return Math.min(100, base + Math.min(warningCount * 3, 15));
+}
+
+export function wrapUrlResult(url: string, result: URLAnalysisResult): UnifiedScamResult {
+  const confidence = riskLevelToConfidence(result.riskLevel, result.warnings.length);
+  const reportCount = (result as any)._communityReportCount as number | undefined;
+  return {
+    inputType: "url",
+    input: url,
+    scamLikelihood: result.riskLevel,
+    confidenceScore: confidence,
+    riskLevel: result.riskLevel,
+    explanation: result.warnings,
+    recommendedActions: result.recommendations,
+    communityReports: reportCount || 0,
+    checkedAt: new Date().toISOString(),
+  };
+}
+
+export function wrapPhoneResult(phone: string, result: PhoneAnalysisResult): UnifiedScamResult {
+  const confidence = riskLevelToConfidence(result.riskLevel, result.warnings.length);
+  return {
+    inputType: "phone",
+    input: phone,
+    scamLikelihood: result.riskLevel,
+    confidenceScore: confidence,
+    riskLevel: result.riskLevel,
+    explanation: result.warnings.length > 0
+      ? result.warnings
+      : ["No suspicious indicators detected for this phone number"],
+    recommendedActions: result.recommendations,
+    checkedAt: new Date().toISOString(),
+  };
+}
+
+export function wrapDescriptionResult(description: string, result: ScamAnalysisResult): UnifiedScamResult {
+  const verdictToLevel: Record<string, "safe" | "low" | "medium" | "high" | "critical"> = {
+    safe: "safe",
+    suspicious: "medium",
+    likely_scam: "high",
+    scam: "critical",
+  };
+  const riskLevel = verdictToLevel[result.verdict] || "medium";
+  return {
+    inputType: "description",
+    input: description.substring(0, 200),
+    scamLikelihood: riskLevel,
+    confidenceScore: result.confidence,
+    riskLevel,
+    explanation: [result.explanation, ...result.redFlags],
+    recommendedActions: result.recommendations,
+    scamType: result.scamType,
+    checkedAt: new Date().toISOString(),
+  };
+}
+
+export function wrapImageResult(filename: string, result: ImageAnalysisResult): UnifiedScamResult {
+  const verdictToLevel: Record<string, "safe" | "low" | "medium" | "high" | "critical"> = {
+    safe: "safe",
+    suspicious: "medium",
+    likely_scam: "high",
+    scam: "critical",
+  };
+  const riskLevel = verdictToLevel[result.scamAnalysis.verdict] || "medium";
+  return {
+    inputType: "image",
+    input: filename,
+    scamLikelihood: riskLevel,
+    confidenceScore: result.scamAnalysis.confidence,
+    riskLevel,
+    explanation: [result.scamAnalysis.explanation, ...result.scamAnalysis.redFlags],
+    recommendedActions: result.scamAnalysis.recommendations,
+    scamType: result.scamAnalysis.scamType,
+    checkedAt: new Date().toISOString(),
+  };
 }
 
 export async function analyzeImage(imageBuffer: Buffer): Promise<ImageAnalysisResult> {
