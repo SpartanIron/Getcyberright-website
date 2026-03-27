@@ -6,11 +6,48 @@ const BASE_URL = "https://www.getcyberright.com";
 const DEFAULT_TITLE = "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors";
 const DEFAULT_DESCRIPTION = "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training. Trusted by thousands of families worldwide.";
 
+const OG_IMAGES: Record<string, string> = {
+  "/": `${BASE_URL}/og/trust-metrics.png`,
+  "/scam-checker": `${BASE_URL}/og/scam-guard.png`,
+  "/shield": `${BASE_URL}/og/data-shield.png`,
+  "/data-removal": `${BASE_URL}/og/data-shield.png`,
+  "/news": `${BASE_URL}/og/news-alerts.png`,
+  "/alerts": `${BASE_URL}/og/news-alerts.png`,
+  "/training": `${BASE_URL}/og/training.png`,
+  "/resources": `${BASE_URL}/og/education.png`,
+  "/kids": `${BASE_URL}/og/education.png`,
+  "/seniors": `${BASE_URL}/og/education.png`,
+  "/parents": `${BASE_URL}/og/education.png`,
+  "/parent-guide": `${BASE_URL}/og/education.png`,
+  "/tools": `${BASE_URL}/og/scam-guard.png`,
+  "/cyber-threat-radar": `${BASE_URL}/og/breaking-news.png`,
+  "/threat-trends": `${BASE_URL}/og/breaking-news.png`,
+  "/emergency-help": `${BASE_URL}/og/howto-hacked.png`,
+  "/report-scam": `${BASE_URL}/og/scam-calls-texts.png`,
+  "/awareness-hub": `${BASE_URL}/og/education.png`,
+  "/faq": `${BASE_URL}/og/trust-metrics.png`,
+  "/about": `${BASE_URL}/og/trust-metrics.png`,
+  "/browser-extension": `${BASE_URL}/og/scam-guard.png`,
+  "/breach-dashboard": `${BASE_URL}/og/data-shield.png`,
+  "/password-generator": `${BASE_URL}/og/scam-guard.png`,
+  "/safety-score": `${BASE_URL}/og/trust-metrics.png`,
+  "/quick-assessment": `${BASE_URL}/og/trust-metrics.png`,
+  "/small-business": `${BASE_URL}/og/training.png`,
+  "/educators": `${BASE_URL}/og/education.png`,
+  "/ai-prompts": `${BASE_URL}/og/training.png`,
+  "/ai-safety": `${BASE_URL}/og/training.png`,
+  "/scam-intel": `${BASE_URL}/og/scam-calls-texts.png`,
+  "/guides": `${BASE_URL}/og/education.png`,
+  "/pricing": `${BASE_URL}/og/trust-metrics.png`,
+  "/gcr-guard-pricing": `${BASE_URL}/og/scam-guard.png`,
+};
+
 export interface PageMeta {
   title: string;
   description: string;
   canonicalUrl: string;
   ogType: string;
+  ogImage?: string;
   jsonLd: string;
   noindex?: boolean;
 }
@@ -427,6 +464,7 @@ export async function resolvePageMeta(urlPath: string): Promise<PageMeta> {
       description: DEFAULT_DESCRIPTION,
       canonicalUrl: `${BASE_URL}/`,
       ogType: "website",
+      ogImage: OG_IMAGES["/"],
       jsonLd: `${buildOrgSchema()}\n    ${buildWebSiteSchema()}`,
     };
   }
@@ -468,6 +506,7 @@ export async function resolvePageMeta(urlPath: string): Promise<PageMeta> {
       description: staticMeta.description,
       canonicalUrl: `${BASE_URL}${path}`,
       ogType: staticMeta.ogType || "website",
+      ogImage: OG_IMAGES[path],
       jsonLd: `${buildOrgSchema()}\n    ${breadcrumbs}${extraSchema}`,
     };
   }
@@ -528,6 +567,7 @@ export async function resolvePageMeta(urlPath: string): Promise<PageMeta> {
           description: article.excerpt || article.title,
           canonicalUrl: `${BASE_URL}/news/${article.slug}`,
           ogType: "article",
+          ogImage: `${BASE_URL}/api/social-images/social-${article.id}.png`,
           jsonLd: `${breadcrumbs}\n    ${articleSchema}`,
         };
       }
@@ -628,6 +668,7 @@ export async function resolvePageMeta(urlPath: string): Promise<PageMeta> {
 }
 
 export function injectMeta(template: string, meta: PageMeta): string {
+  const ogImage = meta.ogImage || "https://www.getcyberright.com/og-image.png";
   let result = template
     .replace(/%%PAGE_TITLE%%/g, escapeAttr(meta.title))
     .replace(/%%META_DESCRIPTION%%/g, escapeAttr(meta.description))
@@ -635,6 +676,7 @@ export function injectMeta(template: string, meta: PageMeta): string {
     .replace(/%%OG_DESCRIPTION%%/g, escapeAttr(meta.description))
     .replace(/%%OG_TYPE%%/g, meta.ogType)
     .replace(/%%OG_URL%%/g, meta.canonicalUrl || "")
+    .replace(/%%OG_IMAGE%%/g, ogImage)
     .replace(/%%TWITTER_TITLE%%/g, escapeAttr(meta.title))
     .replace(/%%TWITTER_DESCRIPTION%%/g, escapeAttr(meta.description))
     .replace(/%%CANONICAL_URL%%/g, meta.canonicalUrl || "")

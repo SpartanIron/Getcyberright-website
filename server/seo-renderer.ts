@@ -24,6 +24,7 @@ function buildHead(meta: {
   description: string;
   url: string;
   type?: string;
+  ogImage?: string;
   publishedTime?: string;
   modifiedTime?: string;
   section?: string;
@@ -31,6 +32,7 @@ function buildHead(meta: {
 }): string {
   const canonical = `https://www.getcyberright.com${meta.url}`;
   const ogType = meta.type || "article";
+  const ogImageUrl = meta.ogImage || getOgImage(meta.url) || "https://www.getcyberright.com/og-image.png";
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,10 +47,13 @@ function buildHead(meta: {
   <meta property="og:description" content="${escapeHtml(meta.description)}">
   <meta property="og:type" content="${ogType}">
   <meta property="og:url" content="${canonical}">
-  <meta property="og:image" content="https://www.getcyberright.com/og-image.png">
+  <meta property="og:image" content="${ogImageUrl}">
+  <meta property="og:image:width" content="1080">
+  <meta property="og:image:height" content="1080">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escapeHtml(meta.title)}">
   <meta name="twitter:description" content="${escapeHtml(meta.description)}">
+  <meta name="twitter:image" content="${ogImageUrl}">
   ${meta.publishedTime ? `<meta property="article:published_time" content="${meta.publishedTime}">` : ""}
   ${meta.modifiedTime ? `<meta property="article:modified_time" content="${meta.modifiedTime}">` : ""}
   ${meta.section ? `<meta property="article:section" content="${escapeHtml(meta.section)}">` : ""}
@@ -82,6 +87,46 @@ function buildBreadcrumbs(items: { name: string; url: string }[]): string {
     })),
   };
   return buildJsonLd(schema);
+}
+
+const OG_IMAGES: Record<string, string> = {
+  "/": "https://www.getcyberright.com/og/trust-metrics.png",
+  "/scam-checker": "https://www.getcyberright.com/og/scam-guard.png",
+  "/shield": "https://www.getcyberright.com/og/data-shield.png",
+  "/data-removal": "https://www.getcyberright.com/og/data-shield.png",
+  "/news": "https://www.getcyberright.com/og/news-alerts.png",
+  "/alerts": "https://www.getcyberright.com/og/news-alerts.png",
+  "/training": "https://www.getcyberright.com/og/training.png",
+  "/resources": "https://www.getcyberright.com/og/education.png",
+  "/kids": "https://www.getcyberright.com/og/education.png",
+  "/seniors": "https://www.getcyberright.com/og/education.png",
+  "/parents": "https://www.getcyberright.com/og/education.png",
+  "/parent-guide": "https://www.getcyberright.com/og/education.png",
+  "/tools": "https://www.getcyberright.com/og/scam-guard.png",
+  "/cyber-threat-radar": "https://www.getcyberright.com/og/breaking-news.png",
+  "/threat-trends": "https://www.getcyberright.com/og/breaking-news.png",
+  "/emergency-help": "https://www.getcyberright.com/og/howto-hacked.png",
+  "/report-scam": "https://www.getcyberright.com/og/scam-calls-texts.png",
+  "/awareness-hub": "https://www.getcyberright.com/og/education.png",
+  "/faq": "https://www.getcyberright.com/og/trust-metrics.png",
+  "/about": "https://www.getcyberright.com/og/trust-metrics.png",
+  "/browser-extension": "https://www.getcyberright.com/og/scam-guard.png",
+  "/breach-dashboard": "https://www.getcyberright.com/og/data-shield.png",
+  "/password-generator": "https://www.getcyberright.com/og/scam-guard.png",
+  "/safety-score": "https://www.getcyberright.com/og/trust-metrics.png",
+  "/quick-assessment": "https://www.getcyberright.com/og/trust-metrics.png",
+  "/small-business": "https://www.getcyberright.com/og/training.png",
+  "/educators": "https://www.getcyberright.com/og/education.png",
+  "/ai-prompts": "https://www.getcyberright.com/og/training.png",
+  "/ai-safety": "https://www.getcyberright.com/og/training.png",
+  "/scam-intel": "https://www.getcyberright.com/og/scam-calls-texts.png",
+  "/guides": "https://www.getcyberright.com/og/education.png",
+  "/pricing": "https://www.getcyberright.com/og/trust-metrics.png",
+  "/gcr-guard-pricing": "https://www.getcyberright.com/og/scam-guard.png",
+};
+
+function getOgImage(path: string): string | undefined {
+  return OG_IMAGES[path];
 }
 
 function buildFaqSchema(faqs: { question: string; answer: string }[]): string {
@@ -1629,10 +1674,13 @@ async function renderNewsPage(slug: string): Promise<string | null> {
   const article = await storage.getNewsArticleBySlug(slug);
   if (!article) return null;
 
+  const articleOgImage = `https://www.getcyberright.com/api/social-images/social-${article.id}.png`;
+
   const head = buildHead({
     title: `${article.title} | GetCyberRight`,
     description: article.excerpt || article.title,
     url: `/news/${article.slug}`,
+    ogImage: articleOgImage,
     publishedTime: article.publishedAt?.toISOString(),
     section: article.category,
     type: "article",
