@@ -150,3 +150,21 @@ id = "eccEmoO6FJyMPREvkvmzy"
 uri = "file://attached_assets/scam-explainer-v2.png"
 type = "image"
 title = "Scam Calls & Texts Explainer Infographic v2"
+
+[[outputs]]
+id = "0_hC3sNNnPHnBJgQ4ul7r"
+uri = "file://attached_assets/scam-explainer-bright-1.png"
+type = "image"
+title = "Option 1: Clean & Airy (white/blue)"
+
+[[outputs]]
+id = "OJW2wlZNfmgecfUVDL8W-"
+uri = "file://attached_assets/scam-explainer-bright-2.png"
+type = "image"
+title = "Option 2: Warm Family (peach/lavender)"
+
+[[outputs]]
+id = "zW-CM4IKXyBdlxq-Vmj6s"
+uri = "file://attached_assets/scam-explainer-bright-3.png"
+type = "image"
+title = "Option 3: Bold & Empowering (teal/white)"
