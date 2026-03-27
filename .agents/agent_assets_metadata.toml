@@ -108,3 +108,33 @@ id = "8A-cU7GDjxYrLtQVxJ_fc"
 uri = "file://attached_assets/gcr-social-training.png"
 type = "image"
 title = "5. Training Academy & Courses"
+
+[[outputs]]
+id = "LH-ztXnUXlLWwtJsvvnhO"
+uri = "file://attached_assets/gcr-breaking-news-template.png"
+type = "image"
+title = "1. Breaking News Template - For breach/incident stories"
+
+[[outputs]]
+id = "_IQTkqQGim2-JPMjE0f1N"
+uri = "file://attached_assets/gcr-stat-card-phishing.png"
+type = "image"
+title = "2. Stat Card - Shareable data point graphic"
+
+[[outputs]]
+id = "o7pKiRoRgwNRKf1CTBS6D"
+uri = "file://attached_assets/gcr-howto-hacked.png"
+type = "image"
+title = "3. How-To Infographic - Step-by-step if hacked"
+
+[[outputs]]
+id = "STulsb-E6MYRcfZ0A_Ew5"
+uri = "file://attached_assets/gcr-trust-metrics.png"
+type = "image"
+title = "4. Trust/Social Proof - Platform metrics showcase"
+
+[[outputs]]
+id = "xhyrxI4Kh1If7T2iPb0u4"
+uri = "file://attached_assets/gcr-seasonal-holiday-scams.png"
+type = "image"
+title = "5. Seasonal Awareness - Holiday shopping scam warning"
