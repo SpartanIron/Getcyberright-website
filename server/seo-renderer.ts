@@ -1625,6 +1625,65 @@ function renderHomePage(): string {
 </body></html>`;
 }
 
+async function renderNewsPage(slug: string): Promise<string | null> {
+  const article = await storage.getNewsArticleBySlug(slug);
+  if (!article) return null;
+
+  const head = buildHead({
+    title: `${article.title} | GetCyberRight`,
+    description: article.excerpt || article.title,
+    url: `/news/${article.slug}`,
+    publishedTime: article.publishedAt?.toISOString(),
+    section: article.category,
+    type: "article",
+  });
+
+  const breadcrumbs = buildBreadcrumbs([
+    { name: "Home", url: "/" },
+    { name: "News", url: "/news" },
+    { name: article.title, url: `/news/${article.slug}` },
+  ]);
+
+  const articleSchema = buildArticleSchema({
+    title: article.title,
+    description: article.excerpt || "",
+    url: `/news/${article.slug}`,
+    publishedAt: article.publishedAt?.toISOString(),
+  });
+
+  const contentHtml = article.content ? escapeHtml(article.content).replace(/\n/g, "<br>") : `<p>${escapeHtml(article.excerpt)}</p>`;
+
+  const safeSourceUrl = article.sourceUrl && article.sourceUrl.startsWith("http") ? escapeHtml(article.sourceUrl) : null;
+  const safeToolUrl = article.relatedToolUrl && article.relatedToolUrl.startsWith("/") ? escapeHtml(article.relatedToolUrl) : null;
+
+  return `${head}
+<body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+  ${breadcrumbs}
+  ${articleSchema}
+  <article>
+    <h1>${escapeHtml(article.title)}</h1>
+    <p style="color:#666;font-size:14px;">Category: ${escapeHtml(article.category)} | Published: ${article.publishedAt ? article.publishedAt.toLocaleDateString() : "Recently"}${article.source ? ` | Source: ${escapeHtml(article.source)}` : ""}</p>
+    <p style="font-size:18px;color:#444;">${escapeHtml(article.excerpt)}</p>
+    <div>${contentHtml}</div>
+    ${safeSourceUrl ? `<p style="margin-top:20px;"><a href="${safeSourceUrl}" rel="nofollow noopener" target="_blank">Read original source</a></p>` : ""}
+    ${safeToolUrl && article.relatedToolName ? `<p><strong>Related Tool:</strong> <a href="${safeToolUrl}">${escapeHtml(article.relatedToolName)}</a></p>` : ""}
+  </article>
+  <nav style="margin-top:30px;padding:20px;background:#f0fdfa;border-radius:8px;">
+    <h2>More from GetCyberRight</h2>
+    <ul>
+      <li><a href="/news">All Cybersecurity News</a></li>
+      <li><a href="/guides">Safety Guides</a></li>
+      <li><a href="/scam-checker">GCR Scam Guard</a></li>
+      <li><a href="/tools">Security Tools</a></li>
+      <li><a href="/alerts">Threat Alerts</a></li>
+    </ul>
+  </nav>
+  ${buildFooter()}
+  <div id="root"></div>
+
+</body></html>`;
+}
+
 export function seoMiddleware() {
   return async (req: Request, res: Response, next: NextFunction) => {
     const ua = req.get("User-Agent");
@@ -1665,6 +1724,12 @@ export function seoMiddleware() {
       if (!html && scamMatch) {
         isDynamicRoute = true;
         html = renderScamPage(scamMatch[1]);
+      }
+
+      const newsMatch = path.match(/^\/news\/([a-z0-9-]+)$/);
+      if (!html && newsMatch) {
+        isDynamicRoute = true;
+        html = await renderNewsPage(newsMatch[1]);
       }
 
       const topicMatch = path.match(/^\/topics\/([a-z0-9-]+)$/);

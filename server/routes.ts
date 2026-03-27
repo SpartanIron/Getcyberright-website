@@ -339,6 +339,17 @@ export async function registerRoutes(
         xml += `    <priority>0.7</priority>\n`;
         xml += `  </url>\n`;
       }
+      const newsArticles = await storage.getNewsArticles(undefined, 500);
+      for (const article of newsArticles) {
+        if (!article.slug || !/^[a-z0-9-]+$/.test(article.slug)) continue;
+        const lastmod = article.publishedAt ? new Date(article.publishedAt).toISOString().split('T')[0] : today;
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/news/${article.slug}</loc>\n`;
+        xml += `    <lastmod>${lastmod}</lastmod>\n`;
+        xml += `    <changefreq>weekly</changefreq>\n`;
+        xml += `    <priority>0.7</priority>\n`;
+        xml += `  </url>\n`;
+      }
     } catch (err) {
       console.error("[Sitemap] Error fetching dynamic content:", err);
     }
