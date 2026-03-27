@@ -60,3 +60,21 @@ id = "srdRLa_TlNLvso5By0Chb"
 uri = "file://marquee-promo-tile.png"
 type = "image"
 title = "Marquee Promo Tile (1400x560, 24-bit PNG)"
+
+[[outputs]]
+id = "FRbps9sEohH8ixb-X0UNR"
+uri = "file://attached_assets/gcr-social-post-template.png"
+type = "image"
+title = "Version 1: Light Theme (Sitecore-style)"
+
+[[outputs]]
+id = "Ntxjq4WymDVnqQBQFUshJ"
+uri = "file://attached_assets/gcr-social-post-v2.png"
+type = "image"
+title = "Version 2: Multi-Device Mockup"
+
+[[outputs]]
+id = "8u2gi4no4kRie000ph8h-"
+uri = "file://attached_assets/gcr-social-post-dark.png"
+type = "image"
+title = "Version 3: Dark Futuristic Theme"
