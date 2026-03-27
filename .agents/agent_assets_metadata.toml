@@ -78,3 +78,33 @@ id = "8u2gi4no4kRie000ph8h-"
 uri = "file://attached_assets/gcr-social-post-dark.png"
 type = "image"
 title = "Version 3: Dark Futuristic Theme"
+
+[[outputs]]
+id = "6Ad8aQ2iB5Zgp5HZMkNwU"
+uri = "file://attached_assets/gcr-social-scam-guard.png"
+type = "image"
+title = "1. GCR Scam Guard - Browser Extension"
+
+[[outputs]]
+id = "KaTxRo2ZLSddI3crCVeAj"
+uri = "file://attached_assets/gcr-social-data-shield.png"
+type = "image"
+title = "2. GCR Data Shield - Privacy Protection"
+
+[[outputs]]
+id = "XZyqeHDUmQVr04KTgeZIr"
+uri = "file://attached_assets/gcr-social-education.png"
+type = "image"
+title = "3. Family Cybersecurity Education"
+
+[[outputs]]
+id = "rVUTUx5wgxA9YLn8XSC-v"
+uri = "file://attached_assets/gcr-social-news-alerts.png"
+type = "image"
+title = "4. Cyber News & Threat Alerts"
+
+[[outputs]]
+id = "8A-cU7GDjxYrLtQVxJ_fc"
+uri = "file://attached_assets/gcr-social-training.png"
+type = "image"
+title = "5. Training Academy & Courses"
