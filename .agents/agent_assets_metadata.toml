@@ -204,3 +204,21 @@ id = "ZacJ8EdUKtpPfiwilhsQT"
 uri = "file://attached_assets/scam-explainer-final-3.png"
 type = "image"
 title = "Option 3: Bold & Empowering + Logo + CTA"
+
+[[outputs]]
+id = "hXXYWtwbjYgTPPpngwt4p"
+uri = "file://attached_assets/scam-final-black-woman.png"
+type = "image"
+title = "Option A: Young Black Woman - Clean & Airy"
+
+[[outputs]]
+id = "kh1-JYLGwvLxb5CVt6T3x"
+uri = "file://attached_assets/scam-final-latino-family.png"
+type = "image"
+title = "Option B: Latino Father & Daughter - Warm Family"
+
+[[outputs]]
+id = "vT6ekHvBTGLgoTunQ8ghK"
+uri = "file://attached_assets/scam-final-asian-man.png"
+type = "image"
+title = "Option C: South Asian Man - Bold & Empowering"
