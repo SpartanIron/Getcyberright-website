@@ -10,6 +10,7 @@ import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Shield,
   AlertTriangle,
@@ -28,6 +29,11 @@ import {
   RefreshCw,
   Bell,
   Eye,
+  Trash2,
+  Zap,
+  FileText,
+  Lock,
+  ShieldCheck,
 } from "lucide-react";
 
 type BrokerResult = {
@@ -37,6 +43,11 @@ type BrokerResult = {
   found: boolean | null;
   dataFound: string[] | null;
   redacted?: boolean;
+  optOutUrl?: string | null;
+  optOutEmail?: string | null;
+  optOutMethod?: string | null;
+  optOutInstructions?: string | null;
+  difficultyRating?: number | null;
 };
 
 type BreachResult = {
@@ -67,7 +78,15 @@ type ExposureReport = {
   brokerFoundCount?: number;
 };
 
+type UserTier = "free" | "essential" | "professional";
 type AccessLevel = "free" | "full";
+
+type RemovalStatus = {
+  requestId: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
 const SCORE_CONFIG = {
   low: {
@@ -100,6 +119,31 @@ const SCORE_CONFIG = {
   },
 };
 
+function getDifficultyLabel(rating: number | null | undefined): { label: string; color: string } {
+  if (!rating || rating <= 3) return { label: "Easy", color: "text-green-600 dark:text-green-400" };
+  if (rating <= 6) return { label: "Medium", color: "text-yellow-600 dark:text-yellow-400" };
+  return { label: "Hard", color: "text-orange-600 dark:text-orange-400" };
+}
+
+function getRemovalStatusDisplay(status: string): { label: string; color: string; bgColor: string } {
+  switch (status) {
+    case "request_sent":
+      return { label: "Request Sent", color: "text-blue-700 dark:text-blue-300", bgColor: "bg-blue-100 dark:bg-blue-950/40" };
+    case "acknowledged":
+      return { label: "Acknowledged", color: "text-blue-700 dark:text-blue-300", bgColor: "bg-blue-100 dark:bg-blue-950/40" };
+    case "in_progress":
+      return { label: "In Progress", color: "text-yellow-700 dark:text-yellow-300", bgColor: "bg-yellow-100 dark:bg-yellow-950/40" };
+    case "confirmed_removed":
+      return { label: "Removed", color: "text-green-700 dark:text-green-300", bgColor: "bg-green-100 dark:bg-green-950/40" };
+    case "failed":
+      return { label: "Failed", color: "text-red-700 dark:text-red-300", bgColor: "bg-red-100 dark:bg-red-950/40" };
+    case "re_appeared":
+      return { label: "Re-appeared", color: "text-orange-700 dark:text-orange-300", bgColor: "bg-orange-100 dark:bg-orange-950/40" };
+    default:
+      return { label: "Pending", color: "text-gray-700 dark:text-gray-300", bgColor: "bg-gray-100 dark:bg-gray-800" };
+  }
+}
+
 function ShieldResultsPage() {
   const params = useParams<{ scanId: string }>();
   const scanId = params.scanId;
@@ -111,10 +155,15 @@ function ShieldResultsPage() {
   const [summary, setSummary] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [alertEmail, setAlertEmail] = useState("");
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [accessLevel, setAccessLevel] = useState<AccessLevel>("free");
+  const [userTier, setUserTier] = useState<UserTier>("free");
+  const [showNotFound, setShowNotFound] = useState(false);
+  const [guidedBroker, setGuidedBroker] = useState<string | null>(null);
+  const [removalStatuses, setRemovalStatuses] = useState<Record<string, RemovalStatus>>({});
+  const [removingBrokers, setRemovingBrokers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!scanId) return;
@@ -128,6 +177,7 @@ function ShieldResultsPage() {
         const data = await res.json();
 
         if (data.accessLevel) setAccessLevel(data.accessLevel);
+        if (data.userTier) setUserTier(data.userTier);
 
         if (data.status === "complete" && data.report) {
           setReport(data.report);
@@ -158,6 +208,20 @@ function ShieldResultsPage() {
     poll();
   }, [scanId]);
 
+  useEffect(() => {
+    if (!isAuthenticated || userTier === "free") return;
+    async function fetchRemovalStatuses() {
+      try {
+        const res = await fetch(`/api/shield/removal-status/${scanId}`, { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          setRemovalStatuses(data.removalStatuses || {});
+        }
+      } catch {}
+    }
+    fetchRemovalStatuses();
+  }, [scanId, isAuthenticated, userTier]);
+
   const leadMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", `/api/scan/${scanId}/lead`, {
@@ -174,11 +238,56 @@ function ShieldResultsPage() {
     },
   });
 
-  function toggleExpand(idx: number) {
+  async function handleRemovalRequest(brokerId: string) {
+    setRemovingBrokers((prev) => new Set(prev).add(brokerId));
+    try {
+      const res = await apiRequest("POST", "/api/shield/removal-request", { brokerId, scanId });
+      const data = await res.json();
+
+      if (data.action === "guided") {
+        setGuidedBroker(brokerId);
+        toggleExpand(`broker-${brokerId}`);
+      } else if (data.action === "needs_vault") {
+        toast({
+          title: "Setup Required",
+          description: data.message,
+        });
+        setLocation(data.setupUrl || "/data-removal");
+      } else if (data.action === "automated") {
+        setRemovalStatuses((prev) => ({
+          ...prev,
+          [brokerId]: {
+            requestId: data.requestId,
+            status: data.status || "not_started",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        }));
+        toast({
+          title: "Removal Request Submitted",
+          description: data.message,
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Request Failed",
+        description: err.message || "Could not submit removal request",
+        variant: "destructive",
+      });
+    } finally {
+      setRemovingBrokers((prev) => {
+        const next = new Set(prev);
+        next.delete(brokerId);
+        return next;
+      });
+    }
+  }
+
+  function toggleExpand(key: string) {
     setExpandedItems((prev) => {
       const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx);
-      else next.add(idx);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   }
@@ -230,46 +339,18 @@ function ShieldResultsPage() {
 
   const brokerResults = report.brokerResults || [];
   const redactedBrokerCount = brokerResults.filter(b => b.redacted).length;
-  const visibleBrokers = brokerResults.filter(b => !b.redacted);
 
-  const allSources = [
-    ...(report.breachResults || []).map((b, i) => ({
-      type: "breach" as const,
-      title: `Data Breach: ${b.breachName}`,
-      description: `Your email was found in the ${b.breachName} data breach${b.breachDate ? ` (${b.breachDate})` : ""}. The types of data exposed include: ${b.dataClasses.join(", ")}.`,
-      status: "found",
-      url: null as string | null,
-      idx: i,
-      redacted: false,
-    })),
-    ...visibleBrokers.map((b, i) => ({
-      type: "broker" as const,
-      title: `Data Broker: ${b.broker}`,
-      description:
-        b.status === "found"
-          ? `Your information was found on ${b.broker}. ${b.dataFound ? `Data types found: ${b.dataFound.join(", ")}.` : ""}`
-          : b.status === "pending_verification"
-          ? `${b.broker} may have your data. This requires manual verification.`
-          : b.status === "rate_limited"
-          ? `We could not check ${b.broker} at this time. Try again later for complete results.`
-          : b.status === "timed_out"
-          ? `The check for ${b.broker} timed out. Try again later.`
-          : b.status === "unavailable"
-          ? `${b.broker} could not be checked at this time.`
-          : `${b.broker} was checked — no matching records were found.`,
-      status: b.status,
-      url: b.url || null,
-      idx: (report.breachResults?.length || 0) + i,
-      redacted: false,
-    })),
-  ];
-
-  const foundSources = allSources.filter(s => s.status === "found");
-  const totalFoundBrokers = report.brokerFoundCount || 0;
-  const uncheckedSources = allSources.filter(s =>
-    s.status === "rate_limited" || s.status === "timed_out" || s.status === "unavailable"
+  const foundBrokers = brokerResults.filter(b => b.status === "found" && !b.redacted);
+  const redactedBrokers = brokerResults.filter(b => b.redacted);
+  const notFoundBrokers = brokerResults.filter(b => b.status === "not_found");
+  const uncheckedBrokers = brokerResults.filter(b =>
+    b.status === "rate_limited" || b.status === "timed_out" || b.status === "unavailable"
   );
-  const hasPartialChecks = report.partialResults || uncheckedSources.length > 0;
+  const pendingBrokers = brokerResults.filter(b => b.status === "pending_verification");
+
+  const breachResults = report.breachResults || [];
+  const totalFoundBrokers = report.brokerFoundCount || foundBrokers.length;
+  const hasPartialChecks = report.partialResults || uncheckedBrokers.length > 0;
 
   return (
     <>
@@ -281,14 +362,26 @@ function ShieldResultsPage() {
       <main className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4 max-w-2xl space-y-6">
 
-          {accessLevel === "full" && (
+          {userTier === "professional" && (
             <div
               className="flex items-center gap-2 p-3 rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30"
-              data-testid="banner-full-access"
+              data-testid="banner-professional"
             >
-              <Crown className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+              <ShieldCheck className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
               <p className="text-sm text-green-800 dark:text-green-200 font-medium">
-                Ongoing protection active — auto re-scans, alerts, and removal tracking included.
+                Continuous protection active — monthly re-scans, auto re-submission, and alerts included.
+              </p>
+            </div>
+          )}
+
+          {userTier === "essential" && (
+            <div
+              className="flex items-center gap-2 p-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30"
+              data-testid="banner-essential"
+            >
+              <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+                Automated removal active — we submit opt-out requests on your behalf.
               </p>
             </div>
           )}
@@ -323,76 +416,207 @@ function ShieldResultsPage() {
             <div
               className="flex items-start gap-3 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/30"
               role="alert"
-              data-testid="banner-partial-results"
+              data-testid="alert-partial-results"
             >
               <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                {uncheckedSources.length > 0
-                  ? `${uncheckedSources.length} site${uncheckedSources.length !== 1 ? "s" : ""} could not be checked due to timeouts or rate limits. Your actual exposure may be higher than shown.`
+                {uncheckedBrokers.length > 0
+                  ? `${uncheckedBrokers.length} site${uncheckedBrokers.length !== 1 ? "s" : ""} could not be checked due to timeouts or rate limits. Your actual exposure may be higher than shown.`
                   : "Some checks could not be completed. Your actual exposure may be higher than shown."
                 }
               </p>
             </div>
           )}
 
-          {allSources.length > 0 && (
+          {(foundBrokers.length > 0 || redactedBrokerCount > 0) && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg" data-testid="text-findings-title">
-                  {hasPaidAccess
-                    ? `Detailed Findings (${foundSources.length} found across ${allSources.length} sources)`
-                    : `Your Scan Results`
-                  }
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center gap-2" data-testid="text-exposures-title">
+                    <AlertTriangle className="h-5 w-5 text-red-500" />
+                    Data Exposures Found
+                    <Badge variant="destructive" className="ml-1" data-testid="badge-exposure-count">
+                      {totalFoundBrokers} site{totalFoundBrokers !== 1 ? "s" : ""}
+                    </Badge>
+                  </CardTitle>
+                  {userTier !== "free" && foundBrokers.length > 1 && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        foundBrokers.forEach(b => {
+                          if (b.broker && !removalStatuses[b.broker]) {
+                            handleRemovalRequest(b.broker);
+                          }
+                        });
+                      }}
+                      data-testid="button-remove-all"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                      Remove All
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
-              <CardContent className="space-y-2">
-                {allSources.map((source) => {
-                  const isExpanded = expandedItems.has(source.idx);
-                  const statusIcon =
-                    source.status === "found" ? (
-                      <AlertTriangle className="h-4 w-4 text-red-500" aria-label="Found" />
-                    ) : source.status === "pending_verification" ? (
-                      <AlertCircle className="h-4 w-4 text-yellow-500" aria-label="Pending verification" />
-                    ) : source.status === "rate_limited" || source.status === "timed_out" || source.status === "unavailable" ? (
-                      <Clock className="h-4 w-4 text-orange-500" aria-label="Could not be checked" />
-                    ) : (
-                      <CheckCircle2 className="h-4 w-4 text-green-500" aria-label="Not found" />
-                    );
+              <CardContent className="space-y-3">
+                {foundBrokers.map((broker) => {
+                  if (!broker.broker) return null;
+                  const brokerId = broker.broker;
+                  const isExpanded = expandedItems.has(`broker-${brokerId}`);
+                  const difficulty = getDifficultyLabel(broker.difficultyRating);
+                  const existingRemoval = removalStatuses[brokerId];
+                  const isRemoving = removingBrokers.has(brokerId);
+                  const isGuided = guidedBroker === brokerId;
 
                   return (
-                    <div key={source.idx} className="border rounded-lg">
-                      <button
-                        onClick={() => toggleExpand(source.idx)}
-                        className="w-full flex items-center justify-between p-4 text-left min-h-[48px] hover:bg-muted/50 transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                        aria-expanded={isExpanded}
-                        data-testid={`button-expand-${source.idx}`}
-                      >
-                        <div className="flex items-center gap-3">
-                          {statusIcon}
-                          <span className="font-medium text-sm">{source.title}</span>
-                        </div>
-                        {isExpanded ? (
-                          <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </button>
-                      {isExpanded && (
-                        <div className="px-4 pb-4 pt-0 space-y-3">
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {source.description}
-                          </p>
-                          {source.url && (
-                            <a
-                              href={source.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline min-h-[44px]"
+                    <div key={brokerId} className="border rounded-lg border-red-200 dark:border-red-900/50" data-testid={`card-broker-${brokerId}`}>
+                      <div className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
+                            <div className="min-w-0">
+                              <span className="font-medium text-sm block">{brokerId}</span>
+                              {broker.dataFound && broker.dataFound.length > 0 && (
+                                <span className="text-xs text-muted-foreground">
+                                  Found: {broker.dataFound.join(", ")}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {existingRemoval ? (
+                              <Badge
+                                variant="outline"
+                                className={`${getRemovalStatusDisplay(existingRemoval.status).bgColor} ${getRemovalStatusDisplay(existingRemoval.status).color} border-0 text-xs`}
+                                data-testid={`badge-removal-status-${brokerId}`}
+                              >
+                                {getRemovalStatusDisplay(existingRemoval.status).label}
+                              </Badge>
+                            ) : (
+                              <>
+                                {userTier === "free" ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      toggleExpand(`broker-${brokerId}`);
+                                      setGuidedBroker(brokerId);
+                                    }}
+                                    className="text-xs h-8"
+                                    data-testid={`button-guide-${brokerId}`}
+                                  >
+                                    <FileText className="h-3 w-3 mr-1" />
+                                    Remove Yourself
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleRemovalRequest(brokerId)}
+                                    disabled={isRemoving}
+                                    className="text-xs h-8"
+                                    data-testid={`button-auto-remove-${brokerId}`}
+                                  >
+                                    {isRemoving ? (
+                                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                    ) : (
+                                      <Zap className="h-3 w-3 mr-1" />
+                                    )}
+                                    Auto-Remove
+                                  </Button>
+                                )}
+                              </>
+                            )}
+                            <button
+                              onClick={() => toggleExpand(`broker-${brokerId}`)}
+                              className="p-1.5 hover:bg-muted rounded-md transition-colors"
+                              aria-expanded={isExpanded}
+                              data-testid={`button-expand-broker-${brokerId}`}
                             >
-                              <ExternalLink className="h-3.5 w-3.5" />
-                              View on {source.title.split(": ")[1]}
-                            </a>
-                          )}
+                              {isExpanded ? (
+                                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-0 border-t border-red-100 dark:border-red-900/30 space-y-3">
+                          <div className="pt-3 space-y-3">
+                            {broker.dataFound && broker.dataFound.length > 0 && (
+                              <p className="text-sm text-muted-foreground">
+                                Your information found on {brokerId}: {broker.dataFound.join(", ")}.
+                              </p>
+                            )}
+
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              {broker.optOutMethod && (
+                                <span className="flex items-center gap-1">
+                                  <FileText className="h-3 w-3" />
+                                  Removal via: {broker.optOutMethod === "web-form" ? "Web Form" : broker.optOutMethod === "email" ? "Email" : broker.optOutMethod}
+                                </span>
+                              )}
+                              {broker.difficultyRating && (
+                                <span className={`flex items-center gap-1 ${difficulty.color}`}>
+                                  Difficulty: {difficulty.label}
+                                </span>
+                              )}
+                            </div>
+
+                            {(isGuided || userTier === "free") && broker.optOutInstructions && (
+                              <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                                <p className="text-sm font-medium flex items-center gap-1.5">
+                                  <FileText className="h-3.5 w-3.5 text-primary" />
+                                  Step-by-Step Removal Guide
+                                </p>
+                                <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
+                                  {broker.optOutInstructions}
+                                </p>
+                              </div>
+                            )}
+
+                            <div className="flex items-center gap-3 flex-wrap">
+                              {broker.optOutUrl && (
+                                <a
+                                  href={broker.optOutUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline min-h-[36px] font-medium"
+                                  data-testid={`link-optout-${brokerId}`}
+                                >
+                                  <ExternalLink className="h-3.5 w-3.5" />
+                                  Go to Opt-Out Page
+                                </a>
+                              )}
+                              {broker.url && hasPaidAccess && (
+                                <a
+                                  href={broker.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:underline min-h-[36px]"
+                                  data-testid={`link-profile-${brokerId}`}
+                                >
+                                  <Eye className="h-3.5 w-3.5" />
+                                  View Your Listing
+                                </a>
+                              )}
+                            </div>
+
+                            {userTier === "free" && (
+                              <div className="bg-primary/5 border border-primary/10 rounded-lg p-3 mt-2">
+                                <p className="text-xs text-muted-foreground">
+                                  <Lock className="h-3 w-3 inline mr-1" />
+                                  Want us to handle this automatically?{" "}
+                                  <Link href="/pricing" className="text-primary hover:underline font-medium">
+                                    Upgrade to Essential
+                                  </Link>
+                                  {" "}and we'll submit removal requests on your behalf.
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -408,7 +632,7 @@ function ShieldResultsPage() {
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                      Upgrade to see all broker names, get step-by-step removal instructions, and automatic re-scans.
+                      Upgrade to see all broker names, get automated removal, and ongoing monitoring.
                     </p>
                     <Link href="/pricing">
                       <Button size="sm" className="min-h-[40px]" data-testid="button-see-all-brokers">
@@ -420,6 +644,104 @@ function ShieldResultsPage() {
                 )}
               </CardContent>
             </Card>
+          )}
+
+          {breachResults.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2" data-testid="text-breaches-title">
+                  <ShieldAlert className="h-5 w-5 text-orange-500" />
+                  Data Breaches
+                  <Badge variant="outline" className="ml-1 border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300">
+                    {breachResults.length} breach{breachResults.length !== 1 ? "es" : ""}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {breachResults.map((breach, i) => {
+                  const key = `breach-${i}`;
+                  const isExpanded = expandedItems.has(key);
+                  return (
+                    <div key={key} className="border rounded-lg">
+                      <button
+                        onClick={() => toggleExpand(key)}
+                        className="w-full flex items-center justify-between p-4 text-left min-h-[48px] hover:bg-muted/50 transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        aria-expanded={isExpanded}
+                        data-testid={`button-expand-breach-${i}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <AlertTriangle className="h-4 w-4 text-orange-500" />
+                          <span className="font-medium text-sm">{breach.breachName}</span>
+                          {breach.breachDate && (
+                            <span className="text-xs text-muted-foreground">({breach.breachDate})</span>
+                          )}
+                        </div>
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </button>
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-0 space-y-2">
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            Your email was found in the {breach.breachName} data breach
+                            {breach.breachDate ? ` (${breach.breachDate})` : ""}.
+                            Data exposed: {breach.dataClasses.join(", ")}.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          )}
+
+          {(notFoundBrokers.length > 0 || uncheckedBrokers.length > 0 || pendingBrokers.length > 0) && (
+            <div>
+              <button
+                onClick={() => setShowNotFound(!showNotFound)}
+                className="w-full flex items-center justify-between p-3 text-left text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg"
+                data-testid="button-toggle-not-found"
+              >
+                <span className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  {notFoundBrokers.length} site{notFoundBrokers.length !== 1 ? "s" : ""} checked — no data found
+                  {uncheckedBrokers.length > 0 && ` · ${uncheckedBrokers.length} could not be checked`}
+                </span>
+                {showNotFound ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </button>
+
+              {showNotFound && (
+                <Card className="mt-2">
+                  <CardContent className="py-4 space-y-1.5">
+                    {notFoundBrokers.map((b, i) => (
+                      <div key={`nf-${i}`} className="flex items-center gap-2 py-1.5 px-2 text-sm text-muted-foreground">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                        <span>{b.broker || "Unknown"}</span>
+                      </div>
+                    ))}
+                    {pendingBrokers.map((b, i) => (
+                      <div key={`pv-${i}`} className="flex items-center gap-2 py-1.5 px-2 text-sm text-muted-foreground">
+                        <AlertCircle className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />
+                        <span>{b.broker || "Unknown"} — pending verification</span>
+                      </div>
+                    ))}
+                    {uncheckedBrokers.map((b, i) => (
+                      <div key={`uc-${i}`} className="flex items-center gap-2 py-1.5 px-2 text-sm text-muted-foreground">
+                        <Clock className="h-3.5 w-3.5 text-orange-500 flex-shrink-0" />
+                        <span>{b.broker || "Unknown"} — could not be checked</span>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
 
           {((report.breachResults && report.breachResults.length > 0) || (report.breachCount && report.breachCount > 0)) && (
@@ -439,39 +761,35 @@ function ShieldResultsPage() {
             </div>
           )}
 
-          {!hasPaidAccess && foundSources.length > 0 && (
+          {userTier === "free" && (foundBrokers.length > 0 || redactedBrokerCount > 0) && (
             <Card className="border-2 border-primary/20">
               <CardContent className="py-8">
                 <div className="text-center space-y-4 max-w-md mx-auto">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
-                    <RefreshCw className="h-6 w-6 text-primary" />
+                    <Zap className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold mb-1" data-testid="text-cta-heading">
-                      Keep your data protected
+                      Let us handle the removal
                     </h2>
                     <p className="text-muted-foreground text-sm">
-                      Data brokers re-add your information every 30-90 days. With ongoing monitoring, we automatically re-scan and alert you when your data reappears.
+                      Removing your data from {totalFoundBrokers} site{totalFoundBrokers !== 1 ? "s" : ""} manually takes time. Upgrade and we'll submit opt-out requests on your behalf.
                     </p>
                   </div>
-                  <div className="text-left space-y-2 text-sm">
-                    {redactedBrokerCount > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Eye className="h-4 w-4 text-primary flex-shrink-0" />
-                        <span>See all {totalFoundBrokers} sites with your data</span>
+                  <div className="text-left space-y-3 text-sm">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <Zap className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-medium">Essential</span>
+                        <p className="text-muted-foreground text-xs mt-0.5">Automated opt-out requests + status tracking + verification re-scan</p>
                       </div>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Step-by-step removal instructions</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <RefreshCw className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Automatic re-scans every 30 days</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Bell className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Instant alerts when your data reappears</span>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                      <Crown className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-medium">Professional</span>
+                        <p className="text-muted-foreground text-xs mt-0.5">Everything in Essential + monthly re-scans + auto re-submission when data reappears + email alerts</p>
+                      </div>
                     </div>
                   </div>
                   <Link href="/pricing">
@@ -485,7 +803,33 @@ function ShieldResultsPage() {
             </Card>
           )}
 
-          {!hasPaidAccess && foundSources.length === 0 && (
+          {userTier === "essential" && foundBrokers.length > 0 && (
+            <Card className="border border-blue-200 dark:border-blue-800">
+              <CardContent className="py-6">
+                <div className="text-center space-y-3 max-w-md mx-auto">
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center mx-auto">
+                    <RefreshCw className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-semibold mb-1" data-testid="text-upgrade-pro-heading">
+                      Want continuous protection?
+                    </h2>
+                    <p className="text-muted-foreground text-sm">
+                      Data brokers re-add your information every 30-90 days. Upgrade to Professional for monthly re-scans and automatic re-submission.
+                    </p>
+                  </div>
+                  <Link href="/pricing">
+                    <Button variant="outline" size="sm" className="min-h-[40px]" data-testid="button-upgrade-pro">
+                      <Crown className="h-4 w-4 mr-2" />
+                      Upgrade to Professional
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {userTier === "free" && foundBrokers.length === 0 && redactedBrokerCount === 0 && (
             <Card>
               <CardContent className="py-8">
                 <div className="text-center space-y-4 max-w-md mx-auto">

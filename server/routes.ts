@@ -4612,14 +4612,20 @@ EDGE CASE HANDLING
     }),
   });
 
-  function getShieldAccessLevel(user: any): { level: "free" | "full" } {
-    if (!user) return { level: "free" };
+  function getShieldAccessLevel(user: any): { level: "free" | "full"; tier: "free" | "essential" | "professional" } {
+    if (!user) return { level: "free", tier: "free" };
 
-    if (hasTierAccess(user.subscriptionTier || "free", SUBSCRIPTION_TIERS.ESSENTIAL)) {
-      return { level: "full" };
+    const userTier = user.subscriptionTier || "free";
+
+    if (hasTierAccess(userTier, SUBSCRIPTION_TIERS.PROFESSIONAL)) {
+      return { level: "full", tier: "professional" };
     }
 
-    return { level: "free" };
+    if (hasTierAccess(userTier, SUBSCRIPTION_TIERS.ESSENTIAL)) {
+      return { level: "full", tier: "essential" };
+    }
+
+    return { level: "free", tier: "free" };
   }
 
   function prepareReportForFree(report: any) {
@@ -4633,6 +4639,10 @@ EDGE CASE HANDLING
       found: b.found,
       dataFound: b.dataFound,
       url: undefined,
+      optOutUrl: b.optOutUrl || null,
+      optOutMethod: b.optOutMethod || null,
+      optOutInstructions: b.optOutInstructions || null,
+      difficultyRating: b.difficultyRating || null,
     }));
 
     const redactedBrokers = foundBrokers.slice(previewCount).map((_b: any, i: number) => ({
@@ -4734,9 +4744,10 @@ EDGE CASE HANDLING
             ...memStatus,
             report: prepareReportForFree(memStatus.report),
             accessLevel: access.level,
+            userTier: access.tier,
           });
         }
-        return res.json({ ...memStatus, accessLevel: access.level });
+        return res.json({ ...memStatus, accessLevel: access.level, userTier: access.tier });
       }
 
       const dbScan = await getShieldScanFromDb(scanId);
@@ -4750,6 +4761,7 @@ EDGE CASE HANDLING
             report: prepareReportForFree(report),
             summary: undefined,
             accessLevel: access.level,
+            userTier: access.tier,
           });
         }
         return res.json({
@@ -4757,10 +4769,11 @@ EDGE CASE HANDLING
           report,
           summary: undefined,
           accessLevel: access.level,
+          userTier: access.tier,
         });
       }
 
-      return res.json({ status: dbScan.status, accessLevel: access.level });
+      return res.json({ status: dbScan.status, accessLevel: access.level, userTier: access.tier });
     } catch (error: any) {
       console.error("[shield] Status check error");
       res.status(500).json({ error: "Could not check scan status" });
@@ -4786,6 +4799,147 @@ EDGE CASE HANDLING
     } catch (error) {
       console.error("[shield] Delete scan error");
       res.status(500).json({ error: "Could not delete scan data" });
+    }
+  });
+
+  app.post("/api/shield/removal-request", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const access = getShieldAccessLevel(user);
+      const { brokerId, scanId } = req.body;
+
+      if (!brokerId || !scanId) {
+        return res.status(400).json({ error: "brokerId and scanId are required" });
+      }
+
+      const { getShieldScanFromDb } = await import("./shieldScanService");
+      const scan = await getShieldScanFromDb(scanId);
+      if (!scan) {
+        return res.status(404).json({ error: "Scan not found" });
+      }
+      if (scan.userId && scan.userId !== user.id) {
+        return res.status(403).json({ error: "You do not have access to this scan" });
+      }
+
+      const scanReport = scan.rawResults as any;
+      const brokerResults = scanReport?.brokerResults || [];
+      const brokerInScan = brokerResults.find(
+        (b: any) => b.broker === brokerId && b.status === "found"
+      );
+      if (!brokerInScan) {
+        return res.status(400).json({ error: "This broker was not found in your scan results" });
+      }
+
+      const [broker] = await db.select().from(dataBrokers).where(eq(dataBrokers.id, brokerId));
+      if (!broker) {
+        return res.status(404).json({ error: "Broker not found" });
+      }
+
+      if (access.tier === "free") {
+        return res.json({
+          tier: "free",
+          action: "guided",
+          broker: {
+            id: broker.id,
+            name: broker.name,
+            optOutUrl: broker.optOutUrl,
+            optOutEmail: broker.optOutEmail,
+            optOutMethod: broker.optOutMethod,
+            optOutInstructions: broker.optOutInstructions,
+            difficultyRating: broker.difficultyRating,
+          },
+          message: "Follow the opt-out instructions to remove your data yourself.",
+        });
+      }
+
+      const existingRequests = await getUserRemovalRequests(user.id);
+      const existingForBroker = existingRequests.find(
+        (r: any) => r.brokerId === brokerId && !["confirmed_removed", "failed"].includes(r.status)
+      );
+      if (existingForBroker) {
+        return res.json({
+          tier: access.tier,
+          action: "already_requested",
+          requestId: existingForBroker.id,
+          status: existingForBroker.status,
+          message: "A removal request is already in progress for this broker.",
+        });
+      }
+
+      let vaultProfile = null;
+      try {
+        const { getUserVaultProfile } = await import("./dataBrokerService");
+        vaultProfile = await getUserVaultProfile(user.id);
+      } catch (err) {}
+
+      if (!vaultProfile) {
+        return res.json({
+          tier: access.tier,
+          action: "needs_vault",
+          message: "Please set up your Data Vault profile first so we can submit removal requests on your behalf.",
+          setupUrl: "/data-removal",
+        });
+      }
+
+      const ipAddress = req.ip || req.connection?.remoteAddress;
+      const request = await createRemovalRequest(user.id, brokerId, vaultProfile.id, null, ipAddress);
+
+      if (access.tier === "essential" || access.tier === "professional") {
+        try {
+          await sendAutoRemovalRequest(request.id);
+        } catch (err: any) {
+          console.error("[shield] Auto-removal send failed:", err?.message);
+        }
+      }
+
+      res.json({
+        tier: access.tier,
+        action: "automated",
+        requestId: request.id,
+        status: request.status,
+        message: "Removal request submitted. We'll handle the rest.",
+      });
+    } catch (error: any) {
+      console.error("[shield] Removal request error:", error?.message);
+      res.status(500).json({ error: error.message || "Failed to process removal request" });
+    }
+  });
+
+  app.get("/api/shield/removal-status/:scanId", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const user = req.user;
+      const { scanId } = req.params;
+
+      const { getShieldScanFromDb } = await import("./shieldScanService");
+      const scan = await getShieldScanFromDb(scanId);
+      if (!scan) {
+        return res.status(404).json({ error: "Scan not found" });
+      }
+      if (scan.userId && scan.userId !== user.id) {
+        return res.status(403).json({ error: "You do not have access to this scan" });
+      }
+
+      const scanReport = scan.rawResults as any;
+      const scanBrokerIds = (scanReport?.brokerResults || [])
+        .filter((b: any) => b.status === "found")
+        .map((b: any) => b.broker);
+
+      const requests = await getUserRemovalRequests(user.id);
+      const statusMap: Record<string, { requestId: string; status: string; createdAt: any; updatedAt: any }> = {};
+      for (const r of requests) {
+        if (scanBrokerIds.includes(r.brokerId)) {
+          statusMap[r.brokerId] = {
+            requestId: r.id,
+            status: r.status,
+            createdAt: r.createdAt,
+            updatedAt: r.updatedAt,
+          };
+        }
+      }
+      res.json({ removalStatuses: statusMap });
+    } catch (error: any) {
+      console.error("[shield] Removal status error:", error?.message);
+      res.status(500).json({ error: "Failed to fetch removal status" });
     }
   });
 

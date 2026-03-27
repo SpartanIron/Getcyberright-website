@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { shieldScans, shieldLeads } from "@shared/schema";
-import { eq, and, lte, isNull, sql } from "drizzle-orm";
+import { shieldScans, shieldLeads, dataBrokers } from "@shared/schema";
+import { eq, and, lte, isNull, sql, inArray } from "drizzle-orm";
 import { searchAllBrokersForProfile, type ProfileSearchResult } from "./brokerAdapters";
 
 export type BrokerResult = {
@@ -9,6 +9,11 @@ export type BrokerResult = {
   url: string;
   found: boolean | null;
   dataFound: string[] | null;
+  optOutUrl?: string | null;
+  optOutEmail?: string | null;
+  optOutMethod?: string | null;
+  optOutInstructions?: string | null;
+  difficultyRating?: number | null;
 };
 
 export type BreachResult = {
@@ -294,6 +299,40 @@ async function runRealBrokerSearch(input: ScanInput): Promise<BrokerResult[]> {
 
     const brokerResults: BrokerResult[] = [];
 
+    const brokerIds = Array.from(stats.brokerStatuses.keys());
+    const brokerOptOutData = new Map<string, {
+      optOutUrl: string | null;
+      optOutEmail: string | null;
+      optOutMethod: string | null;
+      optOutInstructions: string | null;
+      difficultyRating: number | null;
+    }>();
+
+    if (brokerIds.length > 0) {
+      try {
+        const dbBrokers = await db.select({
+          id: dataBrokers.id,
+          optOutUrl: dataBrokers.optOutUrl,
+          optOutEmail: dataBrokers.optOutEmail,
+          optOutMethod: dataBrokers.optOutMethod,
+          optOutInstructions: dataBrokers.optOutInstructions,
+          difficultyRating: dataBrokers.difficultyRating,
+        }).from(dataBrokers).where(inArray(dataBrokers.id, brokerIds));
+
+        for (const b of dbBrokers) {
+          brokerOptOutData.set(b.id, {
+            optOutUrl: b.optOutUrl,
+            optOutEmail: b.optOutEmail,
+            optOutMethod: b.optOutMethod,
+            optOutInstructions: b.optOutInstructions,
+            difficultyRating: b.difficultyRating,
+          });
+        }
+      } catch (err: any) {
+        console.error("[shield-scan] Failed to fetch broker opt-out data:", err?.message);
+      }
+    }
+
     for (const [brokerId, brokerStatus] of stats.brokerStatuses.entries()) {
       const result = results.get(brokerId);
 
@@ -315,12 +354,19 @@ async function runRealBrokerSearch(input: ScanInput): Promise<BrokerResult[]> {
       if (result?.extractedAge) dataFound.push("Age");
       if (result?.extractedRelatives?.length && result.extractedRelatives.length > 0) dataFound.push("Known Associates");
 
+      const optOut = brokerOptOutData.get(brokerId);
+
       brokerResults.push({
         broker: brokerId,
         status,
         url: result?.profileUrl || "",
         found: result ? (result.found && result.nameMatch && result.matchScore >= 40) : false,
         dataFound: dataFound.length > 0 ? dataFound : null,
+        optOutUrl: optOut?.optOutUrl || null,
+        optOutEmail: optOut?.optOutEmail || null,
+        optOutMethod: optOut?.optOutMethod || null,
+        optOutInstructions: optOut?.optOutInstructions || null,
+        difficultyRating: optOut?.difficultyRating || null,
       });
     }
 
