@@ -9,6 +9,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
+import { renderMarkdown } from "@/lib/markdown";
 
 interface NewsArticleData {
   id: string;
@@ -207,13 +208,10 @@ export default function NewsArticlePage() {
               <Card className="mb-8">
                 <CardContent className="p-6 md:p-8">
                   <div
-                    className="prose dark:prose-invert max-w-none text-base leading-relaxed space-y-4"
+                    className="prose dark:prose-invert max-w-none text-base leading-relaxed"
                     data-testid="text-article-content"
-                  >
-                    {article.content.split("\n\n").map((paragraph, i) => (
-                      <p key={i}>{paragraph}</p>
-                    ))}
-                  </div>
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
+                  />
                 </CardContent>
               </Card>
             </motion.div>

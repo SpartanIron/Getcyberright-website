@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { BookOpen, Clock, Calendar, ArrowLeft, User, HelpCircle, Loader2, ArrowRight } from "lucide-react";
-import { sanitizeHtml } from "@/lib/sanitize";
+import { renderMarkdown } from "@/lib/markdown";
 
 interface GuideDetail {
   id: string;
@@ -224,7 +224,7 @@ export default function GuideDetailPage() {
 
             <article 
               className="prose prose-slate dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-teal-600 dark:prose-a:text-teal-400"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(guide.content || "") }}
+              dangerouslySetInnerHTML={{ __html: renderMarkdown(guide.content || "") }}
               data-testid="article-content"
             />
 

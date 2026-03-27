@@ -88,6 +88,7 @@
     "jsonwebtoken": "^9.0.3",
     "jsqr": "^1.4.0",
     "lucide-react": "^0.563.0",
+    "marked": "^17.0.5",
     "memoizee": "^0.4.17",
     "multer": "^2.0.2",
     "nanoid": "^5.1.6",

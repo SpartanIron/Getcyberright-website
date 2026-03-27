@@ -3,7 +3,7 @@ import DOMPurify from "dompurify";
 const ALLOWED_TAGS = [
   "b", "i", "em", "strong", "a", "p", "br", "ul", "ol", "li",
   "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "code", "pre",
-  "span", "div"
+  "span", "div", "table", "thead", "tbody", "tr", "th", "td", "hr", "del"
 ];
 
 const ALLOWED_ATTR = ["href", "title", "class", "id", "target", "rel"];

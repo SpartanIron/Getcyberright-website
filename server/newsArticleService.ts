@@ -277,6 +277,12 @@ For EACH item, output a JSON object with:
   3. What you should do RIGHT NOW (1-2 paragraphs — give numbered, specific steps like "1. Change your password on [site] 2. Enable two-factor authentication 3. Watch for suspicious emails")
   4. How to stay protected long-term (1 paragraph — connect to broader safety habits)
 
+WRITING RULES:
+- Do NOT use em dashes (—) anywhere. Use commas, periods, or semicolons instead.
+- Use short, clear sentences. Break up long paragraphs.
+- Use proper paragraph breaks between sections.
+- Use numbered lists for action steps.
+
 IMPORTANT: You MUST output exactly ${items.length} objects, one for each input item. Do not skip any.
 Output a JSON array of these objects. Output ONLY the JSON array, no markdown.`
       }]
