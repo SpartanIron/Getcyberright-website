@@ -178,7 +178,29 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  
+
+  app.get('/api/social-images/:filename', (req: Request, res: Response) => {
+    const filename = req.params.filename.replace(/[^a-zA-Z0-9._-]/g, '');
+    const searchDirs = [
+      path.join(process.cwd(), 'dist', 'social-images'),
+      path.join(process.cwd(), '.local', 'social-images'),
+    ];
+    for (const dir of searchDirs) {
+      const imgPath = path.join(dir, filename);
+      if (fs.existsSync(imgPath)) {
+        const ext = path.extname(filename).toLowerCase();
+        const mimeTypes: Record<string, string> = {
+          '.png': 'image/png', '.webp': 'image/webp',
+          '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+        };
+        res.setHeader('Content-Type', mimeTypes[ext] || 'image/png');
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
+        return res.sendFile(path.resolve(imgPath), { dotfiles: 'allow' });
+      }
+    }
+    res.status(404).json({ error: 'Image not found' });
+  });
+
   app.get('/api/platform-stats', async (_req: Request, res: Response) => {
     try {
       const guides = await storage.getAllGuides();
@@ -5154,6 +5176,35 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("[news] Manual social generation failed:", error.message);
       res.status(500).json({ error: "Social generation failed" });
+    }
+  });
+
+  app.post("/api/news/generate-social-images", isAuthenticated, isAdmin, async (_req: Request, res: Response) => {
+    try {
+      const { generateSocialImage } = await import("./socialImageGenerator");
+      const articles = await storage.getNewsArticles(undefined, 100);
+      let generated = 0;
+      let updated = 0;
+      for (const article of articles) {
+        const imagePath = await generateSocialImage(
+          article.id, article.title, article.category,
+          article.urgencyLevel || 1, article.source
+        );
+        if (imagePath) {
+          generated++;
+          const posts = await storage.getSocialPostsByContentId("news_article", article.id);
+          for (const post of posts) {
+            if (!post.imageUrl || !fs.existsSync(post.imageUrl)) {
+              await storage.updateSocialPost(post.id, { imageUrl: imagePath });
+              updated++;
+            }
+          }
+        }
+      }
+      res.json({ message: `Generated ${generated} images, updated ${updated} social posts`, generated, updated });
+    } catch (error: any) {
+      console.error("[news] Image generation failed:", error.message);
+      res.status(500).json({ error: "Image generation failed" });
     }
   });
 

@@ -3,6 +3,7 @@ import { storage } from "./storage";
 import type { NewsArticle, InsertSocialPost } from "@shared/schema";
 import * as fs from "fs";
 import * as path from "path";
+import { generateSocialImage } from "./socialImageGenerator";
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -314,10 +315,23 @@ export async function generateSocialPostsForArticle(
     const posts = await generateNewsPostContent(article, format, audience);
     if (!posts) return result;
 
-    const rawImageUrl = article.thumbnailUrl || article.imageUrl || null;
-    const imageUrl = rawImageUrl && isImageUrlTrusted(rawImageUrl) ? rawImageUrl : null;
-    if (rawImageUrl && !imageUrl) {
-      console.log(`[NewsSocial] Skipping untrusted image domain for "${article.title}": ${rawImageUrl}`);
+    let imageUrl: string | null = null;
+    const generatedImage = await generateSocialImage(
+      article.id,
+      article.title,
+      article.category,
+      article.urgencyLevel || 1,
+      article.source
+    );
+    if (generatedImage) {
+      imageUrl = generatedImage;
+      console.log(`[NewsSocial] Using branded image for "${article.title}": ${generatedImage}`);
+    } else {
+      const rawImageUrl = article.thumbnailUrl || article.imageUrl || null;
+      imageUrl = rawImageUrl && isImageUrlTrusted(rawImageUrl) ? rawImageUrl : null;
+      if (rawImageUrl && !imageUrl) {
+        console.log(`[NewsSocial] Skipping untrusted image domain for "${article.title}": ${rawImageUrl}`);
+      }
     }
 
     const platformPosts: { platform: string; content: string }[] = [

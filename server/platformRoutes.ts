@@ -553,26 +553,6 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/social-images/:filename", async (req: Request, res: Response) => {
-    try {
-      const filename = req.params.filename;
-      if (filename.includes("..") || filename.includes("/")) {
-        return res.status(400).send("Invalid filename");
-      }
-      const filepath = path.join(process.cwd(), ".local", "social-images", filename);
-      if (!fs.existsSync(filepath)) {
-        return res.status(404).send("Image not found");
-      }
-      const ext = path.extname(filename).toLowerCase();
-      const mimeTypes: Record<string, string> = { ".jpeg": "image/jpeg", ".jpg": "image/jpeg", ".webp": "image/webp", ".png": "image/png" };
-      res.set("Content-Type", mimeTypes[ext] || "image/jpeg");
-      res.set("Cache-Control", "public, max-age=86400");
-      res.sendFile(filepath, { dotfiles: "allow" });
-    } catch (error: any) {
-      res.status(500).send("Failed to serve image");
-    }
-  });
-
   // ─── Content Automation Endpoints ──────────────────────────────────
 
   app.post("/api/admin/content-automation/generate", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
