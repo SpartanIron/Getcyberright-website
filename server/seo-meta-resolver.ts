@@ -12,6 +12,7 @@ export interface PageMeta {
   canonicalUrl: string;
   ogType: string;
   jsonLd: string;
+  noindex?: boolean;
 }
 
 function escapeAttr(str: string): string {
@@ -316,6 +317,86 @@ const TOPIC_META: Record<string, { title: string; description: string }> = {
   },
 };
 
+const FAQ_ITEMS = [
+  { q: "What is GetCyberRight?", a: "GetCyberRight is a mission-driven platform dedicated to family cyber safety. We provide educational resources, tools, and guidance to help families navigate the online world safely." },
+  { q: "Is GetCyberRight free?", a: "Our educational content, articles, guides, and core scam checking tools are free to use. We also offer paid subscription plans that unlock advanced features like automatic page scanning and data monitoring." },
+  { q: "What is GCR Scam Guard?", a: "GCR Scam Guard is our Chrome browser extension that protects you from scams in real time as you browse. It can automatically scan pages for threats, detect fake websites, and warn you before you interact with suspicious content." },
+  { q: "What features are available on the free plan?", a: "Free users can manually scan any page by right-clicking and selecting 'Scan with GCR Scam Guard' or clicking the extension icon. You get full AI-powered threat analysis on every manual scan at no cost." },
+  { q: "What do the scan results mean?", a: "Scan results use clear labels: 'Verified Safe' means no threats found, 'Low Risk' means minor concerns, 'Caution Advised' means notable warning signs, 'High Risk Detected' means strong indicators of a scam, and 'Confirmed Threat' means the content matches known scam patterns." },
+  { q: "How can I protect my children online?", a: "Start with open conversations about online safety. Use our Youth Safety Hub for age-appropriate resources, set up parental controls on devices, and teach them to recognize suspicious messages and requests." },
+  { q: "How can I help my elderly parents stay safe online?", a: "Our Senior Safety Center provides resources specifically designed for older adults. Focus on teaching them to recognize common scams, never share personal information with strangers, and verify requests through official channels." },
+  { q: "What should I do if a family member falls for a scam?", a: "Act quickly. Contact your bank if financial information was shared. Change passwords for any compromised accounts. Report the scam to local authorities and relevant agencies like the FTC. Visit our Emergency Help page for step-by-step guidance." },
+  { q: "I think I've been hacked. What should I do?", a: "Immediately change passwords on all important accounts, starting with email and banking. Enable two-factor authentication where available. Check for unauthorized transactions and contact your bank if financial accounts may be compromised." },
+  { q: "How do you protect my data?", a: "We use industry-standard security measures including HTTPS encryption, secure authentication, and minimal data collection. We never sell your data or share it with advertisers." },
+  { q: "What subscription plans do you offer?", a: "We offer three tiers: Free (manual scans), Essential (adds Auto-Protect for automatic page scanning), and Professional (adds scan history, safety scores, family profiles, and priority support)." },
+  { q: "Where can I report a scam?", a: "In the US, report to the FTC at reportfraud.ftc.gov or the FBI at ic3.gov. In the UK, use Action Fraud. Our Emergency Help page provides region-specific reporting information." },
+];
+
+function buildFAQPageSchema(): string {
+  return safeJsonLd({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQ_ITEMS.map(item => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a,
+      },
+    })),
+  });
+}
+
+function buildSoftwareAppSchema(name: string, description: string, url: string): string {
+  return safeJsonLd({
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name,
+    description,
+    url: `${BASE_URL}${url}`,
+    applicationCategory: "SecurityApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "GetCyberRight",
+      url: BASE_URL,
+    },
+  });
+}
+
+function buildEducationalOrgSchema(): string {
+  return safeJsonLd({
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    name: "GetCyberRight",
+    url: BASE_URL,
+    description: "Free cybersecurity education platform for families, parents, kids, and seniors.",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "176 Mine Lake Court, Ste. 100",
+      addressLocality: "Raleigh",
+      addressRegion: "NC",
+      postalCode: "27615",
+      addressCountry: "US",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      email: "tips@getcyberright.com",
+      contactType: "customer support",
+    },
+    sameAs: [
+      "https://www.facebook.com/getcyberright",
+      "https://www.linkedin.com/company/getcyberright",
+      "https://www.instagram.com/getcyberright",
+    ],
+  });
+}
+
 function getDefaultMeta(path: string): PageMeta {
   return {
     title: DEFAULT_TITLE,
@@ -323,6 +404,17 @@ function getDefaultMeta(path: string): PageMeta {
     canonicalUrl: `${BASE_URL}${path === "/" ? "" : path}`,
     ogType: "website",
     jsonLd: `${buildOrgSchema()}\n    ${buildWebSiteSchema()}`,
+  };
+}
+
+function get404Meta(): PageMeta {
+  return {
+    title: "Page Not Found | GetCyberRight",
+    description: "The page you're looking for doesn't exist. Visit GetCyberRight for free cybersecurity education, tools, and safety resources for families.",
+    canonicalUrl: "",
+    ogType: "website",
+    jsonLd: buildOrgSchema(),
+    noindex: true,
   };
 }
 
@@ -345,12 +437,38 @@ export async function resolvePageMeta(urlPath: string): Promise<PageMeta> {
       { name: "Home", url: "/" },
       { name: staticMeta.title.split("|")[0].split(":")[0].trim(), url: path },
     ]);
+
+    let extraSchema = "";
+
+    if (path === "/faq") {
+      extraSchema = `\n    ${buildFAQPageSchema()}`;
+    }
+
+    if (path === "/about" || path === "/our-mission") {
+      extraSchema = `\n    ${buildEducationalOrgSchema()}`;
+    }
+
+    const toolSchemas: Record<string, { name: string; desc: string }> = {
+      "/scam-checker": { name: "GCR Scam Guard", desc: "AI-powered scam detection tool that analyzes URLs, emails, phone numbers, and messages for potential threats." },
+      "/password-generator": { name: "Secure Password Generator", desc: "Generate strong, unique passwords instantly with customizable length and character types." },
+      "/shield": { name: "GCR Data Shield", desc: "Scan 500+ data brokers to find and remove your exposed personal information online." },
+      "/breach-dashboard": { name: "Data Breach Monitor", desc: "Monitor your email addresses for data breaches and get instant alerts when your information appears in known breaches." },
+      "/cyber-threat-radar": { name: "Cyber Threat Radar", desc: "Real-time cybersecurity threat monitoring with live threat alerts, trending attack vectors, and security advisories." },
+      "/quick-assessment": { name: "Cybersecurity Quick Assessment", desc: "Free 5-minute cybersecurity assessment to evaluate your online safety habits with personalized recommendations." },
+      "/safety-score": { name: "Personal Cyber Safety Score", desc: "Calculate your personal cyber safety score based on your security practices and get actionable improvement steps." },
+    };
+
+    if (toolSchemas[path]) {
+      const tool = toolSchemas[path];
+      extraSchema = `\n    ${buildSoftwareAppSchema(tool.name, tool.desc, path)}`;
+    }
+
     return {
       title: staticMeta.title,
       description: staticMeta.description,
       canonicalUrl: `${BASE_URL}${path}`,
       ogType: staticMeta.ogType || "website",
-      jsonLd: `${buildOrgSchema()}\n    ${breadcrumbs}`,
+      jsonLd: `${buildOrgSchema()}\n    ${breadcrumbs}${extraSchema}`,
     };
   }
 
@@ -506,19 +624,29 @@ export async function resolvePageMeta(urlPath: string): Promise<PageMeta> {
     }
   }
 
-  return getDefaultMeta(path);
+  return get404Meta();
 }
 
 export function injectMeta(template: string, meta: PageMeta): string {
-  return template
+  let result = template
     .replace(/%%PAGE_TITLE%%/g, escapeAttr(meta.title))
     .replace(/%%META_DESCRIPTION%%/g, escapeAttr(meta.description))
     .replace(/%%OG_TITLE%%/g, escapeAttr(meta.title))
     .replace(/%%OG_DESCRIPTION%%/g, escapeAttr(meta.description))
     .replace(/%%OG_TYPE%%/g, meta.ogType)
-    .replace(/%%OG_URL%%/g, meta.canonicalUrl)
+    .replace(/%%OG_URL%%/g, meta.canonicalUrl || "")
     .replace(/%%TWITTER_TITLE%%/g, escapeAttr(meta.title))
     .replace(/%%TWITTER_DESCRIPTION%%/g, escapeAttr(meta.description))
-    .replace(/%%CANONICAL_URL%%/g, meta.canonicalUrl)
+    .replace(/%%CANONICAL_URL%%/g, meta.canonicalUrl || "")
     .replace(/%%JSON_LD%%/g, meta.jsonLd);
+
+  if (meta.noindex) {
+    result = result.replace(
+      '<meta name="description"',
+      '<meta name="robots" content="noindex, nofollow">\n    <meta name="description"'
+    );
+    result = result.replace(/<link rel="canonical" href="[^"]*" \/>/, '');
+  }
+
+  return result;
 }
