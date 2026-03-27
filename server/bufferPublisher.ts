@@ -142,7 +142,7 @@ export async function createBufferPost(
     }
 
     if (options.platform === "instagram") {
-      input.metadata = { instagram: { type: "post" } };
+      input.metadata = { instagram: { type: "post", shouldShareToFeed: true } };
     }
 
     if (options.imageUrl) {
