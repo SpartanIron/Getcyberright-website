@@ -1,4 +1,4 @@
-import { createRoot } from "react-dom/client";
+import { hydrateRoot, createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
@@ -8,4 +8,11 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootEl = document.getElementById("root")!;
+const hasSSRContent = rootEl.innerHTML.trim().length > 0;
+
+if (hasSSRContent) {
+  hydrateRoot(rootEl, <App />);
+} else {
+  createRoot(rootEl).render(<App />);
+}

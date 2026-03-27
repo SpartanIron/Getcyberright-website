@@ -1,9 +1,35 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { execSync } from "child_process";
+
+function ssrBuildPlugin() {
+  return {
+    name: "ssr-build",
+    apply: "build" as const,
+    closeBundle() {
+      if (process.env.VITE_SSR_BUILD) return;
+      try {
+        console.log("[SSR] Building SSR bundle...");
+        execSync(
+          "VITE_SSR_BUILD=1 npx vite build --config ../vite.config.ts --ssr src/entry-server.tsx --outDir ../dist/server",
+          {
+            cwd: path.resolve(import.meta.dirname, "client"),
+            stdio: "inherit",
+          },
+        );
+        console.log("[SSR] SSR bundle built successfully");
+      } catch (e) {
+        console.error("[SSR] SSR build failed — site will fall back to client-side rendering");
+      }
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     react(),
+    ssrBuildPlugin(),
   ],
   resolve: {
     alias: {
@@ -16,6 +42,9 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+  },
+  ssr: {
+    noExternal: ["wouter", "react-google-recaptcha-v3"],
   },
   server: {
     fs: {

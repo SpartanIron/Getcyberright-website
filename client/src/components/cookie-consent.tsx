@@ -12,6 +12,7 @@ export type CookiePreferences = {
 const STORAGE_KEY = "gcr_cookie_consent";
 
 export function getCookiePreferences(): CookiePreferences | null {
+  if (typeof window === "undefined") return null;
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return null;

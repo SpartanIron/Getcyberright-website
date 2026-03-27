@@ -8,6 +8,7 @@ import type { PlatformAnnouncement } from "@shared/schema";
 const DISMISSED_KEY = "gcr_dismissed_announcements";
 
 function getDismissedIds(): string[] {
+  if (typeof window === "undefined") return [];
   try {
     const stored = localStorage.getItem(DISMISSED_KEY);
     return stored ? JSON.parse(stored) : [];

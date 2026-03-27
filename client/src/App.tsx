@@ -1,5 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -15,37 +15,70 @@ import { useAnalytics } from "./hooks/use-analytics";
 import { Loader2 } from "lucide-react";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
-// Critical pages loaded immediately
+const isServer = typeof window === "undefined";
+
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
+import Tools from "@/pages/tools";
+import Resources from "@/pages/resources";
+import About from "@/pages/about";
+import Contact from "@/pages/contact";
+import Privacy from "@/pages/privacy";
+import Terms from "@/pages/terms";
+import EmergencyHelp from "@/pages/emergency-help";
+import Kids from "@/pages/kids";
+import Seniors from "@/pages/seniors";
+import Parents from "@/pages/parents";
+import SupportPage from "@/pages/support";
+import Security from "@/pages/security";
+import OurMission from "@/pages/pricing";
+import SupportTheMission from "@/pages/support-the-mission";
+import ThreatTrendsPage from "@/pages/threat-trends";
+import CyberThreatRadar from "@/pages/cyber-threat-radar";
+import AwarenessHub from "@/pages/awareness-hub";
+import ReportScam from "@/pages/report-scam";
+import Checklists from "@/pages/checklists";
+import AIPrompts from "@/pages/ai-prompts";
+import AISafety from "@/pages/ai-safety";
+import Training from "@/pages/training";
+import TrainingPath from "@/pages/training-path";
+import TrainingLesson from "@/pages/training-lesson";
+import TrainingQuiz from "@/pages/training-quiz";
+import DataRemoval from "@/pages/data-removal";
+import News from "@/pages/news";
+import NewsArticle from "@/pages/news-article";
+import CyberHygiene from "@/pages/cyber-hygiene";
+import PasswordGenerator from "@/pages/password-generator";
+import BreachDashboard from "@/pages/breach-dashboard";
+import SearchPage from "@/pages/search";
+import ParentGuide from "@/pages/parent-guide";
+import SmallBusiness from "@/pages/small-business";
+import Educators from "@/pages/educators";
+import TravelSafety from "@/pages/travel-safety";
+import Accessibility from "@/pages/accessibility";
+import Advertise from "@/pages/advertise";
+import PartnerDeck from "@/pages/partner-deck";
+import FeedbackPage from "@/pages/feedback";
+import Experience from "@/pages/experience";
+import GcrGuardPricing from "@/pages/gcr-guard-pricing";
+import PrintableGuides from "@/pages/printable-guides";
+import QuickAssessment from "@/pages/quick-assessment";
+import SafetyScore from "@/pages/safety-score";
+import ScamChecker from "@/pages/scam-checker";
+import BrowserExtensionPage from "@/pages/browser-extension";
+import ScamPage from "@/pages/scam-page";
+import TopicHub from "@/pages/topic-hub";
+import FAQ from "@/pages/faq";
+import GuidesListing from "@/pages/guides";
+import GuideDetail from "@/pages/guide-detail";
+import AlertsListing from "@/pages/alerts-listing";
+import AlertDetail from "@/pages/alert-detail";
+import ScamIntelListing from "@/pages/scam-intel-listing";
+import ScamIntelDetail from "@/pages/scam-intel-detail";
+import ShieldPage from "@/pages/shield";
+import ShieldResultsPage from "@/pages/shield-results";
 
-// Lazy-loaded pages for better initial bundle size
-const Tools = lazy(() => import("@/pages/tools"));
-const Resources = lazy(() => import("@/pages/resources"));
-const About = lazy(() => import("@/pages/about"));
-const Contact = lazy(() => import("@/pages/contact"));
-const Privacy = lazy(() => import("@/pages/privacy"));
-const Terms = lazy(() => import("@/pages/terms"));
-const EmergencyHelp = lazy(() => import("@/pages/emergency-help"));
-const Kids = lazy(() => import("@/pages/kids"));
-const Seniors = lazy(() => import("@/pages/seniors"));
-const Parents = lazy(() => import("@/pages/parents"));
-const Support = lazy(() => import("@/pages/support"));
-const Security = lazy(() => import("@/pages/security"));
-const OurMission = lazy(() => import("@/pages/pricing"));
-const SupportTheMission = lazy(() => import("@/pages/support-the-mission"));
 const Dashboard = lazy(() => import("@/pages/dashboard"));
-const ThreatTrendsPage = lazy(() => import("@/pages/threat-trends"));
-const CyberThreatRadar = lazy(() => import("@/pages/cyber-threat-radar"));
-const AwarenessHub = lazy(() => import("@/pages/awareness-hub"));
-const ReportScam = lazy(() => import("@/pages/report-scam"));
-const Checklists = lazy(() => import("@/pages/checklists"));
-const AIPrompts = lazy(() => import("@/pages/ai-prompts"));
-const AISafety = lazy(() => import("@/pages/ai-safety"));
-const Training = lazy(() => import("@/pages/training"));
-const TrainingPath = lazy(() => import("@/pages/training-path"));
-const TrainingLesson = lazy(() => import("@/pages/training-lesson"));
-const TrainingQuiz = lazy(() => import("@/pages/training-quiz"));
 const AdminDashboard = lazy(() => import("@/pages/admin/index"));
 const AdminUsers = lazy(() => import("@/pages/admin/users"));
 const AdminMessages = lazy(() => import("@/pages/admin/messages"));
@@ -67,45 +100,11 @@ const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
 const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
-const DataRemoval = lazy(() => import("@/pages/data-removal"));
-const News = lazy(() => import("@/pages/news"));
-const NewsArticle = lazy(() => import("@/pages/news-article"));
-const CyberHygiene = lazy(() => import("@/pages/cyber-hygiene"));
-const PasswordGenerator = lazy(() => import("@/pages/password-generator"));
-const BreachDashboard = lazy(() => import("@/pages/breach-dashboard"));
-const Search = lazy(() => import("@/pages/search"));
-const ParentGuide = lazy(() => import("@/pages/parent-guide"));
-const SmallBusiness = lazy(() => import("@/pages/small-business"));
-const Educators = lazy(() => import("@/pages/educators"));
-const TravelSafety = lazy(() => import("@/pages/travel-safety"));
-const Accessibility = lazy(() => import("@/pages/accessibility"));
-const Advertise = lazy(() => import("@/pages/advertise"));
-const PartnerDeck = lazy(() => import("@/pages/partner-deck"));
-const Feedback = lazy(() => import("@/pages/feedback"));
-const Experience = lazy(() => import("@/pages/experience"));
 const CheckoutSuccess = lazy(() => import("@/pages/checkout-success"));
-const GcrGuardPricing = lazy(() => import("@/pages/gcr-guard-pricing"));
 const ExtensionAuth = lazy(() => import("@/pages/extension-auth"));
 const Preferences = lazy(() => import("@/pages/preferences"));
-const PrintableGuides = lazy(() => import("@/pages/printable-guides"));
-const QuickAssessment = lazy(() => import("@/pages/quick-assessment"));
-const SafetyScore = lazy(() => import("@/pages/safety-score"));
-const ScamChecker = lazy(() => import("@/pages/scam-checker"));
 const ScanReportPage = lazy(() => import("@/pages/scan-report"));
-const BrowserExtensionPage = lazy(() => import("@/pages/browser-extension"));
-const ScamPage = lazy(() => import("@/pages/scam-page"));
-const TopicHub = lazy(() => import("@/pages/topic-hub"));
-const FAQ = lazy(() => import("@/pages/faq"));
-const GuidesListing = lazy(() => import("@/pages/guides"));
-const GuideDetail = lazy(() => import("@/pages/guide-detail"));
-const AlertsListing = lazy(() => import("@/pages/alerts-listing"));
-const AlertDetail = lazy(() => import("@/pages/alert-detail"));
-const ScamIntelListing = lazy(() => import("@/pages/scam-intel-listing"));
-const ScamIntelDetail = lazy(() => import("@/pages/scam-intel-detail"));
-const ShieldPage = lazy(() => import("@/pages/shield"));
-const ShieldResultsPage = lazy(() => import("@/pages/shield-results"));
 
-// Loading fallback component
 function PageLoader() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -119,18 +118,17 @@ function PageLoader() {
 
 function ScrollToTop() {
   const [location] = useLocation();
-  
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
-  
+
   return null;
 }
 
-function Router() {
-  // Track page views when routes change
+function AppRouter() {
   useAnalytics();
-  
+
   return (
     <Suspense fallback={<PageLoader />}>
       <Switch>
@@ -146,7 +144,7 @@ function Router() {
         <Route path="/seniors" component={Seniors} />
         <Route path="/parents" component={Parents} />
         <Route path="/parents/child-safety-scanner" component={ChildSafetyScanner} />
-        <Route path="/support" component={Support} />
+        <Route path="/support" component={SupportPage} />
         <Route path="/security" component={Security} />
         <Route path="/our-mission" component={OurMission} />
         <Route path="/pricing" component={GcrGuardPricing} />
@@ -167,7 +165,7 @@ function Router() {
         <Route path="/cyber-hygiene" component={CyberHygiene} />
         <Route path="/password-generator" component={PasswordGenerator} />
         <Route path="/breach-dashboard" component={BreachDashboard} />
-        <Route path="/search" component={Search} />
+        <Route path="/search" component={SearchPage} />
         <Route path="/parent-guide" component={ParentGuide} />
         <Route path="/small-business" component={SmallBusiness} />
         <Route path="/educators" component={Educators} />
@@ -175,7 +173,7 @@ function Router() {
         <Route path="/accessibility" component={Accessibility} />
         <Route path="/advertise" component={Advertise} />
         <Route path="/partner-deck" component={PartnerDeck} />
-        <Route path="/feedback" component={Feedback} />
+        <Route path="/feedback" component={FeedbackPage} />
         <Route path="/experience" component={Experience} />
         <Route path="/checkout-success" component={CheckoutSuccess} />
         <Route path="/preferences" component={Preferences} />
@@ -227,7 +225,11 @@ function Router() {
 }
 
 function App() {
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
+    setIsClient(true);
+
     if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
       initGA();
     }
@@ -241,24 +243,40 @@ function App() {
     return () => window.removeEventListener("cookie-consent-updated", handleConsentUpdate);
   }, []);
 
-  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
+  const recaptchaSiteKey = (!isServer && import.meta.env.VITE_RECAPTCHA_SITE_KEY) || "";
+
+  const appContent = (
+    <ThemeProvider>
+      <TooltipProvider>
+        {!isServer && <ScrollToTop />}
+        <AnnouncementBanner />
+        <Toaster />
+        <ErrorBoundary>
+          <AppRouter />
+        </ErrorBoundary>
+        {isClient && (
+          <>
+            <DeziAssistant />
+            <FeedbackWidget />
+            <CookieConsent />
+          </>
+        )}
+      </TooltipProvider>
+    </ThemeProvider>
+  );
+
+  if (isServer) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        {appContent}
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
       <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
-        <ThemeProvider>
-          <TooltipProvider>
-            <ScrollToTop />
-            <AnnouncementBanner />
-            <Toaster />
-            <ErrorBoundary>
-              <Router />
-            </ErrorBoundary>
-            <DeziAssistant />
-            <FeedbackWidget />
-            <CookieConsent />
-          </TooltipProvider>
-        </ThemeProvider>
+        {appContent}
       </GoogleReCaptchaProvider>
     </QueryClientProvider>
   );
