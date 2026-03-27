@@ -144,3 +144,9 @@ id = "8yZSKzaXV4BNDu437ullc"
 uri = "file://attached_assets/gcr-social-scam-calls-texts.png"
 type = "image"
 title = "Scam Calls & Texts Awareness Graphic"
+
+[[outputs]]
+id = "eccEmoO6FJyMPREvkvmzy"
+uri = "file://attached_assets/scam-explainer-v2.png"
+type = "image"
+title = "Scam Calls & Texts Explainer Infographic"
