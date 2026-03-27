@@ -71,7 +71,20 @@ export function serveStatic(app: Express) {
 
       res.status(statusCode).set({ "Content-Type": "text/html" }).end(template);
     } catch (e) {
-      res.status(statusCode).sendFile(path.resolve(distPath, "index.html"));
+      try {
+        const rawHtml = await fs.promises.readFile(path.resolve(distPath, "index.html"), "utf-8");
+        const fallbackMeta = {
+          title: "GetCyberRight: Free Cybersecurity Education for Families",
+          description: "Protect your family online with free cybersecurity education, AI-powered scam detection tools, and safety training.",
+          canonicalUrl: `https://www.getcyberright.com${req.path}`,
+          ogType: "website",
+          jsonLd: "",
+        };
+        const processed = injectMeta(rawHtml, fallbackMeta);
+        res.status(statusCode).set({ "Content-Type": "text/html" }).end(processed);
+      } catch {
+        res.status(500).send("Server error");
+      }
     }
   });
 }
