@@ -168,3 +168,21 @@ id = "zW-CM4IKXyBdlxq-Vmj6s"
 uri = "file://attached_assets/scam-explainer-bright-3.png"
 type = "image"
 title = "Option 3: Bold & Empowering (teal/white)"
+
+[[outputs]]
+id = "JsBrLtcJAKFKwnBJaUZIp"
+uri = "file://attached_assets/scam-explainer-bright-1-branded.png"
+type = "image"
+title = "Option 1: Clean & Airy + Logo"
+
+[[outputs]]
+id = "EPR3Bt1wlKPJ8Ls_s4yOu"
+uri = "file://attached_assets/scam-explainer-bright-2-branded.png"
+type = "image"
+title = "Option 2: Warm Family + Logo"
+
+[[outputs]]
+id = "xA-QORxyGreKU3LH1Bb5h"
+uri = "file://attached_assets/scam-explainer-bright-3-branded.png"
+type = "image"
+title = "Option 3: Bold & Empowering + Logo"
