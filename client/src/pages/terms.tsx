@@ -503,8 +503,8 @@ export default function Terms() {
                   <div className="bg-muted/30 rounded-lg p-6 mt-4 border">
                     <p className="font-semibold text-foreground mb-2">ColorCode Solutions LLC</p>
                     <p className="text-sm text-muted-foreground mb-2">Operating as GetCyberRight</p>
-                    <p className="mb-1">301 S McDowell Street, Suite 125</p>
-                    <p className="mb-1">Charlotte, NC 28204</p>
+                    <p className="mb-1">176 Mine Lake Court, Ste. 100</p>
+                    <p className="mb-1">Raleigh, NC 27615</p>
                     <p className="mb-1">United States</p>
                     <p className="mt-4">
                       <strong className="text-foreground">Legal Inquiries:</strong>{" "}
