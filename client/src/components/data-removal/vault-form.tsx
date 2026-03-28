@@ -28,6 +28,12 @@ import {
   Fingerprint,
   ShieldAlert,
   Target,
+  ArrowRight,
+  Search,
+  CheckCircle2,
+  Bell,
+  FileText,
+  Eye,
 } from "lucide-react";
 import type { VaultProfile } from "@/components/data-removal/types";
 
@@ -268,6 +274,82 @@ export function VaultForm() {
         </CardContent>
       </Card>
 
+      {vaultData && (
+        <Card className="border-primary/30 bg-primary/5" data-testid="card-next-steps">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+              Your Vault Is Set Up — Here's What to Do Next
+            </CardTitle>
+            <CardDescription>
+              Your personal information is saved and encrypted. Now use it to find and remove your exposed data.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                {
+                  icon: Search,
+                  title: "Run a Data Scan",
+                  description: "Search 500+ data broker sites for your personal information",
+                  href: "/shield",
+                  buttonText: "Start Scan",
+                  testId: "button-nextstep-scan",
+                  primary: true,
+                },
+                {
+                  icon: FileText,
+                  title: "View Removal Center",
+                  description: "Track removal requests and see your exposure report",
+                  href: "/data-removal",
+                  buttonText: "Open Center",
+                  testId: "button-nextstep-removal",
+                  primary: false,
+                },
+                {
+                  icon: Eye,
+                  title: "Check Breach Exposure",
+                  description: "See if your email appears in known data breaches",
+                  href: "/shield",
+                  buttonText: "Check Breaches",
+                  testId: "button-nextstep-breaches",
+                  primary: false,
+                },
+              ].map((step, i) => (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: i * 0.1 }}
+                >
+                  <div className="flex flex-col h-full p-4 rounded-lg border bg-background">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`h-8 w-8 rounded-md flex items-center justify-center ${step.primary ? "bg-primary/10" : "bg-muted"}`}>
+                        <step.icon className={`h-4 w-4 ${step.primary ? "text-primary" : "text-muted-foreground"}`} />
+                      </div>
+                      <h4 className="font-semibold text-sm">{step.title}</h4>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-3 flex-1">{step.description}</p>
+                    <Button
+                      asChild
+                      size="sm"
+                      variant={step.primary ? "default" : "outline"}
+                      className="w-full"
+                      data-testid={step.testId}
+                    >
+                      <Link href={step.href}>
+                        {step.buttonText}
+                        <ArrowRight className="h-3 w-3 ml-1" />
+                      </Link>
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {vaultData && <PrivacyModeSection vaultProfileId={vaultData.id} currentMode={vaultData.privacyMode ?? "standard"} />}
 
       <FamilyProfilesSection />
@@ -407,8 +489,38 @@ function FamilyProfilesSection() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {(!profiles || profiles.length === 0) && !showAddForm && (
+          <div className="flex flex-col items-center py-6 gap-3 text-center" data-testid="family-empty-state">
+            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+              <Users className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">No family members added yet</p>
+              <p className="text-xs text-muted-foreground max-w-sm mt-1">
+                Add your family members so we can scan for their exposed data too. Each profile gets its own monitoring and removal tracking.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center mt-1">
+              {["Spouse/Partner", "Children", "Parents", "Grandparents"].map((example) => (
+                <Badge key={example} variant="outline" className="text-xs">{example}</Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
         {profiles && profiles.length > 0 && (
           <div className="space-y-2">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs text-muted-foreground">{profiles.length} of 6 profiles used</p>
+              <div className="flex gap-1">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1.5 w-6 rounded-full ${i < (profiles?.length || 0) ? "bg-primary" : "bg-muted"}`}
+                  />
+                ))}
+              </div>
+            </div>
             {profiles.map((profile) => (
               <div key={profile.id} className="flex items-center justify-between gap-3 p-3 rounded-md border" data-testid={`card-family-profile-${profile.id}`}>
                 <div className="flex items-center gap-3">
