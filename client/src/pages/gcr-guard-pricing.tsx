@@ -22,6 +22,8 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
+type BillingInterval = "monthly" | "annual";
+
 interface TierData {
   id: string;
   name: string;
@@ -30,6 +32,11 @@ interface TierData {
   features: string[];
   description: string;
 }
+
+const ANNUAL_PRICES: Record<string, { monthly: number; annual: number; savePerYear: number }> = {
+  essential: { monthly: 599, annual: 499, savePerYear: 1200 },
+  professional: { monthly: 1199, annual: 999, savePerYear: 2400 },
+};
 
 const FEATURE_LABELS: Record<string, string> = {
   manual_scan: "Manual URL & content scanning",
@@ -80,6 +87,7 @@ export default function GcrGuardPricing() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [billingInterval, setBillingInterval] = useState<BillingInterval>("monthly");
 
   const { data: userData } = useQuery<any>({
     queryKey: ["/api/auth/user"],
@@ -96,6 +104,13 @@ export default function GcrGuardPricing() {
     { id: "professional", name: "Family", price: 1199, interval: "month", features: [], description: "Complete protection for the whole family" },
   ];
 
+  const getDisplayPrice = (tierId: string, basePrice: number) => {
+    if (basePrice === 0) return 0;
+    const annual = ANNUAL_PRICES[tierId];
+    if (!annual) return basePrice;
+    return billingInterval === "annual" ? annual.annual : annual.monthly;
+  };
+
   const handleSelectPlan = async (tierId: string) => {
     if (tierId === "free") {
       window.open("/browser-extension", "_self");
@@ -106,11 +121,11 @@ export default function GcrGuardPricing() {
       return;
     }
 
-    const planId = `${tierId}_monthly`;
+    const planId = `${tierId}_${billingInterval === "annual" ? "annual" : "monthly"}`;
     setLoadingPlan(tierId);
 
     try {
-      const res = await apiRequest("POST", "/api/stripe/create-checkout", { planId });
+      const res = await apiRequest("POST", "/api/stripe/create-checkout", { planId, returnPath: "/gcr-guard-pricing" });
       const data = await res.json();
 
       if (data.url) {
@@ -136,8 +151,8 @@ export default function GcrGuardPricing() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="GCR Scam Guard Pricing | GetCyberRight"
-        description="Choose your GCR Scam Guard protection plan. Free manual scanning, Pro auto-protection for $5.99/month, or Family coverage for $11.99/month."
+        title="GCR Scam Guard Pricing"
+        description="Choose your GCR Scam Guard protection plan. Free manual scanning, Pro auto-protection from $4.99/month, or Family coverage from $9.99/month. Save 17% with annual billing."
         keywords="GCR Scam Guard pricing, browser extension subscription, cybersecurity protection plans"
       />
       <Navigation />
@@ -160,9 +175,34 @@ export default function GcrGuardPricing() {
             <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-[-0.025em]" data-testid="heading-pricing">
               Protection + Education Others Can't Match
             </h1>
-            <p className="text-xl text-white/70 max-w-2xl mx-auto">
+            <p className="text-xl text-white/70 max-w-2xl mx-auto mb-8">
               AI scam detection, 500+ data broker removals, a browser extension, and family cybersecurity education — all in one platform, for a fraction of what others charge.
             </p>
+            <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full p-1" data-testid="toggle-billing-interval">
+              <button
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                  billingInterval === "monthly"
+                    ? "bg-white text-[#0A2A3C] shadow-sm"
+                    : "text-white/70 hover:text-white"
+                }`}
+                onClick={() => setBillingInterval("monthly")}
+                data-testid="button-billing-monthly"
+              >
+                Monthly
+              </button>
+              <button
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                  billingInterval === "annual"
+                    ? "bg-white text-[#0A2A3C] shadow-sm"
+                    : "text-white/70 hover:text-white"
+                }`}
+                onClick={() => setBillingInterval("annual")}
+                data-testid="button-billing-annual"
+              >
+                Annual
+                <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-semibold">Save 17%</span>
+              </button>
+            </div>
           </div>
         </section>
 
@@ -210,8 +250,21 @@ export default function GcrGuardPricing() {
                             <div className="text-3xl font-bold" data-testid={`text-price-${tier.id}`}>Free</div>
                           ) : (
                             <div data-testid={`text-price-${tier.id}`}>
-                              <span className="text-3xl font-bold">${(tier.price / 100).toFixed(2)}</span>
+                              <span className="text-3xl font-bold">${(getDisplayPrice(tier.id, tier.price) / 100).toFixed(2)}</span>
                               <span className="text-muted-foreground">/month</span>
+                              {billingInterval === "annual" && ANNUAL_PRICES[tier.id] && (
+                                <div className="mt-1 space-y-0.5">
+                                  <span className="text-xs text-muted-foreground line-through block">
+                                    ${(ANNUAL_PRICES[tier.id].monthly / 100).toFixed(2)}/mo monthly
+                                  </span>
+                                  <span className="text-xs font-medium text-green-600 dark:text-green-400 block" data-testid={`text-savings-${tier.id}`}>
+                                    Save ${(ANNUAL_PRICES[tier.id].savePerYear / 100).toFixed(2)}/year
+                                  </span>
+                                  <span className="text-xs text-muted-foreground block">
+                                    Billed as ${((getDisplayPrice(tier.id, tier.price) * 12) / 100).toFixed(2)}/year
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           )}
                           <p className="text-sm text-muted-foreground mt-1">{tier.description}</p>
@@ -282,7 +335,7 @@ export default function GcrGuardPricing() {
                       <div className="flex flex-col items-center gap-1">
                         <Shield className="w-5 h-5 text-teal-600" />
                         <span className="font-bold text-teal-700 dark:text-teal-400">GetCyberRight</span>
-                        <span className="text-xs text-muted-foreground">from $5.99/mo</span>
+                        <span className="text-xs text-muted-foreground">from $4.99/mo</span>
                       </div>
                     </th>
                     <th className="py-4 px-4 text-center">
@@ -426,7 +479,7 @@ export default function GcrGuardPricing() {
                 },
                 {
                   q: "Can I cancel anytime?",
-                  a: "Yes. You can downgrade to the free plan at any time from your account dashboard. Your premium features will remain active until the end of your current billing period."
+                  a: "Yes. You can downgrade to the free plan at any time from your account dashboard. Your premium features will remain active until the end of your current billing period. Annual subscribers receive a prorated refund for unused months."
                 },
                 {
                   q: "Which payment methods are accepted?",

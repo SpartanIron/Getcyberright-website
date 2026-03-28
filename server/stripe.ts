@@ -11,6 +11,8 @@ const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const PRICE_MAP: Record<string, { tier: string; name: string; amount: number; interval: "month" | "year" }> = {
   essential_monthly: { tier: "essential", name: "GCR Scam Guard Pro", amount: 599, interval: "month" },
   professional_monthly: { tier: "professional", name: "GCR Scam Guard Family", amount: 1199, interval: "month" },
+  essential_annual: { tier: "essential", name: "GCR Scam Guard Pro (Annual)", amount: 5988, interval: "year" },
+  professional_annual: { tier: "professional", name: "GCR Scam Guard Family (Annual)", amount: 11988, interval: "year" },
 };
 
 let stripe: Stripe | null = null;

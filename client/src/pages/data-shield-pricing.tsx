@@ -31,6 +31,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { StructuredData } from "@/components/structured-data";
 
+type BillingInterval = "monthly" | "annual";
+
+const ANNUAL_PRICES: Record<string, { monthly: number; annual: number; savePerYear: number }> = {
+  essential: { monthly: 599, annual: 499, savePerYear: 1200 },
+  professional: { monthly: 1199, annual: 999, savePerYear: 2400 },
+};
+
 interface ShieldTier {
   id: string;
   name: string;
@@ -136,6 +143,7 @@ export default function DataShieldPricing() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [billingInterval, setBillingInterval] = useState<BillingInterval>("monthly");
 
   const { data: subStatus } = useQuery<{ tier: string; isActive: boolean }>({
     queryKey: ["/api/subscription/status"],
@@ -143,6 +151,13 @@ export default function DataShieldPricing() {
   });
 
   const currentTier = subStatus?.tier || "free";
+
+  const getDisplayPrice = (tierId: string, basePrice: number) => {
+    if (basePrice === 0) return 0;
+    const annual = ANNUAL_PRICES[tierId];
+    if (!annual) return basePrice;
+    return billingInterval === "annual" ? annual.annual : annual.monthly;
+  };
 
   const handleSelectPlan = async (tierId: string) => {
     if (tierId === "free") {
@@ -155,7 +170,7 @@ export default function DataShieldPricing() {
       return;
     }
 
-    const planId = `${tierId}_monthly`;
+    const planId = `${tierId}_${billingInterval === "annual" ? "annual" : "monthly"}`;
     setLoadingTier(tierId);
 
     try {
@@ -205,7 +220,7 @@ export default function DataShieldPricing() {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="GCR Data Shield Pricing"
-        description="Protect your personal data with GCR Data Shield. Free scan of 500+ data broker sites. Automated removal from $5.99/month. Continuous family protection from $11.99/month."
+        description="Protect your personal data with GCR Data Shield. Free scan of 500+ data broker sites. Automated removal from $4.99/month (billed annually). Continuous family protection from $9.99/month."
         keywords="data broker removal pricing, personal data protection, privacy scan, data removal service"
       />
       <StructuredData
@@ -236,7 +251,7 @@ export default function DataShieldPricing() {
                 Over 500 data broker sites trade your name, address, phone number, and more.
                 We find them, and remove you — so you don't have to.
               </p>
-              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground mb-8">
                 <span className="flex items-center gap-1.5">
                   <Check className="w-4 h-4 text-teal-600" />
                   500+ brokers scanned
@@ -249,6 +264,31 @@ export default function DataShieldPricing() {
                   <Check className="w-4 h-4 text-teal-600" />
                   Cancel anytime
                 </span>
+              </div>
+              <div className="inline-flex items-center bg-muted rounded-full p-1" data-testid="toggle-shield-billing-interval">
+                <button
+                  className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                    billingInterval === "monthly"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  onClick={() => setBillingInterval("monthly")}
+                  data-testid="button-shield-billing-monthly"
+                >
+                  Monthly
+                </button>
+                <button
+                  className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                    billingInterval === "annual"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  onClick={() => setBillingInterval("annual")}
+                  data-testid="button-shield-billing-annual"
+                >
+                  Annual
+                  <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-semibold">Save 17%</span>
+                </button>
               </div>
             </motion.div>
           </div>
@@ -297,8 +337,21 @@ export default function DataShieldPricing() {
                             <div className="text-3xl font-bold" data-testid={`text-shield-price-${tier.id}`}>Free</div>
                           ) : (
                             <div data-testid={`text-shield-price-${tier.id}`}>
-                              <span className="text-3xl font-bold">${(tier.price / 100).toFixed(2)}</span>
+                              <span className="text-3xl font-bold">${(getDisplayPrice(tier.id, tier.price) / 100).toFixed(2)}</span>
                               <span className="text-muted-foreground">/month</span>
+                              {billingInterval === "annual" && ANNUAL_PRICES[tier.id] && (
+                                <div className="mt-1 space-y-0.5">
+                                  <span className="text-xs text-muted-foreground line-through block">
+                                    ${(ANNUAL_PRICES[tier.id].monthly / 100).toFixed(2)}/mo monthly
+                                  </span>
+                                  <span className="text-xs font-medium text-green-600 dark:text-green-400 block" data-testid={`text-shield-savings-${tier.id}`}>
+                                    Save ${(ANNUAL_PRICES[tier.id].savePerYear / 100).toFixed(2)}/year
+                                  </span>
+                                  <span className="text-xs text-muted-foreground block">
+                                    Billed as ${((getDisplayPrice(tier.id, tier.price) * 12) / 100).toFixed(2)}/year
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
@@ -396,8 +449,8 @@ export default function DataShieldPricing() {
                   <tr className="border-b-2">
                     <th className="text-left py-3 px-4 font-semibold w-[40%]">Feature</th>
                     <th className="py-3 px-4 text-center font-semibold">Scan<br/><span className="font-normal text-xs text-muted-foreground">Free</span></th>
-                    <th className="py-3 px-4 text-center font-semibold text-teal-700 dark:text-teal-400">Remove<br/><span className="font-normal text-xs text-muted-foreground">$5.99/mo</span></th>
-                    <th className="py-3 px-4 text-center font-semibold">Protect<br/><span className="font-normal text-xs text-muted-foreground">$11.99/mo</span></th>
+                    <th className="py-3 px-4 text-center font-semibold text-teal-700 dark:text-teal-400">Remove<br/><span className="font-normal text-xs text-muted-foreground">from $4.99/mo</span></th>
+                    <th className="py-3 px-4 text-center font-semibold">Protect<br/><span className="font-normal text-xs text-muted-foreground">from $9.99/mo</span></th>
                   </tr>
                 </thead>
                 <tbody>
