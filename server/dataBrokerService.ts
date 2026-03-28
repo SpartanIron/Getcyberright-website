@@ -1,5 +1,6 @@
 import { db } from "./db";
 import { createHash } from "crypto";
+import { encryptVaultData, decryptVaultData } from "./vaultEncryption";
 import {
   dataBrokers,
   userVaultProfiles,
@@ -546,14 +547,16 @@ export async function getUserVaultProfile(userId: string): Promise<UserVaultProf
     .select()
     .from(userVaultProfiles)
     .where(and(eq(userVaultProfiles.userId, userId), eq(userVaultProfiles.isActive, true)));
-  return profile ?? null;
+  if (!profile) return null;
+  return decryptVaultData(profile);
 }
 
 export async function getAllVaultProfiles(userId: string): Promise<UserVaultProfile[]> {
-  return db
+  const profiles = await db
     .select()
     .from(userVaultProfiles)
     .where(and(eq(userVaultProfiles.userId, userId), eq(userVaultProfiles.isActive, true)));
+  return profiles.map((p) => decryptVaultData(p));
 }
 
 export async function createFamilyProfile(
@@ -572,11 +575,12 @@ export async function createFamilyProfile(
     throw new Error("Maximum of 6 family member profiles allowed");
   }
 
+  const encryptedData = encryptVaultData(data);
   const [created] = await db
     .insert(userVaultProfiles)
-    .values({ userId, ...data })
+    .values({ userId, ...encryptedData })
     .returning();
-  return created;
+  return decryptVaultData(created);
 }
 
 export async function deleteFamilyProfile(userId: string, profileId: string) {
@@ -611,22 +615,23 @@ export async function upsertVaultProfile(
     employerNames: string[];
   }>
 ) {
+  const encryptedData = encryptVaultData(data);
   const existing = await getUserVaultProfile(userId);
 
   if (existing) {
     const [updated] = await db
       .update(userVaultProfiles)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...encryptedData, updatedAt: new Date() })
       .where(eq(userVaultProfiles.id, existing.id))
       .returning();
-    return updated;
+    return decryptVaultData(updated);
   }
 
   const [created] = await db
     .insert(userVaultProfiles)
-    .values({ userId, ...data })
+    .values({ userId, ...encryptedData })
     .returning();
-  return created;
+  return decryptVaultData(created);
 }
 
 function getUserDataTypes(profile: UserVaultProfile): Set<string> {
@@ -643,14 +648,16 @@ function getUserDataTypes(profile: UserVaultProfile): Set<string> {
 }
 
 export async function runExposureScan(userId: string, vaultProfileId: string) {
-  const [profile] = await db
+  const [rawProfile] = await db
     .select()
     .from(userVaultProfiles)
     .where(and(eq(userVaultProfiles.id, vaultProfileId), eq(userVaultProfiles.userId, userId)));
 
-  if (!profile) {
+  if (!rawProfile) {
     throw new Error("Vault profile not found");
   }
+
+  const profile = decryptVaultData(rawProfile);
 
   const [scan] = await db
     .insert(exposureScans)
@@ -1004,11 +1011,12 @@ export async function createRemovalRequest(
   const [broker] = await db.select().from(dataBrokers).where(eq(dataBrokers.id, brokerId));
   if (!broker) throw new Error("Broker not found");
 
-  const [profile] = await db
+  const [rawProfile] = await db
     .select()
     .from(userVaultProfiles)
     .where(and(eq(userVaultProfiles.id, vaultProfileId), eq(userVaultProfiles.userId, userId)));
-  if (!profile) throw new Error("Vault profile not found");
+  if (!rawProfile) throw new Error("Vault profile not found");
+  const profile = decryptVaultData(rawProfile);
 
   const { jurisdiction, legalBasis } = determineJurisdiction(broker, profile.currentAddress);
   const complianceDeadline = calculateComplianceDeadline(jurisdiction);
@@ -1567,12 +1575,13 @@ export async function runMonitoringScan(userId: string) {
   const schedule = await getMonitoringSchedule(userId);
   if (!schedule) throw new Error("No active monitoring schedule found");
 
-  const [profile] = await db
+  const [rawMonProfile] = await db
     .select()
     .from(userVaultProfiles)
     .where(and(eq(userVaultProfiles.id, schedule.vaultProfileId), eq(userVaultProfiles.userId, userId)));
 
-  if (!profile) throw new Error("Vault profile not found for monitoring");
+  if (!rawMonProfile) throw new Error("Vault profile not found for monitoring");
+  const profile = decryptVaultData(rawMonProfile);
 
   try {
     const scanResult = await runExposureScan(userId, schedule.vaultProfileId);

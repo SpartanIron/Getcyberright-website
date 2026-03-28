@@ -242,6 +242,13 @@ app.use((req, res, next) => {
         console.error("Failed to seed badge definitions:", err);
       });
 
+      // Migrate any unencrypted vault data to encrypted storage
+      import("./vaultEncryption").then(({ migrateUnencryptedVaultData }) => {
+        migrateUnencryptedVaultData();
+      }).catch(err => {
+        console.error("Failed to migrate vault encryption:", err);
+      });
+
       // Generate social posts for any published content that doesn't have them
       import("./socialPostSeed").then(({ seedSocialPosts }) => {
         seedSocialPosts();

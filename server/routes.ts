@@ -16,6 +16,8 @@ import { registerAdminRoutes, registerToolTrackingRoutes } from "./admin";
 import { registerPlatformRoutes } from "./platformRoutes";
 import { registerChatRoutes } from "./replit_integrations/chat";
 import { registerStripeRoutes, registerStripeWebhook } from "./stripe";
+import { decryptVaultData } from "./vaultEncryption";
+import { logVaultAccess, extractRequestContext } from "./vaultAuditLog";
 import { 
   checkGoogleSafeBrowsing, 
   checkVirusTotal, 
@@ -3197,6 +3199,8 @@ EDGE CASE HANDLING
     try {
       const user = req.user;
       const profile = await getUserVaultProfile(user.id);
+      const { ipAddress, userAgent } = extractRequestContext(req);
+      logVaultAccess({ userId: user.id, action: "vault_read", vaultProfileId: profile?.id, ipAddress, userAgent });
       res.json(profile);
     } catch (error: any) {
       console.error("Error fetching vault profile:", error);
@@ -3229,7 +3233,18 @@ EDGE CASE HANDLING
       sanitized.lastAccessedAt = new Date();
       sanitized.dataMinimized = true;
 
+      const existingProfile = await getUserVaultProfile(user.id);
       const profile = await upsertVaultProfile(user.id, sanitized);
+      const { ipAddress, userAgent } = extractRequestContext(req);
+      const fieldsAccessed = Object.keys(sanitized).filter(k => k !== "retentionExpiresAt" && k !== "lastAccessedAt" && k !== "dataMinimized");
+      logVaultAccess({
+        userId: user.id,
+        action: existingProfile ? "vault_update" : "vault_create",
+        vaultProfileId: profile.id,
+        ipAddress,
+        userAgent,
+        fieldsAccessed,
+      });
       res.json(profile);
     } catch (error: any) {
       console.error("Error upserting vault profile:", error);
@@ -3240,6 +3255,8 @@ EDGE CASE HANDLING
   app.get("/api/data-removal/vault/profiles", isAuthenticated, async (req: any, res: Response) => {
     try {
       const profiles = await getAllVaultProfiles(req.user.id);
+      const { ipAddress, userAgent } = extractRequestContext(req);
+      logVaultAccess({ userId: req.user.id, action: "vault_read_all", ipAddress, userAgent });
       res.json(profiles);
     } catch (error: any) {
       console.error("Error fetching vault profiles:", error);
@@ -3260,6 +3277,8 @@ EDGE CASE HANDLING
         phoneNumbers,
         currentAddress,
       });
+      const { ipAddress, userAgent } = extractRequestContext(req);
+      logVaultAccess({ userId: req.user.id, action: "vault_family_create", vaultProfileId: profile.id, ipAddress, userAgent });
       res.json(profile);
     } catch (error: any) {
       console.error("Error creating family profile:", error);
@@ -3271,6 +3290,8 @@ EDGE CASE HANDLING
     try {
       const profileId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const result = await deleteFamilyProfile(req.user.id, profileId);
+      const { ipAddress, userAgent } = extractRequestContext(req);
+      logVaultAccess({ userId: req.user.id, action: "vault_family_delete", vaultProfileId: profileId, ipAddress, userAgent });
       res.json(result);
     } catch (error: any) {
       console.error("Error deleting family profile:", error);
@@ -3287,6 +3308,8 @@ EDGE CASE HANDLING
       }
 
       const result = await runExposureScan(user.id, vaultProfileId);
+      const { ipAddress, userAgent } = extractRequestContext(req);
+      logVaultAccess({ userId: user.id, action: "vault_scan_initiated", vaultProfileId, ipAddress, userAgent });
 
       res.json(result);
     } catch (error: any) {
@@ -3324,8 +3347,9 @@ EDGE CASE HANDLING
       if (!brokerId || !vaultProfileId) {
         return res.status(400).json({ error: "brokerId and vaultProfileId are required" });
       }
-      const ipAddress = req.ip || req.connection?.remoteAddress;
+      const { ipAddress, userAgent } = extractRequestContext(req);
       const request = await createRemovalRequest(user.id, brokerId, vaultProfileId, findingId, ipAddress);
+      logVaultAccess({ userId: user.id, action: "vault_removal_requested", vaultProfileId, ipAddress, userAgent });
       res.json(request);
     } catch (error: any) {
       console.error("Error creating removal request:", error);
@@ -3401,8 +3425,9 @@ EDGE CASE HANDLING
         return res.status(400).json({ error: "Maximum 50 requests per batch" });
       }
       const uniqueIds = Array.from(new Set(requestIds as string[]));
-      const ipAddress = req.ip || req.connection?.remoteAddress;
+      const { ipAddress, userAgent } = extractRequestContext(req);
       const result = await bulkAutoRemoval(user.id, uniqueIds, ipAddress);
+      logVaultAccess({ userId: user.id, action: "vault_bulk_removal", ipAddress, userAgent });
       res.json(result);
     } catch (error: any) {
       console.error("Error bulk auto-sending removal requests:", error);
@@ -3491,6 +3516,8 @@ EDGE CASE HANDLING
         monitoringMode,
         darkWebMonitoring,
       });
+      const { ipAddress, userAgent } = extractRequestContext(req);
+      logVaultAccess({ userId: user.id, action: "vault_monitoring_setup", vaultProfileId, ipAddress, userAgent });
       res.json(schedule);
     } catch (error: any) {
       console.error("Error setting up monitoring:", error);
@@ -3731,8 +3758,9 @@ EDGE CASE HANDLING
       const [broker] = await db.select().from(dataBrokers).where(eq(dataBrokers.id, brokerId));
       if (!broker) return res.status(404).json({ error: "Broker not found" });
 
-      const [profile] = await db.select().from(userVaultProfiles).where(and(eq(userVaultProfiles.id, vaultProfileId), eq(userVaultProfiles.userId, req.user.id)));
-      if (!profile) return res.status(404).json({ error: "Vault profile not found" });
+      const [rawProfile] = await db.select().from(userVaultProfiles).where(and(eq(userVaultProfiles.id, vaultProfileId), eq(userVaultProfiles.userId, req.user.id)));
+      if (!rawProfile) return res.status(404).json({ error: "Vault profile not found" });
+      const profile = decryptVaultData(rawProfile);
 
       const template = generateExecutiveComplianceTemplate(broker, profile, framework || "CCPA");
       res.json({ template, framework: framework || "CCPA", broker: broker.name });

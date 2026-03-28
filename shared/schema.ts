@@ -744,6 +744,19 @@ export const insertUserVaultProfileSchema = createInsertSchema(userVaultProfiles
 });
 export type InsertUserVaultProfile = z.infer<typeof insertUserVaultProfileSchema>;
 
+export const vaultAuditLogs = pgTable("vault_audit_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  action: text("action").notNull(),
+  vaultProfileId: varchar("vault_profile_id"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  fieldsAccessed: text("fields_accessed").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type VaultAuditLog = typeof vaultAuditLogs.$inferSelect;
+
 export const exposureScans = pgTable("exposure_scans", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull(),
