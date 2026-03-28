@@ -3195,7 +3195,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.get("/api/data-removal/vault", isAuthenticated, async (req: any, res: Response) => {
+  app.get("/api/data-removal/vault", strictRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const user = req.user;
       const profile = await getUserVaultProfile(user.id);
@@ -3252,7 +3252,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.get("/api/data-removal/vault/profiles", isAuthenticated, async (req: any, res: Response) => {
+  app.get("/api/data-removal/vault/profiles", strictRateLimit, isAuthenticated, async (req: any, res: Response) => {
     try {
       const profiles = await getAllVaultProfiles(req.user.id);
       const { ipAddress, userAgent } = extractRequestContext(req);
