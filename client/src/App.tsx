@@ -77,6 +77,7 @@ import ScamIntelListing from "@/pages/scam-intel-listing";
 import ScamIntelDetail from "@/pages/scam-intel-detail";
 import ShieldPage from "@/pages/shield";
 import ShieldResultsPage from "@/pages/shield-results";
+import ShieldNextSteps from "@/pages/shield-next-steps";
 
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const AdminDashboard = lazy(() => import("@/pages/admin/index"));
@@ -194,6 +195,7 @@ function AppRouter() {
         <Route path="/scam-intel/:slug" component={ScamIntelDetail} />
         <Route path="/shield" component={ShieldPage} />
         <Route path="/shield/results/:scanId" component={ShieldResultsPage} />
+        <Route path="/shield/next-steps" component={ShieldNextSteps} />
         <Route path="/training" component={Training} />
         <Route path="/training/:pathId" component={TrainingPath} />
         <Route path="/training/lesson/:lessonId" component={TrainingLesson} />

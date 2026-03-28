@@ -939,13 +939,27 @@ function ShieldResultsPage() {
             </Card>
           )}
 
-          <div className="text-center">
-            <Link href="/shield">
-              <Button variant="outline" className="min-h-[44px]" data-testid="button-new-scan">
-                Run Another Scan
-              </Button>
-            </Link>
-          </div>
+          <Card className="border-primary/30 bg-primary/5" data-testid="card-next-steps-cta">
+            <CardContent className="p-6 text-center">
+              <ShieldAlert className="w-8 h-8 text-primary mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-foreground mb-2">Not Sure What to Do Next?</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                We've built a step-by-step guide based on your risk level to help you take back control of your data.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link href="/shield/next-steps">
+                  <Button className="bg-primary hover:bg-primary/90 min-h-[44px]" data-testid="button-next-steps">
+                    View Your Action Plan
+                  </Button>
+                </Link>
+                <Link href="/shield">
+                  <Button variant="outline" className="min-h-[44px]" data-testid="button-new-scan">
+                    Run Another Scan
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
       <Footer />

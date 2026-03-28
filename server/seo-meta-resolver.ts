@@ -10,6 +10,7 @@ const OG_IMAGES: Record<string, string> = {
   "/": `${BASE_URL}/og/trust-metrics.png`,
   "/scam-checker": `${BASE_URL}/og/scam-guard.png`,
   "/shield": `${BASE_URL}/og/data-shield.png`,
+  "/shield/next-steps": `${BASE_URL}/og/data-shield.png`,
   "/data-removal": `${BASE_URL}/og/data-shield.png`,
   "/news": `${BASE_URL}/og/news-alerts.png`,
   "/alerts": `${BASE_URL}/og/news-alerts.png`,
@@ -132,6 +133,10 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; ogT
   "/shield": {
     title: "GCR Data Shield: Find & Remove Your Exposed Personal Data",
     description: "Scan 500+ data brokers to find where your personal information is exposed online. Get step-by-step removal guidance or automated removal.",
+  },
+  "/shield/next-steps": {
+    title: "What to Do After Your Data Shield Scan | GetCyberRight",
+    description: "Your data was found exposed online. Follow this step-by-step guide based on your risk level to remove your data from broker sites and protect against identity theft.",
   },
   "/breach-dashboard": {
     title: "Data Breach Monitor: Check If Your Email Has Been Compromised",
