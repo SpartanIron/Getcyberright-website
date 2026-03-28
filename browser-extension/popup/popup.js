@@ -1,3 +1,12 @@
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const scanInput = document.getElementById("scan-input");
   const btnScan = document.getElementById("btn-scan");
@@ -536,7 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
         html += ` <span class="digest-stat digest-stat-warn">${flaggedCount} flagged</span>`;
       }
       if (threatDomains.length > 0) {
-        html += `<span class="digest-threats">Top threats: ${threatDomains.join(", ")}</span>`;
+        html += `<span class="digest-threats">Top threats: ${threatDomains.map(escapeHtml).join(", ")}</span>`;
       }
       if (digest?.generatedAt) {
         const ago = timeAgo(digest.generatedAt);
