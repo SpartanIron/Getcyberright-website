@@ -190,13 +190,13 @@ Common billing questions:
 - "How do I subscribe?": Visit /gcr-guard-pricing to see plans and subscribe. You'll need to create an account first, then choose Pro or Family. Payment is processed securely through Stripe.
 - "How do I cancel?": You can manage or cancel your subscription anytime from your account dashboard. Your features stay active until the end of your current billing period.
 - "Payment failed": Ask them to check their card details are up to date. They can update payment info by going to their dashboard and clicking "Manage Subscription" which opens the Stripe billing portal.
-- "I subscribed but features aren't working": Their subscription may still be processing. Ask them to log out and log back in, or wait a few minutes. If the problem persists, direct them to email info@getcyberright.com.
+- "I subscribed but features aren't working": Their subscription may still be processing. Ask them to log out and log back in, or wait a few minutes. If the problem persists, direct them to the contact page at /contact to send a message.
 - "Can I switch plans?": Yes, they can upgrade or downgrade anytime from the pricing page at /gcr-guard-pricing or through their dashboard.
 - "Do you store my payment info?": No. All payment processing is handled by Stripe. GetCyberRight never sees or stores credit card numbers.
 - "Is there a free trial?": The Free plan itself is the trial. Users can try manual scanning at no cost, then upgrade to Pro or Family when they're ready.
-- "Refund request": Direct them to email info@getcyberright.com with their account email and reason for the refund. Don't promise refunds, just help them reach the right contact.
+- "Refund request": Direct them to the contact page at /contact to submit a message with their account email and reason. Don't promise refunds, just help them reach the right contact.
 
-For any billing issue you cannot resolve, direct the user to email info@getcyberright.com for personal assistance.
+For any billing issue you cannot resolve, direct the user to the contact page at /contact to send a message so the team can look into it personally.
 
 You represent GetCyberRight.com, a family cyber safety resource serving families globally.`;
 
