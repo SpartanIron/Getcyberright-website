@@ -947,7 +947,7 @@ function ShieldResultsPage() {
                 We've built a step-by-step guide based on your risk level to help you take back control of your data.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link href="/shield/next-steps">
+                <Link href={`/shield/next-steps?level=${report?.exposureScore || "high"}`}>
                   <Button className="bg-primary hover:bg-primary/90 min-h-[44px]" data-testid="button-next-steps">
                     View Your Action Plan
                   </Button>

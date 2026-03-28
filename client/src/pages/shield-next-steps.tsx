@@ -1,363 +1,516 @@
-import { Link } from "wouter";
+import { useState, useEffect, useCallback } from "react";
+import { Link, useSearch } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Shield,
   ShieldCheck,
   ShieldAlert,
   AlertTriangle,
   CheckCircle2,
+  Circle,
   Lock,
   Eye,
   Trash2,
-  Mail,
-  Phone,
   CreditCard,
   Key,
   RefreshCw,
-  ArrowRight,
   Clock,
   Users,
-  FileWarning,
   Smartphone,
   Globe,
   ChevronRight,
+  ExternalLink,
   Zap,
   Bell,
+  PartyPopper,
+  ArrowRight,
 } from "lucide-react";
 
-const URGENCY_LEVELS = [
-  {
-    level: "Critical",
-    color: "bg-red-500/10 border-red-500/30 dark:bg-red-500/20",
-    badgeColor: "bg-red-500 text-white",
-    icon: ShieldAlert,
-    description: "Passwords, SSN, or financial data exposed in breaches",
-    timeframe: "Act within 24 hours",
-    steps: [
-      { action: "Change all exposed passwords immediately", detail: "Start with email, banking, and any accounts using the same password. Use our Password Generator to create strong, unique passwords.", link: "/password-generator", linkText: "Password Generator" },
-      { action: "Enable two-factor authentication everywhere", detail: "Prioritize email, banking, social media, and any account tied to your exposed data. Use an authenticator app, not SMS when possible.", link: null, linkText: null },
-      { action: "Freeze your credit at all three bureaus", detail: "Contact Equifax, Experian, and TransUnion to place a security freeze. This prevents anyone from opening new accounts in your name. It's free and takes about 10 minutes per bureau.", link: null, linkText: null },
-      { action: "Set up fraud alerts", detail: "Place an initial fraud alert with one bureau (it automatically applies to all three). This requires creditors to verify your identity before opening new accounts.", link: null, linkText: null },
-      { action: "Monitor your financial accounts daily", detail: "Check bank and credit card statements for unfamiliar transactions. Set up transaction alerts through your bank's app.", link: null, linkText: null },
-    ],
-  },
-  {
-    level: "High",
-    color: "bg-orange-500/10 border-orange-500/30 dark:bg-orange-500/20",
-    badgeColor: "bg-orange-500 text-white",
-    icon: AlertTriangle,
-    description: "Personal info found on multiple data broker sites",
-    timeframe: "Act within the first week",
-    steps: [
-      { action: "Submit opt-out requests to each data broker", detail: "Your Data Shield results show exactly which brokers have your data. Each broker has a different removal process. Some use web forms, others require email requests.", link: "/data-removal", linkText: "Start Removal Process" },
-      { action: "Document everything", detail: "Screenshot your Data Shield results and save confirmation emails from opt-out requests. Brokers are required to honor removal requests within 30-45 days.", link: null, linkText: null },
-      { action: "Opt out of people-search sites", detail: "Sites like Spokeo, WhitePages, and BeenVerified aggregate your data. Removing yourself from these reduces your exposure to scammers and identity thieves.", link: null, linkText: null },
-      { action: "Review your social media privacy settings", detail: "Data brokers scrape public profiles. Set your accounts to private and limit what information is publicly visible.", link: null, linkText: null },
-    ],
-  },
-  {
-    level: "Medium",
-    color: "bg-yellow-500/10 border-yellow-500/30 dark:bg-yellow-500/20",
-    badgeColor: "bg-yellow-600 text-white",
-    icon: Eye,
-    description: "Email found in older breaches, some broker listings",
-    timeframe: "Address within 2 weeks",
-    steps: [
-      { action: "Update passwords on affected accounts", detail: "Even older breaches are dangerous. Criminals often test stolen credentials months or years after a breach.", link: "/password-generator", linkText: "Password Generator" },
-      { action: "Check if you're reusing passwords", detail: "If any exposed password is used on other accounts, change those too. Password reuse is one of the most common ways accounts get compromised.", link: null, linkText: null },
-      { action: "Set up ongoing monitoring", detail: "Re-scan with Data Shield monthly to catch new exposures. Data brokers often re-list people within 60-90 days of removal.", link: "/shield", linkText: "Schedule Re-scan" },
-      { action: "Review your Breach Dashboard", detail: "Get a comprehensive view of all your breach exposures and track which ones you've addressed.", link: "/breach-dashboard", linkText: "Breach Dashboard" },
-    ],
-  },
-  {
-    level: "Low",
-    color: "bg-green-500/10 border-green-500/30 dark:bg-green-500/20",
-    badgeColor: "bg-green-600 text-white",
-    icon: ShieldCheck,
-    description: "Minimal exposure found",
-    timeframe: "Maintain good habits",
-    steps: [
-      { action: "Keep your good security posture", detail: "You're in good shape. Continue using strong, unique passwords and two-factor authentication on important accounts.", link: null, linkText: null },
-      { action: "Set up proactive monitoring", detail: "Even with low exposure, new breaches happen daily. Schedule monthly re-scans to stay ahead of any new threats.", link: "/shield", linkText: "Data Shield" },
-      { action: "Protect your family too", detail: "Run Data Shield scans for your family members, especially seniors and teenagers who may be more vulnerable.", link: "/shield", linkText: "Scan for Family" },
-    ],
-  },
-];
+type ExposureLevel = "critical" | "high" | "medium" | "low";
 
-const PROTECTION_CHECKLIST = [
-  { icon: Key, label: "Change all exposed passwords", category: "Immediate" },
-  { icon: Lock, label: "Enable 2FA on critical accounts", category: "Immediate" },
-  { icon: CreditCard, label: "Freeze credit at all 3 bureaus", category: "Immediate" },
-  { icon: Trash2, label: "Submit data broker opt-outs", category: "This Week" },
-  { icon: Mail, label: "Set up breach monitoring alerts", category: "This Week" },
-  { icon: Smartphone, label: "Review social media privacy", category: "This Week" },
-  { icon: RefreshCw, label: "Schedule monthly re-scans", category: "Ongoing" },
-  { icon: Eye, label: "Monitor financial statements", category: "Ongoing" },
-  { icon: Users, label: "Scan family members' data", category: "Ongoing" },
-  { icon: Globe, label: "Review app permissions", category: "Ongoing" },
-];
+type ActionStep = {
+  id: string;
+  action: string;
+  detail: string;
+  link?: string;
+  linkText?: string;
+  externalLinks?: { label: string; url: string }[];
+  timeframe: string;
+};
+
+const LEVEL_CONFIG: Record<ExposureLevel, {
+  label: string;
+  color: string;
+  badgeColor: string;
+  borderColor: string;
+  progressColor: string;
+  icon: typeof ShieldAlert;
+  headline: string;
+  subtitle: string;
+  timeframe: string;
+}> = {
+  critical: {
+    label: "Critical Exposure",
+    color: "bg-red-500/10 dark:bg-red-500/20",
+    badgeColor: "bg-red-500 text-white",
+    borderColor: "border-red-500/30",
+    progressColor: "[&>div]:bg-red-500",
+    icon: ShieldAlert,
+    headline: "Your data needs immediate attention.",
+    subtitle: "Passwords, financial data, or sensitive information was found exposed. Follow these steps now to protect yourself.",
+    timeframe: "Complete within 24 hours",
+  },
+  high: {
+    label: "High Exposure",
+    color: "bg-orange-500/10 dark:bg-orange-500/20",
+    badgeColor: "bg-orange-500 text-white",
+    borderColor: "border-orange-500/30",
+    progressColor: "[&>div]:bg-orange-500",
+    icon: AlertTriangle,
+    headline: "Your personal info is widely available online.",
+    subtitle: "Multiple data broker sites have your information. Start removing it this week to reduce your risk.",
+    timeframe: "Complete within 1 week",
+  },
+  medium: {
+    label: "Moderate Exposure",
+    color: "bg-yellow-500/10 dark:bg-yellow-500/20",
+    badgeColor: "bg-yellow-600 text-white",
+    borderColor: "border-yellow-500/30",
+    progressColor: "[&>div]:bg-yellow-500",
+    icon: Eye,
+    headline: "Some exposure found. Time to clean up.",
+    subtitle: "Your email appeared in older breaches or a few broker listings. Address these to stay ahead of threats.",
+    timeframe: "Complete within 2 weeks",
+  },
+  low: {
+    label: "Low Exposure",
+    color: "bg-green-500/10 dark:bg-green-500/20",
+    badgeColor: "bg-green-600 text-white",
+    borderColor: "border-green-500/30",
+    progressColor: "[&>div]:bg-green-500",
+    icon: ShieldCheck,
+    headline: "You're in good shape. Stay protected.",
+    subtitle: "Minimal exposure found. These quick steps will keep you ahead of future threats.",
+    timeframe: "Quick maintenance",
+  },
+};
+
+const ACTION_STEPS: Record<ExposureLevel, ActionStep[]> = {
+  critical: [
+    {
+      id: "change-passwords",
+      action: "Change your exposed passwords right now",
+      detail: "Start with email, banking, and any account that uses the same password. Every minute counts when passwords are exposed.",
+      link: "/password-generator",
+      linkText: "Open Password Generator",
+      timeframe: "Do this now",
+    },
+    {
+      id: "enable-2fa",
+      action: "Turn on two-factor authentication",
+      detail: "Prioritize your email (it's the key to all other accounts), then banking and social media. Use an authenticator app instead of SMS for stronger protection.",
+      timeframe: "Do this now",
+    },
+    {
+      id: "freeze-credit",
+      action: "Freeze your credit at all three bureaus",
+      detail: "This is free and prevents anyone from opening new accounts in your name. Takes about 10 minutes per bureau.",
+      externalLinks: [
+        { label: "Equifax Freeze", url: "https://www.equifax.com/personal/credit-report-services/credit-freeze/" },
+        { label: "Experian Freeze", url: "https://www.experian.com/freeze/center.html" },
+        { label: "TransUnion Freeze", url: "https://www.transunion.com/credit-freeze" },
+      ],
+      timeframe: "Do this now",
+    },
+    {
+      id: "start-removal",
+      action: "Start removing your data from broker sites",
+      detail: "Your scan found your information on data broker sites. Begin the opt-out process to get it removed.",
+      link: "/data-removal",
+      linkText: "Start Data Removal",
+      timeframe: "Start today",
+    },
+    {
+      id: "monitor-accounts",
+      action: "Set up alerts on your financial accounts",
+      detail: "Turn on transaction notifications through your bank's app so you're alerted to any unfamiliar activity immediately.",
+      timeframe: "Start today",
+    },
+    {
+      id: "rescan-verify",
+      action: "Re-scan in 30 days to verify progress",
+      detail: "After completing the steps above, run another scan to confirm your data has been removed and no new exposures have appeared.",
+      link: "/shield",
+      linkText: "Set Reminder to Re-scan",
+      timeframe: "In 30 days",
+    },
+  ],
+  high: [
+    {
+      id: "start-removal",
+      action: "Submit opt-out requests to every broker that has your data",
+      detail: "Your scan showed which brokers have your information. Each broker's removal process is different. Our Data Removal tool walks you through each one.",
+      link: "/data-removal",
+      linkText: "Start Data Removal",
+      timeframe: "Start this week",
+    },
+    {
+      id: "people-search",
+      action: "Opt out of people-search sites",
+      detail: "Sites like Spokeo, WhitePages, and BeenVerified are the most common places your data appears. Removing yourself from these cuts off the easiest access scammers have to your info.",
+      link: "/data-removal",
+      linkText: "View Broker List",
+      timeframe: "This week",
+    },
+    {
+      id: "update-passwords",
+      action: "Update your passwords on sensitive accounts",
+      detail: "Even if passwords weren't directly exposed, your personal data being public makes you a target for phishing. Strengthen your most important accounts.",
+      link: "/password-generator",
+      linkText: "Open Password Generator",
+      timeframe: "This week",
+    },
+    {
+      id: "social-privacy",
+      action: "Lock down your social media profiles",
+      detail: "Data brokers scrape public profiles. Set your accounts to private and review what information is publicly visible on Facebook, LinkedIn, and Instagram.",
+      timeframe: "This week",
+    },
+    {
+      id: "rescan-verify",
+      action: "Re-scan in 30 days to confirm removals",
+      detail: "Brokers are required to process opt-outs within 30-45 days. Re-scan to confirm your data has been removed and catch any sites that re-listed you.",
+      link: "/shield",
+      linkText: "Set Reminder to Re-scan",
+      timeframe: "In 30 days",
+    },
+  ],
+  medium: [
+    {
+      id: "change-passwords",
+      action: "Update passwords on accounts affected by breaches",
+      detail: "Even older breaches are dangerous. Criminals test stolen credentials months or years later. If you reused any exposed password on other sites, change those too.",
+      link: "/password-generator",
+      linkText: "Open Password Generator",
+      timeframe: "This week",
+    },
+    {
+      id: "check-breaches",
+      action: "Review your full breach history",
+      detail: "See exactly which breaches included your email and what data was exposed. This helps you prioritize which accounts need attention first.",
+      link: "/breach-dashboard",
+      linkText: "Open Breach Dashboard",
+      timeframe: "This week",
+    },
+    {
+      id: "enable-2fa",
+      action: "Add two-factor authentication to important accounts",
+      detail: "Even moderate exposure means your email is in attacker databases. Adding 2FA makes your accounts much harder to break into.",
+      timeframe: "This week",
+    },
+    {
+      id: "monthly-scans",
+      action: "Set up monthly monitoring scans",
+      detail: "New breaches happen constantly and data brokers re-list people within 60-90 days. Monthly scanning catches new exposures early.",
+      link: "/shield",
+      linkText: "Schedule Re-scan",
+      timeframe: "Ongoing",
+    },
+  ],
+  low: [
+    {
+      id: "review-passwords",
+      action: "Audit your password strength",
+      detail: "Great news on low exposure. Now make sure you're using unique, strong passwords on every account. If you reuse any passwords, now is the time to fix that.",
+      link: "/password-generator",
+      linkText: "Open Password Generator",
+      timeframe: "When convenient",
+    },
+    {
+      id: "enable-2fa",
+      action: "Confirm 2FA is on for your most important accounts",
+      detail: "Email, banking, and social media should all have two-factor authentication enabled. This is your strongest defense against future threats.",
+      timeframe: "When convenient",
+    },
+    {
+      id: "family-scan",
+      action: "Run scans for your family members",
+      detail: "Seniors are frequently targeted by scammers using broker data, and children's clean credit histories make them attractive for identity theft.",
+      link: "/shield",
+      linkText: "Scan for Family",
+      timeframe: "When convenient",
+    },
+    {
+      id: "monthly-scans",
+      action: "Re-scan monthly to stay protected",
+      detail: "Your low exposure today doesn't guarantee tomorrow. New breaches and data broker listings happen constantly. Stay ahead with regular scans.",
+      link: "/shield",
+      linkText: "Bookmark Data Shield",
+      timeframe: "Ongoing",
+    },
+  ],
+};
+
+const STORAGE_KEY = "gcr-shield-checklist";
+
+function getStoredChecks(level: ExposureLevel): Record<string, boolean> {
+  try {
+    const stored = localStorage.getItem(`${STORAGE_KEY}-${level}`);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+}
+
+function setStoredChecks(level: ExposureLevel, checks: Record<string, boolean>) {
+  try {
+    localStorage.setItem(`${STORAGE_KEY}-${level}`, JSON.stringify(checks));
+  } catch {}
+}
 
 export default function ShieldNextSteps() {
+  const searchString = useSearch();
+  const params = new URLSearchParams(searchString);
+  const levelParam = params.get("level") as ExposureLevel | null;
+  const level: ExposureLevel = levelParam && levelParam in LEVEL_CONFIG ? levelParam : "high";
+
+  const config = LEVEL_CONFIG[level];
+  const steps = ACTION_STEPS[level];
+  const Icon = config.icon;
+
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    setChecked(getStoredChecks(level));
+  }, [level]);
+
+  const toggleCheck = useCallback((stepId: string) => {
+    setChecked((prev) => {
+      const next = { ...prev, [stepId]: !prev[stepId] };
+      setStoredChecks(level, next);
+      return next;
+    });
+  }, [level]);
+
+  const completedCount = steps.filter((s) => checked[s.id]).length;
+  const progressPercent = Math.round((completedCount / steps.length) * 100);
+  const allDone = completedCount === steps.length;
+
   return (
     <>
       <SEOHead
-        title="What to Do After Your Data Shield Scan | GetCyberRight"
-        description="Your data was found exposed online. Here's exactly what to do next, step by step, based on your risk level. Protect yourself and your family from identity theft and scams."
+        title="Your Action Plan | Data Shield | GetCyberRight"
+        description="Your personalized action plan based on your Data Shield scan results. Step-by-step guidance to remove your exposed data and protect against identity theft."
         canonicalUrl="https://www.getcyberright.com/shield/next-steps"
       />
       <Navigation />
 
       <main className="min-h-screen bg-background">
-        <section className="relative py-16 md:py-24 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 via-background to-background" />
+        <section className="relative py-12 md:py-20 overflow-hidden">
+          <div className={`absolute inset-0 ${config.color} opacity-30`} />
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-3xl mx-auto text-center">
-              <Badge className="bg-red-500/10 text-red-500 border-red-500/30 mb-4" data-testid="badge-alert">
-                <AlertTriangle className="w-3 h-3 mr-1" />
-                Your Data Was Found Exposed
-              </Badge>
-              <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-4" data-testid="heading-main">
-                Your Data Is Out There.{" "}
-                <span className="text-primary">Here's What to Do.</span>
+            <div className="max-w-3xl mx-auto">
+              <div className="flex items-center gap-3 mb-6">
+                <div className={`p-3 rounded-xl ${config.color} ${config.borderColor} border`}>
+                  <Icon className="w-7 h-7 text-foreground" />
+                </div>
+                <div>
+                  <Badge className={config.badgeColor} data-testid="badge-level">
+                    {config.label}
+                  </Badge>
+                  <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {config.timeframe}
+                  </p>
+                </div>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3" data-testid="heading-main">
+                {config.headline}
               </h1>
               <p className="text-lg text-muted-foreground mb-8" data-testid="text-subtitle">
-                Don't panic, but don't wait either. Follow these steps based on your
-                exposure level to take back control of your personal information.
+                {config.subtitle}
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link href="/shield">
-                  <Button size="lg" variant="outline" data-testid="button-rescan">
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Run a New Scan
-                  </Button>
-                </Link>
-                <Link href="/data-removal">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90" data-testid="button-start-removal">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Start Data Removal
-                  </Button>
-                </Link>
+
+              <div className={`flex items-center gap-4 p-4 rounded-xl ${config.color} ${config.borderColor} border`} data-testid="progress-bar">
+                <div className="flex-1">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-medium text-foreground">
+                      {completedCount} of {steps.length} steps completed
+                    </span>
+                    <span className="text-muted-foreground">{progressPercent}%</span>
+                  </div>
+                  <Progress value={progressPercent} className={`h-3 ${config.progressColor}`} />
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-12 md:py-16">
+        <section className="py-8 md:py-12">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3" data-testid="heading-urgency">
-                  Steps Based on Your Risk Level
-                </h2>
-                <p className="text-muted-foreground">
-                  Find your exposure level from your Data Shield results and follow the matching action plan.
-                </p>
-              </div>
-
-              <div className="space-y-8">
-                {URGENCY_LEVELS.map((level) => {
-                  const Icon = level.icon;
-                  return (
-                    <Card
-                      key={level.level}
-                      className={`border ${level.color}`}
-                      data-testid={`card-level-${level.level.toLowerCase()}`}
-                    >
-                      <CardContent className="p-6 md:p-8">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-background border">
-                              <Icon className="w-6 h-6 text-foreground" />
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <Badge className={level.badgeColor}>
-                                  {level.level} Exposure
-                                </Badge>
-                                <span className="text-sm text-muted-foreground flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  {level.timeframe}
-                                </span>
-                              </div>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {level.description}
-                              </p>
-                            </div>
+            <div className="max-w-3xl mx-auto space-y-4">
+              {steps.map((step, idx) => {
+                const isDone = checked[step.id];
+                return (
+                  <Card
+                    key={step.id}
+                    className={`border transition-all duration-200 ${isDone ? "border-green-500/30 bg-green-500/5" : "border-border"}`}
+                    data-testid={`step-${step.id}`}
+                  >
+                    <CardContent className="p-5">
+                      <div className="flex gap-4">
+                        <button
+                          onClick={() => toggleCheck(step.id)}
+                          className="flex-shrink-0 mt-0.5 focus:outline-none focus:ring-2 focus:ring-primary rounded-full"
+                          aria-label={isDone ? `Unmark "${step.action}" as done` : `Mark "${step.action}" as done`}
+                          data-testid={`check-${step.id}`}
+                        >
+                          {isDone ? (
+                            <CheckCircle2 className="w-7 h-7 text-green-500" />
+                          ) : (
+                            <Circle className="w-7 h-7 text-muted-foreground/40 hover:text-primary transition-colors" />
+                          )}
+                        </button>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                            <h3 className={`font-semibold text-foreground ${isDone ? "line-through opacity-60" : ""}`}>
+                              <span className="text-primary mr-2">{idx + 1}.</span>
+                              {step.action}
+                            </h3>
+                            <Badge variant="outline" className="text-xs flex-shrink-0 whitespace-nowrap">
+                              {step.timeframe}
+                            </Badge>
+                          </div>
+                          <p className={`text-sm text-muted-foreground mb-3 ${isDone ? "opacity-60" : ""}`}>
+                            {step.detail}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {step.link && (
+                              <Link href={step.link}>
+                                <Button
+                                  size="sm"
+                                  variant={isDone ? "outline" : "default"}
+                                  className="min-h-[36px]"
+                                  data-testid={`action-${step.id}`}
+                                >
+                                  {step.linkText}
+                                  <ArrowRight className="w-3 h-3 ml-1.5" />
+                                </Button>
+                              </Link>
+                            )}
+                            {step.externalLinks?.map((ext) => (
+                              <a
+                                key={ext.label}
+                                href={ext.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="min-h-[36px]"
+                                  data-testid={`ext-${step.id}-${ext.label.toLowerCase().replace(/\s+/g, "-")}`}
+                                >
+                                  {ext.label}
+                                  <ExternalLink className="w-3 h-3 ml-1.5" />
+                                </Button>
+                              </a>
+                            ))}
                           </div>
                         </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
 
-                        <div className="space-y-4">
-                          {level.steps.map((step, idx) => (
-                            <div
-                              key={idx}
-                              className="flex gap-3 p-4 rounded-lg bg-background/50 border border-border/50"
-                              data-testid={`step-${level.level.toLowerCase()}-${idx}`}
-                            >
-                              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold mt-0.5">
-                                {idx + 1}
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="font-semibold text-foreground mb-1">
-                                  {step.action}
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {step.detail}
-                                </p>
-                                {step.link && (
-                                  <Link href={step.link}>
-                                    <Button
-                                      variant="link"
-                                      className="p-0 h-auto mt-2 text-primary"
-                                      data-testid={`link-${level.level.toLowerCase()}-${idx}`}
-                                    >
-                                      {step.linkText}
-                                      <ChevronRight className="w-3 h-3 ml-1" />
-                                    </Button>
-                                  </Link>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-12 md:py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-10">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3" data-testid="heading-checklist">
-                  Your Protection Checklist
-                </h2>
-                <p className="text-muted-foreground">
-                  Track your progress as you secure your digital life.
-                </p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                {["Immediate", "This Week", "Ongoing"].map((category) => (
-                  <div key={category} className={category === "Ongoing" ? "md:col-span-2" : ""}>
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                      {category}
+              {allDone && (
+                <Card className="border-green-500/30 bg-green-500/5" data-testid="card-all-done">
+                  <CardContent className="p-6 text-center">
+                    <PartyPopper className="w-10 h-10 text-green-500 mx-auto mb-3" />
+                    <h3 className="text-xl font-bold text-foreground mb-2">
+                      All steps completed!
                     </h3>
-                    <div className={`space-y-2 ${category === "Ongoing" ? "grid md:grid-cols-2 gap-2 space-y-0" : ""}`}>
-                      {PROTECTION_CHECKLIST.filter((item) => item.category === category).map(
-                        (item, idx) => {
-                          const Icon = item.icon;
-                          return (
-                            <Card
-                              key={idx}
-                              className="border border-border/50"
-                              data-testid={`checklist-item-${idx}`}
-                            >
-                              <CardContent className="p-3 flex items-center gap-3">
-                                <div className="p-1.5 rounded-md bg-primary/10">
-                                  <Icon className="w-4 h-4 text-primary" />
-                                </div>
-                                <span className="text-sm font-medium text-foreground">
-                                  {item.label}
-                                </span>
-                              </CardContent>
-                            </Card>
-                          );
-                        },
-                      )}
+                    <p className="text-muted-foreground mb-6">
+                      You've taken the right steps to protect yourself. Re-scan in 30 days to make sure your data stays removed and no new exposures appear.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Link href="/shield">
+                        <Button size="lg" className="bg-green-600 hover:bg-green-700 min-h-[44px]" data-testid="button-verify-scan">
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Run Verification Scan
+                        </Button>
+                      </Link>
+                      <Link href="/breach-dashboard">
+                        <Button size="lg" variant="outline" className="min-h-[44px]" data-testid="button-breach-dashboard">
+                          <Bell className="w-4 h-4 mr-2" />
+                          Set Up Breach Alerts
+                        </Button>
+                      </Link>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </section>
 
-        <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-10">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3" data-testid="heading-faq">
-                  Common Questions After a Scan
+        {!allDone && (
+          <section className="py-10 md:py-14">
+            <div className="container mx-auto px-4">
+              <div className="max-w-2xl mx-auto text-center">
+                <Shield className="w-10 h-10 text-primary mx-auto mb-3" />
+                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3" data-testid="heading-cta">
+                  Need help getting started?
                 </h2>
+                <p className="text-muted-foreground mb-6">
+                  Our Data Removal tool walks you through each opt-out request step by step.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link href="/data-removal">
+                    <Button size="lg" className="bg-primary hover:bg-primary/90 min-h-[44px]" data-testid="button-cta-removal">
+                      <Zap className="w-4 h-4 mr-2" />
+                      Start Data Removal
+                    </Button>
+                  </Link>
+                  <Link href="/shield">
+                    <Button size="lg" variant="outline" className="min-h-[44px]" data-testid="button-cta-scan">
+                      <Shield className="w-4 h-4 mr-2" />
+                      Run Another Scan
+                    </Button>
+                  </Link>
+                </div>
               </div>
+            </div>
+          </section>
+        )}
 
-              <div className="space-y-4">
+        <section className="py-10 md:py-14 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-lg font-semibold text-foreground mb-6" data-testid="heading-faq">
+                Quick Answers
+              </h2>
+              <div className="space-y-3">
                 {[
-                  {
-                    q: "How did my data end up on broker sites?",
-                    a: "Data brokers legally collect information from public records, social media, purchase history, and other sources. They compile and sell profiles that include your name, address, phone number, email, and more. It's a multi-billion dollar industry, and completely legal in most states.",
-                  },
-                  {
-                    q: "Will removing my data actually work?",
-                    a: "Yes, but it requires persistence. Most data brokers are legally required to honor opt-out requests within 30-45 days. However, they often re-list your information over time. That's why regular re-scanning is important. We recommend monthly checks with Data Shield.",
-                  },
-                  {
-                    q: "Is my identity at risk?",
-                    a: "If your personal details like name, address, and date of birth are exposed, the risk is real but manageable. Criminals use this information for phishing, account takeover, and identity theft. Taking the steps in this guide significantly reduces your risk.",
-                  },
-                  {
-                    q: "Should I be worried about old breaches?",
-                    a: "Yes. Stolen credentials are traded on dark web forums for years after a breach. If you used the same password on multiple sites (which most people do), an old breach can still lead to new compromises. Always change passwords that appeared in any breach, no matter how old.",
-                  },
-                  {
-                    q: "How often should I re-scan?",
-                    a: "We recommend scanning monthly. Data brokers often re-list people within 60-90 days of removal, and new data breaches happen constantly. Regular scanning helps you catch new exposures early.",
-                  },
-                  {
-                    q: "Should I scan my family members too?",
-                    a: "Absolutely. Seniors are frequently targeted by scammers using data from broker sites, and children's clean credit histories make them attractive targets for identity theft. Run Data Shield for every family member.",
-                  },
+                  { q: "Will removing my data actually work?", a: "Yes. Most data brokers are legally required to honor opt-out requests within 30-45 days. However, they often re-list people over time, which is why monthly re-scanning is important." },
+                  { q: "Should I be worried about old breaches?", a: "Yes. Stolen credentials are traded for years after a breach. If you reused any exposed password, change it on every site where you used it." },
+                  { q: "How often should I re-scan?", a: "Monthly. Data brokers re-list people within 60-90 days and new breaches happen constantly." },
+                  { q: "Should I scan my family members?", a: "Absolutely. Seniors are frequently targeted using broker data, and children's clean credit histories make them attractive targets for identity theft." },
                 ].map((faq, idx) => (
-                  <Card key={idx} className="border" data-testid={`faq-${idx}`}>
-                    <CardContent className="p-5">
-                      <h3 className="font-semibold text-foreground mb-2">{faq.q}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
+                  <Card key={idx} className="border border-border/50" data-testid={`faq-${idx}`}>
+                    <CardContent className="p-4">
+                      <h3 className="font-medium text-foreground text-sm mb-1">{faq.q}</h3>
+                      <p className="text-sm text-muted-foreground">{faq.a}</p>
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 md:py-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto text-center">
-              <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4" data-testid="heading-cta">
-                Ready to Take Back Control?
-              </h2>
-              <p className="text-muted-foreground mb-8">
-                Start removing your data from broker sites and strengthen your digital defenses today.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link href="/data-removal">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90" data-testid="button-cta-removal">
-                    <Zap className="w-4 h-4 mr-2" />
-                    Start Data Removal
-                  </Button>
-                </Link>
-                <Link href="/shield">
-                  <Button size="lg" variant="outline" data-testid="button-cta-scan">
-                    <Shield className="w-4 h-4 mr-2" />
-                    Run Another Scan
-                  </Button>
-                </Link>
-                <Link href="/breach-dashboard">
-                  <Button size="lg" variant="outline" data-testid="button-cta-breach">
-                    <Bell className="w-4 h-4 mr-2" />
-                    Breach Dashboard
-                  </Button>
-                </Link>
               </div>
             </div>
           </div>
