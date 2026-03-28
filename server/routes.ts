@@ -14,6 +14,7 @@ import { registerAuthRoutes, isAuthenticated, isAdmin, seedAdminUser } from "./a
 import { registerAdminRoutes, registerToolTrackingRoutes } from "./admin";
 import { registerPlatformRoutes } from "./platformRoutes";
 import { registerChatRoutes } from "./replit_integrations/chat";
+import { registerStripeRoutes, registerStripeWebhook } from "./stripe";
 import { 
   checkGoogleSafeBrowsing, 
   checkVirusTotal, 
@@ -441,6 +442,9 @@ export async function registerRoutes(
   registerPlatformRoutes(app);
 
   registerChatRoutes(app);
+
+  registerStripeRoutes(app);
+  registerStripeWebhook(app);
 
   // Contact form - strict rate limiting (10 req/min)
   app.post("/api/contact", strictRateLimit, async (req, res) => {

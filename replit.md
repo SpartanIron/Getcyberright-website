@@ -26,12 +26,22 @@ The frontend uses React 19, TypeScript, and Vite, with Wouter for routing, TanSt
 - **User Engagement**: Gamification & Achievement System, Dynamic Trending Threats, Regional Scam Profiles, User Feedback System.
 - **Admin & SEO**: Comprehensive Admin System with role-based access control (Super Admin, Admin, Editor, Viewer), user creation with configurable access levels, SEO Keyword Database, Internal Linking Engine, Dynamic Sitemap generation (includes news articles), SSR middleware for search engines, JSON-LD structured data. **Universal Meta Injection** (`server/seo-meta-resolver.ts`): All visitors (not just bots) receive page-specific `<title>`, meta description, canonical URL, OG/Twitter tags, and JSON-LD structured data (Organization + WebSite schemas on homepage, BreadcrumbList + Article schemas on content pages). Template placeholders in `client/index.html` are replaced at serve-time by both `server/vite.ts` (dev) and `server/static.ts` (prod). Bot visitors still get full pre-rendered HTML from `server/seo-renderer.ts` (which now includes `renderNewsPage()` for `/news/:slug` routes).
 
+## Stripe Integration
+- **Module**: `server/stripe.ts` - checkout session creation, webhook handler, customer portal, checkout status verification
+- **Products**: Auto-created on first checkout: Pro ($3.99/mo, tier=essential), Family ($7.99/mo, tier=professional)
+- **Flow**: Pricing page (`/gcr-guard-pricing`) → Stripe Checkout → `/checkout-success?session_id=` → webhook updates subscription
+- **Webhook security**: Requires `STRIPE_WEBHOOK_SECRET` - unsigned payloads are rejected. CSRF exempted for webhook route.
+- **Customer portal**: `/api/stripe/create-portal` for users to manage/cancel subscriptions
+- **DB fields**: `users.stripe_customer_id`, `users.subscription_tier`, `users.subscription_expires_at`
+- **Required secrets**: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+
 ## External Dependencies
 
 - **Database**: PostgreSQL (Neon), Drizzle Kit.
 - **UI & Styling**: Radix UI, shadcn/ui, Lucide React, react-icons, Tailwind CSS.
 - **Form & Validation**: Zod, React Hook Form, @hookform/resolvers.
 - **Authentication**: `connect-pg-simple`, `bcrypt`, `speakeasy`, `qrcode`, `jsonwebtoken`, `otplib`, `@simplewebauthn/server`, `@simplewebauthn/browser`.
+- **Payments**: Stripe (checkout sessions, webhooks, customer portal).
 - **Threat Intelligence & Data Sources**: PhishTank API, URLhaus API, Google Safe Browsing API v4, VirusTotal API, AlienVault OTX, RDAP/WHOIS, XposedOrNot, FBI IC3, FTC Consumer Sentinel, Europol IOCTA, Verizon DBIR, WEF Global Cybersecurity Outlook, UK NCSC, Australian ACSC, INTERPOL, ITU Global Cybersecurity Index, AARP Fraud Survey, CISA.
 - **AI Services**: Anthropic API (Claude), OpenAI.
 - **Email Services**: Brevo, MailerSend, SMTP2GO, Resend.

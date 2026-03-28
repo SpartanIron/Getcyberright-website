@@ -468,6 +468,10 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
     return next();
   }
 
+  if (req.path === '/api/stripe/webhook') {
+    return next();
+  }
+
   const extensionSafeRoutes = [
     '/api/security/ai-scam-analyze',
     '/api/security/check-url-reputation',

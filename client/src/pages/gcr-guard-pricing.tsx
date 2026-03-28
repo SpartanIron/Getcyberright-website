@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -14,10 +15,12 @@ import {
   Users,
   Crown,
   Download,
+  Loader2,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface TierData {
   id: string;
@@ -75,6 +78,8 @@ const TIER_COLORS: Record<string, string> = {
 
 export default function GcrGuardPricing() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const { data: userData } = useQuery<any>({
     queryKey: ["/api/auth/user"],
@@ -91,7 +96,7 @@ export default function GcrGuardPricing() {
     { id: "professional", name: "Family", price: 799, interval: "month", features: [], description: "Complete protection for the whole family" },
   ];
 
-  const handleSelectPlan = (tierId: string) => {
+  const handleSelectPlan = async (tierId: string) => {
     if (tierId === "free") {
       window.open("/browser-extension", "_self");
       return;
@@ -100,7 +105,32 @@ export default function GcrGuardPricing() {
       setLocation("/register");
       return;
     }
-    setLocation("/contact");
+
+    const planId = `${tierId}_monthly`;
+    setLoadingPlan(tierId);
+
+    try {
+      const res = await apiRequest("POST", "/api/stripe/create-checkout", { planId });
+      const data = await res.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast({
+          title: "Something went wrong",
+          description: data.error || "Could not start checkout. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Checkout error",
+        description: error.message || "Failed to start checkout. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPlan(null);
+    }
   };
 
   return (
@@ -211,11 +241,16 @@ export default function GcrGuardPricing() {
                           className="w-full"
                           variant={isPopular ? "default" : "outline"}
                           onClick={() => handleSelectPlan(tier.id)}
-                          disabled={isCurrentPlan}
+                          disabled={isCurrentPlan || loadingPlan === tier.id}
                           data-testid={`button-select-${tier.id}`}
                         >
-                          {isCurrentPlan ? "Current Plan" : tier.price === 0 ? "Get Started" : "Subscribe"}
-                          {!isCurrentPlan && <ArrowRight className="w-4 h-4 ml-2" />}
+                          {loadingPlan === tier.id ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Loading...
+                            </>
+                          ) : isCurrentPlan ? "Current Plan" : tier.price === 0 ? "Get Started" : "Subscribe"}
+                          {!isCurrentPlan && loadingPlan !== tier.id && <ArrowRight className="w-4 h-4 ml-2" />}
                         </Button>
                       </CardContent>
                     </Card>
@@ -275,7 +310,7 @@ export default function GcrGuardPricing() {
                 },
                 {
                   q: "Which payment methods are accepted?",
-                  a: "We are finalizing our payment provider to ensure global availability. Contact us at info@getcyberright.com for early access or to be notified when subscriptions go live."
+                  a: "We accept all major credit and debit cards through our secure payment processor, Stripe. Your payment information is never stored on our servers."
                 },
               ].map((faq, i) => (
                 <Card key={i} data-testid={`card-faq-${i}`}>
