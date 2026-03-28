@@ -65,6 +65,7 @@ import {
 import { threatIntelService } from "./threatIntelService";
 import { contentGovernanceService } from "./contentGovernanceService";
 import { newsletterService } from "./newsletterService";
+import { removalReportService } from "./removalReportService";
 import { complianceService } from "./complianceService";
 import { seedCurriculum, seedAISafetyTraining } from "./curriculumSeed";
 import { seedDataBrokers } from "./dataBrokerSeed";
@@ -2070,6 +2071,11 @@ EDGE CASE HANDLING
     console.error("Failed to initialize newsletter service:", err)
   );
 
+  // Initialize monthly removal report service for paying subscribers
+  removalReportService.initialize().catch(err =>
+    console.error("Failed to initialize removal report service:", err)
+  );
+
   // Seed admin user from environment variables (for production deployment)
   seedAdminUser().catch(err => 
     console.error("Failed to seed admin user:", err)
@@ -2473,6 +2479,43 @@ EDGE CASE HANDLING
       const issueId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
       const result = await newsletterService.sendNewsletter(issueId);
       res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // ============================================
+  // MONTHLY REMOVAL REPORT ROUTES
+  // ============================================
+
+  app.post("/api/admin/removal-reports/send-all", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = await removalReportService.generateAndSendAllReports();
+      res.json({ success: true, ...result });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.post("/api/admin/removal-reports/send/:userId", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
+      const result = await removalReportService.sendReportToUser(userId);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.get("/api/admin/removal-reports/preview/:userId", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
+      const preview = await removalReportService.previewReport(userId);
+      if (!preview) {
+        res.status(404).json({ success: false, error: "No data available for this user" });
+        return;
+      }
+      res.json({ success: true, ...preview });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }

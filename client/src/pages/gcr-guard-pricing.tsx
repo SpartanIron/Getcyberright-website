@@ -158,10 +158,10 @@ export default function GcrGuardPricing() {
               GCR Scam Guard
             </Badge>
             <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-[-0.025em]" data-testid="heading-pricing">
-              Choose Your Protection
+              Protection + Education Others Can't Match
             </h1>
             <p className="text-xl text-white/70 max-w-2xl mx-auto">
-              Real-time browser protection powered by AI. Start free, upgrade when you are ready.
+              AI scam detection, 500+ data broker removals, a browser extension, and family cybersecurity education — all in one platform, for a fraction of what others charge.
             </p>
           </div>
         </section>
@@ -261,7 +261,120 @@ export default function GcrGuardPricing() {
           </div>
         </section>
 
-        <section className="py-12 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30" data-testid="section-comparison">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <Badge className="mb-3 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800">
+                Honest Comparison
+              </Badge>
+              <h2 className="text-3xl font-bold mb-3" data-testid="heading-comparison">How We Compare</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                We don't try to be everything. We focus on what matters most: removing your data, detecting scams, and teaching your family to stay safe online.
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm" data-testid="table-comparison">
+                <thead>
+                  <tr className="border-b-2">
+                    <th className="text-left py-4 px-4 font-semibold text-base w-[40%]">Feature</th>
+                    <th className="py-4 px-4 text-center">
+                      <div className="flex flex-col items-center gap-1">
+                        <Shield className="w-5 h-5 text-teal-600" />
+                        <span className="font-bold text-teal-700 dark:text-teal-400">GetCyberRight</span>
+                        <span className="text-xs text-muted-foreground">from $3.99/mo</span>
+                      </div>
+                    </th>
+                    <th className="py-4 px-4 text-center">
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="font-bold text-slate-600 dark:text-slate-400">DeleteMe</span>
+                        <span className="text-xs text-muted-foreground">$10.75/mo</span>
+                      </div>
+                    </th>
+                    <th className="py-4 px-4 text-center">
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="font-bold text-slate-600 dark:text-slate-400">Aura</span>
+                        <span className="text-xs text-muted-foreground">$12/mo</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: "Data Broker Removals", gcr: true, deleteme: true, aura: true, gcrNote: "500+ brokers" },
+                    { feature: "Monthly Removal Reports", gcr: true, deleteme: true, aura: true },
+                    { feature: "AI Scam Detection & Analysis", gcr: true, deleteme: false, aura: false, highlight: true },
+                    { feature: "Browser Extension Protection", gcr: true, deleteme: false, aura: false, highlight: true },
+                    { feature: "Family Cybersecurity Education", gcr: true, deleteme: false, aura: false, highlight: true },
+                    { feature: "Real-Time Phishing Alerts", gcr: true, deleteme: false, aura: true },
+                    { feature: "Breach Monitoring", gcr: true, deleteme: false, aura: true },
+                    { feature: "Community Scam Reporting", gcr: true, deleteme: false, aura: false, highlight: true },
+                    { feature: "Interactive Safety Training", gcr: true, deleteme: false, aura: false, highlight: true },
+                    { feature: "Identity Theft Insurance", gcr: false, deleteme: false, aura: true },
+                    { feature: "VPN", gcr: false, deleteme: false, aura: true },
+                    { feature: "Antivirus", gcr: false, deleteme: false, aura: true },
+                    { feature: "Credit Monitoring", gcr: false, deleteme: false, aura: true },
+                  ].map((row, i) => (
+                    <tr key={i} className={`border-b ${row.highlight ? "bg-teal-50/50 dark:bg-teal-950/20" : ""}`} data-testid={`row-compare-${i}`}>
+                      <td className="py-3 px-4 font-medium">
+                        {row.feature}
+                        {row.gcrNote && <span className="block text-xs text-teal-600 dark:text-teal-400 font-normal">{row.gcrNote}</span>}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        {row.gcr ? (
+                          <Check className="w-5 h-5 text-teal-600 dark:text-teal-400 mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-slate-300 dark:text-slate-600 mx-auto" />
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        {row.deleteme ? (
+                          <Check className="w-5 h-5 text-slate-500 mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-slate-300 dark:text-slate-600 mx-auto" />
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        {row.aura ? (
+                          <Check className="w-5 h-5 text-slate-500 mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-slate-300 dark:text-slate-600 mx-auto" />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-8 grid sm:grid-cols-3 gap-4">
+              <Card className="border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20">
+                <CardContent className="p-5 text-center">
+                  <div className="text-3xl font-bold text-teal-700 dark:text-teal-400" data-testid="text-broker-count">500+</div>
+                  <p className="text-sm text-muted-foreground mt-1">Data brokers scanned</p>
+                </CardContent>
+              </Card>
+              <Card className="border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20">
+                <CardContent className="p-5 text-center">
+                  <div className="text-3xl font-bold text-teal-700 dark:text-teal-400">3x</div>
+                  <p className="text-sm text-muted-foreground mt-1">Less cost than Aura</p>
+                </CardContent>
+              </Card>
+              <Card className="border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20">
+                <CardContent className="p-5 text-center">
+                  <div className="text-3xl font-bold text-teal-700 dark:text-teal-400">5</div>
+                  <p className="text-sm text-muted-foreground mt-1">Unique features others lack</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center mt-6">
+              Competitor pricing and features as of March 2026. Aura and DeleteMe are trademarks of their respective owners.
+            </p>
+          </div>
+        </section>
+
+        <section className="py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-4" data-testid="heading-get-extension">Get the Extension</h2>
             <p className="text-muted-foreground mb-6">
@@ -294,11 +407,19 @@ export default function GcrGuardPricing() {
                 },
                 {
                   q: "What does the Pro plan add?",
-                  a: "Pro unlocks automatic page scanning on every website you visit, lookalike domain detection, form warnings, link hover checks, community trust scores, and webmail scanning for Gmail and Outlook."
+                  a: "Pro unlocks automatic page scanning on every website you visit, lookalike domain detection, form warnings, link hover checks, community trust scores, webmail scanning, and monthly data removal reports."
                 },
                 {
                   q: "What is the Family plan?",
-                  a: "The Family plan includes everything in Pro, plus weekly safety digest reports, full scan history, personal safety scores, and family member profiles so you can monitor safety for your whole household."
+                  a: "The Family plan includes everything in Pro, plus weekly safety digest reports, full scan history, personal safety scores, family member profiles, and monthly removal reports."
+                },
+                {
+                  q: "Why choose GetCyberRight over Aura or DeleteMe?",
+                  a: "DeleteMe only removes your data. Aura bundles everything but costs 3x more. GetCyberRight is the only platform that combines data broker removal with AI scam detection, a browser extension, and family cybersecurity education. You get protection and the knowledge to stay safe, at a fraction of the cost."
+                },
+                {
+                  q: "What are Monthly Removal Reports?",
+                  a: "Paying subscribers receive a monthly email summary of their data removal progress: how many brokers were scanned, removals completed, any new exposures detected, and your updated privacy score. It is like a credit report, but for your personal data online."
                 },
                 {
                   q: "How do I connect my account to the extension?",
