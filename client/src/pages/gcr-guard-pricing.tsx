@@ -267,9 +267,9 @@ export default function GcrGuardPricing() {
               <Badge className="mb-3 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800">
                 Honest Comparison
               </Badge>
-              <h2 className="text-3xl font-bold mb-3" data-testid="heading-comparison">How We Compare</h2>
+              <h2 className="text-3xl font-bold mb-3" data-testid="heading-comparison">GCR vs Competitors</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                We don't try to be everything. We focus on what matters most: removing your data, detecting scams, and teaching your family to stay safe online.
+                Most services do one thing. We combine data removal, scam detection, and family education in one platform — at a fraction of the industry price.
               </p>
             </div>
 
@@ -287,33 +287,32 @@ export default function GcrGuardPricing() {
                     </th>
                     <th className="py-4 px-4 text-center">
                       <div className="flex flex-col items-center gap-1">
-                        <span className="font-bold text-slate-600 dark:text-slate-400">DeleteMe</span>
-                        <span className="text-xs text-muted-foreground">$10.75/mo</span>
+                        <span className="font-bold text-slate-600 dark:text-slate-400">Data Removal Services</span>
+                        <span className="text-xs text-muted-foreground">typically $10+/mo</span>
                       </div>
                     </th>
                     <th className="py-4 px-4 text-center">
                       <div className="flex flex-col items-center gap-1">
-                        <span className="font-bold text-slate-600 dark:text-slate-400">Aura</span>
-                        <span className="text-xs text-muted-foreground">$12/mo</span>
+                        <span className="font-bold text-slate-600 dark:text-slate-400">All-in-One Security Suites</span>
+                        <span className="text-xs text-muted-foreground">typically $12+/mo</span>
                       </div>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    { feature: "Data Broker Removals", gcr: true, deleteme: true, aura: true, gcrNote: "500+ brokers" },
-                    { feature: "Monthly Removal Reports", gcr: true, deleteme: true, aura: true },
-                    { feature: "AI Scam Detection & Analysis", gcr: true, deleteme: false, aura: false, highlight: true },
-                    { feature: "Browser Extension Protection", gcr: true, deleteme: false, aura: false, highlight: true },
-                    { feature: "Family Cybersecurity Education", gcr: true, deleteme: false, aura: false, highlight: true },
-                    { feature: "Real-Time Phishing Alerts", gcr: true, deleteme: false, aura: true },
-                    { feature: "Breach Monitoring", gcr: true, deleteme: false, aura: true },
-                    { feature: "Community Scam Reporting", gcr: true, deleteme: false, aura: false, highlight: true },
-                    { feature: "Interactive Safety Training", gcr: true, deleteme: false, aura: false, highlight: true },
-                    { feature: "Identity Theft Insurance", gcr: false, deleteme: false, aura: true },
-                    { feature: "VPN", gcr: false, deleteme: false, aura: true },
-                    { feature: "Antivirus", gcr: false, deleteme: false, aura: true },
-                    { feature: "Credit Monitoring", gcr: false, deleteme: false, aura: true },
+                    { feature: "Data Broker Removals", gcr: true, removal: true, suite: true, gcrNote: "500+ brokers" },
+                    { feature: "Monthly Removal Reports", gcr: true, removal: true, suite: true },
+                    { feature: "AI Scam Detection & Analysis", gcr: true, removal: false, suite: false, highlight: true },
+                    { feature: "Browser Extension Protection", gcr: true, removal: false, suite: false, highlight: true },
+                    { feature: "Family Cybersecurity Education", gcr: true, removal: false, suite: false, highlight: true },
+                    { feature: "Real-Time Phishing Alerts", gcr: true, removal: false, suite: true },
+                    { feature: "Breach Monitoring", gcr: true, removal: false, suite: true },
+                    { feature: "Community Scam Reporting", gcr: true, removal: false, suite: false, highlight: true },
+                    { feature: "Interactive Safety Training", gcr: true, removal: false, suite: false, highlight: true },
+                    { feature: "Identity Theft Insurance", gcr: false, removal: false, suite: true },
+                    { feature: "VPN / Antivirus Bundled", gcr: false, removal: false, suite: true },
+                    { feature: "Credit Monitoring", gcr: false, removal: false, suite: true },
                   ].map((row, i) => (
                     <tr key={i} className={`border-b ${row.highlight ? "bg-teal-50/50 dark:bg-teal-950/20" : ""}`} data-testid={`row-compare-${i}`}>
                       <td className="py-3 px-4 font-medium">
@@ -328,14 +327,14 @@ export default function GcrGuardPricing() {
                         )}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {row.deleteme ? (
+                        {row.removal ? (
                           <Check className="w-5 h-5 text-slate-500 mx-auto" />
                         ) : (
                           <X className="w-5 h-5 text-slate-300 dark:text-slate-600 mx-auto" />
                         )}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {row.aura ? (
+                        {row.suite ? (
                           <Check className="w-5 h-5 text-slate-500 mx-auto" />
                         ) : (
                           <X className="w-5 h-5 text-slate-300 dark:text-slate-600 mx-auto" />
@@ -356,20 +355,20 @@ export default function GcrGuardPricing() {
               </Card>
               <Card className="border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20">
                 <CardContent className="p-5 text-center">
-                  <div className="text-3xl font-bold text-teal-700 dark:text-teal-400">3x</div>
-                  <p className="text-sm text-muted-foreground mt-1">Less cost than Aura</p>
+                  <div className="text-3xl font-bold text-teal-700 dark:text-teal-400">Up to 3x</div>
+                  <p className="text-sm text-muted-foreground mt-1">Less than competitors</p>
                 </CardContent>
               </Card>
               <Card className="border-teal-200 dark:border-teal-800 bg-teal-50/50 dark:bg-teal-950/20">
                 <CardContent className="p-5 text-center">
                   <div className="text-3xl font-bold text-teal-700 dark:text-teal-400">5</div>
-                  <p className="text-sm text-muted-foreground mt-1">Unique features others lack</p>
+                  <p className="text-sm text-muted-foreground mt-1">Features unique to GCR</p>
                 </CardContent>
               </Card>
             </div>
 
             <p className="text-xs text-muted-foreground text-center mt-6">
-              Competitor pricing and features as of March 2026. Aura and DeleteMe are trademarks of their respective owners.
+              Based on publicly available pricing and feature sets of leading data removal services and all-in-one security suites as of 2026.
             </p>
           </div>
         </section>
@@ -414,8 +413,8 @@ export default function GcrGuardPricing() {
                   a: "The Family plan includes everything in Pro, plus weekly safety digest reports, full scan history, personal safety scores, family member profiles, and monthly removal reports."
                 },
                 {
-                  q: "Why choose GetCyberRight over Aura or DeleteMe?",
-                  a: "DeleteMe only removes your data. Aura bundles everything but costs 3x more. GetCyberRight is the only platform that combines data broker removal with AI scam detection, a browser extension, and family cybersecurity education. You get protection and the knowledge to stay safe, at a fraction of the cost."
+                  q: "Why choose GetCyberRight over other services?",
+                  a: "Most data removal services only remove your data. All-in-one security suites bundle everything but charge 3x more. GetCyberRight is the only platform that combines data broker removal with AI scam detection, a browser extension, and family cybersecurity education. You get protection and the knowledge to stay safe, at a fraction of the industry price."
                 },
                 {
                   q: "What are Monthly Removal Reports?",
