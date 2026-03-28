@@ -26,9 +26,20 @@ const VALID_ACTIONS = new Set([
   "CHECK_FEATURE"
 ]);
 
-const ALLOWED_ORIGINS = new Set([
-  "chrome-extension://",
-  "https://www.getcyberright.com"
+const ALLOWED_ORIGINS_EXACT = new Set([
+  "https://www.getcyberright.com",
+  "https://getcyberright.com"
+]);
+
+const SENSITIVE_ACTIONS = new Set([
+  "SIGN_IN",
+  "SIGN_OUT",
+  "GET_AUTH_STATUS",
+  "SAVE_SETTINGS",
+  "CHECK_FEATURE",
+  "REPORT_SCAM",
+  "REPORT_SCAM_STRUCTURED",
+  "FLAG_DOMAIN"
 ]);
 
 function validateMessage(message) {
@@ -44,10 +55,18 @@ function validateMessage(message) {
     logWarn(MODULE, "Rejected: unknown action type:", message.type);
     return false;
   }
+  if (message.content && typeof message.content === "string" && message.content.length > 10000) {
+    logWarn(MODULE, "Rejected: content exceeds maximum length");
+    return false;
+  }
+  if (message.url && typeof message.url === "string" && message.url.length > 2048) {
+    logWarn(MODULE, "Rejected: URL exceeds maximum length");
+    return false;
+  }
   return true;
 }
 
-function validateSender(sender) {
+function validateSender(sender, messageType) {
   if (!sender) {
     logWarn(MODULE, "Rejected: no sender information");
     return false;
@@ -55,15 +74,21 @@ function validateSender(sender) {
   if (sender.id === chrome.runtime.id) {
     return true;
   }
-  if (sender.origin) {
-    for (const allowed of ALLOWED_ORIGINS) {
-      if (sender.origin.startsWith(allowed)) return true;
+  if (SENSITIVE_ACTIONS.has(messageType)) {
+    if (sender.origin && ALLOWED_ORIGINS_EXACT.has(sender.origin)) return true;
+    if (sender.id === chrome.runtime.id) return true;
+    if (sender.tab && sender.tab.url) {
+      try {
+        const senderUrl = new URL(sender.tab.url);
+        if (senderUrl.protocol === "chrome-extension:" && senderUrl.hostname === chrome.runtime.id) return true;
+      } catch {}
     }
+    logWarn(MODULE, "Rejected: sensitive action from untrusted sender:", messageType, sender.origin || sender.url || "unknown");
+    return false;
   }
-  if (sender.url) {
-    for (const allowed of ALLOWED_ORIGINS) {
-      if (sender.url.startsWith(allowed)) return true;
-    }
+  if (sender.origin) {
+    if (ALLOWED_ORIGINS_EXACT.has(sender.origin)) return true;
+    if (sender.origin.startsWith("chrome-extension://")) return true;
   }
   if (sender.tab && sender.tab.url) {
     if (sender.tab.url.startsWith("http://") || sender.tab.url.startsWith("https://")) {
@@ -81,7 +106,7 @@ export function setupMessageHandlers(handlers) {
       return false;
     }
 
-    if (!validateSender(sender)) {
+    if (!validateSender(sender, message.type)) {
       sendResponse({ error: "Unauthorized sender" });
       return false;
     }

@@ -1,6 +1,7 @@
 (function () {
-  if (window.__gcrContentLoaded) return;
-  window.__gcrContentLoaded = true;
+  const GCR_LOADED_KEY = Symbol.for("__gcr_scanner_loaded");
+  if (window[GCR_LOADED_KEY]) return;
+  Object.defineProperty(window, GCR_LOADED_KEY, { value: true, writable: false, enumerable: false, configurable: false });
 
   let tooltipEl = null;
   let currentHoverLink = null;

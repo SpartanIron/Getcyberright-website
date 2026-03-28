@@ -813,8 +813,11 @@ function capitalize(s) {
 
 async function handleSignIn(token) {
   try {
-    if (!token || typeof token !== "string" || token.length < 10) {
+    if (!token || typeof token !== "string" || token.length < 10 || token.length > 4096) {
       return { success: false, error: "Invalid token" };
+    }
+    if (!/^[A-Za-z0-9._\-]+$/.test(token)) {
+      return { success: false, error: "Invalid token format" };
     }
     const response = await fetchWithRetry(`${API_BASE}/api/extension/subscription-status`, {
       headers: { "Authorization": `Bearer ${token}` }

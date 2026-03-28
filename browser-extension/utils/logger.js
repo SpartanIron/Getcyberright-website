@@ -1,7 +1,9 @@
 const PREFIX = "[gcr-guard]";
 
+const IS_DEV = typeof chrome !== "undefined" && chrome.runtime && !("update_url" in (chrome.runtime.getManifest?.() || {}));
+
 export function logInfo(module, ...args) {
-  console.info(`${PREFIX}[${module}]`, ...args);
+  if (IS_DEV) console.info(`${PREFIX}[${module}]`, ...args);
 }
 
 export function logWarn(module, ...args) {
