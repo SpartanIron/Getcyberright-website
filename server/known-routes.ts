@@ -65,6 +65,7 @@ export const KNOWN_CLIENT_ROUTES = new Set([
   "/admin/messages",
   "/admin/subscribers",
   "/admin/scam-reports",
+  "/admin/scan-management",
   "/admin/tool-analytics",
   "/admin/security",
   "/admin/threat-intelligence",

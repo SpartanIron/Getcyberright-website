@@ -24,8 +24,8 @@ The frontend is built with React 19, TypeScript, and Vite, utilizing Wouter for 
 - **News Section**: Curates cybersecurity news from 20 trusted RSS feeds, simplified by AI for families. It includes a relevance scoring system to filter irrelevant content and prioritize actionable stories.
 - **Automation & Governance**: Features automated weekly newsletters, AI content guardrails, automated threat intelligence, and a social distribution engine.
 - **Monthly Removal Reports**: Automated monthly HTML email reports for subscribers detailing privacy scores, removal progress, and exposed data categories.
-- **Competitive Positioning**: The pricing page includes a "How We Compare" section, highlighting GetCyberRight's differentiators in AI scam detection, data broker removals, browser extension, and family education.
-- **Admin & SEO**: A comprehensive admin system with role-based access control, SEO keyword database, internal linking engine, dynamic sitemap generation, and universal meta injection for enhanced search engine visibility.
+- **Competitive Positioning**: The pricing page includes a "GCR vs Competitors" comparison table (against generic "Data Removal Services" and "All-in-One Security Suites" categories), stat highlight cards, and updated FAQ. Pricing: Free / $5.99/mo Pro / $11.99/mo Family.
+- **Admin & SEO**: A comprehensive admin system with role-based access control, scan activity monitoring (data broker scans + scam checks), admin password reset for user accounts, SEO keyword database, internal linking engine, dynamic sitemap generation, and universal meta injection for enhanced search engine visibility.
 
 ## External Dependencies
 

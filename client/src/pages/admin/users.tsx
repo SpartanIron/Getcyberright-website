@@ -43,7 +43,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Users, Trash2, MailCheck, MailX, UserPlus, Crown, ShieldCheck, Pencil, Eye } from "lucide-react";
+import { Users, Trash2, MailCheck, MailX, UserPlus, Crown, ShieldCheck, Pencil, Eye, KeyRound } from "lucide-react";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -253,6 +253,71 @@ function CreateUserDialog({ isSuperAdmin }: { isSuperAdmin: boolean }) {
             </Button>
           </DialogFooter>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ResetPasswordDialog({ userId, userEmail }: { userId: string; userEmail: string }) {
+  const [open, setOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const { toast } = useToast();
+
+  const resetMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", `/api/admin/users/${userId}/reset-password`, { newPassword });
+    },
+    onSuccess: () => {
+      toast({ title: "Password reset successfully" });
+      setOpen(false);
+      setNewPassword("");
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+    },
+    onError: () => {
+      toast({ title: "Failed to reset password", variant: "destructive" });
+    },
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" data-testid={`btn-reset-password-${userId}`}>
+          <KeyRound className="w-4 h-4 text-amber-500" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Reset Password</DialogTitle>
+          <DialogDescription>
+            Set a new password for {userEmail}. The user will be required to change it on their next login.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="new-password">New Password</Label>
+            <Input
+              id="new-password"
+              type="text"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Minimum 12 characters"
+              data-testid="input-new-password"
+            />
+            {newPassword.length > 0 && newPassword.length < 12 && (
+              <p className="text-xs text-destructive mt-1">Password must be at least 12 characters</p>
+            )}
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button
+            onClick={() => resetMutation.mutate()}
+            disabled={newPassword.length < 12 || resetMutation.isPending}
+            data-testid="btn-confirm-reset-password"
+          >
+            {resetMutation.isPending ? "Resetting..." : "Reset Password"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
@@ -505,42 +570,47 @@ export default function AdminUsers() {
                           : "Unknown"}
                       </TableCell>
                       <TableCell className="text-right">
-                        {isSuperAdmin && u.id !== user?.id ? (
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                data-testid={`btn-delete-${u.id}`}
-                              >
-                                <Trash2 className="w-4 h-4 text-destructive" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete User</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to delete this user? This action
-                                  cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => deleteUserMutation.mutate(u.id)}
-                                  className="bg-destructive text-destructive-foreground"
-                                  data-testid={`btn-confirm-delete-${u.id}`}
+                        <div className="flex items-center justify-end gap-1">
+                          {u.id !== user?.id && (isSuperAdmin || currentRole === "admin") && (
+                            <ResetPasswordDialog userId={u.id} userEmail={u.email || "user"} />
+                          )}
+                          {isSuperAdmin && u.id !== user?.id ? (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  data-testid={`btn-delete-${u.id}`}
                                 >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">
-                            {u.id === user?.id ? "You" : ""}
-                          </span>
-                        )}
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete User</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete this user? This action
+                                    cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => deleteUserMutation.mutate(u.id)}
+                                    className="bg-destructive text-destructive-foreground"
+                                    data-testid={`btn-confirm-delete-${u.id}`}
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">
+                              {u.id === user?.id ? "You" : ""}
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

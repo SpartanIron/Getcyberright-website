@@ -92,8 +92,8 @@ export default function GcrGuardPricing() {
 
   const tiers = tierData?.tiers || [
     { id: "free", name: "Free", price: 0, interval: null, features: ["manual_scan"], description: "Basic protection with manual scanning" },
-    { id: "essential", name: "Pro", price: 399, interval: "month", features: [], description: "Full auto-protection for individuals" },
-    { id: "professional", name: "Family", price: 799, interval: "month", features: [], description: "Complete protection for the whole family" },
+    { id: "essential", name: "Pro", price: 599, interval: "month", features: [], description: "Full auto-protection for individuals" },
+    { id: "professional", name: "Family", price: 1199, interval: "month", features: [], description: "Complete protection for the whole family" },
   ];
 
   const handleSelectPlan = async (tierId: string) => {
@@ -137,7 +137,7 @@ export default function GcrGuardPricing() {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="GCR Scam Guard Pricing | GetCyberRight"
-        description="Choose your GCR Scam Guard protection plan. Free manual scanning, Pro auto-protection for $3.99/month, or Family coverage for $7.99/month."
+        description="Choose your GCR Scam Guard protection plan. Free manual scanning, Pro auto-protection for $5.99/month, or Family coverage for $11.99/month."
         keywords="GCR Scam Guard pricing, browser extension subscription, cybersecurity protection plans"
       />
       <Navigation />
@@ -282,7 +282,7 @@ export default function GcrGuardPricing() {
                       <div className="flex flex-col items-center gap-1">
                         <Shield className="w-5 h-5 text-teal-600" />
                         <span className="font-bold text-teal-700 dark:text-teal-400">GetCyberRight</span>
-                        <span className="text-xs text-muted-foreground">from $3.99/mo</span>
+                        <span className="text-xs text-muted-foreground">from $5.99/mo</span>
                       </div>
                     </th>
                     <th className="py-4 px-4 text-center">

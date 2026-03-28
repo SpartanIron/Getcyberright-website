@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
 import { storage } from "./storage";
-import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks } from "@shared/schema";
+import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks, shieldScans, exposureScans, exposureFindings } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
 import { securityLogger } from "./security";
@@ -296,6 +296,41 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  app.post("/api/admin/users/:id/reset-password", isAuthenticated, isAdminMiddleware, requireRole("admin"), async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { newPassword } = req.body;
+
+      if (!newPassword || typeof newPassword !== "string" || newPassword.length < 12) {
+        return res.status(400).json({ error: "Password must be at least 12 characters" });
+      }
+
+      const [targetUser] = await db.select().from(users).where(eq(users.id, id));
+      if (!targetUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const passwordHash = await bcrypt.hash(newPassword, 12);
+      await db.update(users).set({
+        passwordHash,
+        mustChangePassword: true,
+        failedLoginAttempts: 0,
+        lockedUntil: null,
+      }).where(eq(users.id, id));
+
+      securityLogger.info("Admin reset user password", {
+        adminId: req.user.id,
+        targetUserId: id,
+        targetEmail: targetUser.email,
+      });
+
+      res.json({ success: true, message: "Password reset successfully. User will be prompted to change password on next login." });
+    } catch (error) {
+      console.error("Admin reset password error:", error);
+      res.status(500).json({ error: "Failed to reset password" });
+    }
+  });
+
   // Contact messages management
   app.get("/api/admin/contact-messages", isAuthenticated, isAdminMiddleware, async (req, res) => {
     try {
@@ -475,6 +510,96 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error("Admin tool analytics error:", error);
       res.status(500).json({ error: "Failed to fetch tool analytics" });
+    }
+  });
+
+  app.get("/api/admin/scans/data-broker", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const scans = await db
+        .select({
+          scanId: shieldScans.scanId,
+          firstName: shieldScans.firstName,
+          lastName: shieldScans.lastName,
+          email: shieldScans.email,
+          status: shieldScans.status,
+          exposureScore: shieldScans.exposureScore,
+          createdAt: shieldScans.createdAt,
+          userId: shieldScans.userId,
+        })
+        .from(shieldScans)
+        .orderBy(desc(shieldScans.createdAt))
+        .limit(100);
+
+      const [totalCount] = await db.select({ count: count() }).from(shieldScans);
+      const [completedCount] = await db.select({ count: count() }).from(shieldScans).where(eq(shieldScans.status, "complete"));
+
+      const exposureScansList = await db
+        .select({
+          id: exposureScans.id,
+          userId: exposureScans.userId,
+          status: exposureScans.status,
+          brokersScanned: exposureScans.brokersScanned,
+          exposuresFound: exposureScans.exposuresFound,
+          createdAt: exposureScans.createdAt,
+        })
+        .from(exposureScans)
+        .orderBy(desc(exposureScans.createdAt))
+        .limit(100);
+
+      const [exposureTotal] = await db.select({ count: count() }).from(exposureScans);
+
+      res.json({
+        shieldScans: {
+          total: totalCount.count,
+          completed: completedCount.count,
+          recent: scans,
+        },
+        exposureScans: {
+          total: exposureTotal.count,
+          recent: exposureScansList,
+        },
+      });
+    } catch (error) {
+      console.error("Admin data broker scans error:", error);
+      res.status(500).json({ error: "Failed to fetch scan data" });
+    }
+  });
+
+  app.get("/api/admin/scans/scam-checks", isAuthenticated, isAdminMiddleware, async (req, res) => {
+    try {
+      const scamChecks = await db
+        .select()
+        .from(toolUsage)
+        .where(eq(toolUsage.toolName, "scam-checker"))
+        .orderBy(desc(toolUsage.createdAt))
+        .limit(100);
+
+      const [totalScamChecks] = await db
+        .select({ count: count() })
+        .from(toolUsage)
+        .where(eq(toolUsage.toolName, "scam-checker"));
+
+      const reports = await db
+        .select()
+        .from(scamReports)
+        .orderBy(desc(scamReports.createdAt))
+        .limit(50);
+
+      const [totalReports] = await db.select({ count: count() }).from(scamReports);
+
+      res.json({
+        scamChecks: {
+          total: totalScamChecks.count,
+          recent: scamChecks,
+        },
+        scamReports: {
+          total: totalReports.count,
+          recent: reports,
+        },
+      });
+    } catch (error) {
+      console.error("Admin scam checks error:", error);
+      res.status(500).json({ error: "Failed to fetch scam check data" });
     }
   });
 }

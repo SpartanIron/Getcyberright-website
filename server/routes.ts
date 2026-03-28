@@ -4571,7 +4571,7 @@ EDGE CASE HANDLING
         {
           id: "essential",
           name: "Pro",
-          price: 399,
+          price: 599,
           interval: "month",
           features: TIER_FEATURES.essential,
           description: "Full auto-protection for individuals",
@@ -4579,7 +4579,7 @@ EDGE CASE HANDLING
         {
           id: "professional",
           name: "Family",
-          price: 799,
+          price: 1199,
           interval: "month",
           features: TIER_FEATURES.professional,
           description: "Complete protection for the whole family",

@@ -136,7 +136,7 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(how much|pricing|price|cost|how much does)/.test(t) && /(plan|pro|family|subscribe|subscription)/.test(t),
     responses: [
-      "The Free plan covers manual scanning at no cost, no account needed. Pro is $3.99 per month and adds automatic scanning on every page, fake domain detection, and email scanning. Family is $7.99 per month and adds safety digests, full scan history, and family profiles. You can see all the details at /gcr-guard-pricing.",
+      "The Free plan covers manual scanning at no cost, no account needed. Pro is $5.99 per month and adds automatic scanning on every page, fake domain detection, and email scanning. Family is $11.99 per month and adds safety digests, full scan history, and family profiles. You can see all the details at /gcr-guard-pricing.",
     ],
   },
   {
@@ -160,13 +160,13 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(what.*pro|pro.*include|pro.*plan|what.*get.*pro)/.test(t) && !/(family)/.test(t),
     responses: [
-      "The Pro plan at $3.99 per month includes everything in Free, plus automatic page scanning on every site you visit, fake domain detection, suspicious form warnings, link hover safety previews, community trust scores, and Gmail and Outlook email scanning. You can check it out at /gcr-guard-pricing.",
+      "The Pro plan at $5.99 per month includes everything in Free, plus automatic page scanning on every site you visit, fake domain detection, suspicious form warnings, link hover safety previews, community trust scores, and Gmail and Outlook email scanning. You can check it out at /gcr-guard-pricing.",
     ],
   },
   {
     pattern: (t) => /(what.*family|family.*include|family.*plan|what.*get.*family)/.test(t),
     responses: [
-      "The Family plan at $7.99 per month includes everything in Pro, plus weekly safety digest reports, full scan history, a personal safety score, and family member profiles so you can keep an eye on safety for your whole household. See the full breakdown at /gcr-guard-pricing.",
+      "The Family plan at $11.99 per month includes everything in Pro, plus weekly safety digest reports, full scan history, a personal safety score, and family member profiles so you can keep an eye on safety for your whole household. See the full breakdown at /gcr-guard-pricing.",
     ],
   },
   {

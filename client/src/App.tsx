@@ -87,6 +87,7 @@ const AdminSubscribers = lazy(() => import("@/pages/admin/subscribers"));
 const AdminScamReports = lazy(() => import("@/pages/admin/scam-reports"));
 const AdminChangePassword = lazy(() => import("@/pages/admin/change-password"));
 const AdminToolAnalytics = lazy(() => import("@/pages/admin/tool-analytics"));
+const AdminScanManagement = lazy(() => import("@/pages/admin/scan-management"));
 const AdminSecurity = lazy(() => import("@/pages/admin-security"));
 const AdminThreatIntelligence = lazy(() => import("@/pages/admin-threat-intelligence"));
 const AdminContentGovernance = lazy(() => import("@/pages/admin-content-governance"));
@@ -205,6 +206,7 @@ function AppRouter() {
         <Route path="/admin/messages" component={AdminMessages} />
         <Route path="/admin/subscribers" component={AdminSubscribers} />
         <Route path="/admin/scam-reports" component={AdminScamReports} />
+        <Route path="/admin/scan-management" component={AdminScanManagement} />
         <Route path="/admin/tool-analytics" component={AdminToolAnalytics} />
         <Route path="/admin/security" component={AdminSecurity} />
         <Route path="/admin/threat-intelligence" component={AdminThreatIntelligence} />

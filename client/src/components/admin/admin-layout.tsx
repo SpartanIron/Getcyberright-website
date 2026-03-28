@@ -13,7 +13,8 @@ import {
   Megaphone,
   TrendingUp,
   MessageSquare,
-  FileText
+  FileText,
+  ScanSearch
 } from "lucide-react";
 import logoImage from "@/assets/logo.png";
 
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/subscribers", label: "Subscribers", icon: Newspaper },
   { href: "/admin/scam-reports", label: "Scam Reports", icon: AlertTriangle },
+  { href: "/admin/scan-management", label: "Scan Activity", icon: ScanSearch },
   { href: "/admin/tool-analytics", label: "Tool Analytics", icon: BarChart3 },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/trending-threats", label: "Trending Threats", icon: TrendingUp },
