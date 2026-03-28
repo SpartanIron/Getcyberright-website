@@ -563,19 +563,45 @@ document.addEventListener("DOMContentLoaded", () => {
     const topPad = 4;
     const availH = chartH - bottomPad - topPad;
 
-    let svgContent = "";
+    const ns = "http://www.w3.org/2000/svg";
+
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
 
     for (let i = 0; i < 7; i++) {
       const x = gap + i * (barW * 2 + 4 + gap);
       const scanH = scans[i] > 0 ? Math.max(2, (scans[i] / maxVal) * availH) : 0;
       const threatH = threats[i] > 0 ? Math.max(2, (threats[i] / maxVal) * availH) : 0;
 
-      svgContent += `<rect x="${x}" y="${topPad + availH - scanH}" width="${barW}" height="${scanH}" rx="3" fill="#0A2A3C" opacity="0.7"/>`;
-      svgContent += `<rect x="${x + barW + 2}" y="${topPad + availH - threatH}" width="${barW}" height="${threatH}" rx="3" fill="#dc2626" opacity="0.7"/>`;
-      svgContent += `<text x="${x + barW}" y="${chartH - 2}" text-anchor="middle" font-size="9" fill="#9ca3af" font-family="-apple-system,sans-serif">${days[i]}</text>`;
-    }
+      const scanRect = document.createElementNS(ns, "rect");
+      scanRect.setAttribute("x", x);
+      scanRect.setAttribute("y", topPad + availH - scanH);
+      scanRect.setAttribute("width", barW);
+      scanRect.setAttribute("height", scanH);
+      scanRect.setAttribute("rx", "3");
+      scanRect.setAttribute("fill", "#0A2A3C");
+      scanRect.setAttribute("opacity", "0.7");
+      svg.appendChild(scanRect);
 
-    svg.innerHTML = svgContent;
+      const threatRect = document.createElementNS(ns, "rect");
+      threatRect.setAttribute("x", x + barW + 2);
+      threatRect.setAttribute("y", topPad + availH - threatH);
+      threatRect.setAttribute("width", barW);
+      threatRect.setAttribute("height", threatH);
+      threatRect.setAttribute("rx", "3");
+      threatRect.setAttribute("fill", "#dc2626");
+      threatRect.setAttribute("opacity", "0.7");
+      svg.appendChild(threatRect);
+
+      const label = document.createElementNS(ns, "text");
+      label.setAttribute("x", x + barW);
+      label.setAttribute("y", chartH - 2);
+      label.setAttribute("text-anchor", "middle");
+      label.setAttribute("font-size", "9");
+      label.setAttribute("fill", "#9ca3af");
+      label.setAttribute("font-family", "-apple-system,sans-serif");
+      label.textContent = days[i];
+      svg.appendChild(label);
+    }
   }
 
   function loadScanHistory() {
