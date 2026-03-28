@@ -222,3 +222,45 @@ id = "vT6ekHvBTGLgoTunQ8ghK"
 uri = "file://attached_assets/scam-final-asian-man.png"
 type = "image"
 title = "Option C: South Asian Man - Bold & Empowering"
+
+[[outputs]]
+id = "-EvY4fHFnoY7t8ZPyOfwX"
+uri = "file://attached_assets/generated_images/promo-scam-guard-hero.png"
+type = "image"
+title = "Scam Guard - Hero Banner (16:9)"
+
+[[outputs]]
+id = "aCT2kFaE6Oo3BY_MRzACB"
+uri = "file://attached_assets/generated_images/promo-data-shield-hero.png"
+type = "image"
+title = "Data Shield - Hero Banner (16:9)"
+
+[[outputs]]
+id = "IBJMC0YczIleOTPLrUg58"
+uri = "file://attached_assets/generated_images/promo-scam-guard-features.png"
+type = "image"
+title = "Scam Guard - Features Showcase (4:3)"
+
+[[outputs]]
+id = "xUtIW8rRxda3xUBua0udG"
+uri = "file://attached_assets/generated_images/promo-data-shield-features.png"
+type = "image"
+title = "Data Shield - Features Showcase (4:3)"
+
+[[outputs]]
+id = "fvmJv3U-9KHuP7rI1Mycd"
+uri = "file://attached_assets/generated_images/promo-scam-guard-social.png"
+type = "image"
+title = "Scam Guard - Social Media (1:1)"
+
+[[outputs]]
+id = "ZdK_ShJ4KIu7nuxwEJXFZ"
+uri = "file://attached_assets/generated_images/promo-data-shield-social.png"
+type = "image"
+title = "Data Shield - Social Media (1:1)"
+
+[[outputs]]
+id = "zyUBvxOghLv-Qqgj9BeJM"
+uri = "file://attached_assets/promotional-messaging.md"
+type = "text"
+title = "Complete Promotional Messaging Guide"
