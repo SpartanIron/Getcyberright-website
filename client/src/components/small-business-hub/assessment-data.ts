@@ -144,7 +144,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "invoice-fraud",
     title: "Overdue Invoice Payment Request",
     sender: "accounting@quick-books-invoice.com",
-    subject: "URGENT: Invoice #INV-2024-8847 Past Due - Immediate Payment Required",
+    subject: "URGENT: Invoice #INV-2024-8847 Past Due. Immediate Payment Required",
     body: "Dear Accounts Payable,\n\nThis is a final notice regarding Invoice #INV-2024-8847 for $12,450.00, which is now 45 days past due. To avoid service interruption and late fees, please process payment immediately via wire transfer to our updated banking details below.\n\nNew Bank: First National Trust\nRouting: 071923456\nAccount: 8834201957\n\nPlease confirm payment within 24 hours.\n\nRegards,\nSarah Mitchell\nAccounts Receivable Manager",
     isPhishing: true,
     redFlags: [
@@ -162,7 +162,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "ceo-impersonation",
     title: "CEO Urgent Wire Transfer Request",
     sender: "ceo.johnson@company-mail.net",
-    subject: "Confidential - Need Your Help Urgently",
+    subject: "Confidential. Need Your Help Urgently",
     body: "Hi,\n\nI need you to process a wire transfer of $28,500 to a new vendor today. This is for a confidential acquisition we're working on, so please don't discuss this with anyone else on the team.\n\nI'm in meetings all day and can't take calls. Please handle this ASAP and send me confirmation when done.\n\nThanks,\nMichael Johnson\nCEO\n\nSent from my iPhone",
     isPhishing: true,
     redFlags: [
@@ -198,7 +198,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "it-reset",
     title: "IT Department Password Reset Required",
     sender: "it-security@your-company-helpdesk.com",
-    subject: "Mandatory Password Reset - Security Update Required",
+    subject: "Mandatory Password Reset. Security Update Required",
     body: "Dear Employee,\n\nOur security team has detected a potential breach in our authentication system. As a precautionary measure, all employees must reset their passwords within the next 2 hours.\n\nClick the secure link below to reset your password:\n[Reset Password Now]\n\nFailure to comply will result in your account being temporarily suspended.\n\nIT Security Team\nHelpDesk Ticket #HD-29847",
     isPhishing: true,
     redFlags: [
@@ -234,7 +234,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "shipping",
     title: "UPS Delivery Exception Notification",
     sender: "delivery-notice@ups-tracking-update.com",
-    subject: "Package Delivery Failed - Action Required",
+    subject: "Package Delivery Failed. Action Required",
     body: "UPS Notification\n\nTracking Number: 1Z999AA10123456784\n\nWe attempted to deliver your package but were unable to complete delivery. A customs fee of $4.99 is required before redelivery can be scheduled.\n\n[Pay Fee and Schedule Redelivery]\n\nIf no action is taken within 48 hours, the package will be returned to sender.\n\nUPS Customer Service",
     isPhishing: true,
     redFlags: [
@@ -270,7 +270,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "ceo-impersonation",
     title: "Managing Director Urgent Payment",
     sender: "md.williams@company-uk.net",
-    subject: "Urgent - Payment Needed Before Close of Business",
+    subject: "Urgent. Payment Needed Before Close of Business",
     body: "Hi,\n\nI need a BACS payment of £18,750 processed to a new supplier before close of business today. The supplier reference is SUP-2024-445.\n\nI'm travelling and my phone signal is poor so email is best. Please process and confirm.\n\nRegards,\nJames Williams\nManaging Director",
     isPhishing: true,
     redFlags: [
@@ -288,7 +288,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "renewal-scam",
     title: "Companies House Annual Filing Reminder",
     sender: "filing@companies-house-annual.co.uk",
-    subject: "Annual Return Filing - Payment of £85 Required",
+    subject: "Annual Return Filing. Payment of £85 Required",
     body: "Dear Company Director,\n\nYour annual confirmation statement is due. A filing fee of £85 is required to maintain your company's active status on the register.\n\nFailing to file will result in your company being struck off and dissolved.\n\n[File and Pay Now]\n\nCompanies House\nCrown Way, Cardiff, CF14 3UZ",
     isPhishing: true,
     redFlags: [
@@ -324,7 +324,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "invoice-fraud",
     title: "CRA Business Tax Assessment Notice",
     sender: "assessment@cra-business-tax.ca",
-    subject: "Notice of Assessment - Balance Due $8,950.00",
+    subject: "Notice of Assessment. Balance Due $8,950.00",
     body: "Canada Revenue Agency\n\nNotice of Assessment\n\nYour business has an outstanding balance of $8,950.00 CAD for the 2024 tax year. Interest charges of 5% will be applied after 30 days.\n\nTo avoid penalties, pay immediately through our secure portal:\n[Pay Now]\n\nAlternatively, you may pay using cryptocurrency or prepaid cards for faster processing.\n\nCanada Revenue Agency\nOttawa, ON K1A 0L5",
     isPhishing: true,
     redFlags: [
@@ -372,7 +372,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "invoice-fraud",
     title: "ATO Business Activity Statement Alert",
     sender: "bas@ato-lodgement.com.au",
-    subject: "BAS Lodgement Overdue - Penalty Notice",
+    subject: "BAS Lodgement Overdue. Penalty Notice",
     body: "Australian Taxation Office\n\nYour Business Activity Statement (BAS) for Q3 2024 is overdue. A penalty of $1,100 AUD has been applied. To avoid further penalties, lodge and pay immediately through our portal:\n\n[Lodge BAS Now]\n\nFailure to respond within 7 days will result in director penalty notices being issued.\n\nAustralian Taxation Office\nCanberra ACT 2601",
     isPhishing: true,
     redFlags: [
@@ -390,7 +390,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "ceo-impersonation",
     title: "Director Requesting Urgent EFT",
     sender: "director.smith@company-au.net",
-    subject: "Need EFT Processed Today - Confidential",
+    subject: "Need EFT Processed Today. Confidential",
     body: "Hi,\n\nCan you please process an urgent EFT of $34,200 AUD to the following BSB and account? This is for a settlement we're finalising privately.\n\nBSB: 062-000\nAccount: 1234 5678\n\nPlease keep this between us until the deal is announced. I'm in a board meeting and can't call.\n\nCheers,\nDavid Smith\nDirector",
     isPhishing: true,
     redFlags: [
@@ -449,7 +449,7 @@ export const phishingScenarios: PhishingScenario[] = [
     isPhishing: true,
     redFlags: [
       "M-Pesa reversals are handled by Safaricom customer service, not by sending money back",
-      "The 'accidental payment' may never have been received - check your actual balance",
+      "The 'accidental payment' may never have been received, check your actual balance",
       "2-hour deadline creates panic",
       "Safaricom does not send reversal requests via SMS asking you to send money",
       "This is the most common B2C mobile money fraud in East Africa"
@@ -462,7 +462,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "tax-scam",
     title: "SARS Business Tax Clearance",
     sender: "compliance@sars-efiling-portal.co.za",
-    subject: "Tax Clearance Certificate - Urgent Action Required",
+    subject: "Tax Clearance Certificate. Urgent Action Required",
     body: "South African Revenue Service\n\nYour business tax clearance certificate has expired. Without a valid TCC, your business will be unable to tender for government contracts or receive payments from government departments.\n\nTo renew your certificate immediately, verify your tax details:\n[Renew TCC Now]\n\nNon-compliance penalties of R50,000 may apply.\n\nSARS eFiling Support",
     isPhishing: true,
     redFlags: [
@@ -516,7 +516,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "invoice-fraud",
     title: "Supplier Invoice with EcoCash Payment",
     sender: "accounts@trusted-supplier-zw.com",
-    subject: "Invoice Payment - Please Use EcoCash",
+    subject: "Invoice Payment. Please Use EcoCash",
     body: "Dear Customer,\n\nDue to banking system challenges, we request that payment for Invoice ZW-2024-091 (USD $3,200) be made via EcoCash to our new merchant number: *151*2*1*XXXXXXX#\n\nThis is temporary until our bank account is restored. Please process urgently as stock allocation depends on payment.\n\nThank you,\nFinance Department\nTrusted Supplier (Pvt) Ltd",
     isPhishing: true,
     redFlags: [
@@ -534,7 +534,7 @@ export const phishingScenarios: PhishingScenario[] = [
     type: "renewal-scam",
     title: "CIPC Annual Return Filing",
     sender: "filing@cipc-annual-returns.co.za",
-    subject: "Annual Return Overdue - Company May Be Deregistered",
+    subject: "Annual Return Overdue. Company May Be Deregistered",
     body: "Companies and Intellectual Property Commission\n\nYour company's annual return is overdue. Failure to file within 14 days will result in deregistration proceedings.\n\nFile your annual return and pay the filing fee online:\n[File Annual Return]\n\nFiling fee: R480 (includes late penalty)\n\nCIPC\nPretoria, South Africa",
     isPhishing: true,
     redFlags: [
@@ -635,16 +635,16 @@ export const policyTemplates: PolicyTemplate[] = [
     description: "Define procedures for responding to security incidents.",
     icon: "alert-triangle",
     questions: [
-      { id: "ir-q1", question: "Do you have a designated incident response team?", options: ["Yes, formal team", "Informal - IT handles it", "No, not yet"] },
+      { id: "ir-q1", question: "Do you have a designated incident response team?", options: ["Yes, formal team", "Informal. IT handles it", "No, not yet"] },
       { id: "ir-q2", question: "Do you have cyber insurance?", options: ["Yes", "Researching options", "No"] },
       { id: "ir-q3", question: "How quickly can you isolate a compromised system?", options: ["Within minutes", "Within hours", "Not sure"] },
-      { id: "ir-q4", question: "Do you have regulatory notification obligations?", options: ["Yes (GDPR, HIPAA, etc.)", "Maybe - need to check", "No"] }
+      { id: "ir-q4", question: "Do you have regulatory notification obligations?", options: ["Yes (GDPR, HIPAA, etc.)", "Maybe; need to check", "No"] }
     ],
     sections: [
       { title: "Purpose and Scope", description: "What constitutes a security incident.", sampleLanguage: "This policy defines [Company Name]'s procedures for identifying, responding to, and recovering from cybersecurity incidents. A security incident is any event that threatens the confidentiality, integrity, or availability of company systems or data." },
       { title: "Incident Response Team", description: "Who is responsible during an incident.", sampleLanguage: "The Incident Response Team consists of: Incident Commander (decision-maker), Technical Lead (IT/security), Communications Lead (internal/external messaging), and Legal/Compliance (regulatory requirements)." },
       { title: "Detection and Reporting", description: "How incidents are identified and reported.", sampleLanguage: "All employees must report suspected security incidents immediately to [reporting email/phone]. Do not attempt to investigate or resolve the incident independently." },
-      { title: "Response Procedures", description: "Step-by-step response actions.", sampleLanguage: "Upon confirmed incident: 1) Contain - isolate affected systems. 2) Assess - determine scope and impact. 3) Eradicate - remove the threat. 4) Recover - restore systems from clean backups. 5) Document - record all actions taken." },
+      { title: "Response Procedures", description: "Step-by-step response actions.", sampleLanguage: "Upon confirmed incident: 1) Contain; isolate affected systems. 2) Assess; determine scope and impact. 3) Eradicate; remove the threat. 4) Recover; restore systems from clean backups. 5) Document; record all actions taken." },
       { title: "Communication Plan", description: "Who needs to be notified.", sampleLanguage: "Internal notifications: executive team within 1 hour, all staff as needed. External notifications: cyber insurance provider, legal counsel, regulatory authorities (if required), affected customers (if data breach confirmed)." },
       { title: "Post-Incident Review", description: "Learning from incidents.", sampleLanguage: "Within 5 business days of incident resolution, the IR Team will conduct a post-incident review to identify root cause, evaluate response effectiveness, and implement improvements." }
     ]
@@ -661,7 +661,7 @@ export const policyTemplates: PolicyTemplate[] = [
     ],
     sections: [
       { title: "Purpose", description: "Why data classification matters.", sampleLanguage: "This policy establishes a framework for classifying [Company Name]'s data based on sensitivity and criticality, ensuring appropriate protection measures are applied." },
-      { title: "Classification Levels", description: "Data categories and definitions.", sampleLanguage: "PUBLIC - No restrictions. INTERNAL - For internal use only, not for external distribution. CONFIDENTIAL - Sensitive business data requiring access controls. RESTRICTED - Highly sensitive data (PII, financial, health) requiring encryption and strict access controls." },
+      { title: "Classification Levels", description: "Data categories and definitions.", sampleLanguage: "PUBLIC. No restrictions. INTERNAL. For internal use only, not for external distribution. CONFIDENTIAL. Sensitive business data requiring access controls. RESTRICTED. Highly sensitive data (PII, financial, health) requiring encryption and strict access controls." },
       { title: "Handling Requirements", description: "How each classification level should be handled.", sampleLanguage: "CONFIDENTIAL and RESTRICTED data must be: encrypted at rest and in transit, stored only on approved systems, shared only with authorized personnel, and securely disposed of when no longer needed." },
       { title: "Data Ownership", description: "Who is responsible for classifying data.", sampleLanguage: "Each department head is the data owner for data created and managed by their team. Data owners are responsible for classifying their data and ensuring appropriate handling." },
       { title: "Compliance and Audit", description: "How compliance will be verified.", sampleLanguage: "The IT team will conduct quarterly audits of data handling practices. Violations will be reported to management and may result in disciplinary action." }
@@ -697,11 +697,11 @@ export const incidentTypes: IncidentType[] = [
     description: "Your files have been encrypted and attackers demand payment.",
     steps: [
       { id: "r1", title: "Isolate Affected Systems", description: "Disconnect infected computers from the network immediately.", options: [
-        { label: "Systems are disconnected from network", nextId: "r2", actions: ["Unplug network cables", "Disable Wi-Fi", "Do NOT power off - evidence may be lost"] },
+        { label: "Systems are disconnected from network", nextId: "r2", actions: ["Unplug network cables", "Disable Wi-Fi", "Do NOT power off; evidence may be lost"] },
         { label: "I can't access the systems", nextId: "r2-alt", actions: ["Disconnect the network at the router/switch level", "Contact your IT provider immediately"] }
       ]},
       { id: "r2", title: "Do NOT Pay the Ransom", description: "Payment does not guarantee data recovery and funds criminal activity.", options: [
-        { label: "Understood - moving to assessment", nextId: "r3" }
+        { label: "Understood; moving to assessment", nextId: "r3" }
       ]},
       { id: "r2-alt", title: "Escalate to IT Support", description: "Professional help is needed for network-level isolation.", options: [
         { label: "IT provider contacted", nextId: "r3" }
@@ -714,7 +714,7 @@ export const incidentTypes: IncidentType[] = [
         { label: "Restoration in progress", nextId: "r5", actions: ["Ensure backups are from before the infection", "Scan backups for malware before restoring", "Restore to clean systems only"] }
       ]},
       { id: "r4b", title: "Engage Incident Response Professionals", description: "Without clean backups, professional recovery assistance is critical.", options: [
-        { label: "Contacting IR professionals", nextId: "r5", actions: ["Contact your cyber insurance provider - they often have IR partners", "Preserve all evidence for investigation", "Check nomoreransom.org for free decryption tools"] }
+        { label: "Contacting IR professionals", nextId: "r5", actions: ["Contact your cyber insurance provider; they often have IR partners", "Preserve all evidence for investigation", "Check nomoreransom.org for free decryption tools"] }
       ]},
       { id: "r5", title: "Report and Notify", description: "Report the incident to appropriate authorities and notify affected parties.", options: [
         { label: "Reports filed", nextId: null, actions: ["Report to law enforcement (see contacts below)", "Notify cyber insurance provider", "Assess regulatory notification requirements", "Document the full incident timeline"] }
@@ -736,8 +736,8 @@ export const incidentTypes: IncidentType[] = [
     description: "Unauthorized access to or exposure of sensitive business or customer data.",
     steps: [
       { id: "db1", title: "Confirm the Breach", description: "Verify that unauthorized access or data exposure has occurred.", options: [
-        { label: "Breach confirmed - data was accessed", nextId: "db2" },
-        { label: "Potential breach - still investigating", nextId: "db1b" }
+        { label: "Breach confirmed; data was accessed", nextId: "db2" },
+        { label: "Potential breach; still investigating", nextId: "db1b" }
       ]},
       { id: "db1b", title: "Preserve Evidence", description: "Do not alter or delete anything while investigating.", options: [
         { label: "Evidence preserved, continuing investigation", nextId: "db2", actions: ["Screenshot any suspicious activity", "Capture server and application logs", "Note exact times and systems involved"] }
@@ -774,7 +774,7 @@ export const incidentTypes: IncidentType[] = [
     color: "bg-amber-500",
     description: "Money was sent to a fraudulent account due to a spoofed or compromised email.",
     steps: [
-      { id: "bec1", title: "Contact Your Bank Immediately", description: "Time is critical - banks can sometimes recall wire transfers within 24-72 hours.", options: [
+      { id: "bec1", title: "Contact Your Bank Immediately", description: "Time is critical; banks can sometimes recall wire transfers within 24-72 hours.", options: [
         { label: "Bank has been contacted", nextId: "bec2", actions: ["Call your bank's fraud department directly", "Request an urgent wire recall", "Ask about the Recovery Asset Team (US banks)"] }
       ]},
       { id: "bec2", title: "Determine How It Happened", description: "Was it a spoofed email or a compromised account?", options: [
@@ -877,7 +877,7 @@ export const securityTools: SecurityTool[] = [
   { id: "firewall", category: "Network Security", name: "Next-Gen Firewall", description: "Network traffic filtering with intrusion prevention.", priceSmall: "$50-150/mo", priceMedium: "$150-500/mo", priceLarge: "$500-2000/mo", roiPoint: "First line of defense against network-based attacks and unauthorized access.", priority: "recommended" },
   { id: "vpn", category: "Network Security", name: "Business VPN", description: "Encrypted remote access to company resources.", priceSmall: "$5-10/user/mo", priceMedium: "$8-12/user/mo", priceLarge: "$10-15/user/mo", roiPoint: "Secures remote work connections, preventing eavesdropping and man-in-the-middle attacks.", priority: "recommended" },
   { id: "dns", category: "Network Security", name: "DNS Filtering", description: "Blocks access to known malicious websites.", priceSmall: "$1-3/user/mo", priceMedium: "$2-4/user/mo", priceLarge: "$3-5/user/mo", roiPoint: "Prevents 33% of malware infections by blocking malicious domains before connection.", priority: "recommended" },
-  { id: "cyber-ins", category: "Risk Management", name: "Cyber Insurance", description: "Financial protection against cybersecurity incidents.", priceSmall: "$500-2000/yr", priceMedium: "$2000-10000/yr", priceLarge: "$10000-50000/yr", roiPoint: "Covers incident response costs, legal fees, and business interruption - average breach cost for SMBs is $108,000.", priority: "recommended" },
+  { id: "cyber-ins", category: "Risk Management", name: "Cyber Insurance", description: "Financial protection against cybersecurity incidents.", priceSmall: "$500-2000/yr", priceMedium: "$2000-10000/yr", priceLarge: "$10000-50000/yr", roiPoint: "Covers incident response costs, legal fees, and business interruption; average breach cost for SMBs is $108,000.", priority: "recommended" },
   { id: "siem", category: "Monitoring", name: "SIEM/Log Management", description: "Centralized security event monitoring and alerting.", priceSmall: "$100-300/mo", priceMedium: "$300-1000/mo", priceLarge: "$1000-5000/mo", roiPoint: "Reduces breach detection time from 200+ days to hours.", priority: "nice-to-have" },
   { id: "dlp", category: "Data Protection", name: "Data Loss Prevention", description: "Monitors and prevents unauthorized data transfers.", priceSmall: "$5-10/user/mo", priceMedium: "$8-15/user/mo", priceLarge: "$10-20/user/mo", roiPoint: "Prevents data exfiltration by insiders and compromised accounts.", priority: "nice-to-have" },
   { id: "vuln-scan", category: "Monitoring", name: "Vulnerability Scanner", description: "Automated scanning for security weaknesses.", priceSmall: "$100-300/mo", priceMedium: "$200-500/mo", priceLarge: "$500-2000/mo", roiPoint: "Identifies exploitable vulnerabilities before attackers find them.", priority: "nice-to-have" },

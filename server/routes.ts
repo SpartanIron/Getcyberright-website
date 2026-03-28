@@ -1047,7 +1047,7 @@ export async function registerRoutes(
       res.json({ success: true, result });
     } catch (error) {
       console.error("AI content analysis error:", error);
-      res.status(400).json({ success: false, error: "Invalid input - minimum 50 characters required" });
+      res.status(400).json({ success: false, error: "Invalid input, minimum 50 characters required" });
     }
   });
 
@@ -1101,9 +1101,9 @@ Respond ONLY in this exact JSON structure:
 {
   "contentTypeDetected": "[Type + confidence %]",
   "scamRiskLevel": "Low" | "Moderate" | "High" | "Critical",
-  "keyRedFlags": ["bullet list of specific indicators - write each one so a non-technical person understands the risk. Example: Instead of 'subdomain manipulation: secure-login falsely implies legitimacy', write 'The web address is designed to look like a real login page, but it belongs to scammers'"],
+  "keyRedFlags": ["bullet list of specific indicators, write each one so a non-technical person understands the risk. Example: Instead of 'subdomain manipulation: secure-login falsely implies legitimacy', write 'The web address is designed to look like a real login page, but it belongs to scammers'"],
   "technicalObservations": ["plain-language explanations of technical findings. Write for someone who has never worked in IT. Example: Instead of 'SPF/DKIM authentication failure', write 'The email failed security checks that verify the sender is who they claim to be'. Only include if applicable, otherwise empty array"],
-  "recommendedActions": ["clear, specific steps anyone can follow. Start each with a verb. Example: 'Delete this message without clicking any links', 'Go directly to paypal.com by typing it in your browser - do not use the link in this message'"],
+  "recommendedActions": ["clear, specific steps anyone can follow. Start each with a verb. Example: 'Delete this message without clicking any links', 'Go directly to paypal.com by typing it in your browser, do not use the link in this message'"],
   "confidenceLevel": "explanation of certainty and any limitations",
   "summary": "2-3 sentence plain-language summary. Write as if explaining to a family member. Be direct and specific about what the threat is and what they should do."
 }
@@ -3937,19 +3937,19 @@ EDGE CASE HANDLING
             to: [adminEmail],
             subject: `[Feedback] New ${parsed.data.category} from GetCyberRight`,
             html: `
-              <div style="font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #0d9488; padding: 20px; border-radius: 8px 8px 0 0;">
-                  <h2 style="color: white; margin: 0;">New User Feedback</h2>
+              <div style="font-family: -apple-system, sans-serif, max-width: 600px, margin: 0 auto;">
+                <div style="background: #0d9488; padding: 20px, border-radius: 8px 8px 0 0;">
+                  <h2 style="color: white, margin: 0;">New User Feedback</h2>
                 </div>
-                <div style="border: 1px solid #e5e7eb; border-top: none; padding: 20px; border-radius: 0 0 8px 8px;">
+                <div style="border: 1px solid #e5e7eb, border-top: none, padding: 20px, border-radius: 0 0 8px 8px;">
                   <p><strong>Category:</strong> ${safeCategory}</p>
                   <p><strong>Page:</strong> ${safePage}</p>
                   ${safeEmail ? `<p><strong>Email:</strong> ${safeEmail}</p>` : ""}
-                  <div style="background: #f9fafb; padding: 16px; border-radius: 6px; margin: 16px 0;">
+                  <div style="background: #f9fafb, padding: 16px, border-radius: 6px, margin: 16px 0;">
                     <p style="margin: 0; white-space: pre-wrap;">${safeMessage}</p>
                   </div>
                   <p style="color: #6b7280; font-size: 14px;">Submitted: ${new Date().toLocaleString()}</p>
-                  <a href="${req.protocol}://${req.get("host")}/admin/feedback" style="display: inline-block; background: #0d9488; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; margin-top: 8px;">View in Admin</a>
+                  <a href="${req.protocol}://${req.get("host")}/admin/feedback" style="display: inline-block, background: #0d9488; color: white, padding: 10px 20px, border-radius: 6px, text-decoration: none, margin-top: 8px;">View in Admin</a>
                 </div>
               </div>
             `,
@@ -4494,7 +4494,7 @@ EDGE CASE HANDLING
       }
 
       res.setHeader("Content-Type", "application/zip");
-      res.setHeader("Content-Disposition", "attachment; filename=gcr-guard-extension.zip");
+      res.setHeader("Content-Disposition", "attachment, filename=gcr-guard-extension.zip");
 
       const archive = archiver("zip", { zlib: { level: 9 } });
       archive.pipe(res);

@@ -248,7 +248,7 @@ export default function DataShieldPricing() {
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
                 Over 500 data broker sites trade your name, address, phone number, and more.
-                We find them, and remove you - so you don't have to.
+                We find them, and remove you, so you don't have to.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground mb-8">
                 <span className="flex items-center gap-1.5">

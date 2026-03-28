@@ -73,7 +73,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Whiteboard or chart paper", "Markers", "Smiley-face stickers"],
     procedure: [
       "Ask: 'What does it mean to be kind when we talk to someone face to face?'",
-      "Explain that the internet is like a playground - the same rules about kindness apply",
+      "Explain that the internet is like a playground, and the same rules about kindness apply",
       "Show two example sentences: one kind, one unkind. Have students give thumbs-up or thumbs-down",
       "Class creates one 'Online Kindness Rule' together and each student gets a sticker for participating"
     ],
@@ -117,7 +117,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Review: each student shares their favorite rule and why"
     ],
     assessment: "Students can recite at least 3 digital citizenship rules.",
-    extensions: "Share the pledge with families; students teach one rule to a sibling."
+    extensions: "Share the pledge with families. Students teach one rule to a sibling."
   },
   {
     id: "dc-k2-full",
@@ -147,7 +147,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["THINK poster (True, Helpful, Inspiring, Necessary, Kind)", "Whiteboard"],
     procedure: [
       "Introduce the THINK acronym: Is it True? Is it Helpful? Is it Inspiring? Is it Necessary? Is it Kind?",
-      "Show 3 sample social media posts; students evaluate each using THINK",
+      "Show 3 sample social media posts. Students evaluate each using THINK",
       "Quick turn-and-talk: share a time you posted or said something you wished you could take back",
       "Class creates a THINK reminder card to keep at their desk"
     ],
@@ -295,7 +295,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Ask: 'Who reads the Terms of Service before clicking Accept?' (expect few hands)",
       "Show 3 surprising ToS excerpts (e.g., data ownership, content licensing, tracking policies)",
       "Quick-fire discussion: 'Would you still agree if you knew this?'",
-      "Key insight: you are trading privacy for free services - is the trade worth it?"
+      "Key insight: you are trading privacy for free services. Is the trade worth it?"
     ],
     assessment: "Students can identify at least 2 concerning aspects of common ToS agreements.",
     extensions: "Read and annotate the ToS of one app you use daily."
@@ -329,7 +329,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["AI case study handouts", "Ethics framework reference", "Discussion rubric"],
     procedure: [
       "Introduction (5 min): What AI tools do you use? (ChatGPT, image generators, etc.)",
-      "Case studies (15 min): Groups analyze AI ethics scenarios - deepfakes, AI-generated homework, biased algorithms, surveillance",
+      "Case studies (15 min): Groups analyze AI ethics scenarios (deepfakes, AI-generated homework, biased algorithms, surveillance)",
       "Ethics framework (10 min): Apply an ethical framework (consequentialism, deontology, virtue ethics) to one case",
       "Fishbowl discussion (10 min): Inner circle debates while outer circle takes notes",
       "Policy draft (5 min): Each group proposes one school AI-use guideline"
@@ -348,7 +348,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     procedure: [
       "Self-assessment (10 min): Audit your current digital presence across all platforms",
       "Research (10 min): Examine how digital presence affects college admissions and job prospects",
-      "Create (20 min): Build a positive digital portfolio - curate content you would want future employers to see",
+      "Create (20 min): Build a positive digital portfolio. Curate content you would want future employers to see",
       "Peer review (10 min): Exchange portfolios with a partner for constructive feedback",
       "Manifesto (10 min): Write a personal 'Digital Citizenship Manifesto' - your principles for online life"
     ],
@@ -420,7 +420,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     procedure: [
       "Read example phrases aloud: 'I like your drawing' vs 'That is the worst drawing ever'",
       "Students sort phrases into Kind or Unkind baskets",
-      "Explain: 'These words can be said face-to-face OR typed on a screen - they feel the same'",
+      "Explain: 'These words can be said face-to-face OR typed on a screen. They feel the same'",
       "Each student says one kind thing they could type to a friend"
     ],
     assessment: "Students can identify kind vs. unkind messages.",
@@ -522,7 +522,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     objectives: ["Research cyberbullying laws in your state/country", "Analyze real legal cases involving online harassment"],
     materials: ["Case study handouts", "Legal research resources", "Analysis framework"],
     procedure: [
-      "Overview: cyberbullying is not just a school issue - it can be a legal issue (10 min)",
+      "Overview: cyberbullying is not just a school issue. It can be a legal issue (10 min)",
       "Case study analysis: groups examine 2 real cases with different outcomes (15 min)",
       "Legal research: find your state or country's cyberbullying laws (10 min)",
       "Group presentations: key findings and takeaways (10 min)"
@@ -540,7 +540,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Superhero mask cutouts", "Markers"],
     procedure: [
       "Ask: 'Do superheroes tell everyone their real name? Why not?'",
-      "Explain: 'Online, we can use a special name - like a superhero identity - to stay safe'",
+      "Explain: 'Online, we can use a special name, like a superhero identity, to stay safe'",
       "Each student creates a superhero name (not their real name) and decorates a mask",
       "Practice: 'If someone online asks your real name, what do you say? I use my superhero name!'"
     ],
@@ -577,7 +577,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     procedure: [
       "Show app permission screenshots: 'Why does a flashlight app need access to your contacts?'",
       "Quick survey: how many students check app permissions before installing?",
-      "Review 4 common permission types: camera, location, contacts, microphone - when are these reasonable?",
+      "Review 4 common permission types: camera, location, contacts, microphone. When are these reasonable?",
       "Takeaway: if the permission does not match the app's purpose, be suspicious"
     ],
     assessment: "Students can identify at least 2 unreasonable app permission requests.",
@@ -664,7 +664,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Introduce 3 key questions: Who made this? Why did they make it? What do they want me to do?",
       "Show 4 examples: a toy ad, a news article, a social media influencer post, a PSA",
       "Students answer the 3 questions for each example",
-      "Takeaway: everything online was made by someone with a purpose - always ask why"
+      "Takeaway: everything online was made by someone with a purpose, so always ask why"
     ],
     assessment: "Students can apply the 3 questions to at least 2 different types of media.",
     extensions: "Find one example each of media that wants to inform, persuade, and entertain."
@@ -678,7 +678,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     objectives: ["Recognize clickbait headlines", "Understand how headlines can misrepresent article content"],
     materials: ["10 headline/article pairs (projected)", "True/Misleading voting cards"],
     procedure: [
-      "Show 10 headlines one at a time - students vote: accurate or clickbait?",
+      "Show 10 headlines one at a time. Students vote: accurate or clickbait?",
       "Reveal the actual article content for each headline",
       "Discuss: what techniques make a headline misleading? (exaggeration, missing context, emotional language)",
       "Challenge: rewrite 2 clickbait headlines to be accurate"
@@ -730,8 +730,8 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Traffic light cutout (red/yellow/green)", "Activity picture cards"],
     procedure: [
       "Green light: time to play games or watch videos!",
-      "Yellow light: you have been playing for a while - take a break soon!",
-      "Red light: time to stop and do something else - play outside, read, or draw!",
+      "Yellow light: you have been playing for a while. Take a break soon!",
+      "Red light: time to stop and do something else! Play outside, read, or draw!",
       "Sort activity cards: which activities are screen time? Which are break activities?"
     ],
     assessment: "Students can name 3 non-screen activities to do during 'red light' time.",
@@ -784,7 +784,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Show 4 manipulative design patterns: countdown timers, limited-time offers, social pressure notifications, energy systems",
       "For each: explain how it creates urgency or FOMO",
       "Ask: 'Have you ever felt pressured by a game to spend money or play longer?'",
-      "Takeaway: when a game makes you feel anxious about missing out, that is by design - recognize it"
+      "Takeaway: when a game makes you feel anxious about missing out, that is by design. Recognize it"
     ],
     assessment: "Students can identify at least 2 manipulative game design patterns.",
     extensions: "Identify these patterns in games you currently play."
@@ -815,7 +815,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     objectives: ["Analyze ethical concerns with modern game monetization", "Form evidence-based opinions on regulation"],
     materials: ["Monetization case studies", "Ethics framework", "Debate preparation sheets"],
     procedure: [
-      "Overview: how games make money - from $60 purchases to free-to-play microtransactions (10 min)",
+      "Overview: how games make money, from $60 purchases to free-to-play microtransactions (10 min)",
       "Case studies: loot boxes in children's games, pay-to-win mechanics, cosmetic-only vs. gameplay advantages (15 min)",
       "Ethical analysis: apply fairness, transparency, and harm principles to each case (10 min)",
       "Mini-debate: 'Should loot boxes be classified as gambling and regulated by law?' (10 min)"
@@ -852,7 +852,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Sort activity cards: is this something you should do on school computers? (10 min)",
       "Appropriate: research for class, educational games, typing practice",
       "Not appropriate: personal social media, downloading random games, sharing passwords",
-      "Introduce the idea of school rules for technology - just like playground rules (5 min)"
+      "Introduce the idea of school rules for technology, just like playground rules (5 min)"
     ],
     assessment: "Students can identify 3 appropriate and 3 inappropriate school technology uses.",
     extensions: "Create a 'School Tech Do's and Don'ts' poster."
@@ -886,7 +886,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Surprising fact: schools are one of the most targeted sectors for cyberattacks",
       "Discussion: what data does your school have? (grades, addresses, SSNs, medical records)",
       "Why attackers want it: identity theft (children's clean credit histories), ransomware, data sale",
-      "Student role: you are part of the defense - following safety rules protects everyone"
+      "Student role: you are part of the defense. Following safety rules protects everyone"
     ],
     assessment: "Students can explain why schools are attractive targets for cyberattacks.",
     extensions: "Research a real school district cyberattack and its impact."
@@ -919,7 +919,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     procedure: [
       "Introduction: what happens when a school is hacked? Walk through real examples (5 min)",
       "Assign team roles: detector, reporter, responder, communicator (5 min)",
-      "Scenario: your school email system has been compromised - run through the response (15 min)",
+      "Scenario: your school email system has been compromised. Run through the response (15 min)",
       "Debrief: what went well? What would you do differently? (5 min)"
     ],
     assessment: "Teams can execute a structured response to a simulated security incident.",
@@ -937,7 +937,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Brainstorm: what information do websites and apps ask for?",
       "Sort cards: students decide if each piece of info is private or shareable",
       "Discuss surprising items (e.g., birthday seems harmless but can be used for identity theft)",
-      "Role-play: a 'website' asks for your information - practice saying no",
+      "Role-play: a 'website' asks for your information. Practice saying no",
       "Create a 'My Private Info' shield drawing"
     ],
     assessment: "Students correctly categorize at least 8 out of 10 information types.",
@@ -955,7 +955,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Demonstrate how quickly weak passwords can be cracked (use projected statistics, not actual cracking)",
       "Teach password strength principles: length beats complexity, passphrases, no personal info",
       "Students create 3 strong passwords using the passphrase method",
-      "Test passwords against strength criteria (not online - use the rubric)",
+      "Test passwords against strength criteria (not online, use the rubric)",
       "Discuss password managers and why they help",
       "Challenge: create a password that is both strong AND memorable in 2 minutes"
     ],
@@ -974,7 +974,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Introduction to phishing: statistics and impact (5 min)",
       "Teach analysis techniques: check sender domain, hover over links (show on projector), urgency language, generic greetings, misspellings (10 min)",
       "Lab: students analyze 8 emails and classify each as phishing or legitimate using the checklist (20 min)",
-      "Review answers as a class - discuss the trickiest ones (10 min)"
+      "Review answers as a class. Discuss the trickiest ones (10 min)"
     ],
     assessment: "Students correctly identify at least 6 of 8 emails.",
     extensions: "Create a phishing awareness poster for the school."
@@ -988,7 +988,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     objectives: ["Distinguish between real and manipulated images", "Develop healthy skepticism about online images"],
     materials: ["Projected images (mix of real and edited/AI-generated)", "Voting cards (Real/Fake)"],
     procedure: [
-      "Show 10 images one at a time - students vote: real or fake?",
+      "Show 10 images one at a time. Students vote: real or fake?",
       "After each vote, reveal the answer and discuss clues",
       "Teach 3 signs of manipulated images: weird shadows, blurry edges, impossible scenarios",
       "Key lesson: not everything you see online is real",
@@ -1041,7 +1041,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Game scenario cards", "Safety rules chart paper", "Red/Green flags cards"],
     procedure: [
       "Discuss: what games do you play? Do you play with strangers? (5 min)",
-      "Present 8 gaming scenarios - students hold up green flag (safe) or red flag (unsafe) (10 min)",
+      "Present 8 gaming scenarios. Students hold up green flag (safe) or red flag (unsafe) (10 min)",
       "Discuss each scenario and why it is safe or unsafe (10 min)",
       "Create class gaming safety rules together (5 min)"
     ],
@@ -1078,7 +1078,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Explain: students and schools are targets for phishing too (5 min)",
       "Show 6 sample emails: some legitimate school communications, some phishing attempts (10 min)",
       "Students work in pairs to classify each email and explain their reasoning (10 min)",
-      "Review as a class - introduce the reporting process for suspicious emails at school (5 min)"
+      "Review as a class. Introduce the reporting process for suspicious emails at school (5 min)"
     ],
     assessment: "Students correctly identify at least 4 of 6 emails.",
     extensions: "Create a 'Phishing Red Flags' quick reference card."
@@ -1112,7 +1112,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     procedure: [
       "Story time: read a story about online friendship and kindness (10 min)",
       "Puppet show: teacher uses puppets to show kind vs. unkind online interactions (10 min)",
-      "Students practice with puppets in pairs - each pair shows a kind online moment (10 min)",
+      "Students practice with puppets in pairs. Each pair shows a kind online moment (10 min)",
       "Class creates a 'Good Online Friend' poster with illustrated rules (10 min)",
       "Friendship bracelet activity: students make bracelets as a pledge to be kind online (5 min)"
     ],
@@ -1147,7 +1147,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     objectives: ["Understand the far-reaching impact of online posts", "Develop strategies to stop negative ripples"],
     materials: ["Bowl of water", "Pebbles", "Ripple effect worksheet", "Scenario cards"],
     procedure: [
-      "Demonstration: drop a pebble in water and watch the ripples spread - connect to how words spread online (5 min)",
+      "Demonstration: drop a pebble in water and watch the ripples spread. Connect to how words spread online (5 min)",
       "Present 4 scenarios: trace how one mean post affects multiple people (15 min)",
       "Students map the 'ripple effect' of each scenario on their worksheets (10 min)",
       "Reverse ripple: for each scenario, students create a kind action that starts a positive ripple (10 min)",
@@ -1187,7 +1187,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Role assignment and preparation (10 min): assign roles, teams prepare their arguments",
       "Trial (20 min): prosecution presents evidence, defense responds, witnesses testify",
       "Jury deliberation (10 min): jury discusses and reaches a verdict",
-      "Debrief (10 min): discuss the experience - what did you learn from seeing different perspectives?"
+      "Debrief (10 min): discuss the experience. What did you learn from seeing different perspectives?"
     ],
     assessment: "Students demonstrate understanding of multiple perspectives and consequences of cyberbullying.",
     extensions: "Write a reflection essay about what justice means in cyberbullying cases."
@@ -1293,7 +1293,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     procedure: [
       "Agency briefing (10 min): students become Privacy Detectives investigating data collection",
       "Investigation 1 (15 min): examine 4 popular kids' websites and note what data they collect (using worksheets, not actual accounts)",
-      "Investigation 2 (15 min): compare privacy policies of 2 apps - which protects kids better?",
+      "Investigation 2 (15 min): compare privacy policies of 2 apps. Which protects kids better?",
       "Evidence report (10 min): each detective team presents their findings",
       "Action plan (10 min): create a 'Smart Data Detective' pledge with personal rules for sharing data"
     ],
@@ -1330,7 +1330,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Law comparison worksheets", "Research devices", "Debate preparation materials"],
     procedure: [
       "Overview (10 min): why do privacy laws exist? Brief history from FTC Act to GDPR",
-      "Research (15 min): groups research assigned laws - GDPR, CCPA, COPPA, FERPA - using structured worksheets",
+      "Research (15 min): groups research assigned laws. GDPR, CCPA, COPPA, FERPA, using structured worksheets",
       "Comparison matrix (10 min): groups fill in a comparison chart: who is protected, what data is covered, what rights are granted",
       "Presentations (15 min): each group presents their law and how it compares",
       "Debate (10 min): 'Is current privacy legislation sufficient to protect individuals in the age of big data?'"
@@ -1441,7 +1441,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
       "Introduce the CRAAP test: Currency, Relevance, Authority, Accuracy, Purpose (5 min)",
       "Model: evaluate one source together using the CRAAP criteria (5 min)",
       "Students evaluate 4 additional sources independently using the worksheet (15 min)",
-      "Review: compare evaluations and discuss disagreements - credibility is sometimes a judgment call (5 min)"
+      "Review: compare evaluations and discuss disagreements. Credibility is sometimes a judgment call (5 min)"
     ],
     assessment: "Students correctly assess the credibility of at least 3 of 4 sources.",
     extensions: "Apply the CRAAP test to sources used in your next research assignment."
@@ -1457,7 +1457,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     procedure: [
       "Introduction (10 min): what makes a news source reliable? Review journalistic standards: accuracy, fairness, transparency",
       "Research (15 min): gather facts about a school or community event from multiple sources",
-      "Write (15 min): create a news article following journalistic standards - accurate headline, multiple sources, balanced perspective",
+      "Write (15 min): create a news article following journalistic standards: accurate headline, multiple sources, balanced perspective",
       "Peer review (10 min): exchange articles and evaluate using the ethics checklist",
       "Revise and publish (10 min): incorporate feedback and publish to a class blog or newsletter"
     ],
@@ -1473,8 +1473,8 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     objectives: ["Analyze the modern information ecosystem", "Develop advanced media literacy strategies for the AI age"],
     materials: ["Information ecosystem map template", "Case study packets", "Strategy development worksheet"],
     procedure: [
-      "Mapping (10 min): create a personal information ecosystem map - where do you get your news and information?",
-      "Analysis (15 min): identify vulnerabilities in your ecosystem - filter bubbles, single-source dependence, algorithm influence",
+      "Mapping (10 min): create a personal information ecosystem map. Where do you get your news and information?",
+      "Analysis (15 min): identify vulnerabilities in your ecosystem (filter bubbles, single-source dependence, algorithm influence)",
       "Case studies (15 min): analyze 3 examples of misinformation campaigns and how they exploited information ecosystems",
       "Strategy development (15 min): create a personal 'Media Literacy Toolkit' with verification strategies for text, image, video, and AI-generated content",
       "Commitment (5 min): write one concrete change you will make to your information consumption habits"
@@ -1492,10 +1492,10 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Daily schedule template with picture slots", "Activity picture cards", "Clock prop"],
     procedure: [
       "Discussion (5 min): what are all the things you do in a day? (eat, play, learn, sleep, screen time)",
-      "Sorting (10 min): sort activity cards into groups - physical play, creative play, learning, screen time, rest",
+      "Sorting (10 min): sort activity cards into groups: physical play, creative play, learning, screen time, rest",
       "Schedule building (15 min): students create their ideal balanced day using picture cards on the template",
       "Check: is there too much of one thing? Adjust for balance (5 min)",
-      "Practice (10 min): role-play stopping a game when the timer goes off - practice saying 'Time for something else!'"
+      "Practice (10 min): role-play stopping a game when the timer goes off. Practice saying 'Time for something else!'"
     ],
     assessment: "Students create a balanced daily schedule with limited screen time.",
     extensions: "Try following your balanced schedule for one day and draw how it went."
@@ -1530,7 +1530,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     procedure: [
       "Discussion (5 min): have you ever bought something in a game? How much did it cost?",
       "Scenario activity (15 min): using play money, students 'purchase' items from game store cards and track spending",
-      "Calculation (10 min): add up the total spent - compare to real things that money could buy",
+      "Calculation (10 min): add up the total spent. Compare to real things that money could buy",
       "Reflection (10 min): create a 'Before I Buy' checklist for in-game purchases",
       "Sharing (5 min): what surprised you about how quickly spending adds up?"
     ],
@@ -1547,8 +1547,8 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Game design template", "Example game mechanic cards", "Art supplies for game boards"],
     procedure: [
       "Introduction (10 min): how do game designers make games fun? Introduce reward systems, challenges, social features",
-      "Analysis (10 min): look at 3 popular games - which design choices keep you playing? Which are fair? Which might be manipulative?",
-      "Design phase (20 min): students design their own simple game concept using the template - must be fun without spending money",
+      "Analysis (10 min): look at 3 popular games. Which design choices keep you playing? Which are fair? Which might be manipulative?",
+      "Design phase (20 min): students design their own simple game concept using the template. Must be fun without spending money",
       "Presentation (15 min): each student pitches their game to the class",
       "Discussion (5 min): what did you learn about game design that changes how you think about the games you play?"
     ],
@@ -1565,7 +1565,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Chat log examples (teacher-created)", "Safety rules template", "Scenario cards"],
     procedure: [
       "Review (5 min): why is communicating with strangers in games risky?",
-      "Analyze (10 min): review 6 example in-game chat logs - identify safe and unsafe interactions",
+      "Analyze (10 min): review 6 example in-game chat logs. Identify safe and unsafe interactions",
       "Create (10 min): develop personal gaming communication rules covering: what to share, what to never share, when to report, when to mute",
       "Scenario practice (5 min): apply your rules to 3 quick scenarios"
     ],
@@ -1581,8 +1581,8 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     objectives: ["Research the gaming industry's business practices", "Form informed opinions about responsible gaming"],
     materials: ["Research packets", "Investigation worksheets", "Debate preparation sheets"],
     procedure: [
-      "Introduction (5 min): the gaming industry makes billions - how?",
-      "Research stations (20 min): groups investigate assigned topics - loot boxes, pay-to-win, advertising to kids, gaming addiction research, esports",
+      "Introduction (5 min): the gaming industry makes billions. How?",
+      "Research stations (20 min): groups investigate assigned topics: loot boxes, pay-to-win, advertising to kids, gaming addiction research, esports",
       "Findings report (15 min): each group presents key findings with evidence",
       "Debate (15 min): 'Should the government regulate how games are designed and monetized?'",
       "Personal reflection (5 min): write your position on responsible gaming practices"
@@ -1636,7 +1636,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Large poster paper", "Markers", "Computer or tablet for practice"],
     procedure: [
       "Discussion (5 min): why do we have rules for the playground? We need rules for computers too!",
-      "Brainstorm (10 min): students suggest rules - teacher writes them on poster paper, guiding toward 5-6 key rules",
+      "Brainstorm (10 min): students suggest rules. Teacher writes them on poster paper, guiding toward 5-6 key rules",
       "Illustrate (10 min): students help draw pictures for each rule on the poster",
       "Practice (5 min): supervised computer time where students demonstrate following the rules"
     ],
@@ -1707,7 +1707,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     objectives: ["Demonstrate comprehensive school technology safety knowledge", "Teach others about safe technology use"],
     materials: ["Poster supplies", "Activity station materials", "Presentation rubric", "Visitor feedback forms"],
     procedure: [
-      "Planning (10 min): each group chooses a topic - passwords, phishing, safe websites, reporting problems, logging out",
+      "Planning (10 min): each group chooses a topic: passwords, phishing, safe websites, reporting problems, logging out",
       "Creating (20 min): groups create an interactive display with a poster and a hands-on activity for visitors",
       "Practice (10 min): rehearse presenting and running the activity",
       "Fair time (15 min): groups rotate visiting each other's stations, completing each activity",
@@ -1727,7 +1727,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     procedure: [
       "Scenario setup (5 min): 'Your school's student database has been hacked. Student names, grades, and addresses are exposed'",
       "Impact analysis (10 min): groups analyze what this breach means for students, teachers, parents, and the school",
-      "Response planning (10 min): teams develop a response plan - who to notify, what steps to take, how to prevent it next time",
+      "Response planning (10 min): teams develop a response plan: who to notify, what steps to take, how to prevent it next time",
       "What could have prevented this? (10 min): trace the breach to its cause and identify preventive measures",
       "Commitment (10 min): each student writes 3 things they will do to help protect school data"
     ],
@@ -1744,7 +1744,7 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     materials: ["Assessment rubric", "Interview question templates", "Report template", "Presentation materials"],
     procedure: [
       "Introduction (10 min): what is a cybersecurity assessment and why do organizations do them?",
-      "Assessment design (10 min): teams design their assessment plan - what to evaluate and how",
+      "Assessment design (10 min): teams design their assessment plan: what to evaluate and how",
       "Assessment execution (15 min): teams assess school technology practices using observation and their rubric (no actual testing of systems)",
       "Report writing (15 min): teams write up findings and recommendations in a structured report",
       "Presentation (10 min): teams present their top 3 findings and recommendations"
@@ -1761,9 +1761,9 @@ export const lessonPlanTemplates: LessonPlanTemplate[] = [
     objectives: ["Analyze existing school technology policies", "Draft improved policies based on current threats"],
     materials: ["School AUP copies", "Policy analysis framework", "Drafting template", "Peer review rubric"],
     procedure: [
-      "Policy review (10 min): read and analyze the school's current Acceptable Use Policy - what works? What is missing?",
+      "Policy review (10 min): read and analyze the school's current Acceptable Use Policy. What works? What is missing?",
       "Threat landscape (10 min): identify current cybersecurity threats specific to schools (ransomware, phishing, data breaches, social engineering)",
-      "Gap analysis (10 min): compare current policy against identified threats - where are the gaps?",
+      "Gap analysis (10 min): compare current policy against identified threats. Where are the gaps?",
       "Policy drafting (20 min): groups draft policy improvements addressing identified gaps, including student responsibilities",
       "Peer review and presentation (10 min): exchange drafts for feedback and present top recommendations"
     ],
@@ -1785,7 +1785,7 @@ export const classroomActivities: ClassroomActivity[] = [
       {
         stepNumber: 1,
         instruction: "Display or distribute 8 sample emails on the projector or as handouts. Mix includes phishing attempts and legitimate emails.",
-        teacherNote: "Use teacher-created examples only - never show students real phishing emails with active links. Include a mix of obvious and subtle examples."
+        teacherNote: "Use teacher-created examples only. Never show students real phishing emails with active links. Include a mix of obvious and subtle examples."
       },
       {
         stepNumber: 2,
@@ -1826,7 +1826,7 @@ export const classroomActivities: ClassroomActivity[] = [
       {
         stepNumber: 1,
         instruction: "Teach password strength basics: length is more important than complexity. A 4-word passphrase beats a short complex password.",
-        teacherNote: "Use analogies: 'A short password is like a tiny lock - easy to break. A passphrase is like a long chain - much harder.'"
+        teacherNote: "Use analogies: 'A short password is like a tiny lock, easy to break. A passphrase is like a long chain, much harder.'"
       },
       {
         stepNumber: 2,
@@ -1882,17 +1882,17 @@ export const classroomActivities: ClassroomActivity[] = [
       {
         stepNumber: 3,
         instruction: "For each account, students note: Is it still active? Did I ever delete it? What information did I share? Who can see it?",
-        teacherNote: "Inactive accounts are still a risk - data remains on servers even when we stop using a platform."
+        teacherNote: "Inactive accounts are still a risk. Data remains on servers even when we stop using a platform."
       },
       {
         stepNumber: 4,
         instruction: "Color-code the timeline: green for accounts they actively manage, yellow for forgotten accounts, red for accounts they cannot access anymore.",
-        teacherNote: "Red accounts are the highest risk - students cannot control what happens to that data."
+        teacherNote: "Red accounts are the highest risk. Students cannot control what happens to that data."
       },
       {
         stepNumber: 5,
         instruction: "Create an action plan: identify 3 accounts to review privacy settings on this week and 2 inactive accounts to deactivate or delete.",
-        teacherNote: "Make this a homework assignment - students should actually follow through on their action plan."
+        teacherNote: "Make this a homework assignment. Students should actually follow through on their action plan."
       }
     ],
     debrief: [
@@ -1927,7 +1927,7 @@ export const classroomActivities: ClassroomActivity[] = [
       },
       {
         stepNumber: 4,
-        instruction: "After each scenario, freeze the action and ask: 'Bystanders - what could you do RIGHT NOW to help?' Brainstorm at least 3 options.",
+        instruction: "After each scenario, freeze the action and ask: 'Bystanders, what could you do RIGHT NOW to help?' Brainstorm at least 3 options.",
         teacherNote: "Options include: report to an adult, send a supportive private message, speak up publicly, document the bullying, invite the target to a different activity."
       },
       {
@@ -1959,17 +1959,17 @@ export const classroomActivities: ClassroomActivity[] = [
       {
         stepNumber: 2,
         instruction: "Walk through key privacy settings together using the projector: account visibility (public vs private), who can message you, who can see your location, who can tag you.",
-        teacherNote: "Navigate the settings on a demo account so students can follow along. Note that settings change frequently - teach the principle, not just the current menu location."
+        teacherNote: "Navigate the settings on a demo account so students can follow along. Note that settings change frequently, so teach the principle, not just the current menu location."
       },
       {
         stepNumber: 3,
         instruction: "Students independently audit their chosen platform using the checklist: check each setting, note the current value, and decide whether to change it.",
-        teacherNote: "Circulate and help students find settings. Many are buried in submenus. This is deliberate by the platforms - discuss why."
+        teacherNote: "Circulate and help students find settings. Many are buried in submenus. This is deliberate by the platforms. Discuss why."
       },
       {
         stepNumber: 4,
         instruction: "Data download: show students how to request a download of their data from platforms (most have this under Privacy or Account settings). Discuss what they might find.",
-        teacherNote: "Students do not need to actually download their data in class - just show them where the option is and explain why it matters."
+        teacherNote: "Students do not need to actually download their data in class. Just show them where the option is and explain why it matters."
       },
       {
         stepNumber: 5,
@@ -1989,7 +1989,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   { id: "dc-q1", topic: "Digital Citizenship", question: "What is a 'digital footprint'?", options: [
     { text: "A tracking device placed on your computer", isCorrect: false, explanation: "A digital footprint is not a physical device. It refers to the trail of data you leave behind through your online activity." },
     { text: "The trail of data you leave behind through your online activity", isCorrect: true, explanation: "Correct! Every post, search, click, and account creation adds to your digital footprint, which can be permanent and searchable." },
-    { text: "A type of computer virus", isCorrect: false, explanation: "A digital footprint is not a virus. It is the collection of data traces from your online activity - posts, searches, accounts, and more." },
+    { text: "A type of computer virus", isCorrect: false, explanation: "A digital footprint is not a virus. It is the collection of data traces from your online activity; posts, searches, accounts, and more." },
     { text: "Your computer's physical location", isCorrect: false, explanation: "Your physical location is separate from your digital footprint. A digital footprint is the data trail from everything you do online." }
   ]},
   { id: "dc-q2", topic: "Digital Citizenship", question: "What does the 'T' in the THINK acronym stand for when deciding whether to post something online?", options: [
@@ -2002,17 +2002,17 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     { text: "Sharing a classmate's embarrassing photo because it is funny", isCorrect: false, explanation: "Sharing embarrassing photos without consent is a form of cyberbullying, not good digital citizenship." },
     { text: "Using someone else's password to check their messages", isCorrect: false, explanation: "Accessing someone's account without permission is a violation of their privacy and potentially illegal." },
     { text: "Reporting a social media post that contains bullying", isCorrect: true, explanation: "Correct! Reporting harmful content helps keep online spaces safe and shows responsibility as a digital citizen." },
-    { text: "Creating a fake profile to spy on someone", isCorrect: false, explanation: "Creating fake profiles to spy on others is deceptive and potentially harassing - the opposite of good digital citizenship." }
+    { text: "Creating a fake profile to spy on someone", isCorrect: false, explanation: "Creating fake profiles to spy on others is deceptive and potentially harassing; the opposite of good digital citizenship." }
   ]},
   { id: "dc-q4", topic: "Digital Citizenship", question: "Why should you be careful about what you share on social media even with privacy settings on?", options: [
     { text: "Privacy settings make everything completely private forever", isCorrect: false, explanation: "Privacy settings are not foolproof. Platforms change policies, friends can screenshot, and data breaches can expose content." },
-    { text: "Nothing you post online is truly private - screenshots, data breaches, and policy changes can expose your content", isCorrect: true, explanation: "Correct! Even with the strongest privacy settings, content can be screenshotted, hacked, or exposed through policy changes." },
+    { text: "Nothing you post online is truly private. Screenshots, data breaches, and policy changes can expose your content", isCorrect: true, explanation: "Correct! Even with the strongest privacy settings, content can be screenshotted, hacked, or exposed through policy changes." },
     { text: "Social media companies never look at your private posts", isCorrect: false, explanation: "Social media companies may access and analyze your content, even private posts, as outlined in their Terms of Service." },
     { text: "Only your friends can ever see your private content", isCorrect: false, explanation: "Friends can screenshot and share your content, platform employees may access it, and data breaches can expose it." }
   ]},
   { id: "dc-q5", topic: "Digital Citizenship", question: "What is the best response if you receive a message from a stranger asking for personal information?", options: [
     { text: "Reply politely and answer their questions", isCorrect: false, explanation: "Never share personal information with strangers online, regardless of how polite they seem." },
-    { text: "Ignore it - they will go away eventually", isCorrect: false, explanation: "While ignoring is better than engaging, the best response includes reporting and telling a trusted adult." },
+    { text: "Ignore it. They will go away eventually", isCorrect: false, explanation: "While ignoring is better than engaging, the best response includes reporting and telling a trusted adult." },
     { text: "Do not respond, block the person, and tell a trusted adult", isCorrect: true, explanation: "Correct! Do not engage with strangers asking for personal info. Block them, report the message, and inform a trusted adult." },
     { text: "Ask them why they need the information first", isCorrect: false, explanation: "Engaging with the stranger at all opens the door to manipulation. The safest response is to not respond, block, and report." }
   ]},
@@ -2020,11 +2020,11 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     { text: "The internet will never be shut down", isCorrect: false, explanation: "This phrase refers to the permanence of content, not the infrastructure. What you post can be copied, cached, and preserved indefinitely." },
     { text: "Content posted online can be copied, saved, and may never truly be deleted", isCorrect: true, explanation: "Correct! Even deleted content may exist in screenshots, cached versions, archived pages, or other people's downloads." },
     { text: "You must keep your accounts active forever", isCorrect: false, explanation: "You can deactivate accounts, but the phrase means the content you created may persist beyond your control." },
-    { text: "Websites never change or update their content", isCorrect: false, explanation: "Websites change constantly. The phrase means your contributions - posts, comments, photos - can persist permanently." }
+    { text: "Websites never change or update their content", isCorrect: false, explanation: "Websites change constantly. The phrase means your contributions; posts, comments, photos; can persist permanently." }
   ]},
   { id: "dc-q7", topic: "Digital Citizenship", question: "A friend asks you to share your login password 'just in case.' What should you do?", options: [
     { text: "Share it because they are your friend and you trust them", isCorrect: false, explanation: "Even trusted friends should not have your passwords. Friendships change, and shared passwords create security risks." },
-    { text: "Politely decline - passwords should never be shared with anyone except a parent or guardian", isCorrect: true, explanation: "Correct! Your password is like a key to your house. Only a parent or guardian should know it for safety purposes." },
+    { text: "Politely decline. Passwords should never be shared with anyone except a parent or guardian", isCorrect: true, explanation: "Correct! Your password is like a key to your house. Only a parent or guardian should know it for safety purposes." },
     { text: "Give them an old password instead", isCorrect: false, explanation: "Sharing any password, even an old one, is a bad habit. If you reused that password, they could access your accounts." },
     { text: "Share it but change it after a few days", isCorrect: false, explanation: "Even temporary sharing is risky. The friend could access your account, change settings, or post on your behalf." }
   ]},
@@ -2036,7 +2036,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   ]},
 
   { id: "cb-q1", topic: "Cyberbullying Prevention", question: "What is the difference between cyberbullying and a one-time mean comment?", options: [
-    { text: "There is no difference - all mean comments are cyberbullying", isCorrect: false, explanation: "While all mean comments are harmful, cyberbullying specifically involves a pattern of repeated harmful behavior." },
+    { text: "There is no difference. All mean comments are cyberbullying", isCorrect: false, explanation: "While all mean comments are harmful, cyberbullying specifically involves a pattern of repeated harmful behavior." },
     { text: "Cyberbullying involves repeated, intentional harmful behavior using technology", isCorrect: true, explanation: "Correct! Cyberbullying is defined by its repetition and intentional nature. A single comment may be mean but is not necessarily cyberbullying." },
     { text: "Cyberbullying only happens on social media", isCorrect: false, explanation: "Cyberbullying can happen through any digital channel: text messages, gaming platforms, email, social media, and more." },
     { text: "Cyberbullying is less serious than in-person bullying", isCorrect: false, explanation: "Cyberbullying can be equally or more damaging because it can happen 24/7, reach large audiences, and content can be permanent." }
@@ -2048,16 +2048,16 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     { text: "Figure out who is doing it and confront them in person", isCorrect: false, explanation: "Confrontation can escalate the situation. Save evidence, report it, and let adults help resolve the situation safely." }
   ]},
   { id: "cb-q3", topic: "Cyberbullying Prevention", question: "Which of these is an example of cyberbullying?", options: [
-    { text: "Disagreeing with someone's opinion in a respectful comment", isCorrect: false, explanation: "Respectful disagreement is normal and healthy online discourse - it is not cyberbullying." },
+    { text: "Disagreeing with someone's opinion in a respectful comment", isCorrect: false, explanation: "Respectful disagreement is normal and healthy online discourse; it is not cyberbullying." },
     { text: "Repeatedly sending threatening messages to someone after they ask you to stop", isCorrect: true, explanation: "Correct! Continued threatening messages after being asked to stop is a clear example of cyberbullying." },
     { text: "Not accepting a friend request from someone you do not know", isCorrect: false, explanation: "Being selective about who you connect with online is smart digital citizenship, not bullying." },
     { text: "Unfollowing someone whose content you no longer enjoy", isCorrect: false, explanation: "Unfollowing is a normal part of managing your social media experience and is not cyberbullying." }
   ]},
   { id: "cb-q4", topic: "Cyberbullying Prevention", question: "What is an 'upstander'?", options: [
-    { text: "Someone who stands up physically to confront a bully", isCorrect: false, explanation: "An upstander takes positive action but does not need to physically confront anyone - there are many safe ways to intervene." },
+    { text: "Someone who stands up physically to confront a bully", isCorrect: false, explanation: "An upstander takes positive action but does not need to physically confront anyone; there are many safe ways to intervene." },
     { text: "Someone who witnesses bullying and takes positive action to support the target", isCorrect: true, explanation: "Correct! Upstanders help by reporting, supporting the target privately, refusing to share harmful content, or speaking up safely." },
     { text: "Someone who watches bullying but does not get involved", isCorrect: false, explanation: "That describes a bystander. An upstander actively takes steps to help the person being bullied." },
-    { text: "Someone who tells the bully's secrets to get revenge", isCorrect: false, explanation: "Revenge is not being an upstander - it is escalating the conflict. Upstanders support the target through positive, constructive actions." }
+    { text: "Someone who tells the bully's secrets to get revenge", isCorrect: false, explanation: "Revenge is not being an upstander. It is escalating the conflict. Upstanders support the target through positive, constructive actions." }
   ]},
   { id: "cb-q5", topic: "Cyberbullying Prevention", question: "Why is cyberbullying sometimes harder to escape than traditional bullying?", options: [
     { text: "Because cyberbullies are always adults", isCorrect: false, explanation: "Cyberbullies can be any age. The difficulty of escaping comes from the 24/7, persistent nature of digital communication." },
@@ -2104,14 +2104,14 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   ]},
   { id: "ps-q4", topic: "Privacy & Security", question: "What is two-factor authentication (2FA)?", options: [
     { text: "Using two different passwords for the same account", isCorrect: false, explanation: "2FA is not about two passwords. It combines something you know (password) with something you have (phone) or are (fingerprint)." },
-    { text: "A security method that requires two forms of verification to access an account", isCorrect: true, explanation: "Correct! 2FA adds a second layer of security beyond your password - usually a code sent to your phone, an authenticator app, or biometrics." },
+    { text: "A security method that requires two forms of verification to access an account", isCorrect: true, explanation: "Correct! 2FA adds a second layer of security beyond your password; usually a code sent to your phone, an authenticator app, or biometrics." },
     { text: "Having two people share the same account", isCorrect: false, explanation: "Sharing accounts is a security risk, not a security feature. 2FA is about verifying identity through two different methods." },
     { text: "Logging in from two different devices", isCorrect: false, explanation: "2FA is about verification methods, not device count. It requires two different types of proof that you are who you claim to be." }
   ]},
   { id: "ps-q5", topic: "Privacy & Security", question: "You receive a text from your 'bank' asking you to verify your account by clicking a link. What should you do?", options: [
     { text: "Click the link immediately to protect your account", isCorrect: false, explanation: "Never click links in unsolicited texts claiming to be from your bank. This is a common smishing (SMS phishing) technique." },
     { text: "Reply to the text asking if it is real", isCorrect: false, explanation: "Replying confirms your phone number is active and may lead to more scam attempts. Never engage with suspicious texts." },
-    { text: "Do not click the link - instead, call your bank directly using the number on your card or their official website", isCorrect: true, explanation: "Correct! Always verify directly with the institution using contact information you know is legitimate, not from the suspicious message." },
+    { text: "Do not click the link. Instead, call your bank directly using the number on your card or their official website", isCorrect: true, explanation: "Correct! Always verify directly with the institution using contact information you know is legitimate, not from the suspicious message." },
     { text: "Forward it to all your contacts to warn them", isCorrect: false, explanation: "Forwarding could accidentally spread the phishing link. Instead, report it to your bank and your carrier (forward to 7726/SPAM)." }
   ]},
   { id: "ps-q6", topic: "Privacy & Security", question: "Which piece of information is MOST dangerous to share publicly online?", options: [
@@ -2137,13 +2137,13 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     { text: "Reading articles from left to right", isCorrect: false, explanation: "Lateral reading is a research technique, not a reading direction." },
     { text: "Opening new tabs to check what other sources say about a claim instead of just reading deeper into the original source", isCorrect: true, explanation: "Correct! Lateral reading means verifying information by checking other sources rather than relying on the original site, which may be biased or false." },
     { text: "Reading only the headlines of articles", isCorrect: false, explanation: "Reading only headlines is a poor information practice. Lateral reading involves actively cross-referencing information across multiple sources." },
-    { text: "Reading two articles at the same time", isCorrect: false, explanation: "Lateral reading is about verification strategy - checking claims against independent sources rather than trusting a single source." }
+    { text: "Reading two articles at the same time", isCorrect: false, explanation: "Lateral reading is about verification strategy: checking claims against independent sources rather than trusting a single source." }
   ]},
   { id: "ml-q2", topic: "Media Literacy", question: "What is a 'filter bubble'?", options: [
     { text: "A tool that blocks spam emails", isCorrect: false, explanation: "A filter bubble is not a spam filter. It describes the information isolation created by algorithmic personalization." },
     { text: "An algorithm-created environment where you only see content that matches your existing beliefs and interests", isCorrect: true, explanation: "Correct! Filter bubbles limit your exposure to diverse viewpoints, potentially reinforcing biases and creating a distorted view of reality." },
     { text: "A water filtration system", isCorrect: false, explanation: "In media literacy, a filter bubble refers to the personalized information ecosystem created by algorithms." },
-    { text: "A privacy setting on social media", isCorrect: false, explanation: "Filter bubbles are not settings you choose - they are created automatically by algorithms that personalize your content feed." }
+    { text: "A privacy setting on social media", isCorrect: false, explanation: "Filter bubbles are not settings you choose. They are created automatically by algorithms that personalize your content feed." }
   ]},
   { id: "ml-q3", topic: "Media Literacy", question: "Which of the following is the BEST way to check if a news story is true?", options: [
     { text: "Check if it has a lot of likes and shares", isCorrect: false, explanation: "Viral content is not necessarily accurate. Misinformation often spreads faster than accurate reporting." },
@@ -2160,7 +2160,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   { id: "ml-q5", topic: "Media Literacy", question: "Why is it important to check the date of an article before sharing it?", options: [
     { text: "Older articles are always wrong", isCorrect: false, explanation: "Old articles are not necessarily wrong, but sharing outdated information can be misleading if the situation has changed." },
     { text: "Because outdated information shared as current can be misleading and cause confusion", isCorrect: true, explanation: "Correct! Old articles about resolved crises, changed laws, or outdated statistics can spread misinformation if shared as if they are current." },
-    { text: "Because websites delete old articles", isCorrect: false, explanation: "Most websites keep old articles available. The issue is not access but context - old information shared without date context is misleading." },
+    { text: "Because websites delete old articles", isCorrect: false, explanation: "Most websites keep old articles available. The issue is not access, but context; old information shared without date context is misleading." },
     { text: "Because search engines penalize old content", isCorrect: false, explanation: "Search engine ranking is not the concern. The risk is that outdated information can mislead people who assume it is current." }
   ]},
   { id: "ml-q6", topic: "Media Literacy", question: "What is 'confirmation bias'?", options: [
@@ -2178,7 +2178,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   { id: "ml-q8", topic: "Media Literacy", question: "What role do algorithms play in the spread of misinformation?", options: [
     { text: "Algorithms always remove false information", isCorrect: false, explanation: "Algorithms are not designed primarily to filter truth. They prioritize engagement, which can actually amplify sensational misinformation." },
     { text: "Algorithms have no effect on what information spreads", isCorrect: false, explanation: "Algorithms have enormous influence on information distribution. They determine what appears in your feed based on engagement patterns." },
-    { text: "Algorithms can amplify misinformation by prioritizing engaging content, regardless of accuracy", isCorrect: true, explanation: "Correct! Engagement-driven algorithms often promote sensational, emotional, or controversial content - which misinformation tends to be." },
+    { text: "Algorithms can amplify misinformation by prioritizing engaging content, regardless of accuracy", isCorrect: true, explanation: "Correct! Engagement-driven algorithms often promote sensational, emotional, or controversial content; which misinformation tends to be." },
     { text: "Algorithms only show you content from verified sources", isCorrect: false, explanation: "Most social media algorithms prioritize engagement metrics, not source verification. This means unverified content can be widely promoted." }
   ]},
 
@@ -2195,8 +2195,8 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     { text: "It depends on the game so you cannot estimate", isCorrect: false, explanation: "Basic math applies regardless of the game: $1-5/week x 52 weeks = $52-260/year." }
   ]},
   { id: "rg-q3", topic: "Responsible Gaming", question: "What is a healthy approach to managing screen time?", options: [
-    { text: "No screens at all - technology is always harmful", isCorrect: false, explanation: "Technology can be educational and social. The key is balance, not complete avoidance." },
-    { text: "Set intentional time limits, take regular breaks, and balance screen time with physical activity and face-to-face interaction", isCorrect: true, explanation: "Correct! Healthy screen time is about intentional, balanced use - not complete avoidance or unlimited access." },
+    { text: "No screens at all, because technology is always harmful", isCorrect: false, explanation: "Technology can be educational and social. The key is balance, not complete avoidance." },
+    { text: "Set intentional time limits, take regular breaks, and balance screen time with physical activity and face-to-face interaction", isCorrect: true, explanation: "Correct! Healthy screen time is about intentional, balanced use; not complete avoidance or unlimited access." },
     { text: "Use screens as much as you want as long as you are doing something educational", isCorrect: false, explanation: "Even educational screen time should be balanced. Prolonged use can affect sleep, physical health, and social development." },
     { text: "Only use screens on weekends", isCorrect: false, explanation: "Rigid rules are less effective than developing self-regulation skills. The goal is balanced, intentional use throughout the week." }
   ]},
@@ -2220,9 +2220,9 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   ]},
   { id: "rg-q7", topic: "Responsible Gaming", question: "What is 'FOMO' in the context of gaming?", options: [
     { text: "A game genre", isCorrect: false, explanation: "FOMO (Fear of Missing Out) is a psychological phenomenon exploited by game design, not a game genre." },
-    { text: "Fear of Missing Out - anxiety created by limited-time events and exclusive items that pressure players to play more or spend money", isCorrect: true, explanation: "Correct! Games use limited-time events, exclusive items, and countdown timers to create urgency and drive engagement and spending." },
+    { text: "Fear of Missing Out, which is anxiety created by limited-time events and exclusive items that pressure players to play more or spend money", isCorrect: true, explanation: "Correct! Games use limited-time events, exclusive items, and countdown timers to create urgency and drive engagement and spending." },
     { text: "A cheat code used in gaming", isCorrect: false, explanation: "FOMO is a psychological concept about the anxiety of missing out on experiences, not a game mechanic or code." },
-    { text: "A type of in-game currency", isCorrect: false, explanation: "FOMO stands for Fear of Missing Out - a feeling that game designers deliberately create to increase player engagement." }
+    { text: "A type of in-game currency", isCorrect: false, explanation: "FOMO stands for Fear of Missing Out, a feeling that game designers deliberately create to increase player engagement." }
   ]},
   { id: "rg-q8", topic: "Responsible Gaming", question: "How can excessive gaming affect your health?", options: [
     { text: "Gaming has no effect on health", isCorrect: false, explanation: "Excessive gaming can affect sleep, physical health, mental health, and social development." },
@@ -2234,7 +2234,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   { id: "st-q1", topic: "School Technology Safety", question: "What should you do if you receive a suspicious email that appears to come from your school administration?", options: [
     { text: "Click the link to see if it is real", isCorrect: false, explanation: "Never click links in suspicious emails. This is how phishing attacks compromise accounts and systems." },
     { text: "Reply to ask if it is legitimate", isCorrect: false, explanation: "Replying engages with the potential attacker. Instead, verify through a separate, trusted communication channel." },
-    { text: "Report it to your IT department or teacher and verify by contacting administration directly through a known channel", isCorrect: true, explanation: "Correct! Report suspicious emails and verify through official channels - call the office, ask in person, or use a known email address." },
+    { text: "Report it to your IT department or teacher and verify by contacting administration directly through a known channel", isCorrect: true, explanation: "Correct! Report suspicious emails and verify through official channels; call the office, ask in person, or use a known email address." },
     { text: "Delete it and forget about it", isCorrect: false, explanation: "While deleting is better than clicking, reporting helps the school protect other potential targets from the same attack." }
   ]},
   { id: "st-q2", topic: "School Technology Safety", question: "Why is it important to lock your school computer or account when stepping away?", options: [
@@ -2257,7 +2257,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   ]},
   { id: "st-q5", topic: "School Technology Safety", question: "What is the purpose of a school's Acceptable Use Policy (AUP)?", options: [
     { text: "To prevent students from using any technology", isCorrect: false, explanation: "AUPs are not designed to prevent technology use but to establish guidelines for safe and responsible use." },
-    { text: "To establish guidelines for responsible and safe technology use, protecting both students and the school", isCorrect: true, explanation: "Correct! AUPs outline what is acceptable, what is prohibited, and the consequences of misuse - protecting everyone in the school community." },
+    { text: "To establish guidelines for responsible and safe technology use, protecting both students and the school", isCorrect: true, explanation: "Correct! AUPs outline what is acceptable, what is prohibited, and the consequences of misuse; protecting everyone in the school community." },
     { text: "To monitor everything students do online", isCorrect: false, explanation: "While monitoring may be part of school policy, the primary purpose of an AUP is to set clear expectations for responsible use." },
     { text: "To restrict social media access only", isCorrect: false, explanation: "AUPs cover all technology use, not just social media. They address email, internet browsing, device use, and more." }
   ]},

@@ -1389,7 +1389,7 @@ export async function seedAISafetyTraining(): Promise<void> {
 <li>They pressure the victim to send money immediately via wire transfer, gift cards, or cryptocurrency</li>
 </ol>
 <h3>The Family Code Word System</h3>
-<p>The single most effective defense against voice cloning scams is a family code word - a secret word or phrase that only your family knows. Here's how to set it up:</p>
+<p>The single most effective defense against voice cloning scams is a family code word; a secret word or phrase that only your family knows. Here's how to set it up:</p>
 <ul>
 <li>Choose a word or phrase that is unusual and not something you'd ever post online</li>
 <li>Share it only in person with family members</li>
@@ -1407,7 +1407,7 @@ export async function seedAISafetyTraining(): Promise<void> {
             "AI can clone anyone's voice from just a few seconds of audio",
             "Set up a family code word that you only share in person",
             "Always hang up and call back on a number you trust",
-            "Real emergencies can wait 5 minutes for verification - scams cannot"
+            "Real emergencies can wait 5 minutes for verification, scams cannot"
           ]
         }
       ],
@@ -1446,7 +1446,7 @@ export async function seedAISafetyTraining(): Promise<void> {
         {
           type: "multiple-choice",
           question: "Someone calls you sounding exactly like your grandchild, saying they need bail money immediately. What should you do?",
-          options: ["Send the money right away - it sounds just like them", "Ask for the family code word and hang up to call them back", "Give them your credit card number", "Post about it on social media to warn others"],
+          options: ["Send the money right away, it sounds just like them", "Ask for the family code word and hang up to call them back", "Give them your credit card number", "Post about it on social media to warn others"],
           answer: "Ask for the family code word and hang up to call them back",
           explanation: "Voice cloning scams create urgency to prevent you from verifying. Always ask for your code word, hang up, and call the person directly on a number you have saved.",
           difficulty: "easy"
@@ -1551,7 +1551,7 @@ export async function seedAISafetyTraining(): Promise<void> {
           type: "true-false",
           question: "A website with a padlock (HTTPS) in the browser address bar is always safe and legitimate.",
           answer: "False",
-          explanation: "HTTPS only means the connection is encrypted - it doesn't verify the site is legitimate. Scam websites commonly use HTTPS to appear trustworthy.",
+          explanation: "HTTPS only means the connection is encrypted, it doesn't verify the site is legitimate. Scam websites commonly use HTTPS to appear trustworthy.",
           difficulty: "easy"
         },
         {
@@ -1612,7 +1612,7 @@ export async function seedAISafetyTraining(): Promise<void> {
           title: "How to Use AI Safely: Privacy Settings and Smart Habits",
           description: "Practical steps to protect your privacy while still getting value from AI tools.",
           content: `<h2>Practical Privacy Protection</h2>
-<p>You don't have to avoid AI tools entirely - but you should use them wisely. Here are specific settings to change and habits to build.</p>
+<p>You don't have to avoid AI tools entirely, but you should use them wisely. Here are specific settings to change and habits to build.</p>
 <h3>Privacy Settings to Change Right Now</h3>
 <ul>
 <li><strong>ChatGPT:</strong> Settings > Data Controls > Toggle OFF "Improve the model for everyone" - this stops your chats from being used for training</li>
@@ -1630,7 +1630,7 @@ export async function seedAISafetyTraining(): Promise<void> {
 <li><strong>Use enterprise versions for work:</strong> Business versions of AI tools (ChatGPT Enterprise, etc.) offer better data isolation and don't use your conversations for training</li>
 </ul>
 <h3>Teaching Your Family</h3>
-<p>Make sure everyone in your household knows these basics. Kids especially need to understand that AI is not a trusted friend - it's a tool run by a company that stores what you say.</p>`,
+<p>Make sure everyone in your household knows these basics. Kids especially need to understand that AI is not a trusted friend; it's a tool run by a company that stores what you say.</p>`,
           takeaways: [
             "Turn off model training in ChatGPT settings and Gemini activity",
             "Use temporary chats for anything you wouldn't want stored permanently",
@@ -1705,15 +1705,15 @@ export async function seedAISafetyTraining(): Promise<void> {
 <li><strong>Facts and accuracy:</strong> AI confidently states incorrect information ("hallucinations"). It can invent fake statistics, citations, and historical events.</li>
 <li><strong>Math:</strong> AI frequently makes calculation errors, especially with multi-step problems</li>
 <li><strong>Current events:</strong> AI's training data has a cutoff date. It may not know about recent events.</li>
-<li><strong>Personal advice:</strong> AI doesn't know your actual situation - medical, legal, or financial advice from AI should always be verified with professionals</li>
+<li><strong>Personal advice:</strong> AI doesn't know your actual situation, medical, legal, or financial advice from AI should always be verified with professionals</li>
 <li><strong>Judgment:</strong> AI has no real understanding of context, ethics, or consequences the way humans do</li>
 </ul>
 <h3>The Golden Rule</h3>
 <p>Use AI as a starting point, never as the final answer. Think of it as a smart assistant that's very good at drafting but needs a human to check its work.</p>`,
           takeaways: [
-            "AI predicts text based on patterns - it doesn't truly 'understand' anything",
+            "AI predicts text based on patterns, it doesn't truly 'understand' anything",
             "AI is great for drafting, summarizing, brainstorming, and organizing",
-            "AI confidently presents wrong information - always verify facts and numbers",
+            "AI confidently presents wrong information, always verify facts and numbers",
             "Use AI as a starting point, never as the final answer for important decisions"
           ]
         },
@@ -1721,7 +1721,7 @@ export async function seedAISafetyTraining(): Promise<void> {
           title: "Getting Better Results: How to Talk to AI",
           description: "Simple techniques for writing prompts that get you more useful, accurate responses.",
           content: `<h2>Better Questions, Better Answers</h2>
-<p>The quality of what AI gives you depends almost entirely on how you ask. You don't need to be technical - you just need to be specific.</p>
+<p>The quality of what AI gives you depends almost entirely on how you ask. You don't need to be technical, you just need to be specific.</p>
 <h3>5 Simple Prompt Techniques</h3>
 <h4>1. Be Specific</h4>
 <p>Instead of: "Give me a recipe"<br/>
@@ -1742,14 +1742,14 @@ Try: "Explain blockchain to my 70-year-old mother who has never used cryptocurre
 <ul>
 <li>"Make that shorter" or "Make that more detailed"</li>
 <li>"Can you simplify the language?"</li>
-<li>"That's not quite what I meant - I was asking about..."</li>
+<li>"That's not quite what I meant. I was asking about..."</li>
 <li>"Give me a real-world example of that"</li>
 </ul>`,
           takeaways: [
             "Specific prompts get dramatically better results than vague ones",
             "Include context about who you are and what you need",
             "Ask for a specific format (table, list, step-by-step) for clearer responses",
-            "Always follow up and refine - AI conversations are back-and-forth"
+            "Always follow up and refine. AI conversations are back-and-forth"
           ]
         }
       ],

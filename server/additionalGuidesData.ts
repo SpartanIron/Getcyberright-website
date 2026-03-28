@@ -205,7 +205,7 @@ Regularly check your router's admin page for connected devices. If you see devic
 5. **Change passwords** on all accounts connected to that device
 6. **Check other devices** on the same network for unusual behavior
 
-Securing your smart home takes about an hour of setup time. That hour protects your family from surveillance, harassment, and data theft. Start with the highest-risk devices - baby monitors and cameras - and work through every connected device in your home.`,
+Securing your smart home takes about an hour of setup time. That hour protects your family from surveillance, harassment, and data theft. Start with the highest-risk devices; baby monitors and cameras; and work through every connected device in your home.`,
   },
   {
     slug: "how-to-protect-cloud-accounts",
@@ -413,7 +413,7 @@ Make sure children, teens, and elderly family members know about deepfakes. Show
 ### 5. Report Deepfake Scams
 Report deepfake scams to the FBI at [ic3.gov](https://ic3.gov), the FTC at [reportfraud.ftc.gov](https://reportfraud.ftc.gov), and the platform where you encountered the content.
 
-Deepfake detection is not about being paranoid - it is about being prepared. As the technology improves, verification habits become more important than detection skills. Build the habit of verifying before trusting, and your family will be protected.`,
+Deepfake detection is not about being paranoid; it is about being prepared. As the technology improves, verification habits become more important than detection skills. Build the habit of verifying before trusting, and your family will be protected.`,
   },
   {
     slug: "teen-online-safety-sextortion-prevention",
@@ -551,7 +551,7 @@ Your teen's safety depends more on open communication than on any monitoring too
       { question: "How do I explain AI safety to young children?", answer: "Use simple concepts: 'Some things on the internet are made by computers to look real but are not. If you see or hear something confusing or scary, tell me right away. We have a secret code word to prove who we really are.'" },
       { question: "Is it safe to use AI voice assistants at home?", answer: "Voice assistants are generally safe for home use. To protect privacy: review and delete voice recordings regularly, disable purchasing by voice, and place assistants away from bedrooms and private conversations." },
     ],
-    content: `Artificial intelligence is transforming everyday life - but it is also creating new threats for families. AI-powered scams are harder to detect, easier to create, and increasingly targeting individuals and families. This guide helps every member of your household understand and stay safe from AI threats.
+    content: `Artificial intelligence is transforming everyday life, but it is also creating new threats for families. AI-powered scams are harder to detect, easier to create, and increasingly targeting individuals and families. This guide helps every member of your household understand and stay safe from AI threats.
 
 ## AI Threats Every Family Should Know About
 
@@ -642,7 +642,7 @@ Discuss AI regularly with your family. Topics to cover:
 8. **Stay informed** about new AI threats through trusted sources
 9. **Practice verification** - make the "call back to verify" habit second nature
 
-AI technology is not going away - it will only become more powerful and accessible. Families that build verification habits, maintain open communication, and stay informed will be well-protected against AI-powered threats.`,
+AI technology is not going away; it will only become more powerful and accessible. Families that build verification habits, maintain open communication, and stay informed will be well-protected against AI-powered threats.`,
   },
   {
     slug: "what-to-do-if-phone-number-stolen",
@@ -842,7 +842,7 @@ A password manager creates, stores, and fills unique, strong passwords for every
 ## Setting Up Your Family Password Manager
 
 ### Step 1: Choose Your Manager and Create Your Account
-Install the app and browser extension. Create your master password - aim for 4+ random words (like "correct horse battery staple") which is both strong and memorable.
+Install the app and browser extension. Create your master password; aim for 4+ random words (like "correct horse battery staple") which is both strong and memorable.
 
 ### Step 2: Import Existing Passwords
 Most managers can import passwords from your browser. Export from Chrome/Safari/Firefox and import into your new manager.

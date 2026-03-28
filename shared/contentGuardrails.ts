@@ -156,14 +156,14 @@ WRITING QUALITY STANDARDS:
 10. Avoid jargon unless necessary, and explain technical terms when used.
 
 EXAMPLES:
-BAD: "Check your email - look for suspicious links - report any scams"
+BAD: "Check your email, look for suspicious links, report any scams"
 GOOD: "Check your email for suspicious links. Report any scams you find."
 
-BAD: "Phishing - a type of scam - targets users via email"
+BAD: "Phishing, a type of scam, targets users via email"
 GOOD: "Phishing is a type of scam that targets users via email."
 
-BAD: "Enable 2FA - it adds extra security"
-GOOD: "Enable two factor authentication; it adds extra security to your account."
+BAD: "Enable 2FA, it adds extra security"
+GOOD: "Enable two factor authentication, it adds extra security to your account."
 `,
 };
 

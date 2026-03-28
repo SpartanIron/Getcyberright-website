@@ -707,7 +707,7 @@ function ShieldResultsPage() {
               >
                 <span className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  {notFoundBrokers.length} site{notFoundBrokers.length !== 1 ? "s" : ""} checked - no data found
+                  {notFoundBrokers.length} site{notFoundBrokers.length !== 1 ? "s" : ""} checked; no data found
                   {uncheckedBrokers.length > 0 && ` · ${uncheckedBrokers.length} could not be checked`}
                 </span>
                 {showNotFound ? (

@@ -136,7 +136,7 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(how much|pricing|price|cost|how much does)/.test(t) && /(plan|pro|family|subscribe|subscription|bundle)/.test(t),
     responses: [
-      "GetCyberRight has two products you can buy separately or bundled. GCR Scam Guard: Free, Pro $4.99/mo, or Family $7.99/mo. GCR Data Shield: Free scan, Essential $8.99/mo, or Professional $14.99/mo. Bundle deals: Complete Protection (Pro + Essential) $11.99/mo, or Total Protection (Family + Professional) $18.99/mo - save up to 23%. See /pricing for bundles, /gcr-guard-pricing for Scam Guard, or /data-shield-pricing for Data Shield.",
+      "GetCyberRight has two products you can buy separately or bundled. GCR Scam Guard: Free, Pro $4.99/mo, or Family $7.99/mo. GCR Data Shield: Free scan, Essential $8.99/mo, or Professional $14.99/mo. Bundle deals: Complete Protection (Pro + Essential) $11.99/mo, or Total Protection (Family + Professional) $18.99/mo; save up to 23%. See /pricing for bundles, /gcr-guard-pricing for Scam Guard, or /data-shield-pricing for Data Shield.",
     ],
   },
   {

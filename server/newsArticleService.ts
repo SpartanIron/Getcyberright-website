@@ -8,7 +8,7 @@ import { generateSocialPostsForNewsBatch } from "./newsSocialEngine";
 async function fetchOgImage(url: string): Promise<string | null> {
   const userAgents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh. Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
   ];
 
   for (const ua of userAgents) {
@@ -261,7 +261,7 @@ async function simplifyBatch(items: RawFeedItem[], startIndex: number): Promise<
       max_tokens: 4000,
       messages: [{
         role: "user",
-        content: `You are a cybersecurity journalist writing for families and everyday internet users - NOT for IT professionals. Your goal is to help people understand threats AND take action.
+        content: `You are a cybersecurity journalist writing for families and everyday internet users. NOT for IT professionals. Your goal is to help people understand threats AND take action.
 
 For each of the following news items, create a family-friendly article. Focus on: Is this something families need to worry about? What should they actually DO?
 
@@ -269,12 +269,12 @@ ${itemsText}
 
 For EACH item, output a JSON object with:
 - "index": the item number (MUST match the number in brackets)
-- "familyTitle": a clear, calm headline a parent or grandparent would understand. Frame around what matters to THEM, not the attacker. Example: "Your School Records May Have Been Exposed - Here's What To Do" instead of "Hackers Breach Education Platform"
+- "familyTitle": a clear, calm headline a parent or grandparent would understand. Frame around what matters to THEM, not the attacker. Example: "Your School Records May Have Been Exposed. Here's What To Do" instead of "Hackers Breach Education Platform"
 - "excerpt": 1-2 sentence summary explaining why this matters to families (max 200 chars)
 - "content": 4-6 paragraph article body with this structure:
   1. What happened (1 paragraph, simple language, no jargon)
-  2. Who is affected and how (1 paragraph - be specific: "If you use [service], your email and password may have been exposed")
-  3. What you should do RIGHT NOW (1-2 paragraphs - give numbered, specific steps like "1. Change your password on [site] 2. Enable two-factor authentication 3. Watch for suspicious emails")
+  2. Who is affected and how (1 paragraph; be specific: "If you use [service], your email and password may have been exposed")
+  3. What you should do RIGHT NOW (1-2 paragraphs; give numbered, specific steps like "1. Change your password on [site] 2. Enable two-factor authentication 3. Watch for suspicious emails")
   4. How to stay protected long-term (1 paragraph - connect to broader safety habits)
 
 WRITING RULES:
@@ -370,7 +370,7 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
   const prioritized = prioritizeArticles(relevant);
   const batch = prioritized.slice(0, 15);
   const actionCount = batch.filter(b => isBreachArticle(b.title, b.summary)).length;
-  console.log(`[NewsService] Processing ${batch.length} articles (${actionCount} action-needed, ${newItems.length - relevant.length} dropped by relevance filter)...`);
+  console.log(`[NewsService] Processing ${batch.length} articles (${actionCount} action-needed, ${newItems.length, relevant.length} dropped by relevance filter)...`);
 
   const simplified = await simplifyFeedItems(batch);
   let created = 0;

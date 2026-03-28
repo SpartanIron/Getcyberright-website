@@ -113,7 +113,7 @@ interface BreachResult {
 async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
   const hibpApiKey = process.env.HIBP_API_KEY;
   if (!hibpApiKey) {
-    console.log("[scan] HIBP API key not configured - breach check skipped. Add HIBP_API_KEY secret to enable breach detection.");
+    console.log("[scan] HIBP API key not configured, breach check skipped. Add HIBP_API_KEY secret to enable breach detection.");
     return [];
   }
 
@@ -131,7 +131,7 @@ async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
 
     if (response.status === 404) return [];
     if (response.status === 401) {
-      console.log("[scan] HIBP API key invalid or expired - breach check skipped");
+      console.log("[scan] HIBP API key invalid or expired, breach check skipped");
       return [];
     }
     if (response.status === 429) {
@@ -380,8 +380,8 @@ async function runRealVerification(
           verificationDetails = `A public profile matching your ${matchDescription} was found on ${broker.name}.${profileResult.profileUrl ? ` You can verify this listing at: ${profileResult.profileUrl}` : ""}`;
           evidenceSummary = `Profile found - ${confidenceLabel} confidence (${matchCount} detail${matchCount !== 1 ? "s" : ""} matched)`;
         } else {
-          verificationDetails = `${broker.name} (${domain}) is a known active data broker with an opt-out process. Your data may be listed - we recommend sending a removal request.`;
-          evidenceSummary = "Active broker - removal recommended";
+          verificationDetails = `${broker.name} (${domain}) is a known active data broker with an opt-out process. Your data may be listed, we recommend sending a removal request.`;
+          evidenceSummary = "Active broker, removal recommended";
         }
 
         let exposureLevel = "info";
@@ -925,15 +925,15 @@ async function logAuditEvent(
 }
 
 const JURISDICTION_LEGAL_BASIS: Record<string, string> = {
-  "CCPA": "California Consumer Privacy Act - Cal. Civ. Code \u00A71798.105",
-  "CPRA": "California Privacy Rights Act - Cal. Civ. Code \u00A71798.105 (amended)",
-  "GDPR": "General Data Protection Regulation - Article 17 (Right to Erasure)",
-  "VCDPA": "Virginia Consumer Data Protection Act - Va. Code \u00A759.1-580",
-  "CPA": "Colorado Privacy Act - C.R.S. \u00A76-1-1306",
-  "CTDPA": "Connecticut Data Privacy Act - Conn. Gen. Stat. \u00A742-520",
-  "UCPA": "Utah Consumer Privacy Act - Utah Code \u00A713-61-201",
-  "PIPEDA": "Personal Information Protection and Electronic Documents Act - S.C. 2000, c. 5",
-  "LGPD": "Lei Geral de Prote\u00E7\u00E3o de Dados - Art. 18(VI)",
+  "CCPA": "California Consumer Privacy Act. Cal. Civ. Code \u00A71798.105",
+  "CPRA": "California Privacy Rights Act. Cal. Civ. Code \u00A71798.105 (amended)",
+  "GDPR": "General Data Protection Regulation. Article 17 (Right to Erasure)",
+  "VCDPA": "Virginia Consumer Data Protection Act. Va. Code \u00A759.1-580",
+  "CPA": "Colorado Privacy Act. C.R.S. \u00A76-1-1306",
+  "CTDPA": "Connecticut Data Privacy Act. Conn. Gen. Stat. \u00A742-520",
+  "UCPA": "Utah Consumer Privacy Act. Utah Code \u00A713-61-201",
+  "PIPEDA": "Personal Information Protection and Electronic Documents Act. S.C. 2000, c. 5",
+  "LGPD": "Lei Geral de Prote\u00E7\u00E3o de Dados. Art. 18(VI)",
 };
 
 function determineJurisdiction(broker: DataBroker, userAddress?: string | null): { jurisdiction: string; legalBasis: string } {
@@ -1712,9 +1712,9 @@ export async function generatePrivacyReport(userId: string) {
 
   const confirmedFindings = findings.filter(f => f.verificationMethod === "breach_confirmed").length;
   let riskAssessment = "Low Risk";
-  if (confirmedFindings >= 10 || totalExposures >= 50) riskAssessment = "Critical Risk - Immediate action recommended";
-  else if (confirmedFindings >= 5 || totalExposures >= 20) riskAssessment = "High Risk - Multiple exposures detected";
-  else if (totalExposures >= 5) riskAssessment = "Medium Risk - Some exposures found";
+  if (confirmedFindings >= 10 || totalExposures >= 50) riskAssessment = "Critical Risk. Immediate action recommended";
+  else if (confirmedFindings >= 5 || totalExposures >= 20) riskAssessment = "High Risk. Multiple exposures detected";
+  else if (totalExposures >= 5) riskAssessment = "Medium Risk. Some exposures found";
 
   const recommendations: string[] = [];
   if (totalExposures > 0 && totalPending > 0) {
@@ -2334,11 +2334,11 @@ export function computeReappearanceRisk(broker: DataBroker, performance?: Broker
 
   if (broker.category === "people-search" || broker.category === "public-records") {
     riskScore += 30;
-    factors.push("Public records source - data may be re-ingested from government databases");
+    factors.push("Public records source, data may be re-ingested from government databases");
   }
   if (broker.category === "data-aggregator" || broker.category === "data-aggregator-enrichment") {
     riskScore += 25;
-    factors.push("Data aggregator - sources data from multiple third parties");
+    factors.push("Data aggregator, sources data from multiple third parties");
   }
   if (broker.relatedBrokers && broker.relatedBrokers.length > 0) {
     riskScore += 15;
@@ -2382,23 +2382,23 @@ export function getBrokerTosRiskFlags(broker: DataBroker): { level: string; flag
   let level = "low";
 
   if (broker.requiresAccountCreation) {
-    flags.push("Requires account creation - exposes additional data to broker");
+    flags.push("Requires account creation, exposes additional data to broker");
     level = "medium";
   }
   if (broker.requiresIdVerification) {
-    flags.push("Requires government ID - identity theft risk if broker is compromised");
+    flags.push("Requires government ID, identity theft risk if broker is compromised");
     level = "high";
   }
   if (broker.optOutMethod === "mail") {
-    flags.push("Requires physical mail - exposes your mailing address");
+    flags.push("Requires physical mail, exposes your mailing address");
     level = level === "low" ? "medium" : level;
   }
   if (broker.difficulty === "hard") {
-    flags.push("Complex removal process - may require multiple attempts");
+    flags.push("Complex removal process, may require multiple attempts");
     level = level === "low" ? "medium" : level;
   }
   if (!broker.optOutUrl && broker.optOutMethod === "web-form") {
-    flags.push("No documented opt-out URL - process may have changed");
+    flags.push("No documented opt-out URL, process may have changed");
     level = level === "low" ? "medium" : level;
   }
 

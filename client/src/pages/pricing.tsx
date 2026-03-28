@@ -146,7 +146,7 @@ export default function PricingPage() {
   const faqItems = [
     {
       question: "What do I get with a bundle?",
-      answer: "Bundles combine both GCR Scam Guard and GCR Data Shield into a single subscription at a discounted price. You get all features from both products - browser-based scam detection AND automated data broker removal - for less than buying them separately."
+      answer: "Bundles combine both GCR Scam Guard and GCR Data Shield into a single subscription at a discounted price. You get all features from both products; browser-based scam detection AND automated data broker removal; for less than buying them separately."
     },
     {
       question: "Can I buy Scam Guard or Data Shield individually?",
@@ -169,7 +169,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="GetCyberRight Pricing - Bundle & Save"
+        title="GetCyberRight Pricing: Bundle & Save"
         description="Get both GCR Scam Guard and GCR Data Shield together and save. Complete Protection from $8.99/month. Total Protection from $13.99/month. Annual billing saves even more."
         keywords="GetCyberRight pricing, bundle deal, scam protection, data removal, cybersecurity bundle"
       />
