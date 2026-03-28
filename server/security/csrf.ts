@@ -99,6 +99,7 @@ export function csrfMiddlewareForAuthRoutes(req: Request, res: Response, next: N
     '/api/auth/login',
     '/api/auth/register',
     '/api/newsletter',
+    '/api/newsletter/subscribe',
     '/api/daily-tips/subscribe',
     '/api/contact',
     '/api/scam-check',

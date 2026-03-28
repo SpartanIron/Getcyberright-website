@@ -9,6 +9,7 @@ import { db } from "./db";
 import { eq, and, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
+import { verifyRecaptcha } from "./security/recaptcha";
 import { embedFingerprint } from "./content-fingerprint";
 import { registerAuthRoutes, isAuthenticated, isAdmin, seedAdminUser } from "./auth";
 import { registerAdminRoutes, registerToolTrackingRoutes } from "./admin";
@@ -463,27 +464,66 @@ export async function registerRoutes(
   });
 
   // Newsletter signup - strict rate limiting (10 req/min)
-  app.post("/api/newsletter", strictRateLimit, async (req, res) => {
+  const MIN_FORM_FILL_MS = 2000;
+  const SUSPICIOUS_EMAIL_PATTERN = /^[a-z](\.[a-z]){4,}[\d.]*@/i;
+
+  async function handleNewsletterSubscribe(req: Request, res: Response) {
     try {
-      const validatedData = insertNewsletterSubscriberSchema.parse(req.body);
-      
-      const existing = await storage.getNewsletterSubscriberByEmail(validatedData.email);
-      if (existing) {
-        res.json({ success: true, message: "Already subscribed" });
+      const { recaptchaToken, _timestamp, ...rest } = req.body;
+
+      if (!recaptchaToken || recaptchaToken === '') {
+        securityLogger.warn("Newsletter missing reCAPTCHA token");
+        res.status(400).json({ message: "Security verification required. Please refresh the page and try again." });
         return;
       }
-      
+
+      const recaptchaResult = await verifyRecaptcha(recaptchaToken);
+      if (!recaptchaResult.success || recaptchaResult.score < 0.5) {
+        securityLogger.warn("Newsletter reCAPTCHA rejected", { success: recaptchaResult.success, score: recaptchaResult.score, error: recaptchaResult.error });
+        res.status(400).json({ message: "Security verification failed. Please refresh the page and try again." });
+        return;
+      }
+
+      if (!_timestamp) {
+        securityLogger.warn("Newsletter missing timestamp");
+        res.json({ success: true, message: "Thank you for subscribing!" });
+        return;
+      }
+      const elapsed = Date.now() - parseInt(_timestamp, 10);
+      if (isNaN(elapsed) || elapsed < MIN_FORM_FILL_MS) {
+        securityLogger.warn("Newsletter bot timing detected", { elapsed });
+        res.json({ success: true, message: "Thank you for subscribing!" });
+        return;
+      }
+
+      const validatedData = insertNewsletterSubscriberSchema.parse(rest);
+
+      if (SUSPICIOUS_EMAIL_PATTERN.test(validatedData.email)) {
+        securityLogger.warn("Newsletter suspicious email pattern", { email: validatedData.email });
+        res.json({ success: true, message: "Thank you for subscribing!" });
+        return;
+      }
+
+      const existing = await storage.getNewsletterSubscriberByEmail(validatedData.email);
+      if (existing) {
+        res.status(400).json({ message: "This email is already subscribed" });
+        return;
+      }
+
       const subscriber = await storage.createNewsletterSubscriber(validatedData);
       securityLogger.info("Newsletter subscription", { email: validatedData.email });
       res.json({ success: true, subscriber });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid email address", details: (error as any).issues });
+        res.status(400).json({ message: "Please enter a valid email address" });
       } else {
-        res.status(500).json({ error: "Failed to subscribe" });
+        res.status(500).json({ message: "Failed to subscribe" });
       }
     }
-  });
+  }
+
+  app.post("/api/newsletter/subscribe", strictRateLimit, handleNewsletterSubscribe);
+  app.post("/api/newsletter", strictRateLimit, handleNewsletterSubscribe);
 
   app.post("/api/experience/waitlist", strictRateLimit, async (req, res) => {
     try {

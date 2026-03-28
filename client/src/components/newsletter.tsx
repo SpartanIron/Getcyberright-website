@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,12 +11,12 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertNewsletterSubscriberSchema } from "@shared/schema";
 import { z } from "zod";
 import { Mail, CheckCircle2 } from "lucide-react";
+import { useRecaptcha } from "@/hooks/use-recaptcha";
 
 const newsletterFormSchema = insertNewsletterSubscriberSchema.extend({
   email: z.string().email("Please enter a valid email address"),
@@ -27,6 +27,24 @@ type NewsletterFormData = z.infer<typeof newsletterFormSchema>;
 export function Newsletter() {
   const { toast } = useToast();
   const [subscribed, setSubscribed] = useState(false);
+  const [formTimestamp, setFormTimestamp] = useState<number>(0);
+  const { getRecaptchaToken } = useRecaptcha();
+
+  useEffect(() => {
+    setFormTimestamp(Date.now());
+  }, []);
+
+  const getCSRFToken = async () => {
+    let match = document.cookie.match(/csrf_token=([^;]+)/);
+    if (match) return match[1];
+    try {
+      const response = await fetch('/api/csrf-token', { credentials: 'include' });
+      const data = await response.json();
+      return data.csrfToken || '';
+    } catch {
+      return '';
+    }
+  };
 
   const form = useForm<NewsletterFormData>({
     resolver: zodResolver(newsletterFormSchema),
@@ -37,7 +55,21 @@ export function Newsletter() {
 
   const mutation = useMutation({
     mutationFn: async (data: NewsletterFormData) => {
-      const response = await apiRequest("POST", "/api/newsletter", data);
+      const csrfToken = await getCSRFToken();
+      const recaptchaToken = await getRecaptchaToken('newsletter_subscribe');
+      const response = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-csrf-token": csrfToken,
+        },
+        body: JSON.stringify({ ...data, _timestamp: formTimestamp.toString(), recaptchaToken }),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.message || "Subscription failed");
+      }
       return response.json();
     },
     onSuccess: () => {

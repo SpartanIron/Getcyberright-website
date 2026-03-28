@@ -16,6 +16,7 @@ import { useState, useEffect } from "react";
 import { detectUserRegion, getRegionInfo, type Region } from "@/lib/region-detect";
 import { TechPatternBg } from "@/components/tech-pattern-bg";
 import { useToast } from "@/hooks/use-toast";
+import { useRecaptcha } from "@/hooks/use-recaptcha";
 
 interface ScamTrend {
   scamType: string;
@@ -59,10 +60,13 @@ export default function ScamCheckerPage() {
 
   const { toast } = useToast();
   const [extensionEmail, setExtensionEmail] = useState("");
+  const [formTimestamp, setFormTimestamp] = useState<number>(0);
+  const { getRecaptchaToken } = useRecaptcha();
 
   const [userRegion, setUserRegion] = useState<Region | null>(null);
   
   useEffect(() => {
+    setFormTimestamp(Date.now());
     const cached = localStorage.getItem('user_region');
     if (cached) {
       setUserRegion(cached as Region);
@@ -82,7 +86,10 @@ export default function ScamCheckerPage() {
   });
 
   const extensionSignup = useMutation({
-    mutationFn: (email: string) => apiRequest("POST", "/api/newsletter", { email }),
+    mutationFn: async (email: string) => {
+      const recaptchaToken = await getRecaptchaToken('newsletter_subscribe');
+      return apiRequest("POST", "/api/newsletter/subscribe", { email, recaptchaToken, _timestamp: formTimestamp.toString() });
+    },
     onSuccess: () => {
       toast({ title: "You're on the list!", description: "We'll notify you when the browser extension launches." });
       setExtensionEmail("");
