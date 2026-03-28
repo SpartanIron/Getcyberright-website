@@ -54,7 +54,7 @@ const URGENCY_LEVELS = [
     description: "Personal info found on multiple data broker sites",
     timeframe: "Act within the first week",
     steps: [
-      { action: "Submit opt-out requests to each data broker", detail: "Your Data Shield results show exactly which brokers have your data. Each broker has a different removal process — some use web forms, others require email requests.", link: "/data-removal", linkText: "Start Removal Process" },
+      { action: "Submit opt-out requests to each data broker", detail: "Your Data Shield results show exactly which brokers have your data. Each broker has a different removal process. Some use web forms, others require email requests.", link: "/data-removal", linkText: "Start Removal Process" },
       { action: "Document everything", detail: "Screenshot your Data Shield results and save confirmation emails from opt-out requests. Brokers are required to honor removal requests within 30-45 days.", link: null, linkText: null },
       { action: "Opt out of people-search sites", detail: "Sites like Spokeo, WhitePages, and BeenVerified aggregate your data. Removing yourself from these reduces your exposure to scammers and identity thieves.", link: null, linkText: null },
       { action: "Review your social media privacy settings", detail: "Data brokers scrape public profiles. Set your accounts to private and limit what information is publicly visible.", link: null, linkText: null },
@@ -107,7 +107,7 @@ export default function ShieldNextSteps() {
     <>
       <SEOHead
         title="What to Do After Your Data Shield Scan | GetCyberRight"
-        description="Your data was found exposed online. Here's exactly what to do next — step by step, based on your risk level. Protect yourself and your family from identity theft and scams."
+        description="Your data was found exposed online. Here's exactly what to do next, step by step, based on your risk level. Protect yourself and your family from identity theft and scams."
         canonicalUrl="https://www.getcyberright.com/shield/next-steps"
       />
       <Navigation />
@@ -126,7 +126,7 @@ export default function ShieldNextSteps() {
                 <span className="text-primary">Here's What to Do.</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-8" data-testid="text-subtitle">
-                Don't panic — but don't wait either. Follow these steps based on your
+                Don't panic, but don't wait either. Follow these steps based on your
                 exposure level to take back control of your personal information.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -294,11 +294,11 @@ export default function ShieldNextSteps() {
                 {[
                   {
                     q: "How did my data end up on broker sites?",
-                    a: "Data brokers legally collect information from public records, social media, purchase history, and other sources. They compile and sell profiles that include your name, address, phone number, email, and more. It's a multi-billion dollar industry — and completely legal in most states.",
+                    a: "Data brokers legally collect information from public records, social media, purchase history, and other sources. They compile and sell profiles that include your name, address, phone number, email, and more. It's a multi-billion dollar industry, and completely legal in most states.",
                   },
                   {
                     q: "Will removing my data actually work?",
-                    a: "Yes, but it requires persistence. Most data brokers are legally required to honor opt-out requests within 30-45 days. However, they often re-list your information over time. That's why regular re-scanning is important — we recommend monthly checks with Data Shield.",
+                    a: "Yes, but it requires persistence. Most data brokers are legally required to honor opt-out requests within 30-45 days. However, they often re-list your information over time. That's why regular re-scanning is important. We recommend monthly checks with Data Shield.",
                   },
                   {
                     q: "Is my identity at risk?",
