@@ -69,8 +69,8 @@ CRITICAL CONTENT INTEGRITY REQUIREMENTS:
     
     return text
       // Remove dashes used as separators (but keep hyphens in compound words like "well-known")
-      .replace(/\s+[-–—]\s+/g, "; ")
-      .replace(/^[-–—]\s+/gm, "")
+      .replace(/\s+[-–-]\s+/g, "; ")
+      .replace(/^[-–-]\s+/gm, "")
       // Fix sentence structure
       .replace(/\s{2,}/g, " ")
       // Ensure proper punctuation

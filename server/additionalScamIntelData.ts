@@ -10,7 +10,7 @@ export const additionalScamIntel = [
     metaDescription: "Warning about QR code phishing scams where fake QR codes at restaurants, parking meters, and in emails redirect to credential-stealing websites.",
     exampleMessages: [
       { context: "Restaurant Table Sticker", message: "Scan to view our menu and place your order" },
-      { context: "Parking Meter Sticker", message: "Scan to pay for parking — Quick & Easy" },
+      { context: "Parking Meter Sticker", message: "Scan to pay for parking - Quick & Easy" },
       { context: "Email", message: "Your recent order requires verification. Scan the QR code below to confirm your delivery details." },
     ],
     warningSigns: [
@@ -22,7 +22,7 @@ export const additionalScamIntel = [
     ],
     preventionTips: [
       "Preview the URL before opening it after scanning a QR code",
-      "Look for signs of tampering — stickers placed over existing codes",
+      "Look for signs of tampering - stickers placed over existing codes",
       "Use your phone camera app instead of third-party QR scanners",
       "Type the website address manually instead of scanning when in doubt",
       "Never enter payment info on a site reached via an unexpected QR code",
@@ -53,7 +53,7 @@ export const additionalScamIntel = [
       { context: "Follow-up Text", message: "I can't talk long. Just wire the money to this account and I'll explain everything when I'm safe." },
     ],
     warningSigns: [
-      "Video quality seems slightly off — unusual blinking, lip sync issues",
+      "Video quality seems slightly off - unusual blinking, lip sync issues",
       "Caller creates extreme urgency and begs for secrecy",
       "Requests money via wire transfer, cryptocurrency, or gift cards",
       "Call comes at an unusual time or from an unexpected number",
@@ -86,7 +86,7 @@ export const additionalScamIntel = [
     targetAudience: ["general", "young adults"],
     regions: ["US", "EU", "GB", "CA", "AU", "GLOBAL"],
     riskLevel: "critical",
-    metaDescription: "Warning about pig butchering scams — long-con cryptocurrency investment fraud where scammers build trust over weeks before stealing life savings.",
+    metaDescription: "Warning about pig butchering scams - long-con cryptocurrency investment fraud where scammers build trust over weeks before stealing life savings.",
     exampleMessages: [
       { context: "Initial Contact", message: "Hey! Sorry, I think I have the wrong number. But since we're connected, how are you doing today?" },
       { context: "Investment Pitch", message: "I've been making great returns on this crypto platform my uncle introduced me to. Want me to show you how it works? I started with just $500." },
@@ -104,7 +104,7 @@ export const additionalScamIntel = [
       "No legitimate investment guarantees returns",
       "Verify any trading platform with the SEC at investor.gov",
       "Start by trying to withdraw your initial investment before adding more",
-      "Research the platform independently — do not rely on links they send you",
+      "Research the platform independently - do not rely on links they send you",
       "Talk to a licensed financial advisor before investing significant amounts",
     ],
     howItWorks: [
@@ -115,7 +115,7 @@ export const additionalScamIntel = [
       { step: 5, title: "The Slaughter", description: "When the victim tries to withdraw, they face fees, taxes, or frozen accounts. The money is gone." },
     ],
     faq: [
-      { question: "Why is it called pig butchering?", answer: "The term comes from the Chinese phrase 'sha zhu pan.' Scammers 'fatten' victims with fake profits and trust before 'slaughtering' them — stealing all their money." },
+      { question: "Why is it called pig butchering?", answer: "The term comes from the Chinese phrase 'sha zhu pan.' Scammers 'fatten' victims with fake profits and trust before 'slaughtering' them - stealing all their money." },
       { question: "How much do people typically lose?", answer: "According to the FBI, victims of pig butchering scams lose an average of $178,000. Some have lost over $1 million. The FBI's IC3 reported over $3.9 billion in crypto investment fraud losses in 2023." },
     ],
     averageLoss: "$178,000",
@@ -143,9 +143,9 @@ export const additionalScamIntel = [
     preventionTips: [
       "Never share intimate images with anyone online, even someone you trust",
       "Know that scammers often pretend to be teens to build false trust",
-      "If threatened, do not pay — paying often leads to more demands",
+      "If threatened, do not pay - paying often leads to more demands",
       "Screenshot all threats and report to NCMEC at CyberTipline.org",
-      "Tell a trusted adult immediately — you will not be in trouble",
+      "Tell a trusted adult immediately - you will not be in trouble",
       "Report to the FBI at ic3.gov and to the platform where contact occurred",
       "Know that you can report to the Take It Down service at takeitdown.ncmec.org",
     ],
@@ -213,7 +213,7 @@ export const additionalScamIntel = [
     riskLevel: "medium",
     metaDescription: "Warning about subscription trap scams that lure you with free trials, then charge recurring fees that are nearly impossible to cancel.",
     exampleMessages: [
-      { context: "Social Media Ad", message: "Try our premium skincare FREE — just pay $4.99 shipping! Limited time offer." },
+      { context: "Social Media Ad", message: "Try our premium skincare FREE - just pay $4.99 shipping! Limited time offer." },
       { context: "Hidden Terms", message: "By accepting this trial, you agree to a $89.99/month subscription that auto-renews. Cancel within 14 days to avoid charges." },
     ],
     warningSigns: [
@@ -234,7 +234,7 @@ export const additionalScamIntel = [
     howItWorks: [
       { step: 1, title: "Attractive Offer", description: "Ads promote a 'free trial' of a product with only small shipping charges required." },
       { step: 2, title: "Hidden Terms", description: "Buried in fine print is an automatic enrollment in a costly monthly subscription." },
-      { step: 3, title: "Difficult Cancellation", description: "The company makes cancellation nearly impossible — no working phone number, broken website links, or requirement to call during limited hours." },
+      { step: 3, title: "Difficult Cancellation", description: "The company makes cancellation nearly impossible - no working phone number, broken website links, or requirement to call during limited hours." },
       { step: 4, title: "Continued Charges", description: "Monthly charges of $50-$150 continue until the victim's bank intervenes." },
     ],
     faq: [
@@ -374,17 +374,17 @@ export const additionalScamIntel = [
     metaDescription: "Warning about scams that trick victims into buying gift cards as payment for fake debts, taxes, or emergencies. Gift cards are the #1 payment method in elder fraud.",
     exampleMessages: [
       { context: "Phone Call", message: "This is the IRS. You owe $3,000 in back taxes. Purchase Google Play gift cards and read us the numbers to settle this today or a warrant will be issued." },
-      { context: "Email from 'Boss'", message: "I need you to buy $500 in Amazon gift cards for a client gift. Please send me the card numbers. I'll reimburse you. — Sent from my iPhone" },
+      { context: "Email from 'Boss'", message: "I need you to buy $500 in Amazon gift cards for a client gift. Please send me the card numbers. I'll reimburse you. - Sent from my iPhone" },
     ],
     warningSigns: [
-      "Anyone asking you to pay with gift cards — no legitimate business or government does this",
-      "Urgency — threats of arrest, account closure, or consequences if you do not pay immediately",
+      "Anyone asking you to pay with gift cards - no legitimate business or government does this",
+      "Urgency - threats of arrest, account closure, or consequences if you do not pay immediately",
       "Caller asks you to read the gift card numbers and PINs over the phone",
       "Email from your 'boss' or 'CEO' asking you to buy gift cards",
       "Being told to keep the purchase a secret from others",
     ],
     preventionTips: [
-      "Gift cards are for gifts, not payments — no legitimate entity accepts gift cards as payment",
+      "Gift cards are for gifts, not payments - no legitimate entity accepts gift cards as payment",
       "If someone asks you to pay with gift cards, it is always a scam",
       "Tell the store cashier if someone asked you to buy gift cards for payment",
       "Verify requests from your boss by calling them directly on a known phone number",
@@ -394,10 +394,10 @@ export const additionalScamIntel = [
       { step: 1, title: "The Demand", description: "Scammer contacts the victim posing as the IRS, utility company, tech support, or the victim's boss." },
       { step: 2, title: "Gift Card Instruction", description: "They instruct the victim to purchase gift cards (Google Play, Amazon, iTunes, Walmart) and call back with the numbers." },
       { step: 3, title: "Card Number Collection", description: "The victim reads the gift card numbers and PINs, which the scammer immediately redeems or sells." },
-      { step: 4, title: "Money Gone", description: "Once a gift card is redeemed, the money is gone — it cannot be traced or recovered." },
+      { step: 4, title: "Money Gone", description: "Once a gift card is redeemed, the money is gone - it cannot be traced or recovered." },
     ],
     faq: [
-      { question: "Can the government ask me to pay with gift cards?", answer: "Absolutely not. No government agency — not the IRS, not the SSA, not the police — will ever ask for payment via gift cards. This is always a scam." },
+      { question: "Can the government ask me to pay with gift cards?", answer: "Absolutely not. No government agency - not the IRS, not the SSA, not the police - will ever ask for payment via gift cards. This is always a scam." },
       { question: "I already gave a scammer my gift card numbers. What can I do?", answer: "Contact the gift card company immediately. Some companies (Amazon, Google, Apple) may be able to freeze the remaining balance. Report to the FTC at reportfraud.ftc.gov." },
     ],
     averageLoss: "$1,000",
@@ -456,7 +456,7 @@ export const additionalScamIntel = [
       { context: "Smart Lock Breach", message: "Front door unlocks on its own. Smart lock logs show access from an unknown device." },
     ],
     warningSigns: [
-      "Smart devices behaving erratically — turning on/off, changing settings",
+      "Smart devices behaving erratically - turning on/off, changing settings",
       "Unknown voices coming through smart speakers or baby monitors",
       "New devices appearing on your home Wi-Fi network",
       "Smart lock showing access by unrecognized users or devices",
@@ -669,7 +669,7 @@ export const additionalScamIntel = [
     howItWorks: [
       { step: 1, title: "Exploit Tragedy", description: "Immediately after a disaster or tragedy, scammers create fake charities with names similar to legitimate organizations." },
       { step: 2, title: "Emotional Appeal", description: "They use real disaster images and emotional language on social media, email, and fake websites." },
-      { step: 3, title: "Collection", description: "Donations are collected through untraceable methods — cash apps, cryptocurrency, or wire transfers." },
+      { step: 3, title: "Collection", description: "Donations are collected through untraceable methods - cash apps, cryptocurrency, or wire transfers." },
       { step: 4, title: "Disappearance", description: "The fake charity disappears. None of the donated money reaches victims." },
     ],
     faq: [
@@ -688,7 +688,7 @@ export const additionalScamIntel = [
     riskLevel: "medium",
     metaDescription: "Warning about fake antivirus software that displays false virus warnings to trick you into paying for useless or malicious programs.",
     exampleMessages: [
-      { context: "Pop-up Alert", message: "WARNING: 47 viruses detected on your computer! Your personal data is at risk. Download SecureShield Pro NOW to remove threats — 60% OFF today only!" },
+      { context: "Pop-up Alert", message: "WARNING: 47 viruses detected on your computer! Your personal data is at risk. Download SecureShield Pro NOW to remove threats - 60% OFF today only!" },
       { context: "Email", message: "Your Norton subscription has expired. Your device is unprotected. Renew now at this link to stay safe." },
     ],
     warningSigns: [
@@ -700,7 +700,7 @@ export const additionalScamIntel = [
     ],
     preventionTips: [
       "Use only reputable antivirus software (Windows Defender, Malwarebytes, Bitdefender)",
-      "Close pop-ups using your browser — do not click anything inside them",
+      "Close pop-ups using your browser - do not click anything inside them",
       "Never download security software from pop-up warnings",
       "Keep your browser and operating system updated",
       "Renew antivirus subscriptions only through the official vendor website",
@@ -822,7 +822,7 @@ export const additionalScamIntel = [
       "Enable two-factor authentication on all cloud accounts",
       "Use unique, strong passwords for Google, Apple, and Microsoft accounts",
       "Review account activity regularly (Google: myaccount.google.com/security)",
-      "Never click 'sign in' links from emails — type the URL directly",
+      "Never click 'sign in' links from emails - type the URL directly",
       "Set up recovery phone numbers and backup email addresses",
       "Use a password manager to generate and store unique passwords",
     ],

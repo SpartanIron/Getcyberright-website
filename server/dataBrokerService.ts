@@ -113,7 +113,7 @@ interface BreachResult {
 async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
   const hibpApiKey = process.env.HIBP_API_KEY;
   if (!hibpApiKey) {
-    console.log("[scan] HIBP API key not configured — breach check skipped. Add HIBP_API_KEY secret to enable breach detection.");
+    console.log("[scan] HIBP API key not configured - breach check skipped. Add HIBP_API_KEY secret to enable breach detection.");
     return [];
   }
 
@@ -131,7 +131,7 @@ async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
 
     if (response.status === 404) return [];
     if (response.status === 401) {
-      console.log("[scan] HIBP API key invalid or expired — breach check skipped");
+      console.log("[scan] HIBP API key invalid or expired - breach check skipped");
       return [];
     }
     if (response.status === 429) {
@@ -139,7 +139,7 @@ async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
       return [];
     }
     if (!response.ok) {
-      console.log(`[scan] HIBP returned status ${response.status} — breach check skipped`);
+      console.log(`[scan] HIBP returned status ${response.status} - breach check skipped`);
       return [];
     }
 
@@ -378,10 +378,10 @@ async function runRealVerification(
           const confidenceLabel = matchCount >= 3 ? "Very High" : matchCount >= 2 ? "High" : "Likely";
           const matchDescription = matchParts.join(", ");
           verificationDetails = `A public profile matching your ${matchDescription} was found on ${broker.name}.${profileResult.profileUrl ? ` You can verify this listing at: ${profileResult.profileUrl}` : ""}`;
-          evidenceSummary = `Profile found — ${confidenceLabel} confidence (${matchCount} detail${matchCount !== 1 ? "s" : ""} matched)`;
+          evidenceSummary = `Profile found - ${confidenceLabel} confidence (${matchCount} detail${matchCount !== 1 ? "s" : ""} matched)`;
         } else {
-          verificationDetails = `${broker.name} (${domain}) is a known active data broker with an opt-out process. Your data may be listed — we recommend sending a removal request.`;
-          evidenceSummary = "Active broker — removal recommended";
+          verificationDetails = `${broker.name} (${domain}) is a known active data broker with an opt-out process. Your data may be listed - we recommend sending a removal request.`;
+          evidenceSummary = "Active broker - removal recommended";
         }
 
         let exposureLevel = "info";
@@ -2334,11 +2334,11 @@ export function computeReappearanceRisk(broker: DataBroker, performance?: Broker
 
   if (broker.category === "people-search" || broker.category === "public-records") {
     riskScore += 30;
-    factors.push("Public records source — data may be re-ingested from government databases");
+    factors.push("Public records source - data may be re-ingested from government databases");
   }
   if (broker.category === "data-aggregator" || broker.category === "data-aggregator-enrichment") {
     riskScore += 25;
-    factors.push("Data aggregator — sources data from multiple third parties");
+    factors.push("Data aggregator - sources data from multiple third parties");
   }
   if (broker.relatedBrokers && broker.relatedBrokers.length > 0) {
     riskScore += 15;
@@ -2346,7 +2346,7 @@ export function computeReappearanceRisk(broker: DataBroker, performance?: Broker
   }
   if (broker.parentCompany) {
     riskScore += 10;
-    factors.push(`Part of ${broker.parentCompany} — data may be shared across subsidiaries`);
+    factors.push(`Part of ${broker.parentCompany} - data may be shared across subsidiaries`);
   }
 
   if (performance) {
@@ -2382,23 +2382,23 @@ export function getBrokerTosRiskFlags(broker: DataBroker): { level: string; flag
   let level = "low";
 
   if (broker.requiresAccountCreation) {
-    flags.push("Requires account creation — exposes additional data to broker");
+    flags.push("Requires account creation - exposes additional data to broker");
     level = "medium";
   }
   if (broker.requiresIdVerification) {
-    flags.push("Requires government ID — identity theft risk if broker is compromised");
+    flags.push("Requires government ID - identity theft risk if broker is compromised");
     level = "high";
   }
   if (broker.optOutMethod === "mail") {
-    flags.push("Requires physical mail — exposes your mailing address");
+    flags.push("Requires physical mail - exposes your mailing address");
     level = level === "low" ? "medium" : level;
   }
   if (broker.difficulty === "hard") {
-    flags.push("Complex removal process — may require multiple attempts");
+    flags.push("Complex removal process - may require multiple attempts");
     level = level === "low" ? "medium" : level;
   }
   if (!broker.optOutUrl && broker.optOutMethod === "web-form") {
-    flags.push("No documented opt-out URL — process may have changed");
+    flags.push("No documented opt-out URL - process may have changed");
     level = level === "low" ? "medium" : level;
   }
 
@@ -2734,7 +2734,7 @@ export function generateExecutiveComplianceTemplate(broker: DataBroker, profile:
 
   const modeLabel = mode === "military" ? "Military/Defense Personnel" : mode === "government" ? "Government Official" : mode === "executive" ? "Executive" : "Individual";
 
-  return `Subject: ${framework} Data Deletion Request — ${modeLabel} Priority
+  return `Subject: ${framework} Data Deletion Request - ${modeLabel} Priority
 
 To the Privacy Officer at ${broker.name},
 

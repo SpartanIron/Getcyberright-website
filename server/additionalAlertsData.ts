@@ -63,9 +63,9 @@ export const additionalAlerts = [
       { type: "tactic", value: "Threats to distribute intimate images unless paid", description: "Extortion demand after image sharing" },
     ],
     mitigationSteps: [
-      "Talk to your children about sextortion — they need to know this threat exists",
+      "Talk to your children about sextortion - they need to know this threat exists",
       "Teach teens: never share intimate images with anyone online",
-      "If threatened, do not pay — it usually leads to more demands",
+      "If threatened, do not pay - it usually leads to more demands",
       "Report to NCMEC CyberTipline.org and FBI ic3.gov",
       "Use the Take It Down service at takeitdown.ncmec.org for image removal",
       "Reassure teens that they are the victim and will not be in trouble for reporting",
@@ -106,7 +106,7 @@ export const additionalAlerts = [
     slug: "smart-home-iot-device-attacks",
     threatName: "Smart Home IoT Device Attacks Targeting Families",
     threatCategory: "iot_attack",
-    description: "Hackers are exploiting unsecured smart home devices — baby monitors, security cameras, smart locks, and voice assistants — to spy on families and gain access to home networks.",
+    description: "Hackers are exploiting unsecured smart home devices - baby monitors, security cameras, smart locks, and voice assistants - to spy on families and gain access to home networks.",
     detailedAnalysis: "The number of IoT attacks has increased 400% year over year. Researchers have found that 57% of IoT devices are vulnerable to medium or high-severity attacks. Common targets include Ring cameras, baby monitors with default passwords, and smart locks with outdated firmware. Once compromised, devices can be used for surveillance, harassment, or as entry points to the home network.",
     riskLevel: "high",
     affectedPlatforms: ["Smart Home Devices", "Wi-Fi Networks", "Baby Monitors", "Security Cameras"],
@@ -193,7 +193,7 @@ export const additionalAlerts = [
       { type: "tactic", value: "Urgency with threats of arrest or account closure", description: "Pressure to buy cards immediately" },
     ],
     mitigationSteps: [
-      "Gift cards are for gifts, not payments — no legitimate entity accepts them as payment",
+      "Gift cards are for gifts, not payments - no legitimate entity accepts them as payment",
       "Tell store cashiers if someone told you to buy gift cards for payment",
       "Share this rule with elderly family members: if someone asks for gift cards, it is always a scam",
       "Hang up on callers demanding gift card payment",
@@ -244,7 +244,7 @@ export const additionalAlerts = [
     ],
     mitigationSteps: [
       "Enable two-factor authentication on Google, Apple, and Microsoft accounts",
-      "Never click sign-in links in emails — navigate to the site directly",
+      "Never click sign-in links in emails - navigate to the site directly",
       "Review account activity at myaccount.google.com/security regularly",
       "Use unique, strong passwords for each cloud account",
       "Set up recovery phone numbers and backup email addresses",
@@ -312,7 +312,7 @@ export const additionalAlerts = [
     threatName: "AI-Generated Rental Listing Fraud",
     threatCategory: "online_fraud",
     description: "Scammers are using AI to generate fake rental property photos and listings, stealing deposits from apartment and house hunters on Craigslist, Facebook, and Zillow.",
-    detailedAnalysis: "Rental scams have increased significantly with AI-generated property photos making fake listings more convincing. Scammers copy legitimate listings, lower the price, and post them on multiple platforms. They claim to be out of town and request wire transfers for deposits. Victims lose first month's rent, last month's rent, and security deposits — typically $2,000-$5,000.",
+    detailedAnalysis: "Rental scams have increased significantly with AI-generated property photos making fake listings more convincing. Scammers copy legitimate listings, lower the price, and post them on multiple platforms. They claim to be out of town and request wire transfers for deposits. Victims lose first month's rent, last month's rent, and security deposits - typically $2,000-$5,000.",
     riskLevel: "high",
     affectedPlatforms: ["Craigslist", "Facebook Marketplace", "Zillow", "Apartments.com"],
     indicators: [
@@ -346,7 +346,7 @@ export const additionalAlerts = [
       { type: "tactic", value: "Download prompt for unknown security software", description: "Software not from recognized vendors" },
     ],
     mitigationSteps: [
-      "Close browser pop-ups with Ctrl+W or Cmd+W — do not click anything inside them",
+      "Close browser pop-ups with Ctrl+W or Cmd+W - do not click anything inside them",
       "Use only reputable antivirus: Windows Defender, Malwarebytes, or Bitdefender",
       "Never download security software from pop-up warnings",
       "If your browser is frozen, force quit with Ctrl+Alt+Delete or Cmd+Option+Escape",

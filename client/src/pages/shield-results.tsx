@@ -369,7 +369,7 @@ function ShieldResultsPage() {
             >
               <ShieldCheck className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
               <p className="text-sm text-green-800 dark:text-green-200 font-medium">
-                Continuous protection active — monthly re-scans, auto re-submission, and alerts included.
+                Continuous protection active - monthly re-scans, auto re-submission, and alerts included.
               </p>
             </div>
           )}
@@ -381,7 +381,7 @@ function ShieldResultsPage() {
             >
               <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
               <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
-                Automated removal active — we submit opt-out requests on your behalf.
+                Automated removal active - we submit opt-out requests on your behalf.
               </p>
             </div>
           )}
@@ -707,7 +707,7 @@ function ShieldResultsPage() {
               >
                 <span className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  {notFoundBrokers.length} site{notFoundBrokers.length !== 1 ? "s" : ""} checked — no data found
+                  {notFoundBrokers.length} site{notFoundBrokers.length !== 1 ? "s" : ""} checked - no data found
                   {uncheckedBrokers.length > 0 && ` · ${uncheckedBrokers.length} could not be checked`}
                 </span>
                 {showNotFound ? (
@@ -729,13 +729,13 @@ function ShieldResultsPage() {
                     {pendingBrokers.map((b, i) => (
                       <div key={`pv-${i}`} className="flex items-center gap-2 py-1.5 px-2 text-sm text-muted-foreground">
                         <AlertCircle className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />
-                        <span>{b.broker || "Unknown"} — pending verification</span>
+                        <span>{b.broker || "Unknown"} - pending verification</span>
                       </div>
                     ))}
                     {uncheckedBrokers.map((b, i) => (
                       <div key={`uc-${i}`} className="flex items-center gap-2 py-1.5 px-2 text-sm text-muted-foreground">
                         <Clock className="h-3.5 w-3.5 text-orange-500 flex-shrink-0" />
-                        <span>{b.broker || "Unknown"} — could not be checked</span>
+                        <span>{b.broker || "Unknown"} - could not be checked</span>
                       </div>
                     ))}
                   </CardContent>

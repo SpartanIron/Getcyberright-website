@@ -279,7 +279,7 @@ export function VaultForm() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-              Your Vault Is Set Up — Here's What to Do Next
+              Your Vault Is Set Up - Here's What to Do Next
             </CardTitle>
             <CardDescription>
               Your personal information is saved and encrypted. Now use it to find and remove your exposed data.

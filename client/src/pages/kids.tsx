@@ -183,7 +183,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
         tips: [
           "Always lock your device when you are done using it.",
           "Ask a parent before downloading any new apps.",
-          "Updates fix security problems — ask a parent to help install them.",
+          "Updates fix security problems - ask a parent to help install them.",
           "Only download apps from official app stores.",
           "Check what permissions an app is asking for. A flashlight app should not need your contacts!",
           "Be careful on public Wi-Fi. Do not log into important accounts on it.",
@@ -270,13 +270,13 @@ const lessonTopics: Record<string, LessonTopic[]> = {
           "Set your accounts to private so only people you approve can see your content.",
           "Think before you post. Would you be comfortable if your teacher or grandparent saw this?",
           "Real giveaways never ask for your personal info through DMs.",
-          "Do not post vacation photos in real time — wait until you are back home.",
+          "Do not post vacation photos in real time - wait until you are back home.",
           "Always get permission before sharing content that includes other people.",
           "Take breaks from social media if it starts affecting how you feel.",
           "Report harmful content and support friends who are targeted.",
           "Be suspicious of follow requests from people with new accounts and no mutual friends."
         ],
-        remember: "Social media is a tool. Use it wisely to connect, create, and share — but always protect your privacy and wellbeing.",
+        remember: "Social media is a tool. Use it wisely to connect, create, and share - but always protect your privacy and wellbeing.",
         platformGuides: [
           { platform: "Instagram Safety", steps: ["Go to Settings > Privacy and set your account to Private", "Turn off Activity Status so people cannot see when you are online", "Review tagged photos in Settings > Privacy > Tags before they appear on your profile", "Block or restrict accounts that make you uncomfortable", "Report inappropriate content by tapping the three dots on any post"] },
           { platform: "TikTok Safety", steps: ["Go to Settings > Privacy and set your account to Private", "Turn off 'Suggest your account to others'", "Disable DMs from everyone or set to Friends Only", "Turn off 'Allow your videos to be downloaded'", "Set up Family Pairing with a parent for additional controls"] },
@@ -301,12 +301,12 @@ const lessonTopics: Record<string, LessonTopic[]> = {
         tips: [
           "Cyberbullying includes spreading rumors, sharing embarrassing photos, sending mean messages, or excluding someone online.",
           "If you are being bullied, save evidence by taking screenshots.",
-          "Do not respond to bullies — it often makes things worse.",
+          "Do not respond to bullies - it often makes things worse.",
           "Report cyberbullying to the platform and tell a trusted adult.",
           "Forwarding mean content makes you part of the problem, even if you did not create it.",
           "Be an upstander, not a bystander. Support people who are being bullied.",
           "Think before you type. If you would not say it face-to-face, do not post it.",
-          "Remember that people cannot always tell tone online — what seems like a joke might hurt someone."
+          "Remember that people cannot always tell tone online - what seems like a joke might hurt someone."
         ],
         remember: "Everyone deserves to feel safe online. Being an upstander means using your voice to support others and stop harm.",
         checklist: [
@@ -328,7 +328,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
         intro: "Online gaming is fun, but it comes with risks like scam offers, predators, and spending traps. Learn how to enjoy gaming while staying safe.",
         tips: [
           "Only share your game name, never your real name or location.",
-          "Never share your login for 'account boosting' — it is a scam to steal your account.",
+          "Never share your login for 'account boosting' - it is a scam to steal your account.",
           "All 'free V-Bucks/Robux generators' are scams. Only use official stores.",
           "Be cautious of older players who want to chat privately outside the game.",
           "Set a gaming budget with your parents and stick to it.",
@@ -389,7 +389,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
         tips: [
           "Search your name on Google to see what others can find about you.",
           "Think about how posts might look to a future college or employer.",
-          "Screenshots last forever — even deleted posts may have been saved.",
+          "Screenshots last forever - even deleted posts may have been saved.",
           "Be intentional about building a positive online presence.",
           "Review privacy settings on all platforms regularly.",
           "Remove tags from photos you do not want associated with you.",
@@ -454,13 +454,13 @@ const lessonTopics: Record<string, LessonTopic[]> = {
         intro: "As you use more apps and services, your digital privacy becomes increasingly important. Understanding how your data is collected, stored, and used empowers you to make informed decisions about your online presence.",
         tips: [
           "Review app permissions regularly. A calculator should not need your camera or contacts.",
-          "Only accept necessary cookies — tracking cookies follow your activity across the web.",
+          "Only accept necessary cookies - tracking cookies follow your activity across the web.",
           "Use messaging apps with end-to-end encryption for private conversations.",
           "Read privacy policies before signing up. Free VPNs that sell data defeat their purpose.",
           "Use a password manager to create and store unique passwords for every account.",
           "Enable two-factor authentication on every account that supports it.",
           "Check if your email has been in a data breach using HaveIBeenPwned.",
-          "Be cautious with social logins — they share your profile data with third-party services."
+          "Be cautious with social logins - they share your profile data with third-party services."
         ],
         remember: "Privacy is a right, not a luxury. The more you understand about data collection, the better you can protect yourself.",
         platformGuides: [
@@ -483,10 +483,10 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       color: "bg-red-700",
       image: kidsPhishingImg,
       content: {
-        intro: "Social engineering is when attackers manipulate people instead of hacking computers. They use psychology — urgency, authority, fear, and trust — to trick you into revealing information or taking dangerous actions.",
+        intro: "Social engineering is when attackers manipulate people instead of hacking computers. They use psychology - urgency, authority, fear, and trust - to trick you into revealing information or taking dangerous actions.",
         tips: [
           "Vishing (voice phishing) uses phone calls to create urgency and trick you.",
-          "Never plug in unknown USB drives — they can contain malware.",
+          "Never plug in unknown USB drives - they can contain malware.",
           "No legitimate administrator asks for credentials via email.",
           "Never share your Social Security Number before being officially hired.",
           "Free textbook sites requiring special software downloads often bundle malware.",
@@ -516,10 +516,10 @@ const lessonTopics: Record<string, LessonTopic[]> = {
           "Set screen time limits and use app timers to manage usage.",
           "Create phone-free zones like your bedroom at night.",
           "If you feel anxious when away from your phone, that is a sign to take a break.",
-          "Remember that social media shows curated, filtered versions of life — not reality.",
+          "Remember that social media shows curated, filtered versions of life - not reality.",
           "Unfollow accounts that consistently make you feel bad about yourself.",
           "It is okay to set boundaries and not be available online 24/7.",
-          "Cyberstalking is serious — help friends report it and tell trusted adults.",
+          "Cyberstalking is serious - help friends report it and tell trusted adults.",
           "Build positive online communities through authenticity and kindness."
         ],
         remember: "Your mental health matters more than any notification. Technology should serve you, not control you.",
@@ -539,13 +539,13 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       color: "bg-blue-700",
       image: kidsDigitalFootprintImg,
       content: {
-        intro: "Your online identity is more than your social media profile — it is how the digital world sees you. From deepfakes to data brokers, understanding threats to your identity helps you protect and build a positive presence.",
+        intro: "Your online identity is more than your social media profile - it is how the digital world sees you. From deepfakes to data brokers, understanding threats to your identity helps you protect and build a positive presence.",
         tips: [
           "Deepfakes are AI-generated fake media. Report them immediately and preserve evidence.",
           "Build your personal brand around your work, not personal details.",
           "Viral content is permanent. What seems edgy now could hurt future opportunities.",
           "Request data removal from data broker sites that list your information.",
-          "Age restrictions exist for safety — bypassing them removes legal protections for minors.",
+          "Age restrictions exist for safety - bypassing them removes legal protections for minors.",
           "Employers and schools regularly check social media profiles.",
           "Address privacy violations directly and involve trusted adults when needed.",
           "Share opinions respectfully and remember comments are permanent."
@@ -567,14 +567,14 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       color: "bg-green-700",
       image: kidsSpottingTricksImg,
       content: {
-        intro: "As you start managing your own money — whether through allowance, part-time jobs, or gift cards — knowing how to protect it online becomes crucial. Financial scams increasingly target young people.",
+        intro: "As you start managing your own money - whether through allowance, part-time jobs, or gift cards - knowing how to protect it online becomes crucial. Financial scams increasingly target young people.",
         tips: [
           "Prices 90% lower than competitors are a red flag for scam stores.",
           "Enable biometric authentication and transaction alerts for mobile payments.",
-          "Beware of 'accidental' payments that ask you to send money back — the original is reversed but yours stays gone.",
+          "Beware of 'accidental' payments that ask you to send money back - the original is reversed but yours stays gone.",
           "Legitimate age verification never requires payment card details.",
           "No investment is 'guaranteed.' Crypto scams targeting young people are extremely common.",
-          "Never share gift card numbers and PINs — once shared, the funds can be stolen.",
+          "Never share gift card numbers and PINs - once shared, the funds can be stolen.",
           "Use platform payment systems for online marketplace transactions.",
           "Money flipping posts on social media are always scams."
         ],
@@ -598,7 +598,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
         intro: "In the age of AI, deepfakes, and viral misinformation, critical thinking is your most powerful tool. Learning to evaluate information before believing or sharing it protects you and your community.",
         tips: [
           "Verify breaking news through at least 3 reputable sources before sharing.",
-          "AI can generate convincing but incorrect information — always verify.",
+          "AI can generate convincing but incorrect information - always verify.",
           "Check petition creators and their data collection practices before signing.",
           "Health claims need support from medical professionals, not social media views.",
           "Seek multiple perspectives and consider publication biases.",
@@ -606,7 +606,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
           "Use reverse image search to check if images are manipulated or out of context.",
           "Be extra cautious of information that perfectly confirms what you already believe."
         ],
-        remember: "Critical thinking means questioning everything — including things you agree with. The truth can withstand scrutiny.",
+        remember: "Critical thinking means questioning everything - including things you agree with. The truth can withstand scrutiny.",
         checklist: [
           "I verify information before sharing it.",
           "I check multiple sources for important claims.",

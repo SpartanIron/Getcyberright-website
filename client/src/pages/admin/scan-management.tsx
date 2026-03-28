@@ -127,7 +127,7 @@ export default function ScanManagement() {
                 <Database className="w-5 h-5 text-teal-600" />
                 <div>
                   <div className="text-2xl font-bold" data-testid="text-shield-scan-count">
-                    {brokerData?.shieldScans.total ?? "—"}
+                    {brokerData?.shieldScans.total ?? "-"}
                   </div>
                   <div className="text-xs text-muted-foreground">Data Shield Scans</div>
                 </div>
@@ -140,7 +140,7 @@ export default function ScanManagement() {
                 <Shield className="w-5 h-5 text-green-600" />
                 <div>
                   <div className="text-2xl font-bold" data-testid="text-completed-scan-count">
-                    {brokerData?.shieldScans.completed ?? "—"}
+                    {brokerData?.shieldScans.completed ?? "-"}
                   </div>
                   <div className="text-xs text-muted-foreground">Completed Scans</div>
                 </div>
@@ -153,7 +153,7 @@ export default function ScanManagement() {
                 <ScanSearch className="w-5 h-5 text-blue-600" />
                 <div>
                   <div className="text-2xl font-bold" data-testid="text-exposure-scan-count">
-                    {brokerData?.exposureScans.total ?? "—"}
+                    {brokerData?.exposureScans.total ?? "-"}
                   </div>
                   <div className="text-xs text-muted-foreground">Exposure Scans</div>
                 </div>
@@ -166,7 +166,7 @@ export default function ScanManagement() {
                 <AlertTriangle className="w-5 h-5 text-orange-600" />
                 <div>
                   <div className="text-2xl font-bold" data-testid="text-scam-check-count">
-                    {scamData?.scamChecks.total ?? "—"}
+                    {scamData?.scamChecks.total ?? "-"}
                   </div>
                   <div className="text-xs text-muted-foreground">Scam Checks</div>
                 </div>
@@ -264,8 +264,8 @@ export default function ScanManagement() {
                               {scan.status}
                             </Badge>
                           </TableCell>
-                          <TableCell>{scan.brokersScanned ?? "—"}</TableCell>
-                          <TableCell>{scan.exposuresFound ?? "—"}</TableCell>
+                          <TableCell>{scan.brokersScanned ?? "-"}</TableCell>
+                          <TableCell>{scan.exposuresFound ?? "-"}</TableCell>
                           <TableCell className="text-muted-foreground">
                             {new Date(scan.createdAt).toLocaleDateString()}
                           </TableCell>

@@ -449,7 +449,7 @@ export const phishingScenarios: PhishingScenario[] = [
     isPhishing: true,
     redFlags: [
       "M-Pesa reversals are handled by Safaricom customer service, not by sending money back",
-      "The 'accidental payment' may never have been received — check your actual balance",
+      "The 'accidental payment' may never have been received - check your actual balance",
       "2-hour deadline creates panic",
       "Safaricom does not send reversal requests via SMS asking you to send money",
       "This is the most common B2C mobile money fraud in East Africa"
@@ -635,16 +635,16 @@ export const policyTemplates: PolicyTemplate[] = [
     description: "Define procedures for responding to security incidents.",
     icon: "alert-triangle",
     questions: [
-      { id: "ir-q1", question: "Do you have a designated incident response team?", options: ["Yes, formal team", "Informal — IT handles it", "No, not yet"] },
+      { id: "ir-q1", question: "Do you have a designated incident response team?", options: ["Yes, formal team", "Informal - IT handles it", "No, not yet"] },
       { id: "ir-q2", question: "Do you have cyber insurance?", options: ["Yes", "Researching options", "No"] },
       { id: "ir-q3", question: "How quickly can you isolate a compromised system?", options: ["Within minutes", "Within hours", "Not sure"] },
-      { id: "ir-q4", question: "Do you have regulatory notification obligations?", options: ["Yes (GDPR, HIPAA, etc.)", "Maybe — need to check", "No"] }
+      { id: "ir-q4", question: "Do you have regulatory notification obligations?", options: ["Yes (GDPR, HIPAA, etc.)", "Maybe - need to check", "No"] }
     ],
     sections: [
       { title: "Purpose and Scope", description: "What constitutes a security incident.", sampleLanguage: "This policy defines [Company Name]'s procedures for identifying, responding to, and recovering from cybersecurity incidents. A security incident is any event that threatens the confidentiality, integrity, or availability of company systems or data." },
       { title: "Incident Response Team", description: "Who is responsible during an incident.", sampleLanguage: "The Incident Response Team consists of: Incident Commander (decision-maker), Technical Lead (IT/security), Communications Lead (internal/external messaging), and Legal/Compliance (regulatory requirements)." },
       { title: "Detection and Reporting", description: "How incidents are identified and reported.", sampleLanguage: "All employees must report suspected security incidents immediately to [reporting email/phone]. Do not attempt to investigate or resolve the incident independently." },
-      { title: "Response Procedures", description: "Step-by-step response actions.", sampleLanguage: "Upon confirmed incident: 1) Contain — isolate affected systems. 2) Assess — determine scope and impact. 3) Eradicate — remove the threat. 4) Recover — restore systems from clean backups. 5) Document — record all actions taken." },
+      { title: "Response Procedures", description: "Step-by-step response actions.", sampleLanguage: "Upon confirmed incident: 1) Contain - isolate affected systems. 2) Assess - determine scope and impact. 3) Eradicate - remove the threat. 4) Recover - restore systems from clean backups. 5) Document - record all actions taken." },
       { title: "Communication Plan", description: "Who needs to be notified.", sampleLanguage: "Internal notifications: executive team within 1 hour, all staff as needed. External notifications: cyber insurance provider, legal counsel, regulatory authorities (if required), affected customers (if data breach confirmed)." },
       { title: "Post-Incident Review", description: "Learning from incidents.", sampleLanguage: "Within 5 business days of incident resolution, the IR Team will conduct a post-incident review to identify root cause, evaluate response effectiveness, and implement improvements." }
     ]
@@ -661,7 +661,7 @@ export const policyTemplates: PolicyTemplate[] = [
     ],
     sections: [
       { title: "Purpose", description: "Why data classification matters.", sampleLanguage: "This policy establishes a framework for classifying [Company Name]'s data based on sensitivity and criticality, ensuring appropriate protection measures are applied." },
-      { title: "Classification Levels", description: "Data categories and definitions.", sampleLanguage: "PUBLIC — No restrictions. INTERNAL — For internal use only, not for external distribution. CONFIDENTIAL — Sensitive business data requiring access controls. RESTRICTED — Highly sensitive data (PII, financial, health) requiring encryption and strict access controls." },
+      { title: "Classification Levels", description: "Data categories and definitions.", sampleLanguage: "PUBLIC - No restrictions. INTERNAL - For internal use only, not for external distribution. CONFIDENTIAL - Sensitive business data requiring access controls. RESTRICTED - Highly sensitive data (PII, financial, health) requiring encryption and strict access controls." },
       { title: "Handling Requirements", description: "How each classification level should be handled.", sampleLanguage: "CONFIDENTIAL and RESTRICTED data must be: encrypted at rest and in transit, stored only on approved systems, shared only with authorized personnel, and securely disposed of when no longer needed." },
       { title: "Data Ownership", description: "Who is responsible for classifying data.", sampleLanguage: "Each department head is the data owner for data created and managed by their team. Data owners are responsible for classifying their data and ensuring appropriate handling." },
       { title: "Compliance and Audit", description: "How compliance will be verified.", sampleLanguage: "The IT team will conduct quarterly audits of data handling practices. Violations will be reported to management and may result in disciplinary action." }
@@ -697,11 +697,11 @@ export const incidentTypes: IncidentType[] = [
     description: "Your files have been encrypted and attackers demand payment.",
     steps: [
       { id: "r1", title: "Isolate Affected Systems", description: "Disconnect infected computers from the network immediately.", options: [
-        { label: "Systems are disconnected from network", nextId: "r2", actions: ["Unplug network cables", "Disable Wi-Fi", "Do NOT power off — evidence may be lost"] },
+        { label: "Systems are disconnected from network", nextId: "r2", actions: ["Unplug network cables", "Disable Wi-Fi", "Do NOT power off - evidence may be lost"] },
         { label: "I can't access the systems", nextId: "r2-alt", actions: ["Disconnect the network at the router/switch level", "Contact your IT provider immediately"] }
       ]},
       { id: "r2", title: "Do NOT Pay the Ransom", description: "Payment does not guarantee data recovery and funds criminal activity.", options: [
-        { label: "Understood — moving to assessment", nextId: "r3" }
+        { label: "Understood - moving to assessment", nextId: "r3" }
       ]},
       { id: "r2-alt", title: "Escalate to IT Support", description: "Professional help is needed for network-level isolation.", options: [
         { label: "IT provider contacted", nextId: "r3" }
@@ -714,7 +714,7 @@ export const incidentTypes: IncidentType[] = [
         { label: "Restoration in progress", nextId: "r5", actions: ["Ensure backups are from before the infection", "Scan backups for malware before restoring", "Restore to clean systems only"] }
       ]},
       { id: "r4b", title: "Engage Incident Response Professionals", description: "Without clean backups, professional recovery assistance is critical.", options: [
-        { label: "Contacting IR professionals", nextId: "r5", actions: ["Contact your cyber insurance provider — they often have IR partners", "Preserve all evidence for investigation", "Check nomoreransom.org for free decryption tools"] }
+        { label: "Contacting IR professionals", nextId: "r5", actions: ["Contact your cyber insurance provider - they often have IR partners", "Preserve all evidence for investigation", "Check nomoreransom.org for free decryption tools"] }
       ]},
       { id: "r5", title: "Report and Notify", description: "Report the incident to appropriate authorities and notify affected parties.", options: [
         { label: "Reports filed", nextId: null, actions: ["Report to law enforcement (see contacts below)", "Notify cyber insurance provider", "Assess regulatory notification requirements", "Document the full incident timeline"] }
@@ -736,8 +736,8 @@ export const incidentTypes: IncidentType[] = [
     description: "Unauthorized access to or exposure of sensitive business or customer data.",
     steps: [
       { id: "db1", title: "Confirm the Breach", description: "Verify that unauthorized access or data exposure has occurred.", options: [
-        { label: "Breach confirmed — data was accessed", nextId: "db2" },
-        { label: "Potential breach — still investigating", nextId: "db1b" }
+        { label: "Breach confirmed - data was accessed", nextId: "db2" },
+        { label: "Potential breach - still investigating", nextId: "db1b" }
       ]},
       { id: "db1b", title: "Preserve Evidence", description: "Do not alter or delete anything while investigating.", options: [
         { label: "Evidence preserved, continuing investigation", nextId: "db2", actions: ["Screenshot any suspicious activity", "Capture server and application logs", "Note exact times and systems involved"] }
@@ -774,7 +774,7 @@ export const incidentTypes: IncidentType[] = [
     color: "bg-amber-500",
     description: "Money was sent to a fraudulent account due to a spoofed or compromised email.",
     steps: [
-      { id: "bec1", title: "Contact Your Bank Immediately", description: "Time is critical — banks can sometimes recall wire transfers within 24-72 hours.", options: [
+      { id: "bec1", title: "Contact Your Bank Immediately", description: "Time is critical - banks can sometimes recall wire transfers within 24-72 hours.", options: [
         { label: "Bank has been contacted", nextId: "bec2", actions: ["Call your bank's fraud department directly", "Request an urgent wire recall", "Ask about the Recovery Asset Team (US banks)"] }
       ]},
       { id: "bec2", title: "Determine How It Happened", description: "Was it a spoofed email or a compromised account?", options: [
@@ -788,7 +788,7 @@ export const incidentTypes: IncidentType[] = [
         { label: "Account secured", nextId: "bec4", actions: ["Reset the password immediately", "Revoke all active sessions", "Enable MFA if not already active", "Check for mail forwarding rules set by the attacker", "Review sent mail for messages sent by the attacker"] }
       ]},
       { id: "bec4", title: "Report to Authorities", description: "Law enforcement may be able to assist with fund recovery.", options: [
-        { label: "Reports filed", nextId: null, actions: ["File a report with law enforcement (see contacts below)", "US: File with FBI IC3 — they have a Recovery Asset Team for wire fraud", "Document all communication related to the fraud", "Review and strengthen payment verification procedures"] }
+        { label: "Reports filed", nextId: null, actions: ["File a report with law enforcement (see contacts below)", "US: File with FBI IC3 - they have a Recovery Asset Team for wire fraud", "Document all communication related to the fraud", "Review and strengthen payment verification procedures"] }
       ]}
     ],
     reportingContacts: [
@@ -873,11 +873,11 @@ export const securityTools: SecurityTool[] = [
   { id: "email-sec", category: "Email Security", name: "Email Security Gateway", description: "Anti-phishing, anti-spam, and email threat protection.", priceSmall: "$2-5/user/mo", priceMedium: "$3-8/user/mo", priceLarge: "$5-12/user/mo", roiPoint: "Prevents BEC attacks that average $125,000+ per incident.", priority: "essential" },
   { id: "sec-training", category: "Employee Training", name: "Security Awareness Training", description: "Automated training with simulated phishing campaigns.", priceSmall: "$3-5/user/mo", priceMedium: "$3-8/user/mo", priceLarge: "$4-10/user/mo", roiPoint: "Reduces successful phishing by 75% within 12 months.", priority: "essential" },
   { id: "endpoint", category: "Endpoint Security", name: "Endpoint Detection & Response (EDR)", description: "Advanced antivirus with behavioral analysis and response capability.", priceSmall: "$5-8/device/mo", priceMedium: "$6-12/device/mo", priceLarge: "$8-15/device/mo", roiPoint: "Detects and stops ransomware and zero-day threats that traditional antivirus misses.", priority: "essential" },
-  { id: "backup", category: "Data Protection", name: "Cloud Backup Solution", description: "Automated backups with encryption and recovery testing.", priceSmall: "$5-10/device/mo", priceMedium: "$8-15/device/mo", priceLarge: "$10-20/device/mo", roiPoint: "Average ransomware downtime cost is $274,000 — backups reduce recovery to hours instead of weeks.", priority: "essential" },
+  { id: "backup", category: "Data Protection", name: "Cloud Backup Solution", description: "Automated backups with encryption and recovery testing.", priceSmall: "$5-10/device/mo", priceMedium: "$8-15/device/mo", priceLarge: "$10-20/device/mo", roiPoint: "Average ransomware downtime cost is $274,000 - backups reduce recovery to hours instead of weeks.", priority: "essential" },
   { id: "firewall", category: "Network Security", name: "Next-Gen Firewall", description: "Network traffic filtering with intrusion prevention.", priceSmall: "$50-150/mo", priceMedium: "$150-500/mo", priceLarge: "$500-2000/mo", roiPoint: "First line of defense against network-based attacks and unauthorized access.", priority: "recommended" },
   { id: "vpn", category: "Network Security", name: "Business VPN", description: "Encrypted remote access to company resources.", priceSmall: "$5-10/user/mo", priceMedium: "$8-12/user/mo", priceLarge: "$10-15/user/mo", roiPoint: "Secures remote work connections, preventing eavesdropping and man-in-the-middle attacks.", priority: "recommended" },
   { id: "dns", category: "Network Security", name: "DNS Filtering", description: "Blocks access to known malicious websites.", priceSmall: "$1-3/user/mo", priceMedium: "$2-4/user/mo", priceLarge: "$3-5/user/mo", roiPoint: "Prevents 33% of malware infections by blocking malicious domains before connection.", priority: "recommended" },
-  { id: "cyber-ins", category: "Risk Management", name: "Cyber Insurance", description: "Financial protection against cybersecurity incidents.", priceSmall: "$500-2000/yr", priceMedium: "$2000-10000/yr", priceLarge: "$10000-50000/yr", roiPoint: "Covers incident response costs, legal fees, and business interruption — average breach cost for SMBs is $108,000.", priority: "recommended" },
+  { id: "cyber-ins", category: "Risk Management", name: "Cyber Insurance", description: "Financial protection against cybersecurity incidents.", priceSmall: "$500-2000/yr", priceMedium: "$2000-10000/yr", priceLarge: "$10000-50000/yr", roiPoint: "Covers incident response costs, legal fees, and business interruption - average breach cost for SMBs is $108,000.", priority: "recommended" },
   { id: "siem", category: "Monitoring", name: "SIEM/Log Management", description: "Centralized security event monitoring and alerting.", priceSmall: "$100-300/mo", priceMedium: "$300-1000/mo", priceLarge: "$1000-5000/mo", roiPoint: "Reduces breach detection time from 200+ days to hours.", priority: "nice-to-have" },
   { id: "dlp", category: "Data Protection", name: "Data Loss Prevention", description: "Monitors and prevents unauthorized data transfers.", priceSmall: "$5-10/user/mo", priceMedium: "$8-15/user/mo", priceLarge: "$10-20/user/mo", roiPoint: "Prevents data exfiltration by insiders and compromised accounts.", priority: "nice-to-have" },
   { id: "vuln-scan", category: "Monitoring", name: "Vulnerability Scanner", description: "Automated scanning for security weaknesses.", priceSmall: "$100-300/mo", priceMedium: "$200-500/mo", priceLarge: "$500-2000/mo", roiPoint: "Identifies exploitable vulnerabilities before attackers find them.", priority: "nice-to-have" },

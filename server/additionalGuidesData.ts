@@ -35,7 +35,7 @@ export const additionalGuides: CriticalGuideData[] = [
 
 ## What Is SIM Swapping?
 
-A SIM swap attack happens when a hacker convinces your phone carrier to transfer your phone number to a new SIM card — one that the hacker controls. Once they have your number, they receive all your calls, texts, and most importantly, your two-factor authentication (2FA) codes.
+A SIM swap attack happens when a hacker convinces your phone carrier to transfer your phone number to a new SIM card - one that the hacker controls. Once they have your number, they receive all your calls, texts, and most importantly, your two-factor authentication (2FA) codes.
 
 With those codes, they can reset passwords on your bank accounts, email, cryptocurrency wallets, and social media profiles.
 
@@ -61,7 +61,7 @@ With your phone number redirected, they receive your 2FA codes and reset passwor
 - **Your bank sends alerts about transactions you did not make**
 - **You cannot log into accounts that use SMS verification**
 
-If you notice any of these signs, **act immediately** — you may have minutes before accounts are compromised.
+If you notice any of these signs, **act immediately** - you may have minutes before accounts are compromised.
 
 ## 7 Steps to Protect Your Phone Number
 
@@ -78,7 +78,7 @@ Replace SMS-based 2FA with authenticator apps on all accounts that support it:
 - Authy
 - Microsoft Authenticator
 
-These apps generate codes on your device — a SIM swapper cannot intercept them.
+These apps generate codes on your device - a SIM swapper cannot intercept them.
 
 ### 3. Use Hardware Security Keys
 For your most critical accounts (email, banking, crypto), use a hardware security key like YubiKey. This is the strongest form of two-factor authentication available.
@@ -176,7 +176,7 @@ Manufacturers release security patches through firmware updates. Check for updat
 Turn off features you do not use:
 - Remote access (if you only use the device at home)
 - Microphones (on devices that do not need voice control)
-- UPnP (Universal Plug and Play — often exploited by attackers)
+- UPnP (Universal Plug and Play - often exploited by attackers)
 
 ### 5. Buy From Reputable Manufacturers
 Choose brands with published security policies and a track record of regular security updates. Cheap devices from unknown brands often have no security support.
@@ -205,7 +205,7 @@ Regularly check your router's admin page for connected devices. If you see devic
 5. **Change passwords** on all accounts connected to that device
 6. **Check other devices** on the same network for unusual behavior
 
-Securing your smart home takes about an hour of setup time. That hour protects your family from surveillance, harassment, and data theft. Start with the highest-risk devices — baby monitors and cameras — and work through every connected device in your home.`,
+Securing your smart home takes about an hour of setup time. That hour protects your family from surveillance, harassment, and data theft. Start with the highest-risk devices - baby monitors and cameras - and work through every connected device in your home.`,
   },
   {
     slug: "how-to-protect-cloud-accounts",
@@ -306,8 +306,8 @@ Having a recovery plan before you need it is essential:
 1. **Set up recovery options** on all three platforms (phone number, backup email, trusted contacts)
 2. **Save recovery codes** in a secure, offline location (printed in a safe, not in your cloud storage)
 3. **Use a password manager** to store unique passwords for each account
-4. **Review security settings quarterly** — check connected devices, third-party apps, and recent activity
-5. **Keep your recovery phone number current** — if you change phone numbers, update your accounts first
+4. **Review security settings quarterly** - check connected devices, third-party apps, and recent activity
+5. **Keep your recovery phone number current** - if you change phone numbers, update your accounts first
 
 The 20 minutes it takes to secure these three accounts protects years of personal data. Start with whichever account you use most and work through the others this week.`,
   },
@@ -357,7 +357,7 @@ Deepfakes are AI-generated or AI-manipulated videos, audio recordings, and image
 ## How to Spot a Deepfake Video
 
 ### Look at the Eyes
-- **Unnatural blinking**: Deepfakes often blink at unusual intervals — too rarely or too regularly
+- **Unnatural blinking**: Deepfakes often blink at unusual intervals - too rarely or too regularly
 - **Reflection inconsistencies**: Check that light reflections in both eyes match. Real eyes reflect the same light source
 - **Unfocused gaze**: The eyes may not track naturally when the person moves
 
@@ -405,7 +405,7 @@ Choose a secret word or phrase that only family members know. If anyone calls wi
 Every video you post publicly gives scammers material to create deepfakes. Review privacy settings on social media and consider making video content visible only to friends.
 
 ### 3. Verify Before Acting
-Any request for money, personal information, or urgent action — whether via video, voice, or text — should be verified through a separate communication channel.
+Any request for money, personal information, or urgent action - whether via video, voice, or text - should be verified through a separate communication channel.
 
 ### 4. Educate Everyone in Your Household
 Make sure children, teens, and elderly family members know about deepfakes. Show them examples so they understand the technology.
@@ -413,7 +413,7 @@ Make sure children, teens, and elderly family members know about deepfakes. Show
 ### 5. Report Deepfake Scams
 Report deepfake scams to the FBI at [ic3.gov](https://ic3.gov), the FTC at [reportfraud.ftc.gov](https://reportfraud.ftc.gov), and the platform where you encountered the content.
 
-Deepfake detection is not about being paranoid — it is about being prepared. As the technology improves, verification habits become more important than detection skills. Build the habit of verifying before trusting, and your family will be protected.`,
+Deepfake detection is not about being paranoid - it is about being prepared. As the technology improves, verification habits become more important than detection skills. Build the habit of verifying before trusting, and your family will be protected.`,
   },
   {
     slug: "teen-online-safety-sextortion-prevention",
@@ -466,7 +466,7 @@ Sextortion is when someone threatens to share intimate images of your child unle
 5. **Ongoing demands**: Even after payment, demands continue for more money or more images
 
 ### The Financial Variant
-In the growing financial variant, predators do not want more images — they want money. They target boys, quickly obtain compromising material, and demand immediate payment via Cash App, Venmo, or gift cards. Many of these operations originate from organized criminal groups.
+In the growing financial variant, predators do not want more images - they want money. They target boys, quickly obtain compromising material, and demand immediate payment via Cash App, Venmo, or gift cards. Many of these operations originate from organized criminal groups.
 
 ## How to Talk to Your Teen About Sextortion
 
@@ -506,7 +506,7 @@ Collaborate on rules rather than imposing them. Teens who help create the rules 
 1. **Stay calm and supportive.** Your teen is terrified. Reassure them that they are safe and not in trouble.
 2. **Stop all communication** with the predator. Do not respond to threats.
 3. **Do not pay.** Payment leads to escalation, not resolution.
-4. **Screenshot everything** — messages, threats, the predator's profile, and any payment demands.
+4. **Screenshot everything** - messages, threats, the predator's profile, and any payment demands.
 5. **Do not delete anything.** Evidence is essential for law enforcement.
 
 ### Reporting
@@ -551,7 +551,7 @@ Your teen's safety depends more on open communication than on any monitoring too
       { question: "How do I explain AI safety to young children?", answer: "Use simple concepts: 'Some things on the internet are made by computers to look real but are not. If you see or hear something confusing or scary, tell me right away. We have a secret code word to prove who we really are.'" },
       { question: "Is it safe to use AI voice assistants at home?", answer: "Voice assistants are generally safe for home use. To protect privacy: review and delete voice recordings regularly, disable purchasing by voice, and place assistants away from bedrooms and private conversations." },
     ],
-    content: `Artificial intelligence is transforming everyday life — but it is also creating new threats for families. AI-powered scams are harder to detect, easier to create, and increasingly targeting individuals and families. This guide helps every member of your household understand and stay safe from AI threats.
+    content: `Artificial intelligence is transforming everyday life - but it is also creating new threats for families. AI-powered scams are harder to detect, easier to create, and increasingly targeting individuals and families. This guide helps every member of your household understand and stay safe from AI threats.
 
 ## AI Threats Every Family Should Know About
 
@@ -613,7 +613,7 @@ Listen for flat emotional range, missing breathing sounds, and unusual pronuncia
 - If an AI interaction feels uncomfortable or confusing, tell a parent
 
 ### Privacy With AI Services
-- Read privacy policies before using AI services — some retain your data
+- Read privacy policies before using AI services - some retain your data
 - Use AI tools that do not store conversation history for sensitive topics
 - Do not upload family photos to unknown AI apps or websites
 - Be selective about which AI apps have microphone or camera access
@@ -629,20 +629,20 @@ Discuss AI regularly with your family. Topics to cover:
 
 ### This Week
 1. **Create your family code word** and share it with all family members in person
-2. **Review social media privacy settings** for every family member — limit public video and audio content
+2. **Review social media privacy settings** for every family member - limit public video and audio content
 3. **Enable two-factor authentication** on all critical accounts
 
 ### This Month
-4. **Have a family conversation about AI** — show examples of deepfakes and discuss what to watch for
+4. **Have a family conversation about AI** - show examples of deepfakes and discuss what to watch for
 5. **Set ground rules for AI tool use** for children
 6. **Review and update your voice assistant** privacy settings
 
 ### Ongoing
 7. **Update the code word** every 3-6 months
 8. **Stay informed** about new AI threats through trusted sources
-9. **Practice verification** — make the "call back to verify" habit second nature
+9. **Practice verification** - make the "call back to verify" habit second nature
 
-AI technology is not going away — it will only become more powerful and accessible. Families that build verification habits, maintain open communication, and stay informed will be well-protected against AI-powered threats.`,
+AI technology is not going away - it will only become more powerful and accessible. Families that build verification habits, maintain open communication, and stay informed will be well-protected against AI-powered threats.`,
   },
   {
     slug: "what-to-do-if-phone-number-stolen",
@@ -842,7 +842,7 @@ A password manager creates, stores, and fills unique, strong passwords for every
 ## Setting Up Your Family Password Manager
 
 ### Step 1: Choose Your Manager and Create Your Account
-Install the app and browser extension. Create your master password — aim for 4+ random words (like "correct horse battery staple") which is both strong and memorable.
+Install the app and browser extension. Create your master password - aim for 4+ random words (like "correct horse battery staple") which is both strong and memorable.
 
 ### Step 2: Import Existing Passwords
 Most managers can import passwords from your browser. Export from Chrome/Safari/Firefox and import into your new manager.

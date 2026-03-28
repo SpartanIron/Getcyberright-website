@@ -3249,7 +3249,7 @@ function SocialPostGeneratorTab({ token }: { token: string }) {
   const cleanText = (text: string): string => {
     if (!text) return "";
     let cleaned = text
-      .replace(/\s*[-–—]\s*/g, ", ")
+      .replace(/\s*[-–-]\s*/g, ", ")
       .replace(/\s+/g, " ")
       .replace(/,\s*,/g, ",")
       .replace(/\s*,\s*/g, ", ")

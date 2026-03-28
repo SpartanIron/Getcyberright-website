@@ -178,7 +178,7 @@ export default function GcrGuardPricing() {
               Protection + Education Others Can't Match
             </h1>
             <p className="text-xl text-white/70 max-w-2xl mx-auto mb-8">
-              AI scam detection, 500+ data broker removals, a browser extension, and family cybersecurity education — all in one platform, for a fraction of what others charge.
+              AI scam detection, 500+ data broker removals, a browser extension, and family cybersecurity education - all in one platform, for a fraction of what others charge.
             </p>
             <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full p-1" data-testid="toggle-billing-interval">
               <button
@@ -324,7 +324,7 @@ export default function GcrGuardPricing() {
               </Badge>
               <h2 className="text-3xl font-bold mb-3" data-testid="heading-comparison">GCR vs Competitors</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Most services do one thing. We combine data removal, scam detection, and family education in one platform — at a fraction of the industry price.
+                Most services do one thing. We combine data removal, scam detection, and family education in one platform - at a fraction of the industry price.
               </p>
             </div>
 

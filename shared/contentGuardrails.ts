@@ -19,9 +19,9 @@ export const ContentGuardrails = {
     
     return text
       // Replace dashes used as separators (surrounded by spaces) with semicolons
-      .replace(/\s+[-–—]\s+/g, "; ")
+      .replace(/\s+[-–-]\s+/g, "; ")
       // Remove dashes at the start of lines (list style dashes)
-      .replace(/^[-–—]\s+/gm, "• ")
+      .replace(/^[-–-]\s+/gm, "• ")
       // Fix multiple spaces
       .replace(/\s{2,}/g, " ")
       // Clean up any markdown formatting that may have slipped through
@@ -130,7 +130,7 @@ export const ContentGuardrails = {
     let score = 100;
     
     // Deduct for issues
-    if (/\s+[-–—]\s+/.test(text)) score -= 10; // Dashes as separators
+    if (/\s+[-–-]\s+/.test(text)) score -= 10; // Dashes as separators
     if (/\s{2,}/.test(text)) score -= 5; // Multiple spaces
     if (!/[.!?]$/.test(text.trim())) score -= 5; // Missing end punctuation
     if (/[a-z][A-Z]/.test(text)) score -= 5; // Missing space between sentences

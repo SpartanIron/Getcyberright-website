@@ -20,7 +20,7 @@ function sanitizePostContent(text: string): string {
     .replace(/^[-*]\s+/gm, "")
     .replace(/\u2014/g, ", ")
     .replace(/\u2013/g, ", ")
-    .replace(/—/g, ", ")
+    .replace(/-/g, ", ")
     .replace(/–/g, ", ")
     .replace(/\s{2,}/g, " ")
     .replace(/ ,/g, ",")

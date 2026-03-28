@@ -67,7 +67,7 @@ export async function runMigrations(): Promise<void> {
 
       console.log(`[migrate] Applying: ${filename}`);
 
-      // Execute the migration SQL, then record it — both in the same transaction
+      // Execute the migration SQL, then record it - both in the same transaction
       await sql.begin(async (tx) => {
         await tx.unsafe(sqlContent);
         await tx`

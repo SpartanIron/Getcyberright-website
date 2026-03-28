@@ -102,12 +102,12 @@ export function SafetyTipCarousel({ ageGroup }: { ageGroup: string }) {
       { tip: "Never share your real name, school, or address with anyone online", icon: Shield, color: "from-teal-400 to-blue-500" },
       { tip: "Use a fun nickname instead of your real name for online accounts", icon: Users, color: "from-green-400 to-emerald-500" },
       { tip: "Tell a trusted adult if anything online makes you uncomfortable", icon: Eye, color: "from-orange-400 to-red-500" },
-      { tip: "Strong passwords are like secret codes — never share them!", icon: Lock, color: "from-purple-400 to-pink-500" },
+      { tip: "Strong passwords are like secret codes - never share them!", icon: Lock, color: "from-purple-400 to-pink-500" },
       { tip: "If a pop-up says you won something, it is always a trick", icon: AlertTriangle, color: "from-yellow-400 to-orange-500" },
     ],
     "11-13": [
       { tip: "Set all your social media accounts to private by default", icon: Lock, color: "from-purple-400 to-indigo-500" },
-      { tip: "Think before you post — screenshots last forever", icon: Eye, color: "from-blue-400 to-cyan-500" },
+      { tip: "Think before you post - screenshots last forever", icon: Eye, color: "from-blue-400 to-cyan-500" },
       { tip: "Report cyberbullying instead of responding to it", icon: Shield, color: "from-teal-400 to-green-500" },
       { tip: "Free in-game currency generators are always scams", icon: AlertTriangle, color: "from-orange-400 to-red-500" },
       { tip: "Your digital footprint follows you to college and job applications", icon: Globe, color: "from-pink-400 to-rose-500" },
@@ -116,8 +116,8 @@ export function SafetyTipCarousel({ ageGroup }: { ageGroup: string }) {
       { tip: "Use a password manager to create unique passwords for every account", icon: Lock, color: "from-indigo-400 to-purple-500" },
       { tip: "Enable two-factor authentication on every account that offers it", icon: Shield, color: "from-green-400 to-teal-500" },
       { tip: "Verify news from at least 3 sources before sharing it", icon: Globe, color: "from-blue-400 to-indigo-500" },
-      { tip: "No legitimate investment guarantees returns — if they do, it is a scam", icon: AlertTriangle, color: "from-red-400 to-orange-500" },
-      { tip: "AI-generated deepfakes exist — always verify shocking content", icon: Eye, color: "from-purple-400 to-pink-500" },
+      { tip: "No legitimate investment guarantees returns - if they do, it is a scam", icon: AlertTriangle, color: "from-red-400 to-orange-500" },
+      { tip: "AI-generated deepfakes exist - always verify shocking content", icon: Eye, color: "from-purple-400 to-pink-500" },
     ],
   };
 

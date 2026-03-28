@@ -157,7 +157,7 @@ function sanitizePostContent(text: string): string {
     .replace(/^[-*]\s+/gm, "")
     .replace(/\u2014/g, ", ")
     .replace(/\u2013/g, ", ")
-    .replace(/—/g, ", ")
+    .replace(/-/g, ", ")
     .replace(/–/g, ", ")
     .replace(/[^\S\n]{2,}/g, " ")
     .replace(/\n{4,}/g, "\n\n\n")

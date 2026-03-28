@@ -39,7 +39,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 5, title: "Confirm removal", description: "Check your email and click the confirmation link Spokeo sends you.", actionType: "confirm" },
       { stepNumber: 6, title: "Wait for processing", description: "Removal typically takes 24-48 hours to complete.", actionType: "wait" },
     ],
-    tips: ["You may have multiple profiles — search variations of your name", "Removal only removes that specific listing, not all your data"],
+    tips: ["You may have multiple profiles - search variations of your name", "Removal only removes that specific listing, not all your data"],
   },
   {
     brokerId: "whitepages",
@@ -81,7 +81,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 6, title: "Confirm via email", description: "Check your email and click the verification link.", actionType: "confirm" },
       { stepNumber: 7, title: "Wait for removal", description: "Processing takes 24 hours to a few days.", actionType: "wait" },
     ],
-    tips: ["BeenVerified pulls from public records — new records may reappear after removal", "Check back in 30 days to verify removal stuck"],
+    tips: ["BeenVerified pulls from public records - new records may reappear after removal", "Check back in 30 days to verify removal stuck"],
   },
   {
     brokerId: "truepeoplesearch",
@@ -120,7 +120,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 5, title: "Confirm via email", description: "Click the verification link in the email Intelius sends.", actionType: "confirm" },
       { stepNumber: 6, title: "Wait for processing", description: "Removal takes about 72 hours.", actionType: "wait" },
     ],
-    tips: ["Intelius owns several other people-search sites — removing here may not remove from all of them", "Also check Zabasearch and Addresses.com (same parent company)"],
+    tips: ["Intelius owns several other people-search sites - removing here may not remove from all of them", "Also check Zabasearch and Addresses.com (same parent company)"],
   },
   {
     brokerId: "radaris",
@@ -141,7 +141,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 6, title: "Delete your account", description: "After removal is confirmed, delete your Radaris account to prevent re-collection.", actionType: "click" },
       { stepNumber: 7, title: "Wait for processing", description: "Removal can take up to 2 weeks.", actionType: "wait" },
     ],
-    tips: ["Delete your Radaris account after removal to prevent them from keeping your data", "Radaris is known for slow processing — follow up if not removed after 2 weeks"],
+    tips: ["Delete your Radaris account after removal to prevent them from keeping your data", "Radaris is known for slow processing - follow up if not removed after 2 weeks"],
   },
   {
     brokerId: "peoplefinder",
@@ -179,7 +179,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 3, title: "Submit your profile link", description: "Paste your PeekYou profile URL and enter your email.", actionType: "fill_form" },
       { stepNumber: 4, title: "Wait for removal", description: "PeekYou typically processes removals within 30 days.", actionType: "wait" },
     ],
-    tips: ["PeekYou aggregates social media profiles — it may reappear if your social accounts are public"],
+    tips: ["PeekYou aggregates social media profiles - it may reappear if your social accounts are public"],
   },
   {
     brokerId: "anywho",
@@ -198,7 +198,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 4, title: "Confirm via email", description: "Click the link in the confirmation email.", actionType: "confirm" },
       { stepNumber: 5, title: "Wait for removal", description: "Removal takes about 24-48 hours.", actionType: "wait" },
     ],
-    tips: ["AnyWho is powered by Intelius — removing from both is recommended"],
+    tips: ["AnyWho is powered by Intelius - removing from both is recommended"],
   },
   {
     brokerId: "addresses",
@@ -217,7 +217,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 4, title: "Complete opt-out", description: "Follow the prompts to submit your removal.", actionType: "fill_form" },
       { stepNumber: 5, title: "Wait for removal", description: "Processing takes about 24-48 hours.", actionType: "wait" },
     ],
-    tips: ["Part of the Intelius family — check their other sites too"],
+    tips: ["Part of the Intelius family - check their other sites too"],
   },
   {
     brokerId: "instantcheckmate",
@@ -238,7 +238,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 6, title: "Confirm via email", description: "Click the verification link in the email.", actionType: "confirm" },
       { stepNumber: 7, title: "Wait for removal", description: "Processing takes about 48 hours.", actionType: "wait" },
     ],
-    tips: ["Owned by the same company as TruthFinder — remove from both"],
+    tips: ["Owned by the same company as TruthFinder - remove from both"],
   },
   {
     brokerId: "truthfinder",
@@ -278,7 +278,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 4, title: "Submit request", description: "Submit the CCPA deletion request form.", actionType: "confirm" },
       { stepNumber: 5, title: "Wait for response", description: "MyLife is legally required to respond within 45 days under CCPA.", actionType: "wait" },
     ],
-    tips: ["Use the CCPA route — it's the most effective for MyLife", "If they don't respond within 45 days, you can file a complaint with the California AG"],
+    tips: ["Use the CCPA route - it's the most effective for MyLife", "If they don't respond within 45 days, you can file a complaint with the California AG"],
   },
   {
     brokerId: "ussearch",
@@ -354,7 +354,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 3, title: "Submit request", description: "Submit the removal request form.", actionType: "confirm" },
       { stepNumber: 4, title: "Wait for response", description: "Pipl typically responds within 30 days.", actionType: "wait" },
     ],
-    tips: ["Pipl is primarily used by businesses for identity verification — your data may persist in their commercial database"],
+    tips: ["Pipl is primarily used by businesses for identity verification - your data may persist in their commercial database"],
   },
   {
     brokerId: "thatsthem",
@@ -445,7 +445,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 3, title: "Submit request", description: "Submit the opt-out form.", actionType: "confirm" },
       { stepNumber: 4, title: "Wait for processing", description: "Processing takes about 4-6 weeks.", actionType: "wait" },
     ],
-    tips: ["Longer processing time than most — be patient"],
+    tips: ["Longer processing time than most - be patient"],
   },
   {
     brokerId: "voterrecords",
@@ -462,7 +462,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 2, title: "Send removal email", description: "Email optout@voterrecords.com with your full name, state, and a link to your record.", actionType: "fill_form" },
       { stepNumber: 3, title: "Wait for response", description: "They typically process within 1-2 weeks.", actionType: "wait" },
     ],
-    tips: ["Voter registration is public record — this only removes it from this specific site, not from government databases"],
+    tips: ["Voter registration is public record - this only removes it from this specific site, not from government databases"],
   },
   {
     brokerId: "nuwber",
@@ -482,7 +482,7 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 5, title: "Submit removal", description: "Submit the removal request.", actionType: "confirm" },
       { stepNumber: 6, title: "Wait for removal", description: "Processing takes about 72 hours.", actionType: "wait" },
     ],
-    tips: ["Nuwber aggregates from multiple sources — removal may take longer"],
+    tips: ["Nuwber aggregates from multiple sources - removal may take longer"],
   },
   {
     brokerId: "acxiom",
@@ -501,6 +501,6 @@ export const brokerWalkthroughs: WalkthroughData[] = [
       { stepNumber: 4, title: "Submit request", description: "Submit the form.", actionType: "confirm" },
       { stepNumber: 5, title: "Wait for processing", description: "Acxiom processes requests within 2-4 weeks.", actionType: "wait" },
     ],
-    tips: ["Acxiom is one of the largest data brokers — removing here has significant impact", "They may ask for identity verification via mail"],
+    tips: ["Acxiom is one of the largest data brokers - removing here has significant impact", "They may ask for identity verification via mail"],
   },
 ];

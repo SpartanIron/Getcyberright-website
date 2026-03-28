@@ -557,7 +557,7 @@ export function AssessmentQuizBuilder({ questions }: { questions: AssessmentQues
                 <div className="flex items-start gap-2">
                   <span className="font-medium text-foreground min-w-[120px]">Mastery Level:</span>
                   <span className={pct >= 80 ? "text-green-700 dark:text-green-300" : pct >= 50 ? "text-amber-700 dark:text-amber-300" : "text-red-700 dark:text-red-300"}>
-                    {pct >= 90 ? "Advanced" : pct >= 80 ? "Proficient" : pct >= 60 ? "Developing" : "Beginning"} — {pct >= 80 ? "students are ready to move to the next topic" : pct >= 60 ? "review missed concepts before advancing" : "recommend re-teaching core concepts"}
+                    {pct >= 90 ? "Advanced" : pct >= 80 ? "Proficient" : pct >= 60 ? "Developing" : "Beginning"} - {pct >= 80 ? "students are ready to move to the next topic" : pct >= 60 ? "review missed concepts before advancing" : "recommend re-teaching core concepts"}
                   </span>
                 </div>
                 {answers.some(a => !a) && (
@@ -797,7 +797,7 @@ export function CurriculumAlignmentGuide({ standards }: { standards: CurriculumS
                       {standard.topics.includes(topic) ? (
                         <CheckCircle className="w-4 h-4 text-green-500 mx-auto" />
                       ) : (
-                        <span className="text-muted-foreground/30">—</span>
+                        <span className="text-muted-foreground/30">-</span>
                       )}
                     </td>
                   ))}

@@ -758,7 +758,7 @@ function analyzeUrlEntropy(url: string): { isHigh: boolean; entropy: number; rea
     return { 
       isHigh: true, 
       entropy, 
-      reason: `This link contains a suspicious jumble of random characters — a common trick used in scam links` 
+      reason: `This link contains a suspicious jumble of random characters - a common trick used in scam links` 
     };
   }
   
@@ -777,7 +777,7 @@ function analyzeSubdomainDepth(url: string): { isDeep: boolean; depth: number; r
     return {
       isDeep: true,
       depth,
-      reason: `The web address has an unusually complex structure — scammers use this to hide the real destination`
+      reason: `The web address has an unusually complex structure - scammers use this to hide the real destination`
     };
   }
   
@@ -796,7 +796,7 @@ function detectBase64Payload(url: string): { found: boolean; reason: string } {
     if (candidate.length % 4 === 0 || candidate.endsWith('=')) {
       return {
         found: true,
-        reason: "This link contains hidden encoded data — often used to bypass security filters"
+        reason: "This link contains hidden encoded data - often used to bypass security filters"
       };
     }
   }
@@ -813,7 +813,7 @@ function detectPunycode(url: string): { found: boolean; domain: string; reason: 
     return {
       found: true,
       domain,
-      reason: "This address uses special characters to impersonate a real website — a known scam technique"
+      reason: "This address uses special characters to impersonate a real website - a known scam technique"
     };
   }
   
@@ -1089,7 +1089,7 @@ function detectBrandSimilarity(domain: string): { found: boolean; brand: string;
         found: true,
         brand,
         distance,
-        reason: `This website name "${mainDomain}" is very close to "${brand}" — it may be a fake version trying to trick you`
+        reason: `This website name "${mainDomain}" is very close to "${brand}" - it may be a fake version trying to trick you`
       };
     }
   }
@@ -1417,14 +1417,14 @@ function analyzeUrl(url: string): URLAnalysis {
   // Check for typosquatting
   const typosquat = detectTyposquatting(url);
   if (typosquat) {
-    reasons.push(`Fake ${typosquat.brand} website — the address is slightly misspelled to trick you`);
+    reasons.push(`Fake ${typosquat.brand} website - the address is slightly misspelled to trick you`);
     isSuspicious = true;
   }
   
   // Check for homograph attacks
   const homoglyphs = detectHomoglyphs(url);
   if (homoglyphs.found) {
-    reasons.push(`Uses deceptive characters that look real but aren't — designed to fool you`);
+    reasons.push(`Uses deceptive characters that look real but aren't - designed to fool you`);
     isSuspicious = true;
   }
   
@@ -1623,7 +1623,7 @@ function analyzeContent(content: string): AnalysisResult {
     overallRisk = "safe";
     confidenceScore = 75;
     title = "Verified Safe";
-    summary = "Our scan checked for known scam patterns, suspicious links, and deceptive tactics — none were found. As always, verify unexpected messages through official channels.";
+    summary = "Our scan checked for known scam patterns, suspicious links, and deceptive tactics - none were found. As always, verify unexpected messages through official channels.";
   } else if (totalScore <= 2) {
     overallRisk = "low";
     confidenceScore = 60;
@@ -2396,7 +2396,7 @@ export function ScamChecker() {
                           onClick={() => {
                             const url = content.match(/https?:\/\/[^\s]+/)?.[0];
                             navigator.clipboard.writeText(
-                              `GCR Scam Guard Scan Result: ${result.title}\n\n${result.summary}\n\n${url ? "Link scanned: " + url + "\n\n" : ""}Protect yourself and your family — getcyberright.com`
+                              `GCR Scam Guard Scan Result: ${result.title}\n\n${result.summary}\n\n${url ? "Link scanned: " + url + "\n\n" : ""}Protect yourself and your family - getcyberright.com`
                             );
                             toast({ title: "Copied to clipboard", description: "Share this warning with others to keep them safe." });
                           }}
@@ -2464,7 +2464,7 @@ export function ScamChecker() {
                                     const url = content.match(/https?:\/\/[^\s]+/)?.[0];
                                     if (url) {
                                       navigator.clipboard.writeText(
-                                        `GCR Scam Guard Scan Result: ${getFriendlyRiskTitle(aiResult.scamRiskLevel)}\n\n${aiResult.summary}\n\nLink scanned: ${url}\n\nProtect yourself and your family — getcyberright.com`
+                                        `GCR Scam Guard Scan Result: ${getFriendlyRiskTitle(aiResult.scamRiskLevel)}\n\n${aiResult.summary}\n\nLink scanned: ${url}\n\nProtect yourself and your family - getcyberright.com`
                                       );
                                       toast({ title: "Copied to clipboard", description: "Share this warning with others to keep them safe." });
                                     }

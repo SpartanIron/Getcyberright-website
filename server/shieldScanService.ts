@@ -90,7 +90,7 @@ async function fetchWithRetry(
 async function checkHaveIBeenPwned(email: string): Promise<BreachResult[]> {
   const hibpApiKey = process.env.HIBP_API_KEY;
   if (!hibpApiKey) {
-    console.log("[shield-scan] HIBP_API_KEY not configured — inserting placeholder");
+    console.log("[shield-scan] HIBP_API_KEY not configured - inserting placeholder");
     return [];
   }
 
@@ -494,7 +494,7 @@ function generatePlainLanguageSummary(report: ExposureReport): string {
   }
 
   if (parts.length === 0) {
-    return "Good news — we did not find your information on the data broker sites and breach databases we checked. This does not guarantee your data is not out there, but it is a positive sign.";
+    return "Good news - we did not find your information on the data broker sites and breach databases we checked. This does not guarantee your data is not out there, but it is a positive sign.";
   }
 
   let summary = parts[0];
