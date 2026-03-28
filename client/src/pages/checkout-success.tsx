@@ -40,10 +40,13 @@ export default function CheckoutSuccess() {
   }, [checkoutData]);
 
   const isShield = checkoutData?.product === "shield";
-  const tierName = isShield
-    ? (checkoutData?.tier === "professional" ? "Professional" : "Essential")
-    : (checkoutData?.tier === "professional" ? "Family" : "Pro");
-  const productName = isShield ? "GCR Data Shield" : "GCR Scam Guard";
+  const isBundle = checkoutData?.product === "bundle";
+  const tierName = isBundle
+    ? (checkoutData?.tier === "total" ? "Total Protection" : "Complete Protection")
+    : isShield
+      ? (checkoutData?.tier === "professional" ? "Professional" : "Essential")
+      : (checkoutData?.tier === "professional" ? "Family" : "Pro");
+  const productName = isBundle ? "GetCyberRight" : isShield ? "GCR Data Shield" : "GCR Scam Guard";
   const isPaid = checkoutData?.status === "paid";
 
   return (
@@ -108,7 +111,22 @@ export default function CheckoutSuccess() {
 
                     <div className="bg-muted/50 rounded-lg p-4 mb-6 text-left max-w-sm mx-auto" data-testid="next-steps-box">
                       <h3 className="font-semibold text-sm text-foreground mb-3">What to do next:</h3>
-                      {isShield ? (
+                      {isBundle ? (
+                        <ol className="space-y-2 text-sm text-muted-foreground">
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold text-primary">1.</span>
+                            Install the GCR Scam Guard browser extension
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold text-primary">2.</span>
+                            Run a Data Shield scan to find your exposed data
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold text-primary">3.</span>
+                            Sign in to the extension and track removals from your dashboard
+                          </li>
+                        </ol>
+                      ) : isShield ? (
                         <ol className="space-y-2 text-sm text-muted-foreground">
                           <li className="flex items-start gap-2">
                             <span className="font-bold text-primary">1.</span>
@@ -142,9 +160,24 @@ export default function CheckoutSuccess() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      {isShield ? (
+                      {isBundle ? (
                         <>
-                          <Link href="/gcr-data-shield">
+                          <Link href="/browser-extension">
+                            <Button size="lg" data-testid="button-get-extension">
+                              <Download className="w-4 h-4 mr-2" />
+                              Get the Extension
+                            </Button>
+                          </Link>
+                          <Link href="/shield">
+                            <Button size="lg" variant="outline" data-testid="button-start-scan">
+                              <Database className="w-4 h-4 mr-2" />
+                              Run a Scan
+                            </Button>
+                          </Link>
+                        </>
+                      ) : isShield ? (
+                        <>
+                          <Link href="/shield">
                             <Button size="lg" data-testid="button-start-scan">
                               <Database className="w-4 h-4 mr-2" />
                               Start a Scan

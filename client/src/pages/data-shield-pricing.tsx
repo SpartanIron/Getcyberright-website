@@ -23,6 +23,7 @@ import {
   FileText,
   Lock,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -506,6 +507,38 @@ export default function DataShieldPricing() {
           </div>
         </section>
 
+        <section className="py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="border-primary/30 bg-primary/5">
+                <CardContent className="p-6 sm:p-8 text-center">
+                  <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-3 py-1 rounded-full mb-4">
+                    <Sparkles className="w-4 h-4" />
+                    Bundle & Save
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2" data-testid="text-bundle-heading">
+                    Want Data Shield + Scam Guard Together?
+                  </h3>
+                  <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+                    Get both products in one plan and save up to 23%. Our bundle plans combine personal data monitoring with real-time scam protection.
+                  </p>
+                  <Link href="/pricing">
+                    <Button size="lg" data-testid="button-view-bundles">
+                      View Bundle Plans
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </section>
+
         <section className="px-4 sm:px-6 lg:px-8 py-12">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold mb-3" data-testid="heading-shield-cta">Start With a Free Scan</h2>
@@ -526,9 +559,6 @@ export default function DataShieldPricing() {
                 </Button>
               </Link>
             </div>
-            <p className="text-xs text-muted-foreground mt-4">
-              One subscription covers both GCR Data Shield and GCR Scam Guard.
-            </p>
           </div>
         </section>
       </main>

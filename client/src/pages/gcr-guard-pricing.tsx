@@ -16,6 +16,7 @@ import {
   Crown,
   Download,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -495,6 +496,38 @@ export default function GcrGuardPricing() {
                 </Card>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="border-primary/30 bg-primary/5">
+                <CardContent className="p-6 sm:p-8 text-center">
+                  <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-3 py-1 rounded-full mb-4">
+                    <Sparkles className="w-4 h-4" />
+                    Bundle & Save
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2" data-testid="text-bundle-heading">
+                    Want Scam Guard + Data Shield Together?
+                  </h3>
+                  <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+                    Get both products in one plan and save up to 23%. Our bundle plans combine real-time scam protection with personal data monitoring.
+                  </p>
+                  <Link href="/pricing">
+                    <Button size="lg" data-testid="button-view-bundles">
+                      View Bundle Plans
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         </section>
 

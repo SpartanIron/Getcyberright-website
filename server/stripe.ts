@@ -8,7 +8,7 @@ import { isAuthenticated } from "./auth";
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
-type ProductType = "scamguard" | "shield";
+type ProductType = "scamguard" | "shield" | "bundle";
 
 interface PriceConfig {
   product: ProductType;
@@ -16,6 +16,8 @@ interface PriceConfig {
   name: string;
   amount: number;
   interval: "month" | "year";
+  bundleSgTier?: string;
+  bundleDsTier?: string;
 }
 
 const PRICE_MAP: Record<string, PriceConfig> = {
@@ -27,6 +29,10 @@ const PRICE_MAP: Record<string, PriceConfig> = {
   ds_essential_annual: { product: "shield", tier: "essential", name: "GCR Data Shield Essential (Annual)", amount: 8388, interval: "year" },
   ds_professional_monthly: { product: "shield", tier: "professional", name: "GCR Data Shield Professional", amount: 1499, interval: "month" },
   ds_professional_annual: { product: "shield", tier: "professional", name: "GCR Data Shield Professional (Annual)", amount: 14388, interval: "year" },
+  bundle_complete_monthly: { product: "bundle", tier: "complete", name: "GCR Complete Protection", amount: 1199, interval: "month", bundleSgTier: "essential", bundleDsTier: "essential" },
+  bundle_complete_annual: { product: "bundle", tier: "complete", name: "GCR Complete Protection (Annual)", amount: 10788, interval: "year", bundleSgTier: "essential", bundleDsTier: "essential" },
+  bundle_total_monthly: { product: "bundle", tier: "total", name: "GCR Total Protection", amount: 1899, interval: "month", bundleSgTier: "professional", bundleDsTier: "professional" },
+  bundle_total_annual: { product: "bundle", tier: "total", name: "GCR Total Protection (Annual)", amount: 16788, interval: "year", bundleSgTier: "professional", bundleDsTier: "professional" },
 };
 
 let stripe: Stripe | null = null;
@@ -120,7 +126,19 @@ async function getOrCreateStripeCustomer(userId: string, email: string): Promise
   return customerId;
 }
 
-function applySubscriptionUpdate(product: ProductType, tier: string, periodEnd: Date) {
+function applySubscriptionUpdate(product: ProductType, tier: string, periodEnd: Date, planKey?: string) {
+  if (product === "bundle") {
+    const config = planKey ? PRICE_MAP[planKey] : null;
+    const sgTier = config?.bundleSgTier || "essential";
+    const dsTier = config?.bundleDsTier || "essential";
+    return {
+      subscriptionTier: sgTier,
+      subscriptionExpiresAt: periodEnd,
+      shieldSubscriptionTier: dsTier,
+      shieldSubscriptionExpiresAt: periodEnd,
+      updatedAt: new Date(),
+    };
+  }
   if (product === "shield") {
     return {
       shieldSubscriptionTier: tier,
@@ -136,6 +154,15 @@ function applySubscriptionUpdate(product: ProductType, tier: string, periodEnd: 
 }
 
 function applyCancellation(product: ProductType) {
+  if (product === "bundle") {
+    return {
+      subscriptionTier: "free",
+      subscriptionExpiresAt: null,
+      shieldSubscriptionTier: "free",
+      shieldSubscriptionExpiresAt: null,
+      updatedAt: new Date(),
+    };
+  }
   if (product === "shield") {
     return {
       shieldSubscriptionTier: "free",
@@ -178,8 +205,8 @@ export function registerStripeRoutes(app: Express) {
 
       const host = req.headers.host;
       const baseUrl = `https://${host}`;
-      const defaultReturn = config.product === "shield" ? "/data-shield-pricing" : "/gcr-guard-pricing";
-      const cancelPath = returnPath || defaultReturn;
+      const defaultReturnMap: Record<string, string> = { shield: "/data-shield-pricing", bundle: "/pricing", scamguard: "/gcr-guard-pricing" };
+      const cancelPath = returnPath || defaultReturnMap[config.product] || "/gcr-guard-pricing";
 
       const session = await s.checkout.sessions.create({
         customer: customerId,
@@ -192,12 +219,14 @@ export function registerStripeRoutes(app: Express) {
           gcr_user_id: user.id,
           gcr_product: config.product,
           gcr_tier: config.tier,
+          gcr_plan_key: planId,
         },
         subscription_data: {
           metadata: {
             gcr_user_id: user.id,
             gcr_product: config.product,
             gcr_tier: config.tier,
+            gcr_plan_key: planId,
           },
         },
       });
@@ -310,13 +339,14 @@ export function registerStripeWebhook(app: Express) {
             if (userId && session.subscription) {
               const subscription = await s.subscriptions.retrieve(session.subscription as string);
               const periodEnd = new Date(subscription.current_period_end * 1000);
+              const planKey = session.metadata?.gcr_plan_key;
 
               await db.update(users).set({
-                ...applySubscriptionUpdate(product, tier, periodEnd),
+                ...applySubscriptionUpdate(product, tier, periodEnd, planKey),
                 stripeCustomerId: session.customer as string,
               }).where(eq(users.id, userId));
 
-              console.log(`Subscription activated: user=${userId}, product=${product}, tier=${tier}, expires=${periodEnd.toISOString()}`);
+              console.log(`Subscription activated: user=${userId}, product=${product}, tier=${tier}, planKey=${planKey}, expires=${periodEnd.toISOString()}`);
             }
             break;
           }
@@ -328,12 +358,13 @@ export function registerStripeWebhook(app: Express) {
             if (userId) {
               const tier = subscription.metadata?.gcr_tier || "essential";
               const product = (subscription.metadata?.gcr_product || "scamguard") as ProductType;
+              const planKey = subscription.metadata?.gcr_plan_key;
               const periodEnd = new Date(subscription.current_period_end * 1000);
               const isActive = subscription.status === "active" || subscription.status === "trialing";
 
               if (isActive) {
                 await db.update(users).set(
-                  applySubscriptionUpdate(product, tier, periodEnd)
+                  applySubscriptionUpdate(product, tier, periodEnd, planKey)
                 ).where(eq(users.id, userId));
               } else {
                 await db.update(users).set(
@@ -372,9 +403,10 @@ export function registerStripeWebhook(app: Express) {
               if (userId) {
                 const periodEnd = new Date(subscription.current_period_end * 1000);
                 const tier = subscription.metadata?.gcr_tier || "essential";
+                const planKey = subscription.metadata?.gcr_plan_key;
 
                 await db.update(users).set(
-                  applySubscriptionUpdate(product, tier, periodEnd)
+                  applySubscriptionUpdate(product, tier, periodEnd, planKey)
                 ).where(eq(users.id, userId));
 
                 console.log(`Subscription renewed: user=${userId}, product=${product}, expires=${periodEnd.toISOString()}`);

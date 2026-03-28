@@ -31,7 +31,8 @@ import Seniors from "@/pages/seniors";
 import Parents from "@/pages/parents";
 import SupportPage from "@/pages/support";
 import Security from "@/pages/security";
-import OurMission from "@/pages/pricing";
+import PricingPage from "@/pages/pricing";
+const OurMission = lazy(() => import("@/pages/our-mission"));
 import SupportTheMission from "@/pages/support-the-mission";
 import ThreatTrendsPage from "@/pages/threat-trends";
 import CyberThreatRadar from "@/pages/cyber-threat-radar";
@@ -150,7 +151,7 @@ function AppRouter() {
         <Route path="/support" component={SupportPage} />
         <Route path="/security" component={Security} />
         <Route path="/our-mission" component={OurMission} />
-        <Route path="/pricing" component={GcrGuardPricing} />
+        <Route path="/pricing" component={PricingPage} />
         <Route path="/gcr-guard-pricing" component={GcrGuardPricing} />
         <Route path="/data-shield-pricing" component={DataShieldPricing} />
         <Route path="/extension-auth" component={ExtensionAuth} />

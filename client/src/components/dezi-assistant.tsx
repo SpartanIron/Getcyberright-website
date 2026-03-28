@@ -134,9 +134,9 @@ const localResponses: LocalMatch[] = [
     ],
   },
   {
-    pattern: (t) => /(how much|pricing|price|cost|how much does)/.test(t) && /(plan|pro|family|subscribe|subscription)/.test(t),
+    pattern: (t) => /(how much|pricing|price|cost|how much does)/.test(t) && /(plan|pro|family|subscribe|subscription|bundle)/.test(t),
     responses: [
-      "GetCyberRight has two separate products. GCR Scam Guard: Free manual scanning, Pro at $4.99 per month, or Family at $7.99 per month. GCR Data Shield: Free scan, Essential at $8.99 per month, or Professional at $14.99 per month. Save with annual billing. See /gcr-guard-pricing for Scam Guard or /data-shield-pricing for Data Shield.",
+      "GetCyberRight has two products you can buy separately or bundled. GCR Scam Guard: Free, Pro $4.99/mo, or Family $7.99/mo. GCR Data Shield: Free scan, Essential $8.99/mo, or Professional $14.99/mo. Bundle deals: Complete Protection (Pro + Essential) $11.99/mo, or Total Protection (Family + Professional) $18.99/mo — save up to 23%. See /pricing for bundles, /gcr-guard-pricing for Scam Guard, or /data-shield-pricing for Data Shield.",
     ],
   },
   {
@@ -167,6 +167,12 @@ const localResponses: LocalMatch[] = [
     pattern: (t) => /(what.*family|family.*include|family.*plan|what.*get.*family)/.test(t),
     responses: [
       "The Scam Guard Family plan at $7.99 per month includes everything in Pro, plus weekly safety digest reports, full scan history, a personal safety score, and family member profiles so you can keep an eye on safety for your whole household. See the full breakdown at /gcr-guard-pricing.",
+    ],
+  },
+  {
+    pattern: (t) => /(bundle|both.*product|complete.*protection|total.*protection|scam.*guard.*data.*shield|data.*shield.*scam.*guard)/.test(t),
+    responses: [
+      "We offer two bundle plans that combine GCR Scam Guard and GCR Data Shield at a discount. Complete Protection at $11.99 per month includes Scam Guard Pro plus Data Shield Essential. Total Protection at $18.99 per month includes Scam Guard Family plus Data Shield Professional. Both save you money compared to buying each product separately. Annual billing saves even more. Check out the details at /pricing.",
     ],
   },
   {
@@ -254,9 +260,9 @@ function getContextualPrompts(pathname: string): { text: string; icon: typeof Sh
   }
   if (pathname.includes("pricing") || pathname.includes("checkout") || pathname.includes("dashboard")) {
     return [
+      { text: "Tell me about bundle plans", icon: HelpCircle },
       { text: "What's included in the Pro plan?", icon: HelpCircle },
       { text: "How do I cancel my subscription?", icon: HelpCircle },
-      { text: "My payment didn't go through", icon: AlertTriangle },
       { text: "Can I switch between plans?", icon: Shield },
     ];
   }
