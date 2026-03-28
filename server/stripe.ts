@@ -227,14 +227,14 @@ export function registerStripeRoutes(app: Express) {
 export function registerStripeWebhook(app: Express) {
   if (!STRIPE_SECRET_KEY) return;
 
-  if (!STRIPE_WEBHOOK_SECRET) {
-    console.warn("Stripe webhook route disabled: STRIPE_WEBHOOK_SECRET not set");
-    return;
-  }
-
-  const webhookSecret = STRIPE_WEBHOOK_SECRET;
-
   app.post("/api/stripe/webhook", async (req: Request, res: Response) => {
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+      if (!webhookSecret) {
+        console.warn("Stripe webhook received but STRIPE_WEBHOOK_SECRET not configured");
+        return res.status(200).json({ received: true, warning: "Webhook secret not configured" });
+      }
+
       const s = getStripe();
       const sig = req.headers["stripe-signature"];
 
