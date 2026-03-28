@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/use-auth";
 import {
   Shield,
   ShieldCheck,
@@ -30,6 +31,8 @@ import {
   Bell,
   PartyPopper,
   ArrowRight,
+  UserPlus,
+  Star,
 } from "lucide-react";
 
 type ExposureLevel = "critical" | "high" | "medium" | "low";
@@ -284,6 +287,7 @@ export default function ShieldNextSteps() {
   const steps = ACTION_STEPS[level];
   const Icon = config.icon;
 
+  const { isAuthenticated } = useAuth();
   const [checked, setChecked] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -430,6 +434,65 @@ export default function ShieldNextSteps() {
                 );
               })}
 
+              {!isAuthenticated && completedCount >= Math.floor(steps.length / 2) && !allDone && (
+                <Card className="border-primary/30 bg-primary/5" data-testid="card-create-account">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col sm:flex-row items-center gap-5">
+                      <div className="flex-shrink-0 p-3 rounded-xl bg-primary/10 border border-primary/20">
+                        <UserPlus className="w-8 h-8 text-primary" />
+                      </div>
+                      <div className="flex-1 text-center sm:text-left">
+                        <h3 className="font-semibold text-foreground mb-1">
+                          You're making great progress. Create a free account to keep it going.
+                        </h3>
+                        <ul className="text-sm text-muted-foreground space-y-1 mt-2">
+                          <li className="flex items-center gap-2"><Star className="w-3.5 h-3.5 text-primary flex-shrink-0" /> Save your checklist progress across devices</li>
+                          <li className="flex items-center gap-2"><Bell className="w-3.5 h-3.5 text-primary flex-shrink-0" /> Get notified when new breaches affect you</li>
+                          <li className="flex items-center gap-2"><Shield className="w-3.5 h-3.5 text-primary flex-shrink-0" /> Track your data removal requests</li>
+                          <li className="flex items-center gap-2"><Users className="w-3.5 h-3.5 text-primary flex-shrink-0" /> Monitor your whole family from one dashboard</li>
+                        </ul>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <Link href="/auth">
+                          <Button size="lg" className="bg-primary hover:bg-primary/90 min-h-[44px]" data-testid="button-create-account">
+                            <UserPlus className="w-4 h-4 mr-2" />
+                            Create Free Account
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {!isAuthenticated && allDone && (
+                <Card className="border-primary/40 bg-primary/5" data-testid="card-create-account-final">
+                  <CardContent className="p-6 text-center">
+                    <UserPlus className="w-10 h-10 text-primary mx-auto mb-3" />
+                    <h3 className="text-xl font-bold text-foreground mb-2">
+                      You did it. Now lock in your protection.
+                    </h3>
+                    <p className="text-muted-foreground mb-2">
+                      Create a free account to save your progress, get breach alerts, and track future scans. Your action plan will be waiting for you when you log in.
+                    </p>
+                    <ul className="text-sm text-muted-foreground space-y-1 mb-5 inline-block text-left">
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-green-500 flex-shrink-0" /> Your checklist progress, saved</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-green-500 flex-shrink-0" /> New breach alerts, delivered to you</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-green-500 flex-shrink-0" /> Data removal tracking dashboard</li>
+                      <li className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-green-500 flex-shrink-0" /> Family member monitoring</li>
+                    </ul>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Link href="/auth">
+                        <Button size="lg" className="bg-primary hover:bg-primary/90 min-h-[44px]" data-testid="button-signup-final">
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Create Free Account
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {allDone && (
                 <Card className="border-green-500/30 bg-green-500/5" data-testid="card-all-done">
                   <CardContent className="p-6 text-center">
@@ -464,28 +527,58 @@ export default function ShieldNextSteps() {
         {!allDone && (
           <section className="py-10 md:py-14">
             <div className="container mx-auto px-4">
-              <div className="max-w-2xl mx-auto text-center">
-                <Shield className="w-10 h-10 text-primary mx-auto mb-3" />
-                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3" data-testid="heading-cta">
-                  Need help getting started?
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Our Data Removal tool walks you through each opt-out request step by step.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link href="/data-removal">
-                    <Button size="lg" className="bg-primary hover:bg-primary/90 min-h-[44px]" data-testid="button-cta-removal">
-                      <Zap className="w-4 h-4 mr-2" />
-                      Start Data Removal
-                    </Button>
-                  </Link>
-                  <Link href="/shield">
-                    <Button size="lg" variant="outline" className="min-h-[44px]" data-testid="button-cta-scan">
-                      <Shield className="w-4 h-4 mr-2" />
-                      Run Another Scan
-                    </Button>
-                  </Link>
-                </div>
+              <div className="max-w-3xl mx-auto">
+                <Card className="border border-border/50 overflow-hidden" data-testid="card-removal-cta">
+                  <CardContent className="p-0">
+                    <div className="flex flex-col md:flex-row">
+                      <div className="flex-1 p-6 md:p-8">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Trash2 className="w-5 h-5 text-primary" />
+                          <h2 className="text-xl font-bold text-foreground" data-testid="heading-cta">
+                            Ready to start removing your data?
+                          </h2>
+                        </div>
+                        <p className="text-muted-foreground mb-4">
+                          Our Data Removal tool shows you exactly which sites have your information and walks you through each opt-out request step by step. Most sites process removals within 30 days.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <Link href="/data-removal">
+                            <Button size="lg" className="bg-primary hover:bg-primary/90 min-h-[44px]" data-testid="button-cta-removal">
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Start Removing Your Data
+                            </Button>
+                          </Link>
+                          {!isAuthenticated && (
+                            <Link href="/auth">
+                              <Button size="lg" variant="outline" className="min-h-[44px]" data-testid="button-cta-signup">
+                                <UserPlus className="w-4 h-4 mr-2" />
+                                Create Free Account
+                              </Button>
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                      <div className="hidden md:flex flex-col justify-center gap-2 bg-muted/30 p-6 min-w-[220px] border-l border-border/50">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span>Step-by-step opt-out guides</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span>Track removal progress</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span>Re-scan to verify removals</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span>Free to get started</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </section>
