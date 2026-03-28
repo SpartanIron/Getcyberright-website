@@ -405,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
     flagsEl.innerHTML = "";
     if (result.keyRedFlags && result.keyRedFlags.length > 0) {
       warningsSection.classList.remove("hidden");
-      warningsLabel.innerHTML = data.warningsLabel;
+      warningsLabel.textContent = data.warningsLabel;
       result.keyRedFlags.forEach((flag) => {
         const div = document.createElement("div");
         div.className = "flag-item";
