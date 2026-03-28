@@ -26,8 +26,9 @@ import {
 import { useLocation, Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
+import { setupVaultKey, unlockVault, clearDEK } from "@/lib/vaultCrypto";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -68,6 +69,43 @@ export default function Login() {
     },
   });
 
+  const initializeVaultEncryption = async (password: string) => {
+    try {
+      clearDEK();
+
+      const vaultKeyRes = await fetch("/api/vault-keys", { credentials: "include" });
+      if (!vaultKeyRes.ok) {
+        console.error("[vault] Failed to fetch vault key:", vaultKeyRes.status);
+        return;
+      }
+      const vaultKeyData = await vaultKeyRes.json();
+
+      if (vaultKeyData && vaultKeyData.salt && vaultKeyData.encryptedVaultKey) {
+        const unlocked = await unlockVault(
+          password,
+          vaultKeyData.salt,
+          vaultKeyData.encryptedVaultKey,
+          vaultKeyData.verification,
+          vaultKeyData.iterations
+        );
+        if (!unlocked) {
+          clearDEK();
+          console.error("[vault] Failed to unlock vault: verification mismatch");
+        }
+      } else {
+        const keySetup = await setupVaultKey(password);
+        await apiRequest("POST", "/api/vault-keys/setup", {
+          salt: keySetup.salt,
+          encryptedVaultKey: keySetup.encryptedDEK,
+          verification: keySetup.verification,
+        });
+      }
+    } catch (e) {
+      clearDEK();
+      console.error("[vault] Failed to initialize vault encryption:", e);
+    }
+  };
+
   const handleLogin = async (data: LoginFormData) => {
     setError("");
     setIsLoading(true);
@@ -92,6 +130,8 @@ export default function Login() {
         setIsLoading(false);
         return;
       }
+
+      await initializeVaultEncryption(data.password);
 
       toast({
         title: "Welcome back",
@@ -136,6 +176,8 @@ export default function Login() {
         setIsLoading(false);
         return;
       }
+
+      await initializeVaultEncryption(loginForm.getValues("password"));
 
       toast({
         title: "Welcome back",

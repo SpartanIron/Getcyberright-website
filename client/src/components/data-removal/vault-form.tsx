@@ -4,6 +4,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { trackToolUsage } from "@/lib/analytics";
+import { isVaultUnlocked } from "@/lib/vaultCrypto";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,7 +57,6 @@ export function VaultForm() {
   const [relativeNames, setRelativeNames] = useState("");
   const [employerNames, setEmployerNames] = useState("");
   const [initialized, setInitialized] = useState(false);
-
   if (vaultData && !initialized) {
     setFullName(vaultData.fullName || "");
     setPreviousNames(vaultData.previousNames?.join(", ") || "");
@@ -144,6 +144,10 @@ export function VaultForm() {
           <CardDescription>
             Enter your personal information below. We use your email to check for confirmed breaches and verify which data broker sites are active.
           </CardDescription>
+          <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400 mt-2" data-testid="vault-encryption-status">
+            <Shield className="h-3.5 w-3.5" />
+            {isVaultUnlocked() ? "AES-256 encrypted with vault key protection" : "AES-256 encrypted at rest"}
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

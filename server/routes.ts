@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { getAllScamSlugs } from "@shared/scam-content";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports, siteReputation } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, userVaultKeys, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports, siteReputation } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -3192,6 +3192,89 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("Error running guest scan:", error);
       res.status(500).json({ error: error.message || "Failed to run scan" });
+    }
+  });
+
+  app.get("/api/vault-keys", strictRateLimit, isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const [vaultKey] = await db.select().from(userVaultKeys).where(eq(userVaultKeys.userId, req.user.id));
+      if (!vaultKey) {
+        return res.json(null);
+      }
+      res.json({
+        salt: vaultKey.vaultKeySalt,
+        encryptedVaultKey: vaultKey.encryptedVaultKey,
+        verification: vaultKey.vaultKeyVerification,
+        iterations: vaultKey.keyDerivationIterations,
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch vault key" });
+    }
+  });
+
+  app.post("/api/vault-keys/setup", strictRateLimit, isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const { salt, encryptedVaultKey, verification } = req.body;
+      if (!salt || !encryptedVaultKey || !verification) {
+        return res.status(400).json({ error: "salt, encryptedVaultKey, and verification are required" });
+      }
+      if (typeof salt !== "string" || salt.length < 20 || salt.length > 200) {
+        return res.status(400).json({ error: "Invalid salt format" });
+      }
+      if (typeof encryptedVaultKey !== "string" || encryptedVaultKey.length < 50 || encryptedVaultKey.length > 500) {
+        return res.status(400).json({ error: "Invalid encrypted vault key format" });
+      }
+      if (typeof verification !== "string" || verification.length < 20 || verification.length > 200) {
+        return res.status(400).json({ error: "Invalid verification format" });
+      }
+      const [existing] = await db.select().from(userVaultKeys).where(eq(userVaultKeys.userId, req.user.id));
+      if (existing) {
+        await db.update(userVaultKeys)
+          .set({ vaultKeySalt: salt, encryptedVaultKey, vaultKeyVerification: verification, updatedAt: new Date() })
+          .where(eq(userVaultKeys.userId, req.user.id));
+      } else {
+        await db.insert(userVaultKeys).values({
+          userId: req.user.id,
+          vaultKeySalt: salt,
+          encryptedVaultKey,
+          vaultKeyVerification: verification,
+        });
+      }
+      const { ipAddress, userAgent } = extractRequestContext(req);
+      logVaultAccess({ userId: req.user.id, action: "vault_create", ipAddress, userAgent, fieldsAccessed: ["vault_key_setup"] });
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to set up vault key" });
+    }
+  });
+
+  app.post("/api/vault-keys/rotate", strictRateLimit, isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const { salt, encryptedVaultKey, verification } = req.body;
+      if (!salt || !encryptedVaultKey || !verification) {
+        return res.status(400).json({ error: "salt, encryptedVaultKey, and verification are required" });
+      }
+      if (typeof salt !== "string" || salt.length < 20 || salt.length > 200) {
+        return res.status(400).json({ error: "Invalid salt format" });
+      }
+      if (typeof encryptedVaultKey !== "string" || encryptedVaultKey.length < 50 || encryptedVaultKey.length > 500) {
+        return res.status(400).json({ error: "Invalid encrypted vault key format" });
+      }
+      if (typeof verification !== "string" || verification.length < 20 || verification.length > 200) {
+        return res.status(400).json({ error: "Invalid verification format" });
+      }
+      const [existing] = await db.select().from(userVaultKeys).where(eq(userVaultKeys.userId, req.user.id));
+      if (!existing) {
+        return res.status(404).json({ error: "No vault key found" });
+      }
+      await db.update(userVaultKeys)
+        .set({ vaultKeySalt: salt, encryptedVaultKey, vaultKeyVerification: verification, updatedAt: new Date() })
+        .where(eq(userVaultKeys.userId, req.user.id));
+      const { ipAddress, userAgent } = extractRequestContext(req);
+      logVaultAccess({ userId: req.user.id, action: "vault_update", ipAddress, userAgent, fieldsAccessed: ["vault_key_rotate"] });
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to rotate vault key" });
     }
   });
 

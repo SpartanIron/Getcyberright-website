@@ -757,6 +757,19 @@ export const vaultAuditLogs = pgTable("vault_audit_logs", {
 
 export type VaultAuditLog = typeof vaultAuditLogs.$inferSelect;
 
+export const userVaultKeys = pgTable("user_vault_keys", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().unique(),
+  vaultKeySalt: text("vault_key_salt").notNull(),
+  encryptedVaultKey: text("encrypted_vault_key").notNull(),
+  vaultKeyVerification: text("vault_key_verification").notNull(),
+  keyDerivationIterations: integer("key_derivation_iterations").notNull().default(600000),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type UserVaultKey = typeof userVaultKeys.$inferSelect;
+
 export const exposureScans = pgTable("exposure_scans", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull(),
