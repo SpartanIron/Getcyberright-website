@@ -466,6 +466,12 @@ export default function GcrGuardPricing() {
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>
+                <Link href="/data-shield-pricing">
+                  <Button size="lg" variant="outline" data-testid="button-cta-data-shield">
+                    See Data Shield Plans
+                    <Shield className="ml-2 w-4 h-4" />
+                  </Button>
+                </Link>
               </div>
             </motion.div>
           </div>

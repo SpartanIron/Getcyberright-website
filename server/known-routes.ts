@@ -50,6 +50,7 @@ export const KNOWN_CLIENT_ROUTES = new Set([
   "/browser-extension",
   "/extension-auth",
   "/gcr-guard-pricing",
+  "/data-shield-pricing",
   "/faq",
   "/resources/glossary",
   "/resources/cheat-sheets",

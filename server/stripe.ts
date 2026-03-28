@@ -111,7 +111,7 @@ export function registerStripeRoutes(app: Express) {
     try {
       const s = getStripe();
       const user = req.user;
-      const { planId } = req.body;
+      const { planId, returnPath } = req.body;
 
       if (!planId || !PRICE_MAP[planId]) {
         return res.status(400).json({ error: "Invalid plan selected" });
@@ -147,7 +147,7 @@ export function registerStripeRoutes(app: Express) {
         payment_method_types: ["card"],
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${baseUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/gcr-guard-pricing`,
+        cancel_url: `${baseUrl}${returnPath === "/data-shield-pricing" ? "/data-shield-pricing" : "/gcr-guard-pricing"}`,
         metadata: {
           gcr_user_id: user.id,
           gcr_tier: PRICE_MAP[planId].tier,

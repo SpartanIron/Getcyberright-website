@@ -61,6 +61,7 @@ import PartnerDeck from "@/pages/partner-deck";
 import FeedbackPage from "@/pages/feedback";
 import Experience from "@/pages/experience";
 import GcrGuardPricing from "@/pages/gcr-guard-pricing";
+const DataShieldPricing = lazy(() => import("@/pages/data-shield-pricing"));
 import PrintableGuides from "@/pages/printable-guides";
 import QuickAssessment from "@/pages/quick-assessment";
 import SafetyScore from "@/pages/safety-score";
@@ -151,6 +152,7 @@ function AppRouter() {
         <Route path="/our-mission" component={OurMission} />
         <Route path="/pricing" component={GcrGuardPricing} />
         <Route path="/gcr-guard-pricing" component={GcrGuardPricing} />
+        <Route path="/data-shield-pricing" component={DataShieldPricing} />
         <Route path="/extension-auth" component={ExtensionAuth} />
         <Route path="/support-the-mission" component={SupportTheMission} />
         <Route path="/dashboard" component={Dashboard} />

@@ -609,7 +609,7 @@ function ShieldResultsPage() {
                                 <p className="text-xs text-muted-foreground">
                                   <Lock className="h-3 w-3 inline mr-1" />
                                   Want us to handle this automatically?{" "}
-                                  <Link href="/pricing" className="text-primary hover:underline font-medium">
+                                  <Link href="/data-shield-pricing" className="text-primary hover:underline font-medium">
                                     Upgrade to Essential
                                   </Link>
                                   {" "}and we'll submit removal requests on your behalf.
@@ -634,7 +634,7 @@ function ShieldResultsPage() {
                     <p className="text-sm text-muted-foreground max-w-sm mx-auto">
                       Upgrade to see all broker names, get automated removal, and ongoing monitoring.
                     </p>
-                    <Link href="/pricing">
+                    <Link href="/data-shield-pricing">
                       <Button size="sm" className="min-h-[40px]" data-testid="button-see-all-brokers">
                         <Crown className="h-4 w-4 mr-2" />
                         See All {totalFoundBrokers} Sites
@@ -792,7 +792,7 @@ function ShieldResultsPage() {
                       </div>
                     </div>
                   </div>
-                  <Link href="/pricing">
+                  <Link href="/data-shield-pricing">
                     <Button className="min-h-[44px] w-full" data-testid="button-view-plans">
                       <Crown className="h-4 w-4 mr-2" />
                       View Protection Plans
@@ -818,7 +818,7 @@ function ShieldResultsPage() {
                       Data brokers re-add your information every 30-90 days. Upgrade to Professional for monthly re-scans and automatic re-submission.
                     </p>
                   </div>
-                  <Link href="/pricing">
+                  <Link href="/data-shield-pricing">
                     <Button variant="outline" size="sm" className="min-h-[40px]" data-testid="button-upgrade-pro">
                       <Crown className="h-4 w-4 mr-2" />
                       Upgrade to Professional

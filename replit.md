@@ -25,6 +25,7 @@ The frontend is built with React 19, TypeScript, and Vite, utilizing Wouter for 
 - **Automation & Governance**: Features automated weekly newsletters, AI content guardrails, automated threat intelligence, and a social distribution engine.
 - **Monthly Removal Reports**: Automated monthly HTML email reports for subscribers detailing privacy scores, removal progress, and exposed data categories.
 - **Competitive Positioning**: The pricing page includes a "GCR vs Competitors" comparison table (against generic "Data Removal Services" and "All-in-One Security Suites" categories), stat highlight cards, and updated FAQ. Pricing: Free / $5.99/mo Pro / $11.99/mo Family.
+- **Data Shield Pricing Page** (`/data-shield-pricing`): Dedicated pricing page for GCR Data Shield with three tiers (Scan/Free, Remove/$5.99, Protect/$11.99), feature comparison table, how-it-works section, FAQ with structured data, and cross-links to Scam Guard pricing. Shares same Stripe subscription tiers as Scam Guard. Upgrade CTAs in shield-results.tsx now link here instead of /pricing.
 - **Admin & SEO**: A comprehensive admin system with role-based access control, scan activity monitoring (data broker scans + scam checks), admin password reset for user accounts, SEO keyword database, internal linking engine, dynamic sitemap generation, and universal meta injection for enhanced search engine visibility.
 
 ## External Dependencies
