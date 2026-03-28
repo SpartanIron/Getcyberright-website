@@ -230,7 +230,7 @@ function ShieldPage() {
                     <div className="space-y-1.5">
                       <label htmlFor="shield-phone" className="text-sm font-medium block">
                         Phone Number{" "}
-                        <span className="text-muted-foreground font-normal">(include country code, e.g. +1 for US, +233 for Ghana)</span>
+                        <span className="text-muted-foreground font-normal">(with country code)</span>
                       </label>
                       <Input
                         id="shield-phone"
