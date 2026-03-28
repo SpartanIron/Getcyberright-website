@@ -134,6 +134,60 @@ const localResponses: LocalMatch[] = [
     ],
   },
   {
+    pattern: (t) => /(how much|pricing|price|cost|how much does)/.test(t) && /(plan|pro|family|subscribe|subscription)/.test(t),
+    responses: [
+      "The Free plan covers manual scanning at no cost, no account needed. Pro is $3.99 per month and adds automatic scanning on every page, fake domain detection, and email scanning. Family is $7.99 per month and adds safety digests, full scan history, and family profiles. You can see all the details at /gcr-guard-pricing.",
+    ],
+  },
+  {
+    pattern: (t) => /(cancel|unsubscribe|stop.*(subscription|paying|plan))/.test(t),
+    responses: [
+      "You can cancel anytime from your account dashboard. Your features stay active until the end of your current billing period. If you need any help with that, head over to /contact and send us a message.",
+    ],
+  },
+  {
+    pattern: (t) => /(payment.*(fail|decline|reject|issue|problem|error|wrong)|card.*(decline|reject|fail|issue|not work)|billing.*(issue|problem|error))/.test(t),
+    responses: [
+      "Sorry to hear that. First, check that your card details are current by going to your dashboard and clicking \"Manage Subscription\" to open the Stripe billing portal. If the issue continues, send us a message at /contact with your account email and we'll sort it out.",
+    ],
+  },
+  {
+    pattern: (t) => /(refund|money back|get.*refund|want.*refund)/.test(t),
+    responses: [
+      "For refund requests, head to /contact and send a message with your account email and a brief description of the situation. Our team will review it and get back to you personally.",
+    ],
+  },
+  {
+    pattern: (t) => /(what.*pro|pro.*include|pro.*plan|what.*get.*pro)/.test(t) && !/(family)/.test(t),
+    responses: [
+      "The Pro plan at $3.99 per month includes everything in Free, plus automatic page scanning on every site you visit, fake domain detection, suspicious form warnings, link hover safety previews, community trust scores, and Gmail and Outlook email scanning. You can check it out at /gcr-guard-pricing.",
+    ],
+  },
+  {
+    pattern: (t) => /(what.*family|family.*include|family.*plan|what.*get.*family)/.test(t),
+    responses: [
+      "The Family plan at $7.99 per month includes everything in Pro, plus weekly safety digest reports, full scan history, a personal safety score, and family member profiles so you can keep an eye on safety for your whole household. See the full breakdown at /gcr-guard-pricing.",
+    ],
+  },
+  {
+    pattern: (t) => /(contact|talk.*human|real person|speak.*someone|customer.*(service|support)|support.*(team|help))/.test(t),
+    responses: [
+      "You can reach our team directly by heading to /contact and sending a message. Someone will get back to you as soon as possible.",
+    ],
+  },
+  {
+    pattern: (t) => /(extension.*not work|extension.*broken|scam guard.*not work|install.*extension|chrome.*extension)/.test(t),
+    responses: [
+      "Try checking that the extension is enabled in your Chrome settings at chrome://extensions. If it's there but not working, try removing and reinstalling it. Also make sure your Chrome browser is up to date. If it's still not cooperating, send us a message at /contact describing what you're seeing.",
+    ],
+  },
+  {
+    pattern: (t) => /(can't log in|cannot log in|login.*fail|login.*issue|locked out|forgot.*password|reset.*password|password.*reset)/.test(t),
+    responses: [
+      "Try the password reset option on the login page. If that doesn't work, clearing your browser cookies and trying a different browser can sometimes help. Still stuck? Send us a message at /contact and we'll help you get back in.",
+    ],
+  },
+  {
     pattern: (t) => /(thank|thanks|thx|ty |appreciate)/.test(t),
     responses: [
       "You're welcome! I'm always here if you have more questions about staying safe online.",
@@ -198,6 +252,14 @@ function getContextualPrompts(pathname: string): { text: string; icon: typeof Sh
       { text: "Is my personal data at risk?", icon: Shield },
     ];
   }
+  if (pathname.includes("pricing") || pathname.includes("checkout") || pathname.includes("dashboard")) {
+    return [
+      { text: "What's included in the Pro plan?", icon: HelpCircle },
+      { text: "How do I cancel my subscription?", icon: HelpCircle },
+      { text: "My payment didn't go through", icon: AlertTriangle },
+      { text: "Can I switch between plans?", icon: Shield },
+    ];
+  }
   return [
     { text: "I got a suspicious message", icon: AlertTriangle },
     { text: "How do I protect my family online?", icon: Shield },
@@ -218,6 +280,9 @@ function getContextualWelcome(pathname: string): string {
   }
   if (pathname.includes("data-removal")) {
     return "Want to know who has your personal data? Ask me anything.";
+  }
+  if (pathname.includes("pricing") || pathname.includes("checkout")) {
+    return "Questions about plans or billing? I can help with that.";
   }
   return "Your AI safety assistant. Ask me anything about staying safe online.";
 }
