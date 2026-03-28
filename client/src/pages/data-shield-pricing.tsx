@@ -34,8 +34,8 @@ import { StructuredData } from "@/components/structured-data";
 type BillingInterval = "monthly" | "annual";
 
 const ANNUAL_PRICES: Record<string, { monthly: number; annual: number; savePerYear: number }> = {
-  essential: { monthly: 599, annual: 499, savePerYear: 1200 },
-  professional: { monthly: 1199, annual: 999, savePerYear: 2400 },
+  essential: { monthly: 899, annual: 699, savePerYear: 2400 },
+  professional: { monthly: 1499, annual: 1199, savePerYear: 3600 },
 };
 
 interface ShieldTier {
@@ -73,7 +73,7 @@ const SHIELD_TIERS: ShieldTier[] = [
   {
     id: "essential",
     name: "Remove",
-    price: 599,
+    price: 899,
     interval: "month",
     tagline: "We remove your data for you",
     icon: Trash2,
@@ -87,13 +87,12 @@ const SHIELD_TIERS: ShieldTier[] = [
       "Verification re-scan after removal",
       "Monthly removal progress reports",
       "Email alerts for new exposures",
-      "Also includes: GCR Scam Guard Pro",
     ],
   },
   {
     id: "professional",
     name: "Protect",
-    price: 1199,
+    price: 1499,
     interval: "month",
     tagline: "Continuous protection for your family",
     icon: Shield,
@@ -106,7 +105,6 @@ const SHIELD_TIERS: ShieldTier[] = [
       "Individual privacy scores per member",
       "Weekly safety digest reports",
       "Priority removal processing",
-      "Also includes: GCR Scam Guard Family",
     ],
   },
 ];
@@ -145,12 +143,12 @@ export default function DataShieldPricing() {
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const [billingInterval, setBillingInterval] = useState<BillingInterval>("monthly");
 
-  const { data: subStatus } = useQuery<{ tier: string; isActive: boolean }>({
+  const { data: subStatus } = useQuery<{ tier: string; shieldTier: string; isActive: boolean }>({
     queryKey: ["/api/subscription/status"],
     enabled: !!user,
   });
 
-  const currentTier = subStatus?.tier || "free";
+  const currentTier = subStatus?.shieldTier || "free";
 
   const getDisplayPrice = (tierId: string, basePrice: number) => {
     if (basePrice === 0) return 0;
@@ -170,7 +168,7 @@ export default function DataShieldPricing() {
       return;
     }
 
-    const planId = `${tierId}_${billingInterval === "annual" ? "annual" : "monthly"}`;
+    const planId = `ds_${tierId}_${billingInterval === "annual" ? "annual" : "monthly"}`;
     setLoadingTier(tierId);
 
     try {
@@ -208,7 +206,7 @@ export default function DataShieldPricing() {
     },
     {
       q: "Does this include the browser extension?",
-      a: "Yes. The Remove plan includes GCR Scam Guard Pro (auto-scanning, fake domain detection, email scanning). The Protect plan includes GCR Scam Guard Family with weekly safety digests and family profiles. Both products are covered under one subscription."
+      a: "GCR Data Shield and GCR Scam Guard are separate products with independent subscriptions. Data Shield focuses on finding and removing your personal data from broker sites. If you also want browser-based scam detection and email scanning, you can subscribe to GCR Scam Guard separately at /gcr-guard-pricing."
     },
     {
       q: "How is this different from competitors?",
@@ -220,7 +218,7 @@ export default function DataShieldPricing() {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="GCR Data Shield Pricing"
-        description="Protect your personal data with GCR Data Shield. Free scan of 500+ data broker sites. Automated removal from $4.99/month (billed annually). Continuous family protection from $9.99/month."
+        description="Protect your personal data with GCR Data Shield. Free scan of 500+ data broker sites. Automated removal from $8.99/month. Continuous family protection from $14.99/month. Save with annual billing."
         keywords="data broker removal pricing, personal data protection, privacy scan, data removal service"
       />
       <StructuredData
@@ -449,8 +447,8 @@ export default function DataShieldPricing() {
                   <tr className="border-b-2">
                     <th className="text-left py-3 px-4 font-semibold w-[40%]">Feature</th>
                     <th className="py-3 px-4 text-center font-semibold">Scan<br/><span className="font-normal text-xs text-muted-foreground">Free</span></th>
-                    <th className="py-3 px-4 text-center font-semibold text-teal-700 dark:text-teal-400">Remove<br/><span className="font-normal text-xs text-muted-foreground">from $4.99/mo</span></th>
-                    <th className="py-3 px-4 text-center font-semibold">Protect<br/><span className="font-normal text-xs text-muted-foreground">from $9.99/mo</span></th>
+                    <th className="py-3 px-4 text-center font-semibold text-teal-700 dark:text-teal-400">Remove<br/><span className="font-normal text-xs text-muted-foreground">from $8.99/mo</span></th>
+                    <th className="py-3 px-4 text-center font-semibold">Protect<br/><span className="font-normal text-xs text-muted-foreground">from $14.99/mo</span></th>
                   </tr>
                 </thead>
                 <tbody>

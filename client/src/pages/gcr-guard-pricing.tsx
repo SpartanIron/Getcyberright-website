@@ -34,8 +34,8 @@ interface TierData {
 }
 
 const ANNUAL_PRICES: Record<string, { monthly: number; annual: number; savePerYear: number }> = {
-  essential: { monthly: 599, annual: 499, savePerYear: 1200 },
-  professional: { monthly: 1199, annual: 999, savePerYear: 2400 },
+  essential: { monthly: 499, annual: 399, savePerYear: 1200 },
+  professional: { monthly: 799, annual: 599, savePerYear: 2400 },
 };
 
 const FEATURE_LABELS: Record<string, string> = {
@@ -98,10 +98,11 @@ export default function GcrGuardPricing() {
     queryKey: ["/api/subscription/tiers"],
   });
 
-  const tiers = tierData?.tiers || [
+  const tierResponse = tierData as any;
+  const tiers = tierResponse?.scamguard || [
     { id: "free", name: "Free", price: 0, interval: null, features: ["manual_scan"], description: "Basic protection with manual scanning" },
-    { id: "essential", name: "Pro", price: 599, interval: "month", features: [], description: "Full auto-protection for individuals" },
-    { id: "professional", name: "Family", price: 1199, interval: "month", features: [], description: "Complete protection for the whole family" },
+    { id: "essential", name: "Pro", price: 499, interval: "month", features: [], description: "Full auto-protection for individuals" },
+    { id: "professional", name: "Family", price: 799, interval: "month", features: [], description: "Complete protection for the whole family" },
   ];
 
   const getDisplayPrice = (tierId: string, basePrice: number) => {
@@ -121,7 +122,7 @@ export default function GcrGuardPricing() {
       return;
     }
 
-    const planId = `${tierId}_${billingInterval === "annual" ? "annual" : "monthly"}`;
+    const planId = `sg_${tierId}_${billingInterval === "annual" ? "annual" : "monthly"}`;
     setLoadingPlan(tierId);
 
     try {
@@ -152,7 +153,7 @@ export default function GcrGuardPricing() {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="GCR Scam Guard Pricing"
-        description="Choose your GCR Scam Guard protection plan. Free manual scanning, Pro auto-protection from $4.99/month, or Family coverage from $9.99/month. Save 17% with annual billing."
+        description="Choose your GCR Scam Guard protection plan. Free manual scanning, Pro auto-protection from $4.99/month, or Family coverage from $7.99/month. Save 17% with annual billing."
         keywords="GCR Scam Guard pricing, browser extension subscription, cybersecurity protection plans"
       />
       <Navigation />
@@ -459,19 +460,19 @@ export default function GcrGuardPricing() {
                 },
                 {
                   q: "What does the Pro plan add?",
-                  a: "Pro unlocks automatic page scanning on every website you visit, lookalike domain detection, form warnings, link hover checks, community trust scores, webmail scanning, and monthly data removal reports."
+                  a: "Pro unlocks automatic page scanning on every website you visit, lookalike domain detection, form warnings, link hover checks, community trust scores, and webmail scanning for Gmail and Outlook."
                 },
                 {
                   q: "What is the Family plan?",
-                  a: "The Family plan includes everything in Pro, plus weekly safety digest reports, full scan history, personal safety scores, family member profiles, and monthly removal reports."
+                  a: "The Family plan includes everything in Pro, plus weekly safety digest reports, full scan history, personal safety scores, and family member profiles for household-wide monitoring."
                 },
                 {
                   q: "Why choose GetCyberRight over other services?",
                   a: "Most data removal services only remove your data. All-in-one security suites bundle everything but charge 3x more. GetCyberRight is the only platform that combines data broker removal with AI scam detection, a browser extension, and family cybersecurity education. You get protection and the knowledge to stay safe, at a fraction of the industry price."
                 },
                 {
-                  q: "What are Monthly Removal Reports?",
-                  a: "Paying subscribers receive a monthly email summary of their data removal progress: how many brokers were scanned, removals completed, any new exposures detected, and your updated privacy score. It is like a credit report, but for your personal data online."
+                  q: "What about data broker removal?",
+                  a: "Data broker removal is handled by GCR Data Shield, a separate product. You can subscribe to Data Shield independently at /data-shield-pricing for automated removal of your personal information from 500+ data broker sites."
                 },
                 {
                   q: "How do I connect my account to the extension?",

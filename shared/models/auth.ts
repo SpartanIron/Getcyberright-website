@@ -74,10 +74,14 @@ export const users = pgTable("users", {
   // Force password change on first login
   mustChangePassword: boolean("must_change_password").default(false),
   
-  // Subscription
+  // Scam Guard Subscription
   subscriptionTier: varchar("subscription_tier").default("free"),
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
   stripeCustomerId: varchar("stripe_customer_id"),
+  
+  // Data Shield Subscription
+  shieldSubscriptionTier: varchar("shield_subscription_tier").default("free"),
+  shieldSubscriptionExpiresAt: timestamp("shield_subscription_expires_at"),
   
   // GCR Data Shield trial
   shieldTrialStartedAt: timestamp("shield_trial_started_at"),

@@ -1576,13 +1576,18 @@ EDGE CASE HANDLING
       }
       
       const now = new Date();
-      const isExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
-      const effectiveTier = isExpired ? "free" : (user.subscriptionTier || "free");
+      const sgExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
+      const dsExpired = user.shieldSubscriptionExpiresAt && new Date(user.shieldSubscriptionExpiresAt) < now;
+      const effectiveSgTier = sgExpired ? "free" : (user.subscriptionTier || "free");
+      const effectiveDsTier = dsExpired ? "free" : (user.shieldSubscriptionTier || "free");
       
       res.json({
-        tier: effectiveTier,
+        tier: effectiveSgTier,
+        shieldTier: effectiveDsTier,
         expiresAt: user.subscriptionExpiresAt,
-        isExpired,
+        shieldExpiresAt: user.shieldSubscriptionExpiresAt,
+        isExpired: sgExpired,
+        isActive: !sgExpired,
         availableTiers: Object.values(SUBSCRIPTION_TIERS)
       });
     } catch (error) {
@@ -4559,7 +4564,7 @@ EDGE CASE HANDLING
 
   app.get("/api/subscription/tiers", (_req, res) => {
     res.json({
-      tiers: [
+      scamguard: [
         {
           id: "free",
           name: "Free",
@@ -4571,7 +4576,8 @@ EDGE CASE HANDLING
         {
           id: "essential",
           name: "Pro",
-          price: 599,
+          price: 499,
+          annualPrice: 399,
           interval: "month",
           features: TIER_FEATURES.essential,
           description: "Full auto-protection for individuals",
@@ -4579,32 +4585,39 @@ EDGE CASE HANDLING
         {
           id: "professional",
           name: "Family",
-          price: 1199,
+          price: 799,
+          annualPrice: 599,
           interval: "month",
           features: TIER_FEATURES.professional,
           description: "Complete protection for the whole family",
         },
       ],
+      shield: [
+        {
+          id: "free",
+          name: "Scan",
+          price: 0,
+          interval: null,
+          description: "Discover your exposure",
+        },
+        {
+          id: "essential",
+          name: "Remove",
+          price: 899,
+          annualPrice: 699,
+          interval: "month",
+          description: "We remove your data for you",
+        },
+        {
+          id: "professional",
+          name: "Protect",
+          price: 1499,
+          annualPrice: 1199,
+          interval: "month",
+          description: "Continuous protection for your family",
+        },
+      ],
     });
-  });
-
-  app.get("/api/subscription/status", isAuthenticated, async (req, res) => {
-    try {
-      const user = (req as any).user;
-      const tier = user.subscriptionTier || "free";
-      const isActive = tier === "free" ? true : (!user.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
-      const effectiveFeatures = isActive ? (TIER_FEATURES[tier] || TIER_FEATURES.free) : TIER_FEATURES.free;
-
-      res.json({
-        tier: isActive ? tier : "free",
-        isActive,
-        features: effectiveFeatures,
-        expiresAt: user.subscriptionExpiresAt,
-      });
-    } catch (error) {
-      console.error("Subscription status error:", error);
-      res.status(500).json({ error: "Failed to fetch subscription status" });
-    }
   });
 
   app.post("/api/subscription/update", isAuthenticated, isAdmin, async (req, res) => {
@@ -4735,13 +4748,13 @@ EDGE CASE HANDLING
   function getShieldAccessLevel(user: any): { level: "free" | "full"; tier: "free" | "essential" | "professional" } {
     if (!user) return { level: "free", tier: "free" };
 
-    const userTier = user.subscriptionTier || "free";
+    const shieldTier = user.shieldSubscriptionTier || "free";
 
-    if (hasTierAccess(userTier, SUBSCRIPTION_TIERS.PROFESSIONAL)) {
+    if (hasTierAccess(shieldTier, SUBSCRIPTION_TIERS.PROFESSIONAL)) {
       return { level: "full", tier: "professional" };
     }
 
-    if (hasTierAccess(userTier, SUBSCRIPTION_TIERS.ESSENTIAL)) {
+    if (hasTierAccess(shieldTier, SUBSCRIPTION_TIERS.ESSENTIAL)) {
       return { level: "full", tier: "essential" };
     }
 

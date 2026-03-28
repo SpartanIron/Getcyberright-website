@@ -315,7 +315,7 @@ Manage preferences: https://www.getcyberright.com/preferences
   async generateAndSendAllReports(): Promise<{ total: number; sent: number; failed: number }> {
     const payingUsers = await db.select().from(users)
       .where(
-        sql`${users.subscriptionTier} IN ('essential', 'professional') AND ${users.subscriptionExpiresAt} > NOW()`
+        sql`${users.shieldSubscriptionTier} IN ('essential', 'professional') AND ${users.shieldSubscriptionExpiresAt} > NOW()`
       );
 
     console.log(`[removal-reports] Found ${payingUsers.length} paying users for monthly reports`);

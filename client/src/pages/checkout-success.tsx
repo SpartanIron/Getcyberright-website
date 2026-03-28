@@ -5,7 +5,7 @@ import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, ArrowRight, Shield, Download, Loader2 } from "lucide-react";
+import { CheckCircle, ArrowRight, Shield, Download, Loader2, Database } from "lucide-react";
 import { Link, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
@@ -18,6 +18,7 @@ export default function CheckoutSuccess() {
   const { data: checkoutData, isLoading, isError } = useQuery<{
     status: string;
     tier: string;
+    product: string;
     subscriptionId: string;
   }>({
     queryKey: ["/api/stripe/checkout-status", sessionId],
@@ -38,7 +39,11 @@ export default function CheckoutSuccess() {
     }
   }, [checkoutData]);
 
-  const tierName = checkoutData?.tier === "professional" ? "Family" : "Pro";
+  const isShield = checkoutData?.product === "shield";
+  const tierName = isShield
+    ? (checkoutData?.tier === "professional" ? "Professional" : "Essential")
+    : (checkoutData?.tier === "professional" ? "Family" : "Pro");
+  const productName = isShield ? "GCR Data Shield" : "GCR Scam Guard";
   const isPaid = checkoutData?.status === "paid";
 
   return (
@@ -91,47 +96,83 @@ export default function CheckoutSuccess() {
                     </div>
 
                     <h1 className="text-3xl font-bold text-foreground mb-2" data-testid="heading-success">
-                      {isPaid ? `Welcome to GCR Scam Guard ${tierName}!` : "Welcome to GetCyberRight!"}
+                      {isPaid ? `Welcome to ${productName} ${tierName}!` : "Welcome to GetCyberRight!"}
                     </h1>
 
                     <p className="text-muted-foreground mb-6 max-w-md mx-auto" data-testid="text-description">
                       {isPaid
-                        ? `Your ${tierName} subscription is now active. You have full access to all ${tierName} features.`
+                        ? `Your ${productName} ${tierName} subscription is now active. You have full access to all ${tierName} features.`
                         : "Your subscription is now active. You have full access to premium security tools, training materials, and exclusive content."
                       }
                     </p>
 
                     <div className="bg-muted/50 rounded-lg p-4 mb-6 text-left max-w-sm mx-auto" data-testid="next-steps-box">
                       <h3 className="font-semibold text-sm text-foreground mb-3">What to do next:</h3>
-                      <ol className="space-y-2 text-sm text-muted-foreground">
-                        <li className="flex items-start gap-2">
-                          <span className="font-bold text-primary">1.</span>
-                          Install the GCR Scam Guard browser extension
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="font-bold text-primary">2.</span>
-                          Sign in through the extension to activate your features
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="font-bold text-primary">3.</span>
-                          Browse with confidence knowing you're protected
-                        </li>
-                      </ol>
+                      {isShield ? (
+                        <ol className="space-y-2 text-sm text-muted-foreground">
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold text-primary">1.</span>
+                            Run a Data Shield scan to find your exposed data
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold text-primary">2.</span>
+                            Review your results and start automated removals
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold text-primary">3.</span>
+                            Track removal progress from your dashboard
+                          </li>
+                        </ol>
+                      ) : (
+                        <ol className="space-y-2 text-sm text-muted-foreground">
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold text-primary">1.</span>
+                            Install the GCR Scam Guard browser extension
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold text-primary">2.</span>
+                            Sign in through the extension to activate your features
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="font-bold text-primary">3.</span>
+                            Browse with confidence knowing you're protected
+                          </li>
+                        </ol>
+                      )}
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Link href="/browser-extension">
-                        <Button size="lg" data-testid="button-get-extension">
-                          <Download className="w-4 h-4 mr-2" />
-                          Get the Extension
-                        </Button>
-                      </Link>
-                      <Link href="/dashboard">
-                        <Button size="lg" variant="outline" data-testid="button-dashboard">
-                          Go to Dashboard
-                          <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
-                      </Link>
+                      {isShield ? (
+                        <>
+                          <Link href="/gcr-data-shield">
+                            <Button size="lg" data-testid="button-start-scan">
+                              <Database className="w-4 h-4 mr-2" />
+                              Start a Scan
+                            </Button>
+                          </Link>
+                          <Link href="/dashboard">
+                            <Button size="lg" variant="outline" data-testid="button-dashboard">
+                              Go to Dashboard
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <Link href="/browser-extension">
+                            <Button size="lg" data-testid="button-get-extension">
+                              <Download className="w-4 h-4 mr-2" />
+                              Get the Extension
+                            </Button>
+                          </Link>
+                          <Link href="/dashboard">
+                            <Button size="lg" variant="outline" data-testid="button-dashboard">
+                              Go to Dashboard
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          </Link>
+                        </>
+                      )}
                     </div>
 
                     <div className="mt-6 text-sm text-muted-foreground">

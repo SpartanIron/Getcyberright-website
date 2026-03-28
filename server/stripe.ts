@@ -8,11 +8,25 @@ import { isAuthenticated } from "./auth";
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
-const PRICE_MAP: Record<string, { tier: string; name: string; amount: number; interval: "month" | "year" }> = {
-  essential_monthly: { tier: "essential", name: "GCR Scam Guard Pro", amount: 599, interval: "month" },
-  professional_monthly: { tier: "professional", name: "GCR Scam Guard Family", amount: 1199, interval: "month" },
-  essential_annual: { tier: "essential", name: "GCR Scam Guard Pro (Annual)", amount: 5988, interval: "year" },
-  professional_annual: { tier: "professional", name: "GCR Scam Guard Family (Annual)", amount: 11988, interval: "year" },
+type ProductType = "scamguard" | "shield";
+
+interface PriceConfig {
+  product: ProductType;
+  tier: string;
+  name: string;
+  amount: number;
+  interval: "month" | "year";
+}
+
+const PRICE_MAP: Record<string, PriceConfig> = {
+  sg_essential_monthly: { product: "scamguard", tier: "essential", name: "GCR Scam Guard Pro", amount: 499, interval: "month" },
+  sg_essential_annual: { product: "scamguard", tier: "essential", name: "GCR Scam Guard Pro (Annual)", amount: 4788, interval: "year" },
+  sg_professional_monthly: { product: "scamguard", tier: "professional", name: "GCR Scam Guard Family", amount: 799, interval: "month" },
+  sg_professional_annual: { product: "scamguard", tier: "professional", name: "GCR Scam Guard Family (Annual)", amount: 7188, interval: "year" },
+  ds_essential_monthly: { product: "shield", tier: "essential", name: "GCR Data Shield Essential", amount: 899, interval: "month" },
+  ds_essential_annual: { product: "shield", tier: "essential", name: "GCR Data Shield Essential (Annual)", amount: 8388, interval: "year" },
+  ds_professional_monthly: { product: "shield", tier: "professional", name: "GCR Data Shield Professional", amount: 1499, interval: "month" },
+  ds_professional_annual: { product: "shield", tier: "professional", name: "GCR Data Shield Professional (Annual)", amount: 14388, interval: "year" },
 };
 
 let stripe: Stripe | null = null;
@@ -40,6 +54,7 @@ async function ensureProductsAndPrices(): Promise<Record<string, string>> {
     const existingPrice = existingPrices.data.find((p) => {
       const product = p.product as Stripe.Product;
       return (
+        product.metadata?.gcr_product === config.product &&
         product.metadata?.gcr_tier === config.tier &&
         p.unit_amount === config.amount &&
         p.recurring?.interval === config.interval
@@ -51,11 +66,13 @@ async function ensureProductsAndPrices(): Promise<Record<string, string>> {
       continue;
     }
 
-    let product = existingProducts.data.find((p) => p.metadata?.gcr_tier === config.tier);
+    let product = existingProducts.data.find(
+      (p) => p.metadata?.gcr_product === config.product && p.metadata?.gcr_tier === config.tier
+    );
     if (!product) {
       product = await s.products.create({
         name: config.name,
-        metadata: { gcr_tier: config.tier },
+        metadata: { gcr_product: config.product, gcr_tier: config.tier },
       });
     }
 
@@ -64,13 +81,13 @@ async function ensureProductsAndPrices(): Promise<Record<string, string>> {
       unit_amount: config.amount,
       currency: "usd",
       recurring: { interval: config.interval },
-      metadata: { gcr_tier: config.tier },
+      metadata: { gcr_product: config.product, gcr_tier: config.tier },
     });
 
     priceIds[key] = price.id;
   }
 
-  console.log("Stripe products/prices ready:", priceIds);
+  console.log("Stripe products/prices ready:", Object.keys(priceIds).length, "prices");
   return priceIds;
 }
 
@@ -103,6 +120,36 @@ async function getOrCreateStripeCustomer(userId: string, email: string): Promise
   return customerId;
 }
 
+function applySubscriptionUpdate(product: ProductType, tier: string, periodEnd: Date) {
+  if (product === "shield") {
+    return {
+      shieldSubscriptionTier: tier,
+      shieldSubscriptionExpiresAt: periodEnd,
+      updatedAt: new Date(),
+    };
+  }
+  return {
+    subscriptionTier: tier,
+    subscriptionExpiresAt: periodEnd,
+    updatedAt: new Date(),
+  };
+}
+
+function applyCancellation(product: ProductType) {
+  if (product === "shield") {
+    return {
+      shieldSubscriptionTier: "free",
+      shieldSubscriptionExpiresAt: null,
+      updatedAt: new Date(),
+    };
+  }
+  return {
+    subscriptionTier: "free",
+    subscriptionExpiresAt: null,
+    updatedAt: new Date(),
+  };
+}
+
 export function registerStripeRoutes(app: Express) {
   if (!STRIPE_SECRET_KEY) {
     console.log("Stripe routes skipped: STRIPE_SECRET_KEY not set");
@@ -119,6 +166,7 @@ export function registerStripeRoutes(app: Express) {
         return res.status(400).json({ error: "Invalid plan selected" });
       }
 
+      const config = PRICE_MAP[planId];
       const prices = await ensureProductsAndPrices();
       const priceId = prices[planId];
 
@@ -128,20 +176,10 @@ export function registerStripeRoutes(app: Express) {
 
       const customerId = await getOrCreateStripeCustomer(user.id, user.email);
 
-      const existingSubs = await s.subscriptions.list({
-        customer: customerId,
-        status: "active",
-        limit: 1,
-      });
-
-      if (existingSubs.data.length > 0) {
-        return res.status(400).json({
-          error: "You already have an active subscription. Manage it from your dashboard.",
-        });
-      }
-
       const host = req.headers.host;
       const baseUrl = `https://${host}`;
+      const defaultReturn = config.product === "shield" ? "/data-shield-pricing" : "/gcr-guard-pricing";
+      const cancelPath = returnPath || defaultReturn;
 
       const session = await s.checkout.sessions.create({
         customer: customerId,
@@ -149,15 +187,17 @@ export function registerStripeRoutes(app: Express) {
         payment_method_types: ["card"],
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${baseUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}${returnPath === "/data-shield-pricing" ? "/data-shield-pricing" : "/gcr-guard-pricing"}`,
+        cancel_url: `${baseUrl}${cancelPath}`,
         metadata: {
           gcr_user_id: user.id,
-          gcr_tier: PRICE_MAP[planId].tier,
+          gcr_product: config.product,
+          gcr_tier: config.tier,
         },
         subscription_data: {
           metadata: {
             gcr_user_id: user.id,
-            gcr_tier: PRICE_MAP[planId].tier,
+            gcr_product: config.product,
+            gcr_tier: config.tier,
           },
         },
       });
@@ -213,10 +253,12 @@ export function registerStripeRoutes(app: Express) {
 
       const subscription = session.subscription as Stripe.Subscription;
       const tier = session.metadata?.gcr_tier || "essential";
+      const product = session.metadata?.gcr_product || "scamguard";
 
       res.json({
         status: session.payment_status,
         tier,
+        product,
         subscriptionId: subscription?.id,
       });
     } catch (error: any) {
@@ -263,19 +305,18 @@ export function registerStripeWebhook(app: Express) {
             const session = event.data.object as Stripe.Checkout.Session;
             const userId = session.metadata?.gcr_user_id;
             const tier = session.metadata?.gcr_tier || "essential";
+            const product = (session.metadata?.gcr_product || "scamguard") as ProductType;
 
             if (userId && session.subscription) {
               const subscription = await s.subscriptions.retrieve(session.subscription as string);
               const periodEnd = new Date(subscription.current_period_end * 1000);
 
               await db.update(users).set({
-                subscriptionTier: tier,
-                subscriptionExpiresAt: periodEnd,
+                ...applySubscriptionUpdate(product, tier, periodEnd),
                 stripeCustomerId: session.customer as string,
-                updatedAt: new Date(),
               }).where(eq(users.id, userId));
 
-              console.log(`Subscription activated: user=${userId}, tier=${tier}, expires=${periodEnd.toISOString()}`);
+              console.log(`Subscription activated: user=${userId}, product=${product}, tier=${tier}, expires=${periodEnd.toISOString()}`);
             }
             break;
           }
@@ -286,16 +327,21 @@ export function registerStripeWebhook(app: Express) {
 
             if (userId) {
               const tier = subscription.metadata?.gcr_tier || "essential";
+              const product = (subscription.metadata?.gcr_product || "scamguard") as ProductType;
               const periodEnd = new Date(subscription.current_period_end * 1000);
               const isActive = subscription.status === "active" || subscription.status === "trialing";
 
-              await db.update(users).set({
-                subscriptionTier: isActive ? tier : "free",
-                subscriptionExpiresAt: periodEnd,
-                updatedAt: new Date(),
-              }).where(eq(users.id, userId));
+              if (isActive) {
+                await db.update(users).set(
+                  applySubscriptionUpdate(product, tier, periodEnd)
+                ).where(eq(users.id, userId));
+              } else {
+                await db.update(users).set(
+                  applyCancellation(product)
+                ).where(eq(users.id, userId));
+              }
 
-              console.log(`Subscription updated: user=${userId}, tier=${isActive ? tier : "free"}, status=${subscription.status}`);
+              console.log(`Subscription updated: user=${userId}, product=${product}, tier=${isActive ? tier : "free"}, status=${subscription.status}`);
             }
             break;
           }
@@ -305,13 +351,13 @@ export function registerStripeWebhook(app: Express) {
             const userId = subscription.metadata?.gcr_user_id;
 
             if (userId) {
-              await db.update(users).set({
-                subscriptionTier: "free",
-                subscriptionExpiresAt: null,
-                updatedAt: new Date(),
-              }).where(eq(users.id, userId));
+              const product = (subscription.metadata?.gcr_product || "scamguard") as ProductType;
 
-              console.log(`Subscription canceled: user=${userId}`);
+              await db.update(users).set(
+                applyCancellation(product)
+              ).where(eq(users.id, userId));
+
+              console.log(`Subscription canceled: user=${userId}, product=${product}`);
             }
             break;
           }
@@ -321,15 +367,17 @@ export function registerStripeWebhook(app: Express) {
             if (invoice.subscription && invoice.billing_reason === "subscription_cycle") {
               const subscription = await s.subscriptions.retrieve(invoice.subscription as string);
               const userId = subscription.metadata?.gcr_user_id;
+              const product = (subscription.metadata?.gcr_product || "scamguard") as ProductType;
 
               if (userId) {
                 const periodEnd = new Date(subscription.current_period_end * 1000);
-                await db.update(users).set({
-                  subscriptionExpiresAt: periodEnd,
-                  updatedAt: new Date(),
-                }).where(eq(users.id, userId));
+                const tier = subscription.metadata?.gcr_tier || "essential";
 
-                console.log(`Subscription renewed: user=${userId}, expires=${periodEnd.toISOString()}`);
+                await db.update(users).set(
+                  applySubscriptionUpdate(product, tier, periodEnd)
+                ).where(eq(users.id, userId));
+
+                console.log(`Subscription renewed: user=${userId}, product=${product}, expires=${periodEnd.toISOString()}`);
               }
             }
             break;
