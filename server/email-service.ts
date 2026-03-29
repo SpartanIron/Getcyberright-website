@@ -368,7 +368,7 @@ export async function sendQuizResults(result: QuizResult, email: string): Promis
 }
 
 export function generateEmailVerificationEmail(email: string, token: string, baseUrl: string): EmailOptions {
-  const verificationUrl = `${baseUrl}/verify-email?token=${token}`;
+  const verificationUrl = `${baseUrl}/api/auth/verify-email/${token}`;
   
   const htmlBody = `
 <!DOCTYPE html>

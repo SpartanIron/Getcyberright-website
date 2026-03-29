@@ -817,10 +817,10 @@ export function registerAuthRoutes(app: Express) {
       
       securityLogger.info("Email verified", { userId: user.id });
       
-      res.json({ success: true, message: "Email verified successfully" });
+      res.redirect("/login?verified=true");
     } catch (error) {
       console.error("Email verification error:", error);
-      res.status(500).json({ error: "Verification failed" });
+      res.redirect("/login?verified=error");
     }
   });
 }
