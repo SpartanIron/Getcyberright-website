@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import type { CyberSafetyGuide, CyberThreatAlert, ScamIntelligence, InsertSocialPost } from "@shared/schema";
 import { generateBrandedImage, serveImagePath } from "./socialImageService";
 import { getBufferChannelsByPlatform } from "./bufferPublisher";
+import { tagAllGcrLinks, tagSingleUrl, buildCampaignId } from "./utmTracking";
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -122,12 +123,14 @@ Create excerpt-style posts for each platform. Each post should share a compellin
 - Open with the single most compelling insight, stat, or story from the article
 - Share 1-2 specific takeaways that demonstrate the article's value
 - Include a "teaser" line hinting at what else the full article covers (e.g. "The full guide covers 7 more warning signs and a step-by-step action plan.")
+- ALGORITHM TIP: LinkedIn penalizes posts with external links in the body. Write pure value content first, then put the link on its own final line separated by TWO line breaks. Front-load the insight above the "see more" fold
 - End with a clear CTA: "Read the full guide here:" followed by the link on its own line
 - Professional but human tone
 
 2. FACEBOOK (80-150 words)
 - Start with a relatable hook or surprising fact from the article
 - Share one practical tip or insight as a preview
+- ALGORITHM TIP: Facebook deprioritizes posts with external links. Write the post as native content that provides value on its own. Put the link on a separate final line after a clear paragraph break. The more it reads like organic content, the more Facebook will distribute it
 - End with a conversational CTA that drives to the article (e.g. "We break down exactly how to protect yourself. Read more here:" followed by the link)
 - Warm, conversational, like advising a neighbor
 
@@ -141,7 +144,8 @@ Create excerpt-style posts for each platform. Each post should share a compellin
 4. INSTAGRAM (120-200 words)
 - Hook in the first line that creates curiosity
 - Share 2-3 key points from the article as a preview
-- End with a CTA driving to the article: "Full guide on our website, link in bio" or "Read the complete guide at getcyberright.com"
+- End with a CTA: "Full guide on our website, link in bio" or "Read the complete guide at getcyberright.com"
+- ALGORITHM TIP: Instagram rewards saves and shares. Write captions people want to save for later. Carousel posts get 3x more engagement than single images. Format tips as numbered lists that feel bookmark-worthy
 - Include 8-12 relevant hashtags at the end, separated by a line break
 
 5. SHORT ALERT (under 150 chars)
@@ -348,11 +352,12 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 
   const createdIds: string[] = [];
   const connectedPlatforms = await getConnectedPlatforms();
+  const campaignId = buildCampaignId("guide", "multi");
 
   const allPlatforms: { platform: string; content: string }[] = [
-    { platform: "linkedin", content: posts.linkedin },
-    { platform: "facebook", content: posts.facebook || posts.linkedin },
-    { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
+    { platform: "linkedin", content: tagAllGcrLinks(posts.linkedin, "linkedin", "guide", guide.slug) },
+    { platform: "facebook", content: tagAllGcrLinks(posts.facebook || posts.linkedin, "facebook", "guide", guide.slug) },
+    { platform: "x", content: tagAllGcrLinks(posts.xThread.join("\n\n---\n\n"), "x", "guide", guide.slug) },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
@@ -375,13 +380,14 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
       hashtags: posts.hashtags,
       imageUrl: imagePath || undefined,
       status: "draft",
+      utmCampaign: campaignId,
     };
 
     const created = await storage.createSocialPost(post);
     createdIds.push(created.id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} social posts with images for guide: "${guide.title}"`);
+  console.log(`[SocialDistribution] Generated ${createdIds.length} UTM-tagged social posts with images for guide: "${guide.title}"`);
   return createdIds;
 }
 
@@ -403,9 +409,9 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
   const connectedPlatforms = await getConnectedPlatforms();
 
   const allPlatforms: { platform: string; content: string }[] = [
-    { platform: "linkedin", content: posts.linkedin },
-    { platform: "facebook", content: posts.facebook || posts.linkedin },
-    { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
+    { platform: "linkedin", content: tagAllGcrLinks(posts.linkedin, "linkedin", "threat_alert", alert.slug) },
+    { platform: "facebook", content: tagAllGcrLinks(posts.facebook || posts.linkedin, "facebook", "threat_alert", alert.slug) },
+    { platform: "x", content: tagAllGcrLinks(posts.xThread.join("\n\n---\n\n"), "x", "threat_alert", alert.slug) },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
@@ -416,6 +422,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
     console.log(`[SocialDistribution] Skipping disconnected platforms: ${skipped.join(", ")}`);
   }
 
+  const alertCampaignId = buildCampaignId("threat_alert", "multi");
   for (const { platform, content } of platforms) {
     if (!content) continue;
     const imagePath = await generateImageForPost(alert.threatName, "threat_alert", platform);
@@ -428,13 +435,14 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
       hashtags: posts.hashtags,
       imageUrl: imagePath || undefined,
       status: "draft",
+      utmCampaign: alertCampaignId,
     };
 
     const created = await storage.createSocialPost(post);
     createdIds.push(created.id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} social posts with images for alert: "${alert.threatName}"`);
+  console.log(`[SocialDistribution] Generated ${createdIds.length} UTM-tagged social posts with images for alert: "${alert.threatName}"`);
   return createdIds;
 }
 
@@ -456,9 +464,9 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
   const connectedPlatforms = await getConnectedPlatforms();
 
   const allPlatforms: { platform: string; content: string }[] = [
-    { platform: "linkedin", content: posts.linkedin },
-    { platform: "facebook", content: posts.facebook || posts.linkedin },
-    { platform: "x", content: posts.xThread.join("\n\n---\n\n") },
+    { platform: "linkedin", content: tagAllGcrLinks(posts.linkedin, "linkedin", "scam_intel", scam.slug) },
+    { platform: "facebook", content: tagAllGcrLinks(posts.facebook || posts.linkedin, "facebook", "scam_intel", scam.slug) },
+    { platform: "x", content: tagAllGcrLinks(posts.xThread.join("\n\n---\n\n"), "x", "scam_intel", scam.slug) },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
@@ -469,6 +477,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
     console.log(`[SocialDistribution] Skipping disconnected platforms: ${skipped.join(", ")}`);
   }
 
+  const scamCampaignId = buildCampaignId("scam_intel", "multi");
   for (const { platform, content } of platforms) {
     if (!content) continue;
     const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform);
@@ -481,13 +490,14 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
       hashtags: posts.hashtags,
       imageUrl: imagePath || undefined,
       status: "draft",
+      utmCampaign: scamCampaignId,
     };
 
     const created = await storage.createSocialPost(post);
     createdIds.push(created.id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} social posts with images for scam: "${scam.scamName}"`);
+  console.log(`[SocialDistribution] Generated ${createdIds.length} UTM-tagged social posts with images for scam: "${scam.scamName}"`);
   return createdIds;
 }
 

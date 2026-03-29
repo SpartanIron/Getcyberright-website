@@ -1414,6 +1414,8 @@ export const socialPosts = pgTable("social_posts", {
   status: text("status").notNull().default("draft"),
   publishError: text("publish_error"),
   engagementMetrics: jsonb("engagement_metrics").$type<{ views?: number; clicks?: number; shares?: number }>(),
+  utmCampaign: text("utm_campaign"),
+  postStyle: text("post_style"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

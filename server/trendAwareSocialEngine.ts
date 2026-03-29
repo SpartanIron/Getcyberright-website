@@ -3,6 +3,7 @@ import { storage } from "./storage";
 import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
 import { createBufferPost, getBufferChannelsByPlatform, getPublicImageUrl } from "./bufferPublisher";
 import type { InsertSocialPost } from "@shared/schema";
+import { tagAllGcrLinks } from "./utmTracking";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -886,10 +887,10 @@ WHAT NOT TO DO:
 - Do not use emojis excessively (0-2 per post max)
 - Do not use: "game-changer", "wake-up call", "in today's digital landscape", "cyber hygiene"
 
-PLATFORM OPTIMIZATION:
-- LinkedIn: concise, sharp, insight-driven. Strong opening lines. Tighter structure
-- Facebook: more conversational, slightly longer storytelling, warmer tone
-- Instagram: punchy, visual-first. The image card carries the headline. Caption is the supporting context. Short, direct, with hashtags at the end. No clickable links. "Link in bio" is the only CTA
+PLATFORM OPTIMIZATION (ALGORITHM-AWARE):
+- LinkedIn: The algorithm penalizes external links in the main body. Write the post as pure value content (insight, analysis, tip). Put the CTA link on its own final line, separated by TWO line breaks from the content. This way the valuable content appears above the "see more" fold and the link is below. The algorithm rewards posts that keep people on LinkedIn longer, so front-load the insight
+- Facebook: Similar to LinkedIn, the algorithm deprioritizes posts with external links. Write the post body as native content that provides value on its own. Place the link on a separate final line after a clear paragraph break. Do NOT embed the link mid-sentence. The more the post reads like organic content (not a link share), the more Facebook will distribute it
+- Instagram: punchy, visual-first. The image card carries the headline. Caption is the supporting context. Short, direct, with hashtags at the end. No clickable links. "Link in bio" is the only CTA. Instagram rewards saves and shares, so write captions that people want to save for later
 
 GOAL: Position GetCyberRight as the most trusted, human-centered cybersecurity authority for everyday users navigating modern digital risks. Content must be immediately publishable to Buffer without edits.`,
       messages: [
@@ -2087,9 +2088,14 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     );
     console.log(`[TrendEngine] Image resolved: source=${imageSource}, url=${imageUrl ? "yes" : "none"}`);
 
-    const validatedLinkedin = await validateAndFixPostLinks(posts.linkedin);
-    const validatedFacebook = await validateAndFixPostLinks(posts.facebook);
-    const validatedInstagram = posts.instagram;
+    const fixedLinkedin = await validateAndFixPostLinks(posts.linkedin);
+    const fixedFacebook = await validateAndFixPostLinks(posts.facebook);
+    const fixedInstagram = posts.instagram;
+
+    const contentSlug = posts.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50);
+    const validatedLinkedin = tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle);
+    const validatedFacebook = tagAllGcrLinks(fixedFacebook, "facebook", "trend_insight", contentSlug, postStyle);
+    const validatedInstagram = fixedInstagram;
 
     const platformFilter = options?.platformFilter;
     const platformPosts: { platform: string; content: string; image: string | null }[] = [];
@@ -2099,6 +2105,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
 
     for (const { platform, content, image } of platformPosts) {
       try {
+        const { buildCampaignId } = await import("./utmTracking");
         const socialPost: InsertSocialPost = {
           contentType: "trend_insight",
           contentId: `trend-${Date.now()}-${platform}`,
@@ -2107,6 +2114,8 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
           postContent: content,
           hashtags: posts.hashtags,
           status: "published",
+          utmCampaign: buildCampaignId("trend_insight", platform, postStyle),
+          postStyle,
         };
 
         const created = await storage.createSocialPost(socialPost);

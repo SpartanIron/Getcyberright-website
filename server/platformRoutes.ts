@@ -633,6 +633,75 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  app.get("/api/admin/social-distribution/utm-campaigns", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const allPosts = await storage.getSocialPosts(undefined, 500);
+      const campaigns: Record<string, {
+        campaignId: string;
+        posts: number;
+        platforms: string[];
+        contentTypes: string[];
+        titles: string[];
+        published: number;
+        drafts: number;
+        failed: number;
+        postStyles: string[];
+        dateRange: { earliest: string; latest: string };
+      }> = {};
+
+      for (const post of allPosts) {
+        const campaignId = post.utmCampaign || "untagged";
+        if (!campaigns[campaignId]) {
+          campaigns[campaignId] = {
+            campaignId,
+            posts: 0,
+            platforms: [],
+            contentTypes: [],
+            titles: [],
+            published: 0,
+            drafts: 0,
+            failed: 0,
+            postStyles: [],
+            dateRange: { earliest: "", latest: "" },
+          };
+        }
+        const c = campaigns[campaignId];
+        c.posts++;
+        if (!c.platforms.includes(post.platform)) c.platforms.push(post.platform);
+        if (!c.contentTypes.includes(post.contentType)) c.contentTypes.push(post.contentType);
+        if (!c.titles.includes(post.contentTitle)) c.titles.push(post.contentTitle);
+        if (post.postStyle && !c.postStyles.includes(post.postStyle)) c.postStyles.push(post.postStyle);
+        if (post.status === "published") c.published++;
+        else if (post.status === "draft") c.drafts++;
+        else if (post.status === "failed") c.failed++;
+        const dateStr = post.createdAt ? new Date(post.createdAt).toISOString().slice(0, 10) : "";
+        if (dateStr) {
+          if (!c.dateRange.earliest || dateStr < c.dateRange.earliest) c.dateRange.earliest = dateStr;
+          if (!c.dateRange.latest || dateStr > c.dateRange.latest) c.dateRange.latest = dateStr;
+        }
+      }
+
+      const sorted = Object.values(campaigns).sort((a, b) => {
+        if (a.dateRange.latest && b.dateRange.latest) return b.dateRange.latest.localeCompare(a.dateRange.latest);
+        return b.posts - a.posts;
+      });
+
+      const taggedCount = allPosts.filter(p => p.utmCampaign).length;
+      const untaggedCount = allPosts.length - taggedCount;
+
+      res.json({
+        totalPosts: allPosts.length,
+        taggedPosts: taggedCount,
+        untaggedPosts: untaggedCount,
+        tagRate: allPosts.length > 0 ? Math.round((taggedCount / allPosts.length) * 100) : 0,
+        campaigns: sorted,
+        utmNote: "Connect Google Analytics to see traffic driven by each campaign. Filter by utm_source (platform), utm_medium (social), utm_campaign (content type + date), and utm_content (content slug).",
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch UTM campaign data" });
+    }
+  });
+
   // ─── Growth Orchestrator Endpoints ─────────────────────────────────
 
   app.get("/api/admin/growth/dashboard", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
