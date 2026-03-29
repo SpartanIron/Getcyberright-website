@@ -24,14 +24,22 @@ const scamGuardNav = [
   { title: "AI Scam Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
   { title: "Browser Extension", description: "Real-time protection while you browse", href: "/browser-extension", icon: Chrome },
   { title: "Report a Scam", description: "Help protect the community by reporting threats", href: "/report-scam", icon: ShieldAlert },
-  { title: "Password Generator", description: "Create strong, unique passwords instantly", href: "/tools?tab=safety-toolkit", icon: Lock },
-  { title: "Voice Deepfake Detector", description: "Detect AI-generated voice clones", href: "/tools?tab=safety-toolkit", icon: Radio },
 ];
 
 const dataShieldNav = [
   { title: "Data Exposure Scan", description: "Find your personal data across 500+ brokers", href: "/shield", icon: ShieldCheck },
   { title: "Data Removal Center", description: "Identity Shield, Vault & Monitoring tools", href: "/data-removal", icon: Trash2 },
   { title: "Breach Monitor", description: "Get alerted when your data appears in breaches", href: "/breach-dashboard", icon: AlertTriangle },
+];
+
+const scamGuardNavFull = [
+  ...scamGuardNav,
+  { title: "Password Generator", description: "Create strong, unique passwords instantly", href: "/tools?tab=password", icon: Lock },
+  { title: "Voice Deepfake Detector", description: "Detect AI-generated voice clones", href: "/tools?tab=voice-clone", icon: Radio },
+];
+
+const dataShieldNavFull = [
+  ...dataShieldNav,
   { title: "Safety Score Assessment", description: "Check your overall online safety in minutes", href: "/quick-assessment", icon: ClipboardCheck },
   { title: "Cyber Hygiene Checklist", description: "Daily habits to keep your digital life secure", href: "/cyber-hygiene", icon: Shield },
   { title: "Child Safety Scanner", description: "Check if sites and apps are safe for kids", href: "/parents/child-safety-scanner", icon: Baby },
@@ -364,18 +372,6 @@ export function Navigation() {
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <Link
-                    href="/contact"
-                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-[15px] font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/contact' ? 'text-primary' : ''}`}
-                    data-testid="nav-contact"
-                  >
-                    Contact
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
 
@@ -426,7 +422,7 @@ export function Navigation() {
                   </div>
                   <p className="text-xs text-muted-foreground -mt-1 ml-6">Core tools are free</p>
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-3 ml-6">GCR Scam Guard</p>
-                  {scamGuardNav.map((item) => (
+                  {scamGuardNavFull.map((item) => (
                     <Link
                       key={item.title}
                       href={item.href}
@@ -444,7 +440,7 @@ export function Navigation() {
                     </Link>
                   ))}
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-3 ml-6">GCR Data Shield</p>
-                  {dataShieldNav.map((item) => (
+                  {dataShieldNavFull.map((item) => (
                     <Link
                       key={item.title}
                       href={item.href}
