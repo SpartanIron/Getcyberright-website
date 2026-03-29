@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { getAllScamSlugs } from "@shared/scam-content";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, userVaultKeys, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports, siteReputation } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, userVaultKeys, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports, siteReputation, scanHistory } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -50,6 +50,8 @@ import {
   wrapPhoneResult,
   wrapDescriptionResult,
   wrapImageResult,
+  parseEmailHeaders,
+  analyzeEmailHeadersEnhanced,
   type UnifiedScamResult
 } from "./scam-checker";
 import {
@@ -586,6 +588,240 @@ export async function registerRoutes(
         console.error("Scam report error:", error);
         res.status(500).json({ error: "Failed to submit report" });
       }
+    }
+  });
+
+  async function recordScan(opts: {
+    userId?: string | null;
+    contentSnippet: string;
+    contentType: string;
+    riskLevel: string;
+    riskScore?: number;
+    resultSummary?: string;
+    flagsFound?: number;
+    sourceComponent?: string;
+    sessionId?: string;
+  }) {
+    try {
+      await db.insert(scanHistory).values({
+        userId: opts.userId || null,
+        contentSnippet: opts.contentSnippet.substring(0, 500),
+        contentType: opts.contentType,
+        riskLevel: opts.riskLevel,
+        riskScore: opts.riskScore || 0,
+        resultSummary: opts.resultSummary || null,
+        flagsFound: opts.flagsFound || 0,
+        sourceComponent: opts.sourceComponent || null,
+        sessionId: opts.sessionId || null,
+      });
+    } catch (e) {
+      console.error("[scan-record] Failed to record scan:", e);
+    }
+  }
+
+  app.post("/api/scam-check/url", standardRateLimit, async (req: any, res) => {
+    try {
+      const normalizedBody = { ...req.body, url: normalizeUrl(req.body.url || '') };
+      const { url } = urlCheckSchema.parse(normalizedBody);
+
+      const parsedUrl = new URL(url);
+      const domain = parsedUrl.hostname;
+
+      const [phishTankResult, urlhausResult, gsbResult, domainAgeResult] = await Promise.allSettled([
+        (async () => {
+          const formData = new URLSearchParams();
+          formData.append('url', url);
+          formData.append('format', 'json');
+          const phishTankKey = process.env.PHISHTANK_API_KEY;
+          if (phishTankKey) formData.append('app_key', phishTankKey);
+          const response = await fetchWithTimeout('https://checkurl.phishtank.com/checkurl/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'phishtank/getcyberright' },
+            body: formData.toString(),
+          }, 15000);
+          if (!response.ok) throw new Error(`PhishTank error: ${response.status}`);
+          const text = await response.text();
+          try { return JSON.parse(text); } catch { throw new Error('Non-JSON response'); }
+        })(),
+        (async () => {
+          const formData = new URLSearchParams();
+          formData.append('url', url);
+          const headers: Record<string, string> = { 'Content-Type': 'application/x-www-form-urlencoded' };
+          const urlhausKey = process.env.URLHAUS_AUTH_KEY;
+          if (urlhausKey) headers['Auth-Key'] = urlhausKey;
+          const response = await fetchWithTimeout('https://urlhaus-api.abuse.ch/v1/url/', { method: 'POST', headers, body: formData.toString() }, 10000);
+          if (!response.ok) throw new Error(`URLhaus error: ${response.status}`);
+          return response.json();
+        })(),
+        checkGoogleSafeBrowsing(url),
+        checkDomainAge(domain)
+      ]);
+
+      const warnings: string[] = [];
+      let isSuspicious = false;
+      let riskLevel = "safe";
+
+      if (phishTankResult.status === "fulfilled" && phishTankResult.value?.results?.in_database) {
+        isSuspicious = true;
+        warnings.push("Found in PhishTank phishing database");
+        riskLevel = "dangerous";
+      }
+      if (urlhausResult.status === "fulfilled" && urlhausResult.value?.query_status === "ok") {
+        isSuspicious = true;
+        warnings.push("Found in URLhaus malware database");
+        riskLevel = "dangerous";
+      }
+      if (gsbResult.status === "fulfilled" && (gsbResult.value as any)?.isThreat) {
+        isSuspicious = true;
+        warnings.push("Flagged by Google Safe Browsing");
+        riskLevel = "dangerous";
+      }
+      if (domainAgeResult.status === "fulfilled") {
+        const age = domainAgeResult.value as any;
+        if (age?.ageInDays !== undefined && age.ageInDays < 30) {
+          warnings.push("Domain registered less than 30 days ago");
+          if (riskLevel === "safe") riskLevel = "suspicious";
+        }
+      }
+
+      const recommendations = isSuspicious
+        ? ["Do not click or visit this link", "Do not enter any personal information", "Report this to the platform where you received it"]
+        : ["Always verify links before clicking", "Look for misspelled domain names", "Check for HTTPS before entering sensitive data"];
+
+      const result = { isSuspicious, riskLevel, warnings, recommendations, url, domain };
+
+      const userId = req.session?.userId || null;
+      recordScan({
+        userId,
+        contentSnippet: url,
+        contentType: "url",
+        riskLevel,
+        riskScore: isSuspicious ? 80 : 10,
+        resultSummary: isSuspicious ? `Suspicious URL: ${warnings.join("; ")}` : "URL appears safe",
+        flagsFound: warnings.length,
+        sourceComponent: "dezi-hero",
+        sessionId: req.sessionID,
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid URL", details: (error as any).issues });
+      }
+      console.error("[scam-check/url] Error:", error?.message);
+      res.status(500).json({ error: "URL check failed" });
+    }
+  });
+
+  app.post("/api/scam-check/phone", standardRateLimit, async (req: any, res) => {
+    try {
+      const { phone } = phoneCheckSchema.parse(req.body);
+      const result = await checkPhoneNumber(phone);
+
+      const isSuspicious = result.riskLevel !== "low" && result.riskLevel !== "safe";
+      const warnings = result.riskIndicators || [];
+
+      const userId = req.session?.userId || null;
+      recordScan({
+        userId,
+        contentSnippet: phone.replace(/\d(?=\d{4})/g, '*'),
+        contentType: "phone",
+        riskLevel: result.riskLevel || "safe",
+        riskScore: isSuspicious ? 70 : 10,
+        resultSummary: isSuspicious ? "Suspicious phone number" : "Phone number appears safe",
+        flagsFound: warnings.length,
+        sourceComponent: "dezi-hero",
+        sessionId: req.sessionID,
+      });
+
+      res.json({ success: true, isSuspicious, warnings, ...result });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid phone number", details: (error as any).issues });
+      }
+      console.error("[scam-check/phone] Error:", error?.message);
+      res.status(500).json({ error: "Phone check failed" });
+    }
+  });
+
+  app.post("/api/scam-check/email-headers", standardRateLimit, async (req: any, res) => {
+    try {
+      const { headers } = z.object({ headers: z.string().min(5).max(50000) }).parse(req.body);
+      const parsed = parseEmailHeaders(headers);
+      const analysis = await analyzeEmailHeadersEnhanced(headers);
+
+      const riskLevel = analysis.riskLevel || "unknown";
+      const userId = req.session?.userId || null;
+      recordScan({
+        userId,
+        contentSnippet: headers.substring(0, 200),
+        contentType: "email",
+        riskLevel,
+        riskScore: riskLevel === "dangerous" ? 90 : riskLevel === "suspicious" ? 60 : 20,
+        resultSummary: analysis.summary || "Email header analysis complete",
+        flagsFound: analysis.redFlags?.length || 0,
+        sourceComponent: "dezi-hero",
+        sessionId: req.sessionID,
+      });
+
+      res.json(analysis);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid email content", details: (error as any).issues });
+      }
+      console.error("[scam-check/email] Error:", error?.message);
+      res.status(500).json({ error: "Email analysis failed" });
+    }
+  });
+
+  app.post("/api/scam-check/analyze", standardRateLimit, async (req: any, res) => {
+    try {
+      const { description, scamType } = z.object({
+        description: z.string().min(5).max(10000),
+        scamType: z.string().optional(),
+      }).parse(req.body);
+
+      const result = await analyzeScamDescription(description, scamType);
+
+      const riskLevel = result.verdict || "unknown";
+      const userId = req.session?.userId || null;
+      recordScan({
+        userId,
+        contentSnippet: description.substring(0, 200),
+        contentType: "text",
+        riskLevel,
+        riskScore: result.confidence || 0,
+        resultSummary: result.explanation || "Content analysis complete",
+        flagsFound: result.redFlags?.length || 0,
+        sourceComponent: "dezi-hero",
+        sessionId: req.sessionID,
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid content", details: (error as any).issues });
+      }
+      console.error("[scam-check/analyze] Error:", error?.message);
+      res.status(500).json({ error: "Analysis failed" });
+    }
+  });
+
+  app.get("/api/scan-stats", async (_req, res) => {
+    try {
+      const [scanCount] = await db.select({ count: sql<number>`count(*)` }).from(scanHistory);
+      const [scamReportCount] = await db.select({ count: sql<number>`count(*)` }).from(scamReports);
+      const [communityCount] = await db.select({ count: sql<number>`count(*)` }).from(communityScamReports);
+
+      const totalScans = Number(scanCount?.count || 0) + Number(scamReportCount?.count || 0) + Number(communityCount?.count || 0);
+
+      res.json({
+        scansRun: totalScans,
+        lastUpdated: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("[scan-stats] Error:", error);
+      res.status(500).json({ scansRun: 0 });
     }
   });
 
@@ -1147,6 +1383,20 @@ EDGE CASE HANDLING
 
       const jsonMatch = resultText.match(/\{[\s\S]*\}/);
       const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : resultText);
+
+      const userId = (req as any).session?.userId || null;
+      recordScan({
+        userId,
+        contentSnippet: content.substring(0, 200),
+        contentType: parsed.contentTypeDetected || "ai-analysis",
+        riskLevel: parsed.scamRiskLevel?.toLowerCase() || "unknown",
+        riskScore: parsed.scamRiskLevel === "Critical" ? 95 : parsed.scamRiskLevel === "High" ? 80 : parsed.scamRiskLevel === "Moderate" ? 50 : 15,
+        resultSummary: parsed.summary || "AI analysis complete",
+        flagsFound: parsed.keyRedFlags?.length || 0,
+        sourceComponent: "scam-checker-ai",
+        sessionId: (req as any).sessionID,
+      });
+
       res.json({ success: true, result: parsed });
     } catch (error: any) {
       console.error("AI Scam Analyzer error:", error);

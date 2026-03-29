@@ -1541,13 +1541,15 @@ export type InsertRegionalAttackType = z.infer<typeof insertRegionalAttackTypeSc
 
 export const scanHistory = pgTable("scan_history", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull(),
+  userId: varchar("user_id"),
   contentSnippet: text("content_snippet").notNull(),
   contentType: text("content_type").notNull(),
   riskLevel: text("risk_level").notNull(),
   riskScore: integer("risk_score").default(0),
   resultSummary: text("result_summary"),
   flagsFound: integer("flags_found").default(0),
+  sourceComponent: text("source_component"),
+  sessionId: varchar("session_id"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -1112,13 +1112,15 @@ CREATE TABLE IF NOT EXISTS "regional_attack_types" (
 -- Scan History
 CREATE TABLE IF NOT EXISTS "scan_history" (
   "id" varchar PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-  "user_id" varchar NOT NULL,
+  "user_id" varchar,
   "content_snippet" text NOT NULL,
   "content_type" text NOT NULL,
   "risk_level" text NOT NULL,
   "risk_score" integer DEFAULT 0,
   "result_summary" text,
   "flags_found" integer DEFAULT 0,
+  "source_component" text,
+  "session_id" varchar,
   "created_at" timestamp DEFAULT now()
 );
 

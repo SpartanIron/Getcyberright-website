@@ -254,11 +254,8 @@ export function DeziHero({ compact = false }: DeziHeroProps) {
       let analysisResult: AnalysisResult;
 
       if (inputType === "url") {
-        response = await apiRequest("/api/scam-check/url", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: input.trim() })
-        });
+        const res = await apiRequest("POST", "/api/scam-check/url", { url: input.trim() });
+        response = await res.json();
         
         analysisResult = {
           type: "url",
@@ -273,11 +270,8 @@ export function DeziHero({ compact = false }: DeziHeroProps) {
           id: generateResultId()
         };
       } else if (inputType === "phone") {
-        response = await apiRequest("/api/scam-check/phone", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: input.trim() })
-        });
+        const res = await apiRequest("POST", "/api/scam-check/phone", { phone: input.trim() });
+        response = await res.json();
         
         analysisResult = {
           type: "phone",
@@ -292,11 +286,8 @@ export function DeziHero({ compact = false }: DeziHeroProps) {
           id: generateResultId()
         };
       } else if (inputType === "email") {
-        response = await apiRequest("/api/scam-check/email-headers", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ headers: input.trim() })
-        });
+        const res = await apiRequest("POST", "/api/scam-check/email-headers", { headers: input.trim() });
+        response = await res.json();
         
         analysisResult = {
           type: "email",
@@ -309,14 +300,11 @@ export function DeziHero({ compact = false }: DeziHeroProps) {
           id: generateResultId()
         };
       } else {
-        response = await apiRequest("/api/scam-check/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            description: input.trim(),
-            scamType: "other"
-          })
+        const res = await apiRequest("POST", "/api/scam-check/analyze", { 
+          description: input.trim(),
+          scamType: "other"
         });
+        response = await res.json();
         
         analysisResult = {
           type: "description",
