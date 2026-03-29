@@ -9,6 +9,7 @@ import { db } from "./db";
 import { users, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema, changePasswordSchema, mfaVerifySchema } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { securityLogger, failedLoginTracker, ipBlocklist } from "./security";
+import { sendEmailVerification } from "./email-service";
 import { z } from "zod";
 
 // Constants
@@ -163,6 +164,12 @@ export function registerAuthRoutes(app: Express) {
           emailVerificationToken: null,
           emailVerificationExpires: null
         }).where(eq(users.id, newUser.id));
+      } else {
+        const baseUrl = `${req.protocol}://${req.get("host")}`;
+        const emailSent = await sendEmailVerification(validatedData.email.toLowerCase(), emailVerificationToken, baseUrl);
+        if (!emailSent) {
+          console.error("[auth] Failed to send verification email to", validatedData.email);
+        }
       }
       
       res.json({ 

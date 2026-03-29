@@ -4,6 +4,7 @@ const log = logger.child('EmailService');
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 const SMTP2GO_API_URL = 'https://api.smtp2go.com/v3/email/send';
 const MAILERSEND_API_URL = 'https://api.mailersend.com/v1/email';
+const RESEND_API_URL = 'https://api.resend.com/emails';
 
 interface EmailOptions {
   to: string[];
@@ -12,12 +13,13 @@ interface EmailOptions {
   textBody?: string;
 }
 
-type EmailProvider = 'brevo' | 'mailersend' | 'smtp2go' | 'none';
+type EmailProvider = 'brevo' | 'mailersend' | 'smtp2go' | 'resend' | 'none';
 
 function getConfiguredProvider(): EmailProvider {
   if (process.env.BREVO_API_KEY) return 'brevo';
   if (process.env.MAILERSEND_API_KEY) return 'mailersend';
   if (process.env.SMTP2GO_API_KEY) return 'smtp2go';
+  if (process.env.RESEND_API_KEY) return 'resend';
   return 'none';
 }
 
@@ -130,6 +132,41 @@ async function sendViaSMTP2GO(options: EmailOptions): Promise<boolean> {
   }
 }
 
+async function sendViaResend(options: EmailOptions): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.EMAIL_FROM_ADDRESS || 'tips@getcyberright.com';
+  const fromName = process.env.EMAIL_FROM_NAME || 'GetCyberRight';
+
+  try {
+    const response = await fetch(RESEND_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        from: `${fromName} <${fromEmail}>`,
+        to: options.to,
+        subject: options.subject,
+        html: options.htmlBody,
+        text: options.textBody || options.htmlBody.replace(/<[^>]*>/g, ''),
+      }),
+    });
+
+    if (response.ok) {
+      log.info('Email sent successfully via Resend');
+      return true;
+    } else {
+      const error = await response.text();
+      log.error('Resend failed', { error });
+      return false;
+    }
+  } catch (error) {
+    log.error('Resend error', { error: String(error) });
+    return false;
+  }
+}
+
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const provider = getConfiguredProvider();
   
@@ -147,6 +184,10 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
   if (provider === 'mailersend') {
     return sendViaMailerSend(options);
+  }
+
+  if (provider === 'resend') {
+    return sendViaResend(options);
   }
   
   return sendViaSMTP2GO(options);
