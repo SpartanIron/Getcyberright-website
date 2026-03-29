@@ -355,7 +355,7 @@ export default function GcrGuardPricing() {
                               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                               Loading...
                             </>
-                          ) : isCurrentPlan ? "Current Plan" : tier.price === 0 ? "Get Started" : isPopular ? "Start 30-Day Free Trial" : "Subscribe"}
+                          ) : isCurrentPlan ? "Current Plan" : tier.price === 0 ? "Get Started" : "Start 30-Day Free Trial"}
                           {!isCurrentPlan && loadingPlan !== tier.id && <ArrowRight className="w-4 h-4 ml-2" />}
                         </Button>
                       </CardContent>

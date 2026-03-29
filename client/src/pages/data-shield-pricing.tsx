@@ -400,7 +400,7 @@ export default function DataShieldPricing() {
                             ? "Current Plan"
                             : tier.price === 0
                             ? "Scan Free Now"
-                            : "Subscribe"}
+                            : "Start 30-Day Free Trial"}
                         </Button>
                       </CardContent>
                     </Card>

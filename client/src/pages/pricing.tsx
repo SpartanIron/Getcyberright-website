@@ -343,7 +343,7 @@ export default function PricingPage() {
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
                             <>
-                              Get {tier.name}
+                              Start 30-Day Free Trial
                               <ArrowRight className="w-4 h-4 ml-2" />
                             </>
                           )}
