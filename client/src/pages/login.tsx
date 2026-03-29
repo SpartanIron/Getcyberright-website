@@ -144,7 +144,9 @@ export default function Login() {
       if (result.user?.mustChangePassword) {
         setLocation("/admin/change-password");
       } else {
-        setLocation(redirectTo || "/admin");
+        const defaultRoute = result.user?.isAdmin ? "/admin" : "/dashboard";
+        const safeRedirect = redirectTo && (!redirectTo.startsWith("/admin") || result.user?.isAdmin) ? redirectTo : null;
+        setLocation(safeRedirect || defaultRoute);
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -190,7 +192,9 @@ export default function Login() {
       if (result.user?.mustChangePassword) {
         setLocation("/admin/change-password");
       } else {
-        setLocation(redirectTo || "/admin");
+        const defaultRoute = result.user?.isAdmin ? "/admin" : "/dashboard";
+        const safeRedirect = redirectTo && (!redirectTo.startsWith("/admin") || result.user?.isAdmin) ? redirectTo : null;
+        setLocation(safeRedirect || defaultRoute);
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
