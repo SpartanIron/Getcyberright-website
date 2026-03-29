@@ -2,11 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Navigation } from "@/components/navigation";
-import { Footer } from "@/components/footer";
-import { PageBanner } from "@/components/page-banner";
-import { SEOHead } from "@/components/seo-head";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -448,8 +444,8 @@ function AliasCard({ identity, onRefresh }: { identity: MaskedIdentity; onRefres
   );
 }
 
-export default function IdentityShield() {
-  const { user, isLoading: authLoading } = useAuth();
+export function IdentityShieldPanel() {
+  const { user } = useAuth();
   const [filter, setFilter] = useState<AliasType | "all">("all");
 
   const { data: identities, isLoading: identitiesLoading, refetch: refetchIdentities } = useQuery<MaskedIdentity[]>({
@@ -472,220 +468,163 @@ export default function IdentityShield() {
   };
 
   return (
-    <>
-      <SEOHead
-        title="Identity Shield - Masked Identities | GetCyberRight"
-        description="Generate masked emails, phone numbers, and usernames to protect your real identity when signing up for services. Stop giving out your real data."
-        path="/identity-shield"
-      />
-      <Navigation />
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold flex items-center gap-2" data-testid="heading-identity-shield">
+          <ShieldCheck className="w-5 h-5 text-primary" />
+          Identity Shield
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Generate masked emails, phone numbers, and usernames to protect your real identity when signing up for services.
+        </p>
+      </div>
 
-      <PageBanner
-        title="Identity Shield"
-        subtitle="Stop giving out your real email, phone number, and username. Generate masked identities for every signup."
-      />
-
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-        {!user && !authLoading ? (
+      {statsLoading ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-24 rounded-xl" />
+          ))}
+        </div>
+      ) : stats ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
-            <CardContent className="py-16 text-center space-y-4">
-              <Shield className="w-16 h-16 mx-auto text-primary opacity-80" />
-              <h2 className="text-2xl font-bold">Protect Your Real Identity</h2>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                Every time you sign up for a service with your real email or phone, you create another point of exposure.
-                Identity Shield generates masked identities that forward to you, so your real information stays hidden.
-              </p>
-              <div className="flex items-center justify-center gap-4">
-                <Link href="/auth">
-                  <Button size="lg" className="gap-2" data-testid="button-sign-in">
-                    <Lock className="w-4 h-4" /> Sign In to Get Started
-                  </Button>
-                </Link>
-                <Link href="/data-shield-pricing">
-                  <Button variant="outline" size="lg" data-testid="button-view-plans">
-                    View Plans
-                  </Button>
-                </Link>
+            <CardContent className="p-4 text-center">
+              <ShieldCheck className="w-6 h-6 mx-auto text-primary mb-1" />
+              <div className="text-2xl font-bold" data-testid="text-total-aliases">
+                {stats.activeAliases}
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 text-left max-w-2xl mx-auto">
-                <div className="p-4 rounded-lg border bg-card">
-                  <Mail className="w-8 h-8 text-primary mb-2" />
-                  <h3 className="font-semibold text-sm">Masked Emails</h3>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Generate unique email addresses that forward to your real inbox. Disable anytime.
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg border bg-card">
-                  <Phone className="w-8 h-8 text-primary mb-2" />
-                  <h3 className="font-semibold text-sm">Masked Phone Numbers</h3>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Get disposable phone numbers for verifications and signups.
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg border bg-card">
-                  <User className="w-8 h-8 text-primary mb-2" />
-                  <h3 className="font-semibold text-sm">Masked Usernames</h3>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Create unique usernames for every service so breaches cannot link your accounts.
-                  </p>
-                </div>
+              <div className="text-xs text-muted-foreground">
+                Active Identities ({stats.currentCount}/{stats.limit})
               </div>
             </CardContent>
           </Card>
-        ) : (
-          <>
-            {statsLoading ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-24 rounded-xl" />
-                ))}
+          <Card>
+            <CardContent className="p-4 text-center">
+              <TrendingUp className="w-6 h-6 mx-auto text-green-500 mb-1" />
+              <div className="text-2xl font-bold" data-testid="text-forwarded">
+                {stats.totalForwarded}
               </div>
-            ) : stats ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <ShieldCheck className="w-6 h-6 mx-auto text-primary mb-1" />
-                    <div className="text-2xl font-bold" data-testid="text-total-aliases">
-                      {stats.activeAliases}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Active Identities ({stats.currentCount}/{stats.limit})
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <TrendingUp className="w-6 h-6 mx-auto text-green-500 mb-1" />
-                    <div className="text-2xl font-bold" data-testid="text-forwarded">
-                      {stats.totalForwarded}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Messages Forwarded</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <Shield className="w-6 h-6 mx-auto text-red-500 mb-1" />
-                    <div className="text-2xl font-bold" data-testid="text-blocked">
-                      {stats.totalBlocked}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Threats Blocked</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <Activity className="w-6 h-6 mx-auto text-blue-500 mb-1" />
-                    <div className="text-2xl font-bold" data-testid="text-alias-types">
-                      {Object.keys(stats.byType).length}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Identity Types</div>
-                  </CardContent>
-                </Card>
+              <div className="text-xs text-muted-foreground">Messages Forwarded</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Shield className="w-6 h-6 mx-auto text-red-500 mb-1" />
+              <div className="text-2xl font-bold" data-testid="text-blocked">
+                {stats.totalBlocked}
               </div>
-            ) : null}
+              <div className="text-xs text-muted-foreground">Threats Blocked</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Activity className="w-6 h-6 mx-auto text-blue-500 mb-1" />
+              <div className="text-2xl font-bold" data-testid="text-alias-types">
+                {Object.keys(stats.byType).length}
+              </div>
+              <div className="text-xs text-muted-foreground">Identity Types</div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : null}
 
-            {stats && stats.currentCount >= stats.limit && (
-              <Card className="border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      You have reached your {stats.tier} plan limit of {stats.limit} identities.
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Upgrade your Data Shield plan to create more masked identities.
-                    </p>
-                  </div>
-                  <Link href="/data-shield-pricing">
-                    <Button size="sm" variant="outline" data-testid="button-upgrade">
-                      Upgrade
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            )}
-
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                {(["all", "email", "phone", "username"] as const).map((type) => (
-                  <Button
-                    key={type}
-                    variant={filter === type ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setFilter(type)}
-                    data-testid={`button-filter-${type}`}
-                  >
-                    {type === "all" ? "All" : type.charAt(0).toUpperCase() + type.slice(1)}
-                  </Button>
-                ))}
-              </div>
-              <CreateAliasDialog onCreated={handleRefresh} />
+      {stats && stats.currentCount >= stats.limit && (
+        <Card className="border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20">
+          <CardContent className="p-4 flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium">
+                You have reached your {stats.tier} plan limit of {stats.limit} identities.
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Upgrade your Data Shield plan to create more masked identities.
+              </p>
             </div>
+            <Link href="/data-shield-pricing">
+              <Button size="sm" variant="outline" data-testid="button-upgrade">
+                Upgrade
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
-            {identitiesLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-32 rounded-xl" />
-                ))}
-              </div>
-            ) : filteredIdentities.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Shield className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
-                  <p className="text-muted-foreground">
-                    {filter !== "all"
-                      ? `No ${filter} identities yet. Create one to get started.`
-                      : "No masked identities yet. Create your first one to stop exposing your real information."}
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <AnimatePresence mode="popLayout">
-                <div className="space-y-3">
-                  {filteredIdentities.map((identity) => (
-                    <AliasCard
-                      key={identity.id}
-                      identity={identity}
-                      onRefresh={handleRefresh}
-                    />
-                  ))}
-                </div>
-              </AnimatePresence>
-            )}
-
-            <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-primary" />
-                  How Identity Shield Works
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
-                  <div>
-                    <div className="font-medium mb-1">1. Generate</div>
-                    <p className="text-muted-foreground text-xs">
-                      Create a masked email, phone, or username. Each is unique and encrypted.
-                    </p>
-                  </div>
-                  <div>
-                    <div className="font-medium mb-1">2. Use It Everywhere</div>
-                    <p className="text-muted-foreground text-xs">
-                      Sign up for services with your masked identity instead of your real one. Copy and paste from here.
-                    </p>
-                  </div>
-                  <div>
-                    <div className="font-medium mb-1">3. Stay Protected</div>
-                    <p className="text-muted-foreground text-xs">
-                      Messages forward to your real address. If a service gets breached, only the alias is exposed. Disable it in one click.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        )}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          {(["all", "email", "phone", "username"] as const).map((type) => (
+            <Button
+              key={type}
+              variant={filter === type ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilter(type)}
+              data-testid={`button-filter-${type}`}
+            >
+              {type === "all" ? "All" : type.charAt(0).toUpperCase() + type.slice(1)}
+            </Button>
+          ))}
+        </div>
+        <CreateAliasDialog onCreated={handleRefresh} />
       </div>
 
-      <Footer />
-    </>
+      {identitiesLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-32 rounded-xl" />
+          ))}
+        </div>
+      ) : filteredIdentities.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <Shield className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
+            <p className="text-muted-foreground">
+              {filter !== "all"
+                ? `No ${filter} identities yet. Create one to get started.`
+                : "No masked identities yet. Create your first one to stop exposing your real information."}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <AnimatePresence mode="popLayout">
+          <div className="space-y-3">
+            {filteredIdentities.map((identity) => (
+              <AliasCard
+                key={identity.id}
+                identity={identity}
+                onRefresh={handleRefresh}
+              />
+            ))}
+          </div>
+        </AnimatePresence>
+      )}
+
+      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+        <CardContent className="p-6">
+          <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+            How Identity Shield Works
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
+            <div>
+              <div className="font-medium mb-1">1. Generate</div>
+              <p className="text-muted-foreground text-xs">
+                Create a masked email, phone, or username. Each is unique and encrypted.
+              </p>
+            </div>
+            <div>
+              <div className="font-medium mb-1">2. Use It Everywhere</div>
+              <p className="text-muted-foreground text-xs">
+                Sign up for services with your masked identity instead of your real one. Copy and paste from here.
+              </p>
+            </div>
+            <div>
+              <div className="font-medium mb-1">3. Stay Protected</div>
+              <p className="text-muted-foreground text-xs">
+                Messages forward to your real address. If a service gets breached, only the alias is exposed. Disable it in one click.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

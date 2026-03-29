@@ -25,6 +25,7 @@ import {
   Eye,
   BarChart3,
   Trash2,
+  Fingerprint,
 } from "lucide-react";
 
 import { GuestScanForm } from "@/components/data-removal/guest-scan";
@@ -36,6 +37,7 @@ import { BrokerDatabase } from "@/components/data-removal/brokers";
 import { Reports } from "@/components/data-removal/reports";
 import { ProgressCelebration } from "@/components/data-removal/progress-celebration";
 import { MonitoringPanel, ComplianceTracker } from "@/components/data-removal/monitoring";
+import { IdentityShieldPanel } from "@/components/data-removal/identity-shield";
 import type { VaultProfile, DashboardStats } from "@/components/data-removal/types";
 
 type JourneyStep = "vault" | "scan" | "remove" | "monitor";
@@ -93,7 +95,7 @@ function AuthenticatedJourney() {
     queryKey: ["/api/data-removal/dashboard"],
   });
 
-  const [activeView, setActiveView] = useState<"journey" | "dashboard" | "vault" | "scan" | "tracker" | "brokers" | "reports" | "monitoring">("journey");
+  const [activeView, setActiveView] = useState<"journey" | "dashboard" | "vault" | "scan" | "tracker" | "brokers" | "reports" | "monitoring" | "identity">("journey");
 
   if (vaultLoading || dashboardLoading) {
     return (
@@ -130,6 +132,7 @@ function AuthenticatedJourney() {
   if (activeView === "brokers") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><BrokerDatabase /></>;
   if (activeView === "reports") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><Reports /></>;
   if (activeView === "monitoring") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><div className="space-y-6"><MonitoringPanel /><ComplianceTracker /></div></>;
+  if (activeView === "identity") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><IdentityShieldPanel /></>;
 
   return (
     <div className="space-y-6">
@@ -243,6 +246,7 @@ function AuthenticatedJourney() {
       <div className="space-y-2 pt-4">
         <p className="text-sm font-medium text-muted-foreground">Tools & Resources</p>
         {[
+          { id: "identity", label: "Identity Shield", icon: Fingerprint, desc: "Generate masked emails, phones, and usernames for signups", view: "identity" as const },
           { id: "vault", label: "Personal Vault", icon: Lock, desc: "Manage your protected information", view: "vault" as const },
           { id: "monitoring", label: "Monitoring & Compliance", icon: Eye, desc: "Continuous monitoring and regulatory compliance tracking", view: "monitoring" as const },
           { id: "brokers", label: "Broker Database", icon: Database, desc: "Browse 500+ known data broker sites", view: "brokers" as const },
@@ -276,9 +280,10 @@ const viewLabels: Record<string, string> = {
   brokers: "Broker Database",
   reports: "Reports",
   monitoring: "Monitoring & Compliance",
+  identity: "Identity Shield",
 };
 
-function ViewNav({ activeView, setActiveView }: { activeView: string; setActiveView: (v: "journey" | "dashboard" | "vault" | "scan" | "tracker" | "brokers" | "reports" | "monitoring") => void }) {
+function ViewNav({ activeView, setActiveView }: { activeView: string; setActiveView: (v: "journey" | "dashboard" | "vault" | "scan" | "tracker" | "brokers" | "reports" | "monitoring" | "identity") => void }) {
   return (
     <div className="mb-6 flex items-center gap-2">
       <Button
