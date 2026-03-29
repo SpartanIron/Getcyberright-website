@@ -43,10 +43,10 @@ export function ThreatAwareness() {
           </div>
 
           <h2 id="threat-heading" className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-5" data-testid="text-threat-heading">
-            The threats your family faces have changed. Your protection should too.
+            Today's scams do not look like scams anymore.
           </h2>
           <p className="text-lg text-white/75 leading-relaxed mb-8">
-            Scam messages now look identical to real ones from your bank or favorite stores. Criminals can copy a loved one's voice to make phone calls. And your personal data is being collected and sold without your permission.
+            That text from your bank? It could be fake. That phone call from your grandchild? It might be an AI-generated voice. Your name, address, and phone number are already on hundreds of websites you have never heard of. The good news: you can fight back.
           </p>
 
           <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-10">

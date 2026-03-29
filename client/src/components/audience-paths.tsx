@@ -10,7 +10,7 @@ const paths = [
   {
     id: "families",
     title: "Parents & Families",
-    description: "Age-appropriate guides, device monitoring tips, and conversation starters.",
+    description: "Set up safe devices, start the right conversations, and protect your kids online.",
     href: "/parents",
     image: familyImg,
     alt: "Diverse family together at home",
@@ -18,7 +18,7 @@ const paths = [
   {
     id: "seniors",
     title: "Seniors",
-    description: "Spot phone scams, protect your identity, and use technology with confidence.",
+    description: "Recognize phone scams, protect your identity, and use technology with confidence.",
     href: "/seniors",
     image: seniorsImg,
     alt: "Seniors learning about online safety with a younger guide",
@@ -26,7 +26,7 @@ const paths = [
   {
     id: "kids",
     title: "Kids & Teens",
-    description: "Interactive safety lessons designed for ages 8 to 16.",
+    description: "Fun, interactive lessons that teach kids and teens to stay safe online.",
     href: "/kids",
     image: kidsImg,
     alt: "Diverse children using computers in a classroom",
@@ -34,7 +34,7 @@ const paths = [
   {
     id: "educators",
     title: "Educators",
-    description: "Curriculum resources and classroom-ready cybersecurity materials.",
+    description: "Ready-made lesson plans and classroom activities for teaching digital safety.",
     href: "/educators",
     image: educatorImg,
     alt: "Family learning together with educational materials",
@@ -42,7 +42,7 @@ const paths = [
   {
     id: "business",
     title: "Small Businesses",
-    description: "Free awareness training your whole team can finish in a lunch break.",
+    description: "Quick, practical security training your whole team can finish in a lunch break.",
     href: "/small-business",
     image: businessImg,
     alt: "Diverse business team in a cybersecurity training session",
@@ -55,10 +55,10 @@ export function AudiencePaths() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-14 sm:mb-20">
           <h2 id="audience-paths-heading" className="text-4xl sm:text-5xl font-extrabold text-foreground mb-5" data-testid="text-audience-paths-heading">
-            Protection Built for the Way You Live
+            Safety Guides Built for Your World
           </h2>
           <p className="text-xl text-muted-foreground leading-relaxed">
-            Pick the path that fits your life. Every guide is written for real people, not IT departments.
+            Whether you are a parent, grandparent, teacher, or business owner, there is a path here for you. No jargon, no assumptions, just practical help.
           </p>
         </div>
 

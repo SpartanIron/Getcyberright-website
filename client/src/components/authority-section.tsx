@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import authorityImg from "@/assets/images/feature-family-learning-diverse.webp";
 
 const trustPoints = [
-  "Backed by the same data that law enforcement and security agencies worldwide rely on",
-  "Every scan checks 8 trusted sources to tell you if something is safe",
-  "Built to internationally recognized safety standards",
-  "Designed for families, not IT departments",
-  "Free to get started, no account required",
-  "Trusted by families, educators, and small businesses",
+  "Powered by the same threat data law enforcement and security agencies rely on",
+  "Every scan checks 8 trusted sources and gives you a clear, plain-language result",
+  "Built to internationally recognized safety standards (NIST, MITRE)",
+  "Designed for families, seniors, and small businesses, not IT departments",
+  "Free to get started with no account required",
+  "Used by families and educators across 30+ countries",
 ];
 
 export function AuthoritySection() {
@@ -34,10 +34,10 @@ export function AuthoritySection() {
 
           <div className="order-1 lg:order-2">
             <h2 id="authority-heading" className="text-4xl sm:text-5xl font-extrabold text-foreground mb-6" data-testid="text-authority-heading">
-              Built on the Same Data the Experts Use
+              Professional-Grade Protection, Built for Real People
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed mb-10">
-              GetCyberRight uses the same safety tools that protect banks and government agencies worldwide, now available to your family.
+              The same safety databases that protect banks and government agencies, made simple enough for anyone to use.
             </p>
 
             <div className="space-y-0 mb-10">

@@ -45,10 +45,10 @@ export function ContentPreview() {
           <div>
             <div className="max-w-3xl mb-14 sm:mb-16">
               <h2 id="content-heading" className="text-4xl sm:text-5xl font-extrabold text-foreground mb-5" data-testid="text-content-heading">
-                Stay Informed, Stay Protected
+                Know What to Watch For
               </h2>
               <p className="text-xl text-muted-foreground leading-relaxed">
-                Active scam alerts and safety guides updated regularly. Written in plain language so your whole family can understand them.
+                New scam alerts and safety guides every week, written so your whole family can understand and act on them.
               </p>
             </div>
 

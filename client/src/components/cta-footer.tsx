@@ -21,10 +21,10 @@ export function CTAFooter() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-center md:text-left">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white" data-testid="text-cta-footer-heading">
-              Your family's safety is worth 5 minutes.
+              Five minutes today could save your family from a scam tomorrow.
             </h2>
             <p className="text-lg text-white/80 mt-3">
-              Take a quick safety check and find out where your family stands. No account needed, no data stored.
+              Take a quick safety check and see where you stand. No account needed, nothing stored.
             </p>
           </div>
           <Button asChild size="lg" className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold text-base flex-shrink-0" data-testid="button-cta-footer">

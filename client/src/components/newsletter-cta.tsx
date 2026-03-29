@@ -104,10 +104,10 @@ export function NewsletterCTA() {
         </div>
 
         <h2 id="newsletter-heading" className="text-3xl sm:text-4xl font-extrabold text-white mb-4" data-testid="text-newsletter-heading">
-          Stay One Step Ahead
+          Get Smarter About Safety Every Week
         </h2>
         <p className="text-lg text-white/80 mb-6 leading-relaxed">
-          Join families who get weekly scam alerts, safety tips, and tool updates delivered to their inbox. Free, no spam, unsubscribe anytime.
+          One email a week with the latest scam alerts, quick safety tips, and new tools to protect your family. Free, no spam, unsubscribe anytime.
         </p>
 
         <div className="flex flex-wrap justify-center gap-5 sm:gap-6 mb-8">

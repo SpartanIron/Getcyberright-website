@@ -6,22 +6,22 @@ const steps = [
   {
     number: "1",
     icon: Search,
-    title: "Paste a suspicious link, email, or message",
-    description: "Copy anything that looks suspicious and drop it into our GCR Scam Guard. No signup needed.",
+    title: "Paste anything that looks suspicious",
+    description: "Got a weird text, email, or link? Copy it and drop it into GCR Scam Guard. No account, no download, no hassle.",
     color: "bg-primary/10 text-primary",
   },
   {
     number: "2",
     icon: Shield,
-    title: "We check 8 trusted sources instantly",
-    description: "Your submission is scanned across multiple safety sources including VirusTotal, PhishTank, and more in real time.",
+    title: "We run it through 8 safety sources",
+    description: "In seconds, your submission is checked against VirusTotal, PhishTank, Google Safe Browsing, and five other trusted databases.",
     color: "bg-accent/10 text-accent",
   },
   {
     number: "3",
     icon: CheckCircle,
-    title: "Get a clear safety score in seconds",
-    description: "You get a plain-language verdict: safe, suspicious, or dangerous, with a full breakdown of why.",
+    title: "Get a clear answer, not a tech report",
+    description: "Safe, suspicious, or dangerous, explained in plain language with a breakdown anyone can understand.",
     color: "bg-green-500/10 text-green-600 dark:text-green-400",
   },
 ];
@@ -32,10 +32,10 @@ export function HowItWorks() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-3" data-testid="text-how-it-works-heading">
-            How It Works
+            Protection in Three Simple Steps
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Three steps. No technical knowledge required. No account needed.
+            If you can copy and paste, you can protect your family.
           </p>
         </div>
 

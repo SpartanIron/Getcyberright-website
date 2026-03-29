@@ -54,10 +54,10 @@ export function Testimonials() {
             className="text-4xl sm:text-5xl font-extrabold text-white mb-5"
             data-testid="text-testimonials-heading"
           >
-            What People Are Saying
+            Real Stories from Real Families
           </h2>
           <p className="text-xl text-white/70 leading-relaxed">
-            Real situations where the right tool or the right information made the difference.
+            People around the world are using these tools to protect the people they love. Here are some of their stories.
           </p>
         </div>
 

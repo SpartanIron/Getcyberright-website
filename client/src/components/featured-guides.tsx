@@ -112,10 +112,10 @@ export function FeaturedGuide() {
               Featured Guide
             </Badge>
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-              Protect Your Family Today
+              This Week's Essential Read
             </h2>
             <p className="text-muted-foreground mt-1">
-              Practical, jargon-free guides you can use right now
+              Practical guides you can use right now, written in plain language
             </p>
           </div>
           <Link href="/guides" className="hidden sm:flex items-center gap-1 text-sm text-primary hover:underline" data-testid="link-all-guides">

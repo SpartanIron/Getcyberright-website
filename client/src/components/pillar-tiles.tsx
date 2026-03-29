@@ -10,7 +10,7 @@ const features = [
     id: "scam-checker",
     label: "Most Popular",
     title: "GCR Scam Guard",
-    description: "Paste a suspicious URL, email, phone number, or message and get an instant risk analysis. Checked against 8 trusted safety sources in real time.",
+    description: "Got a suspicious text, email, or link? Paste it here and find out in seconds if it is safe. Checked against 8 trusted safety databases automatically.",
     href: "/scam-checker",
     cta: "Check a Scam",
     icon: Search,
@@ -24,7 +24,7 @@ const features = [
     id: "data-removal",
     label: "Privacy",
     title: "GCR Data Shield",
-    description: "Your personal information may be exposed on data broker sites and in data breaches. GCR Data Shield scans for your exposure and shows you how to protect yourself.",
+    description: "Your name, email, and phone number may already be listed on hundreds of data broker websites. Find out where you are exposed and take back control of your information.",
     href: "/shield",
     cta: "Scan Your Exposure",
     icon: ShieldCheck,
@@ -38,7 +38,7 @@ const features = [
     id: "training",
     label: "Education",
     title: "Training Academy",
-    description: "Structured, audience-specific courses for parents, seniors, kids, and small businesses. Earn badges and build real cybersecurity awareness at your own pace.",
+    description: "Short, practical courses for parents, seniors, kids, and small businesses. Learn at your own pace, earn badges, and build real safety habits that stick.",
     href: "/training",
     cta: "Start Learning",
     icon: GraduationCap,
@@ -56,10 +56,10 @@ export function PillarTiles() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-14 sm:mb-20">
           <h2 id="pillars-heading" className="text-4xl sm:text-5xl font-extrabold text-white mb-5" data-testid="text-pillars-heading">
-            Your Protection Starts Here
+            Three Ways to Protect What Matters
           </h2>
           <p className="text-xl text-white/75 leading-relaxed">
-            The same protection that large organizations rely on, built for your family. Pick a tool and take action in under a minute.
+            Detect scams, control your personal data, and learn safety habits your whole family can use. Pick one and start in under a minute.
           </p>
         </div>
 
