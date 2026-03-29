@@ -180,18 +180,18 @@ export function HeroSection() {
                 className="text-[2rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-white leading-[1.05] mb-6 sm:mb-8"
                 data-testid="text-hero-heading"
               >
-                Your Family Is
+                Online Safety
                 <br />
-                the Target.
+                Should Not Require
                 <br />
-                <span className="hero-gradient-text">We Are the Shield.</span>
+                <span className="hero-gradient-text">a Tech Degree.</span>
               </h1>
 
               <p
                 className="text-base sm:text-xl text-white/80 leading-relaxed mb-8 sm:mb-10"
                 data-testid="text-hero-subtext"
               >
-                GetCyberRight is the most accessible digital protection platform for families and everyday people. Spot scams before they trick you, find and take control of your personal data across hundreds of sites, and learn to stay safe online with simple guides anyone can follow. Everything you need, all in one place.
+                GetCyberRight makes digital protection simple for everyone. Check if that text or email is a scam, discover who has your personal data and remove it, and learn practical safety habits with guides written in plain language. Protection for the whole family, no expertise needed.
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 mb-8 sm:mb-10">

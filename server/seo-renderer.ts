@@ -1533,7 +1533,7 @@ function renderHomePage(): string {
 
   <header>
     <h1>GetCyberRight: Cybersecurity Tools for Families, Seniors &amp; Small Businesses</h1>
-    <p style="font-size:18px;color:#444;">GetCyberRight is the most accessible digital protection platform for families and everyday people. Spot scams before they trick you, find and take control of your personal data across hundreds of sites, and learn to stay safe online with simple guides anyone can follow. Everything you need, all in one place.</p>
+    <p style="font-size:18px;color:#444;">GetCyberRight makes digital protection simple for everyone. Check if that text or email is a scam, discover who has your personal data and remove it, and learn practical safety habits with guides written in plain language. Protection for the whole family, no expertise needed.</p>
   </header>
 
   <section>
