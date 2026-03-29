@@ -20,7 +20,7 @@ function ssrBuildPlugin() {
         );
         console.log("[SSR] SSR bundle built successfully");
       } catch (e) {
-        console.error("[SSR] SSR build failed — site will fall back to client-side rendering");
+        console.error("[SSR] SSR build failed. Site will fall back to client-side rendering.");
       }
     },
   };

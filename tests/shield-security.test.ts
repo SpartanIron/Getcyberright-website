@@ -40,7 +40,7 @@ async function del(path: string) {
 // ═══════════════════════════════════════════════════
 async function testInputValidation() {
   console.log("\n=== INPUT VALIDATION (3-request rate-limit budget) ===");
-  console.log("  Note: rate limiter fires before Zod — all 3 slots used here");
+  console.log("  Note: rate limiter fires before Zod. All 3 slots used here.");
 
   const res3 = await post("/api/scan", {
     firstName: "A".repeat(101),
@@ -50,7 +50,7 @@ async function testInputValidation() {
   });
   record("Input Validation", "Oversized firstName (101 chars)",
     res3.status === 400,
-    `Status ${res3.status} — Zod max(100) enforced`);
+    `Status ${res3.status}, Zod max(100) enforced`);
 
   const res4 = await post("/api/scan", {
     firstName: "",
@@ -60,7 +60,7 @@ async function testInputValidation() {
   });
   record("Input Validation", "Empty firstName",
     res4.status === 400,
-    `Status ${res4.status} — Zod min(1) enforced`);
+    `Status ${res4.status}, Zod min(1) enforced`);
 
   const res6 = await post("/api/scan", {
     firstName: "Test",
@@ -74,7 +74,7 @@ async function testInputValidation() {
 }
 
 async function testInputValidationDesignOnly() {
-  console.log("\n=== INPUT VALIDATION (DESIGN AUDIT — beyond rate-limit budget) ===");
+  console.log("\n=== INPUT VALIDATION (DESIGN AUDIT, beyond rate-limit budget) ===");
   console.log("  Note: rate limiter blocks further scan requests; these are verified by code review");
 
   record("Consent", "Missing consentGiven field rejected by Zod",
@@ -83,7 +83,7 @@ async function testInputValidationDesignOnly() {
 
   record("Consent", "consentGiven=null rejected by Zod",
     true,
-    "Zod z.boolean() rejects null — only true/false accepted, then refine requires true");
+    "Zod z.boolean() rejects null. Only true/false accepted, then refine requires true.");
 
   record("Input Validation", "Invalid email format rejected by Zod",
     true,
@@ -106,18 +106,18 @@ async function testRateLimiting() {
 
   record("Rate Limiting", "Excess scan request returns 429",
     res.status === 429,
-    `Status ${res.status} — rate limit enforced after 3 requests`);
+    `Status ${res.status}, rate limit enforced after 3 requests`);
 }
 
 // ═══════════════════════════════════════════════════
-// 3. INPUT VALIDATION (design audit — no HTTP calls needed)
+// 3. INPUT VALIDATION (design audit, no HTTP calls needed)
 // ═══════════════════════════════════════════════════
 async function testInputDesignAudit() {
   console.log("\n=== INPUT VALIDATION (DESIGN AUDIT) ===");
 
   record("Input Validation", "SQL injection safe (Drizzle parameterized queries)",
     true,
-    "Drizzle ORM uses parameterized queries — SQL injection impossible via scan endpoint");
+    "Drizzle ORM uses parameterized queries. SQL injection impossible via scan endpoint.");
 
   record("Input Validation", "XSS stored safely (parameterized insert)",
     true,
@@ -125,7 +125,7 @@ async function testInputDesignAudit() {
 
   record("Input Validation", "Mass assignment prevented (Zod strict parse)",
     true,
-    "shieldScanInputSchema defines exact fields — extra fields stripped by Zod .parse()");
+    "shieldScanInputSchema defines exact fields. Extra fields stripped by Zod .parse().");
 
   record("Input Validation", "Unicode characters handled safely",
     true,
@@ -183,7 +183,7 @@ async function testPiiLeakPrevention() {
 
   record("PII Leak Prevention", "Console logs use scanId only",
     true,
-    "All [shield-scan] logs reference scanId, never email/name/phone — verified by code review");
+    "All [shield-scan] logs reference scanId, never email/name/phone. Verified by code review.");
 
   record("PII Leak Prevention", "Error responses don't leak PII",
     true,
@@ -315,7 +315,7 @@ async function main() {
   if (failed > 0) {
     console.log("\nFailed tests:");
     for (const r of results.filter((r) => !r.passed)) {
-      console.log(`  FAIL: [${r.category}] ${r.name} — ${r.details}`);
+      console.log(`  FAIL: [${r.category}] ${r.name}: ${r.details}`);
     }
   }
 

@@ -85,7 +85,7 @@ async function sendAlertEmail(
 
   if (!resendApiKey) {
     console.log(
-      `[rescan-job] RESEND_API_KEY not configured — email to ${to.substring(0, 3)}*** would have been sent`,
+      `[rescan-job] RESEND_API_KEY not configured. Email to ${to.substring(0, 3)}*** would have been sent.`,
     );
     console.log(`[rescan-job] Subject: ${content.subject}`);
     return;

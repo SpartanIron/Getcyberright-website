@@ -347,7 +347,7 @@ End the work week with a quick, easy-to-digest safety tip people can act on over
 
     case "weekend_roundup":
       return `TODAY'S CONTENT PILLAR: WEEKEND SAFETY ROUNDUP
-Saturday content should feel timely and accessible. Highlight what happened this week in plain language -- the biggest breach, the trending scam, the new tactic to watch for. Frame it as "what you might have missed this week." People are scrolling casually on Saturday mornings. Make it scannable and shareable. Prioritize breaking_insight or preventative_education content mode.`;
+Saturday content should feel timely and accessible. Highlight what happened this week in plain language: the biggest breach, the trending scam, the new tactic to watch for. Frame it as "what you might have missed this week." People are scrolling casually on Saturday mornings. Make it scannable and shareable. Prioritize breaking_insight or preventative_education content mode.`;
 
     case "family_focus":
       return `TODAY'S CONTENT PILLAR: FAMILY FOCUS SUNDAY
@@ -1228,11 +1228,10 @@ async function downloadSourceImage(url: string, title: string): Promise<string |
     }
 
     await sharp(buffer)
-      .resize(1200, 630, { fit: "cover", position: "center" })
       .png({ quality: 90 })
       .toFile(outputPath);
 
-    console.log(`[TrendEngine] Downloaded source image: ${filename} (${metadata.width}x${metadata.height} original, ${(buffer.length / 1024).toFixed(0)}KB)`);
+    console.log(`[TrendEngine] Downloaded source image: ${filename} (${metadata.width}x${metadata.height}, ${(buffer.length / 1024).toFixed(0)}KB)`);
     return outputPath;
   } catch (error: any) {
     console.warn(`[TrendEngine] Failed to download source image: ${error.message}`);
@@ -1280,11 +1279,10 @@ async function generateAIImage(prompt: string, title: string): Promise<string | 
           const imgBuffer = Buffer.from(data.data[0].b64_json, "base64");
           const sharp = (await import("sharp")).default;
           await sharp(imgBuffer)
-            .resize(1200, 630, { fit: "cover", position: "center" })
             .png({ quality: 90 })
             .toFile(outputPath);
 
-          console.log(`[TrendEngine] Generated AI image (1200x630): ${filename}`);
+          console.log(`[TrendEngine] Generated AI image: ${filename}`);
           return outputPath;
         }
       }
@@ -1309,56 +1307,162 @@ async function resolvePostImage(
   if (sourceImageUrl) {
     const downloaded = await downloadSourceImage(sourceImageUrl, title);
     if (downloaded) {
-      const publicUrl = getPublicImageUrl(downloaded);
-      if (publicUrl) {
-        const igPath = await cropImageForInstagram(downloaded, title);
-        const igUrl = igPath ? getPublicImageUrl(igPath) : publicUrl;
-        console.log(`[TrendEngine] Using source article image`);
-        return { mainImage: publicUrl, igImage: igUrl, imageSource: "source" };
+      const mainPath = await applyBrandOverlay(downloaded, imageHeadline, imageSubtext, templateStyle, 1200, 630);
+      const igPath = await applyBrandOverlay(downloaded, imageHeadline, imageSubtext, templateStyle, 1080, 1080);
+      const mainUrl = mainPath ? getPublicImageUrl(mainPath) : null;
+      const igUrl = igPath ? getPublicImageUrl(igPath) : mainUrl;
+      if (mainUrl) {
+        console.log(`[TrendEngine] Using branded source article image`);
+        return { mainImage: mainUrl, igImage: igUrl, imageSource: "source" };
       }
     }
-    console.warn(`[TrendEngine] Source image download failed, trying AI generation...`);
+    console.warn(`[TrendEngine] Source image processing failed, trying AI generation...`);
   }
 
   if (aiImagePrompt) {
     const aiImage = await generateAIImage(aiImagePrompt, title);
     if (aiImage) {
-      const publicUrl = getPublicImageUrl(aiImage);
-      if (publicUrl) {
-        const igPath = await cropImageForInstagram(aiImage, title);
-        const igUrl = igPath ? getPublicImageUrl(igPath) : publicUrl;
-        console.log(`[TrendEngine] Using AI-generated image`);
-        return { mainImage: publicUrl, igImage: igUrl, imageSource: "ai" };
+      const mainPath = await applyBrandOverlay(aiImage, imageHeadline, imageSubtext, templateStyle, 1200, 630);
+      const igPath = await applyBrandOverlay(aiImage, imageHeadline, imageSubtext, templateStyle, 1080, 1080);
+      const mainUrl = mainPath ? getPublicImageUrl(mainPath) : null;
+      const igUrl = igPath ? getPublicImageUrl(igPath) : mainUrl;
+      if (mainUrl) {
+        console.log(`[TrendEngine] Using branded AI-generated image`);
+        return { mainImage: mainUrl, igImage: igUrl, imageSource: "ai" };
       }
     }
-    console.warn(`[TrendEngine] AI image generation failed, falling back to branded image...`);
+    console.warn(`[TrendEngine] AI image generation failed, falling back to branded card...`);
   }
 
   const mainPath = await generatePostImage(imageHeadline, imageSubtext, templateStyle);
   const mainImage = mainPath ? getPublicImageUrl(mainPath) : null;
   const igPath = await generateInstagramImage(imageHeadline, imageSubtext, templateStyle);
-  const igImage = igPath ? getPublicImageUrl(igPath) : null;
+  const igImage = igPath ? getPublicImageUrl(igPath) : (mainImage ?? null);
 
   return { mainImage, igImage, imageSource: "branded" };
 }
 
-async function cropImageForInstagram(sourcePath: string, title: string): Promise<string | null> {
+async function applyBrandOverlay(
+  sourcePath: string,
+  headline: string,
+  subtext: string,
+  templateStyle: TemplateStyle,
+  width: number,
+  height: number
+): Promise<string | null> {
   try {
     ensureSocialImagesDir();
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
-    const filename = `ig-${slug}-${Date.now()}.png`;
+    const isSquare = width === height;
+    const slug = headline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 35);
+    const prefix = isSquare ? "branded-ig" : "branded";
+    const filename = `${prefix}-${slug}-${Date.now()}.png`;
     const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
 
     const sharp = (await import("sharp")).default;
-    await sharp(sourcePath)
-      .resize(1080, 1080, { fit: "cover", position: "center" })
-      .png({ quality: 90 })
+
+    const baseImage = await sharp(sourcePath)
+      .resize(width, height, { fit: "cover", position: "center" })
+      .toBuffer();
+
+    const logoPath = path.join(process.cwd(), "client", "public", "lock-logo-transparent.png");
+    let logoBase64 = "";
+    if (fs.existsSync(logoPath)) {
+      const logoBuffer = fs.readFileSync(logoPath);
+      logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
+    }
+
+    const templates: Record<TemplateStyle, { accent: string; accentLight: string }> = {
+      stat_card: { accent: "#E8732A", accentLight: "#F5A66D" },
+      tip_card: { accent: "#4ECDC4", accentLight: "#7EDDD6" },
+      alert_card: { accent: "#FF4444", accentLight: "#FF7777" },
+      insight_card: { accent: "#E8732A", accentLight: "#F5A66D" },
+      quote_card: { accent: "#45B7D1", accentLight: "#7DD3E8" },
+    };
+
+    const tmpl = templates[templateStyle];
+    const maxChars = isSquare ? 16 : 22;
+    let headlineLines = wrapText(headline, maxChars);
+    if (headlineLines.length > 3) {
+      headlineLines = headlineLines.slice(0, 3);
+      headlineLines[2] = headlineLines[2].slice(0, -3) + "...";
+    }
+
+    const fontSize = isSquare
+      ? (headlineLines.length > 2 ? 48 : 56)
+      : (headlineLines.length > 2 ? 40 : 48);
+    const lineHeight = fontSize + 12;
+    const totalTextHeight = headlineLines.length * lineHeight;
+
+    const bottomBarHeight = isSquare ? 340 : 200;
+    const gradientStart = height - bottomBarHeight - 80;
+
+    const headlineStartY = height - bottomBarHeight + 50 + (isSquare ? 10 : 0);
+    const subtextY = headlineStartY + totalTextHeight + 14;
+
+    const headlineSvg = headlineLines
+      .map((line, i) => {
+        return `<text x="${isSquare ? 60 : 70}" y="${headlineStartY + i * lineHeight}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="800" fill="white" letter-spacing="-0.5" filter="url(#textShadow)">${escapeXml(line)}</text>`;
+      })
+      .join("\n");
+
+    let subtextLine = subtext;
+    if (subtextLine.length > (isSquare ? 45 : 60)) {
+      subtextLine = subtextLine.slice(0, isSquare ? 42 : 57) + "...";
+    }
+
+    const logoSize = isSquare ? 32 : 28;
+    const logoX = isSquare ? 60 : 70;
+    const logoY = isSquare ? height - 70 : height - 55;
+    const brandTextX = logoBase64 ? (logoX + logoSize + 10) : logoX;
+    const brandTextY = logoY + logoSize - 6;
+
+    const logoElement = logoBase64
+      ? `<image href="${logoBase64}" x="${logoX}" y="${logoY}" width="${logoSize}" height="${logoSize}" opacity="0.95"/>`
+      : "";
+
+    const accentBarH = isSquare ? 6 : 5;
+
+    const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="bottomGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#000000" stop-opacity="0.4"/>
+      <stop offset="70%" stop-color="#000000" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.95"/>
+    </linearGradient>
+    <filter id="textShadow">
+      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#000000" flood-opacity="0.7"/>
+    </filter>
+  </defs>
+
+  <rect y="${gradientStart}" width="${width}" height="${height - gradientStart}" fill="url(#bottomGrad)"/>
+
+  <rect x="0" y="0" width="${width}" height="${accentBarH}" fill="${tmpl.accent}" opacity="0.9"/>
+
+  ${headlineSvg}
+
+  <text x="${isSquare ? 60 : 70}" y="${subtextY}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="${isSquare ? 20 : 18}" fill="${tmpl.accentLight}" opacity="0.95" filter="url(#textShadow)">${escapeXml(subtextLine)}</text>
+
+  ${logoElement}
+  <text x="${brandTextX}" y="${brandTextY}" font-family="'Segoe UI',Arial,sans-serif" font-size="${isSquare ? 16 : 14}" font-weight="600" fill="${tmpl.accent}" letter-spacing="1.5" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
+
+  <rect x="0" y="${height - accentBarH}" width="${width}" height="${accentBarH}" fill="${tmpl.accent}" opacity="0.85"/>
+</svg>`;
+
+    const overlaySvgBuffer = await sharp(Buffer.from(svg))
+      .resize(width, height)
+      .png()
+      .toBuffer();
+
+    await sharp(baseImage)
+      .composite([{ input: overlaySvgBuffer, top: 0, left: 0 }])
+      .png({ quality: 95 })
       .toFile(outputPath);
 
-    console.log(`[TrendEngine] Cropped Instagram square image: ${filename}`);
+    console.log(`[TrendEngine] Applied brand overlay: ${filename} (${width}x${height}, template: ${templateStyle})`);
     return outputPath;
   } catch (error: any) {
-    console.warn(`[TrendEngine] Instagram crop failed: ${error.message}`);
+    console.error(`[TrendEngine] Brand overlay failed: ${error.message}`);
     return null;
   }
 }
@@ -1377,6 +1481,14 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
   const lines: string[] = [];
   let current = "";
   for (const word of words) {
+    if (word.length > maxCharsPerLine) {
+      if (current) lines.push(current.trim());
+      for (let i = 0; i < word.length; i += maxCharsPerLine) {
+        lines.push(word.slice(i, i + maxCharsPerLine));
+      }
+      current = "";
+      continue;
+    }
     if ((current + " " + word).trim().length > maxCharsPerLine) {
       if (current) lines.push(current.trim());
       current = word;
