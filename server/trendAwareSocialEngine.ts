@@ -233,13 +233,16 @@ function getRecentPerformanceSummary(): string {
 
 const POSTING_DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-type ContentPillar = "threat_alert" | "practical_protection" | "myth_buster" | "family_focus";
+type ContentPillar = "threat_alert" | "practical_protection" | "myth_buster" | "family_focus" | "weekly_kickoff" | "friday_tips" | "weekend_roundup";
 
 const CONTENT_PILLARS: Record<number, ContentPillar> = {
+  0: "family_focus",
+  1: "weekly_kickoff",
   2: "threat_alert",
   3: "practical_protection",
   4: "myth_buster",
-  0: "family_focus",
+  5: "friday_tips",
+  6: "weekend_roundup",
 };
 
 const PILLAR_LABELS: Record<ContentPillar, string> = {
@@ -247,6 +250,9 @@ const PILLAR_LABELS: Record<ContentPillar, string> = {
   practical_protection: "Practical Protection Wednesday",
   myth_buster: "Myth Buster Thursday",
   family_focus: "Family Focus Sunday",
+  weekly_kickoff: "Start Your Week Safe Monday",
+  friday_tips: "Friday Quick Tips",
+  weekend_roundup: "Weekend Safety Roundup",
 };
 
 interface PlatformPostingWindow {
@@ -257,22 +263,31 @@ interface PlatformPostingWindow {
 
 const PLATFORM_POSTING_WINDOWS: Record<string, Record<number, PlatformPostingWindow | null>> = {
   linkedin: {
+    0: null,
+    1: { hour: 8, minute: 30, windowMinutes: 90 },
     2: { hour: 9, minute: 0, windowMinutes: 60 },
     3: { hour: 9, minute: 0, windowMinutes: 60 },
     4: { hour: 9, minute: 0, windowMinutes: 60 },
-    0: null,
+    5: { hour: 10, minute: 0, windowMinutes: 60 },
+    6: null,
   },
   facebook: {
+    0: { hour: 19, minute: 30, windowMinutes: 60 },
+    1: { hour: 11, minute: 0, windowMinutes: 90 },
     2: { hour: 11, minute: 30, windowMinutes: 90 },
     3: { hour: 11, minute: 30, windowMinutes: 90 },
     4: { hour: 11, minute: 30, windowMinutes: 90 },
-    0: { hour: 19, minute: 30, windowMinutes: 60 },
+    5: { hour: 12, minute: 0, windowMinutes: 90 },
+    6: { hour: 10, minute: 0, windowMinutes: 120 },
   },
   instagram: {
+    0: { hour: 19, minute: 0, windowMinutes: 60 },
+    1: { hour: 11, minute: 30, windowMinutes: 60 },
     2: { hour: 12, minute: 0, windowMinutes: 60 },
     3: { hour: 12, minute: 0, windowMinutes: 60 },
     4: { hour: 12, minute: 0, windowMinutes: 60 },
-    0: { hour: 19, minute: 0, windowMinutes: 60 },
+    5: { hour: 12, minute: 30, windowMinutes: 60 },
+    6: { hour: 10, minute: 30, windowMinutes: 90 },
   },
 };
 
@@ -310,6 +325,10 @@ function getTodaysPillar(): ContentPillar | null {
 
 function getPillarPromptInstructions(pillar: ContentPillar): string {
   switch (pillar) {
+    case "weekly_kickoff":
+      return `TODAY'S CONTENT PILLAR: START YOUR WEEK SAFE MONDAY
+Kick off the week with a quick security briefing. Lead with "This week in cyber:" and highlight the 1-2 biggest threats or stories breaking right now. Frame it as "here's what you need to know before your week starts." If there's a major breach, scam wave, or new threat trending, lead with that. If it's a quieter week, pick a practical "do this one thing today" tip. The tone is energetic, forward-looking, and sets GCR up as the trusted weekly briefing. Prioritize breaking_insight content mode.`;
+
     case "threat_alert":
       return `TODAY'S CONTENT PILLAR: THREAT ALERT TUESDAY
 Focus on the most urgent active threat, scam, or vulnerability from the news feed. This is GCR's "we're watching so you don't have to" authority play. Prioritize breaking_insight or quick_breakdown content modes. The audience expects timely, actionable threat intelligence today.`;
@@ -322,9 +341,20 @@ Focus on ONE specific, actionable protection tip. "Change this setting." "Check 
       return `TODAY'S CONTENT PILLAR: MYTH BUSTER THURSDAY
 Challenge conventional cybersecurity wisdom. Pick a common misconception related to today's news and demolish it with specific facts. Be slightly provocative. Strong opinions drive engagement because people argue. Prioritize myth_debunking content mode. The audience expects a hot take backed by real expertise today.`;
 
+    case "friday_tips":
+      return `TODAY'S CONTENT PILLAR: FRIDAY QUICK TIPS
+End the work week with a quick, easy-to-digest safety tip people can act on over the weekend. "Before you close your laptop for the weekend..." or "Weekend project: 5 minutes to check your..." Keep it light, practical, and completable. People are wrapping up their week and want something they can knock out quickly. Prioritize preventative_education content mode.`;
+
+    case "weekend_roundup":
+      return `TODAY'S CONTENT PILLAR: WEEKEND SAFETY ROUNDUP
+Saturday content should feel timely and accessible. Highlight what happened this week in plain language -- the biggest breach, the trending scam, the new tactic to watch for. Frame it as "what you might have missed this week." People are scrolling casually on Saturday mornings. Make it scannable and shareable. Prioritize breaking_insight or preventative_education content mode.`;
+
     case "family_focus":
       return `TODAY'S CONTENT PILLAR: FAMILY FOCUS SUNDAY
 Use relatable family scenarios. "Your kid got a message that says..." or "Your parent called about a 'Microsoft' call..." These are the most shareable posts because they hit home. Prioritize scenario_simulation content mode. The audience is relaxed, scrolling on a Sunday evening, thinking about the week ahead. Make it personal and protective.`;
+
+    default:
+      return "";
   }
 }
 
@@ -425,7 +455,7 @@ async function checkRateLimit(): Promise<{ allowed: boolean; availablePlatforms:
 
     if (!isPostingDay()) {
       const dayName = POSTING_DAY_NAMES[et.dayOfWeek];
-      console.log(`[TrendEngine] ${dayName} is not a posting day (posting days: Tue, Wed, Thu, Sun). Skipping.`);
+      console.log(`[TrendEngine] ${dayName} is not a posting day. Skipping.`);
       return { allowed: false, availablePlatforms: [] };
     }
 
@@ -1489,7 +1519,7 @@ export function isWithinAnyPostingWindow(): boolean {
   return ["linkedin", "facebook", "instagram"].some(p => isPlatformInWindow(p));
 }
 
-const BREAKING_NEWS_URGENCY_THRESHOLD = 4;
+const BREAKING_NEWS_URGENCY_THRESHOLD = 3;
 
 async function getAvailablePlatformsForBreaking(): Promise<string[]> {
   try {
@@ -1601,7 +1631,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
 
     if (scheduleBlocked) {
       const isBreaking = posts.trendAnalysis.urgency_score >= BREAKING_NEWS_URGENCY_THRESHOLD
-        && posts.trendAnalysis.impact_level === "high";
+        && (posts.trendAnalysis.impact_level === "high" || posts.trendAnalysis.impact_level === "medium");
 
       if (isBreaking) {
         const breakingPlatforms = await getAvailablePlatformsForBreaking();
@@ -1630,7 +1660,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
         );
       } else {
         console.log(
-          `[TrendEngine] Story not urgent enough for breaking override (urgency: ${posts.trendAnalysis.urgency_score}, impact: ${posts.trendAnalysis.impact_level}). Requires urgency >= ${BREAKING_NEWS_URGENCY_THRESHOLD} AND high impact. Skipping.`
+          `[TrendEngine] Story not urgent enough for breaking override (urgency: ${posts.trendAnalysis.urgency_score}, impact: ${posts.trendAnalysis.impact_level}). Requires urgency >= ${BREAKING_NEWS_URGENCY_THRESHOLD} AND medium or high impact. Skipping.`
         );
         return result;
       }
