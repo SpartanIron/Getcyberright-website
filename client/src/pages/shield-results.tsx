@@ -265,7 +265,26 @@ function ShieldResultsPage() {
         }));
         toast({
           title: "Removal Request Submitted",
-          description: data.message,
+          description: data.message || "We'll handle the removal process for you.",
+        });
+      } else if (data.action === "already_requested") {
+        setRemovalStatuses((prev) => ({
+          ...prev,
+          [brokerId]: {
+            requestId: data.requestId,
+            status: data.status || "in_progress",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        }));
+        toast({
+          title: "Already In Progress",
+          description: data.message || "A removal request is already being processed for this broker.",
+        });
+      } else {
+        toast({
+          title: "Request Received",
+          description: data.message || "Your removal request has been received.",
         });
       }
     } catch (err: any) {

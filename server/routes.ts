@@ -5380,7 +5380,7 @@ EDGE CASE HANDLING
 
       if (access.tier === "essential" || access.tier === "professional") {
         try {
-          await sendAutoRemovalRequest(request.id);
+          await sendAutoRemovalRequest(user.id, request.id, ipAddress);
         } catch (err: any) {
           console.error("[shield] Auto-removal send failed:", err?.message);
         }
