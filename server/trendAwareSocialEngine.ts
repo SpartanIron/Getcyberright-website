@@ -541,6 +541,8 @@ interface TrendAwarePostResult {
   confidenceScore: number;
   recommendedAction: "auto_publish" | "review";
   sourceValidation: { tier1Count: number; tier2Count: number; tier3Count: number; highestTier: 1 | 2 | 3 };
+  sourceImageUrl: string | null;
+  aiImagePrompt: string | null;
 }
 
 function enforcePostFormatting(text: string, platform: string): string {
@@ -685,12 +687,13 @@ async function generateTrendAwarePost(
   postStyle: PostStyle,
   sourceCredibility: { tier1Count: number; tier2Count: number; tier3Count: number; highestTier: 1 | 2 | 3 }
 ): Promise<TrendAwarePostResult | null> {
-  const newsContext = trendingNews
-    .slice(0, 8)
+  const newsSlice = trendingNews.slice(0, 8);
+  const newsContext = newsSlice
     .map((item, i) => {
       const tier = getSourceTier(item.source);
       const tierLabel = tier === 1 ? "Tier 1 (gov/official)" : tier === 2 ? "Tier 2 (established pub)" : "Tier 3 (unverified)";
-      return `[${i + 1}] ${item.source} [${tierLabel}]: "${item.title}"\n   ${item.summary}\n   Published: ${item.pubDate || "recent"}`;
+      const imgNote = item.imageUrl ? `   Image: ${item.imageUrl}` : "   Image: none";
+      return `[${i + 1}] ${item.source} [${tierLabel}]: "${item.title}"\n   ${item.summary}\n   Published: ${item.pubDate || "recent"}\n${imgNote}`;
     })
     .join("\n\n");
 
@@ -950,6 +953,10 @@ INSTAGRAM POST (40-80 words max, CRITICAL DIFFERENCES):
 - Use a slightly more casual, direct tone than LinkedIn
 - Focus on ONE key takeaway, not multiple tips
 
+IMAGE HANDLING:
+Each news item includes an "Image:" field. If the article you base your post on has an image URL, return its index in "source_article_index" so we can use the real thumbnail.
+If the chosen article has NO image (Image: none), write an "ai_image_prompt" describing a photorealistic image that would complement the post. The prompt should describe a specific, realistic scene (not abstract graphics or text overlays). Think editorial photography: real people using devices, cybersecurity scenarios, office settings, family tech moments. Keep it under 100 words. Do NOT include any text, logos, watermarks, or brand names in the image description.
+
 Format your complete output as this strict JSON with \\n for line breaks within post text:
 {
   "linkedin": "Post text with \\n\\n between paragraphs",
@@ -959,6 +966,8 @@ Format your complete output as this strict JSON with \\n for line breaks within 
   "hashtags": ["tag1", "tag2", "tag3", "tag4"],
   "imageHeadline": "Under 8 words for branded image card",
   "imageSubtext": "Supporting detail under 15 words",
+  "source_article_index": 1,
+  "ai_image_prompt": "Only if source article has no image. Photorealistic scene description.",
   "content_mode": "breaking_insight | preventative_education | myth_debunking | scenario_simulation | tool_highlight",
   "trend_analysis": {
     "summary": "One-sentence summary of the signal",
@@ -1082,8 +1091,18 @@ Format your complete output as this strict JSON with \\n for line breaks within 
       if (matched) gcrToolReference.url = matched.url;
     }
 
+    let sourceImageUrl: string | null = null;
+    const articleIndex = typeof parsed.source_article_index === "number" ? parsed.source_article_index - 1 : null;
+    if (articleIndex !== null && articleIndex >= 0 && articleIndex < newsSlice.length) {
+      sourceImageUrl = newsSlice[articleIndex].imageUrl || null;
+    }
+
+    const aiImagePrompt: string | null = parsed.ai_image_prompt && typeof parsed.ai_image_prompt === "string"
+      ? parsed.ai_image_prompt
+      : null;
+
     console.log(
-      `[TrendEngine] Pipeline complete: mode=${contentMode}, category=${trendAnalysis.category}, urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}, confidence=${confidenceScore}, action=${recommendedAction}${gcrToolReference ? `, tool=${gcrToolReference.tool_name}` : ""}`
+      `[TrendEngine] Pipeline complete: mode=${contentMode}, category=${trendAnalysis.category}, urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}, confidence=${confidenceScore}, action=${recommendedAction}${gcrToolReference ? `, tool=${gcrToolReference.tool_name}` : ""}${sourceImageUrl ? ", has source image" : aiImagePrompt ? ", will generate AI image" : ", no image source"}`
     );
 
     return {
@@ -1101,6 +1120,8 @@ Format your complete output as this strict JSON with \\n for line breaks within 
       confidenceScore,
       recommendedAction,
       sourceValidation: sourceCredibility,
+      sourceImageUrl,
+      aiImagePrompt,
     };
   } catch (error: any) {
     console.error("[TrendEngine] AI generation failed:", error.message);
@@ -1113,6 +1134,232 @@ const SOCIAL_IMAGES_DIR = path.join(process.cwd(), ".local", "social-images");
 function ensureSocialImagesDir(): void {
   if (!fs.existsSync(SOCIAL_IMAGES_DIR)) {
     fs.mkdirSync(SOCIAL_IMAGES_DIR, { recursive: true });
+  }
+}
+
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+function isUrlSafeForFetch(urlStr: string): boolean {
+  try {
+    const parsed = new URL(urlStr);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
+    if (parsed.username || parsed.password) return false;
+    const host = parsed.hostname.toLowerCase();
+    if (host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0" || host === "::1") return false;
+    if (host.startsWith("10.") || host.startsWith("192.168.") || host.startsWith("172.")) return false;
+    if (host.endsWith(".local") || host.endsWith(".internal") || host === "metadata.google.internal") return false;
+    if (host.startsWith("169.254.")) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function downloadSourceImage(url: string, title: string): Promise<string | null> {
+  try {
+    if (!isUrlSafeForFetch(url)) {
+      console.warn(`[TrendEngine] Source image URL blocked (safety check): ${url}`);
+      return null;
+    }
+
+    ensureSocialImagesDir();
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
+    const filename = `source-${slug}-${Date.now()}.png`;
+    const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    const response = await fetch(url, {
+      signal: controller.signal,
+      redirect: "follow",
+      headers: {
+        "User-Agent": "GetCyberRight/1.0 (Cybersecurity Education Platform)",
+        "Accept": "image/*",
+      },
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      console.warn(`[TrendEngine] Source image HTTP ${response.status} for: ${url}`);
+      return null;
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.startsWith("image/")) {
+      console.warn(`[TrendEngine] Source image not an image (${contentType}): ${url}`);
+      return null;
+    }
+
+    const contentLength = parseInt(response.headers.get("content-length") || "0", 10);
+    if (contentLength > MAX_IMAGE_BYTES) {
+      console.warn(`[TrendEngine] Source image too large (${contentLength} bytes): ${url}`);
+      return null;
+    }
+
+    const chunks: Uint8Array[] = [];
+    let totalBytes = 0;
+    const reader = response.body?.getReader();
+    if (!reader) return null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.length;
+      if (totalBytes > MAX_IMAGE_BYTES) {
+        reader.cancel();
+        console.warn(`[TrendEngine] Source image download exceeded ${MAX_IMAGE_BYTES} bytes, aborting: ${url}`);
+        return null;
+      }
+      chunks.push(value);
+    }
+
+    const buffer = Buffer.concat(chunks);
+    if (buffer.length < 5000) {
+      console.warn(`[TrendEngine] Source image too small (${buffer.length} bytes), likely a tracking pixel: ${url}`);
+      return null;
+    }
+
+    const sharp = (await import("sharp")).default;
+    const metadata = await sharp(buffer).metadata();
+    if (!metadata.width || !metadata.height || metadata.width < 200 || metadata.height < 200) {
+      console.warn(`[TrendEngine] Source image too small dimensions (${metadata.width}x${metadata.height}): ${url}`);
+      return null;
+    }
+
+    await sharp(buffer)
+      .resize(1200, 630, { fit: "cover", position: "center" })
+      .png({ quality: 90 })
+      .toFile(outputPath);
+
+    console.log(`[TrendEngine] Downloaded source image: ${filename} (${metadata.width}x${metadata.height} original, ${(buffer.length / 1024).toFixed(0)}KB)`);
+    return outputPath;
+  } catch (error: any) {
+    console.warn(`[TrendEngine] Failed to download source image: ${error.message}`);
+    return null;
+  }
+}
+
+async function generateAIImage(prompt: string, title: string): Promise<string | null> {
+  try {
+    ensureSocialImagesDir();
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
+    const filename = `ai-${slug}-${Date.now()}.png`;
+    const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
+
+    const apiKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY;
+    const baseURL = process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL || "";
+
+    const isModelfarm = baseURL.includes("modelfarm") || baseURL.includes("replit");
+
+    if (isModelfarm) {
+      const imageGenUrl = baseURL.replace(/\/v1\/?$/, "").replace(/\/anthropic\/?$/, "") + "/image/generations";
+
+      const aiController = new AbortController();
+      const aiTimeout = setTimeout(() => aiController.abort(), 30000);
+
+      const response = await fetch(imageGenUrl, {
+        method: "POST",
+        signal: aiController.signal,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          prompt: `Ultra realistic editorial photograph: ${prompt}. Professional quality, sharp focus, natural lighting, photojournalistic style.`,
+          n: 1,
+          size: "1024x1024",
+          response_format: "b64_json",
+        }),
+      });
+      clearTimeout(aiTimeout);
+
+      if (response.ok) {
+        const data: any = await response.json();
+        if (data.data?.[0]?.b64_json) {
+          const imgBuffer = Buffer.from(data.data[0].b64_json, "base64");
+          const sharp = (await import("sharp")).default;
+          await sharp(imgBuffer)
+            .resize(1200, 630, { fit: "cover", position: "center" })
+            .png({ quality: 90 })
+            .toFile(outputPath);
+
+          console.log(`[TrendEngine] Generated AI image (1200x630): ${filename}`);
+          return outputPath;
+        }
+      }
+      console.warn(`[TrendEngine] AI image generation API returned ${response.status}`);
+    }
+
+    return null;
+  } catch (error: any) {
+    console.warn(`[TrendEngine] AI image generation failed: ${error.message}`);
+    return null;
+  }
+}
+
+async function resolvePostImage(
+  sourceImageUrl: string | null,
+  aiImagePrompt: string | null,
+  imageHeadline: string,
+  imageSubtext: string,
+  templateStyle: TemplateStyle,
+  title: string
+): Promise<{ mainImage: string | null; igImage: string | null; imageSource: "source" | "ai" | "branded" }> {
+  if (sourceImageUrl) {
+    const downloaded = await downloadSourceImage(sourceImageUrl, title);
+    if (downloaded) {
+      const publicUrl = getPublicImageUrl(downloaded);
+      if (publicUrl) {
+        const igPath = await cropImageForInstagram(downloaded, title);
+        const igUrl = igPath ? getPublicImageUrl(igPath) : publicUrl;
+        console.log(`[TrendEngine] Using source article image`);
+        return { mainImage: publicUrl, igImage: igUrl, imageSource: "source" };
+      }
+    }
+    console.warn(`[TrendEngine] Source image download failed, trying AI generation...`);
+  }
+
+  if (aiImagePrompt) {
+    const aiImage = await generateAIImage(aiImagePrompt, title);
+    if (aiImage) {
+      const publicUrl = getPublicImageUrl(aiImage);
+      if (publicUrl) {
+        const igPath = await cropImageForInstagram(aiImage, title);
+        const igUrl = igPath ? getPublicImageUrl(igPath) : publicUrl;
+        console.log(`[TrendEngine] Using AI-generated image`);
+        return { mainImage: publicUrl, igImage: igUrl, imageSource: "ai" };
+      }
+    }
+    console.warn(`[TrendEngine] AI image generation failed, falling back to branded image...`);
+  }
+
+  const mainPath = await generatePostImage(imageHeadline, imageSubtext, templateStyle);
+  const mainImage = mainPath ? getPublicImageUrl(mainPath) : null;
+  const igPath = await generateInstagramImage(imageHeadline, imageSubtext, templateStyle);
+  const igImage = igPath ? getPublicImageUrl(igPath) : null;
+
+  return { mainImage, igImage, imageSource: "branded" };
+}
+
+async function cropImageForInstagram(sourcePath: string, title: string): Promise<string | null> {
+  try {
+    ensureSocialImagesDir();
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
+    const filename = `ig-${slug}-${Date.now()}.png`;
+    const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
+
+    const sharp = (await import("sharp")).default;
+    await sharp(sourcePath)
+      .resize(1080, 1080, { fit: "cover", position: "center" })
+      .png({ quality: 90 })
+      .toFile(outputPath);
+
+    console.log(`[TrendEngine] Cropped Instagram square image: ${filename}`);
+    return outputPath;
+  } catch (error: any) {
+    console.warn(`[TrendEngine] Instagram crop failed: ${error.message}`);
+    return null;
   }
 }
 
@@ -1718,21 +1965,15 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     const templateStyle = selectTemplateForTrend(posts.trendAnalysis, posts.contentMode, defaultTemplate);
     console.log(`[TrendEngine] Template: ${templateStyle} (mode: ${posts.contentMode}, urgency: ${posts.trendAnalysis.urgency_score})`);
 
-    let imageUrl: string | null = null;
-    const imagePath = await generatePostImage(posts.imageHeadline, posts.imageSubtext, templateStyle);
-    if (imagePath) {
-      imageUrl = getPublicImageUrl(imagePath);
-      console.log(`[TrendEngine] Image URL: ${imageUrl}`);
-    }
-
-    let igImageUrl: string | null = null;
-    if (channels.instagram && allowedPlatforms.includes("instagram")) {
-      const igImagePath = await generateInstagramImage(posts.imageHeadline, posts.imageSubtext, templateStyle);
-      if (igImagePath) {
-        igImageUrl = getPublicImageUrl(igImagePath);
-        console.log(`[TrendEngine] Instagram image URL: ${igImageUrl}`);
-      }
-    }
+    const { mainImage: imageUrl, igImage: igImageUrl, imageSource } = await resolvePostImage(
+      posts.sourceImageUrl,
+      posts.aiImagePrompt,
+      posts.imageHeadline,
+      posts.imageSubtext,
+      templateStyle,
+      posts.title
+    );
+    console.log(`[TrendEngine] Image resolved: source=${imageSource}, url=${imageUrl ? "yes" : "none"}`);
 
     const validatedLinkedin = await validateAndFixPostLinks(posts.linkedin);
     const validatedFacebook = await validateAndFixPostLinks(posts.facebook);
