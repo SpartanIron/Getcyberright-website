@@ -629,7 +629,7 @@ function ShieldResultsPage() {
                                   <Lock className="h-3 w-3 inline mr-1" />
                                   Want us to handle this automatically?{" "}
                                   <Link href="/data-shield-pricing" className="text-primary hover:underline font-medium">
-                                    Upgrade to Essential
+                                    Start a free 30-day trial
                                   </Link>
                                   {" "}and we'll submit removal requests on your behalf.
                                 </p>
@@ -651,7 +651,7 @@ function ShieldResultsPage() {
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                      Upgrade to see all broker names, get automated removal, and ongoing monitoring.
+                      Start a free 30-day trial to see all broker names, get automated removal, and ongoing monitoring.
                     </p>
                     <Link href="/data-shield-pricing">
                       <Button size="sm" className="min-h-[40px]" data-testid="button-see-all-brokers">
@@ -792,7 +792,7 @@ function ShieldResultsPage() {
                       Let us handle the removal
                     </h2>
                     <p className="text-muted-foreground text-sm">
-                      Removing your data from {totalFoundBrokers} site{totalFoundBrokers !== 1 ? "s" : ""} manually takes time. Upgrade and we'll submit opt-out requests on your behalf.
+                      Removing your data from {totalFoundBrokers} site{totalFoundBrokers !== 1 ? "s" : ""} manually takes time. Start a free 30-day trial and we'll submit opt-out requests on your behalf.
                     </p>
                   </div>
                   <div className="text-left space-y-3 text-sm">
@@ -814,7 +814,7 @@ function ShieldResultsPage() {
                   <Link href="/data-shield-pricing">
                     <Button className="min-h-[44px] w-full" data-testid="button-view-plans">
                       <Crown className="h-4 w-4 mr-2" />
-                      View Protection Plans
+                      Start 30-Day Free Trial
                     </Button>
                   </Link>
                 </div>
@@ -834,13 +834,13 @@ function ShieldResultsPage() {
                       Want continuous protection?
                     </h2>
                     <p className="text-muted-foreground text-sm">
-                      Data brokers re-add your information every 30-90 days. Upgrade to Professional for monthly re-scans and automatic re-submission.
+                      Data brokers re-add your information every 30-90 days. Try Professional free for 30 days and get monthly re-scans and automatic re-submission.
                     </p>
                   </div>
                   <Link href="/data-shield-pricing">
                     <Button variant="outline" size="sm" className="min-h-[40px]" data-testid="button-upgrade-pro">
                       <Crown className="h-4 w-4 mr-2" />
-                      Upgrade to Professional
+                      Try Professional Free
                     </Button>
                   </Link>
                 </div>

@@ -212,6 +212,10 @@ export default function DataShieldPricing() {
       a: "GCR Data Shield and GCR Scam Guard are separate products with independent subscriptions. Data Shield focuses on finding and removing your personal data from broker sites. If you also want browser-based scam detection and email scanning, you can subscribe to GCR Scam Guard separately at /gcr-guard-pricing."
     },
     {
+      q: "How does the 30-day free trial work?",
+      a: "When you sign up for any paid Data Shield plan, you get full access for 30 days at no charge. You will not be billed until the trial ends. If you decide it is not for you, cancel before the trial is over and you will not be charged."
+    },
+    {
       q: "How is this different from competitors?",
       a: "Most data removal services only remove your data. We combine removal with AI-powered scam detection, a protective browser extension, and family cybersecurity education. You get more protection at a lower price."
     },
@@ -221,7 +225,7 @@ export default function DataShieldPricing() {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="GCR Data Shield Pricing"
-        description="Protect your personal data with GCR Data Shield. Free scan of 500+ data broker sites. Automated removal from $8.99/month. Continuous family protection from $14.99/month. Save with annual billing."
+        description="Protect your personal data with GCR Data Shield. Free scan of 500+ data broker sites. Automated removal from $8.99/month with a 30-day free trial. Continuous family protection from $14.99/month. Save with annual billing."
         keywords="data broker removal pricing, personal data protection, privacy scan, data removal service"
       />
       <StructuredData

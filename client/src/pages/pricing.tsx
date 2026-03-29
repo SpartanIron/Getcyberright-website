@@ -164,6 +164,10 @@ export default function PricingPage() {
       question: "What happens if I cancel my bundle?",
       answer: "Both products deactivate at the end of your current billing period. You can re-subscribe to individual products or a different bundle at any time."
     },
+    {
+      question: "Is there a free trial?",
+      answer: "Yes. Every paid plan includes a 30-day free trial. You get full access to all features with no charge for a full month. Cancel anytime before the trial ends and you will not be billed."
+    },
   ];
 
   return (
