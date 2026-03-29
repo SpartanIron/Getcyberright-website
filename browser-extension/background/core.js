@@ -234,6 +234,46 @@ setupMessageHandlers({
   CHECK_FEATURE: (message, _sender, sendResponse) => {
     checkFeatureAccess(message.feature).then(sendResponse);
     return true;
+  },
+  NOTIFICATION_THREAT_DETECTED: (message, _sender, sendResponse) => {
+    handleNotificationThreat(message.data).then(sendResponse);
+    return true;
+  },
+  PUSH_SUBSCRIBE_ATTEMPT: (message, _sender, sendResponse) => {
+    logInfo("notification-guard", `Push subscribe attempt from ${message.data?.domain} (risk: ${message.data?.riskScore})`);
+    incrementScanStat("notificationsBlocked");
+    sendResponse({ acknowledged: true });
+    return true;
+  },
+  REDIRECT_CHAIN_ALERT: (message, _sender, sendResponse) => {
+    logInfo("redirect-detect", `Redirect chain: ${message.data?.chainLength} hops across ${message.data?.domains?.length} domains`);
+    incrementScanStat("redirectChainsDetected");
+    sendResponse({ acknowledged: true });
+    return true;
+  },
+  CLIPBOARD_HIJACK_DETECTED: (message, _sender, sendResponse) => {
+    logInfo("clipboard-protect", `Clipboard hijack detected on ${message.data?.domain}: ${message.data?.replacedPattern}`);
+    incrementScanStat("clipboardHijacksBlocked");
+    chrome.notifications.create("gcr-clipboard-hijack", {
+      type: "basic",
+      iconUrl: "icons/icon128.png",
+      title: "Clipboard Hijack Blocked",
+      message: `A script on ${message.data?.domain} modified your clipboard to a suspicious value. Do not paste this content.`,
+      priority: 2
+    });
+    sendResponse({ acknowledged: true });
+    return true;
+  },
+  GET_REDIRECT_HISTORY: (_message, sender, sendResponse) => {
+    const tabId = sender.tab?.id;
+    if (tabId) {
+      chrome.storage.session.get([`redirects_${tabId}`], (result) => {
+        sendResponse(result[`redirects_${tabId}`] || []);
+      });
+    } else {
+      sendResponse([]);
+    }
+    return true;
   }
 });
 
@@ -969,6 +1009,70 @@ async function checkFeatureAccess(feature) {
   if (auth.expiresAt && new Date(auth.expiresAt) < new Date()) return false;
   const features = auth.features || ["manual_scan"];
   return features.includes(feature);
+}
+
+function incrementScanStat(statName) {
+  chrome.storage.local.get(["scanStats"], (result) => {
+    const stats = result.scanStats || { totalScans: 0, threatsBlocked: 0, linksChecked: 0 };
+    stats[statName] = (stats[statName] || 0) + 1;
+    chrome.storage.local.set({ scanStats: stats });
+  });
+}
+
+async function handleNotificationThreat(data) {
+  if (!data || !data.domain) return { acknowledged: false };
+
+  logInfo("notification-guard", `Notification threat from ${data.domain}: ${data.threatType}`);
+  incrementScanStat("notificationsBlocked");
+
+  try {
+    if (API_BASE) {
+      await fetch(`${API_BASE}/api/extension/notification-report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          domain: data.domain,
+          threatType: data.threatType,
+          sampleContent: data.sampleContent
+        })
+      });
+    }
+  } catch (e) {
+    logWarn("notification-guard", "Failed to report threat to server:", e.message);
+  }
+
+  chrome.notifications.create("gcr-notification-blocked", {
+    type: "basic",
+    iconUrl: "icons/icon128.png",
+    title: "Notification Spam Blocked",
+    message: `GCR Scam Guard blocked a suspicious notification request from ${data.domain}.`,
+    priority: 2
+  });
+
+  return { acknowledged: true };
+}
+
+if (chrome.webNavigation) {
+  chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+    if (details.frameId !== 0) return;
+    const tabId = details.tabId;
+    const key = `redirects_${tabId}`;
+
+    chrome.storage.session.get([key], (result) => {
+      const history = result[key] || [];
+      history.push({ url: details.url, timestamp: Date.now() });
+      if (history.length > 10) history.shift();
+      chrome.storage.session.set({ [key]: history });
+    });
+  });
+
+  chrome.webNavigation.onCompleted.addListener((details) => {
+    if (details.frameId !== 0) return;
+    setTimeout(() => {
+      const key = `redirects_${details.tabId}`;
+      chrome.storage.session.set({ [key]: [] });
+    }, 5000);
+  });
 }
 
 logInfo("core", "GCR Scam Guard background service worker loaded");

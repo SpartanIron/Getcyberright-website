@@ -80,6 +80,7 @@ import ScamIntelDetail from "@/pages/scam-intel-detail";
 import ShieldPage from "@/pages/shield";
 import ShieldResultsPage from "@/pages/shield-results";
 import ShieldNextSteps from "@/pages/shield-next-steps";
+import IdentityShield from "@/pages/identity-shield";
 
 const Dashboard = lazy(() => import("@/pages/dashboard"));
 const AdminDashboard = lazy(() => import("@/pages/admin/index"));
@@ -163,6 +164,7 @@ function AppRouter() {
         <Route path="/report-scam" component={ReportScam} />
         <Route path="/checklists" component={Checklists} />
         <Route path="/data-removal" component={DataRemoval} />
+        <Route path="/identity-shield" component={IdentityShield} />
         <Route path="/ai-prompts" component={AIPrompts} />
         <Route path="/ai-safety" component={AISafety} />
         <Route path="/news" component={News} />

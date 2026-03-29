@@ -1659,3 +1659,61 @@ export const insertNewsArticleSchema = createInsertSchema(newsArticles).omit({
 
 export type NewsArticle = typeof newsArticles.$inferSelect;
 export type InsertNewsArticle = z.infer<typeof insertNewsArticleSchema>;
+
+export const maskedIdentities = pgTable("masked_identities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  alias: varchar("alias", { length: 255 }).notNull().unique(),
+  aliasType: varchar("alias_type", { length: 20 }).notNull(),
+  realValue: text("real_value").notNull(),
+  label: varchar("label", { length: 100 }),
+  serviceName: varchar("service_name", { length: 200 }),
+  serviceCategory: varchar("service_category", { length: 50 }),
+  isActive: boolean("is_active").default(true),
+  forwardingEnabled: boolean("forwarding_enabled").default(true),
+  totalForwarded: integer("total_forwarded").default(0),
+  totalBlocked: integer("total_blocked").default(0),
+  lastActivityAt: timestamp("last_activity_at"),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertMaskedIdentitySchema = createInsertSchema(maskedIdentities).omit({
+  id: true,
+  totalForwarded: true,
+  totalBlocked: true,
+  lastActivityAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MaskedIdentity = typeof maskedIdentities.$inferSelect;
+export type InsertMaskedIdentity = z.infer<typeof insertMaskedIdentitySchema>;
+
+export const maskedIdentityActivity = pgTable("masked_identity_activity", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  identityId: varchar("identity_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  eventType: varchar("event_type", { length: 30 }).notNull(),
+  senderAddress: text("sender_address"),
+  subject: text("subject"),
+  action: varchar("action", { length: 20 }).notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type MaskedIdentityActivityEntry = typeof maskedIdentityActivity.$inferSelect;
+
+export const notificationThreats = pgTable("notification_threats", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  domain: varchar("domain", { length: 255 }).notNull(),
+  threatType: varchar("threat_type", { length: 50 }).notNull(),
+  severity: varchar("severity", { length: 20 }).notNull(),
+  reportCount: integer("report_count").default(1),
+  sampleContent: text("sample_content"),
+  firstSeenAt: timestamp("first_seen_at").defaultNow(),
+  lastSeenAt: timestamp("last_seen_at").defaultNow(),
+});
+
+export type NotificationThreat = typeof notificationThreats.$inferSelect;

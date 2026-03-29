@@ -4918,9 +4918,9 @@ EDGE CASE HANDLING
 
   const TIER_FEATURES: Record<string, string[]> = {
     free: ["manual_scan"],
-    essential: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous"],
-    professional: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "weekly_digest", "scan_history", "safety_score", "family_profiles"],
-    enterprise: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "weekly_digest", "scan_history", "safety_score", "family_profiles", "priority_support", "api_access"],
+    essential: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection"],
+    professional: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection", "weekly_digest", "scan_history", "safety_score", "family_profiles"],
+    enterprise: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection", "weekly_digest", "scan_history", "safety_score", "family_profiles", "priority_support", "api_access"],
   };
 
   app.get("/api/subscription/tiers", (_req, res) => {
@@ -5695,6 +5695,254 @@ EDGE CASE HANDLING
     } catch (error: any) {
       console.error("[news] Article fetch failed:", error.message);
       res.status(500).json({ error: "Failed to fetch article" });
+    }
+  });
+
+  // ==========================================
+  // Masked Identity (Identity Shield) Routes
+  // ==========================================
+
+  app.get("/api/masked-identities", async (req: any, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const userId = req.session.userId;
+      const { getUserMaskedIdentities } = await import("./maskedIdentityService");
+      const identities = await getUserMaskedIdentities(userId);
+      res.json(identities);
+    } catch (error: any) {
+      console.error("[masked-identity] List failed:", error.message);
+      res.status(500).json({ error: "Failed to fetch masked identities" });
+    }
+  });
+
+  app.get("/api/masked-identities/stats", async (req: any, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const userId = req.session.userId;
+      const { getIdentityStats, getUserAliasCount, getAliasLimit } = await import("./maskedIdentityService");
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      const stats = await getIdentityStats(userId);
+      const currentCount = await getUserAliasCount(userId);
+      const shieldTier = user?.shieldSubscriptionTier || "free";
+      const limit = getAliasLimit(shieldTier);
+      res.json({ ...stats, limit, currentCount, tier: shieldTier });
+    } catch (error: any) {
+      console.error("[masked-identity] Stats failed:", error.message);
+      res.status(500).json({ error: "Failed to fetch identity stats" });
+    }
+  });
+
+  app.post("/api/masked-identities", async (req: any, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const userId = req.session.userId;
+      const { createMaskedIdentity, getUserAliasCount, getAliasLimit } = await import("./maskedIdentityService");
+
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      const shieldTier = user?.shieldSubscriptionTier || "free";
+      const currentCount = await getUserAliasCount(userId);
+      const limit = getAliasLimit(shieldTier);
+
+      if (currentCount >= limit) {
+        return res.status(403).json({
+          error: "Alias limit reached",
+          currentCount,
+          limit,
+          tier: shieldTier,
+          upgradeRequired: true,
+        });
+      }
+
+      const { aliasType, realValue, label, serviceName, serviceCategory, prefix } = req.body;
+
+      if (!aliasType || !["email", "phone", "username"].includes(aliasType)) {
+        return res.status(400).json({ error: "Valid aliasType required (email, phone, or username)" });
+      }
+      if (!realValue || typeof realValue !== "string" || realValue.length < 1) {
+        return res.status(400).json({ error: "realValue is required" });
+      }
+
+      const identity = await createMaskedIdentity(
+        userId,
+        aliasType,
+        realValue,
+        { label, serviceName, serviceCategory, prefix }
+      );
+
+      res.status(201).json(identity);
+    } catch (error: any) {
+      console.error("[masked-identity] Create failed:", error.message);
+      res.status(500).json({ error: "Failed to create masked identity" });
+    }
+  });
+
+  app.patch("/api/masked-identities/:id/toggle", async (req: any, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const userId = req.session.userId;
+      const { toggleIdentityActive } = await import("./maskedIdentityService");
+      const { isActive } = req.body;
+      if (typeof isActive !== "boolean") {
+        return res.status(400).json({ error: "isActive boolean required" });
+      }
+      const updated = await toggleIdentityActive(req.params.id, userId, isActive);
+      if (!updated) return res.status(404).json({ error: "Identity not found" });
+      res.json(updated);
+    } catch (error: any) {
+      console.error("[masked-identity] Toggle failed:", error.message);
+      res.status(500).json({ error: "Failed to toggle identity" });
+    }
+  });
+
+  app.patch("/api/masked-identities/:id/forwarding", async (req: any, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const userId = req.session.userId;
+      const { toggleForwarding } = await import("./maskedIdentityService");
+      const { enabled } = req.body;
+      if (typeof enabled !== "boolean") {
+        return res.status(400).json({ error: "enabled boolean required" });
+      }
+      const updated = await toggleForwarding(req.params.id, userId, enabled);
+      if (!updated) return res.status(404).json({ error: "Identity not found" });
+      res.json(updated);
+    } catch (error: any) {
+      console.error("[masked-identity] Forwarding toggle failed:", error.message);
+      res.status(500).json({ error: "Failed to toggle forwarding" });
+    }
+  });
+
+  app.patch("/api/masked-identities/:id/service", async (req: any, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const userId = req.session.userId;
+      const { updateIdentityService } = await import("./maskedIdentityService");
+      const { serviceName, serviceCategory } = req.body;
+      if (!serviceName || typeof serviceName !== "string") {
+        return res.status(400).json({ error: "serviceName required" });
+      }
+      const updated = await updateIdentityService(req.params.id, userId, serviceName, serviceCategory);
+      if (!updated) return res.status(404).json({ error: "Identity not found" });
+      res.json(updated);
+    } catch (error: any) {
+      console.error("[masked-identity] Service update failed:", error.message);
+      res.status(500).json({ error: "Failed to update service" });
+    }
+  });
+
+  app.delete("/api/masked-identities/:id", async (req: any, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const userId = req.session.userId;
+      const { deleteMaskedIdentity } = await import("./maskedIdentityService");
+      const deleted = await deleteMaskedIdentity(req.params.id, userId);
+      if (!deleted) return res.status(404).json({ error: "Identity not found" });
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("[masked-identity] Delete failed:", error.message);
+      res.status(500).json({ error: "Failed to delete identity" });
+    }
+  });
+
+  app.get("/api/masked-identities/activity", async (req: any, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const userId = req.session.userId;
+      const { getIdentityActivity } = await import("./maskedIdentityService");
+      const identityId = req.query.identityId as string | undefined;
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+      const activity = await getIdentityActivity(userId, identityId, limit);
+      res.json(activity);
+    } catch (error: any) {
+      console.error("[masked-identity] Activity failed:", error.message);
+      res.status(500).json({ error: "Failed to fetch activity" });
+    }
+  });
+
+  app.get("/api/masked-identities/categories", async (_req: any, res) => {
+    const { getServiceCategories } = await import("./maskedIdentityService");
+    res.json(getServiceCategories());
+  });
+
+  // Notification threat check (used by browser extension)
+  app.post("/api/extension/notification-check", async (req: any, res) => {
+    try {
+      const { domain } = req.body;
+      if (!domain || typeof domain !== "string") {
+        return res.status(400).json({ error: "domain required" });
+      }
+
+      const { notificationThreats } = await import("@shared/schema");
+      const [threat] = await db.select()
+        .from(notificationThreats)
+        .where(eq(notificationThreats.domain, domain.toLowerCase()))
+        .limit(1);
+
+      if (threat) {
+        return res.json({
+          isKnownThreat: true,
+          severity: threat.severity,
+          threatType: threat.threatType,
+          reportCount: threat.reportCount,
+        });
+      }
+
+      res.json({ isKnownThreat: false });
+    } catch (error: any) {
+      res.status(500).json({ error: "Check failed" });
+    }
+  });
+
+  app.post("/api/extension/notification-report", async (req: any, res) => {
+    try {
+      const { domain, threatType, sampleContent } = req.body;
+      if (!domain || !threatType) {
+        return res.status(400).json({ error: "domain and threatType required" });
+      }
+
+      const { notificationThreats } = await import("@shared/schema");
+      const normalizedDomain = domain.toLowerCase();
+
+      const [existing] = await db.select()
+        .from(notificationThreats)
+        .where(eq(notificationThreats.domain, normalizedDomain))
+        .limit(1);
+
+      if (existing) {
+        await db.update(notificationThreats)
+          .set({
+            reportCount: sql`${notificationThreats.reportCount} + 1`,
+            lastSeenAt: new Date(),
+          })
+          .where(eq(notificationThreats.id, existing.id));
+      } else {
+        await db.insert(notificationThreats).values({
+          domain: normalizedDomain,
+          threatType,
+          severity: "medium",
+          sampleContent: sampleContent?.substring(0, 500) || null,
+        });
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: "Report failed" });
     }
   });
 

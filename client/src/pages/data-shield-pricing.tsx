@@ -88,6 +88,7 @@ const SHIELD_TIERS: ShieldTier[] = [
       "Verification re-scan after removal",
       "Monthly removal progress reports",
       "Email alerts for new exposures",
+      "Identity Shield: 10 masked identities",
     ],
   },
   {
@@ -106,6 +107,7 @@ const SHIELD_TIERS: ShieldTier[] = [
       "Individual privacy scores per member",
       "Weekly safety digest reports",
       "Priority removal processing",
+      "Identity Shield: 50 masked identities",
     ],
   },
 ];

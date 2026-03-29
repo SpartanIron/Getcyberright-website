@@ -236,6 +236,345 @@
     return results;
   }
 
+  // ==========================================
+  // Notification Permission Monitoring
+  // ==========================================
+
+  const NOTIFICATION_SPAM_PATTERNS = [
+    /virus|infected|malware|trojan|worm/i,
+    /your (computer|device|pc|mac) (is|has been)/i,
+    /click here to (fix|clean|remove|scan)/i,
+    /congratulations.*won/i,
+    /claim your (prize|reward|gift)/i,
+    /urgent.*action required/i,
+    /warning.*detected/i,
+    /subscribe.*notifications/i,
+    /allow notifications to (continue|proceed|verify|access)/i
+  ];
+
+  const KNOWN_NOTIFICATION_ABUSERS = [
+    "push-notifications", "pushnotifications", "notifpush", "allow-notifications",
+    "clickallow", "bestpush", "pushame", "onclicknow", "notification-hub"
+  ];
+
+  function setupNotificationMonitoring() {
+    if (!("Notification" in window)) return;
+
+    const originalRequestPermission = Notification.requestPermission;
+    Notification.requestPermission = function(callback) {
+      const domain = window.location.hostname;
+      const isKnownAbuser = KNOWN_NOTIFICATION_ABUSERS.some(pattern =>
+        domain.includes(pattern)
+      );
+
+      const pageContent = document.body?.innerText?.substring(0, 2000) || "";
+      const hasSpamIndicators = NOTIFICATION_SPAM_PATTERNS.some(pattern =>
+        pattern.test(pageContent)
+      );
+
+      if (isKnownAbuser || hasSpamIndicators || pageRiskScore >= 3) {
+        showNotificationWarning(domain, isKnownAbuser ? "known_abuser" : "spam_patterns");
+
+        chrome.runtime.sendMessage({
+          type: "NOTIFICATION_THREAT_DETECTED",
+          data: {
+            domain,
+            threatType: isKnownAbuser ? "known_abuser" : "spam_content",
+            sampleContent: pageContent.substring(0, 300),
+            riskScore: pageRiskScore
+          }
+        });
+
+        if (callback) callback("denied");
+        return Promise.resolve("denied");
+      }
+
+      if (pageRiskLevel === "unknown" || pageRiskScore >= 1) {
+        showNotificationCaution(domain);
+      }
+
+      return originalRequestPermission.apply(this, arguments);
+    };
+
+    const pushManagerProto = window.PushManager?.prototype;
+    if (pushManagerProto) {
+      const originalSubscribe = pushManagerProto.subscribe;
+      pushManagerProto.subscribe = function(options) {
+        const domain = window.location.hostname;
+
+        chrome.runtime.sendMessage({
+          type: "PUSH_SUBSCRIBE_ATTEMPT",
+          data: { domain, riskScore: pageRiskScore }
+        });
+
+        if (pageRiskScore >= 3) {
+          showNotificationWarning(domain, "high_risk_push");
+          return Promise.reject(new DOMException("Blocked by GCR Scam Guard", "NotAllowedError"));
+        }
+
+        return originalSubscribe.apply(this, arguments);
+      };
+    }
+  }
+
+  function showNotificationWarning(domain, reason) {
+    const reasons = {
+      known_abuser: "This site is known for sending spam and scam notifications.",
+      spam_patterns: "This site shows signs of notification abuse (fake virus alerts, prize scams).",
+      high_risk_push: "This site has a high risk score. Allowing push notifications is not recommended."
+    };
+
+    showBanner(
+      "Notification Blocked",
+      `GCR Scam Guard blocked a notification request from ${domain}. ${reasons[reason] || "This site may abuse browser notifications."}`,
+      "critical"
+    );
+  }
+
+  function showNotificationCaution(domain) {
+    showBanner(
+      "Notification Request Detected",
+      `${domain} wants to send you notifications. Only allow this if you trust the site. Scam sites use notifications to send fake virus warnings and phishing links.`,
+      "warning"
+    );
+  }
+
+  // ==========================================
+  // Search Result Safety Annotations
+  // ==========================================
+
+  const SEARCH_ENGINES = {
+    "google": { resultSelector: "div.g a[href]:first-of-type, div[data-sokoban-container] a[href]:first-of-type", hostSelector: "cite" },
+    "bing": { resultSelector: "#b_results .b_algo a[href]:first-of-type", hostSelector: "cite" },
+    "duckduckgo": { resultSelector: ".result__a[href]", hostSelector: ".result__url" },
+    "yahoo": { resultSelector: ".compTitle a[href]", hostSelector: ".compText" }
+  };
+
+  function getSearchEngine() {
+    const host = window.location.hostname;
+    if (host.includes("google.")) return "google";
+    if (host.includes("bing.com")) return "bing";
+    if (host.includes("duckduckgo.com")) return "duckduckgo";
+    if (host.includes("search.yahoo.com")) return "yahoo";
+    return null;
+  }
+
+  function setupSearchSafetyAnnotations() {
+    const engine = getSearchEngine();
+    if (!engine) return;
+
+    const config = SEARCH_ENGINES[engine];
+    annotateSearchResults(config);
+
+    const observer = new MutationObserver(() => {
+      annotateSearchResults(config);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function annotateSearchResults(config) {
+    const links = document.querySelectorAll(config.resultSelector);
+
+    links.forEach(link => {
+      if (link.dataset.gcrSearchChecked) return;
+      link.dataset.gcrSearchChecked = "true";
+
+      const href = link.href;
+      if (!href || href.startsWith("javascript:")) return;
+
+      let hostname;
+      try {
+        hostname = new URL(href).hostname;
+      } catch { return; }
+
+      const lookalike = settings.lookalikeDetection ? detectLookalike(href) : null;
+      const suspicion = isSuspiciousURL(href);
+      const quickCheck = quickSuspicionCheck(href);
+
+      let badgeType = null;
+      let badgeText = "";
+      let badgeTooltip = "";
+
+      if (lookalike) {
+        badgeType = "danger";
+        badgeText = "Impersonator";
+        badgeTooltip = `This may impersonate ${capitalize(lookalike.brand)}. The real site is ${lookalike.real}.`;
+      } else if (suspicion.suspicious || quickCheck.score >= 3) {
+        badgeType = "warning";
+        badgeText = "Suspicious";
+        badgeTooltip = (suspicion.reasons || quickCheck.flags).join(", ");
+      } else if (isDomainFamiliar(hostname)) {
+        badgeType = "safe";
+        badgeText = "Verified";
+        badgeTooltip = "This is a well-known, trusted domain.";
+      }
+
+      if (badgeType) {
+        const badge = createSearchBadge(badgeType, badgeText, badgeTooltip);
+        const container = link.closest("div") || link.parentElement;
+        if (container && !container.querySelector(".gcr-search-badge")) {
+          container.style.position = "relative";
+          container.appendChild(badge);
+        }
+      }
+    });
+  }
+
+  function createSearchBadge(type, text, tooltip) {
+    const colors = {
+      danger: { bg: "#ff4444", border: "#cc0000", text: "#ffffff" },
+      warning: { bg: "#ff9800", border: "#e68a00", text: "#ffffff" },
+      safe: { bg: "#4caf50", border: "#388e3c", text: "#ffffff" }
+    };
+
+    const color = colors[type] || colors.warning;
+    const badge = document.createElement("span");
+    badge.className = "gcr-search-badge";
+    badge.textContent = "\u{1F6E1} " + text;
+    badge.title = tooltip;
+    badge.style.cssText = `
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 8px; margin-left: 8px; border-radius: 12px;
+      background: ${color.bg}; color: ${color.text}; border: 1px solid ${color.border};
+      font-size: 11px; font-weight: 600; font-family: -apple-system, sans-serif;
+      cursor: help; white-space: nowrap; vertical-align: middle;
+      line-height: 16px; letter-spacing: 0.3px;
+    `;
+    return badge;
+  }
+
+  // ==========================================
+  // Redirect Chain Detection
+  // ==========================================
+
+  let redirectHistory = [];
+  const MAX_REDIRECT_CHAIN = 3;
+
+  function setupRedirectDetection() {
+    const currentUrl = window.location.href;
+
+    chrome.runtime.sendMessage({ type: "GET_REDIRECT_HISTORY" }, (history) => {
+      if (!history || !Array.isArray(history)) return;
+      redirectHistory = history;
+
+      if (redirectHistory.length >= MAX_REDIRECT_CHAIN) {
+        const domains = redirectHistory.map(entry => {
+          try { return new URL(entry.url).hostname; } catch { return "unknown"; }
+        });
+        const uniqueDomains = [...new Set(domains)];
+
+        if (uniqueDomains.length >= MAX_REDIRECT_CHAIN) {
+          showBanner(
+            "Redirect Chain Detected",
+            `This page arrived through ${redirectHistory.length} redirects across ${uniqueDomains.length} different domains (${uniqueDomains.slice(0, 3).join(" > ")}). Scam sites use redirect chains to hide their real destination.`,
+            "warning"
+          );
+
+          chrome.runtime.sendMessage({
+            type: "REDIRECT_CHAIN_ALERT",
+            data: {
+              chainLength: redirectHistory.length,
+              domains: uniqueDomains,
+              finalUrl: currentUrl
+            }
+          });
+        }
+      }
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectParams = ["redirect", "url", "next", "goto", "return_to", "continue", "dest", "destination", "redir", "ref"];
+    for (const param of redirectParams) {
+      const value = urlParams.get(param);
+      if (value) {
+        try {
+          const targetUrl = new URL(value, window.location.origin);
+          const currentDomain = window.location.hostname;
+          const targetDomain = targetUrl.hostname;
+
+          if (targetDomain !== currentDomain && !isDomainFamiliar(targetDomain)) {
+            showBanner(
+              "Suspicious Redirect Parameter",
+              `This page contains a redirect to ${targetDomain}, which is not a recognized domain. Be cautious before proceeding.`,
+              "warning"
+            );
+          }
+        } catch {}
+      }
+    }
+  }
+
+  // ==========================================
+  // Clipboard Hijack Protection
+  // ==========================================
+
+  let lastClipboardValue = null;
+
+  function setupClipboardProtection() {
+    if (pageRiskScore < 1 && isDomainFamiliar(window.location.hostname)) return;
+
+    document.addEventListener("copy", (e) => {
+      const selection = window.getSelection()?.toString();
+      if (selection) {
+        lastClipboardValue = selection;
+      }
+    });
+
+    document.addEventListener("paste", (e) => {
+      if (lastClipboardValue === null) return;
+
+      setTimeout(() => {
+        navigator.clipboard.readText().then(current => {
+          if (current && lastClipboardValue && current !== lastClipboardValue) {
+            const looksLikeCrypto = /^(0x)?[0-9a-f]{25,}$/i.test(current) ||
+              /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(current) ||
+              /^bc1[a-z0-9]{39,59}$/i.test(current);
+
+            if (looksLikeCrypto) {
+              showBanner(
+                "Clipboard Hijack Detected",
+                "Your clipboard content was changed to what appears to be a cryptocurrency address. This is a common attack that redirects your funds to a scammer. Do NOT paste this address.",
+                "critical"
+              );
+
+              chrome.runtime.sendMessage({
+                type: "CLIPBOARD_HIJACK_DETECTED",
+                data: {
+                  domain: window.location.hostname,
+                  originalLength: lastClipboardValue.length,
+                  replacedPattern: "crypto_address",
+                  url: window.location.href
+                }
+              });
+            }
+          }
+        }).catch(() => {});
+      }, 100);
+    });
+
+    const scriptObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (node.nodeType === 1 && node.tagName === "SCRIPT") {
+            const content = node.textContent || "";
+            if (/navigator\.clipboard\.writeText/i.test(content) ||
+                /document\.execCommand\s*\(\s*['"]copy['"]\s*\)/i.test(content)) {
+              if (pageRiskScore >= 2) {
+                showBanner(
+                  "Clipboard Access Detected",
+                  "A script on this page is attempting to modify your clipboard. This could be used to replace cryptocurrency addresses or other sensitive data.",
+                  "warning"
+                );
+              }
+            }
+          }
+        }
+      }
+    });
+
+    scriptObserver.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
   function init() {
     if (settings.hoverCheck && hasFeature("hover_check")) {
       document.addEventListener("mouseover", handleLinkHover, true);
@@ -268,6 +607,22 @@
 
     if (settings.webmailScan && hasFeature("webmail_scan")) {
       initWebmailScanning();
+    }
+
+    if (hasFeature("notification_guard")) {
+      setupNotificationMonitoring();
+    }
+
+    if (hasFeature("search_safety") && settings.autoScan) {
+      setupSearchSafetyAnnotations();
+    }
+
+    if (hasFeature("redirect_detection")) {
+      setupRedirectDetection();
+    }
+
+    if (hasFeature("clipboard_protection")) {
+      setupClipboardProtection();
     }
   }
 

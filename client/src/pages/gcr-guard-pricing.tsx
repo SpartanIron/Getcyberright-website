@@ -54,6 +54,10 @@ const FEATURE_LABELS: Record<string, string> = {
   family_profiles: "Family member profiles",
   priority_support: "Priority support",
   api_access: "API access",
+  notification_blocking: "Notification spam blocking",
+  search_annotations: "Search result safety badges",
+  redirect_detection: "Redirect chain detection",
+  clipboard_protection: "Clipboard hijack protection",
 };
 
 const ALL_FEATURES = [
@@ -65,6 +69,10 @@ const ALL_FEATURES = [
   "community_trust",
   "webmail_scan",
   "block_dangerous",
+  "notification_blocking",
+  "search_annotations",
+  "redirect_detection",
+  "clipboard_protection",
   "weekly_digest",
   "scan_history",
   "safety_score",
@@ -102,8 +110,8 @@ export default function GcrGuardPricing() {
   const tierResponse = tierData as any;
   const tiers = tierResponse?.scamguard || [
     { id: "free", name: "Free", price: 0, interval: null, features: ["manual_scan"], description: "Basic protection with manual scanning" },
-    { id: "essential", name: "Pro", price: 499, interval: "month", features: [], description: "Full auto-protection for individuals" },
-    { id: "professional", name: "Family", price: 799, interval: "month", features: [], description: "Complete protection for the whole family" },
+    { id: "essential", name: "Pro", price: 499, interval: "month", features: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection"], description: "Full auto-protection for individuals" },
+    { id: "professional", name: "Family", price: 799, interval: "month", features: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection", "weekly_digest", "scan_history", "safety_score", "family_profiles"], description: "Complete protection for the whole family" },
   ];
 
   const getDisplayPrice = (tierId: string, basePrice: number) => {
@@ -461,7 +469,7 @@ export default function GcrGuardPricing() {
                 },
                 {
                   q: "What does the Pro plan add?",
-                  a: "Pro unlocks automatic page scanning on every website you visit, lookalike domain detection, form warnings, link hover checks, community trust scores, and webmail scanning for Gmail and Outlook."
+                  a: "Pro unlocks automatic page scanning on every website you visit, lookalike domain detection, form warnings, link hover checks, community trust scores, webmail scanning for Gmail and Outlook, notification spam blocking, search result safety badges, redirect chain detection, and clipboard hijack protection."
                 },
                 {
                   q: "What is the Family plan?",

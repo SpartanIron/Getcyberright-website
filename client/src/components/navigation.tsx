@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper, CreditCard } from "lucide-react";
+import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper, CreditCard, Fingerprint } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -24,6 +24,7 @@ const toolsNav = [
   { title: "Security Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
   { title: "AI Prompt Library", description: "Ready-to-use AI templates for everyday life", href: "/ai-prompts", icon: Zap, badge: "New" },
   { title: "GCR Data Shield", description: "Scan for your exposed personal data", href: "/shield", icon: ShieldCheck },
+  { title: "Identity Shield", description: "Masked emails, phones, and usernames", href: "/identity-shield", icon: Fingerprint, badge: "New" },
   { title: "Safety Toolkit", description: "Password generator & voice detector", href: "/tools?tab=safety-toolkit", icon: Shield },
 ];
 
