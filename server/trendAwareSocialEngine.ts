@@ -1581,11 +1581,25 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     const etTimeStr = `${et.hour}:${String(et.minute).padStart(2, "0")} ET`;
     console.log(`[TrendEngine] ${pillarLabel} | style: ${postStyle} | template: ${defaultTemplate} | time: ${etTimeStr}`);
 
-    const [trendingNews, guides, recentPosts] = await Promise.all([
+    const [trendingNewsResult, guidesResult, recentPostsResult] = await Promise.allSettled([
       fetchRealThreats(),
       storage.getPublishedGuides(undefined, 30),
       storage.getSocialPosts("published", 20),
     ]);
+
+    const trendingNews = trendingNewsResult.status === "fulfilled" ? trendingNewsResult.value : [];
+    const guides = guidesResult.status === "fulfilled" ? guidesResult.value : [];
+    const recentPosts = recentPostsResult.status === "fulfilled" ? recentPostsResult.value : [];
+
+    if (trendingNewsResult.status === "rejected") {
+      console.error("[TrendEngine] Failed to fetch trending news:", trendingNewsResult.reason?.message || trendingNewsResult.reason);
+    }
+    if (guidesResult.status === "rejected") {
+      console.error("[TrendEngine] Failed to fetch guides:", guidesResult.reason?.message || guidesResult.reason);
+    }
+    if (recentPostsResult.status === "rejected") {
+      console.error("[TrendEngine] Failed to fetch recent posts:", recentPostsResult.reason?.message || recentPostsResult.reason);
+    }
 
     if (trendingNews.length === 0) {
       console.warn("[TrendEngine] No trending news available");

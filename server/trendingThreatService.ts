@@ -10,9 +10,10 @@ const anthropic = new Anthropic({
 });
 
 const rssParser = new Parser({
-  timeout: 15000,
+  timeout: 30000,
   headers: {
     "User-Agent": "GetCyberRight/1.0 (Cybersecurity Education Platform)",
+    "Accept": "application/rss+xml, application/xml, text/xml, */*",
   },
   customFields: {
     item: [
@@ -21,6 +22,24 @@ const rssParser = new Parser({
     ],
   },
 });
+
+async function fetchFeedWithRetry(feed: typeof TRUSTED_FEEDS[number], maxRetries = 2): Promise<any[]> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const parsed = await rssParser.parseURL(feed.url);
+      return (parsed.items || []).slice(0, 3);
+    } catch (error) {
+      if (attempt < maxRetries) {
+        const backoff = (attempt + 1) * 3000;
+        await new Promise(r => setTimeout(r, backoff));
+        continue;
+      }
+      console.warn(`Failed to fetch RSS from ${feed.source}:`, error instanceof Error ? error.message : error);
+      return [];
+    }
+  }
+  return [];
+}
 
 export interface RawFeedItem {
   title: string;
@@ -172,60 +191,54 @@ export async function fetchRealThreats(): Promise<RawFeedItem[]> {
   const allItems: RawFeedItem[] = [];
 
   const feedPromises = TRUSTED_FEEDS.map(async (feed) => {
-    try {
-      const parsed = await rssParser.parseURL(feed.url);
-      const recent = (parsed.items || []).slice(0, 3);
-      return recent.map((item: any) => {
-        let imageUrl: string | undefined;
-        if (item.enclosure?.url && /\.(jpg|jpeg|png|webp|gif)/i.test(item.enclosure.url)) {
-          imageUrl = item.enclosure.url;
-        }
+    const items = await fetchFeedWithRetry(feed);
+    return items.map((item: any) => {
+      let imageUrl: string | undefined;
+      if (item.enclosure?.url && /\.(jpg|jpeg|png|webp|gif)/i.test(item.enclosure.url)) {
+        imageUrl = item.enclosure.url;
+      }
 
-        if (!imageUrl && item.mediaThumbnail) {
-          const thumb = item.mediaThumbnail;
-          imageUrl = thumb.$?.url || thumb.url || (typeof thumb === 'string' ? thumb : undefined);
-        }
+      if (!imageUrl && item.mediaThumbnail) {
+        const thumb = item.mediaThumbnail;
+        imageUrl = thumb.$?.url || thumb.url || (typeof thumb === 'string' ? thumb : undefined);
+      }
 
-        if (!imageUrl && item.mediaContent) {
-          const mc = item.mediaContent;
-          imageUrl = mc.$?.url || mc.url || (typeof mc === 'string' ? mc : undefined);
-        }
+      if (!imageUrl && item.mediaContent) {
+        const mc = item.mediaContent;
+        imageUrl = mc.$?.url || mc.url || (typeof mc === 'string' ? mc : undefined);
+      }
 
-        if (!imageUrl && item['media:content']?.['$']?.url) {
-          imageUrl = item['media:content']['$'].url;
-        }
-        if (!imageUrl && item['media:thumbnail']?.['$']?.url) {
-          imageUrl = item['media:thumbnail']['$'].url;
-        }
+      if (!imageUrl && item['media:content']?.['$']?.url) {
+        imageUrl = item['media:content']['$'].url;
+      }
+      if (!imageUrl && item['media:thumbnail']?.['$']?.url) {
+        imageUrl = item['media:thumbnail']['$'].url;
+      }
 
-        if (!imageUrl && item.itunes?.image) {
-          imageUrl = item.itunes.image;
-        }
+      if (!imageUrl && item.itunes?.image) {
+        imageUrl = item.itunes.image;
+      }
 
-        if (!imageUrl) {
-          const contentHtml = item.content || item['content:encoded'] || item.description || '';
-          const imgMatch = contentHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
-          if (imgMatch?.[1] && !imgMatch[1].includes('gravatar') && !imgMatch[1].includes('pixel') && !imgMatch[1].includes('1x1') && !imgMatch[1].includes('feedburner')) {
-            imageUrl = imgMatch[1];
-          }
+      if (!imageUrl) {
+        const contentHtml = item.content || item['content:encoded'] || item.description || '';
+        const imgMatch = contentHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (imgMatch?.[1] && !imgMatch[1].includes('gravatar') && !imgMatch[1].includes('pixel') && !imgMatch[1].includes('1x1') && !imgMatch[1].includes('feedburner')) {
+          imageUrl = imgMatch[1];
         }
+      }
 
-        if (imageUrl) {
-          imageUrl = imageUrl.replace(/&amp;/g, '&').replace(/^http:\/\//i, 'https://');
-        }
-        return {
-          title: item.title || "Untitled",
-          link: item.link || feed.fallbackUrl,
-          summary: (item.contentSnippet || item.content || item.title || "").substring(0, 500),
-          source: feed.source,
-          pubDate: item.pubDate || item.isoDate,
-          imageUrl,
-        };
-      });
-    } catch (error) {
-      console.warn(`Failed to fetch RSS from ${feed.source}:`, error instanceof Error ? error.message : error);
-      return [];
-    }
+      if (imageUrl) {
+        imageUrl = imageUrl.replace(/&amp;/g, '&').replace(/^http:\/\//i, 'https://');
+      }
+      return {
+        title: item.title || "Untitled",
+        link: item.link || feed.fallbackUrl,
+        summary: (item.contentSnippet || item.content || item.title || "").substring(0, 500),
+        source: feed.source,
+        pubDate: item.pubDate || item.isoDate,
+        imageUrl,
+      };
+    });
   });
 
   const results = await Promise.allSettled(feedPromises);
