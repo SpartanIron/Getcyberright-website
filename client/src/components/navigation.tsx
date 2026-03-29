@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper, CreditCard } from "lucide-react";
+import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper, CreditCard, Chrome, Radio, Baby, ClipboardCheck, ShieldAlert } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -20,11 +20,21 @@ const whoWeHelp = [
   { title: "Seniors Hub", description: "Protect against phone scams, fraud, and tech tricks", href: "/seniors", icon: Heart, featured: true, color: "text-rose-500" },
 ];
 
-const toolsNav = [
-  { title: "Security Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
-  { title: "AI Prompt Library", description: "Ready-to-use AI templates for everyday life", href: "/ai-prompts", icon: Zap, badge: "New" },
-  { title: "GCR Data Shield", description: "Scan for your exposed personal data", href: "/shield", icon: ShieldCheck },
-  { title: "Safety Toolkit", description: "Password generator & voice detector", href: "/tools?tab=safety-toolkit", icon: Shield },
+const scamGuardNav = [
+  { title: "AI Scam Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
+  { title: "Browser Extension", description: "Real-time protection while you browse", href: "/browser-extension", icon: Chrome },
+  { title: "Report a Scam", description: "Help protect the community by reporting threats", href: "/report-scam", icon: ShieldAlert },
+  { title: "Password Generator", description: "Create strong, unique passwords instantly", href: "/tools?tab=safety-toolkit", icon: Lock },
+  { title: "Voice Deepfake Detector", description: "Detect AI-generated voice clones", href: "/tools?tab=safety-toolkit", icon: Radio },
+];
+
+const dataShieldNav = [
+  { title: "Data Exposure Scan", description: "Find your personal data across 500+ brokers", href: "/shield", icon: ShieldCheck },
+  { title: "Data Removal Center", description: "Identity Shield, Vault & Monitoring tools", href: "/data-removal", icon: Trash2 },
+  { title: "Breach Monitor", description: "Get alerted when your data appears in breaches", href: "/breach-dashboard", icon: AlertTriangle },
+  { title: "Safety Score Assessment", description: "Check your overall online safety in minutes", href: "/quick-assessment", icon: ClipboardCheck },
+  { title: "Cyber Hygiene Checklist", description: "Daily habits to keep your digital life secure", href: "/cyber-hygiene", icon: Shield },
+  { title: "Child Safety Scanner", description: "Check if sites and apps are safe for kids", href: "/parents/child-safety-scanner", icon: Baby },
 ];
 
 const learnItems = [
@@ -32,12 +42,15 @@ const learnItems = [
   { title: "Awareness Hub", description: "Visual guides, checklists & safety resources", href: "/awareness-hub", icon: BookOpen, color: "text-teal-500", featured: true },
   { title: "Cyber Threat Radar", description: "Real-time threat monitoring & alerts", href: "/cyber-threat-radar", icon: AlertTriangle, color: "text-red-500", featured: true },
   { title: "AI Safety Guide", description: "Spot deepfakes, AI scams & protect your privacy", href: "/ai-safety", icon: Brain, color: "text-purple-500", featured: true },
+  { title: "AI Prompt Library", description: "Ready-to-use AI templates for everyday life", href: "/ai-prompts", icon: Zap, color: "text-amber-500", featured: true },
+  { title: "Scam Intelligence", description: "Latest scam trends, tactics & intelligence reports", href: "/scam-intel", icon: Search, color: "text-orange-500", featured: true },
 ];
 
 const learnTopics = [
+  { title: "Cyber Safety Guides", href: "/guides", icon: BookOpen },
   { title: "Phishing & Email Scams", href: "/resources?category=phishing", icon: AlertTriangle },
   { title: "Online Privacy", href: "/resources?category=privacy", icon: Lock },
-  { title: "Password Security", href: "/resources?category=passwords", icon: Shield },
+  { title: "Resource Library", href: "/resources", icon: FileText },
 ];
 
 export function Navigation() {
@@ -131,49 +144,76 @@ export function Navigation() {
 
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-[15px]" data-testid="nav-tools">
-                  Tools
+                  Protection Hub
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-[500px] p-6">
+                  <div className="w-[680px] p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Security Tools</h3>
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Protection Hub</h3>
                       <Link href="/tools" className="text-sm text-primary flex items-center gap-1 hover:underline">
                         View all tools <ChevronRight className="w-3 h-3" />
                       </Link>
                     </div>
-                    <div className="space-y-2">
-                      {toolsNav.map((item) => (
-                        <NavigationMenuLink asChild key={item.title}>
-                          <Link
-                            href={item.href}
-                            className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
-                            data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
-                          >
-                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
-                              <item.icon className="w-5 h-5 text-accent" />
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2 mb-0.5">
-                                <span className="text-sm font-medium text-foreground">
-                                  {item.title}
-                                </span>
-                                {item.badge && (
-                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-white font-medium">
-                                    {item.badge}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground leading-snug">
-                                {item.description}
-                              </p>
-                            </div>
-                          </Link>
-                        </NavigationMenuLink>
-                      ))}
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Shield className="w-4 h-4 text-accent" />
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">GCR Scam Guard</h4>
+                        </div>
+                        <div className="space-y-1">
+                          {scamGuardNav.map((item) => (
+                            <NavigationMenuLink asChild key={item.title}>
+                              <Link
+                                href={item.href}
+                                className="flex items-start gap-2.5 rounded-lg p-2.5 transition-colors hover-elevate"
+                                data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                              >
+                                <div className="flex-shrink-0 w-8 h-8 rounded-md bg-accent/10 flex items-center justify-center mt-0.5">
+                                  <item.icon className="w-4 h-4 text-accent" />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2 mb-0.5">
+                                    <span className="text-sm font-medium text-foreground">{item.title}</span>
+                                    {item.badge && (
+                                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-white font-medium">{item.badge}</span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground leading-snug">{item.description}</p>
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <ShieldCheck className="w-4 h-4 text-teal-500" />
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">GCR Data Shield</h4>
+                        </div>
+                        <div className="space-y-1">
+                          {dataShieldNav.map((item) => (
+                            <NavigationMenuLink asChild key={item.title}>
+                              <Link
+                                href={item.href}
+                                className="flex items-start gap-2.5 rounded-lg p-2.5 transition-colors hover-elevate"
+                                data-testid={`nav-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                              >
+                                <div className="flex-shrink-0 w-8 h-8 rounded-md bg-teal-500/10 flex items-center justify-center mt-0.5">
+                                  <item.icon className="w-4 h-4 text-teal-500" />
+                                </div>
+                                <div>
+                                  <span className="text-sm font-medium text-foreground">{item.title}</span>
+                                  <p className="text-xs text-muted-foreground leading-snug">{item.description}</p>
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     <div className="mt-4 pt-4 border-t">
                       <p className="text-xs text-muted-foreground">
-                        No signup required to use our tools.
+                        Core tools are free. No signup required to get started.
                       </p>
                     </div>
                   </div>
@@ -182,12 +222,12 @@ export function Navigation() {
 
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-[15px]" data-testid="nav-learn">
-                  Learn
+                  Learning Hub
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="w-[550px] p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Learn & Train</h3>
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Learning Hub</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-3 mb-5">
                       {learnItems.map((item) => (
@@ -381,11 +421,12 @@ export function Navigation() {
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Search className="w-4 h-4 text-muted-foreground" />
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Tools</h4>
+                    <Shield className="w-4 h-4 text-muted-foreground" />
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Protection Hub</h4>
                   </div>
-                  <p className="text-xs text-muted-foreground -mt-1 ml-6">No signup required</p>
-                  {toolsNav.map((item) => (
+                  <p className="text-xs text-muted-foreground -mt-1 ml-6">Core tools are free</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-3 ml-6">GCR Scam Guard</p>
+                  {scamGuardNav.map((item) => (
                     <Link
                       key={item.title}
                       href={item.href}
@@ -402,6 +443,19 @@ export function Navigation() {
                       )}
                     </Link>
                   ))}
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-3 ml-6">GCR Data Shield</p>
+                  {dataShieldNav.map((item) => (
+                    <Link
+                      key={item.title}
+                      href={item.href}
+                      className="flex items-center gap-3 py-2 text-foreground transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                      data-testid={`mobile-link-${item.title.toLowerCase().replace(/\s/g, "-")}`}
+                    >
+                      <item.icon className="w-4 h-4 text-teal-500" />
+                      {item.title}
+                    </Link>
+                  ))}
                 </div>
 
                 <div className="h-px bg-border" />
@@ -409,7 +463,7 @@ export function Navigation() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-muted-foreground" />
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Learn</h4>
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Learning Hub</h4>
                   </div>
                   {learnItems.map((item) => (
                     <Link

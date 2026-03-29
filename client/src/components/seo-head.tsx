@@ -73,7 +73,7 @@ export const pageSEO = {
     description: "Got a suspicious message? Check it before it costs you. Free AI-powered scam detection, data broker removal, and safety training for families, seniors, and small businesses.",
   },
   tools: {
-    title: "Security Tools",
+    title: "Protection Hub",
     description: "Check suspicious emails, URLs, and phone numbers for scams. AI-powered threat detection tools to keep you safe online.",
   },
   resources: {

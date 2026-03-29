@@ -33,6 +33,7 @@ The frontend is built with React 19, TypeScript, and Vite, utilizing Wouter for 
 - **Competitive Positioning**: Individual pricing pages include competitor comparison tables, stat highlight cards, and updated FAQ. Both link to `/pricing` for bundle deals.
 - **Annual Billing**: All pricing pages feature a Monthly/Annual billing toggle with ~17-23% annual discount. The checkout endpoint accepts `returnPath` for source-aware cancel URLs.
 - **Admin & SEO**: A comprehensive admin system with role-based access control, scan activity monitoring (data broker scans + scam checks), admin password reset for user accounts, SEO keyword database, internal linking engine, dynamic sitemap generation, and universal meta injection for enhanced search engine visibility.
+- **Navigation Architecture**: Two-hub structure: **Protection Hub** (GCR Scam Guard tools + GCR Data Shield tools) and **Learning Hub** (educational content). Protection Hub groups: Scam Guard (AI Scanner, Browser Extension, Report a Scam, Password Generator, Voice Deepfake Detector) and Data Shield (Data Exposure Scan, Data Removal Center, Breach Monitor, Safety Score Assessment, Cyber Hygiene Checklist, Child Safety Scanner). Learning Hub: Training Academy, Awareness Hub, Cyber Threat Radar, AI Safety Guide, AI Prompt Library, Scam Intelligence. Applied consistently across desktop nav, mobile nav, footer, and tools page (`/tools`).
 
 ## External Dependencies
 

@@ -133,7 +133,7 @@ export default function Tools() {
     type: "BreadcrumbList",
     items: [
       { name: "Home", url: "https://www.getcyberright.com/" },
-      { name: "Security Tools", url: "https://www.getcyberright.com/tools" },
+      { name: "Protection Hub", url: "https://www.getcyberright.com/tools" },
     ],
   };
 
@@ -145,8 +145,8 @@ export default function Tools() {
       
       <main id="main-content" tabIndex={-1}>
         <PageBanner
-          title="Your Cyber Protection Arsenal"
-          subtitle="Powerful security tools and utilities designed to protect you and your family. Core tools are free, no account required."
+          title="Protection Hub"
+          subtitle="All of your security tools in one place. GCR Scam Guard and GCR Data Shield work together to keep you and your family safe. Core tools are free, no account required."
           imageSrc={bannerImage}
           imageAlt="Modern workspace with laptop displaying security checkmarks and password generator in bright natural light"
           imagePosition="left"

@@ -4,19 +4,21 @@ import { Link } from "wouter";
 import logoImage from "@/assets/logo.png";
 
 const footerLinks = {
-  knowledge: [
+  learning: [
+    { name: "Training Academy", href: "/training" },
+    { name: "Awareness Hub", href: "/awareness-hub" },
     { name: "Cyber Safety Guides", href: "/guides" },
+    { name: "AI Safety Guide", href: "/ai-safety" },
+    { name: "AI Prompt Library", href: "/ai-prompts" },
     { name: "Scam Intelligence", href: "/scam-intel" },
     { name: "Cyber Threat Radar", href: "/cyber-threat-radar" },
-    { name: "Awareness Hub", href: "/awareness-hub" },
-    { name: "Training Academy", href: "/training" },
     { name: "Resource Library", href: "/resources" },
   ],
-  tools: [
-    { name: "GCR Scam Guard", href: "/scam-checker" },
+  protection: [
+    { name: "GCR Scam Guard", href: "/tools" },
+    { name: "Browser Extension", href: "/browser-extension" },
     { name: "GCR Data Shield", href: "/shield" },
-    { name: "Password Generator", href: "/password-generator" },
-    { name: "AI Prompt Library", href: "/ai-prompts" },
+    { name: "Data Removal Center", href: "/data-removal" },
     { name: "Breach Monitor", href: "/breach-dashboard" },
     { name: "All Tools", href: "/tools" },
   ],
@@ -73,9 +75,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">Knowledge Hub</h4>
+            <h4 className="font-semibold text-white text-sm mb-3">Learning Hub</h4>
             <ul className="space-y-2">
-              {footerLinks.knowledge.map((link) => (
+              {footerLinks.learning.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
@@ -90,9 +92,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">Tools</h4>
+            <h4 className="font-semibold text-white text-sm mb-3">Protection Hub</h4>
             <ul className="space-y-2">
-              {footerLinks.tools.map((link) => (
+              {footerLinks.protection.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
