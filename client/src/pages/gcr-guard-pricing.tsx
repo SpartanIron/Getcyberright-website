@@ -17,6 +17,8 @@ import {
   Download,
   Loader2,
   Sparkles,
+  Gift,
+  Clock,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -109,7 +111,7 @@ export default function GcrGuardPricing() {
 
   const tierResponse = tierData as any;
   const tiers = tierResponse?.scamguard || [
-    { id: "free", name: "Free", price: 0, interval: null, features: ["manual_scan"], description: "Basic protection with manual scanning" },
+    { id: "free", name: "Free", price: 0, interval: null, features: ["manual_scan", "lookalike_detection", "community_trust", "search_annotations", "redirect_detection"], description: "Essential scanning and safety tools" },
     { id: "essential", name: "Pro", price: 499, interval: "month", features: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection"], description: "Full auto-protection for individuals" },
     { id: "professional", name: "Family", price: 799, interval: "month", features: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection", "weekly_digest", "scan_history", "safety_score", "family_profiles"], description: "Complete protection for the whole family" },
   ];
@@ -162,7 +164,7 @@ export default function GcrGuardPricing() {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="GCR Scam Guard Pricing"
-        description="Choose your GCR Scam Guard protection plan. Free manual scanning, Pro auto-protection from $4.99/month, or Family coverage from $7.99/month. Save 17% with annual billing."
+        description="Choose your GCR Scam Guard plan. Free tier includes scanning, fake domain detection, and trust scores. Try Pro free for 30 days with full auto-protection. Family plan from $7.99/month."
         keywords="GCR Scam Guard pricing, browser extension subscription, cybersecurity protection plans"
       />
       <Navigation />
@@ -216,6 +218,39 @@ export default function GcrGuardPricing() {
           </div>
         </section>
 
+        <section className="px-4 sm:px-6 lg:px-8 pt-6 pb-0">
+          <div className="max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="relative overflow-hidden rounded-xl bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 p-4 sm:p-5 text-white shadow-lg"
+              data-testid="banner-promo"
+            >
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9zdmc+')] opacity-50" />
+              <div className="relative flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <Gift className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-base sm:text-lg">Try Pro Free for 30 Days</p>
+                    <p className="text-sm text-white/85">Full auto-protection with no charge for 30 days. Cancel anytime before your trial ends.</p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  className="bg-white text-teal-700 hover:bg-white/90 font-semibold shrink-0 rounded-full px-6"
+                  onClick={() => handleSelectPlan("essential")}
+                  data-testid="button-promo-trial"
+                >
+                  Start Free Trial <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
         <section className="py-16 px-4 sm:px-6 lg:px-8 -mt-8">
           <div className="max-w-5xl mx-auto">
             <div className="grid md:grid-cols-3 gap-6">
@@ -262,6 +297,14 @@ export default function GcrGuardPricing() {
                             <div data-testid={`text-price-${tier.id}`}>
                               <span className="text-3xl font-bold">${(getDisplayPrice(tier.id, tier.price) / 100).toFixed(2)}</span>
                               <span className="text-muted-foreground">/month</span>
+                              {isPopular && (
+                                <div className="mt-1.5">
+                                  <span className="inline-flex items-center gap-1 text-xs font-semibold bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 px-2.5 py-1 rounded-full" data-testid="badge-trial">
+                                    <Clock className="w-3 h-3" />
+                                    First 30 days free
+                                  </span>
+                                </div>
+                              )}
                               {billingInterval === "annual" && ANNUAL_PRICES[tier.id] && (
                                 <div className="mt-1 space-y-0.5">
                                   <span className="text-xs text-muted-foreground line-through block">
@@ -312,7 +355,7 @@ export default function GcrGuardPricing() {
                               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                               Loading...
                             </>
-                          ) : isCurrentPlan ? "Current Plan" : tier.price === 0 ? "Get Started" : "Subscribe"}
+                          ) : isCurrentPlan ? "Current Plan" : tier.price === 0 ? "Get Started" : isPopular ? "Start 30-Day Free Trial" : "Subscribe"}
                           {!isCurrentPlan && loadingPlan !== tier.id && <ArrowRight className="w-4 h-4 ml-2" />}
                         </Button>
                       </CardContent>
@@ -465,11 +508,15 @@ export default function GcrGuardPricing() {
               {[
                 {
                   q: "Can I use GCR Scam Guard for free?",
-                  a: "Yes. The free plan includes manual scanning of URLs, emails, phone numbers, and suspicious messages. You can scan anything anytime without an account."
+                  a: "Yes. The free plan includes manual URL and content scanning, fake domain detection, community trust scores, search result safety badges, and redirect chain detection. No account required."
+                },
+                {
+                  q: "How does the 30-day free trial work?",
+                  a: "When you sign up for the Pro plan, you get full access to every Pro feature for 30 days at no charge. You will not be billed until the trial ends. If you decide it is not for you, cancel before the trial is over and you will not be charged."
                 },
                 {
                   q: "What does the Pro plan add?",
-                  a: "Pro unlocks automatic page scanning on every website you visit, lookalike domain detection, form warnings, link hover checks, community trust scores, webmail scanning for Gmail and Outlook, notification spam blocking, search result safety badges, redirect chain detection, and clipboard hijack protection."
+                  a: "Pro unlocks automatic page scanning on every website you visit, suspicious form warnings, link hover safety previews, Gmail and Outlook email scanning, dangerous link blocking, notification spam blocking, and clipboard hijack protection."
                 },
                 {
                   q: "What is the Family plan?",

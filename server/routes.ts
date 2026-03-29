@@ -4965,7 +4965,7 @@ EDGE CASE HANDLING
   // ============================================================
 
   const TIER_FEATURES: Record<string, string[]> = {
-    free: ["manual_scan"],
+    free: ["manual_scan", "lookalike_detection", "community_trust", "search_annotations", "redirect_detection"],
     essential: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection"],
     professional: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection", "weekly_digest", "scan_history", "safety_score", "family_profiles"],
     enterprise: ["manual_scan", "auto_scan", "lookalike_detection", "form_warnings", "hover_check", "community_trust", "webmail_scan", "block_dangerous", "notification_blocking", "search_annotations", "redirect_detection", "clipboard_protection", "weekly_digest", "scan_history", "safety_score", "family_profiles", "priority_support", "api_access"],
@@ -4980,7 +4980,7 @@ EDGE CASE HANDLING
           price: 0,
           interval: null,
           features: TIER_FEATURES.free,
-          description: "Basic protection with manual scanning",
+          description: "Essential scanning and safety tools",
         },
         {
           id: "essential",

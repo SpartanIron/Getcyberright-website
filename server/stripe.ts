@@ -208,6 +208,8 @@ export function registerStripeRoutes(app: Express) {
       const defaultReturnMap: Record<string, string> = { shield: "/data-shield-pricing", bundle: "/pricing", scamguard: "/gcr-guard-pricing" };
       const cancelPath = returnPath || defaultReturnMap[config.product] || "/gcr-guard-pricing";
 
+      const isProTrial = config.product === "scamguard" && config.tier === "essential";
+
       const session = await s.checkout.sessions.create({
         customer: customerId,
         mode: "subscription",
@@ -222,6 +224,7 @@ export function registerStripeRoutes(app: Express) {
           gcr_plan_key: planId,
         },
         subscription_data: {
+          ...(isProTrial ? { trial_period_days: 30 } : {}),
           metadata: {
             gcr_user_id: user.id,
             gcr_product: config.product,
