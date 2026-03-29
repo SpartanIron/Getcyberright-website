@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper } from "lucide-react";
+import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper, CreditCard } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import logoImage from "@/assets/logo.png";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -247,6 +247,73 @@ export function Navigation() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-[15px]" data-testid="nav-pricing">
+                  Pricing
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-[400px] p-6">
+                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-4">Plans & Pricing</h3>
+                    <div className="space-y-2">
+                      <NavigationMenuLink asChild>
+                        <Link
+                          href="/pricing"
+                          className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
+                          data-testid="nav-link-bundle-pricing"
+                        >
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <CreditCard className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="text-sm font-medium text-foreground">Bundle Plans</span>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-white font-medium">Best Value</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground leading-snug">
+                              Scam Guard + Data Shield together. Save up to 23%.
+                            </p>
+                          </div>
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link
+                          href="/gcr-guard-pricing"
+                          className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
+                          data-testid="nav-link-guard-pricing"
+                        >
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                            <Shield className="w-5 h-5 text-accent" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-foreground mb-0.5">GCR Scam Guard</div>
+                            <p className="text-xs text-muted-foreground leading-snug">
+                              Real-time scam detection & browser protection.
+                            </p>
+                          </div>
+                        </Link>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <Link
+                          href="/data-shield-pricing"
+                          className="flex items-start gap-3 rounded-lg p-3 transition-colors hover-elevate"
+                          data-testid="nav-link-shield-pricing"
+                        >
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                            <ShieldCheck className="w-5 h-5 text-accent" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-foreground mb-0.5">GCR Data Shield</div>
+                            <p className="text-xs text-muted-foreground leading-snug">
+                              Personal data removal from 500+ broker sites.
+                            </p>
+                          </div>
+                        </Link>
+                      </NavigationMenuLink>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
                 <NavigationMenuLink asChild>
                   <Link
                     href="/about"
@@ -369,6 +436,43 @@ export function Navigation() {
                   <Newspaper className="w-4 h-4 text-teal-500" />
                   <span className="font-medium">News</span>
                 </Link>
+
+                <div className="h-px bg-border" />
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-muted-foreground" />
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Pricing</h4>
+                  </div>
+                  <Link
+                    href="/pricing"
+                    className="flex items-center gap-3 py-2 text-foreground transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                    data-testid="mobile-link-bundle-pricing"
+                  >
+                    <CreditCard className="w-4 h-4 text-primary" />
+                    <span className="font-medium">Bundle Plans</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-white font-medium">Best Value</span>
+                  </Link>
+                  <Link
+                    href="/gcr-guard-pricing"
+                    className="flex items-center gap-3 py-2 text-foreground transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                    data-testid="mobile-link-guard-pricing"
+                  >
+                    <Shield className="w-4 h-4 text-accent" />
+                    <span className="font-medium">GCR Scam Guard</span>
+                  </Link>
+                  <Link
+                    href="/data-shield-pricing"
+                    className="flex items-center gap-3 py-2 text-foreground transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                    data-testid="mobile-link-shield-pricing"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-accent" />
+                    <span className="font-medium">GCR Data Shield</span>
+                  </Link>
+                </div>
 
                 <div className="h-px bg-border" />
 
