@@ -4825,6 +4825,56 @@ EDGE CASE HANDLING
     }
   });
 
+  app.get("/api/admin/social-partners", isAuthenticated, isAdmin, async (_req, res) => {
+    try {
+      const { loadPartners } = await import("./socialEngagementService");
+      res.json({ partners: loadPartners() });
+    } catch (error) {
+      console.error("Social partners error:", error);
+      res.status(500).json({ error: "Failed to load partners" });
+    }
+  });
+
+  app.post("/api/admin/social-partners", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { addPartner } = await import("./socialEngagementService");
+      const partner = req.body;
+      if (!partner.name || !partner.handles) {
+        res.status(400).json({ error: "Partner name and handles are required" });
+        return;
+      }
+      const updated = addPartner(partner);
+      res.json({ partners: updated });
+    } catch (error) {
+      console.error("Add partner error:", error);
+      res.status(500).json({ error: "Failed to add partner" });
+    }
+  });
+
+  app.delete("/api/admin/social-partners/:name", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { removePartner } = await import("./socialEngagementService");
+      const updated = removePartner(req.params.name);
+      res.json({ partners: updated });
+    } catch (error) {
+      console.error("Remove partner error:", error);
+      res.status(500).json({ error: "Failed to remove partner" });
+    }
+  });
+
+  app.post("/api/admin/social-engagement/run", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { likeRecentPostsFromPartners } = await import("./socialEngagementService");
+      const platform = req.body.platform || "facebook";
+      const category = req.body.category || "general_awareness";
+      const results = await likeRecentPostsFromPartners(platform, category, 5);
+      res.json({ results });
+    } catch (error) {
+      console.error("Social engagement error:", error);
+      res.status(500).json({ error: "Failed to run engagement" });
+    }
+  });
+
   app.get("/api/scam-feed", async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;

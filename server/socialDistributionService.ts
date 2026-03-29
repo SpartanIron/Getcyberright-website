@@ -5,6 +5,7 @@ import type { CyberSafetyGuide, CyberThreatAlert, ScamIntelligence, InsertSocial
 import { generateBrandedImage, serveImagePath } from "./socialImageService";
 import { getBufferChannelsByPlatform } from "./bufferPublisher";
 import { tagAllGcrLinks, tagSingleUrl, buildCampaignId } from "./utmTracking";
+import { buildPartnerContext } from "./socialEngagementService";
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -117,8 +118,8 @@ TOPICS: ${tags.join(", ")}
 EDUCATIONAL SOURCE MATERIAL (use this to write genuinely informative posts):
 ${educationalContext}
 
-Create excerpt-style posts for each platform. Each post should share a compelling taste of the article and drive readers to the full piece on our website:
-
+Create excerpt-style posts for each platform. Each post should share a compelling taste of the article and drive readers to the full piece on our website.
+${buildPartnerContext("linkedin", tags[0] || "general_awareness")}${buildPartnerContext("facebook", tags[0] || "general_awareness")}${buildPartnerContext("x", tags[0] || "general_awareness")}${buildPartnerContext("instagram", tags[0] || "general_awareness")}
 1. LINKEDIN (150-250 words)
 - Open with the single most compelling insight, stat, or story from the article
 - Share 1-2 specific takeaways that demonstrate the article's value

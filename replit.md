@@ -47,4 +47,4 @@ All images use WebP format for performance (converted from PNG, 80-90% size redu
 - **AI Services**: Anthropic API (Claude), OpenAI.
 - **Email Services**: Brevo, MailerSend, SMTP2GO, Resend.
 - **Image Processing**: Tesseract.js (OCR), jsQR (QR code decoding), Sharp.
-- **Social Publishing**: Buffer (Facebook, LinkedIn, Instagram).
+- **Social Publishing**: Buffer (Facebook, LinkedIn, Instagram). Social Engagement Service handles partner tagging, group sharing, and auto-engagement.

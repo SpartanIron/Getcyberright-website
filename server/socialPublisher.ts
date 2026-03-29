@@ -1,6 +1,7 @@
 import { storage } from "./storage";
 import { getImageAsBase64 } from "./socialImageService";
 import { isBufferConfigured, publishPostViaBuffer, publishAllDraftsViaBuffer } from "./bufferPublisher";
+import { runPostPublishEngagement } from "./socialEngagementService";
 import * as fs from "fs";
 
 interface PublishResult {
@@ -403,6 +404,15 @@ async function publishPostDirect(post: { id: string; platform: string; postConte
       publishedAt: new Date(),
     });
     console.log(`[SocialPublisher] Published ${post.platform} post: ${post.id}`);
+
+    runPostPublishEngagement(
+      post.postContent,
+      post.platform,
+      "general_awareness",
+      post.imageUrl || undefined
+    ).catch((err) => {
+      console.warn(`[SocialPublisher] Post-publish engagement error: ${err.message}`);
+    });
   } else {
     await storage.updateSocialPost(post.id, {
       status: "failed",

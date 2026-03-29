@@ -4,6 +4,7 @@ import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
 import { createBufferPost, getBufferChannelsByPlatform, getPublicImageUrl } from "./bufferPublisher";
 import type { InsertSocialPost } from "@shared/schema";
 import { tagAllGcrLinks } from "./utmTracking";
+import { buildPartnerContext, runPostPublishEngagement } from "./socialEngagementService";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -736,6 +737,11 @@ ${contentMix.recommendation}\n`;
 
   const sourceValidationContext = `\nSOURCE CREDIBILITY SUMMARY: ${sourceCredibility.tier1Count} Tier 1 (government/official), ${sourceCredibility.tier2Count} Tier 2 (established publications), ${sourceCredibility.tier3Count} Tier 3 (unverified). ${sourceCredibility.highestTier === 3 ? "WARNING: No high-credibility sources available. Downgrade urgency and frame claims as emerging/unverified." : ""}`;
 
+  const partnerContextLinkedIn = buildPartnerContext("linkedin", "general_awareness");
+  const partnerContextFacebook = buildPartnerContext("facebook", "general_awareness");
+  const partnerContextX = buildPartnerContext("x", "general_awareness");
+  const partnerContextInstagram = buildPartnerContext("instagram", "general_awareness");
+
   const styleInstructions: Record<PostStyle, string> = {
     expert_reaction: `WRITING STYLE: Expert Reaction. React to the biggest story as a CISM-certified professional would. Use first person ("As someone who works in cybersecurity..."). Share a specific professional insight that a layperson wouldn't know. Be direct and confident. Reference the specific technical details (CVE numbers, attack vectors, affected systems) but explain them in plain language. NO numbered tips list. Instead, give ONE concrete recommendation that shows deep expertise.`,
 
@@ -937,14 +943,14 @@ LINKEDIN POST (120-180 words max, STRICTLY ENFORCED):
 - Each paragraph: 1-2 sentences MAX. Break after every thought
 - End with a clear CTA driving to the relevant GetCyberRight page (e.g. "Full breakdown and protection steps:" followed by the link on its own line)
 - The post MUST contain at least 4 paragraph breaks (\\n\\n)
-
+${partnerContextLinkedIn}
 FACEBOOK POST (60-120 words max):
 - Conversational, like talking to a neighbor
 - Share the most surprising or relatable insight from the topic
 - Give 1-2 quick tips as a preview
 - End with a conversational CTA and link (e.g. "We put together a full guide on this. Check it out:" followed by the link)
 - Use paragraph breaks between thoughts
-
+${partnerContextFacebook}
 INSTAGRAM POST (40-80 words max, CRITICAL DIFFERENCES):
 - Instagram is IMAGE-FIRST. The caption supports the branded image card, not the other way around
 - Lead with a punchy hook or question that stops the scroll
@@ -953,6 +959,7 @@ INSTAGRAM POST (40-80 words max, CRITICAL DIFFERENCES):
 - Add 8-12 relevant hashtags at the END, separated from the caption by two line breaks
 - Use a slightly more casual, direct tone than LinkedIn
 - Focus on ONE key takeaway, not multiple tips
+${partnerContextInstagram}
 
 IMAGE HANDLING:
 Each news item includes an "Image:" field. If the article you base your post on has an image URL, return its index in "source_article_index" so we can use the real thumbnail.
