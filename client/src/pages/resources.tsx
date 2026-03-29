@@ -28,7 +28,7 @@ import {
   ExternalLink,
   CalendarDays
 } from "lucide-react";
-import bannerImage from "@/assets/banners/resources-banner.png";
+import bannerImage from "@/assets/banners/resources-banner.webp";
 
 type ResourceType = "guide" | "video" | "checklist";
 

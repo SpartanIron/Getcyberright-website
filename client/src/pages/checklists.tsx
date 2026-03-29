@@ -9,7 +9,7 @@ import { Home, User, Users, Briefcase, Shield, CalendarDays } from "lucide-react
 import { Link } from "wouter";
 import { StructuredData } from "@/components/structured-data";
 import type { BreadcrumbData } from "@/components/structured-data";
-import bannerImage from "@/assets/banners/resources-banner.png";
+import bannerImage from "@/assets/banners/resources-banner.webp";
 
 const checklistTabs = [
   { id: "home", label: "Home Network", icon: Home, checklist: securityChecklists.homeNetwork },

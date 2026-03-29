@@ -204,7 +204,7 @@ export default function FAQ() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-background">
       <StructuredData data={faqStructuredData} />
       <section className="relative py-16 overflow-hidden">
         <AnimatedCyberBackground />
@@ -273,6 +273,6 @@ export default function FAQ() {
           </Card>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

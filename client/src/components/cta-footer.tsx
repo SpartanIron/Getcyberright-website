@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
-import aboutFamilyImg from "@/assets/images/about-family-together.png";
+import aboutFamilyImg from "@/assets/images/about-family-together.webp";
 
 export function CTAFooter() {
   return (
@@ -9,7 +9,7 @@ export function CTAFooter() {
       <div className="absolute inset-0">
         <img
           src={aboutFamilyImg}
-          alt=""
+          alt="Diverse family learning online safety together"
           className="w-full h-full object-cover"
           loading="lazy"
           aria-hidden="true"

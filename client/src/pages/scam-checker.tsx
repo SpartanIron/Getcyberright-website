@@ -117,7 +117,7 @@ export default function ScamCheckerPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 overflow-hidden">
+    <main id="main-content" tabIndex={-1} className="relative min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 overflow-hidden">
       <StructuredData data={[scamCheckerApp, scamCheckerFaq, scamCheckerBreadcrumbs]} />
       <TechPatternBg variant="radar" />
       
@@ -460,6 +460,6 @@ export default function ScamCheckerPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BookOpen, ArrowRight, AlertTriangle, Shield, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import scamDetectionImg from "@/assets/images/feature-scam-detection-diverse.png";
+import scamDetectionImg from "@/assets/images/feature-scam-detection-diverse.webp";
 
 const severityColors: Record<string, string> = {
   critical: "bg-red-700 text-white",

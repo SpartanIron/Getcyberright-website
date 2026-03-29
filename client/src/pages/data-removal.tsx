@@ -8,7 +8,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { SEOHead } from "@/components/seo-head";
-import bannerImage from "@/assets/images/tool-data-scan-diverse.png";
+import bannerImage from "@/assets/images/tool-data-scan-diverse.webp";
 import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
 import { Skeleton } from "@/components/ui/skeleton";

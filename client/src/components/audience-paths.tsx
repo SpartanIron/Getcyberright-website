@@ -1,10 +1,10 @@
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
-import familyImg from "@/assets/images/about-family-together.png";
-import seniorsImg from "@/assets/images/about-seniors-learning.png";
+import familyImg from "@/assets/images/about-family-together.webp";
+import seniorsImg from "@/assets/images/about-seniors-learning.webp";
 import kidsImg from "@/assets/images/kids-safety-banner.jpg";
-import educatorImg from "@/assets/images/feature-family-learning-diverse.png";
-import businessImg from "@/assets/images/business-security-training.png";
+import educatorImg from "@/assets/images/feature-family-learning-diverse.webp";
+import businessImg from "@/assets/images/business-security-training.webp";
 
 const paths = [
   {

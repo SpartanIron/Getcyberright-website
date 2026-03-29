@@ -4,7 +4,7 @@ import { ArrowRight, MapPin, Shield, AlertTriangle, ShieldCheck, Eye } from "luc
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { TrendingThreat } from "@shared/schema";
-import heroFamilyImg from "@/assets/images/hero-family-diverse.png";
+import heroFamilyImg from "@/assets/images/hero-family-diverse.webp";
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
   "America/New_York": "US", "America/Chicago": "US", "America/Denver": "US",

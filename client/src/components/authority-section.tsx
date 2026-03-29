@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import authorityImg from "@/assets/images/feature-family-learning-diverse.png";
+import authorityImg from "@/assets/images/feature-family-learning-diverse.webp";
 
 const trustPoints = [
   "Backed by the same data that law enforcement and security agencies worldwide rely on",

@@ -15,7 +15,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Link } from "wouter";
-import supportImage from "@/assets/banners/contact-banner.png";
+import supportImage from "@/assets/banners/contact-banner.webp";
 
 const supportOptions = [
   {

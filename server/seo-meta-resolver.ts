@@ -3,7 +3,7 @@ import { SCAM_PAGES } from "@shared/scam-content";
 
 const BASE_URL = "https://www.getcyberright.com";
 
-const DEFAULT_TITLE = "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors";
+const DEFAULT_TITLE = "GetCyberRight: Free Cybersecurity for Families";
 const DEFAULT_DESCRIPTION = "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training. Trusted by thousands of families worldwide.";
 
 const OG_IMAGES: Record<string, string> = {
@@ -123,15 +123,15 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; ogT
     description: "Analyze suspicious URLs, emails, text messages, and QR codes with our AI-powered scam checker. Free manual scanning, no account required.",
   },
   "/password-generator": {
-    title: "Secure Password Generator: Create Strong, Unique Passwords | GetCyberRight",
+    title: "Secure Password Generator | GetCyberRight",
     description: "Generate strong, unique passwords instantly with our secure password generator. Customize length, character types, and complexity. Free to use.",
   },
   "/data-removal": {
-    title: "Data Broker Removal: Remove Your Personal Information from 501+ Sites",
+    title: "Data Broker Removal: 501+ Sites | GetCyberRight",
     description: "Protect your privacy by removing your personal information from 501+ data broker sites. No account needed to get started.",
   },
   "/shield": {
-    title: "GCR Data Shield: Find & Remove Your Exposed Personal Data",
+    title: "GCR Data Shield | GetCyberRight",
     description: "Scan 500+ data brokers to find where your personal information is exposed online. Get step-by-step removal guidance or automated removal.",
   },
   "/shield/next-steps": {
@@ -139,27 +139,27 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; ogT
     description: "Your data was found exposed online. Follow this step-by-step guide based on your risk level to remove your data from broker sites and protect against identity theft.",
   },
   "/breach-dashboard": {
-    title: "Data Breach Monitor: Check If Your Email Has Been Compromised",
+    title: "Data Breach Monitor | GetCyberRight",
     description: "Monitor your email addresses for data breaches. Get instant alerts when your personal information appears in known data breaches.",
   },
   "/cyber-threat-radar": {
-    title: "Live Cyber Threat Radar: Real-Time Security Alerts & Threat Map",
+    title: "Live Cyber Threat Radar | GetCyberRight",
     description: "Monitor live cybersecurity threats with our real-time Cyber Threat Radar. See active threat alerts, trending attack vectors, and security advisories.",
   },
   "/tools": {
-    title: "Cybersecurity Tools: GCR Scam Guard, Password Generator & More | GetCyberRight",
+    title: "Cybersecurity Tools & Scam Guard | GetCyberRight",
     description: "Access cybersecurity tools including an AI-powered GCR Scam Guard, secure Password Generator, Data Broker Removal, and Breach Monitor. Core tools are free.",
   },
   "/guides": {
-    title: "Cybersecurity Guides: Practical Safety Advice for Families | GetCyberRight",
+    title: "Cybersecurity Guides for Families | GetCyberRight",
     description: "Browse expert cybersecurity guides covering phishing, identity theft, password security, data privacy, and online safety for families, seniors, and kids.",
   },
   "/alerts": {
-    title: "Cyber Threat Alerts: Latest Security Warnings | GetCyberRight",
+    title: "Cyber Threat Alerts | GetCyberRight",
     description: "Stay informed with the latest cybersecurity threat alerts. Real-time warnings about active scams, malware, data breaches, and emerging threats.",
   },
   "/scam-intel": {
-    title: "Scam Intelligence Center: How Scams Work & How to Stay Safe | GetCyberRight",
+    title: "Scam Intelligence Center | GetCyberRight",
     description: "Deep-dive intelligence reports on how scams work, who they target, and how to protect yourself. Detailed analysis of current and emerging scam tactics.",
   },
   "/news": {
@@ -167,11 +167,11 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; ogT
     description: "Stay informed with the latest cybersecurity news, data breach reports, emerging threats, and security advisories. Curated updates for families and businesses.",
   },
   "/kids": {
-    title: "Kids Digital Safety Hub: Fun Online Safety Lessons for Ages 8-16 | GetCyberRight",
+    title: "Kids Online Safety Lessons (Ages 8-16) | GCR",
     description: "Interactive cybersecurity lessons designed for kids and teens ages 8 to 16. Learn about password safety, spotting scams, and being a good digital citizen.",
   },
   "/seniors": {
-    title: "Senior Safety Center: Protect Yourself from Online Scams | GetCyberRight",
+    title: "Senior Online Safety Center | GetCyberRight",
     description: "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, protect your identity, and avoid romance fraud.",
   },
   "/parents": {
@@ -179,27 +179,27 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; ogT
     description: "Cybersecurity guides for parents. Learn about parental controls, age-appropriate device settings, and how to protect your children from online threats.",
   },
   "/training": {
-    title: "Cybersecurity Training Academy: Courses for All Skill Levels | GetCyberRight",
+    title: "Cybersecurity Training Academy | GetCyberRight",
     description: "Access cybersecurity training courses designed for beginners, families, seniors, and small businesses. Core courses are free to get started.",
   },
   "/emergency-help": {
-    title: "Emergency Cyber Help: What to Do If You Have Been Scammed | GetCyberRight",
+    title: "Emergency Cyber Help | GetCyberRight",
     description: "Immediate steps to take if you have been scammed online. Emergency contacts, account recovery guidance, and financial protection steps.",
   },
   "/ai-prompts": {
-    title: "406+ AI Cybersecurity Prompts: ChatGPT, Claude & AI Security Library",
+    title: "406+ AI Cybersecurity Prompts | GetCyberRight",
     description: "Browse 406+ expertly crafted AI prompts for cybersecurity. Use with ChatGPT, Claude, and other AI tools to analyze threats and protect your digital life.",
   },
   "/ai-safety": {
-    title: "AI Safety Guide: Protect Yourself from AI-Powered Threats | GetCyberRight",
+    title: "AI Safety Guide: AI Threat Protection | GCR",
     description: "Learn how to identify and protect yourself from AI-powered scams, deepfakes, and synthetic media. Practical safety tips for the age of AI.",
   },
   "/faq": {
-    title: "Frequently Asked Questions About Cybersecurity | GetCyberRight",
+    title: "Cybersecurity FAQ | GetCyberRight",
     description: "Find answers to common cybersecurity questions. Learn about password security, phishing prevention, identity theft protection, and online safety.",
   },
   "/pricing": {
-    title: "Plans & Pricing: Free Cybersecurity Tools for Everyone | GetCyberRight",
+    title: "Plans & Pricing | GetCyberRight",
     description: "GetCyberRight is free to get started. Access AI-powered scam checking, data broker removal, safety training, and more.",
   },
   "/contact": {
@@ -211,55 +211,55 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; ogT
     description: "Report a scam to GetCyberRight and help protect others. Submit details about suspicious emails, phone calls, text messages, or websites.",
   },
   "/awareness-hub": {
-    title: "Cyber Awareness Hub: Safety Guides, Checklists & Resources | GetCyberRight",
+    title: "Cyber Awareness Hub | GetCyberRight",
     description: "Access printable cybersecurity guides, safety checklists, and awareness resources for families, schools, and organizations.",
   },
   "/resources": {
-    title: "Cybersecurity Resources: Guides, Tools & Training | GetCyberRight",
+    title: "Cybersecurity Resources | GetCyberRight",
     description: "Explore our complete library of cybersecurity resources including safety guides, interactive tools, training courses, and scam alerts.",
   },
   "/checklists": {
-    title: "Cybersecurity Checklists: Printable Security Guides | GetCyberRight",
+    title: "Cybersecurity Checklists | GetCyberRight",
     description: "Download free printable cybersecurity checklists for families, seniors, and small businesses. Step-by-step security guides.",
   },
   "/printable-guides": {
-    title: "Printable Cybersecurity Guides: Download Free Safety Resources | GetCyberRight",
+    title: "Printable Cybersecurity Guides | GetCyberRight",
     description: "Download and print free cybersecurity guides for your family, classroom, or business. Visual safety checklists and reference cards.",
   },
   "/small-business": {
-    title: "Small Business Cybersecurity: Security Training & Guides | GetCyberRight",
+    title: "Small Business Cybersecurity | GetCyberRight",
     description: "Cybersecurity resources for small businesses. Employee awareness training, security policy templates, and incident response guides.",
   },
   "/educators": {
-    title: "Educator Resources: Cybersecurity Curriculum & Teaching Materials | GetCyberRight",
+    title: "Educator Cybersecurity Resources | GetCyberRight",
     description: "Cybersecurity teaching resources for educators. Access lesson plans, classroom activities, printable guides, and curriculum materials.",
   },
   "/cyber-hygiene": {
-    title: "Cyber Hygiene: Daily Habits for Better Online Safety | GetCyberRight",
+    title: "Cyber Hygiene: Daily Safety Habits | GCR",
     description: "Learn essential cyber hygiene practices to protect yourself daily. Simple, actionable habits for passwords, software updates, and safe browsing.",
   },
   "/travel-safety": {
-    title: "Travel Cybersecurity: Stay Safe Online While Traveling | GetCyberRight",
+    title: "Travel Cybersecurity Tips | GetCyberRight",
     description: "Protect your digital life while traveling. Tips for secure Wi-Fi use, device protection, avoiding travel scams, and keeping data safe.",
   },
   "/threat-trends": {
-    title: "Cybersecurity Threat Trends: Current Attack Patterns & Statistics | GetCyberRight",
+    title: "Cybersecurity Threat Trends | GetCyberRight",
     description: "Track the latest cybersecurity threat trends and attack patterns. Data-driven insights on emerging scams and security threats.",
   },
   "/quick-assessment": {
-    title: "Cybersecurity Quick Assessment: Check Your Security in 5 Minutes | GetCyberRight",
+    title: "Quick Security Assessment | GetCyberRight",
     description: "Take our free 5-minute cybersecurity assessment to evaluate your online safety habits. Get personalized recommendations.",
   },
   "/safety-score": {
-    title: "Personal Cyber Safety Score: Rate Your Digital Security | GetCyberRight",
+    title: "Your Cyber Safety Score | GetCyberRight",
     description: "Calculate your personal cyber safety score based on your security practices. Get a detailed breakdown and actionable steps.",
   },
   "/parent-guide": {
-    title: "Parent's Guide to Online Safety: Protect Your Children Online | GetCyberRight",
+    title: "Parent's Guide to Online Safety | GCR",
     description: "A complete guide for parents to keep children safe online. Covers parental controls, age-appropriate conversations, and device setup.",
   },
   "/our-mission": {
-    title: "Our Mission: Making Online Safety Accessible to Everyone | GetCyberRight",
+    title: "Our Mission | GetCyberRight",
     description: "GetCyberRight's mission is to make cybersecurity education simple, practical, and available to every family.",
   },
   "/support": {
@@ -267,7 +267,7 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; ogT
     description: "Get help with GetCyberRight tools and resources. Find answers to common questions and troubleshooting guides.",
   },
   "/support-the-mission": {
-    title: "Support the Mission: Help Keep Families Safe Online | GetCyberRight",
+    title: "Support the Mission | GetCyberRight",
     description: "Support GetCyberRight's mission to make cybersecurity education accessible to everyone.",
   },
   "/search": {
@@ -295,19 +295,19 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; ogT
     description: "Learn about the security measures and practices GetCyberRight uses to protect your data and privacy.",
   },
   "/advertise": {
-    title: "Advertise with GetCyberRight: Reach Security-Conscious Families",
+    title: "Advertise with GetCyberRight",
     description: "Partner with GetCyberRight to reach families and businesses who care about online safety.",
   },
   "/partner-deck": {
-    title: "Partnership Opportunities: Collaborate with GetCyberRight",
+    title: "Partner with GetCyberRight",
     description: "Explore partnership opportunities with GetCyberRight to advance cybersecurity education.",
   },
   "/experience": {
-    title: "The GetCyberRight Experience: Where Families Take Back Their Digital Safety",
+    title: "The GCR Experience | GetCyberRight",
     description: "A first-of-its-kind family event where digital safety meets real fun. Interactive stations, vetted experts, and activities for every age.",
   },
   "/browser-extension": {
-    title: "GCR Scam Guard Chrome Extension: Real-Time Scam Protection",
+    title: "GCR Scam Guard Chrome Extension | GCR",
     description: "Protect yourself while browsing with the GCR Scam Guard Chrome extension. Real-time scam detection, phishing alerts, and website safety ratings.",
   },
   "/gcr-guard-pricing": {
@@ -318,43 +318,43 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; ogT
 
 const TOPIC_META: Record<string, { title: string; description: string }> = {
   "identity-theft": {
-    title: "Identity Theft Prevention & Recovery Guide | GetCyberRight",
+    title: "Identity Theft Prevention | GetCyberRight",
     description: "Comprehensive resources on identity theft prevention, detection, and recovery. Learn how to protect your personal information and what to do if your identity is stolen.",
   },
   "online-scams": {
-    title: "Online Scams: How to Recognize & Avoid Them | GetCyberRight",
+    title: "Online Scams: Recognize & Avoid | GetCyberRight",
     description: "Learn about the latest online scams, how they work, and how to protect yourself. Covers phishing, romance scams, tech support fraud, and more.",
   },
   "phishing-attacks": {
-    title: "Phishing Attacks: How to Spot & Stop Them | GetCyberRight",
+    title: "Phishing Attacks: Spot & Stop Them | GCR",
     description: "Everything you need to know about phishing attacks. Learn to identify phishing emails, texts, and websites before they compromise your accounts.",
   },
   "cyber-safety-seniors": {
-    title: "Cyber Safety for Seniors: Complete Protection Guide | GetCyberRight",
+    title: "Cyber Safety for Seniors | GetCyberRight",
     description: "Cybersecurity resources designed specifically for older adults. Covers phone scams, identity theft, romance fraud, and technology safety.",
   },
   "cyber-safety-kids": {
-    title: "Cyber Safety for Kids: Online Protection Guide | GetCyberRight",
+    title: "Cyber Safety for Kids | GetCyberRight",
     description: "Help keep children safe online with age-appropriate cybersecurity education, parental controls guidance, and digital citizenship lessons.",
   },
   "password-security": {
-    title: "Password Security: Best Practices & Tools | GetCyberRight",
+    title: "Password Security Tips | GetCyberRight",
     description: "Learn password security best practices. Create strong passwords, use password managers, and protect your accounts from credential theft.",
   },
   "privacy-protection": {
-    title: "Privacy Protection: Control Your Personal Data | GetCyberRight",
+    title: "Privacy Protection | GetCyberRight",
     description: "Take control of your online privacy. Learn about data brokers, privacy settings, data removal, and how to minimize your digital footprint.",
   },
   "device-security": {
-    title: "Device Security: Protect Your Phones, Computers & IoT | GetCyberRight",
+    title: "Device Security Guide | GetCyberRight",
     description: "Secure all your devices from phones to smart home gadgets. Covers updates, antivirus, encryption, and safe device setup.",
   },
   "data-breaches": {
-    title: "Data Breaches: Monitor, Respond & Recover | GetCyberRight",
+    title: "Data Breaches: Respond & Recover | GCR",
     description: "Stay informed about data breaches affecting your accounts. Learn how to check for breaches, respond quickly, and protect yourself.",
   },
   "social-media-security": {
-    title: "Social Media Security: Protect Your Accounts & Privacy | GetCyberRight",
+    title: "Social Media Security | GetCyberRight",
     description: "Secure your social media accounts and protect your privacy. Covers account settings, scam awareness, and safe sharing practices.",
   },
 };

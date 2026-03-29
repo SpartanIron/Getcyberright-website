@@ -44,7 +44,7 @@ import {
   Send,
   Info,
 } from "lucide-react";
-import bannerImage from "@/assets/banners/tools-banner.png";
+import bannerImage from "@/assets/banners/tools-banner.webp";
 
 const scamTypes = [
   { value: "phishing", label: "Phishing Email/Text", icon: Mail },

@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { ArrowRight, AlertTriangle, DollarSign, Users, Phone, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import seniorsImg from "@/assets/images/seniors-diverse.png";
+import seniorsImg from "@/assets/images/seniors-diverse.webp";
 
 const threats = [
   {

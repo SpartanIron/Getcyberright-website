@@ -12,9 +12,9 @@ import {
   GraduationCap, Lock, ShieldCheck, UserX, Mail, Phone,
   Landmark, TrendingUp, BadgeAlert, ScanLine, FileText
 } from "lucide-react";
-import familyTogetherImage from "@/assets/images/about-family-together.png";
-import seniorsLearningImage from "@/assets/images/about-seniors-learning.png";
-import ctaBackgroundImage from "@/assets/images/about-cta-background.png";
+import familyTogetherImage from "@/assets/images/about-family-together.webp";
+import seniorsLearningImage from "@/assets/images/about-seniors-learning.webp";
+import ctaBackgroundImage from "@/assets/images/about-cta-background.webp";
 
 const aboutArticleSchema: ArticleData = {
   type: "Article",
@@ -401,7 +401,7 @@ export default function About() {
         <section className="relative py-20 sm:py-24 overflow-hidden">
           <img
             src={ctaBackgroundImage}
-            alt=""
+            alt="Family learning cybersecurity together at home"
             className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
             aria-hidden="true"

@@ -14,13 +14,13 @@ import {
   ArrowRight, Lightbulb, DollarSign, Server,
   Key, Eye, CalendarDays, BarChart3, Globe
 } from "lucide-react";
-import bannerImage from "@/assets/banners/small-business-banner.png";
-import imgEmployeeTraining from "@/assets/images/card-employee-training.png";
-import imgPhishingBusiness from "@/assets/images/card-phishing-business.png";
-import imgPasswordManagement from "@/assets/images/card-password-management.png";
-import imgDataProtection from "@/assets/images/card-data-protection.png";
-import imgCyberInsurance from "@/assets/images/card-cyber-insurance.png";
-import imgIncidentResponse from "@/assets/images/card-incident-response-biz.png";
+import bannerImage from "@/assets/banners/small-business-banner.webp";
+import imgEmployeeTraining from "@/assets/images/card-employee-training.webp";
+import imgPhishingBusiness from "@/assets/images/card-phishing-business.webp";
+import imgPasswordManagement from "@/assets/images/card-password-management.webp";
+import imgDataProtection from "@/assets/images/card-data-protection.webp";
+import imgCyberInsurance from "@/assets/images/card-cyber-insurance.webp";
+import imgIncidentResponse from "@/assets/images/card-incident-response-biz.webp";
 import {
   SecurityPostureAssessment,
   PhishingSimulationTrainer,

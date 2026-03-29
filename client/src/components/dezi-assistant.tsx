@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import deziAvatar from "@/assets/images/dezi-avatar.png";
+import deziAvatar from "@/assets/images/dezi-avatar.webp";
 
 interface Message {
   id: string;

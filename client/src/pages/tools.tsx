@@ -30,7 +30,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import bannerImage from "@/assets/banners/tools-banner.png";
+import bannerImage from "@/assets/banners/tools-banner.webp";
 
 const scamGuardTools = [
   { title: "Browser Extension", description: "12 protection features including notification blocking, search safety badges, redirect detection, and clipboard protection. Install on Chrome, Edge, Brave, or Opera.", href: "/browser-extension", icon: Chrome, badge: "Free + Pro" },

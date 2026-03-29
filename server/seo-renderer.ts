@@ -37,7 +37,7 @@ function buildHead(meta: {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(meta.title)}</title>
   <meta name="description" content="${escapeHtml(meta.description)}">
   <link rel="canonical" href="${canonical}">
@@ -218,8 +218,6 @@ function buildSiteNav(): string {
         <li><a href="/checklists" style="color:#0d9488;">Security Checklists</a></li>
         <li><a href="/printable-guides" style="color:#0d9488;">Printable Guides</a></li>
         <li><a href="/resources" style="color:#0d9488;">All Resources</a></li>
-        <li><a href="/resources/glossary" style="color:#0d9488;">Glossary</a></li>
-        <li><a href="/resources/cheat-sheets" style="color:#0d9488;">Cheat Sheets</a></li>
       </ul>
     </div>
     <div style="min-width:180px;">
@@ -1259,26 +1257,6 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     faqs: [
       { question: "What does the Child Safety Scanner check?", answer: "The scanner evaluates your family's online safety across key areas including device settings, parental controls, social media exposure, and communication habits. It then provides personalized recommendations based on your children's ages." },
       { question: "Is the scanner free to use?", answer: "Yes, the Child Safety Scanner is completely free and does not require an account. Your responses are used only to generate your personalized safety recommendations." },
-    ],
-  },
-  "/resources/glossary": {
-    title: "Cybersecurity Glossary: Simple Definitions for Common Terms",
-    description: "A plain-language glossary of cybersecurity terms. Understand common security concepts without the technical jargon. Perfect for beginners and families.",
-    path: "/resources/glossary",
-    features: ["Plain-language definitions", "Alphabetical browsing", "Common terms explained", "Real-world examples", "Family-friendly explanations"],
-    faqs: [
-      { question: "Who is this glossary for?", answer: "This glossary is for anyone who has encountered cybersecurity terms they do not understand. We explain technical concepts in plain, everyday language so families, seniors, students, and beginners can follow along." },
-      { question: "How many terms are in the glossary?", answer: "Our glossary covers the most common cybersecurity terms you will encounter in everyday life, from basic concepts like passwords and updates to more advanced topics. We add new terms regularly." },
-    ],
-  },
-  "/resources/cheat-sheets": {
-    title: "Cybersecurity Cheat Sheets: Quick Reference Security Guides",
-    description: "Quick-reference cybersecurity cheat sheets covering passwords, safe browsing, email safety, social media privacy, and more. Print-friendly and easy to follow.",
-    path: "/resources/cheat-sheets",
-    features: ["Password security cheat sheet", "Safe browsing quick reference", "Email safety checklist", "Social media privacy guide", "Print-friendly format"],
-    faqs: [
-      { question: "Can I print the cheat sheets?", answer: "Yes, all cheat sheets are designed to be print-friendly. Print them out and keep them near your computer, share them with family members, or post them in your office or classroom." },
-      { question: "What topics do the cheat sheets cover?", answer: "Our cheat sheets cover essential topics including password best practices, safe browsing habits, email safety, social media privacy settings, device security, and what to do if you suspect a scam." },
     ],
   },
 };

@@ -223,9 +223,9 @@ export default function BreachDashboard() {
               <AlertTriangle className="w-5 h-5" />
               Access Required
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold mb-4 tracking-[-0.025em]">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-4 tracking-[-0.025em]">
               Family Breach Dashboard
-            </h1>
+            </h2>
             <p className="text-white/60 mb-8">
               To access your breach monitoring dashboard, you need a secure access link. 
               This link is sent to you when you sign up for breach monitoring.

@@ -31,7 +31,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertContactMessageSchema } from "@shared/schema";
 import { z } from "zod";
 import { Mail, Phone, Clock, Send, CheckCircle2, MapPin } from "lucide-react";
-import bannerImage from "@/assets/banners/contact-banner.png";
+import bannerImage from "@/assets/banners/contact-banner.webp";
 
 const contactMethods = [
   {

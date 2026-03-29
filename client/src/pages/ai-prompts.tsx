@@ -41,7 +41,7 @@ import {
   Clock,
   Zap
 } from "lucide-react";
-import bannerImage from "@/assets/banners/ai-prompts-banner.png";
+import bannerImage from "@/assets/banners/ai-prompts-banner.webp";
 
 type Audience = "all" | "everyday" | "families" | "seniors" | "students" | "business";
 type Category = "all" | "productivity" | "communication" | "safety" | "health" | "finance" | "learning" | "work" | "tech";

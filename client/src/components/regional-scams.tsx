@@ -5,21 +5,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getScamProfileByRegion, ALL_REGIONS, type RegionalScamProfile } from "@shared/regions";
 
-import scamGovernment from "@/assets/images/scam-government.png";
-import scamHealthcare from "@/assets/images/scam-healthcare.png";
-import scamFinancial from "@/assets/images/scam-financial.png";
-import scamRomance from "@/assets/images/scam-romance.png";
-import scamPhone from "@/assets/images/scam-phone.png";
-import scamAiDeepfake from "@/assets/images/scam-ai-deepfake.png";
-import scamTechSupport from "@/assets/images/scam-tech-support.png";
-import scamPhishing from "@/assets/images/scam-phishing.png";
-import scamIdentity from "@/assets/images/scam-identity.png";
-import scamDelivery from "@/assets/images/scam-delivery.png";
-import scamBusiness from "@/assets/images/scam-business.png";
-import scamInvestment from "@/assets/images/scam-investment.png";
-import scamImpersonation from "@/assets/images/scam-impersonation.png";
-import scamMalware from "@/assets/images/scam-malware.png";
-import scamGeneral from "@/assets/images/scam-general.png";
+import scamGovernment from "@/assets/images/scam-government.webp";
+import scamHealthcare from "@/assets/images/scam-healthcare.webp";
+import scamFinancial from "@/assets/images/scam-financial.webp";
+import scamRomance from "@/assets/images/scam-romance.webp";
+import scamPhone from "@/assets/images/scam-phone.webp";
+import scamAiDeepfake from "@/assets/images/scam-ai-deepfake.webp";
+import scamTechSupport from "@/assets/images/scam-tech-support.webp";
+import scamPhishing from "@/assets/images/scam-phishing.webp";
+import scamIdentity from "@/assets/images/scam-identity.webp";
+import scamDelivery from "@/assets/images/scam-delivery.webp";
+import scamBusiness from "@/assets/images/scam-business.webp";
+import scamInvestment from "@/assets/images/scam-investment.webp";
+import scamImpersonation from "@/assets/images/scam-impersonation.webp";
+import scamMalware from "@/assets/images/scam-malware.webp";
+import scamGeneral from "@/assets/images/scam-general.webp";
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
   "America/New_York": "US",

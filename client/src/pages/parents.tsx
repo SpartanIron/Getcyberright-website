@@ -18,13 +18,13 @@ import {
   ClipboardCheck, Brain, Smartphone, Scale,
   Sparkles, BarChart3, Globe
 } from "lucide-react";
-import bannerImage from "@/assets/banners/parents-banner.png";
-import cardParentalControls from "@/assets/images/card-parental-controls.png";
-import cardSocialMedia from "@/assets/images/card-social-media-safety.png";
-import cardScreenTime from "@/assets/images/card-screen-time.png";
-import cardGamingSafety from "@/assets/images/card-gaming-safety.png";
-import cardOnlinePredators from "@/assets/images/card-online-predators.png";
-import cardFirstDevice from "@/assets/images/card-first-device.png";
+import bannerImage from "@/assets/banners/parents-banner.webp";
+import cardParentalControls from "@/assets/images/card-parental-controls.webp";
+import cardSocialMedia from "@/assets/images/card-social-media-safety.webp";
+import cardScreenTime from "@/assets/images/card-screen-time.webp";
+import cardGamingSafety from "@/assets/images/card-gaming-safety.webp";
+import cardOnlinePredators from "@/assets/images/card-online-predators.webp";
+import cardFirstDevice from "@/assets/images/card-first-device.webp";
 
 import {
   DeviceAuditChecklist, ParentingQuiz, AppSafetyReview,

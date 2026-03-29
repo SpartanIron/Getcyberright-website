@@ -45,7 +45,7 @@ export default function PasswordGeneratorPage() {
   });
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 overflow-hidden">
+    <main id="main-content" tabIndex={-1} className="relative min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 overflow-hidden">
       <StructuredData data={[passwordGenApp, passwordGenFaq, passwordGenBreadcrumbs]} />
       <TechPatternBg variant="matrix" />
       
@@ -303,6 +303,6 @@ export default function PasswordGeneratorPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

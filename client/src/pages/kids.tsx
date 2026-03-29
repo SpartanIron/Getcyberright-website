@@ -18,20 +18,20 @@ import {
   DollarSign, Globe, Fingerprint
 } from "lucide-react";
 
-import kidsYoungLearnersImg from "@/assets/images/kids-young-learners.png";
-import kidsTeenLearnersImg from "@/assets/images/kids-teen-learners.png";
-import kidsSpotScamImg from "@/assets/images/kids-spot-scam.png";
-import kidsFamilyTogetherImg from "@/assets/images/kids-family-together.png";
-import kidsPersonalInfoImg from "@/assets/images/kids-personal-info.png";
-import kidsPasswordPowerImg from "@/assets/images/kids-password-power.png";
-import kidsSpottingTricksImg from "@/assets/images/kids-spotting-tricks.png";
-import kidsDeviceSafetyImg from "@/assets/images/kids-device-safety.png";
-import kidsTrustedAdultsImg from "@/assets/images/kids-trusted-adults.png";
-import kidsSocialMediaImg from "@/assets/images/kids-social-media.png";
-import kidsCyberbullyingImg from "@/assets/images/kids-cyberbullying.png";
-import kidsGamingSmartImg from "@/assets/images/kids-gaming-smart.png";
-import kidsPhishingImg from "@/assets/images/kids-phishing.png";
-import kidsDigitalFootprintImg from "@/assets/images/kids-digital-footprint.png";
+import kidsYoungLearnersImg from "@/assets/images/kids-young-learners.webp";
+import kidsTeenLearnersImg from "@/assets/images/kids-teen-learners.webp";
+import kidsSpotScamImg from "@/assets/images/kids-spot-scam.webp";
+import kidsFamilyTogetherImg from "@/assets/images/kids-family-together.webp";
+import kidsPersonalInfoImg from "@/assets/images/kids-personal-info.webp";
+import kidsPasswordPowerImg from "@/assets/images/kids-password-power.webp";
+import kidsSpottingTricksImg from "@/assets/images/kids-spotting-tricks.webp";
+import kidsDeviceSafetyImg from "@/assets/images/kids-device-safety.webp";
+import kidsTrustedAdultsImg from "@/assets/images/kids-trusted-adults.webp";
+import kidsSocialMediaImg from "@/assets/images/kids-social-media.webp";
+import kidsCyberbullyingImg from "@/assets/images/kids-cyberbullying.webp";
+import kidsGamingSmartImg from "@/assets/images/kids-gaming-smart.webp";
+import kidsPhishingImg from "@/assets/images/kids-phishing.webp";
+import kidsDigitalFootprintImg from "@/assets/images/kids-digital-footprint.webp";
 
 import { quizBanks, spotTheScamScenarios, storyScenarios, decisionTrees } from "@/components/kids-hub/quiz-data";
 import { MultiQuiz, SpotTheScamGame, StoryActivity, PasswordStrengthBuilder, ProgressDashboard, WhatWouldYouDo } from "@/components/kids-hub/interactive-games";

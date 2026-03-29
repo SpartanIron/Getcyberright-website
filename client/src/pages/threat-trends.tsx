@@ -3,7 +3,7 @@ import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { ThreatTrends } from "@/components/threat-trends";
 import { PageBanner } from "@/components/page-banner";
-import bannerImage from "@/assets/banners/tools-banner.png";
+import bannerImage from "@/assets/banners/tools-banner.webp";
 
 export default function ThreatTrendsPage() {
   return (

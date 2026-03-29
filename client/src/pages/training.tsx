@@ -7,13 +7,13 @@ import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { SEOHead } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { CourseData, BreadcrumbData } from "@/components/structured-data";
-import bannerImage from "@/assets/banners/training-banner.png";
-import trainingKidsImg from "@/assets/images/card-training-kids.png";
-import trainingParentsImg from "@/assets/images/card-training-parents.png";
-import trainingSeniorsImg from "@/assets/images/card-training-seniors.png";
-import trainingEducatorsImg from "@/assets/images/card-training-educators.png";
-import trainingBusinessImg from "@/assets/images/card-training-business.png";
-import trainingEveryoneImg from "@/assets/images/card-training-everyone.png";
+import bannerImage from "@/assets/banners/training-banner.webp";
+import trainingKidsImg from "@/assets/images/card-training-kids.webp";
+import trainingParentsImg from "@/assets/images/card-training-parents.webp";
+import trainingSeniorsImg from "@/assets/images/card-training-seniors.webp";
+import trainingEducatorsImg from "@/assets/images/card-training-educators.webp";
+import trainingBusinessImg from "@/assets/images/card-training-business.webp";
+import trainingEveryoneImg from "@/assets/images/card-training-everyone.webp";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -161,7 +161,7 @@ export default function Training() {
           <div className="absolute inset-0 hidden lg:block" aria-hidden="true">
             <img
               src={bannerImage}
-              alt=""
+              alt="Diverse people learning cybersecurity together"
               className="w-full h-full object-cover"
               loading="eager"
             />

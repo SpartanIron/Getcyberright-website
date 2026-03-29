@@ -23,7 +23,7 @@ import {
   FileText,
   CheckCircle2
 } from "lucide-react";
-import bannerImage from "@/assets/banners/emergency-banner.png";
+import bannerImage from "@/assets/banners/emergency-banner.webp";
 
 interface EmergencyContact {
   name: string;

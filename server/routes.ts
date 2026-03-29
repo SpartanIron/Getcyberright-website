@@ -276,8 +276,6 @@ export async function registerRoutes(
       { path: '/travel-safety', changefreq: 'monthly', priority: '0.7' },
       { path: '/faq', changefreq: 'monthly', priority: '0.7' },
       { path: '/parents/child-safety-scanner', changefreq: 'monthly', priority: '0.7' },
-      { path: '/resources/glossary', changefreq: 'monthly', priority: '0.7' },
-      { path: '/resources/cheat-sheets', changefreq: 'monthly', priority: '0.7' },
       { path: '/parent-guide', changefreq: 'monthly', priority: '0.6' },
       { path: '/contact', changefreq: 'monthly', priority: '0.6' },
       { path: '/pricing', changefreq: 'monthly', priority: '0.6' },

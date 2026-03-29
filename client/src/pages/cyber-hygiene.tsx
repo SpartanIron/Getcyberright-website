@@ -15,7 +15,7 @@ export default function CyberHygiene() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Back Navigation */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
         <div className="container mx-auto px-4 py-3">
@@ -299,6 +299,6 @@ export default function CyberHygiene() {
           <ShareCallToAction />
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper, CreditCard, Chrome, Radio, Baby, ClipboardCheck, ShieldAlert } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import logoImage from "@/assets/logo.png";
+import logoImage from "@/assets/logo.webp";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   NavigationMenu,
@@ -103,7 +103,7 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-[72px] items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5" data-testid="link-logo">
-            <img src={logoImage} alt="GetCyberRight" className="w-11 h-11 object-contain" />
+            <img src={logoImage} alt="GetCyberRight" className="w-11 h-11 object-contain" width={44} height={44} loading="lazy" />
             <span className="font-bold text-xl text-white tracking-tight">
               GetCyberRight
             </span>

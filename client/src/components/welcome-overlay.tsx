@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Shield, Users, Compass, ArrowRight, X } from "lucide-react";
 import { useLocation } from "wouter";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.webp";
 
 const WELCOME_SEEN_KEY = "getcyberright_welcomed";
 

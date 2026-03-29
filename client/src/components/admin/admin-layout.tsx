@@ -16,7 +16,7 @@ import {
   FileText,
   ScanSearch
 } from "lucide-react";
-import logoImage from "@/assets/logo.png";
+import logoImage from "@/assets/logo.webp";
 
 interface AdminLayoutProps {
   children: ReactNode;

@@ -23,7 +23,7 @@ import {
   ShoppingBag
 } from "lucide-react";
 import { Link } from "wouter";
-import bannerImage from "@/assets/banners/pricing-banner.png";
+import bannerImage from "@/assets/banners/pricing-banner.webp";
 
 const whatWeOffer = [
   { icon: Search, name: "GCR Scam Guard", description: "Check suspicious emails, texts, URLs, QR codes, and phone numbers" },

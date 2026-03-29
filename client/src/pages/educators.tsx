@@ -14,13 +14,13 @@ import {
   ArrowRight, Lightbulb, GraduationCap, School,
   ClipboardList, Download, CalendarDays
 } from "lucide-react";
-import bannerImage from "@/assets/banners/educators-banner.png";
-import digitalCitizenshipImg from "@/assets/images/card-digital-citizenship.png";
-import cyberbullyingImg from "@/assets/images/card-cyberbullying.png";
-import privacyEducationImg from "@/assets/images/card-privacy-education.png";
-import socialMediaLiteracyImg from "@/assets/images/card-social-media-literacy.png";
-import onlineResearchImg from "@/assets/images/card-online-research.png";
-import passwordEducationImg from "@/assets/images/card-password-education.png";
+import bannerImage from "@/assets/banners/educators-banner.webp";
+import digitalCitizenshipImg from "@/assets/images/card-digital-citizenship.webp";
+import cyberbullyingImg from "@/assets/images/card-cyberbullying.webp";
+import privacyEducationImg from "@/assets/images/card-privacy-education.webp";
+import socialMediaLiteracyImg from "@/assets/images/card-social-media-literacy.webp";
+import onlineResearchImg from "@/assets/images/card-online-research.webp";
+import passwordEducationImg from "@/assets/images/card-password-education.webp";
 import {
   LessonPlanGenerator,
   ClassroomActivitySimulator,

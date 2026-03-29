@@ -15,8 +15,8 @@ import {
   Calendar, MapPin, Star, CheckCircle,
   Lightbulb, Handshake, PartyPopper, Send,
 } from "lucide-react";
-import heroImage from "@/assets/images/experience-hero.png";
-import familiesImage from "@/assets/images/experience-families.png";
+import heroImage from "@/assets/images/experience-hero.webp";
+import familiesImage from "@/assets/images/experience-families.webp";
 
 const breadcrumbs: BreadcrumbData = {
   type: "BreadcrumbList",

@@ -1,9 +1,9 @@
 import { Link } from "wouter";
 import { ArrowRight, Search, Trash2, GraduationCap, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import scamCheckerImg from "@/assets/images/card-scam-checker.png";
-import seniorImg from "@/assets/images/about-seniors-learning.png";
-import businessImg from "@/assets/images/business-security-training.png";
+import scamCheckerImg from "@/assets/images/card-scam-checker.webp";
+import seniorImg from "@/assets/images/about-seniors-learning.webp";
+import businessImg from "@/assets/images/business-security-training.webp";
 
 const features = [
   {

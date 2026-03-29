@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
-import featureScamImg from "@/assets/images/feature-scam-detection-diverse.png";
-import featureLearningImg from "@/assets/images/feature-family-learning-diverse.png";
-import featureGenerationImg from "@/assets/images/feature-every-generation-diverse.png";
-import featureEmergencyImg from "@/assets/images/feature-emergency-help-diverse.png";
+import featureScamImg from "@/assets/images/feature-scam-detection-diverse.webp";
+import featureLearningImg from "@/assets/images/feature-family-learning-diverse.webp";
+import featureGenerationImg from "@/assets/images/feature-every-generation-diverse.webp";
+import featureEmergencyImg from "@/assets/images/feature-emergency-help-diverse.webp";
 
 const features = [
   {

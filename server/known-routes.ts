@@ -52,8 +52,6 @@ export const KNOWN_CLIENT_ROUTES = new Set([
   "/gcr-guard-pricing",
   "/data-shield-pricing",
   "/faq",
-  "/resources/glossary",
-  "/resources/cheat-sheets",
   "/guides",
   "/alerts",
   "/scam-intel",

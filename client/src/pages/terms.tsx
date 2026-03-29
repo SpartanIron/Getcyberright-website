@@ -4,7 +4,7 @@ import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { SEOHead } from "@/components/seo-head";
 import { Link } from "wouter";
-import bannerImage from "@/assets/banners/terms-banner.png";
+import bannerImage from "@/assets/banners/terms-banner.webp";
 
 export default function Terms() {
   const effectiveDate = "January 31, 2026";

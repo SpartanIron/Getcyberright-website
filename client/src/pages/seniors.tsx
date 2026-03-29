@@ -18,15 +18,15 @@ import {
   ExternalLink, Wallet, UserX, ChevronDown, ChevronUp,
   Search, BarChart3, TreeDeciduous, Handshake
 } from "lucide-react";
-import bannerImage from "@/assets/banners/seniors-banner.png";
-import cardRomanceScams from "@/assets/images/card-romance-scams.png";
-import cardTechSupportScams from "@/assets/images/card-tech-support-scams.png";
-import cardMedicareScams from "@/assets/images/card-medicare-scams.png";
-import cardPhoneEmailScams from "@/assets/images/card-phone-email-scams.png";
-import cardIdentityTheft from "@/assets/images/card-identity-theft-seniors.png";
-import cardOnlineShopping from "@/assets/images/card-online-shopping-seniors.png";
-import cardGovernmentScams from "@/assets/images/card-government-scams.png";
-import cardInvestmentFraud from "@/assets/images/card-investment-fraud.png";
+import bannerImage from "@/assets/banners/seniors-banner.webp";
+import cardRomanceScams from "@/assets/images/card-romance-scams.webp";
+import cardTechSupportScams from "@/assets/images/card-tech-support-scams.webp";
+import cardMedicareScams from "@/assets/images/card-medicare-scams.webp";
+import cardPhoneEmailScams from "@/assets/images/card-phone-email-scams.webp";
+import cardIdentityTheft from "@/assets/images/card-identity-theft-seniors.webp";
+import cardOnlineShopping from "@/assets/images/card-online-shopping-seniors.webp";
+import cardGovernmentScams from "@/assets/images/card-government-scams.webp";
+import cardInvestmentFraud from "@/assets/images/card-investment-fraud.webp";
 
 import {
   ScamScenarioExercise,
