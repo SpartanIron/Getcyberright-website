@@ -4,6 +4,7 @@ import { LiveActivityBar } from "@/components/live-activity-bar";
 import { TrustStrip } from "@/components/trust-strip";
 import { HowItWorks } from "@/components/how-it-works";
 import { PillarTiles } from "@/components/pillar-tiles";
+import { PromoBanners } from "@/components/promo-banners";
 import { ThreatAwareness } from "@/components/threat-awareness";
 import { ContentPreview } from "@/components/content-preview";
 import { FeaturedGuide } from "@/components/featured-guides";
@@ -49,6 +50,7 @@ export default function Home() {
         <HowItWorks />
         <ThreatAwareness />
         <PillarTiles />
+        <PromoBanners />
         <AudiencePaths />
         <AuthoritySection />
         <Testimonials />
