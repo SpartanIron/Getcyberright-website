@@ -5702,7 +5702,7 @@ EDGE CASE HANDLING
   // Masked Identity (Identity Shield) Routes
   // ==========================================
 
-  app.get("/api/masked-identities", async (req: any, res) => {
+  app.get("/api/masked-identities", standardRateLimit, async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ error: "Authentication required" });
@@ -5717,7 +5717,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.get("/api/masked-identities/stats", async (req: any, res) => {
+  app.get("/api/masked-identities/stats", standardRateLimit, async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ error: "Authentication required" });
@@ -5736,7 +5736,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/masked-identities", async (req: any, res) => {
+  app.post("/api/masked-identities", standardRateLimit, async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ error: "Authentication required" });
@@ -5767,6 +5767,21 @@ EDGE CASE HANDLING
       if (!realValue || typeof realValue !== "string" || realValue.length < 1) {
         return res.status(400).json({ error: "realValue is required" });
       }
+      if (realValue.length > 320) {
+        return res.status(400).json({ error: "realValue is too long" });
+      }
+      if (aliasType === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(realValue)) {
+        return res.status(400).json({ error: "Please provide a valid email address" });
+      }
+      if (aliasType === "phone") {
+        const digitsOnly = realValue.replace(/[^\d]/g, "");
+        if (digitsOnly.length < 7 || digitsOnly.length > 15 || !/^\+?[\d\s\-().]{7,20}$/.test(realValue)) {
+          return res.status(400).json({ error: "Please provide a valid phone number (7-15 digits)" });
+        }
+      }
+      if (aliasType === "username" && !/^[a-zA-Z0-9._\-@]{1,64}$/.test(realValue)) {
+        return res.status(400).json({ error: "Username can only contain letters, numbers, dots, underscores, hyphens, and @ symbols" });
+      }
 
       const identity = await createMaskedIdentity(
         userId,
@@ -5782,7 +5797,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.patch("/api/masked-identities/:id/toggle", async (req: any, res) => {
+  app.patch("/api/masked-identities/:id/toggle", standardRateLimit, async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ error: "Authentication required" });
@@ -5802,7 +5817,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.patch("/api/masked-identities/:id/forwarding", async (req: any, res) => {
+  app.patch("/api/masked-identities/:id/forwarding", standardRateLimit, async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ error: "Authentication required" });
@@ -5822,7 +5837,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.patch("/api/masked-identities/:id/service", async (req: any, res) => {
+  app.patch("/api/masked-identities/:id/service", standardRateLimit, async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ error: "Authentication required" });
@@ -5842,7 +5857,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.delete("/api/masked-identities/:id", async (req: any, res) => {
+  app.delete("/api/masked-identities/:id", standardRateLimit, async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ error: "Authentication required" });
@@ -5858,7 +5873,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.get("/api/masked-identities/activity", async (req: any, res) => {
+  app.get("/api/masked-identities/activity", standardRateLimit, async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ error: "Authentication required" });
@@ -5909,7 +5924,7 @@ EDGE CASE HANDLING
     }
   });
 
-  app.post("/api/extension/notification-report", async (req: any, res) => {
+  app.post("/api/extension/notification-report", standardRateLimit, async (req: any, res) => {
     try {
       const { domain, threatType, sampleContent } = req.body;
       if (!domain || !threatType) {

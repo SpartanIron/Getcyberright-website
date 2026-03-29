@@ -607,20 +607,96 @@ export function IdentityShieldPanel() {
             <div>
               <div className="font-medium mb-1">1. Generate</div>
               <p className="text-muted-foreground text-xs">
-                Create a masked email, phone, or username. Each is unique and encrypted.
+                Create a masked email, phone, or username. Each is unique and encrypted with AES-256 so your real information stays private.
               </p>
             </div>
             <div>
               <div className="font-medium mb-1">2. Use It Everywhere</div>
               <p className="text-muted-foreground text-xs">
-                Sign up for services with your masked identity instead of your real one. Copy and paste from here.
+                Sign up for services with your masked identity instead of your real one. Click the alias to copy it, then paste it into any sign-up form.
               </p>
             </div>
             <div>
               <div className="font-medium mb-1">3. Stay Protected</div>
               <p className="text-muted-foreground text-xs">
-                Messages forward to your real address. If a service gets breached, only the alias is exposed. Disable it in one click.
+                Messages forward to your real address. If a service gets breached, only the alias is exposed. Disable or delete it in one click.
               </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-muted">
+        <CardContent className="p-6">
+          <h3 className="font-semibold text-lg mb-4">Tips for Getting the Most Out of Identity Shield</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <h4 className="font-medium text-primary mb-2">For Parents</h4>
+              <ul className="space-y-1.5 text-muted-foreground text-xs">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  Create a masked email for each of your child's gaming or app accounts. If one gets breached, the others stay safe.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  Use the "Kids Apps" category to group your children's aliases so you can manage them all in one place.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  Never give out your child's real email to websites. Use a masked email and turn off forwarding if spam starts coming through.
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium text-primary mb-2">For Seniors</h4>
+              <ul className="space-y-1.5 text-muted-foreground text-xs">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  Use a masked email when signing up for newsletters, loyalty programs, or online services. This keeps your real inbox clean and protected.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  If you start getting suspicious messages to one of your aliases, simply toggle forwarding off. You do not need to change your real email.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  Label each alias clearly (like "Doctor's Office" or "Pharmacy") so you always know which is which.
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium text-primary mb-2">For Online Shoppers</h4>
+              <ul className="space-y-1.5 text-muted-foreground text-xs">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  Create a separate masked email for each shopping site. If one retailer gets breached, your other accounts are not affected.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  Use the "Shopping" category so all your retail aliases are grouped together for easy management.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  After making a purchase, you can disable forwarding on that alias until you need it again. This stops promotional spam.
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium text-primary mb-2">For Everyone</h4>
+              <ul className="space-y-1.5 text-muted-foreground text-xs">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  Use a different masked identity for every service you sign up for. This prevents data brokers from linking your accounts together.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  If spam appears on a specific alias, you know exactly which service leaked your data. Delete that alias and report the service.
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mt-0.5 shrink-0" />
+                  Combine Identity Shield with Data Shield's broker removal for complete protection: remove what is already out there and prevent new exposure going forward.
+                </li>
+              </ul>
             </div>
           </div>
         </CardContent>

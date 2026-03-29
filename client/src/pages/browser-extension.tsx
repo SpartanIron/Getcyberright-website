@@ -8,7 +8,8 @@ import { Link } from "wouter";
 import { TechPatternBg } from "@/components/tech-pattern-bg";
 import {
   Shield, Chrome, ArrowLeft, Download, Eye, Bell, MousePointer2,
-  Search, Flag, Zap, Lock, CheckCircle2, Monitor
+  Search, Flag, Zap, Lock, CheckCircle2, Monitor, BellOff, Globe,
+  ArrowRightLeft, Clipboard
 } from "lucide-react";
 
 const extensionApp: WebApplicationData = {
@@ -69,6 +70,26 @@ const features = [
     icon: Lock,
     title: "Privacy-First Design",
     description: "No browsing history tracked. No personal data collected. Scans only happen when you trigger them or when auto-scan is enabled."
+  },
+  {
+    icon: BellOff,
+    title: "Notification Spam Blocker",
+    description: "Automatically detects when shady websites try to send you browser notifications. Blocks known spam domains before they clutter your screen with fake alerts."
+  },
+  {
+    icon: Globe,
+    title: "Search Result Safety Badges",
+    description: "See safety ratings right next to search results on Google, Bing, DuckDuckGo, and Yahoo. Know which links are safe before you click."
+  },
+  {
+    icon: ArrowRightLeft,
+    title: "Redirect Chain Detection",
+    description: "Flags suspicious websites that bounce you through multiple hidden redirects. A common trick scammers use to disguise where they are actually sending you."
+  },
+  {
+    icon: Clipboard,
+    title: "Clipboard Hijack Protection",
+    description: "Monitors for malicious scripts that secretly swap what you copy, like changing a crypto wallet address. You will be alerted if clipboard content is tampered with."
   },
 ];
 
@@ -224,7 +245,78 @@ export default function BrowserExtensionPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white dark:bg-slate-900">
+      <section className="py-16 md:py-24 bg-white dark:bg-slate-900">
+        <div className="container max-w-5xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-3" style={{ letterSpacing: "-0.025em" }}>
+              Getting the Most Out of Scam Guard
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Practical tips for families, parents, seniors, and anyone who wants to stay safe online.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              {
+                title: "For Parents",
+                tips: [
+                  "Install it on your children's devices so every page they visit is automatically scanned for scams and inappropriate content.",
+                  "Turn on notification spam blocking to prevent pop-up traps that trick kids into clicking fake alerts.",
+                  "Use the search result safety badges so your child can see green, yellow, or red ratings before clicking any link on Google or Bing.",
+                  "Check the weekly safety digest to see what threats were detected across your family's browsing."
+                ],
+                color: "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800"
+              },
+              {
+                title: "For Seniors",
+                tips: [
+                  "Use the right-click scanner on any link in an email or social media post before clicking it. If you are unsure, scan it first.",
+                  "The link hover feature shows a safety preview when you hold your mouse over a link, so you never have to guess.",
+                  "Redirect chain detection will warn you if a website tries to bounce you through hidden pages, a common trick in phone and tech support scams.",
+                  "If you see a red shield icon in your toolbar, leave the page immediately. Green means safe."
+                ],
+                color: "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800"
+              },
+              {
+                title: "For Online Shoppers",
+                tips: [
+                  "Before entering payment details on any website, check the extension badge. A yellow or red badge means you should not proceed.",
+                  "Use the page-wide link scan on unfamiliar shopping sites. It checks every link on the page and highlights dangerous ones in red.",
+                  "Clipboard protection ensures that no script on a shopping page can secretly change a wallet address or payment link you copied.",
+                  "Pair with Identity Shield (in GCR Data Shield) to create a masked email for each shopping account so breaches do not expose your real address."
+                ],
+                color: "bg-purple-50 dark:bg-purple-950/30 border-purple-200 dark:border-purple-800"
+              },
+              {
+                title: "For Everyone",
+                tips: [
+                  "Keep the extension enabled at all times. Most scam sites look identical to real ones, and the extension catches what your eyes cannot.",
+                  "Report any confirmed scam using the community reporting feature. Your report protects thousands of other families.",
+                  "Review the Scam of the Week alerts to stay ahead of trending scams. Knowledge is your strongest defense.",
+                  "Upgrade to the Pro plan to enable auto-scan, which silently checks every page you visit without any extra effort."
+                ],
+                color: "bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800"
+              },
+            ].map((group, i) => (
+              <Card key={i} className={`border ${group.color}`} data-testid={`tips-${group.title.toLowerCase().replace(/\s/g, '-')}`}>
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-4">{group.title}</h3>
+                  <ul className="space-y-3">
+                    {group.tips.map((tip, j) => (
+                      <li key={j} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                        <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span>{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-slate-50 dark:bg-slate-800/50">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-3" style={{ letterSpacing: "-0.025em" }}>
@@ -233,11 +325,15 @@ export default function BrowserExtensionPage() {
           </div>
           <div className="space-y-4 max-w-2xl mx-auto">
             {[
-              { q: "Is the browser extension free?", a: "The extension is free to download and includes manual scanning at no cost. Optional paid plans (Pro and Family) unlock advanced features like automatic page scanning, webmail protection, and family profiles." },
+              { q: "Is the browser extension free?", a: "The extension is free to download and includes manual scanning at no cost. Optional paid plans (Pro and Family) unlock advanced features like automatic page scanning, notification blocking, search safety badges, redirect detection, clipboard protection, webmail scanning, and family profiles." },
               { q: "Does it track my browsing activity?", a: "No. The extension only scans content when you explicitly trigger a scan or when auto-scan is enabled. No browsing history is stored or transmitted." },
               { q: "What browsers does it work with?", a: "It works with any Chromium-based browser including Google Chrome, Brave, Microsoft Edge, Opera, and Vivaldi." },
               { q: "Why isn't it on the Chrome Web Store?", a: "We're working on Chrome Web Store approval. In the meantime, you can install it manually using Developer Mode, which takes about 30 seconds." },
               { q: "How accurate is the scanning?", a: "GCR Scam Guard uses the same AI-powered analysis and multi-source threat intelligence (VirusTotal, PhishTank, Google Safe Browsing, and more) as our web-based GCR Scam Guard." },
+              { q: "What are search result safety badges?", a: "When you search on Google, Bing, DuckDuckGo, or Yahoo, the extension adds colored badges next to each result showing whether the link is safe, suspicious, or dangerous. This helps you avoid risky sites before you even click." },
+              { q: "How does notification spam blocking work?", a: "Many scam sites trick you into allowing browser notifications, then flood you with fake virus warnings and misleading ads. The extension detects these permission requests and blocks known spam domains automatically." },
+              { q: "What is clipboard hijack protection?", a: "Some malicious websites run hidden scripts that change what you have copied to your clipboard. For example, swapping a crypto wallet address so funds go to a scammer. The extension detects these changes and alerts you immediately." },
+              { q: "Can I install it on my family's devices?", a: "Yes. The Family plan lets you manage profiles for up to 6 family members. Install the extension on each device, sign in with the same account, and everyone gets protected. You can review safety activity across all devices from your dashboard." },
             ].map((faq, i) => (
               <Card key={i} className="border shadow-sm" data-testid={`faq-${i}`}>
                 <CardContent className="p-5">
