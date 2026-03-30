@@ -175,6 +175,17 @@ export async function createBufferPost(
     if (result?.post) {
       const scheduledInfo = result.post.dueAt ? ` (scheduled: ${result.post.dueAt})` : "";
       console.log(`[Buffer] Post created on ${result.post.channelService}: ${result.post.status}${scheduledInfo}`);
+
+      if (result.post.status === "error") {
+        console.error(`[Buffer] Post returned error status on ${result.post.channelService} (Buffer ID: ${result.post.id})`);
+        return {
+          success: false,
+          platform: "buffer",
+          bufferId: result.post.id,
+          error: `Buffer post created but returned error status on ${result.post.channelService}`,
+        };
+      }
+
       return {
         success: true,
         platform: "buffer",
@@ -267,6 +278,18 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     imageUrl,
     platform: post.platform,
   });
+
+  if (!result.success && post.platform === "instagram" && imageUrl) {
+    console.warn(`[Buffer] Instagram post ${postId} failed with shareNow. Retrying with addToQueue mode...`);
+    result = await createBufferPost(channel.id, post.postContent, {
+      mode: "addToQueue",
+      imageUrl,
+      platform: post.platform,
+    });
+    if (result.success) {
+      console.log(`[Buffer] Instagram retry with addToQueue succeeded for post ${postId}`);
+    }
+  }
 
   if (!result.success && imageUrl && result.error?.toLowerCase().includes("image")) {
     console.warn(`[Buffer] Image rejected for ${post.platform} post ${postId}: ${result.error}. Retrying without image...`);
