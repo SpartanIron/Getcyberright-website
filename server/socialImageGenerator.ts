@@ -149,7 +149,8 @@ export async function generateSocialImage(
       return outputPath;
     }
 
-    const svg = generateSvg(title, category, urgency, source);
+    const cleanTitle = title.replace(/\[.*?\]\s*/g, "").trim();
+    const svg = generateSvg(cleanTitle, category, urgency, source);
 
     await sharp(Buffer.from(svg))
       .png({ quality: 90, compressionLevel: 6 })

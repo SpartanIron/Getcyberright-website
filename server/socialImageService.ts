@@ -305,14 +305,15 @@ export async function generateBrandedImage(
   try {
     ensureDir();
 
+    const cleanTitle = title.replace(/\[.*?\]\s*/g, "").trim();
     const dims = PLATFORM_DIMENSIONS[platform] || PLATFORM_DIMENSIONS.facebook;
-    const topic = detectTopic(title, contentType);
+    const topic = detectTopic(cleanTitle, contentType);
     const config = TOPIC_CONFIG[topic] || TOPIC_CONFIG.default;
     const isSquare = platform === "instagram";
 
     const svg = isSquare
-      ? buildSquareSvg(dims.width, dims.height, title, contentType, config)
-      : buildLandscapeSvg(dims.width, dims.height, title, contentType, config);
+      ? buildSquareSvg(dims.width, dims.height, cleanTitle, contentType, config)
+      : buildLandscapeSvg(dims.width, dims.height, cleanTitle, contentType, config);
 
     const logoSize = isSquare ? 70 : 65;
     const logoBuffer = await getLogoPngBuffer(logoSize);

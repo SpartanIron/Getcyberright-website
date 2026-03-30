@@ -2024,7 +2024,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
             await storage.createSocialPost({
               contentType: "trend_insight",
               contentId: `trend-${Date.now()}-${platform}-breaking-queued`,
-              contentTitle: `[BREAKING-QUEUED] ${posts.title}`,
+              contentTitle: posts.title,
               platform,
               postContent: content,
               hashtags: posts.hashtags,
