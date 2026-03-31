@@ -276,3 +276,9 @@ id = "OrgdNRxc4-eClOmVOl6au"
 uri = "file://.local/social-images/ig-cisco-breached-via-poisoned-developer-to-1774984668387.jpeg"
 type = "image"
 title = "Instagram Image (1080x1080) — Cisco Breach Story"
+
+[[outputs]]
+id = "E1mn3ht7K97sbv7CdjJom"
+uri = "file://dist/social-images/social-test-fixed-rendering-1774987445383.png"
+type = "image"
+title = "FIXED: Cisco Breached Via Poisoned Developer Tool (1080x1080)"
