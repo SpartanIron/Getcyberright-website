@@ -1364,7 +1364,8 @@ async function applyBrandOverlay(
     const cleanHeadline = headline.replace(/\[.*?\]\s*/g, "").trim();
     const slug = cleanHeadline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 35);
     const prefix = isSquare ? "branded-ig" : "branded";
-    const filename = `${prefix}-${slug}-${Date.now()}.png`;
+    const ext = isSquare ? "jpeg" : "png";
+    const filename = `${prefix}-${slug}-${Date.now()}.${ext}`;
     const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
 
     const sharp = (await import("sharp")).default;
@@ -1489,10 +1490,13 @@ async function applyBrandOverlay(
       .png()
       .toBuffer();
 
-    await sharp(baseImage)
-      .composite([{ input: overlaySvgBuffer, top: 0, left: 0 }])
-      .png({ quality: 95 })
-      .toFile(outputPath);
+    const outputImg = sharp(baseImage)
+      .composite([{ input: overlaySvgBuffer, top: 0, left: 0 }]);
+    if (isSquare) {
+      await outputImg.jpeg({ quality: 92 }).toFile(outputPath);
+    } else {
+      await outputImg.png({ quality: 95 }).toFile(outputPath);
+    }
 
     console.log(`[TrendEngine] Applied brand overlay: ${filename} (${width}x${height}, template: ${templateStyle})`);
     return outputPath;
@@ -1716,7 +1720,7 @@ async function generateInstagramImage(
     ensureSocialImagesDir();
     const cleanHeadline = headline.replace(/\[.*?\]\s*/g, "").trim();
     const slug = cleanHeadline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
-    const filename = `ig-${slug}-${Date.now()}.png`;
+    const filename = `ig-${slug}-${Date.now()}.jpeg`;
     const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
     const sharp = (await import("sharp")).default;
 
@@ -1828,7 +1832,7 @@ async function generateInstagramImage(
   <text x="${padX}" y="1050" font-family="'Segoe UI',Arial,sans-serif" font-size="15" fill="#6B8FA3" opacity="0.8">getcyberright.com</text>
 </svg>`;
 
-    await sharp(Buffer.from(svg)).png({ quality: 95 }).toFile(outputPath);
+    await sharp(Buffer.from(svg)).flatten({ background: '#0A0A1A' }).jpeg({ quality: 92 }).toFile(outputPath);
     console.log(`[TrendEngine] Generated Instagram image: ${filename} (1080x1080, template: ${templateStyle})`);
     return outputPath;
   } catch (error: any) {
@@ -2204,6 +2208,18 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
           platform,
           imageUrl: image || undefined,
         });
+
+        if (!bufferResult.success && platform === "instagram" && image) {
+          console.warn(`[TrendEngine] Instagram shareNow failed: ${bufferResult.error}. Retrying with addToQueue...`);
+          bufferResult = await createBufferPost(channel.id, content, {
+            mode: "addToQueue",
+            platform,
+            imageUrl: image,
+          });
+          if (bufferResult.success) {
+            console.log(`[TrendEngine] Instagram retry with addToQueue succeeded`);
+          }
+        }
 
         if (!bufferResult.success && image && bufferResult.error?.toLowerCase().includes("image")) {
           console.warn(`[TrendEngine] Image rejected for ${platform}: ${bufferResult.error}. Retrying without image...`);
