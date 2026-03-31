@@ -107,6 +107,7 @@ const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
 const CheckoutSuccess = lazy(() => import("@/pages/checkout-success"));
 const ExtensionAuth = lazy(() => import("@/pages/extension-auth"));
 const Preferences = lazy(() => import("@/pages/preferences"));
+const Account = lazy(() => import("@/pages/account"));
 const ScanReportPage = lazy(() => import("@/pages/scan-report"));
 
 function PageLoader() {
@@ -157,6 +158,7 @@ function AppRouter() {
         <Route path="/extension-auth" component={ExtensionAuth} />
         <Route path="/support-the-mission" component={SupportTheMission} />
         <Route path="/dashboard" component={Dashboard} />
+        <Route path="/account" component={Account} />
         <Route path="/threat-trends" component={ThreatTrendsPage} />
         <Route path="/cyber-threat-radar" component={CyberThreatRadar} />
         <Route path="/awareness-hub" component={AwarenessHub} />

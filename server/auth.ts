@@ -446,8 +446,12 @@ export function registerAuthRoutes(app: Express) {
       mfaEnabled: user.mfaEnabled,
       mustChangePassword: user.mustChangePassword,
       subscriptionTier: user.subscriptionTier,
+      subscriptionExpiresAt: user.subscriptionExpiresAt,
+      shieldSubscriptionTier: user.shieldSubscriptionTier || "free",
+      shieldSubscriptionExpiresAt: user.shieldSubscriptionExpiresAt,
       isAdmin: user.isAdmin,
-      emailVerified: user.emailVerified
+      emailVerified: user.emailVerified,
+      createdAt: user.createdAt
     });
   });
   
@@ -622,6 +626,36 @@ export function registerAuthRoutes(app: Express) {
     }
   });
   
+  app.patch("/api/auth/profile", isAuthenticated, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const { firstName, lastName } = req.body;
+      const updates: Record<string, any> = { updatedAt: new Date() };
+      if (typeof firstName === "string" && firstName.trim()) updates.firstName = firstName.trim();
+      if (typeof lastName === "string" && lastName.trim()) updates.lastName = lastName.trim();
+      
+      await db.update(users).set(updates).where(eq(users.id, user.id));
+      const updated = await db.select().from(users).where(eq(users.id, user.id));
+      if (!updated[0]) return res.status(404).json({ error: "User not found" });
+      
+      res.json({
+        id: updated[0].id,
+        email: updated[0].email,
+        firstName: updated[0].firstName,
+        lastName: updated[0].lastName,
+        profileImageUrl: updated[0].profileImageUrl,
+        mfaEnabled: updated[0].mfaEnabled,
+        subscriptionTier: updated[0].subscriptionTier,
+        shieldSubscriptionTier: updated[0].shieldSubscriptionTier || "free",
+        isAdmin: updated[0].isAdmin,
+        emailVerified: updated[0].emailVerified
+      });
+    } catch (error) {
+      console.error("Profile update error:", error);
+      res.status(500).json({ error: "Profile update failed" });
+    }
+  });
+
   // Enable MFA - Generate secret and QR code
   app.post("/api/auth/mfa/enable", isAuthenticated, async (req, res) => {
     try {

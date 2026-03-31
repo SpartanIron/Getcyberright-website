@@ -6,7 +6,7 @@ import { storage } from "./storage";
 import { getAllScamSlugs } from "@shared/scam-content";
 import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, userVaultKeys, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports, siteReputation, scanHistory } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, inArray, sql } from "drizzle-orm";
+import { eq, and, inArray, sql, desc } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
 import { verifyRecaptcha } from "./security/recaptcha";
@@ -435,7 +435,95 @@ export async function registerRoutes(
 
   // Register custom auth routes
   registerAuthRoutes(app);
-  
+
+  app.get('/api/user/dashboard-stats', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+      const scanHistoryEntries = await storage.getScanHistory(userId, 100);
+      const totalScans = scanHistoryEntries.length;
+
+      let brokersFound = 0;
+      let removalReqCount = 0;
+      let removalsComplete = 0;
+      try {
+        const schema = await import("@shared/schema");
+        const userScans = await db.select().from(schema.exposureScans).where(eq(schema.exposureScans.userId, userId)).orderBy(desc(schema.exposureScans.createdAt)).limit(1);
+        if (userScans.length > 0) {
+          brokersFound = userScans[0].totalExposuresFound || 0;
+          const findings = await db.select().from(schema.exposureFindings).where(eq(schema.exposureFindings.scanId, userScans[0].id));
+          brokersFound = Math.max(brokersFound, findings.length);
+        }
+        const removals = await db.select().from(removalRequests).where(eq(removalRequests.userId, userId));
+        removalReqCount = removals.length;
+        removalsComplete = removals.filter((r: any) => r.status === "completed" || r.status === "verified").length;
+      } catch {}
+
+      let breachAlerts = 0;
+      try {
+        const schema = await import("@shared/schema");
+        const alerts = await db.select().from(schema.breachAlerts).where(eq(schema.breachAlerts.userId, userId));
+        breachAlerts = alerts.length;
+      } catch {}
+
+      let maskedIdentityCount = 0;
+      try {
+        const schema = await import("@shared/schema");
+        const masked = await db.select().from(schema.maskedIdentities).where(eq(schema.maskedIdentities.userId, userId));
+        maskedIdentityCount = masked.filter((m: any) => m.status === "active").length;
+      } catch {}
+
+      let learningProgress = 0;
+      try {
+        const progress = await db.select().from(userLearningProgress).where(eq(userLearningProgress.userId, userId));
+        const completed = progress.filter((p: any) => p.status === "completed").length;
+        learningProgress = progress.length > 0 ? Math.round((completed / progress.length) * 100) : 0;
+      } catch {}
+
+      const recentScans = scanHistoryEntries.slice(0, 5).map((s: any) => ({
+        id: s.id,
+        type: s.scanType,
+        result: s.riskLevel || s.result,
+        createdAt: s.createdAt,
+      }));
+
+      const safetyScore = Math.min(100, 20 +
+        (totalScans > 0 ? 15 : 0) +
+        (removalsComplete > 0 ? 20 : 0) +
+        (breachAlerts === 0 ? 15 : 5) +
+        (maskedIdentityCount > 0 ? 10 : 0) +
+        (learningProgress > 50 ? 10 : learningProgress > 0 ? 5 : 0) +
+        ((req as any).user?.mfaEnabled ? 10 : 0)
+      );
+
+      res.json({
+        totalScans,
+        brokersFound,
+        removalRequests: removalReqCount,
+        removalsComplete,
+        breachAlerts,
+        maskedIdentities: maskedIdentityCount,
+        learningProgress,
+        safetyScore,
+        recentScans,
+      });
+    } catch (error: any) {
+      console.error("[dashboard-stats] Error:", error.message);
+      res.json({
+        totalScans: 0,
+        brokersFound: 0,
+        removalRequests: 0,
+        removalsComplete: 0,
+        breachAlerts: 0,
+        maskedIdentities: 0,
+        learningProgress: 0,
+        safetyScore: 20,
+        recentScans: [],
+      });
+    }
+  });
+
   // Register admin routes
   registerAdminRoutes(app);
   

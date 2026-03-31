@@ -134,26 +134,64 @@ export default function Register() {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-md mx-auto text-center">
+        <main id="main-content" tabIndex={-1} className="py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-lg mx-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-                <Check className="w-10 h-10 text-green-600 dark:text-green-400" />
-              </div>
-              <h1 className="text-3xl font-bold text-foreground mb-4">Account Created</h1>
-              <p className="text-muted-foreground mb-6">
-                Please check your email to verify your account. You will be redirected to the login page shortly.
-              </p>
-              <Link href="/login">
-                <Button data-testid="button-go-to-login">
-                  Go to Login
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
+              <Card className="border-green-500/20">
+                <CardContent className="p-8 text-center">
+                  <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+                    <Check className="w-10 h-10 text-green-600 dark:text-green-400" />
+                  </div>
+                  <h1 className="text-3xl font-bold text-foreground mb-2" data-testid="text-registration-success">
+                    Welcome to GetCyberRight
+                  </h1>
+                  <p className="text-muted-foreground mb-6">
+                    Your account has been created. Check your inbox for a verification email to activate your account.
+                  </p>
+
+                  <div className="bg-muted/50 rounded-lg p-4 mb-6 text-left space-y-3">
+                    <h3 className="text-sm font-semibold text-foreground">What's next:</h3>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <Mail className="w-3 h-3 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Verify your email</p>
+                        <p className="text-xs text-muted-foreground">Click the link in your inbox to activate your account</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <Shield className="w-3 h-3 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Log in and explore</p>
+                        <p className="text-xs text-muted-foreground">Access your dashboard, run scans, and set up protection</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <Lock className="w-3 h-3 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Enable two-factor auth</p>
+                        <p className="text-xs text-muted-foreground">Secure your account with an extra layer of protection</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link href="/login">
+                    <Button className="w-full" size="lg" data-testid="button-go-to-login">
+                      Continue to Login
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
             </motion.div>
           </div>
         </main>

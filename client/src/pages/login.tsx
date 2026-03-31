@@ -21,7 +21,8 @@ import {
   Eye, 
   EyeOff,
   LogIn,
-  AlertCircle
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 import { useLocation, Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -47,7 +48,9 @@ type MfaFormData = z.infer<typeof mfaSchema>;
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const redirectTo = new URLSearchParams(window.location.search).get("redirect");
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectTo = searchParams.get("redirect");
+  const isVerified = searchParams.get("verified") === "true";
   
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -224,6 +227,22 @@ export default function Login() {
                 Sign in to access your security dashboard
               </p>
             </div>
+
+            {isVerified && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4"
+                data-testid="alert-email-verified"
+              >
+                <Alert className="border-green-500/30 bg-green-500/10">
+                  <CheckCircle2 className="w-4 h-4 text-green-600" />
+                  <AlertDescription className="text-green-700 dark:text-green-400">
+                    Your email has been verified. You can now log in.
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
+            )}
 
             <Card>
               <CardHeader>
