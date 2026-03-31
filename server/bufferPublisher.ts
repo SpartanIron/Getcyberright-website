@@ -339,6 +339,35 @@ async function getTodaysPublishedCountByPlatform(): Promise<Record<string, numbe
   return counts;
 }
 
+function normalizeTitleForDedup(title: string): string {
+  return title
+    .replace(/\[.*?\]\s*/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isDraftTitleDuplicate(draftTitle: string, publishedTitles: string[]): boolean {
+  const norm = normalizeTitleForDedup(draftTitle);
+  if (!norm) return false;
+  for (const pub of publishedTitles) {
+    const pubNorm = normalizeTitleForDedup(pub);
+    if (!pubNorm) continue;
+    if (norm === pubNorm) return true;
+    const normWords = new Set(norm.split(" ").filter(w => w.length > 3));
+    const pubWords = new Set(pubNorm.split(" ").filter(w => w.length > 3));
+    if (normWords.size === 0 || pubWords.size === 0) continue;
+    let overlap = 0;
+    for (const w of normWords) {
+      if (pubWords.has(w)) overlap++;
+    }
+    const similarity = overlap / Math.min(normWords.size, pubWords.size);
+    if (similarity >= 0.75) return true;
+  }
+  return false;
+}
+
 export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]> {
   const drafts = await storage.getSocialPosts("draft", 50);
   const results: BufferPublishResult[] = [];
@@ -350,6 +379,12 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
     console.warn(`[Buffer] No connected channels found. Cannot publish ${nonAlertDrafts.length} draft posts. Run channel check.`);
     return results;
   }
+
+  const recentPublished = await storage.getSocialPosts("published", 100);
+  const sevenDaysAgo = Date.now() - 7 * 86400000;
+  const recentPublishedTitles = recentPublished
+    .filter(p => p.publishedAt && new Date(p.publishedAt).getTime() > sevenDaysAgo)
+    .map(p => p.contentTitle);
 
   const platformCounts: Record<string, number> = {};
   let skippedCount = 0;
@@ -374,6 +409,12 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
 
     const alreadyPublished = publishedPerPlatform[draft.platform] || 0;
     if (alreadyPublished >= DAILY_POSTS_PER_PLATFORM) continue;
+
+    if (isDraftTitleDuplicate(draft.contentTitle, recentPublishedTitles)) {
+      console.warn(`[Buffer] DUPLICATE SKIPPED: "${draft.contentTitle}" on ${draft.platform} matches a recently published post. Deleting draft.`);
+      await storage.updateSocialPost(draft.id, { status: "failed", publishError: "Duplicate topic already published" });
+      continue;
+    }
 
     const result = await publishPostViaBuffer(draft.id);
     results.push(result);

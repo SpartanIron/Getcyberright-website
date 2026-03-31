@@ -1447,7 +1447,7 @@ async function applyBrandOverlay(
 
     const logoSize = isSquare ? 36 : 30;
     const logoX = padX;
-    const logoY = isSquare ? height - 80 : height - 60;
+    const logoY = isSquare ? 40 : 30;
     const brandTextX = logoBase64 ? (logoX + logoSize + 10) : logoX;
     const brandTextY = logoY + logoSize - 8;
     const logoElement = logoBase64
@@ -1526,6 +1526,35 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
   }
   if (current) lines.push(current);
   return lines;
+}
+
+function normalizeTitle(title: string): string {
+  return title
+    .replace(/\[.*?\]\s*/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isTitleDuplicate(title: string, existingTitles: string[]): boolean {
+  const norm = normalizeTitle(title);
+  if (!norm) return false;
+  for (const existing of existingTitles) {
+    const existingNorm = normalizeTitle(existing);
+    if (!existingNorm) continue;
+    if (norm === existingNorm) return true;
+    const normWords = new Set(norm.split(" ").filter(w => w.length > 3));
+    const existingWords = new Set(existingNorm.split(" ").filter(w => w.length > 3));
+    if (normWords.size === 0 || existingWords.size === 0) continue;
+    let overlap = 0;
+    for (const w of normWords) {
+      if (existingWords.has(w)) overlap++;
+    }
+    const similarity = overlap / Math.min(normWords.size, existingWords.size);
+    if (similarity >= 0.75) return true;
+  }
+  return false;
 }
 
 function selectTemplateForTrend(trendAnalysis: TrendAnalysis, contentMode: ContentMode, fallback: TemplateStyle): TemplateStyle {
@@ -2045,6 +2074,11 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       return result;
     }
 
+    if (isTitleDuplicate(posts.title, recentTitles)) {
+      console.warn(`[TrendEngine] DUPLICATE DETECTED: "${posts.title}" is too similar to a recently published post. Skipping.`);
+      return result;
+    }
+
     if (scheduleBlocked) {
       const isBreaking = posts.trendAnalysis.urgency_score >= BREAKING_NEWS_URGENCY_THRESHOLD
         && (posts.trendAnalysis.impact_level === "high" || posts.trendAnalysis.impact_level === "medium");
@@ -2158,6 +2192,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
           status: "published",
           utmCampaign: buildCampaignId("trend_insight", platform, postStyle),
           postStyle,
+          imageUrl: image || undefined,
         };
 
         const created = await storage.createSocialPost(socialPost);
@@ -2178,6 +2213,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
           });
           if (bufferResult.success) {
             console.log(`[TrendEngine] Retry without image succeeded for ${platform}`);
+            await storage.updateSocialPost(created.id, { imageUrl: null });
           }
         }
 
