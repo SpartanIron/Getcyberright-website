@@ -299,6 +299,26 @@ export async function getOrchestratorDashboard() {
   };
 }
 
+function getTodayET(): string {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric", month: "2-digit", day: "2-digit",
+  });
+  const parts = formatter.formatToParts(new Date());
+  const get = (type: string) => parts.find(p => p.type === type)?.value || "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
+function toETDateString(date: Date): string {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric", month: "2-digit", day: "2-digit",
+  });
+  const parts = formatter.formatToParts(date);
+  const get = (type: string) => parts.find(p => p.type === type)?.value || "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
 async function allPlatformsPublishedToday(): Promise<boolean> {
   try {
     const { getBufferChannelsByPlatform } = await import("./bufferPublisher");
@@ -307,17 +327,18 @@ async function allPlatformsPublishedToday(): Promise<boolean> {
     if (connectedPlatforms.length === 0) return false;
 
     const recentPosts = await storage.getSocialPosts("published", 100);
-    const today = new Date().toDateString();
+    const todayET = getTodayET();
     const publishedPlatforms = new Set<string>();
     for (const post of recentPosts) {
       if (!post.publishedAt) continue;
-      if (new Date(post.publishedAt).toDateString() !== today) continue;
+      const postDateET = toETDateString(new Date(post.publishedAt));
+      if (postDateET !== todayET) continue;
       publishedPlatforms.add(post.platform);
     }
 
     const allDone = connectedPlatforms.every(p => publishedPlatforms.has(p));
     if (allDone) {
-      console.log(`[GrowthOrchestrator] All connected platforms (${connectedPlatforms.join(", ")}) already published today`);
+      console.log(`[GrowthOrchestrator] All connected platforms (${connectedPlatforms.join(", ")}) already published today (${todayET} ET)`);
     }
     return allDone;
   } catch {
