@@ -33,6 +33,8 @@ import {
   type InsertScamOfWeek,
   type NewsArticle,
   type InsertNewsArticle,
+  type EngagementOpportunity,
+  type InsertEngagementOpportunity,
   users,
   contactMessages,
   newsletterSubscribers,
@@ -51,6 +53,7 @@ import {
   scanReports,
   scamOfWeek,
   newsArticles,
+  engagementOpportunities,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, gte, lte, ilike, or } from "drizzle-orm";
@@ -150,6 +153,12 @@ export interface IStorage {
   getNewsArticleBySourceUrl(sourceUrl: string): Promise<NewsArticle | undefined>;
   searchNewsArticles(query: string, limit?: number): Promise<NewsArticle[]>;
   getNewsArticleCount(): Promise<number>;
+
+  createEngagementOpportunity(opp: InsertEngagementOpportunity): Promise<EngagementOpportunity>;
+  getEngagementOpportunities(status?: string, limit?: number): Promise<EngagementOpportunity[]>;
+  getEngagementOpportunityById(id: string): Promise<EngagementOpportunity | undefined>;
+  updateEngagementOpportunity(id: string, data: Partial<EngagementOpportunity>): Promise<EngagementOpportunity | undefined>;
+  deleteEngagementOpportunity(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -670,6 +679,44 @@ export class DatabaseStorage implements IStorage {
   async getNewsArticleCount(): Promise<number> {
     const result = await db.select({ count: sql<number>`count(*)` }).from(newsArticles);
     return Number(result[0].count);
+  }
+
+  async createEngagementOpportunity(opp: InsertEngagementOpportunity): Promise<EngagementOpportunity> {
+    const result = await db.insert(engagementOpportunities).values(opp).returning();
+    return result[0];
+  }
+
+  async getEngagementOpportunities(status?: string, limit: number = 50): Promise<EngagementOpportunity[]> {
+    if (status && status !== "all") {
+      return db.select().from(engagementOpportunities)
+        .where(eq(engagementOpportunities.status, status))
+        .orderBy(desc(engagementOpportunities.relevanceScore))
+        .limit(limit);
+    }
+    return db.select().from(engagementOpportunities)
+      .orderBy(desc(engagementOpportunities.discoveredAt))
+      .limit(limit);
+  }
+
+  async getEngagementOpportunityById(id: string): Promise<EngagementOpportunity | undefined> {
+    const result = await db.select().from(engagementOpportunities)
+      .where(eq(engagementOpportunities.id, id));
+    return result[0];
+  }
+
+  async updateEngagementOpportunity(id: string, data: Partial<EngagementOpportunity>): Promise<EngagementOpportunity | undefined> {
+    const result = await db.update(engagementOpportunities)
+      .set(data)
+      .where(eq(engagementOpportunities.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteEngagementOpportunity(id: string): Promise<boolean> {
+    const result = await db.delete(engagementOpportunities)
+      .where(eq(engagementOpportunities.id, id))
+      .returning();
+    return result.length > 0;
   }
 }
 

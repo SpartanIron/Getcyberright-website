@@ -291,6 +291,13 @@ app.use((req, res, next) => {
         console.error("Failed to start growth orchestrator:", err);
       });
 
+      // Start engagement discovery scheduler (scans every 4 hours)
+      import("./engagementDiscoveryService").then(({ startEngagementDiscoveryScheduler }) => {
+        startEngagementDiscoveryScheduler();
+      }).catch(err => {
+        console.error("Failed to start engagement discovery scheduler:", err);
+      });
+
       // GCR Data Shield: 90-day auto-purge (runs daily)
       import("./shieldScanService").then(({ purgeExpiredScans }) => {
         async function runPurge() {

@@ -2457,18 +2457,21 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
         await storage.updateSocialPost(created.id, { publishedAt: new Date() });
 
         const channel = channels[platform];
-        let bufferResult = await createBufferPost(channel.id, content, {
+        const { publishWithFirstComment } = await import("./bufferPublisher");
+        let bufferResult = await publishWithFirstComment(channel.id, content, {
           mode: "shareNow",
           platform,
           imageUrl: image || undefined,
+          sourceArticleUrl: posts.sourceArticleUrl,
         });
 
         if (!bufferResult.success && platform === "instagram" && image) {
           console.warn(`[TrendEngine] Instagram shareNow failed: ${bufferResult.error}. Retrying with addToQueue...`);
-          bufferResult = await createBufferPost(channel.id, content, {
+          bufferResult = await publishWithFirstComment(channel.id, content, {
             mode: "addToQueue",
             platform,
             imageUrl: image,
+            sourceArticleUrl: posts.sourceArticleUrl,
           });
           if (bufferResult.success) {
             console.log(`[TrendEngine] Instagram retry with addToQueue succeeded`);
@@ -2477,9 +2480,10 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
 
         if (!bufferResult.success && image && bufferResult.error?.toLowerCase().includes("image")) {
           console.warn(`[TrendEngine] Image rejected for ${platform}: ${bufferResult.error}. Retrying without image...`);
-          bufferResult = await createBufferPost(channel.id, content, {
+          bufferResult = await publishWithFirstComment(channel.id, content, {
             mode: "shareNow",
             platform,
+            sourceArticleUrl: posts.sourceArticleUrl,
           });
           if (bufferResult.success) {
             console.log(`[TrendEngine] Retry without image succeeded for ${platform}`);

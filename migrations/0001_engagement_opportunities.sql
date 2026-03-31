@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS "engagement_opportunities" (
+  "id" varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+  "platform" text NOT NULL,
+  "source_type" text NOT NULL,
+  "source_url" text,
+  "source_author" text,
+  "source_title" text NOT NULL,
+  "source_snippet" text,
+  "topic" text NOT NULL,
+  "relevance_score" integer DEFAULT 0,
+  "suggested_comment" text,
+  "approved_comment" text,
+  "status" text NOT NULL DEFAULT 'discovered',
+  "discovered_at" timestamp DEFAULT now(),
+  "approved_at" timestamp,
+  "posted_at" timestamp,
+  "dismissed_at" timestamp,
+  "post_error" text
+);

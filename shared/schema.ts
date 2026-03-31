@@ -1719,3 +1719,33 @@ export const notificationThreats = pgTable("notification_threats", {
 });
 
 export type NotificationThreat = typeof notificationThreats.$inferSelect;
+
+export const engagementOpportunities = pgTable("engagement_opportunities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  platform: text("platform").notNull(),
+  sourceType: text("source_type").notNull(),
+  sourceUrl: text("source_url"),
+  sourceAuthor: text("source_author"),
+  sourceTitle: text("source_title").notNull(),
+  sourceSnippet: text("source_snippet"),
+  topic: text("topic").notNull(),
+  relevanceScore: integer("relevance_score").default(0),
+  suggestedComment: text("suggested_comment"),
+  approvedComment: text("approved_comment"),
+  status: text("status").notNull().default("discovered"),
+  discoveredAt: timestamp("discovered_at").defaultNow(),
+  approvedAt: timestamp("approved_at"),
+  postedAt: timestamp("posted_at"),
+  dismissedAt: timestamp("dismissed_at"),
+  postError: text("post_error"),
+});
+
+export const insertEngagementOpportunitySchema = createInsertSchema(engagementOpportunities).omit({
+  id: true,
+  approvedAt: true,
+  postedAt: true,
+  dismissedAt: true,
+});
+
+export type EngagementOpportunity = typeof engagementOpportunities.$inferSelect;
+export type InsertEngagementOpportunity = z.infer<typeof insertEngagementOpportunitySchema>;

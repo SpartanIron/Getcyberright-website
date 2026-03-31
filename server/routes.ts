@@ -4976,6 +4976,67 @@ EDGE CASE HANDLING
     }
   });
 
+  app.get("/api/admin/engagement-opportunities", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const validStatuses = ["discovered", "approved", "posted", "dismissed", "all"];
+      const status = validStatuses.includes(req.query.status as string) ? (req.query.status as string) : "discovered";
+      const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 50, 1), 200);
+      const opportunities = await storage.getEngagementOpportunities(status, limit);
+      const { getOpportunitySummary } = await import("./engagementDiscoveryService");
+      const summary = await getOpportunitySummary();
+      res.json({ opportunities, summary });
+    } catch (error: any) {
+      console.error("Engagement opportunities error:", error);
+      res.status(500).json({ error: error.message || "Failed to fetch engagement opportunities" });
+    }
+  });
+
+  app.post("/api/admin/engagement-opportunities/discover", isAuthenticated, isAdmin, async (_req: Request, res: Response) => {
+    try {
+      const { discoverEngagementOpportunities } = await import("./engagementDiscoveryService");
+      const result = await discoverEngagementOpportunities();
+      res.json(result);
+    } catch (error: any) {
+      console.error("Engagement discovery error:", error);
+      res.status(500).json({ error: error.message || "Failed to discover opportunities" });
+    }
+  });
+
+  app.post("/api/admin/engagement-opportunities/:id/approve", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const editedComment = typeof req.body.comment === "string" ? req.body.comment.trim().slice(0, 2000) : undefined;
+      if (editedComment !== undefined && editedComment.length === 0) {
+        res.status(400).json({ error: "Comment cannot be empty" });
+        return;
+      }
+      const { approveOpportunity } = await import("./engagementDiscoveryService");
+      const result = await approveOpportunity(req.params.id, editedComment);
+      if (!result) {
+        res.status(404).json({ error: "Opportunity not found" });
+        return;
+      }
+      res.json(result);
+    } catch (error: any) {
+      console.error("Approve opportunity error:", error);
+      res.status(500).json({ error: error.message || "Failed to approve opportunity" });
+    }
+  });
+
+  app.post("/api/admin/engagement-opportunities/:id/dismiss", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { dismissOpportunity } = await import("./engagementDiscoveryService");
+      const success = await dismissOpportunity(req.params.id);
+      if (!success) {
+        res.status(404).json({ error: "Opportunity not found" });
+        return;
+      }
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Dismiss opportunity error:", error);
+      res.status(500).json({ error: error.message || "Failed to dismiss opportunity" });
+    }
+  });
+
   app.get("/api/scam-feed", async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;

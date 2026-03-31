@@ -100,6 +100,7 @@ const AdminAnnouncements = lazy(() => import("@/pages/admin/announcements"));
 const AdminTrendingThreats = lazy(() => import("@/pages/admin/trending-threats"));
 const AdminFeedback = lazy(() => import("@/pages/admin/feedback"));
 const AdminContentManager = lazy(() => import("@/pages/admin/content-manager"));
+const AdminEngagementOpportunities = lazy(() => import("@/pages/admin/engagement-opportunities"));
 const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
@@ -223,6 +224,7 @@ function AppRouter() {
         <Route path="/admin/trending-threats" component={AdminTrendingThreats} />
         <Route path="/admin/feedback" component={AdminFeedback} />
         <Route path="/admin/content" component={AdminContentManager} />
+        <Route path="/admin/engagement" component={AdminEngagementOpportunities} />
         <Route path="/admin/change-password" component={AdminChangePassword} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />

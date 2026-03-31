@@ -440,6 +440,113 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
   return results;
 }
 
+export async function addFirstComment(
+  postBufferId: string,
+  channelId: string,
+  commentText: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (!postBufferId || !commentText) {
+      return { success: false, error: "Missing postBufferId or commentText" };
+    }
+
+    const data = await graphql<{ createPostComment: any }>(
+      `mutation CreatePostComment($input: CreatePostCommentInput!) {
+        createPostComment(input: $input) {
+          __typename
+          ... on PostCommentActionSuccess {
+            comment { id text }
+          }
+          ... on InvalidInputError { message }
+          ... on UnexpectedError { message }
+          ... on UnauthorizedError { message }
+          ... on NotFoundError { message }
+        }
+      }`,
+      {
+        input: {
+          postId: postBufferId,
+          channelId,
+          text: commentText,
+        },
+      }
+    );
+
+    const result = data.createPostComment;
+    if (result?.comment) {
+      console.log(`[Buffer] First comment added to post ${postBufferId}`);
+      return { success: true };
+    }
+
+    if (result?.message) {
+      console.warn(`[Buffer] First comment failed: ${result.message}`);
+      return { success: false, error: result.message };
+    }
+
+    console.warn(`[Buffer] Unexpected first comment response:`, JSON.stringify(result));
+    return { success: false, error: "Unexpected response" };
+  } catch (error: any) {
+    console.warn(`[Buffer] First comment error: ${error.message}`);
+    return { success: false, error: error.message };
+  }
+}
+
+function extractArticleUrl(postContent: string): string | null {
+  const urlRegex = /https?:\/\/(?!(?:www\.)?getcyberright\.com)[^\s"<>)]+/g;
+  const matches = postContent.match(urlRegex);
+  if (!matches || matches.length === 0) return null;
+  return matches[matches.length - 1];
+}
+
+function stripArticleUrlFromPost(postContent: string, articleUrl: string): string {
+  let cleaned = postContent;
+
+  const urlEscaped = articleUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  cleaned = cleaned.replace(new RegExp(`\\n*\\s*(?:Read more|Full story|Source|Learn more|Article)?:?\\s*${urlEscaped}\\s*`, "gi"), "");
+  cleaned = cleaned.replace(new RegExp(`\\n*${urlEscaped}\\s*`, "g"), "");
+  cleaned = cleaned.replace(/\n{3,}/g, "\n\n").trim();
+
+  return cleaned;
+}
+
+export async function publishWithFirstComment(
+  channelId: string,
+  content: string,
+  options: {
+    mode?: "addToQueue" | "shareNow" | "shareNext";
+    imageUrl?: string;
+    platform?: string;
+    sourceArticleUrl?: string | null;
+  } = {}
+): Promise<BufferPublishResult> {
+  const articleUrl = options.sourceArticleUrl || extractArticleUrl(content);
+  let postContent = content;
+
+  if (articleUrl && options.platform !== "instagram") {
+    postContent = stripArticleUrlFromPost(content, articleUrl);
+  }
+
+  const result = await createBufferPost(channelId, postContent, {
+    mode: options.mode || "shareNow",
+    imageUrl: options.imageUrl,
+    platform: options.platform,
+  });
+
+  if (result.success && result.bufferId && articleUrl && options.platform !== "instagram") {
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const commentText = `${articleUrl}`;
+    const commentResult = await addFirstComment(result.bufferId, channelId, commentText);
+    if (commentResult.success) {
+      console.log(`[Buffer] Article link posted as first comment on ${options.platform}`);
+    } else {
+      console.warn(`[Buffer] First comment failed (post still published): ${commentResult.error}`);
+    }
+  }
+
+  return result;
+}
+
 export async function getBufferStatus(): Promise<{
   configured: boolean;
   connected: boolean;
