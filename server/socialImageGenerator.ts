@@ -30,20 +30,19 @@ function escapeXml(text: string): string {
 }
 
 function wrapText(text: string, maxCharsPerLine: number): string[] {
-  const words = text.split(/\s+/);
+  const words = text.split(/\s+/).filter(w => w.length > 0);
   const lines: string[] = [];
-  let currentLine = "";
-
+  let current = "";
   for (const word of words) {
-    if (currentLine.length + word.length + 1 > maxCharsPerLine) {
-      if (currentLine) lines.push(currentLine.trim());
-      currentLine = word;
+    const w = word.length > maxCharsPerLine ? word.slice(0, maxCharsPerLine - 1) + "." : word;
+    if (current && (current + " " + w).length > maxCharsPerLine) {
+      lines.push(current);
+      current = w;
     } else {
-      currentLine += (currentLine ? " " : "") + word;
+      current = current ? current + " " + w : w;
     }
   }
-  if (currentLine) lines.push(currentLine.trim());
-
+  if (current) lines.push(current);
   return lines.slice(0, 5);
 }
 
@@ -54,8 +53,13 @@ function generateSvg(
   source: string
 ): string {
   const theme = CATEGORY_THEMES[category] || CATEGORY_THEMES["default"];
-  const titleLines = wrapText(title, 30);
-  const titleStartY = 340 - (titleLines.length * 48) / 2;
+  const uppercaseTitle = title.toUpperCase();
+  const titleLines = wrapText(uppercaseTitle, 14);
+
+  if (titleLines.length > 5) {
+    titleLines.length = 5;
+    titleLines[4] = titleLines[4].slice(0, -3) + "...";
+  }
 
   const urgencyLabel = urgency >= 4 ? "BREAKING" : urgency >= 3 ? "ALERT" : "NEWS";
   const urgencyColor = urgency >= 4 ? "#EF4444" : urgency >= 3 ? "#F59E0B" : theme.accent;
@@ -65,68 +69,81 @@ function generateSvg(
     .replace(/\/.*/g, "")
     .toUpperCase();
 
-  const titleTspans = titleLines
-    .map((line, i) => `<tspan x="540" dy="${i === 0 ? 0 : 56}">${escapeXml(line)}</tspan>`)
-    .join("\n        ");
+  const fontSize = titleLines.length > 4 ? 52 : titleLines.length > 3 ? 58 : 66;
+  const lineHeight = fontSize + 8;
+  const totalTextHeight = titleLines.length * lineHeight;
+  const padX = 50;
+  const padHighlight = 10;
+  const headlineStartY = 1080 - 140 - totalTextHeight;
+
+  const allLineWords = titleLines.map(line => line.split(" "));
+  const allWords = allLineWords.flat();
+  const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
+  const highlightedWords = new Set<number>();
+  allWords.forEach((word, idx) => {
+    if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
+  });
+  if (highlightedWords.size === 0) {
+    const mid = Math.floor(allWords.length / 2);
+    highlightedWords.add(mid);
+    if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
+  }
+
+  let headlineSvg = "";
+  let globalWordIdx = 0;
+  for (let lineIdx = 0; lineIdx < titleLines.length; lineIdx++) {
+    const y = headlineStartY + lineIdx * lineHeight;
+    const words = allLineWords[lineIdx];
+    let curX = padX;
+    const charWidth = fontSize * 0.62;
+    for (const word of words) {
+      const wordWidth = word.length * charWidth;
+      if (highlightedWords.has(globalWordIdx)) {
+        headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${theme.accent}"/>`;
+      }
+      headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="white" letter-spacing="1">${escapeXml(word)}</text>`;
+      curX += wordWidth + charWidth * 0.6;
+      globalWordIdx++;
+    }
+  }
+
+  const gridLines: string[] = [];
+  for (let i = 0; i < 11; i++) {
+    const pos = 100 + i * 100;
+    gridLines.push(`<line x1="${pos}" y1="0" x2="${pos}" y2="1080" stroke="${theme.accent}" stroke-width="0.5" opacity="0.04"/>`);
+    gridLines.push(`<line x1="0" y1="${pos}" x2="1080" y2="${pos}" stroke="${theme.accent}" stroke-width="0.5" opacity="0.04"/>`);
+  }
 
   return `<svg width="1080" height="1080" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg" x1="0" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="${theme.bg}"/>
-      <stop offset="100%" stop-color="#0A0A1A"/>
+      <stop offset="100%" stop-color="#050A12"/>
     </linearGradient>
-    <linearGradient id="accent-line" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="${theme.accent}" stop-opacity="0"/>
-      <stop offset="20%" stop-color="${theme.accent}"/>
-      <stop offset="80%" stop-color="${theme.accent}"/>
+    <radialGradient id="glow" cx="70%" cy="25%" r="55%">
+      <stop offset="0%" stop-color="${theme.accent}" stop-opacity="0.08"/>
       <stop offset="100%" stop-color="${theme.accent}" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="bottom-fade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${theme.bg}" stop-opacity="0"/>
-      <stop offset="100%" stop-color="${theme.accent}" stop-opacity="0.08"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="20" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
+    </radialGradient>
   </defs>
 
   <rect width="1080" height="1080" fill="url(#bg)"/>
+  <rect width="1080" height="1080" fill="url(#glow)"/>
 
-  <rect y="880" width="1080" height="200" fill="url(#bottom-fade)"/>
+  ${gridLines.join("\n  ")}
 
-  <circle cx="900" cy="180" r="300" fill="${theme.accent}" opacity="0.03"/>
-  <circle cx="180" cy="900" r="250" fill="${theme.accent}" opacity="0.03"/>
+  <circle cx="800" cy="280" r="200" fill="none" stroke="${theme.accent}" stroke-width="1" opacity="0.06"/>
+  <circle cx="800" cy="280" r="130" fill="none" stroke="${theme.accent}" stroke-width="0.8" opacity="0.04"/>
+  <circle cx="800" cy="280" r="60" fill="${theme.accent}" opacity="0.03"/>
 
-  <rect x="60" y="120" width="960" height="3" fill="url(#accent-line)" rx="1.5"/>
+  <rect x="${padX}" y="45" width="${urgencyLabel.length * 18 + 30}" height="36" rx="4" fill="${urgencyColor}"/>
+  <text x="${padX + 15}" y="70" fill="white" font-family="'Impact','Arial Black',Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="2">${urgencyLabel}</text>
 
-  <rect x="60" y="160" width="${urgencyLabel.length * 20 + 40}" height="44" rx="6" fill="${urgencyColor}" opacity="0.15"/>
-  <rect x="60" y="160" width="${urgencyLabel.length * 20 + 40}" height="44" rx="6" fill="none" stroke="${urgencyColor}" stroke-width="1.5" opacity="0.5"/>
-  <text x="${80}" y="189" fill="${urgencyColor}" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="20" font-weight="700" letter-spacing="3">${urgencyLabel}</text>
+  <text x="${padX}" y="120" font-family="'Segoe UI',Arial,sans-serif" font-size="18" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
 
-  <text x="540" y="${titleStartY}" fill="#FFFFFF" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="48" font-weight="800" text-anchor="middle" letter-spacing="-0.5">
-        ${titleTspans}
-  </text>
+  ${headlineSvg}
 
-  <rect x="60" y="620" width="960" height="1.5" fill="url(#accent-line)" opacity="0.3"/>
-
-  <text x="540" y="690" fill="${theme.accent}" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="18" font-weight="600" text-anchor="middle" letter-spacing="2" opacity="0.8">SOURCE: ${escapeXml(sourceDisplay)}</text>
-
-  <rect x="60" y="880" width="960" height="1" fill="url(#accent-line)" opacity="0.2"/>
-
-  <text x="90" y="950" fill="#FFFFFF" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="32" font-weight="800" letter-spacing="1">
-    <tspan fill="${theme.accent}">GCR</tspan> GetCyberRight
-  </text>
-  <text x="90" y="985" fill="#FFFFFF" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="16" opacity="0.5" letter-spacing="1">CYBERSECURITY FOR FAMILIES</text>
-
-  <text x="990" y="955" fill="${theme.accent}" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="16" font-weight="500" text-anchor="end" opacity="0.7">getcyberright.com</text>
-
-  <circle cx="540" cy="790" r="45" fill="${theme.accent}" opacity="0.08"/>
-  <circle cx="540" cy="790" r="32" fill="none" stroke="${theme.accent}" stroke-width="1.5" opacity="0.3"/>
-  <text x="540" y="800" font-size="32" text-anchor="middle">${theme.icon}</text>
+  <text x="${padX}" y="1020" fill="#6B8FA3" font-family="'Segoe UI',Arial,sans-serif" font-size="14" opacity="0.7">Source: ${escapeXml(sourceDisplay)}</text>
+  <text x="${padX}" y="1050" fill="#6B8FA3" font-family="'Segoe UI',Arial,sans-serif" font-size="15" opacity="0.8">getcyberright.com</text>
 </svg>`;
 }
 

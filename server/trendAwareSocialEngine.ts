@@ -1361,7 +1361,8 @@ async function applyBrandOverlay(
   try {
     ensureSocialImagesDir();
     const isSquare = width === height;
-    const slug = headline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 35);
+    const cleanHeadline = headline.replace(/\[.*?\]\s*/g, "").trim();
+    const slug = cleanHeadline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 35);
     const prefix = isSquare ? "branded-ig" : "branded";
     const filename = `${prefix}-${slug}-${Date.now()}.png`;
     const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
@@ -1379,82 +1380,108 @@ async function applyBrandOverlay(
       logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
     }
 
-    const templates: Record<TemplateStyle, { accent: string; accentLight: string }> = {
-      stat_card: { accent: "#E8732A", accentLight: "#F5A66D" },
-      tip_card: { accent: "#4ECDC4", accentLight: "#7EDDD6" },
-      alert_card: { accent: "#FF4444", accentLight: "#FF7777" },
-      insight_card: { accent: "#E8732A", accentLight: "#F5A66D" },
-      quote_card: { accent: "#45B7D1", accentLight: "#7DD3E8" },
+    const templates: Record<TemplateStyle, { accent: string; accentDark: string }> = {
+      stat_card: { accent: "#E8612D", accentDark: "#B84A1E" },
+      tip_card: { accent: "#4ECDC4", accentDark: "#2A9D8F" },
+      alert_card: { accent: "#FF4444", accentDark: "#CC2222" },
+      insight_card: { accent: "#E8612D", accentDark: "#B84A1E" },
+      quote_card: { accent: "#45B7D1", accentDark: "#2E8BA8" },
     };
 
     const tmpl = templates[templateStyle];
-    const maxChars = isSquare ? 16 : 22;
-    let headlineLines = wrapText(headline, maxChars);
-    if (headlineLines.length > 3) {
-      headlineLines = headlineLines.slice(0, 3);
-      headlineLines[2] = headlineLines[2].slice(0, -3) + "...";
+    const maxChars = isSquare ? 14 : 20;
+    const uppercaseHeadline = cleanHeadline.toUpperCase();
+    let headlineLines = wrapText(uppercaseHeadline, maxChars);
+    if (headlineLines.length > 4) {
+      headlineLines = headlineLines.slice(0, 4);
+      headlineLines[3] = headlineLines[3].slice(0, -3) + "...";
     }
 
     const fontSize = isSquare
-      ? (headlineLines.length > 2 ? 48 : 56)
-      : (headlineLines.length > 2 ? 40 : 48);
-    const lineHeight = fontSize + 12;
+      ? (headlineLines.length > 3 ? 52 : headlineLines.length > 2 ? 58 : 66)
+      : (headlineLines.length > 3 ? 42 : headlineLines.length > 2 ? 48 : 54);
+    const lineHeight = fontSize + 8;
     const totalTextHeight = headlineLines.length * lineHeight;
+    const padX = isSquare ? 50 : 60;
+    const padHighlight = 12;
 
-    const bottomBarHeight = isSquare ? 340 : 200;
-    const gradientStart = height - bottomBarHeight - 80;
+    const textBottomMargin = isSquare ? 130 : 90;
+    const headlineStartY = height - textBottomMargin - totalTextHeight;
 
-    const headlineStartY = height - bottomBarHeight + 50 + (isSquare ? 10 : 0);
-    const subtextY = headlineStartY + totalTextHeight + 14;
-
-    const headlineSvg = headlineLines
-      .map((line, i) => {
-        return `<text x="${isSquare ? 60 : 70}" y="${headlineStartY + i * lineHeight}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="800" fill="white" letter-spacing="-0.5" filter="url(#textShadow)">${escapeXml(line)}</text>`;
-      })
-      .join("\n");
-
-    let subtextLine = subtext;
-    if (subtextLine.length > (isSquare ? 45 : 60)) {
-      subtextLine = subtextLine.slice(0, isSquare ? 42 : 57) + "...";
+    const headlineWords = headlineLines.map(line => line.split(" "));
+    const highlightedWords = new Set<number>();
+    const allWords = headlineWords.flat();
+    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
+    allWords.forEach((word, idx) => {
+      if (importantTerms.some(t => word.includes(t))) {
+        highlightedWords.add(idx);
+      }
+    });
+    if (highlightedWords.size === 0) {
+      const mid = Math.floor(allWords.length / 2);
+      highlightedWords.add(mid);
+      if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
     }
 
-    const logoSize = isSquare ? 32 : 28;
-    const logoX = isSquare ? 60 : 70;
-    const logoY = isSquare ? height - 70 : height - 55;
-    const brandTextX = logoBase64 ? (logoX + logoSize + 10) : logoX;
-    const brandTextY = logoY + logoSize - 6;
+    let headlineSvg = "";
+    let globalWordIdx = 0;
+    for (let lineIdx = 0; lineIdx < headlineLines.length; lineIdx++) {
+      const y = headlineStartY + lineIdx * lineHeight;
+      const words = headlineWords[lineIdx];
+      let curX = padX;
 
+      for (const word of words) {
+        const charWidth = fontSize * 0.62;
+        const wordWidth = word.length * charWidth;
+        const isHighlighted = highlightedWords.has(globalWordIdx);
+
+        if (isHighlighted) {
+          headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${tmpl.accent}"/>`;
+        }
+
+        headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="white" letter-spacing="1">${escapeXml(word)}</text>`;
+        curX += wordWidth + charWidth * 0.6;
+        globalWordIdx++;
+      }
+    }
+
+    const logoSize = isSquare ? 36 : 30;
+    const logoX = padX;
+    const logoY = isSquare ? height - 80 : height - 60;
+    const brandTextX = logoBase64 ? (logoX + logoSize + 10) : logoX;
+    const brandTextY = logoY + logoSize - 8;
     const logoElement = logoBase64
       ? `<image href="${logoBase64}" x="${logoX}" y="${logoY}" width="${logoSize}" height="${logoSize}" opacity="0.95"/>`
       : "";
 
-    const accentBarH = isSquare ? 6 : 5;
+    const gradientStart = Math.max(0, headlineStartY - 120);
+    const gradientHeight = height - gradientStart;
 
     const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
     <linearGradient id="bottomGrad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
-      <stop offset="30%" stop-color="#000000" stop-opacity="0.4"/>
-      <stop offset="70%" stop-color="#000000" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0.95"/>
+      <stop offset="15%" stop-color="#000000" stop-opacity="0.15"/>
+      <stop offset="40%" stop-color="#000000" stop-opacity="0.55"/>
+      <stop offset="70%" stop-color="#000000" stop-opacity="0.82"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.94"/>
+    </linearGradient>
+    <linearGradient id="topGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
     </linearGradient>
     <filter id="textShadow">
-      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#000000" flood-opacity="0.7"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.8"/>
     </filter>
   </defs>
 
-  <rect y="${gradientStart}" width="${width}" height="${height - gradientStart}" fill="url(#bottomGrad)"/>
-
-  <rect x="0" y="0" width="${width}" height="${accentBarH}" fill="${tmpl.accent}" opacity="0.9"/>
-
-  ${headlineSvg}
-
-  <text x="${isSquare ? 60 : 70}" y="${subtextY}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="${isSquare ? 20 : 18}" fill="${tmpl.accentLight}" opacity="0.95" filter="url(#textShadow)">${escapeXml(subtextLine)}</text>
+  <rect y="0" width="${width}" height="${isSquare ? 100 : 70}" fill="url(#topGrad)"/>
+  <rect y="${gradientStart}" width="${width}" height="${gradientHeight}" fill="url(#bottomGrad)"/>
 
   ${logoElement}
-  <text x="${brandTextX}" y="${brandTextY}" font-family="'Segoe UI',Arial,sans-serif" font-size="${isSquare ? 16 : 14}" font-weight="600" fill="${tmpl.accent}" letter-spacing="1.5" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
+  <text x="${brandTextX}" y="${brandTextY}" font-family="'Segoe UI',Arial,sans-serif" font-size="${isSquare ? 18 : 15}" font-weight="700" fill="white" letter-spacing="1.5" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
 
-  <rect x="0" y="${height - accentBarH}" width="${width}" height="${accentBarH}" fill="${tmpl.accent}" opacity="0.85"/>
+  ${headlineSvg}
 </svg>`;
 
     const overlaySvgBuffer = await sharp(Buffer.from(svg))
@@ -1485,26 +1512,19 @@ function escapeXml(text: string): string {
 }
 
 function wrapText(text: string, maxCharsPerLine: number): string[] {
-  const words = text.split(" ");
+  const words = text.split(/\s+/).filter(w => w.length > 0);
   const lines: string[] = [];
   let current = "";
   for (const word of words) {
-    if (word.length > maxCharsPerLine) {
-      if (current) lines.push(current.trim());
-      for (let i = 0; i < word.length; i += maxCharsPerLine) {
-        lines.push(word.slice(i, i + maxCharsPerLine));
-      }
-      current = "";
-      continue;
-    }
-    if ((current + " " + word).trim().length > maxCharsPerLine) {
-      if (current) lines.push(current.trim());
-      current = word;
+    const w = word.length > maxCharsPerLine ? word.slice(0, maxCharsPerLine - 1) + "." : word;
+    if (current && (current + " " + w).length > maxCharsPerLine) {
+      lines.push(current);
+      current = w;
     } else {
-      current = current ? current + " " + word : word;
+      current = current ? current + " " + w : w;
     }
   }
-  if (current) lines.push(current.trim());
+  if (current) lines.push(current);
   return lines;
 }
 
@@ -1534,7 +1554,8 @@ async function generatePostImage(
 ): Promise<string | null> {
   try {
     ensureSocialImagesDir();
-    const slug = headline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
+    const cleanHeadline = headline.replace(/\[.*?\]\s*/g, "").trim();
+    const slug = cleanHeadline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
     const filename = `trend-${slug}-${Date.now()}.png`;
     const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
     const sharp = (await import("sharp")).default;
@@ -1546,137 +1567,106 @@ async function generatePostImage(
       logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
     }
 
-    const templates: Record<TemplateStyle, { bg: string; accent: string; accentLight: string; layout: string }> = {
-      stat_card: {
-        bg: "#0A2A3C",
-        accent: "#E8732A",
-        accentLight: "#F5A66D",
-        layout: "center",
-      },
-      tip_card: {
-        bg: "#071A24",
-        accent: "#4ECDC4",
-        accentLight: "#7EDDD6",
-        layout: "left",
-      },
-      alert_card: {
-        bg: "#1A0A0A",
-        accent: "#FF4444",
-        accentLight: "#FF7777",
-        layout: "center",
-      },
-      insight_card: {
-        bg: "#0D1B2A",
-        accent: "#E8732A",
-        accentLight: "#F5A66D",
-        layout: "left",
-      },
-      quote_card: {
-        bg: "#0A2A3C",
-        accent: "#45B7D1",
-        accentLight: "#7DD3E8",
-        layout: "center",
-      },
+    const templates: Record<TemplateStyle, { bgFrom: string; bgTo: string; accent: string }> = {
+      stat_card: { bgFrom: "#1B1B2F", bgTo: "#0A0A1A", accent: "#E8612D" },
+      tip_card: { bgFrom: "#0B2027", bgTo: "#071419", accent: "#4ECDC4" },
+      alert_card: { bgFrom: "#2A0A0A", bgTo: "#140505", accent: "#FF4444" },
+      insight_card: { bgFrom: "#1A1230", bgTo: "#0D0920", accent: "#E8612D" },
+      quote_card: { bgFrom: "#0B2035", bgTo: "#061020", accent: "#45B7D1" },
     };
 
     const tmpl = templates[templateStyle];
-    let headlineLines = wrapText(headline, 22);
-    if (headlineLines.length > 3) {
-      headlineLines = headlineLines.slice(0, 3);
-      headlineLines[2] = headlineLines[2].slice(0, -3) + "...";
-    }
-    let subtextLines = wrapText(subtext, 40);
-    if (subtextLines.length > 2) {
-      subtextLines = subtextLines.slice(0, 2);
-      subtextLines[1] = subtextLines[1].slice(0, -3) + "...";
+    const uppercaseHeadline = cleanHeadline.toUpperCase();
+    let headlineLines = wrapText(uppercaseHeadline, 20);
+    if (headlineLines.length > 4) {
+      headlineLines = headlineLines.slice(0, 4);
+      headlineLines[3] = headlineLines[3].slice(0, -3) + "...";
     }
 
-    const headlineFontSize = headlineLines.length > 2 ? 48 : 56;
-    const headlineLineHeight = headlineFontSize + 12;
+    const fontSize = headlineLines.length > 3 ? 44 : headlineLines.length > 2 ? 50 : 56;
+    const lineHeight = fontSize + 8;
+    const totalTextHeight = headlineLines.length * lineHeight;
+    const padX = 70;
+    const padHighlight = 10;
 
-    const totalHeadlineHeight = headlineLines.length * headlineLineHeight;
-    const subtextHeight = subtextLines.length * 30;
-    const contentHeight = totalHeadlineHeight + subtextHeight + 60;
-    const startY = Math.max(180, (630 - contentHeight) / 2 + 40);
+    const headlineStartY = 630 - 90 - totalTextHeight;
 
-    const headlineSvg = headlineLines
-      .map((line, i) => {
-        const x = tmpl.layout === "center" ? 600 : 90;
-        const anchor = tmpl.layout === "center" ? "middle" : "start";
-        return `<text x="${x}" y="${startY + i * headlineLineHeight}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="${headlineFontSize}" font-weight="800" fill="white" text-anchor="${anchor}" letter-spacing="-1">${escapeXml(line)}</text>`;
-      })
-      .join("\n");
+    const headlineWords = headlineLines.map(line => line.split(" "));
+    const highlightedWords = new Set<number>();
+    const allWords = headlineWords.flat();
+    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
+    allWords.forEach((word, idx) => {
+      if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
+    });
+    if (highlightedWords.size === 0) {
+      const mid = Math.floor(allWords.length / 2);
+      highlightedWords.add(mid);
+      if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
+    }
 
-    const subtextY = startY + totalHeadlineHeight + 30;
-    const subtextSvg = subtextLines
-      .map((line, i) => {
-        const x = tmpl.layout === "center" ? 600 : 90;
-        const anchor = tmpl.layout === "center" ? "middle" : "start";
-        return `<text x="${x}" y="${subtextY + i * 30}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="22" fill="${tmpl.accentLight}" text-anchor="${anchor}" opacity="0.9">${escapeXml(line)}</text>`;
-      })
-      .join("\n");
+    let headlineSvg = "";
+    let globalWordIdx = 0;
+    for (let lineIdx = 0; lineIdx < headlineLines.length; lineIdx++) {
+      const y = headlineStartY + lineIdx * lineHeight;
+      const words = headlineWords[lineIdx];
+      let curX = padX;
+      const charWidth = fontSize * 0.62;
+      for (const word of words) {
+        const wordWidth = word.length * charWidth;
+        if (highlightedWords.has(globalWordIdx)) {
+          headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${tmpl.accent}"/>`;
+        }
+        headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="white" letter-spacing="1">${escapeXml(word)}</text>`;
+        curX += wordWidth + charWidth * 0.6;
+        globalWordIdx++;
+      }
+    }
 
-    const gridDots = Array.from({ length: 80 }, (_, i) => {
-      const col = i % 10;
-      const row = Math.floor(i / 10);
-      const x = 800 + col * 45;
-      const y = 30 + row * 75;
-      const opacity = 0.03 + (i % 7) * 0.01;
-      return `<circle cx="${x}" cy="${y}" r="2" fill="${tmpl.accent}" opacity="${opacity}"/>`;
-    }).join("\n");
+    const gridLines: string[] = [];
+    for (let i = 0; i < 12; i++) {
+      const x = 100 + i * 100;
+      gridLines.push(`<line x1="${x}" y1="0" x2="${x}" y2="630" stroke="${tmpl.accent}" stroke-width="0.5" opacity="0.05"/>`);
+    }
+    for (let i = 0; i < 7; i++) {
+      const y = i * 100;
+      gridLines.push(`<line x1="0" y1="${y}" x2="1200" y2="${y}" stroke="${tmpl.accent}" stroke-width="0.5" opacity="0.05"/>`);
+    }
 
-    const accentShapes = templateStyle === "alert_card"
-      ? `<polygon points="600,40 620,75 580,75" fill="${tmpl.accent}" opacity="0.15"/>
-         <polygon points="600,50 612,70 588,70" fill="${tmpl.accent}" opacity="0.1"/>`
-      : templateStyle === "tip_card"
-      ? `<circle cx="1100" cy="100" r="80" fill="none" stroke="${tmpl.accent}" stroke-width="2" opacity="0.12"/>
-         <circle cx="1100" cy="100" r="50" fill="none" stroke="${tmpl.accent}" stroke-width="1.5" opacity="0.08"/>`
-      : `<rect x="1050" y="80" width="100" height="100" rx="8" fill="none" stroke="${tmpl.accent}" stroke-width="2" opacity="0.1" transform="rotate(15 1100 130)"/>`;
-
+    const logoSize = 30;
+    const logoX = padX;
+    const logoY = 30;
     const logoElement = logoBase64
-      ? `<image href="${logoBase64}" x="${tmpl.layout === 'center' ? 555 : 90}" y="45" width="45" height="45" opacity="0.95"/>`
+      ? `<image href="${logoBase64}" x="${logoX}" y="${logoY}" width="${logoSize}" height="${logoSize}" opacity="0.95"/>`
       : "";
-
-    const brandX = tmpl.layout === "center" ? 600 : 90;
-    const brandAnchor = tmpl.layout === "center" ? "middle" : "start";
-    const brandTextX = logoBase64 ? (tmpl.layout === "center" ? 600 : 145) : brandX;
-
-    const dividerX = tmpl.layout === "center" ? 540 : 90;
+    const brandTextX = logoBase64 ? (logoX + logoSize + 10) : logoX;
 
     const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="${tmpl.bg}"/>
-      <stop offset="100%" stop-color="${adjustColor(tmpl.bg, -15)}"/>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="${tmpl.bgFrom}"/>
+      <stop offset="100%" stop-color="${tmpl.bgTo}"/>
     </linearGradient>
-    <linearGradient id="accentBar" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${tmpl.accent}"/>
-      <stop offset="100%" stop-color="${tmpl.accent}" stop-opacity="0.4"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
+    <radialGradient id="glowGrad" cx="80%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="${tmpl.accent}" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="${tmpl.accent}" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
   <rect width="1200" height="630" fill="url(#bgGrad)"/>
+  <rect width="1200" height="630" fill="url(#glowGrad)"/>
 
-  ${gridDots}
-  ${accentShapes}
+  ${gridLines.join("\n  ")}
 
-  <rect x="0" y="0" width="5" height="630" fill="url(#accentBar)"/>
+  <circle cx="950" cy="200" r="180" fill="none" stroke="${tmpl.accent}" stroke-width="1" opacity="0.06"/>
+  <circle cx="950" cy="200" r="120" fill="none" stroke="${tmpl.accent}" stroke-width="0.8" opacity="0.04"/>
+  <circle cx="950" cy="200" r="60" fill="${tmpl.accent}" opacity="0.03"/>
 
   ${logoElement}
-  <text x="${brandTextX}" y="${logoBase64 ? 78 : 75}" font-family="'Segoe UI',Arial,sans-serif" font-size="18" font-weight="600" fill="${tmpl.accent}" text-anchor="${brandAnchor}" letter-spacing="2">GETCYBERRIGHT</text>
-
-  <rect x="${dividerX}" y="${startY - 50}" width="120" height="3" rx="1.5" fill="${tmpl.accent}" opacity="0.6"/>
+  <text x="${brandTextX}" y="${logoY + logoSize - 6}" font-family="'Segoe UI',Arial,sans-serif" font-size="16" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
 
   ${headlineSvg}
-  ${subtextSvg}
 
-  <rect x="0" y="622" width="1200" height="8" fill="${tmpl.accent}" opacity="0.85"/>
-
-  <text x="${tmpl.layout === 'center' ? 600 : 90}" y="600" font-family="'Segoe UI',Arial,sans-serif" font-size="15" fill="#6B8FA3" text-anchor="${brandAnchor}">getcyberright.com</text>
+  <text x="${padX}" y="605" font-family="'Segoe UI',Arial,sans-serif" font-size="14" fill="#6B8FA3" opacity="0.8">getcyberright.com  |  Protecting Families in the Digital World</text>
 </svg>`;
 
     await sharp(Buffer.from(svg)).png({ quality: 95 }).toFile(outputPath);
@@ -1695,7 +1685,8 @@ async function generateInstagramImage(
 ): Promise<string | null> {
   try {
     ensureSocialImagesDir();
-    const slug = headline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
+    const cleanHeadline = headline.replace(/\[.*?\]\s*/g, "").trim();
+    const slug = cleanHeadline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40);
     const filename = `ig-${slug}-${Date.now()}.png`;
     const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
     const sharp = (await import("sharp")).default;
@@ -1707,61 +1698,105 @@ async function generateInstagramImage(
       logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
     }
 
-    const templates: Record<TemplateStyle, { bg: string; accent: string; accentLight: string }> = {
-      stat_card: { bg: "#0A2A3C", accent: "#E8732A", accentLight: "#F5A66D" },
-      tip_card: { bg: "#071A24", accent: "#4ECDC4", accentLight: "#7EDDD6" },
-      alert_card: { bg: "#1A0A0A", accent: "#FF4444", accentLight: "#FF7777" },
-      insight_card: { bg: "#0D1B2A", accent: "#E8732A", accentLight: "#F5A66D" },
-      quote_card: { bg: "#0A2A3C", accent: "#45B7D1", accentLight: "#7DD3E8" },
+    const templates: Record<TemplateStyle, { bgFrom: string; bgTo: string; accent: string }> = {
+      stat_card: { bgFrom: "#1B1B2F", bgTo: "#0A0A1A", accent: "#E8612D" },
+      tip_card: { bgFrom: "#0B2027", bgTo: "#071419", accent: "#4ECDC4" },
+      alert_card: { bgFrom: "#2A0A0A", bgTo: "#140505", accent: "#FF4444" },
+      insight_card: { bgFrom: "#1A1230", bgTo: "#0D0920", accent: "#E8612D" },
+      quote_card: { bgFrom: "#0B2035", bgTo: "#061020", accent: "#45B7D1" },
     };
 
     const tmpl = templates[templateStyle];
-    let headlineLines = wrapText(headline, 18);
-    if (headlineLines.length > 4) {
-      headlineLines = headlineLines.slice(0, 4);
-      headlineLines[3] = headlineLines[3].slice(0, -3) + "...";
-    }
-    let subtextLines = wrapText(subtext, 30);
-    if (subtextLines.length > 2) {
-      subtextLines = subtextLines.slice(0, 2);
+    const uppercaseHeadline = cleanHeadline.toUpperCase();
+    let headlineLines = wrapText(uppercaseHeadline, 14);
+    if (headlineLines.length > 5) {
+      headlineLines = headlineLines.slice(0, 5);
+      headlineLines[4] = headlineLines[4].slice(0, -3) + "...";
     }
 
-    const headlineFontSize = headlineLines.length > 3 ? 52 : 60;
-    const headlineLineHeight = headlineFontSize + 14;
-    const totalHeadlineHeight = headlineLines.length * headlineLineHeight;
-    const subtextHeight = subtextLines.length * 34;
-    const contentHeight = totalHeadlineHeight + subtextHeight + 60;
-    const startY = Math.max(250, (1080 - contentHeight) / 2);
+    const fontSize = headlineLines.length > 4 ? 52 : headlineLines.length > 3 ? 58 : 66;
+    const lineHeight = fontSize + 8;
+    const totalTextHeight = headlineLines.length * lineHeight;
+    const padX = 50;
+    const padHighlight = 10;
+    const headlineStartY = 1080 - 120 - totalTextHeight;
 
-    const headlineSvg = headlineLines
-      .map((line, i) => `<text x="540" y="${startY + i * headlineLineHeight}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="${headlineFontSize}" font-weight="800" fill="white" text-anchor="middle" letter-spacing="-1">${escapeXml(line)}</text>`)
-      .join("\n");
+    const headlineWords = headlineLines.map(line => line.split(" "));
+    const highlightedWords = new Set<number>();
+    const allWords = headlineWords.flat();
+    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
+    allWords.forEach((word, idx) => {
+      if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
+    });
+    if (highlightedWords.size === 0) {
+      const mid = Math.floor(allWords.length / 2);
+      highlightedWords.add(mid);
+      if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
+    }
 
-    const subtextY = startY + totalHeadlineHeight + 40;
-    const subtextSvg = subtextLines
-      .map((line, i) => `<text x="540" y="${subtextY + i * 34}" font-family="'Segoe UI',Arial,Helvetica,sans-serif" font-size="24" fill="${tmpl.accentLight}" text-anchor="middle" opacity="0.9">${escapeXml(line)}</text>`)
-      .join("\n");
+    let headlineSvg = "";
+    let globalWordIdx = 0;
+    for (let lineIdx = 0; lineIdx < headlineLines.length; lineIdx++) {
+      const y = headlineStartY + lineIdx * lineHeight;
+      const words = headlineWords[lineIdx];
+      let curX = padX;
+      const charWidth = fontSize * 0.62;
+      for (const word of words) {
+        const wordWidth = word.length * charWidth;
+        if (highlightedWords.has(globalWordIdx)) {
+          headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${tmpl.accent}"/>`;
+        }
+        headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="white" letter-spacing="1">${escapeXml(word)}</text>`;
+        curX += wordWidth + charWidth * 0.6;
+        globalWordIdx++;
+      }
+    }
 
+    const gridLines: string[] = [];
+    for (let i = 0; i < 11; i++) {
+      const x = 100 + i * 100;
+      gridLines.push(`<line x1="${x}" y1="0" x2="${x}" y2="1080" stroke="${tmpl.accent}" stroke-width="0.5" opacity="0.04"/>`);
+    }
+    for (let i = 0; i < 11; i++) {
+      const y = 100 + i * 100;
+      gridLines.push(`<line x1="0" y1="${y}" x2="1080" y2="${y}" stroke="${tmpl.accent}" stroke-width="0.5" opacity="0.04"/>`);
+    }
+
+    const logoSize = 36;
+    const logoX = padX;
+    const logoY = 40;
     const logoElement = logoBase64
-      ? `<image href="${logoBase64}" x="495" y="100" width="50" height="50" opacity="0.95"/>`
+      ? `<image href="${logoBase64}" x="${logoX}" y="${logoY}" width="${logoSize}" height="${logoSize}" opacity="0.95"/>`
       : "";
+    const brandTextX = logoBase64 ? (logoX + logoSize + 10) : logoX;
 
     const svg = `<svg width="1080" height="1080" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="${tmpl.bg}"/>
-      <stop offset="100%" stop-color="${adjustColor(tmpl.bg, -15)}"/>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="${tmpl.bgFrom}"/>
+      <stop offset="100%" stop-color="${tmpl.bgTo}"/>
     </linearGradient>
+    <radialGradient id="glowGrad" cx="70%" cy="25%" r="55%">
+      <stop offset="0%" stop-color="${tmpl.accent}" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="${tmpl.accent}" stop-opacity="0"/>
+    </radialGradient>
   </defs>
+
   <rect width="1080" height="1080" fill="url(#bgGrad)"/>
-  <rect x="0" y="0" width="1080" height="6" fill="${tmpl.accent}" opacity="0.85"/>
+  <rect width="1080" height="1080" fill="url(#glowGrad)"/>
+
+  ${gridLines.join("\n  ")}
+
+  <circle cx="750" cy="300" r="200" fill="none" stroke="${tmpl.accent}" stroke-width="1" opacity="0.06"/>
+  <circle cx="750" cy="300" r="130" fill="none" stroke="${tmpl.accent}" stroke-width="0.8" opacity="0.04"/>
+  <circle cx="750" cy="300" r="60" fill="${tmpl.accent}" opacity="0.03"/>
+
   ${logoElement}
-  <text x="540" y="${logoBase64 ? 170 : 140}" font-family="'Segoe UI',Arial,sans-serif" font-size="20" font-weight="600" fill="${tmpl.accent}" text-anchor="middle" letter-spacing="2">GETCYBERRIGHT</text>
-  <rect x="460" y="${startY - 50}" width="160" height="3" rx="1.5" fill="${tmpl.accent}" opacity="0.6"/>
+  <text x="${brandTextX}" y="${logoY + logoSize - 8}" font-family="'Segoe UI',Arial,sans-serif" font-size="18" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
+
   ${headlineSvg}
-  ${subtextSvg}
-  <rect x="0" y="1072" width="1080" height="8" fill="${tmpl.accent}" opacity="0.85"/>
-  <text x="540" y="1040" font-family="'Segoe UI',Arial,sans-serif" font-size="16" fill="#6B8FA3" text-anchor="middle">getcyberright.com</text>
+
+  <text x="${padX}" y="1050" font-family="'Segoe UI',Arial,sans-serif" font-size="15" fill="#6B8FA3" opacity="0.8">getcyberright.com</text>
 </svg>`;
 
     await sharp(Buffer.from(svg)).png({ quality: 95 }).toFile(outputPath);

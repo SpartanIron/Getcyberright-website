@@ -117,18 +117,19 @@ function escapeXml(text: string): string {
 }
 
 function wrapText(text: string, maxChars: number): string[] {
-  const words = text.split(" ");
+  const words = text.split(/\s+/).filter(w => w.length > 0);
   const lines: string[] = [];
   let current = "";
   for (const word of words) {
-    if ((current + " " + word).trim().length > maxChars) {
-      lines.push(current.trim());
-      current = word;
+    const w = word.length > maxChars ? word.slice(0, maxChars - 1) + "." : word;
+    if (current && (current + " " + w).length > maxChars) {
+      lines.push(current);
+      current = w;
     } else {
-      current = (current + " " + word).trim();
+      current = current ? current + " " + w : w;
     }
   }
-  if (current) lines.push(current.trim());
+  if (current) lines.push(current);
   return lines;
 }
 
@@ -139,80 +140,85 @@ function buildLandscapeSvg(
   contentType: string,
   topic: TopicConfig
 ): string {
-  const contentLabel = contentType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const truncTitle = title.length > 90 ? title.substring(0, 87) + "..." : title;
-  const titleLines = wrapText(truncTitle, 32);
-  const titleFontSize = 40;
-  const titleStartY = 120;
+  const uppercaseTitle = title.toUpperCase();
+  const titleLines = wrapText(uppercaseTitle, 20);
+  const fontSize = titleLines.length > 3 ? 44 : titleLines.length > 2 ? 50 : 56;
+  const lineHeight = fontSize + 8;
+  const totalTextHeight = Math.min(titleLines.length, 4) * lineHeight;
+  const padX = 70;
+  const padHighlight = 10;
+  const headlineStartY = height - 90 - totalTextHeight;
 
-  const titleSvg = titleLines.slice(0, 3).map((line, i) =>
-    `<text x="80" y="${titleStartY + i * (titleFontSize + 10)}" fill="${BRAND.white}" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="${titleFontSize}" letter-spacing="-0.5">${escapeXml(line)}</text>`
-  ).join("\n    ");
+  if (titleLines.length > 4) {
+    titleLines.length = 4;
+    titleLines[3] = titleLines[3].slice(0, -3) + "...";
+  }
 
-  const tipStartY = titleStartY + titleLines.slice(0, 3).length * (titleFontSize + 10) + 30;
-  const tipsSvg = topic.tips.slice(0, 3).map((tip, i) => {
-    const y = tipStartY + i * 36;
-    return `
-    <circle cx="94" cy="${y - 5}" r="4" fill="${topic.accent}"/>
-    <text x="110" y="${y}" fill="${BRAND.lightGray}" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="18">${escapeXml(tip)}</text>`;
-  }).join("");
+  const allLineWords = titleLines.map(line => line.split(" "));
+  const allWords = allLineWords.flat();
+  const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
+  const highlightedWords = new Set<number>();
+  allWords.forEach((word, idx) => {
+    if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
+  });
+  if (highlightedWords.size === 0) {
+    const mid = Math.floor(allWords.length / 2);
+    highlightedWords.add(mid);
+    if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
+  }
 
-  const statBoxX = width - 320;
-  const statBoxY = 100;
-  const statBoxW = 250;
-  const statBoxH = 200;
+  let headlineSvg = "";
+  let globalWordIdx = 0;
+  for (let lineIdx = 0; lineIdx < titleLines.length; lineIdx++) {
+    const y = headlineStartY + lineIdx * lineHeight;
+    const words = allLineWords[lineIdx];
+    let curX = padX;
+    const charWidth = fontSize * 0.62;
+    for (const word of words) {
+      const wordWidth = word.length * charWidth;
+      if (highlightedWords.has(globalWordIdx)) {
+        headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${topic.accent}"/>`;
+      }
+      headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="${BRAND.white}" letter-spacing="1">${escapeXml(word)}</text>`;
+      curX += wordWidth + charWidth * 0.6;
+      globalWordIdx++;
+    }
+  }
+
+  const gridLines: string[] = [];
+  for (let i = 0; i < 12; i++) {
+    gridLines.push(`<line x1="${100 + i * 100}" y1="0" x2="${100 + i * 100}" y2="${height}" stroke="${topic.accent}" stroke-width="0.5" opacity="0.05"/>`);
+  }
+  for (let i = 0; i < 7; i++) {
+    gridLines.push(`<line x1="0" y1="${i * 100}" x2="${width}" y2="${i * 100}" stroke="${topic.accent}" stroke-width="0.5" opacity="0.05"/>`);
+  }
 
   return `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:${BRAND.darkTeal}"/>
-      <stop offset="100%" style="stop-color:${BRAND.navDark}"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="${BRAND.darkTeal}"/>
+      <stop offset="100%" stop-color="#050E14"/>
     </linearGradient>
-    <linearGradient id="accent-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:${topic.accent}"/>
-      <stop offset="100%" style="stop-color:${topic.accent};stop-opacity:0.6"/>
-    </linearGradient>
-    <clipPath id="stat-clip">
-      <rect x="${statBoxX}" y="${statBoxY}" width="${statBoxW}" height="${statBoxH}" rx="16"/>
-    </clipPath>
+    <radialGradient id="glow" cx="80%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="${topic.accent}" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="${topic.accent}" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
   <rect width="${width}" height="${height}" fill="url(#bg)"/>
+  <rect width="${width}" height="${height}" fill="url(#glow)"/>
 
-  <rect x="0" y="0" width="6" height="${height}" fill="${topic.accent}"/>
-  <rect x="0" y="${height - 5}" width="${width}" height="5" fill="${topic.accent}"/>
+  ${gridLines.join("\n  ")}
 
-  <circle cx="${width - 100}" cy="80" r="180" fill="${topic.accent}" opacity="0.04"/>
-  <circle cx="${width - 50}" cy="${height - 60}" r="120" fill="${topic.accent}" opacity="0.03"/>
-  <circle cx="200" cy="${height + 40}" r="160" fill="${topic.accent}" opacity="0.02"/>
+  <circle cx="${width - 200}" cy="180" r="180" fill="none" stroke="${topic.accent}" stroke-width="1" opacity="0.06"/>
+  <circle cx="${width - 200}" cy="180" r="120" fill="none" stroke="${topic.accent}" stroke-width="0.8" opacity="0.04"/>
+  <circle cx="${width - 200}" cy="180" r="60" fill="${topic.accent}" opacity="0.03"/>
 
-  <rect x="80" y="50" width="10" height="10" rx="2" fill="${topic.accent}" opacity="0.3"/>
-  <rect x="100" y="50" width="10" height="10" rx="2" fill="${topic.accent}" opacity="0.5"/>
-  <rect x="120" y="50" width="10" height="10" rx="2" fill="${topic.accent}" opacity="0.7"/>
+  <text x="${padX}" y="55" font-family="'Segoe UI',Arial,sans-serif" font-size="16" font-weight="700" fill="${BRAND.white}" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
 
-  <text x="142" y="60" fill="${topic.accent}" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="14" letter-spacing="2.5">${escapeXml(contentLabel.toUpperCase())}</text>
+  ${headlineSvg}
 
-  <rect x="80" y="75" width="60" height="3" rx="1.5" fill="${topic.accent}" opacity="0.6"/>
-
-    ${titleSvg}
-
-    ${tipsSvg}
-
-  <rect x="${statBoxX}" y="${statBoxY}" width="${statBoxW}" height="${statBoxH}" rx="16" fill="${BRAND.deepTeal}" stroke="${topic.accent}" stroke-width="1.5" stroke-opacity="0.3"/>
-  <text x="${statBoxX + statBoxW / 2}" y="${statBoxY + 80}" text-anchor="middle" fill="${topic.accent}" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="52">${escapeXml(topic.stat)}</text>
-  <text x="${statBoxX + statBoxW / 2}" y="${statBoxY + 115}" text-anchor="middle" fill="${BRAND.lightGray}" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="14">${escapeXml(topic.statLabel)}</text>
-
-  <g transform="translate(${statBoxX + statBoxW / 2 - 16}, ${statBoxY + 130}) scale(1.3)">
-    ${topic.iconPath}
-  </g>
-
-  <rect x="${statBoxX}" y="${height - 170}" width="${statBoxW}" height="80" rx="12" fill="${BRAND.deepTeal}" stroke="${BRAND.tealAccent}" stroke-width="1" stroke-opacity="0.2"/>
-  <text x="${statBoxX + statBoxW / 2}" y="${height - 135}" text-anchor="middle" fill="${BRAND.mutedGray}" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="11" letter-spacing="1">POWERED BY</text>
-  <text x="${statBoxX + statBoxW / 2}" y="${height - 110}" text-anchor="middle" fill="${BRAND.white}" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="16">8 Threat Intelligence Feeds</text>
-
-  <line x1="80" y1="${height - 65}" x2="${width * 0.55}" y2="${height - 65}" stroke="${BRAND.tealAccent}" stroke-width="1" stroke-opacity="0.2"/>
-  <text x="80" y="${height - 35}" fill="${BRAND.white}" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="20" opacity="0.9">GetCyberRight.com</text>
-  <text x="310" y="${height - 35}" fill="${topic.accent}" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="14" opacity="0.7">Protecting Families in the Digital World</text>
+  <text x="${padX}" y="${height - 25}" font-family="'Segoe UI',Arial,sans-serif" font-size="14" fill="${BRAND.mutedGray}" opacity="0.8">getcyberright.com  |  Protecting Families in the Digital World</text>
 </svg>`;
 }
 
@@ -223,61 +229,84 @@ function buildSquareSvg(
   contentType: string,
   topic: TopicConfig
 ): string {
-  const contentLabel = contentType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const truncTitle = title.length > 80 ? title.substring(0, 77) + "..." : title;
-  const titleLines = wrapText(truncTitle, 26);
-  const titleFontSize = 38;
-  const titleStartY = 200;
+  const uppercaseTitle = title.toUpperCase();
+  const titleLines = wrapText(uppercaseTitle, 14);
+  const fontSize = titleLines.length > 4 ? 52 : titleLines.length > 3 ? 58 : 66;
+  const lineHeight = fontSize + 8;
+  const totalTextHeight = Math.min(titleLines.length, 5) * lineHeight;
+  const padX = 50;
+  const padHighlight = 10;
+  const headlineStartY = height - 120 - totalTextHeight;
 
-  const titleSvg = titleLines.slice(0, 3).map((line, i) =>
-    `<text x="${width / 2}" y="${titleStartY + i * (titleFontSize + 10)}" text-anchor="middle" fill="${BRAND.white}" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="${titleFontSize}" letter-spacing="-0.5">${escapeXml(line)}</text>`
-  ).join("\n    ");
+  if (titleLines.length > 5) {
+    titleLines.length = 5;
+    titleLines[4] = titleLines[4].slice(0, -3) + "...";
+  }
 
-  const tipStartY = titleStartY + titleLines.slice(0, 3).length * (titleFontSize + 10) + 40;
-  const tipBoxPad = 60;
-  const tipsSvg = topic.tips.slice(0, 3).map((tip, i) => {
-    const y = tipStartY + i * 50;
-    return `
-    <rect x="${tipBoxPad}" y="${y - 28}" width="${width - tipBoxPad * 2}" height="42" rx="8" fill="${BRAND.deepTeal}" stroke="${topic.accent}" stroke-width="1" stroke-opacity="0.15"/>
-    <circle cx="${tipBoxPad + 24}" cy="${y - 7}" r="4" fill="${topic.accent}"/>
-    <text x="${tipBoxPad + 40}" y="${y - 2}" fill="${BRAND.lightGray}" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="17">${escapeXml(tip)}</text>`;
-  }).join("");
+  const allLineWords = titleLines.map(line => line.split(" "));
+  const allWords = allLineWords.flat();
+  const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
+  const highlightedWords = new Set<number>();
+  allWords.forEach((word, idx) => {
+    if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
+  });
+  if (highlightedWords.size === 0) {
+    const mid = Math.floor(allWords.length / 2);
+    highlightedWords.add(mid);
+    if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
+  }
 
-  const statY = 120;
+  let headlineSvg = "";
+  let globalWordIdx = 0;
+  for (let lineIdx = 0; lineIdx < titleLines.length; lineIdx++) {
+    const y = headlineStartY + lineIdx * lineHeight;
+    const words = allLineWords[lineIdx];
+    let curX = padX;
+    const charWidth = fontSize * 0.62;
+    for (const word of words) {
+      const wordWidth = word.length * charWidth;
+      if (highlightedWords.has(globalWordIdx)) {
+        headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${topic.accent}"/>`;
+      }
+      headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="${BRAND.white}" letter-spacing="1">${escapeXml(word)}</text>`;
+      curX += wordWidth + charWidth * 0.6;
+      globalWordIdx++;
+    }
+  }
+
+  const gridLines: string[] = [];
+  for (let i = 0; i < 11; i++) {
+    const pos = 100 + i * 100;
+    gridLines.push(`<line x1="${pos}" y1="0" x2="${pos}" y2="${height}" stroke="${topic.accent}" stroke-width="0.5" opacity="0.04"/>`);
+    gridLines.push(`<line x1="0" y1="${pos}" x2="${width}" y2="${pos}" stroke="${topic.accent}" stroke-width="0.5" opacity="0.04"/>`);
+  }
 
   return `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:${BRAND.darkTeal}"/>
-      <stop offset="100%" style="stop-color:${BRAND.navDark}"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="${BRAND.darkTeal}"/>
+      <stop offset="100%" stop-color="#050E14"/>
     </linearGradient>
+    <radialGradient id="glow" cx="70%" cy="25%" r="55%">
+      <stop offset="0%" stop-color="${topic.accent}" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="${topic.accent}" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
   <rect width="${width}" height="${height}" fill="url(#bg)"/>
+  <rect width="${width}" height="${height}" fill="url(#glow)"/>
 
-  <rect x="0" y="0" width="${width}" height="6" fill="${topic.accent}"/>
-  <rect x="0" y="${height - 6}" width="${width}" height="6" fill="${topic.accent}"/>
+  ${gridLines.join("\n  ")}
 
-  <circle cx="${width - 60}" cy="60" r="140" fill="${topic.accent}" opacity="0.04"/>
-  <circle cx="60" cy="${height - 60}" r="120" fill="${topic.accent}" opacity="0.03"/>
+  <circle cx="${width - 150}" cy="250" r="200" fill="none" stroke="${topic.accent}" stroke-width="1" opacity="0.06"/>
+  <circle cx="${width - 150}" cy="250" r="130" fill="none" stroke="${topic.accent}" stroke-width="0.8" opacity="0.04"/>
+  <circle cx="${width - 150}" cy="250" r="60" fill="${topic.accent}" opacity="0.03"/>
 
-  <g transform="translate(${width / 2 - 16}, ${statY - 50}) scale(1.3)">
-    ${topic.iconPath}
-  </g>
+  <text x="${padX}" y="60" font-family="'Segoe UI',Arial,sans-serif" font-size="18" font-weight="700" fill="${BRAND.white}" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
 
-  <rect x="${width / 2 - 60}" y="${statY - 10}" width="120" height="48" rx="24" fill="${topic.accent}" opacity="0.15"/>
-  <text x="${width / 2}" y="${statY + 26}" text-anchor="middle" fill="${topic.accent}" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="28">${escapeXml(topic.stat)}</text>
-  <text x="${width / 2}" y="${statY + 52}" text-anchor="middle" fill="${BRAND.mutedGray}" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="13">${escapeXml(topic.statLabel)}</text>
+  ${headlineSvg}
 
-  <text x="${width / 2}" y="${titleStartY - 30}" text-anchor="middle" fill="${topic.accent}" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="14" letter-spacing="2.5">${escapeXml(contentLabel.toUpperCase())}</text>
-
-    ${titleSvg}
-
-    ${tipsSvg}
-
-  <line x1="60" y1="${height - 90}" x2="${width - 60}" y2="${height - 90}" stroke="${BRAND.tealAccent}" stroke-width="1" stroke-opacity="0.2"/>
-  <text x="${width / 2}" y="${height - 55}" text-anchor="middle" fill="${BRAND.white}" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="22" opacity="0.9">GetCyberRight.com</text>
-  <text x="${width / 2}" y="${height - 28}" text-anchor="middle" fill="${topic.accent}" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="13" opacity="0.7">Protecting Families in the Digital World</text>
+  <text x="${padX}" y="${height - 40}" font-family="'Segoe UI',Arial,sans-serif" font-size="15" fill="${BRAND.mutedGray}" opacity="0.8">getcyberright.com</text>
 </svg>`;
 }
 
