@@ -1599,181 +1599,130 @@ async function applyBrandOverlay(
     const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
 
     const sharp = (await import("sharp")).default;
+    const fontFamily = "'Inter','DejaVu Sans',Arial,sans-serif";
 
     const logoPath = path.join(process.cwd(), "client", "public", "lock-logo-transparent.png");
     let logoBuffer: Buffer | null = null;
+    const logoSize = isSquare ? 36 : 30;
     if (fs.existsSync(logoPath)) {
       logoBuffer = await sharp(logoPath)
-        .resize(isSquare ? 52 : 44, isSquare ? 52 : 44, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+        .resize(logoSize, logoSize, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
         .png()
         .toBuffer();
     }
 
-    const templates: Record<TemplateStyle, { accent: string; accentRgb: string; urgencyLabel: string }> = {
-      stat_card: { accent: "#E8612D", accentRgb: "232,97,45", urgencyLabel: "NEWS" },
-      tip_card: { accent: "#0D9488", accentRgb: "13,148,136", urgencyLabel: "TIP" },
-      alert_card: { accent: "#DC2626", accentRgb: "220,38,38", urgencyLabel: "ALERT" },
-      insight_card: { accent: "#E8612D", accentRgb: "232,97,45", urgencyLabel: "INSIGHT" },
-      quote_card: { accent: "#2563EB", accentRgb: "37,99,235", urgencyLabel: "NEWS" },
+    const templates: Record<TemplateStyle, { accent: string; accentRgb: string; categoryLabel: string; gradientOpacity: number }> = {
+      alert_card:   { accent: "#EF4444", accentRgb: "239,68,68",  categoryLabel: "SECURITY ALERT",  gradientOpacity: 0.85 },
+      stat_card:    { accent: "#F97316", accentRgb: "249,115,22", categoryLabel: "CYBER NEWS",      gradientOpacity: 0.82 },
+      tip_card:     { accent: "#10B981", accentRgb: "16,185,129", categoryLabel: "CYBER TIP",       gradientOpacity: 0.82 },
+      insight_card: { accent: "#3B82F6", accentRgb: "59,130,246", categoryLabel: "INSIGHT",         gradientOpacity: 0.82 },
+      quote_card:   { accent: "#8B5CF6", accentRgb: "139,92,246", categoryLabel: "ANALYSIS",        gradientOpacity: 0.82 },
     };
     const tmpl = templates[templateStyle];
 
-    if (isSquare) {
-      const imgH = Math.round(height * 0.52);
-      const panelH = height - imgH;
+    const baseImage = await sharp(sourcePath)
+      .resize(width, height, { fit: "cover", position: "center" })
+      .toBuffer();
 
-      const photoImage = await sharp(sourcePath)
-        .resize(width, imgH, { fit: "cover", position: "center" })
-        .toBuffer();
-
-      const maxChars = 20;
-      const uppercaseHeadline = cleanHeadline.toUpperCase();
-      let headlineLines = wrapText(uppercaseHeadline, maxChars);
-      if (headlineLines.length > 4) {
-        headlineLines = headlineLines.slice(0, 4);
-        headlineLines[3] = headlineLines[3].slice(0, -3) + "...";
-      }
-
-      const padX = 50;
-      const fontSize = headlineLines.length > 3 ? 42 : headlineLines.length > 2 ? 48 : 54;
-      const lineHeight = fontSize * 1.25;
-
-      const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "THREAT", "RISK", "FLAW", "PATCH", "UPDATE", "BLOCKS", "BANS"];
-
-      let headlineSvg = "";
-      const headlineStartY = 80;
-      for (let i = 0; i < headlineLines.length; i++) {
-        const y = headlineStartY + i * lineHeight;
-        const words = headlineLines[i].split(" ");
-        const tspans = words.map(w => {
-          const isImp = importantTerms.some(t => w.includes(t));
-          return isImp
-            ? `<tspan fill="${tmpl.accent}">${escapeXml(w)}</tspan>`
-            : `<tspan>${escapeXml(w)}</tspan>`;
-        }).join(" ");
-        headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${fontSize}" font-weight="bold" fill="#1A1A2E" letter-spacing="0.5">${tspans}</text>`;
-      }
-
-      const subtextY = headlineStartY + headlineLines.length * lineHeight + 16;
-      const subtextClean = subtext ? escapeXml(subtext.slice(0, 60)) : "";
-      const urgencyLabel = tmpl.urgencyLabel;
-      const badgeW = urgencyLabel.length * 13 + 24;
-
-      const panelSvg = `<svg width="${width}" height="${panelH}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${width}" height="${panelH}" fill="#FAFAFA"/>
-  <rect x="0" y="0" width="${width}" height="4" fill="${tmpl.accent}"/>
-
-  <rect x="${width - padX - badgeW}" y="20" width="${badgeW}" height="26" rx="4" fill="${tmpl.accent}"/>
-  <text x="${width - padX - badgeW / 2}" y="38" text-anchor="middle" font-family="'DejaVu Sans',Arial,sans-serif" font-size="13" font-weight="700" fill="white" letter-spacing="2">${urgencyLabel}</text>
-
-  ${headlineSvg}
-
-  ${subtextClean ? `<text x="${padX}" y="${subtextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="16" fill="#64748B" letter-spacing="0.3">${subtextClean}</text>` : ""}
-
-  <rect x="${padX}" y="${panelH - 52}" width="${width - padX * 2}" height="1" fill="#E2E8F0"/>
-  <text x="${padX + (logoBuffer ? 58 : 0)}" y="${panelH - 26}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="16" font-weight="700" fill="#1A1A2E" letter-spacing="1.5">GETCYBERRIGHT</text>
-  <text x="${width - padX}" y="${panelH - 26}" text-anchor="end" font-family="'DejaVu Sans',Arial,sans-serif" font-size="12" fill="#94A3B8">getcyberright.com</text>
-</svg>`;
-
-      const panelBuffer = await sharp(Buffer.from(panelSvg))
-        .resize(width, panelH)
-        .png()
-        .toBuffer();
-
-      const composites: sharp.OverlayOptions[] = [
-        { input: panelBuffer, top: imgH, left: 0 },
-      ];
-      if (logoBuffer) {
-        composites.push({
-          input: logoBuffer,
-          top: imgH + panelH - 52 + 2,
-          left: padX,
-        });
-      }
-
-      await sharp(photoImage)
-        .resize(width, imgH)
-        .extend({ bottom: panelH, background: { r: 250, g: 250, b: 250, alpha: 1 } })
-        .composite(composites)
-        .jpeg({ quality: 92 })
-        .toFile(outputPath);
-
-    } else {
-      const imgH = Math.round(height * 0.55);
-      const panelH = height - imgH;
-
-      const photoImage = await sharp(sourcePath)
-        .resize(width, imgH, { fit: "cover", position: "center" })
-        .toBuffer();
-
-      const maxChars = 38;
-      const uppercaseHeadline = cleanHeadline.toUpperCase();
-      let headlineLines = wrapText(uppercaseHeadline, maxChars);
-      if (headlineLines.length > 3) {
-        headlineLines = headlineLines.slice(0, 3);
-        headlineLines[2] = headlineLines[2].slice(0, -3) + "...";
-      }
-
-      const padX = 55;
-      const fontSize = headlineLines.length > 2 ? 34 : 40;
-      const lineHeight = fontSize * 1.25;
-
-      const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "THREAT", "RISK", "FLAW", "PATCH", "UPDATE", "BLOCKS", "BANS"];
-
-      let headlineSvg = "";
-      const headlineStartY = 55;
-      for (let i = 0; i < headlineLines.length; i++) {
-        const y = headlineStartY + i * lineHeight;
-        const words = headlineLines[i].split(" ");
-        const tspans = words.map(w => {
-          const isImp = importantTerms.some(t => w.includes(t));
-          return isImp
-            ? `<tspan fill="${tmpl.accent}">${escapeXml(w)}</tspan>`
-            : `<tspan>${escapeXml(w)}</tspan>`;
-        }).join(" ");
-        headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${fontSize}" font-weight="bold" fill="#1A1A2E" letter-spacing="0.5">${tspans}</text>`;
-      }
-
-      const urgencyLabel = tmpl.urgencyLabel;
-      const badgeW = urgencyLabel.length * 12 + 22;
-
-      const panelSvg = `<svg width="${width}" height="${panelH}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${width}" height="${panelH}" fill="#FAFAFA"/>
-  <rect x="0" y="0" width="${width}" height="4" fill="${tmpl.accent}"/>
-
-  <rect x="${width - padX - badgeW}" y="14" width="${badgeW}" height="24" rx="4" fill="${tmpl.accent}"/>
-  <text x="${width - padX - badgeW / 2}" y="30" text-anchor="middle" font-family="'DejaVu Sans',Arial,sans-serif" font-size="12" font-weight="700" fill="white" letter-spacing="2">${urgencyLabel}</text>
-
-  ${headlineSvg}
-
-  <rect x="${padX}" y="${panelH - 42}" width="${width - padX * 2}" height="1" fill="#E2E8F0"/>
-  <text x="${padX + (logoBuffer ? 50 : 0)}" y="${panelH - 18}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="14" font-weight="700" fill="#1A1A2E" letter-spacing="1.5">GETCYBERRIGHT</text>
-  <text x="${width - padX}" y="${panelH - 18}" text-anchor="end" font-family="'DejaVu Sans',Arial,sans-serif" font-size="11" fill="#94A3B8">getcyberright.com</text>
-</svg>`;
-
-      const panelBuffer = await sharp(Buffer.from(panelSvg))
-        .resize(width, panelH)
-        .png()
-        .toBuffer();
-
-      const composites: sharp.OverlayOptions[] = [
-        { input: panelBuffer, top: imgH, left: 0 },
-      ];
-      if (logoBuffer) {
-        composites.push({
-          input: logoBuffer,
-          top: imgH + panelH - 42 + 2,
-          left: padX,
-        });
-      }
-
-      await sharp(photoImage)
-        .resize(width, imgH)
-        .extend({ bottom: panelH, background: { r: 250, g: 250, b: 250, alpha: 1 } })
-        .composite(composites)
-        .jpeg({ quality: 92 })
-        .toFile(outputPath);
+    const uppercaseHeadline = cleanHeadline.toUpperCase();
+    const maxChars = isSquare ? 18 : 32;
+    let headlineLines = wrapText(uppercaseHeadline, maxChars);
+    const maxLines = isSquare ? 5 : 3;
+    if (headlineLines.length > maxLines) {
+      headlineLines = headlineLines.slice(0, maxLines);
+      headlineLines[maxLines - 1] = headlineLines[maxLines - 1].slice(0, -3) + "...";
     }
+
+    const padX = isSquare ? 48 : 56;
+    const padBottom = isSquare ? 48 : 40;
+
+    const fontSize = isSquare
+      ? (headlineLines.length > 3 ? 40 : headlineLines.length > 2 ? 46 : 52)
+      : (headlineLines.length > 2 ? 36 : 42);
+    const lineHeight = fontSize * 1.2;
+    const categoryFontSize = isSquare ? 13 : 12;
+    const subtextFontSize = isSquare ? 15 : 14;
+    const brandFontSize = isSquare ? 14 : 13;
+
+    const totalHeadlineH = headlineLines.length * lineHeight;
+    const categoryH = categoryFontSize + 16;
+    const subtextH = subtext ? subtextFontSize + 20 : 0;
+    const brandH = brandFontSize + 8;
+    const spacingBetween = 16;
+    const contentH = categoryH + spacingBetween + totalHeadlineH + spacingBetween + subtextH + spacingBetween + brandH;
+    const gradientH = Math.max(contentH + padBottom + 40, Math.round(height * 0.55));
+
+    const gradientStartY = height - gradientH;
+    const categoryY = height - padBottom - contentH + categoryFontSize;
+    const headlineStartY = categoryY + categoryH + spacingBetween;
+
+    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "THREAT", "RISK", "FLAW", "PATCH", "UPDATE", "BLOCKS", "BANS", "DANGEROUS", "INFECTED", "SPYWARE", "TROJAN", "BACKDOOR", "SUPPLY-CHAIN", "DATA", "PRIVACY", "SURVEILLANCE", "DEEPFAKE"];
+
+    let headlineSvg = "";
+    for (let i = 0; i < headlineLines.length; i++) {
+      const y = headlineStartY + i * lineHeight + fontSize * 0.85;
+      const words = headlineLines[i].split(" ");
+      const tspans = words.map(w => {
+        const isAccent = importantTerms.some(t => w.includes(t));
+        return isAccent
+          ? `<tspan fill="${tmpl.accent}" font-weight="800">${escapeXml(w)}</tspan>`
+          : `<tspan>${escapeXml(w)}</tspan>`;
+      }).join(" ");
+      headlineSvg += `<text x="${padX}" y="${y}" font-family="${fontFamily}" font-size="${fontSize}" font-weight="700" fill="white" letter-spacing="0.5">${tspans}</text>`;
+    }
+
+    const subtextY = headlineStartY + totalHeadlineH + spacingBetween + subtextFontSize;
+    const subtextClean = subtext ? escapeXml(subtext.slice(0, 70)) : "";
+
+    const brandY = height - padBottom;
+    const accentLineY = brandY - brandFontSize - 16;
+
+    const categoryBadgeW = tmpl.categoryLabel.length * (categoryFontSize * 0.65) + 24;
+
+    const overlaySvg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(0,0,0,0)" />
+      <stop offset="${Math.round((gradientStartY / height) * 100)}%" stop-color="rgba(0,0,0,0)" />
+      <stop offset="${Math.round(((gradientStartY + gradientH * 0.3) / height) * 100)}%" stop-color="rgba(10,15,28,${tmpl.gradientOpacity * 0.6})" />
+      <stop offset="100%" stop-color="rgba(10,15,28,${tmpl.gradientOpacity})" />
+    </linearGradient>
+  </defs>
+
+  <rect width="${width}" height="${height}" fill="url(#grad)" />
+
+  <rect x="${padX}" y="${categoryY - categoryFontSize}" width="${categoryBadgeW}" height="${categoryFontSize + 10}" rx="3" fill="${tmpl.accent}" />
+  <text x="${padX + categoryBadgeW / 2}" y="${categoryY}" text-anchor="middle" font-family="${fontFamily}" font-size="${categoryFontSize}" font-weight="700" fill="white" letter-spacing="2">${tmpl.categoryLabel}</text>
+
+  ${headlineSvg}
+
+  ${subtextClean ? `<text x="${padX}" y="${subtextY}" font-family="${fontFamily}" font-size="${subtextFontSize}" fill="rgba(255,255,255,0.7)" letter-spacing="0.3">${subtextClean}</text>` : ""}
+
+  <rect x="${padX}" y="${accentLineY}" width="${width - padX * 2}" height="1" fill="rgba(255,255,255,0.15)" />
+
+  <text x="${padX + (logoBuffer ? logoSize + 10 : 0)}" y="${brandY}" font-family="${fontFamily}" font-size="${brandFontSize}" font-weight="600" fill="rgba(255,255,255,0.9)" letter-spacing="1.5">GETCYBERRIGHT</text>
+  <text x="${width - padX}" y="${brandY}" text-anchor="end" font-family="${fontFamily}" font-size="${Math.round(brandFontSize * 0.85)}" fill="rgba(255,255,255,0.5)">getcyberright.com</text>
+</svg>`;
+
+    const overlayBuffer = await sharp(Buffer.from(overlaySvg))
+      .png()
+      .toBuffer();
+
+    const composites: sharp.OverlayOptions[] = [
+      { input: overlayBuffer, top: 0, left: 0 },
+    ];
+    if (logoBuffer) {
+      composites.push({
+        input: logoBuffer,
+        top: Math.round(brandY - logoSize + 4),
+        left: padX,
+      });
+    }
+
+    await sharp(baseImage)
+      .composite(composites)
+      .jpeg({ quality: 93 })
+      .toFile(outputPath);
 
     console.log(`[TrendEngine] Applied brand overlay: ${filename} (${width}x${height}, template: ${templateStyle})`);
     return outputPath;

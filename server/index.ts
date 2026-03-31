@@ -16,6 +16,9 @@ import {
   securityLogger,
 } from "./security";
 import { antiScrapingHeaders, botProtection } from "./security/middleware";
+import { setupFonts } from "./fontSetup";
+
+setupFonts();
 
 const app = express();
 
