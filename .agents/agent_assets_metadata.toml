@@ -306,3 +306,15 @@ id = "3f8w1DHFn8ZBSiKixnr9Y"
 uri = "file://.local/social-images/pro-branded-ln-1774989082378.png"
 type = "image"
 title = "LinkedIn/Facebook (1200x630) — Real Article Image + Pro Brand Overlay"
+
+[[outputs]]
+id = "DBeKbxnex3HOfIMdsG6tj"
+uri = "file://.local/social-images/test-cybernews-style.jpeg"
+type = "image"
+title = "LinkedIn/Facebook Format (1200x630)"
+
+[[outputs]]
+id = "Ek8rNPStlhERouHm9yseu"
+uri = "file://.local/social-images/test-ig-style.jpeg"
+type = "image"
+title = "Instagram Format (1080x1080)"

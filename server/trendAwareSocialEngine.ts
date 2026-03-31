@@ -1410,51 +1410,66 @@ async function resolvePostImage(
   imageSubtext: string,
   templateStyle: TemplateStyle,
   title: string,
-  articleUrl?: string | null
-): Promise<{ mainImage: string | null; igImage: string | null; imageSource: "source" | "og" | "ai" | "branded" }> {
+  articleUrl?: string | null,
+  category?: string | null
+): Promise<{ mainImage: string | null; igImage: string | null; imageSource: "source" | "og" | "stock" | "ai" | "branded" }> {
+
+  const tryBrandOverlay = async (imgPath: string, source: "source" | "og" | "stock" | "ai"): Promise<{ mainImage: string | null; igImage: string | null; imageSource: typeof source } | null> => {
+    const mainPath = await applyBrandOverlay(imgPath, imageHeadline, imageSubtext, templateStyle, 1200, 630);
+    const igPath = await applyBrandOverlay(imgPath, imageHeadline, imageSubtext, templateStyle, 1080, 1080);
+    const mainUrl = mainPath ? getPublicImageUrl(mainPath) : null;
+    const igUrl = igPath ? getPublicImageUrl(igPath) : mainUrl;
+    if (mainUrl) return { mainImage: mainUrl, igImage: igUrl, imageSource: source };
+    return null;
+  };
+
   if (sourceImageUrl) {
     const downloaded = await downloadSourceImage(sourceImageUrl, title);
     if (downloaded) {
-      const mainPath = await applyBrandOverlay(downloaded, imageHeadline, imageSubtext, templateStyle, 1200, 630);
-      const igPath = await applyBrandOverlay(downloaded, imageHeadline, imageSubtext, templateStyle, 1080, 1080);
-      const mainUrl = mainPath ? getPublicImageUrl(mainPath) : null;
-      const igUrl = igPath ? getPublicImageUrl(igPath) : mainUrl;
-      if (mainUrl) {
-        console.log(`[TrendEngine] Using branded source article image`);
-        return { mainImage: mainUrl, igImage: igUrl, imageSource: "source" };
+      const result = await tryBrandOverlay(downloaded, "source");
+      if (result) {
+        console.log(`[TrendEngine] Using source article image with brand overlay`);
+        return result;
       }
     }
-    console.warn(`[TrendEngine] Source image processing failed, trying og:image from article page...`);
+    console.warn(`[TrendEngine] Source image processing failed`);
   }
 
-  if (articleUrl && !sourceImageUrl) {
+  if (articleUrl) {
     const ogImageUrl = await fetchOgImageFromArticle(articleUrl);
     if (ogImageUrl) {
       const downloaded = await downloadSourceImage(ogImageUrl, title);
       if (downloaded) {
-        const mainPath = await applyBrandOverlay(downloaded, imageHeadline, imageSubtext, templateStyle, 1200, 630);
-        const igPath = await applyBrandOverlay(downloaded, imageHeadline, imageSubtext, templateStyle, 1080, 1080);
-        const mainUrl = mainPath ? getPublicImageUrl(mainPath) : null;
-        const igUrl = igPath ? getPublicImageUrl(igPath) : mainUrl;
-        if (mainUrl) {
-          console.log(`[TrendEngine] Using branded og:image from article page`);
-          return { mainImage: mainUrl, igImage: igUrl, imageSource: "og" };
+        const result = await tryBrandOverlay(downloaded, "og");
+        if (result) {
+          console.log(`[TrendEngine] Using og:image from article page with brand overlay`);
+          return result;
         }
       }
     }
-    console.warn(`[TrendEngine] og:image fetch failed, trying AI generation...`);
+    console.warn(`[TrendEngine] og:image not available`);
+  }
+
+  const stockPhoto = await searchStockPhoto(category || "default", title);
+  if (stockPhoto) {
+    const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, title);
+    if (imgPath) {
+      const result = await tryBrandOverlay(imgPath, "stock");
+      if (result) {
+        console.log(`[TrendEngine] Using stock photo by ${stockPhoto.photographer} with brand overlay`);
+        return result;
+      }
+    }
+    console.warn(`[TrendEngine] Stock photo processing failed`);
   }
 
   if (aiImagePrompt) {
     const aiImage = await generateAIImage(aiImagePrompt, title);
     if (aiImage) {
-      const mainPath = await applyBrandOverlay(aiImage, imageHeadline, imageSubtext, templateStyle, 1200, 630);
-      const igPath = await applyBrandOverlay(aiImage, imageHeadline, imageSubtext, templateStyle, 1080, 1080);
-      const mainUrl = mainPath ? getPublicImageUrl(mainPath) : null;
-      const igUrl = igPath ? getPublicImageUrl(igPath) : mainUrl;
-      if (mainUrl) {
-        console.log(`[TrendEngine] Using branded AI-generated image`);
-        return { mainImage: mainUrl, igImage: igUrl, imageSource: "ai" };
+      const result = await tryBrandOverlay(aiImage, "ai");
+      if (result) {
+        console.log(`[TrendEngine] Using AI-generated image with brand overlay`);
+        return result;
       }
     }
     console.warn(`[TrendEngine] AI image generation failed, falling back to branded card...`);
@@ -1466,6 +1481,104 @@ async function resolvePostImage(
   const igImage = igPath ? getPublicImageUrl(igPath) : (mainImage ?? null);
 
   return { mainImage, igImage, imageSource: "branded" };
+}
+
+const TOPIC_SEARCH_TERMS: Record<string, string[]> = {
+  "Data Breaches": ["data security", "cybersecurity lock", "digital security"],
+  "Phishing": ["email security", "phishing scam", "cyber attack warning"],
+  "Malware": ["computer virus", "malware code", "cybersecurity threat"],
+  "Ransomware": ["ransomware lock", "encrypted files", "cyber extortion"],
+  "Privacy": ["digital privacy", "data protection", "online privacy"],
+  "Scams": ["online fraud", "scam alert", "internet safety"],
+  "Family Safety": ["family technology", "children internet safety", "parental control"],
+  "Government": ["government cybersecurity", "national security digital", "federal cyber"],
+  "Business": ["corporate security", "business cybersecurity", "enterprise security"],
+  "Mobile Security": ["smartphone security", "mobile device protection", "phone security"],
+  "IoT": ["smart home security", "iot devices", "connected devices security"],
+  "AI & Security": ["artificial intelligence security", "AI technology", "machine learning security"],
+  "default": ["cybersecurity", "digital security", "internet protection"],
+};
+
+const LOCAL_STOCK_PHOTOS_DIR = path.join(process.cwd(), ".local", "stock-photos");
+const PICSUM_TECH_IDS = [0, 1, 2, 180, 201, 367, 403, 60, 119, 160, 366, 453, 537, 593, 756];
+
+async function ensureLocalStockPhotos(): Promise<void> {
+  if (!fs.existsSync(LOCAL_STOCK_PHOTOS_DIR)) {
+    fs.mkdirSync(LOCAL_STOCK_PHOTOS_DIR, { recursive: true });
+  }
+  const existing = fs.readdirSync(LOCAL_STOCK_PHOTOS_DIR).filter(f => f.endsWith(".jpg"));
+  if (existing.length >= 5) return;
+
+  console.log(`[TrendEngine] Downloading local stock photo set...`);
+  const ids = PICSUM_TECH_IDS.sort(() => Math.random() - 0.5).slice(0, 8);
+  for (const id of ids) {
+    const filePath = path.join(LOCAL_STOCK_PHOTOS_DIR, `stock-${id}.jpg`);
+    if (fs.existsSync(filePath)) continue;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const resp = await fetch(`https://picsum.photos/id/${id}/1200/800`, {
+        signal: controller.signal,
+        headers: { "User-Agent": "curl/8.0" },
+      });
+      clearTimeout(timeout);
+      if (resp.ok) {
+        const buffer = Buffer.from(await resp.arrayBuffer());
+        fs.writeFileSync(filePath, buffer);
+        console.log(`[TrendEngine] Downloaded stock photo: stock-${id}.jpg (${buffer.length} bytes)`);
+      }
+    } catch {
+    }
+  }
+}
+
+function getLocalStockPhoto(): string | null {
+  if (!fs.existsSync(LOCAL_STOCK_PHOTOS_DIR)) return null;
+  const photos = fs.readdirSync(LOCAL_STOCK_PHOTOS_DIR).filter(f => f.endsWith(".jpg"));
+  if (photos.length === 0) return null;
+  const chosen = photos[Math.floor(Math.random() * photos.length)];
+  return path.join(LOCAL_STOCK_PHOTOS_DIR, chosen);
+}
+
+async function searchStockPhoto(category: string, title: string): Promise<{ url: string; photographer: string; localPath?: string } | null> {
+  try {
+    const searchTerms = TOPIC_SEARCH_TERMS[category] || TOPIC_SEARCH_TERMS["default"];
+    const titleWords = title.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(w => w.length > 3);
+    const relevantWords = titleWords.slice(0, 3).join(" ");
+    const query = relevantWords || searchTerms[Math.floor(Math.random() * searchTerms.length)];
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const pexelsHeaders = { "User-Agent": "curl/8.0", "Accept": "*/*" };
+
+    const response = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape`,
+      { signal: controller.signal, headers: pexelsHeaders }
+    );
+    clearTimeout(timeout);
+
+    if (response.ok) {
+      const data: any = await response.json();
+      if (data.photos?.length) {
+        const photo = data.photos[Math.floor(Math.random() * Math.min(data.photos.length, 5))];
+        console.log(`[TrendEngine] Pexels stock photo: "${photo.alt}" by ${photo.photographer}`);
+        return { url: photo.src.large2x || photo.src.large, photographer: photo.photographer };
+      }
+    }
+
+    console.log(`[TrendEngine] Pexels unavailable (status: ${response.status}), trying local stock photos...`);
+  } catch (error: any) {
+    console.warn(`[TrendEngine] Pexels search failed: ${error.message}, trying local stock photos...`);
+  }
+
+  await ensureLocalStockPhotos();
+  const localPath = getLocalStockPhoto();
+  if (localPath) {
+    console.log(`[TrendEngine] Using local stock photo: ${path.basename(localPath)}`);
+    return { url: "", photographer: "Picsum Photos (CC0)", localPath };
+  }
+
+  return null;
 }
 
 async function applyBrandOverlay(
@@ -1482,145 +1595,184 @@ async function applyBrandOverlay(
     const cleanHeadline = headline.replace(/\[.*?\]\s*/g, "").trim();
     const slug = cleanHeadline.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 35);
     const prefix = isSquare ? "branded-ig" : "branded";
-    const ext = isSquare ? "jpeg" : "png";
-    const filename = `${prefix}-${slug}-${Date.now()}.${ext}`;
+    const filename = `${prefix}-${slug}-${Date.now()}.jpeg`;
     const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
 
     const sharp = (await import("sharp")).default;
 
-    const baseImage = await sharp(sourcePath)
-      .resize(width, height, { fit: "cover", position: "center" })
-      .toBuffer();
-
     const logoPath = path.join(process.cwd(), "client", "public", "lock-logo-transparent.png");
-    let logoBase64 = "";
+    let logoBuffer: Buffer | null = null;
     if (fs.existsSync(logoPath)) {
-      const logoBuffer = fs.readFileSync(logoPath);
-      logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
+      logoBuffer = await sharp(logoPath)
+        .resize(isSquare ? 52 : 44, isSquare ? 52 : 44, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+        .png()
+        .toBuffer();
     }
 
-    const templates: Record<TemplateStyle, { accent: string; accentDark: string; urgencyLabel: string }> = {
-      stat_card: { accent: "#E8612D", accentDark: "#B84A1E", urgencyLabel: "NEWS" },
-      tip_card: { accent: "#14B8A6", accentDark: "#0D9488", urgencyLabel: "TIP" },
-      alert_card: { accent: "#EF4444", accentDark: "#DC2626", urgencyLabel: "ALERT" },
-      insight_card: { accent: "#E8612D", accentDark: "#B84A1E", urgencyLabel: "INSIGHT" },
-      quote_card: { accent: "#3B82F6", accentDark: "#2563EB", urgencyLabel: "NEWS" },
+    const templates: Record<TemplateStyle, { accent: string; accentRgb: string; urgencyLabel: string }> = {
+      stat_card: { accent: "#E8612D", accentRgb: "232,97,45", urgencyLabel: "NEWS" },
+      tip_card: { accent: "#0D9488", accentRgb: "13,148,136", urgencyLabel: "TIP" },
+      alert_card: { accent: "#DC2626", accentRgb: "220,38,38", urgencyLabel: "ALERT" },
+      insight_card: { accent: "#E8612D", accentRgb: "232,97,45", urgencyLabel: "INSIGHT" },
+      quote_card: { accent: "#2563EB", accentRgb: "37,99,235", urgencyLabel: "NEWS" },
     };
-
     const tmpl = templates[templateStyle];
-    const maxChars = isSquare ? 18 : 28;
-    const uppercaseHeadline = cleanHeadline.toUpperCase();
-    let headlineLines = wrapText(uppercaseHeadline, maxChars);
-    if (headlineLines.length > 4) {
-      headlineLines = headlineLines.slice(0, 4);
-      headlineLines[3] = headlineLines[3].slice(0, -3) + "...";
-    }
 
-    const fontSize = isSquare
-      ? (headlineLines.length > 3 ? 48 : headlineLines.length > 2 ? 56 : 64)
-      : (headlineLines.length > 3 ? 40 : headlineLines.length > 2 ? 46 : 52);
-    const lineHeight = fontSize * 1.25;
-    const totalTextHeight = headlineLines.length * lineHeight;
-    const padX = isSquare ? 55 : 65;
+    if (isSquare) {
+      const imgH = Math.round(height * 0.52);
+      const panelH = height - imgH;
 
-    const textBottomMargin = isSquare ? 110 : 80;
-    const headlineStartY = height - textBottomMargin - totalTextHeight;
+      const photoImage = await sharp(sourcePath)
+        .resize(width, imgH, { fit: "cover", position: "center" })
+        .toBuffer();
 
-    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "THREAT", "RISK", "FLAW", "PATCH", "UPDATE"];
+      const maxChars = 20;
+      const uppercaseHeadline = cleanHeadline.toUpperCase();
+      let headlineLines = wrapText(uppercaseHeadline, maxChars);
+      if (headlineLines.length > 4) {
+        headlineLines = headlineLines.slice(0, 4);
+        headlineLines[3] = headlineLines[3].slice(0, -3) + "...";
+      }
 
-    let headlineSvg = "";
-    for (let lineIdx = 0; lineIdx < headlineLines.length; lineIdx++) {
-      const y = headlineStartY + lineIdx * lineHeight;
-      const words = headlineLines[lineIdx].split(" ");
-      const tspans = words.map(word => {
-        const isImportant = importantTerms.some(t => word.includes(t));
-        return isImportant
-          ? `<tspan fill="${tmpl.accent}">${escapeXml(word)}</tspan>`
-          : `<tspan>${escapeXml(word)}</tspan>`;
-      }).join(" ");
-      headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans','Arial',Helvetica,sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" letter-spacing="1" filter="url(#headlineShadow)">${tspans}</text>`;
-    }
+      const padX = 50;
+      const fontSize = headlineLines.length > 3 ? 42 : headlineLines.length > 2 ? 48 : 54;
+      const lineHeight = fontSize * 1.25;
 
-    const accentBarH = isSquare ? 5 : 4;
-    const logoSize = isSquare ? 56 : 48;
-    const logoX = padX;
-    const logoY = accentBarH + (isSquare ? 20 : 16);
-    const brandTextX = logoBase64 ? (logoX + logoSize + 12) : logoX;
-    const brandTextY = logoY + logoSize / 2 + 6;
-    const brandFontSize = isSquare ? 22 : 18;
-    const logoElement = logoBase64
-      ? `<image href="${logoBase64}" x="${logoX}" y="${logoY}" width="${logoSize}" height="${logoSize}" opacity="0.95"/>`
-      : "";
+      const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "THREAT", "RISK", "FLAW", "PATCH", "UPDATE", "BLOCKS", "BANS"];
 
-    const urgencyLabel = tmpl.urgencyLabel;
-    const badgeW = urgencyLabel.length * (isSquare ? 16 : 14) + 28;
-    const badgeH = isSquare ? 30 : 26;
-    const badgeX = width - padX - badgeW;
-    const badgeY = accentBarH + (isSquare ? 28 : 22);
-    const badgeFontSize = isSquare ? 15 : 13;
+      let headlineSvg = "";
+      const headlineStartY = 80;
+      for (let i = 0; i < headlineLines.length; i++) {
+        const y = headlineStartY + i * lineHeight;
+        const words = headlineLines[i].split(" ");
+        const tspans = words.map(w => {
+          const isImp = importantTerms.some(t => w.includes(t));
+          return isImp
+            ? `<tspan fill="${tmpl.accent}">${escapeXml(w)}</tspan>`
+            : `<tspan>${escapeXml(w)}</tspan>`;
+        }).join(" ");
+        headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${fontSize}" font-weight="bold" fill="#1A1A2E" letter-spacing="0.5">${tspans}</text>`;
+      }
 
-    const gradientStart = Math.max(0, headlineStartY - 160);
-    const gradientHeight = height - gradientStart;
+      const subtextY = headlineStartY + headlineLines.length * lineHeight + 16;
+      const subtextClean = subtext ? escapeXml(subtext.slice(0, 60)) : "";
+      const urgencyLabel = tmpl.urgencyLabel;
+      const badgeW = urgencyLabel.length * 13 + 24;
 
-    const subtextClean = subtext ? escapeXml(subtext.slice(0, 80)) : "";
-    const subtextY = headlineStartY + totalTextHeight + (isSquare ? 28 : 22);
+      const panelSvg = `<svg width="${width}" height="${panelH}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="${width}" height="${panelH}" fill="#FAFAFA"/>
+  <rect x="0" y="0" width="${width}" height="4" fill="${tmpl.accent}"/>
 
-    const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <defs>
-    <linearGradient id="bottomGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
-      <stop offset="8%" stop-color="#000000" stop-opacity="0.05"/>
-      <stop offset="25%" stop-color="#000000" stop-opacity="0.35"/>
-      <stop offset="50%" stop-color="#000000" stop-opacity="0.7"/>
-      <stop offset="75%" stop-color="#000000" stop-opacity="0.88"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0.95"/>
-    </linearGradient>
-    <linearGradient id="topGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#000000" stop-opacity="0.7"/>
-      <stop offset="60%" stop-color="#000000" stop-opacity="0.2"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
-    </linearGradient>
-    <filter id="headlineShadow">
-      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#000000" flood-opacity="0.9"/>
-    </filter>
-    <filter id="textShadow">
-      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#000000" flood-opacity="0.7"/>
-    </filter>
-  </defs>
-
-  <rect x="0" y="0" width="${width}" height="${accentBarH}" fill="${tmpl.accent}"/>
-
-  <rect y="${accentBarH}" width="${width}" height="${isSquare ? 160 : 120}" fill="url(#topGrad)"/>
-  <rect y="${gradientStart}" width="${width}" height="${gradientHeight}" fill="url(#bottomGrad)"/>
-
-  ${logoElement}
-  <text x="${brandTextX}" y="${brandTextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${brandFontSize}" font-weight="700" fill="white" letter-spacing="2.5" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
-
-  <rect x="${badgeX}" y="${badgeY}" width="${badgeW}" height="${badgeH}" rx="3" fill="${tmpl.accent}" opacity="0.95"/>
-  <text x="${badgeX + badgeW / 2}" y="${badgeY + badgeH / 2 + badgeFontSize * 0.35}" text-anchor="middle" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${badgeFontSize}" font-weight="700" fill="white" letter-spacing="2.5">${urgencyLabel}</text>
-
-  <rect x="${padX}" y="${headlineStartY - lineHeight + fontSize - 6}" width="40" height="4" rx="2" fill="${tmpl.accent}" opacity="0.9"/>
+  <rect x="${width - padX - badgeW}" y="20" width="${badgeW}" height="26" rx="4" fill="${tmpl.accent}"/>
+  <text x="${width - padX - badgeW / 2}" y="38" text-anchor="middle" font-family="'DejaVu Sans',Arial,sans-serif" font-size="13" font-weight="700" fill="white" letter-spacing="2">${urgencyLabel}</text>
 
   ${headlineSvg}
 
-  ${subtextClean ? `<text x="${padX}" y="${subtextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 16 : 14}" fill="white" opacity="0.7" filter="url(#textShadow)">${subtextClean}</text>` : ""}
+  ${subtextClean ? `<text x="${padX}" y="${subtextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="16" fill="#64748B" letter-spacing="0.3">${subtextClean}</text>` : ""}
 
-  <rect x="${padX}" y="${height - (isSquare ? 55 : 42)}" width="${width - padX * 2}" height="1" fill="white" opacity="0.15"/>
-  <text x="${padX}" y="${height - (isSquare ? 28 : 18)}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 14 : 12}" fill="white" opacity="0.6" letter-spacing="1" filter="url(#textShadow)">GETCYBERRIGHT.COM</text>
-  <text x="${width - padX}" y="${height - (isSquare ? 28 : 18)}" text-anchor="end" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 12 : 10}" fill="white" opacity="0.45" filter="url(#textShadow)">Cybersecurity for Families</text>
+  <rect x="${padX}" y="${panelH - 52}" width="${width - padX * 2}" height="1" fill="#E2E8F0"/>
+  <text x="${padX + (logoBuffer ? 58 : 0)}" y="${panelH - 26}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="16" font-weight="700" fill="#1A1A2E" letter-spacing="1.5">GETCYBERRIGHT</text>
+  <text x="${width - padX}" y="${panelH - 26}" text-anchor="end" font-family="'DejaVu Sans',Arial,sans-serif" font-size="12" fill="#94A3B8">getcyberright.com</text>
 </svg>`;
 
-    const overlaySvgBuffer = await sharp(Buffer.from(svg))
-      .resize(width, height)
-      .png()
-      .toBuffer();
+      const panelBuffer = await sharp(Buffer.from(panelSvg))
+        .resize(width, panelH)
+        .png()
+        .toBuffer();
 
-    const outputImg = sharp(baseImage)
-      .composite([{ input: overlaySvgBuffer, top: 0, left: 0 }]);
-    if (isSquare) {
-      await outputImg.jpeg({ quality: 92 }).toFile(outputPath);
+      const composites: sharp.OverlayOptions[] = [
+        { input: panelBuffer, top: imgH, left: 0 },
+      ];
+      if (logoBuffer) {
+        composites.push({
+          input: logoBuffer,
+          top: imgH + panelH - 52 + 2,
+          left: padX,
+        });
+      }
+
+      await sharp(photoImage)
+        .resize(width, imgH)
+        .extend({ bottom: panelH, background: { r: 250, g: 250, b: 250, alpha: 1 } })
+        .composite(composites)
+        .jpeg({ quality: 92 })
+        .toFile(outputPath);
+
     } else {
-      await outputImg.png({ quality: 95 }).toFile(outputPath);
+      const imgH = Math.round(height * 0.55);
+      const panelH = height - imgH;
+
+      const photoImage = await sharp(sourcePath)
+        .resize(width, imgH, { fit: "cover", position: "center" })
+        .toBuffer();
+
+      const maxChars = 38;
+      const uppercaseHeadline = cleanHeadline.toUpperCase();
+      let headlineLines = wrapText(uppercaseHeadline, maxChars);
+      if (headlineLines.length > 3) {
+        headlineLines = headlineLines.slice(0, 3);
+        headlineLines[2] = headlineLines[2].slice(0, -3) + "...";
+      }
+
+      const padX = 55;
+      const fontSize = headlineLines.length > 2 ? 34 : 40;
+      const lineHeight = fontSize * 1.25;
+
+      const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "THREAT", "RISK", "FLAW", "PATCH", "UPDATE", "BLOCKS", "BANS"];
+
+      let headlineSvg = "";
+      const headlineStartY = 55;
+      for (let i = 0; i < headlineLines.length; i++) {
+        const y = headlineStartY + i * lineHeight;
+        const words = headlineLines[i].split(" ");
+        const tspans = words.map(w => {
+          const isImp = importantTerms.some(t => w.includes(t));
+          return isImp
+            ? `<tspan fill="${tmpl.accent}">${escapeXml(w)}</tspan>`
+            : `<tspan>${escapeXml(w)}</tspan>`;
+        }).join(" ");
+        headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${fontSize}" font-weight="bold" fill="#1A1A2E" letter-spacing="0.5">${tspans}</text>`;
+      }
+
+      const urgencyLabel = tmpl.urgencyLabel;
+      const badgeW = urgencyLabel.length * 12 + 22;
+
+      const panelSvg = `<svg width="${width}" height="${panelH}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="${width}" height="${panelH}" fill="#FAFAFA"/>
+  <rect x="0" y="0" width="${width}" height="4" fill="${tmpl.accent}"/>
+
+  <rect x="${width - padX - badgeW}" y="14" width="${badgeW}" height="24" rx="4" fill="${tmpl.accent}"/>
+  <text x="${width - padX - badgeW / 2}" y="30" text-anchor="middle" font-family="'DejaVu Sans',Arial,sans-serif" font-size="12" font-weight="700" fill="white" letter-spacing="2">${urgencyLabel}</text>
+
+  ${headlineSvg}
+
+  <rect x="${padX}" y="${panelH - 42}" width="${width - padX * 2}" height="1" fill="#E2E8F0"/>
+  <text x="${padX + (logoBuffer ? 50 : 0)}" y="${panelH - 18}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="14" font-weight="700" fill="#1A1A2E" letter-spacing="1.5">GETCYBERRIGHT</text>
+  <text x="${width - padX}" y="${panelH - 18}" text-anchor="end" font-family="'DejaVu Sans',Arial,sans-serif" font-size="11" fill="#94A3B8">getcyberright.com</text>
+</svg>`;
+
+      const panelBuffer = await sharp(Buffer.from(panelSvg))
+        .resize(width, panelH)
+        .png()
+        .toBuffer();
+
+      const composites: sharp.OverlayOptions[] = [
+        { input: panelBuffer, top: imgH, left: 0 },
+      ];
+      if (logoBuffer) {
+        composites.push({
+          input: logoBuffer,
+          top: imgH + panelH - 42 + 2,
+          left: padX,
+        });
+      }
+
+      await sharp(photoImage)
+        .resize(width, imgH)
+        .extend({ bottom: panelH, background: { r: 250, g: 250, b: 250, alpha: 1 } })
+        .composite(composites)
+        .jpeg({ quality: 92 })
+        .toFile(outputPath);
     }
 
     console.log(`[TrendEngine] Applied brand overlay: ${filename} (${width}x${height}, template: ${templateStyle})`);
@@ -2265,7 +2417,8 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       posts.imageSubtext,
       templateStyle,
       posts.title,
-      posts.sourceArticleUrl
+      posts.sourceArticleUrl,
+      posts.trendAnalysis.category
     );
     console.log(`[TrendEngine] Image resolved: source=${imageSource}, url=${imageUrl ? "yes" : "none"}`);
 
