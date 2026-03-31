@@ -264,3 +264,15 @@ id = "zyUBvxOghLv-Qqgj9BeJM"
 uri = "file://attached_assets/promotional-messaging.md"
 type = "text"
 title = "Complete Promotional Messaging Guide"
+
+[[outputs]]
+id = "__RjtDgs0L1__WgUt5S5m"
+uri = "file://.local/social-images/branded-google-ends-anonymous-android-apps-1774984432939.png"
+type = "image"
+title = "LinkedIn/Facebook Image (1200x630) — Google Android Story"
+
+[[outputs]]
+id = "OrgdNRxc4-eClOmVOl6au"
+uri = "file://.local/social-images/ig-cisco-breached-via-poisoned-developer-to-1774984668387.jpeg"
+type = "image"
+title = "Instagram Image (1080x1080) — Cisco Breach Story"
