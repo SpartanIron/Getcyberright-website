@@ -28,6 +28,7 @@ interface EngagementOpportunity {
   platform: string;
   sourceType: string;
   sourceUrl: string | null;
+  platformSearchUrl: string | null;
   sourceAuthor: string | null;
   sourceTitle: string;
   sourceSnippet: string | null;
@@ -130,17 +131,34 @@ function OpportunityCard({
               <p className="text-xs text-muted-foreground mt-0.5">by {opp.sourceAuthor}</p>
             )}
           </div>
-          {opp.sourceUrl && (
-            <a
-              href={opp.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 text-muted-foreground hover:text-foreground"
-              data-testid={`link-source-${opp.id}`}
-            >
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          )}
+          <div className="shrink-0 flex flex-col gap-1">
+            {opp.platformSearchUrl && (
+              <a
+                href={opp.platformSearchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 flex items-center gap-1"
+                title={`Find posts about this on ${opp.platform}`}
+                data-testid={`link-platform-search-${opp.id}`}
+              >
+                <Search className="h-3 w-3" />
+                Find posts
+              </a>
+            )}
+            {opp.sourceUrl && (
+              <a
+                href={opp.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                title="View original article"
+                data-testid={`link-source-${opp.id}`}
+              >
+                <ExternalLink className="h-3 w-3" />
+                Article
+              </a>
+            )}
+          </div>
         </div>
 
         {opp.sourceSnippet && (
@@ -237,15 +255,15 @@ function OpportunityCard({
                   Copy Comment
                 </Button>
               )}
-              {opp.sourceUrl && (
+              {(opp.platformSearchUrl || opp.sourceUrl) && (
                 <Button
                   size="sm"
                   variant="outline"
                   asChild
                 >
-                  <a href={opp.sourceUrl} target="_blank" rel="noopener noreferrer" data-testid={`button-visit-${opp.id}`}>
-                    <ExternalLink className="h-4 w-4 mr-1" />
-                    Visit Source
+                  <a href={opp.platformSearchUrl || opp.sourceUrl!} target="_blank" rel="noopener noreferrer" data-testid={`button-visit-${opp.id}`}>
+                    <Search className="h-4 w-4 mr-1" />
+                    Find Posts on {opp.platform}
                   </a>
                 </Button>
               )}

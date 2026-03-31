@@ -1725,6 +1725,7 @@ export const engagementOpportunities = pgTable("engagement_opportunities", {
   platform: text("platform").notNull(),
   sourceType: text("source_type").notNull(),
   sourceUrl: text("source_url"),
+  platformSearchUrl: text("platform_search_url"),
   sourceAuthor: text("source_author"),
   sourceTitle: text("source_title").notNull(),
   sourceSnippet: text("source_snippet"),

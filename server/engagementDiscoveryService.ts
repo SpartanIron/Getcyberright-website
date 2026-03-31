@@ -178,6 +178,21 @@ function extractTextFromXml(xml: string, tag: string): string {
   return (match[1] || match[2] || "").replace(/<[^>]+>/g, "").trim();
 }
 
+function generatePlatformSearchUrl(platform: string, title: string, articleUrl: string): string {
+  const shortTitle = title.split(/[:\-–—|]/).slice(0, 2).join(" ").trim().slice(0, 80);
+  const searchTerms = shortTitle || title.slice(0, 80);
+
+  if (platform === "linkedin") {
+    return `https://www.linkedin.com/search/results/content/?keywords=${encodeURIComponent(searchTerms)}&sortBy=%22date_posted%22`;
+  }
+
+  if (platform === "facebook") {
+    return `https://www.facebook.com/search/posts/?q=${encodeURIComponent(searchTerms)}`;
+  }
+
+  return articleUrl || "";
+}
+
 function extractLinkFromXml(xml: string): string {
   const cdataLink = xml.match(/<link[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/link>/i);
   if (cdataLink && cdataLink[1].trim()) return cdataLink[1].trim();
@@ -263,10 +278,13 @@ export async function discoverEngagementOpportunities(): Promise<{
         const platforms = ["linkedin", "facebook"];
 
         for (const platform of platforms) {
+          const searchUrl = generatePlatformSearchUrl(platform, item.title, item.link);
+
           const opportunity: InsertEngagementOpportunity = {
             platform,
             sourceType: "rss_article",
             sourceUrl: item.link || null,
+            platformSearchUrl: searchUrl,
             sourceAuthor: feed.source,
             sourceTitle: item.title,
             sourceSnippet: item.description?.slice(0, 500) || null,

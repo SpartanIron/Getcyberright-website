@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS "engagement_opportunities" (
   "platform" text NOT NULL,
   "source_type" text NOT NULL,
   "source_url" text,
+  "platform_search_url" text,
   "source_author" text,
   "source_title" text NOT NULL,
   "source_snippet" text,
