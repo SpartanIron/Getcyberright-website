@@ -318,3 +318,15 @@ id = "Ek8rNPStlhERouHm9yseu"
 uri = "file://.local/social-images/test-ig-style.jpeg"
 type = "image"
 title = "Instagram Format (1080x1080)"
+
+[[outputs]]
+id = "dNHeTJzpDr9ldEGgYpwh_"
+uri = "file://.local/social-images/test-real-linkedin.jpeg"
+type = "image"
+title = "LinkedIn/Facebook - Real Article Thumbnail (1200x630)"
+
+[[outputs]]
+id = "OAUSgkPvc3urMJYmNvRS_"
+uri = "file://.local/social-images/test-real-instagram.jpeg"
+type = "image"
+title = "Instagram - Real Article Thumbnail (1080x1080)"
