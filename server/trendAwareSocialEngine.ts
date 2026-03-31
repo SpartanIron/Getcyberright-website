@@ -1335,7 +1335,7 @@ async function downloadSourceImage(url: string, title: string): Promise<string |
     }
 
     await sharp(buffer)
-      .png({ quality: 90 })
+      .png({ quality: 95 })
       .toFile(outputPath);
 
     console.log(`[TrendEngine] Downloaded source image: ${filename} (${metadata.width}x${metadata.height}, ${(buffer.length / 1024).toFixed(0)}KB)`);
@@ -1500,7 +1500,7 @@ const TOPIC_SEARCH_TERMS: Record<string, string[]> = {
 };
 
 const LOCAL_STOCK_PHOTOS_DIR = path.join(process.cwd(), ".local", "stock-photos");
-const PICSUM_TECH_IDS = [0, 1, 2, 180, 201, 367, 403, 60, 119, 160, 366, 453, 537, 593, 756];
+const PICSUM_TECH_IDS = [0, 1, 2, 60, 119, 160, 180, 201, 366, 367, 403, 453, 537, 593, 756];
 
 async function ensureLocalStockPhotos(): Promise<void> {
   if (!fs.existsSync(LOCAL_STOCK_PHOTOS_DIR)) {
@@ -1517,7 +1517,7 @@ async function ensureLocalStockPhotos(): Promise<void> {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
-      const resp = await fetch(`https://picsum.photos/id/${id}/1200/800`, {
+      const resp = await fetch(`https://picsum.photos/id/${id}/1920/1080`, {
         signal: controller.signal,
         headers: { "User-Agent": "curl/8.0" },
       });
@@ -1540,19 +1540,100 @@ function getLocalStockPhoto(): string | null {
   return path.join(LOCAL_STOCK_PHOTOS_DIR, chosen);
 }
 
+function extractSearchQuery(title: string, category: string): string[] {
+  const STOP_WORDS = new Set([
+    "the", "and", "for", "are", "but", "not", "you", "all", "can", "had",
+    "her", "was", "one", "our", "out", "has", "have", "been", "will", "from",
+    "they", "been", "said", "each", "she", "which", "their", "what", "about",
+    "would", "make", "like", "just", "over", "such", "take", "than", "them",
+    "very", "some", "could", "into", "year", "plan", "know", "time", "that",
+    "with", "this", "your", "how", "why", "new", "most", "more", "after",
+    "also", "made", "many", "before", "must", "through", "back", "should",
+    "where", "much", "every", "same", "being", "here", "does", "puts",
+    "keep", "gets", "says", "come", "look", "find", "ways", "next",
+  ]);
+
+  const CYBER_VISUAL_MAP: Record<string, string> = {
+    "hack": "hacker computer dark room",
+    "breach": "data breach cybersecurity",
+    "ransomware": "ransomware attack locked computer",
+    "phishing": "phishing email suspicious message",
+    "malware": "malware virus computer code",
+    "scam": "online scam fraud warning",
+    "password": "password security login screen",
+    "vpn": "vpn secure connection network",
+    "encryption": "encryption padlock digital security",
+    "privacy": "digital privacy surveillance camera",
+    "identity": "identity theft stolen data",
+    "android": "android smartphone mobile security",
+    "iphone": "iphone smartphone mobile device",
+    "apple": "apple device technology",
+    "google": "google technology company office",
+    "microsoft": "microsoft windows computer",
+    "facebook": "social media privacy data",
+    "ai": "artificial intelligence technology robot",
+    "deepfake": "deepfake artificial intelligence face",
+    "spyware": "spyware surveillance monitoring",
+    "trojan": "trojan virus cybersecurity",
+    "zero-day": "zero day exploit vulnerability code",
+    "supply chain": "supply chain software development",
+    "cloud": "cloud computing server data center",
+    "router": "wifi router network security",
+    "smart home": "smart home iot devices",
+    "children": "children internet safety family",
+    "family": "family using technology together",
+    "bank": "online banking financial security",
+    "crypto": "cryptocurrency bitcoin digital finance",
+    "telegram": "messaging app encrypted communication",
+    "chrome": "google chrome web browser",
+    "firefox": "web browser internet security",
+    "windows": "windows computer desktop security",
+    "linux": "linux server technology",
+    "quantum": "quantum computing technology",
+    "surveillance": "surveillance camera security monitoring",
+    "data": "data center server technology",
+    "exploit": "cybersecurity exploit code terminal",
+    "vulnerability": "software vulnerability bug code",
+    "patch": "software update security patch",
+  };
+
+  const lowerTitle = title.toLowerCase();
+
+  for (const [keyword, visualQuery] of Object.entries(CYBER_VISUAL_MAP)) {
+    if (lowerTitle.includes(keyword)) {
+      return [visualQuery];
+    }
+  }
+
+  const words = lowerTitle
+    .replace(/[^a-z0-9\s]/g, "")
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !STOP_WORDS.has(w));
+
+  if (words.length >= 2) {
+    return [words.slice(0, 3).join(" ") + " technology"];
+  }
+
+  const searchTerms = TOPIC_SEARCH_TERMS[category] || TOPIC_SEARCH_TERMS["default"];
+  return [searchTerms[Math.floor(Math.random() * searchTerms.length)]];
+}
+
 async function searchStockPhoto(category: string, title: string): Promise<{ url: string; photographer: string; localPath?: string } | null> {
   try {
-    const searchTerms = TOPIC_SEARCH_TERMS[category] || TOPIC_SEARCH_TERMS["default"];
-    const titleWords = title.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(w => w.length > 3);
-    const relevantWords = titleWords.slice(0, 3).join(" ");
-    const query = relevantWords || searchTerms[Math.floor(Math.random() * searchTerms.length)];
+    const queries = extractSearchQuery(title, category);
+    const query = queries[0];
 
+    const pexelsApiKey = process.env.PEXELS_API_KEY;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
-    const pexelsHeaders = { "User-Agent": "curl/8.0", "Accept": "*/*" };
+    const pexelsHeaders: Record<string, string> = { "Accept": "*/*" };
+    if (pexelsApiKey) {
+      pexelsHeaders["Authorization"] = pexelsApiKey;
+    }
+    pexelsHeaders["User-Agent"] = "curl/8.0";
 
     const response = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape`,
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=15&orientation=landscape&size=large`,
       { signal: controller.signal, headers: pexelsHeaders }
     );
     clearTimeout(timeout);
@@ -1560,9 +1641,37 @@ async function searchStockPhoto(category: string, title: string): Promise<{ url:
     if (response.ok) {
       const data: any = await response.json();
       if (data.photos?.length) {
-        const photo = data.photos[Math.floor(Math.random() * Math.min(data.photos.length, 5))];
-        console.log(`[TrendEngine] Pexels stock photo: "${photo.alt}" by ${photo.photographer}`);
-        return { url: photo.src.large2x || photo.src.large, photographer: photo.photographer };
+        const validPhotos = data.photos.filter((p: any) => {
+          const w = p.width || 0;
+          const h = p.height || 0;
+          return w >= 1200 && h >= 630;
+        });
+
+        const pool = validPhotos.length > 0 ? validPhotos : data.photos;
+        const photo = pool[Math.floor(Math.random() * Math.min(pool.length, 5))];
+        const photoUrl = photo.src.original || photo.src.large2x || photo.src.large;
+        console.log(`[TrendEngine] Pexels stock photo: "${photo.alt}" by ${photo.photographer} (query: "${query}", ${photo.width}x${photo.height})`);
+        return { url: photoUrl, photographer: photo.photographer };
+      }
+
+      console.log(`[TrendEngine] Pexels returned no results for: "${query}", trying fallback...`);
+      const fallbackQuery = (TOPIC_SEARCH_TERMS[category] || TOPIC_SEARCH_TERMS["default"])[0];
+      const fbController = new AbortController();
+      const fbTimeout = setTimeout(() => fbController.abort(), 8000);
+      const fbResponse = await fetch(
+        `https://api.pexels.com/v1/search?query=${encodeURIComponent(fallbackQuery)}&per_page=10&orientation=landscape&size=large`,
+        { signal: fbController.signal, headers: pexelsHeaders }
+      );
+      clearTimeout(fbTimeout);
+
+      if (fbResponse.ok) {
+        const fbData: any = await fbResponse.json();
+        if (fbData.photos?.length) {
+          const photo = fbData.photos[Math.floor(Math.random() * Math.min(fbData.photos.length, 5))];
+          const photoUrl = photo.src.original || photo.src.large2x || photo.src.large;
+          console.log(`[TrendEngine] Pexels fallback: "${photo.alt}" by ${photo.photographer} (query: "${fallbackQuery}")`);
+          return { url: photoUrl, photographer: photo.photographer };
+        }
       }
     }
 
@@ -1721,7 +1830,7 @@ async function applyBrandOverlay(
 
     await sharp(baseImage)
       .composite(composites)
-      .jpeg({ quality: 93 })
+      .jpeg({ quality: 95, mozjpeg: true })
       .toFile(outputPath);
 
     console.log(`[TrendEngine] Applied brand overlay: ${filename} (${width}x${height}, template: ${templateStyle})`);
