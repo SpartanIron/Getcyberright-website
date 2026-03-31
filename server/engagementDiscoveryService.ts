@@ -342,6 +342,89 @@ export async function dismissOpportunity(id: string): Promise<boolean> {
   return true;
 }
 
+export async function createResponsePost(
+  id: string,
+  editedComment?: string
+): Promise<{ success: boolean; error?: string; platforms?: string[] }> {
+  const opp = await storage.getEngagementOpportunityById(id);
+  if (!opp) return { success: false, error: "Opportunity not found" };
+
+  const comment = editedComment || opp.approvedComment || opp.suggestedComment;
+  if (!comment) return { success: false, error: "No comment text available" };
+
+  try {
+    const Anthropic = (await import("@anthropic-ai/sdk")).default;
+    const client = new Anthropic();
+    const { getBufferChannelsByPlatform, publishWithFirstComment } = await import("./bufferPublisher");
+
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 800,
+      messages: [
+        {
+          role: "user",
+          content: `You are the social media voice for GetCyberRight, a family-focused cybersecurity education platform. Create a response post for ${opp.platform} about this trending cybersecurity topic.
+
+Article: "${opp.sourceTitle}"
+Source: ${opp.sourceAuthor || "Unknown"}
+Context: ${opp.sourceSnippet?.slice(0, 300) || "N/A"}
+Topic: ${opp.topic}
+
+Your approved take/insight: "${comment}"
+
+Rules:
+- Write a standalone post for OUR ${opp.platform} profile that responds to this trending topic
+- Lead with our expert perspective or the key insight from the approved comment
+- Reference the original article/source naturally (e.g. "According to ${opp.sourceAuthor}..." or "A new report reveals...")
+- Include one actionable tip for families or individuals
+- End with a call to learn more at getcyberright.com if appropriate
+- LinkedIn: 150-250 words, professional tone, include 3-5 relevant hashtags at the end
+- Facebook: 80-150 words, conversational and approachable, no hashtags
+- Do NOT use emojis or exclamation marks
+- Do NOT include the article URL in the post body (it will be added as a first comment)
+
+Write ONLY the post text for ${opp.platform}, nothing else.`,
+        },
+      ],
+    });
+
+    const textBlock = response.content.find((b: any) => b.type === "text");
+    const postContent = textBlock?.text?.trim();
+    if (!postContent) return { success: false, error: "AI failed to generate post content" };
+
+    const channels = await getBufferChannelsByPlatform();
+    const channel = channels[opp.platform];
+    if (!channel) return { success: false, error: `No Buffer channel configured for ${opp.platform}` };
+
+    const result = await publishWithFirstComment(channel.id, postContent, {
+      mode: "addToQueue",
+      platform: opp.platform,
+      sourceArticleUrl: opp.sourceUrl,
+    });
+
+    if (result.success) {
+      await storage.updateEngagementOpportunity(id, {
+        status: "posted",
+        approvedComment: comment,
+        postedAt: new Date(),
+      });
+      console.log(`[EngagementDiscovery] Response post created for ${opp.platform}: "${opp.sourceTitle.slice(0, 50)}..."`);
+      return { success: true, platforms: [opp.platform] };
+    } else {
+      await storage.updateEngagementOpportunity(id, {
+        postError: result.error || "Buffer publish failed",
+      });
+      return { success: false, error: result.error || "Buffer publish failed" };
+    }
+  } catch (error: any) {
+    console.error(`[EngagementDiscovery] Response post error:`, error.message);
+    await storage.updateEngagementOpportunity(id, {
+      postError: error.message,
+    });
+    return { success: false, error: error.message };
+  }
+}
+
 export async function getOpportunitySummary(): Promise<{
   total: number;
   discovered: number;

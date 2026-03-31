@@ -5022,6 +5022,22 @@ EDGE CASE HANDLING
     }
   });
 
+  app.post("/api/admin/engagement-opportunities/:id/post", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const editedComment = typeof req.body.comment === "string" ? req.body.comment.trim().slice(0, 2000) : undefined;
+      const { createResponsePost } = await import("./engagementDiscoveryService");
+      const result = await createResponsePost(req.params.id, editedComment);
+      if (!result.success) {
+        res.status(result.error === "Opportunity not found" ? 404 : 500).json({ error: result.error });
+        return;
+      }
+      res.json(result);
+    } catch (error: any) {
+      console.error("Create response post error:", error);
+      res.status(500).json({ error: error.message || "Failed to create response post" });
+    }
+  });
+
   app.post("/api/admin/engagement-opportunities/:id/dismiss", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const { dismissOpportunity } = await import("./engagementDiscoveryService");

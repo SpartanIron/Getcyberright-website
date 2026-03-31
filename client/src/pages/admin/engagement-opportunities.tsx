@@ -18,6 +18,7 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  Send,
 } from "lucide-react";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { useToast } from "@/hooks/use-toast";
@@ -99,14 +100,18 @@ function OpportunityCard({
   opp,
   onApprove,
   onDismiss,
+  onCreatePost,
   isApproving,
   isDismissing,
+  isPosting,
 }: {
   opp: EngagementOpportunity;
   onApprove: (id: string, comment: string) => void;
   onDismiss: (id: string) => void;
+  onCreatePost: (id: string, comment: string) => void;
   isApproving: boolean;
   isDismissing: boolean;
+  isPosting: boolean;
 }) {
   const [editedComment, setEditedComment] = useState(opp.suggestedComment || "");
   const [isEditing, setIsEditing] = useState(false);
@@ -199,12 +204,26 @@ function OpportunityCard({
               )}
             </div>
 
-            <div className="flex gap-2 pt-1">
+            <div className="flex gap-2 pt-1 flex-wrap">
               <Button
                 size="sm"
+                onClick={() => onCreatePost(opp.id, editedComment)}
+                disabled={isPosting || !editedComment}
+                className="flex-1"
+                data-testid={`button-create-post-${opp.id}`}
+              >
+                {isPosting ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                ) : (
+                  <Send className="h-4 w-4 mr-1" />
+                )}
+                Create Response Post
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
                 onClick={() => onApprove(opp.id, editedComment)}
                 disabled={isApproving || !editedComment}
-                className="flex-1"
                 data-testid={`button-approve-${opp.id}`}
               >
                 {isApproving ? (
@@ -212,7 +231,7 @@ function OpportunityCard({
                 ) : (
                   <ThumbsUp className="h-4 w-4 mr-1" />
                 )}
-                Approve
+                Save
               </Button>
               <Button
                 size="sm"
@@ -242,7 +261,20 @@ function OpportunityCard({
                 {opp.approvedComment}
               </p>
             )}
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                size="sm"
+                onClick={() => onCreatePost(opp.id, opp.approvedComment || "")}
+                disabled={isPosting || !opp.approvedComment}
+                data-testid={`button-create-post-approved-${opp.id}`}
+              >
+                {isPosting ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                ) : (
+                  <Send className="h-4 w-4 mr-1" />
+                )}
+                Create Response Post
+              </Button>
               {opp.approvedComment && (
                 <Button
                   size="sm"
@@ -263,7 +295,7 @@ function OpportunityCard({
                 >
                   <a href={opp.platformSearchUrl || opp.sourceUrl!} target="_blank" rel="noopener noreferrer" data-testid={`button-visit-${opp.id}`}>
                     <Search className="h-4 w-4 mr-1" />
-                    Find Posts on {opp.platform}
+                    Find Posts
                   </a>
                 </Button>
               )}
@@ -305,6 +337,7 @@ export default function AdminEngagementOpportunities() {
   const [activeTab, setActiveTab] = useState("discovered");
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [dismissingId, setDismissingId] = useState<string | null>(null);
+  const [postingId, setPostingId] = useState<string | null>(null);
 
   const { data, isLoading, refetch } = useQuery<{
     opportunities: EngagementOpportunity[];
@@ -357,6 +390,20 @@ export default function AdminEngagementOpportunities() {
     },
   });
 
+  const createPostMutation = useMutation({
+    mutationFn: ({ id, comment }: { id: string; comment: string }) =>
+      apiRequest("POST", `/api/admin/engagement-opportunities/${id}/post`, { comment }),
+    onSuccess: () => {
+      setPostingId(null);
+      toast({ title: "Response post created", description: "Your post has been queued in Buffer." });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/engagement-opportunities"] });
+    },
+    onError: (err: Error) => {
+      setPostingId(null);
+      toast({ title: "Post creation failed", description: err.message, variant: "destructive" });
+    },
+  });
+
   const handleApprove = (id: string, comment: string) => {
     setApprovingId(id);
     approveMutation.mutate({ id, comment });
@@ -365,6 +412,11 @@ export default function AdminEngagementOpportunities() {
   const handleDismiss = (id: string) => {
     setDismissingId(id);
     dismissMutation.mutate(id);
+  };
+
+  const handleCreatePost = (id: string, comment: string) => {
+    setPostingId(id);
+    createPostMutation.mutate({ id, comment });
   };
 
   const opportunities = data?.opportunities || [];
@@ -478,8 +530,10 @@ export default function AdminEngagementOpportunities() {
                     opp={opp}
                     onApprove={handleApprove}
                     onDismiss={handleDismiss}
+                    onCreatePost={handleCreatePost}
                     isApproving={approvingId === opp.id && approveMutation.isPending}
                     isDismissing={dismissingId === opp.id && dismissMutation.isPending}
+                    isPosting={postingId === opp.id && createPostMutation.isPending}
                   />
                 ))}
               </div>
