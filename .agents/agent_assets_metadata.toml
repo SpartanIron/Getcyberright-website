@@ -294,3 +294,15 @@ id = "gEU7GDDUvDRky30DbY6QO"
 uri = "file://.local/social-images/test-branded-overlay-1774987983738.png"
 type = "image"
 title = "Real Article Thumbnail with Brand Overlay — How Posts Will Look"
+
+[[outputs]]
+id = "SBJ5p1cyrhdV9-obYeFGd"
+uri = "file://.local/social-images/pro-branded-ig-1774989081985.jpeg"
+type = "image"
+title = "Instagram (1080x1080) — Real Article Image + Pro Brand Overlay"
+
+[[outputs]]
+id = "3f8w1DHFn8ZBSiKixnr9Y"
+uri = "file://.local/social-images/pro-branded-ln-1774989082378.png"
+type = "image"
+title = "LinkedIn/Facebook (1200x630) — Real Article Image + Pro Brand Overlay"

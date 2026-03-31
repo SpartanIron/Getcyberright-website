@@ -1499,12 +1499,12 @@ async function applyBrandOverlay(
       logoBase64 = `data:image/png;base64,${logoBuffer.toString("base64")}`;
     }
 
-    const templates: Record<TemplateStyle, { accent: string; accentDark: string }> = {
-      stat_card: { accent: "#E8612D", accentDark: "#B84A1E" },
-      tip_card: { accent: "#4ECDC4", accentDark: "#2A9D8F" },
-      alert_card: { accent: "#FF4444", accentDark: "#CC2222" },
-      insight_card: { accent: "#E8612D", accentDark: "#B84A1E" },
-      quote_card: { accent: "#45B7D1", accentDark: "#2E8BA8" },
+    const templates: Record<TemplateStyle, { accent: string; accentDark: string; urgencyLabel: string }> = {
+      stat_card: { accent: "#E8612D", accentDark: "#B84A1E", urgencyLabel: "NEWS" },
+      tip_card: { accent: "#14B8A6", accentDark: "#0D9488", urgencyLabel: "TIP" },
+      alert_card: { accent: "#EF4444", accentDark: "#DC2626", urgencyLabel: "ALERT" },
+      insight_card: { accent: "#E8612D", accentDark: "#B84A1E", urgencyLabel: "INSIGHT" },
+      quote_card: { accent: "#3B82F6", accentDark: "#2563EB", urgencyLabel: "NEWS" },
     };
 
     const tmpl = templates[templateStyle];
@@ -1517,16 +1517,16 @@ async function applyBrandOverlay(
     }
 
     const fontSize = isSquare
-      ? (headlineLines.length > 3 ? 48 : headlineLines.length > 2 ? 54 : 62)
-      : (headlineLines.length > 3 ? 38 : headlineLines.length > 2 ? 44 : 50);
-    const lineHeight = fontSize * 1.2;
+      ? (headlineLines.length > 3 ? 48 : headlineLines.length > 2 ? 56 : 64)
+      : (headlineLines.length > 3 ? 40 : headlineLines.length > 2 ? 46 : 52);
+    const lineHeight = fontSize * 1.25;
     const totalTextHeight = headlineLines.length * lineHeight;
-    const padX = isSquare ? 50 : 60;
+    const padX = isSquare ? 55 : 65;
 
-    const textBottomMargin = isSquare ? 130 : 90;
+    const textBottomMargin = isSquare ? 110 : 80;
     const headlineStartY = height - textBottomMargin - totalTextHeight;
 
-    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT"];
+    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "THREAT", "RISK", "FLAW", "PATCH", "UPDATE"];
 
     let headlineSvg = "";
     for (let lineIdx = 0; lineIdx < headlineLines.length; lineIdx++) {
@@ -1538,49 +1538,76 @@ async function applyBrandOverlay(
           ? `<tspan fill="${tmpl.accent}">${escapeXml(word)}</tspan>`
           : `<tspan>${escapeXml(word)}</tspan>`;
       }).join(" ");
-      headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans','Arial',Helvetica,sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" letter-spacing="0.5">${tspans}</text>`;
+      headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans','Arial',Helvetica,sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" letter-spacing="1" filter="url(#headlineShadow)">${tspans}</text>`;
     }
 
-    const logoSize = isSquare ? 72 : 60;
+    const accentBarH = isSquare ? 5 : 4;
+    const logoSize = isSquare ? 56 : 48;
     const logoX = padX;
-    const logoY = isSquare ? 30 : 20;
-    const brandTextX = logoBase64 ? (logoX + logoSize + 14) : logoX;
-    const brandTextY = logoY + logoSize / 2 + 7;
-    const brandFontSize = isSquare ? 24 : 20;
+    const logoY = accentBarH + (isSquare ? 20 : 16);
+    const brandTextX = logoBase64 ? (logoX + logoSize + 12) : logoX;
+    const brandTextY = logoY + logoSize / 2 + 6;
+    const brandFontSize = isSquare ? 22 : 18;
     const logoElement = logoBase64
       ? `<image href="${logoBase64}" x="${logoX}" y="${logoY}" width="${logoSize}" height="${logoSize}" opacity="0.95"/>`
       : "";
 
-    const gradientStart = Math.max(0, headlineStartY - 120);
+    const urgencyLabel = tmpl.urgencyLabel;
+    const badgeW = urgencyLabel.length * (isSquare ? 16 : 14) + 28;
+    const badgeH = isSquare ? 30 : 26;
+    const badgeX = width - padX - badgeW;
+    const badgeY = accentBarH + (isSquare ? 28 : 22);
+    const badgeFontSize = isSquare ? 15 : 13;
+
+    const gradientStart = Math.max(0, headlineStartY - 160);
     const gradientHeight = height - gradientStart;
+
+    const subtextClean = subtext ? escapeXml(subtext.slice(0, 80)) : "";
+    const subtextY = headlineStartY + totalTextHeight + (isSquare ? 28 : 22);
 
     const svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
     <linearGradient id="bottomGrad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
-      <stop offset="15%" stop-color="#000000" stop-opacity="0.15"/>
-      <stop offset="40%" stop-color="#000000" stop-opacity="0.55"/>
-      <stop offset="70%" stop-color="#000000" stop-opacity="0.82"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0.94"/>
+      <stop offset="8%" stop-color="#000000" stop-opacity="0.05"/>
+      <stop offset="25%" stop-color="#000000" stop-opacity="0.35"/>
+      <stop offset="50%" stop-color="#000000" stop-opacity="0.7"/>
+      <stop offset="75%" stop-color="#000000" stop-opacity="0.88"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.95"/>
     </linearGradient>
     <linearGradient id="topGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#000000" stop-opacity="0.6"/>
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.7"/>
+      <stop offset="60%" stop-color="#000000" stop-opacity="0.2"/>
       <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
     </linearGradient>
+    <filter id="headlineShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#000000" flood-opacity="0.9"/>
+    </filter>
     <filter id="textShadow">
-      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.8"/>
+      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#000000" flood-opacity="0.7"/>
     </filter>
   </defs>
 
-  <rect y="0" width="${width}" height="${isSquare ? 140 : 110}" fill="url(#topGrad)"/>
+  <rect x="0" y="0" width="${width}" height="${accentBarH}" fill="${tmpl.accent}"/>
+
+  <rect y="${accentBarH}" width="${width}" height="${isSquare ? 160 : 120}" fill="url(#topGrad)"/>
   <rect y="${gradientStart}" width="${width}" height="${gradientHeight}" fill="url(#bottomGrad)"/>
 
   ${logoElement}
-  <text x="${brandTextX}" y="${brandTextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${brandFontSize}" font-weight="700" fill="white" letter-spacing="2" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
+  <text x="${brandTextX}" y="${brandTextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${brandFontSize}" font-weight="700" fill="white" letter-spacing="2.5" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
+
+  <rect x="${badgeX}" y="${badgeY}" width="${badgeW}" height="${badgeH}" rx="3" fill="${tmpl.accent}" opacity="0.95"/>
+  <text x="${badgeX + badgeW / 2}" y="${badgeY + badgeH / 2 + badgeFontSize * 0.35}" text-anchor="middle" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${badgeFontSize}" font-weight="700" fill="white" letter-spacing="2.5">${urgencyLabel}</text>
+
+  <rect x="${padX}" y="${headlineStartY - lineHeight + fontSize - 6}" width="40" height="4" rx="2" fill="${tmpl.accent}" opacity="0.9"/>
 
   ${headlineSvg}
 
-  <text x="${padX}" y="${height - (isSquare ? 40 : 25)}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 14 : 12}" fill="white" opacity="0.6" font-style="italic">getcyberright.com | Protecting Families in the Digital World</text>
+  ${subtextClean ? `<text x="${padX}" y="${subtextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 16 : 14}" fill="white" opacity="0.7" filter="url(#textShadow)">${subtextClean}</text>` : ""}
+
+  <rect x="${padX}" y="${height - (isSquare ? 55 : 42)}" width="${width - padX * 2}" height="1" fill="white" opacity="0.15"/>
+  <text x="${padX}" y="${height - (isSquare ? 28 : 18)}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 14 : 12}" fill="white" opacity="0.6" letter-spacing="1" filter="url(#textShadow)">GETCYBERRIGHT.COM</text>
+  <text x="${width - padX}" y="${height - (isSquare ? 28 : 18)}" text-anchor="end" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 12 : 10}" fill="white" opacity="0.45" filter="url(#textShadow)">Cybersecurity for Families</text>
 </svg>`;
 
     const overlaySvgBuffer = await sharp(Buffer.from(svg))
