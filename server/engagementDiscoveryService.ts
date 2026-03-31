@@ -178,6 +178,22 @@ function extractTextFromXml(xml: string, tag: string): string {
   return (match[1] || match[2] || "").replace(/<[^>]+>/g, "").trim();
 }
 
+function extractLinkFromXml(xml: string): string {
+  const cdataLink = xml.match(/<link[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/link>/i);
+  if (cdataLink && cdataLink[1].trim()) return cdataLink[1].trim();
+
+  const textLink = xml.match(/<link[^>]*>(https?:\/\/[^<]+)<\/link>/i);
+  if (textLink && textLink[1].trim()) return textLink[1].trim();
+
+  const hrefLink = xml.match(/<link[^>]*\bhref="([^"]+)"/i);
+  if (hrefLink && hrefLink[1].trim()) return hrefLink[1].trim();
+
+  const guidLink = xml.match(/<guid[^>]*>(https?:\/\/[^<]+)<\/guid>/i);
+  if (guidLink && guidLink[1].trim()) return guidLink[1].trim();
+
+  return "";
+}
+
 export async function discoverEngagementOpportunities(): Promise<{
   discovered: number;
   sources: string[];
@@ -213,11 +229,7 @@ export async function discoverEngagementOpportunities(): Promise<{
       while ((match = itemRegex.exec(xml)) !== null && items.length < 5) {
         const itemXml = match[1];
         const title = extractTextFromXml(itemXml, "title");
-        let link = extractTextFromXml(itemXml, "link");
-        if (!link) {
-          const linkMatch = itemXml.match(/<link[^>]*href="([^"]+)"/i);
-          if (linkMatch) link = linkMatch[1];
-        }
+        const link = extractLinkFromXml(itemXml);
         const description = extractTextFromXml(itemXml, "description");
         if (title) items.push({ title, link, description });
       }
@@ -225,10 +237,7 @@ export async function discoverEngagementOpportunities(): Promise<{
       while ((match = entryRegex.exec(xml)) !== null && items.length < 5) {
         const entryXml = match[1];
         const title = extractTextFromXml(entryXml, "title");
-        let link = "";
-        const linkMatch = entryXml.match(/<link[^>]*href="([^"]+)"/i);
-        if (linkMatch) link = linkMatch[1];
-        if (!link) link = extractTextFromXml(entryXml, "link");
+        const link = extractLinkFromXml(entryXml);
         const description = extractTextFromXml(entryXml, "content") || extractTextFromXml(entryXml, "summary");
         if (title) items.push({ title, link, description });
       }
