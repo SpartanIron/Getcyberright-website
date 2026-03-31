@@ -17,6 +17,7 @@ export const KNOWN_CLIENT_ROUTES = new Set([
   "/our-mission",
   "/pricing",
   "/dashboard",
+  "/account",
   "/threat-trends",
   "/cyber-threat-radar",
   "/awareness-hub",
