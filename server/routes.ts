@@ -4913,6 +4913,19 @@ EDGE CASE HANDLING
     }
   });
 
+  app.post("/api/admin/social-test-generate", isAuthenticated, isAdmin, async (_req, res) => {
+    try {
+      const { generateAndPublishTrendAwarePosts, getCurrentSlot } = await import("./trendAwareSocialEngine");
+      const slot = getCurrentSlot();
+      console.log(`[Social Test] Generating test post for slot: ${slot} (draft only, no publishing)`);
+      const result = await generateAndPublishTrendAwarePosts();
+      res.json({ slot, result });
+    } catch (error: any) {
+      console.error("Social test generate error:", error);
+      res.status(500).json({ error: error.message || "Failed to generate test post" });
+    }
+  });
+
   app.get("/api/admin/social-partners", isAuthenticated, isAdmin, async (_req, res) => {
     try {
       const { loadPartners } = await import("./socialEngagementService");

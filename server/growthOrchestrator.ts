@@ -326,19 +326,20 @@ async function allPlatformsPublishedToday(): Promise<boolean> {
     const connectedPlatforms = Object.keys(channels);
     if (connectedPlatforms.length === 0) return false;
 
-    const recentPosts = await storage.getSocialPosts("published", 100);
+    const recentPosts = await storage.getSocialPosts("published", 200);
     const todayET = getTodayET();
-    const publishedPlatforms = new Set<string>();
+    const platformCounts: Record<string, number> = {};
     for (const post of recentPosts) {
       if (!post.publishedAt) continue;
       const postDateET = toETDateString(new Date(post.publishedAt));
       if (postDateET !== todayET) continue;
-      publishedPlatforms.add(post.platform);
+      platformCounts[post.platform] = (platformCounts[post.platform] || 0) + 1;
     }
 
-    const allDone = connectedPlatforms.every(p => publishedPlatforms.has(p));
+    const DAILY_LIMIT = 2;
+    const allDone = connectedPlatforms.every(p => (platformCounts[p] || 0) >= DAILY_LIMIT);
     if (allDone) {
-      console.log(`[GrowthOrchestrator] All connected platforms (${connectedPlatforms.join(", ")}) already published today (${todayET} ET)`);
+      console.log(`[GrowthOrchestrator] All connected platforms (${connectedPlatforms.join(", ")}) at daily limit (${DAILY_LIMIT}/day) for ${todayET} ET`);
     }
     return allDone;
   } catch {

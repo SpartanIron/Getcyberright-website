@@ -263,35 +263,49 @@ interface PlatformPostingWindow {
   windowMinutes: number;
 }
 
-const PLATFORM_POSTING_WINDOWS: Record<string, Record<number, PlatformPostingWindow | null>> = {
+type PostingSlot = "morning" | "evening";
+
+interface PlatformSlotWindows {
+  morning: PlatformPostingWindow | null;
+  evening: PlatformPostingWindow | null;
+}
+
+const DAILY_POST_LIMIT = 2;
+
+const PLATFORM_POSTING_WINDOWS: Record<string, Record<number, PlatformSlotWindows>> = {
   linkedin: {
-    0: null,
-    1: { hour: 8, minute: 30, windowMinutes: 90 },
-    2: { hour: 9, minute: 0, windowMinutes: 60 },
-    3: { hour: 9, minute: 0, windowMinutes: 60 },
-    4: { hour: 9, minute: 0, windowMinutes: 60 },
-    5: { hour: 10, minute: 0, windowMinutes: 60 },
-    6: null,
+    0: { morning: null, evening: { hour: 17, minute: 30, windowMinutes: 90 } },
+    1: { morning: { hour: 8, minute: 30, windowMinutes: 90 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    2: { morning: { hour: 9, minute: 0, windowMinutes: 60 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    3: { morning: { hour: 9, minute: 0, windowMinutes: 60 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    4: { morning: { hour: 9, minute: 0, windowMinutes: 60 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    5: { morning: { hour: 10, minute: 0, windowMinutes: 60 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    6: { morning: null, evening: { hour: 17, minute: 30, windowMinutes: 90 } },
   },
   facebook: {
-    0: { hour: 19, minute: 30, windowMinutes: 60 },
-    1: { hour: 11, minute: 0, windowMinutes: 90 },
-    2: { hour: 11, minute: 30, windowMinutes: 90 },
-    3: { hour: 11, minute: 30, windowMinutes: 90 },
-    4: { hour: 11, minute: 30, windowMinutes: 90 },
-    5: { hour: 12, minute: 0, windowMinutes: 90 },
-    6: { hour: 10, minute: 0, windowMinutes: 120 },
+    0: { morning: { hour: 10, minute: 0, windowMinutes: 120 }, evening: { hour: 17, minute: 30, windowMinutes: 120 } },
+    1: { morning: { hour: 11, minute: 0, windowMinutes: 90 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    2: { morning: { hour: 11, minute: 30, windowMinutes: 90 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    3: { morning: { hour: 11, minute: 30, windowMinutes: 90 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    4: { morning: { hour: 11, minute: 30, windowMinutes: 90 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    5: { morning: { hour: 12, minute: 0, windowMinutes: 90 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    6: { morning: { hour: 10, minute: 0, windowMinutes: 120 }, evening: { hour: 17, minute: 30, windowMinutes: 120 } },
   },
   instagram: {
-    0: { hour: 19, minute: 0, windowMinutes: 60 },
-    1: { hour: 11, minute: 30, windowMinutes: 60 },
-    2: { hour: 12, minute: 0, windowMinutes: 60 },
-    3: { hour: 12, minute: 0, windowMinutes: 60 },
-    4: { hour: 12, minute: 0, windowMinutes: 60 },
-    5: { hour: 12, minute: 30, windowMinutes: 60 },
-    6: { hour: 10, minute: 30, windowMinutes: 90 },
+    0: { morning: { hour: 10, minute: 30, windowMinutes: 90 }, evening: { hour: 17, minute: 30, windowMinutes: 120 } },
+    1: { morning: { hour: 11, minute: 30, windowMinutes: 60 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    2: { morning: { hour: 12, minute: 0, windowMinutes: 60 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    3: { morning: { hour: 12, minute: 0, windowMinutes: 60 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    4: { morning: { hour: 12, minute: 0, windowMinutes: 60 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    5: { morning: { hour: 12, minute: 30, windowMinutes: 60 }, evening: { hour: 17, minute: 0, windowMinutes: 120 } },
+    6: { morning: { hour: 10, minute: 30, windowMinutes: 90 }, evening: { hour: 17, minute: 30, windowMinutes: 120 } },
   },
 };
+
+function getCurrentSlot(): PostingSlot {
+  const et = getETComponents();
+  return et.hour >= 15 ? "evening" : "morning";
+}
 
 function getETComponents(): { year: number; month: number; day: number; hour: number; minute: number; dayOfWeek: number; dateStr: string } {
   const now = new Date();
@@ -431,14 +445,17 @@ async function getContentMixRatio(): Promise<{ value: number; softProduct: numbe
   }
 }
 
-function isPlatformInWindow(platform: string): boolean {
+function isPlatformInWindow(platform: string, slot?: PostingSlot): boolean {
   const et = getETComponents();
   const windows = PLATFORM_POSTING_WINDOWS[platform];
   if (!windows) return true;
 
-  const window = windows[et.dayOfWeek];
-  if (window === null) return false;
-  if (window === undefined) return false;
+  const dayWindows = windows[et.dayOfWeek];
+  if (!dayWindows) return false;
+
+  const targetSlot = slot || getCurrentSlot();
+  const window = dayWindows[targetSlot];
+  if (!window) return false;
 
   const currentMinutes = et.hour * 60 + et.minute;
   const windowStart = window.hour * 60 + window.minute;
@@ -451,18 +468,31 @@ function getETDateString(): string {
   return getETComponents().dateStr;
 }
 
-async function checkRateLimit(): Promise<{ allowed: boolean; availablePlatforms: string[] }> {
+function getSlotPostCount(todaysPosts: any[], platform: string, slot: PostingSlot): number {
+  return todaysPosts.filter(p => {
+    if (p.platform !== platform || !p.publishedAt) return false;
+    const postHour = parseInt(
+      new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "2-digit", hour12: false })
+        .formatToParts(new Date(p.publishedAt))
+        .find(x => x.type === "hour")?.value || "0"
+    );
+    return slot === "evening" ? postHour >= 15 : postHour < 15;
+  }).length;
+}
+
+async function checkRateLimit(): Promise<{ allowed: boolean; availablePlatforms: string[]; currentSlot: PostingSlot }> {
+  const slot = getCurrentSlot();
   try {
     const et = getETComponents();
 
     if (!isPostingDay()) {
       const dayName = POSTING_DAY_NAMES[et.dayOfWeek];
       console.log(`[TrendEngine] ${dayName} is not a posting day. Skipping.`);
-      return { allowed: false, availablePlatforms: [] };
+      return { allowed: false, availablePlatforms: [], currentSlot: slot };
     }
 
     const todayET = getETDateString();
-    const recentPosts = await storage.getSocialPosts("published", 100);
+    const recentPosts = await storage.getSocialPosts("published", 200);
     const todaysPosts = recentPosts.filter((p) => {
       if (!p.publishedAt) return false;
       const postET = new Intl.DateTimeFormat("en-US", {
@@ -480,37 +510,46 @@ async function checkRateLimit(): Promise<{ allowed: boolean; availablePlatforms:
     const connectedPlatforms = Object.keys(channels);
 
     const available = connectedPlatforms.filter(p => {
-      if ((platformCounts[p] || 0) >= 1) return false;
-      if (!isPlatformInWindow(p)) return false;
+      if ((platformCounts[p] || 0) >= DAILY_POST_LIMIT) return false;
+      if (getSlotPostCount(todaysPosts, p, slot) >= 1) return false;
+      if (!isPlatformInWindow(p, slot)) return false;
       return true;
     });
 
-    const atLimit = connectedPlatforms.filter(p => (platformCounts[p] || 0) >= 1);
+    const atDailyLimit = connectedPlatforms.filter(p => (platformCounts[p] || 0) >= DAILY_POST_LIMIT);
+    const slotFilled = connectedPlatforms.filter(p =>
+      (platformCounts[p] || 0) < DAILY_POST_LIMIT && getSlotPostCount(todaysPosts, p, slot) >= 1
+    );
     const outsideWindow = connectedPlatforms.filter(p =>
-      (platformCounts[p] || 0) < 1 && !isPlatformInWindow(p)
+      (platformCounts[p] || 0) < DAILY_POST_LIMIT &&
+      getSlotPostCount(todaysPosts, p, slot) < 1 &&
+      !isPlatformInWindow(p, slot)
     );
 
     const etTimeStr = `${et.hour}:${String(et.minute).padStart(2, "0")} ET`;
 
-    if (atLimit.length > 0) {
-      console.log(`[TrendEngine] Rate limit: ${atLimit.join(", ")} already at daily max (1/day)`);
+    if (atDailyLimit.length > 0) {
+      console.log(`[TrendEngine] Rate limit: ${atDailyLimit.join(", ")} at daily max (${DAILY_POST_LIMIT}/day)`);
+    }
+    if (slotFilled.length > 0) {
+      console.log(`[TrendEngine] ${slot} slot filled: ${slotFilled.join(", ")} already posted this ${slot}`);
     }
     if (outsideWindow.length > 0) {
-      console.log(`[TrendEngine] Outside posting window (${etTimeStr}): ${outsideWindow.join(", ")}`);
+      console.log(`[TrendEngine] Outside ${slot} posting window (${etTimeStr}): ${outsideWindow.join(", ")}`);
     }
 
     if (available.length === 0) {
-      if (outsideWindow.length > 0 && atLimit.length === 0) {
-        console.log("[TrendEngine] All platforms outside their posting windows. Will retry later.");
+      if (outsideWindow.length > 0 && atDailyLimit.length === 0 && slotFilled.length === 0) {
+        console.log(`[TrendEngine] All platforms outside their ${slot} posting windows. Will retry later.`);
       } else {
-        console.log("[TrendEngine] All platforms at limit or outside window, skipping");
+        console.log(`[TrendEngine] All platforms at limit or outside ${slot} window, skipping`);
       }
-      return { allowed: false, availablePlatforms: [] };
+      return { allowed: false, availablePlatforms: [], currentSlot: slot };
     }
-    console.log(`[TrendEngine] Platforms ready for posting: ${available.join(", ")}`);
-    return { allowed: true, availablePlatforms: available };
+    console.log(`[TrendEngine] [${slot}] Platforms ready for posting: ${available.join(", ")}`);
+    return { allowed: true, availablePlatforms: available, currentSlot: slot };
   } catch {
-    return { allowed: true, availablePlatforms: ["linkedin", "facebook", "instagram"] };
+    return { allowed: true, availablePlatforms: ["linkedin", "facebook", "instagram"], currentSlot: slot };
   }
 }
 
@@ -725,6 +764,13 @@ async function generateTrendAwarePost(
   const performanceContext = getRecentPerformanceSummary();
 
   const pillar = getTodaysPillar();
+  const slot = getCurrentSlot();
+  const slotContext = slot === "evening"
+    ? `\nPOSTING SLOT: EVENING (breaking news / alert focus)
+This is the evening post. Focus on the most urgent, breaking, or alarming story from today's feed. Use breaking_insight or quick_breakdown content mode. The tone should be urgent and direct — this is our "alert" post. Lead with the threat, explain the risk, give one clear action. If no truly breaking story exists, pick the most actionable security tip from today's feed.\n`
+    : `\nPOSTING SLOT: MORNING (educational / trend analysis)
+This is the morning post. Focus on education, trend analysis, and building trust. Use the content pillar theme for today.\n`;
+
   const pillarContext = pillar
     ? `\n${getPillarPromptInstructions(pillar)}\n`
     : "";
@@ -905,6 +951,7 @@ GOAL: Position GetCyberRight as the most trusted, human-centered cybersecurity a
           content: `Run the full 11-step intelligence pipeline and create today's social media content for GetCyberRight.
 
 DATE: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+${slotContext}
 ${pillarContext}
 ${mixContext}
 ${styleInstructions[postStyle]}
@@ -1859,26 +1906,31 @@ export function getSocialScheduleStatus(): {
   currentDay: string;
   currentPillar: string | null;
   currentTimeET: string;
-  platformWindows: Record<string, { scheduled: string; inWindow: boolean } | { skippedToday: true }>;
+  currentSlot: PostingSlot;
+  postsPerDay: number;
+  platformWindows: Record<string, { morning: string | null; evening: string | null; inMorningWindow: boolean; inEveningWindow: boolean }>;
 } {
   const et = getETComponents();
   const pillar = getTodaysPillar();
   const etTimeStr = `${et.hour}:${String(et.minute).padStart(2, "0")} ET`;
+  const slot = getCurrentSlot();
 
-  const platformWindows: Record<string, { scheduled: string; inWindow: boolean } | { skippedToday: true }> = {};
+  const platformWindows: Record<string, { morning: string | null; evening: string | null; inMorningWindow: boolean; inEveningWindow: boolean }> = {};
   for (const platform of ["linkedin", "facebook", "instagram"]) {
     const windows = PLATFORM_POSTING_WINDOWS[platform];
     if (!windows) continue;
-    const window = windows[et.dayOfWeek];
-    if (window === null || window === undefined) {
-      platformWindows[platform] = { skippedToday: true };
-    } else {
-      const scheduledTime = `${window.hour}:${String(window.minute).padStart(2, "0")} ET`;
-      platformWindows[platform] = {
-        scheduled: scheduledTime,
-        inWindow: isPlatformInWindow(platform),
-      };
-    }
+    const dayWindows = windows[et.dayOfWeek];
+    if (!dayWindows) continue;
+
+    const morningW = dayWindows.morning;
+    const eveningW = dayWindows.evening;
+
+    platformWindows[platform] = {
+      morning: morningW ? `${morningW.hour}:${String(morningW.minute).padStart(2, "0")} ET` : null,
+      evening: eveningW ? `${eveningW.hour}:${String(eveningW.minute).padStart(2, "0")} ET` : null,
+      inMorningWindow: isPlatformInWindow(platform, "morning"),
+      inEveningWindow: isPlatformInWindow(platform, "evening"),
+    };
   }
 
   return {
@@ -1886,6 +1938,8 @@ export function getSocialScheduleStatus(): {
     currentDay: POSTING_DAY_NAMES[et.dayOfWeek],
     currentPillar: pillar ? PILLAR_LABELS[pillar] : null,
     currentTimeET: etTimeStr,
+    currentSlot: slot,
+    postsPerDay: DAILY_POST_LIMIT,
     platformWindows,
   };
 }
@@ -1896,7 +1950,8 @@ export async function getContentMixStatus(): Promise<{ value: number; softProduc
 
 export function isWithinAnyPostingWindow(): boolean {
   if (!isPostingDay()) return false;
-  return ["linkedin", "facebook", "instagram"].some(p => isPlatformInWindow(p));
+  const slot = getCurrentSlot();
+  return ["linkedin", "facebook", "instagram"].some(p => isPlatformInWindow(p, slot));
 }
 
 const BREAKING_NEWS_URGENCY_THRESHOLD = 3;
@@ -1904,7 +1959,7 @@ const BREAKING_NEWS_URGENCY_THRESHOLD = 3;
 async function getAvailablePlatformsForBreaking(): Promise<string[]> {
   try {
     const todayET = getETDateString();
-    const recentPosts = await storage.getSocialPosts("published", 100);
+    const recentPosts = await storage.getSocialPosts("published", 200);
     const todaysPosts = recentPosts.filter((p) => {
       if (!p.publishedAt) return false;
       const postET = new Intl.DateTimeFormat("en-US", {
@@ -1919,7 +1974,7 @@ async function getAvailablePlatformsForBreaking(): Promise<string[]> {
       platformCounts[post.platform] = (platformCounts[post.platform] || 0) + 1;
     }
     const channels = await getBufferChannelsByPlatform();
-    return Object.keys(channels).filter(p => (platformCounts[p] || 0) < 1);
+    return Object.keys(channels).filter(p => (platformCounts[p] || 0) < DAILY_POST_LIMIT);
   } catch {
     return ["linkedin", "facebook", "instagram"];
   }
@@ -1959,7 +2014,8 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     const pillarLabel = pillar ? PILLAR_LABELS[pillar] : "none";
     const et = getETComponents();
     const etTimeStr = `${et.hour}:${String(et.minute).padStart(2, "0")} ET`;
-    console.log(`[TrendEngine] ${pillarLabel} | style: ${postStyle} | template: ${defaultTemplate} | time: ${etTimeStr}`);
+    const currentSlot = getCurrentSlot();
+    console.log(`[TrendEngine] ${pillarLabel} | style: ${postStyle} | template: ${defaultTemplate} | slot: ${currentSlot} | time: ${etTimeStr}`);
 
     const [trendingNewsResult, guidesResult, recentPostsResult] = await Promise.allSettled([
       fetchRealThreats(),
