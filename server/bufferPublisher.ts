@@ -131,9 +131,7 @@ export async function createBufferPost(
       mode,
     };
 
-    if (mode !== "shareNow") {
-      input.schedulingType = "automatic";
-    }
+    input.schedulingType = "automatic";
 
     if (options.dueAt) {
       input.dueAt = options.dueAt;
@@ -159,7 +157,7 @@ export async function createBufferPost(
         createPost(input: $input) {
           __typename
           ... on PostActionSuccess {
-            post { id status statusMessage text dueAt channelService }
+            post { id status text dueAt channelService }
           }
           ... on InvalidInputError { message }
           ... on UnexpectedError { message }
@@ -176,17 +174,16 @@ export async function createBufferPost(
 
     if (result?.post) {
       const scheduledInfo = result.post.dueAt ? ` (scheduled: ${result.post.dueAt})` : "";
-      const statusMsg = result.post.statusMessage ? ` | reason: ${result.post.statusMessage}` : "";
-      console.log(`[Buffer] Post created on ${result.post.channelService}: ${result.post.status}${scheduledInfo}${statusMsg}`);
+      console.log(`[Buffer] Post created on ${result.post.channelService}: ${result.post.status}${scheduledInfo}`);
 
       if (result.post.status === "error") {
-        console.error(`[Buffer] Post returned error status on ${result.post.channelService} (Buffer ID: ${result.post.id})${statusMsg}`);
+        console.error(`[Buffer] Post returned error status on ${result.post.channelService} (Buffer ID: ${result.post.id})`);
         console.error(`[Buffer] Full error response: ${JSON.stringify(result.post)}`);
         return {
           success: false,
           platform: "buffer",
           bufferId: result.post.id,
-          error: `Buffer post error on ${result.post.channelService}: ${result.post.statusMessage || "unknown reason"}`,
+          error: `Buffer post error on ${result.post.channelService}: unknown reason`,
         };
       }
 
