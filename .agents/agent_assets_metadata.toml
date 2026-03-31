@@ -330,3 +330,45 @@ id = "OAUSgkPvc3urMJYmNvRS_"
 uri = "file://.local/social-images/test-real-instagram.jpeg"
 type = "image"
 title = "Instagram - Real Article Thumbnail (1080x1080)"
+
+[[outputs]]
+id = "WnyxO8ut-EpJnLrDWlnxf"
+uri = "file://.local/social-images/branded-100m-weekly-downloads-compromised-1774989652231.jpeg"
+type = "image"
+title = "OLD - LinkedIn/Facebook (100M Downloads)"
+
+[[outputs]]
+id = "AFYTdaiJJjVFmXEceCVhe"
+uri = "file://.local/social-images/v2-100m-weekly-downloads-compromised-i-1774997882357.jpeg"
+type = "image"
+title = "NEW - LinkedIn/Facebook (100M Downloads)"
+
+[[outputs]]
+id = "rtxujp-OsksoinL1Eu6wd"
+uri = "file://.local/social-images/branded-ig-google-ends-anonymous-android-apps-1774984433648.jpeg"
+type = "image"
+title = "OLD - Instagram (Google Android Apps)"
+
+[[outputs]]
+id = "UKiUU1RlG7CFM-zo9cCy1"
+uri = "file://.local/social-images/v2-ig-google-ends-anonymous-android-apps-1774997882093.jpeg"
+type = "image"
+title = "NEW - Instagram (Google Android Apps)"
+
+[[outputs]]
+id = "fbaRPOGfWV6YAg2eSyKeS"
+uri = "file://.local/social-images/v2-5-password-mistakes-that-put-your-f-1774997882797.jpeg"
+type = "image"
+title = "NEW - LinkedIn/Facebook (Password Mistakes)"
+
+[[outputs]]
+id = "0oqrDOoX9JzBOmQy_URuV"
+uri = "file://.local/social-images/v2-ig-5-password-mistakes-that-put-your-f-1774997882987.jpeg"
+type = "image"
+title = "NEW - Instagram (Password Mistakes)"
+
+[[outputs]]
+id = "wusFoosaBVoMB5A7DYgm4"
+uri = "file://.local/social-images/v2-ig-why-ai-deepfakes-are-the-next-big-c-1774997883421.jpeg"
+type = "image"
+title = "NEW - Instagram (AI Deepfakes)"
