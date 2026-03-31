@@ -282,3 +282,15 @@ id = "E1mn3ht7K97sbv7CdjJom"
 uri = "file://dist/social-images/social-test-fixed-rendering-1774987445383.png"
 type = "image"
 title = "FIXED: Cisco Breached Via Poisoned Developer Tool (1080x1080)"
+
+[[outputs]]
+id = "S5KMifqI3qdAKdu7CY3go"
+uri = "file://dist/social-images/social-test-big-logo-1774987924501.png"
+type = "image"
+title = "Fallback SVG Card (no source image) — Bigger Logo"
+
+[[outputs]]
+id = "gEU7GDDUvDRky30DbY6QO"
+uri = "file://.local/social-images/test-branded-overlay-1774987983738.png"
+type = "image"
+title = "Real Article Thumbnail with Brand Overlay — How Posts Will Look"

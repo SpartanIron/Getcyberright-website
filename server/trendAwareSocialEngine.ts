@@ -1147,9 +1147,11 @@ Format your complete output as this strict JSON with \\n for line breaks within 
     }
 
     let sourceImageUrl: string | null = null;
+    let sourceArticleUrl: string | null = null;
     const articleIndex = typeof parsed.source_article_index === "number" ? parsed.source_article_index - 1 : null;
     if (articleIndex !== null && articleIndex >= 0 && articleIndex < newsSlice.length) {
       sourceImageUrl = newsSlice[articleIndex].imageUrl || null;
+      sourceArticleUrl = newsSlice[articleIndex].link || null;
     }
 
     const aiImagePrompt: string | null = parsed.ai_image_prompt && typeof parsed.ai_image_prompt === "string"
@@ -1176,6 +1178,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
       recommendedAction,
       sourceValidation: sourceCredibility,
       sourceImageUrl,
+      sourceArticleUrl,
       aiImagePrompt,
     };
   } catch (error: any) {
@@ -1207,6 +1210,55 @@ function isUrlSafeForFetch(urlStr: string): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+async function fetchOgImageFromArticle(articleUrl: string): Promise<string | null> {
+  try {
+    if (!isUrlSafeForFetch(articleUrl)) return null;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(articleUrl, {
+      signal: controller.signal,
+      redirect: "follow",
+      headers: {
+        "User-Agent": "GetCyberRight/1.0 (Cybersecurity Education Platform)",
+        "Accept": "text/html",
+      },
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) return null;
+
+    const html = await response.text();
+    const ogMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i);
+
+    if (ogMatch?.[1]) {
+      let ogUrl = ogMatch[1].replace(/&amp;/g, "&");
+      if (ogUrl.startsWith("//")) ogUrl = "https:" + ogUrl;
+      if (!ogUrl.startsWith("http")) return null;
+      console.log(`[TrendEngine] Extracted og:image from article page: ${ogUrl}`);
+      return ogUrl;
+    }
+
+    const twitterMatch = html.match(/<meta[^>]*name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']twitter:image["']/i);
+
+    if (twitterMatch?.[1]) {
+      let twUrl = twitterMatch[1].replace(/&amp;/g, "&");
+      if (twUrl.startsWith("//")) twUrl = "https:" + twUrl;
+      if (!twUrl.startsWith("http")) return null;
+      console.log(`[TrendEngine] Extracted twitter:image from article page: ${twUrl}`);
+      return twUrl;
+    }
+
+    return null;
+  } catch (error: any) {
+    console.warn(`[TrendEngine] Failed to fetch og:image from ${articleUrl}: ${error.message}`);
+    return null;
   }
 }
 
@@ -1357,8 +1409,9 @@ async function resolvePostImage(
   imageHeadline: string,
   imageSubtext: string,
   templateStyle: TemplateStyle,
-  title: string
-): Promise<{ mainImage: string | null; igImage: string | null; imageSource: "source" | "ai" | "branded" }> {
+  title: string,
+  articleUrl?: string | null
+): Promise<{ mainImage: string | null; igImage: string | null; imageSource: "source" | "og" | "ai" | "branded" }> {
   if (sourceImageUrl) {
     const downloaded = await downloadSourceImage(sourceImageUrl, title);
     if (downloaded) {
@@ -1371,7 +1424,25 @@ async function resolvePostImage(
         return { mainImage: mainUrl, igImage: igUrl, imageSource: "source" };
       }
     }
-    console.warn(`[TrendEngine] Source image processing failed, trying AI generation...`);
+    console.warn(`[TrendEngine] Source image processing failed, trying og:image from article page...`);
+  }
+
+  if (articleUrl && !sourceImageUrl) {
+    const ogImageUrl = await fetchOgImageFromArticle(articleUrl);
+    if (ogImageUrl) {
+      const downloaded = await downloadSourceImage(ogImageUrl, title);
+      if (downloaded) {
+        const mainPath = await applyBrandOverlay(downloaded, imageHeadline, imageSubtext, templateStyle, 1200, 630);
+        const igPath = await applyBrandOverlay(downloaded, imageHeadline, imageSubtext, templateStyle, 1080, 1080);
+        const mainUrl = mainPath ? getPublicImageUrl(mainPath) : null;
+        const igUrl = igPath ? getPublicImageUrl(igPath) : mainUrl;
+        if (mainUrl) {
+          console.log(`[TrendEngine] Using branded og:image from article page`);
+          return { mainImage: mainUrl, igImage: igUrl, imageSource: "og" };
+        }
+      }
+    }
+    console.warn(`[TrendEngine] og:image fetch failed, trying AI generation...`);
   }
 
   if (aiImagePrompt) {
@@ -1470,11 +1541,12 @@ async function applyBrandOverlay(
       headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans','Arial',Helvetica,sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" letter-spacing="0.5">${tspans}</text>`;
     }
 
-    const logoSize = isSquare ? 36 : 30;
+    const logoSize = isSquare ? 72 : 60;
     const logoX = padX;
-    const logoY = isSquare ? 40 : 30;
-    const brandTextX = logoBase64 ? (logoX + logoSize + 10) : logoX;
-    const brandTextY = logoY + logoSize - 8;
+    const logoY = isSquare ? 30 : 20;
+    const brandTextX = logoBase64 ? (logoX + logoSize + 14) : logoX;
+    const brandTextY = logoY + logoSize / 2 + 7;
+    const brandFontSize = isSquare ? 24 : 20;
     const logoElement = logoBase64
       ? `<image href="${logoBase64}" x="${logoX}" y="${logoY}" width="${logoSize}" height="${logoSize}" opacity="0.95"/>`
       : "";
@@ -1500,11 +1572,11 @@ async function applyBrandOverlay(
     </filter>
   </defs>
 
-  <rect y="0" width="${width}" height="${isSquare ? 100 : 70}" fill="url(#topGrad)"/>
+  <rect y="0" width="${width}" height="${isSquare ? 140 : 110}" fill="url(#topGrad)"/>
   <rect y="${gradientStart}" width="${width}" height="${gradientHeight}" fill="url(#bottomGrad)"/>
 
   ${logoElement}
-  <text x="${brandTextX}" y="${brandTextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 18 : 15}" font-weight="700" fill="white" letter-spacing="1.5" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
+  <text x="${brandTextX}" y="${brandTextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${brandFontSize}" font-weight="700" fill="white" letter-spacing="2" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
 
   ${headlineSvg}
 
@@ -2165,7 +2237,8 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       posts.imageHeadline,
       posts.imageSubtext,
       templateStyle,
-      posts.title
+      posts.title,
+      posts.sourceArticleUrl
     );
     console.log(`[TrendEngine] Image resolved: source=${imageSource}, url=${imageUrl ? "yes" : "none"}`);
 

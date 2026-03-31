@@ -344,7 +344,7 @@ export async function generateBrandedImage(
       ? buildSquareSvg(dims.width, dims.height, cleanTitle, contentType, config)
       : buildLandscapeSvg(dims.width, dims.height, cleanTitle, contentType, config);
 
-    const logoSize = isSquare ? 70 : 65;
+    const logoSize = isSquare ? 90 : 75;
     const logoBuffer = await getLogoPngBuffer(logoSize);
 
     const composites: sharp.OverlayOptions[] = [];

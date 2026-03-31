@@ -3,6 +3,17 @@ import * as fs from "fs";
 import * as path from "path";
 
 const IMAGES_DIR = path.join(process.cwd(), "dist", "social-images");
+const LOGO_PATH = path.join(process.cwd(), "client", "public", "lock-logo-transparent.png");
+
+function getLogoBase64(): string {
+  try {
+    if (!fs.existsSync(LOGO_PATH)) return "";
+    const buffer = fs.readFileSync(LOGO_PATH);
+    return `data:image/png;base64,${buffer.toString("base64")}`;
+  } catch {
+    return "";
+  }
+}
 
 const CATEGORY_THEMES: Record<string, { accent: string; icon: string; bg: string }> = {
   "Data Breaches": { accent: "#EF4444", icon: "🔓", bg: "#1E1B2E" },
@@ -121,7 +132,8 @@ function generateSvg(
   <rect x="${padX}" y="45" width="${urgencyLabel.length * 18 + 30}" height="36" rx="4" fill="${urgencyColor}"/>
   <text x="${padX + 15}" y="70" fill="white" font-family="'DejaVu Sans','Arial',sans-serif" font-size="18" font-weight="700" letter-spacing="2">${urgencyLabel}</text>
 
-  <text x="${padX}" y="120" font-family="'DejaVu Sans',Arial,sans-serif" font-size="18" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
+  ${getLogoBase64() ? `<image href="${getLogoBase64()}" x="${padX}" y="95" width="60" height="60" opacity="0.95"/>` : ""}
+  <text x="${padX + (getLogoBase64() ? 74 : 0)}" y="135" font-family="'DejaVu Sans',Arial,sans-serif" font-size="24" font-weight="700" fill="white" letter-spacing="2" opacity="0.95">GETCYBERRIGHT</text>
 
   ${headlineSvg}
 
