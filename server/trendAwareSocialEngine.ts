@@ -1390,7 +1390,7 @@ async function applyBrandOverlay(
     };
 
     const tmpl = templates[templateStyle];
-    const maxChars = isSquare ? 14 : 20;
+    const maxChars = isSquare ? 18 : 28;
     const uppercaseHeadline = cleanHeadline.toUpperCase();
     let headlineLines = wrapText(uppercaseHeadline, maxChars);
     if (headlineLines.length > 4) {
@@ -1399,51 +1399,28 @@ async function applyBrandOverlay(
     }
 
     const fontSize = isSquare
-      ? (headlineLines.length > 3 ? 52 : headlineLines.length > 2 ? 58 : 66)
-      : (headlineLines.length > 3 ? 42 : headlineLines.length > 2 ? 48 : 54);
-    const lineHeight = fontSize + 8;
+      ? (headlineLines.length > 3 ? 48 : headlineLines.length > 2 ? 54 : 62)
+      : (headlineLines.length > 3 ? 38 : headlineLines.length > 2 ? 44 : 50);
+    const lineHeight = fontSize * 1.2;
     const totalTextHeight = headlineLines.length * lineHeight;
     const padX = isSquare ? 50 : 60;
-    const padHighlight = 12;
 
     const textBottomMargin = isSquare ? 130 : 90;
     const headlineStartY = height - textBottomMargin - totalTextHeight;
 
-    const headlineWords = headlineLines.map(line => line.split(" "));
-    const highlightedWords = new Set<number>();
-    const allWords = headlineWords.flat();
-    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
-    allWords.forEach((word, idx) => {
-      if (importantTerms.some(t => word.includes(t))) {
-        highlightedWords.add(idx);
-      }
-    });
-    if (highlightedWords.size === 0) {
-      const mid = Math.floor(allWords.length / 2);
-      highlightedWords.add(mid);
-      if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
-    }
+    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT"];
 
     let headlineSvg = "";
-    let globalWordIdx = 0;
     for (let lineIdx = 0; lineIdx < headlineLines.length; lineIdx++) {
       const y = headlineStartY + lineIdx * lineHeight;
-      const words = headlineWords[lineIdx];
-      let curX = padX;
-
-      for (const word of words) {
-        const charWidth = fontSize * 0.62;
-        const wordWidth = word.length * charWidth;
-        const isHighlighted = highlightedWords.has(globalWordIdx);
-
-        if (isHighlighted) {
-          headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${tmpl.accent}"/>`;
-        }
-
-        headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="white" letter-spacing="1">${escapeXml(word)}</text>`;
-        curX += wordWidth + charWidth * 0.6;
-        globalWordIdx++;
-      }
+      const words = headlineLines[lineIdx].split(" ");
+      const tspans = words.map(word => {
+        const isImportant = importantTerms.some(t => word.includes(t));
+        return isImportant
+          ? `<tspan fill="${tmpl.accent}">${escapeXml(word)}</tspan>`
+          : `<tspan>${escapeXml(word)}</tspan>`;
+      }).join(" ");
+      headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans','Arial',Helvetica,sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" letter-spacing="0.5">${tspans}</text>`;
     }
 
     const logoSize = isSquare ? 36 : 30;
@@ -1480,9 +1457,11 @@ async function applyBrandOverlay(
   <rect y="${gradientStart}" width="${width}" height="${gradientHeight}" fill="url(#bottomGrad)"/>
 
   ${logoElement}
-  <text x="${brandTextX}" y="${brandTextY}" font-family="'Segoe UI',Arial,sans-serif" font-size="${isSquare ? 18 : 15}" font-weight="700" fill="white" letter-spacing="1.5" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
+  <text x="${brandTextX}" y="${brandTextY}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 18 : 15}" font-weight="700" fill="white" letter-spacing="1.5" opacity="0.95" filter="url(#textShadow)">GETCYBERRIGHT</text>
 
   ${headlineSvg}
+
+  <text x="${padX}" y="${height - (isSquare ? 40 : 25)}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="${isSquare ? 14 : 12}" fill="white" opacity="0.6" font-style="italic">getcyberright.com | Protecting Families in the Digital World</text>
 </svg>`;
 
     const overlaySvgBuffer = await sharp(Buffer.from(svg))
@@ -1610,49 +1589,32 @@ async function generatePostImage(
 
     const tmpl = templates[templateStyle];
     const uppercaseHeadline = cleanHeadline.toUpperCase();
-    let headlineLines = wrapText(uppercaseHeadline, 20);
+    let headlineLines = wrapText(uppercaseHeadline, 28);
     if (headlineLines.length > 4) {
       headlineLines = headlineLines.slice(0, 4);
       headlineLines[3] = headlineLines[3].slice(0, -3) + "...";
     }
 
-    const fontSize = headlineLines.length > 3 ? 44 : headlineLines.length > 2 ? 50 : 56;
-    const lineHeight = fontSize + 8;
+    const fontSize = headlineLines.length > 3 ? 38 : headlineLines.length > 2 ? 44 : 50;
+    const lineHeight = fontSize * 1.2;
     const totalTextHeight = headlineLines.length * lineHeight;
     const padX = 70;
-    const padHighlight = 10;
 
     const headlineStartY = 630 - 90 - totalTextHeight;
 
-    const headlineWords = headlineLines.map(line => line.split(" "));
-    const highlightedWords = new Set<number>();
-    const allWords = headlineWords.flat();
-    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
-    allWords.forEach((word, idx) => {
-      if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
-    });
-    if (highlightedWords.size === 0) {
-      const mid = Math.floor(allWords.length / 2);
-      highlightedWords.add(mid);
-      if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
-    }
+    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT"];
 
     let headlineSvg = "";
-    let globalWordIdx = 0;
     for (let lineIdx = 0; lineIdx < headlineLines.length; lineIdx++) {
       const y = headlineStartY + lineIdx * lineHeight;
-      const words = headlineWords[lineIdx];
-      let curX = padX;
-      const charWidth = fontSize * 0.62;
-      for (const word of words) {
-        const wordWidth = word.length * charWidth;
-        if (highlightedWords.has(globalWordIdx)) {
-          headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${tmpl.accent}"/>`;
-        }
-        headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="white" letter-spacing="1">${escapeXml(word)}</text>`;
-        curX += wordWidth + charWidth * 0.6;
-        globalWordIdx++;
-      }
+      const words = headlineLines[lineIdx].split(" ");
+      const tspans = words.map(word => {
+        const isImportant = importantTerms.some(t => word.includes(t));
+        return isImportant
+          ? `<tspan fill="${tmpl.accent}">${escapeXml(word)}</tspan>`
+          : `<tspan>${escapeXml(word)}</tspan>`;
+      }).join(" ");
+      headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans','Arial',Helvetica,sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" letter-spacing="0.5">${tspans}</text>`;
     }
 
     const gridLines: string[] = [];
@@ -1695,11 +1657,11 @@ async function generatePostImage(
   <circle cx="950" cy="200" r="60" fill="${tmpl.accent}" opacity="0.03"/>
 
   ${logoElement}
-  <text x="${brandTextX}" y="${logoY + logoSize - 6}" font-family="'Segoe UI',Arial,sans-serif" font-size="16" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
+  <text x="${brandTextX}" y="${logoY + logoSize - 6}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="16" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
 
   ${headlineSvg}
 
-  <text x="${padX}" y="605" font-family="'Segoe UI',Arial,sans-serif" font-size="14" fill="#6B8FA3" opacity="0.8">getcyberright.com  |  Protecting Families in the Digital World</text>
+  <text x="${padX}" y="605" font-family="'DejaVu Sans',Arial,sans-serif" font-size="14" fill="#6B8FA3" opacity="0.8">getcyberright.com  |  Protecting Families in the Digital World</text>
 </svg>`;
 
     await sharp(Buffer.from(svg)).png({ quality: 95 }).toFile(outputPath);
@@ -1741,48 +1703,31 @@ async function generateInstagramImage(
 
     const tmpl = templates[templateStyle];
     const uppercaseHeadline = cleanHeadline.toUpperCase();
-    let headlineLines = wrapText(uppercaseHeadline, 14);
+    let headlineLines = wrapText(uppercaseHeadline, 18);
     if (headlineLines.length > 5) {
       headlineLines = headlineLines.slice(0, 5);
       headlineLines[4] = headlineLines[4].slice(0, -3) + "...";
     }
 
-    const fontSize = headlineLines.length > 4 ? 52 : headlineLines.length > 3 ? 58 : 66;
-    const lineHeight = fontSize + 8;
+    const fontSize = headlineLines.length > 4 ? 48 : headlineLines.length > 3 ? 54 : 62;
+    const lineHeight = fontSize * 1.2;
     const totalTextHeight = headlineLines.length * lineHeight;
     const padX = 50;
-    const padHighlight = 10;
     const headlineStartY = 1080 - 120 - totalTextHeight;
 
-    const headlineWords = headlineLines.map(line => line.split(" "));
-    const highlightedWords = new Set<number>();
-    const allWords = headlineWords.flat();
-    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
-    allWords.forEach((word, idx) => {
-      if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
-    });
-    if (highlightedWords.size === 0) {
-      const mid = Math.floor(allWords.length / 2);
-      highlightedWords.add(mid);
-      if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
-    }
+    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "BANS", "LAUNCHES", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT"];
 
     let headlineSvg = "";
-    let globalWordIdx = 0;
     for (let lineIdx = 0; lineIdx < headlineLines.length; lineIdx++) {
       const y = headlineStartY + lineIdx * lineHeight;
-      const words = headlineWords[lineIdx];
-      let curX = padX;
-      const charWidth = fontSize * 0.62;
-      for (const word of words) {
-        const wordWidth = word.length * charWidth;
-        if (highlightedWords.has(globalWordIdx)) {
-          headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${tmpl.accent}"/>`;
-        }
-        headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="white" letter-spacing="1">${escapeXml(word)}</text>`;
-        curX += wordWidth + charWidth * 0.6;
-        globalWordIdx++;
-      }
+      const words = headlineLines[lineIdx].split(" ");
+      const tspans = words.map(word => {
+        const isImportant = importantTerms.some(t => word.includes(t));
+        return isImportant
+          ? `<tspan fill="${tmpl.accent}">${escapeXml(word)}</tspan>`
+          : `<tspan>${escapeXml(word)}</tspan>`;
+      }).join(" ");
+      headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans','Arial',Helvetica,sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" letter-spacing="0.5">${tspans}</text>`;
     }
 
     const gridLines: string[] = [];
@@ -1825,11 +1770,11 @@ async function generateInstagramImage(
   <circle cx="750" cy="300" r="60" fill="${tmpl.accent}" opacity="0.03"/>
 
   ${logoElement}
-  <text x="${brandTextX}" y="${logoY + logoSize - 8}" font-family="'Segoe UI',Arial,sans-serif" font-size="18" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
+  <text x="${brandTextX}" y="${logoY + logoSize - 8}" font-family="'DejaVu Sans',Arial,sans-serif" font-size="18" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
 
   ${headlineSvg}
 
-  <text x="${padX}" y="1050" font-family="'Segoe UI',Arial,sans-serif" font-size="15" fill="#6B8FA3" opacity="0.8">getcyberright.com</text>
+  <text x="${padX}" y="1050" font-family="'DejaVu Sans',Arial,sans-serif" font-size="15" fill="#6B8FA3" opacity="0.8">getcyberright.com</text>
 </svg>`;
 
     await sharp(Buffer.from(svg)).flatten({ background: '#0A0A1A' }).jpeg({ quality: 92 }).toFile(outputPath);

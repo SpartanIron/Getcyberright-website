@@ -54,7 +54,7 @@ function generateSvg(
 ): string {
   const theme = CATEGORY_THEMES[category] || CATEGORY_THEMES["default"];
   const uppercaseTitle = title.toUpperCase();
-  const titleLines = wrapText(uppercaseTitle, 14);
+  const titleLines = wrapText(uppercaseTitle, 18);
 
   if (titleLines.length > 5) {
     titleLines.length = 5;
@@ -69,42 +69,25 @@ function generateSvg(
     .replace(/\/.*/g, "")
     .toUpperCase();
 
-  const fontSize = titleLines.length > 4 ? 52 : titleLines.length > 3 ? 58 : 66;
-  const lineHeight = fontSize + 8;
+  const fontSize = titleLines.length > 4 ? 48 : titleLines.length > 3 ? 54 : 62;
+  const lineHeight = fontSize * 1.2;
   const totalTextHeight = titleLines.length * lineHeight;
   const padX = 50;
-  const padHighlight = 10;
   const headlineStartY = 1080 - 140 - totalTextHeight;
 
-  const allLineWords = titleLines.map(line => line.split(" "));
-  const allWords = allLineWords.flat();
-  const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
-  const highlightedWords = new Set<number>();
-  allWords.forEach((word, idx) => {
-    if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
-  });
-  if (highlightedWords.size === 0) {
-    const mid = Math.floor(allWords.length / 2);
-    highlightedWords.add(mid);
-    if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
-  }
+  const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT"];
 
   let headlineSvg = "";
-  let globalWordIdx = 0;
   for (let lineIdx = 0; lineIdx < titleLines.length; lineIdx++) {
     const y = headlineStartY + lineIdx * lineHeight;
-    const words = allLineWords[lineIdx];
-    let curX = padX;
-    const charWidth = fontSize * 0.62;
-    for (const word of words) {
-      const wordWidth = word.length * charWidth;
-      if (highlightedWords.has(globalWordIdx)) {
-        headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${theme.accent}"/>`;
-      }
-      headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="white" letter-spacing="1">${escapeXml(word)}</text>`;
-      curX += wordWidth + charWidth * 0.6;
-      globalWordIdx++;
-    }
+    const words = titleLines[lineIdx].split(" ");
+    const tspans = words.map(word => {
+      const isImportant = importantTerms.some(t => word.includes(t));
+      return isImportant
+        ? `<tspan fill="${theme.accent}">${escapeXml(word)}</tspan>`
+        : `<tspan>${escapeXml(word)}</tspan>`;
+    }).join(" ");
+    headlineSvg += `<text x="${padX}" y="${y}" font-family="'DejaVu Sans','Arial',Helvetica,sans-serif" font-size="${fontSize}" font-weight="bold" fill="white" letter-spacing="0.5">${tspans}</text>`;
   }
 
   const gridLines: string[] = [];
@@ -136,14 +119,14 @@ function generateSvg(
   <circle cx="800" cy="280" r="60" fill="${theme.accent}" opacity="0.03"/>
 
   <rect x="${padX}" y="45" width="${urgencyLabel.length * 18 + 30}" height="36" rx="4" fill="${urgencyColor}"/>
-  <text x="${padX + 15}" y="70" fill="white" font-family="'Impact','Arial Black',Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="2">${urgencyLabel}</text>
+  <text x="${padX + 15}" y="70" fill="white" font-family="'DejaVu Sans','Arial',sans-serif" font-size="18" font-weight="700" letter-spacing="2">${urgencyLabel}</text>
 
-  <text x="${padX}" y="120" font-family="'Segoe UI',Arial,sans-serif" font-size="18" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
+  <text x="${padX}" y="120" font-family="'DejaVu Sans',Arial,sans-serif" font-size="18" font-weight="700" fill="white" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
 
   ${headlineSvg}
 
-  <text x="${padX}" y="1020" fill="#6B8FA3" font-family="'Segoe UI',Arial,sans-serif" font-size="14" opacity="0.7">Source: ${escapeXml(sourceDisplay)}</text>
-  <text x="${padX}" y="1050" fill="#6B8FA3" font-family="'Segoe UI',Arial,sans-serif" font-size="15" opacity="0.8">getcyberright.com</text>
+  <text x="${padX}" y="1020" fill="#6B8FA3" font-family="'DejaVu Sans',Arial,sans-serif" font-size="14" opacity="0.7">Source: ${escapeXml(sourceDisplay)}</text>
+  <text x="${padX}" y="1050" fill="#6B8FA3" font-family="'DejaVu Sans',Arial,sans-serif" font-size="15" opacity="0.8">getcyberright.com</text>
 </svg>`;
 }
 
