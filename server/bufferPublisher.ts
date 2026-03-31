@@ -120,6 +120,7 @@ export async function createBufferPost(
     dueAt?: string;
     imageUrl?: string;
     platform?: string;
+    firstComment?: string;
   } = {}
 ): Promise<BufferPublishResult> {
   try {
@@ -143,6 +144,10 @@ export async function createBufferPost(
 
     if (options.platform === "instagram") {
       input.metadata = { instagram: { type: "post", shouldShareToFeed: true } };
+    }
+
+    if (options.firstComment && options.platform !== "instagram") {
+      input.firstComment = options.firstComment;
     }
 
     if (options.imageUrl) {
@@ -445,50 +450,8 @@ export async function addFirstComment(
   channelId: string,
   commentText: string
 ): Promise<{ success: boolean; error?: string }> {
-  try {
-    if (!postBufferId || !commentText) {
-      return { success: false, error: "Missing postBufferId or commentText" };
-    }
-
-    const data = await graphql<{ createPostComment: any }>(
-      `mutation CreatePostComment($input: CreatePostCommentInput!) {
-        createPostComment(input: $input) {
-          __typename
-          ... on PostCommentActionSuccess {
-            comment { id text }
-          }
-          ... on InvalidInputError { message }
-          ... on UnexpectedError { message }
-          ... on UnauthorizedError { message }
-          ... on NotFoundError { message }
-        }
-      }`,
-      {
-        input: {
-          postId: postBufferId,
-          channelId,
-          text: commentText,
-        },
-      }
-    );
-
-    const result = data.createPostComment;
-    if (result?.comment) {
-      console.log(`[Buffer] First comment added to post ${postBufferId}`);
-      return { success: true };
-    }
-
-    if (result?.message) {
-      console.warn(`[Buffer] First comment failed: ${result.message}`);
-      return { success: false, error: result.message };
-    }
-
-    console.warn(`[Buffer] Unexpected first comment response:`, JSON.stringify(result));
-    return { success: false, error: "Unexpected response" };
-  } catch (error: any) {
-    console.warn(`[Buffer] First comment error: ${error.message}`);
-    return { success: false, error: error.message };
-  }
+  console.log(`[Buffer] First comment not supported as separate API call — use firstComment in createPost input instead`);
+  return { success: false, error: "Buffer API does not support separate comment creation; use firstComment field in createPost" };
 }
 
 function extractArticleUrl(postContent: string): string | null {
@@ -521,27 +484,22 @@ export async function publishWithFirstComment(
 ): Promise<BufferPublishResult> {
   const articleUrl = options.sourceArticleUrl || extractArticleUrl(content);
   let postContent = content;
+  let firstComment: string | undefined;
 
   if (articleUrl && options.platform !== "instagram") {
     postContent = stripArticleUrlFromPost(content, articleUrl);
+    firstComment = articleUrl;
   }
 
   const result = await createBufferPost(channelId, postContent, {
     mode: options.mode || "shareNow",
     imageUrl: options.imageUrl,
     platform: options.platform,
+    firstComment,
   });
 
-  if (result.success && result.bufferId && articleUrl && options.platform !== "instagram") {
-    await new Promise((r) => setTimeout(r, 2000));
-
-    const commentText = `${articleUrl}`;
-    const commentResult = await addFirstComment(result.bufferId, channelId, commentText);
-    if (commentResult.success) {
-      console.log(`[Buffer] Article link posted as first comment on ${options.platform}`);
-    } else {
-      console.warn(`[Buffer] First comment failed (post still published): ${commentResult.error}`);
-    }
+  if (firstComment && result.success) {
+    console.log(`[Buffer] Article link included as first comment on ${options.platform}`);
   }
 
   return result;
