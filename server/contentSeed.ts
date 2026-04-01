@@ -795,9 +795,12 @@ async function seedAlerts() {
 
 async function ensureCriticalGuides() {
   const { criticalGuides } = await import("./criticalGuidesData");
+  const { socialMediaGuides } = await import("./socialMediaGuidesData");
+
+  const allGuides = [...criticalGuides, ...socialMediaGuides];
 
   let inserted = 0;
-  for (const guide of criticalGuides) {
+  for (const guide of allGuides) {
     const existing = await db.select({ slug: cyberSafetyGuides.slug }).from(cyberSafetyGuides).where(eq(cyberSafetyGuides.slug, guide.slug));
     if (existing.length === 0) {
       await db.insert(cyberSafetyGuides).values({
@@ -810,12 +813,12 @@ async function ensureCriticalGuides() {
         seoScore: 85,
       });
       inserted++;
-      console.log(`[content-seed] Inserted critical guide: "${guide.title}"`);
+      console.log(`[content-seed] Inserted guide: "${guide.title}"`);
     }
   }
 
   if (inserted > 0) {
-    console.log(`[content-seed] Ensured ${inserted} critical guide(s) exist`);
+    console.log(`[content-seed] Ensured ${inserted} guide(s) exist`);
   }
 }
 

@@ -24,13 +24,14 @@ interface Guide {
   authorName: string;
 }
 
-const categoryIcons: Record<string, { icon: typeof BookOpen; color: string; bg: string }> = {
+const categoryIcons: Record<string, { icon: typeof BookOpen; color: string; bg: string; label?: string }> = {
   "Identity Theft": { icon: Shield, color: "text-red-500", bg: "bg-red-50 dark:bg-red-950/30" },
   "Phishing": { icon: Lock, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-950/30" },
   "Privacy": { icon: Globe, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/30" },
   "Device Security": { icon: Smartphone, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-950/30" },
   "Family Safety": { icon: Users, color: "text-teal-500", bg: "bg-teal-50 dark:bg-teal-950/30" },
   "AI Threats": { icon: Brain, color: "text-pink-500", bg: "bg-pink-50 dark:bg-pink-950/30" },
+  "social-media-security": { icon: Smartphone, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30", label: "Social Media" },
 };
 
 export default function GuidesListing() {
@@ -109,7 +110,7 @@ export default function GuidesListing() {
                   data-testid={`tile-${cat}`}
                 >
                   <Icon className={`h-6 w-6 ${catConfig.color}`} />
-                  <span className="text-xs font-medium text-center leading-tight">{cat}</span>
+                  <span className="text-xs font-medium text-center leading-tight">{catConfig.label || cat}</span>
                 </button>
               );
             })}
@@ -134,7 +135,7 @@ export default function GuidesListing() {
               onClick={() => setSelectedCategory(null)}
               data-testid="filter-clear"
             >
-              {selectedCategory} x
+              {categoryIcons[selectedCategory]?.label || selectedCategory} x
             </Badge>
           )}
         </div>
@@ -169,7 +170,7 @@ export default function GuidesListing() {
                   )}
                   <CardContent className={guide.featuredImage ? "pt-4" : "pt-6"}>
                     {guide.category && (
-                      <Badge variant="secondary" className="mb-2">{guide.category}</Badge>
+                      <Badge variant="secondary" className="mb-2">{categoryIcons[guide.category]?.label || guide.category}</Badge>
                     )}
                     <h2 className="text-lg font-semibold mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-2">
                       {guide.title}
