@@ -921,7 +921,8 @@ Use our <a href="/tools">AI Scam Checker</a> to verify suspicious messages, link
 1. Go to **Settings > Chats > Chat Backup**
 2. Tap **Back Up** to create a backup to Google Drive (Android) or iCloud (iPhone)
 3. Enable **End-to-End Encrypted Backup** and set a password or 64-digit encryption key
-4. Without encrypted backup, your messages are stored unencrypted on Google Drive or iCloud
+
+**Critical privacy warning:** If you do not enable end-to-end encrypted backup, your message history is not protected by WhatsApp's encryption once it reaches the cloud. This means the cloud provider (Google or Apple), anyone with legal access to your cloud account, or anyone who compromises it can read your backed-up messages. Always enable encrypted backup to keep your conversations private.
 
 ### Export Individual Chats
 1. Open the chat you want to export

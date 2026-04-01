@@ -38,7 +38,16 @@ export function serveStatic(app: Express) {
 
   app.use(seoMiddleware());
 
-  app.use(express.static(distPath, { index: false }));
+  app.use(express.static(distPath, {
+    index: false,
+    maxAge: "1y",
+    immutable: true,
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith(".html")) {
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      }
+    },
+  }));
 
   app.use("/{*path}", async (req, res) => {
     const statusCode = isKnownRoute(req.path) ? 200 : 404;

@@ -47,3 +47,13 @@ The frontend is built with React 19, TypeScript, and Vite, using Wouter for rout
 - **Email Services**: Brevo, MailerSend, SMTP2GO, Resend.
 - **Image Processing**: Tesseract.js (OCR), jsQR (QR code decoding), Sharp.
 - **Social Publishing**: Buffer.
+
+## Security & Performance Audit (Completed)
+- **CSP**: `unsafe-inline` removed from `scriptSrc` in production (kept in dev for Vite HMR). `imgSrc` whitelisted to Unsplash/Pexels/Picsum domains. `connectSrc` restricted to known API endpoints. Both `server/security.ts` and `server/security/middleware.ts` updated.
+- **PII Logging**: Sensitive API routes excluded from response body logging. Registration log no longer includes email.
+- **Error Format**: Global error handler returns `{ error: message }` consistently.
+- **Performance**: All routes lazy-loaded in `App.tsx` (Home/NotFound eager). Static assets cached with `max-age=1y, immutable`. Vite `manualChunks` splits framer-motion, @tanstack/react-query, radix-ui. TanStack Query `staleTime` set to 5 minutes.
+- **Accessibility**: `aria-live="polite"` on scam checker and data removal scan result containers. Touch targets meet 44px minimum on icon buttons. H1 responsive sizing (1.75rem mobile, 2.25rem desktop).
+- **Cookie Security**: CSRF cookies use `sameSite: "strict"`, session cookies use `sameSite: "lax"` (documented in code comments).
+- **SEO**: Cross-reference comment added to `use-seo.ts` for server-side meta sync with `seo-meta-resolver.ts`.
+- **Content**: WhatsApp guide includes encrypted backup privacy warning. Trust-strip marquee uses 3x duplication for seamless loop.

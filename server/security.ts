@@ -530,13 +530,12 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
 export function configureHelmet(app: Express) {
   app.use(
     helmet({
-      // Content Security Policy
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: [
             "'self'",
-            "'unsafe-inline'",
+            ...(process.env.NODE_ENV !== "production" ? ["'unsafe-inline'"] : []),
             "https://www.googletagmanager.com",
             "https://www.google-analytics.com",
             "https://www.google.com",
@@ -545,7 +544,22 @@ export function configureHelmet(app: Express) {
             "https://js.stripe.com",
           ],
           styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-          imgSrc: ["'self'", "data:", "blob:", "https:"],
+          imgSrc: [
+            "'self'",
+            "data:",
+            "blob:",
+            "https://images.unsplash.com",
+            "https://source.unsplash.com",
+            "https://images.pexels.com",
+            "https://www.getcyberright.com",
+            "https://*.googleusercontent.com",
+            "https://www.google-analytics.com",
+            "https://www.googletagmanager.com",
+            "https://lh3.googleusercontent.com",
+            "https://picsum.photos",
+            "https://fastly.picsum.photos",
+            "https://*.stripe.com",
+          ],
           fontSrc: ["'self'", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
           connectSrc: [
             "'self'",
@@ -559,8 +573,13 @@ export function configureHelmet(app: Express) {
             "https://www.recaptcha.net",
             "https://api.stripe.com",
             "https://api.openai.com",
-            "ws:",
-            "wss:",
+            "https://api.anthropic.com",
+            "https://api.unsplash.com",
+            "https://api.pexels.com",
+            "wss://*.replit.dev",
+            "wss://*.replit.app",
+            "wss://*.repl.co",
+            "wss://www.getcyberright.com",
           ],
           frameSrc: [
             "https://js.stripe.com",
@@ -574,24 +593,17 @@ export function configureHelmet(app: Express) {
           upgradeInsecureRequests: null,
         },
       },
-      // Strict Transport Security (HSTS)
       strictTransportSecurity: {
-        maxAge: 31536000, // 1 year
+        maxAge: 31536000,
         includeSubDomains: true,
         preload: true,
       },
-      // X-Frame-Options
       frameguard: { action: "deny" },
-      // X-Content-Type-Options
       noSniff: true,
-      // X-XSS-Protection (legacy, but still useful)
       xssFilter: true,
-      // Referrer Policy
       referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-      // Disable X-Powered-By
       hidePoweredBy: true,
-      // Cross-Origin policies
-      crossOriginEmbedderPolicy: false, // Disabled to allow external images
+      crossOriginEmbedderPolicy: false,
       crossOriginOpenerPolicy: { policy: "same-origin" },
       crossOriginResourcePolicy: { policy: "cross-origin" },
     })
@@ -619,11 +631,15 @@ export function requestSizeLimiter(maxSizeBytes: number = 102400) { // 100KB def
 }
 
 // Cookie security configuration
+// sameSite: "strict" for CSRF-sensitive operations (token cookies, security endpoints).
+// Session cookies in auth.ts use "lax" instead, because "strict" would break
+// top-level navigations (e.g., clicking a link from an email or external site
+// wouldn't carry the session cookie on the first request).
 export const secureCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: "strict" as const,
-  maxAge: 86400000, // 24 hours
+  maxAge: 86400000,
   path: "/",
 };
 

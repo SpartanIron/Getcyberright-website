@@ -236,7 +236,7 @@ export function ScanResults() {
         </Card>
       </motion.div>
 
-      {selectedScanId && (
+      {selectedScanId && (<div role="region" aria-label="Scan findings" aria-live="polite">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card>
             <CardHeader>
@@ -395,7 +395,7 @@ export function ScanResults() {
             </CardContent>
           </Card>
         </motion.div>
-      )}
+      </div>)}
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <Card>

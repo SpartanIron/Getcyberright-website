@@ -15,7 +15,7 @@ import {
   apiAnomalyDetection,
   securityLogger,
 } from "./security";
-import { antiScrapingHeaders, botProtection } from "./security/middleware";
+import { antiScrapingHeaders, botProtection, corsConfig } from "./security/middleware";
 import { setupFonts } from "./fontSetup";
 
 setupFonts();
@@ -35,6 +35,9 @@ declare module "http" {
 
 // Security: Configure Helmet security headers first
 configureHelmet(app);
+
+// Security: CORS - explicit whitelist for cross-origin requests (browser extension, etc.)
+app.use(corsConfig);
 
 // Performance: Enable gzip compression for responses
 app.use(compression({
@@ -127,9 +130,23 @@ app.use((req, res, next) => {
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
+  const sensitiveRoutes = [
+    "/api/auth",
+    "/api/user",
+    "/api/vault",
+    "/api/shield/scan",
+    "/api/subscription",
+    "/api/extension/subscription",
+    "/api/admin/users",
+  ];
+
+  const isSensitive = sensitiveRoutes.some((r) => path.startsWith(r));
+
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
+    if (!isSensitive) {
+      capturedJsonResponse = bodyJson;
+    }
     return originalResJson.apply(res, [bodyJson, ...args]);
   };
 
@@ -174,7 +191,7 @@ app.use((req, res, next) => {
       return next(err);
     }
 
-    return res.status(status).json({ message });
+    return res.status(status).json({ error: message });
   });
 
   // importantly only setup vite in development and after

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, CheckCircle, Key, ChevronLeft, ChevronRight } from "lucide-react";
@@ -21,12 +21,25 @@ const slideImages = [
   familyTechImage
 ];
 
+function usePreloadImages(images: string[], currentIndex: number) {
+  const loaded = useRef(new Set<number>([0]));
+  useEffect(() => {
+    const next = (currentIndex + 1) % images.length;
+    if (!loaded.current.has(next)) {
+      const img = new Image();
+      img.src = images[next];
+      loaded.current.add(next);
+    }
+  }, [currentIndex, images]);
+}
+
 export function HeroCarousel() {
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   const slideCount = slideImages.length;
+  usePreloadImages(slideImages, currentSlide);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slideCount);
@@ -65,6 +78,8 @@ export function HeroCarousel() {
             src={slideImages[currentSlide]} 
             alt={t(`carousel.slide${currentSlide + 1}.headline`)}
             className="w-full h-full object-cover"
+            loading={currentSlide === 0 ? "eager" : "lazy"}
+            fetchPriority={currentSlide === 0 ? "high" : "auto"}
             style={{ objectPosition: 'center 30%' }}
           />
         </motion.div>

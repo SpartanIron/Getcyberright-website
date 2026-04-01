@@ -2917,7 +2917,7 @@ export function ScamChecker() {
         )}
 
         {headerResult && (
-          <div className="space-y-4" data-testid="result-header-analysis">
+          <div className="space-y-4" role="region" aria-label="Email header analysis results" aria-live="polite" data-testid="result-header-analysis">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -3117,7 +3117,7 @@ export function ScamChecker() {
         )}
 
         {result && (
-          <div className="flex flex-wrap gap-2" data-testid="section-result-actions">
+          <div className="flex flex-wrap gap-2" role="region" aria-label="Result actions" aria-live="polite" data-testid="section-result-actions">
             <Button
               variant="outline"
               size="sm"

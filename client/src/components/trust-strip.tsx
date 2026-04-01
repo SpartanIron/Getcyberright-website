@@ -86,7 +86,7 @@ export function TrustStrip() {
 
           <div className="overflow-hidden">
             <div className="flex w-max items-center animate-marquee motion-reduce:animate-none motion-reduce:justify-center motion-reduce:flex-wrap motion-reduce:gap-8 motion-reduce:w-auto">
-              {[...sources, ...sources, ...sources, ...sources].map((source, i) => (
+              {[...sources, ...sources, ...sources].map((source, i) => (
                 <img
                   key={`${source.name}-${i}`}
                   src={source.logo}

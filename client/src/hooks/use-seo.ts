@@ -1,5 +1,10 @@
 import { useEffect } from "react";
 
+// Client-side SEO hook for dynamic page meta updates.
+// Server-side meta injection (server/seo-meta-resolver.ts) handles the same tags
+// for search engine crawlers that don't execute JS. When updating SEO data here,
+// also update the corresponding entry in seo-meta-resolver.ts to keep them in sync.
+
 interface SEOProps {
   title: string;
   description: string;

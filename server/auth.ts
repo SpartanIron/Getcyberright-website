@@ -125,8 +125,8 @@ export function registerAuthRoutes(app: Express) {
     cookie: {
       secure: useSecureCookies,
       httpOnly: true,
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: "lax", // "lax" (not "strict") so sessions survive top-level navigations from external links
+      maxAge: 24 * 60 * 60 * 1000,
     },
     name: "gcr.sid",
   }));
@@ -156,7 +156,7 @@ export function registerAuthRoutes(app: Express) {
         emailVerificationExpires,
       }).returning();
       
-      securityLogger.info("New user registered", { userId: newUser.id, email: validatedData.email });
+      securityLogger.info("New user registered", { userId: newUser.id });
       
       if (process.env.NODE_ENV !== "production") {
         await db.update(users).set({ 
