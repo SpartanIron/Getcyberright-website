@@ -62,19 +62,28 @@ function getTodaysTemplate(): TemplateStyle {
 }
 
 function sanitizePostContent(text: string): string {
-  return text
+  const urlPlaceholders: string[] = [];
+  let processed = text.replace(/https?:\/\/[^\s)]+/g, (url) => {
+    urlPlaceholders.push(url);
+    return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
+  });
+
+  processed = processed
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/\*([^*]+)\*/g, "$1")
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^[-*]\s+/gm, "")
-    .replace(/\u2014/g, ", ")
-    .replace(/\u2013/g, ", ")
-    .replace(/-/g, ", ")
-    .replace(/–/g, ", ")
+    .replace(/\u2014/g, " — ")
+    .replace(/\u2013/g, " — ")
     .replace(/[^\S\n]{2,}/g, " ")
     .replace(/\n{4,}/g, "\n\n\n")
-    .replace(/ ,/g, ",")
     .trim();
+
+  urlPlaceholders.forEach((url, i) => {
+    processed = processed.replace(`__URL_PLACEHOLDER_${i}__`, url);
+  });
+
+  return processed;
 }
 
 const SOURCE_TIERS: Record<string, 1 | 2 | 3> = {

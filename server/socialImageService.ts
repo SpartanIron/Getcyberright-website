@@ -137,16 +137,14 @@ function buildLandscapeSvg(
   width: number,
   height: number,
   title: string,
-  contentType: string,
   topic: TopicConfig
 ): string {
   const uppercaseTitle = title.toUpperCase();
-  const titleLines = wrapText(uppercaseTitle, 20);
-  const fontSize = titleLines.length > 3 ? 44 : titleLines.length > 2 ? 50 : 56;
-  const lineHeight = fontSize + 8;
+  const titleLines = wrapText(uppercaseTitle, 24);
+  const fontSize = titleLines.length > 3 ? 42 : titleLines.length > 2 ? 48 : 54;
+  const lineHeight = fontSize * 1.35;
   const totalTextHeight = Math.min(titleLines.length, 4) * lineHeight;
   const padX = 70;
-  const padHighlight = 10;
   const headlineStartY = height - 90 - totalTextHeight;
 
   if (titleLines.length > 4) {
@@ -154,35 +152,19 @@ function buildLandscapeSvg(
     titleLines[3] = titleLines[3].slice(0, -3) + "...";
   }
 
-  const allLineWords = titleLines.map(line => line.split(" "));
-  const allWords = allLineWords.flat();
   const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
-  const highlightedWords = new Set<number>();
-  allWords.forEach((word, idx) => {
-    if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
-  });
-  if (highlightedWords.size === 0) {
-    const mid = Math.floor(allWords.length / 2);
-    highlightedWords.add(mid);
-    if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
-  }
 
   let headlineSvg = "";
-  let globalWordIdx = 0;
   for (let lineIdx = 0; lineIdx < titleLines.length; lineIdx++) {
-    const y = headlineStartY + lineIdx * lineHeight;
-    const words = allLineWords[lineIdx];
-    let curX = padX;
-    const charWidth = fontSize * 0.62;
-    for (const word of words) {
-      const wordWidth = word.length * charWidth;
-      if (highlightedWords.has(globalWordIdx)) {
-        headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${topic.accent}"/>`;
-      }
-      headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="${BRAND.white}" letter-spacing="1">${escapeXml(word)}</text>`;
-      curX += wordWidth + charWidth * 0.6;
-      globalWordIdx++;
-    }
+    const y = headlineStartY + lineIdx * lineHeight + fontSize;
+    const words = titleLines[lineIdx].split(" ");
+    const tspans = words.map(w => {
+      const isAccent = importantTerms.some(t => w.includes(t));
+      return isAccent
+        ? `<tspan fill="${topic.accent}" font-weight="900">${escapeXml(w)}</tspan>`
+        : `<tspan>${escapeXml(w)}</tspan>`;
+    }).join(" ");
+    headlineSvg += `<text x="${padX}" y="${y}" font-family="Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="${BRAND.white}" letter-spacing="1" word-spacing="8">${tspans}</text>`;
   }
 
   const gridLines: string[] = [];
@@ -226,16 +208,14 @@ function buildSquareSvg(
   width: number,
   height: number,
   title: string,
-  contentType: string,
   topic: TopicConfig
 ): string {
   const uppercaseTitle = title.toUpperCase();
-  const titleLines = wrapText(uppercaseTitle, 14);
-  const fontSize = titleLines.length > 4 ? 52 : titleLines.length > 3 ? 58 : 66;
-  const lineHeight = fontSize + 8;
+  const titleLines = wrapText(uppercaseTitle, 16);
+  const fontSize = titleLines.length > 4 ? 48 : titleLines.length > 3 ? 54 : 62;
+  const lineHeight = fontSize * 1.35;
   const totalTextHeight = Math.min(titleLines.length, 5) * lineHeight;
   const padX = 50;
-  const padHighlight = 10;
   const headlineStartY = height - 120 - totalTextHeight;
 
   if (titleLines.length > 5) {
@@ -243,35 +223,19 @@ function buildSquareSvg(
     titleLines[4] = titleLines[4].slice(0, -3) + "...";
   }
 
-  const allLineWords = titleLines.map(line => line.split(" "));
-  const allWords = allLineWords.flat();
   const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "SUSPENDS", "BLOCKS", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "DATA", "SECURITY", "PRIVACY", "THREAT", "CYBER", "NEW", "MAJOR"];
-  const highlightedWords = new Set<number>();
-  allWords.forEach((word, idx) => {
-    if (importantTerms.some(t => word.includes(t))) highlightedWords.add(idx);
-  });
-  if (highlightedWords.size === 0) {
-    const mid = Math.floor(allWords.length / 2);
-    highlightedWords.add(mid);
-    if (mid + 1 < allWords.length) highlightedWords.add(mid + 1);
-  }
 
   let headlineSvg = "";
-  let globalWordIdx = 0;
   for (let lineIdx = 0; lineIdx < titleLines.length; lineIdx++) {
-    const y = headlineStartY + lineIdx * lineHeight;
-    const words = allLineWords[lineIdx];
-    let curX = padX;
-    const charWidth = fontSize * 0.62;
-    for (const word of words) {
-      const wordWidth = word.length * charWidth;
-      if (highlightedWords.has(globalWordIdx)) {
-        headlineSvg += `<rect x="${curX - padHighlight}" y="${y - fontSize + 4}" width="${wordWidth + padHighlight * 2}" height="${fontSize + 6}" fill="${topic.accent}"/>`;
-      }
-      headlineSvg += `<text x="${curX}" y="${y}" font-family="'Impact','Arial Black',Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="${BRAND.white}" letter-spacing="1">${escapeXml(word)}</text>`;
-      curX += wordWidth + charWidth * 0.6;
-      globalWordIdx++;
-    }
+    const y = headlineStartY + lineIdx * lineHeight + fontSize;
+    const words = titleLines[lineIdx].split(" ");
+    const tspans = words.map(w => {
+      const isAccent = importantTerms.some(t => w.includes(t));
+      return isAccent
+        ? `<tspan fill="${topic.accent}" font-weight="900">${escapeXml(w)}</tspan>`
+        : `<tspan>${escapeXml(w)}</tspan>`;
+    }).join(" ");
+    headlineSvg += `<text x="${padX}" y="${y}" font-family="Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" fill="${BRAND.white}" letter-spacing="1" word-spacing="8">${tspans}</text>`;
   }
 
   const gridLines: string[] = [];
@@ -341,8 +305,8 @@ export async function generateBrandedImage(
     const isSquare = platform === "instagram";
 
     const svg = isSquare
-      ? buildSquareSvg(dims.width, dims.height, cleanTitle, contentType, config)
-      : buildLandscapeSvg(dims.width, dims.height, cleanTitle, contentType, config);
+      ? buildSquareSvg(dims.width, dims.height, cleanTitle, config)
+      : buildLandscapeSvg(dims.width, dims.height, cleanTitle, config);
 
     const logoSize = isSquare ? 90 : 75;
     const logoBuffer = await getLogoPngBuffer(logoSize);

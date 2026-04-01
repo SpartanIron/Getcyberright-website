@@ -15,18 +15,27 @@ const anthropic = new Anthropic({
 type ContentItem = CyberSafetyGuide | CyberThreatAlert | ScamIntelligence;
 
 function sanitizePostContent(text: string): string {
-  return text
+  const urlPlaceholders: string[] = [];
+  let processed = text.replace(/https?:\/\/[^\s)]+/g, (url) => {
+    urlPlaceholders.push(url);
+    return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
+  });
+
+  processed = processed
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/\*([^*]+)\*/g, "$1")
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^[-*]\s+/gm, "")
-    .replace(/\u2014/g, ", ")
-    .replace(/\u2013/g, ", ")
-    .replace(/-/g, ", ")
-    .replace(/–/g, ", ")
+    .replace(/\u2014/g, " — ")
+    .replace(/\u2013/g, " — ")
     .replace(/\s{2,}/g, " ")
-    .replace(/ ,/g, ",")
     .trim();
+
+  urlPlaceholders.forEach((url, i) => {
+    processed = processed.replace(`__URL_PLACEHOLDER_${i}__`, url);
+  });
+
+  return processed;
 }
 
 const socialPostSetSchema = z.object({
