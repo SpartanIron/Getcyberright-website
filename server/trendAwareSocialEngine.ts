@@ -1731,13 +1731,10 @@ async function searchStockPhoto(category: string, title: string): Promise<{ url:
   const queries = extractSearchQuery(title, category);
   const query = queries[0];
 
-  const shutterstockResult = await searchShutterstockPhoto(query);
-  if (shutterstockResult) return shutterstockResult;
-
   const pexelsResult = await searchPexelsPhoto(query, category);
   if (pexelsResult) return pexelsResult;
 
-  console.log(`[TrendEngine] No stock photos found from Shutterstock or Pexels, trying local...`);
+  console.log(`[TrendEngine] No stock photos found from Pexels, trying local...`);
   await ensureLocalStockPhotos();
   const localPath = getLocalStockPhoto();
   if (localPath) {
