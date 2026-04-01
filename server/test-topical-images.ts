@@ -79,9 +79,14 @@ async function fetchPexelsPhoto(query: string): Promise<Buffer | null> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
+    const headers: Record<string, string> = { "Accept": "*/*" };
+    const pexelsKey = process.env.PEXELS_API_KEY;
+    if (pexelsKey) headers["Authorization"] = pexelsKey;
+    else headers["User-Agent"] = "curl/8.0";
+
     const response = await fetch(
       `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=10&orientation=landscape&size=large`,
-      { signal: controller.signal, headers: { "User-Agent": "curl/8.0", "Accept": "*/*" } }
+      { signal: controller.signal, headers }
     );
     clearTimeout(timeout);
 
