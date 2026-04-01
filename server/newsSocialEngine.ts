@@ -174,6 +174,32 @@ function sanitizePostContent(text: string): string {
   return processed;
 }
 
+function ensureParagraphBreaks(text: string, platform: string): string {
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+  const minParagraphs = platform === "linkedin" ? 4 : 3;
+
+  if (paragraphs.length >= minParagraphs) return text;
+
+  const sentences = text.replace(/\n/g, " ").split(/(?<=[.!?])\s+/).filter(s => s.trim());
+  if (sentences.length < 3) return text;
+
+  const reformatted: string[] = [];
+  if (platform === "linkedin") {
+    reformatted.push(sentences.slice(0, 2).join(" "));
+    for (let i = 2; i < sentences.length; i += 2) {
+      reformatted.push(sentences.slice(i, i + 2).join(" "));
+    }
+  } else {
+    reformatted.push(sentences.slice(0, 2).join(" "));
+    for (let i = 2; i < sentences.length; i += 3) {
+      reformatted.push(sentences.slice(i, i + 3).join(" "));
+    }
+  }
+
+  console.log(`[NewsSocial] Reformatted ${platform} post: split wall of text into ${reformatted.length} paragraphs`);
+  return reformatted.join("\n\n");
+}
+
 interface GeneratedNewsPosts {
   linkedin: string;
   facebook: string;
@@ -219,8 +245,11 @@ ABSOLUTE RULES:
 - NEVER use markdown formatting (no ** bold **, no * italics *, no ## headings, no bullet markers)
 - NEVER use em dashes. Use commas, periods, colons, or semicolons instead
 - Use numbered lists (1. 2. 3.) when listing steps, but never markdown bullet points
-- Use line breaks and short paragraphs, not markdown symbols
 - Use emojis sparingly and purposefully (1-3 per post maximum)
+- VISUAL STRUCTURE IS MANDATORY. Use \\n (newlines) to create clear paragraph breaks between sections. Never write a continuous block of text
+- Structure: Hook (1-2 sentences) → blank line → value/insight → blank line → details or tips → blank line → CTA with link
+- Keep paragraphs SHORT: 2-3 sentences max. Break longer paragraphs
+- LinkedIn posts MUST have at least 4 blank lines between sections. Facebook posts MUST have at least 3
 - The link to the article MUST be ${articleUrl} exactly
 
 VOICE AND TONE:
@@ -261,8 +290,8 @@ Generate posts in this EXACT JSON format (output ONLY the JSON, no markdown code
     const parsed = JSON.parse(cleaned);
 
     return {
-      linkedin: sanitizePostContent(parsed.linkedin || ""),
-      facebook: sanitizePostContent(parsed.facebook || ""),
+      linkedin: ensureParagraphBreaks(sanitizePostContent(parsed.linkedin || ""), "linkedin"),
+      facebook: ensureParagraphBreaks(sanitizePostContent(parsed.facebook || ""), "facebook"),
       hashtags: parsed.hashtags || ["CyberSecurity", "OnlineSafety", "FamilySafety"],
     };
   } catch (error: any) {

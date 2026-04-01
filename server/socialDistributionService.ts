@@ -28,7 +28,8 @@ function sanitizePostContent(text: string): string {
     .replace(/^[-*]\s+/gm, "")
     .replace(/\u2014/g, " — ")
     .replace(/\u2013/g, " — ")
-    .replace(/\s{2,}/g, " ")
+    .replace(/[^\S\n]{2,}/g, " ")
+    .replace(/\n{4,}/g, "\n\n\n")
     .trim();
 
   urlPlaceholders.forEach((url, i) => {
@@ -36,6 +37,32 @@ function sanitizePostContent(text: string): string {
   });
 
   return processed;
+}
+
+function ensureParagraphBreaks(text: string, platform: string): string {
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+  const minParagraphs = platform === "linkedin" ? 4 : 3;
+
+  if (paragraphs.length >= minParagraphs) return text;
+
+  const sentences = text.replace(/\n/g, " ").split(/(?<=[.!?])\s+/).filter(s => s.trim());
+  if (sentences.length < 3) return text;
+
+  const reformatted: string[] = [];
+  if (platform === "linkedin") {
+    reformatted.push(sentences.slice(0, 2).join(" "));
+    for (let i = 2; i < sentences.length; i += 2) {
+      reformatted.push(sentences.slice(i, i + 2).join(" "));
+    }
+  } else {
+    reformatted.push(sentences.slice(0, 2).join(" "));
+    for (let i = 2; i < sentences.length; i += 3) {
+      reformatted.push(sentences.slice(i, i + 3).join(" "));
+    }
+  }
+
+  console.log(`[SocialDistribution] Reformatted ${platform} post: split wall of text into ${reformatted.length} paragraphs`);
+  return reformatted.join("\n\n");
 }
 
 const socialPostSetSchema = z.object({
@@ -90,12 +117,17 @@ SOURCE DIVERSITY (CRITICAL):
 - If the source material references a specific agency, you may cite that agency, but across a set of posts, ensure variety
 - GetCyberRight serves a global audience: reference international agencies and perspectives
 
-Formatting rules (STRICT):
+Formatting rules (STRICT — this determines whether posts look professional or like a wall of text):
 - NEVER use markdown formatting. No ** bold **, no * italics *, no ## headings, no bullet markers
 - NEVER use em dashes. Use commas, periods, colons, or semicolons instead
 - Use proper sentence structure with correct grammar and punctuation throughout
-- Use line breaks and short paragraphs to organize thoughts, not markdown symbols
 - Use numbered lists (1. 2. 3.) when listing steps, but never markdown bullet points
+- VISUAL STRUCTURE IS MANDATORY. Use \\n (newlines) to create clear paragraph breaks. Every post must have visual breathing room between sections. Do NOT write a continuous block of text
+- Structure every LinkedIn and Facebook post exactly like this:
+  [Hook: 1-2 punchy sentences]\\n\\n[Value paragraph: key insight or tip]\\n\\n[Second point or supporting detail]\\n\\n[CTA with link on its own line]
+- Keep paragraphs SHORT: 2-3 sentences max per paragraph. If a paragraph runs longer, break it
+- Numbered tips should each start on their own line with a blank line before and after the group
+- The link MUST be on its own final line, separated by a blank line from the text above it
 
 Your voice is:
 - Professional, knowledgeable, and approachable
@@ -130,19 +162,23 @@ ${educationalContext}
 Create excerpt-style posts for each platform. Each post should share a compelling taste of the article and drive readers to the full piece on our website.
 ${buildPartnerContext("linkedin", tags[0] || "general_awareness")}${buildPartnerContext("facebook", tags[0] || "general_awareness")}${buildPartnerContext("x", tags[0] || "general_awareness")}${buildPartnerContext("instagram", tags[0] || "general_awareness")}
 1. LINKEDIN (150-250 words)
+- STRUCTURE: Hook paragraph (1-2 sentences) → blank line → value paragraph → blank line → action steps or insight → blank line → teaser line → blank line → CTA with link
 - Open with the single most compelling insight, stat, or story from the article
 - Share 1-2 specific takeaways that demonstrate the article's value
 - Include a "teaser" line hinting at what else the full article covers (e.g. "The full guide covers 7 more warning signs and a step-by-step action plan.")
-- ALGORITHM TIP: LinkedIn penalizes posts with external links in the body. Write pure value content first, then put the link on its own final line separated by TWO line breaks. Front-load the insight above the "see more" fold
-- End with a clear CTA: "Read the full guide here:" followed by the link on its own line
+- ALGORITHM TIP: LinkedIn penalizes posts with external links in the body. Write pure value content first, then put the link on its own final line separated by TWO blank lines. Front-load the insight above the "see more" fold
+- End with "Read the full guide here:" followed by the link on its own line
 - Professional but human tone
+- MUST have at least 4 paragraph breaks (blank lines) throughout the post
 
 2. FACEBOOK (80-150 words)
+- STRUCTURE: Hook line → blank line → value/insight → blank line → CTA with link
 - Start with a relatable hook or surprising fact from the article
 - Share one practical tip or insight as a preview
-- ALGORITHM TIP: Facebook deprioritizes posts with external links. Write the post as native content that provides value on its own. Put the link on a separate final line after a clear paragraph break. The more it reads like organic content, the more Facebook will distribute it
-- End with a conversational CTA that drives to the article (e.g. "We break down exactly how to protect yourself. Read more here:" followed by the link)
+- ALGORITHM TIP: Facebook deprioritizes posts with external links. Write the post as native content that provides value on its own. Put the link on a separate final line after a blank line
+- End with a conversational CTA driving to the article, with the link on its own line
 - Warm, conversational, like advising a neighbor
+- MUST have at least 3 paragraph breaks (blank lines) throughout the post
 
 3. X/TWITTER THREAD (3-4 tweets, each under 270 chars)
 - Tweet 1: A hook with the most surprising or alarming insight from the article
@@ -152,11 +188,13 @@ ${buildPartnerContext("linkedin", tags[0] || "general_awareness")}${buildPartner
 - Each tweet should make readers want to click through
 
 4. INSTAGRAM (120-200 words)
+- STRUCTURE: Hook line → blank line → numbered tips/points → blank line → CTA → blank line → hashtags
 - Hook in the first line that creates curiosity
-- Share 2-3 key points from the article as a preview
+- Share 2-3 key points from the article as numbered items, each on its own line
 - End with a CTA: "Full guide on our website, link in bio" or "Read the complete guide at getcyberright.com"
-- ALGORITHM TIP: Instagram rewards saves and shares. Write captions people want to save for later. Carousel posts get 3x more engagement than single images. Format tips as numbered lists that feel bookmark-worthy
-- Include 8-12 relevant hashtags at the end, separated by a line break
+- ALGORITHM TIP: Instagram rewards saves and shares. Format tips as numbered lists that feel bookmark-worthy
+- Include 8-12 relevant hashtags at the end, separated by a blank line
+- MUST have at least 3 paragraph breaks (blank lines) throughout the caption
 
 5. SHORT ALERT (under 150 chars)
 - Urgent, specific excerpt with a teaser
@@ -194,10 +232,10 @@ Format as JSON:
     if (!validated.success) {
       console.warn("[SocialDistribution] AI output validation issues:", validated.error.issues.map(i => `${i.path}: ${i.message}`).join(", "));
       return {
-        linkedin: sanitizePostContent(parsed.linkedin || ""),
-        facebook: sanitizePostContent(parsed.facebook || parsed.linkedin || ""),
+        linkedin: ensureParagraphBreaks(sanitizePostContent(parsed.linkedin || ""), "linkedin"),
+        facebook: ensureParagraphBreaks(sanitizePostContent(parsed.facebook || parsed.linkedin || ""), "facebook"),
         xThread: Array.isArray(parsed.xThread) ? parsed.xThread.map(sanitizePostContent) : [],
-        instagram: sanitizePostContent(parsed.instagram || ""),
+        instagram: ensureParagraphBreaks(sanitizePostContent(parsed.instagram || ""), "instagram"),
         shortAlert: sanitizePostContent(parsed.shortAlert || ""),
         hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
       };
@@ -205,10 +243,10 @@ Format as JSON:
 
     const data = validated.data;
     return {
-      linkedin: sanitizePostContent(data.linkedin),
-      facebook: sanitizePostContent(data.facebook),
+      linkedin: ensureParagraphBreaks(sanitizePostContent(data.linkedin), "linkedin"),
+      facebook: ensureParagraphBreaks(sanitizePostContent(data.facebook), "facebook"),
       xThread: data.xThread.map(sanitizePostContent),
-      instagram: sanitizePostContent(data.instagram),
+      instagram: ensureParagraphBreaks(sanitizePostContent(data.instagram), "instagram"),
       shortAlert: sanitizePostContent(data.shortAlert),
       hashtags: data.hashtags,
     };
