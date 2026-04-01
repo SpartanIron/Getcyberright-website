@@ -16,6 +16,7 @@ import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
+import { BreachChecker } from "@/components/breach-checker";
 import type { WebSiteData, OrganizationData } from "@/components/structured-data";
 
 const websiteSchema: WebSiteData = {
@@ -48,6 +49,9 @@ export default function Home() {
         <LiveActivityBar />
         <TrustStrip />
         <HowItWorks />
+        <section id="breach-checker" className="py-16 px-4 max-w-3xl mx-auto scroll-mt-24">
+          <BreachChecker />
+        </section>
         <ThreatAwareness />
         <PillarTiles />
         <PromoBanners />

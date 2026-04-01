@@ -108,19 +108,26 @@ async function generateSuggestedComment(title: string, snippet: string, topic: s
       messages: [
         {
           role: "user",
-          content: `You are the social media voice for GetCyberRight, a cybersecurity education platform for families. Write a brief, thoughtful comment (2-3 sentences max) to post on a ${topic}-related article/post.
+          content: `Write a short comment (2-3 sentences) responding to this ${topic}-related article, as if you're a real person who works in cybersecurity and genuinely cares about helping everyday people stay safe online.
 
 Article: "${title}"
 Source: ${source}
 Context: ${snippet?.slice(0, 200) || "N/A"}
 
-Rules:
-- Sound like a knowledgeable cybersecurity educator, not a sales pitch
-- Add genuine value: share a tip, insight, or perspective the reader benefits from
-- Naturally mention GetCyberRight ONLY if it fits organically (e.g. "We cover this topic in depth at GetCyberRight" or "Our team at GetCyberRight has been tracking this")
+Critical rules for sounding human:
+- Write like you're texting a friend about something important, not writing a press release
+- Use contractions naturally (don't, it's, that's, we've)
+- Start with a reaction a real person would have ("This one hits close to home" or "Saw this coming" or "My parents almost fell for something like this last month")
+- Share ONE specific, practical thing someone can actually do right now
+- Vary your sentence lengths. Mix short punchy ones with longer ones.
+- It's okay to be slightly informal, slightly opinionated, or to show real concern
+- Reference personal experience or "I've seen this happen" type language occasionally
+- Do NOT say "Great article" or "Important read" or any generic praise
+- Do NOT use corporate phrases like "It's crucial that" or "It is imperative" or "This underscores the importance"
 - Do NOT use hashtags, emojis, or exclamation marks
-- Keep it conversational and professional
-- Focus on helping the reader understand why this matters to them personally
+- Do NOT mention GetCyberRight unless it flows completely naturally (skip it most of the time)
+- Do NOT start with "As a cybersecurity professional" or similar self-important openers
+- Never use the phrase "in today's digital landscape" or "cyber hygiene" or "threat landscape"
 
 Write ONLY the comment text, nothing else.`,
         },
@@ -138,32 +145,34 @@ Write ONLY the comment text, nothing else.`,
 function generateFallbackComment(title: string, topic: string): string {
   const templates: Record<string, string[]> = {
     data_breach: [
-      "This is a critical reminder for everyone to review their accounts and enable two-factor authentication. At GetCyberRight, we help families understand exactly what to do after a breach like this.",
-      "The scale of this breach is concerning. If you or your family may be affected, the most important first step is changing passwords on any related accounts and monitoring your credit reports.",
+      "I've been helping people deal with breaches for years and the same advice always applies — change those passwords now, turn on two-factor auth, and check your bank statements for the next few weeks. Don't wait on the company to tell you what to do.",
+      "Honestly, the number of people who reuse passwords across sites is what makes breaches like this so dangerous. If that email/password combo is the same one you use for your bank, go change it right now. Seriously, right now.",
+      "My neighbor got hit by a breach like this last year and didn't find out until someone opened a credit card in her name. Freezing your credit with all three bureaus takes about 15 minutes and it's free.",
     ],
     phishing: [
-      "Phishing continues to be the number one entry point for cyber attacks. The best defense is awareness — knowing what to look for before you click. We break this down in simple terms at GetCyberRight.",
-      "These tactics are getting more sophisticated every day. Teaching families to pause and verify before clicking any unexpected link or message can prevent most of these attacks.",
+      "I tell everyone the same thing — if an email makes you feel like you need to act RIGHT NOW, that's exactly when you should slow down. Scammers bank on panic. Call the company directly using a number you look up yourself.",
+      "The phishing emails going around lately are wild. I almost clicked one myself last week that looked exactly like a real shipping notification. The only giveaway was hovering over the link and seeing a weird domain.",
+      "My mom got one of these last month and thankfully called me before clicking. The trick that works best is just picking up the phone and calling whoever supposedly sent you the message.",
     ],
     ransomware: [
-      "Ransomware attacks are affecting organizations of all sizes. The best protection is a combination of regular backups, software updates, and security awareness training for everyone in the organization.",
-      "This underscores why backup strategies and security awareness matter for businesses of every size. Prevention is far less costly than recovery.",
+      "The thing nobody talks about enough with ransomware is backups. A $50 external hard drive and 20 minutes a week backing up your files takes away most of the leverage these attackers have.",
+      "Seen way too many small businesses get wiped out by this. The fix isn't complicated — keep backups offline, keep your software updated, and make sure your team knows not to open weird attachments.",
     ],
     vulnerability: [
-      "If you haven't patched yet, now is the time. We recommend enabling automatic updates wherever possible — it's one of the simplest and most effective security measures available.",
-      "Timely patching remains one of the most effective defenses. At GetCyberRight, we help families and individuals understand which updates matter most and why.",
+      "If you haven't updated yet, go do it now. I know update notifications are annoying but this one actually matters. Takes a couple minutes and saves you a massive headache later.",
+      "I keep telling people — turn on automatic updates and forget about it. Most of these vulnerabilities get exploited within days of being announced. The people who patch fast are the ones who don't get hit.",
     ],
     scam: [
-      "Scams like these are designed to create urgency and bypass your critical thinking. The best defense is slowing down and verifying through official channels before taking any action.",
-      "These scams are becoming increasingly convincing. We cover how to spot and avoid them at GetCyberRight — because awareness is the first line of defense.",
+      "This one's been making the rounds. The biggest red flag is always urgency — \"act now or lose your account\" type language. Real companies don't operate that way. When in doubt, hang up and call back using the number on their actual website.",
+      "My uncle fell for something like this a few months back. The scammers are getting really good at sounding legit. Best thing you can do is just never act on an unsolicited call or message without verifying independently first.",
     ],
     family_safety: [
-      "This is exactly why digital literacy conversations need to start at home. At GetCyberRight, we provide free resources to help families navigate online safety together.",
-      "Protecting families online requires ongoing conversation, not just one-time settings. We help parents and caregivers stay informed about the latest risks at GetCyberRight.",
+      "I've found the best thing you can do is just sit with your kids while they're online sometimes. Not hovering, just being around and asking what they're watching or who they're talking to. It opens up conversations naturally.",
+      "Had a good talk with my teenager last week about this kind of thing. The reality is they're going to be online whether we like it or not — the goal is making sure they know what to watch out for and feel comfortable telling us when something feels off.",
     ],
     general: [
-      "Great coverage of an important topic. Cybersecurity affects everyone, and staying informed is the first step toward better protection. We cover topics like this at GetCyberRight.",
-      "Important topic that deserves more attention. Understanding these risks is key to protecting yourself and your family online.",
+      "This is worth paying attention to. The thing most people don't realize is that basic precautions — strong unique passwords, two-factor auth, and not clicking random links — stop the vast majority of attacks.",
+      "We've been seeing a lot more of this lately. If nothing else, take five minutes today to make sure your important accounts have two-factor turned on. It's the single best thing you can do.",
     ],
   };
 
@@ -363,25 +372,34 @@ export async function createResponsePost(
       messages: [
         {
           role: "user",
-          content: `You are the social media voice for GetCyberRight, a family-focused cybersecurity education platform. Create a response post for ${opp.platform} about this trending cybersecurity topic.
+          content: `Write a ${opp.platform} post about this cybersecurity topic. Write like a real person who works in security and talks about it because they genuinely care — not like a brand account.
 
 Article: "${opp.sourceTitle}"
 Source: ${opp.sourceAuthor || "Unknown"}
 Context: ${opp.sourceSnippet?.slice(0, 300) || "N/A"}
 Topic: ${opp.topic}
 
-Your approved take/insight: "${comment}"
+Your take on this: "${comment}"
 
-Rules:
-- Write a standalone post for OUR ${opp.platform} profile that responds to this trending topic
-- Lead with our expert perspective or the key insight from the approved comment
-- Reference the original article/source naturally (e.g. "According to ${opp.sourceAuthor}..." or "A new report reveals...")
-- Include one actionable tip for families or individuals
-- End with a call to learn more at getcyberright.com if appropriate
-- LinkedIn: 150-250 words, professional tone, include 3-5 relevant hashtags at the end
-- Facebook: 80-150 words, conversational and approachable, no hashtags
-- Do NOT use emojis or exclamation marks
-- Do NOT include the article URL in the post body (it will be added as a first comment)
+How to write this:
+- Open with a hook that feels like something you'd actually say out loud ("So this happened..." or "Been thinking about this one all morning" or "Here's the thing nobody's talking about with this breach")
+- Reference the source naturally — don't make it sound like a book report
+- Give ONE concrete thing people can actually do. Be specific. "Change your password" is too vague. "Go to haveibeenpwned.com and check if your email shows up" is useful.
+- Write like you're explaining this to a smart friend who doesn't work in tech
+- Use contractions. Use short sentences mixed with longer ones. Let some personality show.
+- It's fine to express a real opinion ("honestly this was preventable" or "this worries me")
+
+Platform rules:
+- LinkedIn: 120-200 words, a bit more polished but still conversational, 3-4 hashtags at the end only
+- Facebook: 60-120 words, casual and warm, no hashtags
+
+Absolute don'ts:
+- No emojis, no exclamation marks
+- Don't say "in today's digital landscape" or "it's crucial" or "cyber hygiene" or "threat actors"
+- Don't start with "As cybersecurity professionals" or "Here at GetCyberRight"
+- Don't sound like a press release or a LinkedIn thought leader parody
+- Don't include the article URL (it goes in a separate comment)
+- Only mention getcyberright.com if it genuinely fits the flow — skip it most of the time
 
 Write ONLY the post text for ${opp.platform}, nothing else.`,
         },

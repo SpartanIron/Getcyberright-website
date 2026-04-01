@@ -983,19 +983,30 @@ ${performanceContext}
 
 Execute ALL steps of your intelligence pipeline (Signal Interpretation, Source Validation, Relevance Filter, Risk Scoring, Insight Generation, Content Mode Selection, Content Creation, Visual Planning, Product Mapping, Validation, Confidence Scoring), then output:
 
+CRITICAL VOICE RULES FOR ALL PLATFORMS:
+- Write like a real human who works in cybersecurity and genuinely cares, NOT like a brand account or AI
+- Use contractions (don't, it's, we've, that's). Always.
+- Mix short sentences with longer ones. Vary your rhythm.
+- It's okay to express opinions ("this one worries me" or "honestly, this was preventable")
+- Be specific with advice. "Go to haveibeenpwned.com and check your email" beats "monitor your accounts"
+- Reference relatable situations (your parents, your kids, your coworker who clicks everything)
+- NEVER say: "in today's digital landscape", "it's crucial", "cyber hygiene", "threat landscape", "threat actors", "it is imperative", "this underscores", "as cybersecurity professionals"
+- NEVER open with generic corporate lines. Open with something a real person would actually say.
+- NEVER sound like a press release or marketing copy.
+
 LINKEDIN POST (120-180 words max, STRICTLY ENFORCED):
-- Professional audience, both technical and non-technical
-- Structure MUST be: Hook (1-2 punchy lines) \\n\\n Brief insight (1-2 paragraphs) \\n\\n 1-2 actionable tips as preview \\n\\n CTA with link to relevant GetCyberRight page
-- First 2 lines are everything. They appear before "see more". Make them count
-- Each paragraph: 1-2 sentences MAX. Break after every thought
-- End with a clear CTA driving to the relevant GetCyberRight page (e.g. "Full breakdown and protection steps:" followed by the link on its own line)
+- Professional but still sounds like a real person, not a thought-leader parody
+- Structure: Hook that stops the scroll (something you'd actually say out loud) \\n\\n Your take on why this matters \\n\\n 1-2 specific things people can do right now \\n\\n CTA with link
+- First 2 lines appear before "see more". Make them feel real, not salesy.
+- Each paragraph: 1-2 sentences MAX. Break after every thought.
+- End with a natural CTA driving to the relevant GetCyberRight page
 - The post MUST contain at least 4 paragraph breaks (\\n\\n)
 ${partnerContextLinkedIn}
 FACEBOOK POST (60-120 words max):
-- Conversational, like talking to a neighbor
-- Share the most surprising or relatable insight from the topic
-- Give 1-2 quick tips as a preview
-- End with a conversational CTA and link (e.g. "We put together a full guide on this. Check it out:" followed by the link)
+- Casual and warm, like texting a group chat about something important
+- Share the thing that would make someone actually stop scrolling
+- Give 1 quick specific tip
+- End with a natural CTA and link (not "Click here to learn more" but something like "We broke this down step by step here:")
 - Use paragraph breaks between thoughts
 ${partnerContextFacebook}
 INSTAGRAM POST (40-80 words max, CRITICAL DIFFERENCES):
@@ -1004,7 +1015,7 @@ INSTAGRAM POST (40-80 words max, CRITICAL DIFFERENCES):
 - Keep it short and scannable. 2-3 short paragraphs max
 - Do NOT put links in the caption (they are not clickable on Instagram). Instead end with "Link in bio" as CTA
 - Add 8-12 relevant hashtags at the END, separated from the caption by two line breaks
-- Use a slightly more casual, direct tone than LinkedIn
+- Most casual of all platforms. Write like you're talking to a friend.
 - Focus on ONE key takeaway, not multiple tips
 ${partnerContextInstagram}
 
