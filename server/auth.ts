@@ -6,7 +6,7 @@ import speakeasy from "speakeasy";
 import QRCode from "qrcode";
 import crypto from "crypto";
 import { db } from "./db";
-import { users, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema, changePasswordSchema, mfaVerifySchema } from "@shared/schema";
+import { users, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema, changePasswordSchema, mfaVerifySchema, isFreeAccessPeriod } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { securityLogger, failedLoginTracker, ipBlocklist } from "./security";
 import { sendEmailVerification } from "./email-service";
@@ -437,6 +437,7 @@ export function registerAuthRoutes(app: Express) {
   // Get current user
   app.get("/api/auth/user", isAuthenticated, async (req, res) => {
     const user = (req as any).user;
+    const freeAccess = isFreeAccessPeriod();
     res.json({
       id: user.id,
       email: user.email,
@@ -445,13 +446,14 @@ export function registerAuthRoutes(app: Express) {
       profileImageUrl: user.profileImageUrl,
       mfaEnabled: user.mfaEnabled,
       mustChangePassword: user.mustChangePassword,
-      subscriptionTier: user.subscriptionTier,
+      subscriptionTier: freeAccess ? "professional" : user.subscriptionTier,
       subscriptionExpiresAt: user.subscriptionExpiresAt,
-      shieldSubscriptionTier: user.shieldSubscriptionTier || "free",
+      shieldSubscriptionTier: freeAccess ? "professional" : (user.shieldSubscriptionTier || "free"),
       shieldSubscriptionExpiresAt: user.shieldSubscriptionExpiresAt,
       isAdmin: user.isAdmin,
       emailVerified: user.emailVerified,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
+      freeAccessPeriod: freeAccess
     });
   });
   

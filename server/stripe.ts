@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import type { Express, Request, Response } from "express";
 import { db } from "./db";
-import { users } from "@shared/schema";
+import { users, isFreeAccessPeriod } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { isAuthenticated } from "./auth";
 
@@ -185,6 +185,9 @@ export function registerStripeRoutes(app: Express) {
 
   app.post("/api/stripe/create-checkout", isAuthenticated, async (req: any, res: Response) => {
     try {
+      if (isFreeAccessPeriod()) {
+        return res.status(400).json({ error: "All features are currently free! No payment needed." });
+      }
       const s = getStripe();
       const user = req.user;
       const { planId, returnPath } = req.body;

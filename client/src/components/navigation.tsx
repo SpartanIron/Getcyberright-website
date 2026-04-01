@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper, CreditCard, Chrome, Radio, Baby, ClipboardCheck, ShieldAlert } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { isFreeAccessPeriod } from "@shared/models/auth";
 import logoImage from "@/assets/logo.webp";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -294,6 +295,7 @@ export function Navigation() {
                 </NavigationMenuLink>
               </NavigationMenuItem>
 
+              {!isFreeAccessPeriod() && (
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-[15px]" data-testid="nav-pricing">
                   Pricing
@@ -360,6 +362,7 @@ export function Navigation() {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+              )}
 
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
@@ -487,6 +490,8 @@ export function Navigation() {
                   <span className="font-medium">News</span>
                 </Link>
 
+                {!isFreeAccessPeriod() && (
+                <>
                 <div className="h-px bg-border" />
 
                 <div className="space-y-3">
@@ -523,6 +528,8 @@ export function Navigation() {
                     <span className="font-medium">GCR Data Shield</span>
                   </Link>
                 </div>
+                </>
+                )}
 
                 <div className="h-px bg-border" />
 

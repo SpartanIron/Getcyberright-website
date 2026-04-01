@@ -15,6 +15,7 @@ import {
   Pause,
   Play,
 } from "lucide-react";
+import { isFreeAccessPeriod } from "@shared/models/auth";
 
 import promoShieldImg from "@/assets/images/promo-shield-protection.webp";
 import promoPrivacyImg from "@/assets/images/promo-data-privacy.webp";
@@ -37,18 +38,22 @@ interface PromoBanner {
   accentColor: string;
 }
 
+const freeAccess = isFreeAccessPeriod();
+
 const promos: PromoBanner[] = [
   {
     id: "pro-trial",
-    badge: "Limited Time Offer",
+    badge: freeAccess ? "All Features Free" : "Limited Time Offer",
     badgeIcon: Gift,
     badgeColor: "bg-orange-500/90 text-white",
-    headline: "Try Pro Free for 30 Days",
-    subheadline: "Get auto-scanning, email protection, and real-time alerts with no charge for a full month. See what full protection feels like.",
-    cta: "Start Free Trial",
-    ctaHref: "/gcr-guard-pricing",
-    secondaryCta: "See All Plans",
-    secondaryHref: "/pricing",
+    headline: freeAccess ? "Every Tool Is Free Right Now" : "Try Pro Free for 30 Days",
+    subheadline: freeAccess
+      ? "All GCR Scam Guard and Data Shield tools are completely free. No credit card, no catches. Use everything."
+      : "Get auto-scanning, email protection, and real-time alerts with no charge for a full month. See what full protection feels like.",
+    cta: freeAccess ? "Start Using Tools" : "Start Free Trial",
+    ctaHref: freeAccess ? "/tools" : "/gcr-guard-pricing",
+    secondaryCta: freeAccess ? undefined : "See All Plans",
+    secondaryHref: freeAccess ? undefined : "/pricing",
     image: promoShieldImg,
     overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/75 to-transparent",
     accentColor: "bg-teal-500 hover:bg-teal-600",
@@ -62,8 +67,8 @@ const promos: PromoBanner[] = [
     subheadline: "Your name, email, and phone number are listed on hundreds of data broker websites. GCR Data Shield finds and removes them automatically.",
     cta: "Scan Your Exposure",
     ctaHref: "/shield",
-    secondaryCta: "How It Works",
-    secondaryHref: "/data-shield-pricing",
+    secondaryCta: freeAccess ? "Learn More" : "How It Works",
+    secondaryHref: freeAccess ? "/data-removal" : "/data-shield-pricing",
     image: promoPrivacyImg,
     overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/80 to-transparent",
     accentColor: "bg-blue-500 hover:bg-blue-600",

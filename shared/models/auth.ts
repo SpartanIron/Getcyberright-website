@@ -32,8 +32,15 @@ export const TIER_HIERARCHY: Record<SubscriptionTier, number> = {
   [SUBSCRIPTION_TIERS.ENTERPRISE]: 3,
 };
 
+export const FREE_ACCESS_UNTIL = new Date("2026-10-01T00:00:00Z");
+
+export function isFreeAccessPeriod(): boolean {
+  return new Date() < FREE_ACCESS_UNTIL;
+}
+
 // Helper to check if a tier has access to a required tier
 export function hasTierAccess(userTier: string, requiredTier: string): boolean {
+  if (isFreeAccessPeriod()) return true;
   const userRank = TIER_HIERARCHY[userTier as SubscriptionTier] ?? 0;
   const requiredRank = TIER_HIERARCHY[requiredTier as SubscriptionTier];
   if (requiredRank === undefined) {

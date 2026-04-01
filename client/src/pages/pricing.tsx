@@ -20,6 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { StructuredData } from "@/components/structured-data";
+import { isFreeAccessPeriod, FREE_ACCESS_UNTIL } from "@shared/models/auth";
 
 type BillingInterval = "monthly" | "annual";
 
@@ -186,6 +187,21 @@ export default function PricingPage() {
       <Navigation />
 
       <main id="main-content" tabIndex={-1}>
+        {isFreeAccessPeriod() && (
+          <div className="bg-gradient-to-r from-teal-600 to-teal-500 text-white py-4 px-4 text-center" data-testid="banner-free-access">
+            <div className="max-w-3xl mx-auto">
+              <p className="text-lg font-bold mb-1">All Features Are Currently Free!</p>
+              <p className="text-sm text-white/90">
+                Every tool on GetCyberRight is free to use until {FREE_ACCESS_UNTIL.toLocaleDateString("en-US", { month: "long", year: "numeric" })}. No credit card needed.
+              </p>
+              <Link href="/tools">
+                <Button size="sm" className="mt-2 bg-white text-teal-700 hover:bg-white/90 font-semibold" data-testid="button-start-free">
+                  Start Using Tools Free <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
         <section className="relative py-16 sm:py-20 overflow-hidden" style={{ background: "linear-gradient(135deg, #0A2A3C 0%, #003A52 40%, #0D4D66 70%, #0A2A3C 100%)" }}>
           <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: "-40%", right: "5%", width: "60px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.6 }} />

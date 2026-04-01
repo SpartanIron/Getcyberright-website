@@ -28,6 +28,7 @@ import {
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { isFreeAccessPeriod, FREE_ACCESS_UNTIL } from "@shared/models/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { StructuredData } from "@/components/structured-data";
@@ -237,6 +238,21 @@ export default function DataShieldPricing() {
       <Navigation />
 
       <main className="py-16">
+        {isFreeAccessPeriod() && (
+          <div className="bg-gradient-to-r from-teal-600 to-teal-500 text-white py-4 px-4 text-center -mt-16 mb-8" data-testid="banner-free-access">
+            <div className="max-w-3xl mx-auto">
+              <p className="text-lg font-bold mb-1">All Data Shield Features Are Currently Free!</p>
+              <p className="text-sm text-white/90">
+                Full data broker scanning and removal is free until {FREE_ACCESS_UNTIL.toLocaleDateString("en-US", { month: "long", year: "numeric" })}. No credit card needed.
+              </p>
+              <Link href="/data-removal">
+                <Button size="sm" className="mt-2 bg-white text-teal-700 hover:bg-white/90 font-semibold" data-testid="button-start-free">
+                  Start Your Free Scan <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
         <section className="px-4 sm:px-6 lg:px-8 mb-16">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div

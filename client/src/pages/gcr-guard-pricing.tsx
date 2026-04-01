@@ -24,6 +24,7 @@ import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { isFreeAccessPeriod, FREE_ACCESS_UNTIL } from "@shared/models/auth";
 
 type BillingInterval = "monthly" | "annual";
 
@@ -170,6 +171,21 @@ export default function GcrGuardPricing() {
       <Navigation />
 
       <main id="main-content" tabIndex={-1}>
+        {isFreeAccessPeriod() && (
+          <div className="bg-gradient-to-r from-teal-600 to-teal-500 text-white py-4 px-4 text-center" data-testid="banner-free-access">
+            <div className="max-w-3xl mx-auto">
+              <p className="text-lg font-bold mb-1">All Scam Guard Features Are Currently Free!</p>
+              <p className="text-sm text-white/90">
+                Every protection tool is free to use until {FREE_ACCESS_UNTIL.toLocaleDateString("en-US", { month: "long", year: "numeric" })}. No credit card needed.
+              </p>
+              <Link href="/tools">
+                <Button size="sm" className="mt-2 bg-white text-teal-700 hover:bg-white/90 font-semibold" data-testid="button-start-free">
+                  Start Using Tools Free <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
         <section className="relative py-16 sm:py-20 bg-[#0A2A3C] overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
           <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>

@@ -4,7 +4,7 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { getAllScamSlugs } from "@shared/scam-content";
-import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, userVaultKeys, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports, siteReputation, scanHistory } from "@shared/schema";
+import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, isFreeAccessPeriod, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, userVaultKeys, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports, siteReputation, scanHistory } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, inArray, sql, desc } from "drizzle-orm";
 import { z } from "zod";
@@ -1923,16 +1923,18 @@ RECOMMENDATION TONE CALIBRATION (CRITICAL):
       const now = new Date();
       const sgExpired = user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) < now;
       const dsExpired = user.shieldSubscriptionExpiresAt && new Date(user.shieldSubscriptionExpiresAt) < now;
-      const effectiveSgTier = sgExpired ? "free" : (user.subscriptionTier || "free");
-      const effectiveDsTier = dsExpired ? "free" : (user.shieldSubscriptionTier || "free");
+      const freeAccess = isFreeAccessPeriod();
+      const effectiveSgTier = freeAccess ? "professional" : (sgExpired ? "free" : (user.subscriptionTier || "free"));
+      const effectiveDsTier = freeAccess ? "professional" : (dsExpired ? "free" : (user.shieldSubscriptionTier || "free"));
       
       res.json({
         tier: effectiveSgTier,
         shieldTier: effectiveDsTier,
         expiresAt: user.subscriptionExpiresAt,
         shieldExpiresAt: user.shieldSubscriptionExpiresAt,
-        isExpired: sgExpired,
-        isActive: !sgExpired,
+        isExpired: freeAccess ? false : sgExpired,
+        isActive: freeAccess ? true : !sgExpired,
+        freeAccessPeriod: freeAccess,
         availableTiers: Object.values(SUBSCRIPTION_TIERS)
       });
     } catch (error) {
@@ -5281,8 +5283,9 @@ RECOMMENDATION TONE CALIBRATION (CRITICAL):
         return res.status(401).json({ error: "User not found" });
       }
 
-      const tier = user.subscriptionTier || "free";
-      const isActive = tier === "free" ? true : (!user.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date());
+      const freeAccessExt = isFreeAccessPeriod();
+      const tier = freeAccessExt ? "professional" : (user.subscriptionTier || "free");
+      const isActive = freeAccessExt ? true : (tier === "free" ? true : (!user.subscriptionExpiresAt || new Date(user.subscriptionExpiresAt) > new Date()));
       const effectiveFeatures = isActive ? (TIER_FEATURES[tier] || TIER_FEATURES.free) : TIER_FEATURES.free;
 
       res.json({
@@ -5292,6 +5295,7 @@ RECOMMENDATION TONE CALIBRATION (CRITICAL):
         expiresAt: user.subscriptionExpiresAt,
         email: user.email,
         firstName: user.firstName,
+        freeAccessPeriod: freeAccessExt,
       });
     } catch (error) {
       console.error("Extension subscription status error:", error);
@@ -5340,6 +5344,7 @@ RECOMMENDATION TONE CALIBRATION (CRITICAL):
   });
 
   function getShieldAccessLevel(user: any): { level: "free" | "full"; tier: "free" | "essential" | "professional" } {
+    if (isFreeAccessPeriod()) return { level: "full", tier: "professional" };
     if (!user) return { level: "free", tier: "free" };
 
     const shieldTier = user.shieldSubscriptionTier || "free";
@@ -5960,7 +5965,8 @@ RECOMMENDATION TONE CALIBRATION (CRITICAL):
       const [user] = await db.select().from(users).where(eq(users.id, userId));
       const stats = await getIdentityStats(userId);
       const currentCount = await getUserAliasCount(userId);
-      const shieldTier = user?.shieldSubscriptionTier || "free";
+      const freeAccess = isFreeAccessPeriod();
+      const shieldTier = freeAccess ? "professional" : (user?.shieldSubscriptionTier || "free");
       const limit = getAliasLimit(shieldTier);
       res.json({ ...stats, limit, currentCount, tier: shieldTier });
     } catch (error: any) {
@@ -5978,7 +5984,8 @@ RECOMMENDATION TONE CALIBRATION (CRITICAL):
       const { createMaskedIdentity, getUserAliasCount, getAliasLimit } = await import("./maskedIdentityService");
 
       const [user] = await db.select().from(users).where(eq(users.id, userId));
-      const shieldTier = user?.shieldSubscriptionTier || "free";
+      const freeAccessCreate = isFreeAccessPeriod();
+      const shieldTier = freeAccessCreate ? "professional" : (user?.shieldSubscriptionTier || "free");
       const currentCount = await getUserAliasCount(userId);
       const limit = getAliasLimit(shieldTier);
 
