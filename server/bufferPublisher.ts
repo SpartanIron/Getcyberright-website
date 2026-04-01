@@ -47,6 +47,9 @@ export function isBufferConfigured(): boolean {
 }
 
 async function graphql<T = any>(query: string, variables?: Record<string, any>): Promise<T> {
+  if (Date.now() < rateLimitedUntil) {
+    throw new Error("Buffer API rate-limited, backing off");
+  }
   const token = getBufferToken();
   if (!token) throw new Error("Buffer API key not configured");
 
@@ -61,6 +64,10 @@ async function graphql<T = any>(query: string, variables?: Record<string, any>):
 
   if (!res.ok) {
     const body = await res.text();
+    if (res.status === 429) {
+      rateLimitedUntil = Date.now() + 60 * 60 * 1000;
+      console.warn("[Buffer] Rate-limited (429). Backing off for 1 hour.");
+    }
     throw new Error(`Buffer GraphQL HTTP error ${res.status}: ${body}`);
   }
 
@@ -75,10 +82,17 @@ async function graphql<T = any>(query: string, variables?: Record<string, any>):
 let cachedChannels: BufferChannel[] | null = null;
 let channelCacheTime = 0;
 const CACHE_TTL = 5 * 60 * 1000;
+let rateLimitedUntil = 0;
 
 export async function getBufferChannels(): Promise<BufferChannel[]> {
   if (cachedChannels && Date.now() - channelCacheTime < CACHE_TTL) {
     return cachedChannels;
+  }
+
+  if (Date.now() < rateLimitedUntil) {
+    const waitMin = Math.ceil((rateLimitedUntil - Date.now()) / 60000);
+    console.warn(`[Buffer] Rate-limited, skipping channel fetch (${waitMin}min remaining)`);
+    return cachedChannels ?? [];
   }
 
   try {
@@ -90,10 +104,15 @@ export async function getBufferChannels(): Promise<BufferChannel[]> {
     );
     cachedChannels = data.channels;
     channelCacheTime = Date.now();
+    rateLimitedUntil = 0;
     return data.channels;
   } catch (error: any) {
     console.error("[Buffer] Failed to fetch channels:", error.message);
-    return [];
+    if (error.message?.includes("429") || error.message?.includes("RATE_LIMIT")) {
+      rateLimitedUntil = Date.now() + 60 * 60 * 1000;
+      console.warn("[Buffer] Rate-limited by Buffer API. Backing off for 1 hour.");
+    }
+    return cachedChannels ?? [];
   }
 }
 
