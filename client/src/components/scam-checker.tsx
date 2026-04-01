@@ -2513,7 +2513,7 @@ export function ScamChecker() {
                         <div>
                           <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
                             <Shield className="w-4 h-4 text-primary" />
-                            Recommended Actions
+                            {aiResult.scamRiskLevel === "Low" ? "Good to Know" : "Recommended Actions"}
                           </h4>
                           <ul className="space-y-1.5">
                             {aiResult.recommendedActions.map((action, i) => (
@@ -2871,7 +2871,7 @@ export function ScamChecker() {
             <div className="space-y-3">
               <h4 className="font-semibold flex items-center gap-2">
                 <Shield className="w-4 h-4 text-green-500" />
-                Recommended Actions
+                {result.overallRisk === "safe" || result.overallRisk === "low" ? "Good to Know" : "Recommended Actions"}
               </h4>
               <ul className="space-y-2">
                 {result.recommendations.map((rec, idx) => (

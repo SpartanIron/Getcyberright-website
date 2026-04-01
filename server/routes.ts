@@ -1442,8 +1442,15 @@ BEHAVIORAL CONSTRAINTS
 
 EDGE CASE HANDLING
 - If input is empty or minimal: set scamRiskLevel to "Low" and note insufficient data.
-- If clearly benign: state low risk but advise standard caution.
-- If ambiguous: highlight uncertainty explicitly in confidenceLevel.`;
+- If clearly benign or legitimate: set scamRiskLevel to "Low", give genuinely reassuring recommendations that reflect the actual low risk. Do NOT undermine the result with generic warnings like "proceed with standard caution" or "do not enter personal information". If a site is safe, say so clearly. Examples of good low-risk recommendations: "This appears to be a legitimate website. You can use it normally.", "No threats were found. Keep your browser and system updated for general protection.", "This site uses proper security (HTTPS). Standard browsing is safe."
+- If ambiguous: highlight uncertainty explicitly in confidenceLevel.
+
+RECOMMENDATION TONE CALIBRATION (CRITICAL):
+- Recommendations MUST match the risk level. Do not give high-risk advice for low-risk content.
+- Low risk: Reassuring, confident. "This looks legitimate." Not "Be cautious" or "Verify independently."
+- Moderate risk: Measured caution. "Double-check this through official channels."
+- High/Critical risk: Clear, direct warnings. "Do not interact with this."
+- NEVER give blanket warnings like "do not enter personal information" unless there is actual evidence of risk. Generic warnings on safe sites destroy user trust in the tool.`;
 
       const userMessage = `Please analyze the following content for scam/threat indicators:\n\n${content}`;
 

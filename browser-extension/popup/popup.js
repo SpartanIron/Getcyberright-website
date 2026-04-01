@@ -433,8 +433,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     recsEl.innerHTML = "";
-    if (result.recommendedActions && result.recommendedActions.length > 0) {
+    const safetyTipsLabel = document.getElementById("safety-tips-label");
+    if (risk === "safe") {
+      safetyTipsSection.classList.add("hidden");
+    } else if (result.recommendedActions && result.recommendedActions.length > 0) {
       safetyTipsSection.classList.remove("hidden");
+      if (safetyTipsLabel) {
+        safetyTipsLabel.textContent = (risk === "low") ? "\u2705 GOOD TO KNOW" : "\u26A0\uFE0F RECOMMENDED ACTIONS";
+      }
       result.recommendedActions.slice(0, 3).forEach((rec) => {
         const div = document.createElement("div");
         div.className = "rec-item";

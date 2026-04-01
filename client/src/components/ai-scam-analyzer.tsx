@@ -269,24 +269,26 @@ export function AIScamAnalyzer() {
             </Card>
           )}
 
+          {result.recommendedActions.length > 0 && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-primary" />
-                Recommended Actions
+                {result.scamRiskLevel === "Low" ? "Good to Know" : "Recommended Actions"}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
                 {result.recommendedActions.map((action, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm" data-testid={`text-action-${i}`}>
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className={`w-4 h-4 flex-shrink-0 mt-0.5 ${result.scamRiskLevel === "Low" ? "text-green-500" : "text-primary"}`} />
                     <span className="text-foreground">{action}</span>
                   </li>
                 ))}
               </ul>
             </CardContent>
           </Card>
+          )}
 
           <Card>
             <CardHeader className="pb-3">

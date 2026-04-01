@@ -1406,13 +1406,16 @@ export function analyzePhone(phoneNumber: string): PhoneAnalysisResult {
   }
   
   if (warnings.length === 0) {
-    recommendations.push('No obvious red flags detected, but always verify unknown callers');
-    recommendations.push('Never share personal information, PINs, or passwords over the phone');
+    recommendations.push('This phone number shows no suspicious indicators in our database.');
+    recommendations.push('If you received an unexpected call, you can verify the number by searching it online.');
+  } else if (riskScore <= 15) {
+    recommendations.push('We found minor notes about this number, but nothing alarming.');
+    recommendations.push('If you received an unexpected call, verify the caller through official channels.');
   } else {
-    recommendations.push('Do not share any personal or financial information');
-    recommendations.push('If claiming to be from a company, hang up and call the official number');
+    recommendations.push('Do not share any personal or financial information with this caller.');
+    recommendations.push('If claiming to be from a company, hang up and call the official number directly.');
     if (riskScore >= 30) {
-      recommendations.push('Report suspicious calls to your local cybercrime authority');
+      recommendations.push('Report suspicious calls to your local cybercrime authority.');
     }
   }
   
@@ -1504,12 +1507,19 @@ function analyzeURLInternal(url: string, expandedUrl?: string, redirectChain?: s
     }
 
     if (warnings.length === 0) {
-      recommendations.push('No obvious red flags detected, but always verify you\'re on the official website');
+      recommendations.push('This website passed all our security checks. You can browse it normally.');
+      recommendations.push('Keep your browser updated for the best protection while browsing.');
+    } else if (riskScore <= 20) {
+      recommendations.push('We found minor notes, but nothing that indicates a threat. You can use this site normally.');
+      recommendations.push('As always, only enter sensitive information on websites you trust.');
+    } else if (riskScore <= 40) {
+      recommendations.push('Verify you are on the official website before entering any personal information.');
+      recommendations.push('If you received this link unexpectedly, navigate to the site directly instead.');
     } else {
-      recommendations.push('Do not enter any personal information or passwords on this website');
-      recommendations.push('If you received this link unexpectedly, do not click it');
+      recommendations.push('Do not enter any personal information, passwords, or financial details on this website.');
+      recommendations.push('If you received this link unexpectedly, do not click it.');
       if (riskScore >= 50) {
-        recommendations.push('Contact the company directly through their official website or phone number');
+        recommendations.push('Contact the company directly through their official website or phone number.');
       }
     }
 
