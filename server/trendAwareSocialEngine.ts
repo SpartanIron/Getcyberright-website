@@ -1618,6 +1618,44 @@ function extractSearchQuery(title: string, category: string): string[] {
   return [searchTerms[Math.floor(Math.random() * searchTerms.length)]];
 }
 
+async function searchUnsplashPhoto(query: string): Promise<{ url: string; photographer: string } | null> {
+  const accessKey = process.env.UNSPLASH_ACCESS_KEY;
+  if (!accessKey) return null;
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    const response = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=10&orientation=landscape&content_filter=high`,
+      { signal: controller.signal, headers: { "Authorization": `Client-ID ${accessKey}` } }
+    );
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      console.log(`[TrendEngine] Unsplash returned ${response.status}`);
+      return null;
+    }
+
+    const data: any = await response.json();
+    if (!data.results?.length) return null;
+
+    const validPhotos = data.results.filter((p: any) => (p.width || 0) >= 1200 && (p.height || 0) >= 630);
+    const pool = validPhotos.length > 0 ? validPhotos : data.results;
+    const photo = pool[Math.floor(Math.random() * Math.min(pool.length, 5))];
+    const photoUrl = photo.urls?.raw ? `${photo.urls.raw}&w=2400&q=85&fm=jpg` : photo.urls?.full || photo.urls?.regular;
+    const photographer = photo.user?.name || "Unsplash";
+
+    if (!photoUrl) return null;
+
+    console.log(`[TrendEngine] Unsplash photo: "${(photo.alt_description || '').substring(0, 50)}" by ${photographer} (query: "${query}", ${photo.width}x${photo.height})`);
+    return { url: photoUrl, photographer };
+  } catch (error: any) {
+    console.warn(`[TrendEngine] Unsplash search failed: ${error.message}`);
+    return null;
+  }
+}
+
 async function searchShutterstockPhoto(query: string): Promise<{ url: string; photographer: string } | null> {
   const consumerKey = process.env.SHUTTERSTOCK_CONSUMER_KEY;
   const consumerSecret = process.env.SHUTTERSTOCK_CONSUMER_SECRET;
@@ -1731,10 +1769,13 @@ async function searchStockPhoto(category: string, title: string): Promise<{ url:
   const queries = extractSearchQuery(title, category);
   const query = queries[0];
 
+  const unsplashResult = await searchUnsplashPhoto(query);
+  if (unsplashResult) return unsplashResult;
+
   const pexelsResult = await searchPexelsPhoto(query, category);
   if (pexelsResult) return pexelsResult;
 
-  console.log(`[TrendEngine] No stock photos found from Pexels, trying local...`);
+  console.log(`[TrendEngine] No stock photos found from Unsplash or Pexels, trying local...`);
   await ensureLocalStockPhotos();
   const localPath = getLocalStockPhoto();
   if (localPath) {
