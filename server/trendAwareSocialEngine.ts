@@ -1618,19 +1618,62 @@ function extractSearchQuery(title: string, category: string): string[] {
   return [searchTerms[Math.floor(Math.random() * searchTerms.length)]];
 }
 
-async function searchStockPhoto(category: string, title: string): Promise<{ url: string; photographer: string; localPath?: string } | null> {
-  try {
-    const queries = extractSearchQuery(title, category);
-    const query = queries[0];
+async function searchShutterstockPhoto(query: string): Promise<{ url: string; photographer: string } | null> {
+  const consumerKey = process.env.SHUTTERSTOCK_CONSUMER_KEY;
+  const consumerSecret = process.env.SHUTTERSTOCK_CONSUMER_SECRET;
+  if (!consumerKey || !consumerSecret) return null;
 
-    const pexelsApiKey = process.env.PEXELS_API_KEY;
+  try {
+    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(
+      `https://api.shutterstock.com/v2/images/search?query=${encodeURIComponent(query)}&per_page=10&orientation=horizontal&image_type=photo&sort=relevance&view=full`,
+      { signal: controller.signal, headers: { "Authorization": `Basic ${auth}` } }
+    );
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      console.log(`[TrendEngine] Shutterstock returned ${response.status}`);
+      return null;
+    }
+
+    const data: any = await response.json();
+    if (!data.data?.length) return null;
+
+    const photos = data.data.filter((img: any) => {
+      const a = img.assets?.huge || img.assets?.preview_1500 || {};
+      return (a.width || 0) >= 1000;
+    });
+
+    const pool = photos.length > 0 ? photos : data.data;
+    const photo = pool[Math.floor(Math.random() * Math.min(pool.length, 5))];
+    const asset = photo.assets?.huge || photo.assets?.preview_1500 || photo.assets?.preview || {};
+    const photoUrl = asset.url;
+    const photographer = photo.contributor?.id ? `Shutterstock #${photo.id}` : "Shutterstock";
+
+    if (!photoUrl) return null;
+
+    console.log(`[TrendEngine] Shutterstock photo: "${(photo.description || '').substring(0, 50)}" (query: "${query}", ${asset.width || '?'}x${asset.height || '?'})`);
+    return { url: photoUrl, photographer };
+  } catch (error: any) {
+    console.warn(`[TrendEngine] Shutterstock search failed: ${error.message}`);
+    return null;
+  }
+}
+
+async function searchPexelsPhoto(query: string, category: string): Promise<{ url: string; photographer: string } | null> {
+  const pexelsApiKey = process.env.PEXELS_API_KEY;
+  const pexelsHeaders: Record<string, string> = { "Accept": "*/*" };
+  if (pexelsApiKey) {
+    pexelsHeaders["Authorization"] = pexelsApiKey;
+  }
+  pexelsHeaders["User-Agent"] = "curl/8.0";
+
+  try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
-    const pexelsHeaders: Record<string, string> = { "Accept": "*/*" };
-    if (pexelsApiKey) {
-      pexelsHeaders["Authorization"] = pexelsApiKey;
-    }
-    pexelsHeaders["User-Agent"] = "curl/8.0";
 
     const response = await fetch(
       `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=15&orientation=landscape&size=large`,
@@ -1653,9 +1696,11 @@ async function searchStockPhoto(category: string, title: string): Promise<{ url:
         console.log(`[TrendEngine] Pexels stock photo: "${photo.alt}" by ${photo.photographer} (query: "${query}", ${photo.width}x${photo.height})`);
         return { url: photoUrl, photographer: photo.photographer };
       }
+    }
 
-      console.log(`[TrendEngine] Pexels returned no results for: "${query}", trying fallback...`);
-      const fallbackQuery = (TOPIC_SEARCH_TERMS[category] || TOPIC_SEARCH_TERMS["default"])[0];
+    const fallbackQuery = (TOPIC_SEARCH_TERMS[category] || TOPIC_SEARCH_TERMS["default"])[0];
+    if (fallbackQuery !== query) {
+      console.log(`[TrendEngine] Pexels no results for "${query}", trying fallback "${fallbackQuery}"...`);
       const fbController = new AbortController();
       const fbTimeout = setTimeout(() => fbController.abort(), 8000);
       const fbResponse = await fetch(
@@ -1675,11 +1720,24 @@ async function searchStockPhoto(category: string, title: string): Promise<{ url:
       }
     }
 
-    console.log(`[TrendEngine] Pexels unavailable (status: ${response.status}), trying local stock photos...`);
+    return null;
   } catch (error: any) {
-    console.warn(`[TrendEngine] Pexels search failed: ${error.message}, trying local stock photos...`);
+    console.warn(`[TrendEngine] Pexels search failed: ${error.message}`);
+    return null;
   }
+}
 
+async function searchStockPhoto(category: string, title: string): Promise<{ url: string; photographer: string; localPath?: string } | null> {
+  const queries = extractSearchQuery(title, category);
+  const query = queries[0];
+
+  const shutterstockResult = await searchShutterstockPhoto(query);
+  if (shutterstockResult) return shutterstockResult;
+
+  const pexelsResult = await searchPexelsPhoto(query, category);
+  if (pexelsResult) return pexelsResult;
+
+  console.log(`[TrendEngine] No stock photos found from Shutterstock or Pexels, trying local...`);
   await ensureLocalStockPhotos();
   const localPath = getLocalStockPhoto();
   if (localPath) {
