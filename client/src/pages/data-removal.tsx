@@ -12,6 +12,7 @@ import bannerImage from "@/assets/images/tool-data-scan-diverse.webp";
 import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { motion } from "framer-motion";
 import {
   Shield,
@@ -132,7 +133,7 @@ function AuthenticatedJourney() {
   if (activeView === "brokers") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><BrokerDatabase /></>;
   if (activeView === "reports") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><Reports /></>;
   if (activeView === "monitoring") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><div className="space-y-6"><MonitoringPanel /><ComplianceTracker /></div></>;
-  if (activeView === "identity") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><IdentityShieldPanel /></>;
+  if (activeView === "identity") return <><ViewNav activeView={activeView} setActiveView={setActiveView} /><div className="mb-8"><InlinePromoVideo src="/videos/guides/vault_identity_explainer.mp4" heading="How Identity Shield Protects You" description="See how your Privacy Vault and Identity Shield work together to monitor, detect, and protect your personal information from misuse." className="max-w-3xl mx-auto" /></div><IdentityShieldPanel /></>;
 
   return (
     <div className="space-y-6">
@@ -341,6 +342,15 @@ export default function DataRemoval() {
         />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-10">
+            <InlinePromoVideo
+              src="/videos/guides/data_removal_explainer.mp4"
+              heading="Your Data Is Being Sold — Here's How We Remove It"
+              description="See how GCR Data Shield scans 500+ data broker sites, finds your exposed personal information, and sends opt-out requests to get it removed."
+              className="max-w-3xl mx-auto"
+            />
+          </div>
+
           {isAuthenticated ? <AuthenticatedJourney /> : <GuestScanForm />}
         </div>
       </main>

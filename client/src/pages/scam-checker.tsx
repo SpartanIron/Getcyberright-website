@@ -2,6 +2,7 @@ import { useSEO } from "@/hooks/use-seo";
 import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, FAQData, BreadcrumbData } from "@/components/structured-data";
 import { ScamChecker } from "@/components/scam-checker";
+import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { ShareCallToAction } from "@/components/social-share";
 import { AlertTriangle, Shield, Phone, Link2, MessageSquare, CheckCircle, TrendingUp, TrendingDown, Minus, ArrowLeft, Megaphone, Globe, Bell, Chrome, ThumbsUp, Rss } from "lucide-react";
 import { Link } from "wouter";
@@ -153,6 +154,15 @@ export default function ScamCheckerPage() {
                 Not sure if a message, link, or call is a scam? <strong className="text-slate-700 dark:text-slate-300">Describe the situation</strong>, and we'll help you assess whether you're being targeted.
               </p>
             </div>
+          </div>
+
+          <div className="mb-12">
+            <InlinePromoVideo
+              src="/videos/guides/scam_checker_explainer.mp4"
+              heading="See How GCR Scam Guard Works"
+              description="Watch how our AI instantly detects suspicious links, phone numbers, and scam messages — before they can harm you."
+              className="max-w-3xl mx-auto"
+            />
           </div>
 
           <ScamChecker />

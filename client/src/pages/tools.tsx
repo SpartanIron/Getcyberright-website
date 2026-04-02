@@ -341,10 +341,10 @@ export default function Tools() {
 
         <section className="py-12 sm:py-16">
           <InlinePromoVideo
-            src="/videos/promo-tools.mp4"
+            src="/videos/guides/vault_identity_explainer.mp4"
             poster="/videos/poster-tools.png"
-            heading="See Our Tools in Action"
-            description="Watch how GetCyberRight helps families stay safe from scams, phishing, and online threats."
+            heading="See Our Protection Tools in Action"
+            description="Watch how GetCyberRight's Privacy Vault and Identity Shield work together to keep your family safe from scams, data exposure, and online threats."
             className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
           />
         </section>

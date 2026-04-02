@@ -222,11 +222,16 @@ export function HeroSection() {
             <div className="hidden lg:block">
               <div className="relative -mr-8 xl:-mr-16">
                 <div className="relative overflow-hidden rounded-l-3xl">
-                  <img
-                    src={heroFamilyImg}
-                    alt="Diverse family learning together on a laptop"
+                  <video
+                    src="/videos/guides/hero_protection_overview.mp4"
+                    poster={heroFamilyImg}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    aria-label="GetCyberRight platform overview — family digital protection made simple"
                     className="w-full h-[580px] object-cover"
-                    loading="eager"
+                    data-testid="video-hero-overview"
                   />
                 </div>
               </div>
@@ -234,11 +239,16 @@ export function HeroSection() {
 
             <div className="lg:hidden">
               <div className="relative rounded-2xl overflow-hidden shadow-xl">
-                <img
-                  src={heroFamilyImg}
-                  alt="Diverse family learning together on a laptop"
+                <video
+                  src="/videos/guides/hero_protection_overview.mp4"
+                  poster={heroFamilyImg}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  aria-label="GetCyberRight platform overview — family digital protection made simple"
                   className="w-full h-64 sm:h-80 object-cover"
-                  loading="eager"
+                  data-testid="video-hero-overview-mobile"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C]/60 via-transparent to-transparent" />
               </div>

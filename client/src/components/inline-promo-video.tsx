@@ -86,6 +86,7 @@ export function InlinePromoVideo({ src, poster, heading, description, className 
               variant="ghost"
               className="text-white/90 bg-black/40 backdrop-blur-sm"
               onClick={togglePlay}
+              aria-label={isPlaying ? "Pause video" : "Play video"}
               data-testid="button-inline-pause"
             >
               {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
