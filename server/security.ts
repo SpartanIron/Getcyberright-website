@@ -581,6 +581,7 @@ export function configureHelmet(app: Express) {
             "wss://*.repl.co",
             "wss://www.getcyberright.com",
           ],
+          mediaSrc: ["'self'"],
           frameSrc: [
             "https://js.stripe.com",
             "https://www.google.com",

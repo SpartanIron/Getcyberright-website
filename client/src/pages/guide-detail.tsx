@@ -7,8 +7,9 @@ import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { BookOpen, Clock, Calendar, ArrowLeft, User, HelpCircle, Loader2, ArrowRight } from "lucide-react";
+import { BookOpen, Clock, Calendar, ArrowLeft, User, HelpCircle, Loader2, ArrowRight, PlayCircle } from "lucide-react";
 import { renderMarkdown } from "@/lib/markdown";
+import { GuideVideoPlayer, getGuideVideoUrl } from "@/components/guide-video-player";
 
 interface GuideDetail {
   id: string;
@@ -216,11 +217,16 @@ export default function GuideDetailPage() {
           )}
 
           <div className={toc.length > 0 ? "lg:col-span-3" : "lg:col-span-4 max-w-3xl mx-auto"}>
-            {guide.featuredImage && (
-              <div className="mb-8 rounded-lg overflow-hidden">
-                <img src={guide.featuredImage} alt={guide.title} className="w-full h-64 md:h-80 object-cover" />
-              </div>
-            )}
+            {(() => {
+              const videoUrl = getGuideVideoUrl(slug);
+              return videoUrl ? (
+                <GuideVideoPlayer src={videoUrl} title={guide.title} poster={guide.featuredImage || undefined} />
+              ) : guide.featuredImage ? (
+                <div className="mb-8 rounded-lg overflow-hidden">
+                  <img src={guide.featuredImage} alt={guide.title} className="w-full h-64 md:h-80 object-cover" />
+                </div>
+              ) : null;
+            })()}
 
             <article 
               className="prose prose-slate dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-teal-600 dark:prose-a:text-teal-400"
