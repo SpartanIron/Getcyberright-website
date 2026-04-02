@@ -1,3 +1,14 @@
+# Gitleaks configuration for GetCyberRight
+#
+# PURPOSE: Suppress false positives for PUBLIC identifiers only.
+# These are OAuth client IDs, publishable keys, and site keys that are
+# designed to be public-facing. They grant no access without their
+# corresponding secrets.
+#
+# IMPORTANT: Never add allowlist rules for values containing:
+#   _SECRET, _PASSWORD, _TOKEN, _PRIVATE_KEY, sk_live_, sk_test_
+# Those are real credentials and must remain in Replit Secrets.
+
 [extend]
 useDefault = true
 
