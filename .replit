@@ -54,7 +54,6 @@ LINKEDIN_CLIENT_ID = "78icvzdm1d0m64"
 FACEBOOK_APP_ID = "941199795122443"
 THREADS_APP_ID = "26126703126971508"
 STRIPE_PUBLISHABLE_KEY = "pk_live_51SvU8iKVliFwpBWfFLP70p4b8Y34Gzo30zE41O5RVX7oxbGBDfwuqRMymIzR5FJWYqKDFeg5wHnmAb549CYIGdJw00ntpYTodQ"
-VAULT_ENCRYPTION_KEY = "9ac9c02f30441909b2114392b7a6da9189c3d7c939d61b2d48e85dff487a240e"
 
 [agent]
 integrations = ["javascript_anthropic_ai_integrations:2.0.0", "javascript_log_in_with_replit:2.0.0"]
