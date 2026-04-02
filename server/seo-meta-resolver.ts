@@ -687,6 +687,13 @@ export function injectMeta(template: string, meta: PageMeta): string {
     .replace(/%%CANONICAL_URL%%/g, meta.canonicalUrl || "")
     .replace(/%%JSON_LD%%/g, meta.jsonLd);
 
+  const gscVerification = process.env.GOOGLE_SITE_VERIFICATION;
+  if (gscVerification) {
+    result = result.replace(/%%GOOGLE_SITE_VERIFICATION%%/g, `<meta name="google-site-verification" content="${escapeAttr(gscVerification)}" />`);
+  } else {
+    result = result.replace(/%%GOOGLE_SITE_VERIFICATION%%/g, "");
+  }
+
   if (meta.noindex) {
     result = result.replace(
       '<meta name="description"',

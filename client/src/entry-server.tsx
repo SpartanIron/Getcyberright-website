@@ -1,17 +1,24 @@
 import { renderToString } from "react-dom/server";
 import { Router } from "wouter";
+import { Suspense } from "react";
 import App from "./App";
 
 export function render(url: string): string {
   try {
     const html = renderToString(
-      <Router ssrPath={url}>
-        <App />
-      </Router>
+      <Suspense fallback={<></>}>
+        <Router ssrPath={url}>
+          <App />
+        </Router>
+      </Suspense>
     );
     return html;
   } catch (e) {
-    console.error("[SSR] Render error for", url, ":", e instanceof Error ? e.message : e);
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg.includes("Suspense") || msg.includes("lazy") || msg.includes("suspended")) {
+      return "";
+    }
+    console.error("[SSR] Render error for", url, ":", msg);
     return "";
   }
 }

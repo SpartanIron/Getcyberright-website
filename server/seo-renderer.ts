@@ -60,6 +60,7 @@ function buildHead(meta: {
   ${(meta.tags || []).map(t => `<meta property="article:tag" content="${escapeHtml(t)}">`).join("\n  ")}
   <link rel="icon" type="image/png" href="/favicon.png">
   <meta name="theme-color" content="#0d9488">
+  ${process.env.GOOGLE_SITE_VERIFICATION ? `<meta name="google-site-verification" content="${escapeHtml(process.env.GOOGLE_SITE_VERIFICATION)}">` : ""}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -330,13 +331,25 @@ async function renderGuidePage(slug: string): Promise<string | null> {
     ${bodyContent}
     ${guide.tags && guide.tags.length > 0 ? `<p>Tags: ${guide.tags.map(t => `<a href="/guides?tag=${encodeURIComponent(t)}">${escapeHtml(t)}</a>`).join(", ")}</p>` : ""}
   </article>
-  <nav style="margin-top:30px;padding:20px;background:#f0fdfa;border-radius:8px;">
-    <h2>Related Resources</h2>
+  ${await (async () => {
+    const allGuides = await storage.getPublishedGuides(guide.category || undefined, 6);
+    const related = allGuides.filter(g => g.slug !== slug).slice(0, 5);
+    if (related.length === 0) return "";
+    return `<section style="margin-top:30px;padding:20px;background:#f0fdfa;border-radius:8px;">
+    <h2>Related Guides</h2>
+    <ul>${related.map(g => `<li><a href="/guides/${g.slug}">${escapeHtml(g.title)}</a></li>`).join("")}</ul>
+    <p><a href="/guides">View all cybersecurity guides</a></p>
+  </section>`;
+  })()}
+  <nav style="margin-top:20px;padding:20px;background:#f8fafc;border-radius:8px;">
+    <h2>Explore More</h2>
     <ul>
-      <li><a href="/guides">Browse All Guides</a></li>
       <li><a href="/scam-checker">GCR Scam Guard</a></li>
-      <li><a href="/tools">Security Tools</a></li>
+      <li><a href="/scam-intel">Scam Intelligence Center</a></li>
+      <li><a href="/alerts">Threat Alerts</a></li>
+      <li><a href="/news">Cybersecurity News</a></li>
       <li><a href="/training">Training Academy</a></li>
+      <li><a href="/tools">Security Tools</a></li>
     </ul>
   </nav>
   ${buildFooter()}
@@ -596,16 +609,18 @@ async function renderTopicHub(cluster: string): Promise<string | null> {
 </body></html>`;
 }
 
-async function renderListingPage(type: "guides" | "scam-intel" | "alerts"): Promise<string> {
+async function renderListingPage(type: "guides" | "scam-intel" | "alerts" | "news"): Promise<string> {
   const titles: Record<string, string> = {
     guides: "Cybersecurity Guides",
     "scam-intel": "Scam Intelligence Center",
     alerts: "Cyber Threat Alerts",
+    news: "Cybersecurity News & Updates",
   };
   const descriptions: Record<string, string> = {
     guides: "Expert cybersecurity guides covering identity theft, phishing, password security, privacy protection, and more. Practical advice for families and individuals.",
     "scam-intel": "Live scam intelligence database. Track current scams, learn their tactics, and protect yourself from fraud.",
     alerts: "Real-time cyber threat alerts. Stay informed about the latest phishing campaigns, malware, and online fraud.",
+    news: "Stay informed with the latest cybersecurity news, data breach reports, emerging threats, and security advisories. Curated and simplified for families, seniors, and small businesses.",
   };
 
   const head = buildHead({
@@ -614,24 +629,49 @@ async function renderListingPage(type: "guides" | "scam-intel" | "alerts"): Prom
     url: `/${type}`,
   });
 
+  const breadcrumbs = buildBreadcrumbs([
+    { name: "Home", url: "/" },
+    { name: titles[type], url: `/${type}` },
+  ]);
+
   let listItems = "";
+  let crossLinks = "";
 
   if (type === "guides") {
     const guides = await storage.getPublishedGuides();
-    listItems = guides.map(g => `<li style="margin:12px 0;"><a href="/guides/${g.slug}" style="font-size:16px;color:#0d9488;">${escapeHtml(g.title)}</a><p style="color:#666;margin:4px 0;">${escapeHtml(g.metaDescription || "")}</p></li>`).join("");
+    const categories = [...new Set(guides.map(g => g.category).filter(Boolean))];
+    for (const cat of categories) {
+      const catGuides = guides.filter(g => g.category === cat);
+      listItems += `<h2 style="margin-top:24px;font-size:18px;color:#0A2A3C;">${escapeHtml(cat.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()))}</h2>`;
+      listItems += `<ul style="list-style:none;padding:0;">${catGuides.map(g => `<li style="margin:12px 0;"><a href="/guides/${g.slug}" style="font-size:16px;color:#0d9488;">${escapeHtml(g.title)}</a><p style="color:#666;margin:4px 0;">${escapeHtml(g.metaDescription || "")}</p></li>`).join("")}</ul>`;
+    }
+    const uncategorized = guides.filter(g => !g.category);
+    if (uncategorized.length > 0) {
+      listItems += `<h2 style="margin-top:24px;font-size:18px;color:#0A2A3C;">More Guides</h2>`;
+      listItems += `<ul style="list-style:none;padding:0;">${uncategorized.map(g => `<li style="margin:12px 0;"><a href="/guides/${g.slug}" style="font-size:16px;color:#0d9488;">${escapeHtml(g.title)}</a><p style="color:#666;margin:4px 0;">${escapeHtml(g.metaDescription || "")}</p></li>`).join("")}</ul>`;
+    }
+    crossLinks = `<section><h2>Related Resources</h2><ul><li><a href="/scam-intel">Scam Intelligence Center</a></li><li><a href="/alerts">Threat Alerts</a></li><li><a href="/news">Cybersecurity News</a></li><li><a href="/training">Training Academy</a></li></ul></section>`;
   } else if (type === "scam-intel") {
     const scams = await storage.getPublishedScamIntel();
-    listItems = scams.map(s => `<li style="margin:12px 0;"><a href="/scam-intel/${s.slug}" style="font-size:16px;color:#0d9488;">${escapeHtml(s.scamName)}</a><span style="margin-left:8px;background:#fef2f2;color:#b91c1c;padding:2px 8px;border-radius:12px;font-size:12px;">${escapeHtml(s.riskLevel || "")}</span><p style="color:#666;margin:4px 0;">${escapeHtml(s.metaDescription || "")}</p></li>`).join("");
+    listItems = `<ul style="list-style:none;padding:0;">${scams.map(s => `<li style="margin:12px 0;"><a href="/scam-intel/${s.slug}" style="font-size:16px;color:#0d9488;">${escapeHtml(s.scamName)}</a><span style="margin-left:8px;background:#fef2f2;color:#b91c1c;padding:2px 8px;border-radius:12px;font-size:12px;">${escapeHtml(s.riskLevel || "")}</span><p style="color:#666;margin:4px 0;">${escapeHtml(s.metaDescription || "")}</p></li>`).join("")}</ul>`;
+    crossLinks = `<section><h2>Related Resources</h2><ul><li><a href="/guides">Cybersecurity Guides</a></li><li><a href="/alerts">Threat Alerts</a></li><li><a href="/scam-checker">GCR Scam Guard</a></li><li><a href="/report-scam">Report a Scam</a></li></ul></section>`;
   } else if (type === "alerts") {
     const alerts = await storage.getPublishedThreatAlerts();
-    listItems = alerts.map(a => `<li style="margin:12px 0;"><a href="/alerts/${a.slug}" style="font-size:16px;color:#0d9488;">${escapeHtml(a.threatName)}</a><span style="margin-left:8px;background:#fef2f2;color:#b91c1c;padding:2px 8px;border-radius:12px;font-size:12px;">${escapeHtml(a.severityLevel || "")}</span><p style="color:#666;margin:4px 0;">${escapeHtml(a.description?.substring(0, 200) || "")}</p></li>`).join("");
+    listItems = `<ul style="list-style:none;padding:0;">${alerts.map(a => `<li style="margin:12px 0;"><a href="/alerts/${a.slug}" style="font-size:16px;color:#0d9488;">${escapeHtml(a.threatName)}</a><span style="margin-left:8px;background:#fef2f2;color:#b91c1c;padding:2px 8px;border-radius:12px;font-size:12px;">${escapeHtml(a.severityLevel || "")}</span><p style="color:#666;margin:4px 0;">${escapeHtml(a.description?.substring(0, 200) || "")}</p></li>`).join("")}</ul>`;
+    crossLinks = `<section><h2>Related Resources</h2><ul><li><a href="/guides">Cybersecurity Guides</a></li><li><a href="/scam-intel">Scam Intelligence Center</a></li><li><a href="/cyber-threat-radar">Cyber Threat Radar</a></li><li><a href="/news">Cybersecurity News</a></li></ul></section>`;
+  } else if (type === "news") {
+    const articles = await storage.getNewsArticles();
+    listItems = `<ul style="list-style:none;padding:0;">${articles.map(a => `<li style="margin:12px 0;"><a href="/news/${a.slug}" style="font-size:16px;color:#0d9488;">${escapeHtml(a.title)}</a><span style="margin-left:8px;background:#eff6ff;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:12px;">${escapeHtml(a.category || "")}</span><p style="color:#666;margin:4px 0;">${escapeHtml(a.excerpt || "")}</p></li>`).join("")}</ul>`;
+    crossLinks = `<section><h2>Related Resources</h2><ul><li><a href="/alerts">Threat Alerts</a></li><li><a href="/scam-intel">Scam Intelligence Center</a></li><li><a href="/guides">Cybersecurity Guides</a></li><li><a href="/scam-checker">GCR Scam Guard</a></li></ul></section>`;
   }
 
   return `${head}
 <body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
+  ${breadcrumbs}
   <h1>${escapeHtml(titles[type])}</h1>
   <p style="font-size:18px;color:#444;">${escapeHtml(descriptions[type])}</p>
-  <ul style="list-style:none;padding:0;">${listItems}</ul>
+  ${listItems}
+  ${crossLinks}
   ${buildFooter()}
   <div id="root"></div>
 
@@ -1478,7 +1518,7 @@ function renderAboutPage(): string {
 </body></html>`;
 }
 
-function renderHomePage(): string {
+async function renderHomePage(): Promise<string> {
   const head = buildHead({
     title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
     description: "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training. Trusted by thousands of families worldwide.",
@@ -1524,6 +1564,18 @@ function renderHomePage(): string {
     { question: "Who is GetCyberRight for?", answer: "GetCyberRight is for everyone, including families, parents, kids, seniors, educators, and small businesses. We provide audience-specific content tailored to different experience levels." },
     { question: "How does the GCR Scam Guard work?", answer: "Our GCR Scam Guard uses multiple trusted sources including Google Safe Browsing, VirusTotal, and URLhaus to analyze suspicious links, emails, and messages and provide a safety score." },
   ]);
+
+  const [guides, newsArticles, scamIntel, alerts] = await Promise.all([
+    storage.getPublishedGuides(undefined, 15),
+    storage.getNewsArticles(undefined, 15),
+    storage.getPublishedScamIntel(undefined, 15),
+    storage.getPublishedThreatAlerts(undefined, 10),
+  ]);
+
+  const guidesListHtml = guides.map(g => `<li><a href="/guides/${g.slug}">${escapeHtml(g.title)}</a></li>`).join("");
+  const newsListHtml = newsArticles.map(a => `<li><a href="/news/${a.slug}">${escapeHtml(a.title)}</a></li>`).join("");
+  const scamIntelListHtml = scamIntel.map(s => `<li><a href="/scam-intel/${s.slug}">${escapeHtml(s.scamName)}</a> - Risk: ${escapeHtml(s.riskLevel || "")}</li>`).join("");
+  const alertsListHtml = alerts.map(a => `<li><a href="/alerts/${a.slug}">${escapeHtml(a.threatName)}</a></li>`).join("");
 
   return `${head}
 <body style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">
@@ -1575,6 +1627,7 @@ function renderHomePage(): string {
     <ul>
       <li><a href="/scam-intel">Scam Intelligence Center</a> - Region-aware scam database with risk assessments</li>
       <li><a href="/alerts">Threat Alerts</a> - Real-time alerts about active cyber threats</li>
+      <li><a href="/news">Cybersecurity News</a> - Latest news and updates</li>
       <li><a href="/threat-trends">Threat Trends</a> - Emerging cybersecurity trends and analysis</li>
       <li><a href="/report-scam">Report a Scam</a> - Help the community by reporting scam attempts</li>
     </ul>
@@ -1597,20 +1650,27 @@ function renderHomePage(): string {
 
   <section>
     <h2>Latest Cybersecurity Guides</h2>
-    <ul>
-      <li><a href="/guides/how-to-tell-if-text-message-is-scam">How to Tell If a Text Message Is a Scam: 9 Warning Signs</a></li>
-      <li><a href="/guides/signs-someone-using-ai-to-scam-you">5 Signs Someone Is Using AI to Scam You</a></li>
-      <li><a href="/guides/how-to-remove-personal-information-from-internet">How to Remove Your Personal Information from the Internet</a></li>
-      <li><a href="/guides/is-this-email-real-how-to-check">Is This Email Real? How to Check If an Email Is Legitimate</a></li>
-      <li><a href="/guides/how-to-protect-seniors-parents-from-scams">How to Protect Your Parents and Grandparents from Online Scams</a></li>
-      <li><a href="/guides/what-to-do-if-identity-stolen">What to Do If Your Identity Is Stolen: Step-by-Step Recovery Guide</a></li>
-      <li><a href="/guides/free-tools-check-passwords-leaked">Free Tools to Check If Your Passwords Were Leaked</a></li>
-      <li><a href="/guides/facebook-marketplace-scams-buy-sell-safely">Facebook Marketplace Scams: How to Buy and Sell Safely</a></li>
-      <li><a href="/guides/how-to-set-up-parental-controls-every-device">How to Set Up Parental Controls on Every Device</a></li>
-      <li><a href="/guides/romance-scam-warning-signs">Romance Scam Warning Signs: Protect Your Heart and Your Money</a></li>
-    </ul>
+    <ul>${guidesListHtml}</ul>
     <p><a href="/guides">View all cybersecurity guides</a></p>
   </section>
+
+  ${newsListHtml ? `<section>
+    <h2>Cybersecurity News</h2>
+    <ul>${newsListHtml}</ul>
+    <p><a href="/news">View all cybersecurity news</a></p>
+  </section>` : ""}
+
+  ${scamIntelListHtml ? `<section>
+    <h2>Latest Scam Intelligence Reports</h2>
+    <ul>${scamIntelListHtml}</ul>
+    <p><a href="/scam-intel">View all scam intelligence reports</a></p>
+  </section>` : ""}
+
+  ${alertsListHtml ? `<section>
+    <h2>Active Threat Alerts</h2>
+    <ul>${alertsListHtml}</ul>
+    <p><a href="/alerts">View all threat alerts</a></p>
+  </section>` : ""}
 
   <section>
     <h2>Cybersecurity Topics</h2>
@@ -1694,14 +1754,25 @@ async function renderNewsPage(slug: string): Promise<string | null> {
     ${safeSourceUrl ? `<p style="margin-top:20px;"><a href="${safeSourceUrl}" rel="nofollow noopener" target="_blank">Read original source</a></p>` : ""}
     ${safeToolUrl && article.relatedToolName ? `<p><strong>Related Tool:</strong> <a href="${safeToolUrl}">${escapeHtml(article.relatedToolName)}</a></p>` : ""}
   </article>
-  <nav style="margin-top:30px;padding:20px;background:#f0fdfa;border-radius:8px;">
+  ${await (async () => {
+    const recentNews = await storage.getNewsArticles(article.category, 6);
+    const related = recentNews.filter(a => a.slug !== slug).slice(0, 5);
+    if (related.length === 0) return "";
+    return `<section style="margin-top:30px;padding:20px;background:#f0fdfa;border-radius:8px;">
+    <h2>Related News</h2>
+    <ul>${related.map(a => `<li><a href="/news/${a.slug}">${escapeHtml(a.title)}</a></li>`).join("")}</ul>
+    <p><a href="/news">View all cybersecurity news</a></p>
+  </section>`;
+  })()}
+  <nav style="margin-top:20px;padding:20px;background:#f8fafc;border-radius:8px;">
     <h2>More from GetCyberRight</h2>
     <ul>
       <li><a href="/news">All Cybersecurity News</a></li>
       <li><a href="/guides">Safety Guides</a></li>
       <li><a href="/scam-checker">GCR Scam Guard</a></li>
-      <li><a href="/tools">Security Tools</a></li>
+      <li><a href="/scam-intel">Scam Intelligence Center</a></li>
       <li><a href="/alerts">Threat Alerts</a></li>
+      <li><a href="/tools">Security Tools</a></li>
     </ul>
   </nav>
   ${buildFooter()}
@@ -1721,7 +1792,7 @@ export function seoMiddleware() {
 
     try {
       if (path === "/") {
-        html = renderHomePage();
+        html = await renderHomePage();
       }
 
       if (!html && path === "/about") {
@@ -1772,6 +1843,9 @@ export function seoMiddleware() {
       }
       if (!html && path === "/alerts") {
         html = await renderListingPage("alerts");
+      }
+      if (!html && path === "/news") {
+        html = await renderListingPage("news");
       }
 
       if (!html && STATIC_TOOL_PAGES[path]) {
