@@ -545,7 +545,7 @@ export function registerPlatformRoutes(app: Express): void {
       const { generateAndPublishTrendAwarePosts } = await import("./trendAwareSocialEngine");
       const platform = req.body.platform || "linkedin";
       console.log(`[TestPublish] Manual test publish triggered for ${platform}`);
-      const result = await generateAndPublishTrendAwarePosts({ skipRateLimit: true, platformFilter: platform });
+      const result = await generateAndPublishTrendAwarePosts({ skipRateLimit: true, skipDuplicateCheck: true, platformFilter: platform });
       res.json({ success: true, ...result });
     } catch (error: any) {
       console.error("[TestPublish] Error:", error.message);

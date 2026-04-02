@@ -2405,7 +2405,7 @@ async function getAvailablePlatformsForBreaking(): Promise<string[]> {
   }
 }
 
-export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimit?: boolean; platformFilter?: string }): Promise<{
+export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimit?: boolean; skipDuplicateCheck?: boolean; platformFilter?: string }): Promise<{
   published: number;
   platforms: string[];
 }> {
@@ -2504,7 +2504,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       return result;
     }
 
-    if (isTitleDuplicate(posts.title, recentTitles)) {
+    if (!options?.skipDuplicateCheck && isTitleDuplicate(posts.title, recentTitles)) {
       console.warn(`[TrendEngine] DUPLICATE DETECTED: "${posts.title}" is too similar to a recently published post. Skipping.`);
       return result;
     }
