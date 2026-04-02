@@ -4,6 +4,9 @@ import type { NewsArticle, InsertSocialPost } from "@shared/schema";
 import * as fs from "fs";
 import * as path from "path";
 import { generateSocialImage } from "./socialImageGenerator";
+import { getPublicImageUrl } from "./bufferPublisher";
+import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stockPhotoService";
+import type { TemplateStyle } from "./stockPhotoService";
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -368,21 +371,49 @@ export async function generateSocialPostsForArticle(
     if (!posts) return result;
 
     let imageUrl: string | null = null;
-    const generatedImage = await generateSocialImage(
-      article.id,
-      article.title,
-      article.category,
-      article.urgencyLevel || 1,
-      article.source
-    );
-    if (generatedImage) {
-      imageUrl = generatedImage;
-      console.log(`[NewsSocial] Using branded image for "${article.title}": ${generatedImage}`);
-    } else {
-      const rawImageUrl = article.thumbnailUrl || article.imageUrl || null;
-      imageUrl = rawImageUrl && isImageUrlTrusted(rawImageUrl) ? rawImageUrl : null;
-      if (rawImageUrl && !imageUrl) {
-        console.log(`[NewsSocial] Skipping untrusted image domain for "${article.title}": ${rawImageUrl}`);
+
+    const urgency = article.urgencyLevel || 1;
+    const templateStyle: TemplateStyle = urgency >= 4 ? "alert_card" : urgency >= 3 ? "stat_card" : "insight_card";
+    const headline = article.title.length > 50 ? article.title.slice(0, 47) + "..." : article.title;
+    const subtext = "getcyberright.com/news";
+
+    const rawImageUrl = article.thumbnailUrl || article.imageUrl || null;
+    if (rawImageUrl && isImageUrlTrusted(rawImageUrl)) {
+      const downloaded = await downloadSourceImage(rawImageUrl, article.title);
+      if (downloaded) {
+        const overlaid = await applyBrandOverlay(downloaded, headline, subtext, templateStyle, 1200, 630);
+        if (overlaid) {
+          imageUrl = getPublicImageUrl(overlaid);
+          console.log(`[NewsSocial] Using article photo with brand overlay for "${article.title}"`);
+        }
+      }
+    }
+
+    if (!imageUrl) {
+      const stockPhoto = await searchStockPhoto(article.category || "default", article.title);
+      if (stockPhoto) {
+        const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, article.title);
+        if (imgPath) {
+          const overlaid = await applyBrandOverlay(imgPath, headline, subtext, templateStyle, 1200, 630);
+          if (overlaid) {
+            imageUrl = getPublicImageUrl(overlaid);
+            console.log(`[NewsSocial] Using stock photo by ${stockPhoto.photographer} with brand overlay for "${article.title}"`);
+          }
+        }
+      }
+    }
+
+    if (!imageUrl) {
+      const generatedImage = await generateSocialImage(
+        article.id,
+        article.title,
+        article.category,
+        urgency,
+        article.source
+      );
+      if (generatedImage) {
+        imageUrl = getPublicImageUrl(generatedImage) || generatedImage;
+        console.log(`[NewsSocial] Fallback: Using branded card for "${article.title}"`);
       }
     }
 
