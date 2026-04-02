@@ -1,0 +1,42 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public client IDs, site keys, and publishable keys (not secrets)"
+paths = []
+
+[[allowlist.rules]]
+description = "LinkedIn OAuth Client ID (public identifier)"
+id = "generic-api-key"
+path = '''.replit'''
+regex = '''LINKEDIN_CLIENT_ID'''
+
+[[allowlist.rules]]
+description = "Facebook App ID (public identifier)"
+id = "generic-api-key"
+path = '''.replit'''
+regex = '''FACEBOOK_APP_ID'''
+
+[[allowlist.rules]]
+description = "Threads App ID (public identifier)"
+id = "generic-api-key"
+path = '''.replit'''
+regex = '''THREADS_APP_ID'''
+
+[[allowlist.rules]]
+description = "reCAPTCHA site key (public by design)"
+id = "generic-api-key"
+path = '''.replit'''
+regex = '''VITE_RECAPTCHA_SITE_KEY'''
+
+[[allowlist.rules]]
+description = "Stripe publishable key (public by design)"
+id = "generic-api-key"
+path = '''.replit'''
+regex = '''STRIPE_PUBLISHABLE_KEY'''
+
+[[allowlist.rules]]
+description = "Buffer organization ID (public identifier)"
+id = "generic-api-key"
+path = '''.replit'''
+regex = '''BUFFER_ORG_ID'''
