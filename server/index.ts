@@ -52,7 +52,11 @@ app.use(compression({
 }));
 
 // Security: Request size limiting (100KB for JSON, 50KB for forms)
-app.use(requestSizeLimiter(102400));
+// Exempt image upload endpoint which needs up to 10MB for screenshot analysis
+app.use((req, res, next) => {
+  if (req.path === "/api/security/analyze-image") return next();
+  return requestSizeLimiter(102400)(req, res, next);
+});
 
 // Security: Parse cookies for session management
 app.use(cookieParser());
@@ -70,14 +74,16 @@ app.use(antiScrapingHeaders);
 app.use(botProtection);
 
 // Body parsing with size limits
-app.use(
+// Image upload endpoint has its own route-level parser with 10MB limit
+app.use((req, res, next) => {
+  if (req.path === "/api/security/analyze-image") return next();
   express.json({
     limit: "100kb",
     verify: (req, _res, buf) => {
       req.rawBody = buf;
     },
-  }),
-);
+  })(req, res, next);
+});
 
 app.use(express.urlencoded({ extended: false, limit: "50kb" }));
 

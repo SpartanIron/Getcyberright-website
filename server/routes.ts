@@ -1,3 +1,4 @@
+import express from "express";
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import path from "path";
@@ -5102,23 +5103,30 @@ RECOMMENDATION TONE CALIBRATION (CRITICAL):
     }
   });
 
-  app.post("/api/security/analyze-image", standardRateLimit, async (req, res) => {
+  app.post("/api/security/analyze-image", express.json({ limit: "10mb", verify: (req: any, _res: any, buf: Buffer) => { req.rawBody = buf; } }), standardRateLimit, async (req, res) => {
     try {
       const { imageData } = req.body;
       if (!imageData) {
         res.status(400).json({ error: "No image data provided" });
         return;
       }
+      if (typeof imageData !== "string" || !imageData.match(/^data:image\/(png|jpeg|jpg|gif|webp|bmp|svg\+xml);base64,/i)) {
+        res.status(400).json({ error: "Invalid image format. Please upload a PNG, JPEG, GIF, or WebP image." });
+        return;
+      }
 
       const Anthropic = (await import("@anthropic-ai/sdk")).default;
-      const anthropic = new Anthropic();
+      const anthropic = new Anthropic({
+        apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+        baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
+      });
 
       const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
       const mediaTypeMatch = imageData.match(/^data:(image\/\w+);base64,/);
       const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/png";
 
       const response = await anthropic.messages.create({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5",
         max_tokens: 1500,
         messages: [{
           role: "user",
