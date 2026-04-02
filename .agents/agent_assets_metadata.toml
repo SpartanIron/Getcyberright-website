@@ -372,3 +372,9 @@ id = "wusFoosaBVoMB5A7DYgm4"
 uri = "file://.local/social-images/v2-ig-why-ai-deepfakes-are-the-next-big-c-1774997883421.jpeg"
 type = "image"
 title = "NEW - Instagram (AI Deepfakes)"
+
+[[outputs]]
+id = "fG8yMh2LmP6fpn5J8rVRi"
+uri = "file://gcr-scam-guard-v1.4.0.zip"
+type = "unspecified"
+title = "GCR Scam Guard v1.4.0 - Chrome Web Store Package"
