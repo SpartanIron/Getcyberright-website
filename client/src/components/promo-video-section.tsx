@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export function PromoVideoSection() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [activeVideo, setActiveVideo] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 

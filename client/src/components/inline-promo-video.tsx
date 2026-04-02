@@ -13,7 +13,7 @@ interface InlinePromoVideoProps {
 
 export function InlinePromoVideo({ src, poster, heading, description, className = "" }: InlinePromoVideoProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const togglePlay = () => {
