@@ -257,8 +257,24 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
   }
 
   let imageUrl: string | undefined;
-  if (post.imageUrl) {
-    if (post.imageUrl.startsWith("https://")) {
+  const isOldSvgCard = (imgPath: string) => {
+    const basename = path.basename(imgPath);
+    return basename.startsWith("social-") && !basename.startsWith("branded-") && !basename.startsWith("source-");
+  };
+
+  const isRemoteUrl = (url: string) => url.startsWith("https://") || url.startsWith("http://");
+  const isOldSvgRemote = (url: string) => {
+    try { return isOldSvgCard(new URL(url).pathname); } catch { return false; }
+  };
+
+  const needsStockPhotoUpgrade =
+    !post.imageUrl ||
+    (isRemoteUrl(post.imageUrl) && isOldSvgRemote(post.imageUrl)) ||
+    (!isRemoteUrl(post.imageUrl) && isOldSvgCard(post.imageUrl)) ||
+    (!isRemoteUrl(post.imageUrl) && !fs.existsSync(post.imageUrl));
+
+  if (post.imageUrl && !needsStockPhotoUpgrade) {
+    if (isRemoteUrl(post.imageUrl)) {
       imageUrl = post.imageUrl;
       console.log(`[Buffer] Using external image URL: ${imageUrl}`);
     } else if (fs.existsSync(post.imageUrl)) {
@@ -268,53 +284,30 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
       } else {
         console.warn(`[Buffer] Could not resolve public URL for image: ${post.imageUrl}`);
       }
-    } else {
-      console.warn(`[Buffer] Image file not found: ${post.imageUrl}, finding stock photo...`);
-      const { searchStockPhoto: findStock, downloadSourceImage: dlImg, applyBrandOverlay: overlayBrand } = await import("./stockPhotoService");
-      const tplStyle = "insight_card" as const;
-      const hdln = post.contentTitle.length > 50 ? post.contentTitle.slice(0, 47) + "..." : post.contentTitle;
-
-      const sp = await findStock(post.contentType || "default", post.contentTitle);
-      if (sp) {
-        const iPath = sp.localPath || await dlImg(sp.url, post.contentTitle);
-        if (iPath) {
-          const dm = post.platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
-          const ov = await overlayBrand(iPath, hdln, "getcyberright.com", tplStyle, dm.w, dm.h);
-          if (ov) {
-            await storage.updateSocialPost(postId, { imageUrl: ov });
-            imageUrl = getPublicImageUrl(ov);
-          }
-        }
-      }
-
-      if (!imageUrl) {
-        const { generateBrandedImage } = await import("./socialImageService");
-        const newImagePath = await generateBrandedImage(post.contentTitle, post.contentType, post.platform);
-        if (newImagePath) {
-          await storage.updateSocialPost(postId, { imageUrl: newImagePath });
-          const publicUrl = getPublicImageUrl(newImagePath);
-          if (publicUrl) {
-            imageUrl = publicUrl;
-          }
-        }
-      }
     }
-  } else {
+  }
+
+  if (!imageUrl && needsStockPhotoUpgrade) {
+    if (post.imageUrl) {
+      console.log(`[Buffer] Upgrading old SVG card image to stock photo for "${post.contentTitle}"`);
+    } else {
+      console.log(`[Buffer] No image set, generating stock photo for "${post.contentTitle}"`);
+    }
+
     const { searchStockPhoto, downloadSourceImage, applyBrandOverlay } = await import("./stockPhotoService");
-    const templateStyle = "insight_card" as const;
+    const templateStyle = post.contentType === "threat_alert" ? "alert_card" as const : post.contentType === "scam_intel" ? "stat_card" as const : "insight_card" as const;
     const headline = post.contentTitle.length > 50 ? post.contentTitle.slice(0, 47) + "..." : post.contentTitle;
-    const subtext = "getcyberright.com";
+    const dims = post.platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
 
     const stockPhoto = await searchStockPhoto(post.contentType || "default", post.contentTitle);
     if (stockPhoto) {
       const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, post.contentTitle);
       if (imgPath) {
-        const dims = post.platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
-        const overlaid = await applyBrandOverlay(imgPath, headline, subtext, templateStyle, dims.w, dims.h);
+        const overlaid = await applyBrandOverlay(imgPath, headline, "getcyberright.com", templateStyle, dims.w, dims.h);
         if (overlaid) {
           await storage.updateSocialPost(postId, { imageUrl: overlaid });
           imageUrl = getPublicImageUrl(overlaid);
-          console.log(`[Buffer] Generated stock photo image for ${post.platform}: ${imageUrl}`);
+          console.log(`[Buffer] Stock photo image for ${post.platform}: ${stockPhoto.photographer} → ${imageUrl}`);
         }
       }
     }
@@ -327,7 +320,7 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
         const publicUrl = getPublicImageUrl(newImagePath);
         if (publicUrl) {
           imageUrl = publicUrl;
-          console.log(`[Buffer] Fallback: Generated branded card for ${post.platform}: ${imageUrl}`);
+          console.log(`[Buffer] Fallback SVG card for ${post.platform}: ${imageUrl}`);
         }
       }
     }

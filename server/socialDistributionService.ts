@@ -6,6 +6,8 @@ import { generateBrandedImage, serveImagePath } from "./socialImageService";
 import { getBufferChannelsByPlatform } from "./bufferPublisher";
 import { tagAllGcrLinks, tagSingleUrl, buildCampaignId } from "./utmTracking";
 import { buildPartnerContext } from "./socialEngagementService";
+import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stockPhotoService";
+import type { TemplateStyle } from "./stockPhotoService";
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -374,9 +376,30 @@ async function getConnectedPlatforms(): Promise<Set<string>> {
   }
 }
 
-async function generateImageForPost(title: string, contentType: string, platform: string): Promise<string | null> {
+async function generateImageForPost(title: string, contentType: string, platform: string, category?: string): Promise<string | null> {
   try {
+    const searchCategory = category || contentType || "default";
+    const templateStyle: TemplateStyle = contentType === "threat_alert" ? "alert_card" : contentType === "scam_intel" ? "stat_card" : "insight_card";
+    const headline = title.length > 50 ? title.slice(0, 47) + "..." : title;
+    const subtext = "getcyberright.com";
+    const dims = platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
+
+    const stockPhoto = await searchStockPhoto(searchCategory, title);
+    if (stockPhoto) {
+      const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, title);
+      if (imgPath) {
+        const overlaid = await applyBrandOverlay(imgPath, headline, subtext, templateStyle, dims.w, dims.h);
+        if (overlaid) {
+          console.log(`[SocialDistribution] Stock photo image for ${platform}: ${stockPhoto.photographer}`);
+          return overlaid;
+        }
+      }
+    }
+
     const imagePath = await generateBrandedImage(title, contentType, platform);
+    if (imagePath) {
+      console.log(`[SocialDistribution] Fallback SVG card for ${platform}`);
+    }
     return imagePath;
   } catch (error: any) {
     console.error(`[SocialDistribution] Image generation failed for ${platform}:`, error.message);
@@ -418,7 +441,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 
   for (const { platform, content } of platforms) {
     if (!content) continue;
-    const imagePath = await generateImageForPost(guide.title, "guide", platform);
+    const imagePath = await generateImageForPost(guide.title, "guide", platform, guide.category);
     const post: InsertSocialPost = {
       contentType: "guide",
       contentId: guide.id,
@@ -473,7 +496,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
   const alertCampaignId = buildCampaignId("threat_alert", "multi");
   for (const { platform, content } of platforms) {
     if (!content) continue;
-    const imagePath = await generateImageForPost(alert.threatName, "threat_alert", platform);
+    const imagePath = await generateImageForPost(alert.threatName, "threat_alert", platform, alert.threatCategory);
     const post: InsertSocialPost = {
       contentType: "threat_alert",
       contentId: alert.id,
@@ -528,7 +551,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
   const scamCampaignId = buildCampaignId("scam_intel", "multi");
   for (const { platform, content } of platforms) {
     if (!content) continue;
-    const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform);
+    const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform, scam.category || scam.scamCategory);
     const post: InsertSocialPost = {
       contentType: "scam_intel",
       contentId: scam.id,
