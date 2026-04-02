@@ -73,8 +73,8 @@ function sanitizePostContent(text: string): string {
     .replace(/\*([^*]+)\*/g, "$1")
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^[-*]\s+/gm, "")
-    .replace(/\u2014/g, " — ")
-    .replace(/\u2013/g, " — ")
+    .replace(/\u2014/g, ", ")
+    .replace(/\u2013/g, ", ")
     .replace(/[^\S\n]{2,}/g, " ")
     .replace(/\n{4,}/g, "\n\n\n")
     .trim();
@@ -84,6 +84,32 @@ function sanitizePostContent(text: string): string {
   });
 
   return processed;
+}
+
+function ensureParagraphBreaks(text: string, platform: string): string {
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+  const minParagraphs = platform === "linkedin" ? 4 : 3;
+
+  if (paragraphs.length >= minParagraphs) return text;
+
+  const sentences = text.replace(/\n/g, " ").split(/(?<=[.!?])\s+/).filter(s => s.trim());
+  if (sentences.length < 3) return text;
+
+  const reformatted: string[] = [];
+  if (platform === "linkedin") {
+    reformatted.push(sentences.slice(0, 2).join(" "));
+    for (let i = 2; i < sentences.length; i += 2) {
+      reformatted.push(sentences.slice(i, i + 2).join(" "));
+    }
+  } else {
+    reformatted.push(sentences.slice(0, 2).join(" "));
+    for (let i = 2; i < sentences.length; i += 3) {
+      reformatted.push(sentences.slice(i, i + 3).join(" "));
+    }
+  }
+
+  console.log(`[TrendEngine] Reformatted ${platform} post: split wall of text into ${reformatted.length} paragraphs`);
+  return reformatted.join("\n\n");
 }
 
 const SOURCE_TIERS: Record<string, 1 | 2 | 3> = {
@@ -1146,9 +1172,9 @@ Format your complete output as this strict JSON with \\n for line breaks within 
 
     const hashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags.slice(0, 8) : [];
 
-    const linkedinContent = sanitizePostContent(parsed.linkedin);
-    const facebookContent = sanitizePostContent(parsed.facebook);
-    const instagramContent = sanitizePostContent(parsed.instagram);
+    const linkedinContent = ensureParagraphBreaks(sanitizePostContent(parsed.linkedin), "linkedin");
+    const facebookContent = ensureParagraphBreaks(sanitizePostContent(parsed.facebook), "facebook");
+    const instagramContent = ensureParagraphBreaks(sanitizePostContent(parsed.instagram), "instagram");
 
     let gcrToolReference = parsed.gcr_tool_reference
       ? {
