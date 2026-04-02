@@ -59,6 +59,7 @@ export function InlinePromoVideo({ src, poster, heading, description, className 
             className="w-full h-full object-cover"
             muted={isMuted}
             playsInline
+            preload="none"
             onEnded={() => setIsPlaying(false)}
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}

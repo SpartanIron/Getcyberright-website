@@ -55,7 +55,7 @@ self.addEventListener('fetch', (event) => {
           return response;
         }
 
-        if (event.request.url.includes('/api/')) {
+        if (event.request.url.includes('/api/') || event.request.url.includes('/videos/')) {
           return response;
         }
 

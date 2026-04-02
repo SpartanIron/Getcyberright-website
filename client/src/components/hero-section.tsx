@@ -229,6 +229,7 @@ export function HeroSection() {
                     loop
                     muted
                     playsInline
+                    preload="metadata"
                     aria-label="GetCyberRight platform overview — family digital protection made simple"
                     className="w-full h-[580px] object-cover"
                     data-testid="video-hero-overview"
@@ -246,6 +247,7 @@ export function HeroSection() {
                   loop
                   muted
                   playsInline
+                  preload="metadata"
                   aria-label="GetCyberRight platform overview — family digital protection made simple"
                   className="w-full h-64 sm:h-80 object-cover"
                   data-testid="video-hero-overview-mobile"
