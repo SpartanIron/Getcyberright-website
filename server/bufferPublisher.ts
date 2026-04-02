@@ -388,8 +388,14 @@ function isDraftTitleDuplicate(draftTitle: string, publishedTitles: string[]): b
   return false;
 }
 
-export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]> {
-  const drafts = await storage.getSocialPosts("draft", 50);
+export async function publishAllDraftsViaBuffer(options?: { tier?: "guide" | "news_editorial" }): Promise<BufferPublishResult[]> {
+  const allDrafts = await storage.getSocialPosts("draft", 50);
+  let drafts = allDrafts;
+  if (options?.tier === "guide") {
+    drafts = allDrafts.filter(d => d.contentType !== "trend_insight" && d.contentType !== "news_article");
+  } else if (options?.tier === "news_editorial") {
+    drafts = allDrafts.filter(d => d.contentType === "news_article");
+  }
   const results: BufferPublishResult[] = [];
   const channels = await getBufferChannelsByPlatform();
   const connectedPlatforms = new Set(Object.keys(channels));
@@ -423,12 +429,25 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
     console.log(`[Buffer] Already published today (DB check): ${alreadyPublishedLog}`);
   }
 
-  for (const draft of drafts) {
+  const guideDrafts = drafts.filter(d => d.contentType !== "trend_insight" && d.contentType !== "news_article");
+  const newsDrafts = drafts.filter(d => d.contentType === "news_article");
+  const sortedDrafts = [...guideDrafts, ...newsDrafts];
+
+  for (const draft of sortedDrafts) {
     if (draft.platform === "alert") continue;
     if (!connectedPlatforms.has(draft.platform)) continue;
 
     const alreadyPublished = publishedPerPlatform[draft.platform] || 0;
     if (alreadyPublished >= DAILY_POSTS_PER_PLATFORM) continue;
+
+    if (draft.contentType === "news_article" && draft.createdAt) {
+      const ageHours = (Date.now() - new Date(draft.createdAt).getTime()) / 3600000;
+      if (ageHours > 48) {
+        console.warn(`[Buffer] EXPIRED: News editorial "${draft.contentTitle}" on ${draft.platform} is ${Math.round(ageHours)}h old (>48h limit). Expiring.`);
+        await storage.updateSocialPost(draft.id, { status: "failed", publishError: "Auto-expired: news editorial older than 48 hours" });
+        continue;
+      }
+    }
 
     if (isDraftTitleDuplicate(draft.contentTitle, recentPublishedTitles)) {
       console.warn(`[Buffer] DUPLICATE SKIPPED: "${draft.contentTitle}" on ${draft.platform} matches a recently published post. Deleting draft.`);

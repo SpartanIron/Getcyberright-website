@@ -785,10 +785,12 @@ This is the morning post. Focus on education, trend analysis, and building trust
     : "";
 
   const contentMix = await getContentMixRatio();
-  const mixContext = `\nCONTENT MIX RATIO (70/20/10 RULE):
-Current mix (last ${contentMix.total} posts): ${contentMix.value}% value-first, ${contentMix.softProduct}% soft product, ${contentMix.directCta}% direct CTA.
-Target: 70% pure education, 20% natural product integration, 10% direct CTA.
-${contentMix.recommendation}\n`;
+  const mixContext = `\nCONTENT STRATEGY (3-TIER MODEL):
+This is a REACTIVE post (Tier 1 — 30% of all content). It must be timely, breaking, and editorial.
+The overall content mix across all tiers: 50% guide-based (evergreen), 30% reactive (breaking news), 20% news editorial.
+Within reactive posts, maintain: ${contentMix.value}% value-first, ${contentMix.softProduct}% soft product mentions, ${contentMix.directCta}% direct CTA.
+${contentMix.recommendation}
+IMPORTANT: This is a same-day-only post. It will NOT be queued. Write with urgency and editorial voice.\n`;
 
   const sourceValidationContext = `\nSOURCE CREDIBILITY SUMMARY: ${sourceCredibility.tier1Count} Tier 1 (government/official), ${sourceCredibility.tier2Count} Tier 2 (established publications), ${sourceCredibility.tier3Count} Tier 3 (unverified). ${sourceCredibility.highestTier === 3 ? "WARNING: No high-credibility sources available. Downgrade urgency and frame claims as emerging/unverified." : ""}`;
 
@@ -2548,21 +2550,8 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
 
     if (posts.recommendedAction === "review") {
       console.warn(
-        `[TrendEngine] Content flagged for review (confidence: ${posts.confidenceScore}). Saving as draft instead of publishing.`
+        `[TrendEngine] Content flagged for review (confidence: ${posts.confidenceScore}). Discarding — reactive posts are publish-now-or-discard.`
       );
-      for (const platform of ["linkedin", "facebook", "instagram"] as const) {
-        if (!channels[platform] || !allowedPlatforms.includes(platform)) continue;
-        const content = platform === "linkedin" ? posts.linkedin : platform === "instagram" ? posts.instagram : posts.facebook;
-        await storage.createSocialPost({
-          contentType: "trend_insight",
-          contentId: `trend-${Date.now()}-${platform}-review`,
-          contentTitle: `[REVIEW] ${posts.title}`,
-          platform,
-          postContent: content,
-          hashtags: posts.hashtags,
-          status: "draft",
-        });
-      }
 
       savePerformanceEntry({
         date: new Date().toISOString(),
@@ -2577,7 +2566,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
         published: false,
       });
 
-      console.log(`[TrendEngine] Draft saved for review: "${posts.title}" (confidence: ${posts.confidenceScore})`);
+      console.log(`[TrendEngine] Reactive post discarded (low confidence ${posts.confidenceScore}): "${posts.title}"`);
       return result;
     }
 
@@ -2639,19 +2628,6 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
           sourceArticleUrl: posts.sourceArticleUrl,
         });
 
-        if (!bufferResult.success && platform === "instagram" && image) {
-          console.warn(`[TrendEngine] Instagram shareNow failed: ${bufferResult.error}. Retrying with addToQueue...`);
-          bufferResult = await publishWithFirstComment(channel.id, content, {
-            mode: "addToQueue",
-            platform,
-            imageUrl: image,
-            sourceArticleUrl: posts.sourceArticleUrl,
-          });
-          if (bufferResult.success) {
-            console.log(`[TrendEngine] Instagram retry with addToQueue succeeded`);
-          }
-        }
-
         if (!bufferResult.success && image && bufferResult.error?.toLowerCase().includes("image")) {
           console.warn(`[TrendEngine] Image rejected for ${platform}: ${bufferResult.error}. Retrying without image...`);
           bufferResult = await publishWithFirstComment(channel.id, content, {
@@ -2663,6 +2639,10 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
             console.log(`[TrendEngine] Retry without image succeeded for ${platform}`);
             await storage.updateSocialPost(created.id, { imageUrl: null });
           }
+        }
+
+        if (!bufferResult.success) {
+          console.log(`[TrendEngine] Reactive post failed for ${platform}. Discarding (reactive posts are publish-now-or-discard).`);
         }
 
         if (bufferResult.success) {

@@ -229,13 +229,20 @@ async function generateNewsPostContent(
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
       max_tokens: 2000,
-      system: `You're writing social media posts about a cybersecurity news article. Write like a real person who works in security and genuinely wants to help people stay safe, not like a corporate account or AI bot.
+      system: `You're writing social media posts about a cybersecurity news article. This is a NEWS EDITORIAL post (Tier 3 of our 3-tier content model). Your job is to add our own editorial perspective and commentary on the news, then link readers to OUR article about it, not the original source.
 
 POST FORMAT: ${format.toUpperCase()}
 ${FORMAT_DESCRIPTIONS[format]}
 
 TARGET AUDIENCE: ${audience.replace(/_/g, " ")}
 ${audienceInstructions[audience]}
+
+EDITORIAL FRAMING:
+- This is OUR take on the news. We are not just sharing someone else's article.
+- Add original analysis, context, or a perspective the original source did not cover.
+- Frame it as "we broke this down for you" or "here is what this means for your family."
+- The link at the end goes to OUR article at ${articleUrl}. This is where readers get the full story with our editorial.
+- NEVER link to the original external source in the post. Our article already credits and links to the source.
 
 ABSOLUTE RULES:
 - NEVER fabricate statistics, numbers, percentages, dollar amounts, or data points
@@ -247,10 +254,10 @@ ABSOLUTE RULES:
 - Use numbered lists (1. 2. 3.) when listing steps, but never markdown bullet points
 - Use emojis sparingly and purposefully (1-3 per post maximum)
 - VISUAL STRUCTURE IS MANDATORY. Use \\n (newlines) to create clear paragraph breaks between sections. Never write a continuous block of text
-- Structure: Hook (1-2 sentences) → blank line → value/insight → blank line → details or tips → blank line → CTA with link
+- Structure: Hook (1-2 sentences) → blank line → our editorial take → blank line → practical advice → blank line → CTA with link to our article
 - Keep paragraphs SHORT: 2-3 sentences max. Break longer paragraphs
 - LinkedIn posts MUST have at least 4 blank lines between sections. Facebook posts MUST have at least 3
-- The link to the article MUST be ${articleUrl} exactly
+- The link to the article MUST be ${articleUrl} exactly. Do NOT include any other URLs.
 
 VOICE AND TONE:
 - Write like you're telling a friend about something they need to know
@@ -311,6 +318,8 @@ function validateAndFixLinks(content: string, expectedUrl: string): string {
       expectedUrl
     );
   }
+
+  fixed = fixed.replace(/https?:\/\/(?!(?:www\.)?getcyberright\.com)[^\s)]+/g, "").replace(/\n{3,}/g, "\n\n");
 
   const newsLinks = fixed.match(/https:\/\/www\.getcyberright\.com\/news\/[^\s)]+/g) || [];
   if (newsLinks.length > 1) {

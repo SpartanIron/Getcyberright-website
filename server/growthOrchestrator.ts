@@ -347,6 +347,86 @@ async function allPlatformsPublishedToday(): Promise<boolean> {
   }
 }
 
+async function expireStaleDrafts(): Promise<number> {
+  try {
+    const drafts = await storage.getSocialPosts("draft", 200);
+    const now = Date.now();
+    let expired = 0;
+
+    for (const draft of drafts) {
+      if (!draft.createdAt) continue;
+      const ageHours = (now - new Date(draft.createdAt).getTime()) / 3600000;
+
+      const isReactive = draft.contentType === "trend_insight";
+      const isNewsEditorial = draft.contentType === "news_article";
+
+      const todayET = getTodayET();
+      const draftDateET = draft.createdAt ? toETDateString(new Date(draft.createdAt)) : "";
+      const isSameDay = todayET === draftDateET;
+
+      let shouldExpire = false;
+      let reason = "";
+
+      if (isReactive && !isSameDay) {
+        shouldExpire = true;
+        reason = "reactive post older than same day";
+      } else if (isNewsEditorial && ageHours > 48) {
+        shouldExpire = true;
+        reason = "news editorial post older than 48 hours";
+      }
+
+      if (shouldExpire) {
+        await storage.updateSocialPost(draft.id, {
+          status: "failed",
+          publishError: `Auto-expired: ${reason}`,
+        });
+        expired++;
+        console.log(`[ContentTier] Expired draft "${draft.contentTitle}" on ${draft.platform}: ${reason}`);
+      }
+    }
+
+    if (expired > 0) {
+      console.log(`[ContentTier] Expired ${expired} stale drafts`);
+    }
+    return expired;
+  } catch (err: any) {
+    console.error("[ContentTier] Error expiring stale drafts:", err.message);
+    return 0;
+  }
+}
+
+async function getContentTierCounts(): Promise<{ reactive: number; guide: number; newsEditorial: number; total: number }> {
+  const recentPosts = await storage.getSocialPosts("published", 200);
+  const sevenDaysAgo = Date.now() - 7 * 86400000;
+
+  let reactive = 0, guide = 0, newsEditorial = 0;
+  for (const post of recentPosts) {
+    if (!post.publishedAt || new Date(post.publishedAt).getTime() < sevenDaysAgo) continue;
+    if (post.contentType === "trend_insight") reactive++;
+    else if (post.contentType === "news_article") newsEditorial++;
+    else guide++;
+  }
+
+  const total = reactive + guide + newsEditorial;
+  return { reactive, guide, newsEditorial, total };
+}
+
+function selectContentTier(counts: { reactive: number; guide: number; newsEditorial: number; total: number }): "reactive" | "guide" | "news_editorial" {
+  if (counts.total < 3) return "guide";
+
+  const reactivePct = (counts.reactive / counts.total) * 100;
+  const guidePct = (counts.guide / counts.total) * 100;
+  const newsPct = (counts.newsEditorial / counts.total) * 100;
+
+  if (guidePct < 45) return "guide";
+  if (reactivePct < 25) return "reactive";
+  if (newsPct < 15) return "news_editorial";
+
+  if (guidePct < 55) return "guide";
+  if (newsPct < 22) return "news_editorial";
+  return "reactive";
+}
+
 async function dailySocialPublish(): Promise<void> {
   if (!isBufferConfigured()) return;
 
@@ -356,25 +436,73 @@ async function dailySocialPublish(): Promise<void> {
   }
 
   try {
-    console.log(`[GrowthOrchestrator] Starting daily social publish...`);
+    console.log(`[GrowthOrchestrator] Starting daily social publish (3-tier model)...`);
 
-    const trendResult = await generateAndPublishTrendAwarePosts();
-    console.log(
-      `[GrowthOrchestrator] Trend-aware posts: ${trendResult.published} published (${trendResult.platforms.join(", ") || "none"})`
-    );
+    await expireStaleDrafts();
 
-    if (isWithinAnyPostingWindow()) {
-      const drafts = await storage.getSocialPosts("draft", 50);
-      const publishable = drafts.filter(d => d.platform !== "alert");
-      if (publishable.length > 0) {
-        console.log(`[GrowthOrchestrator] Also draining ${publishable.length} remaining draft posts...`);
-        const results = await publishAllDraftsViaBuffer();
-        const succeeded = results.filter(r => r.success).length;
-        const failed = results.filter(r => !r.success).length;
-        console.log(`[GrowthOrchestrator] Draft drain complete: ${succeeded} published, ${failed} failed`);
+    const tierCounts = await getContentTierCounts();
+    const selectedTier = selectContentTier(tierCounts);
+    const tierPcts = tierCounts.total > 0
+      ? `guide=${Math.round((tierCounts.guide / tierCounts.total) * 100)}% reactive=${Math.round((tierCounts.reactive / tierCounts.total) * 100)}% news=${Math.round((tierCounts.newsEditorial / tierCounts.total) * 100)}%`
+      : "no data yet";
+    console.log(`[ContentTier] Current mix (last 7d): ${tierPcts} | Selected tier: ${selectedTier}`);
+
+    if (selectedTier === "reactive") {
+      const trendResult = await generateAndPublishTrendAwarePosts();
+      console.log(
+        `[GrowthOrchestrator] Reactive posts: ${trendResult.published} published (${trendResult.platforms.join(", ") || "none"})`
+      );
+    } else if (selectedTier === "guide") {
+      if (isWithinAnyPostingWindow()) {
+        const drafts = await storage.getSocialPosts("draft", 50);
+        const guideDrafts = drafts.filter(d =>
+          d.platform !== "alert" &&
+          d.contentType !== "trend_insight" &&
+          d.contentType !== "news_article"
+        );
+        if (guideDrafts.length > 0) {
+          console.log(`[GrowthOrchestrator] Publishing guide-based content (${guideDrafts.length} drafts available)...`);
+          const results = await publishAllDraftsViaBuffer({ tier: "guide" });
+          const succeeded = results.filter(r => r.success).length;
+          console.log(`[GrowthOrchestrator] Guide posts: ${succeeded} published`);
+        } else {
+          console.log(`[GrowthOrchestrator] No guide drafts available. Falling back to reactive...`);
+          const trendResult = await generateAndPublishTrendAwarePosts();
+          console.log(`[GrowthOrchestrator] Fallback reactive: ${trendResult.published} published`);
+        }
+      } else {
+        console.log("[GrowthOrchestrator] Outside posting windows, skipping guide drain");
       }
     } else {
-      console.log("[GrowthOrchestrator] Outside posting windows, skipping draft drain");
+      if (isWithinAnyPostingWindow()) {
+        const drafts = await storage.getSocialPosts("draft", 50);
+        const newsDrafts = drafts.filter(d =>
+          d.platform !== "alert" &&
+          d.contentType === "news_article"
+        );
+        if (newsDrafts.length > 0) {
+          console.log(`[GrowthOrchestrator] Publishing news editorial content (${newsDrafts.length} drafts available)...`);
+          const results = await publishAllDraftsViaBuffer({ tier: "news_editorial" });
+          const succeeded = results.filter(r => r.success).length;
+          console.log(`[GrowthOrchestrator] News editorial posts: ${succeeded} published`);
+        } else {
+          console.log(`[GrowthOrchestrator] No news editorial drafts available. Falling back to guide...`);
+          const guideDrafts = (await storage.getSocialPosts("draft", 50)).filter(d =>
+            d.platform !== "alert" && d.contentType !== "trend_insight"
+          );
+          if (guideDrafts.length > 0) {
+            const results = await publishAllDraftsViaBuffer({ tier: "guide" });
+            const succeeded = results.filter(r => r.success).length;
+            console.log(`[GrowthOrchestrator] Fallback guide: ${succeeded} published`);
+          } else {
+            console.log(`[GrowthOrchestrator] No drafts available. Generating reactive...`);
+            const trendResult = await generateAndPublishTrendAwarePosts();
+            console.log(`[GrowthOrchestrator] Fallback reactive: ${trendResult.published} published`);
+          }
+        }
+      } else {
+        console.log("[GrowthOrchestrator] Outside posting windows, skipping news editorial drain");
+      }
     }
   } catch (error: any) {
     console.error("[GrowthOrchestrator] Daily social publish error:", error.message);
