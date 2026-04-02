@@ -139,7 +139,6 @@ export async function createBufferPost(
     dueAt?: string;
     imageUrl?: string;
     platform?: string;
-    firstComment?: string;
   } = {}
 ): Promise<BufferPublishResult> {
   try {
@@ -163,10 +162,6 @@ export async function createBufferPost(
 
     if (options.platform === "instagram") {
       input.metadata = { instagram: { type: "post", shouldShareToFeed: true } };
-    }
-
-    if (options.firstComment && options.platform !== "instagram") {
-      input.firstComment = options.firstComment;
     }
 
     if (options.imageUrl) {
@@ -464,33 +459,6 @@ export async function publishAllDraftsViaBuffer(): Promise<BufferPublishResult[]
   return results;
 }
 
-export async function addFirstComment(
-  postBufferId: string,
-  channelId: string,
-  commentText: string
-): Promise<{ success: boolean; error?: string }> {
-  console.log(`[Buffer] First comment not supported as separate API call — use firstComment in createPost input instead`);
-  return { success: false, error: "Buffer API does not support separate comment creation; use firstComment field in createPost" };
-}
-
-function extractArticleUrl(postContent: string): string | null {
-  const urlRegex = /https?:\/\/(?!(?:www\.)?getcyberright\.com)[^\s"<>)]+/g;
-  const matches = postContent.match(urlRegex);
-  if (!matches || matches.length === 0) return null;
-  return matches[matches.length - 1];
-}
-
-function stripArticleUrlFromPost(postContent: string, articleUrl: string): string {
-  let cleaned = postContent;
-
-  const urlEscaped = articleUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  cleaned = cleaned.replace(new RegExp(`\\n*\\s*(?:Read more|Full story|Source|Learn more|Article)?:?\\s*${urlEscaped}\\s*`, "gi"), "");
-  cleaned = cleaned.replace(new RegExp(`\\n*${urlEscaped}\\s*`, "g"), "");
-  cleaned = cleaned.replace(/\n{3,}/g, "\n\n").trim();
-
-  return cleaned;
-}
-
 export async function publishWithFirstComment(
   channelId: string,
   content: string,
@@ -501,25 +469,11 @@ export async function publishWithFirstComment(
     sourceArticleUrl?: string | null;
   } = {}
 ): Promise<BufferPublishResult> {
-  const articleUrl = options.sourceArticleUrl || extractArticleUrl(content);
-  let postContent = content;
-  let firstComment: string | undefined;
-
-  if (articleUrl && options.platform !== "instagram") {
-    postContent = stripArticleUrlFromPost(content, articleUrl);
-    firstComment = articleUrl;
-  }
-
-  const result = await createBufferPost(channelId, postContent, {
+  const result = await createBufferPost(channelId, content, {
     mode: options.mode || "shareNow",
     imageUrl: options.imageUrl,
     platform: options.platform,
-    firstComment,
   });
-
-  if (firstComment && result.success) {
-    console.log(`[Buffer] Article link included as first comment on ${options.platform}`);
-  }
 
   return result;
 }
