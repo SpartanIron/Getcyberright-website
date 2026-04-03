@@ -7,7 +7,7 @@ import { storage } from "./storage";
 import { getAllScamSlugs } from "@shared/scam-content";
 import { insertContactMessageSchema, insertNewsletterSubscriberSchema, insertScamReportSchema, insertExperienceWaitlistSchema, experienceWaitlist, SUBSCRIPTION_TIERS, hasTierAccess, isFreeAccessPeriod, users, scamReports, userProgress, userBadges, badgeDefinitions, familyCodewords, audioAnalysisHistory, learningPaths, trainingModules, trainingLessons, trainingQuizzes, quizQuestions, userLearningProgress, quizAttempts, trainingCertificates, removalRequests, userVaultProfiles, userVaultKeys, exposureFindings, dataBrokers, insertScanHistorySchema, insertCommunityScamReportSchema, insertScanReportSchema, insertScamOfWeekSchema, communityScamReports, siteReputation, scanHistory } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, inArray, sql, desc } from "drizzle-orm";
+import { eq, and, inArray, sql, desc, gte } from "drizzle-orm";
 import { z } from "zod";
 import { createRateLimitMiddleware, securityLogger } from "./security";
 import { verifyRecaptcha } from "./security/recaptcha";
@@ -1496,6 +1496,283 @@ RECOMMENDATION TONE CALIBRATION (CRITICAL):
       console.error("AI Scam Analyzer error:", error);
       const errorMessage = "Analysis could not be completed. Please try again or use the pattern-based GCR Scam Guard tool.";
       res.status(500).json({ success: false, error: errorMessage });
+    }
+  });
+
+  app.post("/api/security/context-scan", standardRateLimit, async (req, res) => {
+    try {
+      const { matchCampaignPlaybook, identifyBrand, analyzeWithContext, correlateScans, buildContextEnhancedPrompt, generatePhantomAccountProtocol } = await import("./advancedScamIntelligence");
+
+      const schema = z.object({
+        content: z.string().min(5).max(50000),
+        context: z.object({
+          didInitiate: z.boolean().nullable(),
+          hasAccount: z.boolean().nullable(),
+          expectingEmail: z.boolean().nullable(),
+          madeRecentPurchase: z.boolean().nullable(),
+          recognizeSender: z.boolean().nullable(),
+          additionalContext: z.string().optional()
+        }),
+        senderDomain: z.string().optional()
+      });
+
+      const { content, context, senderDomain } = schema.parse(req.body);
+
+      const brand = identifyBrand(content, senderDomain);
+      const playbookMatch = matchCampaignPlaybook(content, senderDomain);
+      const contextAnalysis = analyzeWithContext(content, context, brand);
+
+      const userId = (req as any).session?.userId || null;
+      let campaignCorrelation = null;
+      if (userId) {
+        campaignCorrelation = await correlateScans(userId, content, brand?.brand || null);
+      }
+
+      const phantomProtocol = generatePhantomAccountProtocol(brand, context);
+
+      const enhancedContent = buildContextEnhancedPrompt(
+        content, context, playbookMatch, brand, campaignCorrelation
+      );
+
+      const Anthropic = (await import("@anthropic-ai/sdk")).default;
+      const anthropic = new Anthropic({
+        apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+        baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
+      });
+
+      const systemPrompt = `You are an advanced cybersecurity threat-analysis AI with expertise in multi-step attack campaigns, account weaponization, and legitimate-service abuse detection.
+
+CORE OPERATING PRINCIPLE
+Analyze the submitted content along with any USER CONTEXT, CAMPAIGN INTELLIGENCE, and BRAND INTELLIGENCE provided. The user context answers are CRITICAL to your risk assessment — a legitimate email about a purchase becomes a HIGH RISK threat if the recipient never made that purchase.
+
+ACCOUNT WEAPONIZATION DETECTION
+When a user reports they did NOT initiate an action (account creation, purchase, invoice) but received a legitimate-looking notification:
+- This is likely an "Account Weaponization" attack where attackers use the real company's systems to trigger genuine emails
+- The email may pass ALL technical checks (SPF, DKIM, DMARC) because it IS a real email from the real company
+- The DANGER is in the follow-up messages that will contain phishing links
+- Risk level should be HIGH or CRITICAL even if the individual email appears legitimate
+
+CAMPAIGN AWARENESS
+If CAMPAIGN INTELLIGENCE is provided, you MUST:
+- Reference the matched campaign by name
+- Warn about the predicted next steps
+- Explain this is a known attack pattern used by cybercriminals
+- Emphasize that receiving multiple related messages is not coincidence
+
+OUTPUT FORMAT (MANDATORY)
+{
+  "contentTypeDetected": "[Type + confidence %]",
+  "scamRiskLevel": "Low" | "Moderate" | "High" | "Critical",
+  "attackType": "account_weaponization" | "invoice_fraud" | "credential_harvest" | "phishing" | "social_engineering" | "legitimate" | "unknown",
+  "campaignDetected": true | false,
+  "campaignName": "Name of matched campaign or null",
+  "campaignStep": "Step X of Y or null",
+  "nextStepPrediction": "What the attacker will likely do next, or null",
+  "keyRedFlags": ["plain-language red flags"],
+  "contextualInsights": ["insights based on the user's specific answers about their situation"],
+  "technicalObservations": ["plain-language technical findings"],
+  "recommendedActions": ["clear, specific steps - start each with a verb"],
+  "confidenceLevel": "explanation of certainty",
+  "summary": "2-3 sentence plain-language summary. Be direct about the threat and what they should do."
+}
+
+BEHAVIORAL CONSTRAINTS
+- Factor user context answers heavily into risk assessment
+- Write ALL findings in plain language for non-technical users
+- Never use technical jargon (SPF, DKIM, TLD, etc.)
+- Prioritize user safety over reassurance
+- If campaign intelligence matches, treat as HIGH or CRITICAL risk`;
+
+      const message = await anthropic.messages.create({
+        model: "claude-sonnet-4-5",
+        max_tokens: 8192,
+        system: systemPrompt,
+        messages: [{ role: "user", content: `Please analyze the following content with full context:\n\n${enhancedContent}` }],
+      });
+
+      const block = message.content[0];
+      const resultText = block && block.type === "text" ? block.text : null;
+      if (!resultText) throw new Error("No response from AI model");
+
+      const jsonMatch = resultText.match(/\{[\s\S]*\}/);
+      const aiResult = JSON.parse(jsonMatch ? jsonMatch[0] : resultText);
+
+      recordScan({
+        userId,
+        contentSnippet: content.substring(0, 200),
+        contentType: aiResult.contentTypeDetected || "context-scan",
+        riskLevel: aiResult.scamRiskLevel?.toLowerCase() || "unknown",
+        riskScore: aiResult.scamRiskLevel === "Critical" ? 95 : aiResult.scamRiskLevel === "High" ? 80 : aiResult.scamRiskLevel === "Moderate" ? 50 : 15,
+        resultSummary: aiResult.summary || "Context-aware analysis complete",
+        flagsFound: (aiResult.keyRedFlags?.length || 0) + (aiResult.contextualInsights?.length || 0),
+        sourceComponent: "scam-checker-context",
+        sessionId: (req as any).sessionID,
+      });
+
+      res.json({
+        success: true,
+        result: aiResult,
+        contextAnalysis: {
+          riskModifier: contextAnalysis.riskModifier,
+          isAccountWeaponization: contextAnalysis.isAccountWeaponization,
+          isLegitimateServiceAbuse: contextAnalysis.isLegitimateServiceAbuse,
+          insights: contextAnalysis.insights,
+          responseProtocol: contextAnalysis.responseProtocol
+        },
+        campaignCorrelation,
+        playbookMatch: playbookMatch ? {
+          name: playbookMatch.playbook.name,
+          description: playbookMatch.playbook.description,
+          currentStep: playbookMatch.matchedStep,
+          totalSteps: playbookMatch.playbook.steps.length,
+          confidence: playbookMatch.confidence,
+          sophistication: playbookMatch.playbook.sophistication,
+          prevalence: playbookMatch.playbook.prevalence,
+          responseProtocol: playbookMatch.playbook.responseProtocol,
+          steps: playbookMatch.playbook.steps.map(s => ({
+            order: s.order,
+            description: s.description,
+            isCurrentStep: s.order === playbookMatch.matchedStep,
+            nextStepWarning: s.nextStepWarning
+          }))
+        } : null,
+        phantomAccountProtocol: phantomProtocol.length > 0 ? phantomProtocol : null,
+        brandDetected: brand ? { name: brand.brand, domains: brand.domains } : null
+      });
+    } catch (error: any) {
+      console.error("Context scan error:", error);
+      res.status(500).json({ success: false, error: "Context-aware analysis could not be completed." });
+    }
+  });
+
+  app.get("/api/security/threat-timeline", standardRateLimit, async (req, res) => {
+    try {
+      const userId = (req as any).session?.userId;
+      if (!userId) {
+        res.status(401).json({ error: "Login required to view threat timeline" });
+        return;
+      }
+
+      const { correlateScans, matchCampaignPlaybook, identifyBrand } = await import("./advancedScamIntelligence");
+
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const scans = await db.select()
+        .from(scanHistory)
+        .where(and(
+          eq(scanHistory.userId, userId),
+          gte(scanHistory.createdAt, thirtyDaysAgo)
+        ))
+        .orderBy(desc(scanHistory.createdAt))
+        .limit(50);
+
+      const timelineEntries = scans.map(scan => {
+        const snippet = scan.contentSnippet || "";
+        const brand = identifyBrand(snippet);
+        const playbook = matchCampaignPlaybook(snippet);
+        return {
+          id: scan.id,
+          contentSnippet: snippet,
+          riskLevel: scan.riskLevel,
+          riskScore: scan.riskScore,
+          flagsFound: scan.flagsFound,
+          scannedAt: scan.createdAt?.toISOString(),
+          sourceComponent: scan.sourceComponent,
+          brandDetected: brand?.brand || null,
+          campaignMatch: playbook ? {
+            name: playbook.playbook.name,
+            step: playbook.matchedStep,
+            totalSteps: playbook.playbook.steps.length
+          } : null
+        };
+      });
+
+      const brandGroups: Record<string, number> = {};
+      for (const entry of timelineEntries) {
+        if (entry.brandDetected) {
+          brandGroups[entry.brandDetected] = (brandGroups[entry.brandDetected] || 0) + 1;
+        }
+      }
+
+      const activeCampaigns = timelineEntries
+        .filter(e => e.campaignMatch)
+        .reduce((acc, e) => {
+          const name = e.campaignMatch!.name;
+          if (!acc[name]) acc[name] = { name, scanCount: 0, latestStep: 0, totalSteps: e.campaignMatch!.totalSteps };
+          acc[name].scanCount++;
+          acc[name].latestStep = Math.max(acc[name].latestStep, e.campaignMatch!.step);
+          return acc;
+        }, {} as Record<string, { name: string; scanCount: number; latestStep: number; totalSteps: number }>);
+
+      res.json({
+        success: true,
+        timeline: timelineEntries,
+        summary: {
+          totalScans: scans.length,
+          highRiskScans: scans.filter(s => s.riskLevel === "high" || s.riskLevel === "critical").length,
+          brandsTargeted: Object.keys(brandGroups),
+          brandFrequency: brandGroups,
+          activeCampaigns: Object.values(activeCampaigns)
+        }
+      });
+    } catch (error) {
+      console.error("Threat timeline error:", error);
+      res.status(500).json({ error: "Failed to build threat timeline" });
+    }
+  });
+
+  app.post("/api/security/visual-analyze", express.json({ limit: "10mb", verify: (req: any, _res: any, buf: Buffer) => { req.rawBody = buf; } }), standardRateLimit, async (req, res) => {
+    try {
+      const { imageData } = req.body;
+      if (!imageData || typeof imageData !== "string" || !imageData.match(/^data:image\/(png|jpeg|jpg|gif|webp|bmp|svg\+xml);base64,/i)) {
+        res.status(400).json({ error: "Invalid image data" });
+        return;
+      }
+
+      const { buildVisualAnalysisPrompt, identifyBrand } = await import("./advancedScamIntelligence");
+
+      const contentHint = req.body.contentHint || "";
+      const brand = identifyBrand(contentHint);
+
+      const Anthropic = (await import("@anthropic-ai/sdk")).default;
+      const anthropic = new Anthropic({
+        apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+        baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
+      });
+
+      const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
+      const mediaTypeMatch = imageData.match(/^data:(image\/[\w+]+);base64,/);
+      const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/png";
+
+      const visualPrompt = buildVisualAnalysisPrompt(brand?.brand || null);
+
+      const response = await anthropic.messages.create({
+        model: "claude-sonnet-4-5",
+        max_tokens: 2000,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: mediaType as any, data: base64Data } },
+            { type: "text", text: visualPrompt }
+          ],
+        }],
+      });
+
+      const resultText = (response.content[0] as any).text || "";
+      const jsonMatch = resultText.match(/\{[\s\S]*\}/);
+      const visualResult = jsonMatch ? JSON.parse(jsonMatch[0]) : {
+        brandDetected: brand?.brand || null,
+        templateMatch: "unknown",
+        brandConsistencyScore: 0,
+        visualRedFlags: [],
+        recommendations: ["Unable to parse visual analysis results"]
+      };
+
+      res.json({ success: true, result: visualResult });
+    } catch (error) {
+      console.error("Visual analysis error:", error);
+      res.status(500).json({ error: "Visual analysis failed" });
     }
   });
 

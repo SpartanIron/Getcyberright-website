@@ -1709,6 +1709,63 @@ interface AIAnalysisResult {
   recommendedActions: string[];
   confidenceLevel: string;
   summary: string;
+  attackType?: string;
+  campaignDetected?: boolean;
+  campaignName?: string;
+  campaignStep?: string;
+  nextStepPrediction?: string;
+  contextualInsights?: string[];
+}
+
+interface ContextAnswers {
+  didInitiate: boolean | null;
+  hasAccount: boolean | null;
+  expectingEmail: boolean | null;
+  madeRecentPurchase: boolean | null;
+  recognizeSender: boolean | null;
+  additionalContext?: string;
+}
+
+interface ContextScanResult {
+  result: AIAnalysisResult;
+  contextAnalysis: {
+    riskModifier: number;
+    isAccountWeaponization: boolean;
+    isLegitimateServiceAbuse: boolean;
+    insights: string[];
+    responseProtocol: string[];
+  };
+  campaignCorrelation: {
+    isPartOfCampaign: boolean;
+    relatedScans: Array<{ id: string; contentSnippet: string; riskLevel: string; scannedAt: string; matchReason: string }>;
+    urgencyLevel: string;
+    timelineInsight: string;
+  } | null;
+  playbookMatch: {
+    name: string;
+    description: string;
+    currentStep: number;
+    totalSteps: number;
+    confidence: number;
+    sophistication: string;
+    prevalence: string;
+    responseProtocol: string[];
+    steps: Array<{ order: number; description: string; isCurrentStep: boolean; nextStepWarning: string }>;
+  } | null;
+  phantomAccountProtocol: string[] | null;
+  brandDetected: { name: string; domains: string[] } | null;
+}
+
+interface ThreatTimelineEntry {
+  id: number;
+  contentSnippet: string;
+  riskLevel: string;
+  riskScore: number;
+  flagsFound: number;
+  scannedAt: string;
+  sourceComponent: string;
+  brandDetected: string | null;
+  campaignMatch: { name: string; step: number; totalSteps: number } | null;
 }
 
 function detectEmailHeaders(content: string): boolean {
@@ -1855,6 +1912,15 @@ export function ScamChecker() {
   const [deepfakeWarnings, setDeepfakeWarnings] = useState<string[]>([]);
   const [smsAnalysis, setSmsAnalysis] = useState<{ shortCode?: string; service?: string; patterns: string[]; isLegitOptOut: boolean } | null>(null);
 
+  const [showContextQuestions, setShowContextQuestions] = useState(false);
+  const [contextAnswers, setContextAnswers] = useState<ContextAnswers>({
+    didInitiate: null, hasAccount: null, expectingEmail: null,
+    madeRecentPurchase: null, recognizeSender: null
+  });
+  const [contextResult, setContextResult] = useState<ContextScanResult | null>(null);
+  const [isContextScanning, setIsContextScanning] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
+
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -1892,6 +1958,12 @@ export function ScamChecker() {
   const voteMutation = useMutation({
     mutationFn: (id: string) => apiRequest("POST", `/api/community-reports/${id}/vote`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/community-reports"] }),
+  });
+
+  const threatTimelineQuery = useQuery({
+    queryKey: ["/api/security/threat-timeline"],
+    enabled: !!user && showTimeline,
+    queryFn: () => fetch("/api/security/threat-timeline").then(r => r.json()),
   });
 
   const handleQRUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -2128,6 +2200,35 @@ export function ScamChecker() {
     setShareId(null);
     setDeepfakeWarnings([]);
     setSmsAnalysis(null);
+    setShowContextQuestions(false);
+    setContextAnswers({ didInitiate: null, hasAccount: null, expectingEmail: null, madeRecentPurchase: null, recognizeSender: null });
+    setContextResult(null);
+    setIsContextScanning(false);
+  };
+
+  const handleContextScan = async () => {
+    setIsContextScanning(true);
+    try {
+      const response = await fetch("/api/security/context-scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content,
+          context: contextAnswers,
+          senderDomain: content.match(/@([\w.-]+)/)?.[1] || undefined
+        }),
+      });
+      if (!response.ok) throw new Error("Context scan failed");
+      const data = await response.json();
+      if (data.success) {
+        setContextResult(data);
+        setShowContextQuestions(false);
+      }
+    } catch (err) {
+      toast({ title: "Analysis error", description: "Could not complete context-aware analysis. Please try again.", variant: "destructive" });
+    } finally {
+      setIsContextScanning(false);
+    }
   };
 
   const checkUrlReputation = async (url: string) => {
@@ -2283,16 +2384,28 @@ export function ScamChecker() {
             Scan Screenshot
           </Button>
           {user && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 text-xs ml-auto"
-              onClick={() => setShowHistory(!showHistory)}
-              data-testid="button-toggle-history"
-            >
-              <History className="w-3.5 h-3.5" />
-              {showHistory ? "Hide History" : "Scan History"}
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs ml-auto"
+                onClick={() => { setShowTimeline(!showTimeline); if (!showTimeline) setShowHistory(false); }}
+                data-testid="button-toggle-timeline"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                {showTimeline ? "Hide Timeline" : "Threat Timeline"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs"
+                onClick={() => { setShowHistory(!showHistory); if (!showHistory) setShowTimeline(false); }}
+                data-testid="button-toggle-history"
+              >
+                <History className="w-3.5 h-3.5" />
+                {showHistory ? "Hide History" : "Scan History"}
+              </Button>
+            </>
           )}
         </div>
 
@@ -2367,6 +2480,107 @@ export function ScamChecker() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">No scan history yet. Your scans will appear here.</p>
+            )}
+          </div>
+        )}
+
+        {showTimeline && user && (
+          <div className="space-y-3" data-testid="section-threat-timeline">
+            <h4 className="font-semibold flex items-center gap-2 text-sm">
+              <Shield className="w-4 h-4 text-primary" />
+              Threat Timeline (Last 30 Days)
+            </h4>
+            {threatTimelineQuery.isLoading ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading timeline...
+              </div>
+            ) : threatTimelineQuery.data?.success && threatTimelineQuery.data.timeline?.length > 0 ? (
+              <div className="space-y-3">
+                {threatTimelineQuery.data.summary && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div className="p-3 bg-muted/50 rounded-lg text-center">
+                      <p className="text-2xl font-bold">{threatTimelineQuery.data.summary.totalScans}</p>
+                      <p className="text-xs text-muted-foreground">Total Scans</p>
+                    </div>
+                    <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-red-600">{threatTimelineQuery.data.summary.highRiskScans}</p>
+                      <p className="text-xs text-muted-foreground">High Risk</p>
+                    </div>
+                    <div className="p-3 bg-muted/50 rounded-lg text-center">
+                      <p className="text-2xl font-bold">{threatTimelineQuery.data.summary.brandsTargeted?.length || 0}</p>
+                      <p className="text-xs text-muted-foreground">Brands Targeted</p>
+                    </div>
+                    <div className="p-3 bg-orange-50 dark:bg-orange-950/30 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-orange-600">{threatTimelineQuery.data.summary.activeCampaigns?.length || 0}</p>
+                      <p className="text-xs text-muted-foreground">Active Campaigns</p>
+                    </div>
+                  </div>
+                )}
+
+                {threatTimelineQuery.data.summary?.activeCampaigns?.length > 0 && (
+                  <div className="p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <h5 className="text-sm font-semibold text-orange-700 dark:text-orange-300 mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      Active Campaign Alerts
+                    </h5>
+                    <div className="space-y-1">
+                      {threatTimelineQuery.data.summary.activeCampaigns.map((campaign: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between text-sm">
+                          <span className="text-orange-600 dark:text-orange-400">{campaign.name}</span>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">Step {campaign.latestStep}/{campaign.totalSteps}</Badge>
+                            <Badge className="bg-orange-500 text-white text-xs">{campaign.scanCount} related scans</Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2 max-h-80 overflow-y-auto">
+                  {(threatTimelineQuery.data.timeline as ThreatTimelineEntry[]).map((entry) => (
+                    <div
+                      key={entry.id}
+                      className={`p-3 rounded-lg border ${
+                        entry.riskLevel === "critical" || entry.riskLevel === "high"
+                          ? "bg-red-50/50 dark:bg-red-950/20 border-red-200 dark:border-red-800"
+                          : entry.campaignMatch
+                            ? "bg-orange-50/50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800"
+                            : "bg-muted/50"
+                      }`}
+                      data-testid={`timeline-entry-${entry.id}`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm truncate">{entry.contentSnippet}</p>
+                          <div className="flex flex-wrap items-center gap-2 mt-1">
+                            <Badge className={
+                              entry.riskLevel === "critical" || entry.riskLevel === "high" ? "bg-red-500 text-white" :
+                              entry.riskLevel === "medium" || entry.riskLevel === "moderate" ? "bg-yellow-500 text-black" :
+                              "bg-green-500 text-white"
+                            }>
+                              {entry.riskLevel}
+                            </Badge>
+                            {entry.brandDetected && (
+                              <Badge variant="outline" className="text-xs">{entry.brandDetected}</Badge>
+                            )}
+                            {entry.campaignMatch && (
+                              <Badge className="bg-orange-500 text-white text-xs">
+                                {entry.campaignMatch.name} (Step {entry.campaignMatch.step}/{entry.campaignMatch.totalSteps})
+                              </Badge>
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                              {entry.scannedAt ? new Date(entry.scannedAt).toLocaleDateString() : ""}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No scan history yet. Start scanning to build your threat timeline.</p>
             )}
           </div>
         )}
@@ -2543,6 +2757,21 @@ export function ScamChecker() {
                         </div>
                       )}
 
+                      {!contextResult && !showContextQuestions && (
+                        <div className="pt-2 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full gap-2"
+                            onClick={() => setShowContextQuestions(true)}
+                            data-testid="button-answer-context"
+                          >
+                            <Search className="w-4 h-4" />
+                            Help us analyze this better — answer a few questions
+                          </Button>
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-2 pt-2 border-t text-xs text-muted-foreground">
                         <Shield className="w-3.5 h-3.5" />
                         <span>Scanned against known scam patterns, phishing databases, and deceptive URL techniques</span>
@@ -2550,6 +2779,265 @@ export function ScamChecker() {
                     </div>
                   </CardContent>
                 </Card>
+              </div>
+            )}
+
+            {showContextQuestions && !contextResult && (
+              <Card className="border-2 border-primary/30" data-testid="section-context-questions">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Search className="w-5 h-5 text-primary" />
+                    Help Us Understand Your Situation
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Your answers help detect sophisticated attacks where scammers use real company emails to trick you.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[
+                    { key: "didInitiate" as const, question: "Did you initiate this action?", detail: "Did you sign up, make a purchase, or request something?" },
+                    { key: "hasAccount" as const, question: "Do you have an account with this company?", detail: "Have you ever created an account with them?" },
+                    { key: "expectingEmail" as const, question: "Were you expecting this message?", detail: "Were you waiting for a confirmation, receipt, or notification?" },
+                    { key: "madeRecentPurchase" as const, question: "Did you make a recent purchase?", detail: "Have you bought anything from them in the last few days?" },
+                    { key: "recognizeSender" as const, question: "Do you recognize the sender?", detail: "Is this from someone or a company you know?" },
+                  ].map((q) => (
+                    <div key={q.key} className="space-y-1.5">
+                      <p className="text-sm font-medium">{q.question}</p>
+                      <p className="text-xs text-muted-foreground">{q.detail}</p>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant={contextAnswers[q.key] === true ? "default" : "outline"}
+                          onClick={() => setContextAnswers(prev => ({ ...prev, [q.key]: true }))}
+                          data-testid={`button-context-${q.key}-yes`}
+                        >
+                          Yes
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={contextAnswers[q.key] === false ? "destructive" : "outline"}
+                          onClick={() => setContextAnswers(prev => ({ ...prev, [q.key]: false }))}
+                          data-testid={`button-context-${q.key}-no`}
+                        >
+                          No
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={contextAnswers[q.key] === null ? "secondary" : "ghost"}
+                          onClick={() => setContextAnswers(prev => ({ ...prev, [q.key]: null }))}
+                          data-testid={`button-context-${q.key}-unsure`}
+                        >
+                          Not sure
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      className="flex-1 gap-2"
+                      onClick={handleContextScan}
+                      disabled={isContextScanning || Object.values(contextAnswers).every(v => v === null)}
+                      data-testid="button-run-context-scan"
+                    >
+                      {isContextScanning ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Analyzing with context...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-4 h-4" />
+                          Run Deep Analysis
+                        </>
+                      )}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setShowContextQuestions(false)} data-testid="button-cancel-context">
+                      Skip
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {contextResult && (
+              <div className="space-y-4" data-testid="section-context-results">
+                {contextResult.contextAnalysis.isAccountWeaponization && (
+                  <Card className="border-2 border-red-500/50 bg-red-50/50 dark:bg-red-950/20">
+                    <CardContent className="pt-4 space-y-3">
+                      <h4 className="font-bold flex items-center gap-2 text-red-700 dark:text-red-300">
+                        <AlertTriangle className="w-5 h-5" />
+                        Account Weaponization Detected
+                      </h4>
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        This appears to be an attack where someone used your email to create a real account or trigger a real notification from a legitimate company. The email may be genuine, but the situation is a scam.
+                      </p>
+                      {contextResult.brandDetected && (
+                        <Badge variant="outline" className="text-red-600 border-red-300">
+                          Target brand: {contextResult.brandDetected.name}
+                        </Badge>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {contextResult.playbookMatch && (
+                  <Card className="border-2 border-orange-500/50 bg-orange-50/50 dark:bg-orange-950/20" data-testid="section-campaign-match">
+                    <CardContent className="pt-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold flex items-center gap-2 text-orange-700 dark:text-orange-300">
+                          <AlertTriangle className="w-5 h-5" />
+                          Known Attack Campaign Detected
+                        </h4>
+                        <Badge className="bg-orange-500 text-white">{contextResult.playbookMatch.confidence}% match</Badge>
+                      </div>
+                      <p className="text-sm font-semibold text-orange-800 dark:text-orange-200">
+                        {contextResult.playbookMatch.name}
+                      </p>
+                      <p className="text-sm text-orange-700 dark:text-orange-300">
+                        {contextResult.playbookMatch.description}
+                      </p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Badge variant="outline">Step {contextResult.playbookMatch.currentStep} of {contextResult.playbookMatch.totalSteps}</Badge>
+                        <Badge variant="outline">{contextResult.playbookMatch.sophistication} sophistication</Badge>
+                        <Badge variant="outline">{contextResult.playbookMatch.prevalence}</Badge>
+                      </div>
+
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-orange-800 dark:text-orange-200">Attack Timeline:</p>
+                        {contextResult.playbookMatch.steps.map(step => (
+                          <div key={step.order} className={`p-2 rounded-lg border text-sm ${
+                            step.isCurrentStep
+                              ? "bg-orange-200/50 dark:bg-orange-900/30 border-orange-400"
+                              : step.order < contextResult.playbookMatch!.currentStep
+                                ? "bg-muted/50 border-muted opacity-60"
+                                : "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-300 dark:border-yellow-800"
+                          }`}>
+                            <div className="flex items-center gap-2">
+                              <Badge variant={step.isCurrentStep ? "default" : "secondary"} className="text-xs">
+                                Step {step.order}
+                              </Badge>
+                              {step.isCurrentStep && <Badge className="bg-orange-500 text-white text-xs">You are here</Badge>}
+                            </div>
+                            <p className="mt-1">{step.description}</p>
+                            {(step.isCurrentStep || step.order > contextResult.playbookMatch!.currentStep) && step.nextStepWarning && (
+                              <p className="mt-1 text-xs text-orange-600 dark:text-orange-400 font-medium">
+                                {step.nextStepWarning}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {contextResult.contextAnalysis.insights.length > 0 && (
+                  <Card data-testid="section-context-insights">
+                    <CardContent className="pt-4 space-y-3">
+                      <h4 className="font-semibold flex items-center gap-2 text-sm">
+                        <Eye className="w-4 h-4 text-primary" />
+                        Context-Aware Insights
+                      </h4>
+                      <div className="space-y-2">
+                        {contextResult.contextAnalysis.insights.map((insight, i) => (
+                          <div key={i} className="flex items-start gap-2 text-sm p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md border border-blue-200 dark:border-blue-800">
+                            <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                            <span>{insight}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {contextResult.contextAnalysis.responseProtocol.length > 0 && (
+                  <Card className="border-green-200 dark:border-green-800" data-testid="section-response-protocol">
+                    <CardContent className="pt-4 space-y-3">
+                      <h4 className="font-semibold flex items-center gap-2 text-green-700 dark:text-green-300">
+                        <Shield className="w-5 h-5" />
+                        What You Should Do Right Now
+                      </h4>
+                      <ol className="space-y-2">
+                        {contextResult.contextAnalysis.responseProtocol.map((step, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm p-2 bg-green-50 dark:bg-green-950/30 rounded-md border border-green-200 dark:border-green-800">
+                            <span className="font-bold text-green-700 dark:text-green-300 flex-shrink-0">{i + 1}.</span>
+                            <span>{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {contextResult.phantomAccountProtocol && contextResult.phantomAccountProtocol.length > 0 && (
+                  <Card className="border-2 border-purple-300 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/20" data-testid="section-phantom-account">
+                    <CardContent className="pt-4 space-y-3">
+                      <h4 className="font-bold flex items-center gap-2 text-purple-700 dark:text-purple-300">
+                        <AlertTriangle className="w-5 h-5" />
+                        Phantom Account Alert
+                      </h4>
+                      <div className="space-y-2">
+                        {contextResult.phantomAccountProtocol.filter(s => s.trim()).map((step, i) => (
+                          <div key={i} className={`text-sm ${step.startsWith("PHANTOM") || step.startsWith("WHY") ? "font-semibold text-purple-700 dark:text-purple-300" : "text-foreground"}`}>
+                            {step.startsWith("Step") ? (
+                              <div className="flex items-start gap-2 p-2 bg-purple-100 dark:bg-purple-900/30 rounded-md">
+                                <CheckCircle2 className="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5" />
+                                <span>{step}</span>
+                              </div>
+                            ) : (
+                              <p className={step.startsWith("  ") ? "ml-6 text-sm" : ""}>{step}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {contextResult.result && (
+                  <Card data-testid="section-context-ai-result">
+                    <CardContent className="pt-4 space-y-3">
+                      <div className={`p-4 rounded-lg border ${getAIRiskBg(contextResult.result.scamRiskLevel)}`}>
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 mt-0.5">{getAIRiskIcon(contextResult.result.scamRiskLevel)}</div>
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                              <h3 className={`text-lg font-bold ${getAIRiskColor(contextResult.result.scamRiskLevel)}`}>
+                                Context-Aware Assessment: {getFriendlyRiskTitle(contextResult.result.scamRiskLevel)}
+                              </h3>
+                            </div>
+                            <p className="text-sm">{contextResult.result.summary}</p>
+                          </div>
+                        </div>
+                      </div>
+                      {contextResult.result.contextualInsights && contextResult.result.contextualInsights.length > 0 && (
+                        <div className="space-y-1.5">
+                          {contextResult.result.contextualInsights.map((insight, i) => (
+                            <div key={i} className="flex items-start gap-2 text-sm">
+                              <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                              <span>{insight}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {contextResult.result.recommendedActions && contextResult.result.recommendedActions.length > 0 && (
+                        <div className="space-y-1.5">
+                          <h4 className="font-semibold text-sm flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-primary" />
+                            Recommended Actions
+                          </h4>
+                          {contextResult.result.recommendedActions.map((action, i) => (
+                            <div key={i} className="flex items-start gap-2 text-sm p-2 bg-green-50 dark:bg-green-950/30 rounded-md border border-green-200 dark:border-green-800">
+                              <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                              <span>{action}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
 

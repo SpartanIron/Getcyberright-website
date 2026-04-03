@@ -475,6 +475,8 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
   const extensionSafeRoutes = [
     '/api/security/ai-scam-analyze',
     '/api/security/check-url-reputation',
+    '/api/security/context-scan',
+    '/api/security/visual-analyze',
     '/api/community-reports'
   ];
   const origin = req.headers.origin;

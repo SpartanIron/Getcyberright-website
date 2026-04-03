@@ -54,7 +54,7 @@ app.use(compression({
 // Security: Request size limiting (100KB for JSON, 50KB for forms)
 // Exempt image upload endpoint which needs up to 10MB for screenshot analysis
 app.use((req, res, next) => {
-  if (req.path === "/api/security/analyze-image") return next();
+  if (req.path === "/api/security/analyze-image" || req.path === "/api/security/visual-analyze") return next();
   return requestSizeLimiter(102400)(req, res, next);
 });
 
@@ -76,7 +76,7 @@ app.use(botProtection);
 // Body parsing with size limits
 // Image upload endpoint has its own route-level parser with 10MB limit
 app.use((req, res, next) => {
-  if (req.path === "/api/security/analyze-image") return next();
+  if (req.path === "/api/security/analyze-image" || req.path === "/api/security/visual-analyze") return next();
   express.json({
     limit: "100kb",
     verify: (req, _res, buf) => {
