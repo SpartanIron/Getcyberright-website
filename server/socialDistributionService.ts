@@ -42,7 +42,7 @@ function sanitizePostContent(text: string): string {
 }
 
 function enforceWordLimit(text: string, platform: string): string {
-  const limits: Record<string, number> = { linkedin: 150, facebook: 150, instagram: 200 };
+  const limits: Record<string, number> = { linkedin: 80, facebook: 80, instagram: 120 };
   const limit = limits[platform];
   if (!limit) return text;
 
@@ -194,27 +194,20 @@ TOPICS: ${tags.join(", ")}
 EDUCATIONAL SOURCE MATERIAL (use this to write genuinely informative posts):
 ${educationalContext}
 
-Create excerpt-style posts for each platform. Each post should share a compelling taste of the article and drive readers to the full piece on our website.
+Create SHORT, punchy posts for each platform. Think TechCrunch/Wired style: 1-2 sentences + link. The link preview card does the visual heavy lifting. Do NOT summarize the article. Tease the reader into clicking.
 ${buildPartnerContext("linkedin", tags[0] || "general_awareness")}${buildPartnerContext("facebook", tags[0] || "general_awareness")}${buildPartnerContext("x", tags[0] || "general_awareness")}${buildPartnerContext("instagram", tags[0] || "general_awareness")}
-1. LINKEDIN (100-150 words max, STRICTLY ENFORCED — posts over 150 words are rejected)
-- STRUCTURE: Hook (1-2 punchy sentences) \\n\\n Key insight (2-3 sentences) \\n\\n One actionable tip \\n\\n CTA with link
-- Open with ONE compelling sentence that stops the scroll
-- Share ONE specific takeaway, not a summary of the whole article
-- BREVITY IS CRITICAL: Every sentence must earn its place. Cut ruthlessly. If it can be said in fewer words, use fewer words
-- Keep each paragraph to 1-2 sentences MAX. Never write a paragraph longer than 2 sentences
-- ALGORITHM TIP: LinkedIn penalizes posts with external links in the body. Front-load the insight above the "see more" fold. Put the link on its own final line separated by TWO blank lines
-- End with a short CTA + the link on its own line
-- Professional but human tone, like a knowledgeable friend
-- MUST have at least 4 paragraph breaks (\\n\\n) throughout the post. A wall of text = failure
+1. LINKEDIN (40-80 words MAXIMUM, STRICTLY ENFORCED — posts over 80 words are rejected)
+- Write 1-2 punchy hook sentences that stop the scroll
+- Then the article link on its own line. That is it.
+- The link preview card handles the visual storytelling
+- Do NOT write paragraphs of summary. Do NOT give away the whole article
+- Professional but human tone, like a knowledgeable friend sharing one key insight
+- ALGORITHM TIP: LinkedIn penalizes wordy posts with links. Keep it SHORT. Put the link on its own final line
 
-2. FACEBOOK (80-150 words)
-- STRUCTURE: Hook line → blank line → value/insight → blank line → CTA with link
-- Start with a relatable hook or surprising fact from the article
-- Share one practical tip or insight as a preview
-- ALGORITHM TIP: Facebook deprioritizes posts with external links. Write the post as native content that provides value on its own. Put the link on a separate final line after a blank line
-- End with a conversational CTA driving to the article, with the link on its own line
-- Warm, conversational, like advising a neighbor
-- MUST have at least 3 paragraph breaks (blank lines) throughout the post
+2. FACEBOOK (30-60 words MAXIMUM, STRICTLY ENFORCED)
+- 1-2 sentences + link. Warmer, conversational
+- The link preview card carries the visual weight
+- Do NOT write paragraphs of summary
 
 3. X/TWITTER THREAD (3-4 tweets, each under 270 chars)
 - Tweet 1: A hook with the most surprising or alarming insight from the article

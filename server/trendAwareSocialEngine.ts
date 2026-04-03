@@ -117,7 +117,7 @@ function ensureParagraphBreaks(text: string, platform: string): string {
 }
 
 function enforceWordLimit(text: string, platform: string): string {
-  const limits: Record<string, number> = { linkedin: 150, facebook: 150, instagram: 200 };
+  const limits: Record<string, number> = { linkedin: 80, facebook: 80, instagram: 120 };
   const limit = limits[platform];
   if (!limit) return text;
 
@@ -873,7 +873,7 @@ IMPORTANT: This is a same-day-only post. It will NOT be queued. Write with urgen
 
     hot_take: `WRITING STYLE: Strong Professional Opinion. Take a clear stance on something in the news. Be direct and slightly opinionated. Examples: "Stop telling people to change passwords every 90 days. Here is why that advice is outdated." or "This breach was entirely preventable. Here is the one thing they should have done." Show conviction backed by expertise. This is NOT about being controversial for clicks. It is about having a real expert opinion that goes against common wisdom.`,
 
-    quick_breakdown: `WRITING STYLE: Quick Technical Breakdown. Take a complex threat from the news and break it down into the simplest possible explanation. Use an analogy from everyday life. Structure: "What happened (1 sentence). How it works (analogy). Why you should care (1 sentence). What to do (1 specific action)." Keep it extremely concise. LinkedIn under 150 words. Facebook under 80 words.`,
+    quick_breakdown: `WRITING STYLE: Quick Technical Breakdown. Take a complex threat from the news and break it down into the simplest possible explanation. Use an analogy from everyday life. Structure: "What happened (1 sentence). How it works (analogy). Why you should care (1 sentence). What to do (1 specific action)." Keep it extremely concise. LinkedIn under 80 words. Facebook under 60 words.`,
 
     did_you_know: `WRITING STYLE: Surprising Fact. Lead with a genuinely surprising fact from the news feed. Something that makes people stop scrolling. Then connect it to practical relevance. Keep it short and punchy. The fact MUST come directly from the news feed or be verifiable public knowledge. End with a brief actionable takeaway, not a question.`,
   };
@@ -1002,7 +1002,7 @@ FORMATTING (CRITICAL, STRICTLY ENFORCED):
 - Keep paragraphs to 1-2 sentences maximum. One sentence per paragraph is preferred
 - If using numbered items, put each on its OWN line with a \\n\\n between them
 - White space is critical. A wall of text = automatic failure. If you produce a single unbroken paragraph, you have failed
-- LinkedIn posts that exceed 200 words = failure. Be concise. Cut ruthlessly
+- LinkedIn posts that exceed 80 words = failure. Think TechCrunch style: 1-2 sentences + link. The link preview card does the heavy lifting. Cut ruthlessly
 - Keep sentences under 35 words. If a sentence exceeds 35 words, split it into two
 
 WHAT NOT TO DO:

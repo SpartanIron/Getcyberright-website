@@ -5,6 +5,39 @@ import * as fs from "fs";
 const BUFFER_GRAPHQL_URL = "https://api.buffer.com/graphql";
 const BUFFER_ORG_ID = process.env.BUFFER_ORG_ID || "69b48dd8282d615a79db2ab3";
 
+function enforceWordLimitSafetyNet(text: string, platform: string): string {
+  const limits: Record<string, number> = { linkedin: 80, facebook: 80, instagram: 100 };
+  const limit = limits[platform];
+  if (!limit) return text;
+
+  const urlMatch = text.match(/https?:\/\/[^\s)]+/g);
+  const urls = urlMatch || [];
+  let textWithoutUrls = text;
+  urls.forEach((url, i) => { textWithoutUrls = textWithoutUrls.replace(url, `__URLKEEP_${i}__`); });
+
+  const words = textWithoutUrls.split(/\s+/).filter(w => w.trim());
+  if (words.length <= limit) return text;
+
+  const paragraphs = textWithoutUrls.split(/\n\n+/);
+  let kept: string[] = [];
+  let wordCount = 0;
+  for (const para of paragraphs) {
+    const paraWords = para.split(/\s+/).filter(w => w.trim()).length;
+    if (wordCount + paraWords > limit && kept.length >= 1) break;
+    kept.push(para);
+    wordCount += paraWords;
+  }
+
+  let result = kept.join("\n\n");
+  urls.forEach((url, i) => { result = result.replace(`__URLKEEP_${i}__`, url); });
+  if (!result.includes("http") && urls.length > 0) {
+    result += "\n\n" + urls[urls.length - 1];
+  }
+
+  console.log(`[Buffer] SAFETY NET: Trimmed ${platform} post from ${words.length} to ~${wordCount} words before publishing`);
+  return result;
+}
+
 export function getPublicImageUrl(localImagePath: string): string | null {
   if (!localImagePath) return null;
 
@@ -326,7 +359,9 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     }
   }
 
-  let result = await createBufferPost(channel.id, post.postContent, {
+  const safeContent = enforceWordLimitSafetyNet(post.postContent, post.platform);
+
+  let result = await createBufferPost(channel.id, safeContent, {
     mode: "shareNow",
     imageUrl,
     platform: post.platform,
@@ -334,7 +369,7 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
 
   if (!result.success && post.platform === "instagram" && imageUrl) {
     console.warn(`[Buffer] Instagram post ${postId} failed with shareNow. Retrying with addToQueue mode...`);
-    result = await createBufferPost(channel.id, post.postContent, {
+    result = await createBufferPost(channel.id, safeContent, {
       mode: "addToQueue",
       imageUrl,
       platform: post.platform,

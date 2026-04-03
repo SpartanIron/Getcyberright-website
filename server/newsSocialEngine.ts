@@ -13,6 +13,39 @@ const anthropic = new Anthropic({
   baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
 });
 
+function enforceWordLimit(text: string, platform: string): string {
+  const limits: Record<string, number> = { linkedin: 80, facebook: 60, instagram: 100 };
+  const limit = limits[platform];
+  if (!limit) return text;
+
+  const urlMatch = text.match(/https?:\/\/[^\s)]+/g);
+  const urls = urlMatch || [];
+  let textWithoutUrls = text;
+  urls.forEach((url, i) => { textWithoutUrls = textWithoutUrls.replace(url, `__URLKEEP_${i}__`); });
+
+  const words = textWithoutUrls.split(/\s+/).filter(w => w.trim());
+  if (words.length <= limit) return text;
+
+  const paragraphs = textWithoutUrls.split(/\n\n+/);
+  let kept: string[] = [];
+  let wordCount = 0;
+  for (const para of paragraphs) {
+    const paraWords = para.split(/\s+/).filter(w => w.trim()).length;
+    if (wordCount + paraWords > limit && kept.length >= 1) break;
+    kept.push(para);
+    wordCount += paraWords;
+  }
+
+  let result = kept.join("\n\n");
+  urls.forEach((url, i) => { result = result.replace(`__URLKEEP_${i}__`, url); });
+  if (!result.includes("http") && urls.length > 0) {
+    result += "\n\n" + urls[urls.length - 1];
+  }
+
+  console.log(`[NewsSocial] Trimmed ${platform} post from ${words.length} to ~${wordCount} words`);
+  return result;
+}
+
 const POST_FORMATS = [
   "breaking_alert",
   "family_impact",
@@ -257,9 +290,9 @@ ABSOLUTE RULES:
 - Use numbered lists (1. 2. 3.) when listing steps, but never markdown bullet points
 - Use emojis sparingly and purposefully (1-3 per post maximum)
 - VISUAL STRUCTURE IS MANDATORY. Use \\n (newlines) to create clear paragraph breaks between sections. Never write a continuous block of text
-- Structure: Hook (1-2 sentences) → blank line → our editorial take → blank line → practical advice → blank line → CTA with link to our article
-- Keep paragraphs SHORT: 2-3 sentences max. Break longer paragraphs
-- LinkedIn posts MUST have at least 4 blank lines between sections. Facebook posts MUST have at least 3
+- Structure: 1-2 hook sentences → blank line → article link. That is it. The link preview card handles the visual storytelling.
+- Do NOT write long summaries. Do NOT give away the whole article. Tease the reader into clicking.
+- Think TechCrunch/Wired style: minimal text, maximum impact. Let the card do the work.
 - The link to the article MUST be ${articleUrl} exactly. Do NOT include any other URLs.
 
 VOICE AND TONE:
@@ -288,8 +321,8 @@ ${relatedToolCta}
 
 Generate posts in this EXACT JSON format (output ONLY the JSON, no markdown code blocks):
 {
-  "linkedin": "LinkedIn post (150-250 words). ${format === "action_checklist" ? "Use numbered steps." : format === "quick_stat" ? "Lead with the most striking number." : format === "myth_buster" ? "Start with Think you are safe because..." : format === "family_impact" ? "Start with Imagine..." : "Start with the most urgent fact."} End with the article link on its own line.",
-  "facebook": "Facebook post (80-150 words). Same format style but shorter, warmer, more conversational. End with the article link on its own line.",
+  "linkedin": "LinkedIn post (40-80 words MAXIMUM, STRICTLY ENFORCED). Write 1-2 punchy sentences that hook the reader, then the article link on its own line. The link preview card does the heavy lifting visually. Do NOT summarize the whole article. ${format === "action_checklist" ? "Tease one key action." : format === "quick_stat" ? "Lead with one striking number." : format === "myth_buster" ? "Challenge one assumption." : format === "family_impact" ? "One vivid family scenario." : "State the most urgent fact."} Think TechCrunch style: short text + link.",
+  "facebook": "Facebook post (30-60 words MAXIMUM, STRICTLY ENFORCED). Same style: 1-2 sentences + link. Warmer, more conversational. The link preview card carries the visual weight.",
   "hashtags": ["CyberSecurity", "FamilySafety", "3-5 more relevant hashtags"]
 }`
       }],
@@ -300,8 +333,8 @@ Generate posts in this EXACT JSON format (output ONLY the JSON, no markdown code
     const parsed = JSON.parse(cleaned);
 
     return {
-      linkedin: ensureParagraphBreaks(sanitizePostContent(parsed.linkedin || ""), "linkedin"),
-      facebook: ensureParagraphBreaks(sanitizePostContent(parsed.facebook || ""), "facebook"),
+      linkedin: enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.linkedin || ""), "linkedin"), "linkedin"),
+      facebook: enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.facebook || ""), "facebook"), "facebook"),
       hashtags: parsed.hashtags || ["CyberSecurity", "OnlineSafety", "FamilySafety"],
     };
   } catch (error: any) {
