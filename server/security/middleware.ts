@@ -107,6 +107,9 @@ const allowedOrigins = [
   /\.replit\.dev$/,
   /\.replit\.app$/,
   /\.repl\.co$/,
+  /^chrome-extension:\/\//,
+  /^moz-extension:\/\//,
+  /^safari-web-extension:\/\//,
 ];
 
 export const corsConfig = cors({
