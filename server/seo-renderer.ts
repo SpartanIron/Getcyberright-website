@@ -1,6 +1,7 @@
 import { storage } from "./storage";
 import { SCAM_PAGES, getAllScamSlugs } from "@shared/scam-content";
 import { isKnownRoute } from "./known-routes";
+import { PAGE_BODY_CONTENT } from "./seo-page-body-content";
 import type { Request, Response, NextFunction } from "express";
 
 const BOT_PATTERN = /googlebot|bingbot|yandexbot|duckduckbot|baiduspider|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|ia_archiver|msnbot|semrushbot|ahrefsbot|mj12bot|rogerbot|dotbot|petalbot|bytespider|gptbot|anthropic-ai|claude-web|claudebot|google-extended|chatgpt-user|oai-searchbot|perplexitybot|cohere-ai|youbot|amazonbot|meta-externalagent|meta-externalfetcher|iaskspider|phind-search/i;
@@ -623,6 +624,21 @@ async function renderListingPage(type: "guides" | "scam-intel" | "alerts" | "new
     news: "Stay informed with the latest cybersecurity news, data breach reports, emerging threats, and security advisories. Curated and simplified for families, seniors, and small businesses.",
   };
 
+  const intros: Record<string, string> = {
+    guides: `<article><p>Our library of 125+ cybersecurity guides covers every major online threat in plain language. Each guide is written for real people, not IT professionals, with step-by-step instructions you can follow regardless of your technical background. From spotting phishing emails to securing your home network, find practical guidance you can act on today.</p>
+    <h2>How Our Guides Are Organized</h2>
+    <p>Guides are organized by category so you can quickly find what you need. Whether you are dealing with a suspicious email right now or want to proactively improve your security, browse by topic or use our <a href="/search">search</a> to find specific guidance. Each guide includes real-world examples, actionable checklists, and links to our free tools that help you implement the recommendations.</p></article>`,
+    "scam-intel": `<article><p>Our Scam Intelligence Center tracks active scam campaigns with detailed profiles, risk assessments, and regional targeting data. Each intelligence report breaks down how the scam works, who it targets, what warning signs to look for, and exactly what to do if you encounter it. Use this database to stay informed about the threats most likely to affect you and your family.</p>
+    <h2>How to Use Scam Intelligence Reports</h2>
+    <p>Browse reports by risk level to prioritize the most dangerous active campaigns. Each report includes the scam's tactics, common variations, affected demographics, and recommended protective actions. Share relevant reports with family members who may be at higher risk, especially seniors and young people who are commonly targeted. If you encounter a scam not in our database, <a href="/report-scam">report it</a> to help protect others.</p></article>`,
+    alerts: `<article><p>Our Cyber Threat Alerts provide real-time notifications about active security threats, phishing campaigns, malware outbreaks, and data breaches that could affect you. Each alert includes a severity rating, a plain-language explanation of the threat, who is at risk, and specific steps you should take to protect yourself.</p>
+    <h2>Understanding Severity Levels</h2>
+    <p>Alerts are rated by severity: <strong>Critical</strong> means an active, widespread threat requiring immediate action. <strong>High</strong> indicates a significant threat affecting many people. <strong>Medium</strong> means a notable threat worth awareness. <strong>Low</strong> indicates a minor or highly targeted threat. Focus on Critical and High alerts first, and check our <a href="/cyber-threat-radar">Cyber Threat Radar</a> for a real-time overview of the threat landscape.</p></article>`,
+    news: `<article><p>Stay informed about the latest cybersecurity developments, data breaches, emerging threats, and security best practices. Our news coverage is curated and simplified for families, seniors, and small businesses, cutting through technical jargon to deliver the information that actually matters for your safety.</p>
+    <h2>Why Cybersecurity News Matters for Everyone</h2>
+    <p>Major data breaches can expose your personal information even if you did nothing wrong. New scam campaigns launch daily targeting specific demographics. Software vulnerabilities can put your devices at risk until patches are applied. Staying informed helps you take timely action to protect yourself and your family. Our coverage focuses on the news that affects everyday people, not just enterprise IT departments.</p></article>`,
+  };
+
   const head = buildHead({
     title: `${titles[type]} | GetCyberRight`,
     description: descriptions[type],
@@ -670,6 +686,7 @@ async function renderListingPage(type: "guides" | "scam-intel" | "alerts" | "new
   ${breadcrumbs}
   <h1>${escapeHtml(titles[type])}</h1>
   <p style="font-size:18px;color:#444;">${escapeHtml(descriptions[type])}</p>
+  ${intros[type] || ""}
   ${listItems}
   ${crossLinks}
   ${buildFooter()}
@@ -1299,7 +1316,56 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
       { question: "Is the scanner free to use?", answer: "Yes, the Child Safety Scanner is completely free and does not require an account. Your responses are used only to generate your personalized safety recommendations." },
     ],
   },
+  "/browser-extension": {
+    title: "GCR Scam Guard Chrome Extension: Real-Time Scam Protection",
+    description: "Install the GCR Scam Guard browser extension for real-time protection against phishing, malware, and scam websites. Automatic link scanning powered by 8+ trusted safety databases.",
+    path: "/browser-extension",
+    schemaType: "WebApplication",
+    features: ["Real-time URL scanning", "Automatic phishing warnings", "Multi-source threat detection", "One-click manual scans", "Privacy-first design", "Chrome Web Store install"],
+    faqs: [
+      { question: "What does the GCR Scam Guard extension do?", answer: "The extension automatically checks URLs as you browse against multiple trusted safety databases and warns you before you land on known phishing, malware, or scam websites." },
+      { question: "Does the extension collect my browsing data?", answer: "No. The extension only checks URLs you visit against safety databases. It does not collect browsing history, personal data, or track your activity. Privacy is built into the design." },
+      { question: "Is the extension free?", answer: "The extension is free to get started with basic protection. See our GCR Guard Pricing page for details on available tiers and features." },
+      { question: "Which browsers are supported?", answer: "The GCR Scam Guard extension is currently available for Google Chrome and Chromium-based browsers like Microsoft Edge and Brave." },
+    ],
+  },
+  "/gcr-guard-pricing": {
+    title: "GCR Guard Plans & Pricing: Browser Extension Protection Tiers",
+    description: "Choose your GCR Scam Guard browser extension protection level. From free basic scanning to comprehensive family coverage with multi-source verification and real-time alerts.",
+    path: "/gcr-guard-pricing",
+    features: ["Free basic protection tier", "Multi-source premium scanning", "Real-time threat alerts", "Detailed safety reports", "Priority scan processing", "Family device coverage"],
+    faqs: [
+      { question: "Is the GCR Scam Guard extension free?", answer: "Yes, the basic tier is free and includes link scanning against Google Safe Browsing data. Premium tiers add multi-source verification and additional features." },
+      { question: "What is included in premium?", answer: "Premium includes scanning against 8+ safety databases, real-time threat alerts, detailed URL analysis reports, priority scanning, and coverage for multiple family devices." },
+      { question: "Can I try premium features before paying?", answer: "All features are currently available during our early access period at no cost. We want you to experience the full value before premium tiers launch." },
+    ],
+  },
+  "/shield": {
+    title: "GCR Data Shield: Complete Digital Privacy Protection",
+    description: "Protect your digital privacy with GCR Data Shield. Combines data broker removal from 501+ sites, breach monitoring, and privacy scoring in one unified dashboard.",
+    path: "/shield",
+    schemaType: "WebApplication",
+    features: ["501+ data broker removal", "Breach monitoring alerts", "Privacy score assessment", "Continuous monitoring", "Guided opt-out process", "Unified privacy dashboard"],
+    faqs: [
+      { question: "What is GCR Data Shield?", answer: "GCR Data Shield is a comprehensive privacy protection hub that combines data broker removal, breach monitoring, and privacy assessment into one dashboard, giving you a clear picture of your digital exposure." },
+      { question: "How does data broker removal work?", answer: "We search 501+ data broker and people-search websites for your personal information, then provide guided removal instructions for each site that has your data listed." },
+      { question: "Is my privacy score data kept private?", answer: "Yes. Your privacy assessment data is used only to generate your personalized recommendations and is not shared or sold." },
+    ],
+  },
 };
+
+for (const [pagePath, content] of Object.entries(PAGE_BODY_CONTENT)) {
+  if (STATIC_TOOL_PAGES[pagePath]) {
+    if (!STATIC_TOOL_PAGES[pagePath].bodyContent) {
+      STATIC_TOOL_PAGES[pagePath].bodyContent = content.bodyContent;
+    }
+    if (!STATIC_TOOL_PAGES[pagePath].relatedLinks && content.relatedLinks) {
+      STATIC_TOOL_PAGES[pagePath].relatedLinks = content.relatedLinks;
+    }
+  } else {
+    console.warn(`[SEO] PAGE_BODY_CONTENT has key "${pagePath}" but no matching STATIC_TOOL_PAGES entry — content will not be rendered`);
+  }
+}
 
 function renderStaticToolPage(pagePath: string): string | null {
   const pageDef = STATIC_TOOL_PAGES[pagePath];
@@ -1786,7 +1852,10 @@ export function seoMiddleware() {
     const ua = req.get("User-Agent");
     if (!isBot(ua)) return next();
 
-    const path = req.originalUrl.split("?")[0].split("#")[0];
+    let path = req.originalUrl.split("?")[0].split("#")[0];
+    if (path.length > 1 && path.endsWith("/")) {
+      path = path.slice(0, -1);
+    }
     let html: string | null = null;
     let isDynamicRoute = false;
 

@@ -56,16 +56,6 @@ export async function setupVite(server: Server, app: Express) {
       const meta = await resolvePageMeta(url);
       template = injectMeta(template, meta);
 
-      let ssrHtml = "";
-      try {
-        const ssrModule = await vite.ssrLoadModule("/src/entry-server.tsx");
-        ssrHtml = ssrModule.render(url);
-      } catch (ssrError) {
-        console.error("[SSR] Dev render error:", ssrError instanceof Error ? ssrError.message : ssrError);
-      }
-
-      template = template.replace("<!--ssr-outlet-->", ssrHtml);
-
       const page = await vite.transformIndexHtml(url, template);
       const statusCode = isKnownRoute(url) ? 200 : 404;
       res.status(statusCode).set({ "Content-Type": "text/html" }).end(page);
