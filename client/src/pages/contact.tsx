@@ -341,8 +341,8 @@ export default function Contact() {
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                       <div className="text-muted-foreground">
-                        <p>176 Mine Lake Court, Ste. 100</p>
-                        <p>Raleigh, NC 27615</p>
+                        <p>4030 Wake Forest Rd STE 349</p>
+                        <p>Raleigh, NC 27609</p>
                         <p>United States</p>
                       </div>
                     </div>

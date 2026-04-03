@@ -549,8 +549,8 @@ export default function Privacy() {
                   <div className="bg-muted/30 rounded-lg p-6 mt-4 border">
                     <p className="font-semibold text-foreground mb-2">ColorCode Solutions LLC</p>
                     <p className="text-sm text-muted-foreground mb-2">Operating as GetCyberRight</p>
-                    <p className="mb-1">176 Mine Lake Court, Ste. 100</p>
-                    <p className="mb-1">Raleigh, NC 27615</p>
+                    <p className="mb-1">4030 Wake Forest Rd STE 349</p>
+                    <p className="mb-1">Raleigh, NC 27609</p>
                     <p className="mb-1">United States</p>
                     <p className="mt-4">
                       <strong className="text-foreground">Privacy Inquiries:</strong>{" "}

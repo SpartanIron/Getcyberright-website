@@ -420,10 +420,10 @@ function buildEducationalOrgSchema(): string {
     description: "Free cybersecurity education platform for families, parents, kids, and seniors.",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "176 Mine Lake Court, Ste. 100",
+      streetAddress: "4030 Wake Forest Rd STE 349",
       addressLocality: "Raleigh",
       addressRegion: "NC",
-      postalCode: "27615",
+      postalCode: "27609",
       addressCountry: "US",
     },
     contactPoint: {
