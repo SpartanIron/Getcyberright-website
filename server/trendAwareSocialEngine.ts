@@ -234,7 +234,7 @@ function mapTopicToGCRTool(title: string, content: string): { tool_name: string;
   const combined = (title + " " + content).toLowerCase();
   const keywords: Record<string, string[]> = {
     phishing: ["phishing", "phish", "spear-phishing", "smishing", "vishing", "social engineering", "fake email", "spoofed"],
-    scam: ["scam", "fraud", "fake website", "impersonat", "romance scam", "pig butcher"],
+    scam: ["scam", "fraud", "fake website", "impersonat", "romance scam", "pig butcher", "deepfake", "ai fraud", "ai-generated", "voice clone", "ai safety", "artificial intelligence", "generative ai", "llm"],
     password: ["password", "credential", "brute force", "credential stuffing", "passkey", "authentication"],
     breach: ["breach", "leak", "exposed data", "compromised accounts", "data dump"],
     data_broker: ["data broker", "personal data", "privacy", "tracking", "surveillance"],
@@ -242,7 +242,7 @@ function mapTopicToGCRTool(title: string, content: string): { tool_name: string;
     identity: ["identity theft", "identity fraud", "stolen identity", "synthetic identity"],
     malware: ["malware", "ransomware", "trojan", "worm", "botnet", "exploit", "zero-day", "vulnerability", "cve-"],
     senior: ["senior", "elderly", "older adult", "grandparent", "retirement", "medicare"],
-    scam: [...([] as string[]), "deepfake", "ai fraud", "ai-generated", "voice clone", "ai safety", "artificial intelligence", "generative ai", "llm", "regulation", "eu ai act", "gdpr", "privacy law"],
+    regulation: ["regulation", "eu ai act", "gdpr", "privacy law"],
   };
 
   for (const [category, terms] of Object.entries(keywords)) {

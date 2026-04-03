@@ -44,16 +44,18 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-query": ["@tanstack/react-query"],
-          "vendor-radix": [
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-tooltip",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-select",
-          ],
-        },
+        manualChunks: process.env.VITE_SSR_BUILD
+          ? undefined
+          : {
+              "vendor-query": ["@tanstack/react-query"],
+              "vendor-radix": [
+                "@radix-ui/react-dialog",
+                "@radix-ui/react-dropdown-menu",
+                "@radix-ui/react-tooltip",
+                "@radix-ui/react-tabs",
+                "@radix-ui/react-select",
+              ],
+            },
       },
     },
   },
