@@ -116,6 +116,39 @@ function ensureParagraphBreaks(text: string, platform: string): string {
   return reformatted.join("\n\n");
 }
 
+function enforceWordLimit(text: string, platform: string): string {
+  const limits: Record<string, number> = { linkedin: 150, facebook: 150, instagram: 200 };
+  const limit = limits[platform];
+  if (!limit) return text;
+
+  const urlMatch = text.match(/https?:\/\/[^\s)]+/g);
+  const urls = urlMatch || [];
+  let textWithoutUrls = text;
+  urls.forEach((url, i) => { textWithoutUrls = textWithoutUrls.replace(url, `__URLKEEP_${i}__`); });
+
+  const words = textWithoutUrls.split(/\s+/).filter(w => w.trim());
+  if (words.length <= limit) return text;
+
+  const paragraphs = textWithoutUrls.split(/\n\n+/);
+  const kept: string[] = [];
+  let wordCount = 0;
+  for (const para of paragraphs) {
+    const paraWords = para.split(/\s+/).filter(w => w.trim()).length;
+    if (wordCount + paraWords > limit && kept.length >= 2) break;
+    kept.push(para);
+    wordCount += paraWords;
+  }
+
+  let result = kept.join("\n\n");
+  urls.forEach((url, i) => { result = result.replace(`__URLKEEP_${i}__`, url); });
+  if (!result.includes("http") && urls.length > 0) {
+    result += "\n\n" + urls[urls.length - 1];
+  }
+
+  console.log(`[TrendEngine] Trimmed ${platform} post from ${words.length} to ~${wordCount} words`);
+  return result;
+}
+
 const SOURCE_TIERS: Record<string, 1 | 2 | 3> = {
   "cisa": 1, "us-cert": 1, "nist": 1, "fbi": 1, "ftc": 1, "dhs": 1, "nsa": 1,
   "europol": 1, "ncsc": 1, "interpol": 1, "acsc": 1, "enisa": 1,
@@ -1176,9 +1209,9 @@ Format your complete output as this strict JSON with \\n for line breaks within 
 
     const hashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags.slice(0, 8) : [];
 
-    const linkedinContent = ensureParagraphBreaks(sanitizePostContent(parsed.linkedin), "linkedin");
-    const facebookContent = ensureParagraphBreaks(sanitizePostContent(parsed.facebook), "facebook");
-    const instagramContent = ensureParagraphBreaks(sanitizePostContent(parsed.instagram), "instagram");
+    const linkedinContent = enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.linkedin), "linkedin"), "linkedin");
+    const facebookContent = enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.facebook), "facebook"), "facebook");
+    const instagramContent = enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.instagram), "instagram"), "instagram");
 
     let gcrToolReference = parsed.gcr_tool_reference
       ? {

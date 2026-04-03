@@ -41,6 +41,39 @@ function sanitizePostContent(text: string): string {
   return processed;
 }
 
+function enforceWordLimit(text: string, platform: string): string {
+  const limits: Record<string, number> = { linkedin: 150, facebook: 150, instagram: 200 };
+  const limit = limits[platform];
+  if (!limit) return text;
+
+  const urlMatch = text.match(/https?:\/\/[^\s)]+/g);
+  const urls = urlMatch || [];
+  let textWithoutUrls = text;
+  urls.forEach((url, i) => { textWithoutUrls = textWithoutUrls.replace(url, `__URLKEEP_${i}__`); });
+
+  const words = textWithoutUrls.split(/\s+/).filter(w => w.trim());
+  if (words.length <= limit) return text;
+
+  const paragraphs = textWithoutUrls.split(/\n\n+/);
+  let kept: string[] = [];
+  let wordCount = 0;
+  for (const para of paragraphs) {
+    const paraWords = para.split(/\s+/).filter(w => w.trim()).length;
+    if (wordCount + paraWords > limit && kept.length >= 2) break;
+    kept.push(para);
+    wordCount += paraWords;
+  }
+
+  let result = kept.join("\n\n");
+  urls.forEach((url, i) => { result = result.replace(`__URLKEEP_${i}__`, url); });
+  if (!result.includes("http") && urls.length > 0) {
+    result += "\n\n" + urls[urls.length - 1];
+  }
+
+  console.log(`[SocialDistribution] Trimmed ${platform} post from ${words.length} to ~${wordCount} words`);
+  return result;
+}
+
 function ensureParagraphBreaks(text: string, platform: string): string {
   const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
   const minParagraphs = platform === "linkedin" ? 4 : 3;
@@ -163,15 +196,16 @@ ${educationalContext}
 
 Create excerpt-style posts for each platform. Each post should share a compelling taste of the article and drive readers to the full piece on our website.
 ${buildPartnerContext("linkedin", tags[0] || "general_awareness")}${buildPartnerContext("facebook", tags[0] || "general_awareness")}${buildPartnerContext("x", tags[0] || "general_awareness")}${buildPartnerContext("instagram", tags[0] || "general_awareness")}
-1. LINKEDIN (150-250 words)
-- STRUCTURE: Hook paragraph (1-2 sentences) → blank line → value paragraph → blank line → action steps or insight → blank line → teaser line → blank line → CTA with link
-- Open with the single most compelling insight, stat, or story from the article
-- Share 1-2 specific takeaways that demonstrate the article's value
-- Include a "teaser" line hinting at what else the full article covers (e.g. "The full guide covers 7 more warning signs and a step-by-step action plan.")
-- ALGORITHM TIP: LinkedIn penalizes posts with external links in the body. Write pure value content first, then put the link on its own final line separated by TWO blank lines. Front-load the insight above the "see more" fold
-- End with "Read the full guide here:" followed by the link on its own line
-- Professional but human tone
-- MUST have at least 4 paragraph breaks (blank lines) throughout the post
+1. LINKEDIN (100-150 words max, STRICTLY ENFORCED — posts over 150 words are rejected)
+- STRUCTURE: Hook (1-2 punchy sentences) \\n\\n Key insight (2-3 sentences) \\n\\n One actionable tip \\n\\n CTA with link
+- Open with ONE compelling sentence that stops the scroll
+- Share ONE specific takeaway, not a summary of the whole article
+- BREVITY IS CRITICAL: Every sentence must earn its place. Cut ruthlessly. If it can be said in fewer words, use fewer words
+- Keep each paragraph to 1-2 sentences MAX. Never write a paragraph longer than 2 sentences
+- ALGORITHM TIP: LinkedIn penalizes posts with external links in the body. Front-load the insight above the "see more" fold. Put the link on its own final line separated by TWO blank lines
+- End with a short CTA + the link on its own line
+- Professional but human tone, like a knowledgeable friend
+- MUST have at least 4 paragraph breaks (\\n\\n) throughout the post. A wall of text = failure
 
 2. FACEBOOK (80-150 words)
 - STRUCTURE: Hook line → blank line → value/insight → blank line → CTA with link
@@ -234,8 +268,8 @@ Format as JSON:
     if (!validated.success) {
       console.warn("[SocialDistribution] AI output validation issues:", validated.error.issues.map(i => `${i.path}: ${i.message}`).join(", "));
       return {
-        linkedin: ensureParagraphBreaks(sanitizePostContent(parsed.linkedin || ""), "linkedin"),
-        facebook: ensureParagraphBreaks(sanitizePostContent(parsed.facebook || parsed.linkedin || ""), "facebook"),
+        linkedin: enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.linkedin || ""), "linkedin"), "linkedin"),
+        facebook: enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.facebook || parsed.linkedin || ""), "facebook"), "facebook"),
         xThread: Array.isArray(parsed.xThread) ? parsed.xThread.map(sanitizePostContent) : [],
         instagram: ensureParagraphBreaks(sanitizePostContent(parsed.instagram || ""), "instagram"),
         shortAlert: sanitizePostContent(parsed.shortAlert || ""),
@@ -245,10 +279,10 @@ Format as JSON:
 
     const data = validated.data;
     return {
-      linkedin: ensureParagraphBreaks(sanitizePostContent(data.linkedin), "linkedin"),
-      facebook: ensureParagraphBreaks(sanitizePostContent(data.facebook), "facebook"),
+      linkedin: enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(data.linkedin), "linkedin"), "linkedin"),
+      facebook: enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(data.facebook), "facebook"), "facebook"),
       xThread: data.xThread.map(sanitizePostContent),
-      instagram: ensureParagraphBreaks(sanitizePostContent(data.instagram), "instagram"),
+      instagram: enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(data.instagram), "instagram"), "instagram"),
       shortAlert: sanitizePostContent(data.shortAlert),
       hashtags: data.hashtags,
     };
