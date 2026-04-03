@@ -1640,7 +1640,7 @@ BEHAVIORAL CONSTRAINTS
         brandDetected: brand ? { name: brand.brand, domains: brand.domains } : null
       });
     } catch (error: any) {
-      console.error("Context scan error:", error);
+      console.error("Context scan error:", error instanceof Error ? error.message : "Unknown error");
       res.status(500).json({ success: false, error: "Context-aware analysis could not be completed." });
     }
   });
@@ -1741,7 +1741,7 @@ BEHAVIORAL CONSTRAINTS
         baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
       });
 
-      const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
+      const base64Data = imageData.replace(/^data:image\/[\w+]+;base64,/, "");
       const mediaTypeMatch = imageData.match(/^data:(image\/[\w+]+);base64,/);
       const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/png";
 
@@ -1771,7 +1771,7 @@ BEHAVIORAL CONSTRAINTS
 
       res.json({ success: true, result: visualResult });
     } catch (error) {
-      console.error("Visual analysis error:", error);
+      console.error("Visual analysis error:", error instanceof Error ? error.message : "Unknown error");
       res.status(500).json({ error: "Visual analysis failed" });
     }
   });
@@ -5398,8 +5398,8 @@ BEHAVIORAL CONSTRAINTS
         baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
       });
 
-      const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
-      const mediaTypeMatch = imageData.match(/^data:(image\/\w+);base64,/);
+      const base64Data = imageData.replace(/^data:image\/[\w+]+;base64,/, "");
+      const mediaTypeMatch = imageData.match(/^data:(image\/[\w+]+);base64,/);
       const mediaType = mediaTypeMatch ? mediaTypeMatch[1] : "image/png";
 
       const response = await anthropic.messages.create({

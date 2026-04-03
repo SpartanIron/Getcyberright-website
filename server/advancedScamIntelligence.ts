@@ -570,7 +570,7 @@ export function matchCampaignPlaybook(content: string, senderDomain?: string): {
 
   for (const playbook of CAMPAIGN_PLAYBOOKS) {
     const brandMatch = senderDomain
-      ? playbook.targetBrands.some(b => senderDomain.includes(b))
+      ? playbook.targetBrands.some(b => isDomainMatch(senderDomain.toLowerCase(), b))
       : playbook.targetBrands.some(b => lowerContent.includes(b));
 
     if (!brandMatch) {
@@ -789,8 +789,8 @@ export async function correlateScans(userId: string, currentContent: string, cur
         }
       }
 
-      const currentDomains = lowerContent.match(/[\w.-]+\.[a-z]{2,}/g) || [];
-      const scanDomains = snippet.match(/[\w.-]+\.[a-z]{2,}/g) || [];
+      const currentDomains: string[] = lowerContent.match(/[\w.-]+\.[a-z]{2,}/g) || [];
+      const scanDomains: string[] = snippet.match(/[\w.-]+\.[a-z]{2,}/g) || [];
       const sharedDomains = currentDomains.filter(d => scanDomains.includes(d));
       if (sharedDomains.length > 0 && !matchReason) {
         matchReason = `Both scans reference ${sharedDomains[0]}`;
