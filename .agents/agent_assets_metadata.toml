@@ -6,6 +6,12 @@ uri = "file://artifacts/mockup-sandbox/public/images/og-sample.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "mEbNRJPVQ6O0f_aY87gu8"
+uri = "file://.canvas/assets/og-sample-v2.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "rZqQKOOCV-y0ksJa4V7mQ"
 uri = "file://.local/traffic-growth-analysis.md"
