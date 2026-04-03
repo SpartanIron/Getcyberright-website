@@ -45,7 +45,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          "vendor-motion": ["framer-motion"],
           "vendor-query": ["@tanstack/react-query"],
           "vendor-radix": [
             "@radix-ui/react-dialog",
