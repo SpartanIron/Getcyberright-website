@@ -396,8 +396,8 @@ How to write this:
 - It's fine to express a real opinion ("honestly this was preventable" or "this worries me")
 
 Platform rules:
-- LinkedIn: 120-200 words, a bit more polished but still conversational, 3-4 hashtags at the end only
-- Facebook: 60-120 words, casual and warm, no hashtags
+- LinkedIn: 60-80 words max (STRICTLY ENFORCED), a bit more polished but still conversational, 3-4 hashtags at the end only
+- Facebook: 40-60 words max (STRICTLY ENFORCED), casual and warm, no hashtags
 
 Absolute don'ts:
 - No emojis, no exclamation marks

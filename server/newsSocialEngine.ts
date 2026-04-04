@@ -37,12 +37,28 @@ function enforceWordLimit(text: string, platform: string): string {
   }
 
   let result = kept.join("\n\n");
+
+  const resultWords = result.split(/\s+/).filter(w => w.trim() && !w.startsWith("__URLKEEP_"));
+  if (resultWords.length > limit) {
+    const allWords = result.split(/\s+/).filter(w => w.trim());
+    let count = 0;
+    const finalWords: string[] = [];
+    for (const w of allWords) {
+      if (w.startsWith("__URLKEEP_")) { finalWords.push(w); continue; }
+      if (count >= limit) break;
+      finalWords.push(w);
+      count++;
+    }
+    result = finalWords.join(" ");
+  }
+
   urls.forEach((url, i) => { result = result.replace(`__URLKEEP_${i}__`, url); });
   if (!result.includes("http") && urls.length > 0) {
     result += "\n\n" + urls[urls.length - 1];
   }
 
-  console.log(`[NewsSocial] Trimmed ${platform} post from ${words.length} to ~${wordCount} words`);
+  const finalCount = result.split(/\s+/).filter(w => w.trim() && !w.match(/^https?:\/\//)).length;
+  console.log(`[NewsSocial] Trimmed ${platform} post from ${words.length} to ${finalCount} words (limit: ${limit})`);
   return result;
 }
 

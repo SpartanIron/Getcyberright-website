@@ -134,18 +134,34 @@ function enforceWordLimit(text: string, platform: string): string {
   let wordCount = 0;
   for (const para of paragraphs) {
     const paraWords = para.split(/\s+/).filter(w => w.trim()).length;
-    if (wordCount + paraWords > limit && kept.length >= 2) break;
+    if (wordCount + paraWords > limit && kept.length >= 1) break;
     kept.push(para);
     wordCount += paraWords;
   }
 
   let result = kept.join("\n\n");
+
+  const resultWords = result.split(/\s+/).filter(w => w.trim() && !w.startsWith("__URLKEEP_"));
+  if (resultWords.length > limit) {
+    const allWords = result.split(/\s+/).filter(w => w.trim());
+    let count = 0;
+    const finalWords: string[] = [];
+    for (const w of allWords) {
+      if (w.startsWith("__URLKEEP_")) { finalWords.push(w); continue; }
+      if (count >= limit) break;
+      finalWords.push(w);
+      count++;
+    }
+    result = finalWords.join(" ");
+  }
+
   urls.forEach((url, i) => { result = result.replace(`__URLKEEP_${i}__`, url); });
   if (!result.includes("http") && urls.length > 0) {
     result += "\n\n" + urls[urls.length - 1];
   }
 
-  console.log(`[TrendEngine] Trimmed ${platform} post from ${words.length} to ~${wordCount} words`);
+  const finalCount = result.split(/\s+/).filter(w => w.trim() && !w.match(/^https?:\/\//)).length;
+  console.log(`[TrendEngine] Trimmed ${platform} post from ${words.length} to ${finalCount} words (limit: ${limit})`);
   return result;
 }
 
@@ -1068,15 +1084,15 @@ CRITICAL VOICE RULES FOR ALL PLATFORMS:
 - NEVER open with generic corporate lines. Open with something a real person would actually say.
 - NEVER sound like a press release or marketing copy.
 
-LINKEDIN POST (120-180 words max, STRICTLY ENFORCED):
+LINKEDIN POST (60-80 words max, STRICTLY ENFORCED — posts over 80 words are rejected):
 - Professional but still sounds like a real person, not a thought-leader parody
-- Structure: Hook that stops the scroll (something you'd actually say out loud) \\n\\n Your take on why this matters \\n\\n 1-2 specific things people can do right now \\n\\n CTA with link
-- First 2 lines appear before "see more". Make them feel real, not salesy.
+- Structure: Hook (1-2 sentences) \\n\\n One key insight or action \\n\\n CTA with link
+- First 2 lines appear before "see more". Make them count.
 - Each paragraph: 1-2 sentences MAX. Break after every thought.
 - End with a natural CTA driving to the relevant GetCyberRight page
-- The post MUST contain at least 4 paragraph breaks (\\n\\n)
+- Keep it SHORT. The link preview card does the visual heavy lifting. Do NOT summarize — tease.
 ${partnerContextLinkedIn}
-FACEBOOK POST (60-120 words max):
+FACEBOOK POST (40-60 words max, STRICTLY ENFORCED):
 - Casual and warm, like texting a group chat about something important
 - Share the thing that would make someone actually stop scrolling
 - Give 1 quick specific tip
