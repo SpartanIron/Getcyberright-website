@@ -1,58 +1,10 @@
 import { storage } from "./storage";
 import * as path from "path";
 import * as fs from "fs";
+import { enforcePostPolicy } from "./socialPostPolicy";
 
 const BUFFER_GRAPHQL_URL = "https://api.buffer.com/graphql";
 const BUFFER_ORG_ID = process.env.BUFFER_ORG_ID || "69b48dd8282d615a79db2ab3";
-
-function enforceWordLimitSafetyNet(text: string, platform: string): string {
-  const limits: Record<string, number> = { linkedin: 80, facebook: 80, instagram: 100 };
-  const limit = limits[platform];
-  if (!limit) return text;
-
-  const urlMatch = text.match(/https?:\/\/[^\s)]+/g);
-  const urls = urlMatch || [];
-  let textWithoutUrls = text;
-  urls.forEach((url, i) => { textWithoutUrls = textWithoutUrls.replace(url, `__URLKEEP_${i}__`); });
-
-  const words = textWithoutUrls.split(/\s+/).filter(w => w.trim());
-  if (words.length <= limit) return text;
-
-  const paragraphs = textWithoutUrls.split(/\n\n+/);
-  let kept: string[] = [];
-  let wordCount = 0;
-  for (const para of paragraphs) {
-    const paraWords = para.split(/\s+/).filter(w => w.trim()).length;
-    if (wordCount + paraWords > limit && kept.length >= 1) break;
-    kept.push(para);
-    wordCount += paraWords;
-  }
-
-  let result = kept.join("\n\n");
-
-  const resultWords = result.split(/\s+/).filter(w => w.trim() && !w.startsWith("__URLKEEP_"));
-  if (resultWords.length > limit) {
-    const allWords = result.split(/\s+/).filter(w => w.trim());
-    let count = 0;
-    const finalWords: string[] = [];
-    for (const w of allWords) {
-      if (w.startsWith("__URLKEEP_")) { finalWords.push(w); continue; }
-      if (count >= limit) break;
-      finalWords.push(w);
-      count++;
-    }
-    result = finalWords.join(" ");
-  }
-
-  urls.forEach((url, i) => { result = result.replace(`__URLKEEP_${i}__`, url); });
-  if (!result.includes("http") && urls.length > 0) {
-    result += "\n\n" + urls[urls.length - 1];
-  }
-
-  const finalCount = result.split(/\s+/).filter(w => w.trim() && !w.match(/^https?:\/\//)).length;
-  console.log(`[Buffer] SAFETY NET: Trimmed ${platform} post from ${words.length} to ${finalCount} words (limit: ${limit})`);
-  return result;
-}
 
 export function getPublicImageUrl(localImagePath: string): string | null {
   if (!localImagePath) return null;
@@ -375,7 +327,8 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     }
   }
 
-  const safeContent = enforceWordLimitSafetyNet(post.postContent, post.platform);
+  const policyResult = enforcePostPolicy(post.postContent, post.platform);
+  const safeContent = policyResult.content;
 
   const publishMode = post.platform === "instagram" ? "addToQueue" : "shareNow";
   let result = await createBufferPost(channel.id, safeContent, {

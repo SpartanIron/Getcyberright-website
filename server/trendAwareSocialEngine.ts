@@ -5,6 +5,7 @@ import { createBufferPost, getBufferChannelsByPlatform, getPublicImageUrl } from
 import type { InsertSocialPost } from "@shared/schema";
 import { tagAllGcrLinks } from "./utmTracking";
 import { buildPartnerContext, runPostPublishEngagement } from "./socialEngagementService";
+import { enforceAndSanitize, sanitizeContent } from "./socialPostPolicy";
 import {
   searchStockPhoto,
   downloadSourceImage,
@@ -63,106 +64,6 @@ function getTodaysTemplate(): TemplateStyle {
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
   );
   return TEMPLATE_STYLES[dayOfYear % TEMPLATE_STYLES.length];
-}
-
-function sanitizePostContent(text: string): string {
-  const urlPlaceholders: string[] = [];
-  let processed = text.replace(/https?:\/\/[^\s)]+/g, (url) => {
-    urlPlaceholders.push(url);
-    return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
-  });
-
-  processed = processed
-    .replace(/\*\*([^*]+)\*\*/g, "$1")
-    .replace(/\*([^*]+)\*/g, "$1")
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/^[-*]\s+/gm, "")
-    .replace(/\u2014/g, ", ")
-    .replace(/\u2013/g, ", ")
-    .replace(/[^\S\n]{2,}/g, " ")
-    .replace(/\n{4,}/g, "\n\n\n")
-    .trim();
-
-  urlPlaceholders.forEach((url, i) => {
-    processed = processed.replace(`__URL_PLACEHOLDER_${i}__`, url);
-  });
-
-  return processed;
-}
-
-function ensureParagraphBreaks(text: string, platform: string): string {
-  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
-  const minParagraphs = platform === "linkedin" ? 4 : 3;
-
-  if (paragraphs.length >= minParagraphs) return text;
-
-  const sentences = text.replace(/\n/g, " ").split(/(?<=[.!?])\s+/).filter(s => s.trim());
-  if (sentences.length < 3) return text;
-
-  const reformatted: string[] = [];
-  if (platform === "linkedin") {
-    reformatted.push(sentences.slice(0, 2).join(" "));
-    for (let i = 2; i < sentences.length; i += 2) {
-      reformatted.push(sentences.slice(i, i + 2).join(" "));
-    }
-  } else {
-    reformatted.push(sentences.slice(0, 2).join(" "));
-    for (let i = 2; i < sentences.length; i += 3) {
-      reformatted.push(sentences.slice(i, i + 3).join(" "));
-    }
-  }
-
-  console.log(`[TrendEngine] Reformatted ${platform} post: split wall of text into ${reformatted.length} paragraphs`);
-  return reformatted.join("\n\n");
-}
-
-function enforceWordLimit(text: string, platform: string): string {
-  const limits: Record<string, number> = { linkedin: 80, facebook: 80, instagram: 100 };
-  const limit = limits[platform];
-  if (!limit) return text;
-
-  const urlMatch = text.match(/https?:\/\/[^\s)]+/g);
-  const urls = urlMatch || [];
-  let textWithoutUrls = text;
-  urls.forEach((url, i) => { textWithoutUrls = textWithoutUrls.replace(url, `__URLKEEP_${i}__`); });
-
-  const words = textWithoutUrls.split(/\s+/).filter(w => w.trim());
-  if (words.length <= limit) return text;
-
-  const paragraphs = textWithoutUrls.split(/\n\n+/);
-  const kept: string[] = [];
-  let wordCount = 0;
-  for (const para of paragraphs) {
-    const paraWords = para.split(/\s+/).filter(w => w.trim()).length;
-    if (wordCount + paraWords > limit && kept.length >= 1) break;
-    kept.push(para);
-    wordCount += paraWords;
-  }
-
-  let result = kept.join("\n\n");
-
-  const resultWords = result.split(/\s+/).filter(w => w.trim() && !w.startsWith("__URLKEEP_"));
-  if (resultWords.length > limit) {
-    const allWords = result.split(/\s+/).filter(w => w.trim());
-    let count = 0;
-    const finalWords: string[] = [];
-    for (const w of allWords) {
-      if (w.startsWith("__URLKEEP_")) { finalWords.push(w); continue; }
-      if (count >= limit) break;
-      finalWords.push(w);
-      count++;
-    }
-    result = finalWords.join(" ");
-  }
-
-  urls.forEach((url, i) => { result = result.replace(`__URLKEEP_${i}__`, url); });
-  if (!result.includes("http") && urls.length > 0) {
-    result += "\n\n" + urls[urls.length - 1];
-  }
-
-  const finalCount = result.split(/\s+/).filter(w => w.trim() && !w.match(/^https?:\/\//)).length;
-  console.log(`[TrendEngine] Trimmed ${platform} post from ${words.length} to ${finalCount} words (limit: ${limit})`);
-  return result;
 }
 
 const SOURCE_TIERS: Record<string, 1 | 2 | 3> = {
@@ -1217,17 +1118,17 @@ Format your complete output as this strict JSON with \\n for line breaks within 
         }))
       : [];
 
-    let imageHeadline = sanitizePostContent(parsed.imageHeadline || parsed.title);
+    let imageHeadline = sanitizeContent(parsed.imageHeadline || parsed.title);
     if (imageHeadline.length > 50) imageHeadline = imageHeadline.slice(0, 47) + "...";
 
-    let imageSubtext = sanitizePostContent(parsed.imageSubtext || "getcyberright.com");
+    let imageSubtext = sanitizeContent(parsed.imageSubtext || "getcyberright.com");
     if (imageSubtext.length > 80) imageSubtext = imageSubtext.slice(0, 77) + "...";
 
     const hashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags.slice(0, 8) : [];
 
-    const linkedinContent = enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.linkedin), "linkedin"), "linkedin");
-    const facebookContent = enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.facebook), "facebook"), "facebook");
-    const instagramContent = enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.instagram), "instagram"), "instagram");
+    const linkedinContent = enforceAndSanitize(parsed.linkedin, "linkedin");
+    const facebookContent = enforceAndSanitize(parsed.facebook, "facebook");
+    const instagramContent = enforceAndSanitize(parsed.instagram, "instagram");
 
     let gcrToolReference = parsed.gcr_tool_reference
       ? {
@@ -1267,7 +1168,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
       linkedin: linkedinContent,
       facebook: facebookContent,
       instagram: instagramContent,
-      title: sanitizePostContent(parsed.title).slice(0, 80),
+      title: sanitizeContent(parsed.title).slice(0, 80),
       hashtags,
       imageHeadline,
       imageSubtext,

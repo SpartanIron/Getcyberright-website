@@ -5,6 +5,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { generateSocialImage } from "./socialImageGenerator";
 import { getPublicImageUrl } from "./bufferPublisher";
+import { enforceAndSanitize } from "./socialPostPolicy";
 import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stockPhotoService";
 import type { TemplateStyle } from "./stockPhotoService";
 
@@ -12,55 +13,6 @@ const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
   baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
 });
-
-function enforceWordLimit(text: string, platform: string): string {
-  const limits: Record<string, number> = { linkedin: 80, facebook: 60, instagram: 100 };
-  const limit = limits[platform];
-  if (!limit) return text;
-
-  const urlMatch = text.match(/https?:\/\/[^\s)]+/g);
-  const urls = urlMatch || [];
-  let textWithoutUrls = text;
-  urls.forEach((url, i) => { textWithoutUrls = textWithoutUrls.replace(url, `__URLKEEP_${i}__`); });
-
-  const words = textWithoutUrls.split(/\s+/).filter(w => w.trim());
-  if (words.length <= limit) return text;
-
-  const paragraphs = textWithoutUrls.split(/\n\n+/);
-  let kept: string[] = [];
-  let wordCount = 0;
-  for (const para of paragraphs) {
-    const paraWords = para.split(/\s+/).filter(w => w.trim()).length;
-    if (wordCount + paraWords > limit && kept.length >= 1) break;
-    kept.push(para);
-    wordCount += paraWords;
-  }
-
-  let result = kept.join("\n\n");
-
-  const resultWords = result.split(/\s+/).filter(w => w.trim() && !w.startsWith("__URLKEEP_"));
-  if (resultWords.length > limit) {
-    const allWords = result.split(/\s+/).filter(w => w.trim());
-    let count = 0;
-    const finalWords: string[] = [];
-    for (const w of allWords) {
-      if (w.startsWith("__URLKEEP_")) { finalWords.push(w); continue; }
-      if (count >= limit) break;
-      finalWords.push(w);
-      count++;
-    }
-    result = finalWords.join(" ");
-  }
-
-  urls.forEach((url, i) => { result = result.replace(`__URLKEEP_${i}__`, url); });
-  if (!result.includes("http") && urls.length > 0) {
-    result += "\n\n" + urls[urls.length - 1];
-  }
-
-  const finalCount = result.split(/\s+/).filter(w => w.trim() && !w.match(/^https?:\/\//)).length;
-  console.log(`[NewsSocial] Trimmed ${platform} post from ${words.length} to ${finalCount} words (limit: ${limit})`);
-  return result;
-}
 
 const POST_FORMATS = [
   "breaking_alert",
@@ -201,57 +153,6 @@ function detectAudience(title: string, content: string): AudienceType {
   return "families_general";
 }
 
-function sanitizePostContent(text: string): string {
-  const urlPlaceholders: string[] = [];
-  let processed = text.replace(/https?:\/\/[^\s)]+/g, (url) => {
-    urlPlaceholders.push(url);
-    return `__URL_PLACEHOLDER_${urlPlaceholders.length - 1}__`;
-  });
-
-  processed = processed
-    .replace(/\*\*([^*]+)\*\*/g, "$1")
-    .replace(/\*([^*]+)\*/g, "$1")
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/^[-*]\s+/gm, "")
-    .replace(/\u2014/g, " — ")
-    .replace(/\u2013/g, " — ")
-    .replace(/[^\S\n]{2,}/g, " ")
-    .replace(/\n{4,}/g, "\n\n\n")
-    .trim();
-
-  urlPlaceholders.forEach((url, i) => {
-    processed = processed.replace(`__URL_PLACEHOLDER_${i}__`, url);
-  });
-
-  return processed;
-}
-
-function ensureParagraphBreaks(text: string, platform: string): string {
-  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
-  const minParagraphs = platform === "linkedin" ? 4 : 3;
-
-  if (paragraphs.length >= minParagraphs) return text;
-
-  const sentences = text.replace(/\n/g, " ").split(/(?<=[.!?])\s+/).filter(s => s.trim());
-  if (sentences.length < 3) return text;
-
-  const reformatted: string[] = [];
-  if (platform === "linkedin") {
-    reformatted.push(sentences.slice(0, 2).join(" "));
-    for (let i = 2; i < sentences.length; i += 2) {
-      reformatted.push(sentences.slice(i, i + 2).join(" "));
-    }
-  } else {
-    reformatted.push(sentences.slice(0, 2).join(" "));
-    for (let i = 2; i < sentences.length; i += 3) {
-      reformatted.push(sentences.slice(i, i + 3).join(" "));
-    }
-  }
-
-  console.log(`[NewsSocial] Reformatted ${platform} post: split wall of text into ${reformatted.length} paragraphs`);
-  return reformatted.join("\n\n");
-}
-
 interface GeneratedNewsPosts {
   linkedin: string;
   facebook: string;
@@ -349,8 +250,8 @@ Generate posts in this EXACT JSON format (output ONLY the JSON, no markdown code
     const parsed = JSON.parse(cleaned);
 
     return {
-      linkedin: enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.linkedin || ""), "linkedin"), "linkedin"),
-      facebook: enforceWordLimit(ensureParagraphBreaks(sanitizePostContent(parsed.facebook || ""), "facebook"), "facebook"),
+      linkedin: enforceAndSanitize(parsed.linkedin || "", "linkedin"),
+      facebook: enforceAndSanitize(parsed.facebook || "", "facebook"),
       hashtags: parsed.hashtags || ["CyberSecurity", "OnlineSafety", "FamilySafety"],
     };
   } catch (error: any) {
