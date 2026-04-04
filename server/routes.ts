@@ -6134,6 +6134,17 @@ BEHAVIORAL CONSTRAINTS
     }
   });
 
+  app.post("/api/news/sanitize", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { sanitizeExistingArticles } = await import("./newsArticleService");
+      const cleaned = await sanitizeExistingArticles();
+      res.json({ success: true, articlesCleaned: cleaned });
+    } catch (error: any) {
+      console.error("[news] Sanitize failed:", error.message);
+      res.status(500).json({ error: "Failed to sanitize news articles" });
+    }
+  });
+
   app.post("/api/news/refresh", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const { refreshNewsArticles } = await import("./newsArticleService");

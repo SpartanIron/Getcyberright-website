@@ -3,7 +3,7 @@ import { SCAM_PAGES } from "@shared/scam-content";
 
 const BASE_URL = "https://www.getcyberright.com";
 
-const DEFAULT_TITLE = "GetCyberRight: Free Cybersecurity for Families";
+const DEFAULT_TITLE = "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors";
 const DEFAULT_DESCRIPTION = "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training. Trusted by thousands of families worldwide.";
 
 const OG_IMAGES: Record<string, string> = {

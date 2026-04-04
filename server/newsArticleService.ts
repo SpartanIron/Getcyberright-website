@@ -278,10 +278,11 @@ For EACH item, output a JSON object with:
   4. How to stay protected long-term (1 paragraph - connect to broader safety habits)
 
 WRITING RULES:
-- Do NOT use em dashes (-) anywhere. Use commas, periods, or semicolons instead.
+- NEVER use em dashes (\u2014), en dashes (\u2013), or double hyphens (--). Restructure sentences using periods, commas, semicolons, or colons instead. For example, write "Your data may be at risk. Here is what to do." NOT "Your data may be at risk \u2014 here is what to do."
 - Use short, clear sentences. Break up long paragraphs.
 - Use proper paragraph breaks between sections.
 - Use numbered lists for action steps.
+- Write complete sentences with proper punctuation. Every sentence must end with a period, question mark, or exclamation point.
 
 IMPORTANT: You MUST output exactly ${items.length} objects, one for each input item. Do not skip any.
 Output a JSON array of these objects. Output ONLY the JSON array, no markdown.`
@@ -291,11 +292,31 @@ Output a JSON array of these objects. Output ONLY the JSON array, no markdown.`
     const text = response.content[0].type === "text" ? response.content[0].text : "";
     const cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
     const parsed = JSON.parse(cleaned);
-    return Array.isArray(parsed) ? parsed : [];
+    const articles = Array.isArray(parsed) ? parsed : [];
+    return articles.map(sanitizeArticle);
   } catch (error: any) {
     console.error(`[NewsService] AI batch simplification failed:`, error.message);
     return [];
   }
+}
+
+function sanitizeArticleText(text: string): string {
+  return text
+    .replace(/\s*[\u2014\u2013]\s*/g, ". ")
+    .replace(/\s*--\s*/g, ". ")
+    .replace(/\.\.\s/g, ". ")
+    .replace(/\.\s*\./g, ".")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function sanitizeArticle(article: ProcessedArticle): ProcessedArticle {
+  return {
+    ...article,
+    familyTitle: sanitizeArticleText(article.familyTitle),
+    excerpt: sanitizeArticleText(article.excerpt),
+    content: sanitizeArticleText(article.content),
+  };
 }
 
 function createFallbackArticle(item: RawFeedItem, index: number): ProcessedArticle {
@@ -437,6 +458,34 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
   return created;
 }
 
+export async function sanitizeExistingArticles(): Promise<number> {
+  const { db } = await import("./db");
+  const { newsArticles } = await import("@shared/schema");
+  const { eq } = await import("drizzle-orm");
+
+  const allArticles = await db.select().from(newsArticles);
+  let cleaned = 0;
+
+  for (const article of allArticles) {
+    const cleanTitle = sanitizeArticleText(article.title);
+    const cleanExcerpt = sanitizeArticleText(article.excerpt);
+    const cleanContent = article.content ? sanitizeArticleText(article.content) : article.content;
+
+    if (cleanTitle !== article.title || cleanExcerpt !== article.excerpt || cleanContent !== article.content) {
+      await db.update(newsArticles).set({
+        title: cleanTitle,
+        excerpt: cleanExcerpt,
+        content: cleanContent,
+      }).where(eq(newsArticles.id, article.id));
+      cleaned++;
+      console.log(`[NewsService] Sanitized article: "${article.title}" -> "${cleanTitle}"`);
+    }
+  }
+
+  console.log(`[NewsService] Sanitized ${cleaned} of ${allArticles.length} total articles`);
+  return cleaned;
+}
+
 export async function refreshNewsArticles(): Promise<number> {
   try {
     const feedItems = await fetchRealThreats();
@@ -451,6 +500,15 @@ export function startNewsScheduler() {
   console.log("[NewsService] Starting news article scheduler (daily refresh)");
 
   setTimeout(async () => {
+    try {
+      const cleaned = await sanitizeExistingArticles();
+      if (cleaned > 0) {
+        console.log(`[NewsService] Startup sanitization: cleaned ${cleaned} articles`);
+      }
+    } catch (err: any) {
+      console.error(`[NewsService] Startup sanitization failed:`, err.message);
+    }
+
     const existingCount = await storage.getNewsArticleCount();
     if (existingCount >= 15) {
       console.log(`[NewsService] ${existingCount} articles already exist, skipping initial fetch`);
