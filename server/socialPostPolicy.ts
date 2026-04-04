@@ -1,7 +1,7 @@
 export interface PlatformPolicy {
   wordLimit: number;
   maxConsecutiveLineBreaks: number;
-  minParagraphs: number;
+  maxParagraphs: number;
   sentencesPerParagraph: number;
 }
 
@@ -9,19 +9,19 @@ export const PLATFORM_POLICIES: Record<string, PlatformPolicy> = {
   linkedin: {
     wordLimit: 80,
     maxConsecutiveLineBreaks: 3,
-    minParagraphs: 4,
+    maxParagraphs: 6,
     sentencesPerParagraph: 2,
   },
   facebook: {
     wordLimit: 80,
     maxConsecutiveLineBreaks: 3,
-    minParagraphs: 3,
+    maxParagraphs: 5,
     sentencesPerParagraph: 3,
   },
   instagram: {
     wordLimit: 100,
     maxConsecutiveLineBreaks: 3,
-    minParagraphs: 3,
+    maxParagraphs: 5,
     sentencesPerParagraph: 3,
   },
 };
@@ -94,22 +94,37 @@ function enforceLineBreaks(text: string, maxConsecutive: number): { text: string
 
 function enforceParagraphStructure(text: string, policy: PlatformPolicy): { text: string; violation: PolicyViolation | null } {
   const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
-  if (paragraphs.length >= policy.minParagraphs) return { text, violation: null };
 
-  const sentences = text.replace(/\n/g, " ").split(/(?<=[.!?])\s+/).filter(s => s.trim());
-  if (sentences.length < 3) return { text, violation: null };
-
-  const reformatted: string[] = [];
-  const chunkSize = policy.sentencesPerParagraph;
-  reformatted.push(sentences.slice(0, 2).join(" "));
-  for (let i = 2; i < sentences.length; i += chunkSize) {
-    reformatted.push(sentences.slice(i, i + chunkSize).join(" "));
+  if (paragraphs.length > policy.maxParagraphs) {
+    const trimmed = paragraphs.slice(0, policy.maxParagraphs);
+    return {
+      text: trimmed.join("\n\n"),
+      violation: { rule: "maxParagraphs", before: paragraphs.length, after: trimmed.length },
+    };
   }
 
-  return {
-    text: reformatted.join("\n\n"),
-    violation: { rule: "minParagraphs", before: paragraphs.length, after: reformatted.length },
-  };
+  if (paragraphs.length === 1) {
+    const sentences = text.replace(/\n/g, " ").split(/(?<=[.!?])\s+/).filter(s => s.trim());
+    if (sentences.length < 3) return { text, violation: null };
+
+    const reformatted: string[] = [];
+    const chunkSize = policy.sentencesPerParagraph;
+    reformatted.push(sentences.slice(0, 2).join(" "));
+    for (let i = 2; i < sentences.length; i += chunkSize) {
+      reformatted.push(sentences.slice(i, i + chunkSize).join(" "));
+    }
+
+    if (reformatted.length > policy.maxParagraphs) {
+      reformatted.length = policy.maxParagraphs;
+    }
+
+    return {
+      text: reformatted.join("\n\n"),
+      violation: { rule: "wallOfText", before: 1, after: reformatted.length },
+    };
+  }
+
+  return { text, violation: null };
 }
 
 function enforceWordLimit(text: string, policy: PlatformPolicy): { text: string; violation: PolicyViolation | null } {
@@ -161,8 +176,11 @@ export function enforcePostPolicy(text: string, platform: string): PolicyResult 
   const policy = PLATFORM_POLICIES[platform];
   if (!policy) return { content: text, violations: [], corrected: false };
 
+  const sanitized = sanitizeContent(text);
+  const originalWordCount = countWords(sanitized);
+
   const violations: PolicyViolation[] = [];
-  let content = text;
+  let content = sanitized;
 
   const lineBreakResult = enforceLineBreaks(content, policy.maxConsecutiveLineBreaks);
   content = lineBreakResult.text;
@@ -177,17 +195,20 @@ export function enforcePostPolicy(text: string, platform: string): PolicyResult 
   if (wordResult.violation) violations.push(wordResult.violation);
 
   if (violations.length > 0) {
-    const violationSummary = violations
-      .map(v => `${v.rule}(${v.before}->${v.after})`)
-      .join(", ");
-    console.log(`[SocialPostPolicy] ${platform} post corrected: ${violationSummary}`);
+    const correctedWordCount = countWords(content);
+    const violatedRules = violations.map(v => v.rule);
+    console.log(
+      `[SocialPostPolicy] ${platform} post corrected | ` +
+      `originalWords=${originalWordCount} | correctedWords=${correctedWordCount} | ` +
+      `limit=${policy.wordLimit} | violatedRules=[${violatedRules.join(", ")}] | ` +
+      `details: ${violations.map(v => `${v.rule}(${v.before}->${v.after})`).join(", ")}`
+    );
   }
 
   return { content, violations, corrected: violations.length > 0 };
 }
 
 export function enforceAndSanitize(text: string, platform: string): string {
-  const sanitized = sanitizeContent(text);
-  const result = enforcePostPolicy(sanitized, platform);
+  const result = enforcePostPolicy(text, platform);
   return result.content;
 }
