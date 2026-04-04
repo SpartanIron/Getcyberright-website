@@ -117,7 +117,7 @@ function ensureParagraphBreaks(text: string, platform: string): string {
 }
 
 function enforceWordLimit(text: string, platform: string): string {
-  const limits: Record<string, number> = { linkedin: 80, facebook: 80, instagram: 120 };
+  const limits: Record<string, number> = { linkedin: 80, facebook: 80, instagram: 100 };
   const limit = limits[platform];
   if (!limit) return text;
 

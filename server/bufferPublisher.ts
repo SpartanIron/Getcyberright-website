@@ -377,28 +377,17 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
 
   const safeContent = enforceWordLimitSafetyNet(post.postContent, post.platform);
 
+  const publishMode = post.platform === "instagram" ? "addToQueue" : "shareNow";
   let result = await createBufferPost(channel.id, safeContent, {
-    mode: "shareNow",
+    mode: publishMode,
     imageUrl,
     platform: post.platform,
   });
 
-  if (!result.success && post.platform === "instagram" && imageUrl) {
-    console.warn(`[Buffer] Instagram post ${postId} failed with shareNow. Retrying with addToQueue mode...`);
-    result = await createBufferPost(channel.id, safeContent, {
-      mode: "addToQueue",
-      imageUrl,
-      platform: post.platform,
-    });
-    if (result.success) {
-      console.log(`[Buffer] Instagram retry with addToQueue succeeded for post ${postId}`);
-    }
-  }
-
   if (!result.success && imageUrl && result.error?.toLowerCase().includes("image")) {
     console.warn(`[Buffer] Image rejected for ${post.platform} post ${postId}: ${result.error}. Retrying without image...`);
-    result = await createBufferPost(channel.id, post.postContent, {
-      mode: "shareNow",
+    result = await createBufferPost(channel.id, safeContent, {
+      mode: publishMode,
       platform: post.platform,
     });
     if (result.success) {

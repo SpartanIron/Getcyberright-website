@@ -42,7 +42,7 @@ function sanitizePostContent(text: string): string {
 }
 
 function enforceWordLimit(text: string, platform: string): string {
-  const limits: Record<string, number> = { linkedin: 80, facebook: 80, instagram: 120 };
+  const limits: Record<string, number> = { linkedin: 80, facebook: 80, instagram: 100 };
   const limit = limits[platform];
   if (!limit) return text;
 
@@ -232,14 +232,13 @@ ${buildPartnerContext("linkedin", tags[0] || "general_awareness")}${buildPartner
 - Final tweet: "Full breakdown on GetCyberRight:" followed by the link
 - Each tweet should make readers want to click through
 
-4. INSTAGRAM (120-200 words)
-- STRUCTURE: Hook line → blank line → numbered tips/points → blank line → CTA → blank line → hashtags
+4. INSTAGRAM (60-100 words max, STRICTLY ENFORCED — posts over 100 words are rejected)
+- Instagram is IMAGE-FIRST. The caption supports the branded image card, not the other way around
 - Hook in the first line that creates curiosity
-- Share 2-3 key points from the article as numbered items, each on its own line
-- End with a CTA: "Full guide on our website, link in bio" or "Read the complete guide at getcyberright.com"
-- ALGORITHM TIP: Instagram rewards saves and shares. Format tips as numbered lists that feel bookmark-worthy
+- Share 1-2 key points as numbered items
+- End with "Link in bio" as CTA (links are not clickable in Instagram captions)
 - Include 8-12 relevant hashtags at the end, separated by a blank line
-- MUST have at least 3 paragraph breaks (blank lines) throughout the caption
+- Keep it SHORT and scannable. 2-3 short paragraphs max
 
 5. SHORT ALERT (under 150 chars)
 - Urgent, specific excerpt with a teaser
