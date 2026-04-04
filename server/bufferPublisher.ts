@@ -514,7 +514,11 @@ export async function publishWithFirstComment(
     sourceArticleUrl?: string | null;
   } = {}
 ): Promise<BufferPublishResult> {
-  const result = await createBufferPost(channelId, content, {
+  const platform = options.platform || "";
+  const policyResult = enforcePostPolicy(content, platform);
+  const safeContent = policyResult.content;
+
+  const result = await createBufferPost(channelId, safeContent, {
     mode: options.mode || "shareNow",
     imageUrl: options.imageUrl,
     platform: options.platform,
