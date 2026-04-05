@@ -1,15 +1,6 @@
 import { storage } from "./storage";
 import { SCAM_PAGES, getAllScamSlugs } from "@shared/scam-content";
-import { isKnownRoute } from "./known-routes";
 import { PAGE_BODY_CONTENT } from "./seo-page-body-content";
-import type { Request, Response, NextFunction } from "express";
-
-const BOT_PATTERN = /googlebot|bingbot|yandexbot|duckduckbot|baiduspider|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|ia_archiver|msnbot|semrushbot|ahrefsbot|mj12bot|rogerbot|dotbot|petalbot|bytespider|gptbot|anthropic-ai|claude-web|claudebot|google-extended|chatgpt-user|oai-searchbot|perplexitybot|cohere-ai|youbot|amazonbot|meta-externalagent|meta-externalfetcher|iaskspider|phind-search/i;
-
-function isBot(userAgent: string | undefined): boolean {
-  if (!userAgent) return false;
-  return BOT_PATTERN.test(userAgent);
-}
 
 function escapeHtml(str: string): string {
   return str
@@ -713,7 +704,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/scam-checker",
     schemaType: "WebApplication",
     features: ["URL safety analysis", "Email scam detection", "QR code scanning", "Real-time safety checks", "Multi-source verification"],
-    bodyContent: `<p>According to the FBI's Internet Crime Complaint Center (IC3), Americans lost over $10.3 billion to online scams in 2023 alone. Many of these scams start with a single suspicious link in an email, text message, or social media post. Our GCR Scam Guard helps you verify whether a link, email, or message is safe before you click.</p>
+    bodyContent: `<p>Online scams are growing more sophisticated every day. Many start with a single suspicious link in an email, text message, or social media post. Our GCR Scam Guard helps you verify whether a link, email, or message is safe before you click.</p>
     <h2>How the GCR Scam Guard Works</h2>
     <p>When you submit a suspicious URL, email, or message, our system runs it through multiple trusted safety databases simultaneously. We check Google Safe Browsing, VirusTotal, URLhaus, and other sources to cross-reference threat data. The tool also examines the domain age, SSL certificate status, and known hosting patterns to identify newly created scam sites that other tools might miss.</p>
     <h2>What You Can Check</h2>
@@ -744,7 +735,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/password-generator",
     schemaType: "WebApplication",
     features: ["Custom password length", "Special character options", "Uppercase and lowercase mixing", "Number inclusion", "Password strength meter"],
-    bodyContent: `<p>Weak passwords remain the number one way accounts get compromised. According to Verizon's Data Breach Investigations Report, over 80% of hacking-related breaches involve stolen or weak passwords. Our password generator creates strong, random passwords that are virtually impossible to guess.</p>
+    bodyContent: `<p>Weak passwords remain the number one way accounts get compromised. The majority of hacking-related breaches involve stolen or weak credentials. Our password generator creates strong, random passwords that are virtually impossible to guess.</p>
     <h2>How It Works</h2>
     <p>Our generator runs entirely in your browser. No passwords are ever sent to our servers or stored anywhere. You choose the length and character types (uppercase, lowercase, numbers, symbols), and the tool uses cryptographically secure randomness to create a password that would take millions of years to crack by brute force.</p>
     <h2>Tips for Better Password Security</h2>
@@ -774,7 +765,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     features: ["501+ data broker database", "Automated removal requests", "Progress tracking", "Privacy score assessment", "Continuous monitoring"],
     bodyContent: `<p>Your personal information, including your name, home address, phone number, email, and even family members' names, is likely listed on dozens of data broker websites right now. These sites collect and sell personal data from public records, social media, purchase history, and other sources. Anyone can search for you and find sensitive details in seconds.</p>
     <h2>The Scale of the Problem</h2>
-    <p>There are over 4,000 data broker companies operating worldwide. The data brokerage industry is worth an estimated $250 billion per year. Our database covers 501+ of the most common data broker sites, including people-search engines like Spokeo, WhitePages, BeenVerified, and Intelius, as well as marketing data aggregators and background check services.</p>
+    <p>Thousands of data broker companies operate worldwide, forming a massive industry that profits from selling personal information. Our database covers 501+ of the most common data broker sites, including people-search engines like Spokeo, WhitePages, BeenVerified, and Intelius, as well as marketing data aggregators and background check services.</p>
     <h2>How Data Removal Works</h2>
     <ol><li><strong>Search</strong> - Enter your name and we identify which data broker sites have your information listed</li><li><strong>Generate opt-out requests</strong> - We create customized removal requests for each site following their specific opt-out procedures</li><li><strong>Submit and track</strong> - Follow the guided removal process and track which sites have processed your request</li><li><strong>Monitor</strong> - Check back periodically since data brokers often re-acquire your information over time</li></ol>
     <h2>Why Data Removal Matters</h2>
@@ -803,7 +794,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     path: "/breach-dashboard",
     schemaType: "WebApplication",
     features: ["Email breach monitoring", "Real-time alerts", "Breach history tracking", "Security recommendations", "Multiple email support"],
-    bodyContent: `<p>Data breaches exposed over 22 billion records in 2023, according to security researchers. If you have used the internet for more than a few years, there is a high chance that at least one of your accounts has been compromised in a breach. Our Breach Monitor lets you check if your email address appears in any known data breaches.</p>
+    bodyContent: `<p>Data breaches expose billions of records every year. If you have used the internet for more than a few years, there is a high chance that at least one of your accounts has been compromised in a breach. Our Breach Monitor lets you check if your email address appears in any known data breaches.</p>
     <h2>What Gets Exposed in a Data Breach</h2>
     <p>When a company gets breached, attackers typically steal email addresses, passwords (sometimes in plain text), names, phone numbers, and in more serious cases, financial information like credit card numbers. Even "minor" breaches that only expose your email and password can be dangerous if you reuse that same password on other accounts.</p>
     <h2>What to Do If Your Email Is Found</h2>
@@ -902,7 +893,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, protect your identity, avoid romance fraud, and use technology with confidence.",
     path: "/seniors",
     features: ["Phone scam detection tips", "Identity theft prevention", "Romance scam awareness", "Medicare and government scam alerts", "Technology confidence guides", "Emergency help contacts"],
-    bodyContent: `<p>Adults over 60 lost $3.4 billion to online scams in 2023, according to the FBI's Internet Crime Report. Scammers often target seniors because they may be less familiar with online tricks and tend to have more savings. But knowledge is your best defense. Our Senior Safety Center is designed specifically for older adults who want straightforward, no-jargon guidance on staying safe online.</p>
+    bodyContent: `<p>Seniors are among the most heavily targeted groups for online scams, with losses climbing every year. Scammers often target older adults because they may be less familiar with online tricks and tend to have more savings. But knowledge is your best defense. Our Senior Safety Center is designed specifically for older adults who want straightforward, no-jargon guidance on staying safe online.</p>
     <h2>The Most Common Scams Targeting Seniors</h2>
     <ul><li><strong>Phone scams</strong> - Callers pretending to be the IRS, Medicare, Social Security, or a grandchild in trouble</li><li><strong>Romance scams</strong> - Fake romantic interests on dating sites or social media who eventually ask for money</li><li><strong>Tech support scams</strong> - Pop-ups or calls claiming your computer has a virus and demanding payment to fix it</li><li><strong>Investment scams</strong> - Promises of guaranteed returns or "risk-free" investments, especially in cryptocurrency</li><li><strong>Impersonation scams</strong> - Emails or calls pretending to be from Amazon, your bank, or a government agency</li></ul>
     <h2>Simple Steps to Stay Protected</h2>
@@ -991,7 +982,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     description: "Cybersecurity resources for small businesses. Employee awareness training, security policy templates, incident response guides, and practical steps to protect your business from cyber threats.",
     path: "/small-business",
     features: ["Employee awareness training", "Security policy templates", "Incident response planning", "Phishing simulation guidance", "Data backup strategies", "Compliance basics"],
-    bodyContent: `<p>Over 43% of cyber attacks target small businesses, and 60% of small companies that experience a major breach go out of business within six months. Yet many small business owners assume they are too small to be a target. The reality is that attackers specifically seek out small businesses because they often have weaker security than large corporations but still hold valuable customer data and financial information.</p>
+    bodyContent: `<p>Small businesses are a prime target for cyber attacks. Attackers specifically seek out small businesses because they often have weaker security than large corporations but still hold valuable customer data and financial information. Many small business owners assume they are too small to be a target, but that assumption is exactly what makes them vulnerable.</p>
     <h2>Where to Start</h2>
     <p>You do not need a dedicated IT department or a large budget to significantly improve your security. The three most impactful steps any small business can take are: train employees to recognize suspicious emails and messages, enable two-factor authentication on all business accounts, and ensure you have regular, tested backups of your critical data.</p>
     <h2>Common Small Business Threats</h2>
@@ -1004,7 +995,7 @@ const STATIC_TOOL_PAGES: Record<string, StaticPageDef> = {
     ],
     faqs: [
       { question: "How much does cybersecurity cost for a small business?", answer: "Many effective cybersecurity measures are free or low-cost. Employee training, strong password policies, multi-factor authentication, and regular software updates cost nothing but significantly reduce risk. Our resources help you build a strong security foundation." },
-      { question: "What are the biggest cybersecurity risks for small businesses?", answer: "The top risks include phishing emails, ransomware, weak passwords, outdated software, and employee mistakes. Over 43% of cyber attacks target small businesses, making awareness training essential." },
+      { question: "What are the biggest cybersecurity risks for small businesses?", answer: "The top risks include phishing emails, ransomware, weak passwords, outdated software, and employee mistakes. Small businesses are disproportionately targeted, making awareness training essential." },
       { question: "Where should I start with cybersecurity for my business?", answer: "Start with three fundamentals: train your employees to recognize phishing, enable multi-factor authentication on all accounts, and ensure regular data backups. Our guides walk you through each step." },
     ],
   },
@@ -1847,102 +1838,87 @@ async function renderNewsPage(slug: string): Promise<string | null> {
 </body></html>`;
 }
 
-export function seoMiddleware() {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const ua = req.get("User-Agent");
-    if (!isBot(ua)) return next();
+function extractBodyContent(fullHtml: string): string {
+  const bodyStart = fullHtml.indexOf("<body");
+  const bodyEnd = fullHtml.indexOf("</body>");
+  if (bodyStart === -1 || bodyEnd === -1) return "";
+  const bodyTagEnd = fullHtml.indexOf(">", bodyStart);
+  if (bodyTagEnd === -1) return "";
+  let body = fullHtml.substring(bodyTagEnd + 1, bodyEnd).trim();
+  body = body.replace(/<div id="root"><\/div>/g, "");
+  return body;
+}
 
-    let path = req.originalUrl.split("?")[0].split("#")[0];
-    if (path.length > 1 && path.endsWith("/")) {
-      path = path.slice(0, -1);
-    }
+export async function getSSRBodyContent(requestPath: string): Promise<string> {
+  let path = requestPath.split("?")[0].split("#")[0];
+  if (path.length > 1 && path.endsWith("/")) {
+    path = path.slice(0, -1);
+  }
+
+  try {
     let html: string | null = null;
-    let isDynamicRoute = false;
 
-    try {
-      if (path === "/") {
-        html = await renderHomePage();
-      }
-
-      if (!html && path === "/about") {
-        html = renderAboutPage();
-      }
-
-      const guideMatch = path.match(/^\/guides\/([a-z0-9-]+)$/);
-      if (!html && guideMatch) {
-        isDynamicRoute = true;
-        html = await renderGuidePage(guideMatch[1]);
-      }
-
-      const alertMatch = path.match(/^\/alerts\/([a-z0-9-]+)$/);
-      if (!html && alertMatch) {
-        isDynamicRoute = true;
-        html = await renderAlertPage(alertMatch[1]);
-      }
-
-      const scamIntelMatch = path.match(/^\/scam-intel\/([a-z0-9-]+)$/);
-      if (!html && scamIntelMatch) {
-        isDynamicRoute = true;
-        html = await renderScamIntelPage(scamIntelMatch[1]);
-      }
-
-      const scamMatch = path.match(/^\/scams\/([a-z0-9-]+)$/);
-      if (!html && scamMatch) {
-        isDynamicRoute = true;
-        html = renderScamPage(scamMatch[1]);
-      }
-
-      const newsMatch = path.match(/^\/news\/([a-z0-9-]+)$/);
-      if (!html && newsMatch) {
-        isDynamicRoute = true;
-        html = await renderNewsPage(newsMatch[1]);
-      }
-
-      const topicMatch = path.match(/^\/topics\/([a-z0-9-]+)$/);
-      if (!html && topicMatch) {
-        isDynamicRoute = true;
-        html = await renderTopicHub(topicMatch[1]);
-      }
-
-      if (!html && path === "/guides") {
-        html = await renderListingPage("guides");
-      }
-      if (!html && path === "/scam-intel") {
-        html = await renderListingPage("scam-intel");
-      }
-      if (!html && path === "/alerts") {
-        html = await renderListingPage("alerts");
-      }
-      if (!html && path === "/news") {
-        html = await renderListingPage("news");
-      }
-
-      if (!html && STATIC_TOOL_PAGES[path]) {
-        html = renderStaticToolPage(path);
-      }
-
-      if (html) {
-        res.status(200).set({
-          "Content-Type": "text/html; charset=utf-8",
-          "Cache-Control": "public, max-age=3600, s-maxage=86400",
-          "X-Robots-Tag": "index, follow",
-        }).end(html);
-        return;
-      }
-
-      if (isDynamicRoute && !html) {
-        res.status(404).set({ "Content-Type": "text/html" }).end("<html><head><title>Not Found</title></head><body><h1>404 - Page Not Found</h1></body></html>");
-        return;
-      }
-
-      if (!html && !isKnownRoute(path)) {
-        res.status(404).set({ "Content-Type": "text/html" }).end("<html><head><title>Not Found</title></head><body><h1>404 - Page Not Found</h1><p>The page you are looking for does not exist.</p><p><a href='/'>Return to GetCyberRight</a></p></body></html>");
-        return;
-      }
-    } catch (error: any) {
-      console.error(`[SEO] Error rendering ${path}:`, error.message);
+    if (path === "/") {
+      html = await renderHomePage();
     }
 
-    next();
-  };
+    if (!html && path === "/about") {
+      html = renderAboutPage();
+    }
+
+    const guideMatch = path.match(/^\/guides\/([a-z0-9-]+)$/);
+    if (!html && guideMatch) {
+      html = await renderGuidePage(guideMatch[1]);
+    }
+
+    const alertMatch = path.match(/^\/alerts\/([a-z0-9-]+)$/);
+    if (!html && alertMatch) {
+      html = await renderAlertPage(alertMatch[1]);
+    }
+
+    const scamIntelMatch = path.match(/^\/scam-intel\/([a-z0-9-]+)$/);
+    if (!html && scamIntelMatch) {
+      html = await renderScamIntelPage(scamIntelMatch[1]);
+    }
+
+    const scamMatch = path.match(/^\/scams\/([a-z0-9-]+)$/);
+    if (!html && scamMatch) {
+      html = renderScamPage(scamMatch[1]);
+    }
+
+    const newsMatch = path.match(/^\/news\/([a-z0-9-]+)$/);
+    if (!html && newsMatch) {
+      html = await renderNewsPage(newsMatch[1]);
+    }
+
+    const topicMatch = path.match(/^\/topics\/([a-z0-9-]+)$/);
+    if (!html && topicMatch) {
+      html = await renderTopicHub(topicMatch[1]);
+    }
+
+    if (!html && path === "/guides") {
+      html = await renderListingPage("guides");
+    }
+    if (!html && path === "/scam-intel") {
+      html = await renderListingPage("scam-intel");
+    }
+    if (!html && path === "/alerts") {
+      html = await renderListingPage("alerts");
+    }
+    if (!html && path === "/news") {
+      html = await renderListingPage("news");
+    }
+
+    if (!html && STATIC_TOOL_PAGES[path]) {
+      html = renderStaticToolPage(path);
+    }
+
+    if (html) {
+      return extractBodyContent(html);
+    }
+  } catch (error: any) {
+    console.error(`[SSR] Error generating body content for ${path}:`, error.message);
+  }
+
+  return "";
 }

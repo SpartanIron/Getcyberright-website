@@ -5,9 +5,9 @@ import viteConfig from "../vite.config";
 import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
-import { seoMiddleware } from "./seo-renderer";
 import { isKnownRoute } from "./known-routes";
 import { resolvePageMeta, injectMeta } from "./seo-meta-resolver";
+import { getSSRBodyContent } from "./seo-renderer";
 
 const viteLogger = createLogger();
 
@@ -34,8 +34,6 @@ export async function setupVite(server: Server, app: Express) {
 
   app.use(vite.middlewares);
 
-  app.use(seoMiddleware());
-
   app.use("/{*path}", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -53,12 +51,19 @@ export async function setupVite(server: Server, app: Express) {
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
 
-      const meta = await resolvePageMeta(url);
-      template = injectMeta(template, meta);
+      const [meta, ssrBody] = await Promise.all([
+        resolvePageMeta(url),
+        getSSRBodyContent(url),
+      ]);
+      template = injectMeta(template, meta, ssrBody);
 
       const page = await vite.transformIndexHtml(url, template);
       const statusCode = isKnownRoute(url) ? 200 : 404;
-      res.status(statusCode).set({ "Content-Type": "text/html" }).end(page);
+      res.status(statusCode).set({ 
+        "Content-Type": "text/html",
+        "Cache-Control": "private, max-age=3600, s-maxage=86400",
+        "X-Robots-Tag": "index, follow",
+      }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);

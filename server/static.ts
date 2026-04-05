@@ -2,9 +2,9 @@ import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { seoMiddleware } from "./seo-renderer";
 import { isKnownRoute } from "./known-routes";
 import { resolvePageMeta, injectMeta } from "./seo-meta-resolver";
+import { getSSRBodyContent } from "./seo-renderer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,8 +16,6 @@ export function serveStatic(app: Express) {
       `Could not find the build directory: ${distPath}, make sure to build the client first`,
     );
   }
-
-  app.use(seoMiddleware());
 
   app.use(express.static(distPath, {
     index: false,
@@ -47,9 +45,21 @@ export function serveStatic(app: Express) {
           jsonLd: "",
         };
       }
-      template = injectMeta(template, meta);
 
-      res.status(statusCode).set({ "Content-Type": "text/html" }).end(template);
+      let ssrBody = "";
+      try {
+        ssrBody = await getSSRBodyContent(req.originalUrl);
+      } catch (e) {
+        console.error(`[SSR] Failed to generate body for ${req.path}:`, (e as Error).message);
+      }
+
+      template = injectMeta(template, meta, ssrBody);
+
+      res.status(statusCode).set({ 
+        "Content-Type": "text/html",
+        "Cache-Control": "private, max-age=3600, s-maxage=86400",
+        "X-Robots-Tag": "index, follow",
+      }).end(template);
     } catch (e) {
       try {
         const rawHtml = await fs.promises.readFile(path.resolve(distPath, "index.html"), "utf-8");

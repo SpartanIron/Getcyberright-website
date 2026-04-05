@@ -673,7 +673,7 @@ export async function resolvePageMeta(urlPath: string): Promise<PageMeta> {
   return get404Meta();
 }
 
-export function injectMeta(template: string, meta: PageMeta): string {
+export function injectMeta(template: string, meta: PageMeta, ssrBody?: string): string {
   const ogImage = meta.ogImage || "https://www.getcyberright.com/og-image.png";
   let result = template
     .replace(/%%PAGE_TITLE%%/g, escapeAttr(meta.title))
@@ -703,15 +703,14 @@ export function injectMeta(template: string, meta: PageMeta): string {
     result = result.replace(/<link rel="canonical" href="[^"]*" \/>/, '');
   }
 
-  const path = (meta.canonicalUrl || "").replace(BASE_URL, "") || "/";
-  const pageContent = PAGE_BODY_CONTENT[path];
-  if (pageContent && pageContent.bodyContent) {
-    const ssrHtml = `<div style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"><h1>${escapeAttr(meta.title)}</h1>${pageContent.bodyContent}${pageContent.relatedLinks ? '<nav>' + pageContent.relatedLinks.map(l => `<a href="${l.href}">${escapeAttr(l.text)}</a>`).join(' ') + '</nav>' : ''}</div>`;
-    result = result.replace('<!--ssr-outlet-->', ssrHtml);
-  } else if (path === "/") {
-    const homeHtml = `<div style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"><h1>${escapeAttr(meta.title)}</h1><p>${escapeAttr(meta.description)}</p><nav><a href="/scam-checker">GCR Scam Guard</a> <a href="/tools">Security Tools</a> <a href="/news">Cybersecurity News</a> <a href="/password-generator">Password Generator</a> <a href="/data-removal">Data Removal</a> <a href="/kids">Kids Safety</a> <a href="/seniors">Senior Safety</a> <a href="/parents">Parent Resources</a> <a href="/guides">Safety Guides</a> <a href="/training">Training Academy</a></nav></div>`;
-    result = result.replace('<!--ssr-outlet-->', homeHtml);
+  if (ssrBody) {
+    result = result.replace(
+      '<div id="root">',
+      `<div id="root"><div id="ssr-content" style="font-family:Sora,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;">${ssrBody}</div>`
+    );
   }
+
+  result = result.replace('<!--ssr-outlet-->', '');
 
   return result;
 }
