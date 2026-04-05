@@ -1,5 +1,6 @@
 import { storage } from "./storage";
 import { SCAM_PAGES } from "@shared/scam-content";
+import { PAGE_BODY_CONTENT } from "./seo-page-body-content";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -700,6 +701,16 @@ export function injectMeta(template: string, meta: PageMeta): string {
       '<meta name="robots" content="noindex, nofollow">\n    <meta name="description"'
     );
     result = result.replace(/<link rel="canonical" href="[^"]*" \/>/, '');
+  }
+
+  const path = (meta.canonicalUrl || "").replace(BASE_URL, "") || "/";
+  const pageContent = PAGE_BODY_CONTENT[path];
+  if (pageContent && pageContent.bodyContent) {
+    const ssrHtml = `<div style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"><h1>${escapeAttr(meta.title)}</h1>${pageContent.bodyContent}${pageContent.relatedLinks ? '<nav>' + pageContent.relatedLinks.map(l => `<a href="${l.href}">${escapeAttr(l.text)}</a>`).join(' ') + '</nav>' : ''}</div>`;
+    result = result.replace('<!--ssr-outlet-->', ssrHtml);
+  } else if (path === "/") {
+    const homeHtml = `<div style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"><h1>${escapeAttr(meta.title)}</h1><p>${escapeAttr(meta.description)}</p><nav><a href="/scam-checker">GCR Scam Guard</a> <a href="/tools">Security Tools</a> <a href="/news">Cybersecurity News</a> <a href="/password-generator">Password Generator</a> <a href="/data-removal">Data Removal</a> <a href="/kids">Kids Safety</a> <a href="/seniors">Senior Safety</a> <a href="/parents">Parent Resources</a> <a href="/guides">Safety Guides</a> <a href="/training">Training Academy</a></nav></div>`;
+    result = result.replace('<!--ssr-outlet-->', homeHtml);
   }
 
   return result;
