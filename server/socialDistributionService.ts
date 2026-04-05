@@ -61,13 +61,15 @@ ABSOLUTE RULES:
 - ONLY state facts from the provided source material or widely established public knowledge
 - If you are unsure whether something is factual, do not include it
 - Your credibility depends on accuracy. Never guess.
+- NEVER reference old research, outdated studies, or past-year reports (e.g. "2023 Verizon DBIR", "2024 Ponemon study", "according to a recent study"). Only reference current facts from the provided source material
+- Do NOT cite annual reports, research publications, or survey data unless they appear directly in the provided source material and were released within the last 30 days
+- Focus on fresh, actionable information. No filler stats from old research to pad posts
 
 SOURCE DIVERSITY (CRITICAL):
-- Do NOT default to citing the FBI for every statistic. Rotate across trusted global sources
-- Preferred sources to cite (vary across posts): FTC, CISA, UK NCSC, Europol, INTERPOL, Action Fraud (UK), ACSC (Australia), ENISA (EU), Canadian Anti-Fraud Centre, APWG, Identity Theft Resource Center, AARP Fraud Watch Network, Google Threat Analysis Group, Microsoft Digital Defense Report, Verizon DBIR
-- When citing a statistic, prefer the most globally relevant source, not just the US-centric one
-- If the source material references a specific agency, you may cite that agency, but across a set of posts, ensure variety
+- When citing a current agency action or alert, rotate across trusted global sources
+- Preferred sources (only when they appear in current source material): FTC, CISA, UK NCSC, Europol, INTERPOL, ACSC (Australia), ENISA (EU), Canadian Anti-Fraud Centre
 - GetCyberRight serves a global audience: reference international agencies and perspectives
+- Do NOT default to citing the FBI for every claim
 
 Formatting rules (STRICT — this determines whether posts look professional or like a wall of text):
 - NEVER use markdown formatting. No ** bold **, no * italics *, no ## headings, no bullet markers

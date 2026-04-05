@@ -456,4 +456,169 @@ export const PAGE_BODY_CONTENT: Record<string, { bodyContent: string; relatedLin
       { text: "GCR Scam Guard", href: "/scam-checker" },
     ],
   },
+  "/scam-checker": {
+    bodyContent: `<p>GCR Scam Guard is a free AI-powered tool that analyzes suspicious URLs, emails, text messages, and QR codes to determine if they are scams. Simply paste any suspicious content and get an instant safety report checked against multiple trusted threat databases.</p>
+    <h2>What You Can Analyze</h2>
+    <p>Check suspicious website links before clicking them. Paste email content to detect phishing attempts. Analyze text messages that seem too good to be true. Scan QR codes to verify they lead to legitimate websites. Each analysis checks multiple security databases and uses AI to identify scam patterns.</p>
+    <h2>How It Works</h2>
+    <p>Our scanner cross-references your submission against known phishing databases, malware registries, and scam URL lists. It also uses AI pattern recognition to identify new threats that have not been cataloged yet. You get a detailed safety report with a risk score, specific threat indicators, and recommended actions.</p>`,
+    relatedLinks: [
+      { text: "Report a Scam", href: "/report-scam" },
+      { text: "Scam Intelligence", href: "/scam-intel" },
+      { text: "Emergency Help", href: "/emergency-help" },
+    ],
+  },
+  "/tools": {
+    bodyContent: `<p>GetCyberRight offers a suite of free cybersecurity tools designed for everyday people, not IT professionals. Each tool addresses a specific security need and is built to be simple enough for anyone in your family to use.</p>
+    <h2>Available Security Tools</h2>
+    <p>GCR Scam Guard analyzes suspicious URLs, emails, and messages using AI. The Password Generator creates strong, unique passwords. Data Broker Removal helps you find and remove your personal information from data broker websites. Breach Dashboard monitors whether your email has appeared in known data breaches. The Cyber Threat Radar shows current active threats in real time.</p>`,
+    relatedLinks: [
+      { text: "GCR Scam Guard", href: "/scam-checker" },
+      { text: "Password Generator", href: "/password-generator" },
+      { text: "Data Removal", href: "/data-removal" },
+      { text: "Breach Dashboard", href: "/breach-dashboard" },
+    ],
+  },
+  "/news": {
+    bodyContent: `<p>Stay informed with the latest cybersecurity news, data breach reports, and security advisories. Every article is rewritten in plain language so families, seniors, and small businesses can understand the risks and take action.</p>
+    <h2>How We Cover Cybersecurity News</h2>
+    <p>We monitor trusted sources including government security agencies, established cybersecurity publications, and official company statements. Each story is evaluated for relevance to everyday people and rewritten to explain what happened, who is affected, what you should do right now, and how to stay protected long term.</p>`,
+    relatedLinks: [
+      { text: "Threat Trends", href: "/threat-trends" },
+      { text: "Security Alerts", href: "/alerts" },
+      { text: "Scam Intelligence", href: "/scam-intel" },
+    ],
+  },
+  "/password-generator": {
+    bodyContent: `<p>Create strong, unique passwords instantly with our free password generator. Weak and reused passwords are the number one cause of account compromises. This tool generates passwords that are virtually impossible to crack.</p>
+    <h2>Why Strong Passwords Matter</h2>
+    <p>Most people reuse the same password across multiple accounts. When one account is breached, attackers try those credentials everywhere else. A unique, strong password for each account prevents this cascade effect. Our generator creates passwords using a mix of uppercase letters, lowercase letters, numbers, and special characters.</p>`,
+    relatedLinks: [
+      { text: "Breach Dashboard", href: "/breach-dashboard" },
+      { text: "Security Checklists", href: "/checklists" },
+      { text: "Cyber Hygiene Guide", href: "/cyber-hygiene" },
+    ],
+  },
+  "/data-removal": {
+    bodyContent: `<p>Data brokers collect and sell your personal information including your name, address, phone number, email, and family details to anyone willing to pay. Our Data Broker Removal tool helps you find which brokers have your data and guides you through removing it.</p>
+    <h2>How Data Broker Removal Works</h2>
+    <p>We search across hundreds of known data broker websites to find where your personal information appears. For each broker that has your data, we provide step-by-step removal instructions specific to that broker. Some brokers allow automated opt-out requests, while others require manual submissions.</p>`,
+    relatedLinks: [
+      { text: "Privacy Protection Guide", href: "/topics/privacy-protection" },
+      { text: "Identity Theft Guide", href: "/topics/identity-theft" },
+      { text: "Security Tools", href: "/tools" },
+    ],
+  },
+  "/kids": {
+    bodyContent: `<p>The internet is an essential part of growing up, but it comes with real risks that kids may not recognize. Our Kids Safety Hub provides age-appropriate resources, interactive lessons, and practical tools to help children navigate the online world safely.</p>
+    <h2>What Kids Learn</h2>
+    <p>Our resources teach children how to recognize online strangers who may not be who they claim, how to protect personal information, what to do if something online makes them uncomfortable, and how to be good digital citizens. Everything is presented in language and scenarios that kids can relate to.</p>`,
+    relatedLinks: [
+      { text: "Parent Resources", href: "/parents" },
+      { text: "Child Safety Scanner", href: "/parents/child-safety-scanner" },
+      { text: "Training Academy", href: "/training" },
+    ],
+  },
+  "/seniors": {
+    bodyContent: `<p>Seniors are disproportionately targeted by scammers because they often have savings, tend to be more trusting, and may be less familiar with digital technology. Our Senior Safety Hub provides straightforward guidance on the most common threats facing older adults online.</p>
+    <h2>Common Threats Targeting Seniors</h2>
+    <p>Tech support scams where callers claim your computer has a virus. Romance scams on dating sites and social media. Medicare and health insurance fraud. Grandparent scams where someone pretends to be a grandchild in trouble. Investment scams promising guaranteed returns. Each of these has specific warning signs and prevention steps that we cover in detail.</p>`,
+    relatedLinks: [
+      { text: "Tech Support Scam Guide", href: "/scams/tech-support-scam" },
+      { text: "Romance Scam Guide", href: "/scams/romance-scam" },
+      { text: "Medicare Scam Guide", href: "/scams/medicare-scam" },
+      { text: "Emergency Help", href: "/emergency-help" },
+    ],
+  },
+  "/parents": {
+    bodyContent: `<p>Keeping your children safe online is one of the most important responsibilities parents face today. Our Parent Resources hub gives you practical tools and guidance for protecting your kids without micromanaging their digital lives.</p>
+    <h2>Resources for Parents</h2>
+    <p>Learn how to set up parental controls on devices and apps your children use. Understand which social media platforms your kids are on and what risks they present. Have age-appropriate conversations about online safety. Monitor for warning signs of cyberbullying, predatory contact, or exposure to harmful content.</p>`,
+    relatedLinks: [
+      { text: "Child Safety Scanner", href: "/parents/child-safety-scanner" },
+      { text: "Kids Safety Hub", href: "/kids" },
+      { text: "Parent Guide", href: "/parent-guide" },
+      { text: "Social Media Security", href: "/topics/social-media-security" },
+    ],
+  },
+  "/emergency-help": {
+    bodyContent: `<p>If you have been hacked, scammed, or had your identity stolen, this page provides immediate steps you can take right now to limit the damage and start recovery. Time matters in these situations, so follow these steps as quickly as possible.</p>
+    <h2>Immediate Actions</h2>
+    <p>Change passwords on compromised accounts immediately. Contact your bank if financial information was exposed. Place a fraud alert with the credit bureaus. File a report with the FTC at IdentityTheft.gov. Document everything including screenshots, emails, and transaction records for your report.</p>`,
+    relatedLinks: [
+      { text: "Report a Scam", href: "/report-scam" },
+      { text: "Identity Theft Guide", href: "/topics/identity-theft" },
+      { text: "Breach Dashboard", href: "/breach-dashboard" },
+    ],
+  },
+  "/breach-dashboard": {
+    bodyContent: `<p>Check if your email address has been exposed in any known data breaches. When companies get hacked, customer data including emails, passwords, and personal information often ends up for sale on the dark web. Our Breach Dashboard helps you find out if you are affected and what to do about it.</p>
+    <h2>How to Use the Breach Dashboard</h2>
+    <p>Enter your email address to search across known breach databases. If your email appears in any breaches, you will see which companies were breached, what data was exposed, and when it happened. We provide specific steps for each breach to help you secure your accounts.</p>`,
+    relatedLinks: [
+      { text: "Password Generator", href: "/password-generator" },
+      { text: "Data Breaches Guide", href: "/topics/data-breaches" },
+      { text: "Security Checklists", href: "/checklists" },
+    ],
+  },
+  "/guides": {
+    bodyContent: `<p>Our cybersecurity guides provide step-by-step instructions for protecting yourself and your family online. Each guide is written in plain language and focuses on practical actions you can take today.</p>
+    <h2>Guide Categories</h2>
+    <p>Guides cover topics including password management, device security, social media privacy, identity theft prevention, safe online shopping, protecting children online, senior safety, and small business cybersecurity. Each guide includes actionable checklists and recommended tools.</p>`,
+    relatedLinks: [
+      { text: "Security Checklists", href: "/checklists" },
+      { text: "Training Academy", href: "/training" },
+      { text: "Printable Guides", href: "/printable-guides" },
+    ],
+  },
+  "/alerts": {
+    bodyContent: `<p>Security alerts notify you about active threats, newly discovered vulnerabilities, and urgent actions you should take. We monitor government security agencies and trusted cybersecurity sources to bring you timely warnings that matter to everyday users.</p>
+    <h2>How Alerts Work</h2>
+    <p>Each alert includes what the threat is, who is affected, how serious it is, and exactly what you should do. Alerts are rated by urgency level so you can prioritize the most critical ones first.</p>`,
+    relatedLinks: [
+      { text: "Threat Trends", href: "/threat-trends" },
+      { text: "Cybersecurity News", href: "/news" },
+      { text: "Cyber Threat Radar", href: "/cyber-threat-radar" },
+    ],
+  },
+  "/scam-intel": {
+    bodyContent: `<p>Our Scam Intelligence Center provides detailed analysis of active scam campaigns targeting consumers. Each report breaks down how the scam works, who it targets, warning signs to watch for, and what to do if you have been targeted.</p>
+    <h2>Active Scam Reports</h2>
+    <p>We track and analyze scams including sextortion targeting teens, pig butchering crypto scams, deepfake video call fraud, QR code phishing, romance scams, AI voice cloning scams, Facebook marketplace fraud, and more. Each report is updated as new tactics emerge.</p>`,
+    relatedLinks: [
+      { text: "GCR Scam Guard", href: "/scam-checker" },
+      { text: "Report a Scam", href: "/report-scam" },
+      { text: "Emergency Help", href: "/emergency-help" },
+    ],
+  },
+  "/about": {
+    bodyContent: `<p>GetCyberRight is a cybersecurity education platform built for families, parents, kids, seniors, and small businesses. We believe everyone deserves access to expert-level security guidance in language they can understand, without the jargon and without the price tag.</p>
+    <h2>Our Approach</h2>
+    <p>We combine AI-powered security tools with human-written educational content to help everyday people protect themselves online. Our tools are free to use, our guides are written in plain language, and our mission is to make cybersecurity accessible to everyone regardless of technical background.</p>`,
+    relatedLinks: [
+      { text: "Our Mission", href: "/our-mission" },
+      { text: "Security Tools", href: "/tools" },
+      { text: "Contact Us", href: "/contact" },
+    ],
+  },
+  "/small-business": {
+    bodyContent: `<p>Small businesses are increasingly targeted by cybercriminals because they often lack the security resources of larger organizations. Our Small Business Hub provides practical, affordable security guidance tailored to businesses with limited IT budgets and staff.</p>
+    <h2>Key Areas for Small Business Security</h2>
+    <p>Employee security awareness training, email security and phishing prevention, data backup and recovery planning, customer data protection, incident response procedures, and compliance with data protection regulations. Each area includes step-by-step implementation guides designed for non-technical business owners.</p>`,
+    relatedLinks: [
+      { text: "Training Academy", href: "/training" },
+      { text: "Security Checklists", href: "/checklists" },
+      { text: "Breach Dashboard", href: "/breach-dashboard" },
+    ],
+  },
+  "/educators": {
+    bodyContent: `<p>Teach digital citizenship and cybersecurity in your classroom with our free educator resources. We provide lesson plans, student activities, and assessment tools designed for K-12 educators who want to integrate cybersecurity awareness into their curriculum.</p>
+    <h2>Classroom Resources</h2>
+    <p>Ready-to-use lesson plans covering online safety, password hygiene, social media awareness, and recognizing scams. Student activities that make cybersecurity concepts engaging and relatable. Assessment tools to measure student understanding. All materials align with common digital citizenship standards.</p>`,
+    relatedLinks: [
+      { text: "Kids Safety Hub", href: "/kids" },
+      { text: "Training Academy", href: "/training" },
+      { text: "Printable Guides", href: "/printable-guides" },
+    ],
+  },
 };

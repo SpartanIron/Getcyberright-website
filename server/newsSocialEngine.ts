@@ -201,6 +201,8 @@ ABSOLUTE RULES:
 - NEVER fabricate statistics, numbers, percentages, dollar amounts, or data points
 - NEVER invent incidents, breaches, or events that are not in the provided article
 - ONLY state facts from the provided source material
+- NEVER reference old research, outdated studies, or past-year reports. Only reference current facts from the provided article
+- Do NOT cite annual reports or survey data unless they appear directly in the article and were released within the last 30 days
 - Every post MUST end with the article link on its own line
 - NEVER use markdown formatting (no ** bold **, no * italics *, no ## headings, no bullet markers)
 - NEVER use em dashes. Use commas, periods, colons, or semicolons instead
