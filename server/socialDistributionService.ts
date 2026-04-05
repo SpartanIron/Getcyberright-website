@@ -51,23 +51,30 @@ async function generateSocialPosts(
 
 CONTENT STRATEGY:
 - Your posts are EXCERPTS that tease the full article, not standalone pieces
-- Share one powerful insight, stat, or story from the article to hook readers
+- Share one powerful insight or story from the article to hook readers
 - Always end with a clear call-to-action driving readers to the full article link
 - The goal is to provide enough value to stop the scroll, but leave the reader wanting more
 
+GETCYBERRIGHT CONTENT PHILOSOPHY:
+- This platform provides the LATEST and most current cybersecurity intelligence, resources, and research
+- All information must be verified, current, and from trusted sources
+- When we present analysis or insights, it is based on our own deep research and expert analysis of current threats
+- We NEVER pad content with recycled statistics or outdated research to appear credible
+- Our authority comes from being current, accurate, and actionable, not from citing old reports
+
 ABSOLUTE RULES:
-- NEVER fabricate statistics, numbers, percentages, dollar amounts, or data points
+- NEVER fabricate statistics, numbers, percentages, dollar amounts, or data points. Zero tolerance for hallucination
 - NEVER invent incidents, breaches, or events
 - ONLY state facts from the provided source material or widely established public knowledge
-- If you are unsure whether something is factual, do not include it
-- Your credibility depends on accuracy. Never guess.
-- NEVER reference old research, outdated studies, or past-year reports (e.g. "2023 Verizon DBIR", "2024 Ponemon study", "according to a recent study"). Only reference current facts from the provided source material
-- Do NOT cite annual reports, research publications, or survey data unless they appear directly in the provided source material and were released within the last 30 days
-- Focus on fresh, actionable information. No filler stats from old research to pad posts
+- If you are unsure whether something is factual, do not include it. Credibility is everything
+- NEVER reference old research, outdated studies, annual reports, or past-year data (e.g. "2023 Verizon DBIR", "2024 Ponemon study", "according to a recent study", "research shows")
+- Do NOT cite any report, survey, or study unless it appears directly in the provided source material AND was released within the last 30 days
+- Do NOT use phrases like "studies show", "research indicates", "experts say", or "according to a report" as filler. Either cite a specific, current, verifiable source or leave it out
+- Every claim must be traceable to the provided source material. No generic authority appeals
 
-SOURCE DIVERSITY (CRITICAL):
+SOURCE ATTRIBUTION:
 - When citing a current agency action or alert, rotate across trusted global sources
-- Preferred sources (only when they appear in current source material): FTC, CISA, UK NCSC, Europol, INTERPOL, ACSC (Australia), ENISA (EU), Canadian Anti-Fraud Centre
+- Only cite sources that appear in the current source material: FTC, CISA, UK NCSC, Europol, INTERPOL, ACSC (Australia), ENISA (EU), Canadian Anti-Fraud Centre
 - GetCyberRight serves a global audience: reference international agencies and perspectives
 - Do NOT default to citing the FBI for every claim
 

@@ -283,6 +283,10 @@ WRITING RULES:
 - Use proper paragraph breaks between sections.
 - Use numbered lists for action steps.
 - Write complete sentences with proper punctuation. Every sentence must end with a period, question mark, or exclamation point.
+- NEVER fabricate statistics, numbers, percentages, or data points. Zero tolerance for hallucination.
+- NEVER reference old research, outdated studies, annual reports, or past-year data. Only use facts from the provided news item.
+- Do NOT use filler phrases like "studies show", "research indicates", "experts say", or "according to a report". Either cite a specific fact from the source or leave it out.
+- Every claim must be traceable to the provided news item. No generic authority appeals.
 
 IMPORTANT: You MUST output exactly ${items.length} objects, one for each input item. Do not skip any.
 Output a JSON array of these objects. Output ONLY the JSON array, no markdown.`

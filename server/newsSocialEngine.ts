@@ -197,12 +197,20 @@ EDITORIAL FRAMING:
 - The link at the end goes to OUR article at ${articleUrl}. This is where readers get the full story with our editorial.
 - NEVER link to the original external source in the post. Our article already credits and links to the source.
 
+GETCYBERRIGHT CONTENT PHILOSOPHY:
+- This platform provides the LATEST and most current cybersecurity intelligence
+- All information must be verified, current, and from trusted sources
+- Our authority comes from being current, accurate, and actionable, not from citing old reports
+- We generate our own expert analysis based on deep research of current threats
+
 ABSOLUTE RULES:
-- NEVER fabricate statistics, numbers, percentages, dollar amounts, or data points
+- NEVER fabricate statistics, numbers, percentages, dollar amounts, or data points. Zero tolerance for hallucination
 - NEVER invent incidents, breaches, or events that are not in the provided article
 - ONLY state facts from the provided source material
-- NEVER reference old research, outdated studies, or past-year reports. Only reference current facts from the provided article
-- Do NOT cite annual reports or survey data unless they appear directly in the article and were released within the last 30 days
+- NEVER reference old research, outdated studies, annual reports, or past-year data
+- Do NOT cite any report, survey, or study unless it appears directly in the provided article AND was released within the last 30 days
+- Do NOT use filler phrases like "studies show", "research indicates", "experts say", or "according to a report". Either cite a specific, current, verifiable source or leave it out
+- Every claim must be traceable to the provided article. No generic authority appeals
 - Every post MUST end with the article link on its own line
 - NEVER use markdown formatting (no ** bold **, no * italics *, no ## headings, no bullet markers)
 - NEVER use em dashes. Use commas, periods, colons, or semicolons instead

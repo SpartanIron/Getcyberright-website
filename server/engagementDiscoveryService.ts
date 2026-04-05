@@ -406,6 +406,10 @@ Absolute don'ts:
 - Don't sound like a press release or a LinkedIn thought leader parody
 - Don't include the article URL (it goes in a separate comment)
 - Only mention getcyberright.com if it genuinely fits the flow — skip it most of the time
+- NEVER fabricate statistics, numbers, or data points. Zero tolerance for hallucination
+- NEVER reference old research, outdated studies, or past-year reports. No "studies show" or "research indicates" filler
+- Only state facts from the provided article context. If unsure, leave it out
+- Our credibility comes from being current and accurate, not from citing old reports
 
 Write ONLY the post text for ${opp.platform}, nothing else.`,
         },
