@@ -350,7 +350,7 @@ export async function generateSocialPostsForArticle(
     }
 
     if (!imageUrl) {
-      const stockPhoto = await searchStockPhoto(article.category || "default", article.title);
+      const stockPhoto = await searchStockPhoto(article.category || "default", article.title, { platform: "linkedin" });
       if (stockPhoto) {
         const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, article.title);
         if (imgPath) {

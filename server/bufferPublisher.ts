@@ -138,6 +138,11 @@ export async function createBufferPost(
   } = {}
 ): Promise<BufferPublishResult> {
   try {
+    if (options.platform === "instagram" && !options.imageUrl) {
+      console.error(`[Buffer] BLOCKED: createBufferPost called for Instagram without an image`);
+      return { success: false, platform: "instagram", error: "Instagram requires an image — blocked at API layer" };
+    }
+
     const mode = options.mode || "shareNow";
 
     const input: Record<string, any> = {
@@ -304,7 +309,7 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     const headline = post.contentTitle.length > 50 ? post.contentTitle.slice(0, 47) + "..." : post.contentTitle;
     const dims = post.platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
 
-    const stockPhoto = await searchStockPhoto(post.contentType || "default", post.contentTitle);
+    const stockPhoto = await searchStockPhoto(post.contentType || "default", post.contentTitle, { platform: post.platform });
     if (stockPhoto) {
       const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, post.contentTitle);
       if (imgPath) {
@@ -528,6 +533,12 @@ export async function publishWithFirstComment(
   } = {}
 ): Promise<BufferPublishResult> {
   const platform = options.platform || "";
+
+  if (platform === "instagram" && !options.imageUrl) {
+    console.error(`[Buffer] publishWithFirstComment: Instagram requires an image — rejecting post`);
+    return { success: false, platform, error: "Instagram requires an image" };
+  }
+
   const policyResult = enforcePostPolicy(content, platform);
   const safeContent = policyResult.content;
 

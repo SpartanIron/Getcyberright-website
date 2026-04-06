@@ -182,6 +182,71 @@ function getLocalStockPhoto(): string | null {
   return path.join(LOCAL_STOCK_PHOTOS_DIR, chosen);
 }
 
+const CYBER_VISUAL_MAP: Record<string, string[]> = {
+  "hack": ["hacker computer dark room", "cybersecurity hacking code screen"],
+  "breach": ["data breach cybersecurity alert", "broken digital lock security"],
+  "ransomware": ["ransomware attack locked computer screen", "encrypted files cyber extortion"],
+  "phishing": ["phishing email suspicious message inbox", "fake login page credential theft"],
+  "malware": ["malware virus computer code terminal", "infected computer warning screen"],
+  "scam": ["online scam fraud warning smartphone", "suspicious message phone alert"],
+  "password": ["password security login screen keyboard", "two factor authentication phone code"],
+  "vpn": ["vpn secure connection network shield", "encrypted tunnel private browsing"],
+  "encryption": ["encryption padlock digital security code", "encrypted data secure communication"],
+  "privacy": ["digital privacy surveillance tracking", "person covering webcam laptop"],
+  "identity": ["identity theft personal documents stolen", "social security card credit card fraud"],
+  "android": ["android smartphone mobile security lock", "mobile phone malware warning screen"],
+  "iphone": ["iphone smartphone security settings", "apple mobile device face id"],
+  "apple": ["apple macbook laptop security", "apple device technology workspace"],
+  "google": ["google chrome browser security warning", "google account security settings"],
+  "microsoft": ["microsoft windows computer security", "windows laptop update screen"],
+  "facebook": ["social media privacy phone scrolling", "facebook settings privacy screen"],
+  "whatsapp": ["whatsapp messaging phone conversation", "encrypted messaging smartphone chat"],
+  "instagram": ["instagram social media phone app", "social media smartphone scrolling"],
+  "tiktok": ["tiktok social media phone video", "short video app smartphone"],
+  "ai": ["artificial intelligence neural network", "AI chatbot conversation screen"],
+  "chatbot": ["AI chatbot conversation screen", "artificial intelligence chat interface"],
+  "deepfake": ["deepfake artificial intelligence face manipulation", "synthetic media face recognition"],
+  "spyware": ["spyware surveillance phone monitoring", "hidden tracking software device"],
+  "trojan": ["trojan virus hidden malware code", "disguised malicious software download"],
+  "zero-day": ["zero day exploit code vulnerability", "security researcher finding software bug"],
+  "supply chain": ["supply chain software development pipeline", "code repository security audit"],
+  "cloud": ["cloud computing data center servers", "cloud storage security padlock"],
+  "router": ["wifi router home network security", "wireless network configuration settings"],
+  "smart home": ["smart home iot devices connected", "smart speaker security camera home"],
+  "children": ["children using tablet internet safety", "kid learning computer parental guidance"],
+  "family": ["family using technology devices together", "parents children digital literacy"],
+  "teen": ["teenager smartphone social media", "teen online safety digital literacy"],
+  "elderly": ["senior citizen using smartphone", "older adult computer technology help"],
+  "bank": ["online banking mobile phone security", "financial transaction secure payment"],
+  "crypto": ["cryptocurrency bitcoin digital wallet", "crypto trading platform screen"],
+  "telegram": ["telegram encrypted messaging app", "secure messaging smartphone chat"],
+  "chrome": ["google chrome browser address bar", "web browser security certificate"],
+  "firefox": ["firefox web browser security", "web browser privacy settings"],
+  "windows": ["windows computer desktop security settings", "windows update security patch"],
+  "linux": ["linux server terminal command line", "open source operating system code"],
+  "quantum": ["quantum computing technology processor", "quantum physics technology lab"],
+  "surveillance": ["surveillance camera security monitoring city", "cctv security monitoring screen"],
+  "data": ["data security server room protection", "digital data encryption storage"],
+  "exploit": ["cybersecurity exploit code terminal screen", "hacker finding software vulnerability"],
+  "vulnerability": ["software vulnerability bug security patch", "code review security audit"],
+  "patch": ["software update security patch download", "system update progress screen"],
+  "sim swap": ["sim card mobile phone carrier", "phone number porting identity theft"],
+  "social engineering": ["person manipulation phone call scam", "suspicious phone call warning"],
+  "dark web": ["dark web anonymous browsing", "hidden internet marketplace security"],
+  "email": ["email inbox security warning phishing", "suspicious email attachment alert"],
+  "wifi": ["public wifi coffee shop security risk", "wireless network password protection"],
+  "backup": ["data backup external drive cloud", "computer backup recovery process"],
+  "update": ["software update phone notification", "system security update download"],
+  "gaming": ["gaming controller headset online multiplayer", "video game account security"],
+  "shopping": ["online shopping credit card payment", "ecommerce secure checkout padlock"],
+  "dating": ["online dating app smartphone", "dating profile catfish scam warning"],
+  "job scam": ["fake job listing employment fraud", "suspicious job offer email"],
+  "tax": ["tax return filing computer fraud", "irs scam phone call warning"],
+  "medicare": ["medicare health insurance card fraud", "senior healthcare scam warning"],
+  "car": ["connected car dashboard technology", "vehicle cybersecurity diagnostic port"],
+  "travel": ["travel booking smartphone airport", "airline ticket booking scam warning"],
+};
+
 export function extractSearchQuery(title: string, category: string): string[] {
   const STOP_WORDS = new Set([
     "the", "and", "for", "are", "but", "not", "you", "all", "can", "had",
@@ -193,58 +258,20 @@ export function extractSearchQuery(title: string, category: string): string[] {
     "also", "made", "many", "before", "must", "through", "back", "should",
     "where", "much", "every", "same", "being", "here", "does", "puts",
     "keep", "gets", "says", "come", "look", "find", "ways", "next",
+    "guide", "complete", "what", "need", "right", "best", "tips", "protect",
+    "prevent", "safe", "secure", "avoid", "stop", "learn", "important",
   ]);
-
-  const CYBER_VISUAL_MAP: Record<string, string> = {
-    "hack": "hacker computer dark room",
-    "breach": "data breach cybersecurity",
-    "ransomware": "ransomware attack locked computer",
-    "phishing": "phishing email suspicious message",
-    "malware": "malware virus computer code",
-    "scam": "online scam fraud warning",
-    "password": "password security login screen",
-    "vpn": "vpn secure connection network",
-    "encryption": "encryption padlock digital security",
-    "privacy": "digital privacy surveillance camera",
-    "identity": "identity theft stolen data",
-    "android": "android smartphone mobile security",
-    "iphone": "iphone smartphone mobile device",
-    "apple": "apple device technology",
-    "google": "google technology company office",
-    "microsoft": "microsoft windows computer",
-    "facebook": "social media privacy data",
-    "ai": "artificial intelligence technology robot",
-    "deepfake": "deepfake artificial intelligence face",
-    "spyware": "spyware surveillance monitoring",
-    "trojan": "trojan virus cybersecurity",
-    "zero-day": "zero day exploit vulnerability code",
-    "supply chain": "supply chain software development",
-    "cloud": "cloud computing server data center",
-    "router": "wifi router network security",
-    "smart home": "smart home iot devices",
-    "children": "children internet safety family",
-    "family": "family using technology together",
-    "bank": "online banking financial security",
-    "crypto": "cryptocurrency bitcoin digital finance",
-    "telegram": "messaging app encrypted communication",
-    "chrome": "google chrome web browser",
-    "firefox": "web browser internet security",
-    "windows": "windows computer desktop security",
-    "linux": "linux server technology",
-    "quantum": "quantum computing technology",
-    "surveillance": "surveillance camera security monitoring",
-    "data": "data center server technology",
-    "exploit": "cybersecurity exploit code terminal",
-    "vulnerability": "software vulnerability bug code",
-    "patch": "software update security patch",
-  };
 
   const lowerTitle = title.toLowerCase();
 
-  for (const [keyword, visualQuery] of Object.entries(CYBER_VISUAL_MAP)) {
+  const matchedQueries: string[] = [];
+  for (const [keyword, visualQueries] of Object.entries(CYBER_VISUAL_MAP)) {
     if (lowerTitle.includes(keyword)) {
-      return [visualQuery];
+      matchedQueries.push(...visualQueries);
     }
+  }
+  if (matchedQueries.length > 0) {
+    return matchedQueries;
   }
 
   const words = lowerTitle
@@ -253,11 +280,11 @@ export function extractSearchQuery(title: string, category: string): string[] {
     .filter(w => w.length > 3 && !STOP_WORDS.has(w));
 
   if (words.length >= 2) {
-    return [words.slice(0, 3).join(" ") + " technology"];
+    return [words.slice(0, 3).join(" ") + " cybersecurity", words.slice(0, 2).join(" ") + " technology"];
   }
 
   const searchTerms = TOPIC_SEARCH_TERMS[category] || TOPIC_SEARCH_TERMS["default"];
-  return [searchTerms[Math.floor(Math.random() * searchTerms.length)]];
+  return searchTerms;
 }
 
 async function searchUnsplashPhoto(query: string): Promise<{ url: string; photographer: string } | null> {
@@ -407,15 +434,70 @@ async function searchPexelsPhoto(query: string, category: string): Promise<{ url
   }
 }
 
-export async function searchStockPhoto(category: string, title: string): Promise<{ url: string; photographer: string; localPath?: string } | null> {
+async function generateAISearchQuery(title: string, category: string): Promise<string | null> {
+  try {
+    const apiKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY;
+    const baseURL = process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL;
+    if (!apiKey || !baseURL) return null;
+
+    const Anthropic = (await import("@anthropic-ai/sdk")).default;
+    const client = new Anthropic({ apiKey, baseURL });
+
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-5",
+      max_tokens: 60,
+      messages: [{
+        role: "user",
+        content: `Generate a 3-5 word stock photo search query for this cybersecurity article title. The query should describe a VISUAL SCENE that relates to the topic — what a photographer would actually photograph. Return ONLY the search query, nothing else.
+
+Title: "${title}"
+Category: ${category}
+
+Examples of good queries:
+- "person typing laptop dark office" for hacking articles
+- "family looking at tablet together" for family safety articles  
+- "phone screen suspicious text message" for SMS scam articles
+- "credit card online payment security" for financial fraud articles`,
+      }],
+    });
+
+    const text = response.content.find((b: any) => b.type === "text");
+    const query = text?.text?.trim().replace(/['"]/g, "");
+    if (query && query.split(/\s+/).length <= 8) {
+      console.log(`[StockPhoto] AI-generated search query: "${query}" (for: "${title.slice(0, 50)}")`);
+      return query;
+    }
+    return null;
+  } catch (error: any) {
+    console.warn(`[StockPhoto] AI query generation failed: ${error.message}`);
+    return null;
+  }
+}
+
+export async function searchStockPhoto(category: string, title: string, options?: { platform?: string }): Promise<{ url: string; photographer: string; localPath?: string } | null> {
   const queries = extractSearchQuery(title, category);
-  const query = queries[0];
 
-  const unsplashResult = await searchUnsplashPhoto(query);
-  if (unsplashResult) return unsplashResult;
+  for (const query of queries) {
+    const unsplashResult = await searchUnsplashPhoto(query);
+    if (unsplashResult) return unsplashResult;
 
-  const pexelsResult = await searchPexelsPhoto(query, category);
-  if (pexelsResult) return pexelsResult;
+    const pexelsResult = await searchPexelsPhoto(query, category);
+    if (pexelsResult) return pexelsResult;
+  }
+
+  const aiQuery = await generateAISearchQuery(title, category);
+  if (aiQuery) {
+    const unsplashResult = await searchUnsplashPhoto(aiQuery);
+    if (unsplashResult) return unsplashResult;
+
+    const pexelsResult = await searchPexelsPhoto(aiQuery, category);
+    if (pexelsResult) return pexelsResult;
+  }
+
+  if (options?.platform === "instagram") {
+    console.log(`[StockPhoto] No relevant stock photos found for Instagram post "${title}". Will use branded card instead.`);
+    return null;
+  }
 
   console.log(`[StockPhoto] No stock photos found from Unsplash or Pexels, trying local...`);
   await ensureLocalStockPhotos();

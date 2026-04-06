@@ -336,7 +336,7 @@ async function generateImageForPost(title: string, contentType: string, platform
     const subtext = "getcyberright.com";
     const dims = platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
 
-    const stockPhoto = await searchStockPhoto(searchCategory, title);
+    const stockPhoto = await searchStockPhoto(searchCategory, title, { platform });
     if (stockPhoto) {
       const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, title);
       if (imgPath) {
@@ -350,7 +350,7 @@ async function generateImageForPost(title: string, contentType: string, platform
 
     const imagePath = await generateBrandedImage(title, contentType, platform);
     if (imagePath) {
-      console.log(`[SocialDistribution] Fallback SVG card for ${platform}`);
+      console.log(`[SocialDistribution] ${platform === "instagram" ? "Branded card" : "Fallback SVG card"} for ${platform}`);
     }
     return imagePath;
   } catch (error: any) {

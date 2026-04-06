@@ -1355,7 +1355,7 @@ async function resolvePostImage(
     console.warn(`[TrendEngine] og:image not available`);
   }
 
-  const stockPhoto = await searchStockPhoto(category || "default", title);
+  const stockPhoto = await searchStockPhoto(category || "default", title, { platform: "instagram" });
   if (stockPhoto) {
     const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, title);
     if (imgPath) {
