@@ -17,11 +17,6 @@ export function getPublicImageUrl(localImagePath: string): string | null {
     return `${cleanBase}/api/social-images/${filename}`;
   }
 
-  if (process.env.REPLIT_DOMAINS) {
-    const domain = process.env.REPLIT_DOMAINS.split(",")[0];
-    return `https://${domain}/api/social-images/${filename}`;
-  }
-
   return `https://www.getcyberright.com/api/social-images/${filename}`;
 }
 
@@ -268,11 +263,20 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     try { return isOldSvgCard(new URL(url).pathname); } catch { return false; }
   };
 
+  const isNonServablePath = (imgPath: string) => {
+    if (isRemoteUrl(imgPath)) return false;
+    const normalized = path.resolve(imgPath);
+    const socialImagesDir = path.resolve(process.cwd(), ".local", "social-images");
+    const distSocialImagesDir = path.resolve(process.cwd(), "dist", "social-images");
+    return !normalized.startsWith(socialImagesDir) && !normalized.startsWith(distSocialImagesDir);
+  };
+
   const needsStockPhotoUpgrade =
     !post.imageUrl ||
     (isRemoteUrl(post.imageUrl) && isOldSvgRemote(post.imageUrl)) ||
     (!isRemoteUrl(post.imageUrl) && isOldSvgCard(post.imageUrl)) ||
-    (!isRemoteUrl(post.imageUrl) && !fs.existsSync(post.imageUrl));
+    (!isRemoteUrl(post.imageUrl) && !fs.existsSync(post.imageUrl)) ||
+    (!isRemoteUrl(post.imageUrl) && isNonServablePath(post.imageUrl));
 
   if (post.imageUrl && !needsStockPhotoUpgrade) {
     if (isRemoteUrl(post.imageUrl)) {
