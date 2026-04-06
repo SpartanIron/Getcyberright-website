@@ -2005,6 +2005,10 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     if (channels.instagram && allowedPlatforms.includes("instagram") && (!platformFilter || platformFilter === "instagram")) platformPosts.push({ platform: "instagram", content: validatedInstagram, image: igImageUrl || imageUrl });
 
     for (const { platform, content, image } of platformPosts) {
+      if (platform === "instagram" && !image) {
+        console.warn(`[TrendEngine] Skipping Instagram reactive post "${posts.title}" — Instagram requires an image`);
+        continue;
+      }
       try {
         const { buildCampaignId } = await import("./utmTracking");
         const socialPost: InsertSocialPost = {
@@ -2033,15 +2037,19 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
         });
 
         if (!bufferResult.success && image && bufferResult.error?.toLowerCase().includes("image")) {
-          console.warn(`[TrendEngine] Image rejected for ${platform}: ${bufferResult.error}. Retrying without image...`);
-          bufferResult = await publishWithFirstComment(channel.id, content, {
-            mode: "shareNow",
-            platform,
-            sourceArticleUrl: posts.sourceArticleUrl,
-          });
-          if (bufferResult.success) {
-            console.log(`[TrendEngine] Retry without image succeeded for ${platform}`);
-            await storage.updateSocialPost(created.id, { imageUrl: null });
+          if (platform === "instagram") {
+            console.error(`[TrendEngine] Image rejected by Instagram: ${bufferResult.error}. Cannot retry without image.`);
+          } else {
+            console.warn(`[TrendEngine] Image rejected for ${platform}: ${bufferResult.error}. Retrying without image...`);
+            bufferResult = await publishWithFirstComment(channel.id, content, {
+              mode: "shareNow",
+              platform,
+              sourceArticleUrl: posts.sourceArticleUrl,
+            });
+            if (bufferResult.success) {
+              console.log(`[TrendEngine] Retry without image succeeded for ${platform}`);
+              await storage.updateSocialPost(created.id, { imageUrl: null });
+            }
           }
         }
 

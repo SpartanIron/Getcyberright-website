@@ -331,6 +331,11 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     }
   }
 
+  if (post.platform === "instagram" && !imageUrl) {
+    console.warn(`[Buffer] Instagram requires an image — skipping post "${post.contentTitle}" (${postId}), keeping as draft for retry`);
+    return { success: false, platform: post.platform, error: "Instagram requires an image. Post kept as draft for retry." };
+  }
+
   const policyResult = enforcePostPolicy(post.postContent, post.platform);
   const safeContent = policyResult.content;
 
@@ -342,13 +347,17 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
   });
 
   if (!result.success && imageUrl && result.error?.toLowerCase().includes("image")) {
-    console.warn(`[Buffer] Image rejected for ${post.platform} post ${postId}: ${result.error}. Retrying without image...`);
-    result = await createBufferPost(channel.id, safeContent, {
-      mode: publishMode,
-      platform: post.platform,
-    });
-    if (result.success) {
-      console.log(`[Buffer] Retry without image succeeded for ${post.platform} post ${postId}`);
+    if (post.platform === "instagram") {
+      console.error(`[Buffer] Image rejected by Instagram for post ${postId}: ${result.error}. Cannot retry without image.`);
+    } else {
+      console.warn(`[Buffer] Image rejected for ${post.platform} post ${postId}: ${result.error}. Retrying without image...`);
+      result = await createBufferPost(channel.id, safeContent, {
+        mode: publishMode,
+        platform: post.platform,
+      });
+      if (result.success) {
+        console.log(`[Buffer] Retry without image succeeded for ${post.platform} post ${postId}`);
+      }
     }
   }
 
