@@ -385,7 +385,7 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
   return result;
 }
 
-const DAILY_POSTS_PER_PLATFORM = 3;
+const DAILY_POSTS_PER_PLATFORM = 2;
 
 async function getTodaysPublishedCountByPlatform(): Promise<Record<string, number>> {
   const counts: Record<string, number> = {};
