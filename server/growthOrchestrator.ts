@@ -453,55 +453,53 @@ async function dailySocialPublish(): Promise<void> {
         `[GrowthOrchestrator] Reactive posts: ${trendResult.published} published (${trendResult.platforms.join(", ") || "none"})`
       );
     } else if (selectedTier === "guide") {
-      if (isWithinAnyPostingWindow()) {
-        const drafts = await storage.getSocialPosts("draft", 50);
-        const guideDrafts = drafts.filter(d =>
-          d.platform !== "alert" &&
-          d.contentType !== "trend_insight" &&
-          d.contentType !== "news_article"
-        );
-        if (guideDrafts.length > 0) {
-          console.log(`[GrowthOrchestrator] Publishing guide-based content (${guideDrafts.length} drafts available)...`);
-          const results = await publishAllDraftsViaBuffer({ tier: "guide" });
-          const succeeded = results.filter(r => r.success).length;
-          console.log(`[GrowthOrchestrator] Guide posts: ${succeeded} published`);
-        } else {
-          console.log(`[GrowthOrchestrator] No guide drafts available. Falling back to reactive...`);
+      const drafts = await storage.getSocialPosts("draft", 50);
+      const guideDrafts = drafts.filter(d =>
+        d.platform !== "alert" &&
+        d.contentType !== "trend_insight" &&
+        d.contentType !== "news_article"
+      );
+      if (guideDrafts.length > 0) {
+        console.log(`[GrowthOrchestrator] Publishing guide-based content (${guideDrafts.length} drafts available)...`);
+        const results = await publishAllDraftsViaBuffer({ tier: "guide" });
+        const succeeded = results.filter(r => r.success).length;
+        console.log(`[GrowthOrchestrator] Guide posts: ${succeeded} published`);
+      } else {
+        console.log(`[GrowthOrchestrator] No guide drafts available. Falling back to reactive...`);
+        if (isWithinAnyPostingWindow()) {
           const trendResult = await generateAndPublishTrendAwarePosts();
           console.log(`[GrowthOrchestrator] Fallback reactive: ${trendResult.published} published`);
+        } else {
+          console.log(`[GrowthOrchestrator] Reactive fallback skipped (outside posting windows)`);
         }
-      } else {
-        console.log("[GrowthOrchestrator] Outside posting windows, skipping guide drain");
       }
     } else {
-      if (isWithinAnyPostingWindow()) {
-        const drafts = await storage.getSocialPosts("draft", 50);
-        const newsDrafts = drafts.filter(d =>
-          d.platform !== "alert" &&
-          d.contentType === "news_article"
-        );
-        if (newsDrafts.length > 0) {
-          console.log(`[GrowthOrchestrator] Publishing news editorial content (${newsDrafts.length} drafts available)...`);
-          const results = await publishAllDraftsViaBuffer({ tier: "news_editorial" });
-          const succeeded = results.filter(r => r.success).length;
-          console.log(`[GrowthOrchestrator] News editorial posts: ${succeeded} published`);
-        } else {
-          console.log(`[GrowthOrchestrator] No news editorial drafts available. Falling back to guide...`);
-          const guideDrafts = (await storage.getSocialPosts("draft", 50)).filter(d =>
-            d.platform !== "alert" && d.contentType !== "trend_insight"
-          );
-          if (guideDrafts.length > 0) {
-            const results = await publishAllDraftsViaBuffer({ tier: "guide" });
-            const succeeded = results.filter(r => r.success).length;
-            console.log(`[GrowthOrchestrator] Fallback guide: ${succeeded} published`);
-          } else {
-            console.log(`[GrowthOrchestrator] No drafts available. Generating reactive...`);
-            const trendResult = await generateAndPublishTrendAwarePosts();
-            console.log(`[GrowthOrchestrator] Fallback reactive: ${trendResult.published} published`);
-          }
-        }
+      const drafts = await storage.getSocialPosts("draft", 50);
+      const newsDrafts = drafts.filter(d =>
+        d.platform !== "alert" &&
+        d.contentType === "news_article"
+      );
+      if (newsDrafts.length > 0) {
+        console.log(`[GrowthOrchestrator] Publishing news editorial content (${newsDrafts.length} drafts available)...`);
+        const results = await publishAllDraftsViaBuffer({ tier: "news_editorial" });
+        const succeeded = results.filter(r => r.success).length;
+        console.log(`[GrowthOrchestrator] News editorial posts: ${succeeded} published`);
       } else {
-        console.log("[GrowthOrchestrator] Outside posting windows, skipping news editorial drain");
+        console.log(`[GrowthOrchestrator] No news editorial drafts available. Falling back to guide...`);
+        const guideDrafts = (await storage.getSocialPosts("draft", 50)).filter(d =>
+          d.platform !== "alert" && d.contentType !== "trend_insight"
+        );
+        if (guideDrafts.length > 0) {
+          const results = await publishAllDraftsViaBuffer({ tier: "guide" });
+          const succeeded = results.filter(r => r.success).length;
+          console.log(`[GrowthOrchestrator] Fallback guide: ${succeeded} published`);
+        } else if (isWithinAnyPostingWindow()) {
+          console.log(`[GrowthOrchestrator] No drafts available. Generating reactive...`);
+          const trendResult = await generateAndPublishTrendAwarePosts();
+          console.log(`[GrowthOrchestrator] Fallback reactive: ${trendResult.published} published`);
+        } else {
+          console.log(`[GrowthOrchestrator] No drafts available, reactive skipped (outside posting windows)`);
+        }
       }
     }
   } catch (error: any) {
