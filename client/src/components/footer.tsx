@@ -1,9 +1,7 @@
-"use client";
-
-import { Mail, Shield, Lock, FileCheck } from "lucide-react";
+import { Shield, Lock, FileCheck } from "lucide-react";
 import { SiLinkedin, SiFacebook, SiYoutube, SiInstagram } from "react-icons/si";
-import { Link } from "@/lib/navigation";
-import logoImage from "@/assets/logo.webp";
+import Link from "next/link";
+import { CookieSettingsButton } from "@/components/cookie-settings-button";
 
 const footerLinks = {
   learning: [
@@ -54,7 +52,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-10">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4" data-testid="footer-link-logo">
-              <img src={logoImage} alt="GetCyberRight" className="w-8 h-8 object-contain" />
+              <img src="/logo.webp" alt="GetCyberRight" className="w-8 h-8 object-contain" />
               <span className="font-semibold text-white">GetCyberRight</span>
             </Link>
             <p className="text-sm leading-relaxed mb-4">
@@ -175,13 +173,7 @@ export function Footer() {
               <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
               <Link href="/support" className="hover:text-slate-300 transition-colors">Support</Link>
               <Link href="/contact" className="hover:text-slate-300 transition-colors">Contact</Link>
-              <button
-                onClick={() => { localStorage.removeItem("gcr_cookie_consent"); window.dispatchEvent(new CustomEvent("cookie-consent-reopen", { detail: null })); }}
-                className="hover:text-slate-300 transition-colors cursor-pointer"
-                data-testid="link-cookie-settings"
-              >
-                Cookie Settings
-              </button>
+              <CookieSettingsButton />
             </div>
           </div>
 

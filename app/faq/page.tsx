@@ -4,6 +4,8 @@ import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDa
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
+import { Navigation } from "@/components/navigation";
+import { Footer } from "@/components/footer";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -127,8 +129,6 @@ const LAST_REVIEWED = "March 2026";
 
 const flatFaqItems = faqCategories.flatMap((cat) => cat.questions);
 
-export const dynamic = "force-static";
-
 export default function FAQPage() {
   const jsonLd = [
     {
@@ -166,6 +166,7 @@ export default function FAQPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
+      <Navigation />
       <main id="main-content" tabIndex={-1} className="min-h-screen bg-background">
         <section className="relative py-16 overflow-hidden">
           <AnimatedCyberBackground />
@@ -242,6 +243,7 @@ export default function FAQPage() {
           </div>
         </section>
       </main>
+      <Footer />
     </>
   );
 }
