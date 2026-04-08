@@ -47,6 +47,14 @@
       "namedRegex": "^/news/(?<nxtPslug>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/report/[shareId]",
+      "regex": "^/report/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPshareId": "nxtPshareId"
+      },
+      "namedRegex": "^/report/(?<nxtPshareId>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/scam-intel/[slug]",
       "regex": "^/scam\\-intel/([^/]+?)(?:/)?$",
       "routeKeys": {
@@ -105,10 +113,22 @@
       "namedRegex": "^/about(?:/)?$"
     },
     {
+      "page": "/accessibility",
+      "regex": "^/accessibility(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/accessibility(?:/)?$"
+    },
+    {
       "page": "/ai-prompts",
       "regex": "^/ai\\-prompts(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/ai\\-prompts(?:/)?$"
+    },
+    {
+      "page": "/ai-safety",
+      "regex": "^/ai\\-safety(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/ai\\-safety(?:/)?$"
     },
     {
       "page": "/alerts",
@@ -117,10 +137,46 @@
       "namedRegex": "^/alerts(?:/)?$"
     },
     {
+      "page": "/awareness-hub",
+      "regex": "^/awareness\\-hub(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/awareness\\-hub(?:/)?$"
+    },
+    {
+      "page": "/breach-dashboard",
+      "regex": "^/breach\\-dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/breach\\-dashboard(?:/)?$"
+    },
+    {
+      "page": "/browser-extension",
+      "regex": "^/browser\\-extension(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/browser\\-extension(?:/)?$"
+    },
+    {
       "page": "/contact",
       "regex": "^/contact(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/contact(?:/)?$"
+    },
+    {
+      "page": "/cyber-hygiene",
+      "regex": "^/cyber\\-hygiene(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/cyber\\-hygiene(?:/)?$"
+    },
+    {
+      "page": "/cyber-threat-radar",
+      "regex": "^/cyber\\-threat\\-radar(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/cyber\\-threat\\-radar(?:/)?$"
+    },
+    {
+      "page": "/data-removal",
+      "regex": "^/data\\-removal(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/data\\-removal(?:/)?$"
     },
     {
       "page": "/educators",
@@ -141,6 +197,12 @@
       "namedRegex": "^/faq(?:/)?$"
     },
     {
+      "page": "/gcr-guard-pricing",
+      "regex": "^/gcr\\-guard\\-pricing(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/gcr\\-guard\\-pricing(?:/)?$"
+    },
+    {
       "page": "/guides",
       "regex": "^/guides(?:/)?$",
       "routeKeys": {},
@@ -159,10 +221,28 @@
       "namedRegex": "^/news(?:/)?$"
     },
     {
+      "page": "/our-mission",
+      "regex": "^/our\\-mission(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/our\\-mission(?:/)?$"
+    },
+    {
+      "page": "/parent-guide",
+      "regex": "^/parent\\-guide(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/parent\\-guide(?:/)?$"
+    },
+    {
       "page": "/parents",
       "regex": "^/parents(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/parents(?:/)?$"
+    },
+    {
+      "page": "/password-generator",
+      "regex": "^/password\\-generator(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/password\\-generator(?:/)?$"
     },
     {
       "page": "/pricing",
@@ -177,10 +257,28 @@
       "namedRegex": "^/privacy(?:/)?$"
     },
     {
+      "page": "/quick-assessment",
+      "regex": "^/quick\\-assessment(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/quick\\-assessment(?:/)?$"
+    },
+    {
+      "page": "/report-scam",
+      "regex": "^/report\\-scam(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/report\\-scam(?:/)?$"
+    },
+    {
       "page": "/resources",
       "regex": "^/resources(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/resources(?:/)?$"
+    },
+    {
+      "page": "/safety-score",
+      "regex": "^/safety\\-score(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/safety\\-score(?:/)?$"
     },
     {
       "page": "/scam-checker",
@@ -193,6 +291,18 @@
       "regex": "^/scam\\-intel(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/scam\\-intel(?:/)?$"
+    },
+    {
+      "page": "/search",
+      "regex": "^/search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/search(?:/)?$"
+    },
+    {
+      "page": "/security",
+      "regex": "^/security(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/security(?:/)?$"
     },
     {
       "page": "/seniors",
@@ -219,6 +329,12 @@
       "namedRegex": "^/terms(?:/)?$"
     },
     {
+      "page": "/threat-trends",
+      "regex": "^/threat\\-trends(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/threat\\-trends(?:/)?$"
+    },
+    {
       "page": "/tools",
       "regex": "^/tools(?:/)?$",
       "routeKeys": {},
@@ -229,6 +345,12 @@
       "regex": "^/training(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/training(?:/)?$"
+    },
+    {
+      "page": "/travel-safety",
+      "regex": "^/travel\\-safety(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/travel\\-safety(?:/)?$"
     }
   ],
   "dataRoutes": [],
