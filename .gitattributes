@@ -1,3 +1,7 @@
 attached_assets/generated_videos/data_s1_exposed.mp4 filter=lfs diff=lfs merge=lfs -text
 attached_assets/generated_videos/hero_s1_threats.mp4 filter=lfs diff=lfs merge=lfs -text
 attached_assets/generated_videos/scam_s2_analysis.mp4 filter=lfs diff=lfs merge=lfs -text
+.next/cache/webpack/client-production/0.pack filter=lfs diff=lfs merge=lfs -text
+.next/cache/webpack/server-production/0.pack filter=lfs diff=lfs merge=lfs -text
+.next/dev/cache/turbopack/8d0f77bf/00000212.sst filter=lfs diff=lfs merge=lfs -text
+.next/dev/cache/turbopack/8d0f77bf/00000213.sst filter=lfs diff=lfs merge=lfs -text

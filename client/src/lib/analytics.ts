@@ -16,7 +16,7 @@ export const initGA = () => {
     return;
   }
 
-  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
   if (!measurementId) {
     console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
     return;
@@ -43,7 +43,7 @@ export const trackPageView = (url: string) => {
   if (!hasAnalyticsConsent()) return;
   if (typeof window === 'undefined' || !window.gtag) return;
 
-  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
   if (!measurementId) return;
 
   window.gtag('config', measurementId, {

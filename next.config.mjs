@@ -1,0 +1,71 @@
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: false,
+
+  allowedDevOrigins: [
+    "924e6b5f-16e9-49c9-929b-489d2a4ca32f-00-bgwqvqdliqo1.kirk.replit.dev",
+    "*.kirk.replit.dev",
+    "*.replit.dev",
+  ],
+
+  webpack: (config) => {
+    config.resolve.alias["@"] = path.resolve(__dirname, "client", "src");
+    config.resolve.alias["@shared"] = path.resolve(__dirname, "shared");
+    config.resolve.alias["@assets"] = path.resolve(__dirname, "attached_assets");
+
+    config.module.rules.push({
+      test: /\.(png|jpg|jpeg|gif|svg|webp|ico|mp4|webm)$/i,
+      type: "asset/resource",
+      include: path.resolve(__dirname, "attached_assets"),
+    });
+
+    return config;
+  },
+
+  serverExternalPackages: [
+    "drizzle-orm",
+    "@neondatabase/serverless",
+    "postgres",
+    "bcrypt",
+    "bcryptjs",
+    "sharp",
+    "winston",
+    "helmet",
+    "express-rate-limit",
+    "express-session",
+    "connect-pg-simple",
+    "stripe",
+    "resend",
+    "openai",
+    "archiver",
+    "multer",
+    "jsdom",
+    "tesseract.js",
+    "speakeasy",
+    "otplib",
+    "jsonwebtoken",
+    "@simplewebauthn/server",
+    "rss-parser",
+  ],
+
+  images: {
+    unoptimized: true,
+  },
+
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
+  env: {
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.VITE_GA_MEASUREMENT_ID || "",
+    NEXT_PUBLIC_RECAPTCHA_SITE_KEY: process.env.VITE_RECAPTCHA_SITE_KEY || "",
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || "",
+  },
+};
+
+export default nextConfig;

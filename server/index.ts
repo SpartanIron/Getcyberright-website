@@ -3,7 +3,6 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import { runMigrations } from "./migrate";
 import { registerRoutes } from "./routes";
-import { serveStatic } from "./static";
 import { createServer } from "http";
 import {
   configureHelmet,
@@ -17,6 +16,8 @@ import {
 } from "./security";
 import { antiScrapingHeaders, botProtection, corsConfig } from "./security/middleware";
 import { setupFonts } from "./fontSetup";
+import next from "next";
+import path from "path";
 
 setupFonts();
 
@@ -200,15 +201,28 @@ app.use((req, res, next) => {
     return res.status(status).json({ error: message });
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (process.env.NODE_ENV === "production") {
-    serveStatic(app);
-  } else {
-    const { setupVite } = await import("./vite");
-    await setupVite(httpServer, app);
-  }
+  const isDev = process.env.NODE_ENV !== "production";
+  const nextApp = next({ dev: isDev, dir: process.cwd() });
+  const nextHandler = nextApp.getRequestHandler();
+  await nextApp.prepare();
+  log(`Next.js initialized in ${isDev ? "development" : "production"} mode`);
+
+  app.use(
+    express.static(path.resolve(process.cwd(), "client/public"), {
+      index: false,
+      maxAge: isDev ? "0" : "1y",
+      immutable: !isDev,
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith(".html")) {
+          res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        }
+      },
+    })
+  );
+
+  app.all("/{*path}", (req, res) => {
+    return nextHandler(req, res);
+  });
 
   const port = parseInt(process.env.PORT || "5000", 10);
 

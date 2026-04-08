@@ -241,12 +241,13 @@ function App() {
   useEffect(() => {
     setIsClient(true);
 
-    if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
+    const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || (typeof globalThis !== "undefined" && (globalThis as any).__VITE_ENV__?.GA_MEASUREMENT_ID) || "";
+    if (gaMeasurementId) {
       initGA();
     }
 
     const handleConsentUpdate = () => {
-      if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
+      if (gaMeasurementId) {
         initGA();
       }
     };
@@ -254,7 +255,7 @@ function App() {
     return () => window.removeEventListener("cookie-consent-updated", handleConsentUpdate);
   }, []);
 
-  const recaptchaSiteKey = (!isServer && import.meta.env.VITE_RECAPTCHA_SITE_KEY) || "";
+  const recaptchaSiteKey = (!isServer && (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "")) || "";
 
   const appContent = (
     <ThemeProvider>
