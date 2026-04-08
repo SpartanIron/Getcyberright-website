@@ -1351,7 +1351,7 @@ export default function Kids() {
           title="Kids Digital Safety Hub"
           subtitle="Fun, interactive lessons to help young people stay safe online. Choose your age group and start learning today."
           colorVariant="teal"
-          imageSrc={kidsBannerImage}
+          imageSrc={imgSrc(kidsBannerImage)}
           imageAlt="Children learning about internet safety on computers"
         />
 

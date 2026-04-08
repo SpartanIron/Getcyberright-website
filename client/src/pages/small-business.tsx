@@ -451,7 +451,7 @@ export default function SmallBusiness() {
         <PageBanner
           title="Protect Your Business"
           subtitle="Practical, cost-effective security guidance designed for small businesses. Build resilience against cyber threats without breaking your budget."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Small business team working on cybersecurity"
           colorVariant="slate"
         />

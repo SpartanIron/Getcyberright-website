@@ -496,7 +496,7 @@ export default function Educators() {
             <PageBanner
               title="Teach Digital Safety"
               subtitle="Classroom resources, lesson plans, and activities to help students become responsible digital citizens and stay safe online."
-              imageSrc={bannerImage}
+              imageSrc={imgSrc(bannerImage)}
               imageAlt="Classroom teaching cybersecurity education"
               colorVariant="indigo"
             />

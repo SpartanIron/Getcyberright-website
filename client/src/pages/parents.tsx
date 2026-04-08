@@ -611,7 +611,7 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
       <PageBanner
         title="Protect Your Family Online"
         subtitle="Step-by-step guides, interactive tools, scenario quizzes, and region-specific resources. Built for parents who want clear answers, not tech jargon."
-        imageSrc={bannerImage}
+        imageSrc={imgSrc(bannerImage)}
         imageAlt="Family learning about digital safety together"
         colorVariant="blue"
       />

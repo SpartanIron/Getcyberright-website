@@ -794,7 +794,7 @@ function SeniorsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
       <PageBanner
         title="Stay Safe and Connected Online"
         subtitle="Practical guidance to protect yourself from scams and fraud. Learn to recognize warning signs and take simple steps to stay secure."
-        imageSrc={bannerImage}
+        imageSrc={imgSrc(bannerImage)}
         imageAlt="Seniors using technology safely"
         colorVariant="teal"
       />
@@ -1206,7 +1206,7 @@ export default function Seniors() {
                 <PageBanner
                   title="Stay Safe and Connected Online"
                   subtitle="Practical guidance to protect yourself from scams and fraud. Learn to recognize warning signs and take simple steps to stay secure."
-                  imageSrc={bannerImage}
+                  imageSrc={imgSrc(bannerImage)}
                   imageAlt="Seniors using technology safely"
                   colorVariant="teal"
                 />
