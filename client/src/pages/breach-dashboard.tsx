@@ -25,7 +25,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useSEO } from "@/hooks/use-seo";
 
 interface MonitoringStatus {
   subscribed: boolean;
@@ -56,11 +55,6 @@ function getSeverityColor(severity: string | null) {
 }
 
 export default function BreachDashboard() {
-  useSEO({
-    title: "Family Breach Dashboard - GetCyberRight",
-    description: "Monitor your family's email addresses for data breaches and get alerted when your data is exposed."
-  });
-
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   

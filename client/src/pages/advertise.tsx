@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Building2, Users, Target, Shield, Heart, CheckCircle, Globe, TrendingUp, Mail, Loader2, Handshake, BookOpen, Lock, ArrowRight, Eye } from "lucide-react";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
-import { useSEO } from "@/hooks/use-seo";
 import { FadeIn } from "@/components/fade-in";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -177,12 +176,6 @@ export default function Advertise() {
  }
  submitInquiry.mutate(formData);
  };
-
- useSEO({
- title: "Partner With Us | GetCyberRight",
- description: "Join GetCyberRight as a trusted partner. Reach safety-conscious families through mission-aligned sponsorship \u2014 no programmatic ads, no data sharing.",
- keywords: "cybersecurity partnership, family safety sponsorship, trusted partner program, mission-aligned sponsorship"
- });
 
  return (
  <div className="min-h-screen bg-background">

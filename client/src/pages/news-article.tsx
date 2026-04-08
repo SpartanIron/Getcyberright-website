@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useRoute, Link } from "@/lib/navigation";
-import { useSEO } from "@/hooks/use-seo";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,11 +76,6 @@ export default function NewsArticlePage() {
  return data.articles || [];
  },
  enabled: !!(error || (!isLoading && !article)),
- });
-
- useSEO({
- title: article ? `${article.title} | GetCyberRight News` : "News | GetCyberRight",
- description: article?.excerpt || "Cybersecurity news simplified for families",
  });
 
  if (isLoading) {

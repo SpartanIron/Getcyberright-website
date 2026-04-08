@@ -1,6 +1,5 @@
 "use client";
 
-import { useSEO } from "@/hooks/use-seo";
 import { ScamChecker } from "@/components/scam-checker";
 import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { ShareCallToAction } from "@/components/social-share";
@@ -26,12 +25,6 @@ interface ScamTrend {
 }
 
 export default function ScamCheckerPage() {
-  useSEO({
-    title: "GCR Scam Guard: Verify Links & Messages | GetCyberRight",
-    description: "Scam detection tool with free manual scanning. Check suspicious links, phone numbers, and messages instantly. Protect your family from fraud.",
-    keywords: "scam checker, fraud detection, phishing detector, link checker, URL scanner, is it a scam, verify message, free scam checker"
-  });
-
   const { toast } = useToast();
   const [extensionEmail, setExtensionEmail] = useState("");
   const [formTimestamp, setFormTimestamp] = useState<number>(0);

@@ -1,6 +1,5 @@
 "use client";
 
-import { useSEO } from "@/hooks/use-seo";
 import { FadeIn } from "@/components/fade-in";
 import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Link } from "@/lib/navigation";
@@ -189,12 +188,6 @@ const embassyContacts: Record<string, { country: string; embassy: string; phone:
 };
 
 export default function TravelSafety() {
- useSEO({
- title: "Travel Safety Checklist - GetCyberRight",
- description: "Prepare for safe travels with our pre-trip cybersecurity checklist. Protect your devices, accounts, and personal data while traveling abroad.",
- keywords: "travel safety, cybersecurity travel, tourist scams, travel checklist, embassy contacts, ATM skimmer, fake wifi, travel security"
- });
-
  const [selectedRegion, setSelectedRegion] = useState<string>("");
  const [selectedCountry, setSelectedCountry] = useState<string>("");
  const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());

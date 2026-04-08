@@ -13,16 +13,9 @@ import { Mail, Bell, Shield, Check, Loader2, Globe, AlertTriangle } from "lucide
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { useSEO } from "@/hooks/use-seo";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function PreferencesPage() {
-  useSEO({
-    title: "Manage Your Subscription Preferences | GetCyberRight",
-    description: "Control how often you receive cyber safety tips and weekly fraud alerts from GetCyberRight.",
-    keywords: "subscription preferences, email settings, cyber safety tips, fraud alerts"
-  });
-
   const [email, setEmail] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [frequency, setFrequency] = useState<"daily" | "thrice_weekly" | "weekly">("daily");

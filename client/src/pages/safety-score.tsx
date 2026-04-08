@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSEO } from "@/hooks/use-seo";
 import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -140,12 +139,6 @@ export default function SafetyScore() {
   const [emailInput, setEmailInput] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-
-  useSEO({
-    title: "Family Safety Score - GetCyberRight",
-    description: "Take our free 2-minute quiz to discover your family's cyber safety strengths and get personalized recommendations.",
-    keywords: "cyber safety quiz, security assessment, online safety score, family protection"
-  });
 
   const totalScore = Object.values(answers).reduce((a, b) => a + b, 0);
   const maxScore = questions.length * 3;

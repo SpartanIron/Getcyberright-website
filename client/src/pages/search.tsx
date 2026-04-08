@@ -18,7 +18,6 @@ import {
  ExternalLink,
  Calendar
 } from "lucide-react";
-import { useSEO } from "@/hooks/use-seo";
 
 interface SearchResult {
  title: string;
@@ -46,11 +45,6 @@ export default function SearchPage() {
  const initialQuery = searchParams.get("q") || "";
  const [searchQuery, setSearchQuery] = useState(initialQuery);
  const [submittedQuery, setSubmittedQuery] = useState(initialQuery);
-
- useSEO({
- title: submittedQuery ? `Search: ${submittedQuery} - GetCyberRight` : "Search - GetCyberRight",
- description: "Search GetCyberRight for cybersecurity resources, safety guides, news, and tools.",
- });
 
  const { data, isLoading, error } = useQuery<SearchResponse>({
  queryKey: ["/api/search", submittedQuery],

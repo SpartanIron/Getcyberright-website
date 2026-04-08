@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "@/lib/navigation";
-import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -3555,11 +3554,6 @@ export default function AdminPage() {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showPasskeyManagement, setShowPasskeyManagement] = useState(false);
   const [, setLocation] = useLocation();
-
-  useSEO({
-    title: "Admin Dashboard | GetCyberRight",
-    description: "Content management dashboard for GetCyberRight administrators",
-  });
 
   useEffect(() => {
     const savedToken = localStorage.getItem("adminToken");

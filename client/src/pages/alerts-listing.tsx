@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@/lib/navigation";
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -41,12 +40,6 @@ const riskBorder: Record<string, string> = {
 export default function AlertsListing() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  useSEO({
-    title: "Cyber Threat Alerts | GetCyberRight",
-    description: "Stay informed about the latest cybersecurity threats, vulnerabilities, and security advisories. Real-time alerts to keep you and your family safe.",
-    keywords: "cyber threats, security alerts, vulnerability alerts, cybersecurity warnings",
-  });
 
   const breadcrumbs: BreadcrumbData = {
     type: "BreadcrumbList",
