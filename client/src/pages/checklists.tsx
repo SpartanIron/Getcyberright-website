@@ -1,11 +1,10 @@
-"use client";
-
 import { FadeIn } from "@/components/fade-in";
 import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import { PrintableChecklist, securityChecklists } from "@/components/printable-checklist";
+import { PrintableChecklist } from "@/components/printable-checklist";
+import { securityChecklists } from "@/data/security-checklists";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home, User, Users, Briefcase, Shield, CalendarDays } from "lucide-react";
 import { Link } from "@/lib/navigation";

@@ -1,5 +1,3 @@
-"use client";
-
 import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, FAQData, BreadcrumbData } from "@/components/structured-data";
 import { PasswordGenerator } from "@/components/password-generator";

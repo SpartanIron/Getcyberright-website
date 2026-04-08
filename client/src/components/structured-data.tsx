@@ -1,6 +1,4 @@
-"use client";
 
-import { useEffect } from "react";
 
 interface OrganizationData {
   type: "Organization";
@@ -326,36 +324,20 @@ function buildJsonLd(data: StructuredDataInput): object {
   }
 }
 
-const SCRIPT_ID_PREFIX = "structured-data-";
-
 export function StructuredData({ data }: { data: StructuredDataInput | StructuredDataInput[] }) {
-  useEffect(() => {
-    const items = Array.isArray(data) ? data : [data];
-    const scriptIds: string[] = [];
+  const items = Array.isArray(data) ? data : [data];
 
-    items.forEach((item, index) => {
-      const id = `${SCRIPT_ID_PREFIX}${item.type}-${index}`;
-      scriptIds.push(id);
-
-      let script = document.getElementById(id) as HTMLScriptElement | null;
-      if (!script) {
-        script = document.createElement("script");
-        script.id = id;
-        script.type = "application/ld+json";
-        document.head.appendChild(script);
-      }
-      script.textContent = JSON.stringify(buildJsonLd(item));
-    });
-
-    return () => {
-      scriptIds.forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.remove();
-      });
-    };
-  }, [data]);
-
-  return null;
+  return (
+    <>
+      {items.map((item, index) => (
+        <script
+          key={`${item.type}-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(item)) }}
+        />
+      ))}
+    </>
+  );
 }
 
 export type {
