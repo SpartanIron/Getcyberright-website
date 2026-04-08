@@ -36,10 +36,6 @@ const colorThemeMap: Record<string, { bg: string; border: string; text: string }
 };
 
 export default function ThreatIntelligence() {
- title: "Live Threat Intelligence | GetCyberRight",
- description: "Real-time global cyber attack statistics and threat intelligence. Track cybercrime trends and regional attack patterns.",
- keywords: "cyber attack map, threat intelligence, live attacks, cybersecurity monitoring, global threats, cybercrime statistics"
- });
 
  const { data: threatData, isLoading } = useQuery<ThreatData>({
  queryKey: ["/api/threat-stats"],
