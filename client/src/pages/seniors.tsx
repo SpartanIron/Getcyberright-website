@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { FAQData, BreadcrumbData } from "@/components/structured-data";
 import { Link } from "@/lib/navigation";
@@ -1186,7 +1185,6 @@ export default function Seniors() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.seniors} />
       <StructuredData data={[seniorsFaqSchema, seniorsBreadcrumbs]} />
       <Navigation />
       

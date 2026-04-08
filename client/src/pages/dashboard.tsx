@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -153,7 +152,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.dashboard} />
       <Navigation />
 
       <main id="main-content" tabIndex={-1} className="py-8 px-4 sm:px-6 lg:px-8">

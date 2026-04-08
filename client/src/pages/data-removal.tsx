@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import { SEOHead } from "@/components/seo-head";
 import bannerImage from "@/assets/images/tool-data-scan-diverse.webp";
 import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
@@ -328,10 +327,6 @@ export default function DataRemoval() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        title="GCR Data Shield. Removal Center | GetCyberRight"
-        description="Track and manage data broker removal requests. Send opt-out requests to 500+ data broker sites, monitor removal progress, and protect your privacy."
-      />
       <StructuredData data={[dataRemovalApp, dataRemovalBreadcrumbs]} />
       <Navigation />
 

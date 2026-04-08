@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { BreadcrumbData } from "@/components/structured-data";
 import { Button } from "@/components/ui/button";
@@ -175,7 +174,6 @@ function ExperienceWaitlistForm({ type }: { type: "family" | "vendor" }) {
 export default function ExperiencePage() {
  return (
  <div className="min-h-screen bg-white">
- <SEOHead {...pageSEO.experience} />
  <StructuredData data={breadcrumbs} />
  <Navigation />
 

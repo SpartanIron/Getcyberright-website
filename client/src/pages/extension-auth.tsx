@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -50,10 +49,6 @@ export default function ExtensionAuth() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        title="Connect Extension | GetCyberRight"
-        description="Connect your GCR Scam Guard browser extension to your GetCyberRight account."
-      />
       <Navigation />
 
       <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">

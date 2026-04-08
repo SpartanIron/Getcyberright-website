@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { 
  Brain, 
  Shield, 
@@ -269,7 +268,6 @@ export default function AISafety() {
 
  return (
  <div className="min-h-screen bg-background">
- <SEOHead {...pageSEO.aiSafety} />
  <Navigation />
  
  <main id="main-content" tabIndex={-1}>

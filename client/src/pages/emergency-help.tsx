@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { RegionSelector } from "@/components/region-selector";
 import { 
   Phone, 
@@ -765,7 +764,6 @@ export default function EmergencyHelp() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.emergencyHelp} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

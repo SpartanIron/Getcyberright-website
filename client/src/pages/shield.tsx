@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -108,10 +107,6 @@ function ShieldPage() {
 
   return (
     <>
-      <SEOHead
-        title="GCR Data Shield - Check Your Data Exposure | GetCyberRight"
-        description="GCR Data Shield scans data broker sites and breach databases to find your exposed personal information. No account required to get started."
-      />
       <Navigation />
       <main className="min-h-screen bg-background">
         <div className="bg-gradient-to-br from-primary/5 via-background to-orange-50/30 dark:from-primary/10 dark:via-background dark:to-orange-950/10 py-16">

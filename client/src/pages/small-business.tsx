@@ -7,7 +7,6 @@ import { PageBanner } from "@/components/page-banner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { FAQData, BreadcrumbData } from "@/components/structured-data";
 import {
@@ -444,7 +443,6 @@ export default function SmallBusiness() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.smallBusiness} />
       <StructuredData data={[businessFaqSchema, businessBreadcrumbs]} />
       <Navigation />
 

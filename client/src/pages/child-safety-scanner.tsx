@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "@/lib/navigation";
-import { SEOHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -145,7 +144,6 @@ export default function ChildSafetyScannerPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-background dark:from-purple-950/20 dark:to-background">
-      <SEOHead title="Child Safety Conversation Scanner" description="Scan conversations for grooming patterns and online safety risks. Protect children from predatory behavior." />
       <main id="main-content" tabIndex={-1}>
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Button 

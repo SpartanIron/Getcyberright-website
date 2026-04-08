@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Link, useSearch } from "@/lib/navigation";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -312,11 +311,6 @@ export default function ShieldNextSteps() {
 
   return (
     <>
-      <SEOHead
-        title="Your Action Plan | Data Shield | GetCyberRight"
-        description="Your personalized action plan based on your Data Shield scan results. Step-by-step guidance to remove your exposed data and protect against identity theft."
-        canonicalUrl="https://www.getcyberright.com/shield/next-steps"
-      />
       <Navigation />
 
       <main className="min-h-screen bg-background">

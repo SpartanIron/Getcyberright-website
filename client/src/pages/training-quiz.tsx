@@ -5,7 +5,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, Link, useLocation } from "@/lib/navigation";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -272,7 +271,6 @@ export default function TrainingQuiz() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SEOHead title="Training Quiz" description="Test your cybersecurity knowledge with interactive quizzes." />
       <Navigation />
       
       <main id="main-content" className="flex-1" tabIndex={-1}>

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/news";
+import { getLatestNews } from "../lib/data";
 
 const BASE_URL = "https://www.getcyberright.com";
-const API_BASE = `http://localhost:${process.env.PORT || 5000}`;
 
 export const metadata: Metadata = {
   title: "Cybersecurity News & Updates | GetCyberRight",
@@ -28,20 +28,10 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
-async function fetchNews() {
-  try {
-    const res = await fetch(`${API_BASE}/api/news/latest?limit=100`, { next: { revalidate: 3600 } });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
+export const revalidate = 3600;
 
 export default async function NewsPage() {
-  const initialNews = await fetchNews();
+  const initialNews = await getLatestNews(100);
   const jsonLd = [
     {
       "@context": "https://schema.org",

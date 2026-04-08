@@ -4,7 +4,6 @@ import { useState } from "react";
 import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -398,10 +397,6 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead 
-        title="Reset Password | GetCyberRight"
-        description="Reset your GetCyberRight account password securely using email verification."
-      />
       <Navigation />
       
       <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">

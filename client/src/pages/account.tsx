@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -141,10 +140,6 @@ export default function Account() {
 
  return (
  <div className="min-h-screen bg-background">
- <SEOHead
- title="Account Settings | GetCyberRight"
- description="Manage your GetCyberRight account, security settings, and subscriptions."
- />
  <Navigation />
 
  <main id="main-content" tabIndex={-1} className="py-8 px-4 sm:px-6 lg:px-8">

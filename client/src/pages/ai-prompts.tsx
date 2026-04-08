@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -269,7 +268,6 @@ export default function AIPrompts() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.tools} title="AI Prompt Library: Ready-to-Use Templates for Everyday Life | GetCyberRight" description="A free, comprehensive collection of AI prompts for families, seniors, students, and small businesses. Copy, paste, and use with no AI experience required." />
       <Navigation />
 
       <PageBanner

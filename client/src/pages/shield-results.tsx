@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -318,7 +317,6 @@ function ShieldResultsPage() {
   if (loading) {
     return (
       <>
-        <SEOHead title="Loading Results... | GCR Data Shield" />
         <Navigation />
         <main className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center space-y-4">
@@ -335,7 +333,6 @@ function ShieldResultsPage() {
   if (error) {
     return (
       <>
-        <SEOHead title="Scan Error | GCR Data Shield" />
         <Navigation />
         <main className="min-h-screen bg-background flex items-center justify-center">
           <Card className="max-w-md">
@@ -375,10 +372,6 @@ function ShieldResultsPage() {
 
   return (
     <>
-      <SEOHead
-        title={`Your Exposure Results | GCR Data Shield`}
-        description="View your personal data exposure scan results from GCR Data Shield."
-      />
       <Navigation />
       <main className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4 max-w-2xl space-y-6">

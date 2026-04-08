@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, FileText, Search, Filter, Download, ExternalLink, Eye, Copy, Star } from "lucide-react";
 import { Link } from "@/lib/navigation";
 import { useState } from "react";
-import { SEOHead } from "@/components/seo-head";
 
 interface CheatSheet {
   id: string;
@@ -177,12 +176,6 @@ export default function CheatSheets() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        page="cheatSheets"
-        title="Cybersecurity Cheat Sheets | GetCyberRight"
-        description="Download free cybersecurity cheat sheets covering password security, phishing prevention, safe browsing, and more. Quick-reference guides for everyday digital safety."
-        keywords="cybersecurity cheat sheets, security quick reference, phishing cheat sheet, password guide, online safety tips"
-      />
       <section className="py-12 bg-gradient-to-br from-background to-muted/50">
         <div className="container mx-auto px-4">
           <Link href="/resources" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6">

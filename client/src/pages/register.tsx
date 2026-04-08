@@ -4,7 +4,6 @@ import { useState } from "react";
 import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { setupVaultKey } from "@/lib/vaultCrypto";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -200,7 +199,6 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.register} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">

@@ -10,7 +10,6 @@ import { useMutation } from "@tanstack/react-query";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,7 +113,6 @@ export default function ReportScam() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.reportScam} />
       <Navigation />
 
       <main id="main-content" tabIndex={-1}>
