@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -356,6 +357,10 @@ export default function DataRemoval() {
           {isAuthenticated ? <AuthenticatedJourney /> : <GuestScanForm />}
         </div>
       </main>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SignupEncouragementBanner toolName="data-removal" show={true} contextMessage="Create a free account to track your data removal progress" />
+      </div>
 
       <Footer />
     </div>

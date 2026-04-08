@@ -21,7 +21,7 @@ const faqCategories = [
       },
       {
         q: "Is GetCyberRight free?",
-        a: "Our educational content, articles, guides, and core scam checking tools are free to use. We also offer paid subscription plans (Essential and Professional) that unlock advanced features like automatic page scanning, scan history, family profiles, and ongoing data monitoring. We believe foundational cybersecurity education should be accessible to everyone."
+        a: "Everything on GetCyberRight is completely free! All tools, features, and educational resources are available at no cost. Just create a free account to get full access to our scam checking tools, data removal, training courses, and more. We believe cybersecurity education and protection should be accessible to everyone."
       },
       {
         q: "Who creates the content on GetCyberRight?",
@@ -73,7 +73,7 @@ const faqCategories = [
       },
       {
         q: "What does Auto-Protect do?",
-        a: "Auto-Protect automatically scans every page you visit in the background without you having to click anything. If a threat is detected, you get an instant notification. Auto-Protect is available on the Essential plan and above."
+        a: "Auto-Protect automatically scans every page you visit in the background without you having to click anything. If a threat is detected, you get an instant notification. Auto-Protect is available for free with your account."
       },
       {
         q: "What data does the extension collect?",
@@ -90,20 +90,20 @@ const faqCategories = [
     icon: CreditCard,
     questions: [
       {
-        q: "What subscription plans do you offer?",
-        a: "We offer three tiers: Free (manual scans on the website and extension), Essential (adds Auto-Protect for automatic page scanning), and Professional (adds scan history, safety scores, family profiles, and priority support). Visit our GCR Scam Guard Pricing page for current pricing."
+        q: "What features are included?",
+        a: "Every feature on GetCyberRight is free with a registered account. That includes manual and automatic scans, browser extension protection, scan history, safety scores, family profiles, data removal tools, training courses, and more."
       },
       {
-        q: "How do I upgrade or change my plan?",
-        a: "Your subscription is managed through your GetCyberRight account. Contact our support team to change your plan. Your new features will be available immediately after your plan is updated."
+        q: "How do I access all features?",
+        a: "Simply create a free account to unlock full access to every tool and feature on GetCyberRight. There are no paid tiers — everything is free."
       },
       {
-        q: "Can I cancel my subscription?",
-        a: "Yes, you can cancel at any time by contacting our support team. After cancellation, you will retain access to paid features until the end of your current billing period, then revert to the free plan."
+        q: "Will GetCyberRight always be free?",
+        a: "Yes, we are committed to making cybersecurity education and tools accessible to everyone. All features are completely free with a registered account."
       },
       {
-        q: "Is there a family plan?",
-        a: "Our Professional plan includes family profile support, allowing you to manage protection for multiple family members under one account."
+        q: "Is there family support?",
+        a: "Yes! Family profile support is included for free, allowing you to manage protection for multiple family members under one account."
       }
     ]
   },
@@ -129,7 +129,7 @@ const faqCategories = [
       },
       {
         q: "Do you store the information I submit to your tools?",
-        a: "On our servers, scan content is analyzed in real time and not permanently stored for free users. Professional subscribers may have server-side scan history retained for up to 90 days. The browser extension also keeps a local history of your recent scans on your device (stored in your browser, never sent to our servers). See our Privacy Policy for complete details."
+        a: "On our servers, scan content is analyzed in real time and not permanently stored. Registered users may have server-side scan history retained for up to 90 days. The browser extension also keeps a local history of your recent scans on your device (stored in your browser, never sent to our servers). See our Privacy Policy for complete details."
       }
     ]
   },

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FadeIn } from "@/components/fade-in";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -373,6 +374,10 @@ export default function ReportScam() {
           </div>
         </section>
       </main>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SignupEncouragementBanner toolName="report-scam" show={true} contextMessage="Create a free account to track your reported scams" />
+      </div>
 
       <Footer />
     </div>

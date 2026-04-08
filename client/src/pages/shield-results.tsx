@@ -630,8 +630,8 @@ function ShieldResultsPage() {
                                 <p className="text-xs text-muted-foreground">
                                   <Lock className="h-3 w-3 inline mr-1" />
                                   Want us to handle this automatically?{" "}
-                                  <Link href="/data-shield-pricing" className="text-primary hover:underline font-medium">
-                                    Start a free 30-day trial
+                                  <Link href="/register" className="text-primary hover:underline font-medium">
+                                    Create a free account
                                   </Link>
                                   {" "}and we'll submit removal requests on your behalf.
                                 </p>
@@ -653,9 +653,9 @@ function ShieldResultsPage() {
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                      Start a free 30-day trial to see all broker names, get automated removal, and ongoing monitoring.
+                      Create a free account to see all broker names, get automated removal, and ongoing monitoring.
                     </p>
-                    <Link href="/data-shield-pricing">
+                    <Link href="/register">
                       <Button size="sm" className="min-h-[40px]" data-testid="button-see-all-brokers">
                         <Crown className="h-4 w-4 mr-2" />
                         See All {totalFoundBrokers} Sites
@@ -794,29 +794,29 @@ function ShieldResultsPage() {
                       Let us handle the removal
                     </h2>
                     <p className="text-muted-foreground text-sm">
-                      Removing your data from {totalFoundBrokers} site{totalFoundBrokers !== 1 ? "s" : ""} manually takes time. Start a free 30-day trial and we'll submit opt-out requests on your behalf.
+                      Removing your data from {totalFoundBrokers} site{totalFoundBrokers !== 1 ? "s" : ""} manually takes time. Create a free account and we'll submit opt-out requests on your behalf.
                     </p>
                   </div>
                   <div className="text-left space-y-3 text-sm">
                     <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                       <Zap className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-medium">Essential</span>
+                        <span className="font-medium">Automated Removal</span>
                         <p className="text-muted-foreground text-xs mt-0.5">Automated opt-out requests + status tracking + verification re-scan</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                       <Crown className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-medium">Professional</span>
-                        <p className="text-muted-foreground text-xs mt-0.5">Everything in Essential + monthly re-scans + auto re-submission when data reappears + email alerts</p>
+                        <span className="font-medium">Continuous Protection</span>
+                        <p className="text-muted-foreground text-xs mt-0.5">Monthly re-scans + auto re-submission when data reappears + email alerts</p>
                       </div>
                     </div>
                   </div>
-                  <Link href="/data-shield-pricing">
+                  <Link href="/register">
                     <Button className="min-h-[44px] w-full" data-testid="button-view-plans">
                       <Crown className="h-4 w-4 mr-2" />
-                      Start 30-Day Free Trial
+                      Sign Up Free
                     </Button>
                   </Link>
                 </div>
@@ -836,13 +836,13 @@ function ShieldResultsPage() {
                       Want continuous protection?
                     </h2>
                     <p className="text-muted-foreground text-sm">
-                      Data brokers re-add your information every 30-90 days. Try Professional free for 30 days and get monthly re-scans and automatic re-submission.
+                      Data brokers re-add your information every 30-90 days. Sign up for free and get monthly re-scans and automatic re-submission.
                     </p>
                   </div>
-                  <Link href="/data-shield-pricing">
-                    <Button variant="outline" size="sm" className="min-h-[40px]" data-testid="button-upgrade-pro">
+                  <Link href="/register">
+                    <Button variant="outline" size="sm" className="min-h-[40px]" data-testid="button-signup-free">
                       <Crown className="h-4 w-4 mr-2" />
-                      Try Professional Free
+                      Sign Up Free
                     </Button>
                   </Link>
                 </div>

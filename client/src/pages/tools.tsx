@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useSearch } from "@/lib/navigation";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +36,7 @@ import {
 import bannerImage from "@/assets/banners/tools-banner.webp";
 
 const scamGuardTools = [
-  { title: "Browser Extension", description: "12 protection features including notification blocking, search safety badges, redirect detection, and clipboard protection. Install on Chrome, Edge, Brave, or Opera.", href: "/browser-extension", icon: Chrome, badge: "Free + Pro" },
+  { title: "Browser Extension", description: "12 protection features including notification blocking, search safety badges, redirect detection, and clipboard protection. Install on Chrome, Edge, Brave, or Opera.", href: "/browser-extension", icon: Chrome, badge: "Free" },
   { title: "Report a Scam", description: "Spotted a scam? Report it to help protect the entire GetCyberRight community. Your report feeds our threat intelligence.", href: "/report-scam", icon: ShieldAlert },
   { title: "Password Generator", description: "Create strong, unique passwords with customizable length and complexity. Runs entirely in your browser.", icon: Lock, badge: "Free", inline: "password" as const },
   { title: "Voice Deepfake Detector", description: "Upload an audio clip to detect signs of AI-generated voice cloning. Useful for verifying suspicious voicemails or calls.", icon: Radio, badge: "Free", inline: "voice-clone" as const },
@@ -117,7 +118,7 @@ export default function Tools() {
       <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Protection Hub"
-          subtitle="Two products, one mission: keeping your family safe online. Use our free tools to get started, or upgrade for full protection."
+          subtitle="Two products, one mission: keeping your family safe online. All tools and features are completely free with your account."
           imageSrc={bannerImage}
           imageAlt="Modern workspace with laptop displaying security checkmarks and password generator in bright natural light"
           imagePosition="left"
@@ -142,7 +143,7 @@ export default function Tools() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <p className="font-semibold text-base">GCR Scam Guard</p>
-                    <Badge variant="outline" className="text-[10px] border-accent/30 text-accent no-default-hover-elevate no-default-active-elevate">Free + Pro</Badge>
+                    <Badge variant="outline" className="text-[10px] border-accent/30 text-accent no-default-hover-elevate no-default-active-elevate">Free</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">AI scam detection, browser extension, and community protection tools</p>
                 </div>
@@ -163,7 +164,7 @@ export default function Tools() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <p className="font-semibold text-base">GCR Data Shield</p>
-                    <Badge variant="outline" className="text-[10px] border-teal-500/30 text-teal-500 no-default-hover-elevate no-default-active-elevate">Free + Premium</Badge>
+                    <Badge variant="outline" className="text-[10px] border-teal-500/30 text-teal-500 no-default-hover-elevate no-default-active-elevate">Free</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">Personal data removal, breach monitoring, and privacy protection tools</p>
                 </div>
@@ -210,9 +211,9 @@ export default function Tools() {
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-foreground">More Scam Guard Tools</h3>
-                    <Link href="/gcr-guard-pricing">
-                      <Button variant="outline" size="sm" data-testid="link-scam-guard-pricing">
-                        View Plans <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                    <Link href="/register">
+                      <Button variant="outline" size="sm" data-testid="link-scam-guard-signup">
+                        Get Started Free <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                       </Button>
                     </Link>
                   </div>
@@ -292,9 +293,9 @@ export default function Tools() {
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-foreground">All Data Shield Tools</h3>
-                    <Link href="/data-shield-pricing">
-                      <Button variant="outline" size="sm" data-testid="link-data-shield-pricing">
-                        View Plans <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                    <Link href="/register">
+                      <Button variant="outline" size="sm" data-testid="link-data-shield-signup">
+                        Get Started Free <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                       </Button>
                     </Link>
                   </div>
@@ -367,9 +368,9 @@ export default function Tools() {
                   <Shield className="w-8 h-8 text-accent mx-auto mb-3" />
                   <h3 className="font-semibold mb-1.5">Scam Guard</h3>
                   <p className="text-xs text-muted-foreground mb-3">Detects and blocks scams, phishing, and fraud in real time</p>
-                  <Link href="/gcr-guard-pricing">
+                  <Link href="/register">
                     <Button variant="outline" size="sm" className="text-xs" data-testid="button-combo-scam-guard">
-                      From Free
+                      Free Access
                     </Button>
                   </Link>
                 </CardContent>
@@ -381,11 +382,11 @@ export default function Tools() {
                     <span className="text-lg font-bold text-primary">+</span>
                     <ShieldCheck className="w-6 h-6 text-teal-500" />
                   </div>
-                  <h3 className="font-semibold mb-1.5">Bundle & Save</h3>
-                  <p className="text-xs text-muted-foreground mb-3">Both products together at up to 23% off</p>
-                  <Link href="/pricing">
+                  <h3 className="font-semibold mb-1.5">All Tools Included</h3>
+                  <p className="text-xs text-muted-foreground mb-3">Get full access to both products — completely free</p>
+                  <Link href="/register">
                     <Button size="sm" className="text-xs" data-testid="button-combo-bundle">
-                      View Bundles
+                      Sign Up Free
                     </Button>
                   </Link>
                 </CardContent>
@@ -395,9 +396,9 @@ export default function Tools() {
                   <ShieldCheck className="w-8 h-8 text-teal-500 mx-auto mb-3" />
                   <h3 className="font-semibold mb-1.5">Data Shield</h3>
                   <p className="text-xs text-muted-foreground mb-3">Finds and removes your exposed personal data</p>
-                  <Link href="/data-shield-pricing">
+                  <Link href="/register">
                     <Button variant="outline" size="sm" className="text-xs" data-testid="button-combo-data-shield">
-                      From Free
+                      Free Access
                     </Button>
                   </Link>
                 </CardContent>
@@ -425,6 +426,10 @@ export default function Tools() {
           </div>
         </section>
       </main>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SignupEncouragementBanner toolName="tools" show={true} contextMessage="Create a free account for full access to all tools" />
+      </div>
 
       <Footer />
     </div>

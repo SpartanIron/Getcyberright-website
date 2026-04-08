@@ -130,25 +130,25 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(what is getcyberright|about.*(this|your).*(site|website|platform)|what.*(this|your) (site|website))/.test(t),
     responses: [
-      "GetCyberRight is a family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like GCR Scam Guard to analyze suspicious messages, a Password Generator, GCR Data Shield to scan for your exposed personal data, and lots of guides tailored to different family members. Core tools are free to get started, with optional paid plans for advanced protection.",
+      "GetCyberRight is a family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like GCR Scam Guard to analyze suspicious messages, a Password Generator, GCR Data Shield to scan for your exposed personal data, and lots of guides tailored to different family members. All tools and features are completely free — just create an account to get full access.",
     ],
   },
   {
     pattern: (t) => /(how much|pricing|price|cost|how much does)/.test(t) && /(plan|pro|family|subscribe|subscription|bundle)/.test(t),
     responses: [
-      "GetCyberRight has two products you can buy separately or bundled. GCR Scam Guard: Free, Pro $4.99/mo, or Family $7.99/mo. GCR Data Shield: Free scan, Essential $8.99/mo, or Professional $14.99/mo. Bundle deals: Complete Protection (Pro + Essential) $11.99/mo, or Total Protection (Family + Professional) $18.99/mo; save up to 23%. See /pricing for bundles, /gcr-guard-pricing for Scam Guard, or /data-shield-pricing for Data Shield.",
+      "Great news — everything on GetCyberRight is completely free right now! All tools, features, and resources are available at no cost. Just create a free account to get full access to GCR Scam Guard, Data Shield, training courses, and everything else.",
     ],
   },
   {
     pattern: (t) => /(cancel|unsubscribe|stop.*(subscription|paying|plan))/.test(t),
     responses: [
-      "You can cancel anytime from your account dashboard. Your features stay active until the end of your current billing period. If you need any help with that, head over to /contact and send us a message.",
+      "Good news — GetCyberRight is completely free! There's nothing to cancel. If you'd like to delete your account, head to /contact and send us a message.",
     ],
   },
   {
     pattern: (t) => /(payment.*(fail|decline|reject|issue|problem|error|wrong)|card.*(decline|reject|fail|issue|not work)|billing.*(issue|problem|error))/.test(t),
     responses: [
-      "Sorry to hear that. First, check that your card details are current by going to your dashboard and clicking \"Manage Subscription\" to open the Stripe billing portal. If the issue continues, send us a message at /contact with your account email and we'll sort it out.",
+      "GetCyberRight is completely free — there should be no charges. If you're seeing unexpected billing, please contact us at /contact with your account email and we'll sort it out right away.",
     ],
   },
   {
@@ -160,19 +160,19 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(what.*pro|pro.*include|pro.*plan|what.*get.*pro)/.test(t) && !/(family)/.test(t),
     responses: [
-      "The Scam Guard Pro plan at $4.99 per month includes everything in Free, plus automatic page scanning on every site you visit, fake domain detection, suspicious form warnings, link hover safety previews, community trust scores, and Gmail and Outlook email scanning. You can check it out at /gcr-guard-pricing.",
+      "All Scam Guard features are currently free! That includes automatic page scanning on every site you visit, fake domain detection, suspicious form warnings, link hover safety previews, community trust scores, and Gmail and Outlook email scanning. Just create a free account to get started.",
     ],
   },
   {
     pattern: (t) => /(what.*family|family.*include|family.*plan|what.*get.*family)/.test(t),
     responses: [
-      "The Scam Guard Family plan at $7.99 per month includes everything in Pro, plus weekly safety digest reports, full scan history, a personal safety score, and family member profiles so you can keep an eye on safety for your whole household. See the full breakdown at /gcr-guard-pricing.",
+      "All Family features are currently free! That includes weekly safety digest reports, full scan history, a personal safety score, family member profiles, plus everything in the standard plan. Just create a free account to access all of it.",
     ],
   },
   {
     pattern: (t) => /(bundle|both.*product|complete.*protection|total.*protection|scam.*guard.*data.*shield|data.*shield.*scam.*guard)/.test(t),
     responses: [
-      "We offer two bundle plans that combine GCR Scam Guard and GCR Data Shield at a discount. Complete Protection at $11.99 per month includes Scam Guard Pro plus Data Shield Essential. Total Protection at $18.99 per month includes Scam Guard Family plus Data Shield Professional. Both save you money compared to buying each product separately. Annual billing saves even more. Check out the details at /pricing.",
+      "Both GCR Scam Guard and GCR Data Shield are completely free right now — no bundles needed! You get full access to all features across both products. Just create a free account and everything is yours.",
     ],
   },
   {
@@ -258,12 +258,12 @@ function getContextualPrompts(pathname: string): { text: string; icon: typeof Sh
       { text: "Is my personal data at risk?", icon: Shield },
     ];
   }
-  if (pathname.includes("pricing") || pathname.includes("checkout") || pathname.includes("dashboard")) {
+  if (pathname.includes("dashboard")) {
     return [
-      { text: "Tell me about bundle plans", icon: HelpCircle },
-      { text: "What's included in the Pro plan?", icon: HelpCircle },
-      { text: "How do I cancel my subscription?", icon: HelpCircle },
-      { text: "Can I switch between plans?", icon: Shield },
+      { text: "What tools are available?", icon: HelpCircle },
+      { text: "How do I check for scams?", icon: HelpCircle },
+      { text: "How do I protect my family?", icon: Shield },
+      { text: "Show me my safety score", icon: Shield },
     ];
   }
   return [

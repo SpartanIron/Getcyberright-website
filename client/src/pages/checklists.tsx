@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeIn } from "@/components/fade-in";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
@@ -127,6 +128,10 @@ export default function Checklists() {
           </div>
         </section>
       </main>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 print:hidden">
+        <SignupEncouragementBanner toolName="checklists" show={true} contextMessage="Create a free account for full access to all checklists" />
+      </div>
 
       <div className="print:hidden">
         <Footer />

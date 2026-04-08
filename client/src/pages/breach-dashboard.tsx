@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FadeIn } from "@/components/fade-in";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { useLocation } from "@/lib/navigation";
 import { 
   Shield, 
@@ -506,6 +507,9 @@ export default function BreachDashboard() {
             </p>
           </div>
         </FadeIn>
+        <div className="max-w-4xl mx-auto mt-8">
+          <SignupEncouragementBanner toolName="breach-dashboard" show={true} contextMessage="Create a free account for full breach monitoring" />
+        </div>
       </div>
     </div>
   );

@@ -133,7 +133,7 @@ function CreateAliasDialog({ onCreated }: { onCreated: () => void }) {
       if (msg.includes("Alias limit")) {
         toast({
           title: "Limit reached",
-          description: "Upgrade your plan to create more masked identities.",
+          description: "You've reached your current identity limit. Create a free account for more.",
           variant: "destructive",
         });
       } else {
@@ -537,12 +537,12 @@ export function IdentityShieldPanel() {
                 You have reached your {stats.tier} plan limit of {stats.limit} identities.
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Upgrade your Data Shield plan to create more masked identities.
+                Create a free account for additional masked identities.
               </p>
             </div>
-            <Link href="/data-shield-pricing">
-              <Button size="sm" variant="outline" data-testid="button-upgrade">
-                Upgrade
+            <Link href="/register">
+              <Button size="sm" variant="outline" data-testid="button-signup-free">
+                Sign Up Free
               </Button>
             </Link>
           </CardContent>

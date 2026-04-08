@@ -294,7 +294,7 @@ export default function Contact() {
                       </h3>
                       <p className="text-sm text-muted-foreground">
                         Yes! Our core tools and educational resources are free to use. 
-                        We also offer premium features for those who want additional support.
+                        All tools and features are completely free with a registered account.
                       </p>
                     </div>
                     

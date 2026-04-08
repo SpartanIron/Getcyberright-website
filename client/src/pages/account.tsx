@@ -332,13 +332,6 @@ export default function Account() {
  <Badge className={tierBadgeStyles[sgTier]}>
  <Crown className="w-3 h-3 mr-1" /> {tierLabels[sgTier]}
  </Badge>
- {sgTier === "free" && (
- <Link href="/gcr-guard-pricing">
- <Button size="sm" variant="outline" data-testid="link-upgrade-sg">
- Upgrade <ArrowRight className="w-3 h-3 ml-1" />
- </Button>
- </Link>
- )}
  </div>
  </div>
 
@@ -358,25 +351,9 @@ export default function Account() {
  <Badge className={tierBadgeStyles[dsTier]}>
  <Crown className="w-3 h-3 mr-1" /> {tierLabels[dsTier]}
  </Badge>
- {dsTier === "free" && (
- <Link href="/data-shield-pricing">
- <Button size="sm" variant="outline" data-testid="link-upgrade-ds">
- Upgrade <ArrowRight className="w-3 h-3 ml-1" />
- </Button>
- </Link>
- )}
  </div>
  </div>
 
- {(sgTier === "free" && dsTier === "free") && (
- <div className="text-center pt-2">
- <Link href="/pricing">
- <Button variant="link" className="text-sm" data-testid="link-view-bundles">
- View Bundle Deals — Save up to 40%
- </Button>
- </Link>
- </div>
- )}
  </CardContent>
  </Card>
  </FadeIn>

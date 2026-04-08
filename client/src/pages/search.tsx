@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useLocation, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { FadeIn } from "@/components/fade-in";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -284,6 +285,9 @@ export default function SearchPage() {
  )}
  </div>
  </section>
+ <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+   <SignupEncouragementBanner toolName="search" show={true} contextMessage="Create a free account for full access to all tools" />
+ </div>
  </div>
  );
 }

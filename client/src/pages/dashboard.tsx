@@ -346,14 +346,6 @@ export default function Dashboard() {
                       <Lock className="w-4 h-4 text-muted-foreground" />
                     )}
                   </div>
-                  {sgTier === "free" && (
-                    <Link href="/gcr-guard-pricing">
-                      <Button size="sm" className="w-full mt-2" data-testid="button-upgrade-scamguard">
-                        Upgrade Scam Guard
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </Link>
-                  )}
                 </div>
               </CardContent>
             </Card>
@@ -426,14 +418,6 @@ export default function Dashboard() {
                     </span>
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
                   </div>
-                  {dsTier === "free" && (
-                    <Link href="/data-shield-pricing">
-                      <Button size="sm" className="w-full mt-2" data-testid="button-upgrade-datashield">
-                        Upgrade Data Shield
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </Link>
-                  )}
                 </div>
               </CardContent>
             </Card>
@@ -520,14 +504,14 @@ export default function Dashboard() {
                       <TrendingUp className="w-6 h-6 text-primary" />
                     </div>
                     <div className="flex-1 text-center sm:text-left">
-                      <h3 className="text-lg font-bold text-foreground">Get complete protection</h3>
+                      <h3 className="text-lg font-bold text-foreground">You have full access</h3>
                       <p className="text-sm text-muted-foreground">
-                        Bundle Scam Guard + Data Shield and save up to 40%. Protect your entire digital life.
+                        All Scam Guard and Data Shield features are included free with your account. Explore all tools.
                       </p>
                     </div>
-                    <Link href="/pricing">
-                      <Button data-testid="button-view-bundles">
-                        View Bundle Deals
+                    <Link href="/tools">
+                      <Button data-testid="button-explore-tools">
+                        Explore All Tools
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </Link>

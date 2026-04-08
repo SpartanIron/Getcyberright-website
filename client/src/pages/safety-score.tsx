@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSEO } from "@/hooks/use-seo";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -439,6 +440,7 @@ export default function SafetyScore() {
             </motion.div>
           )}
         </div>
+        <SignupEncouragementBanner toolName="safety-score" show={true} contextMessage="Create a free account to save your safety score" />
       </div>
     </div>
   );

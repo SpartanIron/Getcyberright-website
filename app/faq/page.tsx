@@ -35,7 +35,7 @@ const faqCategories = [
     iconKey: "shield" as const,
     questions: [
       { q: "What is GetCyberRight?", a: "GetCyberRight is a mission-driven platform dedicated to family cyber safety. We provide educational resources, tools, and guidance to help families navigate the online world safely. Our content is designed for everyone, from children learning about social media to seniors protecting themselves from scams." },
-      { q: "Is GetCyberRight free?", a: "Our educational content, articles, guides, and core scam checking tools are free to use. We also offer paid subscription plans (Essential and Professional) that unlock advanced features like automatic page scanning, scan history, family profiles, and ongoing data monitoring. We believe foundational cybersecurity education should be accessible to everyone." },
+      { q: "Is GetCyberRight free?", a: "Everything on GetCyberRight is completely free! All tools, features, and educational resources are available at no cost. Just create a free account to get full access to our scam checking tools, data removal, training courses, and more. We believe cybersecurity education and protection should be accessible to everyone." },
       { q: "Who creates the content on GetCyberRight?", a: "Our content is created by online safety professionals and educators who specialize in making complex topics accessible to everyday families. We reference authoritative sources from law enforcement and security agencies worldwide to ensure accuracy." },
       { q: "How is GetCyberRight different from other cybersecurity sites?", a: "We focus specifically on families and use plain language instead of technical jargon. Our content is tailored for different audiences including youth, seniors, parents, and travelers. We also provide region-specific guidance for users around the world." },
     ],
@@ -55,21 +55,21 @@ const faqCategories = [
     iconKey: "chrome" as const,
     questions: [
       { q: "What is GCR Scam Guard?", a: "GCR Scam Guard is our Chrome browser extension that protects you from scams in real time as you browse. It can automatically scan pages for threats, detect fake websites, and warn you before you interact with suspicious content." },
-      { q: "How do I install and set up GCR Scam Guard?", a: "Install GCR Scam Guard from the Chrome Web Store. Then visit getcyberright.com, log into your account, go to the Extension Auth page to generate a connection token, and paste it into the extension's Settings. This links the extension to your account and subscription." },
-      { q: "What features are available on the free plan?", a: "Free users can manually scan any page by right-clicking and selecting 'Scan with GCR Scam Guard' or clicking the extension icon. You get full AI-powered threat analysis on every manual scan at no cost." },
-      { q: "What does Auto-Protect do?", a: "Auto-Protect automatically scans every page you visit in the background without you having to click anything. If a threat is detected, you get an instant notification. Auto-Protect is available on the Essential plan and above." },
+      { q: "How do I install and set up GCR Scam Guard?", a: "Install GCR Scam Guard from the Chrome Web Store. Then visit getcyberright.com, log into your account, go to the Extension Auth page to generate a connection token, and paste it into the extension's Settings. This links the extension to your account." },
+      { q: "What features are available?", a: "All features are free! You can manually scan any page by right-clicking and selecting 'Scan with GCR Scam Guard' or clicking the extension icon. Auto-Protect, notification blocking, search safety badges, and all other features are included at no cost." },
+      { q: "What does Auto-Protect do?", a: "Auto-Protect automatically scans every page you visit in the background without you having to click anything. If a threat is detected, you get an instant notification. Auto-Protect is available for free with your account." },
       { q: "What data does the extension collect?", a: "The extension sends page URLs and a summary of page content to our servers for threat analysis. It does not collect your browsing history, passwords, or form data. Your settings are stored locally in your browser. See our Privacy Policy for full details." },
       { q: "How do I disconnect the extension from my account?", a: "You can revoke your extension token at any time from your account settings on getcyberright.com. You can also uninstall the extension from Chrome at any time." },
     ],
   },
   {
-    title: "Subscriptions and Pricing",
+    title: "Access and Features",
     iconKey: "creditcard" as const,
     questions: [
-      { q: "What subscription plans do you offer?", a: "We offer three tiers: Free (manual scans on the website and extension), Essential (adds Auto-Protect for automatic page scanning), and Professional (adds scan history, safety scores, family profiles, and priority support). Visit our GCR Scam Guard Pricing page for current pricing." },
-      { q: "How do I upgrade or change my plan?", a: "Your subscription is managed through your GetCyberRight account. Contact our support team to change your plan. Your new features will be available immediately after your plan is updated." },
-      { q: "Can I cancel my subscription?", a: "Yes, you can cancel at any time by contacting our support team. After cancellation, you will retain access to paid features until the end of your current billing period, then revert to the free plan." },
-      { q: "Is there a family plan?", a: "Our Professional plan includes family profile support, allowing you to manage protection for multiple family members under one account." },
+      { q: "What features are included?", a: "Every feature on GetCyberRight is free with a registered account. That includes manual and automatic scans, browser extension protection, scan history, safety scores, family profiles, data removal tools, training courses, and more." },
+      { q: "How do I access all features?", a: "Simply create a free account to unlock full access to every tool and feature on GetCyberRight. There are no paid tiers — everything is free." },
+      { q: "Will GetCyberRight always be free?", a: "Yes, we are committed to making cybersecurity education and tools accessible to everyone. All features are completely free with a registered account." },
+      { q: "Is there family support?", a: "Yes! Family profile support is included for free, allowing you to manage protection for multiple family members under one account." },
     ],
   },
   {
@@ -80,7 +80,7 @@ const faqCategories = [
       { q: "What do the scan results mean?", a: "Scan results use clear labels: 'Verified Safe' means no threats were found, 'Low Risk' means minor concerns, 'Caution Advised' means notable warning signs, 'High Risk Detected' means strong indicators of a scam, and 'Confirmed Threat' means the content matches known scam patterns." },
       { q: "What is the Safety Score quiz?", a: "The Safety Score quiz is an interactive assessment that evaluates your current cybersecurity habits. After completing it, you receive a personalized score and specific recommendations for improving your online safety." },
       { q: "Are your tools accurate?", a: "Our tools provide helpful guidance based on known scam patterns and AI analysis. They should be used as one factor in your decision-making, not as the sole authority. When in doubt, consult official sources or report suspicious activity to authorities." },
-      { q: "Do you store the information I submit to your tools?", a: "On our servers, scan content is analyzed in real time and not permanently stored for free users. Professional subscribers may have server-side scan history retained for up to 90 days. The browser extension also keeps a local history of your recent scans on your device (stored in your browser, never sent to our servers). See our Privacy Policy for complete details." },
+      { q: "Do you store the information I submit to your tools?", a: "On our servers, scan content is analyzed in real time and not permanently stored. Registered users may have server-side scan history retained for up to 90 days. The browser extension also keeps a local history of your recent scans on your device (stored in your browser, never sent to our servers). See our Privacy Policy for complete details." },
     ],
   },
   {

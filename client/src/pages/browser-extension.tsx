@@ -295,7 +295,7 @@ export default function BrowserExtensionPage() {
                   "Keep the extension enabled at all times. Most scam sites look identical to real ones, and the extension catches what your eyes cannot.",
                   "Report any confirmed scam using the community reporting feature. Your report protects thousands of other families.",
                   "Review the Scam of the Week alerts to stay ahead of trending scams. Knowledge is your strongest defense.",
-                  "Upgrade to the Pro plan to enable auto-scan, which silently checks every page you visit without any extra effort."
+                  "Enable auto-scan to silently check every page you visit without any extra effort — it's free with your account."
                 ],
                 color: "bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800"
               },
@@ -327,7 +327,7 @@ export default function BrowserExtensionPage() {
           </div>
           <div className="space-y-4 max-w-2xl mx-auto">
             {[
-              { q: "Is the browser extension free?", a: "The extension is free to download and includes manual scanning at no cost. Optional paid plans (Pro and Family) unlock advanced features like automatic page scanning, notification blocking, search safety badges, redirect detection, clipboard protection, webmail scanning, and family profiles." },
+              { q: "Is the browser extension free?", a: "Yes! The extension is completely free to download and use. All features are included at no cost — automatic page scanning, notification blocking, search safety badges, redirect detection, clipboard protection, webmail scanning, and family profiles. Just create a free account to get started." },
               { q: "Does it track my browsing activity?", a: "No. The extension only scans content when you explicitly trigger a scan or when auto-scan is enabled. No browsing history is stored or transmitted." },
               { q: "What browsers does it work with?", a: "It works with any Chromium-based browser including Google Chrome, Brave, Microsoft Edge, Opera, and Vivaldi." },
               { q: "Why isn't it on the Chrome Web Store?", a: "We're working on Chrome Web Store approval. In the meantime, you can install it manually using Developer Mode, which takes about 30 seconds." },
@@ -335,7 +335,7 @@ export default function BrowserExtensionPage() {
               { q: "What are search result safety badges?", a: "When you search on Google, Bing, DuckDuckGo, or Yahoo, the extension adds colored badges next to each result showing whether the link is safe, suspicious, or dangerous. This helps you avoid risky sites before you even click." },
               { q: "How does notification spam blocking work?", a: "Many scam sites trick you into allowing browser notifications, then flood you with fake virus warnings and misleading ads. The extension detects these permission requests and blocks known spam domains automatically." },
               { q: "What is clipboard hijack protection?", a: "Some malicious websites run hidden scripts that change what you have copied to your clipboard. For example, swapping a crypto wallet address so funds go to a scammer. The extension detects these changes and alerts you immediately." },
-              { q: "Can I install it on my family's devices?", a: "Yes. The Family plan lets you manage profiles for up to 6 family members. Install the extension on each device, sign in with the same account, and everyone gets protected. You can review safety activity across all devices from your dashboard." },
+              { q: "Can I install it on my family's devices?", a: "Yes! You can manage profiles for up to 6 family members for free. Install the extension on each device, sign in with the same account, and everyone gets protected. You can review safety activity across all devices from your dashboard." },
             ].map((faq, i) => (
               <Card key={i} className="border shadow-sm" data-testid={`faq-${i}`}>
                 <CardContent className="p-5">

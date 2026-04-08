@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@/lib/navigation";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { InlinePromoVideo } from "@/components/inline-promo-video";
@@ -470,6 +471,10 @@ export default function Training() {
           </div>
         </section>
       </main>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SignupEncouragementBanner toolName="training" show={true} contextMessage="Create a free account to earn training certificates" />
+      </div>
 
       <Footer />
     </div>

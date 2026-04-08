@@ -2,6 +2,7 @@
 
 import { useSEO } from "@/hooks/use-seo";
 import { FadeIn } from "@/components/fade-in";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Link } from "@/lib/navigation";
 import { 
  Plane, Shield, Smartphone, Wifi, CreditCard, MapPin, AlertTriangle,
@@ -464,6 +465,9 @@ export default function TravelSafety() {
  </CardContent>
  </Card>
  </FadeIn>
+ <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+   <SignupEncouragementBanner toolName="travel-safety" show={true} contextMessage="Create a free account for full access to all safety tools" />
+ </div>
  </div>
  </div>
  );

@@ -27,11 +27,11 @@ The frontend is built with React 19, TypeScript, and Next.js App Router, with Ta
 - **Automation & Governance**: Features automated weekly newsletters, AI content guardrails, automated threat intelligence, and a social distribution engine. The social engine utilizes a 3-tier content model (Guide-based evergreen, Reactive/breaking news, News Editorial) and integrates with Buffer for multi-platform publishing.
 - **Engagement Discovery Engine**: Monitors cybersecurity RSS feeds, scores engagement opportunities, and generates AI-suggested comments for thought leadership.
 - **Monthly Removal Reports**: Automated monthly HTML email reports detailing privacy scores and removal progress for subscribers.
-- **Independent Subscription Products**: GCR Scam Guard and GCR Data Shield are offered as separate subscription products with independent Stripe integration and pricing tiers, including bundle options. A free access period is active until October 2026, unlocking all features for all users.
+- **Free Platform Model**: The platform is fully free — all pricing pages (/pricing, /gcr-guard-pricing, /data-shield-pricing, /checkout-success) redirect to the homepage. Pricing navigation items are permanently removed. All user-facing text reflects "everything is free" messaging. SignupEncouragementBanner is displayed on 13+ tool pages encouraging free account creation. The underlying tier system code remains intact but all user-facing language promotes free access. Stripe integration is retained but checkout is blocked by `isFreeAccessPeriod()` (active until Oct 2026).
 - **Admin & SEO**: A comprehensive admin system with role-based access control, scan activity monitoring, an SEO keyword database, an internal linking engine, dynamic sitemap generation, and universal meta injection. All public pages are fully SSR for SEO and performance.
 - **Navigation Architecture**: A two-hub structure: Protection Hub (tools) and Learning Hub (educational content), with desktop dropdowns and mobile menus.
 - **User Dashboard**: A product-aware dashboard displaying a safety score, activity statistics, product status cards, quick actions, recent scans, regional threats, and threat intelligence. Includes a post-signup onboarding checklist.
-- **Account Settings**: Comprehensive account management including profile editing, password changes, MFA status, and subscription management for both products.
+- **Account Settings**: Comprehensive account management including profile editing, password changes, and MFA status.
 - **Auth Flow**: Structured post-registration steps and clear login/email verification redirects.
 
 ## External Dependencies

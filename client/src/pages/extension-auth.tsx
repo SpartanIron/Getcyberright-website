@@ -64,7 +64,7 @@ export default function ExtensionAuth() {
             </div>
             <h1 className="text-2xl font-bold" data-testid="heading-extension-auth">Connect GCR Scam Guard</h1>
             <p className="text-muted-foreground mt-2">
-              Link your browser extension to your GetCyberRight account to unlock premium features.
+              Link your browser extension to your GetCyberRight account to access all features for free.
             </p>
           </div>
 
@@ -100,9 +100,9 @@ export default function ExtensionAuth() {
               <CardContent className="p-6">
                 <p className="text-sm text-muted-foreground mb-1">Signed in as</p>
                 <p className="font-medium mb-4" data-testid="text-user-email">{user.email}</p>
-                <p className="text-sm text-muted-foreground mb-1">Subscription</p>
+                <p className="text-sm text-muted-foreground mb-1">Account</p>
                 <p className="font-medium mb-6 capitalize" data-testid="text-user-tier">
-                  {user.subscriptionTier === "essential" ? "Pro" : user.subscriptionTier === "professional" ? "Family" : user.subscriptionTier || "Free"}
+                  Full Access (Free)
                 </p>
                 <Button
                   className="w-full"
@@ -162,9 +162,9 @@ export default function ExtensionAuth() {
           )}
 
           <div className="mt-6 text-center">
-            <Link href="/gcr-guard-pricing">
-              <Button variant="link" className="text-sm" data-testid="link-view-plans">
-                View subscription plans
+            <Link href="/tools">
+              <Button variant="link" className="text-sm" data-testid="link-explore-tools">
+                Explore all free tools
                 <ExternalLink className="w-3 h-3 ml-1" />
               </Button>
             </Link>

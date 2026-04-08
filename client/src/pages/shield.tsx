@@ -5,6 +5,7 @@ import { useLocation } from "@/lib/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead } from "@/components/seo-head";
@@ -348,6 +349,9 @@ function ShieldPage() {
           </div>
         </div>
       </main>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SignupEncouragementBanner toolName="shield" show={true} contextMessage="Create a free account to track your data removal progress" />
+      </div>
       <Footer />
     </>
   );
