@@ -3,7 +3,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useSEO } from "@/hooks/use-seo";
 import { FadeIn } from "@/components/fade-in";
 import { Link } from "@/lib/navigation";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
@@ -23,11 +22,6 @@ interface PublicStats {
 }
 
 export default function PartnerDeck() {
- useSEO({
- title: "Partnership Deck | GetCyberRight",
- description: "Explore how partnering with GetCyberRight connects your brand with safety-conscious families worldwide. Mission-aligned sponsorship with full editorial independence.",
- keywords: "partnership deck, cybersecurity partnership, family safety partner, trusted sponsorship"
- });
 
  const { data: stats } = useQuery<PublicStats>({
  queryKey: ["/api/public/scam-stats"]

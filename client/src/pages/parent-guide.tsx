@@ -1,7 +1,4 @@
-"use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
 import { FadeIn } from "@/components/fade-in";
@@ -155,11 +152,6 @@ const elderlyConversationScripts = [
 ];
 
 export default function ParentGuide() {
- useSEO({
- title: "Parent Guide - Keep Your Children Safe Online | GetCyberRight",
- description: "Complete guide for parents on parental controls, warning signs, and family safety agreements. Protect your kids online.",
- keywords: "parental controls, child online safety, internet safety for kids, digital parenting guide, family safety agreement"
- });
 
  return (
  <div className="min-h-screen">

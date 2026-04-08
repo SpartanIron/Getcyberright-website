@@ -2,7 +2,6 @@
 
 import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BlogPostingData, type FAQData, type BreadcrumbData } from "@/components/structured-data";
 import { RelatedContent } from "@/components/related-content";
 import { Navigation } from "@/components/navigation";
@@ -33,12 +32,6 @@ export default function ScamPage() {
       return res.json();
     },
     enabled: !!scam,
-  });
-
-  useSEO({
-    title: scam?.metaTitle || "Scam Guide | GetCyberRight",
-    description: scam?.metaDescription || "Learn about common scams and how to protect yourself.",
-    keywords: scam?.keywords?.join(", ") || "scam prevention, fraud protection",
   });
 
   if (!scam) {

@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 
 // Client-side SEO hook for dynamic page meta updates.

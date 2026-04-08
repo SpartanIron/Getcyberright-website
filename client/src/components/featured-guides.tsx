@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Link } from "@/lib/navigation";
 import { Shield, BookOpen, Lock, Eye, Users, Smartphone, ArrowRight, ChevronRight } from "lucide-react";

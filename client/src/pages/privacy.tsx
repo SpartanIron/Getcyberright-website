@@ -1,10 +1,7 @@
-"use client";
-
 import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import { SEOHead } from "@/components/seo-head";
 import { Link } from "@/lib/navigation";
 import bannerImage from "@/assets/banners/privacy-banner.webp";
 
@@ -14,10 +11,6 @@ export default function Privacy() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead 
-        title="Privacy Policy" 
-        description="GetCyberRight's privacy policy explains how we collect, use, and protect your personal information. We are committed to transparency and data protection." 
-      />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

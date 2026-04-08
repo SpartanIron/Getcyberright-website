@@ -1,3 +1,5 @@
+"use client";
+
 import { Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { BookOpen, ArrowRight, AlertTriangle, Shield, FileText } from "lucide-react";

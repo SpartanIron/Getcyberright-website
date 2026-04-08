@@ -1,5 +1,3 @@
-"use client";
-
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
 import { LiveActivityBar } from "@/components/live-activity-bar";
@@ -16,7 +14,6 @@ import { Testimonials } from "@/components/testimonials";
 import { NewsletterCTA } from "@/components/newsletter-cta";
 import { CTAFooter } from "@/components/cta-footer";
 import { Footer } from "@/components/footer";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import { BreachChecker } from "@/components/breach-checker";
 import type { WebSiteData, OrganizationData } from "@/components/structured-data";
@@ -43,7 +40,6 @@ const organizationSchema: OrganizationData = {
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.home} />
       <StructuredData data={[websiteSchema, organizationSchema]} />
       <Navigation />
       <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>

@@ -1,3 +1,5 @@
+"use client";
+
 import { Component, ReactNode } from 'react';
 import { Shield, Home, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';

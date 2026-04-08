@@ -1,6 +1,5 @@
 "use client";
 
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, FAQData, BreadcrumbData } from "@/components/structured-data";
 import { PasswordGenerator } from "@/components/password-generator";
@@ -40,11 +39,6 @@ const passwordGenBreadcrumbs: BreadcrumbData = {
 };
 
 export default function PasswordGeneratorPage() {
-  useSEO({
-    title: "Security Key Generator (SKG) - Create Secure Keys & Passwords | GetCyberRight",
-    description: "Generate secure passwords, passphrases, API keys, encryption keys, UUIDs, and JWT secrets. Runs locally in your browser for maximum privacy.",
-    keywords: "security key generator, password generator, API key generator, encryption key, JWT secret, UUID generator, passphrase, secure password"
-  });
 
   return (
     <main id="main-content" tabIndex={-1} className="relative min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 overflow-hidden">

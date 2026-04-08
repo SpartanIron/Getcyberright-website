@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, memo } from "react";
 import { ComposableMap, Geographies, Geography, Marker, Line } from "react-simple-maps";
 import { motion, AnimatePresence } from "framer-motion";

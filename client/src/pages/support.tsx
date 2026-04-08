@@ -1,8 +1,5 @@
-"use client";
-
 import { PageBanner } from "@/components/page-banner";
 import { Footer } from "@/components/footer";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -104,7 +101,6 @@ const faqs = [
 export default function Support() {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.support} />
       <main id="main-content" tabIndex={-1}>
       <PageBanner
         title="How Can We Help?"

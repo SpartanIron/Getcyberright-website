@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";

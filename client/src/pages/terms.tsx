@@ -1,10 +1,7 @@
-"use client";
-
 import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import { SEOHead } from "@/components/seo-head";
 import { Link } from "@/lib/navigation";
 import bannerImage from "@/assets/banners/terms-banner.webp";
 
@@ -14,10 +11,6 @@ export default function Terms() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead 
-        title="Terms of Service" 
-        description="Terms and conditions governing your use of GetCyberRight's cybersecurity education platform, tools, and services." 
-      />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

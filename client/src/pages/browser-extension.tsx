@@ -1,6 +1,3 @@
-"use client";
-
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
 import { Card, CardContent } from "@/components/ui/card";
@@ -103,11 +100,6 @@ const installSteps = [
 ];
 
 export default function BrowserExtensionPage() {
-  useSEO({
-    title: "GCR Scam Guard Browser Extension - Chrome Protection | GetCyberRight",
-    description: "Download the GCR Scam Guard browser extension for Chrome by GetCyberRight. Free manual scanning included. Real-time link scanning, AI-powered scam detection, and community threat alerts.",
-    keywords: "browser extension, chrome extension, scam protection, phishing detector, link scanner, safe browsing, gcr guard, getcyberright"
-  });
 
   return (
     <div className="min-h-screen bg-background">

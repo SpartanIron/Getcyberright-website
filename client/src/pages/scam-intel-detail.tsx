@@ -2,7 +2,6 @@
 
 import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BlogPostingData, type FAQData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -87,12 +86,6 @@ export default function ScamIntelDetailPage() {
       return results.filter(Boolean) as RelatedScam[];
     },
     enabled: !!scam?.relatedScamSlugs?.length,
-  });
-
-  useSEO({
-    title: scam?.scamName ? `${scam.scamName} | Scam Intelligence | GetCyberRight` : "Scam Intelligence | GetCyberRight",
-    description: scam?.metaDescription || "Detailed scam analysis and prevention tips from GetCyberRight.",
-    keywords: scam ? `${scam.scamName}, ${scam.scamCategory}, scam prevention` : "scam intelligence",
   });
 
   if (isLoading) {

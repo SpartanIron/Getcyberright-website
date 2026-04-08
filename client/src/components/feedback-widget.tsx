@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { MessageSquarePlus, X, Send, Bug, Lightbulb, HelpCircle, Star, FileText } from "lucide-react";

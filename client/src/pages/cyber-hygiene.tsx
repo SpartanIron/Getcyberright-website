@@ -1,20 +1,12 @@
-"use client";
-
 import { CyberHygieneSelfCheck } from "@/components/cyber-hygiene-self-check";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, CheckCircle, TrendingUp, Users, Lock, Eye, Wifi, Smartphone, AlertTriangle, FileCheck, ArrowLeft } from "lucide-react";
 import { Link } from "@/lib/navigation";
-import { useSEO } from "@/hooks/use-seo";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { ShareCallToAction } from "@/components/social-share";
 
 export default function CyberHygiene() {
-  useSEO({
-    title: "Cyber Hygiene Self-Check | GetCyberRight",
-    description: "Free security assessment to evaluate your digital safety. Get personalized recommendations in just 5 minutes.",
-    keywords: "cyber hygiene, security assessment, online safety check, digital safety score, password strength test, security quiz"
-  });
 
   return (
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-slate-50 dark:bg-slate-900">

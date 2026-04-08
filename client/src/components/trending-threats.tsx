@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, ShieldAlert, Bug, AlertOctagon, Lock, UserX, Users, MapPin, ChevronLeft, ChevronRight, Radio, ExternalLink } from "lucide-react";

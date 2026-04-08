@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@/lib/navigation";
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -59,11 +58,6 @@ function ThreatLevelIndicator({ level, count }: { level: string; count: number }
 }
 
 export default function CyberThreatRadar() {
-  useSEO({
-    title: "Cyber Threat Radar | Real-Time Threat Monitoring | GetCyberRight",
-    description: "Monitor emerging cyber threats in real time. Track active alerts, trending attacks, and security advisories that affect you and your family.",
-    keywords: "cyber threat radar, real-time threats, security monitoring, threat intelligence, cybersecurity alerts",
-  });
 
   const breadcrumbs: BreadcrumbData = {
     type: "BreadcrumbList",

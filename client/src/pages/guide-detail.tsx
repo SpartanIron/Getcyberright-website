@@ -2,7 +2,6 @@
 
 import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BlogPostingData, type FAQData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -48,12 +47,6 @@ export default function GuideDetailPage() {
       return res.json();
     },
     enabled: !!slug,
-  });
-
-  useSEO({
-    title: guide?.title ? `${guide.title} | GetCyberRight` : "Cyber Safety Guide | GetCyberRight",
-    description: guide?.metaDescription || "Expert cybersecurity guide from GetCyberRight.",
-    keywords: guide?.targetKeywords?.join(", ") || guide?.tags?.join(", "),
   });
 
   if (isLoading) {

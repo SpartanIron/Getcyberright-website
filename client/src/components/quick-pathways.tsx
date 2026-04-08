@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/lib/navigation";
 import { motion } from "framer-motion";

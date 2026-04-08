@@ -4,7 +4,6 @@ import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { SEO_CLUSTERS, CLUSTER_LABELS, CLUSTER_RELATIONSHIPS, CLUSTER_TARGET_PAGES } from "@shared/seo-keywords";
 import { SCAM_PAGES } from "@shared/scam-content";
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -58,12 +57,6 @@ export default function TopicHub() {
   const cluster = params.cluster as string;
   const clusterLabel = CLUSTER_LABELS[cluster as SEOCluster] || cluster;
   const isValid = SEO_CLUSTERS.includes(cluster as SEOCluster);
-
-  useSEO({
-    title: `${clusterLabel}: Complete Guide & Resources | GetCyberRight`,
-    description: CLUSTER_DESCRIPTIONS[cluster] || `Everything you need to know about ${clusterLabel.toLowerCase()}.`,
-    url: `/topics/${cluster}`,
-  });
 
   const { data: guides, isLoading: guidesLoading } = useQuery<any[]>({
     queryKey: ["/api/guides", "published"],

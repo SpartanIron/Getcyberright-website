@@ -1,10 +1,7 @@
-"use client";
-
 import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,11 +45,6 @@ const ourValues = [
 export default function OurMission() {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        title="Our Mission | GetCyberRight"
-        description="GetCyberRight protects the people that corporate cybersecurity leaves behind. Learn about our mission and the trusted partnerships that make it possible."
-        keywords="cybersecurity mission, family safety, trusted partnerships, cyber safety education"
-      />
       <Navigation />
 
       <main id="main-content" tabIndex={-1}>

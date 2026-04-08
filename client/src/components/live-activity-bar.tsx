@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import { Shield, Activity, AlertTriangle, BookOpen } from "lucide-react";
 import { useState, useEffect, useRef } from "react";

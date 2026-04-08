@@ -1,7 +1,4 @@
-"use client";
-
 import { Link } from "@/lib/navigation";
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -131,11 +128,6 @@ const quickLinks = [
 ];
 
 export default function AwarenessHub() {
-  useSEO({
-    title: "Cyber Awareness Hub | Digital Safety Resources | GetCyberRight",
-    description: "Your central resource for cybersecurity education. Visual guides, safety checklists, infographics, and downloadable resources to protect your family online.",
-    keywords: "cyber awareness, digital safety, cybersecurity education, online safety resources, phishing guide, identity theft prevention",
-  });
 
   const breadcrumbs: BreadcrumbData = {
     type: "BreadcrumbList",

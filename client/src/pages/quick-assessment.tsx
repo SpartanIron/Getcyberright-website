@@ -1,14 +1,6 @@
-"use client";
-
 import { QuickAssessment } from "@/components/quick-assessment";
-import { useSEO } from "@/hooks/use-seo";
 
 export default function QuickAssessmentPage() {
-  useSEO({
-    title: "Skill Check - Test Your Cyber Knowledge | GetCyberRight",
-    description: "Take our quick cybersecurity quiz to discover your skill level. Get personalized learning recommendations based on your results.",
-    keywords: "cybersecurity quiz, security skill test, cyber knowledge assessment, online safety quiz"
-  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-12">

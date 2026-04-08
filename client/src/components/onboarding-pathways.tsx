@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Link } from "@/lib/navigation";
 import { Baby, Heart, User, BookOpen } from "lucide-react";

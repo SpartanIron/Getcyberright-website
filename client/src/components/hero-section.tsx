@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin, Shield, AlertTriangle, ShieldCheck, Eye } from "lucide-react";

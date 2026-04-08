@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, User, AlertTriangle, Loader2, RotateCcw, Image, XCircle, Copy, Check } from "lucide-react";

@@ -1,9 +1,6 @@
-"use client";
-
 import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,10 +37,6 @@ const merchItems = [
 export default function SupportTheMission() {
  return (
  <div className="min-h-screen bg-background">
- <SEOHead 
- title="Shop | GetCyberRight"
- description="GetCyberRight gear for people who take digital safety seriously. Apparel, stickers, and drinkware designed with purpose."
- />
  <Navigation />
  
  <main>

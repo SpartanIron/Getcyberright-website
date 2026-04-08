@@ -5,7 +5,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays, Chrome, CreditCard } from "lucide-react";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
-import { useSEO } from "@/hooks/use-seo";
 import { Link } from "@/lib/navigation";
 import { StructuredData } from "@/components/structured-data";
 import type { FAQData } from "@/components/structured-data";
@@ -192,11 +191,6 @@ const faqCategories = [
 const LAST_REVIEWED = "March 2026";
 
 export default function FAQ() {
-  useSEO({
-    title: "Frequently Asked Questions | GetCyberRight",
-    description: "Find answers to common questions about GetCyberRight, online safety, our tools, and how to protect your family from cyber threats.",
-    keywords: "FAQ, frequently asked questions, cyber safety help, online safety questions, GetCyberRight support"
-  });
 
   const faqStructuredData: FAQData = {
     type: "FAQPage",

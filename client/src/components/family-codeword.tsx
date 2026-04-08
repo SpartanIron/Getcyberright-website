@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useCallback } from "react";
 import { trackToolUsage } from "@/lib/analytics";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";

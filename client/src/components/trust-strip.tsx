@@ -1,3 +1,5 @@
+"use client";
+
 import { Shield } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 

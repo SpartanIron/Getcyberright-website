@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Shield, ChevronDown, ChevronUp, Lightbulb, Globe } from "lucide-react";

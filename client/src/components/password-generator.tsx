@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useCallback, useEffect } from "react";
 import { trackToolUsage } from "@/lib/analytics";
 import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";

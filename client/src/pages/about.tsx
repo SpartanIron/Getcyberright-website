@@ -1,10 +1,7 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { ArticleData, BreadcrumbData } from "@/components/structured-data";
 import { Link } from "@/lib/navigation";
@@ -105,7 +102,6 @@ const credibilityStats = [
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead {...pageSEO.about} />
       <StructuredData data={[aboutArticleSchema, aboutBreadcrumbs]} />
       <Navigation />
 

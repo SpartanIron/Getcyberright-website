@@ -1,6 +1,5 @@
 "use client";
 
-import { useSEO } from "@/hooks/use-seo";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
@@ -37,7 +36,6 @@ const colorThemeMap: Record<string, { bg: string; border: string; text: string }
 };
 
 export default function ThreatIntelligence() {
- useSEO({
  title: "Live Threat Intelligence | GetCyberRight",
  description: "Real-time global cyber attack statistics and threat intelligence. Track cybercrime trends and regional attack patterns.",
  keywords: "cyber attack map, threat intelligence, live attacks, cybersecurity monitoring, global threats, cybercrime statistics"

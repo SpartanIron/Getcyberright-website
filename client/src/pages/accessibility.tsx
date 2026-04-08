@@ -1,5 +1,3 @@
-"use client";
-
 import { Link } from "@/lib/navigation";
 import { FadeIn } from "@/components/fade-in";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,13 +12,8 @@ import {
  Mail,
  ExternalLink
 } from "lucide-react";
-import { useSEO } from "@/hooks/use-seo";
 
 export default function AccessibilityPage() {
- useSEO({
- title: "Accessibility Statement - GetCyberRight",
- description: "Our commitment to making GetCyberRight accessible to everyone. Learn about our accessibility features and how to request accommodations.",
- });
 
  const accessibilityFeatures = [
  {

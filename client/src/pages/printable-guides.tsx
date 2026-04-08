@@ -1,6 +1,5 @@
 "use client";
 
-import { useSEO } from "@/hooks/use-seo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/fade-in";
@@ -117,11 +116,6 @@ const checklists = [
 ];
 
 export default function PrintableGuides() {
- useSEO({
- title: "Printable Safety Checklists | GetCyberRight",
- description: "Download free cybersecurity checklists for families. Mobile money safety, scam prevention, and family internet agreements.",
- keywords: "printable safety checklist, cybersecurity PDF, family internet safety, download safety guide, senior safety checklist"
- });
 
  const handlePrint = (checklistId: string) => {
  const printContent = document.getElementById(`checklist-${checklistId}`);

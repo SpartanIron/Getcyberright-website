@@ -1,11 +1,8 @@
-"use client";
-
 import { Shield, Lock, Server, Eye, FileCheck, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { SEOHead, pageSEO } from "@/components/seo-head";
 
 export default function SecurityPage() {
   const securityMeasures = [
@@ -83,7 +80,6 @@ export default function SecurityPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SEOHead {...pageSEO.security} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1} className="flex-1">

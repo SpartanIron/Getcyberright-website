@@ -2,7 +2,6 @@
 
 import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BlogPostingData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -52,12 +51,6 @@ export default function AlertDetailPage() {
       return res.json();
     },
     enabled: !!slug,
-  });
-
-  useSEO({
-    title: alert?.threatName ? `${alert.threatName} | Cyber Threat Alert | GetCyberRight` : "Cyber Threat Alert | GetCyberRight",
-    description: alert?.metaDescription || alert?.description || "Cybersecurity threat alert from GetCyberRight.",
-    keywords: alert?.cveIds?.join(", "),
   });
 
   if (isLoading) {
