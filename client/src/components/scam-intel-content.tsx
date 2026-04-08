@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect, useMemo } from "react";
 import { detectUserRegion, setUserRegion, type Region } from "@/lib/region-detect";
 
-interface ScamIntel {
+export interface ScamIntel {
   id: string;
   slug: string;
   scamName: string;

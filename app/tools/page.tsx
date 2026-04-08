@@ -46,6 +46,24 @@ export default function ToolsPage() {
     },
     {
       "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "GCR Scam Guard",
+      description: "AI-powered tool to check if URLs, emails, phone numbers, and QR codes are scams.",
+      url: `${BASE_URL}/tools`,
+      applicationCategory: "SecurityApplication",
+      provider: { "@type": "Organization", name: "GetCyberRight", url: BASE_URL },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "GCR Data Shield - Personal Data Exposure Scanner",
+      description: "Scan for your exposed personal information across data broker sites and breach databases.",
+      url: `${BASE_URL}/shield`,
+      applicationCategory: "SecurityApplication",
+      provider: { "@type": "Organization", name: "GetCyberRight", url: BASE_URL },
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },

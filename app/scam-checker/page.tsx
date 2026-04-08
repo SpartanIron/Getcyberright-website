@@ -53,6 +53,27 @@ export default function ScamCheckerPage() {
     },
     {
       "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "How does the GCR Scam Guard work?",
+          acceptedAnswer: { "@type": "Answer", text: "The GCR Scam Guard analyzes URLs, emails, phone numbers, QR codes, and messages using multiple safety checks including AI analysis, trusted data sources, and domain reputation checks to determine if something is a scam." },
+        },
+        {
+          "@type": "Question",
+          name: "Is the GCR Scam Guard free to use?",
+          acceptedAnswer: { "@type": "Answer", text: "Manual scanning on the website is free and requires no account. Just paste a suspicious link, message, or phone number and get instant results. The browser extension also includes free manual scanning, with optional paid plans for advanced protection." },
+        },
+        {
+          "@type": "Question",
+          name: "What types of scams can it detect?",
+          acceptedAnswer: { "@type": "Answer", text: "The tool can detect phishing links, fraudulent websites, scam phone numbers, suspicious email content, malicious QR codes, and social engineering attempts across multiple categories of online fraud." },
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },

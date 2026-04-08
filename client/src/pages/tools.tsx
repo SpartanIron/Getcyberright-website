@@ -1,5 +1,3 @@
-import { StructuredData } from "@/components/structured-data";
-import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -7,37 +5,9 @@ import { SignupEncouragementBanner } from "@/components/signup-encouragement-ban
 import { ToolsInteractive } from "@/components/tools-interactive";
 import bannerImage from "@/assets/banners/tools-banner.webp";
 
-const toolsSchemas: WebApplicationData[] = [
-  {
-    type: "WebApplication",
-    name: "GCR Scam Guard",
-    description: "AI-powered tool to check if URLs, emails, phone numbers, and QR codes are scams. Analyzes threats using multiple security engines.",
-    url: "https://www.getcyberright.com/tools",
-    applicationCategory: "SecurityApplication",
-    provider: "GetCyberRight",
-  },
-  {
-    type: "WebApplication",
-    name: "GCR Data Shield - Personal Data Exposure Scanner",
-    description: "Scan for your exposed personal information across data broker sites and breach databases. No account needed to get started.",
-    url: "https://www.getcyberright.com/shield",
-    applicationCategory: "SecurityApplication",
-    provider: "GetCyberRight",
-  },
-];
-
-const toolsBreadcrumbs: BreadcrumbData = {
-  type: "BreadcrumbList",
-  items: [
-    { name: "Home", url: "https://www.getcyberright.com/" },
-    { name: "Protection Hub", url: "https://www.getcyberright.com/tools" },
-  ],
-};
-
 export default function Tools() {
   return (
     <div className="min-h-screen bg-background">
-      <StructuredData data={[...toolsSchemas, toolsBreadcrumbs]} />
       <Navigation />
 
       <main id="main-content" tabIndex={-1}>

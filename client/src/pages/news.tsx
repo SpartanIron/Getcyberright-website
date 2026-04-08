@@ -1,5 +1,5 @@
-import { NewsContent } from "@/components/news-content";
+import { NewsContent, type NewsResponse } from "@/components/news-content";
 
-export default function News({ initialNews }: { initialNews?: any }) {
+export default function News({ initialNews }: { initialNews?: NewsResponse | null }) {
   return <NewsContent initialNews={initialNews} />;
 }

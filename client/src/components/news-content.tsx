@@ -55,7 +55,7 @@ interface NewsItem {
  relatedToolName?: string | null;
 }
 
-interface NewsResponse {
+export interface NewsResponse {
  articles: NewsItem[];
  lastUpdated: string | null;
  stats: {
@@ -407,7 +407,7 @@ function EventCard({ event }: { event: TechEvent }) {
  );
 }
 
-export function NewsContent({ initialNews }: { initialNews?: any }) {
+export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null }) {
  const [searchQuery, setSearchQuery] = useState("");
  const [activeFilter, setActiveFilter] = useState("all");
  const [currentPage, setCurrentPage] = useState(1);
@@ -432,7 +432,7 @@ export function NewsContent({ initialNews }: { initialNews?: any }) {
  if (!res.ok) throw new Error("Failed to fetch news");
  return res.json();
  },
- initialData: activeFilter === "all" ? initialNews : undefined,
+ initialData: activeFilter === "all" && initialNews ? initialNews : undefined,
  enabled: activeFilter !== "conferences",
  refetchInterval: 300000,
  staleTime: 60000,

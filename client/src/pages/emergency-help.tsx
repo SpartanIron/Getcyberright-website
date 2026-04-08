@@ -9,8 +9,6 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { SEOHead, pageSEO } from "@/components/seo-head";
-import { StructuredData } from "@/components/structured-data";
-import type { HowToData, BreadcrumbData } from "@/components/structured-data";
 import { RegionSelector } from "@/components/region-selector";
 import { 
   Phone, 
@@ -765,33 +763,9 @@ export default function EmergencyHelp() {
 
   const selectedCountryData = allCountries.find(c => c.name === selectedCountry);
 
-  const emergencyHowTo: HowToData = {
-    type: "HowTo",
-    name: "What to Do If You Have Been Scammed Online",
-    description: "Step-by-step emergency guidance for scam victims. Learn the immediate actions to take if you have been targeted by an online scam, phishing attack, or fraud.",
-    steps: [
-      { name: "Stay calm and stop all communication", text: "Do not respond to or engage further with the scammer. Block their number, email, or social media profile immediately." },
-      { name: "Secure your accounts", text: "Change passwords on any compromised accounts. Enable two-factor authentication. Check for unauthorized transactions or changes." },
-      { name: "Contact your bank or financial institution", text: "If you shared financial information or sent money, contact your bank immediately to freeze accounts, dispute charges, or stop pending transfers." },
-      { name: "Document everything", text: "Save screenshots of messages, emails, websites, and transaction records. This evidence will be needed when filing reports." },
-      { name: "Report the scam to authorities", text: "File reports with your local police, the FTC (reportfraud.ftc.gov), FBI IC3 (ic3.gov), or your country's equivalent agency." },
-      { name: "Monitor your identity", text: "Place fraud alerts on your credit reports. Monitor your accounts for suspicious activity in the weeks following the incident." },
-    ],
-    dateModified: "2026-03-02",
-  };
-
-  const emergencyBreadcrumbs: BreadcrumbData = {
-    type: "BreadcrumbList",
-    items: [
-      { name: "Home", url: "https://www.getcyberright.com/" },
-      { name: "Emergency Help", url: "https://www.getcyberright.com/emergency-help" },
-    ],
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <SEOHead {...pageSEO.emergencyHelp} />
-      <StructuredData data={[emergencyHowTo, emergencyBreadcrumbs]} />
       <Navigation />
       
       <main id="main-content" tabIndex={-1}>

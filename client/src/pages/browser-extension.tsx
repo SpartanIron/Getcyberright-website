@@ -1,5 +1,3 @@
-import { StructuredData } from "@/components/structured-data";
-import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,23 +9,6 @@ import {
   ArrowRightLeft, Clipboard
 } from "lucide-react";
 
-const extensionApp: WebApplicationData = {
-  type: "WebApplication",
-  name: "GCR Scam Guard Browser Extension by GetCyberRight",
-  description: "Chrome browser extension for real-time scam protection. Free manual scanning included. Scan links, detect phishing sites, and stay safe while browsing. By GetCyberRight.",
-  url: "https://www.getcyberright.com/browser-extension",
-  applicationCategory: "SecurityApplication",
-  provider: "GetCyberRight",
-};
-
-const breadcrumbs: BreadcrumbData = {
-  type: "BreadcrumbList",
-  items: [
-    { name: "Home", url: "https://www.getcyberright.com/" },
-    { name: "Tools", url: "https://www.getcyberright.com/tools" },
-    { name: "Browser Extension", url: "https://www.getcyberright.com/browser-extension" },
-  ],
-};
 
 const features = [
   {
@@ -103,8 +84,6 @@ export default function BrowserExtensionPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <StructuredData data={extensionApp} />
-      <StructuredData data={breadcrumbs} />
 
       <section className="relative bg-[#0A2A3C] text-white overflow-hidden">
         <TechPatternBg />

@@ -4,8 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays, Chrome, CreditCard } from "lucide-react";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { Link } from "@/lib/navigation";
-import { StructuredData } from "@/components/structured-data";
-import type { FAQData } from "@/components/structured-data";
 
 const faqCategories = [
   {
@@ -190,16 +188,8 @@ const LAST_REVIEWED = "March 2026";
 
 export default function FAQ() {
 
-  const faqStructuredData: FAQData = {
-    type: "FAQPage",
-    items: faqCategories.flatMap((cat) =>
-      cat.questions.map((q) => ({ question: q.q, answer: q.a }))
-    ),
-  };
-
   return (
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-background">
-      <StructuredData data={faqStructuredData} />
       <section className="relative py-16 overflow-hidden">
         <AnimatedCyberBackground />
         <div className="relative container mx-auto px-4">

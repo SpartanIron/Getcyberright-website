@@ -1,9 +1,9 @@
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { GuidesContent } from "@/components/guides-content";
+import { GuidesContent, type Guide } from "@/components/guides-content";
 import { BookOpen } from "lucide-react";
 
-export default function GuidesListing({ initialGuides }: { initialGuides?: any[] }) {
+export default function GuidesListing({ initialGuides }: { initialGuides?: Guide[] }) {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />

@@ -8,7 +8,7 @@ import { BookOpen, Clock, Search, ArrowRight, Loader2, BookMarked, Shield, Lock,
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-interface Guide {
+export interface Guide {
   id: string;
   slug: string;
   title: string;

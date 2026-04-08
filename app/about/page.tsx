@@ -30,19 +30,31 @@ export const metadata: Metadata = {
 export const dynamic = "force-static";
 
 export default function AboutPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "About",
-        item: `${BASE_URL}/about`,
-      },
-    ],
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: "About GetCyberRight: Digital Safety Has Never Mattered More",
+      description: "Online scams have changed. GetCyberRight gives families, seniors, and small businesses the simple tools and clear guidance they need to stay safe online.",
+      datePublished: "2024-01-15",
+      dateModified: "2026-03-01",
+      author: { "@type": "Person", name: "GetCyberRight", url: BASE_URL },
+      publisher: { "@type": "Organization", name: "GetCyberRight", logo: `${BASE_URL}/og-image.png` },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "About",
+          item: `${BASE_URL}/about`,
+        },
+      ],
+    },
+  ];
 
   return (
     <>

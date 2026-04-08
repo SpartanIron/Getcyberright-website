@@ -2,8 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
-import { StructuredData } from "@/components/structured-data";
-import type { ArticleData, BreadcrumbData } from "@/components/structured-data";
 import { Link } from "@/lib/navigation";
 import {
   ArrowRight, Shield, Heart, DollarSign, Eye, Users, BookOpen,
@@ -14,24 +12,6 @@ import {
 import familyTogetherImage from "@/assets/images/about-family-together.webp";
 import seniorsLearningImage from "@/assets/images/about-seniors-learning.webp";
 import ctaBackgroundImage from "@/assets/images/about-cta-background.webp";
-
-const aboutArticleSchema: ArticleData = {
-  type: "Article",
-  headline: "About GetCyberRight: Digital Safety Has Never Mattered More",
-  description: "Online scams have changed. GetCyberRight gives families, seniors, and small businesses the simple tools and clear guidance they need to stay safe online.",
-  datePublished: "2024-01-15",
-  dateModified: "2026-03-01",
-  author: { name: "GetCyberRight", url: "https://www.getcyberright.com" },
-  publisher: { name: "GetCyberRight", logo: "https://www.getcyberright.com/og-image.png" },
-};
-
-const aboutBreadcrumbs: BreadcrumbData = {
-  type: "BreadcrumbList",
-  items: [
-    { name: "Home", url: "https://www.getcyberright.com/" },
-    { name: "About", url: "https://www.getcyberright.com/about" },
-  ],
-};
 
 const threatTypes = [
   { icon: Mail, label: "Fake Emails & Texts", description: "Scam messages now look identical to real ones from your bank, employer, or favorite stores. Perfect grammar, real logos, and details pulled from your social media make them nearly impossible to spot." },
@@ -102,7 +82,6 @@ const credibilityStats = [
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
-      <StructuredData data={[aboutArticleSchema, aboutBreadcrumbs]} />
       <Navigation />
 
       <main id="main-content" tabIndex={-1}>

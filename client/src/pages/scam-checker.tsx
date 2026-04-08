@@ -1,8 +1,6 @@
 "use client";
 
 import { useSEO } from "@/hooks/use-seo";
-import { StructuredData } from "@/components/structured-data";
-import type { WebApplicationData, FAQData, BreadcrumbData } from "@/components/structured-data";
 import { ScamChecker } from "@/components/scam-checker";
 import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { ShareCallToAction } from "@/components/social-share";
@@ -26,33 +24,6 @@ interface ScamTrend {
   count: number;
   trend: string;
 }
-
-const scamCheckerApp: WebApplicationData = {
-  type: "WebApplication",
-  name: "GCR Scam Guard",
-  description: "AI-powered scam detection tool. Check suspicious URLs, emails, phone numbers, QR codes, and messages for fraud. Free manual scanning, no account required. Checked against multiple trusted safety sources.",
-  url: "https://www.getcyberright.com/scam-checker",
-  applicationCategory: "SecurityApplication",
-  provider: "GetCyberRight",
-};
-
-const scamCheckerFaq: FAQData = {
-  type: "FAQPage",
-  items: [
-    { question: "How does the GCR Scam Guard work?", answer: "The GCR Scam Guard analyzes URLs, emails, phone numbers, QR codes, and messages using multiple safety checks including AI analysis, trusted data sources, and domain reputation checks to determine if something is a scam." },
-    { question: "Is the GCR Scam Guard free to use?", answer: "Manual scanning on the website is free and requires no account. Just paste a suspicious link, message, or phone number and get instant results. The browser extension also includes free manual scanning, with optional paid plans for advanced protection." },
-    { question: "What types of scams can it detect?", answer: "The tool can detect phishing links, fraudulent websites, scam phone numbers, suspicious email content, malicious QR codes, and social engineering attempts across multiple categories of online fraud." },
-  ],
-};
-
-const scamCheckerBreadcrumbs: BreadcrumbData = {
-  type: "BreadcrumbList",
-  items: [
-    { name: "Home", url: "https://www.getcyberright.com/" },
-    { name: "Tools", url: "https://www.getcyberright.com/tools" },
-    { name: "GCR Scam Guard", url: "https://www.getcyberright.com/scam-checker" },
-  ],
-};
 
 export default function ScamCheckerPage() {
   useSEO({
@@ -121,7 +92,6 @@ export default function ScamCheckerPage() {
 
   return (
     <main id="main-content" tabIndex={-1} className="relative min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 overflow-hidden">
-      <StructuredData data={[scamCheckerApp, scamCheckerFaq, scamCheckerBreadcrumbs]} />
       <TechPatternBg variant="radar" />
       
       {/* Back Navigation */}
