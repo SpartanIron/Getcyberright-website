@@ -724,7 +724,7 @@ export const batch1Prompts: PromptSeedData[] = [
     category: "work",
     tags: ["BEC", "business email compromise", "wire fraud", "CEO fraud", "invoice scam"],
     useCase: "When your business processes financial transactions and you want to protect against email-based payment fraud.",
-    safetyNote: "Business Email Compromise caused over $2.7 billion in losses in 2022. Always verify financial requests by phone using a known number, never using contact information from the email itself.",
+    safetyNote: "Business Email Compromise causes billions in losses annually — the FBI IC3's latest report documented $3.05 billion. Always verify financial requests by phone using a known number, never using contact information from the email itself.",
     iconName: "Mail",
   },
   {

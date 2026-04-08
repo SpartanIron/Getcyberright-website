@@ -382,40 +382,41 @@ const adapters: Record<string, () => Promise<RawThreatItem[]>> = {
   "fbi-ic3": async () => {
     // FBI IC3 requires HTML scraping - return curated statistics
     return [{
-      externalId: "ic3-2024-stats",
+      externalId: "ic3-2025-stats",
       itemType: "statistic",
-      title: "FBI IC3 2024 Internet Crime Report Highlights",
-      summary: "Investment fraud led cybercrime losses at $4.57B in 2023, with romance scams and tech support fraud targeting seniors.",
+      title: "FBI IC3 2025 Internet Crime Report Highlights",
+      summary: "Cybercrime losses hit record $20.88 billion in 2025, with investment fraud, BEC, and crypto scams leading. AI-enabled crime tracked for the first time at $893 million.",
       content: JSON.stringify({
-        totalLosses: "$16.6 billion",
-        topCrimes: ["Investment Fraud", "Business Email Compromise", "Tech Support Fraud"],
-        seniorLosses: "$3.4 billion",
-        complaints: 880000,
-        year: 2023,
+        totalLosses: "$20.88 billion",
+        topCrimes: ["Investment Fraud", "Business Email Compromise", "Tech Support Scams"],
+        seniorLosses: "$7.75 billion",
+        cryptoLosses: "$11.4 billion",
+        aiEnabledCrimeLosses: "$893 million",
+        complaints: 1000000,
+        year: 2025,
       }),
       severity: "informational",
       confidence: 100,
       regions: ["US"],
       tags: ["ic3", "fbi", "statistics", "annual-report"],
       affectedAudiences: ["seniors", "business", "parents"],
-      sourceUrl: "https://www.ic3.gov/Media/PDF/AnnualReport/2023_IC3Report.pdf",
-      publishedAt: new Date("2024-03-01"),
+      sourceUrl: "https://www.ic3.gov/AnnualReport",
+      publishedAt: new Date("2026-04-07"),
     }];
   },
 
   "ftc-sentinel": async () => {
     // FTC Consumer Sentinel requires HTML scraping - return curated statistics
     return [{
-      externalId: "ftc-2024-stats",
+      externalId: "ftc-2025-stats",
       itemType: "statistic",
-      title: "FTC Consumer Fraud Report 2024",
-      summary: "Consumers reported losing more than $10 billion to fraud in 2023, with imposter scams the #1 fraud type.",
+      title: "FTC Consumer Fraud Report",
+      summary: "Consumers report losing billions annually to fraud, with imposter scams consistently the #1 fraud type.",
       content: JSON.stringify({
-        totalLosses: "$10 billion",
+        totalLosses: "billions annually",
         topFraudTypes: ["Imposter Scams", "Online Shopping", "Prizes/Sweepstakes"],
         contactMethods: ["Phone", "Social Media", "Email"],
         medianLoss: "$500",
-        year: 2023,
       }),
       severity: "informational",
       confidence: 100,

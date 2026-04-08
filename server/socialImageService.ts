@@ -47,15 +47,15 @@ const TOPIC_CONFIG: Record<string, TopicConfig> = {
     accent: "#E8612D",
     iconPath: `<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v5.7c0 4.47-3.07 8.67-7 9.82-3.93-1.15-7-5.35-7-9.82V6.3l7-3.12zM11 7v6h2V7h-2zm0 8v2h2v-2h-2z" fill="#E8612D"/>`,
     tips: ["If it sounds too good, question it", "Research before you pay", "Trust your instincts on pressure tactics"],
-    stat: "$10.3B",
-    statLabel: "lost to scams in 2023",
+    stat: "$20.9B",
+    statLabel: "lost to cybercrime annually",
   },
   identity_theft: {
     accent: "#4ECDC4",
     iconPath: `<path d="M12 2C9.24 2 7 4.24 7 7s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zM12 14c-4 0-8 2-8 4v2h16v-2c0-2-4-4-8-4zm-5.87 4c.36-.62 3.07-2 5.87-2s5.51 1.38 5.87 2H6.13z" fill="#4ECDC4"/><path d="M20 10h-2V8a1 1 0 00-2 0v2h-2a1 1 0 000 2h2v2a1 1 0 002 0v-2h2a1 1 0 000-2z" fill="#4ECDC4" opacity="0.6"/>`,
     tips: ["Freeze your credit with all 3 bureaus", "Use unique passwords everywhere", "Monitor bank statements weekly"],
-    stat: "1.4M",
-    statLabel: "identity theft reports in 2023",
+    stat: "1M+",
+    statLabel: "cybercrime complaints filed annually",
   },
   privacy: {
     accent: "#4ECDC4",
@@ -83,7 +83,7 @@ const TOPIC_CONFIG: Record<string, TopicConfig> = {
     iconPath: `<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v5.7c0 4.47-3.07 8.67-7 9.82-3.93-1.15-7-5.35-7-9.82V6.3l7-3.12z" fill="#FF6B6B"/><path d="M10 14.5l-3.5-3.5 1.41-1.41L10 11.67l5.59-5.59L17 7.5l-7 7z" fill="#FF6B6B" opacity="0.5"/>`,
     tips: ["Check if your data has been exposed", "Change passwords immediately", "Watch for unusual account activity"],
     stat: "4,100+",
-    statLabel: "data breaches disclosed in 2023",
+    statLabel: "data breaches disclosed annually",
   },
   default: {
     accent: "#E8612D",

@@ -95,7 +95,7 @@ async function seedGuides() {
         { text: "What to Do If Stolen", anchor: "what-to-do-if-identity-stolen", level: 2 },
       ],
       faq: [
-        { question: "How common is identity theft?", answer: "The FTC received over 1 million identity theft reports in 2023. It is one of the most common forms of consumer fraud." },
+        { question: "How common is identity theft?", answer: "The FTC receives over a million identity theft reports annually. It remains one of the most common forms of consumer fraud, with losses rising year over year." },
         { question: "Does freezing my credit hurt my score?", answer: "No. A credit freeze has no impact on your credit score. You can temporarily lift it when you need to apply for credit." },
         { question: "How do thieves steal identities?", answer: "Common methods include phishing emails, data breaches, stolen mail, social engineering, and malware." },
       ],
@@ -176,7 +176,7 @@ async function seedGuides() {
       tags: ["seniors", "elder fraud", "family safety"],
       targetKeywords: ["protecting seniors from scams", "elder fraud prevention", "scams targeting seniors"],
       content: `<h2 id="why-scammers-target-seniors">Why Scammers Target Seniors</h2>
-<p>Older adults are more frequently targeted by scammers because they tend to be more trusting, may be less familiar with digital technology, and often have accumulated savings. According to the FTC, older adults reported losing over $1.9 billion to fraud in 2023, while the FBI IC3 documented $3.4 billion in losses from cyber-enabled fraud targeting people over 60. The UK's Action Fraud service and Australia's ACSC report similar upward trends globally.</p>
+<p>Older adults are more frequently targeted by scammers because they tend to be more trusting, may be less familiar with digital technology, and often have accumulated savings. The FBI IC3's latest annual report documented $7.75 billion in losses from cyber-enabled fraud targeting people over 60 — roughly 37% of all reported cybercrime losses. The UK's Action Fraud service and Australia's ACSC report similar upward trends globally.</p>
 
 <h2 id="common-scams">Common Scams Targeting Seniors</h2>
 <h3>Tech Support Scams</h3>
@@ -631,7 +631,7 @@ async function seedScamIntel() {
         { step: 5, title: "Escalation", description: "If the victim sends money, more emergencies follow. The scammer continues extracting money until the victim runs out or becomes suspicious." },
       ],
       faq: [
-        { question: "How much do people lose to romance scams?", answer: "The FTC reports romance scam losses exceeded $1.1 billion in 2023, with individual losses averaging $2,000 to $50,000." },
+        { question: "How much do people lose to romance scams?", answer: "Romance scams consistently rank among the costliest scam categories, with individual losses averaging $2,000 to $50,000. The FBI IC3's latest report shows investment and romance fraud combined account for billions in annual losses." },
         { question: "Who falls for romance scams?", answer: "Anyone can be targeted. While seniors are often targeted, victims come from all age groups and backgrounds. Scammers are skilled at emotional manipulation." },
       ],
       averageLoss: "$4,400",

@@ -116,7 +116,7 @@ export const additionalScamIntel = [
     ],
     faq: [
       { question: "Why is it called pig butchering?", answer: "The term comes from the Chinese phrase 'sha zhu pan.' Scammers 'fatten' victims with fake profits and trust before 'slaughtering' them; stealing all their money." },
-      { question: "How much do people typically lose?", answer: "According to the FBI, victims of pig butchering scams lose an average of $178,000. Some have lost over $1 million. The FBI's IC3 reported over $3.9 billion in crypto investment fraud losses in 2023." },
+      { question: "How much do people typically lose?", answer: "According to the FBI, victims of pig butchering scams lose an average of $178,000. Some have lost over $1 million. The FBI IC3's latest annual report documented $11.4 billion in cryptocurrency fraud losses, with pig butchering as the dominant scheme." },
     ],
     averageLoss: "$178,000",
   },
@@ -158,7 +158,7 @@ export const additionalScamIntel = [
     ],
     faq: [
       { question: "What should my child do if they are being sextorted?", answer: "Stop all communication with the person. Do not pay. Screenshot everything. Report to NCMEC CyberTipline.org, the FBI at ic3.gov, and the social media platform. Most importantly, tell them they are not in trouble and you are there to help." },
-      { question: "How common is teen sextortion?", answer: "The FBI has called it the fastest-growing threat to minors. NCMEC received over 186,000 sextortion reports in 2023. At least 30 teen suicides have been linked to sextortion." },
+      { question: "How common is teen sextortion?", answer: "The FBI has called it the fastest-growing threat to minors. NCMEC receives hundreds of thousands of sextortion reports annually, and the numbers continue to climb. At least 30 teen suicides have been linked to sextortion." },
     ],
     averageLoss: "$3,000",
   },

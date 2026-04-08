@@ -29,7 +29,7 @@ export const additionalAlerts = [
     threatName: "Pig Butchering Crypto Investment Fraud Wave",
     threatCategory: "investment_fraud",
     description: "The FBI reports record losses from pig butchering cryptocurrency scams, where criminals build long-term relationships before convincing victims to invest in fake crypto platforms.",
-    detailedAnalysis: "The FBI IC3 reported over $3.9 billion in crypto investment fraud losses in 2023, with pig butchering being the dominant scheme. Victims are typically contacted via wrong number texts, dating apps, or LinkedIn. The scam involves weeks or months of relationship building before introducing a fake trading platform that shows fabricated returns.",
+    detailedAnalysis: "The FBI IC3's latest annual report documented $11.4 billion in cryptocurrency fraud losses, with pig butchering remaining the dominant scheme. Victims are typically contacted via wrong number texts, dating apps, or LinkedIn. The scam involves weeks or months of relationship building before introducing a fake trading platform that shows fabricated returns.",
     riskLevel: "critical",
     affectedPlatforms: ["WhatsApp", "Telegram", "Dating Apps", "LinkedIn", "Instagram"],
     indicators: [
@@ -55,7 +55,7 @@ export const additionalAlerts = [
     threatName: "Teen Sextortion Epidemic",
     threatCategory: "extortion",
     description: "The FBI has declared sextortion the fastest-growing threat to minors. Predators target teenagers on social media and gaming platforms, tricking them into sharing intimate images and then demanding payment.",
-    detailedAnalysis: "NCMEC received over 186,000 sextortion reports in 2023. The FBI has linked at least 30 teen suicides to sextortion. Predators primarily operate through Instagram, Snapchat, and gaming platforms like Discord. They pose as attractive teenagers to build trust before requesting intimate content. Once received, they threaten to share images with the victim's school contacts and family unless payment is made.",
+    detailedAnalysis: "NCMEC receives hundreds of thousands of sextortion reports annually, and the numbers continue to climb. The FBI has linked at least 30 teen suicides to sextortion. Predators primarily operate through Instagram, Snapchat, and gaming platforms like Discord. They pose as attractive teenagers to build trust before requesting intimate content. Once received, they threaten to share images with the victim's school contacts and family unless payment is made.",
     riskLevel: "critical",
     affectedPlatforms: ["Instagram", "Snapchat", "Discord", "TikTok", "Gaming Platforms"],
     indicators: [
@@ -81,7 +81,7 @@ export const additionalAlerts = [
     threatName: "SIM Swapping Attacks Bypassing 2FA",
     threatCategory: "identity_theft",
     description: "A surge in SIM swapping attacks where hackers take over victims' phone numbers to bypass two-factor authentication and drain bank accounts.",
-    detailedAnalysis: "The FBI reported over $68 million in SIM swapping losses in 2023. Attackers social-engineer phone carriers into transferring a victim's number to a new SIM card. With the victim's phone number, they receive all SMS-based 2FA codes, enabling them to reset passwords on banking, email, and cryptocurrency accounts.",
+    detailedAnalysis: "The FBI reports tens of millions in SIM swapping losses annually, with figures rising each year. Attackers social-engineer phone carriers into transferring a victim's number to a new SIM card. With the victim's phone number, they receive all SMS-based 2FA codes, enabling them to reset passwords on banking, email, and cryptocurrency accounts.",
     riskLevel: "critical",
     affectedPlatforms: ["Phone Carriers", "Banking Apps", "Email"],
     indicators: [
@@ -159,7 +159,7 @@ export const additionalAlerts = [
     threatName: "Fake Job and Employment Scam Surge",
     threatCategory: "employment_fraud",
     description: "The FTC reports a massive increase in fake job scams targeting remote workers. Criminals post fake listings on LinkedIn and job boards to steal personal information and money.",
-    detailedAnalysis: "Job scams reported to the FTC increased over 118% from 2022 to 2024. Scammers post attractive remote positions on LinkedIn, Indeed, and ZipRecruiter offering above-market pay. During fake onboarding, they collect Social Security numbers, bank account details, and copies of government IDs. Some scams require upfront equipment purchases with checks that bounce.",
+    detailedAnalysis: "Job scams reported to the FTC have surged dramatically in recent years. Scammers post attractive remote positions on LinkedIn, Indeed, and ZipRecruiter offering above-market pay. During fake onboarding, they collect Social Security numbers, bank account details, and copies of government IDs. Some scams require upfront equipment purchases with checks that bounce.",
     riskLevel: "high",
     affectedPlatforms: ["LinkedIn", "Indeed", "Email", "WhatsApp"],
     indicators: [
@@ -185,7 +185,7 @@ export const additionalAlerts = [
     threatName: "Gift Card Payment Scams Targeting Seniors",
     threatCategory: "payment_fraud",
     description: "Gift card payment scams remain the number one payment method in elder fraud. Scammers impersonate the IRS, tech support, and family members to trick seniors into buying and sending gift card codes.",
-    detailedAnalysis: "The FTC reports that gift cards are the #1 payment method demanded by scammers. In 2023, consumers reported over $217 million in losses from gift card scams. Target, Apple, Google Play, and Amazon gift cards are the most commonly requested. Scammers use government impersonation, tech support fraud, and grandparent scam tactics.",
+    detailedAnalysis: "The FTC reports that gift cards are the #1 payment method demanded by scammers, with consumers losing hundreds of millions annually to gift card scams. Target, Apple, Google Play, and Amazon gift cards are the most commonly requested. Scammers use government impersonation, tech support fraud, and grandparent scam tactics.",
     riskLevel: "high",
     affectedPlatforms: ["Phone", "Email", "SMS"],
     indicators: [

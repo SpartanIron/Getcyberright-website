@@ -31,7 +31,7 @@ export const additionalGuides: CriticalGuideData[] = [
       { question: "Is SMS two-factor authentication safe?", answer: "SMS-based 2FA is better than no 2FA, but it is vulnerable to SIM swapping. Use authenticator apps like Google Authenticator or Authy for stronger protection. Hardware security keys offer the best protection." },
       { question: "Can I get my money back if I am SIM swapped?", answer: "Contact your bank immediately. Many banks will reverse unauthorized transactions if reported quickly. File a report with the FBI at ic3.gov and your local police. Document everything for insurance and legal purposes." },
     ],
-    content: `SIM swapping is one of the fastest-growing cyberattacks. The FBI reported over $68 million in SIM swapping losses in 2023 alone. This guide explains how SIM swapping works and exactly how to protect yourself.
+    content: `SIM swapping is one of the fastest-growing cyberattacks, with the FBI reporting tens of millions in losses annually — and rising. This guide explains how SIM swapping works and exactly how to protect yourself.
 
 ## What Is SIM Swapping?
 
@@ -445,7 +445,7 @@ Deepfake detection is not about being paranoid; it is about being prepared. As t
       { question: "My teen was targeted but is too embarrassed to tell anyone. What should I do?", answer: "Reassure them that they are the victim and will not be in trouble. Many teens feel shame and fear, which is exactly what predators exploit. Professional counseling may help. Contact NCMEC at CyberTipline.org for support." },
       { question: "Can sextortion images be removed from the internet?", answer: "Yes. Use NCMEC's Take It Down service at takeitdown.ncmec.org. This free tool works with major platforms to remove intimate images of minors. It uses hash technology so the images are never seen by NCMEC staff." },
     ],
-    content: `The FBI has declared sextortion the fastest-growing threat to minors in the United States. NCMEC received over 186,000 sextortion reports in 2023. At least 30 teen suicides have been linked to sextortion. This guide gives parents the tools to protect their children.
+    content: `The FBI has declared sextortion the fastest-growing threat to minors in the United States. NCMEC receives hundreds of thousands of sextortion reports annually, and the numbers continue to climb. At least 30 teen suicides have been linked to sextortion. This guide gives parents the tools to protect their children.
 
 ## The Growing Threat to Teenagers Online
 
