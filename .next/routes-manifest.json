@@ -23,6 +23,54 @@
   },
   "dynamicRoutes": [
     {
+      "page": "/alerts/[slug]",
+      "regex": "^/alerts/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/alerts/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/guides/[slug]",
+      "regex": "^/guides/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/guides/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/news/[slug]",
+      "regex": "^/news/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/news/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/scam-intel/[slug]",
+      "regex": "^/scam\\-intel/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/scam\\-intel/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/scams/[scamType]",
+      "regex": "^/scams/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPscamType": "nxtPscamType"
+      },
+      "namedRegex": "^/scams/(?<nxtPscamType>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/topics/[cluster]",
+      "regex": "^/topics/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPcluster": "nxtPcluster"
+      },
+      "namedRegex": "^/topics/(?<nxtPcluster>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/[...slug]",
       "regex": "^/(.+?)(?:/)?$",
       "routeKeys": {
@@ -49,6 +97,138 @@
       "regex": "^/_not\\-found(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/about",
+      "regex": "^/about(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/about(?:/)?$"
+    },
+    {
+      "page": "/ai-prompts",
+      "regex": "^/ai\\-prompts(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/ai\\-prompts(?:/)?$"
+    },
+    {
+      "page": "/alerts",
+      "regex": "^/alerts(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/alerts(?:/)?$"
+    },
+    {
+      "page": "/contact",
+      "regex": "^/contact(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/contact(?:/)?$"
+    },
+    {
+      "page": "/educators",
+      "regex": "^/educators(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/educators(?:/)?$"
+    },
+    {
+      "page": "/emergency-help",
+      "regex": "^/emergency\\-help(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/emergency\\-help(?:/)?$"
+    },
+    {
+      "page": "/faq",
+      "regex": "^/faq(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/faq(?:/)?$"
+    },
+    {
+      "page": "/guides",
+      "regex": "^/guides(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/guides(?:/)?$"
+    },
+    {
+      "page": "/kids",
+      "regex": "^/kids(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kids(?:/)?$"
+    },
+    {
+      "page": "/news",
+      "regex": "^/news(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/news(?:/)?$"
+    },
+    {
+      "page": "/parents",
+      "regex": "^/parents(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/parents(?:/)?$"
+    },
+    {
+      "page": "/pricing",
+      "regex": "^/pricing(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/pricing(?:/)?$"
+    },
+    {
+      "page": "/privacy",
+      "regex": "^/privacy(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/privacy(?:/)?$"
+    },
+    {
+      "page": "/resources",
+      "regex": "^/resources(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/resources(?:/)?$"
+    },
+    {
+      "page": "/scam-checker",
+      "regex": "^/scam\\-checker(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/scam\\-checker(?:/)?$"
+    },
+    {
+      "page": "/scam-intel",
+      "regex": "^/scam\\-intel(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/scam\\-intel(?:/)?$"
+    },
+    {
+      "page": "/seniors",
+      "regex": "^/seniors(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/seniors(?:/)?$"
+    },
+    {
+      "page": "/shield",
+      "regex": "^/shield(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/shield(?:/)?$"
+    },
+    {
+      "page": "/small-business",
+      "regex": "^/small\\-business(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/small\\-business(?:/)?$"
+    },
+    {
+      "page": "/terms",
+      "regex": "^/terms(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/terms(?:/)?$"
+    },
+    {
+      "page": "/tools",
+      "regex": "^/tools(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tools(?:/)?$"
+    },
+    {
+      "page": "/training",
+      "regex": "^/training(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/training(?:/)?$"
     }
   ],
   "dataRoutes": [],

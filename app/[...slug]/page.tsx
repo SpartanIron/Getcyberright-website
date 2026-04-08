@@ -3,21 +3,10 @@ import { notFound } from "next/navigation";
 import ClientApp from "./client-app";
 
 const STATIC_ROUTES = new Set([
-  "about",
-  "tools",
-  "resources",
-  "contact",
-  "privacy",
-  "terms",
-  "emergency-help",
-  "kids",
-  "seniors",
-  "parents",
   "support",
   "support-the-mission",
   "security",
   "our-mission",
-  "pricing",
   "dashboard",
   "account",
   "threat-trends",
@@ -26,16 +15,12 @@ const STATIC_ROUTES = new Set([
   "report-scam",
   "checklists",
   "data-removal",
-  "ai-prompts",
   "ai-safety",
-  "news",
   "cyber-hygiene",
   "password-generator",
   "breach-dashboard",
   "search",
   "parent-guide",
-  "small-business",
-  "educators",
   "travel-safety",
   "accessibility",
   "advertise",
@@ -47,39 +32,31 @@ const STATIC_ROUTES = new Set([
   "printable-guides",
   "quick-assessment",
   "safety-score",
-  "scam-checker",
-  "shield",
   "browser-extension",
   "extension-auth",
   "gcr-guard-pricing",
   "data-shield-pricing",
-  "faq",
-  "guides",
-  "alerts",
-  "scam-intel",
-  "training",
   "login",
   "register",
   "forgot-password",
 ]);
 
-const DYNAMIC_PREFIXES = [
-  "training",
-  "guides",
-  "alerts",
-  "scam-intel",
-  "scams",
-  "topics",
-  "report",
-  "news",
-  "shield",
-  "admin",
-  "parents",
-];
+const DYNAMIC_ROUTES: Record<string, number> = {
+  "training": 2,
+  "report": 2,
+  "shield": 2,
+  "admin": 3,
+  "parents": 2,
+};
 
 function isKnownRoute(segments: string[]): boolean {
   if (segments.length === 1 && STATIC_ROUTES.has(segments[0])) return true;
-  if (segments.length >= 1 && DYNAMIC_PREFIXES.includes(segments[0])) return true;
+
+  if (segments.length >= 1) {
+    const maxDepth = DYNAMIC_ROUTES[segments[0]];
+    if (maxDepth !== undefined && segments.length <= maxDepth) return true;
+  }
+
   return false;
 }
 
