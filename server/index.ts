@@ -34,7 +34,7 @@ declare module "http" {
   }
 }
 
-// Security: Configure Helmet security headers first
+// Security: Configure Helmet (CSP handled by Next.js middleware for nonce support)
 configureHelmet(app);
 
 // Security: CORS - explicit whitelist for cross-origin requests (browser extension, etc.)

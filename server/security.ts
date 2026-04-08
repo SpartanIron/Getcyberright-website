@@ -528,74 +528,10 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
   next();
 }
 
-// Configure Helmet with strict CSP
 export function configureHelmet(app: Express) {
   app.use(
     helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          scriptSrc: [
-            "'self'",
-            ...(process.env.NODE_ENV !== "production" ? ["'unsafe-inline'"] : []),
-            "https://www.googletagmanager.com",
-            "https://www.google-analytics.com",
-            "https://www.google.com",
-            "https://www.gstatic.com",
-            "https://www.recaptcha.net",
-            "https://js.stripe.com",
-          ],
-          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-          imgSrc: [
-            "'self'",
-            "data:",
-            "blob:",
-            "https://images.unsplash.com",
-            "https://source.unsplash.com",
-            "https://images.pexels.com",
-            "https://www.getcyberright.com",
-            "https://*.googleusercontent.com",
-            "https://www.google-analytics.com",
-            "https://www.googletagmanager.com",
-            "https://lh3.googleusercontent.com",
-            "https://picsum.photos",
-            "https://fastly.picsum.photos",
-            "https://*.stripe.com",
-          ],
-          fontSrc: ["'self'", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
-          connectSrc: [
-            "'self'",
-            "https://ip-api.com",
-            "https://checkurl.phishtank.com",
-            "https://urlhaus-api.abuse.ch",
-            "https://haveibeenpwned.com",
-            "https://www.google-analytics.com",
-            "https://analytics.google.com",
-            "https://www.google.com",
-            "https://www.recaptcha.net",
-            "https://api.stripe.com",
-            "https://api.openai.com",
-            "https://api.anthropic.com",
-            "https://api.unsplash.com",
-            "https://api.pexels.com",
-            "wss://*.replit.dev",
-            "wss://*.replit.app",
-            "wss://*.repl.co",
-            "wss://www.getcyberright.com",
-          ],
-          mediaSrc: ["'self'"],
-          frameSrc: [
-            "https://js.stripe.com",
-            "https://www.google.com",
-            "https://recaptcha.google.com",
-            "https://www.recaptcha.net",
-          ],
-          objectSrc: ["'none'"],
-          baseUri: ["'self'"],
-          formAction: ["'self'"],
-          upgradeInsecureRequests: null,
-        },
-      },
+      contentSecurityPolicy: false,
       strictTransportSecurity: {
         maxAge: 31536000,
         includeSubDomains: true,
@@ -611,6 +547,32 @@ export function configureHelmet(app: Express) {
       crossOriginResourcePolicy: { policy: "cross-origin" },
     })
   );
+}
+
+export function cspNonceMiddleware() {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const nonce = generateCSPNonce();
+    res.locals.cspNonce = nonce;
+
+    const csp = [
+      `default-src 'self'`,
+      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://js.stripe.com`,
+      `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+      `img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://images.pexels.com https://www.getcyberright.com https://*.googleusercontent.com https://www.google-analytics.com https://www.googletagmanager.com https://lh3.googleusercontent.com https://picsum.photos https://fastly.picsum.photos https://*.stripe.com`,
+      `font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com`,
+      `connect-src 'self' https://ip-api.com https://checkurl.phishtank.com https://urlhaus-api.abuse.ch https://haveibeenpwned.com https://www.google-analytics.com https://analytics.google.com https://www.google.com https://www.recaptcha.net https://api.stripe.com https://api.openai.com https://api.anthropic.com https://api.unsplash.com https://api.pexels.com wss://*.replit.dev wss://*.replit.app wss://*.repl.co wss://www.getcyberright.com`,
+      `media-src 'self'`,
+      `frame-src https://js.stripe.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net`,
+      `object-src 'none'`,
+      `base-uri 'self'`,
+      `form-action 'self'`,
+      `frame-ancestors 'self'`,
+      `script-src-attr 'none'`,
+    ].join("; ");
+
+    res.setHeader("Content-Security-Policy", csp);
+    next();
+  };
 }
 
 // Request size limiting middleware

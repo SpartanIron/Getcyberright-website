@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import "../client/src/index.css";
 import Providers from "./providers";
 import AppShell from "./app-shell";
@@ -49,11 +50,13 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   const globalJsonLd = [
     {
       "@context": "https://schema.org",
@@ -101,6 +104,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(globalJsonLd).replace(/</g, "\\u003c"),
