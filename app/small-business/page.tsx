@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/small-business";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -18,6 +20,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const revalidate = 3600;
+
 export default function SmallBusinessPage() {
-  return <PageContent />;
+  return <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>;
 }

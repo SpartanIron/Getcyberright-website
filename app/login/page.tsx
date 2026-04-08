@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import PageSkeleton from "../page-skeleton";
+import { Suspense } from "react";
 import PageContent from "@/pages/login";
 
 export const metadata: Metadata = {
@@ -9,5 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default function LoginPage() {
-  return <PageContent />;
+  return <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>;
 }

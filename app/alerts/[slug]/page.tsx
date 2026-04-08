@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "../../page-skeleton";
 import { notFound } from "next/navigation";
 import PageContent from "@/pages/alert-detail";
 
@@ -86,7 +88,9 @@ export default async function AlertDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-      <PageContent />
+      <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>
     </>
   );
 }

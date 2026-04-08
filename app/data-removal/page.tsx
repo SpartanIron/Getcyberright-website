@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/data-removal";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -16,6 +18,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const revalidate = 3600;
+
 export default function DataRemovalPage() {
-  return <PageContent />;
+  return <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>;
 }

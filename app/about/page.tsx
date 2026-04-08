@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/about";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -25,6 +27,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = "force-static";
+
 export default function AboutPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -48,7 +52,9 @@ export default function AboutPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <PageContent />
+      <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>
     </>
   );
 }

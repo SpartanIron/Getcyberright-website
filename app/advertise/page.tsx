@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/advertise";
 
 export const metadata: Metadata = {
@@ -8,6 +10,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+export const dynamic = "force-static";
+
 export default function AdvertisePage() {
-  return <PageContent />;
+  return <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>;
 }

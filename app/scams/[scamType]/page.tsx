@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "../../page-skeleton";
 import PageContent from "@/pages/scam-page";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -41,5 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default function ScamTypePage() {
-  return <PageContent />;
+  return <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>;
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import PageSkeleton from "../../../page-skeleton";
 import PageContent from "@/pages/training-lesson";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -48,5 +50,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function TrainingLessonPage({ params }: PageProps) {
   const { lessonId } = await params;
   if (!lessonId) notFound();
-  return <PageContent />;
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <PageContent />
+    </Suspense>
+  );
 }

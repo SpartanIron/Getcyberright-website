@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/security";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -15,6 +17,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = "force-static";
+
 export default function SecurityPage() {
-  return <PageContent />;
+  return <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>;
 }

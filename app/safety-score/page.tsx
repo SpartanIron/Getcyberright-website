@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import PageSkeleton from "../page-skeleton";
+import { Suspense } from "react";
 import PageContent from "@/pages/safety-score";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -16,6 +18,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const revalidate = 3600;
+
 export default function SafetyScorePage() {
-  return <PageContent />;
+  return <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>;
 }

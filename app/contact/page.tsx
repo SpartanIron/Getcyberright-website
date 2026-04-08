@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/contact";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -16,6 +18,8 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
+
+export const dynamic = "force-static";
 
 export default function ContactPage() {
   const jsonLd = {
@@ -40,7 +44,9 @@ export default function ContactPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <PageContent />
+      <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>
     </>
   );
 }

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/shield";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -24,6 +26,8 @@ export const metadata: Metadata = {
     ],
   },
 };
+
+export const revalidate = 3600;
 
 export default function ShieldPage() {
   const jsonLd = [
@@ -77,7 +81,9 @@ export default function ShieldPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <PageContent />
+      <Suspense fallback={<PageSkeleton />}>
+        <PageContent />
+      </Suspense>
     </>
   );
 }

@@ -675,7 +675,7 @@ function KidsLanding({ onSelectAge }: { onSelectAge: (age: AgeGroup) => void }) 
               <span className="font-semibold">Kids Digital Safety Hub</span>
               <Sparkles className="w-4 h-4" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Learn to Stay Safe Online</h1>
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Learn to Stay Safe Online</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Fun and easy lessons to help you become a smart and safe internet explorer. Choose your age group to get started.
             </p>
