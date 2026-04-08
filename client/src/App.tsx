@@ -1,10 +1,6 @@
 import { Switch, Route, useLocation } from "wouter";
 import { useEffect, useState, lazy, Suspense } from "react";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ThemeProvider } from "@/components/theme-provider";
 import { DeziAssistant } from "@/components/dezi-assistant";
 import { FeedbackWidget } from "@/components/feedback-widget";
 import { AnnouncementBanner } from "@/components/announcement-banner";
@@ -13,7 +9,6 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { Loader2 } from "lucide-react";
-import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
 const isServer = typeof window === "undefined";
 
@@ -255,42 +250,22 @@ function App() {
     return () => window.removeEventListener("cookie-consent-updated", handleConsentUpdate);
   }, []);
 
-  const recaptchaSiteKey = (!isServer && (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "")) || "";
-
-  const appContent = (
-    <ThemeProvider>
-      <TooltipProvider>
-        {!isServer && <ScrollToTop />}
-        <AnnouncementBanner />
-        <Toaster />
-        <ErrorBoundary>
-          <AppRouter />
-        </ErrorBoundary>
-        {isClient && (
-          <>
-            <DeziAssistant />
-            <FeedbackWidget />
-            <CookieConsent />
-          </>
-        )}
-      </TooltipProvider>
-    </ThemeProvider>
-  );
-
-  if (isServer) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        {appContent}
-      </QueryClientProvider>
-    );
-  }
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
-        {appContent}
-      </GoogleReCaptchaProvider>
-    </QueryClientProvider>
+    <>
+      {!isServer && <ScrollToTop />}
+      <AnnouncementBanner />
+      <Toaster />
+      <ErrorBoundary>
+        <AppRouter />
+      </ErrorBoundary>
+      {isClient && (
+        <>
+          <DeziAssistant />
+          <FeedbackWidget />
+          <CookieConsent />
+        </>
+      )}
+    </>
   );
 }
 

@@ -23,15 +23,21 @@
   },
   "dynamicRoutes": [
     {
-      "page": "/[[...slug]]",
-      "regex": "^(?:/(.+?))?(?:/)?$",
+      "page": "/[...slug]",
+      "regex": "^/(.+?)(?:/)?$",
       "routeKeys": {
         "nxtPslug": "nxtPslug"
       },
-      "namedRegex": "^(?:/(?<nxtPslug>.+?))?(?:/)?$"
+      "namedRegex": "^/(?<nxtPslug>.+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
     {
       "page": "/_global-error",
       "regex": "^/_global\\-error(?:/)?$",

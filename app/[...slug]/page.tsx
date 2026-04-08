@@ -78,36 +78,19 @@ const DYNAMIC_PREFIXES = [
 ];
 
 function isKnownRoute(segments: string[]): boolean {
-  if (segments.length === 0) return true;
   if (segments.length === 1 && STATIC_ROUTES.has(segments[0])) return true;
   if (segments.length >= 1 && DYNAMIC_PREFIXES.includes(segments[0])) return true;
   return false;
 }
 
 type PageProps = {
-  params: Promise<{ slug?: string[] }>;
+  params: Promise<{ slug: string[] }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const segments = slug || [];
 
-  if (segments.length === 0) {
-    return {
-      title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
-      description:
-        "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training. Trusted by thousands of families worldwide.",
-      openGraph: {
-        title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
-        description:
-          "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training.",
-        url: "https://www.getcyberright.com",
-        type: "website",
-      },
-    };
-  }
-
-  if (!isKnownRoute(segments)) {
+  if (!isKnownRoute(slug)) {
     return {
       title: "Page Not Found | GetCyberRight",
       description:
@@ -121,9 +104,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CatchAllPage({ params }: PageProps) {
   const { slug } = await params;
-  const segments = slug || [];
 
-  if (!isKnownRoute(segments)) {
+  if (!isKnownRoute(slug)) {
     notFound();
   }
 
