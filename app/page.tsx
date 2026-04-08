@@ -1,16 +1,29 @@
 import type { Metadata } from "next";
 import ClientApp from "./client-app";
 
+const BASE_URL = "https://www.getcyberright.com";
+
 export const metadata: Metadata = {
-  title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
+  title:
+    "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
   description:
     "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training. Trusted by thousands of families worldwide.",
+  alternates: { canonical: BASE_URL },
   openGraph: {
-    title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
+    title:
+      "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
     description:
       "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training.",
-    url: "https://www.getcyberright.com",
+    url: BASE_URL,
     type: "website",
+    images: [
+      {
+        url: `${BASE_URL}/og/trust-metrics.png`,
+        width: 1080,
+        height: 1080,
+        alt: "GetCyberRight - Free Cybersecurity Education for Families",
+      },
+    ],
   },
 };
 

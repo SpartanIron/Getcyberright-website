@@ -14,10 +14,41 @@ export const metadata: Metadata = {
       "Cybersecurity guides for parents. Learn about parental controls, age-appropriate device settings, and how to protect your children from online threats.",
     url: `${BASE_URL}/parents`,
     type: "website",
-    images: [{ url: `${BASE_URL}/og/education.png`, width: 1080, height: 1080, alt: "Parents Hub" }],
+    images: [
+      {
+        url: `${BASE_URL}/og/education.png`,
+        width: 1080,
+        height: 1080,
+        alt: "Parents Hub",
+      },
+    ],
   },
 };
 
 export default function ParentsPage() {
-  return <ClientApp />;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Parents Hub",
+        item: `${BASE_URL}/parents`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <ClientApp />
+    </>
+  );
 }

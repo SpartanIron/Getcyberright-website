@@ -14,10 +14,41 @@ export const metadata: Metadata = {
       "Stay informed with the latest cybersecurity threat alerts. Real-time warnings about active scams, malware, data breaches, and emerging threats.",
     url: `${BASE_URL}/alerts`,
     type: "website",
-    images: [{ url: `${BASE_URL}/og/news-alerts.png`, width: 1080, height: 1080, alt: "GetCyberRight Threat Alerts" }],
+    images: [
+      {
+        url: `${BASE_URL}/og/news-alerts.png`,
+        width: 1080,
+        height: 1080,
+        alt: "GetCyberRight Threat Alerts",
+      },
+    ],
   },
 };
 
 export default function AlertsPage() {
-  return <ClientApp />;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Threat Alerts",
+        item: `${BASE_URL}/alerts`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <ClientApp />
+    </>
+  );
 }

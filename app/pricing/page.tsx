@@ -14,10 +14,41 @@ export const metadata: Metadata = {
       "GetCyberRight is free to get started. Access AI-powered scam checking, data broker removal, safety training, and more.",
     url: `${BASE_URL}/pricing`,
     type: "website",
-    images: [{ url: `${BASE_URL}/og/trust-metrics.png`, width: 1080, height: 1080, alt: "GetCyberRight Pricing" }],
+    images: [
+      {
+        url: `${BASE_URL}/og/trust-metrics.png`,
+        width: 1080,
+        height: 1080,
+        alt: "GetCyberRight Pricing",
+      },
+    ],
   },
 };
 
 export default function PricingPage() {
-  return <ClientApp />;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Pricing",
+        item: `${BASE_URL}/pricing`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <ClientApp />
+    </>
+  );
 }

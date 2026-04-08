@@ -14,10 +14,56 @@ export const metadata: Metadata = {
       "Access cybersecurity tools including an AI-powered GCR Scam Guard, secure Password Generator, Data Broker Removal, and Breach Monitor. Core tools are free.",
     url: `${BASE_URL}/tools`,
     type: "website",
-    images: [{ url: `${BASE_URL}/og/scam-guard.png`, width: 1080, height: 1080, alt: "GetCyberRight Tools" }],
+    images: [
+      {
+        url: `${BASE_URL}/og/scam-guard.png`,
+        width: 1080,
+        height: 1080,
+        alt: "GetCyberRight Tools",
+      },
+    ],
   },
 };
 
 export default function ToolsPage() {
-  return <ClientApp />;
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Cybersecurity Tools & Scam Guard",
+      description:
+        "Free cybersecurity tools including AI-powered scam detection, password generator, data broker removal, and breach monitoring.",
+      url: `${BASE_URL}/tools`,
+      publisher: {
+        "@type": "Organization",
+        name: "GetCyberRight",
+        url: BASE_URL,
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Tools",
+          item: `${BASE_URL}/tools`,
+        },
+      ],
+    },
+  ];
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <ClientApp />
+    </>
+  );
 }

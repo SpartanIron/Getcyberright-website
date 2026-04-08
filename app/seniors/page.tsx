@@ -14,10 +14,41 @@ export const metadata: Metadata = {
       "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, protect your identity, and avoid romance fraud.",
     url: `${BASE_URL}/seniors`,
     type: "website",
-    images: [{ url: `${BASE_URL}/og/education.png`, width: 1080, height: 1080, alt: "Senior Online Safety" }],
+    images: [
+      {
+        url: `${BASE_URL}/og/education.png`,
+        width: 1080,
+        height: 1080,
+        alt: "Senior Online Safety",
+      },
+    ],
   },
 };
 
 export default function SeniorsPage() {
-  return <ClientApp />;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Senior Safety",
+        item: `${BASE_URL}/seniors`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <ClientApp />
+    </>
+  );
 }

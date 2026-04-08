@@ -10,12 +10,37 @@ export const metadata: Metadata = {
   alternates: { canonical: `${BASE_URL}/contact` },
   openGraph: {
     title: "Contact GetCyberRight: Get in Touch | GetCyberRight",
-    description: "Contact the GetCyberRight team for questions about cybersecurity education, partnership opportunities, or to report a scam.",
+    description:
+      "Contact the GetCyberRight team for questions about cybersecurity education, partnership opportunities, or to report a scam.",
     url: `${BASE_URL}/contact`,
     type: "website",
   },
 };
 
 export default function ContactPage() {
-  return <ClientApp />;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Contact",
+        item: `${BASE_URL}/contact`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <ClientApp />
+    </>
+  );
 }
