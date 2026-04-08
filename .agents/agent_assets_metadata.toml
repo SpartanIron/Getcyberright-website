@@ -12,6 +12,18 @@ uri = "file://.canvas/assets/og-sample-v2.png"
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "1LaDMRFe54VOTn43vXgD_"
+uri = "file://client/src/assets/images/hero-family-protected.png"
+type = "image"
+title = "family-cyber-hero"
+
+[[generated]]
+id = "G920PYP8a-qaXPgJAggnU"
+uri = "file://client/src/assets/images/hero-family-protected-v2.png"
+type = "image"
+title = "family-shield-hero"
+
 [[outputs]]
 id = "rZqQKOOCV-y0ksJa4V7mQ"
 uri = "file://.local/traffic-growth-analysis.md"
@@ -389,3 +401,39 @@ id = "fG8yMh2LmP6fpn5J8rVRi"
 uri = "file://gcr-scam-guard-v1.4.0.zip"
 type = "unspecified"
 title = "GCR Scam Guard v1.4.0 - Chrome Web Store Package"
+
+[[outputs]]
+id = "kr5NQ5814zMTcMURoZGi6"
+uri = "file://attached_assets/stock_images/family-hero_1.jpg"
+type = "image"
+title = "diverse family parents children using laptop together home living room warm lighting"
+
+[[outputs]]
+id = "Ouu6w8Q3kKqFOzIq6GVWr"
+uri = "file://attached_assets/stock_images/family-hero_2.jpg"
+type = "image"
+title = "diverse family parents children using laptop together home living room warm lighting"
+
+[[outputs]]
+id = "77g6mNRh7FP4H-qh_-hqR"
+uri = "file://attached_assets/stock_images/family-hero_3.jpg"
+type = "image"
+title = "diverse family parents children using laptop together home living room warm lighting"
+
+[[outputs]]
+id = "nVknJugc9kf1uAsdECg6m"
+uri = "file://attached_assets/stock_images/family-tablet-hero_1.jpg"
+type = "image"
+title = "happy family with two kids looking at tablet computer together on couch modern home"
+
+[[outputs]]
+id = "NADtSBhvuTNMVIVVGEhP5"
+uri = "file://attached_assets/stock_images/family-tablet-hero_2.jpg"
+type = "image"
+title = "happy family with two kids looking at tablet computer together on couch modern home"
+
+[[outputs]]
+id = "tOSNGBKtbd3rNKC1J7raL"
+uri = "file://attached_assets/stock_images/family-tablet-hero_3.jpg"
+type = "image"
+title = "happy family with two kids looking at tablet computer together on couch modern home"
