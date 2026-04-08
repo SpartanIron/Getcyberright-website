@@ -333,7 +333,7 @@ export function StructuredData({ data }: { data: StructuredDataInput | Structure
         <script
           key={`${item.type}-${index}`}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(item)) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(item)).replace(/</g, '\\u003c') }}
         />
       ))}
     </>
