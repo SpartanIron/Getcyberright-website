@@ -51,18 +51,38 @@ export async function setupVite(server: Server, app: Express) {
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
 
-      const [meta, ssrBody] = await Promise.all([
-        resolvePageMeta(url),
-        getSSRBodyContent(url),
-      ]);
+      let meta;
+      let metaResolved = false;
+      try {
+        meta = await resolvePageMeta(url);
+        metaResolved = true;
+      } catch {
+        meta = {
+          title: "GetCyberRight: Free Cybersecurity Education for Families",
+          description: "Protect your family online with free cybersecurity education, AI-powered scam detection tools, and safety training.",
+          canonicalUrl: `https://www.getcyberright.com${req.path}`,
+          ogType: "website",
+          jsonLd: "",
+        };
+      }
+
+      let ssrBody = "";
+      try {
+        ssrBody = await getSSRBodyContent(url);
+      } catch {}
+
       template = injectMeta(template, meta, ssrBody);
 
       const page = await vite.transformIndexHtml(url, template);
-      const statusCode = isKnownRoute(url) ? 200 : 404;
+      const hasRealContent = metaResolved && !meta.noindex;
+      const statusCode = hasRealContent || isKnownRoute(url) ? 200 : 404;
+      const cacheHeader = statusCode === 404
+        ? "private, no-cache, no-store"
+        : "private, max-age=3600, s-maxage=86400";
       res.status(statusCode).set({ 
         "Content-Type": "text/html",
-        "Cache-Control": "private, max-age=3600, s-maxage=86400",
-        "X-Robots-Tag": "index, follow",
+        "Cache-Control": cacheHeader,
+        "X-Robots-Tag": statusCode === 200 ? "index, follow" : "noindex, nofollow",
       }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);

@@ -29,13 +29,14 @@ export function serveStatic(app: Express) {
   }));
 
   app.use("/{*path}", async (req, res) => {
-    const statusCode = isKnownRoute(req.path) ? 200 : 404;
     try {
       const htmlPath = path.resolve(distPath, "index.html");
       let template = await fs.promises.readFile(htmlPath, "utf-8");
       let meta;
+      let metaResolved = false;
       try {
         meta = await resolvePageMeta(req.originalUrl);
+        metaResolved = true;
       } catch (e) {
         meta = {
           title: "GetCyberRight: Free Cybersecurity Education for Families",
@@ -53,12 +54,19 @@ export function serveStatic(app: Express) {
         console.error(`[SSR] Failed to generate body for ${req.path}:`, (e as Error).message);
       }
 
+      const hasRealContent = metaResolved && !meta.noindex;
+      const statusCode = hasRealContent || isKnownRoute(req.path) ? 200 : 404;
+
       template = injectMeta(template, meta, ssrBody);
+
+      const cacheHeader = statusCode === 404
+        ? "private, no-cache, no-store"
+        : "private, max-age=3600, s-maxage=86400";
 
       res.status(statusCode).set({ 
         "Content-Type": "text/html",
-        "Cache-Control": "private, max-age=3600, s-maxage=86400",
-        "X-Robots-Tag": "index, follow",
+        "Cache-Control": cacheHeader,
+        "X-Robots-Tag": statusCode === 200 ? "index, follow" : "noindex, nofollow",
       }).end(template);
     } catch (e) {
       try {
@@ -71,7 +79,7 @@ export function serveStatic(app: Express) {
           jsonLd: "",
         };
         const processed = injectMeta(rawHtml, fallbackMeta);
-        res.status(statusCode).set({ "Content-Type": "text/html" }).end(processed);
+        res.status(isKnownRoute(req.path) ? 200 : 404).set({ "Content-Type": "text/html" }).end(processed);
       } catch {
         res.status(500).send("Server error");
       }
