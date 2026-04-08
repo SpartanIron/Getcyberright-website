@@ -12,6 +12,7 @@ import {
 import familyTogetherImage from "@/assets/images/about-family-together.webp";
 import seniorsLearningImage from "@/assets/images/about-seniors-learning.webp";
 import ctaBackgroundImage from "@/assets/images/about-cta-background.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const threatTypes = [
   { icon: Mail, label: "Fake Emails & Texts", description: "Scam messages now look identical to real ones from your bank, employer, or favorite stores. Perfect grammar, real logos, and details pulled from your social media make them nearly impossible to spot." },
@@ -144,7 +145,7 @@ export default function About() {
               </div>
               <div className="relative rounded-xl overflow-hidden hidden lg:block">
                 <img
-                  src={familyTogetherImage}
+                  src={imgSrc(familyTogetherImage)}
                   alt="Diverse multiracial family using technology safely at home"
                   className="w-full h-[420px] object-cover"
                   loading="eager"
@@ -292,7 +293,7 @@ export default function About() {
               </div>
               <div className="relative rounded-xl overflow-hidden lg:sticky lg:top-24">
                 <img
-                  src={seniorsLearningImage}
+                  src={imgSrc(seniorsLearningImage)}
                   alt="Seniors being helped to use technology safely with family support"
                   className="w-full h-64 sm:h-80 lg:h-[520px] object-cover"
                   loading="lazy"
@@ -377,7 +378,7 @@ export default function About() {
 
         <section className="relative py-20 sm:py-24 overflow-hidden">
           <img
-            src={ctaBackgroundImage}
+            src={imgSrc(ctaBackgroundImage)}
             alt="Family learning cybersecurity together at home"
             className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"

@@ -7,11 +7,12 @@ import { ArrowRight, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import dataScanImg from "@/assets/images/tool-data-scan-diverse.webp";
 import securityCheckImg from "@/assets/images/tool-security-check-diverse.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const tools = [
   {
     id: "data-scan",
-    image: dataScanImg,
+    image: imgSrc(dataScanImg),
     title: "GCR Data Shield: Exposure Scan",
     badge: "Instant Scan",
     description: "Find out if your personal information is exposed on data broker sites or in data breaches. See your risk level and take action to protect yourself.",
@@ -21,7 +22,7 @@ const tools = [
   },
   {
     id: "security-scanner",
-    image: securityCheckImg,
+    image: imgSrc(securityCheckImg),
     title: "Check Something Suspicious",
     badge: "Instant Check",
     description: "Got a sketchy link, email, or phone call? Paste it in and get an instant risk assessment with detailed analysis.",

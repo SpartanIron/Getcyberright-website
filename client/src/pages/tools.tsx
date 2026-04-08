@@ -4,6 +4,7 @@ import { PageBanner } from "@/components/page-banner";
 import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { ToolsInteractive } from "@/components/tools-interactive";
 import bannerImage from "@/assets/banners/tools-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 export default function Tools() {
   return (
@@ -14,7 +15,7 @@ export default function Tools() {
         <PageBanner
           title="Protection Hub"
           subtitle="Two products, one mission: keeping your family safe online. All tools and features are completely free with your account."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Modern workspace with laptop displaying security checkmarks and password generator in bright natural light"
           imagePosition="left"
           colorVariant="teal"

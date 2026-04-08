@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
 import { ArrowRight } from "lucide-react";
 import aboutFamilyImg from "@/assets/images/about-family-together.webp";
+import { imgSrc } from "@/lib/img-src";
 
 export function CTAFooter() {
   return (
     <section className="relative py-16 sm:py-20 overflow-hidden" data-testid="section-cta-footer">
       <div className="absolute inset-0">
         <img
-          src={aboutFamilyImg}
+          src={imgSrc(aboutFamilyImg)}
           alt="Diverse family learning online safety together"
           className="w-full h-full object-cover"
           loading="lazy"

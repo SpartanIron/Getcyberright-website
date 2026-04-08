@@ -23,6 +23,7 @@ import promoShieldImg from "@/assets/images/promo-shield-protection.webp";
 import promoPrivacyImg from "@/assets/images/promo-data-privacy.webp";
 import promoFamilyImg from "@/assets/images/promo-family-learning.webp";
 import promoAlertImg from "@/assets/images/promo-scam-alert.webp";
+import { imgSrc } from "@/lib/img-src";
 
 interface PromoBanner {
   id: string;
@@ -54,7 +55,7 @@ const promos: PromoBanner[] = [
     ctaHref: "/tools",
     secondaryCta: "Create Free Account",
     secondaryHref: "/register",
-    image: promoShieldImg,
+    image: imgSrc(promoShieldImg),
     overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/75 to-transparent",
     accentColor: "bg-teal-500 hover:bg-teal-600",
   },
@@ -69,7 +70,7 @@ const promos: PromoBanner[] = [
     ctaHref: "/shield",
     secondaryCta: "Learn More",
     secondaryHref: "/data-removal",
-    image: promoPrivacyImg,
+    image: imgSrc(promoPrivacyImg),
     overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/80 to-transparent",
     accentColor: "bg-blue-500 hover:bg-blue-600",
   },
@@ -84,7 +85,7 @@ const promos: PromoBanner[] = [
     ctaHref: "/training",
     secondaryCta: "Browse Courses",
     secondaryHref: "/training",
-    image: promoFamilyImg,
+    image: imgSrc(promoFamilyImg),
     overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/70 to-transparent",
     accentColor: "bg-emerald-500 hover:bg-emerald-600",
   },
@@ -99,7 +100,7 @@ const promos: PromoBanner[] = [
     ctaHref: "/scam-checker",
     secondaryCta: "Get the Extension",
     secondaryHref: "/browser-extension",
-    image: promoAlertImg,
+    image: imgSrc(promoAlertImg),
     overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/75 to-transparent",
     accentColor: "bg-orange-500 hover:bg-orange-600",
   },

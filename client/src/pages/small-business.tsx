@@ -36,6 +36,7 @@ import {
   incidentTypes,
   securityTools
 } from "@/components/small-business-hub/assessment-data";
+import { imgSrc } from "@/lib/img-src";
 
 interface BusinessTopic {
   id: string;
@@ -62,7 +63,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Users,
     color: "bg-blue-500",
     priority: "Essential",
-    image: imgEmployeeTraining,
+    image: imgSrc(imgEmployeeTraining),
     content: {
       intro: "Your employees are both your greatest asset and your biggest security vulnerability. The vast majority of successful cyberattacks begin with social engineering, particularly phishing emails. Regular security awareness training transforms your staff from potential weak points into your first line of defense.",
       risks: [
@@ -95,7 +96,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Mail,
     color: "bg-red-500",
     priority: "Critical",
-    image: imgPhishingBusiness,
+    image: imgSrc(imgPhishingBusiness),
     content: {
       intro: "Business Email Compromise (BEC) and phishing attacks cost businesses billions annually. Attackers often research companies to craft convincing emails that appear to come from executives, vendors, or customers. A single successful attack can result in significant financial loss or data breach.",
       risks: [
@@ -128,7 +129,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Key,
     color: "bg-purple-500",
     priority: "Essential",
-    image: imgPasswordManagement,
+    image: imgSrc(imgPasswordManagement),
     content: {
       intro: "Weak and reused passwords are a leading cause of data breaches. Small businesses often struggle with password management as they grow, leading to shared accounts, sticky note passwords, and forgotten access when employees leave. A systematic approach to access management reduces risk significantly.",
       risks: [
@@ -161,7 +162,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Server,
     color: "bg-green-500",
     priority: "Critical",
-    image: imgDataProtection,
+    image: imgSrc(imgDataProtection),
     content: {
       intro: "Data is often a small business's most valuable asset. Customer information, financial records, and intellectual property need protection from both external threats and accidental loss. Regular backups and proper data handling are essential for business continuity.",
       risks: [
@@ -194,7 +195,7 @@ const businessTopics: BusinessTopic[] = [
     icon: Building,
     color: "bg-amber-500",
     priority: "Important",
-    image: imgCyberInsurance,
+    image: imgSrc(imgCyberInsurance),
     content: {
       intro: "Your business is only as secure as your weakest vendor. Third-party providers often have access to your data or systems, and a breach at a vendor can quickly become your problem. Due diligence before engagement and ongoing monitoring are essential.",
       risks: [
@@ -227,7 +228,7 @@ const businessTopics: BusinessTopic[] = [
     icon: AlertTriangle,
     color: "bg-orange-500",
     priority: "Important",
-    image: imgIncidentResponse,
+    image: imgSrc(imgIncidentResponse),
     content: {
       intro: "Security incidents are not a matter of if but when. Having a plan in place before an incident occurs dramatically reduces response time, limits damage, and helps maintain customer trust. Even a simple plan is far better than no plan at all.",
       risks: [

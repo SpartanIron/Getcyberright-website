@@ -20,6 +20,7 @@ import {
   Search
 } from "lucide-react";
 import logoImage from "@/assets/logo.webp";
+import { imgSrc } from "@/lib/img-src";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -51,7 +52,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Link href="/" className="flex items-center gap-2">
-                <img src={logoImage} alt="GetCyberRight" className="w-8 h-8" />
+                <img src={imgSrc(logoImage)} alt="GetCyberRight" className="w-8 h-8" />
                 <span className="font-semibold">GetCyberRight</span>
               </Link>
               <div className="h-6 w-px bg-slate-700" />

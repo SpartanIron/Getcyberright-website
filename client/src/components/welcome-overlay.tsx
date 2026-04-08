@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, Users, Compass, ArrowRight, X } from "lucide-react";
 import { useLocation } from "@/lib/navigation";
 import logo from "@/assets/logo.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const WELCOME_SEEN_KEY = "getcyberright_welcomed";
 
@@ -135,7 +136,7 @@ export function WelcomeOverlay() {
               className="mb-6 sm:mb-8"
             >
               <img
-                src={logo}
+                src={imgSrc(logo)}
                 alt="GetCyberRight"
                 className="w-14 h-14 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6"
                 loading="lazy"

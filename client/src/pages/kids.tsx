@@ -38,6 +38,7 @@ import { quizBanks, spotTheScamScenarios, storyScenarios, decisionTrees } from "
 import { MultiQuiz, SpotTheScamGame, StoryActivity, PasswordStrengthBuilder, ProgressDashboard, WhatWouldYouDo } from "@/components/kids-hub/interactive-games";
 import { CyberStatsInfographic, SafetyTipCarousel, PlatformSafetyGuide } from "@/components/kids-hub/infographics";
 import { loadProgress, completeModule, saveQuizScore, completeActivity } from "@/components/kids-hub/progress";
+import { imgSrc } from "@/lib/img-src";
 
 function FloatingShapes() {
   return (
@@ -81,7 +82,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Learn what information to keep private online.",
       icon: Eye,
       color: "bg-blue-500",
-      image: kidsPersonalInfoImg,
+      image: imgSrc(kidsPersonalInfoImg),
       content: {
         intro: "Personal information is anything that tells people who you are or where to find you. Just like you would not give your house key to a stranger, you should not share personal details online with people you do not know.",
         tips: [
@@ -110,7 +111,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Create super-strong passwords to protect your accounts.",
       icon: Lock,
       color: "bg-green-600",
-      image: kidsPasswordPowerImg,
+      image: imgSrc(kidsPasswordPowerImg),
       content: {
         intro: "Passwords are like secret codes that keep your accounts safe. A strong password is one that is hard for others to guess but easy for you to remember. Let us learn how to make super-strong passwords!",
         tips: [
@@ -150,7 +151,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Recognize scams, tricks, and fake messages.",
       icon: AlertCircle,
       color: "bg-orange-600",
-      image: kidsSpottingTricksImg,
+      image: imgSrc(kidsSpottingTricksImg),
       content: {
         intro: "Some people try to trick you online by offering fake prizes, sending scary messages, or pretending to be someone they are not. Learning to spot these tricks keeps you safe!",
         tips: [
@@ -178,7 +179,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Protect your tablet, phone, and computer.",
       icon: Smartphone,
       color: "bg-teal-600",
-      image: kidsDeviceSafetyImg,
+      image: imgSrc(kidsDeviceSafetyImg),
       content: {
         intro: "Your devices are like treasure chests full of your personal stuff. Keeping them safe means keeping you safe. Let us learn how to protect your tablet, phone, and computer!",
         tips: [
@@ -206,7 +207,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Know who to turn to and when to ask for help.",
       icon: Heart,
       color: "bg-pink-600",
-      image: kidsTrustedAdultsImg,
+      image: imgSrc(kidsTrustedAdultsImg),
       content: {
         intro: "Having trusted adults in your life is one of the best ways to stay safe online. These are people you can turn to when something online makes you feel scared, confused, or uncomfortable.",
         tips: [
@@ -234,7 +235,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Understand the basics of being online safely.",
       icon: Globe,
       color: "bg-cyan-600",
-      image: kidsYoungLearnersImg,
+      image: imgSrc(kidsYoungLearnersImg),
       content: {
         intro: "The internet is like a giant library, playground, and mailbox all rolled into one. It connects people all around the world. Knowing how it works helps you use it safely!",
         tips: [
@@ -264,7 +265,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Navigate social platforms safely and responsibly.",
       icon: Users,
       color: "bg-purple-600",
-      image: kidsSocialMediaImg,
+      image: imgSrc(kidsSocialMediaImg),
       content: {
         intro: "Social media can be great for connecting with friends and sharing your interests. But it also comes with risks if you are not careful about your privacy, the people you interact with, and the content you share.",
         tips: [
@@ -296,7 +297,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Recognize, respond to, and prevent online bullying.",
       icon: Shield,
       color: "bg-red-600",
-      image: kidsCyberbullyingImg,
+      image: imgSrc(kidsCyberbullyingImg),
       content: {
         intro: "Cyberbullying is when someone uses technology to hurt, embarrass, or threaten another person. It can happen through texts, social media, gaming, or any online platform. Knowing how to handle it is an important skill.",
         tips: [
@@ -324,7 +325,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Stay safe while gaming online.",
       icon: Gamepad2,
       color: "bg-indigo-600",
-      image: kidsGamingSmartImg,
+      image: imgSrc(kidsGamingSmartImg),
       content: {
         intro: "Online gaming is fun, but it comes with risks like scam offers, predators, and spending traps. Learn how to enjoy gaming while staying safe.",
         tips: [
@@ -352,7 +353,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Identify phishing emails, texts, and DMs.",
       icon: AlertCircle,
       color: "bg-orange-600",
-      image: kidsPhishingImg,
+      image: imgSrc(kidsPhishingImg),
       content: {
         intro: "Phishing is when scammers send fake messages that look real to trick you into sharing passwords, personal information, or clicking dangerous links. These can come as emails, texts, or social media messages.",
         tips: [
@@ -384,7 +385,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Understand how your online actions follow you.",
       icon: Target,
       color: "bg-purple-600",
-      image: kidsDigitalFootprintImg,
+      image: imgSrc(kidsDigitalFootprintImg),
       content: {
         intro: "Your digital footprint is the trail of information you leave behind online. Every post, comment, photo, and search adds to it. This footprint can be seen by friends, schools, and even future employers.",
         tips: [
@@ -416,7 +417,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Take control of your privacy on apps and devices.",
       icon: Lock,
       color: "bg-teal-600",
-      image: kidsPersonalInfoImg,
+      image: imgSrc(kidsPersonalInfoImg),
       content: {
         intro: "Every app and device you use has privacy settings that control who can see your information and what data is collected. Learning to find and adjust these settings puts you in control of your digital privacy.",
         tips: [
@@ -450,7 +451,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Master privacy controls, encryption, and data protection.",
       icon: Fingerprint,
       color: "bg-indigo-700",
-      image: kidsPersonalInfoImg,
+      image: imgSrc(kidsPersonalInfoImg),
       content: {
         intro: "As you use more apps and services, your digital privacy becomes increasingly important. Understanding how your data is collected, stored, and used empowers you to make informed decisions about your online presence.",
         tips: [
@@ -482,7 +483,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Recognize manipulation tactics used by cybercriminals.",
       icon: Brain,
       color: "bg-red-700",
-      image: kidsPhishingImg,
+      image: imgSrc(kidsPhishingImg),
       content: {
         intro: "Social engineering is when attackers manipulate people instead of hacking computers. They use psychology (urgency, authority, fear, and trust) to trick you into revealing information or taking dangerous actions.",
         tips: [
@@ -510,7 +511,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Build a healthy relationship with technology.",
       icon: Heart,
       color: "bg-pink-700",
-      image: kidsSocialMediaImg,
+      image: imgSrc(kidsSocialMediaImg),
       content: {
         intro: "Technology is a powerful tool, but it can affect your mental health if not managed well. Building healthy digital habits helps you enjoy the benefits while avoiding the downsides.",
         tips: [
@@ -538,7 +539,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Build and protect your digital identity.",
       icon: Globe,
       color: "bg-blue-700",
-      image: kidsDigitalFootprintImg,
+      image: imgSrc(kidsDigitalFootprintImg),
       content: {
         intro: "Your online identity is more than your social media profile. It is how the digital world sees you. From deepfakes to data brokers, understanding threats to your identity helps you protect and build a positive presence.",
         tips: [
@@ -566,7 +567,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Protect your money and avoid financial scams.",
       icon: DollarSign,
       color: "bg-green-700",
-      image: kidsSpottingTricksImg,
+      image: imgSrc(kidsSpottingTricksImg),
       content: {
         intro: "As you start managing your own money (whether through allowance, part-time jobs, or gift cards), knowing how to protect it online becomes crucial. Financial scams increasingly target young people.",
         tips: [
@@ -594,7 +595,7 @@ const lessonTopics: Record<string, LessonTopic[]> = {
       description: "Evaluate information, spot misinformation, and think critically.",
       icon: Zap,
       color: "bg-amber-700",
-      image: kidsGamingSmartImg,
+      image: imgSrc(kidsGamingSmartImg),
       content: {
         intro: "In the age of AI, deepfakes, and viral misinformation, critical thinking is your most powerful tool. Learning to evaluate information before believing or sharing it protects you and your community.",
         tips: [
@@ -628,7 +629,7 @@ const ageGroupConfig = {
     bgGradient: "from-teal-50 via-cyan-50 to-blue-50 dark:from-teal-950/30 dark:via-cyan-950/30 dark:to-blue-950/30",
     borderColor: "border-teal-200 dark:border-teal-800",
     badgeColor: "bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-300",
-    image: kidsYoungLearnersImg,
+    image: imgSrc(kidsYoungLearnersImg),
     imageAlt: "Young children learning about internet safety together",
     icon: Star,
     badges: ["Beginner Friendly", "6 Lessons", "Fun Activities"],
@@ -641,7 +642,7 @@ const ageGroupConfig = {
     bgGradient: "from-purple-50 via-pink-50 to-rose-50 dark:from-purple-950/30 dark:via-pink-950/30 dark:to-rose-950/30",
     borderColor: "border-purple-200 dark:border-purple-800",
     badgeColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300",
-    image: kidsTeenLearnersImg,
+    image: imgSrc(kidsTeenLearnersImg),
     imageAlt: "Preteens confidently using devices with security shields",
     icon: Trophy,
     badges: ["Intermediate", "6 Lessons", "Real Scenarios"],
@@ -654,7 +655,7 @@ const ageGroupConfig = {
     bgGradient: "from-indigo-50 via-violet-50 to-purple-50 dark:from-indigo-950/30 dark:via-violet-950/30 dark:to-purple-950/30",
     borderColor: "border-indigo-200 dark:border-indigo-800",
     badgeColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300",
-    image: kidsTeenLearnersImg,
+    image: imgSrc(kidsTeenLearnersImg),
     imageAlt: "Teenagers mastering advanced cybersecurity concepts",
     icon: Shield,
     badges: ["Advanced", "6 Lessons", "Expert Challenges"],
@@ -962,7 +963,7 @@ function LearningTrack({
                     <AlertCircle className="w-5 h-5 text-orange-500" /> Spot the Scam Challenge
                   </h3>
                   <div className="mb-4">
-                    <img src={kidsSpotScamImg} alt="Fun detective character examining suspicious messages" className="w-24 h-24 mx-auto rounded-xl shadow-md object-cover" loading="lazy" data-testid="img-spot-scam" />
+                    <img src={imgSrc(kidsSpotScamImg)} alt="Fun detective character examining suspicious messages" className="w-24 h-24 mx-auto rounded-xl shadow-md object-cover" loading="lazy" data-testid="img-spot-scam" />
                   </div>
                   <SpotTheScamGame
                     scenarios={scamScenarios}
@@ -1210,7 +1211,7 @@ function ParentSection() {
       <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-12">
           <div className="mb-6">
-            <img src={kidsFamilyTogetherImg} alt="Diverse family learning about online safety together on a tablet" className="w-36 h-36 sm:w-44 sm:h-44 mx-auto rounded-2xl shadow-lg object-cover" loading="lazy" data-testid="img-parent-section-hero" />
+            <img src={imgSrc(kidsFamilyTogetherImg)} alt="Diverse family learning about online safety together on a tablet" className="w-36 h-36 sm:w-44 sm:h-44 mx-auto rounded-2xl shadow-lg object-cover" loading="lazy" data-testid="img-parent-section-hero" />
           </div>
           <Badge className="mb-4">For Parents and Educators</Badge>
           <h2 className="text-3xl font-bold text-foreground mb-4">Partnering with You for Online Safety</h2>
@@ -1305,7 +1306,7 @@ function ParentSection() {
       </div>
 
       <div className="relative overflow-hidden py-12">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${kidsFamilyTogetherImg})` }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${imgSrc(kidsFamilyTogetherImg)})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-rose-400/90 via-red-400/90 to-orange-400/90 dark:from-rose-600/90 dark:via-red-600/90 dark:to-orange-600/90" />
         <div className="relative z-10 max-w-5xl mx-auto px-4">
           <div className="text-center mb-8">

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Users, X, ArrowRight, Lock } from "lucide-react";
 import logoImage from "@assets/image_1767834716649.png";
+import { imgSrc } from "@/lib/img-src";
 
 const WELCOME_SEEN_KEY = "getcyberright_welcome_seen";
 
@@ -114,7 +115,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   className="w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
                 >
                   <motion.img
-                    src={logoImage}
+                    src={imgSrc(logoImage)}
                     alt="GetCyberRight"
                     className="w-14 h-14 lg:w-16 lg:h-16 object-contain"
                     animate={{ scale: [1, 1.05, 1] }}

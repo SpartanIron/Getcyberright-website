@@ -4,6 +4,7 @@ import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { Link } from "@/lib/navigation";
 import bannerImage from "@/assets/banners/terms-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 export default function Terms() {
   const effectiveDate = "January 31, 2026";
@@ -17,7 +18,7 @@ export default function Terms() {
         <PageBanner
           title="Terms of Service"
           subtitle="Please read these terms carefully before using our services. They govern your relationship with GetCyberRight."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Professional desk with official terms document and elegant pen in a formal signing environment"
           imagePosition="right"
         />

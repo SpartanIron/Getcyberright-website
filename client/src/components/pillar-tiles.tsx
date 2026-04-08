@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import scamCheckerImg from "@/assets/images/card-scam-checker.webp";
 import seniorImg from "@/assets/images/about-seniors-learning.webp";
 import businessImg from "@/assets/images/business-security-training.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const features = [
   {
@@ -14,7 +15,7 @@ const features = [
     href: "/scam-checker",
     cta: "Check a Scam",
     icon: Search,
-    image: scamCheckerImg,
+    image: imgSrc(scamCheckerImg),
     imageAlt: "Woman checking her phone for suspicious messages",
     accent: "bg-red-500",
     accentText: "text-red-600 dark:text-red-400",
@@ -28,7 +29,7 @@ const features = [
     href: "/shield",
     cta: "Scan Your Exposure",
     icon: ShieldCheck,
-    image: seniorImg,
+    image: imgSrc(seniorImg),
     imageAlt: "Seniors learning to protect their personal data online",
     accent: "bg-teal-500",
     accentText: "text-teal-600 dark:text-teal-400",
@@ -42,7 +43,7 @@ const features = [
     href: "/training",
     cta: "Start Learning",
     icon: GraduationCap,
-    image: businessImg,
+    image: imgSrc(businessImg),
     imageAlt: "Diverse team participating in cybersecurity training",
     accent: "bg-blue-500",
     accentText: "text-blue-600 dark:text-blue-400",

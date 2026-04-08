@@ -4,6 +4,7 @@ import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { Link } from "@/lib/navigation";
 import bannerImage from "@/assets/banners/privacy-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 export default function Privacy() {
   const effectiveDate = "January 31, 2026";
@@ -17,7 +18,7 @@ export default function Privacy() {
         <PageBanner
           title="Privacy Policy"
           subtitle="Your privacy matters. This policy explains how we handle your information with transparency and care."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Secure document environment with padlock symbolism representing data protection and privacy policy"
           imagePosition="left"
         />

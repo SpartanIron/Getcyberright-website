@@ -6,6 +6,7 @@ import { BookOpen, ArrowRight, AlertTriangle, Shield, FileText } from "lucide-re
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import scamDetectionImg from "@/assets/images/feature-scam-detection-diverse.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const severityColors: Record<string, string> = {
   critical: "bg-red-700 text-white",
@@ -144,7 +145,7 @@ export function ContentPreview() {
           <div className="hidden lg:block sticky top-8">
             <div className="rounded-2xl overflow-hidden shadow-xl mb-6">
               <img
-                src={scamDetectionImg}
+                src={imgSrc(scamDetectionImg)}
                 alt="Person analyzing online messages for scam detection"
                 className="w-full h-auto object-cover"
                 loading="lazy"

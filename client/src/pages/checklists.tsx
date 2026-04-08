@@ -11,6 +11,7 @@ import { Link } from "@/lib/navigation";
 import { StructuredData } from "@/components/structured-data";
 import type { BreadcrumbData } from "@/components/structured-data";
 import bannerImage from "@/assets/banners/resources-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const checklistTabs = [
   { id: "home", label: "Home Network", icon: Home, checklist: securityChecklists.homeNetwork },
@@ -38,7 +39,7 @@ export default function Checklists() {
           <PageBanner
             title="Security Checklists"
             subtitle="Printable step-by-step checklists to help you secure your digital life. Check off each item as you complete it."
-            imageSrc={bannerImage}
+            imageSrc={imgSrc(bannerImage)}
             imageAlt="Security checklists and guides"
             colorVariant="slate"
           />

@@ -19,6 +19,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "@/lib/navigation";
 import deziAvatar from "@/assets/images/dezi-avatar.webp";
+import { imgSrc } from "@/lib/img-src";
 
 interface Message {
   id: string;
@@ -627,7 +628,7 @@ export function DeziAssistant() {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 flex-shrink-0">
                       <img 
-                        src={deziAvatar} 
+                        src={imgSrc(deziAvatar)} 
                         alt="Dezi" 
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -713,7 +714,7 @@ export function DeziAssistant() {
                             {message.role === "assistant" && (
                               <div className="flex items-center gap-2 mb-1.5">
                                 <div className="w-5 h-5 rounded-full overflow-hidden">
-                                  <img src={deziAvatar} alt="" className="w-full h-full object-cover" loading="lazy" />
+                                  <img src={imgSrc(deziAvatar)} alt="" className="w-full h-full object-cover" loading="lazy" />
                                 </div>
                                 <span className="text-xs font-medium text-muted-foreground">Dezi</span>
                                 {message.isStreaming && (
@@ -731,7 +732,7 @@ export function DeziAssistant() {
                         <div className="flex justify-start" data-testid="indicator-dezi-typing">
                           <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-2.5 flex items-center gap-3">
                             <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0">
-                              <img src={deziAvatar} alt="" className="w-full h-full object-cover" loading="lazy" />
+                              <img src={imgSrc(deziAvatar)} alt="" className="w-full h-full object-cover" loading="lazy" />
                             </div>
                             <div className="flex items-center gap-1">
                               <span className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: "0ms", animationDuration: "600ms" }} />
@@ -798,7 +799,7 @@ export function DeziAssistant() {
               </button>
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20 flex-shrink-0">
-                  <img src={deziAvatar} alt="Dezi" className="w-full h-full object-cover" loading="lazy" />
+                  <img src={imgSrc(deziAvatar)} alt="Dezi" className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <div className="flex-1 pr-4">
                   <p className="font-medium text-sm text-foreground mb-1">Hi! I'm Dezi</p>
@@ -843,7 +844,7 @@ export function DeziAssistant() {
           ) : (
             <>
               <div className="w-6 h-6 rounded-full overflow-hidden border border-white/30">
-                <img src={deziAvatar} alt="" className="w-full h-full object-cover" />
+                <img src={imgSrc(deziAvatar)} alt="" className="w-full h-full object-cover" />
               </div>
               <span className="hidden sm:inline">Ask Dezi</span>
               <MessageCircle className="w-5 h-5 sm:hidden" />

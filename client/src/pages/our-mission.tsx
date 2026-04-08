@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { Link } from "@/lib/navigation";
 import bannerImage from "@/assets/banners/pricing-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const whatWeOffer = [
   { icon: Search, name: "GCR Scam Guard", description: "Check suspicious emails, texts, URLs, QR codes, and phone numbers" },
@@ -51,7 +52,7 @@ export default function OurMission() {
         <PageBanner
           title="Our Mission"
           subtitle="Protecting the people that corporate cybersecurity leaves behind. Every parent, every grandparent, every child."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Shield protecting a family online"
           imagePosition="right"
           colorVariant="teal"

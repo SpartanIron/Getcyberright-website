@@ -14,6 +14,7 @@ import {
  BookOpen, ArrowRight
 } from "lucide-react";
 import logoImage from "@assets/image_1767834716649.png";
+import { imgSrc } from "@/lib/img-src";
 
 interface PublicStats {
  totalChecks: number;
@@ -40,7 +41,7 @@ export default function PartnerDeck() {
  <div className="relative container mx-auto px-4">
  <div className="max-w-4xl mx-auto text-center text-white">
  <div className="flex justify-center mb-6 print:mb-4">
- <img src={logoImage} alt="GetCyberRight" className="h-16 print:h-12" data-testid="img-logo" />
+ <img src={imgSrc(logoImage)} alt="GetCyberRight" className="h-16 print:h-12" data-testid="img-logo" />
  </div>
  <Badge className="mb-4 bg-teal-500/20 text-teal-300 border-teal-500/50 print:hidden">
  <Handshake className="h-3 w-3 mr-1" />

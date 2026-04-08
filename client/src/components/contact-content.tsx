@@ -33,6 +33,7 @@ import { insertContactMessageSchema } from "@shared/schema";
 import { z } from "zod";
 import { Mail, Phone, Clock, Send, CheckCircle2, MapPin } from "lucide-react";
 import bannerImage from "@/assets/banners/contact-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const contactMethods = [
   {
@@ -112,7 +113,7 @@ export function ContactContent() {
         <PageBanner
           title="Questions? We Answer Them."
           subtitle="Whether you're unsure where to start or need specific guidance, our team is here. No question is too simple, and we respond to every message."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Welcoming customer service professional at a clean modern desk ready to assist with headset nearby"
           imagePosition="right"
           colorVariant="blue"

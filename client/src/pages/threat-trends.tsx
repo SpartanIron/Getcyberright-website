@@ -3,6 +3,7 @@ import { Footer } from "@/components/footer";
 import { ThreatTrends } from "@/components/threat-trends";
 import { PageBanner } from "@/components/page-banner";
 import bannerImage from "@/assets/banners/tools-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 export default function ThreatTrendsPage() {
   return (
@@ -13,7 +14,7 @@ export default function ThreatTrendsPage() {
         <PageBanner
           title="Threat Trends Dashboard"
           subtitle="Stay informed about the latest cybersecurity threats, scam statistics, and emerging attack patterns based on official government data."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Cybersecurity threat monitoring dashboard"
           colorVariant="slate"
         />

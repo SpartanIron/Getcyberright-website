@@ -37,6 +37,7 @@ import {
   conversationScripts, familyStats, deviceAudits, ispGuides,
   microTransactionStats
 } from "@/components/parents-hub/quiz-data";
+import { imgSrc } from "@/lib/img-src";
 
 interface PlatformGuide {
   platform: string;
@@ -67,7 +68,7 @@ const parentTopics: ParentTopic[] = [
     description: "Step-by-step setup for every device your family uses.",
     icon: Settings,
     color: "bg-blue-500",
-    image: cardParentalControls,
+    image: imgSrc(cardParentalControls),
     content: {
       intro: "Parental controls are built into every device your child uses. The problem is that most parents never turn them on because the steps are buried in settings menus. Here is exactly how to set them up on each platform.",
       keyPoints: [
@@ -159,7 +160,7 @@ const parentTopics: ParentTopic[] = [
     description: "Platform-by-platform privacy settings and monitoring guidance.",
     icon: MessageCircle,
     color: "bg-pink-500",
-    image: cardSocialMedia,
+    image: imgSrc(cardSocialMedia),
     content: {
       intro: "Social media is a major part of most children's lives. The risk is not the platform itself, it is the default settings. Most accounts are public by default, which means anyone can see your child's posts, photos, and location. Here is how to lock down each platform.",
       keyPoints: [
@@ -243,7 +244,7 @@ const parentTopics: ParentTopic[] = [
     description: "Set up device-level time limits with exact steps for each platform.",
     icon: Clock,
     color: "bg-purple-500",
-    image: cardScreenTime,
+    image: imgSrc(cardScreenTime),
     content: {
       intro: "The goal is not to eliminate screen time. It is to make sure it does not crowd out sleep, physical activity, homework, and family time. Every major device has built-in tools to set daily limits and schedules. Here is how to use them.",
       keyPoints: [
@@ -324,7 +325,7 @@ const parentTopics: ParentTopic[] = [
     description: "Console-by-console setup for purchases, chat, and age restrictions.",
     icon: Gamepad2,
     color: "bg-green-500",
-    image: cardGamingSafety,
+    image: imgSrc(cardGamingSafety),
     content: {
       intro: "Video games are social now. Most popular games include voice chat with strangers, in-game purchases that can cost real money, and mechanics designed to keep players engaged for hours. Every gaming platform has parental controls, but they are turned off by default. Here is how to set them up.",
       keyPoints: [
@@ -409,7 +410,7 @@ const parentTopics: ParentTopic[] = [
     description: "Warning signs, prevention strategies, and what to do if it happens.",
     icon: Eye,
     color: "bg-red-500",
-    image: cardOnlinePredators,
+    image: imgSrc(cardOnlinePredators),
     content: {
       intro: "Online predators use social media, gaming platforms, and messaging apps to contact children. They build trust slowly through a process called grooming. Understanding how this works is the best way to protect your child.",
       keyPoints: [
@@ -483,7 +484,7 @@ const parentTopics: ParentTopic[] = [
     description: "A complete guide to preparing your family for the first phone, tablet, or computer.",
     icon: Shield,
     color: "bg-orange-500",
-    image: cardFirstDevice,
+    image: imgSrc(cardFirstDevice),
     content: {
       intro: "Giving your child their first device is a milestone. Whether it is a phone, tablet, or laptop, the preparation you do before handing it over determines how safe and positive the experience will be. Here is a complete framework for getting it right.",
       keyPoints: [

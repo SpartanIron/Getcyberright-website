@@ -13,6 +13,7 @@ import { Moon, Sun, Menu, ChevronDown, ShieldCheck, AlertTriangle, Globe, Shield
 import logoImage from "@assets/image_1767834716649.png";
 import { languages } from "@/lib/i18n";
 import { SiteSearch } from "./site-search";
+import { imgSrc } from "@/lib/img-src";
 
 function scrollToHash(hash: string) {
   const element = document.getElementById(hash.replace('#', ''));
@@ -100,7 +101,7 @@ export function Header() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 flex-shrink-0" data-testid="link-home">
           <img 
-            src={logoImage} 
+            src={imgSrc(logoImage)} 
             alt="GetCyberRight Logo" 
             className="h-10 w-auto"
             data-testid="img-logo"

@@ -8,6 +8,7 @@ import featureScamImg from "@/assets/images/feature-scam-detection-diverse.webp"
 import featureLearningImg from "@/assets/images/feature-family-learning-diverse.webp";
 import featureGenerationImg from "@/assets/images/feature-every-generation-diverse.webp";
 import featureEmergencyImg from "@/assets/images/feature-emergency-help-diverse.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const features = [
   {
@@ -17,7 +18,7 @@ const features = [
     description: "Paste that suspicious text, email, or link and get a plain-English answer. We built this because our own family kept asking us to check things for them.",
     cta: "Check for Scams",
     href: "/tools",
-    image: featureScamImg,
+    image: imgSrc(featureScamImg),
   },
   {
     id: "security-training",
@@ -26,7 +27,7 @@ const features = [
     description: "Short, practical guides written for real people. No IT background needed. Just clear steps your whole family can follow together.",
     cta: "Start Learning",
     href: "/resources",
-    image: featureLearningImg,
+    image: imgSrc(featureLearningImg),
   },
   {
     id: "family-protection",
@@ -35,7 +36,7 @@ const features = [
     description: "Interactive safety lessons for kids. Scam protection for seniors. Monitoring tips for parents. Pick the path that fits your family.",
     cta: "Find Your Path",
     href: "/training",
-    image: featureGenerationImg,
+    image: imgSrc(featureGenerationImg),
   },
   {
     id: "emergency-help",
@@ -44,7 +45,7 @@ const features = [
     description: "It happens to the best of us. Here is exactly what to do right now: who to call, what to report, and how to recover. You are not alone.",
     cta: "Get Help Now",
     href: "/emergency-help",
-    image: featureEmergencyImg,
+    image: imgSrc(featureEmergencyImg),
   },
 ];
 

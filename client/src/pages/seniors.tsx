@@ -45,6 +45,7 @@ import {
   scamStats,
   familyConversations
 } from "@/components/seniors-hub/scenario-data";
+import { imgSrc } from "@/lib/img-src";
 
 interface PlatformGuide {
   platform: string;
@@ -75,7 +76,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Recognize fake online relationships designed to steal money.",
     icon: Heart,
     color: "bg-rose-500",
-    image: cardRomanceScams,
+    image: imgSrc(cardRomanceScams),
     content: {
       intro: "Romance scammers create fake profiles on dating sites, social media, or even through text messages. They build emotional connections over weeks or months, then ask for money for emergencies, travel, or investments. These criminals are skilled at manipulation and target people seeking companionship.",
       keyPoints: [
@@ -159,7 +160,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Avoid fake computer support calls and pop-up warnings.",
     icon: Phone,
     color: "bg-blue-500",
-    image: cardTechSupportScams,
+    image: imgSrc(cardTechSupportScams),
     content: {
       intro: "Tech support scammers pretend to be from well-known companies like Microsoft, Apple, or your internet provider. They may call you directly or use scary pop-up messages claiming your computer has a virus. Their goal is to get remote access to your computer or convince you to pay for unnecessary services.",
       keyPoints: [
@@ -243,7 +244,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Protect your Medicare number and health information.",
     icon: BadgeCheck,
     color: "bg-green-500",
-    image: cardMedicareScams,
+    image: imgSrc(cardMedicareScams),
     content: {
       intro: "Scammers target seniors by pretending to be from Medicare or health insurance companies. They try to steal your Medicare number, which can be used to file false claims and steal your identity. They may offer free medical equipment, genetic testing, or new Medicare cards to trick you.",
       keyPoints: [
@@ -327,7 +328,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Spot phishing emails and suspicious phone calls.",
     icon: Mail,
     color: "bg-cyan-500",
-    image: cardPhoneEmailScams,
+    image: imgSrc(cardPhoneEmailScams),
     content: {
       intro: "Phishing emails and scam phone calls are the most common ways criminals target seniors. These messages are designed to look or sound like they come from banks, shipping companies, government agencies, or other trusted organizations. Their goal is to trick you into clicking a link, sharing personal information, or sending money.",
       keyPoints: [
@@ -410,7 +411,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Safeguard your personal information and credit.",
     icon: Lock,
     color: "bg-purple-500",
-    image: cardIdentityTheft,
+    image: imgSrc(cardIdentityTheft),
     content: {
       intro: "Identity theft occurs when someone uses your personal information without your permission to commit fraud or other crimes. For seniors, identity theft can be devastating, leading to drained bank accounts, unauthorized credit cards, fraudulent tax returns, and even medical identity theft where someone uses your health insurance.",
       keyPoints: [
@@ -494,7 +495,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Shop and bank online securely with confidence.",
     icon: CreditCard,
     color: "bg-teal-500",
-    image: cardOnlineShopping,
+    image: imgSrc(cardOnlineShopping),
     content: {
       intro: "Online shopping and banking can be safe and convenient when you know how to protect yourself. The key is knowing what to look for before entering your personal and financial information online. Most online shopping fraud is preventable with a few simple habits.",
       keyPoints: [
@@ -577,7 +578,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Scammers posing as IRS, Social Security, or law enforcement.",
     icon: UserX,
     color: "bg-indigo-500",
-    image: cardGovernmentScams,
+    image: imgSrc(cardGovernmentScams),
     content: {
       intro: "Government impersonation scams are among the fastest-growing threats targeting older adults. According to the FTC, consumers reported losing over $500 million to these scams in recent years. Criminals pose as IRS agents, Social Security Administration employees, Medicare officials, or even local police to intimidate victims into sending money or sharing personal information.",
       keyPoints: [
@@ -661,7 +662,7 @@ const seniorSafetyTopics: SafetyTopic[] = [
     description: "Protect your retirement savings from fake investment schemes.",
     icon: Wallet,
     color: "bg-orange-500",
-    image: cardInvestmentFraud,
+    image: imgSrc(cardInvestmentFraud),
     content: {
       intro: "Investment fraud targeting seniors has surged, with cryptocurrency scams alone costing victims over $3.4 billion in 2023 according to the FBI IC3 report. Scammers approach through social media, dating apps, unsolicited emails, or even through people you know who have been deceived themselves. They promise guaranteed returns with little or no risk.",
       keyPoints: [

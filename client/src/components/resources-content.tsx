@@ -28,6 +28,7 @@ import {
   CalendarDays
 } from "lucide-react";
 import bannerImage from "@/assets/banners/resources-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 type ResourceType = "guide" | "video" | "checklist";
 
@@ -758,7 +759,7 @@ export function ResourcesContent() {
         <PageBanner
           title="Your Security Education Library"
           subtitle="Practical guides and articles written in everyday language. Learn at your own pace, with content you can actually understand and apply."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Cozy library corner with open guidebooks and educational materials on a wooden table with warm ambient lighting"
           imagePosition="right"
           colorVariant="indigo"

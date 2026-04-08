@@ -7,6 +7,7 @@ import { Link, useLocation } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { TrendingThreat } from "@shared/schema";
 import heroFamilyImg from "@/assets/images/hero-family-diverse.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
   "America/New_York": "US", "America/Chicago": "US", "America/Denver": "US",
@@ -225,7 +226,7 @@ export function HeroSection() {
               <div className="relative -mr-8 xl:-mr-16">
                 <div className="relative overflow-hidden rounded-l-3xl">
                   <img
-                    src={heroFamilyImg}
+                    src={imgSrc(heroFamilyImg)}
                     alt="GetCyberRight — family digital protection made simple"
                     className="w-full h-[580px] object-cover"
                     data-testid="img-hero-overview"
@@ -237,7 +238,7 @@ export function HeroSection() {
             <div className="lg:hidden">
               <div className="relative rounded-2xl overflow-hidden shadow-xl">
                 <img
-                  src={heroFamilyImg}
+                  src={imgSrc(heroFamilyImg)}
                   alt="GetCyberRight — family digital protection made simple"
                   className="w-full h-64 sm:h-80 object-cover"
                   data-testid="img-hero-overview-mobile"

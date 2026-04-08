@@ -36,6 +36,7 @@ import {
   curriculumStandards,
   classroomMaterials
 } from "@/components/educators-hub/activity-data";
+import { imgSrc } from "@/lib/img-src";
 
 interface EducatorResource {
   id: string;
@@ -62,7 +63,7 @@ const educatorResources: EducatorResource[] = [
     icon: Users,
     color: "bg-blue-500",
     gradeLevel: "All Grades",
-    image: digitalCitizenshipImg,
+    image: imgSrc(digitalCitizenshipImg),
     content: {
       overview: "Digital citizenship encompasses the norms of appropriate and responsible technology use. Students need to understand that online actions have real consequences, and that being a good digital citizen means treating others with respect, protecting privacy, and contributing positively to online communities.",
       learningObjectives: [
@@ -95,7 +96,7 @@ const educatorResources: EducatorResource[] = [
     icon: AlertTriangle,
     color: "bg-red-500",
     gradeLevel: "Grades 3-12",
-    image: cyberbullyingImg,
+    image: imgSrc(cyberbullyingImg),
     content: {
       overview: "Cyberbullying can happen 24 hours a day, follows students home, and can spread quickly to large audiences. Unlike traditional bullying, digital content can be preserved and shared repeatedly. Teaching students to recognize cyberbullying and empowering bystanders to act are key prevention strategies.",
       learningObjectives: [
@@ -128,7 +129,7 @@ const educatorResources: EducatorResource[] = [
     icon: Shield,
     color: "bg-green-500",
     gradeLevel: "Grades 4-12",
-    image: privacyEducationImg,
+    image: imgSrc(privacyEducationImg),
     content: {
       overview: "Students often share personal information online without considering the consequences. Teaching privacy and security helps students understand what information is sensitive, how it can be misused, and practical steps to protect themselves. Strong passwords and privacy settings are foundational skills.",
       learningObjectives: [
@@ -161,7 +162,7 @@ const educatorResources: EducatorResource[] = [
     icon: BookOpen,
     color: "bg-purple-500",
     gradeLevel: "Grades 5-12",
-    image: socialMediaLiteracyImg,
+    image: imgSrc(socialMediaLiteracyImg),
     content: {
       overview: "Students encounter a constant stream of information online, but not all of it is accurate or trustworthy. Media literacy teaches students to think critically about the content they consume, verify information before sharing, and understand how algorithms and bias shape what they see.",
       learningObjectives: [
@@ -194,7 +195,7 @@ const educatorResources: EducatorResource[] = [
     icon: Presentation,
     color: "bg-orange-500",
     gradeLevel: "Grades 3-10",
-    image: onlineResearchImg,
+    image: imgSrc(onlineResearchImg),
     content: {
       overview: "Gaming is a significant part of many students' lives. While games can be educational and social, they also present risks including exposure to inappropriate content, in-game purchases, and excessive screen time. Teaching balanced digital habits helps students develop healthy relationships with technology.",
       learningObjectives: [
@@ -227,7 +228,7 @@ const educatorResources: EducatorResource[] = [
     icon: School,
     color: "bg-teal-500",
     gradeLevel: "Educators",
-    image: passwordEducationImg,
+    image: imgSrc(passwordEducationImg),
     content: {
       overview: "Schools are increasingly targets for cyberattacks, and educators play an important role in maintaining security. Understanding basic security practices, recognizing threats, and knowing how to respond to incidents helps protect student data and school operations.",
       learningObjectives: [

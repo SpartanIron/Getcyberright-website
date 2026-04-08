@@ -22,6 +22,7 @@ import scamInvestment from "@/assets/images/scam-investment.webp";
 import scamImpersonation from "@/assets/images/scam-impersonation.webp";
 import scamMalware from "@/assets/images/scam-malware.webp";
 import scamGeneral from "@/assets/images/scam-general.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
   "America/New_York": "US",
@@ -100,28 +101,28 @@ function detectRegion(): string {
 }
 
 const categoryImageMap: Record<string, string> = {
-  "Government": scamGovernment,
-  "Healthcare": scamHealthcare,
-  "Financial": scamFinancial,
-  "Romance": scamRomance,
-  "Phone": scamPhone,
-  "AI/Deepfake": scamAiDeepfake,
-  "Tech Support": scamTechSupport,
-  "Phishing": scamPhishing,
-  "Identity": scamIdentity,
-  "Delivery": scamDelivery,
-  "Business": scamBusiness,
-  "Investment": scamInvestment,
-  "Impersonation": scamImpersonation,
-  "Malware": scamMalware,
-  "Fraud": scamFinancial,
-  "Employment": scamBusiness,
-  "Utility": scamGovernment,
+  "Government": imgSrc(scamGovernment),
+  "Healthcare": imgSrc(scamHealthcare),
+  "Financial": imgSrc(scamFinancial),
+  "Romance": imgSrc(scamRomance),
+  "Phone": imgSrc(scamPhone),
+  "AI/Deepfake": imgSrc(scamAiDeepfake),
+  "Tech Support": imgSrc(scamTechSupport),
+  "Phishing": imgSrc(scamPhishing),
+  "Identity": imgSrc(scamIdentity),
+  "Delivery": imgSrc(scamDelivery),
+  "Business": imgSrc(scamBusiness),
+  "Investment": imgSrc(scamInvestment),
+  "Impersonation": imgSrc(scamImpersonation),
+  "Malware": imgSrc(scamMalware),
+  "Fraud": imgSrc(scamFinancial),
+  "Employment": imgSrc(scamBusiness),
+  "Utility": imgSrc(scamGovernment),
 };
 
 function getCategoryImage(category?: string): string {
-  if (!category) return scamGeneral;
-  return categoryImageMap[category] || scamGeneral;
+  if (!category) return imgSrc(scamGeneral);
+  return categoryImageMap[category] || imgSrc(scamGeneral);
 }
 
 const severityConfig: Record<string, { border: string; bg: string; text: string; label: string; dot: string }> = {

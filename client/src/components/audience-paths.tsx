@@ -5,6 +5,7 @@ import seniorsImg from "@/assets/images/about-seniors-learning.webp";
 import kidsImg from "@/assets/images/kids-safety-banner.jpg";
 import educatorImg from "@/assets/images/feature-family-learning-diverse.webp";
 import businessImg from "@/assets/images/business-security-training.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const paths = [
   {
@@ -12,7 +13,7 @@ const paths = [
     title: "Parents & Families",
     description: "Set up safe devices, start the right conversations, and protect your kids online.",
     href: "/parents",
-    image: familyImg,
+    image: imgSrc(familyImg),
     alt: "Diverse family together at home",
   },
   {
@@ -20,7 +21,7 @@ const paths = [
     title: "Seniors",
     description: "Recognize phone scams, protect your identity, and use technology with confidence.",
     href: "/seniors",
-    image: seniorsImg,
+    image: imgSrc(seniorsImg),
     alt: "Seniors learning about online safety with a younger guide",
   },
   {
@@ -28,7 +29,7 @@ const paths = [
     title: "Kids & Teens",
     description: "Fun, interactive lessons that teach kids and teens to stay safe online.",
     href: "/kids",
-    image: kidsImg,
+    image: imgSrc(kidsImg),
     alt: "Diverse children using computers in a classroom",
   },
   {
@@ -36,7 +37,7 @@ const paths = [
     title: "Educators",
     description: "Ready-made lesson plans and classroom activities for teaching digital safety.",
     href: "/educators",
-    image: educatorImg,
+    image: imgSrc(educatorImg),
     alt: "Family learning together with educational materials",
   },
   {
@@ -44,7 +45,7 @@ const paths = [
     title: "Small Businesses",
     description: "Quick, practical security training your whole team can finish in a lunch break.",
     href: "/small-business",
-    image: businessImg,
+    image: imgSrc(businessImg),
     alt: "Diverse business team in a cybersecurity training session",
   },
 ];

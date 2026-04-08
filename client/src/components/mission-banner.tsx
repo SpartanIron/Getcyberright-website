@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
 import { ArrowRight, Shield, Globe } from "lucide-react";
 import professionalImage from "@/assets/images/professional-focused.jpg";
+import { imgSrc } from "@/lib/img-src";
 
 export function MissionBanner() {
   return (
     <section className="relative overflow-hidden" data-testid="section-mission-banner">
       <div className="relative h-[550px] sm:h-[600px] lg:h-[650px]">
         <img
-          src={professionalImage}
+          src={imgSrc(professionalImage)}
           alt="Professional staying safe online"
           className="absolute inset-0 w-full h-full object-cover"
           loading="eager"

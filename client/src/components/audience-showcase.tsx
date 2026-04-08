@@ -7,11 +7,12 @@ import { ArrowRight, Users, Heart, Briefcase } from "lucide-react";
 import familyImage from "@/assets/images/hero-family-diverse.webp";
 import seniorsImage from "@/assets/images/seniors-diverse.webp";
 import businessImage from "@/assets/images/business-security-training.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const audiences = [
   {
     id: "families",
-    image: familyImage,
+    image: imgSrc(familyImage),
     title: "For Parents & Families",
     subtitle: "Protect Everyone at Home",
     description: "Age-appropriate guides, conversation starters, and monitoring tips so you can protect your kids without hovering or guessing.",
@@ -21,7 +22,7 @@ const audiences = [
   },
   {
     id: "seniors",
-    image: seniorsImage,
+    image: imgSrc(seniorsImage),
     title: "For Seniors",
     subtitle: "Stay Safe, Stay Connected",
     description: "Learn to spot phone scams, protect your identity, and use technology with confidence. Every guide is written in plain language, no tech jargon ever.",
@@ -31,7 +32,7 @@ const audiences = [
   },
   {
     id: "business",
-    image: businessImage,
+    image: imgSrc(businessImage),
     title: "For Small Businesses",
     subtitle: "Train Your Team",
     description: "Small businesses face the same threats as big ones, without the security budget. Free awareness training your whole team can complete in a lunch break.",

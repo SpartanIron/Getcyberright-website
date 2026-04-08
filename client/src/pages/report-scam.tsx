@@ -47,6 +47,7 @@ import {
   Info,
 } from "lucide-react";
 import bannerImage from "@/assets/banners/tools-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const scamTypes = [
   { value: "phishing", label: "Phishing Email/Text", icon: Mail },
@@ -119,7 +120,7 @@ export default function ReportScam() {
         <PageBanner
           title="Report a Scam"
           subtitle="Help protect others by reporting scams you've encountered. Your report helps us track emerging threats and warn the community."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Report suspicious activity"
           colorVariant="slate"
         />

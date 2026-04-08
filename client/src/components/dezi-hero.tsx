@@ -25,6 +25,7 @@ import { Link } from "@/lib/navigation";
 import deziLogo from "@assets/Logo_A_1768679989734.png";
 import { apiRequest } from "@/lib/queryClient";
 import { TechPatternBg } from "./tech-pattern-bg";
+import { imgSrc } from "@/lib/img-src";
 
 type InputType = "url" | "phone" | "email" | "description";
 type RiskLevel = "safe" | "suspicious" | "dangerous" | "unknown";
@@ -76,7 +77,7 @@ function AnimatedDeziLogo({ size = "md", isAnalyzing = false, hasResult = false,
         style={{ backgroundColor: glowColor }}
       />
       <img 
-        src={deziLogo} 
+        src={imgSrc(deziLogo)} 
         alt="Dezi" 
         className={`${sizeClasses} relative z-10`}
       />

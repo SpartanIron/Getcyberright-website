@@ -15,6 +15,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { FadeIn } from "@/components/fade-in";
 import newsBannerImage from "@assets/generated_images/realistic_breaking_news_broadcast_background.png";
+import { imgSrc } from "@/lib/img-src";
 
 function decodeHtmlEntities(text: string): string {
  if (!text) return text;
@@ -514,7 +515,7 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
  <section className="relative text-white overflow-hidden">
  <div 
  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
- style={{ backgroundImage: `url(${newsBannerImage})` }}
+ style={{ backgroundImage: `url(${imgSrc(newsBannerImage)})` }}
  />
  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
  <div className="relative container mx-auto px-4 py-12 sm:py-16 md:py-24">

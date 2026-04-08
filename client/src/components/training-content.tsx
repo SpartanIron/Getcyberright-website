@@ -42,6 +42,7 @@ import {
   Brain
 } from "lucide-react";
 import type { LearningPath } from "@shared/schema";
+import { imgSrc } from "@/lib/img-src";
 
 const audienceInfo = {
   kids: {
@@ -51,7 +52,7 @@ const audienceInfo = {
     color: "from-purple-500 to-pink-500",
     bgColor: "bg-purple-50 dark:bg-purple-950/20",
     borderColor: "border-purple-200 dark:border-purple-800",
-    image: trainingKidsImg
+    image: imgSrc(trainingKidsImg)
   },
   parents: {
     title: "Parents & Families",
@@ -60,7 +61,7 @@ const audienceInfo = {
     color: "from-blue-500 to-cyan-500",
     bgColor: "bg-blue-50 dark:bg-blue-950/20",
     borderColor: "border-blue-200 dark:border-blue-800",
-    image: trainingParentsImg
+    image: imgSrc(trainingParentsImg)
   },
   seniors: {
     title: "Seniors Protection",
@@ -69,7 +70,7 @@ const audienceInfo = {
     color: "from-rose-500 to-orange-500",
     bgColor: "bg-rose-50 dark:bg-rose-950/20",
     borderColor: "border-rose-200 dark:border-rose-800",
-    image: trainingSeniorsImg
+    image: imgSrc(trainingSeniorsImg)
   },
   educators: {
     title: "Educators & Schools",
@@ -78,7 +79,7 @@ const audienceInfo = {
     color: "from-emerald-500 to-teal-500",
     bgColor: "bg-emerald-50 dark:bg-emerald-950/20",
     borderColor: "border-emerald-200 dark:border-emerald-800",
-    image: trainingEducatorsImg
+    image: imgSrc(trainingEducatorsImg)
   },
   "small-business": {
     title: "Small Business",
@@ -87,7 +88,7 @@ const audienceInfo = {
     color: "from-amber-500 to-yellow-500",
     bgColor: "bg-amber-50 dark:bg-amber-950/20",
     borderColor: "border-amber-200 dark:border-amber-800",
-    image: trainingBusinessImg
+    image: imgSrc(trainingBusinessImg)
   },
   everyone: {
     title: "Everyone",
@@ -96,7 +97,7 @@ const audienceInfo = {
     color: "from-teal-500 to-cyan-500",
     bgColor: "bg-teal-50 dark:bg-teal-950/20",
     borderColor: "border-teal-200 dark:border-teal-800",
-    image: trainingEveryoneImg
+    image: imgSrc(trainingEveryoneImg)
   }
 };
 
@@ -142,7 +143,7 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
 
           <div className="absolute inset-0 hidden lg:block" aria-hidden="true">
             <img
-              src={bannerImage}
+              src={imgSrc(bannerImage)}
               alt="Diverse people learning cybersecurity together"
               className="w-full h-full object-cover"
               loading="eager"
@@ -162,7 +163,7 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
             <div className="flex flex-col h-full">
               <div className="lg:hidden">
                 <div className="relative h-[130px] sm:h-[150px] overflow-hidden">
-                  <img src={bannerImage} alt="Diverse people learning cybersecurity together" className="w-full h-full object-cover" loading="eager" />
+                  <img src={imgSrc(bannerImage)} alt="Diverse people learning cybersecurity together" className="w-full h-full object-cover" loading="eager" />
                   <div className="absolute inset-0 bg-[#0A2A3C]/60" />
                   <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0A2A3C] to-transparent" />
                 </div>

@@ -44,6 +44,7 @@ import {
   Zap
 } from "lucide-react";
 import bannerImage from "@/assets/banners/ai-prompts-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 type Audience = "all" | "everyday" | "families" | "seniors" | "students" | "business";
 type Category = "all" | "productivity" | "communication" | "safety" | "health" | "finance" | "learning" | "work" | "tech";
@@ -273,7 +274,7 @@ export default function AIPrompts() {
       <PageBanner
         title="AI Prompt Library"
         subtitle="Ready-to-use AI templates for everyday life. Copy, paste, and get things done. No experience needed."
-        imageSrc={bannerImage}
+        imageSrc={imgSrc(bannerImage)}
         imageAlt="AI Prompt Library banner with neural network patterns"
         colorVariant="teal"
       />

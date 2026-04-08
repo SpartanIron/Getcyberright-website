@@ -6,6 +6,7 @@ import { X, Send, User, AlertTriangle, Loader2, RotateCcw, Image, XCircle, Copy,
 import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
 import deziLogo from "@assets/Logo_A_1768679989734.png";
+import { imgSrc } from "@/lib/img-src";
 
 interface Message {
   id: number;
@@ -394,7 +395,7 @@ export function SafetyChat() {
             <div className="bg-gradient-to-r from-teal-600 to-cyan-600 p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
-                  <img src={deziLogo} alt="Dezi" className="h-8 w-8 object-contain" />
+                  <img src={imgSrc(deziLogo)} alt="Dezi" className="h-8 w-8 object-contain" />
                 </div>
                 <div>
                   <h3 className="font-bold text-white">Dezi</h3>
@@ -430,7 +431,7 @@ export function SafetyChat() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 && (
                 <div className="text-center py-8">
-                  <img src={deziLogo} alt="Dezi" className="h-16 w-16 mx-auto mb-3 object-contain" />
+                  <img src={imgSrc(deziLogo)} alt="Dezi" className="h-16 w-16 mx-auto mb-3 object-contain" />
                   <h4 className="font-semibold text-slate-800 dark:text-white mb-2">
                     Hi, I'm Dezi! How can I help you stay safe?
                   </h4>
@@ -467,7 +468,7 @@ export function SafetyChat() {
                 >
                   {message.role === "assistant" && (
                     <div className="h-8 w-8 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      <img src={deziLogo} alt="Dezi" className="h-6 w-6 object-contain" />
+                      <img src={imgSrc(deziLogo)} alt="Dezi" className="h-6 w-6 object-contain" />
                     </div>
                   )}
                   <div className="flex flex-col">
@@ -524,7 +525,7 @@ export function SafetyChat() {
               {isLoading && messages[messages.length - 1]?.role === "user" && (
                 <div className="flex gap-3 justify-start">
                   <div className="h-8 w-8 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                    <img src={deziLogo} alt="Dezi" className="h-6 w-6 object-contain" />
+                    <img src={imgSrc(deziLogo)} alt="Dezi" className="h-6 w-6 object-contain" />
                   </div>
                   <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl rounded-bl-md">
                     <TypingIndicator />
@@ -652,7 +653,7 @@ export function SafetyChat() {
               exit={{ scale: 0.8, opacity: 0 }}
               className="h-10 w-10 rounded-full overflow-hidden"
             >
-              <img src={deziLogo} alt="Dezi" className="h-full w-full object-cover" />
+              <img src={imgSrc(deziLogo)} alt="Dezi" className="h-full w-full object-cover" />
             </motion.div>
           )}
         </AnimatePresence>

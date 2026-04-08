@@ -2,6 +2,7 @@ import { Link } from "@/lib/navigation";
 import { ArrowRight, AlertTriangle, DollarSign, Users, Phone, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import seniorsImg from "@/assets/images/seniors-diverse.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const threats = [
   {
@@ -80,7 +81,7 @@ export function ThreatAwareness() {
 
         <div className="hidden lg:block">
           <img
-            src={seniorsImg}
+            src={imgSrc(seniorsImg)}
             alt="Diverse group of people learning about online safety"
             className="w-full h-full object-cover"
             loading="lazy"
@@ -92,7 +93,7 @@ export function ThreatAwareness() {
 
       <div className="lg:hidden">
         <img
-          src={seniorsImg}
+          src={imgSrc(seniorsImg)}
           alt="Diverse group of people learning about online safety"
           className="w-full h-64 sm:h-80 object-cover"
           loading="lazy"

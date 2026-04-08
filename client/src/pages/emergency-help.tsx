@@ -23,6 +23,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import bannerImage from "@/assets/banners/emergency-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 interface EmergencyContact {
   name: string;
@@ -770,7 +771,7 @@ export default function EmergencyHelp() {
         <PageBanner
           title="Emergency Help"
           subtitle="Find the right authorities to contact when you or someone you know has been targeted by a scam. Select your region and country below."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Emergency help and support resources"
           imagePosition="left"
         />

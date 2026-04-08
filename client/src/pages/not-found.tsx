@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Home, Search, BookOpen, Shield, ArrowLeft, HelpCircle } from "lucide-react";
 import logoImage from "@/assets/logo.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const helpfulLinks = [
   {
@@ -42,7 +43,7 @@ export default function NotFound() {
         <div className="max-w-2xl w-full text-center">
           <div className="mb-8">
             <img 
-              src={logoImage} 
+              src={imgSrc(logoImage)} 
               alt="GetCyberRight" 
               className="w-24 h-24 mx-auto mb-6 opacity-50"
               loading="lazy"

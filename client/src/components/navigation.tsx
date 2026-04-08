@@ -15,6 +15,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { imgSrc } from "@/lib/img-src";
 
 const whoWeHelp = [
   { title: "Parents Hub", description: "Protect your kids and manage family devices safely", href: "/parents", icon: Users, featured: true, color: "text-blue-500" },
@@ -105,7 +106,7 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-[72px] items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5" data-testid="link-logo">
-            <img src={logoImage} alt="GetCyberRight" className="w-11 h-11 object-contain" width={44} height={44} loading="lazy" />
+            <img src={imgSrc(logoImage)} alt="GetCyberRight" className="w-11 h-11 object-contain" width={44} height={44} loading="lazy" />
             <span className="font-bold text-xl text-white tracking-tight">
               GetCyberRight
             </span>

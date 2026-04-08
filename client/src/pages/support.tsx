@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Link } from "@/lib/navigation";
 import supportImage from "@/assets/banners/contact-banner.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const supportOptions = [
   {
@@ -105,7 +106,7 @@ export default function Support() {
       <PageBanner
         title="How Can We Help?"
         subtitle="Get the support you need. We're here to help you stay safe online."
-        imageSrc={supportImage}
+        imageSrc={imgSrc(supportImage)}
         imageAlt="Customer support"
         imagePosition="right"
         colorVariant="teal"

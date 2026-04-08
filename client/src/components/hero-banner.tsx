@@ -5,13 +5,14 @@ import { Shield, CheckCircle, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
 import heroBannerImage from "@assets/Gemini_Generated_Image_ctwx3actwx3actwx_1768679610678.png";
+import { imgSrc } from "@/lib/img-src";
 
 export function HeroBanner() {
   return (
     <section className="relative text-white overflow-hidden min-h-[500px] sm:min-h-[550px]">
       <div className="absolute inset-0">
         <img 
-          src={heroBannerImage} 
+          src={imgSrc(heroBannerImage)} 
           alt="Diverse multigenerational family" 
           className="w-full h-full object-cover"
           style={{ objectPosition: 'center 20%' }}

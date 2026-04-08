@@ -42,6 +42,7 @@ import { ProgressCelebration } from "@/components/data-removal/progress-celebrat
 import { MonitoringPanel, ComplianceTracker } from "@/components/data-removal/monitoring";
 import { IdentityShieldPanel } from "@/components/data-removal/identity-shield";
 import type { VaultProfile, DashboardStats } from "@/components/data-removal/types";
+import { imgSrc } from "@/lib/img-src";
 
 type JourneyStep = "vault" | "scan" | "remove" | "monitor";
 
@@ -334,7 +335,7 @@ export default function DataRemoval() {
         <PageBanner
           title="GCR Data Shield. Removal Center"
           subtitle="Send opt-out requests, track removal progress, and manage your privacy across 500+ data broker sites."
-          imageSrc={bannerImage}
+          imageSrc={imgSrc(bannerImage)}
           imageAlt="Person scanning for personal data exposure on data broker sites"
           imagePosition="left"
         />

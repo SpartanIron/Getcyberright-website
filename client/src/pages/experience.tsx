@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import heroImage from "@/assets/images/experience-hero.webp";
 import familiesImage from "@/assets/images/experience-families.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const breadcrumbs: BreadcrumbData = {
  type: "BreadcrumbList",
@@ -181,7 +182,7 @@ export default function ExperiencePage() {
  <section className="relative overflow-hidden bg-[#0A2A3C] min-h-[600px] md:min-h-[680px]" data-testid="section-experience-hero">
  <div className="absolute inset-0">
  <img
- src={heroImage}
+ src={imgSrc(heroImage)}
  alt="Diverse families enjoying an interactive digital safety event"
  className="w-full h-full object-cover opacity-30"
  loading="eager"
@@ -258,7 +259,7 @@ export default function ExperiencePage() {
  >
  <div className="rounded-2xl overflow-hidden shadow-2xl">
  <img
- src={familiesImage}
+ src={imgSrc(familiesImage)}
  alt="Families interacting with digital safety displays at The GetCyberRight Experience"
  className="w-full h-auto"
  loading="lazy"

@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/navigation";
 import { ArrowRight } from "lucide-react";
 import expertImage from "@/assets/images/security-expert.jpg";
+import { imgSrc } from "@/lib/img-src";
 
 export function ExpertBanner() {
   return (
     <section className="relative overflow-hidden" data-testid="section-expert-banner">
       <div className="absolute inset-0">
         <img
-          src={expertImage}
+          src={imgSrc(expertImage)}
           alt="Cybersecurity expert"
           className="w-full h-full object-cover object-top"
           loading="eager"

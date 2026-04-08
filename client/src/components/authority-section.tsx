@@ -2,6 +2,7 @@ import { Link } from "@/lib/navigation";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import authorityImg from "@/assets/images/feature-family-learning-diverse.webp";
+import { imgSrc } from "@/lib/img-src";
 
 const trustPoints = [
   "Powered by the same threat data law enforcement and security agencies rely on",
@@ -21,7 +22,7 @@ export function AuthoritySection() {
             <div className="relative">
               <div className="rounded-2xl overflow-hidden shadow-xl">
                 <img
-                  src={authorityImg}
+                  src={imgSrc(authorityImg)}
                   alt="Diverse family learning about online safety together"
                   className="w-full h-64 sm:h-80 lg:h-auto object-cover"
                   loading="lazy"

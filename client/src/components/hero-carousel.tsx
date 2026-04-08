@@ -13,14 +13,15 @@ import kidsTabletImage from "@assets/ChatGPT_Image_Jan_22,_2026,_11_13_49_PM_176
 import teenPhoneImage from "@assets/ChatGPT_Image_Jan_22,_2026,_10_56_48_PM_1769140919527.png";
 import grandparentsImage from "@assets/ChatGPT_Image_Jan_22,_2026,_11_06_36_PM_1769141264903.png";
 import familyTechImage from "@assets/ChatGPT_Image_Jan_22,_2026,_11_26_08_PM_1769142455588.png";
+import { imgSrc } from "@/lib/img-src";
 
 const slideImages = [
-  originalFamilyPhoto,
-  grandparentsImage,
-  teenPhoneImage,
-  seniorsImage,
-  kidsTabletImage,
-  familyTechImage
+  imgSrc(originalFamilyPhoto),
+  imgSrc(grandparentsImage),
+  imgSrc(teenPhoneImage),
+  imgSrc(seniorsImage),
+  imgSrc(kidsTabletImage),
+  imgSrc(familyTechImage)
 ];
 
 function usePreloadImages(images: string[], currentIndex: number) {
