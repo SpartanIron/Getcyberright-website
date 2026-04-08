@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import PageSkeleton from "../../page-skeleton";
-import { Suspense } from "react";
 import PageContent from "@/pages/admin/change-password";
 
 export const metadata: Metadata = {
@@ -10,7 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminChangePasswordPage() {
-  return <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
-      </Suspense>;
+  return <PageContent />;
 }

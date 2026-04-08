@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import PageSkeleton from "../../page-skeleton";
-import { Suspense } from "react";
 import PageContent from "@/pages/admin-compliance";
 
 export const metadata: Metadata = {
@@ -10,7 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminCompliancePage() {
-  return <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
-      </Suspense>;
+  return <PageContent />;
 }

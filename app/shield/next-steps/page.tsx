@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PageSkeleton from "../../page-skeleton";
 import PageContent from "@/pages/shield-next-steps";
 
 export const metadata: Metadata = {
@@ -13,7 +11,5 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default function ShieldNextStepsPage() {
-  return <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
-      </Suspense>;
+  return <PageContent />;
 }

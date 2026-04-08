@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/news";
 import { getLatestNews } from "../lib/data";
 
@@ -69,9 +67,7 @@ export default async function NewsPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <Suspense fallback={<PageSkeleton />}>
-        <PageContent initialNews={initialNews} />
-      </Suspense>
+      <PageContent initialNews={initialNews} />
     </>
   );
 }

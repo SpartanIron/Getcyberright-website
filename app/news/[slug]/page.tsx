@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PageSkeleton from "../../page-skeleton";
 import { notFound } from "next/navigation";
 import PageContent from "@/pages/news-article";
 
@@ -90,9 +88,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-      <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
-      </Suspense>
+      <PageContent />
     </>
   );
 }

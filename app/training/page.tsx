@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/training";
 import { getAllLearningPaths } from "../lib/data";
 
@@ -78,9 +76,7 @@ export default async function TrainingPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <Suspense fallback={<PageSkeleton />}>
-        <PageContent initialPaths={initialPaths} />
-      </Suspense>
+      <PageContent initialPaths={initialPaths} />
     </>
   );
 }

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import PageSkeleton from "../../../page-skeleton";
 import PageContent from "@/pages/shield-results";
@@ -19,8 +18,6 @@ export default async function ShieldResultsPage({ params }: PageProps) {
   const { scanId } = await params;
   if (!scanId) notFound();
   return (
-    <Suspense fallback={<PageSkeleton />}>
-      <PageContent />
-    </Suspense>
+    <PageContent />
   );
 }

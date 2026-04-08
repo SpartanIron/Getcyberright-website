@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import PageSkeleton from "../page-skeleton";
-import { Suspense } from "react";
 import PageContent from "@/pages/scam-checker";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -101,9 +99,7 @@ export default function ScamCheckerPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
-      </Suspense>
+      <PageContent />
     </>
   );
 }

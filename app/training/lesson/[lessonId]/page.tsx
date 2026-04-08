@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import PageSkeleton from "../../../page-skeleton";
 import PageContent from "@/pages/training-lesson";
@@ -51,8 +50,6 @@ export default async function TrainingLessonPage({ params }: PageProps) {
   const { lessonId } = await params;
   if (!lessonId) notFound();
   return (
-    <Suspense fallback={<PageSkeleton />}>
-      <PageContent />
-    </Suspense>
+    <PageContent />
   );
 }

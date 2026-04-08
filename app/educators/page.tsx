@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/educators";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -23,7 +21,5 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default function EducatorsPage() {
-  return <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
-      </Suspense>;
+  return <PageContent />;
 }

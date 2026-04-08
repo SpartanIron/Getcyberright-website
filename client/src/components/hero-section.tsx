@@ -6,7 +6,7 @@ import { ArrowRight, MapPin, Shield, AlertTriangle, ShieldCheck, Eye } from "luc
 import { Link, useLocation } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { TrendingThreat } from "@shared/schema";
-import heroFamilyImg from "@/assets/images/hero-family-diverse.webp";
+import heroFamilyImg from "@/assets/images/hero-family-protected.webp";
 import { imgSrc } from "@/lib/img-src";
 
 const TIMEZONE_REGION_MAP: Record<string, string> = {
@@ -227,7 +227,7 @@ export function HeroSection() {
                 <div className="relative overflow-hidden rounded-l-3xl">
                   <img
                     src={imgSrc(heroFamilyImg)}
-                    alt="GetCyberRight — family digital protection made simple"
+                    alt="Family protected by a digital security shield while browsing online together"
                     className="w-full h-[580px] object-cover"
                     data-testid="img-hero-overview"
                   />
@@ -239,7 +239,7 @@ export function HeroSection() {
               <div className="relative rounded-2xl overflow-hidden shadow-xl">
                 <img
                   src={imgSrc(heroFamilyImg)}
-                  alt="GetCyberRight — family digital protection made simple"
+                  alt="Family protected by a digital security shield while browsing online together"
                   className="w-full h-64 sm:h-80 object-cover"
                   data-testid="img-hero-overview-mobile"
                 />

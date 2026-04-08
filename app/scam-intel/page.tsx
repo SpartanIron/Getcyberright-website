@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/scam-intel-listing";
 import { getPublishedScamIntel } from "../lib/data";
 
@@ -66,9 +64,7 @@ export default async function ScamIntelPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <Suspense fallback={<PageSkeleton />}>
-        <PageContent initialScams={initialScams} />
-      </Suspense>
+      <PageContent initialScams={initialScams} />
     </>
   );
 }

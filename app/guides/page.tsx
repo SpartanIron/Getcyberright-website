@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/guides";
 import { getPublishedGuides } from "../lib/data";
 
@@ -69,9 +67,7 @@ export default async function GuidesPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <Suspense fallback={<PageSkeleton />}>
-        <PageContent initialGuides={initialGuides} />
-      </Suspense>
+      <PageContent initialGuides={initialGuides} />
     </>
   );
 }

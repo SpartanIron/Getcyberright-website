@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PageSkeleton from "../../page-skeleton";
 import PageContent from "@/pages/scan-report";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -26,7 +24,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default function ReportPage() {
-  return <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
-      </Suspense>;
+  return <PageContent />;
 }

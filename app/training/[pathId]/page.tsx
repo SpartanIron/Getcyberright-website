@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PageSkeleton from "../../page-skeleton";
 import { notFound } from "next/navigation";
 import PageContent from "@/pages/training-path";
 
@@ -57,7 +55,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function TrainingPathPage({ params }: PageProps) {
   const { pathId } = await params;
   if (!pathId) notFound();
-  return <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
-      </Suspense>;
+  return <PageContent />;
 }

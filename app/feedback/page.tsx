@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import PageSkeleton from "../page-skeleton";
-import { Suspense } from "react";
 import PageContent from "@/pages/feedback";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -22,7 +20,5 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default function FeedbackPage() {
-  return <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
-      </Suspense>;
+  return <PageContent />;
 }
