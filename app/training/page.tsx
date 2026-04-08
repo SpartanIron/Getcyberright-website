@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 async function fetchTrainingPaths() {
@@ -55,6 +56,15 @@ export default async function TrainingPage() {
         name: "GetCyberRight",
         url: BASE_URL,
       },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      name: "GetCyberRight Cybersecurity Training Academy",
+      description: "Free, comprehensive cybersecurity training for families, kids, seniors, educators, and small businesses. Learn to protect yourself and your loved ones online.",
+      provider: { "@type": "Organization", name: "GetCyberRight", url: BASE_URL },
+      url: `${BASE_URL}/training`,
+      isAccessibleForFree: true,
     },
     {
       "@context": "https://schema.org",

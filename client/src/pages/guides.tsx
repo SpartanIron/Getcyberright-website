@@ -1,21 +1,11 @@
-import { StructuredData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { GuidesContent } from "@/components/guides-content";
 import { BookOpen } from "lucide-react";
 
-const breadcrumbs: BreadcrumbData = {
-  type: "BreadcrumbList",
-  items: [
-    { name: "Home", url: "https://www.getcyberright.com/" },
-    { name: "Cyber Safety Guides", url: "https://www.getcyberright.com/guides" },
-  ],
-};
-
 export default function GuidesListing({ initialGuides }: { initialGuides?: any[] }) {
   return (
     <div className="min-h-screen bg-background">
-      <StructuredData data={[breadcrumbs]} />
       <Navigation />
 
       <div className="bg-[#0A2A3C] text-white relative overflow-hidden">

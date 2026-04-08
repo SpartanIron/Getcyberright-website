@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 async function fetchScamIntel() {
@@ -42,19 +43,31 @@ async function fetchScamIntel() {
 
 export default async function ScamIntelPage() {
   const initialScams = await fetchScamIntel();
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Scam Intelligence",
-        item: `${BASE_URL}/scam-intel`,
-      },
-    ],
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Scam Intelligence",
+          item: `${BASE_URL}/scam-intel`,
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      name: "Scam Intelligence Database",
+      description: "Comprehensive database of active scams with risk levels, warning signs, prevention tips, and regional targeting data.",
+      url: `${BASE_URL}/scam-intel`,
+      keywords: ["scam database", "fraud intelligence", "cybersecurity threats", "scam prevention", "phishing scams"],
+      creator: { "@type": "Organization", name: "GetCyberRight", url: BASE_URL },
+      variableMeasured: ["risk level", "report count", "average financial loss", "target audience", "platforms used"],
+    },
+  ];
 
   return (
     <>
