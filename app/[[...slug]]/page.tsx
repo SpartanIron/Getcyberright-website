@@ -2,114 +2,85 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ClientApp from "./client-app";
 
-const KNOWN_CLIENT_ROUTES = new Set([
-  "/",
-  "/about",
-  "/tools",
-  "/resources",
-  "/contact",
-  "/privacy",
-  "/terms",
-  "/emergency-help",
-  "/kids",
-  "/seniors",
-  "/parents",
-  "/parents/child-safety-scanner",
-  "/support",
-  "/support-the-mission",
-  "/security",
-  "/our-mission",
-  "/pricing",
-  "/dashboard",
-  "/account",
-  "/threat-trends",
-  "/cyber-threat-radar",
-  "/awareness-hub",
-  "/report-scam",
-  "/checklists",
-  "/data-removal",
-  "/ai-prompts",
-  "/ai-safety",
-  "/news",
-  "/cyber-hygiene",
-  "/password-generator",
-  "/breach-dashboard",
-  "/search",
-  "/parent-guide",
-  "/small-business",
-  "/educators",
-  "/travel-safety",
-  "/accessibility",
-  "/advertise",
-  "/partner-deck",
-  "/feedback",
-  "/experience",
-  "/checkout-success",
-  "/preferences",
-  "/printable-guides",
-  "/quick-assessment",
-  "/safety-score",
-  "/scam-checker",
-  "/shield",
-  "/shield/next-steps",
-  "/browser-extension",
-  "/extension-auth",
-  "/gcr-guard-pricing",
-  "/data-shield-pricing",
-  "/faq",
-  "/guides",
-  "/alerts",
-  "/scam-intel",
-  "/training",
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/admin",
-  "/admin/users",
-  "/admin/messages",
-  "/admin/subscribers",
-  "/admin/scam-reports",
-  "/admin/scan-management",
-  "/admin/tool-analytics",
-  "/admin/security",
-  "/admin/threat-intelligence",
-  "/admin/content-governance",
-  "/admin/compliance",
-  "/admin/newsletter",
-  "/admin/prompt-management",
-  "/admin/announcements",
-  "/admin/trending-threats",
-  "/admin/feedback",
-  "/admin/content",
-  "/admin/change-password",
+const STATIC_ROUTES = new Set([
+  "about",
+  "tools",
+  "resources",
+  "contact",
+  "privacy",
+  "terms",
+  "emergency-help",
+  "kids",
+  "seniors",
+  "parents",
+  "support",
+  "support-the-mission",
+  "security",
+  "our-mission",
+  "pricing",
+  "dashboard",
+  "account",
+  "threat-trends",
+  "cyber-threat-radar",
+  "awareness-hub",
+  "report-scam",
+  "checklists",
+  "data-removal",
+  "ai-prompts",
+  "ai-safety",
+  "news",
+  "cyber-hygiene",
+  "password-generator",
+  "breach-dashboard",
+  "search",
+  "parent-guide",
+  "small-business",
+  "educators",
+  "travel-safety",
+  "accessibility",
+  "advertise",
+  "partner-deck",
+  "feedback",
+  "experience",
+  "checkout-success",
+  "preferences",
+  "printable-guides",
+  "quick-assessment",
+  "safety-score",
+  "scam-checker",
+  "shield",
+  "browser-extension",
+  "extension-auth",
+  "gcr-guard-pricing",
+  "data-shield-pricing",
+  "faq",
+  "guides",
+  "alerts",
+  "scam-intel",
+  "training",
+  "login",
+  "register",
+  "forgot-password",
 ]);
 
-const DYNAMIC_ROUTE_PREFIXES = [
-  "/training/",
-  "/guides/",
-  "/alerts/",
-  "/scam-intel/",
-  "/scams/",
-  "/topics/",
-  "/report/",
-  "/news/",
-  "/shield/",
-  "/admin/",
+const DYNAMIC_PREFIXES = [
+  "training",
+  "guides",
+  "alerts",
+  "scam-intel",
+  "scams",
+  "topics",
+  "report",
+  "news",
+  "shield",
+  "admin",
+  "parents",
 ];
 
-function isKnownRoute(url: string): boolean {
-  let pathname = url.split("?")[0].split("#")[0];
-  if (pathname !== "/" && pathname.endsWith("/")) {
-    pathname = pathname.slice(0, -1);
-  }
-  if (KNOWN_CLIENT_ROUTES.has(pathname)) {
-    return true;
-  }
-  for (const prefix of DYNAMIC_ROUTE_PREFIXES) {
-    if (pathname.startsWith(prefix) && pathname.length > prefix.length) {
-      return true;
-    }
-  }
+function isKnownRoute(segments: string[]): boolean {
+  if (segments.length === 0) return true;
+  if (segments.length === 1 && STATIC_ROUTES.has(segments[0])) return true;
+  if (segments.length >= 1 && DYNAMIC_PREFIXES.includes(segments[0])) return true;
   return false;
 }
 
@@ -118,11 +89,25 @@ type PageProps = {
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const resolvedParams = await params;
-  const slugParts = resolvedParams.slug || [];
-  const path = slugParts.length > 0 ? `/${slugParts.join("/")}` : "/";
+  const { slug } = await params;
+  const segments = slug || [];
 
-  if (!isKnownRoute(path)) {
+  if (segments.length === 0) {
+    return {
+      title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
+      description:
+        "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training. Trusted by thousands of families worldwide.",
+      openGraph: {
+        title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
+        description:
+          "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training.",
+        url: "https://www.getcyberright.com",
+        type: "website",
+      },
+    };
+  }
+
+  if (!isKnownRoute(segments)) {
     return {
       title: "Page Not Found | GetCyberRight",
       description:
@@ -135,11 +120,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function CatchAllPage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const slugParts = resolvedParams.slug || [];
-  const path = slugParts.length > 0 ? `/${slugParts.join("/")}` : "/";
+  const { slug } = await params;
+  const segments = slug || [];
 
-  if (!isKnownRoute(path)) {
+  if (!isKnownRoute(segments)) {
     notFound();
   }
 

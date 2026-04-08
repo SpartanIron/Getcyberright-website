@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "../client/src/index.css";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
@@ -64,7 +65,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <div id="root">{children}</div>
+        <div id="root">
+          <Providers>{children}</Providers>
+        </div>
       </body>
     </html>
   );

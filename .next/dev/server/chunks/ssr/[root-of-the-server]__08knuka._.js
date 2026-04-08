@@ -57,119 +57,101 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b5b2e2e2e$slug$5d5d2f
 ;
 ;
 ;
-const KNOWN_CLIENT_ROUTES = new Set([
-    "/",
-    "/about",
-    "/tools",
-    "/resources",
-    "/contact",
-    "/privacy",
-    "/terms",
-    "/emergency-help",
-    "/kids",
-    "/seniors",
-    "/parents",
-    "/parents/child-safety-scanner",
-    "/support",
-    "/support-the-mission",
-    "/security",
-    "/our-mission",
-    "/pricing",
-    "/dashboard",
-    "/account",
-    "/threat-trends",
-    "/cyber-threat-radar",
-    "/awareness-hub",
-    "/report-scam",
-    "/checklists",
-    "/data-removal",
-    "/ai-prompts",
-    "/ai-safety",
-    "/news",
-    "/cyber-hygiene",
-    "/password-generator",
-    "/breach-dashboard",
-    "/search",
-    "/parent-guide",
-    "/small-business",
-    "/educators",
-    "/travel-safety",
-    "/accessibility",
-    "/advertise",
-    "/partner-deck",
-    "/feedback",
-    "/experience",
-    "/checkout-success",
-    "/preferences",
-    "/printable-guides",
-    "/quick-assessment",
-    "/safety-score",
-    "/scam-checker",
-    "/shield",
-    "/shield/next-steps",
-    "/browser-extension",
-    "/extension-auth",
-    "/gcr-guard-pricing",
-    "/data-shield-pricing",
-    "/faq",
-    "/guides",
-    "/alerts",
-    "/scam-intel",
-    "/training",
-    "/login",
-    "/register",
-    "/forgot-password",
-    "/admin",
-    "/admin/users",
-    "/admin/messages",
-    "/admin/subscribers",
-    "/admin/scam-reports",
-    "/admin/scan-management",
-    "/admin/tool-analytics",
-    "/admin/security",
-    "/admin/threat-intelligence",
-    "/admin/content-governance",
-    "/admin/compliance",
-    "/admin/newsletter",
-    "/admin/prompt-management",
-    "/admin/announcements",
-    "/admin/trending-threats",
-    "/admin/feedback",
-    "/admin/content",
-    "/admin/change-password"
+const STATIC_ROUTES = new Set([
+    "about",
+    "tools",
+    "resources",
+    "contact",
+    "privacy",
+    "terms",
+    "emergency-help",
+    "kids",
+    "seniors",
+    "parents",
+    "support",
+    "support-the-mission",
+    "security",
+    "our-mission",
+    "pricing",
+    "dashboard",
+    "account",
+    "threat-trends",
+    "cyber-threat-radar",
+    "awareness-hub",
+    "report-scam",
+    "checklists",
+    "data-removal",
+    "ai-prompts",
+    "ai-safety",
+    "news",
+    "cyber-hygiene",
+    "password-generator",
+    "breach-dashboard",
+    "search",
+    "parent-guide",
+    "small-business",
+    "educators",
+    "travel-safety",
+    "accessibility",
+    "advertise",
+    "partner-deck",
+    "feedback",
+    "experience",
+    "checkout-success",
+    "preferences",
+    "printable-guides",
+    "quick-assessment",
+    "safety-score",
+    "scam-checker",
+    "shield",
+    "browser-extension",
+    "extension-auth",
+    "gcr-guard-pricing",
+    "data-shield-pricing",
+    "faq",
+    "guides",
+    "alerts",
+    "scam-intel",
+    "training",
+    "login",
+    "register",
+    "forgot-password"
 ]);
-const DYNAMIC_ROUTE_PREFIXES = [
-    "/training/",
-    "/guides/",
-    "/alerts/",
-    "/scam-intel/",
-    "/scams/",
-    "/topics/",
-    "/report/",
-    "/news/",
-    "/shield/",
-    "/admin/"
+const DYNAMIC_PREFIXES = [
+    "training",
+    "guides",
+    "alerts",
+    "scam-intel",
+    "scams",
+    "topics",
+    "report",
+    "news",
+    "shield",
+    "admin",
+    "parents"
 ];
-function isKnownRoute(url) {
-    let pathname = url.split("?")[0].split("#")[0];
-    if (pathname !== "/" && pathname.endsWith("/")) {
-        pathname = pathname.slice(0, -1);
-    }
-    if (KNOWN_CLIENT_ROUTES.has(pathname)) {
-        return true;
-    }
-    for (const prefix of DYNAMIC_ROUTE_PREFIXES){
-        if (pathname.startsWith(prefix) && pathname.length > prefix.length) {
-            return true;
-        }
-    }
+function isKnownRoute(segments) {
+    if (segments.length === 0) return true;
+    if (segments.length === 1 && STATIC_ROUTES.has(segments[0])) return true;
+    if (segments.length >= 1 && DYNAMIC_PREFIXES.includes(segments[0])) return true;
     return false;
 }
 async function generateMetadata({ params }) {
-    const resolvedParams = await params;
-    const slugParts = resolvedParams.slug || [];
-    const path = slugParts.length > 0 ? `/${slugParts.join("/")}` : "/";
-    if (!isKnownRoute(path)) {
+    const { slug } = await params;
+    const segments = slug || [];
+    if (segments.length === 0) {
+        return {
+            title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
+            description: "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training. Trusted by thousands of families worldwide.",
+            openGraph: {
+                title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
+                description: "Protect your family online with free cybersecurity education, AI-powered scam detection tools, data broker removal, and safety training.",
+                url: "https://www.getcyberright.com",
+                type: "website"
+            }
+        };
+    }
+    if (!isKnownRoute(segments)) {
         return {
             title: "Page Not Found | GetCyberRight",
             description: "The page you're looking for doesn't exist. Visit GetCyberRight for free cybersecurity education, tools, and safety resources for families.",
@@ -182,15 +164,14 @@ async function generateMetadata({ params }) {
     return {};
 }
 async function CatchAllPage({ params }) {
-    const resolvedParams = await params;
-    const slugParts = resolvedParams.slug || [];
-    const path = slugParts.length > 0 ? `/${slugParts.join("/")}` : "/";
-    if (!isKnownRoute(path)) {
+    const { slug } = await params;
+    const segments = slug || [];
+    if (!isKnownRoute(segments)) {
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$components$2f$navigation$2e$react$2d$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["notFound"])();
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f5b5b2e2e2e$slug$5d5d2f$client$2d$app$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
         fileName: "[project]/app/[[...slug]]/page.tsx",
-        lineNumber: 146,
+        lineNumber: 130,
         columnNumber: 10
     }, this);
 }
