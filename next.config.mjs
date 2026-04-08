@@ -13,18 +13,12 @@ const nextConfig = {
     "*.replit.dev",
   ],
 
-  webpack: (config) => {
-    config.resolve.alias["@"] = path.resolve(__dirname, "client", "src");
-    config.resolve.alias["@shared"] = path.resolve(__dirname, "shared");
-    config.resolve.alias["@assets"] = path.resolve(__dirname, "attached_assets");
-
-    config.module.rules.push({
-      test: /\.(png|jpg|jpeg|gif|svg|webp|ico|mp4|webm)$/i,
-      type: "asset/resource",
-      include: path.resolve(__dirname, "attached_assets"),
-    });
-
-    return config;
+  turbopack: {
+    resolveAlias: {
+      "@": path.resolve(__dirname, "client", "src"),
+      "@shared": path.resolve(__dirname, "shared"),
+      "@assets": path.resolve(__dirname, "attached_assets"),
+    },
   },
 
   serverExternalPackages: [

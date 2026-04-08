@@ -6,6 +6,7 @@
       "NEXT_PUBLIC_RECAPTCHA_SITE_KEY": "6Lcy8UksAAAAACOcToKZXSP_d8xUAiJhSha7bdFD",
       "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_live_51SvU8iKVliFwpBWfFLP70p4b8Y34Gzo30zE41O5RVX7oxbGBDfwuqRMymIzR5FJWYqKDFeg5wHnmAb549CYIGdJw00ntpYTodQ"
     },
+    "webpack": null,
     "typescript": {
       "ignoreBuildErrors": true
     },
@@ -311,6 +312,14 @@
     "htmlLimitedBots": "[\\w-]+-Google|Google-[\\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight",
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.mjs",
+    "turbopack": {
+      "resolveAlias": {
+        "@": "/home/runner/workspace/client/src",
+        "@shared": "/home/runner/workspace/shared",
+        "@assets": "/home/runner/workspace/attached_assets"
+      },
+      "root": "/home/runner/workspace"
+    },
     "serverExternalPackages": [
       "drizzle-orm",
       "@neondatabase/serverless",
@@ -336,9 +345,6 @@
       "@simplewebauthn/server",
       "rss-parser"
     ],
-    "turbopack": {
-      "root": "/home/runner/workspace"
-    },
     "distDirRoot": ".next"
   },
   "appDir": "/home/runner/workspace",
@@ -351,8 +357,6 @@
     ".next/server/functions-config-manifest.json",
     ".next/server/middleware-manifest.json",
     ".next/server/middleware-build-manifest.js",
-    ".next/server/middleware-react-loadable-manifest.js",
-    ".next/react-loadable-manifest.json",
     ".next/server/app-paths-manifest.json",
     ".next/app-path-routes-manifest.json",
     ".next/server/server-reference-manifest.js",

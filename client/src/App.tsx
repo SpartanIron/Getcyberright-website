@@ -241,7 +241,7 @@ function App() {
   useEffect(() => {
     setIsClient(true);
 
-    const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || (typeof globalThis !== "undefined" && (globalThis as any).__VITE_ENV__?.GA_MEASUREMENT_ID) || "";
+    const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
     if (gaMeasurementId) {
       initGA();
     }
