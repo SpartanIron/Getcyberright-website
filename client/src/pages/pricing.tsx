@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead } from "@/components/seo-head";
@@ -263,12 +263,7 @@ export default function PricingPage() {
                 const separatePrice = getSeparatePrice(tier);
 
                 return (
-                  <motion.div
-                    key={tier.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.15 }}
-                  >
+                  <FadeIn key={tier.id}>
                     <Card
                       className={`relative h-full flex flex-col ${
                         tier.highlighted
@@ -372,7 +367,7 @@ export default function PricingPage() {
                         </Button>
                       </CardContent>
                     </Card>
-                  </motion.div>
+                  </FadeIn>
                 );
               })}
             </div>

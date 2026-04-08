@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -138,11 +138,7 @@ export default function ReportScam() {
                   </CardHeader>
                   <CardContent>
                     {submitted ? (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="text-center py-8"
-                      >
+                      <FadeIn className="text-center py-8">
                         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 flex items-center justify-center">
                           <CheckCircle2 className="w-8 h-8 text-accent" />
                         </div>
@@ -166,7 +162,7 @@ export default function ReportScam() {
                             <a href="/tools">Check a Suspicious Link</a>
                           </Button>
                         </div>
-                      </motion.div>
+                      </FadeIn>
                     ) : (
                       <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

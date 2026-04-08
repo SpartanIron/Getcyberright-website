@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
@@ -215,11 +215,7 @@ export default function Login() {
       
       <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <FadeIn>
             <div className="text-center mb-8">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-8 h-8 text-primary" />
@@ -231,19 +227,14 @@ export default function Login() {
             </div>
 
             {isVerified && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-4"
-                data-testid="alert-email-verified"
-              >
+              <FadeIn className="mb-4" data-testid="alert-email-verified">
                 <Alert className="border-green-500/30 bg-green-500/10">
                   <CheckCircle2 className="w-4 h-4 text-green-600" />
                   <AlertDescription className="text-green-700 dark:text-green-400">
                     Your email has been verified. You can now log in.
                   </AlertDescription>
                 </Alert>
-              </motion.div>
+              </FadeIn>
             )}
 
             <Card>
@@ -413,7 +404,7 @@ export default function Login() {
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
         </div>
       </main>
       

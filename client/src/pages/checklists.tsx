@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
@@ -80,11 +80,7 @@ export default function Checklists() {
 
               {checklistTabs.map((tab) => (
                 <TabsContent key={tab.id} value={tab.id}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
+                  <FadeIn>
                     <PrintableChecklist
                       id={tab.id}
                       title={tab.checklist.title}
@@ -92,7 +88,7 @@ export default function Checklists() {
                       items={tab.checklist.items}
                       category={tab.checklist.category}
                     />
-                  </motion.div>
+                  </FadeIn>
                 </TabsContent>
               ))}
             </Tabs>
@@ -111,13 +107,7 @@ export default function Checklists() {
               ))}
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-12 text-center print:hidden"
-            >
+            <FadeIn className="mt-12 text-center print:hidden" delay={0.2}>
               <p className="text-muted-foreground mb-4">
                 Need more detailed guidance? Check out our comprehensive resources.
               </p>
@@ -128,7 +118,7 @@ export default function Checklists() {
               >
                 View All Resources
               </Link>
-            </motion.div>
+            </FadeIn>
 
             <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground mt-6 print:hidden">
               <CalendarDays className="w-3 h-3" />

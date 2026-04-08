@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,10 +107,7 @@ export default function AdminChangePassword() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+      <FadeIn
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
@@ -259,7 +256,7 @@ export default function AdminChangePassword() {
             </form>
           </CardContent>
         </Card>
-      </motion.div>
+      </FadeIn>
     </div>
   );
 }

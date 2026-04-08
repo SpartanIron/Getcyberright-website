@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
@@ -58,11 +58,7 @@ export default function CheckoutSuccess() {
 
       <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <FadeIn>
             <Card>
               <CardContent className="p-8 text-center">
                 {isLoading ? (
@@ -226,7 +222,7 @@ export default function CheckoutSuccess() {
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
         </div>
       </main>
 

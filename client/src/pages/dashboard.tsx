@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
@@ -159,11 +159,7 @@ export default function Dashboard() {
       <main id="main-content" tabIndex={-1} className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-6">
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
+          <FadeIn>
             <Card>
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -194,7 +190,7 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
 
           {showOnboarding && (
             <OnboardingWelcome
@@ -203,12 +199,7 @@ export default function Dashboard() {
             />
           )}
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="grid md:grid-cols-3 gap-4"
-          >
+          <FadeIn className="grid md:grid-cols-3 gap-4" delay={0.1}>
             <Card className="md:col-span-1" data-testid="card-safety-score">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -304,14 +295,9 @@ export default function Dashboard() {
                 </Link>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="grid md:grid-cols-2 gap-4"
-          >
+          <FadeIn className="grid md:grid-cols-2 gap-4" delay={0.2}>
             <Card data-testid="card-scam-guard">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -451,14 +437,10 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
 
           {stats && stats.recentScans.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-            >
+            <FadeIn delay={0.3}>
               <Card data-testid="card-recent-activity">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base flex items-center gap-2">
@@ -521,25 +503,16 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </FadeIn>
           )}
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.35 }}
-            className="grid lg:grid-cols-2 gap-4"
-          >
+          <FadeIn className="grid lg:grid-cols-2 gap-4" delay={0.35}>
             <RegionalThreatsCard className="h-full" />
             <ThreatIntelCard limit={4} />
-          </motion.div>
+          </FadeIn>
 
           {(sgTier === "free" && dsTier === "free") && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.4 }}
-            >
+            <FadeIn delay={0.4}>
               <Card className="border-primary/20 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" data-testid="card-bundle-cta">
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -561,7 +534,7 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </FadeIn>
           )}
         </div>
       </main>

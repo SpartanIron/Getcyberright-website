@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -124,13 +124,7 @@ export default function Contact() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-3 gap-6 mb-12">
               {contactMethods.map((method, index) => (
-                <motion.div
-                  key={method.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
+                <FadeIn key={method.title}>
                   <Card data-testid={`contact-method-${index}`}>
                     <CardContent className="p-6 text-center">
                       <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mb-4">
@@ -145,17 +139,12 @@ export default function Contact() {
                       <p className="text-sm text-muted-foreground">{method.detail}</p>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </FadeIn>
               ))}
             </div>
 
             <div className="grid lg:grid-cols-2 gap-12">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
+              <FadeIn>
                 <Card>
                   <CardContent className="p-6 sm:p-8">
                     {submitted ? (
@@ -290,15 +279,9 @@ export default function Contact() {
                     )}
                   </CardContent>
                 </Card>
-              </motion.div>
+              </FadeIn>
 
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="space-y-6"
-              >
+              <FadeIn className="space-y-6" delay={0.2}>
                 <div>
                   <h2 className="text-2xl font-bold text-foreground mb-4">
                     Frequently Asked Questions
@@ -350,7 +333,7 @@ export default function Contact() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </FadeIn>
             </div>
           </div>
         </section>

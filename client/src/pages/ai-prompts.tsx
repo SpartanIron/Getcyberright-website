@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -163,11 +163,7 @@ function PromptCard({ prompt: p }: { prompt: Prompt }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
+    <FadeIn>
       <Card className="h-full hover-elevate" data-testid={`card-prompt-${p.id}`}>
         <CardContent className="p-5">
           <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
@@ -229,7 +225,7 @@ function PromptCard({ prompt: p }: { prompt: Prompt }) {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </FadeIn>
   );
 }
 

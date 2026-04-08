@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead } from "@/components/seo-head";
@@ -257,11 +257,7 @@ export default function DataShieldPricing() {
         )}
         <section className="px-4 sm:px-6 lg:px-8 mb-16">
           <div className="max-w-4xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
+            <FadeIn>
               <Badge className="mb-4 bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border-teal-200 dark:border-teal-800">
                 <Database className="w-3 h-3 mr-1" />
                 GCR Data Shield
@@ -313,7 +309,7 @@ export default function DataShieldPricing() {
                   <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-semibold">Save 17%</span>
                 </button>
               </div>
-            </motion.div>
+            </FadeIn>
           </div>
         </section>
 
@@ -325,12 +321,7 @@ export default function DataShieldPricing() {
                 const current = isCurrentPlan(tier.id);
 
                 return (
-                  <motion.div
-                    key={tier.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
-                  >
+                  <FadeIn key={tier.id}>
                     <Card
                       className={`relative h-full flex flex-col ${
                         tier.highlighted
@@ -426,7 +417,7 @@ export default function DataShieldPricing() {
                         </Button>
                       </CardContent>
                     </Card>
-                  </motion.div>
+                  </FadeIn>
                 );
               })}
             </div>
@@ -533,12 +524,7 @@ export default function DataShieldPricing() {
 
         <section className="py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
+            <FadeIn>
               <Card className="border-primary/30 bg-primary/5">
                 <CardContent className="p-6 sm:p-8 text-center">
                   <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-3 py-1 rounded-full mb-4">
@@ -559,7 +545,7 @@ export default function DataShieldPricing() {
                   </Link>
                 </CardContent>
               </Card>
-            </motion.div>
+            </FadeIn>
           </div>
         </section>
 

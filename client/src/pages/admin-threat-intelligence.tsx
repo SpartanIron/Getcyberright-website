@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Link } from "@/lib/navigation";
 import {
   ArrowLeft,
@@ -283,7 +283,7 @@ export default function AdminThreatIntelligence() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <FadeIn delay={0.1}>
             <Card data-testid="card-stat-active-feeds">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
                 <CardTitle className="text-sm font-medium">Active Feeds</CardTitle>
@@ -298,9 +298,9 @@ export default function AdminThreatIntelligence() {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <FadeIn delay={0.2}>
             <Card data-testid="card-stat-total-items">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
                 <CardTitle className="text-sm font-medium">Threat Items</CardTitle>
@@ -315,9 +315,9 @@ export default function AdminThreatIntelligence() {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <FadeIn delay={0.3}>
             <Card data-testid="card-stat-feed-health">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
                 <CardTitle className="text-sm font-medium">Feed Health</CardTitle>
@@ -332,9 +332,9 @@ export default function AdminThreatIntelligence() {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+          <FadeIn delay={0.4}>
             <Card data-testid="card-stat-critical">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
                 <CardTitle className="text-sm font-medium">Critical Items</CardTitle>
@@ -349,11 +349,11 @@ export default function AdminThreatIntelligence() {
                 </p>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
         </div>
 
         {alerts.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <FadeIn className="mb-8">
             <Card className="border-yellow-500/50 bg-yellow-50/50 dark:bg-yellow-900/10" data-testid="card-health-alerts">
               <CardHeader className="flex flex-row items-center gap-2 pb-3">
                 <Bell className="w-5 h-5 text-yellow-600" />
@@ -385,7 +385,7 @@ export default function AdminThreatIntelligence() {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
         )}
 
         <Tabs defaultValue="feeds" className="space-y-6">

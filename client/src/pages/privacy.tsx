@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -31,13 +31,7 @@ export default function Privacy() {
 
         <section className="py-12 sm:py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="prose prose-lg max-w-none"
-            >
+            <FadeIn className="prose prose-lg max-w-none">
               <div className="space-y-10 text-muted-foreground">
                 <div className="bg-muted/30 rounded-lg p-6 border">
                   <p className="text-sm mb-2"><strong className="text-foreground">Effective Date:</strong> {effectiveDate}</p>
@@ -569,7 +563,7 @@ export default function Privacy() {
                   </div>
                 </section>
               </div>
-            </motion.div>
+            </FadeIn>
           </div>
         </section>
       </main>

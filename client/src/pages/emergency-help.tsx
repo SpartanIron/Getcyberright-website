@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -838,13 +838,7 @@ export default function EmergencyHelp() {
 
         <section className="py-16 sm:py-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-12"
-            >
+            <FadeIn className="text-center mb-12">
               <h2 className="text-3xl font-bold text-foreground mb-4">
                 Report to Authorities in Your Country
               </h2>
@@ -854,7 +848,7 @@ export default function EmergencyHelp() {
               <p className="text-xs text-muted-foreground/70 max-w-2xl mx-auto">
                 Contact details sourced from official government websites. We recommend verifying phone numbers on the agency's official website before calling, as numbers may change.
               </p>
-            </motion.div>
+            </FadeIn>
 
             <div className="relative max-w-lg mx-auto mb-8" ref={dropdownRef}>
               <div className="relative">
@@ -911,11 +905,7 @@ export default function EmergencyHelp() {
             </div>
 
             {selectedCountryData && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
+              <FadeIn>
                 <Card data-testid="card-selected-country-contacts">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3 flex-wrap">
@@ -966,7 +956,7 @@ export default function EmergencyHelp() {
                     ))}
                   </CardContent>
                 </Card>
-              </motion.div>
+              </FadeIn>
             )}
           </div>
         </section>

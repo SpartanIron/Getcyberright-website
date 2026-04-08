@@ -15,7 +15,7 @@ import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InlinePromoVideo } from "@/components/inline-promo-video";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import {
   Shield,
   Search,
@@ -146,7 +146,7 @@ function AuthenticatedJourney() {
       )}
 
       {!hasVault && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <FadeIn>
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12 gap-4">
               <div className="p-4 rounded-full bg-primary/10">
@@ -162,11 +162,11 @@ function AuthenticatedJourney() {
               </Button>
             </CardContent>
           </Card>
-        </motion.div>
+        </FadeIn>
       )}
 
       {hasVault && !hasScans && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <FadeIn>
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12 gap-4">
               <div className="p-4 rounded-full bg-primary/10">
@@ -182,11 +182,11 @@ function AuthenticatedJourney() {
               </Button>
             </CardContent>
           </Card>
-        </motion.div>
+        </FadeIn>
       )}
 
       {hasVault && hasScans && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+        <FadeIn className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="pt-5 pb-4 text-center">
@@ -243,7 +243,7 @@ function AuthenticatedJourney() {
               Full Dashboard
             </Button>
           </div>
-        </motion.div>
+        </FadeIn>
       )}
 
       <div className="space-y-2 pt-4">
@@ -255,7 +255,7 @@ function AuthenticatedJourney() {
           { id: "brokers", label: "Broker Database", icon: Database, desc: "Browse 500+ known data broker sites", view: "brokers" as const },
           { id: "reports", label: "Reports", icon: ClipboardCheck, desc: "Detailed progress reports and analytics", view: "reports" as const },
         ].map((item) => (
-          <motion.div key={item.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
+          <FadeIn key={item.id}>
             <button
               className="w-full flex items-center gap-3 p-3 rounded-md border text-left hover-elevate"
               onClick={() => setActiveView(item.view)}
@@ -268,7 +268,7 @@ function AuthenticatedJourney() {
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             </button>
-          </motion.div>
+          </FadeIn>
         ))}
       </div>
     </div>

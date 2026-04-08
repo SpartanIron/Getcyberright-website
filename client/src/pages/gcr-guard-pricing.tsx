@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead } from "@/components/seo-head";
@@ -238,13 +238,7 @@ export default function GcrGuardPricing() {
 
         <section className="px-4 sm:px-6 lg:px-8 pt-6 pb-0">
           <div className="max-w-5xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="relative overflow-hidden rounded-xl bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 p-4 sm:p-5 text-white shadow-lg"
-              data-testid="banner-promo"
-            >
+            <FadeIn className="relative overflow-hidden rounded-xl bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 p-4 sm:p-5 text-white shadow-lg" data-testid="banner-promo">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9zdmc+')] opacity-50" />
               <div className="relative flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -265,7 +259,7 @@ export default function GcrGuardPricing() {
                   Start Free Trial <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
               </div>
-            </motion.div>
+            </FadeIn>
           </div>
         </section>
 
@@ -278,13 +272,7 @@ export default function GcrGuardPricing() {
                 const isCurrentPlan = userData?.subscriptionTier === tier.id;
 
                 return (
-                  <motion.div
-                    key={tier.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.15 }}
-                    className="relative"
-                  >
+                  <FadeIn className="relative" key={tier.id}>
                     {isPopular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
                         <Badge className="bg-teal-500 text-white border-0 shadow-lg" data-testid="badge-popular">
@@ -378,7 +366,7 @@ export default function GcrGuardPricing() {
                         </Button>
                       </CardContent>
                     </Card>
-                  </motion.div>
+                  </FadeIn>
                 );
               })}
             </div>
@@ -574,12 +562,7 @@ export default function GcrGuardPricing() {
 
         <section className="py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
+            <FadeIn>
               <Card className="border-primary/30 bg-primary/5">
                 <CardContent className="p-6 sm:p-8 text-center">
                   <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-3 py-1 rounded-full mb-4">
@@ -600,19 +583,13 @@ export default function GcrGuardPricing() {
                   </Link>
                 </CardContent>
               </Card>
-            </motion.div>
+            </FadeIn>
           </div>
         </section>
 
         <section className="py-16 sm:py-20 bg-primary">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center"
-            >
+            <FadeIn className="text-center">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
                 Stay Safe Online. Start Today.
               </h2>
@@ -633,7 +610,7 @@ export default function GcrGuardPricing() {
                   </Button>
                 </Link>
               </div>
-            </motion.div>
+            </FadeIn>
           </div>
         </section>
       </main>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -783,13 +783,7 @@ export default function Resources() {
                 
                 <div className="grid md:grid-cols-3 gap-6 mb-8">
                   {featuredResources.map((resource, index) => (
-                    <motion.div
-                      key={resource.slug}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                    >
+                    <FadeIn key={resource.slug}>
                       <Card 
                         className={`h-full hover-elevate cursor-pointer ${expandedResource === resource.slug ? 'ring-2 ring-primary' : ''}`}
                         data-testid={`featured-${resource.slug}`}
@@ -829,7 +823,7 @@ export default function Resources() {
                           </div>
                         </CardContent>
                       </Card>
-                    </motion.div>
+                    </FadeIn>
                   ))}
                 </div>
                 
@@ -1225,13 +1219,7 @@ export default function Resources() {
             {!expandedResource && (
               <div className="grid md:grid-cols-2 gap-6">
                 {allResources.map((resource, index) => (
-                  <motion.div
-                    key={resource.slug}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                  >
+                  <FadeIn key={resource.slug}>
                     <Card 
                       className="h-full hover-elevate cursor-pointer" 
                       data-testid={`resource-${resource.slug}`}
@@ -1268,7 +1256,7 @@ export default function Resources() {
                         </div>
                       </CardContent>
                     </Card>
-                  </motion.div>
+                  </FadeIn>
                 ))}
               </div>
             )}

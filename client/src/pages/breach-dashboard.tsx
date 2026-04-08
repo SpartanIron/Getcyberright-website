@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { useLocation } from "@/lib/navigation";
 import { 
   Shield, 
@@ -216,11 +216,7 @@ export default function BreachDashboard() {
     return (
       <div className="min-h-screen bg-[#0A2A3C] text-white">
         <div className="container mx-auto px-4 py-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-2xl mx-auto text-center"
-          >
+          <FadeIn className="max-w-2xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-yellow-500/20 text-yellow-300 px-4 py-2 rounded-full mb-6">
               <AlertTriangle className="w-5 h-5" />
               Access Required
@@ -259,7 +255,7 @@ export default function BreachDashboard() {
                 </Button>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
         </div>
       </div>
     );
@@ -279,11 +275,7 @@ export default function BreachDashboard() {
   return (
     <div className="min-h-screen bg-[#0A2A3C] text-white">
       <div className="container mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto"
-        >
+        <FadeIn className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full mb-4">
               <Users className="w-5 h-5" />
@@ -513,7 +505,7 @@ export default function BreachDashboard() {
               <a href="/" className="text-blue-400 hover:underline">Back to Home</a>
             </p>
           </div>
-        </motion.div>
+        </FadeIn>
       </div>
     </div>
   );

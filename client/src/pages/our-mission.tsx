@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -67,13 +67,7 @@ export default function OurMission() {
 
         <section className="py-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-12"
-            >
+            <FadeIn className="text-center mb-12">
               <h2 className="text-3xl font-bold text-foreground mb-4" data-testid="text-mission-heading">
                 Cybersecurity Should Not Be a Luxury
               </h2>
@@ -81,17 +75,11 @@ export default function OurMission() {
                 Most cybersecurity companies build for corporations with big budgets.
                 We build for families who just want to stay safe online.
               </p>
-            </motion.div>
+            </FadeIn>
 
             <div className="grid sm:grid-cols-2 gap-4 mb-16">
               {ourValues.map((value, index) => (
-                <motion.div
-                  key={value.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
+                <FadeIn key={value.title}>
                   <Card className="h-full" data-testid={`card-value-${index}`}>
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-4">
@@ -105,7 +93,7 @@ export default function OurMission() {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </FadeIn>
               ))}
             </div>
           </div>
@@ -113,30 +101,18 @@ export default function OurMission() {
 
         <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
           <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center mb-12"
-            >
+            <FadeIn className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4" data-testid="text-tools-heading">
                 What We Offer
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
                 Powerful tools designed to keep your family safe. Core tools are free to use, no account needed.
               </p>
-            </motion.div>
+            </FadeIn>
 
             <div className="space-y-3">
               {whatWeOffer.map((tool, index) => (
-                <motion.div
-                  key={tool.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                >
+                <FadeIn key={tool.name}>
                   <Card data-testid={`card-tool-${index}`}>
                     <CardContent className="py-4 px-5">
                       <div className="flex items-center gap-4">
@@ -151,7 +127,7 @@ export default function OurMission() {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </FadeIn>
               ))}
             </div>
           </div>
@@ -159,12 +135,7 @@ export default function OurMission() {
 
         <section className="py-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
+            <FadeIn>
               <Card>
                 <CardContent className="p-8">
                   <div className="flex items-start gap-4 mb-4">
@@ -198,18 +169,13 @@ export default function OurMission() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </FadeIn>
           </div>
         </section>
 
         <section className="py-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
+            <FadeIn>
               <Card>
                 <CardContent className="p-8">
                   <div className="flex items-start gap-4 mb-4">
@@ -238,19 +204,13 @@ export default function OurMission() {
                   </p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </FadeIn>
           </div>
         </section>
 
         <section className="py-16 sm:py-20 bg-primary">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center"
-            >
+            <FadeIn className="text-center">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
                 Start Protecting Your Family Today
               </h2>
@@ -271,7 +231,7 @@ export default function OurMission() {
                   </Button>
                 </Link>
               </div>
-            </motion.div>
+            </FadeIn>
           </div>
         </section>
       </main>

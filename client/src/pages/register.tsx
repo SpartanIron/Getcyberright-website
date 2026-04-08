@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/fade-in";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";
@@ -138,11 +138,7 @@ export default function Register() {
         <Navigation />
         <main id="main-content" tabIndex={-1} className="py-16 px-4 sm:px-6 lg:px-8">
           <div className="max-w-lg mx-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-            >
+            <FadeIn>
               <Card className="border-green-500/20">
                 <CardContent className="p-8 text-center">
                   <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
@@ -194,7 +190,7 @@ export default function Register() {
                   </Link>
                 </CardContent>
               </Card>
-            </motion.div>
+            </FadeIn>
           </div>
         </main>
         <Footer />
@@ -209,11 +205,7 @@ export default function Register() {
       
       <main id="main-content" tabIndex={-1} className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <FadeIn>
             <div className="text-center mb-8">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-8 h-8 text-primary" />
@@ -435,7 +427,7 @@ export default function Register() {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </FadeIn>
         </div>
       </main>
       
