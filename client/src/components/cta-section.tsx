@@ -30,8 +30,8 @@ export function CTASection() {
           </h2>
 
           <p className="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed">
-            Join thousands of families, seniors, and organizations who have
-            already strengthened their cybersecurity with our tools and resources.
+            Start protecting yourself and your family today with free tools,
+            guides, and resources — no account or technical knowledge required.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">

@@ -10,7 +10,7 @@ const trustPoints = [
   "Built to internationally recognized safety standards (NIST, MITRE)",
   "Designed for families, seniors, and small businesses, not IT departments",
   "Free to get started with no account required",
-  "Used by families and educators across 30+ countries",
+  "Open to everyone — families, educators, and organizations worldwide",
 ];
 
 export function AuthoritySection() {

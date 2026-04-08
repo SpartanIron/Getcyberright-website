@@ -211,7 +211,7 @@ export function WelcomeOverlay() {
               transition={{ duration: 0.4, delay: 1 }}
               className="text-white/70 text-sm pb-4"
             >
-              <p>Trusted by families in 50+ countries</p>
+              <p>Free cybersecurity education for every family</p>
             </motion.div>
           </motion.div>
         </motion.div>

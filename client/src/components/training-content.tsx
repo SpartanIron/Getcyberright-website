@@ -432,7 +432,7 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
               <CardContent className="p-8 md:p-12 text-center">
                 <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Your Security Journey?</h2>
                 <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-                  Join thousands of learners who have improved their digital safety skills through our structured training programs.
+                  Build practical digital safety skills through structured, self-paced training programs designed for every experience level.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
                   <Button size="lg" data-testid="button-get-started" onClick={() => {
