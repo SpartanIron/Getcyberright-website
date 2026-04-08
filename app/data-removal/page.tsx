@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/data-removal";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,12 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function DataRemovalPage() {
-  return (<>
-        <SSRContent
-          title="Data Broker Removal Guide"
-          description="Step-by-step guide to removing your personal information from data brokers."
-          sections={[{"heading":"Take Back Your Privacy","text":"Walk through the process of finding and removing your data from common data broker sites."}]}
-        />
-        <ClientApp page="data-removal" />
-      </>);
+  return <PageContent />;
 }

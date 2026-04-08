@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../../client-app";
+import PageContent from "@/pages/admin/feedback";
 
 export const metadata: Metadata = {
   title: "Feedback | Admin | GetCyberRight",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminFeedbackPage() {
-  return <ClientApp page="admin-feedback" />;
+  return <PageContent />;
 }

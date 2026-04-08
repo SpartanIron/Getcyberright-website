@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/news";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -64,12 +63,7 @@ export default function NewsPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="Cybersecurity News for Families"
-          description="Latest cybersecurity news simplified for families. AI-curated articles about data breaches, scams, and online safety."
-          sections={[{"heading":"Stay Informed","text":"Curated cybersecurity stories from trusted sources simplified for family audiences."}]}
-        />
-        <ClientApp page="news" />
+      <PageContent />
     </>
   );
 }

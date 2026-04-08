@@ -1,3 +1,5 @@
+"use client";
+
 import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { SEO_CLUSTERS, CLUSTER_LABELS, CLUSTER_RELATIONSHIPS, CLUSTER_TARGET_PAGES } from "@shared/seo-keywords";

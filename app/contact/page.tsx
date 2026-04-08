@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/contact";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -41,11 +40,7 @@ export default function ContactPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="Contact GetCyberRight"
-          description="Get in touch with questions about cybersecurity education, tools, partnerships, or support."
-        />
-        <ClientApp page="contact" />
+      <PageContent />
     </>
   );
 }

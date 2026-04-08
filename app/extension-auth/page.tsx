@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/extension-auth";
 
 export const metadata: Metadata = {
   title: "Extension Authentication | GetCyberRight",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function ExtensionAuthPage() {
-  return <ClientApp page="extension-auth" />;
+  return <PageContent />;
 }

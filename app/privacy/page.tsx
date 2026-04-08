@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/privacy";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,11 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  return (<>
-        <SSRContent
-          title="Privacy Policy"
-          description="How GetCyberRight collects, uses, and protects your personal information."
-        />
-        <ClientApp page="privacy" />
-      </>);
+  return <PageContent />;
 }

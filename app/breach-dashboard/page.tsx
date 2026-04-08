@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/breach-dashboard";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,11 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function BreachDashboardPage() {
-  return (<>
-        <SSRContent
-          title="Breach Monitoring Dashboard"
-          description="Monitor your emails for data breaches and get alerts."
-        />
-        <ClientApp page="breach-dashboard" />
-      </>);
+  return <PageContent />;
 }

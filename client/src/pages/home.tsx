@@ -1,3 +1,5 @@
+"use client";
+
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
 import { LiveActivityBar } from "@/components/live-activity-bar";

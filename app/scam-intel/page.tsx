@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/scam-intel-listing";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -49,12 +48,7 @@ export default function ScamIntelPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="Scam Intelligence Center"
-          description="Detailed analysis of active scams, fraud campaigns, and social engineering attacks."
-          sections={[{"heading":"Know the Scams","text":"In-depth analysis of current scam campaigns explaining how they work and how to protect yourself."}]}
-        />
-        <ClientApp page="scam-intel" />
+      <PageContent />
     </>
   );
 }

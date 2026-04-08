@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../../client-app";
+import PageContent from "@/pages/resources/cheat-sheets";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function CheatSheetsPage() {
-  return <ClientApp page="resources-cheat-sheets" />;
+  return <PageContent />;
 }

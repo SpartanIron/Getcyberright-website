@@ -1,3 +1,5 @@
+"use client";
+
 import { useSEO } from "@/hooks/use-seo";
 import { motion } from "framer-motion";
 import { Link } from "@/lib/navigation";

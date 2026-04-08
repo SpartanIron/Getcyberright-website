@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/report-scam";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,11 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function ReportScamPage() {
-  return (<>
-        <SSRContent
-          title="Report a Scam"
-          description="Report suspicious scams and phishing attempts to help protect the community."
-        />
-        <ClientApp page="report-scam" />
-      </>);
+  return <PageContent />;
 }

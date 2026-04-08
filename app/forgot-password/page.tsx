@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/forgot-password";
 
 export const metadata: Metadata = {
   title: "Reset Password | GetCyberRight",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function ForgotPasswordPage() {
-  return <ClientApp page="forgot-password" />;
+  return <PageContent />;
 }

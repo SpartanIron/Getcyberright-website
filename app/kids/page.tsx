@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/kids";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -49,13 +48,7 @@ export default function KidsPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="Kids Online Safety Hub"
-          description="Age-appropriate cybersecurity education for children with interactive games, quizzes, and lessons about online safety and digital citizenship."
-          sections={[{"heading":"Learn Online Safety the Fun Way","text":"Our Kids Hub uses interactive games, quizzes, and stories to teach children about staying safe online."},{"heading":"Password Power","text":"Learn how to create strong passwords that are easy to remember but hard to guess."},{"heading":"Social Media Safety","text":"Tips for using social media responsibly including privacy settings and handling cyberbullying."}]}
-          links={[{"label":"Parent Guide","href":"/parent-guide"},{"label":"Training","href":"/training"}]}
-        />
-        <ClientApp page="kids" />
+      <PageContent />
     </>
   );
 }

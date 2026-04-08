@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/shield";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -78,12 +77,7 @@ export default function ShieldPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="GCR Data Shield - Personal Data Exposure Scanner"
-          description="Scan 500+ data brokers to discover where your personal information is exposed. Get guided removal instructions or automated removal."
-          sections={[{"heading":"Find Your Exposed Data","text":"Scan over 500 data brokers to find where your personal information is being sold or shared without your consent."}]}
-        />
-        <ClientApp page="shield" />
+      <PageContent />
     </>
   );
 }

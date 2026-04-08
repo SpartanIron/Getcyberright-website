@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/guides";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -64,12 +63,7 @@ export default function GuidesPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="Cybersecurity Safety Guides"
-          description="Comprehensive cybersecurity guides covering password security, phishing prevention, social media safety, and identity protection."
-          sections={[{"heading":"Expert Guides for Every Topic","text":"Library of cybersecurity guides covering everything from basic password hygiene to advanced privacy protection in plain language."}]}
-        />
-        <ClientApp page="guides" />
+      <PageContent />
     </>
   );
 }

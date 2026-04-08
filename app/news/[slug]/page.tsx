@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ClientApp from "../../client-app";
+import PageContent from "@/pages/news-article";
 
 const BASE_URL = "https://www.getcyberright.com";
 const API_BASE = `http://localhost:${process.env.PORT || 5000}`;
@@ -88,7 +88,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-      <ClientApp page="news-article" />
+      <PageContent />
     </>
   );
 }

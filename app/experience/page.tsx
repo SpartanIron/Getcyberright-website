@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/experience";
 
 export const metadata: Metadata = {
   title: "Experience | GetCyberRight",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function ExperiencePage() {
-  return <ClientApp page="experience" />;
+  return <PageContent />;
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/password-generator";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,12 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function PasswordGeneratorPage() {
-  return (<>
-        <SSRContent
-          title="Secure Password Generator"
-          description="Generate strong, unique passwords with customizable length and character options."
-          sections={[{"heading":"Create Strong Passwords","text":"Customize length, include special characters, numbers, and uppercase. Generate memorable passphrases."}]}
-        />
-        <ClientApp page="password-generator" />
-      </>);
+  return <PageContent />;
 }

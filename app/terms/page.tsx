@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/terms";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,11 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function TermsPage() {
-  return (<>
-        <SSRContent
-          title="Terms of Service"
-          description="GetCyberRight terms of service and usage guidelines."
-        />
-        <ClientApp page="terms" />
-      </>);
+  return <PageContent />;
 }

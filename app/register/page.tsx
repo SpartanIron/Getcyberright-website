@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/register";
 
 export const metadata: Metadata = {
   title: "Create Account | GetCyberRight",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function RegisterPage() {
-  return <ClientApp page="register" />;
+  return <PageContent />;
 }

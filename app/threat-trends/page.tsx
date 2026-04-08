@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/threat-trends";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,11 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function ThreatTrendsPage() {
-  return (<>
-        <SSRContent
-          title="Cybersecurity Threat Trends"
-          description="Current threat landscape and trending cybersecurity threats from real-time intelligence."
-        />
-        <ClientApp page="threat-trends" />
-      </>);
+  return <PageContent />;
 }

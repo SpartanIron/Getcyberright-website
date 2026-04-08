@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/support";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -19,11 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function SupportPage() {
-  return (<>
-        <SSRContent
-          title="Support Center"
-          description="Get help with your account, tools, and cybersecurity questions."
-        />
-        <ClientApp page="support" />
-      </>);
+  return <PageContent />;
 }

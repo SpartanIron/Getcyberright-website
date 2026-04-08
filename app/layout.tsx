@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "../client/src/index.css";
 import Providers from "./providers";
+import AppShell from "./app-shell";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -108,7 +109,7 @@ export default function RootLayout({
       </head>
       <body>
         <div id="root">
-          <Providers>{children}</Providers>
+          <Providers><AppShell>{children}</AppShell></Providers>
         </div>
       </body>
     </html>

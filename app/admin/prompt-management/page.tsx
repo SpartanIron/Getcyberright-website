@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../../client-app";
+import PageContent from "@/pages/admin-prompt-management";
 
 export const metadata: Metadata = {
   title: "Prompt Management | Admin | GetCyberRight",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminPromptManagementPage() {
-  return <ClientApp page="admin-prompt-management" />;
+  return <PageContent />;
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/educators";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -20,11 +19,5 @@ export const metadata: Metadata = {
 };
 
 export default function EducatorsPage() {
-  return (<>
-        <SSRContent
-          title="Cybersecurity for Educators"
-          description="Teaching resources for digital safety including lesson plans and classroom activities."
-        />
-        <ClientApp page="educators" />
-      </>);
+  return <PageContent />;
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { useSEO } from "@/hooks/use-seo";
 import { StructuredData } from "@/components/structured-data";
 import type { WebApplicationData, BreadcrumbData } from "@/components/structured-data";

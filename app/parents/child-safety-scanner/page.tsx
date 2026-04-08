@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../../client-app";
+import PageContent from "@/pages/child-safety-scanner";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function ChildSafetyScannerPage() {
-  return <ClientApp page="child-safety-scanner" />;
+  return <PageContent />;
 }

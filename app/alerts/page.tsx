@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/alerts-listing";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -49,12 +48,7 @@ export default function AlertsPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="Cybersecurity Alerts & Advisories"
-          description="Real-time cybersecurity alerts from CISA, US-CERT, and trusted sources about active threats and vulnerabilities."
-          sections={[{"heading":"Active Security Alerts","text":"Latest cybersecurity alerts and advisories from government agencies and security organizations."}]}
-        />
-        <ClientApp page="alerts" />
+      <PageContent />
     </>
   );
 }

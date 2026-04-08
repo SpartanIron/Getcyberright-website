@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ClientApp from "../../../client-app";
+import PageContent from "@/pages/training-lesson";
 
 const BASE_URL = "https://www.getcyberright.com";
 const API_BASE = `http://localhost:${process.env.PORT || 5000}`;
@@ -48,5 +48,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function TrainingLessonPage({ params }: PageProps) {
   const { lessonId } = await params;
   if (!lessonId) notFound();
-  return <ClientApp page="training-lesson" />;
+  return <PageContent />;
 }

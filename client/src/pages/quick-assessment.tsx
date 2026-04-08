@@ -1,3 +1,5 @@
+"use client";
+
 import { QuickAssessment } from "@/components/quick-assessment";
 import { useSEO } from "@/hooks/use-seo";
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { CyberHygieneSelfCheck } from "@/components/cyber-hygiene-self-check";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

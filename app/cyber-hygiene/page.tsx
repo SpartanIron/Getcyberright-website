@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/cyber-hygiene";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -17,12 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function CyberHygienePage() {
-  return (<>
-        <SSRContent
-          title="Cyber Hygiene Best Practices"
-          description="Essential daily security practices to protect your devices, accounts, and personal information."
-          sections={[{"heading":"Daily Security Habits","text":"Simple daily habits like updating software, using strong passwords, and being cautious with links prevent most attacks."}]}
-        />
-        <ClientApp page="cyber-hygiene" />
-      </>);
+  return <PageContent />;
 }

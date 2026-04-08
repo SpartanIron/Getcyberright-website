@@ -1,3 +1,5 @@
+"use client";
+
 import { PageBanner } from "@/components/page-banner";
 import { Footer } from "@/components/footer";
 import { SEOHead, pageSEO } from "@/components/seo-head";

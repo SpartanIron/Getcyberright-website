@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/partner-deck";
 
 export const metadata: Metadata = {
   title: "Partner Deck | GetCyberRight",
@@ -10,11 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function PartnerDeckPage() {
-  return (<>
-        <SSRContent
-          title="Partnership Information"
-          description="Collaboration opportunities for cybersecurity companies and organizations."
-        />
-        <ClientApp page="partner-deck" />
-      </>);
+  return <PageContent />;
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/checkout-success";
 
 export const metadata: Metadata = {
   title: "Payment Successful | GetCyberRight",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function CheckoutSuccessPage() {
-  return <ClientApp page="checkout-success" />;
+  return <PageContent />;
 }

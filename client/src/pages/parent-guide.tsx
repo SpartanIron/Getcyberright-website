@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";

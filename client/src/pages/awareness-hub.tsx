@@ -1,3 +1,5 @@
+"use client";
+
 import { Link } from "@/lib/navigation";
 import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BreadcrumbData } from "@/components/structured-data";

@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, Link } from "@/lib/navigation";
 import { Navigation } from "@/components/navigation";

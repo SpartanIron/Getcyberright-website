@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/pricing";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -49,12 +48,7 @@ export default function PricingPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="GetCyberRight Pricing Plans"
-          description="Compare GetCyberRight subscription plans. Free tools, Essential auto-protection, and Professional advanced features."
-          sections={[{"heading":"Free Plan","text":"Manual scam checking, guides, training courses, and educational content at no cost."},{"heading":"Essential Plan","text":"Auto-Protect with automatic page scanning, enhanced scan history, and priority analysis."},{"heading":"Professional Plan","text":"Full protection with safety scores, family profiles, data broker monitoring, and all premium features."}]}
-        />
-        <ClientApp page="pricing" />
+      <PageContent />
     </>
   );
 }

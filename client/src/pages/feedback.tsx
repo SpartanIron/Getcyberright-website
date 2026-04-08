@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 import { useLocation } from "@/lib/navigation";
 import { useSEO } from "@/hooks/use-seo";

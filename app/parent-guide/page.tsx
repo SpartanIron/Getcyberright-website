@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/parent-guide";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function ParentGuidePage() {
-  return <ClientApp page="parent-guide" />;
+  return <PageContent />;
 }

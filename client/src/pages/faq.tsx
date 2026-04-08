@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -264,10 +266,8 @@ export default function FAQ() {
               <p className="text-slate-300 mb-6">
                 We are here to help. Reach out to us and we will get back to you as soon as possible.
               </p>
-              <Link href="/contact">
-                <a className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+              <Link href="/contact" className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-lg font-semibold hover:opacity-90 transition-opacity">
                   Contact Us
-                </a>
               </Link>
             </CardContent>
           </Card>

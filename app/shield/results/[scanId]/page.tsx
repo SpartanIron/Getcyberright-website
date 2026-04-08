@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ClientApp from "../../../client-app";
+import PageContent from "@/pages/shield-results";
 
 type PageProps = {
   params: Promise<{ scanId: string }>;
@@ -16,5 +16,5 @@ export const metadata: Metadata = {
 export default async function ShieldResultsPage({ params }: PageProps) {
   const { scanId } = await params;
   if (!scanId) notFound();
-  return <ClientApp page="shield-results" />;
+  return <PageContent />;
 }

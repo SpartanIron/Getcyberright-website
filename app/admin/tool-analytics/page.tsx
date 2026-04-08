@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../../client-app";
+import PageContent from "@/pages/admin/tool-analytics";
 
 export const metadata: Metadata = {
   title: "Tool Analytics | Admin | GetCyberRight",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminToolAnalyticsPage() {
-  return <ClientApp page="admin-tool-analytics" />;
+  return <PageContent />;
 }

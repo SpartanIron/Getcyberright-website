@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";

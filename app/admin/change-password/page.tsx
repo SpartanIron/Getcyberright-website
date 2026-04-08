@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../../client-app";
+import PageContent from "@/pages/admin/change-password";
 
 export const metadata: Metadata = {
   title: "Change Password | Admin | GetCyberRight",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminChangePasswordPage() {
-  return <ClientApp page="admin-change-password" />;
+  return <PageContent />;
 }

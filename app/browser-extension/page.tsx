@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/browser-extension";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -71,12 +70,7 @@ export default function BrowserExtensionPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="GCR Scam Guard Browser Extension"
-          description="Chrome browser extension for real-time scam protection with auto-scanning, safety badges, and phishing warnings."
-          sections={[{"heading":"Real-Time Protection","text":"Automatically scans websites as you visit them, showing safety badges and warning about suspicious sites."}]}
-        />
-        <ClientApp page="browser-extension" />
+      <PageContent />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/dashboard";
 
 export const metadata: Metadata = {
   title: "Dashboard | GetCyberRight",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
-  return <ClientApp page="dashboard" />;
+  return <PageContent />;
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/preferences";
 
 export const metadata: Metadata = {
   title: "Preferences | GetCyberRight",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function PreferencesPage() {
-  return <ClientApp page="preferences" />;
+  return <PageContent />;
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/quick-assessment";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,11 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function QuickAssessmentPage() {
-  return (<>
-        <SSRContent
-          title="Quick Cybersecurity Assessment"
-          description="Evaluate your family's cybersecurity readiness with personalized recommendations."
-        />
-        <ClientApp page="quick-assessment" />
-      </>);
+  return <PageContent />;
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/training";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -64,12 +63,7 @@ export default function TrainingPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="Cybersecurity Training Academy"
-          description="Free interactive cybersecurity training courses for families with learning paths, quizzes, and certificates."
-          sections={[{"heading":"Learn at Your Own Pace","text":"Structured learning paths tailored to different experience levels with interactive lessons, quizzes, and completion certificates."}]}
-        />
-        <ClientApp page="training" />
+      <PageContent />
     </>
   );
 }

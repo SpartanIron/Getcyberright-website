@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../../client-app";
+import PageContent from "@/pages/scam-page";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -41,5 +41,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default function ScamTypePage() {
-  return <ClientApp page="scam-page" />;
+  return <PageContent />;
 }

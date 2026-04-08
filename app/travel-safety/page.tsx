@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/travel-safety";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -17,11 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function TravelSafetyPage() {
-  return (<>
-        <SSRContent
-          title="Cyber Safety While Traveling"
-          description="Cybersecurity tips for travelers to protect devices and data on public WiFi and abroad."
-        />
-        <ClientApp page="travel-safety" />
-      </>);
+  return <PageContent />;
 }

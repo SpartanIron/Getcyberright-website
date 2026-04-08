@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/feedback";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function FeedbackPage() {
-  return <ClientApp page="feedback" />;
+  return <PageContent />;
 }

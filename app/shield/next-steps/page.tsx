@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "../../client-app";
+import PageContent from "@/pages/shield-next-steps";
 
 export const metadata: Metadata = {
   title: "Data Shield Next Steps | GetCyberRight",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function ShieldNextStepsPage() {
-  return <ClientApp page="shield-next-steps" />;
+  return <PageContent />;
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SSRContent from "../ssr-content";
-import ClientApp from "../client-app";
+import PageContent from "@/pages/faq";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -106,12 +105,7 @@ export default function FAQPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <SSRContent
-          title="Cybersecurity FAQ"
-          description="Find answers to common cybersecurity questions about password security, phishing prevention, identity theft protection, and online safety for families."
-          sections={[{"heading":"What is GetCyberRight?","text":"GetCyberRight is a mission-driven platform dedicated to family cyber safety providing educational resources, tools, and guidance."},{"heading":"Is GetCyberRight free?","text":"Our educational content, articles, guides, and core scam checking tools are free. We also offer paid plans for advanced features."},{"heading":"How can I protect my children online?","text":"Start with open conversations about online safety. Use our Youth Safety Hub, set up parental controls, and teach them to recognize suspicious messages."},{"heading":"What should I do if someone falls for a scam?","text":"Contact your bank if financial info was shared. Change passwords. Report to the FTC and local authorities. Visit our Emergency Help page."}]}
-        />
-        <ClientApp page="faq" />
+      <PageContent />
     </>
   );
 }
