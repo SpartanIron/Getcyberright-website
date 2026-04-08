@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -18,5 +19,11 @@ export const metadata: Metadata = {
 };
 
 export default function DataShieldPricingPage() {
-  return <ClientApp page="data-shield-pricing" />;
+  return (<>
+        <SSRContent
+          title="GCR Data Shield Pricing"
+          description="Data broker scanning and removal pricing plans."
+        />
+        <ClientApp page="data-shield-pricing" />
+      </>);
 }

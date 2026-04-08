@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -19,5 +20,11 @@ export const metadata: Metadata = {
 };
 
 export default function SmallBusinessPage() {
-  return <ClientApp page="small-business" />;
+  return (<>
+        <SSRContent
+          title="Small Business Cybersecurity"
+          description="Cybersecurity resources for small businesses with practical security guides and training."
+        />
+        <ClientApp page="small-business" />
+      </>);
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -17,5 +18,11 @@ export const metadata: Metadata = {
 };
 
 export default function CyberThreatRadarPage() {
-  return <ClientApp page="cyber-threat-radar" />;
+  return (<>
+        <SSRContent
+          title="Cyber Threat Radar"
+          description="Real-time cyber threat monitoring dashboard tracking active threats and global attack trends."
+        />
+        <ClientApp page="cyber-threat-radar" />
+      </>);
 }

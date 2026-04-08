@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -48,7 +49,13 @@ export default function ParentsPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp page="parents" />
+      <SSRContent
+          title="Parent Cybersecurity Guide"
+          description="Comprehensive cybersecurity guidance for parents on protecting children online, parental controls, and digital safety conversations."
+          sections={[{"heading":"Protecting Your Family Online","text":"As a parent, you play a crucial role in your children's digital safety. Our guide covers parental controls to open conversations about online risks."}]}
+          links={[{"label":"Kids Hub","href":"/kids"},{"label":"Family Tools","href":"/tools"}]}
+        />
+        <ClientApp page="parents" />
     </>
   );
 }

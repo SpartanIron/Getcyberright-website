@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -17,5 +18,11 @@ export const metadata: Metadata = {
 };
 
 export default function AwarenessHubPage() {
-  return <ClientApp page="awareness-hub" />;
+  return (<>
+        <SSRContent
+          title="Cybersecurity Awareness Hub"
+          description="Cybersecurity awareness resources and educational materials for families and organizations."
+        />
+        <ClientApp page="awareness-hub" />
+      </>);
 }

@@ -197,18 +197,22 @@ export async function rotateVaultKey(
 }
 
 function storeDEK(dekBase64: string): void {
+  if (typeof window === 'undefined') return;
   sessionStorage.setItem(DEK_SESSION_KEY, dekBase64);
 }
 
 export function clearDEK(): void {
+  if (typeof window === 'undefined') return;
   sessionStorage.removeItem(DEK_SESSION_KEY);
 }
 
 export function isVaultUnlocked(): boolean {
+  if (typeof window === 'undefined') return false;
   return sessionStorage.getItem(DEK_SESSION_KEY) !== null;
 }
 
 async function getDEK(): Promise<CryptoKey | null> {
+  if (typeof window === 'undefined') return null;
   const dekBase64 = sessionStorage.getItem(DEK_SESSION_KEY);
   if (!dekBase64) return null;
   return importKey(dekBase64);

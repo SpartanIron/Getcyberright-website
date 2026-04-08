@@ -263,6 +263,7 @@ const ACTION_STEPS: Record<ExposureLevel, ActionStep[]> = {
 const STORAGE_KEY = "gcr-shield-checklist";
 
 function getStoredChecks(level: ExposureLevel): Record<string, boolean> {
+  if (typeof window === 'undefined') return {};
   try {
     const stored = localStorage.getItem(`${STORAGE_KEY}-${level}`);
     return stored ? JSON.parse(stored) : {};
@@ -272,6 +273,7 @@ function getStoredChecks(level: ExposureLevel): Record<string, boolean> {
 }
 
 function setStoredChecks(level: ExposureLevel, checks: Record<string, boolean>) {
+  if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(`${STORAGE_KEY}-${level}`, JSON.stringify(checks));
   } catch {}

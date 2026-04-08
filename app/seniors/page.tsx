@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -48,7 +49,13 @@ export default function SeniorsPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp page="seniors" />
+      <SSRContent
+          title="Senior Cybersecurity Safety Center"
+          description="Cybersecurity education for older adults. Learn to recognize scams, protect your identity, and avoid common online threats."
+          sections={[{"heading":"Stay Safe Online at Every Age","text":"Clear, jargon-free guidance on protecting yourself from online threats, scams, and identity theft."},{"heading":"Common Scams Targeting Seniors","text":"Learn about tech support scams, Medicare fraud, romance scams, grandparent scams, and sweepstakes fraud."}]}
+          links={[{"label":"Emergency Help","href":"/emergency-help"},{"label":"Scam Checker","href":"/scam-checker"}]}
+        />
+        <ClientApp page="seniors" />
     </>
   );
 }

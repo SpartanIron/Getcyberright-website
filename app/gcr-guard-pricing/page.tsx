@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -17,5 +18,11 @@ export const metadata: Metadata = {
 };
 
 export default function GCRGuardPricingPage() {
-  return <ClientApp page="gcr-guard-pricing" />;
+  return (<>
+        <SSRContent
+          title="GCR Scam Guard Pricing"
+          description="Browser extension pricing plans for real-time scam protection."
+        />
+        <ClientApp page="gcr-guard-pricing" />
+      </>);
 }

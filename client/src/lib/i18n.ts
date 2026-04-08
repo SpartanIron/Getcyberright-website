@@ -22,26 +22,40 @@ export const languages = [
 ];
 
 function applyDirection(langCode: string) {
-  document.documentElement.dir = 'ltr';
+  if (typeof document !== 'undefined') {
+    document.documentElement.dir = 'ltr';
+  }
 }
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources,
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false
-    },
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage']
-    }
-  })
-  .then(() => {
-    applyDirection(i18n.language);
-  });
+if (typeof window !== 'undefined') {
+  i18n
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+      resources,
+      fallbackLng: 'en',
+      interpolation: {
+        escapeValue: false
+      },
+      detection: {
+        order: ['localStorage', 'navigator'],
+        caches: ['localStorage']
+      }
+    })
+    .then(() => {
+      applyDirection(i18n.language);
+    });
+} else {
+  i18n
+    .use(initReactI18next)
+    .init({
+      resources,
+      fallbackLng: 'en',
+      interpolation: {
+        escapeValue: false
+      }
+    });
+}
 
 i18n.on('languageChanged', (lng: string) => {
   applyDirection(lng);

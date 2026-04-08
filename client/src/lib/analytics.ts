@@ -22,6 +22,8 @@ export const initGA = () => {
     return;
   }
 
+  if (typeof document === 'undefined') return;
+
   const script1 = document.createElement('script');
   script1.async = true;
   script1.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;

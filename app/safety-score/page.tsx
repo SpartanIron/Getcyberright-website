@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -17,5 +18,11 @@ export const metadata: Metadata = {
 };
 
 export default function SafetyScorePage() {
-  return <ClientApp page="safety-score" />;
+  return (<>
+        <SSRContent
+          title="Your Safety Score"
+          description="View your cybersecurity safety score and recommendations."
+        />
+        <ClientApp page="safety-score" />
+      </>);
 }

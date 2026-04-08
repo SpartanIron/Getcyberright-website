@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -79,7 +80,12 @@ export default function EmergencyHelpPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp page="emergency-help" />
+      <SSRContent
+          title="Cybersecurity Emergency Help"
+          description="Immediate step-by-step guidance if you've been hacked, scammed, or had your identity stolen."
+          sections={[{"heading":"Act Fast","text":"Follow our step-by-step emergency guide to minimize damage and begin recovery."},{"heading":"Report the Incident","text":"Report scams to the FTC at reportfraud.ftc.gov or the FBI at ic3.gov."}]}
+        />
+        <ClientApp page="emergency-help" />
     </>
   );
 }

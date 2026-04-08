@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -18,5 +19,11 @@ export const metadata: Metadata = {
 };
 
 export default function AIPromptsPage() {
-  return <ClientApp page="ai-prompts" />;
+  return (<>
+        <SSRContent
+          title="AI Safety Prompt Library"
+          description="Curated AI prompts for cybersecurity education and family safety discussions."
+        />
+        <ClientApp page="ai-prompts" />
+      </>);
 }

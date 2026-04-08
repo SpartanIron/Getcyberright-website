@@ -45,6 +45,7 @@ export function getRegionInfo(region: Region): RegionInfo {
 }
 
 export async function detectUserRegion(): Promise<Region> {
+  if (typeof window === 'undefined') return 'global';
   const cached = localStorage.getItem('user_region');
   if (cached && Object.keys(regionMap).includes(cached)) {
     return cached as Region;
@@ -74,11 +75,11 @@ export async function detectUserRegion(): Promise<Region> {
 }
 
 export function setUserRegion(region: Region): void {
-  localStorage.setItem('user_region', region);
+  if (typeof window !== 'undefined') localStorage.setItem('user_region', region);
 }
 
 export function clearUserRegion(): void {
-  localStorage.removeItem('user_region');
+  if (typeof window !== 'undefined') localStorage.removeItem('user_region');
 }
 
 export interface UserLocation {
@@ -87,6 +88,7 @@ export interface UserLocation {
 }
 
 export async function detectUserLocation(): Promise<UserLocation> {
+  if (typeof window === 'undefined') return { region: 'global', countryCode: '' };
   const cachedRegion = localStorage.getItem('user_region');
   const cachedCountry = localStorage.getItem('user_country_code');
   

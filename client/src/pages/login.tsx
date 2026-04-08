@@ -48,7 +48,7 @@ type MfaFormData = z.infer<typeof mfaSchema>;
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const searchParams = new URLSearchParams(window.location.search);
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
   const redirectTo = searchParams.get("redirect");
   const isVerified = searchParams.get("verified") === "true";
   

@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
+import { useEffect } from "react";
 
 const AppShell = dynamic(() => import("@/App"), { ssr: false });
 
@@ -104,6 +105,11 @@ const pages: Record<string, ComponentType> = {
 
 export default function ClientApp({ page = "home" }: { page?: string }) {
   const PageComponent = pages[page] || pages["not-found"];
+
+  useEffect(() => {
+    document.querySelectorAll("[data-ssr]").forEach((el) => el.remove());
+  }, []);
+
   return (
     <AppShell>
       <PageComponent />

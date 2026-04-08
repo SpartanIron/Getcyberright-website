@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -17,5 +18,12 @@ export const metadata: Metadata = {
 };
 
 export default function AISafetyPage() {
-  return <ClientApp page="ai-safety" />;
+  return (<>
+        <SSRContent
+          title="AI Safety Guide"
+          description="Learn about AI safety, deepfakes, AI-generated scams, and protecting yourself from AI-powered threats."
+          sections={[{"heading":"Understanding AI Risks","text":"Learn about deepfakes, AI phishing, voice cloning scams, and how to protect your family."}]}
+        />
+        <ClientApp page="ai-safety" />
+      </>);
 }

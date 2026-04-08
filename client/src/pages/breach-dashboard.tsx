@@ -61,7 +61,7 @@ export default function BreachDashboard() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
-  const urlParams = new URLSearchParams(window.location.search);
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
   const token = urlParams.get('token') || '';
   
   const [isLoading, setIsLoading] = useState(true);

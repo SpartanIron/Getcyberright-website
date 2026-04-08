@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 export const metadata: Metadata = {
@@ -9,5 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default function PartnerDeckPage() {
-  return <ClientApp page="partner-deck" />;
+  return (<>
+        <SSRContent
+          title="Partnership Information"
+          description="Collaboration opportunities for cybersecurity companies and organizations."
+        />
+        <ClientApp page="partner-deck" />
+      </>);
 }

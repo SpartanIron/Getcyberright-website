@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -48,7 +49,13 @@ export default function AboutPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp page="about" />
+      <SSRContent
+          title="About GetCyberRight"
+          description="Learn about GetCyberRight's mission to make cybersecurity accessible for every family through education, tools, and community support."
+          sections={[{"heading":"Our Mission","text":"GetCyberRight exists to bridge the cybersecurity knowledge gap for everyday families."},{"heading":"What We Do","text":"We provide free cybersecurity education, AI-powered scam detection tools, data broker removal services, and family-focused safety training."}]}
+          links={[{"label":"Our Mission","href":"/our-mission"},{"label":"Contact Us","href":"/contact"}]}
+        />
+        <ClientApp page="about" />
     </>
   );
 }

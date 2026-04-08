@@ -32,6 +32,7 @@ export function useReferralTracking() {
 }
 
 export function getReferralCode(): string | null {
+  if (typeof window === 'undefined') return null;
   const code = localStorage.getItem(REFERRAL_KEY);
   const timestamp = localStorage.getItem(REFERRAL_TIMESTAMP_KEY);
   
@@ -66,7 +67,7 @@ export function trackReferralConversion(action: string, metadata?: Record<string
 }
 
 export function generateReferralLink(baseUrl: string = "https://www.getcyberright.com"): string {
-  const userId = localStorage.getItem("user_id") || Math.random().toString(36).substring(2, 10);
-  localStorage.setItem("user_id", userId);
+  const userId = typeof window !== 'undefined' ? (localStorage.getItem("user_id") || Math.random().toString(36).substring(2, 10)) : Math.random().toString(36).substring(2, 10);
+  if (typeof window !== 'undefined') localStorage.setItem("user_id", userId);
   return `${baseUrl}?ref=${userId}`;
 }

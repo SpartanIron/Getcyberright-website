@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 export const metadata: Metadata = {
@@ -9,5 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default function AdvertisePage() {
-  return <ClientApp page="advertise" />;
+  return (<>
+        <SSRContent
+          title="Advertise with GetCyberRight"
+          description="Partnership and advertising opportunities."
+        />
+        <ClientApp page="advertise" />
+      </>);
 }

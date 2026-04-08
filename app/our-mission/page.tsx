@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -17,5 +18,12 @@ export const metadata: Metadata = {
 };
 
 export default function OurMissionPage() {
-  return <ClientApp page="our-mission" />;
+  return (<>
+        <SSRContent
+          title="Our Mission"
+          description="GetCyberRight's mission to make cybersecurity education accessible for every family."
+          sections={[{"heading":"Cybersecurity for Everyone","text":"We believe every family deserves clear, actionable cybersecurity guidance."}]}
+        />
+        <ClientApp page="our-mission" />
+      </>);
 }

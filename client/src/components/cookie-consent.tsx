@@ -28,6 +28,7 @@ export function hasAnalyticsConsent(): boolean {
 }
 
 function saveCookiePreferences(prefs: CookiePreferences): void {
+  if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
   window.dispatchEvent(new CustomEvent("cookie-consent-updated", { detail: prefs }));
 }

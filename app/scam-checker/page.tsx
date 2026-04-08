@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SSRContent from "../ssr-content";
 import ClientApp from "../client-app";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -76,7 +77,12 @@ export default function ScamCheckerPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp page="scam-checker" />
+      <SSRContent
+          title="AI Scam Checker Tool"
+          description="Free AI-powered scam checker. Analyze suspicious URLs, emails, phone numbers, QR codes, and text messages for threats."
+          sections={[{"heading":"Check Any Suspicious Content","text":"Paste a URL, email, phone number, or text message and our AI will analyze it for scam indicators and phishing attempts."},{"heading":"How It Works","text":"Multi-layered analysis combining pattern matching, reputation databases, AI classification, and real-time threat intelligence."}]}
+        />
+        <ClientApp page="scam-checker" />
     </>
   );
 }
