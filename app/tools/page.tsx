@@ -62,6 +62,27 @@ export default function ToolsPage() {
     },
     {
       "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "Are GetCyberRight's cybersecurity tools free?",
+          acceptedAnswer: { "@type": "Answer", text: "Yes, all core tools are free to use. The GCR Scam Guard, Password Generator, Breach Monitor, and Data Broker Removal tool all offer free access with no account required for basic scanning." },
+        },
+        {
+          "@type": "Question",
+          name: "What cybersecurity tools does GetCyberRight offer?",
+          acceptedAnswer: { "@type": "Answer", text: "GetCyberRight provides several free tools: GCR Scam Guard (AI-powered scam detection for URLs, emails, phone numbers, and QR codes), Secure Password Generator, Data Broker Removal (opt-out guides for 501+ broker sites), Breach Monitor (check if your email has been compromised), and a browser extension for real-time protection." },
+        },
+        {
+          "@type": "Question",
+          name: "Do I need technical knowledge to use these tools?",
+          acceptedAnswer: { "@type": "Answer", text: "No. All tools are designed for everyday users with no technical background. Simply paste a suspicious link, enter your email to check for breaches, or click a button to generate a password. Results are presented in plain language with clear recommendations." },
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },

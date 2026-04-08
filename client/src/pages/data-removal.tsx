@@ -16,6 +16,7 @@ import type { WebApplicationData, BreadcrumbData } from "@/components/structured
 import { Skeleton } from "@/components/ui/skeleton";
 import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { FadeIn } from "@/components/fade-in";
+import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
 import {
   Shield,
   Search,
@@ -357,6 +358,19 @@ export default function DataRemoval() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SignupEncouragementBanner toolName="data-removal" show={true} contextMessage="Create a free account to track your data removal progress" />
       </div>
+
+      <RelatedResources
+        title="Protect Your Privacy Further"
+        subtitle="More tools and guides to keep your personal information safe."
+        resources={[
+          RESOURCE_LINKS.privacyGuide,
+          RESOURCE_LINKS.scamChecker,
+          RESOURCE_LINKS.breachDashboard,
+          RESOURCE_LINKS.identityTheftGuide,
+          RESOURCE_LINKS.passwordGenerator,
+          RESOURCE_LINKS.allGuides,
+        ]}
+      />
 
       <Footer />
     </div>

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import kidsBannerImage from "@/assets/images/kids-safety-banner.jpg";
+import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
 import {
   Shield, Lock, Eye, MessageCircle, Gamepad2, Users,
   CheckCircle, Star, Trophy, BookOpen, Heart,
@@ -1370,6 +1371,20 @@ export default function Kids() {
           <span>Content last reviewed: March 2026</span>
         </div>
       </main>
+
+      <RelatedResources
+        title="More Safety Resources"
+        subtitle="Explore tools and guides to keep your whole family protected."
+        resources={[
+          RESOURCE_LINKS.parentsHub,
+          RESOURCE_LINKS.parentalControlsGuide,
+          RESOURCE_LINKS.scamChecker,
+          RESOURCE_LINKS.passwordGenerator,
+          RESOURCE_LINKS.trainingAcademy,
+          RESOURCE_LINKS.allGuides,
+        ]}
+      />
+
       <Footer />
     </div>
   );

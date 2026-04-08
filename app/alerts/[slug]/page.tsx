@@ -71,12 +71,27 @@ export default async function AlertDetailPage({ params }: PageProps) {
     },
     {
       "@context": "https://schema.org",
-      "@type": "Article",
+      "@type": "NewsArticle",
       headline: alert.threatName,
       description: alert.description?.substring(0, 160) || alert.threatName,
       url: `${BASE_URL}/alerts/${alert.slug}`,
-      publisher: { "@type": "Organization", name: "GetCyberRight", url: BASE_URL },
       datePublished: alert.publishedAt || new Date().toISOString(),
+      dateModified: alert.updatedAt || alert.publishedAt || new Date().toISOString(),
+      author: {
+        "@type": "Organization",
+        name: "GetCyberRight",
+        url: BASE_URL,
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "GetCyberRight",
+        url: BASE_URL,
+        logo: { "@type": "ImageObject", url: `${BASE_URL}/og-image.png` },
+      },
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": `${BASE_URL}/alerts/${alert.slug}`,
+      },
     },
   ];
 

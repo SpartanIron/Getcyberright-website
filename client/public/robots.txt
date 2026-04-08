@@ -88,10 +88,28 @@ User-agent: PetalBot
 Disallow: /
 
 User-agent: SemrushBot
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /dashboard
+Disallow: /preferences
+Disallow: /checkout-success
+Disallow: /extension-auth
 
 User-agent: AhrefsBot
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /dashboard
+Disallow: /preferences
+Disallow: /checkout-success
+Disallow: /extension-auth
 
 User-agent: MJ12bot
 Disallow: /

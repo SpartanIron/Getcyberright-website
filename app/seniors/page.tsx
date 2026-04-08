@@ -4,14 +4,14 @@ import PageContent from "@/pages/seniors";
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "Senior Online Safety Center | GetCyberRight",
+  title: "Online Safety for Seniors & Older Adults — Free Resources | GetCyberRight",
   description:
-    "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, protect your identity, and avoid romance fraud.",
+    "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, recognize romance fraud, protect your identity, and stay safe online.",
   alternates: { canonical: `${BASE_URL}/seniors` },
   openGraph: {
-    title: "Senior Online Safety Center | GetCyberRight",
+    title: "Online Safety for Seniors & Older Adults — Free Resources | GetCyberRight",
     description:
-      "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, protect your identity, and avoid romance fraud.",
+      "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, recognize romance fraud, protect your identity, and stay safe online.",
     url: `${BASE_URL}/seniors`,
     type: "website",
     images: [
@@ -28,29 +28,5 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default function SeniorsPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Senior Safety",
-        item: `${BASE_URL}/seniors`,
-      },
-    ],
-  };
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
-      <PageContent />
-    </>
-  );
+  return <PageContent />;
 }

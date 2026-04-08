@@ -71,6 +71,12 @@ export default async function RootLayout({
         contactType: "customer support",
         url: `${BASE_URL}/contact`,
       },
+      sameAs: [
+        "https://x.com/getcyberright",
+        "https://www.facebook.com/getcyberright",
+        "https://www.linkedin.com/company/getcyberright",
+        "https://www.youtube.com/@getcyberright",
+      ],
     },
     {
       "@context": "https://schema.org",

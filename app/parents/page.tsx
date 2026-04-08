@@ -4,14 +4,14 @@ import PageContent from "@/pages/parents";
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "Parents Hub: Keep Your Family Safe Online | GetCyberRight",
+  title: "Parents' Guide to Online Safety — Parental Controls & Family Protection | GetCyberRight",
   description:
-    "Cybersecurity guides for parents. Learn about parental controls, age-appropriate device settings, and how to protect your children from online threats.",
+    "Free cybersecurity guides for parents. Set up parental controls, learn age-appropriate device settings, and protect your children from online threats, cyberbullying, and predators.",
   alternates: { canonical: `${BASE_URL}/parents` },
   openGraph: {
-    title: "Parents Hub: Keep Your Family Safe Online | GetCyberRight",
+    title: "Parents' Guide to Online Safety — Parental Controls & Family Protection | GetCyberRight",
     description:
-      "Cybersecurity guides for parents. Learn about parental controls, age-appropriate device settings, and how to protect your children from online threats.",
+      "Free cybersecurity guides for parents. Set up parental controls, learn age-appropriate device settings, and protect your children from online threats, cyberbullying, and predators.",
     url: `${BASE_URL}/parents`,
     type: "website",
     images: [
@@ -28,29 +28,5 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default function ParentsPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Parents Hub",
-        item: `${BASE_URL}/parents`,
-      },
-    ],
-  };
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
-      <PageContent />
-    </>
-  );
+  return <PageContent />;
 }

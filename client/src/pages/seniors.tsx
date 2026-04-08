@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StructuredData } from "@/components/structured-data";
 import type { FAQData, BreadcrumbData } from "@/components/structured-data";
 import { Link } from "@/lib/navigation";
+import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
 import {
   Shield, Lock, Phone, Heart, Mail, CreditCard,
   CheckCircle, BookOpen, AlertTriangle,
@@ -1304,6 +1305,19 @@ export default function Seniors() {
           </>
         )}
       </main>
+
+      <RelatedResources
+        title="Keep Exploring"
+        subtitle="More resources to help you and your family stay safe online."
+        resources={[
+          RESOURCE_LINKS.seniorScamGuide,
+          RESOURCE_LINKS.scamChecker,
+          RESOURCE_LINKS.identityTheftGuide,
+          RESOURCE_LINKS.romanceScamGuide,
+          RESOURCE_LINKS.emergencyHelp,
+          RESOURCE_LINKS.dataRemoval,
+        ]}
+      />
 
       <Footer />
     </div>

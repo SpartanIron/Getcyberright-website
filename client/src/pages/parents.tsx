@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Link } from "@/lib/navigation";
+import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -991,6 +992,19 @@ export default function Parents() {
           <span>Content last reviewed: February 2026</span>
         </div>
       </main>
+
+      <RelatedResources
+        title="More Family Safety Resources"
+        subtitle="Tools and guides to protect every member of your family."
+        resources={[
+          RESOURCE_LINKS.kidsHub,
+          RESOURCE_LINKS.parentalControlsGuide,
+          RESOURCE_LINKS.scamChecker,
+          RESOURCE_LINKS.trainingAcademy,
+          RESOURCE_LINKS.passwordGuide,
+          RESOURCE_LINKS.emergencyHelp,
+        ]}
+      />
 
       <Footer />
     </div>

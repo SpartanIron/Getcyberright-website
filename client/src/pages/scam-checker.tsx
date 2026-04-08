@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { detectUserRegion, getRegionInfo, type Region } from "@/lib/region-detect";
 import { TechPatternBg } from "@/components/tech-pattern-bg";
+import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/use-recaptcha";
 
@@ -435,6 +436,19 @@ export default function ScamCheckerPage() {
           </div>
         </div>
       </div>
+
+      <RelatedResources
+        title="More Protection Tools"
+        subtitle="Keep your digital life secure with these additional resources."
+        resources={[
+          RESOURCE_LINKS.phishingGuide,
+          RESOURCE_LINKS.dataRemoval,
+          RESOURCE_LINKS.breachDashboard,
+          RESOURCE_LINKS.passwordGenerator,
+          RESOURCE_LINKS.emergencyHelp,
+          RESOURCE_LINKS.allGuides,
+        ]}
+      />
     </main>
   );
 }

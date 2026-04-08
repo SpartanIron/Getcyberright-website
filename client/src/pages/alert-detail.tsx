@@ -2,7 +2,6 @@
 
 import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { StructuredData, type BlogPostingData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -95,27 +94,6 @@ export default function AlertDetailPage() {
 
   const risk = riskConfig[alert.riskLevel] || riskConfig.medium;
 
-  const blogPosting: BlogPostingData = {
-    type: "BlogPosting",
-    headline: alert.threatName,
-    description: alert.metaDescription || alert.description,
-    datePublished: alert.publishedAt || alert.dateDetected,
-    dateModified: alert.updatedAt,
-    author: { name: "GetCyberRight Security Team", url: "https://www.getcyberright.com" },
-    publisher: { name: "GetCyberRight", logo: "https://www.getcyberright.com/favicon.svg" },
-    articleSection: "Security Alerts",
-    keywords: [...(alert.cveIds || []), alert.threatCategory].filter(Boolean),
-  };
-
-  const breadcrumbs: BreadcrumbData = {
-    type: "BreadcrumbList",
-    items: [
-      { name: "Home", url: "https://www.getcyberright.com/" },
-      { name: "Alerts", url: "https://www.getcyberright.com/alerts" },
-      { name: alert.threatName, url: `https://www.getcyberright.com/alerts/${alert.slug}` },
-    ],
-  };
-
   const tocItems = [
     { id: "overview", label: "Overview" },
     ...(alert.detailedAnalysis ? [{ id: "analysis", label: "Detailed Analysis" }] : []),
@@ -126,7 +104,6 @@ export default function AlertDetailPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <StructuredData data={[blogPosting, breadcrumbs]} />
       <Navigation />
 
       <div className="bg-[#0A2A3C] text-white relative overflow-hidden">

@@ -72,13 +72,31 @@ export default async function NewsArticlePage({ params }: PageProps) {
     },
     {
       "@context": "https://schema.org",
-      "@type": "Article",
+      "@type": "NewsArticle",
       headline: article.title,
       description: article.excerpt || article.title,
       url: `${BASE_URL}/news/${article.slug}`,
-      publisher: { "@type": "Organization", name: "GetCyberRight", url: BASE_URL },
       datePublished: article.publishedAt || new Date().toISOString(),
-      image: article.imageUrl || undefined,
+      dateModified: article.updatedAt || article.publishedAt || new Date().toISOString(),
+      author: {
+        "@type": "Organization",
+        name: "GetCyberRight",
+        url: BASE_URL,
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "GetCyberRight",
+        url: BASE_URL,
+        logo: {
+          "@type": "ImageObject",
+          url: `${BASE_URL}/og-image.png`,
+        },
+      },
+      ...(article.imageUrl ? { image: article.imageUrl } : {}),
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": `${BASE_URL}/news/${article.slug}`,
+      },
     },
   ];
 
