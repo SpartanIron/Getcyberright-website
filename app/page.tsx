@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ClientApp from "./[...slug]/client-app";
+import ClientApp from "./client-app";
 
 export const metadata: Metadata = {
   title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
