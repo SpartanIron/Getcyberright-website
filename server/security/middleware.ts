@@ -32,7 +32,7 @@ export const securityHeaders = helmet({
       ],
       scriptSrc: [
         "'self'",
-        ...(process.env.NODE_ENV !== "production" ? ["'unsafe-inline'"] : []),
+        "'unsafe-inline'",
         "https://www.googletagmanager.com",
         "https://www.google-analytics.com",
         "https://www.google.com",
