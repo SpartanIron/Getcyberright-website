@@ -9,9 +9,6 @@ tmp/
 .local/
 artifacts/
 .git/
-.gitignore
-.replit
-replit.nix
 .agents/
 .playwright/
 test-results/
@@ -27,22 +24,6 @@ coverage/
 # Logs
 *.log
 npm-debug.log*
-
-# Documentation (except README)
-*.md
-!README.md
-
-# Exclude ALL of attached_assets, then whitelist only used files
-attached_assets/*
-!attached_assets/ChatGPT_Image_Jan_22,_2026,_10_52_57_PM_1769141391397.png
-!attached_assets/ChatGPT_Image_Jan_22,_2026,_10_56_48_PM_1769140919527.png
-!attached_assets/ChatGPT_Image_Jan_22,_2026,_11_06_36_PM_1769141264903.png
-!attached_assets/ChatGPT_Image_Jan_22,_2026,_11_13_49_PM_1769141821801.png
-!attached_assets/ChatGPT_Image_Jan_22,_2026,_11_26_08_PM_1769142455588.png
-!attached_assets/Gemini_Generated_Image_ctwx3actwx3actwx_1768679610678.png
-!attached_assets/generated_images/
-!attached_assets/image_1767834716649.png
-!attached_assets/Logo_A_1768679989734.png
 
 # Temp and swap files
 *.swp
