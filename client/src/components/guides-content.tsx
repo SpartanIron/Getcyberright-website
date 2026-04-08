@@ -32,12 +32,13 @@ const categoryIcons: Record<string, { icon: typeof BookOpen; color: string; bg: 
   "social-media-security": { icon: Smartphone, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950/30", label: "Social Media" },
 };
 
-export function GuidesContent() {
+export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const { data: guides = [], isLoading, isError } = useQuery<Guide[]>({
     queryKey: ["/api/guides"],
+    initialData: initialGuides,
   });
 
   const categories = Array.from(new Set(guides.map((g) => g.category).filter(Boolean)));

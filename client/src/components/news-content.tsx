@@ -16,11 +16,24 @@ import { Footer } from "@/components/footer";
 import { FadeIn } from "@/components/fade-in";
 import newsBannerImage from "@assets/generated_images/realistic_breaking_news_broadcast_background.png";
 
-// Decode HTML entities in text (e.g., &#8216; -> ')
 function decodeHtmlEntities(text: string): string {
  if (!text) return text;
- const doc = new DOMParser().parseFromString(text, 'text/html');
- return doc.body.textContent || '';
+ if (typeof DOMParser !== "undefined") {
+  const doc = new DOMParser().parseFromString(text, 'text/html');
+  return doc.body.textContent || '';
+ }
+ return text
+  .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+  .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCharCode(parseInt(h, 16)))
+  .replace(/&amp;/g, '&')
+  .replace(/&lt;/g, '<')
+  .replace(/&gt;/g, '>')
+  .replace(/&quot;/g, '"')
+  .replace(/&apos;/g, "'")
+  .replace(/&#8216;/g, "\u2018")
+  .replace(/&#8217;/g, "\u2019")
+  .replace(/&#8220;/g, "\u201C")
+  .replace(/&#8221;/g, "\u201D");
 }
 
 interface NewsItem {
@@ -394,7 +407,7 @@ function EventCard({ event }: { event: TechEvent }) {
  );
 }
 
-export function NewsContent() {
+export function NewsContent({ initialNews }: { initialNews?: any }) {
  const [searchQuery, setSearchQuery] = useState("");
  const [activeFilter, setActiveFilter] = useState("all");
  const [currentPage, setCurrentPage] = useState(1);
@@ -419,9 +432,10 @@ export function NewsContent() {
  if (!res.ok) throw new Error("Failed to fetch news");
  return res.json();
  },
+ initialData: activeFilter === "all" ? initialNews : undefined,
  enabled: activeFilter !== "conferences",
- refetchInterval: 300000, // Refresh every 5 minutes
- staleTime: 60000, // Consider data fresh for 1 minute
+ refetchInterval: 300000,
+ staleTime: 60000,
  });
 
  // Fetch tech events when filter is "conferences"

@@ -20,11 +20,11 @@ const datasetSchema: DatasetData = {
   variableMeasured: ["risk level", "report count", "average financial loss", "target audience", "platforms used"],
 };
 
-export default function ScamIntelListing() {
+export default function ScamIntelListing({ initialScams }: { initialScams?: any[] }) {
   return (
     <>
       <StructuredData data={[breadcrumbs, datasetSchema]} />
-      <ScamIntelContent />
+      <ScamIntelContent initialScams={initialScams} />
     </>
   );
 }

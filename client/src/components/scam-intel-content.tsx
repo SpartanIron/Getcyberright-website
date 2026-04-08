@@ -82,7 +82,7 @@ function formatDate(dateStr: string): string {
   }
 }
 
-export function ScamIntelContent() {
+export function ScamIntelContent({ initialScams }: { initialScams?: ScamIntel[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedRisk, setSelectedRisk] = useState<string | null>(null);
@@ -112,6 +112,7 @@ export function ScamIntelContent() {
       if (!res.ok) throw new Error("Failed to fetch");
       return res.json();
     },
+    initialData: selectedRegion === "global" ? initialScams : undefined,
   });
 
   const categories = Array.from(new Set(scams.map((s) => s.scamCategory).filter(Boolean)));

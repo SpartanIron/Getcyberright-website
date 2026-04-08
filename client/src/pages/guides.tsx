@@ -12,7 +12,7 @@ const breadcrumbs: BreadcrumbData = {
   ],
 };
 
-export default function GuidesListing() {
+export default function GuidesListing({ initialGuides }: { initialGuides?: any[] }) {
   return (
     <div className="min-h-screen bg-background">
       <StructuredData data={[breadcrumbs]} />
@@ -40,7 +40,7 @@ export default function GuidesListing() {
         </div>
       </div>
 
-      <GuidesContent />
+      <GuidesContent initialGuides={initialGuides} />
 
       <Footer />
     </div>

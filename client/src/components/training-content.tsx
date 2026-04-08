@@ -116,11 +116,12 @@ const certificationLevels = [
   { level: "advanced", name: "Security Champion", hours: "6-8", badge: "Gold", description: "Expert-level security practices and leadership" }
 ];
 
-export function TrainingContent() {
+export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[] }) {
   const [selectedAudience, setSelectedAudience] = useState<string>("all");
 
   const { data: learningPaths, isLoading } = useQuery<LearningPath[]>({
     queryKey: ["/api/training/paths"],
+    initialData: initialPaths,
   });
 
   const { data: userProgress } = useQuery<{ completedPaths: number; totalPoints: number; certificates: number }>({

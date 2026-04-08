@@ -4,6 +4,7 @@ import PageSkeleton from "../page-skeleton";
 import PageContent from "@/pages/scam-intel-listing";
 
 const BASE_URL = "https://www.getcyberright.com";
+const API_BASE = `http://localhost:${process.env.PORT || 5000}`;
 
 export const metadata: Metadata = {
   title: "Scam Intelligence Center | GetCyberRight",
@@ -29,7 +30,18 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-export default function ScamIntelPage() {
+async function fetchScamIntel() {
+  try {
+    const res = await fetch(`${API_BASE}/api/scam-intel`, { next: { revalidate: 3600 } });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
+export default async function ScamIntelPage() {
+  const initialScams = await fetchScamIntel();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -53,7 +65,7 @@ export default function ScamIntelPage() {
         }}
       />
       <Suspense fallback={<PageSkeleton />}>
-        <PageContent />
+        <PageContent initialScams={initialScams} />
       </Suspense>
     </>
   );

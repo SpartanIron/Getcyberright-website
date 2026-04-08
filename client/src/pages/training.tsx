@@ -19,11 +19,11 @@ const trainingBreadcrumbs: BreadcrumbData = {
   ],
 };
 
-export default function Training() {
+export default function Training({ initialPaths }: { initialPaths?: any[] }) {
   return (
     <>
       <StructuredData data={[trainingCourseSchema, trainingBreadcrumbs]} />
-      <TrainingContent />
+      <TrainingContent initialPaths={initialPaths} />
     </>
   );
 }
