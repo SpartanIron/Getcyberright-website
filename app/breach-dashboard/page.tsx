@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function BreachDashboardPage() {
-  return <ClientApp />;
+  return <ClientApp page="breach-dashboard" />;
 }

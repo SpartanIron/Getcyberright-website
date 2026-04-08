@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function ExperiencePage() {
-  return <ClientApp />;
+  return <ClientApp page="experience" />;
 }

@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

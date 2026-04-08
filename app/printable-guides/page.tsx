@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function PrintableGuidesPage() {
-  return <ClientApp />;
+  return <ClientApp page="printable-guides" />;
 }

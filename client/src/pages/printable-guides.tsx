@@ -6,7 +6,7 @@ import {
   Download, Smartphone, MessageCircle, CreditCard, Lock, 
   Users, Heart, Printer, FileText, CheckCircle, Share2, ArrowLeft
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ShareCallToAction } from "@/components/social-share";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 

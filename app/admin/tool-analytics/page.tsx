@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminToolAnalyticsPage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-tool-analytics" />;
 }

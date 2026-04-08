@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { Search, Shield, Lock, ArrowRight } from "lucide-react";
 
 const capabilities = [

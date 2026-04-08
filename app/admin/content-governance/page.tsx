@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminContentGovernancePage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-content-governance" />;
 }

@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminTrendingThreatsPage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-trending-threats" />;
 }

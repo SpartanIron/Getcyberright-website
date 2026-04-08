@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminEngagementPage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-engagement" />;
 }

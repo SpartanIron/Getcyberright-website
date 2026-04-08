@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  return <ClientApp />;
+  return <ClientApp page="privacy" />;
 }

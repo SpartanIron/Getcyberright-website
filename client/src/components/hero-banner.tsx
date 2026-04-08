@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Shield, CheckCircle, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import heroBannerImage from "@assets/Gemini_Generated_Image_ctwx3actwx3actwx_1768679610678.png";
 
 export function HeroBanner() {

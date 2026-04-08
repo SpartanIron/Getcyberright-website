@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function PartnerDeckPage() {
-  return <ClientApp />;
+  return <ClientApp page="partner-deck" />;
 }

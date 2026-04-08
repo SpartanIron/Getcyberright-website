@@ -41,5 +41,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default function ScamTypePage() {
-  return <ClientApp />;
+  return <ClientApp page="scam-page" />;
 }

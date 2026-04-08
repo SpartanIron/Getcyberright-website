@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ArrowRight } from "lucide-react";
 import featureScamImg from "@/assets/images/feature-scam-detection-diverse.webp";
 import featureLearningImg from "@/assets/images/feature-family-learning-diverse.webp";

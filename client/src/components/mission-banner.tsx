@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ArrowRight, Shield, Globe } from "lucide-react";
 import professionalImage from "@/assets/images/professional-focused.jpg";
 

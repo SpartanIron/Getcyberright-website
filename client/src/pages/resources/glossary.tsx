@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, BookOpen, Search, Filter, Hash } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { useState } from "react";
 import { SEOHead } from "@/components/seo-head";
 

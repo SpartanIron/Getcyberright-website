@@ -30,7 +30,7 @@ import {
   ArrowRight,
   CalendarDays
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ArrowRight, Users, Heart, Briefcase } from "lucide-react";
 import familyImage from "@/assets/images/hero-family-diverse.webp";
 import seniorsImage from "@/assets/images/seniors-diverse.webp";

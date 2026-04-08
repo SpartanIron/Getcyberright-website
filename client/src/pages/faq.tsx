@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays, Chrome, CreditCard } from "lucide-react";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { useSEO } from "@/hooks/use-seo";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { StructuredData } from "@/components/structured-data";
 import type { FAQData } from "@/components/structured-data";
 

@@ -24,5 +24,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default function ReportPage() {
-  return <ClientApp />;
+  return <ClientApp page="scan-report" />;
 }

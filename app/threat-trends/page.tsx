@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function ThreatTrendsPage() {
-  return <ClientApp />;
+  return <ClientApp page="threat-trends" />;
 }

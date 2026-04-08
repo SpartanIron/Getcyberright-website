@@ -11,7 +11,7 @@ import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import {
   Search,
   Copy,

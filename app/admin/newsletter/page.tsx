@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminNewsletterPage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-newsletter" />;
 }

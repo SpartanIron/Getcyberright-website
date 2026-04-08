@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function AIPromptsPage() {
-  return <ClientApp />;
+  return <ClientApp page="ai-prompts" />;
 }

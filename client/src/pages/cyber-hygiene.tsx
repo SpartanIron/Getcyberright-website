@@ -2,7 +2,7 @@ import { CyberHygieneSelfCheck } from "@/components/cyber-hygiene-self-check";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, CheckCircle, TrendingUp, Users, Lock, Eye, Wifi, Smartphone, AlertTriangle, FileCheck, ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { useSEO } from "@/hooks/use-seo";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { ShareCallToAction } from "@/components/social-share";

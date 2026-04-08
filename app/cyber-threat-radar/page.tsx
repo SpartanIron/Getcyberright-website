@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function CyberThreatRadarPage() {
-  return <ClientApp />;
+  return <ClientApp page="cyber-threat-radar" />;
 }

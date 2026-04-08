@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { motion } from "framer-motion";
 import { Users, Shield, Heart, ArrowRight, Smartphone, AlertTriangle, Baby } from "lucide-react";
 

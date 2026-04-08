@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function SafetyScorePage() {
-  return <ClientApp />;
+  return <ClientApp page="safety-score" />;
 }

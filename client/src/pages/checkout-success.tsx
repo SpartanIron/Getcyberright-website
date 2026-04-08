@@ -6,7 +6,7 @@ import { SEOHead, pageSEO } from "@/components/seo-head";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowRight, Shield, Download, Loader2, Database } from "lucide-react";
-import { Link, useSearch } from "wouter";
+import { Link, useSearch } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 

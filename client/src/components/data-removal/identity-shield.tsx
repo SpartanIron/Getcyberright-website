@@ -44,7 +44,7 @@ import {
   AlertTriangle,
   CheckCircle2,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 
 const SERVICE_CATEGORIES = [
   { value: "shopping", label: "Shopping" },

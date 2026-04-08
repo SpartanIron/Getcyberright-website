@@ -84,7 +84,7 @@ export default async function ScamIntelDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-      <ClientApp />
+      <ClientApp page="scam-intel-detail" />
     </>
   );
 }

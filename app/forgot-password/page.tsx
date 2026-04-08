@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function ForgotPasswordPage() {
-  return <ClientApp />;
+  return <ClientApp page="forgot-password" />;
 }

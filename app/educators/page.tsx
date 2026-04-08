@@ -19,5 +19,5 @@ export const metadata: Metadata = {
 };
 
 export default function EducatorsPage() {
-  return <ClientApp />;
+  return <ClientApp page="educators" />;
 }

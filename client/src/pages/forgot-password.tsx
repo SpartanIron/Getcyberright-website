@@ -18,7 +18,7 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import { useLocation, Link } from "wouter";
+import { useLocation, Link } from "@/lib/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 

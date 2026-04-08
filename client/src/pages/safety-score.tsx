@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { Shield, CheckCircle, XCircle, ArrowRight, RotateCcw, Mail, Lock, Smartphone, Users, Eye, MessageCircle, Send, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DailyTipsSubscription } from "@/components/daily-tips-subscription";

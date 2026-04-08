@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ArrowRight, Search, Shield, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

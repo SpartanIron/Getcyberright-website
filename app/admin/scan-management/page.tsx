@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminScanManagementPage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-scan-management" />;
 }

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { Baby, Heart, User, BookOpen } from "lucide-react";
 
 const pathways = [

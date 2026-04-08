@@ -46,5 +46,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default function TopicClusterPage() {
-  return <ClientApp />;
+  return <ClientApp page="topic-hub" />;
 }

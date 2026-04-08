@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function AwarenessHubPage() {
-  return <ClientApp />;
+  return <ClientApp page="awareness-hub" />;
 }

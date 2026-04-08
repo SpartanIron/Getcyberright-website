@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ArrowRight } from "lucide-react";
 import familyImg from "@/assets/images/about-family-together.webp";
 import seniorsImg from "@/assets/images/about-seniors-learning.webp";

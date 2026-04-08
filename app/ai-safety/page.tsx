@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function AISafetyPage() {
-  return <ClientApp />;
+  return <ClientApp page="ai-safety" />;
 }

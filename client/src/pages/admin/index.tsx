@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation } from "@/lib/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ import {
   Activity,
   Zap
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { AdminLayout } from "@/components/admin/admin-layout";
 
 interface AdminStats {

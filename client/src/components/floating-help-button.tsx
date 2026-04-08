@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { HelpCircle, X, AlertTriangle, Search, Shield } from "lucide-react";
 

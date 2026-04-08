@@ -14,7 +14,7 @@ import {
   Chrome,
   Lock,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 
 interface OnboardingWelcomeProps {
   firstName: string;

@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function CheckoutSuccessPage() {
-  return <ClientApp />;
+  return <ClientApp page="checkout-success" />;
 }

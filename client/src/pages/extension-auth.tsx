@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Shield, Copy, Check, LogIn, ExternalLink } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 
 export default function ExtensionAuth() {
   const [token, setToken] = useState<string | null>(null);

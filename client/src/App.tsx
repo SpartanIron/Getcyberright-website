@@ -1,5 +1,5 @@
-import { Switch, Route, useLocation } from "wouter";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useLocation } from "@/lib/navigation";
+import { useEffect, useState, Suspense, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { DeziAssistant } from "@/components/dezi-assistant";
 import { FeedbackWidget } from "@/components/feedback-widget";
@@ -9,102 +9,6 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { Loader2 } from "lucide-react";
-
-const isServer = typeof window === "undefined";
-
-import Home from "@/pages/home";
-import NotFound from "@/pages/not-found";
-
-const Tools = lazy(() => import("@/pages/tools"));
-const Resources = lazy(() => import("@/pages/resources"));
-const About = lazy(() => import("@/pages/about"));
-const Contact = lazy(() => import("@/pages/contact"));
-const Privacy = lazy(() => import("@/pages/privacy"));
-const Terms = lazy(() => import("@/pages/terms"));
-const EmergencyHelp = lazy(() => import("@/pages/emergency-help"));
-const Kids = lazy(() => import("@/pages/kids"));
-const Seniors = lazy(() => import("@/pages/seniors"));
-const Parents = lazy(() => import("@/pages/parents"));
-const SupportPage = lazy(() => import("@/pages/support"));
-const Security = lazy(() => import("@/pages/security"));
-const PricingPage = lazy(() => import("@/pages/pricing"));
-const OurMission = lazy(() => import("@/pages/our-mission"));
-const SupportTheMission = lazy(() => import("@/pages/support-the-mission"));
-const ThreatTrendsPage = lazy(() => import("@/pages/threat-trends"));
-const CyberThreatRadar = lazy(() => import("@/pages/cyber-threat-radar"));
-const AwarenessHub = lazy(() => import("@/pages/awareness-hub"));
-const ReportScam = lazy(() => import("@/pages/report-scam"));
-const Checklists = lazy(() => import("@/pages/checklists"));
-const AIPrompts = lazy(() => import("@/pages/ai-prompts"));
-const AISafety = lazy(() => import("@/pages/ai-safety"));
-const Training = lazy(() => import("@/pages/training"));
-const TrainingPath = lazy(() => import("@/pages/training-path"));
-const TrainingLesson = lazy(() => import("@/pages/training-lesson"));
-const TrainingQuiz = lazy(() => import("@/pages/training-quiz"));
-const DataRemoval = lazy(() => import("@/pages/data-removal"));
-const News = lazy(() => import("@/pages/news"));
-const NewsArticle = lazy(() => import("@/pages/news-article"));
-const CyberHygiene = lazy(() => import("@/pages/cyber-hygiene"));
-const PasswordGenerator = lazy(() => import("@/pages/password-generator"));
-const BreachDashboard = lazy(() => import("@/pages/breach-dashboard"));
-const SearchPage = lazy(() => import("@/pages/search"));
-const ParentGuide = lazy(() => import("@/pages/parent-guide"));
-const SmallBusiness = lazy(() => import("@/pages/small-business"));
-const Educators = lazy(() => import("@/pages/educators"));
-const TravelSafety = lazy(() => import("@/pages/travel-safety"));
-const Accessibility = lazy(() => import("@/pages/accessibility"));
-const Advertise = lazy(() => import("@/pages/advertise"));
-const PartnerDeck = lazy(() => import("@/pages/partner-deck"));
-const FeedbackPage = lazy(() => import("@/pages/feedback"));
-const Experience = lazy(() => import("@/pages/experience"));
-const GcrGuardPricing = lazy(() => import("@/pages/gcr-guard-pricing"));
-const DataShieldPricing = lazy(() => import("@/pages/data-shield-pricing"));
-const PrintableGuides = lazy(() => import("@/pages/printable-guides"));
-const QuickAssessment = lazy(() => import("@/pages/quick-assessment"));
-const SafetyScore = lazy(() => import("@/pages/safety-score"));
-const ScamChecker = lazy(() => import("@/pages/scam-checker"));
-const BrowserExtensionPage = lazy(() => import("@/pages/browser-extension"));
-const ScamPage = lazy(() => import("@/pages/scam-page"));
-const TopicHub = lazy(() => import("@/pages/topic-hub"));
-const FAQ = lazy(() => import("@/pages/faq"));
-const GuidesListing = lazy(() => import("@/pages/guides"));
-const GuideDetail = lazy(() => import("@/pages/guide-detail"));
-const AlertsListing = lazy(() => import("@/pages/alerts-listing"));
-const AlertDetail = lazy(() => import("@/pages/alert-detail"));
-const ScamIntelListing = lazy(() => import("@/pages/scam-intel-listing"));
-const ScamIntelDetail = lazy(() => import("@/pages/scam-intel-detail"));
-const ShieldPage = lazy(() => import("@/pages/shield"));
-const ShieldResultsPage = lazy(() => import("@/pages/shield-results"));
-const ShieldNextSteps = lazy(() => import("@/pages/shield-next-steps"));
-const Dashboard = lazy(() => import("@/pages/dashboard"));
-const AdminDashboard = lazy(() => import("@/pages/admin/index"));
-const AdminUsers = lazy(() => import("@/pages/admin/users"));
-const AdminMessages = lazy(() => import("@/pages/admin/messages"));
-const AdminSubscribers = lazy(() => import("@/pages/admin/subscribers"));
-const AdminScamReports = lazy(() => import("@/pages/admin/scam-reports"));
-const AdminChangePassword = lazy(() => import("@/pages/admin/change-password"));
-const AdminToolAnalytics = lazy(() => import("@/pages/admin/tool-analytics"));
-const AdminScanManagement = lazy(() => import("@/pages/admin/scan-management"));
-const AdminSecurity = lazy(() => import("@/pages/admin-security"));
-const AdminThreatIntelligence = lazy(() => import("@/pages/admin-threat-intelligence"));
-const AdminContentGovernance = lazy(() => import("@/pages/admin-content-governance"));
-const AdminCompliance = lazy(() => import("@/pages/admin-compliance"));
-const AdminNewsletter = lazy(() => import("@/pages/admin-newsletter"));
-const AdminPromptManagement = lazy(() => import("@/pages/admin-prompt-management"));
-const AdminAnnouncements = lazy(() => import("@/pages/admin/announcements"));
-const AdminTrendingThreats = lazy(() => import("@/pages/admin/trending-threats"));
-const AdminFeedback = lazy(() => import("@/pages/admin/feedback"));
-const AdminContentManager = lazy(() => import("@/pages/admin/content-manager"));
-const AdminEngagementOpportunities = lazy(() => import("@/pages/admin/engagement-opportunities"));
-const Login = lazy(() => import("@/pages/login"));
-const Register = lazy(() => import("@/pages/register"));
-const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
-const ChildSafetyScanner = lazy(() => import("@/pages/child-safety-scanner"));
-const CheckoutSuccess = lazy(() => import("@/pages/checkout-success"));
-const ExtensionAuth = lazy(() => import("@/pages/extension-auth"));
-const Preferences = lazy(() => import("@/pages/preferences"));
-const Account = lazy(() => import("@/pages/account"));
-const ScanReportPage = lazy(() => import("@/pages/scan-report"));
 
 function PageLoader() {
   return (
@@ -127,110 +31,12 @@ function ScrollToTop() {
   return null;
 }
 
-function AppRouter() {
+function AnalyticsProvider({ children }: { children: ReactNode }) {
   useAnalytics();
-
-  return (
-    <Suspense fallback={<PageLoader />}>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/tools" component={Tools} />
-        <Route path="/resources" component={Resources} />
-        <Route path="/about" component={About} />
-        <Route path="/contact" component={Contact} />
-        <Route path="/privacy" component={Privacy} />
-        <Route path="/terms" component={Terms} />
-        <Route path="/emergency-help" component={EmergencyHelp} />
-        <Route path="/kids" component={Kids} />
-        <Route path="/seniors" component={Seniors} />
-        <Route path="/parents" component={Parents} />
-        <Route path="/parents/child-safety-scanner" component={ChildSafetyScanner} />
-        <Route path="/support" component={SupportPage} />
-        <Route path="/security" component={Security} />
-        <Route path="/our-mission" component={OurMission} />
-        <Route path="/pricing" component={PricingPage} />
-        <Route path="/gcr-guard-pricing" component={GcrGuardPricing} />
-        <Route path="/data-shield-pricing" component={DataShieldPricing} />
-        <Route path="/extension-auth" component={ExtensionAuth} />
-        <Route path="/support-the-mission" component={SupportTheMission} />
-        <Route path="/dashboard" component={Dashboard} />
-        <Route path="/account" component={Account} />
-        <Route path="/threat-trends" component={ThreatTrendsPage} />
-        <Route path="/cyber-threat-radar" component={CyberThreatRadar} />
-        <Route path="/awareness-hub" component={AwarenessHub} />
-        <Route path="/report-scam" component={ReportScam} />
-        <Route path="/checklists" component={Checklists} />
-        <Route path="/data-removal" component={DataRemoval} />
-        <Route path="/ai-prompts" component={AIPrompts} />
-        <Route path="/ai-safety" component={AISafety} />
-        <Route path="/news" component={News} />
-        <Route path="/news/:slug" component={NewsArticle} />
-        <Route path="/cyber-hygiene" component={CyberHygiene} />
-        <Route path="/password-generator" component={PasswordGenerator} />
-        <Route path="/breach-dashboard" component={BreachDashboard} />
-        <Route path="/search" component={SearchPage} />
-        <Route path="/parent-guide" component={ParentGuide} />
-        <Route path="/small-business" component={SmallBusiness} />
-        <Route path="/educators" component={Educators} />
-        <Route path="/travel-safety" component={TravelSafety} />
-        <Route path="/accessibility" component={Accessibility} />
-        <Route path="/advertise" component={Advertise} />
-        <Route path="/partner-deck" component={PartnerDeck} />
-        <Route path="/feedback" component={FeedbackPage} />
-        <Route path="/experience" component={Experience} />
-        <Route path="/checkout-success" component={CheckoutSuccess} />
-        <Route path="/preferences" component={Preferences} />
-        <Route path="/printable-guides" component={PrintableGuides} />
-        <Route path="/quick-assessment" component={QuickAssessment} />
-        <Route path="/safety-score" component={SafetyScore} />
-        <Route path="/scam-checker" component={ScamChecker} />
-        <Route path="/browser-extension" component={BrowserExtensionPage} />
-        <Route path="/report/:shareId" component={ScanReportPage} />
-        <Route path="/scams/:scamType" component={ScamPage} />
-        <Route path="/topics/:cluster" component={TopicHub} />
-        <Route path="/faq" component={FAQ} />
-        <Route path="/guides" component={GuidesListing} />
-        <Route path="/guides/:slug" component={GuideDetail} />
-        <Route path="/alerts" component={AlertsListing} />
-        <Route path="/alerts/:slug" component={AlertDetail} />
-        <Route path="/scam-intel" component={ScamIntelListing} />
-        <Route path="/scam-intel/:slug" component={ScamIntelDetail} />
-        <Route path="/shield" component={ShieldPage} />
-        <Route path="/shield/results/:scanId" component={ShieldResultsPage} />
-        <Route path="/shield/next-steps" component={ShieldNextSteps} />
-        <Route path="/training" component={Training} />
-        <Route path="/training/:pathId" component={TrainingPath} />
-        <Route path="/training/lesson/:lessonId" component={TrainingLesson} />
-        <Route path="/training/quiz/:quizId" component={TrainingQuiz} />
-        <Route path="/admin" component={AdminDashboard} />
-        <Route path="/admin/users" component={AdminUsers} />
-        <Route path="/admin/messages" component={AdminMessages} />
-        <Route path="/admin/subscribers" component={AdminSubscribers} />
-        <Route path="/admin/scam-reports" component={AdminScamReports} />
-        <Route path="/admin/scan-management" component={AdminScanManagement} />
-        <Route path="/admin/tool-analytics" component={AdminToolAnalytics} />
-        <Route path="/admin/security" component={AdminSecurity} />
-        <Route path="/admin/threat-intelligence" component={AdminThreatIntelligence} />
-        <Route path="/admin/content-governance" component={AdminContentGovernance} />
-        <Route path="/admin/compliance" component={AdminCompliance} />
-        <Route path="/admin/newsletter" component={AdminNewsletter} />
-        <Route path="/admin/prompt-management" component={AdminPromptManagement} />
-        <Route path="/admin/announcements" component={AdminAnnouncements} />
-        <Route path="/admin/trending-threats" component={AdminTrendingThreats} />
-        <Route path="/admin/feedback" component={AdminFeedback} />
-        <Route path="/admin/content" component={AdminContentManager} />
-        <Route path="/admin/engagement" component={AdminEngagementOpportunities} />
-        <Route path="/admin/change-password" component={AdminChangePassword} />
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Register} />
-        <Route path="/forgot-password" component={ForgotPassword} />
-        <Route component={NotFound} />
-      </Switch>
-    </Suspense>
-  );
+  return <>{children}</>;
 }
 
-function App() {
+function App({ children }: { children?: ReactNode }) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -252,11 +58,15 @@ function App() {
 
   return (
     <>
-      {!isServer && <ScrollToTop />}
+      <ScrollToTop />
       <AnnouncementBanner />
       <Toaster />
       <ErrorBoundary>
-        <AppRouter />
+        <AnalyticsProvider>
+          <Suspense fallback={<PageLoader />}>
+            {children}
+          </Suspense>
+        </AnalyticsProvider>
       </ErrorBoundary>
       {isClient && (
         <>

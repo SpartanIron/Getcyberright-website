@@ -16,5 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function SearchPage() {
-  return <ClientApp />;
+  return <ClientApp page="search" />;
 }

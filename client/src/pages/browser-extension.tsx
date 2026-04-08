@@ -4,7 +4,7 @@ import type { WebApplicationData, BreadcrumbData } from "@/components/structured
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { TechPatternBg } from "@/components/tech-pattern-bg";
 import {
   Shield, Chrome, ArrowLeft, Download, Eye, Bell, MousePointer2,

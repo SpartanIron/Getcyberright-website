@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Shield, Brain, Users, Mic, Lock, Award, Heart, Globe, CheckCircle, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 
 const differentiators = [

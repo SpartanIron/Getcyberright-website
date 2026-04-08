@@ -35,7 +35,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation } from "@/lib/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { OnboardingWelcome } from "@/components/onboarding-welcome";

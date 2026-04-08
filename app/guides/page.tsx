@@ -63,7 +63,7 @@ export default function GuidesPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp />
+      <ClientApp page="guides" />
     </>
   );
 }

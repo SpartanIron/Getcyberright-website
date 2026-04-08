@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function ShieldNextStepsPage() {
-  return <ClientApp />;
+  return <ClientApp page="shield-next-steps" />;
 }

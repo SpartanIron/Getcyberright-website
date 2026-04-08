@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function FeedbackPage() {
-  return <ClientApp />;
+  return <ClientApp page="feedback" />;
 }

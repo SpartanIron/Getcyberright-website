@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminThreatIntelligencePage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-threat-intelligence" />;
 }

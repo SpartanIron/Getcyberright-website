@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function GCRGuardPricingPage() {
-  return <ClientApp />;
+  return <ClientApp page="gcr-guard-pricing" />;
 }

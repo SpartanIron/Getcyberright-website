@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, CheckCircle, Key, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 
 import originalFamilyPhoto from "@assets/Gemini_Generated_Image_ctwx3actwx3actwx_1768679610678.png";
 import seniorsImage from "@assets/ChatGPT_Image_Jan_22,_2026,_10_52_57_PM_1769141391397.png";

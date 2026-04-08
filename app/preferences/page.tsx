@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function PreferencesPage() {
-  return <ClientApp />;
+  return <ClientApp page="preferences" />;
 }

@@ -22,7 +22,7 @@ import {
   Check,
   ShoppingBag
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import bannerImage from "@/assets/banners/pricing-banner.webp";
 
 const whatWeOffer = [

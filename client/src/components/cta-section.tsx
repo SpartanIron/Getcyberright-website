@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Shield, ArrowRight, CheckCircle2 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 
 export function CTASection() {
   return (

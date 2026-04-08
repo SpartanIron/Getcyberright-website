@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation } from '@/lib/navigation';
 import { trackPageView } from '../lib/analytics';
 
 export const useAnalytics = () => {

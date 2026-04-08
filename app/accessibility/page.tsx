@@ -16,5 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function AccessibilityPage() {
-  return <ClientApp />;
+  return <ClientApp page="accessibility" />;
 }

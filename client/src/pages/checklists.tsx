@@ -6,7 +6,7 @@ import { PageBanner } from "@/components/page-banner";
 import { PrintableChecklist, securityChecklists } from "@/components/printable-checklist";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home, User, Users, Briefcase, Shield, CalendarDays } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { StructuredData } from "@/components/structured-data";
 import type { BreadcrumbData } from "@/components/structured-data";
 import bannerImage from "@/assets/banners/resources-banner.webp";

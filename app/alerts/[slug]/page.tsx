@@ -86,7 +86,7 @@ export default async function AlertDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-      <ClientApp />
+      <ClientApp page="alert-detail" />
     </>
   );
 }

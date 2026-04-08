@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, FileText, Search, Filter, Download, ExternalLink, Eye, Copy, Star } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { useState } from "react";
 import { SEOHead } from "@/components/seo-head";
 

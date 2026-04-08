@@ -10,7 +10,7 @@ import { PageBanner } from "@/components/page-banner";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { BreadcrumbData } from "@/components/structured-data";
-import { useSearch } from "wouter";
+import { useSearch } from "@/lib/navigation";
 import { 
   ArrowRight, 
   Clock, 

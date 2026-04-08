@@ -48,7 +48,7 @@ export default function ScamIntelPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp />
+      <ClientApp page="scam-intel" />
     </>
   );
 }

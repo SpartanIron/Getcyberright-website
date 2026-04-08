@@ -28,5 +28,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <ClientApp />;
+  return <ClientApp page="home" />;
 }

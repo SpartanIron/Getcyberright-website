@@ -70,7 +70,7 @@ export default function BrowserExtensionPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp />
+      <ClientApp page="browser-extension" />
     </>
   );
 }

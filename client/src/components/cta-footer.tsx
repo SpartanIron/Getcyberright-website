@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ArrowRight } from "lucide-react";
 import aboutFamilyImg from "@/assets/images/about-family-together.webp";
 

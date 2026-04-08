@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function PasswordGeneratorPage() {
-  return <ClientApp />;
+  return <ClientApp page="password-generator" />;
 }

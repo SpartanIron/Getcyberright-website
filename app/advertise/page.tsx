@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdvertisePage() {
-  return <ClientApp />;
+  return <ClientApp page="advertise" />;
 }

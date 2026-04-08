@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ArrowRight } from "lucide-react";
 import expertImage from "@/assets/images/security-expert.jpg";
 

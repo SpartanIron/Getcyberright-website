@@ -18,7 +18,6 @@ import { registerPlatformRoutes } from "./platformRoutes";
 import { registerChatRoutes } from "./replit_integrations/chat";
 import { registerStripeRoutes, registerStripeWebhook } from "./stripe";
 import { decryptVaultData } from "./vaultEncryption";
-import { isKnownRoute, DYNAMIC_ROUTE_PREFIXES } from "./known-routes";
 import { logVaultAccess, extractRequestContext } from "./vaultAuditLog";
 import { 
   checkGoogleSafeBrowsing, 
@@ -405,20 +404,6 @@ export async function registerRoutes(
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  if (process.env.NODE_ENV !== 'production') {
-    app.get('/api/debug/route-check', (_req: Request, res: Response) => {
-      const testPaths = [
-        '/guides/how-to-prevent-sim-swapping',
-        '/guides/identity-theft-protection',
-        '/alerts/pig-butchering-crypto-fraud-wave',
-        '/scam-intel/pig-butchering',
-        '/guides',
-        '/',
-      ];
-      const results = testPaths.map(p => ({ path: p, known: isKnownRoute(p) }));
-      res.json({ results, prefixes: DYNAMIC_ROUTE_PREFIXES });
-    });
-  }
 
   // SSL Health Check Endpoint for external monitoring services
   app.get('/api/health/ssl', standardRateLimit, async (_req: Request, res: Response) => {

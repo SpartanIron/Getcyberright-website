@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function ParentGuidePage() {
-  return <ClientApp />;
+  return <ClientApp page="parent-guide" />;
 }

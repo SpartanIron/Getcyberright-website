@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function DataShieldPricingPage() {
-  return <ClientApp />;
+  return <ClientApp page="data-shield-pricing" />;
 }

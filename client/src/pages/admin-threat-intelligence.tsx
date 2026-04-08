@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import {
   ArrowLeft,
   RefreshCcw,

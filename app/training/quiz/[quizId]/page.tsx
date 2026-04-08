@@ -16,5 +16,5 @@ export const metadata: Metadata = {
 export default async function TrainingQuizPage({ params }: PageProps) {
   const { quizId } = await params;
   if (!quizId) notFound();
-  return <ClientApp />;
+  return <ClientApp page="training-quiz" />;
 }

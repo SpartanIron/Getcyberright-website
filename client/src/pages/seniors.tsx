@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { FAQData, BreadcrumbData } from "@/components/structured-data";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import {
   Shield, Lock, Phone, Heart, Mail, CreditCard,
   CheckCircle, BookOpen, AlertTriangle,

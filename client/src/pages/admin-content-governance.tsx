@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ArrowLeft, FileText, AlertTriangle, CheckCircle, RefreshCw, ExternalLink, Clock, Shield, TrendingUp, Eye, XCircle, Sparkles, Loader2, X } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

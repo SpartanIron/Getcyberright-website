@@ -1,6 +1,6 @@
 import { Mail, Shield, Lock, FileCheck } from "lucide-react";
 import { SiLinkedin, SiFacebook, SiYoutube, SiInstagram } from "react-icons/si";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import logoImage from "@/assets/logo.webp";
 
 const footerLinks = {

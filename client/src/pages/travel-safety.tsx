@@ -1,6 +1,6 @@
 import { useSEO } from "@/hooks/use-seo";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { 
   Plane, Shield, Smartphone, Wifi, CreditCard, MapPin, AlertTriangle,
   CheckCircle, Download, Globe, Phone, Building2, Lock, Eye, Bell,

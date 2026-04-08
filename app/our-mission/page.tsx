@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function OurMissionPage() {
-  return <ClientApp />;
+  return <ClientApp page="our-mission" />;
 }

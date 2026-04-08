@@ -14,7 +14,7 @@ import {
   Clock,
   ChevronRight
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import supportImage from "@/assets/banners/contact-banner.webp";
 
 const supportOptions = [

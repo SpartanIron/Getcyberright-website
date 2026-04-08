@@ -55,5 +55,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function TrainingPathPage({ params }: PageProps) {
   const { pathId } = await params;
   if (!pathId) notFound();
-  return <ClientApp />;
+  return <ClientApp page="training-path" />;
 }

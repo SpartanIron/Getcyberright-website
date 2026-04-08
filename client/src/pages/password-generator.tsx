@@ -4,7 +4,7 @@ import type { WebApplicationData, FAQData, BreadcrumbData } from "@/components/s
 import { PasswordGenerator } from "@/components/password-generator";
 import { ShareCallToAction } from "@/components/social-share";
 import { Shield, Key, Lock, ArrowLeft, Zap, Eye, CheckCircle, Lightbulb, BookOpen, Wifi, Database, Server, Globe, Smartphone, FileKey } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

@@ -13,7 +13,7 @@ import {
   X,
   AlertTriangle
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { useLocation } from "@/lib/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/use-auth";

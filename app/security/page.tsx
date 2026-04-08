@@ -16,5 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function SecurityPage() {
-  return <ClientApp />;
+  return <ClientApp page="security" />;
 }

@@ -19,5 +19,5 @@ export const metadata: Metadata = {
 };
 
 export default function SmallBusinessPage() {
-  return <ClientApp />;
+  return <ClientApp page="small-business" />;
 }

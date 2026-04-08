@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminContentManagerPage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-content" />;
 }

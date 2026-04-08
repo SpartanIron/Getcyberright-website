@@ -3,7 +3,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { SEOHead } from "@/components/seo-head";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import bannerImage from "@/assets/banners/terms-banner.webp";
 
 export default function Terms() {

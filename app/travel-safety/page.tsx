@@ -16,5 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function TravelSafetyPage() {
-  return <ClientApp />;
+  return <ClientApp page="travel-safety" />;
 }

@@ -16,5 +16,5 @@ export const metadata: Metadata = {
 export default async function ShieldResultsPage({ params }: PageProps) {
   const { scanId } = await params;
   if (!scanId) notFound();
-  return <ClientApp />;
+  return <ClientApp page="shield-results" />;
 }

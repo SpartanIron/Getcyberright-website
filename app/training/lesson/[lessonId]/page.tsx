@@ -48,5 +48,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function TrainingLessonPage({ params }: PageProps) {
   const { lessonId } = await params;
   if (!lessonId) notFound();
-  return <ClientApp />;
+  return <ClientApp page="training-lesson" />;
 }

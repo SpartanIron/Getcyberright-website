@@ -5,7 +5,7 @@ import { Newsletter } from "@/components/newsletter";
 import { SEOHead, pageSEO } from "@/components/seo-head";
 import { StructuredData } from "@/components/structured-data";
 import type { ArticleData, BreadcrumbData } from "@/components/structured-data";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import {
   ArrowRight, Shield, Heart, DollarSign, Eye, Users, BookOpen,
   CheckCircle, Globe, Zap, AlertTriangle, Search, Trash2,

@@ -15,7 +15,7 @@ import {
   Sparkles,
   Mail
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 const merchItems = [

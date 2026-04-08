@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { Shield, ArrowRight, CheckCircle, BookOpen, Target, Trophy, Zap, Award, MessageSquareHeart } from "lucide-react";
 
 interface Question {
@@ -89,7 +89,7 @@ function getSkillLevel(score: number): SkillLevel {
       score,
       recommendations: [
         { title: "Parent Guide", description: "Help protect your children online", link: "/parent-guide", icon: Award },
-        { title: "Threat Intelligence", description: "Deep dive into threat analysis", link: "/threat-intelligence", icon: Zap },
+        { title: "Threat Trends", description: "Deep dive into threat analysis", link: "/threat-trends", icon: Zap },
         { title: "All Resources", description: "Explore our full resource library", link: "/resources", icon: Trophy }
       ]
     };

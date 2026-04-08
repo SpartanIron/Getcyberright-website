@@ -5,7 +5,7 @@ import { ScamChecker } from "@/components/scam-checker";
 import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { ShareCallToAction } from "@/components/social-share";
 import { AlertTriangle, Shield, Phone, Link2, MessageSquare, CheckCircle, TrendingUp, TrendingDown, Minus, ArrowLeft, Megaphone, Globe, Bell, Chrome, ThumbsUp, Rss } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

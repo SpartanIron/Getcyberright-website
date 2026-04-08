@@ -79,7 +79,7 @@ export default function EmergencyHelpPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp />
+      <ClientApp page="emergency-help" />
     </>
   );
 }

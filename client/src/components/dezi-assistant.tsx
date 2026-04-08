@@ -15,7 +15,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useLocation } from "wouter";
+import { useLocation } from "@/lib/navigation";
 import deziAvatar from "@/assets/images/dezi-avatar.webp";
 
 interface Message {

@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function DataRemovalPage() {
-  return <ClientApp />;
+  return <ClientApp page="data-removal" />;
 }

@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function TermsPage() {
-  return <ClientApp />;
+  return <ClientApp page="terms" />;
 }

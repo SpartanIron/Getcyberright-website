@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function SupportPage() {
-  return <ClientApp />;
+  return <ClientApp page="support" />;
 }

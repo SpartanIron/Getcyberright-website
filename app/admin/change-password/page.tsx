@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminChangePasswordPage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-change-password" />;
 }

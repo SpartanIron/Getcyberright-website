@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Clock, BookOpen, Video, FileText } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 
 const resources = [
   {

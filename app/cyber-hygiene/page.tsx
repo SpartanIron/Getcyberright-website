@@ -16,5 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function CyberHygienePage() {
-  return <ClientApp />;
+  return <ClientApp page="cyber-hygiene" />;
 }

@@ -88,7 +88,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-      <ClientApp />
+      <ClientApp page="news-article" />
     </>
   );
 }

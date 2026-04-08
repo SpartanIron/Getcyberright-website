@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function ResourcesPage() {
-  return <ClientApp />;
+  return <ClientApp page="resources" />;
 }

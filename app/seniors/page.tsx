@@ -48,7 +48,7 @@ export default function SeniorsPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <ClientApp />
+      <ClientApp page="seniors" />
     </>
   );
 }

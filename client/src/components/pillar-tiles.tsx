@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { ArrowRight, Search, Trash2, GraduationCap, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import scamCheckerImg from "@/assets/images/card-scam-checker.webp";

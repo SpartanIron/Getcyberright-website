@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { CLUSTER_RELATIONSHIPS, CLUSTER_TARGET_PAGES, CLUSTER_LABELS, type SEOCluster } from "@shared/seo-keywords";
 import { SCAM_PAGES } from "@shared/scam-content";
 import { ArrowRight, BookOpen } from "lucide-react";

@@ -93,7 +93,7 @@ export default async function GuideDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-      <ClientApp />
+      <ClientApp page="guide-detail" />
     </>
   );
 }

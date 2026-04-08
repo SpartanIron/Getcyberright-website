@@ -1,4 +1,4 @@
-import { useParams, Link } from "wouter";
+import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { SEO_CLUSTERS, CLUSTER_LABELS, CLUSTER_RELATIONSHIPS, CLUSTER_TARGET_PAGES } from "@shared/seo-keywords";
 import { SCAM_PAGES } from "@shared/scam-content";

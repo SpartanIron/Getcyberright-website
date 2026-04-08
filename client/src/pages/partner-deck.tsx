@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useSEO } from "@/hooks/use-seo";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { useQuery } from "@tanstack/react-query";

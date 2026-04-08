@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function ReportScamPage() {
-  return <ClientApp />;
+  return <ClientApp page="report-scam" />;
 }

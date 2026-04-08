@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import { useSEO } from "@/hooks/use-seo";
 import { StructuredData, type BreadcrumbData, type DatasetData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";

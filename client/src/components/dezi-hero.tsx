@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "wouter";
+import { Link } from "@/lib/navigation";
 import deziLogo from "@assets/Logo_A_1768679989734.png";
 import { apiRequest } from "@/lib/queryClient";
 import { TechPatternBg } from "./tech-pattern-bg";

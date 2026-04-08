@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminScamReportsPage() {
-  return <ClientApp />;
+  return <ClientApp page="admin-scam-reports" />;
 }

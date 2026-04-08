@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function QuickAssessmentPage() {
-  return <ClientApp />;
+  return <ClientApp page="quick-assessment" />;
 }
