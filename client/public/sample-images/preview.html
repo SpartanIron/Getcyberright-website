@@ -1,40 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GetCyberRight — Social Card System</title>
+  <title>GetCyberRight — Social Card Design System</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #060911; color: #fff; font-family: -apple-system, 'SF Pro Display', 'Inter', 'Segoe UI', sans-serif; padding: 60px 40px; }
-    .header { text-align: center; margin-bottom: 60px; }
-    .header h1 { font-size: 42px; font-weight: 700; letter-spacing: -1px; margin-bottom: 12px; }
+    .header { text-align: center; margin-bottom: 72px; }
+    .header h1 { font-size: 48px; font-weight: 700; letter-spacing: -1.5px; margin-bottom: 12px; }
     .header h1 span { color: #00D4AA; }
-    .header p { color: #64748B; font-size: 16px; max-width: 500px; margin: 0 auto; }
-    .section { margin-bottom: 60px; }
-    .section h2 { font-size: 14px; font-weight: 600; letter-spacing: 3px; color: #64748B; text-transform: uppercase; margin-bottom: 24px; padding-left: 4px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(540px, 1fr)); gap: 24px; }
-    .card { border-radius: 12px; overflow: hidden; background: #111827; border: 1px solid #1E293B; transition: transform 0.2s, box-shadow 0.2s; }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    .header p { color: #64748B; font-size: 16px; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+    .section { margin-bottom: 72px; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .section-header h2 { font-size: 13px; font-weight: 600; letter-spacing: 3px; color: #94A3B8; text-transform: uppercase; }
+    .section-header .line { flex: 1; height: 1px; background: #1E293B; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap: 20px; }
+    .card { border-radius: 10px; overflow: hidden; background: #111827; border: 1px solid #1E293B; transition: transform 0.2s, box-shadow 0.2s; }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(0,0,0,0.5); }
     .card img { width: 100%; display: block; }
-    .meta { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .meta .info h3 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-    .meta .info p { font-size: 12px; color: #64748B; }
-    .pill { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 1px; border: 1px solid; }
-    .pill.critical { color: #EF4444; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.1); }
-    .pill.high { color: #F97316; border-color: rgba(249,115,22,0.3); background: rgba(249,115,22,0.1); }
-    .pill.medium { color: #FBBF24; border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.1); }
-    .pill.low { color: #00D4AA; border-color: rgba(0,212,170,0.3); background: rgba(0,212,170,0.1); }
-    .pill.info { color: #38BDF8; border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.1); }
-    .pill.guide { color: #94A3B8; border-color: rgba(148,163,184,0.2); background: rgba(148,163,184,0.05); }
+    .meta { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+    .meta .info h3 { font-size: 13px; font-weight: 600; margin-bottom: 1px; color: #E2E8F0; }
+    .meta .info p { font-size: 11px; color: #64748B; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 1px; border: 1px solid; }
+    .pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+    .pill.critical { color: #EF4444; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.08); }
+    .pill.critical::before { background: #EF4444; }
+    .pill.high { color: #F97316; border-color: rgba(249,115,22,0.3); background: rgba(249,115,22,0.08); }
+    .pill.high::before { background: #F97316; }
+    .pill.medium { color: #FBBF24; border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.08); }
+    .pill.medium::before { background: #FBBF24; }
+    .pill.low { color: #00D4AA; border-color: rgba(0,212,170,0.3); background: rgba(0,212,170,0.08); }
+    .pill.low::before { background: #00D4AA; }
+    .pill.info { color: #38BDF8; border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.08); }
+    .pill.info::before { background: #38BDF8; }
+    .pill.guide { color: #00D4AA; border-color: rgba(0,212,170,0.2); background: rgba(0,212,170,0.05); }
+    .pill.guide::before { background: #00D4AA; }
+    .pill.news { color: #F97316; border-color: rgba(249,115,22,0.2); background: rgba(249,115,22,0.05); }
+    .pill.news::before { background: #F97316; }
+    .pill.insight { color: #38BDF8; border-color: rgba(56,189,248,0.2); background: rgba(56,189,248,0.05); }
+    .pill.insight::before { background: #38BDF8; }
+    .pill.analysis { color: #A78BFA; border-color: rgba(167,139,250,0.2); background: rgba(167,139,250,0.05); }
+    .pill.analysis::before { background: #A78BFA; }
+    .divider { margin: 48px 0; display: flex; align-items: center; gap: 16px; }
+    .divider span { font-size: 12px; color: #475569; font-weight: 600; letter-spacing: 2px; }
+    .divider .line { flex: 1; height: 1px; background: linear-gradient(90deg, #1E293B, transparent); }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>Get<span>Cyber</span>Right</h1>
-    <p>Social Card Design System — Scroll to see every severity level and format</p>
+    <p>Social Card Design System — Branded cards and photo-based posts across every severity level and format</p>
   </div>
 
   <div class="section">
-    <h2>Threat Alerts — Severity System</h2>
+    <div class="section-header">
+      <h2>Branded Cards — Threat Alerts</h2>
+      <div class="line"></div>
+    </div>
     <div class="grid">
       <div class="card">
         <img src="1-critical-breach.jpeg" alt="">
@@ -68,7 +89,10 @@
   </div>
 
   <div class="section">
-    <h2>Lower Severity + Informational</h2>
+    <div class="section-header">
+      <h2>Branded Cards — Lower Severity + Educational</h2>
+      <div class="line"></div>
+    </div>
     <div class="grid">
       <div class="card">
         <img src="7-info-privacy.jpeg" alt="">
@@ -84,12 +108,6 @@
           <span class="pill low">LOW RISK</span>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2>Educational Guides</h2>
-    <div class="grid">
       <div class="card">
         <img src="5-guide-family.jpeg" alt="">
         <div class="meta">
@@ -102,6 +120,86 @@
         <div class="meta">
           <div class="info"><h3>Kids Safety — Instagram</h3><p>1080 x 1080 square</p></div>
           <span class="pill guide">GUIDE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider">
+    <div class="line" style="background: linear-gradient(90deg, transparent, #1E293B);"></div>
+    <span>PHOTO-BASED POSTS</span>
+    <div class="line"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>Photo Posts — Alert + News Templates</h2>
+      <div class="line"></div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <img src="photo-1-alert-landscape.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Security Alert on Photo — LinkedIn/FB</h3><p>1200 x 630 landscape</p></div>
+          <span class="pill critical">ALERT</span>
+        </div>
+      </div>
+      <div class="card">
+        <img src="photo-2-news-landscape.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Cyber News on Photo — LinkedIn</h3><p>1200 x 627 landscape</p></div>
+          <span class="pill news">NEWS</span>
+        </div>
+      </div>
+      <div class="card">
+        <img src="photo-4-alert-landscape2.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Ransomware Alert on Photo — FB</h3><p>1200 x 630 landscape</p></div>
+          <span class="pill critical">ALERT</span>
+        </div>
+      </div>
+      <div class="card">
+        <img src="photo-5-insight-landscape.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Insight on Photo — LinkedIn</h3><p>1200 x 627 landscape</p></div>
+          <span class="pill insight">INSIGHT</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>Photo Posts — Tips, Analysis + Square Format</h2>
+      <div class="line"></div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <img src="photo-3-tip-landscape.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Cyber Tip on Photo — LinkedIn/FB</h3><p>1200 x 630 landscape</p></div>
+          <span class="pill guide">TIP</span>
+        </div>
+      </div>
+      <div class="card">
+        <img src="photo-8-analysis-landscape.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Expert Analysis on Photo — LinkedIn</h3><p>1200 x 630 landscape</p></div>
+          <span class="pill analysis">ANALYSIS</span>
+        </div>
+      </div>
+      <div class="card" style="max-width: 540px;">
+        <img src="photo-6-tip-square.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Cyber Tip on Photo — Instagram</h3><p>1080 x 1080 square</p></div>
+          <span class="pill guide">TIP</span>
+        </div>
+      </div>
+      <div class="card" style="max-width: 540px;">
+        <img src="photo-7-news-square.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>News on Photo — Instagram</h3><p>1080 x 1080 square</p></div>
+          <span class="pill news">NEWS</span>
         </div>
       </div>
     </div>

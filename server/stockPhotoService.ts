@@ -554,24 +554,14 @@ export async function applyBrandOverlay(
     const outputPath = path.join(SOCIAL_IMAGES_DIR, filename);
 
     const sharp = (await import("sharp")).default;
-    const fontFamily = "'Inter','DejaVu Sans',Arial,sans-serif";
-
-    const logoPath = path.join(process.cwd(), "client", "public", "lock-logo-transparent.png");
-    let logoBuffer: Buffer | null = null;
-    const logoSize = isSquare ? 36 : 30;
-    if (fs.existsSync(logoPath)) {
-      logoBuffer = await sharp(logoPath)
-        .resize(logoSize, logoSize, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
-        .png()
-        .toBuffer();
-    }
+    const fontFamily = "'SF Pro Display','Inter','Segoe UI',Helvetica,Arial,sans-serif";
 
     const templates: Record<TemplateStyle, { accent: string; accentRgb: string; categoryLabel: string; gradientOpacity: number }> = {
-      alert_card:   { accent: "#EF4444", accentRgb: "239,68,68",  categoryLabel: "SECURITY ALERT",  gradientOpacity: 0.85 },
-      stat_card:    { accent: "#F97316", accentRgb: "249,115,22", categoryLabel: "CYBER NEWS",      gradientOpacity: 0.82 },
-      tip_card:     { accent: "#10B981", accentRgb: "16,185,129", categoryLabel: "CYBER TIP",       gradientOpacity: 0.82 },
-      insight_card: { accent: "#3B82F6", accentRgb: "59,130,246", categoryLabel: "INSIGHT",         gradientOpacity: 0.82 },
-      quote_card:   { accent: "#8B5CF6", accentRgb: "139,92,246", categoryLabel: "ANALYSIS",        gradientOpacity: 0.82 },
+      alert_card:   { accent: "#EF4444", accentRgb: "239,68,68",  categoryLabel: "SECURITY ALERT",  gradientOpacity: 0.92 },
+      stat_card:    { accent: "#F97316", accentRgb: "249,115,22", categoryLabel: "CYBER NEWS",      gradientOpacity: 0.88 },
+      tip_card:     { accent: "#00D4AA", accentRgb: "0,212,170",  categoryLabel: "CYBER TIP",       gradientOpacity: 0.88 },
+      insight_card: { accent: "#38BDF8", accentRgb: "56,189,248", categoryLabel: "INSIGHT",         gradientOpacity: 0.88 },
+      quote_card:   { accent: "#A78BFA", accentRgb: "167,139,250", categoryLabel: "ANALYSIS",       gradientOpacity: 0.88 },
     };
     const tmpl = templates[templateStyle];
 
@@ -579,103 +569,84 @@ export async function applyBrandOverlay(
       .resize(width, height, { fit: "cover", position: "center" })
       .toBuffer();
 
-    const uppercaseHeadline = cleanHeadline.toUpperCase();
-    const maxChars = isSquare ? 18 : 32;
-    let headlineLines = wrapText(uppercaseHeadline, maxChars);
+    const maxChars = isSquare ? 16 : 28;
+    let headlineLines = wrapText(cleanHeadline, maxChars);
     const maxLines = isSquare ? 5 : 3;
     if (headlineLines.length > maxLines) {
       headlineLines = headlineLines.slice(0, maxLines);
       headlineLines[maxLines - 1] = headlineLines[maxLines - 1].slice(0, -3) + "...";
     }
 
-    const padX = isSquare ? 48 : 56;
-    const padBottom = isSquare ? 48 : 40;
+    const padX = isSquare ? 56 : 64;
+    const padBottom = isSquare ? 56 : 48;
 
     const fontSize = isSquare
-      ? (headlineLines.length > 3 ? 40 : headlineLines.length > 2 ? 46 : 52)
-      : (headlineLines.length > 2 ? 36 : 42);
-    const lineHeight = fontSize * 1.2;
-    const categoryFontSize = isSquare ? 13 : 12;
-    const subtextFontSize = isSquare ? 15 : 14;
-    const brandFontSize = isSquare ? 14 : 13;
+      ? (headlineLines.length > 3 ? 42 : headlineLines.length > 2 ? 48 : 56)
+      : (headlineLines.length > 2 ? 38 : 46);
+    const lineHeight = fontSize * 1.25;
 
     const totalHeadlineH = headlineLines.length * lineHeight;
-    const categoryH = categoryFontSize + 16;
-    const subtextH = subtext ? subtextFontSize + 20 : 0;
-    const brandH = brandFontSize + 8;
-    const spacingBetween = 16;
-    const contentH = categoryH + spacingBetween + totalHeadlineH + spacingBetween + subtextH + spacingBetween + brandH;
-    const gradientH = Math.max(contentH + padBottom + 40, Math.round(height * 0.55));
+    const categoryH = 32;
+    const brandH = 20;
+    const spacingBetween = 14;
+    const contentH = categoryH + spacingBetween + totalHeadlineH + spacingBetween * 2 + brandH;
+    const gradientH = Math.max(contentH + padBottom + 60, Math.round(height * 0.6));
 
     const gradientStartY = height - gradientH;
-    const categoryY = height - padBottom - contentH + categoryFontSize;
+    const categoryY = height - padBottom - contentH + 14;
     const headlineStartY = categoryY + categoryH + spacingBetween;
-
-    const importantTerms = ["BREACH", "HACK", "ATTACK", "WARNING", "ALERT", "CRITICAL", "RANSOMWARE", "MALWARE", "SCAM", "FRAUD", "PHISHING", "EXPLOIT", "VULNERABILITY", "ZERO-DAY", "LEAKED", "STOLEN", "EXPOSED", "MILLION", "BILLION", "COMPROMISED", "EMERGENCY", "URGENT", "THREAT", "RISK", "FLAW", "PATCH", "UPDATE", "BLOCKS", "BANS", "DANGEROUS", "INFECTED", "SPYWARE", "TROJAN", "BACKDOOR", "SUPPLY-CHAIN", "DATA", "PRIVACY", "SURVEILLANCE", "DEEPFAKE"];
 
     let headlineSvg = "";
     for (let i = 0; i < headlineLines.length; i++) {
       const y = headlineStartY + i * lineHeight + fontSize * 0.85;
-      const words = headlineLines[i].split(" ");
-      const tspans = words.map(w => {
-        const isAccent = importantTerms.some(t => w.includes(t));
-        return isAccent
-          ? `<tspan fill="${tmpl.accent}" font-weight="800">${escapeXml(w)}</tspan>`
-          : `<tspan>${escapeXml(w)}</tspan>`;
-      }).join(" ");
-      headlineSvg += `<text x="${padX}" y="${y}" font-family="${fontFamily}" font-size="${fontSize}" font-weight="700" fill="white" letter-spacing="0.5">${tspans}</text>`;
+      headlineSvg += `<text x="${padX}" y="${y}" font-family="${fontFamily}" font-size="${fontSize}" font-weight="700" fill="white" letter-spacing="-0.5">${escapeXml(headlineLines[i])}</text>`;
     }
 
-    const subtextY = headlineStartY + totalHeadlineH + spacingBetween + subtextFontSize;
-    const subtextClean = subtext ? escapeXml(subtext.slice(0, 70)) : "";
-
     const brandY = height - padBottom;
-    const accentLineY = brandY - brandFontSize - 16;
+    const dividerY = brandY - 28;
 
-    const categoryBadgeW = tmpl.categoryLabel.length * (categoryFontSize * 0.65) + 24;
+    const categoryPillW = tmpl.categoryLabel.length * 7.5 + 36;
+    const categoryPillH = 24;
+    const dotR = 3.5;
+
+    const topBarSvg = `<rect x="0" y="0" width="${width}" height="4" fill="${tmpl.accent}"/>`;
 
     const overlaySvg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="rgba(0,0,0,0)" />
-      <stop offset="${Math.round((gradientStartY / height) * 100)}%" stop-color="rgba(0,0,0,0)" />
-      <stop offset="${Math.round(((gradientStartY + gradientH * 0.3) / height) * 100)}%" stop-color="rgba(10,15,28,${tmpl.gradientOpacity * 0.6})" />
-      <stop offset="100%" stop-color="rgba(10,15,28,${tmpl.gradientOpacity})" />
+      <stop offset="0%" stop-color="rgba(0,0,0,0)"/>
+      <stop offset="${Math.round((gradientStartY / height) * 100)}%" stop-color="rgba(0,0,0,0)"/>
+      <stop offset="${Math.round(((gradientStartY + gradientH * 0.25) / height) * 100)}%" stop-color="rgba(10,15,26,${tmpl.gradientOpacity * 0.5})"/>
+      <stop offset="100%" stop-color="rgba(10,15,26,${tmpl.gradientOpacity})"/>
     </linearGradient>
   </defs>
 
-  <rect width="${width}" height="${height}" fill="url(#grad)" />
+  <rect width="${width}" height="${height}" fill="url(#grad)"/>
 
-  <rect x="${padX}" y="${categoryY - categoryFontSize}" width="${categoryBadgeW}" height="${categoryFontSize + 10}" rx="3" fill="${tmpl.accent}" />
-  <text x="${padX + categoryBadgeW / 2}" y="${categoryY}" text-anchor="middle" font-family="${fontFamily}" font-size="${categoryFontSize}" font-weight="700" fill="white" letter-spacing="2">${tmpl.categoryLabel}</text>
+  ${topBarSvg}
+
+  <rect x="${padX}" y="${categoryY}" width="${categoryPillW}" height="${categoryPillH}" rx="4" fill="${tmpl.accent}" opacity="0.2"/>
+  <rect x="${padX}" y="${categoryY}" width="${categoryPillW}" height="${categoryPillH}" rx="4" fill="none" stroke="${tmpl.accent}" stroke-width="1.2" opacity="0.7"/>
+  <circle cx="${padX + 14}" cy="${categoryY + categoryPillH / 2}" r="${dotR}" fill="${tmpl.accent}"/>
+  <text x="${padX + 26}" y="${categoryY + categoryPillH / 2 + 4}" font-family="${fontFamily}" font-size="11" font-weight="700" fill="${tmpl.accent}" letter-spacing="1.5">${tmpl.categoryLabel}</text>
 
   ${headlineSvg}
 
-  ${subtextClean ? `<text x="${padX}" y="${subtextY}" font-family="${fontFamily}" font-size="${subtextFontSize}" fill="rgba(255,255,255,0.7)" letter-spacing="0.3">${subtextClean}</text>` : ""}
+  <line x1="${padX}" y1="${dividerY}" x2="${width - padX}" y2="${dividerY}" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
 
-  <rect x="${padX}" y="${accentLineY}" width="${width - padX * 2}" height="1" fill="rgba(255,255,255,0.15)" />
+  <text x="${padX}" y="${brandY}" font-family="${fontFamily}" font-size="16" font-weight="600" fill="rgba(255,255,255,0.9)">GetCyberRight</text>
+  <line x1="${padX + 138}" y1="${brandY - 12}" x2="${padX + 138}" y2="${brandY + 3}" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="${padX + 152}" y="${brandY}" font-family="${fontFamily}" font-size="12" fill="rgba(255,255,255,0.5)">Protecting Families in the Digital World</text>
 
-  <text x="${padX + (logoBuffer ? logoSize + 10 : 0)}" y="${brandY}" font-family="${fontFamily}" font-size="${brandFontSize}" font-weight="600" fill="rgba(255,255,255,0.9)" letter-spacing="1.5">GETCYBERRIGHT</text>
-  <text x="${width - padX}" y="${brandY}" text-anchor="end" font-family="${fontFamily}" font-size="${Math.round(brandFontSize * 0.85)}" fill="rgba(255,255,255,0.5)">getcyberright.com</text>
+  <rect x="${width - padX - 50}" y="${brandY - 10}" width="50" height="3" rx="1.5" fill="${tmpl.accent}" opacity="0.6"/>
 </svg>`;
 
     const overlayBuffer = await sharp(Buffer.from(overlaySvg))
       .png()
       .toBuffer();
 
-    const composites: sharp.OverlayOptions[] = [
-      { input: overlayBuffer, top: 0, left: 0 },
-    ];
-    if (logoBuffer) {
-      composites.push({
-        input: logoBuffer,
-        top: Math.round(brandY - logoSize + 4),
-        left: padX,
-      });
-    }
-
     await sharp(baseImage)
-      .composite(composites)
+      .composite([{ input: overlayBuffer, top: 0, left: 0 }])
       .jpeg({ quality: 95, mozjpeg: true })
       .toFile(outputPath);
 
