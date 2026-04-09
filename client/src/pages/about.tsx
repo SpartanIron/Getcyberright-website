@@ -400,11 +400,11 @@ export default function About() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg text-white">Built by ColorCode Solutions</h3>
-                    <p className="text-sm text-white/40">Website design &amp; development</p>
+                    <p className="text-sm text-white/40">Affiliate partner &amp; development team</p>
                   </div>
                 </div>
                 <p className="text-base text-white/50 leading-relaxed mb-4">
-                  The GetCyberRight platform was designed and built by ColorCode Solutions, a software development company specializing in web applications. GetCyberRight LLC owns and operates the platform, while ColorCode Solutions handles the technical development.
+                  The GetCyberRight platform was designed and built by ColorCode Solutions, an affiliate of GetCyberRight LLC specializing in web application development. ColorCode Solutions handles the technical development as a service to GetCyberRight LLC.
                 </p>
                 <a href="https://colorcodesolutions.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors" data-testid="link-colorcode">
                   Visit ColorCode Solutions <ExternalLink className="w-3.5 h-3.5" />
