@@ -36,8 +36,9 @@ export default function BrowserExtensionPage() {
       applicationCategory: "BrowserExtension",
       operatingSystem: "Chrome",
       description:
-        "Chrome browser extension providing real-time scam detection, phishing alerts, and website safety ratings.",
+        "Chrome browser extension providing real-time scam detection, phishing alerts, and website safety ratings. Uses VirusTotal, PhishTank, Google Safe Browsing, and AI analysis.",
       url: `${BASE_URL}/browser-extension`,
+      installUrl: "https://chromewebstore.google.com/detail/gcr-scam-guard-by-getcybe/naopegeklahanndbpanhienlkaachjhk",
       offers: {
         "@type": "Offer",
         price: "0",
@@ -47,6 +48,11 @@ export default function BrowserExtensionPage() {
         "@type": "Organization",
         name: "GetCyberRight",
         url: BASE_URL,
+        parentOrganization: {
+          "@type": "Organization",
+          name: "ColorCode Solutions",
+          url: "https://colorcodesolutions.com",
+        },
       },
     },
     {

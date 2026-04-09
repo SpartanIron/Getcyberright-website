@@ -7,7 +7,8 @@ import {
   ArrowRight, Shield, Heart, DollarSign, Eye, Users, BookOpen,
   CheckCircle, Globe, Zap, AlertTriangle, Search, Trash2,
   GraduationCap, Lock, ShieldCheck, UserX, Mail, Phone,
-  Landmark, TrendingUp, BadgeAlert, ScanLine, FileText
+  Landmark, TrendingUp, BadgeAlert, ScanLine, FileText,
+  Building2, ExternalLink, Award, ShieldAlert, Code2
 } from "lucide-react";
 import familyTogetherImage from "@/assets/images/about-family-together.webp";
 import seniorsLearningImage from "@/assets/images/about-seniors-learning.webp";
@@ -371,6 +372,81 @@ export default function About() {
                 <p className="text-base text-muted-foreground leading-relaxed">
                   The best way to support GetCyberRight is to share it with someone who needs it. A parent, a grandparent, a friend, a small business. That is how we grow, one person at a time.
                 </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-20 lg:py-24 bg-[#0A2A3C]" aria-labelledby="team-heading">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-10 sm:mb-14">
+              <div className="flex items-center gap-2 mb-4">
+                <Building2 className="w-5 h-5 text-primary" />
+                <span className="text-sm font-semibold text-primary uppercase tracking-wider">Who We Are</span>
+              </div>
+              <h2 id="team-heading" className="text-3xl sm:text-4xl font-bold text-white mb-5" data-testid="text-team-heading">
+                Built by a Real Team. Backed by Real Experience.
+              </h2>
+              <p className="text-lg text-white/50 leading-relaxed">
+                GetCyberRight is not anonymous software from an unknown source. It is built and maintained by a dedicated team with a clear identity and a traceable history.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-10">
+              <div className="bg-white/[0.03] border border-white/10 rounded-xl p-7" data-testid="card-parent-company">
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg text-white">Powered by ColorCode Solutions</h3>
+                    <p className="text-sm text-white/40">Parent company &amp; development team</p>
+                  </div>
+                </div>
+                <p className="text-base text-white/50 leading-relaxed mb-4">
+                  GetCyberRight is developed and maintained by ColorCode Solutions, a registered software development company. Our team combines expertise in web development, cybersecurity, and user experience to build tools that everyday people can actually use.
+                </p>
+                <a href="https://colorcodesolutions.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors" data-testid="link-colorcode">
+                  Visit ColorCode Solutions <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              <div className="bg-white/[0.03] border border-white/10 rounded-xl p-7" data-testid="card-origin-story">
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Heart className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg text-white">Founded on Personal Experience</h3>
+                    <p className="text-sm text-white/40">A family that lived through it</p>
+                  </div>
+                </div>
+                <p className="text-base text-white/50 leading-relaxed">
+                  GetCyberRight was born after our own family experienced account hacking, voice cloning scams, and a phone scam that drained a family member's savings. We built the platform we wished existed when we needed it most: simple, honest, and free to use.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 text-center" data-testid="trust-verifiable">
+                <Award className="w-7 h-7 text-primary mx-auto mb-3" />
+                <h4 className="font-semibold text-white text-sm mb-1">Verified Publisher</h4>
+                <p className="text-xs text-white/40">Registered company with public identity and contact details</p>
+              </div>
+              <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 text-center" data-testid="trust-sources">
+                <ShieldAlert className="w-7 h-7 text-primary mx-auto mb-3" />
+                <h4 className="font-semibold text-white text-sm mb-1">Trusted Data Sources</h4>
+                <p className="text-xs text-white/40">VirusTotal, PhishTank, Google Safe Browsing, CISA, and more</p>
+              </div>
+              <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 text-center" data-testid="trust-privacy">
+                <Lock className="w-7 h-7 text-primary mx-auto mb-3" />
+                <h4 className="font-semibold text-white text-sm mb-1">Privacy-First</h4>
+                <p className="text-xs text-white/40">No data sold, no tracking, clear privacy policy at /privacy</p>
+              </div>
+              <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 text-center" data-testid="trust-standards">
+                <Code2 className="w-7 h-7 text-primary mx-auto mb-3" />
+                <h4 className="font-semibold text-white text-sm mb-1">Security Standards</h4>
+                <p className="text-xs text-white/40">OWASP-aligned development, NIST framework, SSL encrypted</p>
               </div>
             </div>
           </div>
