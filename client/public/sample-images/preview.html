@@ -1,82 +1,108 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Social Post Image Samples</title>
+  <title>GetCyberRight — Social Card System</title>
   <style>
-    body { background: #111; color: #fff; font-family: system-ui, sans-serif; padding: 40px; margin: 0; }
-    h1 { text-align: center; margin-bottom: 40px; font-size: 28px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; }
-    .card { background: #1a1a1a; border-radius: 12px; overflow: hidden; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #060911; color: #fff; font-family: -apple-system, 'SF Pro Display', 'Inter', 'Segoe UI', sans-serif; padding: 60px 40px; }
+    .header { text-align: center; margin-bottom: 60px; }
+    .header h1 { font-size: 42px; font-weight: 700; letter-spacing: -1px; margin-bottom: 12px; }
+    .header h1 span { color: #00D4AA; }
+    .header p { color: #64748B; font-size: 16px; max-width: 500px; margin: 0 auto; }
+    .section { margin-bottom: 60px; }
+    .section h2 { font-size: 14px; font-weight: 600; letter-spacing: 3px; color: #64748B; text-transform: uppercase; margin-bottom: 24px; padding-left: 4px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(540px, 1fr)); gap: 24px; }
+    .card { border-radius: 12px; overflow: hidden; background: #111827; border: 1px solid #1E293B; transition: transform 0.2s, box-shadow 0.2s; }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
     .card img { width: 100%; display: block; }
-    .card .label { padding: 16px; }
-    .card .label h3 { margin: 0 0 4px; font-size: 16px; }
-    .card .label p { margin: 0; color: #888; font-size: 13px; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-right: 8px; }
-    .critical { background: #FF2D2D; }
-    .high { background: #FF6B35; }
-    .medium { background: #F7B731; color: #000; }
-    .low { background: #4ECDC4; color: #000; }
-    .info { background: #1A8A8A; }
-    .default { background: #444; }
+    .meta { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .meta .info h3 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .meta .info p { font-size: 12px; color: #64748B; }
+    .pill { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 1px; border: 1px solid; }
+    .pill.critical { color: #EF4444; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.1); }
+    .pill.high { color: #F97316; border-color: rgba(249,115,22,0.3); background: rgba(249,115,22,0.1); }
+    .pill.medium { color: #FBBF24; border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.1); }
+    .pill.low { color: #00D4AA; border-color: rgba(0,212,170,0.3); background: rgba(0,212,170,0.1); }
+    .pill.info { color: #38BDF8; border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.1); }
+    .pill.guide { color: #94A3B8; border-color: rgba(148,163,184,0.2); background: rgba(148,163,184,0.05); }
   </style>
 </head>
 <body>
-  <h1>GetCyberRight Social Post Image Samples</h1>
-  <div class="grid">
-    <div class="card">
-      <img src="1-critical-breach.jpeg" alt="Critical breach">
-      <div class="label">
-        <h3><span class="badge critical">CRITICAL</span> Data Breach Alert</h3>
-        <p>LinkedIn / Facebook landscape (1200x630)</p>
+  <div class="header">
+    <h1>Get<span>Cyber</span>Right</h1>
+    <p>Social Card Design System — Scroll to see every severity level and format</p>
+  </div>
+
+  <div class="section">
+    <h2>Threat Alerts — Severity System</h2>
+    <div class="grid">
+      <div class="card">
+        <img src="1-critical-breach.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Critical Threat — LinkedIn</h3><p>1200 x 627 landscape</p></div>
+          <span class="pill critical">CRITICAL</span>
+        </div>
+      </div>
+      <div class="card">
+        <img src="2-high-phishing.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>High Risk — LinkedIn</h3><p>1200 x 627 landscape</p></div>
+          <span class="pill high">HIGH RISK</span>
+        </div>
+      </div>
+      <div class="card">
+        <img src="3-critical-ransomware.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Critical Threat — Facebook</h3><p>1200 x 630 landscape</p></div>
+          <span class="pill critical">CRITICAL</span>
+        </div>
+      </div>
+      <div class="card">
+        <img src="4-medium-password.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Moderate — LinkedIn</h3><p>1200 x 627 landscape</p></div>
+          <span class="pill medium">MODERATE</span>
+        </div>
       </div>
     </div>
-    <div class="card">
-      <img src="2-high-phishing.jpeg" alt="High phishing">
-      <div class="label">
-        <h3><span class="badge high">HIGH RISK</span> Phishing Scam Alert</h3>
-        <p>LinkedIn landscape (1200x627)</p>
+  </div>
+
+  <div class="section">
+    <h2>Lower Severity + Informational</h2>
+    <div class="grid">
+      <div class="card">
+        <img src="7-info-privacy.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Advisory — LinkedIn</h3><p>1200 x 627 landscape</p></div>
+          <span class="pill info">ADVISORY</span>
+        </div>
+      </div>
+      <div class="card">
+        <img src="8-low-identity.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Low Risk — Facebook</h3><p>1200 x 630 landscape</p></div>
+          <span class="pill low">LOW RISK</span>
+        </div>
       </div>
     </div>
-    <div class="card">
-      <img src="3-critical-ransomware.jpeg" alt="Critical ransomware">
-      <div class="label">
-        <h3><span class="badge critical">CRITICAL</span> Ransomware Alert</h3>
-        <p>Facebook landscape (1200x630)</p>
+  </div>
+
+  <div class="section">
+    <h2>Educational Guides</h2>
+    <div class="grid">
+      <div class="card">
+        <img src="5-guide-family.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Family Guide — LinkedIn</h3><p>1200 x 627 landscape</p></div>
+          <span class="pill guide">GUIDE</span>
+        </div>
       </div>
-    </div>
-    <div class="card">
-      <img src="4-medium-password.jpeg" alt="Medium password">
-      <div class="label">
-        <h3><span class="badge medium">MODERATE</span> Vulnerability Advisory</h3>
-        <p>LinkedIn landscape (1200x627)</p>
-      </div>
-    </div>
-    <div class="card">
-      <img src="5-guide-family.jpeg" alt="Family guide">
-      <div class="label">
-        <h3><span class="badge default">GUIDE</span> Family Safety Guide</h3>
-        <p>LinkedIn landscape — no severity badge (educational)</p>
-      </div>
-    </div>
-    <div class="card">
-      <img src="6-guide-kids-ig.jpeg" alt="Kids guide instagram">
-      <div class="label">
-        <h3><span class="badge default">GUIDE</span> Kids Safety — Instagram</h3>
-        <p>Instagram square (1080x1080) — centered logo</p>
-      </div>
-    </div>
-    <div class="card">
-      <img src="7-info-privacy.jpeg" alt="Info privacy">
-      <div class="label">
-        <h3><span class="badge info">ADVISORY</span> Privacy Law Update</h3>
-        <p>LinkedIn landscape — teal accent for informational</p>
-      </div>
-    </div>
-    <div class="card">
-      <img src="8-low-identity.jpeg" alt="Low identity">
-      <div class="label">
-        <h3><span class="badge low">LOW RISK</span> Identity Theft News</h3>
-        <p>Facebook landscape — calm teal for resolved/low risk</p>
+      <div class="card" style="max-width: 540px;">
+        <img src="6-guide-kids-ig.jpeg" alt="">
+        <div class="meta">
+          <div class="info"><h3>Kids Safety — Instagram</h3><p>1080 x 1080 square</p></div>
+          <span class="pill guide">GUIDE</span>
+        </div>
       </div>
     </div>
   </div>
