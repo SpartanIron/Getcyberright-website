@@ -204,6 +204,17 @@ function buildLandscapeSvg(
 </svg>`;
 }
 
+function buildSeverityBadgeSvg(
+  width: number,
+  badgeColor: string,
+  badgeLabel: string
+): string {
+  const textWidth = badgeLabel.length * 10 + 24;
+  const badgeX = width - textWidth - 20;
+  return `<rect x="${badgeX}" y="12" width="${textWidth}" height="30" rx="4" fill="${badgeColor}"/>
+  <text x="${badgeX + textWidth / 2}" y="33" font-family="'Segoe UI',Arial,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">${badgeLabel}</text>`;
+}
+
 function buildSquareSvg(
   width: number,
   height: number,
@@ -290,10 +301,26 @@ async function getLogoPngBuffer(size: number): Promise<Buffer | null> {
   }
 }
 
+const SEVERITY_COLORS: Record<string, { accent: string; badge: string; label: string }> = {
+  critical: { accent: "#FF2D2D", badge: "#FF2D2D", label: "CRITICAL" },
+  high: { accent: "#FF6B35", badge: "#FF6B35", label: "HIGH RISK" },
+  medium: { accent: "#F7B731", badge: "#F7B731", label: "MODERATE" },
+  low: { accent: "#4ECDC4", badge: "#4ECDC4", label: "LOW RISK" },
+  info: { accent: "#1A8A8A", badge: "#1A8A8A", label: "ADVISORY" },
+};
+
+function getSeverityOverrides(severity?: string): Partial<TopicConfig> & { badge?: string; badgeLabel?: string } {
+  if (!severity) return {};
+  const sev = SEVERITY_COLORS[severity.toLowerCase()];
+  if (!sev) return {};
+  return { accent: sev.accent, badge: sev.badge, badgeLabel: sev.label };
+}
+
 export async function generateBrandedImage(
   title: string,
   contentType: string,
-  platform: string
+  platform: string,
+  severity?: string
 ): Promise<string | null> {
   try {
     ensureDir();
@@ -301,12 +328,19 @@ export async function generateBrandedImage(
     const cleanTitle = title.replace(/\[.*?\]\s*/g, "").trim();
     const dims = PLATFORM_DIMENSIONS[platform] || PLATFORM_DIMENSIONS.facebook;
     const topic = detectTopic(cleanTitle, contentType);
-    const config = TOPIC_CONFIG[topic] || TOPIC_CONFIG.default;
+    const baseConfig = TOPIC_CONFIG[topic] || TOPIC_CONFIG.default;
+    const severityOverrides = getSeverityOverrides(severity);
+    const config = { ...baseConfig, ...(severityOverrides.accent ? { accent: severityOverrides.accent } : {}) };
     const isSquare = platform === "instagram";
 
-    const svg = isSquare
+    let svg = isSquare
       ? buildSquareSvg(dims.width, dims.height, cleanTitle, config)
       : buildLandscapeSvg(dims.width, dims.height, cleanTitle, config);
+
+    if (severityOverrides.badge && severityOverrides.badgeLabel) {
+      const badgeSvg = buildSeverityBadgeSvg(dims.width, severityOverrides.badge, severityOverrides.badgeLabel);
+      svg = svg.replace("</svg>", `${badgeSvg}\n</svg>`);
+    }
 
     const logoSize = isSquare ? 90 : 75;
     const logoBuffer = await getLogoPngBuffer(logoSize);
@@ -328,7 +362,7 @@ export async function generateBrandedImage(
       }
     }
 
-    const hash = crypto.createHash("md5").update(title + platform + "v3").digest("hex").substring(0, 12);
+    const hash = crypto.createHash("md5").update(title + platform + (severity || "") + "v4").digest("hex").substring(0, 12);
     const filename = `social-${platform}-${hash}.jpeg`;
     const filepath = path.join(SOCIAL_IMAGES_DIR, filename);
 

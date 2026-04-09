@@ -23,7 +23,7 @@ interface ParsedAlert {
 class SecurityAlertFetcher {
   private isRunning = false;
   private refreshInterval: NodeJS.Timeout | null = null;
-  private readonly REFRESH_INTERVAL = 6 * 60 * 60 * 1000;
+  private readonly REFRESH_INTERVAL = 30 * 60 * 1000;
   
   private readonly alertFeeds: AlertFeed[] = [
     { url: "https://www.cisa.gov/cybersecurity-advisories/all.xml", name: "CISA Advisories", category: "advisory" },
@@ -32,7 +32,7 @@ class SecurityAlertFetcher {
   ];
 
   startScheduler(): void {
-    console.log("[SecurityAlertFetcher] Starting scheduler (every 6 hours)");
+    console.log("[SecurityAlertFetcher] Starting scheduler (every 30 minutes)");
     this.fetchAlerts();
     this.refreshInterval = setInterval(() => {
       this.fetchAlerts();

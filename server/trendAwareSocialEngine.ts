@@ -718,6 +718,14 @@ async function generateTrendAwarePost(
   sourceCredibility: { tier1Count: number; tier2Count: number; tier3Count: number; highestTier: 1 | 2 | 3 }
 ): Promise<TrendAwarePostResult | null> {
   const newsSlice = trendingNews.slice(0, 8);
+  const storyClusters = clusterStories(newsSlice);
+  const clusterAnnotations = storyClusters
+    .filter(c => c.sourceCount >= 2)
+    .map(c => `"${c.lead.title.slice(0, 60)}" — reported by ${c.sourceCount} sources (highest credibility: Tier ${c.highestTier})`)
+    .join("\n");
+  const clusterContext = clusterAnnotations
+    ? `\nDEVELOPING STORIES (multiple sources reporting — prioritize these):\n${clusterAnnotations}\n`
+    : "";
   const newsContext = newsSlice
     .map((item, i) => {
       const tier = getSourceTier(item.source);
@@ -961,7 +969,7 @@ ${styleInstructions[postStyle]}
 
 CURRENT CYBERSECURITY NEWS FEED (with source credibility tiers):
 ${newsContext}
-${sourceValidationContext}
+${clusterContext}${sourceValidationContext}
 
 GETCYBERRIGHT CONTENT (link to the most relevant page in your CTA):
 
@@ -1388,6 +1396,63 @@ async function resolvePostImage(
   return { mainImage, igImage, imageSource: "branded" };
 }
 
+
+interface StoryCluster {
+  lead: RawFeedItem;
+  related: RawFeedItem[];
+  sourceCount: number;
+  highestTier: 1 | 2 | 3;
+  keywords: string[];
+}
+
+function clusterStories(news: RawFeedItem[]): StoryCluster[] {
+  const clusters: StoryCluster[] = [];
+
+  for (const item of news) {
+    const itemWords = new Set(
+      normalizeTitle(item.title)
+        .split(" ")
+        .filter(w => w.length > 3)
+    );
+
+    let merged = false;
+    for (const cluster of clusters) {
+      const clusterWords = new Set(cluster.keywords);
+      let overlap = 0;
+      for (const w of itemWords) {
+        if (clusterWords.has(w)) overlap++;
+      }
+      const similarity = itemWords.size > 0
+        ? overlap / Math.min(itemWords.size, clusterWords.size)
+        : 0;
+
+      if (similarity >= 0.4) {
+        cluster.related.push(item);
+        cluster.sourceCount++;
+        const tier = getSourceTier(item.source);
+        if (tier < cluster.highestTier) cluster.highestTier = tier;
+        for (const w of itemWords) cluster.keywords.push(w);
+        merged = true;
+        break;
+      }
+    }
+
+    if (!merged) {
+      clusters.push({
+        lead: item,
+        related: [],
+        sourceCount: 1,
+        highestTier: getSourceTier(item.source),
+        keywords: [...itemWords],
+      });
+    }
+  }
+
+  return clusters.sort((a, b) => {
+    if (a.highestTier !== b.highestTier) return a.highestTier - b.highestTier;
+    return b.sourceCount - a.sourceCount;
+  });
+}
 
 function normalizeTitle(title: string): string {
   return title
@@ -1871,6 +1936,12 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     if (trendingNews.length === 0) {
       console.warn("[TrendEngine] No trending news available");
       return result;
+    }
+
+    const clusters = clusterStories(trendingNews);
+    const multiSourceClusters = clusters.filter(c => c.sourceCount >= 2);
+    if (multiSourceClusters.length > 0) {
+      console.log(`[TrendEngine] Story clusters: ${clusters.length} total, ${multiSourceClusters.length} multi-source (${multiSourceClusters.map(c => `"${c.lead.title.slice(0, 40)}..." [${c.sourceCount} sources]`).join(", ")})`);
     }
 
     const sourceCredibility = assessSourceCredibility(trendingNews);

@@ -3,6 +3,7 @@ import { runContentAutomationBatch, getContentAutomationStats, optimizeGuideInte
 import { distributeGuideContent, distributeThreatAlertContent, getSocialDistributionStats } from "./socialDistributionService";
 import { isBufferConfigured, publishAllDraftsViaBuffer } from "./bufferPublisher";
 import { generateAndPublishTrendAwarePosts, isWithinAnyPostingWindow } from "./trendAwareSocialEngine";
+import { checkAndGenerateSeriesPosts } from "./contentSeriesEngine";
 import type { InsertGrowthTask } from "@shared/schema";
 
 const TASK_TYPES = {
@@ -427,6 +428,54 @@ function selectContentTier(counts: { reactive: number; guide: number; newsEditor
   return "reactive";
 }
 
+async function checkBreakingNews(): Promise<void> {
+  if (!isBufferConfigured()) return;
+
+  try {
+    const recentAlerts = await storage.getPublishedThreatAlerts(undefined, 10);
+    const oneHourAgo = Date.now() - 60 * 60 * 1000;
+
+    for (const alert of recentAlerts) {
+      const alertTime = new Date(alert.publishedAt || alert.dateDetected).getTime();
+      if (alertTime < oneHourAgo) continue;
+
+      const severity = (alert.riskLevel || "").toLowerCase();
+      if (severity !== "critical" && severity !== "high") continue;
+
+      const existingPosts = await storage.getSocialPostsByContentId("threat_alert", alert.id);
+      if (existingPosts.length > 0) continue;
+
+      console.log(`[BreakingNews] Critical alert detected: "${alert.threatName}" (${severity}). Publishing bonus post.`);
+
+      try {
+        const { distributeThreatAlertContent } = await import("./socialDistributionService");
+        await distributeThreatAlertContent(alert);
+
+        const breakingDrafts = await storage.getSocialPosts("draft", 20);
+        const alertDrafts = breakingDrafts.filter(d =>
+          d.contentType === "threat_alert" && d.contentId === alert.id
+        );
+
+        if (alertDrafts.length > 0) {
+          const { publishPostViaBuffer } = await import("./bufferPublisher");
+          for (const draft of alertDrafts) {
+            try {
+              await publishPostViaBuffer(draft.id);
+            } catch (pubErr: any) {
+              console.warn(`[BreakingNews] Failed to publish ${draft.platform} draft: ${pubErr.message}`);
+            }
+          }
+          console.log(`[BreakingNews] Breaking news published for: "${alert.threatName}" (${alertDrafts.length} posts)`);
+        }
+      } catch (err: any) {
+        console.error(`[BreakingNews] Failed to publish breaking news: ${err.message}`);
+      }
+    }
+  } catch (error: any) {
+    console.error(`[BreakingNews] Check failed: ${error.message}`);
+  }
+}
+
 async function dailySocialPublish(): Promise<void> {
   if (!isBufferConfigured()) return;
 
@@ -543,6 +592,16 @@ export function startGrowthOrchestrator(): void {
       await processPendingTasks();
     } catch (error) {
       console.error("[GrowthOrchestrator] Periodic run error:", error);
+    }
+    try {
+      await checkBreakingNews();
+    } catch (error) {
+      console.error("[GrowthOrchestrator] Breaking news check error:", error);
+    }
+    try {
+      await checkAndGenerateSeriesPosts();
+    } catch (error) {
+      console.error("[GrowthOrchestrator] Content series check error:", error);
     }
     try {
       await dailySocialPublish();

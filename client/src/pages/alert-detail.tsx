@@ -32,10 +32,12 @@ interface AlertDetail {
   relatedGuideSlugs: string[];
 }
 
-const riskConfig: Record<string, { bg: string; icon: string; border: string }> = {
-  high: { bg: "bg-red-500/20", icon: "text-red-400", border: "border-red-500" },
-  medium: { bg: "bg-orange-500/20", icon: "text-orange-400", border: "border-orange-500" },
-  low: { bg: "bg-green-500/20", icon: "text-green-400", border: "border-green-500" },
+const riskConfig: Record<string, { bg: string; icon: string; border: string; label: string; pulse: boolean }> = {
+  critical: { bg: "bg-red-600/25", icon: "text-red-400", border: "border-red-600", label: "CRITICAL", pulse: true },
+  high: { bg: "bg-red-500/20", icon: "text-red-400", border: "border-red-500", label: "HIGH RISK", pulse: false },
+  medium: { bg: "bg-orange-500/20", icon: "text-orange-400", border: "border-orange-500", label: "MODERATE", pulse: false },
+  low: { bg: "bg-green-500/20", icon: "text-green-400", border: "border-green-500", label: "LOW RISK", pulse: false },
+  info: { bg: "bg-blue-500/20", icon: "text-blue-400", border: "border-blue-500", label: "ADVISORY", pulse: false },
 };
 
 export default function AlertDetailPage() {
@@ -127,8 +129,9 @@ export default function AlertDetailPage() {
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <Badge className={`${alert.riskLevel === "high" ? "bg-red-600" : alert.riskLevel === "medium" ? "bg-orange-600" : "bg-green-600"} text-white`}>
-                  {alert.riskLevel?.toUpperCase()} RISK
+                <Badge className={`${risk.bg} ${risk.icon} border ${risk.border} font-bold text-xs tracking-wider`} data-testid="badge-risk-level">
+                  {risk.pulse && <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse mr-1.5" />}
+                  {risk.label}
                 </Badge>
                 {alert.threatCategory && <Badge variant="outline" className="border-white/20 text-white/70">{alert.threatCategory}</Badge>}
               </div>
@@ -138,6 +141,11 @@ export default function AlertDetailPage() {
                   <Calendar className="h-4 w-4" />
                   {new Date(alert.publishedAt || alert.dateDetected).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                 </span>
+                {alert.updatedAt && alert.updatedAt !== alert.publishedAt && (
+                  <span className="flex items-center gap-1 text-amber-400/80" data-testid="text-last-updated">
+                    Updated {new Date(alert.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </span>
+                )}
                 {alert.regions?.length > 0 && (
                   <span className="flex items-center gap-1">
                     <Globe className="h-4 w-4" />
@@ -197,8 +205,14 @@ export default function AlertDetailPage() {
               <section id="analysis" className="scroll-mt-20">
                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                   <Shield className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-                  Detailed Analysis
+                  Expert Analysis
                 </h2>
+                <Card className="border-l-4 border-l-teal-500 bg-teal-50/50 dark:bg-teal-950/20 mb-4" data-testid="card-analysis-callout">
+                  <CardContent className="pt-4 pb-4">
+                    <p className="text-sm font-medium text-teal-700 dark:text-teal-300 mb-1">GetCyberRight Analyst Assessment</p>
+                    <p className="text-sm text-muted-foreground">This analysis was prepared by our security team based on verified threat intelligence and official sources.</p>
+                  </CardContent>
+                </Card>
                 <div className="prose prose-slate dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(alert.detailedAnalysis || "") }} />
               </section>
             )}
