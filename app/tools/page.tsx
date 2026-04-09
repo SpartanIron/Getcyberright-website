@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import PageContent from "@/pages/tools";
 
@@ -28,7 +27,9 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-export default function ToolsPage() {
+export default async function ToolsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const params = await searchParams;
+  const tab = typeof params.tab === "string" ? params.tab : undefined;
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -105,9 +106,7 @@ export default function ToolsPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <Suspense>
-        <PageContent />
-      </Suspense>
+      <PageContent tab={tab} />
     </>
   );
 }

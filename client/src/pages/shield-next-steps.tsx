@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Link, useSearch } from "@/lib/navigation";
+import { Link } from "@/lib/navigation";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -280,11 +280,8 @@ function setStoredChecks(level: ExposureLevel, checks: Record<string, boolean>) 
   } catch {}
 }
 
-export default function ShieldNextSteps() {
-  const searchString = useSearch();
-  const params = new URLSearchParams(searchString);
-  const levelParam = params.get("level") as ExposureLevel | null;
-  const level: ExposureLevel = levelParam && levelParam in LEVEL_CONFIG ? levelParam : "high";
+export default function ShieldNextSteps({ level: levelParam }: { level?: string }) {
+  const level: ExposureLevel = levelParam && levelParam in LEVEL_CONFIG ? (levelParam as ExposureLevel) : "high";
 
   const config = LEVEL_CONFIG[level];
   const steps = ACTION_STEPS[level];

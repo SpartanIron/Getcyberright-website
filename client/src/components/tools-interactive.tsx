@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link, useSearch } from "@/lib/navigation";
+import { Link } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,11 +43,7 @@ const dataShieldTools = [
   { title: "Child Safety Scanner", description: "Check if websites, apps, and online services are safe for your children. Designed for parents and guardians.", href: "/parents/child-safety-scanner", icon: Baby, badge: "Free" },
 ];
 
-export function ToolsInteractive() {
-  const searchString = useSearch();
-  const params = new URLSearchParams(searchString);
-  const tabParam = params.get("tab");
-
+export function ToolsInteractive({ tab: tabParam }: { tab?: string }) {
   const [activeProduct, setActiveProduct] = useState<"scam-guard" | "data-shield">("scam-guard");
   const [inlineTool, setInlineTool] = useState<"scanner" | "password" | "voice-clone">("scanner");
   const [showAllScamGuard, setShowAllScamGuard] = useState(false);

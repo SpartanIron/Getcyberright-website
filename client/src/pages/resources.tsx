@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { StructuredData } from "@/components/structured-data";
 import type { BreadcrumbData } from "@/components/structured-data";
 import { ResourcesContent } from "@/components/resources-content";
@@ -11,13 +10,11 @@ const breadcrumbs: BreadcrumbData = {
   ],
 };
 
-export default function Resources() {
+export default function Resources({ category, type }: { category?: string; type?: string }) {
   return (
     <>
       <StructuredData data={breadcrumbs} />
-      <Suspense>
-        <ResourcesContent />
-      </Suspense>
+      <ResourcesContent category={category} type={type} />
     </>
   );
 }

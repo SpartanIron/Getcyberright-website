@@ -9,7 +9,6 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Newsletter } from "@/components/newsletter";
 import { PageBanner } from "@/components/page-banner";
-import { useSearch } from "@/lib/navigation";
 import { 
   ArrowRight, 
   Clock, 
@@ -691,12 +690,7 @@ const typeLabels: Record<ResourceType, string> = {
 
 const resourceTypes: ResourceType[] = ["guide", "video", "checklist"];
 
-export function ResourcesContent() {
-  const searchString = useSearch();
-  const params = new URLSearchParams(searchString);
-  const categoryParam = params.get("category");
-  const typeParam = params.get("type") as ResourceType | null;
-  
+export function ResourcesContent({ category: categoryParam, type: typeParam }: { category?: string; type?: string }) {
   const getInitialCategory = () => {
     if (!categoryParam) return "All";
     const mappedCategory = categoryMapping[categoryParam.toLowerCase()];
@@ -707,7 +701,7 @@ export function ResourcesContent() {
 
   const getInitialType = (): ResourceType | "All" => {
     if (!typeParam) return "All";
-    if (resourceTypes.includes(typeParam)) return typeParam;
+    if (resourceTypes.includes(typeParam as ResourceType)) return typeParam as ResourceType;
     return "All";
   };
 
@@ -724,7 +718,7 @@ export function ResourcesContent() {
     if (newType !== selectedType) {
       setSelectedType(newType);
     }
-  }, [searchString]);
+  }, [categoryParam, typeParam]);
 
   const filteredResources = resources.filter(r => {
     const categoryMatch = selectedCategory === "All" || r.category === selectedCategory;

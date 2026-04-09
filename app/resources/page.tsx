@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import PageContent from "@/pages/resources";
 
@@ -20,10 +19,9 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-export default function ResourcesPage() {
-  return (
-    <Suspense>
-      <PageContent />
-    </Suspense>
-  );
+export default async function ResourcesPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const params = await searchParams;
+  const category = typeof params.category === "string" ? params.category : undefined;
+  const type = typeof params.type === "string" ? params.type : undefined;
+  return <PageContent category={category} type={type} />;
 }
