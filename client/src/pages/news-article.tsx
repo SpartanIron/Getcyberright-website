@@ -5,7 +5,7 @@ import { useRoute, Link } from "@/lib/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Clock, ExternalLink, Shield, AlertTriangle, Loader2 } from "lucide-react";
+import { ArrowLeft, Clock, ExternalLink, Shield, AlertTriangle, Loader2, User } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { FadeIn } from "@/components/fade-in";
@@ -25,15 +25,23 @@ interface NewsArticleData {
  urgencyLevel: number;
  relatedToolUrl: string | null;
  relatedToolName: string | null;
+ author: string | null;
+ authorRole: string | null;
  publishedAt: string;
  readTime: number;
 }
+
+const AUTHOR_BIOS: Record<string, string> = {
+ "Jude Annan, CISM": "Jude Annan is a Certified Information Security Manager (CISM) and the founder of GetCyberRight, a platform dedicated to making cybersecurity accessible for families, parents, and everyday people. With years of experience in information security and a passion for closing the knowledge gap between the security industry and the public, Jude translates complex threats into clear, actionable guidance.",
+ "GCR Editorial Team": "The GetCyberRight Editorial Team curates educational content, learning resources, and practical guides to help families build cybersecurity skills and stay informed about digital safety.",
+};
 
 function getCategoryColor(category: string): string {
  switch (category) {
  case "Cybersecurity": return "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20";
  case "AI": return "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20";
  case "Tech": return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
+ case "Learning": return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
  default: return "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20";
  }
 }
@@ -102,7 +110,7 @@ export default function NewsArticlePage() {
  </div>
  {latestArticles && latestArticles.length > 0 && (
  <div className="w-full max-w-2xl space-y-3">
- <h2 className="text-lg font-semibold text-center" data-testid="text-latest-heading">Latest News</h2>
+ <h2 className="text-lg font-semibold text-center" data-testid="text-latest-heading">Latest News & Insights</h2>
  {latestArticles.map((a) => (
  <Link key={a.id} href={`/news/${a.slug}`}>
  <Card className="hover:border-primary/30 transition-colors cursor-pointer" data-testid={`card-fallback-article-${a.id}`}>
@@ -123,7 +131,7 @@ export default function NewsArticlePage() {
  <Link href="/news">
  <Button variant="outline" data-testid="link-back-to-news">
  <ArrowLeft className="h-4 w-4 mr-2" />
- Browse All News
+ Browse All News & Insights
  </Button>
  </Link>
  </div>
@@ -144,7 +152,7 @@ export default function NewsArticlePage() {
  <Link href="/news">
  <Button variant="ghost" className="mb-6 text-muted-foreground hover:text-foreground" data-testid="link-back-to-news">
  <ArrowLeft className="h-4 w-4 mr-2" />
- Back to News
+ Back to News & Insights
  </Button>
  </Link>
  </FadeIn>
@@ -184,7 +192,16 @@ export default function NewsArticlePage() {
  {article.title}
  </h1>
 
- <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
+ <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-2">
+ {article.author && (
+ <>
+ <span className="flex items-center gap-1.5" data-testid="text-article-author">
+ <User className="h-3.5 w-3.5" />
+ {article.author}
+ </span>
+ <span>•</span>
+ </>
+ )}
  <span data-testid="text-article-date">{formatDate(article.publishedAt)}</span>
  <span>•</span>
  <span data-testid="text-article-source">Source: {article.source}</span>
@@ -231,9 +248,28 @@ export default function NewsArticlePage() {
  </Card>
  )}
 
+ {article.author && AUTHOR_BIOS[article.author] && (
+ <Card className="border-muted bg-muted/30" data-testid="card-author-bio">
+ <CardContent className="p-5">
+ <div className="flex items-start gap-4">
+ <div className="w-10 h-10 rounded-full bg-[var(--cyber-blue)]/10 flex items-center justify-center flex-shrink-0">
+ <User className="h-5 w-5 text-[var(--cyber-blue)]" />
+ </div>
+ <div>
+ <p className="font-semibold text-sm" data-testid="text-author-name">{article.author}</p>
+ {article.authorRole && (
+ <p className="text-xs text-[var(--cyber-blue)] mb-2" data-testid="text-author-role">{article.authorRole}</p>
+ )}
+ <p className="text-sm text-muted-foreground leading-relaxed">{AUTHOR_BIOS[article.author]}</p>
+ </div>
+ </div>
+ </CardContent>
+ </Card>
+ )}
+
  <div className="flex items-center justify-between pt-4 border-t">
  <p className="text-xs text-muted-foreground">
- Curated from trusted cybersecurity sources, simplified by Dezi AI
+ Curated from trusted cybersecurity sources by GetCyberRight
  </p>
  <a
  href={article.sourceUrl}

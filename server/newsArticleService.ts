@@ -421,6 +421,7 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
     const resolvedImage = rawImage?.replace(/^http:\/\//i, 'https://') || null;
 
     try {
+      const isLearning = category === "Learning" || (article.familyTitle || feedItem.title).toLowerCase().includes("training") || (article.familyTitle || feedItem.title).toLowerCase().includes("certification");
       const stored = await storage.createNewsArticle({
         title: article.familyTitle || feedItem.title,
         slug,
@@ -435,6 +436,8 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
         urgencyLevel: urgency,
         relatedToolUrl: relatedTool?.url || null,
         relatedToolName: relatedTool?.name || null,
+        author: isLearning ? "GCR Editorial Team" : "Jude Annan, CISM",
+        authorRole: isLearning ? "Education & Awareness" : "Founder & Chief Security Strategist",
         publishedAt: feedItem.pubDate ? new Date(feedItem.pubDate) : new Date(),
       });
       created++;

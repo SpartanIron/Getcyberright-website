@@ -6085,6 +6085,7 @@ BEHAVIORAL CONSTRAINTS
         "action-needed": "Action Needed",
         breaking: "Action Needed",
         safety: "Cybersecurity",
+        learning: "Learning",
       };
       const category = categoryMap[req.params.category.toLowerCase()] || req.params.category;
       const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
@@ -6246,6 +6247,8 @@ BEHAVIORAL CONSTRAINTS
         urgencyLevel: article.urgencyLevel,
         relatedToolUrl: article.relatedToolUrl,
         relatedToolName: article.relatedToolName,
+        author: article.author || "Jude Annan, CISM",
+        authorRole: article.authorRole || "Founder & Chief Security Strategist",
         publishedAt: article.publishedAt?.toISOString() || new Date().toISOString(),
         readTime: article.content ? Math.ceil(article.content.split(/\s+/).length / 200) : 2,
       });

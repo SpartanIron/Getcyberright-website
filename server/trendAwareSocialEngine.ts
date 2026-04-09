@@ -2027,6 +2027,10 @@ Output as JSON:
       ? (posts.gcrToolReference.url.startsWith("http") ? posts.gcrToolReference.url : `https://www.getcyberright.com${posts.gcrToolReference.url}`)
       : null;
 
+    const isLearningContent = posts.contentMode === "learning_opportunity";
+    const articleAuthor = isLearningContent ? "GCR Editorial Team" : "Jude Annan, CISM";
+    const articleAuthorRole = isLearningContent ? "Education & Awareness" : "Founder & Chief Security Strategist";
+
     const articleData: InsertNewsArticle = {
       title: parsed.title.slice(0, 200),
       slug,
@@ -2041,6 +2045,8 @@ Output as JSON:
       urgencyLevel: urgencyMap[posts.trendAnalysis.urgency_score] || 2,
       relatedToolUrl,
       relatedToolName: posts.gcrToolReference?.tool_name || null,
+      author: articleAuthor,
+      authorRole: articleAuthorRole,
       publishedAt: new Date(),
     };
 

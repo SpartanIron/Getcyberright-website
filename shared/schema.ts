@@ -1650,6 +1650,8 @@ export const newsArticles = pgTable("news_articles", {
   urgencyLevel: integer("urgency_level").default(1),
   relatedToolUrl: text("related_tool_url"),
   relatedToolName: text("related_tool_name"),
+  author: text("author").default("Jude Annan, CISM"),
+  authorRole: text("author_role").default("Founder & Chief Security Strategist"),
   publishedAt: timestamp("published_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
 });

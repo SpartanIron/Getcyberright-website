@@ -122,6 +122,7 @@ function getCategoryColor(category: string): string {
  case "Tech": return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
  case "Conferences": return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
  case "Action Needed": return "bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/20";
+ case "Learning": return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
  default: return "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20";
  }
 }
@@ -169,6 +170,7 @@ function getCategoryGradient(category: string): string {
  case "AI": return "from-purple-900 via-slate-900 to-indigo-950";
  case "Tech": return "from-blue-900 via-slate-900 to-cyan-950";
  case "Action Needed": return "from-orange-800 via-slate-900 to-orange-950";
+ case "Learning": return "from-emerald-900 via-slate-900 to-emerald-950";
  default: return "from-slate-800 via-slate-900 to-slate-950";
  }
 }
@@ -179,6 +181,7 @@ function getCategoryIcon(category: string) {
  case "AI": return Newspaper;
  case "Tech": return Globe;
  case "Action Needed": return AlertTriangle;
+ case "Learning": return TrendingUp;
  default: return Shield;
  }
 }
@@ -526,18 +529,18 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
  className="inline-flex items-center gap-2 bg-red-600/90 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 mb-4 sm:mb-6"
  >
  <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
- <span className="text-xs sm:text-sm font-semibold text-white uppercase tracking-wide">Threat Alerts</span>
+ <span className="text-xs sm:text-sm font-semibold text-white uppercase tracking-wide">News & Insights</span>
  <LiveNewsIndicator />
  </FadeIn>
  <h1 
  className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 drop-shadow-lg"
  >
- Family Safety Alerts
+ News & Insights
  </h1>
  <p 
  className="text-base sm:text-xl md:text-2xl text-white/90 leading-relaxed drop-shadow-md"
  >
- Scam warnings, data breaches, and security threats that could affect your family. Stay informed to stay protected.
+ Expert cybersecurity analysis, threat intelligence, AI safety insights, and learning opportunities curated for families.
  </p>
  </FadeIn>
  </div>

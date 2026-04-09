@@ -292,7 +292,7 @@ export function Navigation() {
                     data-testid="nav-news"
                   >
                     <Newspaper className="w-4 h-4" />
-                    News
+                    News & Insights
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -421,7 +421,7 @@ export function Navigation() {
                   data-testid="mobile-link-news"
                 >
                   <Newspaper className="w-4 h-4 text-teal-500" />
-                  <span className="font-medium">News</span>
+                  <span className="font-medium">News & Insights</span>
                 </Link>
 
 

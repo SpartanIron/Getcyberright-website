@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Brain, Laptop, Calendar, AlertTriangle, Flame } from "lucide-react";
+import { Shield, Brain, Laptop, Calendar, AlertTriangle, Flame, GraduationCap, Lightbulb } from "lucide-react";
 
 interface NewsFilterProps {
   activeFilter: string;
@@ -8,11 +8,12 @@ interface NewsFilterProps {
 
 export function NewsFilter({ activeFilter, onFilterChange }: NewsFilterProps) {
   const filters = [
-    { key: "all", label: "All Alerts", icon: AlertTriangle },
+    { key: "all", label: "All", icon: Lightbulb },
     { key: "action-needed", label: "Action Needed", icon: Flame },
-    { key: "cybersecurity", label: "Scams & Threats", icon: Shield },
+    { key: "cybersecurity", label: "Threat Intel", icon: Shield },
     { key: "ai", label: "AI Safety", icon: Brain },
     { key: "tech", label: "Tech & Privacy", icon: Laptop },
+    { key: "learning", label: "Learning", icon: GraduationCap },
     { key: "conferences", label: "Events", icon: Calendar },
   ];
 

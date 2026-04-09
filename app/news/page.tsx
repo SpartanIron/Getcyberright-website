@@ -5,24 +5,32 @@ import { getLatestNews } from "../lib/data";
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "Cybersecurity News & Updates | GetCyberRight",
+  title: "News & Insights | Cybersecurity Updates for Families | GetCyberRight",
   description:
-    "Stay informed with the latest cybersecurity news, data breach reports, emerging threats, and security advisories. Curated updates for families and businesses.",
+    "Stay informed with the latest cybersecurity news, threat intelligence, AI safety insights, learning opportunities, and security advisories. Expert analysis curated for families.",
   alternates: { canonical: `${BASE_URL}/news` },
   openGraph: {
-    title: "Cybersecurity News & Updates | GetCyberRight",
+    title: "News & Insights | Cybersecurity Updates for Families | GetCyberRight",
     description:
-      "Stay informed with the latest cybersecurity news, data breach reports, emerging threats, and security advisories. Curated updates for families and businesses.",
+      "Stay informed with the latest cybersecurity news, threat intelligence, AI safety insights, learning opportunities, and security advisories. Expert analysis curated for families.",
     url: `${BASE_URL}/news`,
+    siteName: "GetCyberRight",
     type: "website",
     images: [
       {
         url: `${BASE_URL}/og/news-alerts.png`,
         width: 1080,
         height: 1080,
-        alt: "GetCyberRight News",
+        alt: "GetCyberRight News & Insights",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "News & Insights | GetCyberRight",
+    description:
+      "Expert cybersecurity analysis, threat intelligence, and learning opportunities curated for families.",
+    images: [`${BASE_URL}/og/news-alerts.png`],
   },
 };
 
@@ -34,9 +42,9 @@ export default async function NewsPage() {
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      name: "Cybersecurity News & Updates",
+      name: "News & Insights",
       description:
-        "Latest cybersecurity news, data breach reports, emerging threats, and security advisories curated for families.",
+        "Expert cybersecurity analysis, threat intelligence, AI safety insights, and learning opportunities curated for families.",
       url: `${BASE_URL}/news`,
       publisher: {
         "@type": "Organization",
@@ -52,7 +60,7 @@ export default async function NewsPage() {
         {
           "@type": "ListItem",
           position: 2,
-          name: "News",
+          name: "News & Insights",
           item: `${BASE_URL}/news`,
         },
       ],

@@ -83,7 +83,7 @@ export function Header() {
       { nameKey: "nav.parentGuide", href: "/parent-guide" },
       { nameKey: "nav.resources", href: "/resources" },
     ]},
-    { nameKey: "nav.news", href: "/news", icon: <Newspaper className="h-4 w-4" /> },
+    { nameKey: "nav.newsInsights", href: "/news", icon: <Newspaper className="h-4 w-4" /> },
     { nameKey: "nav.about", href: "/about" },
   ];
 

@@ -37,6 +37,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const url = `${BASE_URL}/news/${article.slug}`;
   const ogImage = article.imageUrl || `${BASE_URL}/api/social-images/social-${article.id}.png`;
 
+  const authorName = article.author || "Jude Annan, CISM";
+
   return {
     title,
     description,
@@ -46,8 +48,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url,
       type: "article",
+      siteName: "GetCyberRight",
+      locale: "en_US",
       images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
       publishedTime: article.publishedAt || undefined,
+      authors: [authorName],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description,
+      images: [ogImage],
     },
   };
 }
@@ -66,7 +77,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
-        { "@type": "ListItem", position: 2, name: "News", item: `${BASE_URL}/news` },
+        { "@type": "ListItem", position: 2, name: "News & Insights", item: `${BASE_URL}/news` },
         { "@type": "ListItem", position: 3, name: article.title, item: `${BASE_URL}/news/${article.slug}` },
       ],
     },
@@ -79,9 +90,15 @@ export default async function NewsArticlePage({ params }: PageProps) {
       datePublished: article.publishedAt || new Date().toISOString(),
       dateModified: article.updatedAt || article.publishedAt || new Date().toISOString(),
       author: {
-        "@type": "Organization",
-        name: "GetCyberRight",
+        "@type": "Person",
+        name: article.author || "Jude Annan, CISM",
+        jobTitle: article.authorRole || "Founder & Chief Security Strategist",
         url: BASE_URL,
+        worksFor: {
+          "@type": "Organization",
+          name: "GetCyberRight",
+          url: BASE_URL,
+        },
       },
       publisher: {
         "@type": "Organization",
