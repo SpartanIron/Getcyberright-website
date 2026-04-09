@@ -38,6 +38,7 @@ const CONTENT_MODES = [
   "tool_highlight",
   "industry_analysis",
   "ai_landscape",
+  "learning_opportunity",
 ] as const;
 
 type ContentMode = (typeof CONTENT_MODES)[number];
@@ -226,13 +227,13 @@ function getRecentPerformanceSummary(): string {
 
 const POSTING_DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-type ContentPillar = "threat_alert" | "practical_protection" | "myth_buster" | "family_focus" | "weekly_kickoff" | "friday_tips" | "weekend_roundup";
+type ContentPillar = "threat_alert" | "practical_protection" | "myth_buster" | "family_focus" | "weekly_kickoff" | "friday_tips" | "weekend_roundup" | "learning_growth";
 
 const CONTENT_PILLARS: Record<number, ContentPillar> = {
   0: "family_focus",
   1: "weekly_kickoff",
   2: "threat_alert",
-  3: "practical_protection",
+  3: "learning_growth",
   4: "myth_buster",
   5: "friday_tips",
   6: "weekend_roundup",
@@ -241,6 +242,7 @@ const CONTENT_PILLARS: Record<number, ContentPillar> = {
 const PILLAR_LABELS: Record<ContentPillar, string> = {
   threat_alert: "Threat Alert Tuesday",
   practical_protection: "Practical Protection Wednesday",
+  learning_growth: "Learn & Grow Wednesday",
   myth_buster: "Myth Buster Thursday",
   family_focus: "Family Focus Sunday",
   weekly_kickoff: "Start Your Week Safe Monday",
@@ -359,6 +361,33 @@ Saturday content should feel timely and accessible. Highlight what happened this
     case "family_focus":
       return `TODAY'S CONTENT PILLAR: FAMILY FOCUS SUNDAY
 Use relatable family scenarios. "Your kid got a message that says..." or "Your parent called about a 'Microsoft' call..." These are the most shareable posts because they hit home. Prioritize scenario_simulation content mode. The audience is relaxed, scrolling on a Sunday evening, thinking about the week ahead. Make it personal and protective.`;
+
+    case "learning_growth":
+      return `TODAY'S CONTENT PILLAR: LEARN & GROW WEDNESDAY
+This is NOT a threat post. Today is about empowerment, learning, and growth.
+
+FOCUS: Share real, actionable learning opportunities in cybersecurity and AI. Surface free or affordable training programs, certifications, courses, workshops, and career resources that everyday people can actually use.
+
+CONTENT PRIORITIES (rotate between these):
+1. FREE CERTIFICATIONS & COURSES: ISC2 Certified in Cybersecurity (free exam + training), Google Cybersecurity Certificate, Microsoft AI Fundamentals, CISA Learning platform, Elements of AI, Harvard CS50 AI course
+2. AI LITERACY FOR FAMILIES: How to use AI safely, understand deepfakes, recognize AI-generated content, teach kids about AI, AI tools for productivity and safety
+3. CAREER PATHWAYS: Entry-level cybersecurity roles families can train for, career change resources, scholarship programs, government workforce initiatives
+4. SKILL BUILDING: Practical digital skills (password managers, 2FA setup, VPN usage, privacy settings), digital citizenship for kids and teens
+5. COMMUNITY LEARNING: Upcoming free webinars, awareness campaigns (Cybersecurity Awareness Month), local community programs, library resources
+
+TONE: Inspiring and opportunity-focused. "Did you know you can earn a cybersecurity certification for free?" not "You need to protect yourself." Frame security knowledge as a valuable life skill and career asset, not just defense.
+
+LINKING STRATEGY: It is perfectly fine (and encouraged) to link to EXTERNAL resources when they are genuinely useful:
+- ISC2: https://www.isc2.org/landing/1mcc
+- Google Cybersecurity Cert: https://grow.google/certificates/cybersecurity/
+- Microsoft Learn: https://learn.microsoft.com/en-us/training/
+- CISA Learning: https://niccs.cisa.gov/training/cisa-learning
+- Elements of AI: https://www.elementsofai.com
+- Coursera free courses: https://www.coursera.org
+- edX free courses: https://www.edx.org
+You may also link to GetCyberRight's own Training Academy at https://www.getcyberright.com/training when relevant.
+
+Prioritize learning_opportunity content mode. The audience is mid-week, productive, and open to self-improvement content.`;
 
     default:
       return "";
@@ -853,19 +882,20 @@ STEP 5 - INSIGHT GENERATION:
 - Prioritize clarity over completeness
 
 STEP 6 - CONTENT MODE SELECTION:
-- Select the most appropriate mode: breaking_insight, preventative_education, myth_debunking, scenario_simulation, or tool_highlight
+- Select the most appropriate mode: breaking_insight, preventative_education, myth_debunking, scenario_simulation, tool_highlight, or learning_opportunity
 - If urgency_score >= 4, force breaking_insight mode
 - For AI developments, regulatory changes, and industry news: breaking_insight or myth_debunking work well
+- If the CONTENT PILLAR instruction says "Learn & Grow" or mentions learning/training/certifications, use learning_opportunity mode
 - The WRITING STYLE instruction determines HOW to write. The content mode determines WHAT angle to take
 - Aim for VARIETY: if recent posts have been threat-focused, lean toward AI developments, privacy news, or regulatory updates if available in the feed
 
 STEP 7 - CONTENT CREATION:
 - Follow the specific WRITING STYLE instruction provided below
-- EXCERPT STRATEGY: Posts are teasers, NOT full articles. Share the most compelling insight to hook readers, then drive them to the relevant GetCyberRight page for the full breakdown
-- Post structure: hook (the most compelling insight) > brief context (1-2 sentences on why it matters) > 1-2 actionable tips as a preview > CTA linking to the most relevant GetCyberRight page (guide, alert, scam intel, or tool)
-- ALWAYS end with a link to a relevant GetCyberRight page
-- CRITICAL: You may ONLY link to URLs that appear in the KEY TOOL PAGES list, or to specific guide/alert/scam-intel slugs listed in the context above. NEVER invent or guess a URL slug. If no specific guide/alert/scam-intel page matches, use the most relevant KEY TOOL PAGE instead
-- ALL links MUST use the www subdomain (https://www.getcyberright.com/...). Never use https://getcyberright.com without www
+- EXCERPT STRATEGY: Posts are teasers, NOT full articles. Share the most compelling insight to hook readers, then drive them to the relevant page for the full breakdown
+- Post structure: hook (the most compelling insight) > brief context (1-2 sentences on why it matters) > 1-2 actionable tips as a preview > CTA linking to the most relevant page
+- For learning_opportunity mode: You MAY link to trusted external learning resources (ISC2, Google, Microsoft Learn, CISA, Coursera, edX, Khan Academy, Elements of AI, Harvard CS50, etc.) when they are the primary value of the post. External links are encouraged for genuine learning opportunities. You may also optionally include a GetCyberRight link as a secondary reference
+- For ALL OTHER modes: ALWAYS end with a link to a relevant GetCyberRight page. You may ONLY link to URLs that appear in the KEY TOOL PAGES list, or to specific guide/alert/scam-intel slugs listed in the context above. NEVER invent or guess a URL slug
+- ALL GetCyberRight links MUST use the www subdomain (https://www.getcyberright.com/...). Never use https://getcyberright.com without www
 - If no specific page matches, link to https://www.getcyberright.com/news as the default fallback (a dedicated article will be created automatically)
 - The link MUST appear on its own line before any hashtags
 
@@ -1049,7 +1079,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
   "imageSubtext": "Supporting detail under 15 words",
   "source_article_index": 1,
   "ai_image_prompt": "Only if source article has no image. Photorealistic scene description.",
-  "content_mode": "breaking_insight | preventative_education | myth_debunking | scenario_simulation | tool_highlight",
+  "content_mode": "breaking_insight | preventative_education | myth_debunking | scenario_simulation | tool_highlight | learning_opportunity",
   "trend_analysis": {
     "summary": "One-sentence summary of the signal",
     "category": "phishing_scam | data_breach | malware | ai_threat | social_engineering | privacy | vulnerability | general_awareness",
@@ -1496,6 +1526,9 @@ function selectTemplateForTrend(trendAnalysis: TrendAnalysis, contentMode: Conte
   }
   if (trendAnalysis.category === "data_breach" || trendAnalysis.category === "vulnerability") {
     return "stat_card";
+  }
+  if (contentMode === "learning_opportunity") {
+    return "insight_card";
   }
   if (contentMode === "preventative_education" || contentMode === "scenario_simulation") {
     return "tip_card";
@@ -2229,7 +2262,9 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     let fixedFacebook = await validateAndFixPostLinks(posts.facebook);
     const fixedInstagram = posts.instagram;
 
-    if (trendArticle) {
+    const isLearningPost = posts.contentMode === "learning_opportunity";
+
+    if (trendArticle && !isLearningPost) {
       const gcrLinkPattern = /https?:\/\/(?:www\.)?getcyberright\.com\/[^\s)\]"',]+/gi;
       fixedLinkedin = fixedLinkedin.replace(gcrLinkPattern, articleUrl);
       fixedFacebook = fixedFacebook.replace(gcrLinkPattern, articleUrl);
@@ -2237,9 +2272,27 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
 
     const contentSlug = trendArticle?.slug || posts.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50);
     const canonicalUrl = articleUrl;
-    const validatedLinkedin = ensureGcrLink(tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle), canonicalUrl, "linkedin", "trend_insight", contentSlug, postStyle);
-    const validatedFacebook = ensureGcrLink(tagAllGcrLinks(fixedFacebook, "facebook", "trend_insight", contentSlug, postStyle), canonicalUrl, "facebook", "trend_insight", contentSlug, postStyle);
+
+    let validatedLinkedin: string;
+    let validatedFacebook: string;
     const validatedInstagram = fixedInstagram;
+
+    if (isLearningPost) {
+      const hasExternalLink = /https?:\/\/(?!(?:www\.)?getcyberright\.com)[^\s)\]"',]+/i;
+      if (hasExternalLink.test(fixedLinkedin)) {
+        validatedLinkedin = fixedLinkedin;
+      } else {
+        validatedLinkedin = ensureGcrLink(tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle), "https://www.getcyberright.com/training", "linkedin", "trend_insight", contentSlug, postStyle);
+      }
+      if (hasExternalLink.test(fixedFacebook)) {
+        validatedFacebook = fixedFacebook;
+      } else {
+        validatedFacebook = ensureGcrLink(tagAllGcrLinks(fixedFacebook, "facebook", "trend_insight", contentSlug, postStyle), "https://www.getcyberright.com/training", "facebook", "trend_insight", contentSlug, postStyle);
+      }
+    } else {
+      validatedLinkedin = ensureGcrLink(tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle), canonicalUrl, "linkedin", "trend_insight", contentSlug, postStyle);
+      validatedFacebook = ensureGcrLink(tagAllGcrLinks(fixedFacebook, "facebook", "trend_insight", contentSlug, postStyle), canonicalUrl, "facebook", "trend_insight", contentSlug, postStyle);
+    }
 
     const platformFilter = options?.platformFilter;
     const platformPosts: { platform: string; content: string; image: string | null }[] = [];
