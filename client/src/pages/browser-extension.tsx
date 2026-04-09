@@ -315,7 +315,7 @@ export default function BrowserExtensionPage() {
                 <h3 className="font-semibold text-white">Who Makes This</h3>
               </div>
               <p className="text-sm text-white/50 leading-relaxed mb-3">
-                GCR Scam Guard is built by <strong className="text-white/70">GetCyberRight</strong>, a cybersecurity education platform powered by <a href="https://colorcodesolutions.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 underline">ColorCode Solutions</a>. We are a real company with a public website, active social media, and a transparent mission.
+                GCR Scam Guard is built by <strong className="text-white/70">GetCyberRight LLC</strong>, a registered cybersecurity education company powered by <a href="https://colorcodesolutions.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 underline">ColorCode Solutions</a>. We are a registered LLC with a public website, active social media, and a transparent mission.
               </p>
               <div className="flex flex-wrap gap-2">
                 <Link href="/about">

@@ -46,7 +46,7 @@ export default function BrowserExtensionPage() {
       },
       provider: {
         "@type": "Organization",
-        name: "GetCyberRight",
+        name: "GetCyberRight LLC",
         url: BASE_URL,
         parentOrganization: {
           "@type": "Organization",

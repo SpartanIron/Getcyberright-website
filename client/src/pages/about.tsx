@@ -388,7 +388,7 @@ export default function About() {
                 Built by a Real Team. Backed by Real Experience.
               </h2>
               <p className="text-lg text-white/50 leading-relaxed">
-                GetCyberRight is not anonymous software from an unknown source. It is built and maintained by a dedicated team with a clear identity and a traceable history.
+                GetCyberRight LLC is not anonymous software from an unknown source. It is a registered limited liability company, built and maintained by a dedicated team with a clear identity and a traceable history.
               </p>
             </div>
 
@@ -404,7 +404,7 @@ export default function About() {
                   </div>
                 </div>
                 <p className="text-base text-white/50 leading-relaxed mb-4">
-                  GetCyberRight is developed and maintained by ColorCode Solutions, a registered software development company. Our team combines expertise in web development, cybersecurity, and user experience to build tools that everyday people can actually use.
+                  GetCyberRight LLC is developed and maintained by ColorCode Solutions. Our team combines expertise in web development, cybersecurity, and user experience to build tools that everyday people can actually use.
                 </p>
                 <a href="https://colorcodesolutions.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors" data-testid="link-colorcode">
                   Visit ColorCode Solutions <ExternalLink className="w-3.5 h-3.5" />
@@ -430,8 +430,8 @@ export default function About() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 text-center" data-testid="trust-verifiable">
                 <Award className="w-7 h-7 text-primary mx-auto mb-3" />
-                <h4 className="font-semibold text-white text-sm mb-1">Verified Publisher</h4>
-                <p className="text-xs text-white/40">Registered company with public identity and contact details</p>
+                <h4 className="font-semibold text-white text-sm mb-1">Registered LLC</h4>
+                <p className="text-xs text-white/40">GetCyberRight LLC with public identity and contact details</p>
               </div>
               <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 text-center" data-testid="trust-sources">
                 <ShieldAlert className="w-7 h-7 text-primary mx-auto mb-3" />

@@ -36,8 +36,8 @@ export default function AboutPage() {
       description: "Online scams have changed. GetCyberRight gives families, seniors, and small businesses the simple tools and clear guidance they need to stay safe online.",
       datePublished: "2024-01-15",
       dateModified: "2026-03-01",
-      author: { "@type": "Organization", name: "GetCyberRight", url: BASE_URL },
-      publisher: { "@type": "Organization", name: "GetCyberRight", logo: `${BASE_URL}/og-image.png`, parentOrganization: { "@type": "Organization", name: "ColorCode Solutions", url: "https://colorcodesolutions.com" } },
+      author: { "@type": "Organization", name: "GetCyberRight LLC", url: BASE_URL },
+      publisher: { "@type": "Organization", name: "GetCyberRight LLC", logo: `${BASE_URL}/og-image.png`, parentOrganization: { "@type": "Organization", name: "ColorCode Solutions", url: "https://colorcodesolutions.com" } },
     },
     {
       "@context": "https://schema.org",
