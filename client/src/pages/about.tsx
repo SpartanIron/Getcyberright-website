@@ -399,12 +399,12 @@ export default function About() {
                     <Building2 className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg text-white">Powered by ColorCode Solutions</h3>
-                    <p className="text-sm text-white/40">Parent company &amp; development team</p>
+                    <h3 className="font-semibold text-lg text-white">Built by ColorCode Solutions</h3>
+                    <p className="text-sm text-white/40">Website design &amp; development</p>
                   </div>
                 </div>
                 <p className="text-base text-white/50 leading-relaxed mb-4">
-                  GetCyberRight LLC is developed and maintained by ColorCode Solutions. Our team combines expertise in web development, cybersecurity, and user experience to build tools that everyday people can actually use.
+                  The GetCyberRight platform was designed and built by ColorCode Solutions, a software development company specializing in web applications. GetCyberRight LLC owns and operates the platform, while ColorCode Solutions handles the technical development.
                 </p>
                 <a href="https://colorcodesolutions.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors" data-testid="link-colorcode">
                   Visit ColorCode Solutions <ExternalLink className="w-3.5 h-3.5" />

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "GCR Scam Guard by GetCyberRight",
   "version": "1.4.0",
-  "description": "AI-powered scam & phishing protection by GetCyberRight LLC (getcyberright.com). Scans pages using VirusTotal, PhishTank, and Google Safe Browsing. Detects fake sites, warns before phishing attacks, and blocks notification spam. Built by ColorCode Solutions.",
+  "description": "AI-powered scam & phishing protection by GetCyberRight LLC (getcyberright.com). Scans pages using VirusTotal, PhishTank, and Google Safe Browsing. Detects fake sites, warns before phishing attacks, and blocks notification spam. Website by ColorCode Solutions.",
   "permissions": [
     "activeTab",
     "contextMenus",
