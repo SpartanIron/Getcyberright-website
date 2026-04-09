@@ -88,6 +88,21 @@ export function tagAllGcrLinks(
   });
 }
 
+export function ensureGcrLink(
+  text: string,
+  canonicalUrl: string,
+  platform: string,
+  contentType: string,
+  contentSlug?: string,
+  postStyle?: string
+): string {
+  if (platform === "instagram" || platform === "alert") return text;
+  const hasLink = /https?:\/\/(?:www\.)?getcyberright\.com/i.test(text);
+  if (hasLink) return text;
+  const taggedUrl = tagSingleUrl(canonicalUrl, platform, contentType, contentSlug, postStyle);
+  return text.trimEnd() + "\n\n" + taggedUrl;
+}
+
 export function tagSingleUrl(
   url: string,
   platform: string,

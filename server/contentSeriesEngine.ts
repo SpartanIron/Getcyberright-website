@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { storage } from "./storage";
 import { enforceAndSanitize, sanitizeContent } from "./socialPostPolicy";
-import { tagAllGcrLinks } from "./utmTracking";
+import { tagAllGcrLinks, ensureGcrLink } from "./utmTracking";
 import type { InsertSocialPost } from "@shared/schema";
 
 const anthropic = new Anthropic({
@@ -197,8 +197,9 @@ Write the ${config.name} content now.`,
     if (!jsonMatch) return null;
 
     const parsed = JSON.parse(jsonMatch[0]);
-    const linkedin = enforceAndSanitize(tagAllGcrLinks(parsed.linkedin, `series_${seriesType}`, "linkedin"), "linkedin");
-    const facebook = enforceAndSanitize(tagAllGcrLinks(parsed.facebook, `series_${seriesType}`, "facebook"), "facebook");
+    const seriesCanonicalUrl = "https://www.getcyberright.com/awareness-hub";
+    const linkedin = ensureGcrLink(enforceAndSanitize(tagAllGcrLinks(parsed.linkedin, `series_${seriesType}`, "linkedin"), "linkedin"), seriesCanonicalUrl, "linkedin", `series_${seriesType}`);
+    const facebook = ensureGcrLink(enforceAndSanitize(tagAllGcrLinks(parsed.facebook, `series_${seriesType}`, "facebook"), "facebook"), seriesCanonicalUrl, "facebook", `series_${seriesType}`);
     const title = sanitizeContent(parsed.title || config.name);
 
     const seriesId = `${seriesType}_${new Date().toISOString().slice(0, 10)}`;

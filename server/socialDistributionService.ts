@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import type { CyberSafetyGuide, CyberThreatAlert, ScamIntelligence, InsertSocialPost } from "@shared/schema";
 import { generateBrandedImage, generateStatCard, serveImagePath } from "./socialImageService";
 import { getBufferChannelsByPlatform } from "./bufferPublisher";
-import { tagAllGcrLinks, tagSingleUrl, buildCampaignId } from "./utmTracking";
+import { tagAllGcrLinks, tagSingleUrl, buildCampaignId, ensureGcrLink } from "./utmTracking";
 import { buildPartnerContext } from "./socialEngagementService";
 import { enforceAndSanitize, sanitizeContent } from "./socialPostPolicy";
 import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stockPhotoService";
@@ -375,9 +375,9 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
   const campaignId = buildCampaignId("guide", "multi");
 
   const allPlatforms: { platform: string; content: string }[] = [
-    { platform: "linkedin", content: tagAllGcrLinks(posts.linkedin, "linkedin", "guide", guide.slug) },
-    { platform: "facebook", content: tagAllGcrLinks(posts.facebook || posts.linkedin, "facebook", "guide", guide.slug) },
-    { platform: "x", content: tagAllGcrLinks(posts.xThread.join("\n\n---\n\n"), "x", "guide", guide.slug) },
+    { platform: "linkedin", content: ensureGcrLink(tagAllGcrLinks(posts.linkedin, "linkedin", "guide", guide.slug), url, "linkedin", "guide", guide.slug) },
+    { platform: "facebook", content: ensureGcrLink(tagAllGcrLinks(posts.facebook || posts.linkedin, "facebook", "guide", guide.slug), url, "facebook", "guide", guide.slug) },
+    { platform: "x", content: ensureGcrLink(tagAllGcrLinks(posts.xThread.join("\n\n---\n\n"), "x", "guide", guide.slug), url, "x", "guide", guide.slug) },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
@@ -429,9 +429,9 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
   const connectedPlatforms = await getConnectedPlatforms();
 
   const allPlatforms: { platform: string; content: string }[] = [
-    { platform: "linkedin", content: tagAllGcrLinks(posts.linkedin, "linkedin", "threat_alert", alert.slug) },
-    { platform: "facebook", content: tagAllGcrLinks(posts.facebook || posts.linkedin, "facebook", "threat_alert", alert.slug) },
-    { platform: "x", content: tagAllGcrLinks(posts.xThread.join("\n\n---\n\n"), "x", "threat_alert", alert.slug) },
+    { platform: "linkedin", content: ensureGcrLink(tagAllGcrLinks(posts.linkedin, "linkedin", "threat_alert", alert.slug), url, "linkedin", "threat_alert", alert.slug) },
+    { platform: "facebook", content: ensureGcrLink(tagAllGcrLinks(posts.facebook || posts.linkedin, "facebook", "threat_alert", alert.slug), url, "facebook", "threat_alert", alert.slug) },
+    { platform: "x", content: ensureGcrLink(tagAllGcrLinks(posts.xThread.join("\n\n---\n\n"), "x", "threat_alert", alert.slug), url, "x", "threat_alert", alert.slug) },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];
@@ -484,9 +484,9 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
   const connectedPlatforms = await getConnectedPlatforms();
 
   const allPlatforms: { platform: string; content: string }[] = [
-    { platform: "linkedin", content: tagAllGcrLinks(posts.linkedin, "linkedin", "scam_intel", scam.slug) },
-    { platform: "facebook", content: tagAllGcrLinks(posts.facebook || posts.linkedin, "facebook", "scam_intel", scam.slug) },
-    { platform: "x", content: tagAllGcrLinks(posts.xThread.join("\n\n---\n\n"), "x", "scam_intel", scam.slug) },
+    { platform: "linkedin", content: ensureGcrLink(tagAllGcrLinks(posts.linkedin, "linkedin", "scam_intel", scam.slug), url, "linkedin", "scam_intel", scam.slug) },
+    { platform: "facebook", content: ensureGcrLink(tagAllGcrLinks(posts.facebook || posts.linkedin, "facebook", "scam_intel", scam.slug), url, "facebook", "scam_intel", scam.slug) },
+    { platform: "x", content: ensureGcrLink(tagAllGcrLinks(posts.xThread.join("\n\n---\n\n"), "x", "scam_intel", scam.slug), url, "x", "scam_intel", scam.slug) },
     { platform: "instagram", content: posts.instagram || "" },
     { platform: "alert", content: posts.shortAlert },
   ];

@@ -290,8 +290,8 @@ app.use((req, res, next) => {
       });
 
       // Generate social posts for any published content that doesn't have them
-      import("./socialPostSeed").then(({ seedSocialPosts }) => {
-        seedSocialPosts();
+      import("./socialPostSeed").then(({ seedSocialPosts, backfillSocialPostLinks }) => {
+        seedSocialPosts().then(() => backfillSocialPostLinks());
       }).catch(err => {
         console.error("Failed to seed social posts:", err);
       });

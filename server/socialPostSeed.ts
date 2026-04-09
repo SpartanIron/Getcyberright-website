@@ -4,6 +4,7 @@ import {
   distributeThreatAlertContent,
   distributeScamIntelContent,
 } from "./socialDistributionService";
+import { ensureGcrLink } from "./utmTracking";
 
 export async function seedSocialPosts() {
   try {
@@ -58,5 +59,71 @@ export async function seedSocialPosts() {
     console.log(`[social-seed] Generated ${totalCreated} social posts for ${missingGuides.length} guides, ${missingAlerts.length} alerts, ${missingScams.length} scam intel entries`);
   } catch (error: any) {
     console.error("[social-seed] Failed to seed social posts:", error.message);
+  }
+}
+
+export async function backfillSocialPostLinks() {
+  try {
+    const allPosts = await storage.getSocialPosts(undefined, 2000);
+    const linkPattern = /https?:\/\/(?:www\.)?getcyberright\.com/i;
+    const postsWithoutLinks = allPosts.filter(
+      p => p.platform !== "instagram" && p.platform !== "alert" && !linkPattern.test(p.postContent)
+    );
+
+    if (postsWithoutLinks.length === 0) {
+      console.log(`[social-seed] All non-Instagram/alert posts have links`);
+      return;
+    }
+
+    console.log(`[social-seed] Backfilling links for ${postsWithoutLinks.length} posts...`);
+
+    const guides = await storage.getPublishedGuides();
+    const alerts = await storage.getPublishedThreatAlerts();
+    const scamIntel = await storage.getPublishedScamIntel();
+
+    const guideMap = new Map(guides.map(g => [g.id, g]));
+    const alertMap = new Map(alerts.map(a => [a.id, a]));
+    const scamMap = new Map(scamIntel.map(s => [s.id, s]));
+
+    let fixed = 0;
+    for (const post of postsWithoutLinks) {
+      let canonicalUrl: string;
+
+      if (post.contentType === "guide") {
+        const guide = guideMap.get(post.contentId);
+        canonicalUrl = guide ? `https://www.getcyberright.com/guides/${guide.slug}` : "https://www.getcyberright.com/guides";
+      } else if (post.contentType === "threat_alert") {
+        const alert = alertMap.get(post.contentId);
+        canonicalUrl = alert ? `https://www.getcyberright.com/alerts/${alert.slug}` : "https://www.getcyberright.com/alerts";
+      } else if (post.contentType === "scam_intel") {
+        const scam = scamMap.get(post.contentId);
+        canonicalUrl = scam ? `https://www.getcyberright.com/scam-intel/${scam.slug}` : "https://www.getcyberright.com/scam-intel";
+      } else {
+        canonicalUrl = "https://www.getcyberright.com/awareness-hub";
+      }
+
+      const slug = post.contentType === "guide" ? guideMap.get(post.contentId)?.slug
+        : post.contentType === "threat_alert" ? alertMap.get(post.contentId)?.slug
+        : post.contentType === "scam_intel" ? scamMap.get(post.contentId)?.slug
+        : undefined;
+
+      const updatedContent = ensureGcrLink(
+        post.postContent,
+        canonicalUrl,
+        post.platform,
+        post.contentType,
+        slug,
+        post.postStyle || undefined
+      );
+
+      if (updatedContent !== post.postContent) {
+        await storage.updateSocialPost(post.id, { postContent: updatedContent });
+        fixed++;
+      }
+    }
+
+    console.log(`[social-seed] Backfilled links for ${fixed} posts`);
+  } catch (error: any) {
+    console.error("[social-seed] Failed to backfill social post links:", error.message);
   }
 }

@@ -3,7 +3,7 @@ import { storage } from "./storage";
 import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
 import { createBufferPost, getBufferChannelsByPlatform, getPublicImageUrl } from "./bufferPublisher";
 import type { InsertSocialPost } from "@shared/schema";
-import { tagAllGcrLinks } from "./utmTracking";
+import { tagAllGcrLinks, ensureGcrLink } from "./utmTracking";
 import { buildPartnerContext, runPostPublishEngagement } from "./socialEngagementService";
 import { enforceAndSanitize, sanitizeContent } from "./socialPostPolicy";
 import {
@@ -2065,8 +2065,9 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     const fixedInstagram = posts.instagram;
 
     const contentSlug = posts.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50);
-    const validatedLinkedin = tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle);
-    const validatedFacebook = tagAllGcrLinks(fixedFacebook, "facebook", "trend_insight", contentSlug, postStyle);
+    const canonicalUrl = "https://www.getcyberright.com/awareness-hub";
+    const validatedLinkedin = ensureGcrLink(tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle), canonicalUrl, "linkedin", "trend_insight", contentSlug, postStyle);
+    const validatedFacebook = ensureGcrLink(tagAllGcrLinks(fixedFacebook, "facebook", "trend_insight", contentSlug, postStyle), canonicalUrl, "facebook", "trend_insight", contentSlug, postStyle);
     const validatedInstagram = fixedInstagram;
 
     const platformFilter = options?.platformFilter;
