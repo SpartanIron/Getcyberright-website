@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -21,7 +22,9 @@ export default function Tools() {
           colorVariant="teal"
         />
 
-        <ToolsInteractive />
+        <Suspense>
+          <ToolsInteractive />
+        </Suspense>
 
         <section className="py-16 sm:py-20 bg-red-50 dark:bg-red-950/20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
