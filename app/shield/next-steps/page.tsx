@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import PageContent from "@/pages/shield-next-steps";
 
@@ -11,5 +12,9 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default function ShieldNextStepsPage() {
-  return <PageContent />;
+  return (
+    <Suspense>
+      <PageContent />
+    </Suspense>
+  );
 }

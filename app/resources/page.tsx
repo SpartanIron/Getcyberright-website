@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import PageContent from "@/pages/resources";
 
@@ -20,5 +21,9 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default function ResourcesPage() {
-  return <PageContent />;
+  return (
+    <Suspense>
+      <PageContent />
+    </Suspense>
+  );
 }

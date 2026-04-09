@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import PageContent from "@/pages/tools";
 
@@ -104,7 +105,9 @@ export default function ToolsPage() {
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <PageContent />
+      <Suspense>
+        <PageContent />
+      </Suspense>
     </>
   );
 }
