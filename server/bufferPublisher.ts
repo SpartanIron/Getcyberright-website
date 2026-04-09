@@ -2,6 +2,7 @@ import { storage } from "./storage";
 import * as path from "path";
 import * as fs from "fs";
 import { enforcePostPolicy } from "./socialPostPolicy";
+import { validateAndPreparePost } from "./linkValidator";
 
 const BUFFER_GRAPHQL_URL = "https://api.buffer.com/graphql";
 const BUFFER_ORG_ID = process.env.BUFFER_ORG_ID || "69b48dd8282d615a79db2ab3";
@@ -341,7 +342,23 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
     return { success: false, platform: post.platform, error: "Instagram requires an image. Post kept as draft for retry." };
   }
 
-  const policyResult = enforcePostPolicy(post.postContent, post.platform);
+  const validation = await validateAndPreparePost(
+    post.postContent,
+    postId,
+    post.platform,
+    post.contentTitle
+  );
+  console.log(validation.validationLog);
+
+  if (!validation.shouldPublish) {
+    return {
+      success: false,
+      platform: post.platform,
+      error: `Link validation failed: broken links detected. Post marked as failed.`,
+    };
+  }
+
+  const policyResult = enforcePostPolicy(validation.content, post.platform);
   const safeContent = policyResult.content;
 
   const publishMode = post.platform === "instagram" ? "addToQueue" : "shareNow";

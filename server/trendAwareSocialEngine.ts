@@ -2004,7 +2004,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     if (channels.facebook && allowedPlatforms.includes("facebook") && (!platformFilter || platformFilter === "facebook")) platformPosts.push({ platform: "facebook", content: validatedFacebook, image: imageUrl });
     if (channels.instagram && allowedPlatforms.includes("instagram") && (!platformFilter || platformFilter === "instagram")) platformPosts.push({ platform: "instagram", content: validatedInstagram, image: igImageUrl || imageUrl });
 
-    for (const { platform, content, image } of platformPosts) {
+    for (let { platform, content, image } of platformPosts) {
       if (platform === "instagram" && !image) {
         console.warn(`[TrendEngine] Skipping Instagram reactive post "${posts.title}" — Instagram requires an image`);
         continue;
@@ -2026,6 +2026,16 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
 
         const created = await storage.createSocialPost(socialPost);
         await storage.updateSocialPost(created.id, { publishedAt: new Date() });
+
+        const { validateAndPreparePost } = await import("./linkValidator");
+        const linkCheck = await validateAndPreparePost(content, created.id, platform, posts.title);
+        console.log(linkCheck.validationLog);
+
+        if (!linkCheck.shouldPublish) {
+          console.error(`[TrendEngine] Post blocked by link validation for ${platform}: "${posts.title}"`);
+          continue;
+        }
+        content = linkCheck.content;
 
         const channel = channels[platform];
         const { publishWithFirstComment } = await import("./bufferPublisher");
