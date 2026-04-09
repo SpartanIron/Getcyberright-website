@@ -48,7 +48,7 @@ export default function BrowserExtensionPage() {
         "@type": "Organization",
         name: "GetCyberRight LLC",
         url: BASE_URL,
-        affiliate: { "@type": "Organization", name: "ColorCode Solutions", url: "https://colorcodesolutions.com" },
+        contractor: { "@type": "Organization", name: "ColorCode Solutions", url: "https://colorcodesolutions.com" },
       },
     },
     {
