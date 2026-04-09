@@ -4,6 +4,9 @@ import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { isAuthenticated } from "./auth";
 import { isAdminMiddleware } from "./admin";
+
+const escapeHtml = (str: string) =>
+  str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 import {
   insertCyberSafetyGuideSchema,
   insertScamIntelligenceSchema,
@@ -842,7 +845,7 @@ export function registerPlatformRoutes(app: Express): void {
       const { code, state, error: oauthError } = req.query;
 
       if (oauthError) {
-        return res.status(400).send(`LinkedIn OAuth error: ${oauthError}`);
+        return res.status(400).send(`LinkedIn OAuth error: ${escapeHtml(String(oauthError))}`);
       }
 
       if (!code || !state) {
@@ -873,27 +876,27 @@ button { background: #E8732A; color: white; border: none; padding: 12px 24px; bo
 </style></head>
 <body><div class="card">
 <h1>LinkedIn Connected Successfully</h1>
-<p class="success">Authenticated as: ${profile.name}</p>
-${orgId ? `<p class="success">Organization ID found: ${orgId}</p>` : '<p style="color:#fbbf24">No organization admin access found. You may need to add the app to your LinkedIn Company Page.</p>'}
+<p class="success">Authenticated as: ${escapeHtml(String(profile.name))}</p>
+${orgId ? `<p class="success">Organization ID found: ${escapeHtml(String(orgId))}</p>` : '<p style="color:#fbbf24">No organization admin access found. You may need to add the app to your LinkedIn Company Page.</p>'}
 <div>
 <p class="label">Access Token (save this as LINKEDIN_ACCESS_TOKEN):</p>
-<div class="token-box">${tokenData.access_token}</div>
+<div class="token-box">${escapeHtml(String(tokenData.access_token))}</div>
 </div>
 ${orgId ? `<div>
 <p class="label">Organization ID (save this as LINKEDIN_ORGANIZATION_ID):</p>
-<div class="token-box">${orgId}</div>
+<div class="token-box">${escapeHtml(String(orgId))}</div>
 </div>` : ""}
-<p class="info">Token expires: ${expiresAt}</p>
+<p class="info">Token expires: ${escapeHtml(String(expiresAt))}</p>
 ${tokenData.refresh_token ? `<div>
 <p class="label">Refresh Token (save this as LINKEDIN_REFRESH_TOKEN):</p>
-<div class="token-box">${tokenData.refresh_token}</div>
+<div class="token-box">${escapeHtml(String(tokenData.refresh_token))}</div>
 </div>` : ""}
 <p class="info">Copy the values above and add them as environment variables, or click below to save automatically.</p>
 <form method="POST" action="/api/auth/linkedin/save-token">
-<input type="hidden" name="access_token" value="${tokenData.access_token}" />
-<input type="hidden" name="expires_at" value="${expiresAt}" />
-${orgId ? `<input type="hidden" name="organization_id" value="${orgId}" />` : ""}
-${tokenData.refresh_token ? `<input type="hidden" name="refresh_token" value="${tokenData.refresh_token}" />` : ""}
+<input type="hidden" name="access_token" value="${escapeHtml(String(tokenData.access_token))}" />
+<input type="hidden" name="expires_at" value="${escapeHtml(String(expiresAt))}" />
+${orgId ? `<input type="hidden" name="organization_id" value="${escapeHtml(String(orgId))}" />` : ""}
+${tokenData.refresh_token ? `<input type="hidden" name="refresh_token" value="${escapeHtml(String(tokenData.refresh_token))}" />` : ""}
 <button type="submit">Save Token Automatically</button>
 </form>
 </div></body></html>`;
@@ -901,7 +904,7 @@ ${tokenData.refresh_token ? `<input type="hidden" name="refresh_token" value="${
       res.send(html);
     } catch (error: any) {
       console.error("[LinkedIn OAuth] Callback error:", error);
-      res.status(500).send(`LinkedIn OAuth failed: ${error.message}`);
+      res.status(500).send(`LinkedIn OAuth failed: ${escapeHtml(error.message || "Unknown error")}`);
     }
   });
 
@@ -976,7 +979,7 @@ a { color: #E8732A; }
       const { code, state, error: oauthError, error_description } = req.query;
 
       if (oauthError) {
-        return res.status(400).send(`Facebook OAuth error: ${oauthError} - ${error_description}`);
+        return res.status(400).send(`Facebook OAuth error: ${escapeHtml(String(oauthError))} - ${escapeHtml(String(error_description || ""))}`);
       }
 
       if (!code || !state) {
@@ -997,16 +1000,16 @@ a { color: #E8732A; }
 
       const pagesHtml = pages.map(p => `
         <div style="background:#0d2230;border:1px solid #1a4a5e;border-radius:8px;padding:16px;margin:12px 0;">
-          <p style="color:#4ade80;font-size:16px;margin:0 0 8px"><strong>${p.name}</strong> (${p.category})</p>
+          <p style="color:#4ade80;font-size:16px;margin:0 0 8px"><strong>${escapeHtml(String(p.name))}</strong> (${escapeHtml(String(p.category))})</p>
           <p class="label">Page ID:</p>
-          <div class="token-box">${p.id}</div>
+          <div class="token-box">${escapeHtml(String(p.id))}</div>
           <p class="label">Page Access Token:</p>
-          <div class="token-box">${p.access_token}</div>
+          <div class="token-box">${escapeHtml(String(p.access_token))}</div>
           <form method="POST" action="/api/auth/facebook/save-token">
-            <input type="hidden" name="page_id" value="${p.id}" />
-            <input type="hidden" name="page_name" value="${p.name}" />
-            <input type="hidden" name="page_access_token" value="${p.access_token}" />
-            <input type="hidden" name="user_access_token" value="${longToken.access_token}" />
+            <input type="hidden" name="page_id" value="${escapeHtml(String(p.id))}" />
+            <input type="hidden" name="page_name" value="${escapeHtml(String(p.name))}" />
+            <input type="hidden" name="page_access_token" value="${escapeHtml(String(p.access_token))}" />
+            <input type="hidden" name="user_access_token" value="${escapeHtml(String(longToken.access_token))}" />
             <button type="submit">Use This Page</button>
           </form>
         </div>
@@ -1026,7 +1029,7 @@ button { background: #E8732A; color: white; border: none; padding: 10px 20px; bo
 </style></head>
 <body><div class="card">
 <h1>Facebook Connected Successfully</h1>
-<p class="info">User token expires: ${expiresAt}</p>
+<p class="info">User token expires: ${escapeHtml(String(expiresAt))}</p>
 ${pages.length > 0
   ? `<p class="success">Found ${pages.length} page(s) you manage. Select the one to use for posting:</p>${pagesHtml}`
   : '<p style="color:#fbbf24">No pages found. Make sure you are an admin of the GetCyberRight Facebook page.</p>'
@@ -1036,7 +1039,7 @@ ${pages.length > 0
       res.send(html);
     } catch (error: any) {
       console.error("[Facebook OAuth] Callback error:", error);
-      res.status(500).send(`Facebook OAuth failed: ${error.message}`);
+      res.status(500).send(`Facebook OAuth failed: ${escapeHtml(error.message || "Unknown error")}`);
     }
   });
 
