@@ -196,7 +196,7 @@ function buildLandscapeSvg(
   <circle cx="${width - 200}" cy="180" r="120" fill="none" stroke="${topic.accent}" stroke-width="0.8" opacity="0.04"/>
   <circle cx="${width - 200}" cy="180" r="60" fill="${topic.accent}" opacity="0.03"/>
 
-  <text x="${padX}" y="55" font-family="'Segoe UI',Arial,sans-serif" font-size="16" font-weight="700" fill="${BRAND.white}" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
+  <text x="${padX}" y="55" font-family="'Segoe UI',Arial,sans-serif" font-size="24" font-weight="700" fill="${BRAND.white}" letter-spacing="1" opacity="0.95">GetCyberRight</text>
 
   ${headlineSvg}
 
@@ -277,7 +277,7 @@ function buildSquareSvg(
   <circle cx="${width - 150}" cy="250" r="130" fill="none" stroke="${topic.accent}" stroke-width="0.8" opacity="0.04"/>
   <circle cx="${width - 150}" cy="250" r="60" fill="${topic.accent}" opacity="0.03"/>
 
-  <text x="${padX}" y="60" font-family="'Segoe UI',Arial,sans-serif" font-size="18" font-weight="700" fill="${BRAND.white}" letter-spacing="2" opacity="0.9">GETCYBERRIGHT</text>
+  <text x="${padX}" y="60" font-family="'Segoe UI',Arial,sans-serif" font-size="26" font-weight="700" fill="${BRAND.white}" letter-spacing="1" opacity="0.95">GetCyberRight</text>
 
   ${headlineSvg}
 
