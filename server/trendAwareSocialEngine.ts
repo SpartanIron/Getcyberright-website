@@ -22,6 +22,8 @@ export type { TemplateStyle };
 export { searchStockPhoto, downloadSourceImage, applyBrandOverlay, extractSearchQuery };
 import * as fs from "fs";
 import * as path from "path";
+import { createHash } from "crypto";
+import type { InsertNewsArticle, NewsArticle } from "@shared/schema";
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -572,6 +574,7 @@ interface TrendAwarePostResult {
   recommendedAction: "auto_publish" | "review";
   sourceValidation: { tier1Count: number; tier2Count: number; tier3Count: number; highestTier: 1 | 2 | 3 };
   sourceImageUrl: string | null;
+  sourceArticleUrl: string | null;
   aiImagePrompt: string | null;
 }
 
@@ -863,7 +866,7 @@ STEP 7 - CONTENT CREATION:
 - ALWAYS end with a link to a relevant GetCyberRight page
 - CRITICAL: You may ONLY link to URLs that appear in the KEY TOOL PAGES list, or to specific guide/alert/scam-intel slugs listed in the context above. NEVER invent or guess a URL slug. If no specific guide/alert/scam-intel page matches, use the most relevant KEY TOOL PAGE instead
 - ALL links MUST use the www subdomain (https://www.getcyberright.com/...). Never use https://getcyberright.com without www
-- If no specific page matches, link to https://www.getcyberright.com/awareness-hub as the default fallback
+- If no specific page matches, link to https://www.getcyberright.com/news as the default fallback (a dedicated article will be created automatically)
 - The link MUST appear on its own line before any hashtags
 
 STEP 8 - VISUAL PLANNING:
@@ -981,6 +984,7 @@ ${scamIntelContext}
 KEY TOOL PAGES (ONLY use these exact URLs):
 - GCR Scam Guard: https://www.getcyberright.com/scam-checker
 - Cyber Threat Radar: https://www.getcyberright.com/cyber-threat-radar
+- News Hub: https://www.getcyberright.com/news
 - Awareness Hub: https://www.getcyberright.com/awareness-hub
 - GCR Data Shield: https://www.getcyberright.com/shield
 - Breach Monitor: https://www.getcyberright.com/breach-dashboard
@@ -1788,7 +1792,7 @@ async function validateAndFixPostLinks(postContent: string): Promise<string> {
       continue;
     }
 
-    const fallback = "https://www.getcyberright.com/awareness-hub";
+    const fallback = "https://www.getcyberright.com/news";
     const fullUrl = match[0].replace(/[.,;:!?)]+$/, "");
     result = result.replace(fullUrl, fallback);
     console.log(`[TrendEngine] Fixed dead link: ${fullUrl} → ${fallback}`);
@@ -1873,6 +1877,156 @@ async function getAvailablePlatformsForBreaking(): Promise<string[]> {
     return Object.keys(channels).filter(p => (platformCounts[p] || 0) < DAILY_POST_LIMIT);
   } catch {
     return ["linkedin", "facebook", "instagram"];
+  }
+}
+
+async function generateTrendArticle(
+  posts: TrendAwarePostResult,
+  postStyle: string
+): Promise<NewsArticle | null> {
+  try {
+    const sourceUrl = posts.sourceArticleUrl || `https://www.getcyberright.com/trend-${Date.now()}`;
+
+    const existing = await storage.getNewsArticleBySourceUrl(sourceUrl);
+    if (existing) {
+      console.log(`[TrendEngine] Article already exists for source: ${sourceUrl}, slug: ${existing.slug}`);
+      return existing;
+    }
+
+    const categoryMap: Record<string, string> = {
+      phishing_scam: "Cybersecurity",
+      data_breach: "Cybersecurity",
+      malware: "Cybersecurity",
+      ai_threat: "AI",
+      social_engineering: "Cybersecurity",
+      privacy: "Cybersecurity",
+      vulnerability: "Cybersecurity",
+      industry_development: "Tech",
+      ai_innovation: "AI",
+      regulatory_update: "Tech",
+      general_awareness: "Cybersecurity",
+    };
+
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-5",
+      max_tokens: 2500,
+      messages: [{
+        role: "user",
+        content: `You are a cybersecurity journalist for GetCyberRight, a trusted family-focused cybersecurity education platform. Write a full, rich article based on this trend insight.
+
+TOPIC: ${posts.title}
+ANALYSIS: ${posts.trendAnalysis.summary}
+CATEGORY: ${posts.trendAnalysis.category}
+URGENCY: ${posts.trendAnalysis.urgency_score}/5
+IMPACT: ${posts.trendAnalysis.impact_level}
+AUDIENCE: ${posts.trendAnalysis.audience}
+${posts.gcrToolReference ? `RELATED TOOL: ${posts.gcrToolReference.tool_name} (${posts.gcrToolReference.how_it_connects})` : ""}
+
+SOCIAL POST CONTENT (use as a starting point, expand significantly):
+${posts.linkedin}
+
+Write a complete article with this structure:
+1. Opening paragraph: What happened, why it matters right now (2-3 sentences)
+2. The Details: Explain the situation in depth for non-technical readers (2-3 paragraphs)
+3. Who Is Affected: Be specific about which groups of people should pay attention (1-2 paragraphs)
+4. What You Should Do Right Now: Numbered, specific action steps families can take immediately (3-5 steps)
+5. The Bigger Picture: Connect this to broader cybersecurity trends and why staying informed matters (1 paragraph)
+${posts.gcrToolReference ? `6. How GetCyberRight Can Help: Mention the ${posts.gcrToolReference.tool_name} tool and how it connects (1 paragraph)` : ""}
+
+WRITING RULES:
+- Write for families, parents, seniors, and everyday internet users. NO jargon.
+- NEVER use em dashes. Use periods, commas, semicolons, or colons instead.
+- NEVER fabricate statistics, numbers, or data points.
+- Use Markdown formatting: ## for section headers, numbered lists for action steps, **bold** for emphasis.
+- Keep sentences under 25 words. Short paragraphs (2-3 sentences max).
+- Be specific and actionable. "Change your password on [service]" not "stay vigilant."
+- Tone: confident, caring, expert. Like a trusted friend who works in cybersecurity.
+- Article should be 400-600 words. Rich and substantive, not padded.
+
+Also provide:
+- "title": A clear, family-friendly headline (under 80 chars). Frame around what matters to the reader.
+- "excerpt": 1-2 sentence summary (under 200 chars)
+
+Output as JSON:
+{
+  "title": "...",
+  "excerpt": "...",
+  "content": "Full article body in Markdown..."
+}`
+      }]
+    });
+
+    const textContent = response.content.find(c => c.type === "text");
+    if (!textContent || textContent.type !== "text") {
+      console.error("[TrendEngine] No text in article generation response");
+      return null;
+    }
+
+    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error("[TrendEngine] No JSON found in article generation response");
+      return null;
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    if (!parsed.title || !parsed.content) {
+      console.error("[TrendEngine] Missing required fields in article response");
+      return null;
+    }
+
+    const articleContent = parsed.content
+      .replace(/\s*[\u2014\u2013]\s*/g, ". ")
+      .replace(/\s*--\s*/g, ". ")
+      .trim();
+
+    const baseSlug = parsed.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .slice(0, 60);
+    const urlHash = createHash("md5").update(sourceUrl).digest("hex").slice(0, 8);
+    const slug = `${baseSlug}-${urlHash}`;
+
+    const urgencyMap: Record<number, number> = { 1: 1, 2: 1, 3: 2, 4: 3, 5: 4 };
+
+    const relatedToolUrl = posts.gcrToolReference?.url
+      ? (posts.gcrToolReference.url.startsWith("http") ? posts.gcrToolReference.url : `https://www.getcyberright.com${posts.gcrToolReference.url}`)
+      : null;
+
+    const articleData: InsertNewsArticle = {
+      title: parsed.title.slice(0, 200),
+      slug,
+      excerpt: (parsed.excerpt || posts.trendAnalysis.summary).slice(0, 300),
+      content: articleContent,
+      category: categoryMap[posts.trendAnalysis.category] || "Cybersecurity",
+      source: "GetCyberRight Intelligence",
+      sourceUrl,
+      originalTitle: posts.title,
+      imageUrl: posts.sourceImageUrl?.replace(/^http:\/\//i, "https://") || null,
+      thumbnailUrl: posts.sourceImageUrl?.replace(/^http:\/\//i, "https://") || null,
+      urgencyLevel: urgencyMap[posts.trendAnalysis.urgency_score] || 2,
+      relatedToolUrl,
+      relatedToolName: posts.gcrToolReference?.tool_name || null,
+      publishedAt: new Date(),
+    };
+
+    const stored = await storage.createNewsArticle(articleData);
+    console.log(`[TrendEngine] Created news article: "${stored.title}" -> /news/${stored.slug}`);
+    return stored;
+  } catch (err: any) {
+    if (err.message?.includes("duplicate key")) {
+      console.log(`[TrendEngine] Article slug collision, looking up existing article`);
+      try {
+        const existingBySource = await storage.getNewsArticleBySourceUrl(
+          posts.sourceArticleUrl || `https://www.getcyberright.com/trend-${Date.now()}`
+        );
+        if (existingBySource) return existingBySource;
+      } catch {}
+      return null;
+    }
+    console.error(`[TrendEngine] Failed to generate trend article: ${err.message}`);
+    return null;
   }
 }
 
@@ -2060,12 +2214,29 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     );
     console.log(`[TrendEngine] Image resolved: source=${imageSource}, url=${imageUrl ? "yes" : "none"}`);
 
-    const fixedLinkedin = await validateAndFixPostLinks(posts.linkedin);
-    const fixedFacebook = await validateAndFixPostLinks(posts.facebook);
+    const trendArticle = await generateTrendArticle(posts, postStyle);
+    const articleUrl = trendArticle
+      ? `https://www.getcyberright.com/news/${trendArticle.slug}`
+      : "https://www.getcyberright.com/awareness-hub";
+
+    if (trendArticle) {
+      console.log(`[TrendEngine] Article ready: /news/${trendArticle.slug} — social posts will link here`);
+    } else {
+      console.warn("[TrendEngine] Article generation failed, falling back to /awareness-hub");
+    }
+
+    let fixedLinkedin = await validateAndFixPostLinks(posts.linkedin);
+    let fixedFacebook = await validateAndFixPostLinks(posts.facebook);
     const fixedInstagram = posts.instagram;
 
-    const contentSlug = posts.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50);
-    const canonicalUrl = "https://www.getcyberright.com/awareness-hub";
+    if (trendArticle) {
+      const gcrLinkPattern = /https?:\/\/(?:www\.)?getcyberright\.com\/[^\s)\]"',]+/gi;
+      fixedLinkedin = fixedLinkedin.replace(gcrLinkPattern, articleUrl);
+      fixedFacebook = fixedFacebook.replace(gcrLinkPattern, articleUrl);
+    }
+
+    const contentSlug = trendArticle?.slug || posts.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50);
+    const canonicalUrl = articleUrl;
     const validatedLinkedin = ensureGcrLink(tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle), canonicalUrl, "linkedin", "trend_insight", contentSlug, postStyle);
     const validatedFacebook = ensureGcrLink(tagAllGcrLinks(fixedFacebook, "facebook", "trend_insight", contentSlug, postStyle), canonicalUrl, "facebook", "trend_insight", contentSlug, postStyle);
     const validatedInstagram = fixedInstagram;
