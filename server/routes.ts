@@ -404,6 +404,28 @@ export async function registerRoutes(
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
+  app.get('/api/og', standardRateLimit, async (req: Request, res: Response) => {
+    try {
+      const title = (req.query.title as string || '').slice(0, 120);
+      if (!title) {
+        res.status(400).json({ error: 'title is required' });
+        return;
+      }
+      const severity = req.query.severity as string | undefined;
+      const type = req.query.type as string || 'alert';
+      const category = req.query.category as string | undefined;
+
+      const { generateOgImage } = await import('./socialImageService');
+      const buffer = await generateOgImage(title, { severity, type, category });
+
+      res.setHeader('Content-Type', 'image/jpeg');
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.send(buffer);
+    } catch (error: any) {
+      console.error('[OG Image] Generation failed:', error.message);
+      res.status(500).json({ error: 'Image generation failed' });
+    }
+  });
 
   // SSL Health Check Endpoint for external monitoring services
   app.get('/api/health/ssl', standardRateLimit, async (_req: Request, res: Response) => {

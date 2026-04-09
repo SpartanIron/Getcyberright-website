@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url,
       type: "article",
-      images: [{ url: `${BASE_URL}/og/news-alerts.png`, width: 1080, height: 1080, alt: alert.threatName }],
+      images: [{ url: `${BASE_URL}/api/og?title=${encodeURIComponent(alert.threatName)}&severity=${encodeURIComponent(alert.riskLevel || '')}&type=alert`, width: 1200, height: 630, alt: alert.threatName }],
       publishedTime: alert.publishedAt || undefined,
     },
   };

@@ -6,7 +6,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShieldAlert, ArrowLeft, Calendar, Globe, Shield, AlertTriangle, CheckCircle, ExternalLink, Loader2, ArrowRight } from "lucide-react";
+import { ShieldAlert, ArrowLeft, Calendar, Globe, Shield, AlertTriangle, CheckCircle, ExternalLink, Loader2, ArrowRight, BadgeCheck, Clock } from "lucide-react";
 import { sanitizeHtml } from "@/lib/sanitize";
 
 interface AlertDetail {
@@ -189,6 +189,42 @@ export default function AlertDetailPage() {
                   </Link>
                 </CardContent>
               </Card>
+
+              <Card className="mt-4 border-slate-200 dark:border-slate-700" data-testid="card-freshness">
+                <CardContent className="pt-4 pb-4 space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Content Freshness</p>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <span className="text-muted-foreground">Published</span>
+                    <span className="ml-auto font-medium">{new Date(alert.publishedAt || alert.dateDetected).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                  </div>
+                  {alert.updatedAt && alert.updatedAt !== alert.publishedAt && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                      <span className="text-muted-foreground">Updated</span>
+                      <span className="ml-auto font-medium text-amber-600 dark:text-amber-400">{new Date(alert.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                    </div>
+                  )}
+                  {alert.sourceUrls && alert.sourceUrls.length > 0 && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <BadgeCheck className="h-3.5 w-3.5 text-teal-500 shrink-0" />
+                      <span className="text-muted-foreground">Sources verified</span>
+                      <span className="ml-auto font-medium">{alert.sourceUrls.length}</span>
+                    </div>
+                  )}
+                  {(() => {
+                    const pubDate = new Date(alert.updatedAt || alert.publishedAt || alert.dateDetected);
+                    const daysSince = Math.floor((Date.now() - pubDate.getTime()) / 86400000);
+                    const isFresh = daysSince <= 30;
+                    return (
+                      <div className={`flex items-center gap-1.5 text-xs rounded-md px-2 py-1.5 mt-1 ${isFresh ? "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400" : "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400"}`} data-testid="text-freshness-status">
+                        <span className={`inline-block w-1.5 h-1.5 rounded-full ${isFresh ? "bg-green-500" : "bg-amber-500"}`} />
+                        {isFresh ? `Current — updated ${daysSince === 0 ? "today" : daysSince === 1 ? "yesterday" : `${daysSince}d ago`}` : `Last updated ${daysSince}d ago`}
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
             </div>
           </aside>
 
@@ -268,13 +304,26 @@ export default function AlertDetailPage() {
                   <ExternalLink className="h-6 w-6 text-blue-500" />
                   Sources
                 </h2>
-                <div className="space-y-2">
-                  {alert.sourceUrls.map((url, i) => (
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-teal-600 dark:text-teal-400 hover:underline" data-testid={`link-source-${i}`}>
-                      <ExternalLink className="h-3 w-3 shrink-0" />
-                      {url.length > 80 ? url.substring(0, 80) + "..." : url}
-                    </a>
-                  ))}
+                <div className="space-y-3">
+                  {alert.sourceUrls.filter((u) => { try { const s = new URL(u).protocol; return s === "https:" || s === "http:"; } catch { return false; } }).map((url, i) => {
+                    const domain = (() => { try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return ""; } })();
+                    const officialDomains = ["cisa.gov", "nist.gov", "ic3.gov", "fbi.gov", "ftc.gov", "ncsc.gov.uk", "cert.org", "us-cert.gov", "enisa.europa.eu"];
+                    const isOfficial = officialDomains.some((d) => domain === d || domain.endsWith(`.${d}`));
+                    return (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm group" data-testid={`link-source-${i}`}>
+                        <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-teal-500 transition-colors" />
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-teal-600 dark:text-teal-400 group-hover:underline truncate">{domain}</span>
+                          {isOfficial && (
+                            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-[10px] px-1.5 py-0 shrink-0">
+                              <BadgeCheck className="h-3 w-3 mr-0.5" />
+                              Official
+                            </Badge>
+                          )}
+                        </div>
+                      </a>
+                    );
+                  })}
                 </div>
               </section>
             )}

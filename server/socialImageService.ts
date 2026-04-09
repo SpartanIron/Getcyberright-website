@@ -370,6 +370,96 @@ export async function generateImagesForAllPlatforms(
   return results;
 }
 
+export async function generateOgImage(
+  title: string,
+  options: { severity?: string; type?: string; category?: string; subtitle?: string } = {}
+): Promise<Buffer> {
+  const width = 1200;
+  const height = 630;
+  const cleanTitle = title.replace(/\[.*?\]\s*/g, "").trim();
+  const contentType = options.type || "alert";
+  const topic = detectTopic(cleanTitle, contentType);
+  const baseConfig = TOPIC_CONFIG[topic] || TOPIC_CONFIG.default;
+  const severityOverrides = getSeverityOverrides(options.severity);
+  const config = { ...baseConfig, ...(severityOverrides.accent ? { accent: severityOverrides.accent } : {}) };
+
+  const svg = buildLandscapeSvg(width, height, cleanTitle, config, severityOverrides.badgeLabel, severityOverrides.badge, contentType);
+
+  return await sharp(Buffer.from(svg)).resize(width, height).jpeg({ quality: 90 }).toBuffer();
+}
+
+export async function generateStatCard(
+  stat: string,
+  label: string,
+  source: string,
+  options: { accent?: string; platform?: string } = {}
+): Promise<string | null> {
+  try {
+    ensureDir();
+    const accent = options.accent || BRAND.teal;
+    const platform = options.platform || "linkedin";
+    const dims = PLATFORM_DIMENSIONS[platform] || PLATFORM_DIMENSIONS.facebook;
+    const isSquare = platform === "instagram";
+    const w = dims.width;
+    const h = dims.height;
+
+    const accentRgb = hexToRgb(accent);
+    const shieldMesh = buildShieldMesh(w, h, accent, 0.04);
+
+    const statFontSize = isSquare ? 140 : 120;
+    const labelLines = wrapText(label, isSquare ? 20 : 30);
+    const labelFontSize = isSquare ? 32 : 28;
+    const labelLineHeight = labelFontSize * 1.4;
+
+    const statY = isSquare ? h * 0.38 : h * 0.42;
+    const labelStartY = statY + 50;
+
+    let labelSvg = "";
+    for (let i = 0; i < Math.min(labelLines.length, 3); i++) {
+      const y = labelStartY + i * labelLineHeight;
+      labelSvg += `<text x="${w / 2}" y="${y}" text-anchor="middle" font-family="'SF Pro Display','Inter','Segoe UI',Helvetica,Arial,sans-serif" font-size="${labelFontSize}" font-weight="500" fill="${BRAND.silver}" letter-spacing="0.5">${escapeXml(labelLines[i])}</text>`;
+    }
+
+    const svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="${BRAND.surface}"/>
+      <stop offset="100%" stop-color="${BRAND.ink}"/>
+    </linearGradient>
+    <linearGradient id="accentGlow" x1="0.5" y1="0.2" x2="0.5" y2="0.8">
+      <stop offset="0%" stop-color="rgba(${accentRgb.r},${accentRgb.g},${accentRgb.b},0.08)"/>
+      <stop offset="100%" stop-color="rgba(${accentRgb.r},${accentRgb.g},${accentRgb.b},0)"/>
+    </linearGradient>
+    <clipPath id="clip"><rect width="${w}" height="${h}"/></clipPath>
+  </defs>
+
+  <rect width="${w}" height="${h}" fill="url(#bg)"/>
+  <rect width="${w}" height="${h}" fill="url(#accentGlow)"/>
+  <g clip-path="url(#clip)" opacity="1">${shieldMesh}</g>
+
+  <rect x="0" y="0" width="${w}" height="4" fill="${accent}"/>
+
+  <text x="${w / 2}" y="${statY}" text-anchor="middle" font-family="'SF Pro Display','Inter','Segoe UI',Helvetica,Arial,sans-serif" font-size="${statFontSize}" font-weight="800" fill="${accent}" letter-spacing="-3">${escapeXml(stat)}</text>
+
+  ${labelSvg}
+
+  <line x1="${w * 0.3}" y1="${h - 80}" x2="${w * 0.7}" y2="${h - 80}" stroke="${BRAND.muted}" stroke-width="0.5" opacity="0.5"/>
+  <text x="${w / 2}" y="${h - 52}" text-anchor="middle" font-family="'SF Pro Display','Inter','Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="${BRAND.slate}">Source: ${escapeXml(source)}</text>
+  <text x="${w / 2}" y="${h - 28}" text-anchor="middle" font-family="'SF Pro Display','Inter','Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="600" fill="${BRAND.silver}">GetCyberRight</text>
+</svg>`;
+
+    const hash = crypto.createHash("md5").update(stat + label + source + platform + "v1").digest("hex").substring(0, 12);
+    const filename = `stat-${platform}-${hash}.jpeg`;
+    const filepath = path.join(SOCIAL_IMAGES_DIR, filename);
+
+    await sharp(Buffer.from(svg)).resize(w, h).jpeg({ quality: 92 }).toFile(filepath);
+    return filepath;
+  } catch (error: any) {
+    console.error(`[SocialImage] Failed to generate stat card:`, error.message);
+    return null;
+  }
+}
+
 export function getImageAsBase64(filepath: string): string | null {
   try {
     if (!fs.existsSync(filepath)) return null;

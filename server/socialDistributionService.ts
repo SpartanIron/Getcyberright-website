@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { storage } from "./storage";
 import type { CyberSafetyGuide, CyberThreatAlert, ScamIntelligence, InsertSocialPost } from "@shared/schema";
-import { generateBrandedImage, serveImagePath } from "./socialImageService";
+import { generateBrandedImage, generateStatCard, serveImagePath } from "./socialImageService";
 import { getBufferChannelsByPlatform } from "./bufferPublisher";
 import { tagAllGcrLinks, tagSingleUrl, buildCampaignId } from "./utmTracking";
 import { buildPartnerContext } from "./socialEngagementService";

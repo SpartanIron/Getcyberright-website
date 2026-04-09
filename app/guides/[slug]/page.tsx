@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url,
       type: "article",
-      images: [{ url: `${BASE_URL}/og/education.png`, width: 1080, height: 1080, alt: guide.title }],
+      images: [{ url: `${BASE_URL}/api/og?title=${encodeURIComponent(guide.title)}&type=guide&category=${encodeURIComponent(guide.category || '')}`, width: 1200, height: 630, alt: guide.title }],
       publishedTime: guide.publishedAt || undefined,
       modifiedTime: guide.updatedAt || guide.publishedAt || undefined,
     },
