@@ -342,35 +342,11 @@ export async function generateBrandedImage(
       svg = svg.replace("</svg>", `${badgeSvg}\n</svg>`);
     }
 
-    const logoSize = isSquare ? 90 : 75;
-    const logoBuffer = await getLogoPngBuffer(logoSize);
-
-    const composites: sharp.OverlayOptions[] = [];
-    if (logoBuffer) {
-      if (isSquare) {
-        composites.push({
-          input: logoBuffer,
-          top: 16,
-          left: Math.round(dims.width / 2 - logoSize / 2),
-        });
-      } else {
-        composites.push({
-          input: logoBuffer,
-          top: dims.height - 75,
-          left: dims.width - 340,
-        });
-      }
-    }
-
-    const hash = crypto.createHash("md5").update(title + platform + (severity || "") + "v4").digest("hex").substring(0, 12);
+    const hash = crypto.createHash("md5").update(title + platform + (severity || "") + "v5").digest("hex").substring(0, 12);
     const filename = `social-${platform}-${hash}.jpeg`;
     const filepath = path.join(SOCIAL_IMAGES_DIR, filename);
 
-    let pipeline = sharp(Buffer.from(svg)).resize(dims.width, dims.height);
-    if (composites.length > 0) {
-      pipeline = pipeline.composite(composites);
-    }
-    await pipeline.jpeg({ quality: 90 }).toFile(filepath);
+    await sharp(Buffer.from(svg)).resize(dims.width, dims.height).jpeg({ quality: 90 }).toFile(filepath);
 
     return filepath;
   } catch (error: any) {
