@@ -7,22 +7,22 @@ export interface PlatformPolicy {
 
 export const PLATFORM_POLICIES: Record<string, PlatformPolicy> = {
   linkedin: {
-    wordLimit: 80,
+    wordLimit: 50,
     maxConsecutiveLineBreaks: 3,
-    maxParagraphs: 6,
+    maxParagraphs: 4,
     sentencesPerParagraph: 2,
   },
   facebook: {
-    wordLimit: 80,
+    wordLimit: 45,
     maxConsecutiveLineBreaks: 3,
-    maxParagraphs: 5,
-    sentencesPerParagraph: 3,
+    maxParagraphs: 3,
+    sentencesPerParagraph: 2,
   },
   instagram: {
-    wordLimit: 100,
+    wordLimit: 60,
     maxConsecutiveLineBreaks: 3,
-    maxParagraphs: 5,
-    sentencesPerParagraph: 3,
+    maxParagraphs: 4,
+    sentencesPerParagraph: 2,
   },
 };
 
@@ -172,6 +172,32 @@ function enforceWordLimit(text: string, policy: PlatformPolicy): { text: string;
   };
 }
 
+const BANNED_PHRASES = [
+  "game-changer", "wake-up call", "in today's digital landscape", "cyber hygiene",
+  "let that sink in", "read that again", "hot take:", "unpopular opinion:",
+  "just a reminder that", "friendly reminder", "PSA:", "this is huge",
+  "this is big", "here's the thing", "here's why this matters",
+  "think about that for a second", "but here's the kicker", "the bottom line",
+  "at the end of the day", "needless to say", "it goes without saying",
+  "food for thought", "mic drop", "threat landscape", "threat actors",
+  "it is imperative", "this underscores", "it's crucial",
+  "as cybersecurity professionals", "I'm excited to share",
+];
+
+function removeBannedPhrases(text: string): { text: string; removed: string[] } {
+  let result = text.replace(/[\u2018\u2019\u201A\u201B]/g, "'").replace(/[\u201C\u201D\u201E\u201F]/g, '"');
+  const removed: string[] = [];
+  for (const phrase of BANNED_PHRASES) {
+    const escapedPhrase = phrase.replace(/'/g, "['\u2019]").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(escapedPhrase, "gi");
+    if (regex.test(result)) {
+      removed.push(phrase);
+      result = result.replace(regex, "").replace(/\s{2,}/g, " ").trim();
+    }
+  }
+  return { text: result, removed };
+}
+
 export function enforcePostPolicy(text: string, platform: string): PolicyResult {
   const policy = PLATFORM_POLICIES[platform];
   if (!policy) return { content: text, violations: [], corrected: false };
@@ -181,6 +207,13 @@ export function enforcePostPolicy(text: string, platform: string): PolicyResult 
 
   const violations: PolicyViolation[] = [];
   let content = sanitized;
+
+  const bannedResult = removeBannedPhrases(content);
+  content = bannedResult.text;
+  if (bannedResult.removed.length > 0) {
+    violations.push({ rule: "bannedPhrases", before: bannedResult.removed.length, after: 0 });
+    console.log(`[SocialPostPolicy] ${platform}: removed banned phrases: ${bannedResult.removed.join(", ")}`);
+  }
 
   const lineBreakResult = enforceLineBreaks(content, policy.maxConsecutiveLineBreaks);
   content = lineBreakResult.text;

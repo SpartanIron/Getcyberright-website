@@ -581,9 +581,9 @@ export async function applyBrandOverlay(
     const padBottom = isSquare ? 56 : 48;
 
     const fontSize = isSquare
-      ? (headlineLines.length > 3 ? 42 : headlineLines.length > 2 ? 48 : 56)
-      : (headlineLines.length > 2 ? 38 : 46);
-    const lineHeight = fontSize * 1.25;
+      ? (headlineLines.length > 3 ? 46 : headlineLines.length > 2 ? 52 : 60)
+      : (headlineLines.length > 2 ? 42 : 50);
+    const lineHeight = fontSize * 1.2;
 
     const totalHeadlineH = headlineLines.length * lineHeight;
     const categoryH = 32;
@@ -616,29 +616,35 @@ export async function applyBrandOverlay(
     <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="rgba(0,0,0,0)"/>
       <stop offset="${Math.round((gradientStartY / height) * 100)}%" stop-color="rgba(0,0,0,0)"/>
-      <stop offset="${Math.round(((gradientStartY + gradientH * 0.25) / height) * 100)}%" stop-color="rgba(10,15,26,${tmpl.gradientOpacity * 0.5})"/>
+      <stop offset="${Math.round(((gradientStartY + gradientH * 0.15) / height) * 100)}%" stop-color="rgba(10,15,26,${tmpl.gradientOpacity * 0.3})"/>
+      <stop offset="${Math.round(((gradientStartY + gradientH * 0.45) / height) * 100)}%" stop-color="rgba(10,15,26,${tmpl.gradientOpacity * 0.7})"/>
       <stop offset="100%" stop-color="rgba(10,15,26,${tmpl.gradientOpacity})"/>
+    </linearGradient>
+    <linearGradient id="accentGlow" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="${tmpl.accent}" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="${tmpl.accent}" stop-opacity="0"/>
     </linearGradient>
   </defs>
 
   <rect width="${width}" height="${height}" fill="url(#grad)"/>
+  <rect x="0" y="${Math.round(height * 0.6)}" width="${Math.round(width * 0.4)}" height="${Math.round(height * 0.4)}" fill="url(#accentGlow)"/>
 
   ${topBarSvg}
 
-  <rect x="${padX}" y="${categoryY}" width="${categoryPillW}" height="${categoryPillH}" rx="4" fill="${tmpl.accent}" opacity="0.2"/>
-  <rect x="${padX}" y="${categoryY}" width="${categoryPillW}" height="${categoryPillH}" rx="4" fill="none" stroke="${tmpl.accent}" stroke-width="1.2" opacity="0.7"/>
+  <rect x="${padX}" y="${categoryY}" width="${categoryPillW}" height="${categoryPillH}" rx="12" fill="${tmpl.accent}" opacity="0.15"/>
+  <rect x="${padX}" y="${categoryY}" width="${categoryPillW}" height="${categoryPillH}" rx="12" fill="none" stroke="${tmpl.accent}" stroke-width="1" opacity="0.5"/>
   <circle cx="${padX + 14}" cy="${categoryY + categoryPillH / 2}" r="${dotR}" fill="${tmpl.accent}"/>
-  <text x="${padX + 26}" y="${categoryY + categoryPillH / 2 + 4}" font-family="${fontFamily}" font-size="11" font-weight="700" fill="${tmpl.accent}" letter-spacing="1.5">${tmpl.categoryLabel}</text>
+  <text x="${padX + 26}" y="${categoryY + categoryPillH / 2 + 4}" font-family="${fontFamily}" font-size="10" font-weight="700" fill="${tmpl.accent}" letter-spacing="2">${tmpl.categoryLabel}</text>
 
   ${headlineSvg}
 
-  <line x1="${padX}" y1="${dividerY}" x2="${width - padX}" y2="${dividerY}" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <line x1="${padX}" y1="${dividerY}" x2="${width - padX}" y2="${dividerY}" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
 
-  <text x="${padX}" y="${brandY}" font-family="${fontFamily}" font-size="16" font-weight="600" fill="rgba(255,255,255,0.9)">GetCyberRight</text>
-  <line x1="${padX + 138}" y1="${brandY - 12}" x2="${padX + 138}" y2="${brandY + 3}" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-  <text x="${padX + 152}" y="${brandY}" font-family="${fontFamily}" font-size="12" fill="rgba(255,255,255,0.5)">Protecting Families in the Digital World</text>
+  <text x="${padX}" y="${brandY}" font-family="${fontFamily}" font-size="17" font-weight="700" fill="rgba(255,255,255,0.95)" letter-spacing="0.5">GetCyberRight</text>
+  <line x1="${padX + 145}" y1="${brandY - 12}" x2="${padX + 145}" y2="${brandY + 3}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+  <text x="${padX + 159}" y="${brandY}" font-family="${fontFamily}" font-size="12" font-weight="400" fill="rgba(255,255,255,0.55)">www.getcyberright.com</text>
 
-  <rect x="${width - padX - 50}" y="${brandY - 10}" width="50" height="3" rx="1.5" fill="${tmpl.accent}" opacity="0.6"/>
+  <rect x="${width - padX - 50}" y="${brandY - 10}" width="50" height="3" rx="1.5" fill="${tmpl.accent}" opacity="0.7"/>
 </svg>`;
 
     const overlayBuffer = await sharp(Buffer.from(overlaySvg))

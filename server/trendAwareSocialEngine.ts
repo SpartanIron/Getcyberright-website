@@ -30,6 +30,88 @@ const anthropic = new Anthropic({
   baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
 });
 
+const CURATED_HASHTAGS: Record<string, string[][]> = {
+  broad_reach: [
+    ["cybersecurity", "infosec", "datasecurity"],
+    ["cybersecurity", "informationsecurity", "cyberthreat"],
+    ["cybersecurity", "infosec", "digitalsecurity"],
+    ["cybersecurity", "cybercrime", "datasecurity"],
+  ],
+  data_breach: [
+    ["databreach", "dataprotection", "privacybreach"],
+    ["databreach", "identitytheft", "dataprivacy"],
+    ["dataexposure", "breachalert", "cyberattack"],
+  ],
+  phishing_scam: [
+    ["phishing", "scamalert", "socialengineering"],
+    ["phishingattack", "emailsecurity", "scamprevention"],
+    ["onlinescam", "phishingscam", "fraudprevention"],
+  ],
+  ransomware: [
+    ["ransomware", "malware", "cyberattack"],
+    ["ransomwareattack", "cybercrime", "malwareprotection"],
+    ["ransomware", "cyberextortion", "cyberthreat"],
+  ],
+  privacy: [
+    ["privacy", "dataprivacy", "digitalprivacy"],
+    ["onlineprivacy", "surveillance", "privacyrights"],
+    ["dataprivacy", "privacymatters", "digitalrights"],
+  ],
+  ai_threat: [
+    ["artificialintelligence", "aisecurity", "deepfake"],
+    ["aisafety", "generativeai", "aithreats"],
+    ["machinelearning", "airisks", "aisecurity"],
+  ],
+  family_safety: [
+    ["familysafety", "parentingtips", "onlinesafety"],
+    ["kidsafety", "digitalparenting", "internetsafety"],
+    ["childsafety", "parentingtech", "safekids"],
+    ["familytech", "screensafety", "cyberparenting"],
+  ],
+  general_tips: [
+    ["cybertips", "securitytips", "staysafe"],
+    ["techsecurity", "protectyourself", "cyberawareness"],
+    ["digitalsafety", "securityawareness", "cyberprotection"],
+  ],
+};
+
+function getCuratedHashtags(category: string, topicKeywords: string[]): string[] {
+  const categoryMap: Record<string, string> = {
+    "data_breach": "data_breach", "breach": "data_breach",
+    "phishing": "phishing_scam", "scam": "phishing_scam", "fraud": "phishing_scam",
+    "ransomware": "ransomware", "malware": "ransomware",
+    "privacy": "privacy", "surveillance": "privacy",
+    "deepfake": "ai_threat", "artificial_intelligence": "ai_threat", "artificial intelligence": "ai_threat",
+    "ai_threat": "ai_threat", "ai_landscape": "ai_threat", "ai_safety": "ai_threat",
+    "family": "family_safety", "kids": "family_safety", "children": "family_safety", "parenting": "family_safety",
+  };
+
+  let tagCategory = "general_tips";
+  const lowerCat = category.toLowerCase();
+  const combinedText = [lowerCat, ...topicKeywords.map(k => k.toLowerCase())].join(" ");
+  for (const [keyword, cat] of Object.entries(categoryMap)) {
+    const wordBoundary = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+    if (wordBoundary.test(combinedText)) {
+      tagCategory = cat;
+      break;
+    }
+  }
+
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+
+  const broadSets = CURATED_HASHTAGS.broad_reach;
+  const broadTags = broadSets[dayOfYear % broadSets.length];
+
+  const nicheSets = CURATED_HASHTAGS[tagCategory] || CURATED_HASHTAGS.general_tips;
+  const nicheTags = nicheSets[(dayOfYear + 1) % nicheSets.length];
+
+  const audienceSets = CURATED_HASHTAGS.family_safety;
+  const audienceTags = audienceSets[(dayOfYear + 2) % audienceSets.length];
+
+  const allTags = [...new Set([...broadTags, ...nicheTags, ...audienceTags])];
+  return allTags.slice(0, 10);
+}
+
 const CONTENT_MODES = [
   "breaking_insight",
   "preventative_education",
@@ -620,61 +702,8 @@ function enforcePostFormatting(text: string, platform: string): string {
     return words.charAt(0) + words.slice(1).toLowerCase() + ": ";
   });
 
-  cleaned = cleaned.replace(/\byou're\b/gi, "you are");
-  cleaned = cleaned.replace(/\bdon't\b/gi, "do not");
-  cleaned = cleaned.replace(/\bdon't\b/gi, "do not");
-  cleaned = cleaned.replace(/\bcan't\b/gi, "cannot");
-  cleaned = cleaned.replace(/\bcan't\b/gi, "cannot");
-  cleaned = cleaned.replace(/\bwon't\b/gi, "will not");
-  cleaned = cleaned.replace(/\bwon't\b/gi, "will not");
-  cleaned = cleaned.replace(/\bisn't\b/gi, "is not");
-  cleaned = cleaned.replace(/\bisn't\b/gi, "is not");
-  cleaned = cleaned.replace(/\baren't\b/gi, "are not");
-  cleaned = cleaned.replace(/\baren't\b/gi, "are not");
-  cleaned = cleaned.replace(/\bdoesn't\b/gi, "does not");
-  cleaned = cleaned.replace(/\bdoesn't\b/gi, "does not");
-  cleaned = cleaned.replace(/\bdidn't\b/gi, "did not");
-  cleaned = cleaned.replace(/\bdidn't\b/gi, "did not");
-  cleaned = cleaned.replace(/\bwasn't\b/gi, "was not");
-  cleaned = cleaned.replace(/\bwasn't\b/gi, "was not");
-  cleaned = cleaned.replace(/\bhaven't\b/gi, "have not");
-  cleaned = cleaned.replace(/\bhaven't\b/gi, "have not");
-  cleaned = cleaned.replace(/\bhasn't\b/gi, "has not");
-  cleaned = cleaned.replace(/\bhasn't\b/gi, "has not");
-  cleaned = cleaned.replace(/\bcouldn't\b/gi, "could not");
-  cleaned = cleaned.replace(/\bcouldn't\b/gi, "could not");
-  cleaned = cleaned.replace(/\bwouldn't\b/gi, "would not");
-  cleaned = cleaned.replace(/\bwouldn't\b/gi, "would not");
-  cleaned = cleaned.replace(/\bshouldn't\b/gi, "should not");
-  cleaned = cleaned.replace(/\bshouldn't\b/gi, "should not");
-  cleaned = cleaned.replace(/\bthey're\b/gi, "they are");
-  cleaned = cleaned.replace(/\bthey're\b/gi, "they are");
-  cleaned = cleaned.replace(/\bwe're\b/gi, "we are");
-  cleaned = cleaned.replace(/\bwe're\b/gi, "we are");
-  cleaned = cleaned.replace(/\bthere's\b/gi, "there is");
-  cleaned = cleaned.replace(/\bthere's\b/gi, "there is");
-  cleaned = cleaned.replace(/\bhere's\b/gi, "here is");
-  cleaned = cleaned.replace(/\bhere's\b/gi, "here is");
-  cleaned = cleaned.replace(/\bwhat's\b/gi, "what is");
-  cleaned = cleaned.replace(/\bwhat's\b/gi, "what is");
-  cleaned = cleaned.replace(/\bthat's\b/gi, "that is");
-  cleaned = cleaned.replace(/\bthat's\b/gi, "that is");
-  cleaned = cleaned.replace(/\bit's\b/gi, "it is");
-  cleaned = cleaned.replace(/\bit's\b/gi, "it is");
-  cleaned = cleaned.replace(/\bI'm\b/g, "I am");
-  cleaned = cleaned.replace(/\bI'm\b/g, "I am");
-  cleaned = cleaned.replace(/\bI've\b/g, "I have");
-  cleaned = cleaned.replace(/\bI've\b/g, "I have");
-  cleaned = cleaned.replace(/\bI'll\b/g, "I will");
-  cleaned = cleaned.replace(/\bI'll\b/g, "I will");
-  cleaned = cleaned.replace(/\bI'd\b/g, "I would");
-  cleaned = cleaned.replace(/\bI'd\b/g, "I would");
-  cleaned = cleaned.replace(/\blet's make sure\b/gi, "Make sure");
-  cleaned = cleaned.replace(/\blet's\b/gi, "We should");
-  cleaned = cleaned.replace(/\blet's make sure\b/gi, "Make sure");
-  cleaned = cleaned.replace(/\blet's\b/gi, "We should");
-  cleaned = cleaned.replace(/\bwho's\b/gi, "who is");
-  cleaned = cleaned.replace(/\bwho's\b/gi, "who is");
+  cleaned = cleaned.replace(/\u2019/g, "'");
+  cleaned = cleaned.replace(/\u2018/g, "'");
 
   cleaned = cleaned.replace(/(\S)\s+(\d+)\.\s/g, (match, before, num) => {
     if (parseInt(num) <= 10) {
@@ -961,8 +990,8 @@ VOICE AND PERSONALITY:
 FORMATTING (CRITICAL, STRICTLY ENFORCED):
 - NEVER use markdown: no ** bold **, no * italics *, no ## headings, no bullet markers (- or *)
 - NEVER use em dashes (use commas, colons, semicolons, or periods instead)
-- NEVER use contractions. Write "you are" not "you're", "do not" not "don't", "it is" not "it's", "cannot" not "can't", "will not" not "won't", "here is" not "here's", "that is" not "that's", "what is" not "what's", "we are" not "we're", "they are" not "they're", "there is" not "there's", "is not" not "isn't", "are not" not "aren't", "does not" not "doesn't", "did not" not "didn't", "have not" not "haven't", "has not" not "hasn't", "I am" not "I'm", "I have" not "I've"
-- When avoiding contractions creates awkward phrasing, restructure the sentence instead. For example: Instead of "let us make sure" (from "let's make sure"), write "Make sure your family..." Instead of "what is one thing" (from "what's one thing"), write "What one thing do you wish..."
+- USE contractions naturally: don't, it's, we've, that's, can't, won't, here's. Write like a human speaks. Posts without contractions sound robotic and corporate
+- If a contraction creates awkward phrasing, restructure the sentence instead
 - NEVER use hashtags on LinkedIn or Facebook posts. No #CyberSecurity, no #ScamAlert, nothing with #
 - NEVER use ALL CAPS for headers or emphasis. Write "How to protect yourself:" not "HOW TO PROTECT YOURSELF:"
 - Every post MUST have multiple \\n\\n paragraph breaks in the JSON output
@@ -972,16 +1001,21 @@ FORMATTING (CRITICAL, STRICTLY ENFORCED):
 - Keep paragraphs to 1-2 sentences maximum. One sentence per paragraph is preferred
 - If using numbered items, put each on its OWN line with a \\n\\n between them
 - White space is critical. A wall of text = automatic failure. If you produce a single unbroken paragraph, you have failed
-- LinkedIn posts that exceed 80 words = failure. Think TechCrunch style: 1-2 sentences + link. The link preview card does the heavy lifting. Cut ruthlessly
-- Keep sentences under 35 words. If a sentence exceeds 35 words, split it into two
+- LinkedIn posts that exceed 50 words = failure. Think Reuters wire dispatch: 1-2 sharp sentences + link. The branded preview card does the heavy lifting. Cut ruthlessly
+- Facebook posts that exceed 45 words = failure. Even tighter than LinkedIn
+- Keep sentences under 25 words. If a sentence exceeds 25 words, split it into two
+- EVERY post must earn the click. If the post gives away the full story, you have failed. Tease, don't tell
 
-WHAT NOT TO DO:
+WHAT NOT TO DO (ANTI-PATTERNS THAT KILL ENGAGEMENT):
 - Do not end every post with a question. Sometimes end with a strong statement
 - Do not say "Here are 3 things you can do right now" every time
 - Do not use "Stay safe out there" or similar platitudes
 - Do not start posts with "Breaking:" or use fake urgency or clickbait
-- Do not use emojis excessively (0-2 per post max)
-- Do not use: "game-changer", "wake-up call", "in today's digital landscape", "cyber hygiene"
+- Do not use emojis excessively (0-2 per post max, and NEVER as bullet points)
+- BANNED PHRASES (automatic failure if used): "game-changer", "wake-up call", "in today's digital landscape", "cyber hygiene", "let that sink in", "read that again", "I'll say it louder for the people in the back", "hot take:", "unpopular opinion:", "just a reminder that", "friendly reminder", "PSA:", "this is huge", "this is big", "here's the thing", "here's why this matters", "think about that for a second", "but here's the kicker", "the bottom line", "at the end of the day", "needless to say", "it goes without saying", "food for thought", "mic drop"
+- NEVER start with "Did you know" more than once per week
+- NEVER use the same hook formula two posts in a row
+- NEVER give a full summary of the article. The post is a TEASER that earns the click
 
 PLATFORM OPTIMIZATION (ALGORITHM-AWARE):
 - LinkedIn: The algorithm penalizes external links in the main body. Write the post as pure value content (insight, analysis, tip). Put the CTA link on its own final line, separated by TWO line breaks from the content. This way the valuable content appears above the "see more" fold and the link is below. The algorithm rewards posts that keep people on LinkedIn longer, so front-load the insight
@@ -1039,29 +1073,38 @@ CRITICAL VOICE RULES FOR ALL PLATFORMS:
 - NEVER open with generic corporate lines. Open with something a real person would actually say.
 - NEVER sound like a press release or marketing copy.
 
-LINKEDIN POST (60-80 words max, STRICTLY ENFORCED — posts over 80 words are rejected):
-- Professional but still sounds like a real person, not a thought-leader parody
-- Structure: Hook (1-2 sentences) \\n\\n One key insight or action \\n\\n CTA with link
-- First 2 lines appear before "see more". Make them count.
-- Each paragraph: 1-2 sentences MAX. Break after every thought.
-- End with a natural CTA driving to the relevant GetCyberRight page
-- Keep it SHORT. The link preview card does the visual heavy lifting. Do NOT summarize — tease.
+LINKEDIN POST (30-50 words max, STRICTLY ENFORCED — posts over 50 words are rejected):
+- Think TechCrunch, Bloomberg, Reuters: the post is a TEASER, not a summary
+- The branded OG preview card does 80% of the work. Your text is the other 20%
+- IDEAL STRUCTURE: One sharp observation or hook (1-2 sentences) \\n\\n Link on its own line
+- The first line MUST be under 15 words and grab attention immediately (this appears before "see more")
+- HOOK FORMULAS (rotate between these):
+  * Stat-lead: "X% of [thing] now [surprising fact]."
+  * Declarative: "[Strong claim]. Here's what that means for your family."
+  * Contrarian: "Everyone's saying [common take]. The real story is different."
+  * News-peg: "[Source] just confirmed [fact]. This changes everything."
+- Do NOT explain the whole story. Tease ONE surprising element that makes people click
+- Maximum 3 short paragraphs. One sentence per paragraph is ideal
+- Link goes on its own final line, separated by \\n\\n
+- NEVER sound like a thought-leader parody. No "I'm excited to share" or "Here are my thoughts"
 ${partnerContextLinkedIn}
-FACEBOOK POST (40-60 words max, STRICTLY ENFORCED):
-- Casual and warm, like texting a group chat about something important
-- Share the thing that would make someone actually stop scrolling
-- Give 1 quick specific tip
-- End with a natural CTA and link (not "Click here to learn more" but something like "We broke this down step by step here:")
-- Use paragraph breaks between thoughts
+FACEBOOK POST (25-45 words max, STRICTLY ENFORCED):
+- Even shorter than LinkedIn. This is a text message to a friend about something urgent
+- ONE sentence hook + ONE sentence context + link
+- Write like you're warning your family group chat
+- The link preview card carries the full context
+- NEVER explain what the article says. Tease why they should care
+- End with a natural bridge to the link (not "Click here" but "Full breakdown:" or "We pulled the details:")
 ${partnerContextFacebook}
-INSTAGRAM POST (40-80 words max, CRITICAL DIFFERENCES):
-- Instagram is IMAGE-FIRST. The caption supports the branded image card, not the other way around
-- Lead with a punchy hook or question that stops the scroll
-- Keep it short and scannable. 2-3 short paragraphs max
-- Do NOT put links in the caption (they are not clickable on Instagram). Instead end with "Link in bio" as CTA
-- Add 8-12 relevant hashtags at the END, separated from the caption by two line breaks
-- Most casual of all platforms. Write like you're talking to a friend.
-- Focus on ONE key takeaway, not multiple tips
+INSTAGRAM POST (30-60 words max, CRITICAL DIFFERENCES):
+- IMAGE-FIRST. The branded card IS the content. Your caption just adds voice
+- Lead with the most emotionally resonant aspect in ONE punchy sentence
+- 2 short paragraphs MAX before hashtags. Less is more
+- Do NOT repeat what the image card says. Add the human angle the image can't convey
+- End with "Link in bio" as the only CTA
+- Add 8-12 curated hashtags at the END, separated by two line breaks
+- Hashtags MUST include 3 broad reach tags (#cybersecurity #infosec #datasecurity), 3 niche tags relevant to the topic, and 3 audience tags (#familysafety #parentingtips #onlinesafety or similar)
+- NEVER use generic filler hashtags like #tech #security #news
 ${partnerContextInstagram}
 
 IMAGE HANDLING:
@@ -1178,7 +1221,13 @@ Format your complete output as this strict JSON with \\n for line breaks within 
     let imageSubtext = sanitizeContent(parsed.imageSubtext || "getcyberright.com");
     if (imageSubtext.length > 80) imageSubtext = imageSubtext.slice(0, 77) + "...";
 
-    const hashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags.slice(0, 8) : [];
+    const aiHashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags.map((t: string) => t.replace(/^#/, "")) : [];
+    const curatedTags = getCuratedHashtags(
+      trendAnalysis.category,
+      [parsed.title || "", ...(aiHashtags.slice(0, 3))]
+    );
+    const mergedTagSet = new Set([...curatedTags, ...aiHashtags]);
+    const hashtags = [...mergedTagSet].slice(0, 12);
 
     const linkedinContent = enforceAndSanitize(parsed.linkedin, "linkedin");
     const facebookContent = enforceAndSanitize(parsed.facebook, "facebook");
