@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import * as fs from "fs";
 import * as path from "path";
+import { uploadSocialImage } from "./imageStorage";
 
 const IMAGES_DIR = path.join(process.cwd(), "dist", "social-images");
 const LOGO_PATH = path.join(process.cwd(), "client", "public", "lock-logo-transparent.png");
@@ -171,6 +172,7 @@ export async function generateSocialImage(
     const stats = fs.statSync(outputPath);
     console.log(`[SocialImage] Generated branded image for "${title}" (${Math.round(stats.size / 1024)}KB): ${outputPath}`);
 
+    await uploadSocialImage(outputPath);
     return outputPath;
   } catch (error: any) {
     console.error(`[SocialImage] Failed to generate image for "${title}":`, error.message);

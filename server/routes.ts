@@ -187,8 +187,14 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
-  app.get('/api/social-images/:filename', (req: Request, res: Response) => {
+  app.get('/api/social-images/:filename', async (req: Request, res: Response) => {
     const filename = req.params.filename.replace(/[^a-zA-Z0-9._-]/g, '');
+    const ext = path.extname(filename).toLowerCase();
+    const mimeTypes: Record<string, string> = {
+      '.png': 'image/png', '.webp': 'image/webp',
+      '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+    };
+
     const searchDirs = [
       path.join(process.cwd(), 'dist', 'social-images'),
       path.join(process.cwd(), '.local', 'social-images'),
@@ -196,16 +202,23 @@ export async function registerRoutes(
     for (const dir of searchDirs) {
       const imgPath = path.join(dir, filename);
       if (fs.existsSync(imgPath)) {
-        const ext = path.extname(filename).toLowerCase();
-        const mimeTypes: Record<string, string> = {
-          '.png': 'image/png', '.webp': 'image/webp',
-          '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
-        };
         res.setHeader('Content-Type', mimeTypes[ext] || 'image/png');
         res.setHeader('Cache-Control', 'public, max-age=31536000');
         return res.sendFile(path.resolve(imgPath), { dotfiles: 'allow' });
       }
     }
+
+    try {
+      const { downloadSocialImage } = await import("./imageStorage");
+      const imageBuffer = await downloadSocialImage(filename);
+      if (imageBuffer) {
+        res.setHeader('Content-Type', mimeTypes[ext] || 'image/png');
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
+        return res.send(imageBuffer);
+      }
+    } catch (e) {
+    }
+
     res.status(404).json({ error: 'Image not found' });
   });
 

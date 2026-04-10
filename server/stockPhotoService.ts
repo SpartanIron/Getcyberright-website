@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { uploadSocialImage } from "./imageStorage";
 
 const SOCIAL_IMAGES_DIR = path.join(process.cwd(), ".local", "social-images");
 
@@ -116,6 +117,7 @@ export async function downloadSourceImage(url: string, title: string): Promise<s
       .toFile(outputPath);
 
     console.log(`[StockPhoto] Downloaded source image: ${filename} (${metadata.width}x${metadata.height}, ${(buffer.length / 1024).toFixed(0)}KB)`);
+    await uploadSocialImage(outputPath);
     return outputPath;
   } catch (error: any) {
     console.warn(`[StockPhoto] Failed to download source image: ${error.message}`);
@@ -657,6 +659,7 @@ export async function applyBrandOverlay(
       .toFile(outputPath);
 
     console.log(`[StockPhoto] Applied brand overlay: ${filename} (${width}x${height}, template: ${templateStyle})`);
+    await uploadSocialImage(outputPath);
     return outputPath;
   } catch (error: any) {
     console.error(`[StockPhoto] Brand overlay failed: ${error.message}`);

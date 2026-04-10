@@ -2,6 +2,7 @@ import sharp from "sharp";
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
+import { uploadSocialImage } from "./imageStorage";
 
 const SOCIAL_IMAGES_DIR = path.join(process.cwd(), ".local", "social-images");
 
@@ -323,6 +324,7 @@ export async function generateBrandedImage(
 
     await sharp(Buffer.from(svg)).resize(dims.width, dims.height).jpeg({ quality: 92 }).toFile(filepath);
 
+    await uploadSocialImage(filepath);
     return filepath;
   } catch (error: any) {
     console.error(`[SocialImage] Failed to generate image for ${platform}:`, error.message);
@@ -346,6 +348,7 @@ export async function resizeImageForPlatform(
       .jpeg({ quality: 90 })
       .toFile(outputPath);
 
+    await uploadSocialImage(outputPath);
     return outputPath;
   } catch (error: any) {
     console.error(`[SocialImage] Failed to resize image for ${platform}:`, error.message);

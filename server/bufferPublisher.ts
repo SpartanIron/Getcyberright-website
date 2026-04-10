@@ -18,6 +18,15 @@ export function getPublicImageUrl(localImagePath: string): string | null {
     return `${cleanBase}/api/social-images/${filename}`;
   }
 
+  if (process.env.NODE_ENV === "production" || process.env.REPLIT_DEPLOYMENT === "1") {
+    return `https://www.getcyberright.com/api/social-images/${filename}`;
+  }
+
+  const devDomain = process.env.REPLIT_DEV_DOMAIN;
+  if (devDomain) {
+    return `https://${devDomain}/api/social-images/${filename}`;
+  }
+
   return `https://www.getcyberright.com/api/social-images/${filename}`;
 }
 

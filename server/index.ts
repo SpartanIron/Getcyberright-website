@@ -296,6 +296,13 @@ app.use((req, res, next) => {
         console.error("Failed to seed social posts:", err);
       });
 
+      import("./imageStorage").then(({ bulkUploadExistingImages }) => {
+        const socialImagesDir = path.join(process.cwd(), ".local", "social-images");
+        bulkUploadExistingImages(socialImagesDir).catch(err => {
+          console.error("[ImageStorage] Bulk upload failed:", err);
+        });
+      }).catch(() => {});
+
       // Start prompt review scheduler (runs weekly - every 168 hours)
       import("./promptReviewService").then(({ startPromptReviewScheduler }) => {
         startPromptReviewScheduler(168);
