@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, Award, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 export function ModernCyber() {
   return (
@@ -36,7 +36,7 @@ export function ModernCyber() {
           <div className="flex justify-between items-start mb-16">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center backdrop-blur-sm shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-                <Shield className="w-8 h-8 text-cyan-400" />
+                <img src="/__mockup/images/lock-logo.png" alt="GetCyberRight" className="w-10 h-10 object-contain" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-wider text-white">GET<span className="text-cyan-400">CYBER</span>RIGHT</h1>
@@ -90,7 +90,7 @@ export function ModernCyber() {
             <div className="col-span-1 flex justify-center pb-4">
               <div className="w-24 h-24 rounded-full border border-slate-700 bg-slate-800/50 flex items-center justify-center relative backdrop-blur-sm group-hover:border-cyan-500/50 transition-colors duration-700">
                 <div className="absolute inset-2 rounded-full border border-dashed border-slate-600 animate-[spin_60s_linear_infinite]" />
-                <Award className="w-10 h-10 text-cyan-500/80" />
+                <img src="/__mockup/images/lock-logo.png" alt="GCR Seal" className="w-12 h-12 object-contain" />
               </div>
             </div>
 

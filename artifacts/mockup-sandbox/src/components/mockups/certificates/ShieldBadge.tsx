@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, CheckCircle, Award } from "lucide-react";
+import { CheckCircle, Award } from "lucide-react";
 
 export function ShieldBadge() {
   return (
@@ -17,9 +17,9 @@ export function ShieldBadge() {
         {/* Top Border Accent */}
         <div className="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-cyan-500 via-emerald-500 to-cyan-500" />
         
-        {/* Background Decorative Shield (Faint) */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none">
-          <Shield className="w-[600px] h-[600px] text-slate-900" strokeWidth={0.5} />
+        {/* Background Decorative Logo (Faint) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
+          <img src="/__mockup/images/lock-logo.png" alt="" className="w-[500px] h-[500px] object-contain" />
         </div>
 
         <div className="flex-1 p-12 md:p-16 flex flex-col relative z-10">
@@ -28,7 +28,7 @@ export function ShieldBadge() {
           <div className="flex justify-between items-start mb-12">
             <div className="flex items-center gap-3">
               <div className="bg-slate-900 p-2 rounded-lg">
-                <Shield className="w-8 h-8 text-cyan-400" />
+                <img src="/__mockup/images/lock-logo.png" alt="GetCyberRight" className="w-8 h-8 object-contain" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-slate-900 tracking-tight uppercase">GetCyberRight</h1>
@@ -50,7 +50,7 @@ export function ShieldBadge() {
                 <div className="absolute inset-0 bg-emerald-500 blur-[40px] opacity-20 rounded-full" />
                 <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 p-1 rounded-[2rem] shadow-xl border border-slate-700">
                   <div className="bg-slate-900 rounded-[1.75rem] p-8 border border-slate-700 flex flex-col items-center justify-center h-64 w-64 text-center">
-                    <Shield className="w-20 h-20 text-emerald-400 mb-4" />
+                    <img src="/__mockup/images/lock-logo.png" alt="GCR Badge" className="w-20 h-20 object-contain mb-4" />
                     <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-1">Verified</p>
                     <p className="text-white text-sm font-medium leading-tight">Cyber Safety<br/>Fundamentals</p>
                   </div>
@@ -116,7 +116,7 @@ export function ShieldBadge() {
             <div className="text-right">
               <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center ml-auto shadow-md">
                 <div className="w-18 h-18 rounded-full border border-slate-700 flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-cyan-400" />
+                  <img src="/__mockup/images/lock-logo.png" alt="GCR Seal" className="w-10 h-10 object-contain" />
                 </div>
               </div>
             </div>
