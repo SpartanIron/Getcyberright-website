@@ -5,7 +5,7 @@ import { createBufferPost, getBufferChannelsByPlatform, getPublicImageUrl } from
 import type { InsertSocialPost } from "@shared/schema";
 import { tagAllGcrLinks, ensureGcrLink } from "./utmTracking";
 import { buildPartnerContext, runPostPublishEngagement } from "./socialEngagementService";
-import { enforceAndSanitize, sanitizeContent } from "./socialPostPolicy";
+import { enforceAndSanitize, sanitizeContent, type PostDepth } from "./socialPostPolicy";
 import {
   searchStockPhoto,
   downloadSourceImage,
@@ -73,9 +73,26 @@ const CURATED_HASHTAGS: Record<string, string[][]> = {
     ["techsecurity", "protectyourself", "cyberawareness"],
     ["digitalsafety", "securityawareness", "cyberprotection"],
   ],
+  crossover_lifestyle: [
+    ["parenting", "momlife", "dadlife"],
+    ["familylife", "parenthood", "modernparenting"],
+    ["raisingkids", "parentinghacks", "familyfirst"],
+    ["parentingtips", "homelife", "familytime"],
+  ],
+  crossover_trending: [
+    ["trending", "viral", "mustsee"],
+    ["technews", "trending", "important"],
+    ["awareness", "mustread", "sharethis"],
+    ["breakingnews", "trending", "foryou"],
+  ],
+  crossover_wellness: [
+    ["digitalwellness", "screentime", "mindfultech"],
+    ["techlife", "digitaldetox", "wellbeing"],
+    ["digitalwellbeing", "healthytech", "screenbalance"],
+  ],
 };
 
-function getCuratedHashtags(category: string, topicKeywords: string[]): string[] {
+function getCuratedHashtags(category: string, topicKeywords: string[], depth: PostDepth = "wire"): string[] {
   const categoryMap: Record<string, string> = {
     "data_breach": "data_breach", "breach": "data_breach",
     "phishing": "phishing_scam", "scam": "phishing_scam", "fraud": "phishing_scam",
@@ -99,17 +116,33 @@ function getCuratedHashtags(category: string, topicKeywords: string[]): string[]
 
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
 
-  const broadSets = CURATED_HASHTAGS.broad_reach;
-  const broadTags = broadSets[dayOfYear % broadSets.length];
+  if (depth === "wire") {
+    const broadSets = CURATED_HASHTAGS.broad_reach;
+    const broadTags = broadSets[dayOfYear % broadSets.length];
+    const nicheSets = CURATED_HASHTAGS[tagCategory] || CURATED_HASHTAGS.general_tips;
+    const nicheTags = nicheSets[(dayOfYear + 1) % nicheSets.length];
+    const audienceSets = CURATED_HASHTAGS.family_safety;
+    const audienceTags = audienceSets[(dayOfYear + 2) % audienceSets.length];
+    const allTags = [...new Set([...broadTags, ...nicheTags, ...audienceTags])];
+    return allTags.slice(0, 10);
+  }
 
   const nicheSets = CURATED_HASHTAGS[tagCategory] || CURATED_HASHTAGS.general_tips;
-  const nicheTags = nicheSets[(dayOfYear + 1) % nicheSets.length];
+  const nicheTags = nicheSets[dayOfYear % nicheSets.length];
 
-  const audienceSets = CURATED_HASHTAGS.family_safety;
-  const audienceTags = audienceSets[(dayOfYear + 2) % audienceSets.length];
+  const lifestyleSets = CURATED_HASHTAGS.crossover_lifestyle;
+  const lifestyleTags = lifestyleSets[(dayOfYear + 1) % lifestyleSets.length];
 
-  const allTags = [...new Set([...broadTags, ...nicheTags, ...audienceTags])];
-  return allTags.slice(0, 10);
+  const trendingSets = CURATED_HASHTAGS.crossover_trending;
+  const trendingTags = trendingSets[(dayOfYear + 2) % trendingSets.length];
+
+  const wellnessSets = CURATED_HASHTAGS.crossover_wellness;
+  const wellnessTags = wellnessSets[(dayOfYear + 3) % wellnessSets.length];
+
+  const securityTags = CURATED_HASHTAGS.broad_reach[dayOfYear % CURATED_HASHTAGS.broad_reach.length].slice(0, 2);
+
+  const allTags = [...new Set([...securityTags, ...nicheTags.slice(0, 2), ...lifestyleTags, ...trendingTags.slice(0, 2), ...wellnessTags.slice(0, 1)])];
+  return allTags.slice(0, 12);
 }
 
 const CONTENT_MODES = [
@@ -669,6 +702,8 @@ interface Visual {
   text_overlay: string;
 }
 
+const POST_DEPTHS = ["wire", "insight", "deep_value"] as const;
+
 interface TrendAwarePostResult {
   linkedin: string;
   facebook: string;
@@ -681,6 +716,7 @@ interface TrendAwarePostResult {
   visuals: Visual[];
   gcrToolReference: { tool_name: string; how_it_connects: string; url: string } | null;
   contentMode: ContentMode;
+  postDepth: PostDepth;
   confidenceScore: number;
   recommendedAction: "auto_publish" | "review";
   sourceValidation: { tier1Count: number; tier2Count: number; tier3Count: number; highestTier: 1 | 2 | 3 };
@@ -918,33 +954,80 @@ STEP 6 - CONTENT MODE SELECTION:
 - The WRITING STYLE instruction determines HOW to write. The content mode determines WHAT angle to take
 - Aim for VARIETY: if recent posts have been threat-focused, lean toward AI developments, privacy news, or regulatory updates if available in the feed
 
-STEP 7 - CONTENT CREATION:
-- Follow the specific WRITING STYLE instruction provided below
-- EXCERPT STRATEGY: Posts are teasers, NOT full articles. Share the most compelling insight to hook readers, then drive them to the relevant page for the full breakdown
-- Post structure: hook (the most compelling insight) > brief context (1-2 sentences on why it matters) > 1-2 actionable tips as a preview > CTA linking to the most relevant page
-- For learning_opportunity mode: You MAY link to trusted external learning resources (ISC2, Google, Microsoft Learn, CISA, Coursera, edX, Khan Academy, Elements of AI, Harvard CS50, etc.) when they are the primary value of the post. External links are encouraged for genuine learning opportunities. You may also optionally include a GetCyberRight link as a secondary reference
-- For ALL OTHER modes: ALWAYS end with a link to a relevant GetCyberRight page. You may ONLY link to URLs that appear in the KEY TOOL PAGES list, or to specific guide/alert/scam-intel slugs listed in the context above. NEVER invent or guess a URL slug
-- ALL GetCyberRight links MUST use the www subdomain (https://www.getcyberright.com/...). Never use https://getcyberright.com without www
-- If no specific page matches, link to https://www.getcyberright.com/news as the default fallback (a dedicated article will be created automatically)
-- The link MUST appear on its own line before any hashtags
+STEP 7 - CONTENT DEPTH SELECTION (CRITICAL NEW STEP):
+You MUST select a post_depth for EVERY post. This determines how you write, how long the post is, and whether you include a link.
 
-STEP 8 - VISUAL PLANNING:
-- Suggest 1-2 visuals: story (real-life situation), educational (simple breakdown), or product_ui (GetCyberRight feature)
+THREE DEPTH LEVELS:
+A) "wire" — Breaking news wire dispatch. Short teaser (30-50 words). Always includes a GCR article link. The OG preview card does 80% of the work. Use for: urgent threats, new vulnerabilities, active attacks, breaking breach news. The post earns the click.
+B) "insight" — Standalone value post. Medium length (80-120 words). Link is OPTIONAL (soft CTA or none). Delivers the full insight in the post itself. Use for: celebrity/public figure privacy stories, relatable family scenarios, myth-busting, privacy implications of mainstream news, cultural moments tied to security. The post IS the value.
+C) "deep_value" — Full educational value. Longer form (100-150 words). No hard link. Ends with "Follow @getcyberright" or "More at getcyberright.com" (soft brand). Use for: step-by-step how-to content, "change these settings tonight" posts, practical protection walkthroughs, learning resources. The post is saveable and shareable.
+
+DEPTH SELECTION RULES:
+- urgency_score >= 4 AND impact_level is "high" → force "wire"
+- Content mode "breaking_insight" with urgency >= 3 → default to "wire"
+- Content pillar "family_focus" or "weekend_roundup" → prefer "insight" (relatable stories go viral)
+- Content pillar "myth_buster" → prefer "insight" (opinions drive engagement)
+- Content pillar "friday_tips" or "practical_protection" → prefer "deep_value" (actionable content gets saved)
+- Content pillar "learning_growth" → prefer "deep_value" (educational value)
+- Content mode "scenario_simulation" → prefer "insight" (story-driven)
+- Content mode "preventative_education" → prefer "deep_value" (action-driven)
+- Content mode "myth_debunking" → prefer "insight" (opinion-driven)
+- If the story involves a public figure, celebrity, or major tech company doing something relatable → strongly prefer "insight"
+- If the story is a how-to or "do this one thing" → prefer "deep_value"
+- Default: "wire" for anything that doesn't clearly fit insight or deep_value
+
+STEP 8 - CONTENT CREATION:
+- Follow the specific WRITING STYLE instruction provided below
+- Your content strategy depends on the post_depth you selected:
+
+FOR "wire" DEPTH:
+- Posts are teasers, NOT full articles. Share the most compelling insight to hook readers, then drive them to the relevant page
+- Post structure: hook > brief context (1-2 sentences) > CTA link on its own line
+- ALWAYS end with a link to a relevant GetCyberRight page
+- EVERY post must earn the click. If the post gives away the full story, you have failed
+
+FOR "insight" DEPTH:
+- Posts deliver STANDALONE VALUE. The reader should learn something valuable just from reading the post
+- Post structure: relatable hook (1-2 sentences) > the insight/story (2-3 paragraphs) > takeaway or reflection (1 sentence) > optional soft CTA
+- Do NOT use a hard article link. Instead, optionally end with "Follow @getcyberright for more" or nothing at all
+- Write like you're telling a friend something fascinating you learned. Not like a brand sharing content
+- The goal is engagement (likes, shares, saves, comments), not clicks
+
+FOR "deep_value" DEPTH:
+- Posts deliver COMPLETE ACTIONABLE VALUE. The reader can act on the advice immediately
+- Post structure: attention hook > educational content (3-4 short paragraphs) > specific action steps > soft brand mention
+- No hard links. End with "Follow @getcyberright" or "More tips at getcyberright.com"
+- Write like a trusted expert sharing practical advice. Think "here's exactly what to do"
+- The goal is saves and shares. People bookmark this content
+
+LINKING RULES (ALL DEPTHS):
+- For learning_opportunity mode: You MAY link to trusted external learning resources (ISC2, Google, Microsoft Learn, CISA, Coursera, edX, etc.)
+- For wire depth: ALWAYS end with a link to a relevant GetCyberRight page
+- For insight/deep_value depth: Do NOT force a GCR article link. A soft brand mention is enough
+- ALL GetCyberRight links MUST use the www subdomain (https://www.getcyberright.com/...)
+- You may ONLY link to URLs that appear in the KEY TOOL PAGES list
+- If no specific page matches for wire depth, link to https://www.getcyberright.com/news
+- Links MUST appear on their own line before any hashtags
+
+STEP 9 - VISUAL PLANNING:
+- For "wire" depth: Suggest branded card visuals (headline on dark background). The card IS the visual
+- For "insight" depth: Suggest authentic, editorial-style photos. Real people, real situations. NO branded overlays. Think editorial photography: a parent checking a child's phone, a family at dinner with devices, someone looking concerned at a screen. The photo should feel real, not corporate
+- For "deep_value" depth: Suggest authentic stock photos showing the action being described. A person changing phone settings, a family setting up parental controls, someone using a password manager. The photo complements the educational content
 - Keep visuals simple, realistic, not cluttered
 
-STEP 9 - PRODUCT MAPPING:
+STEP 10 - PRODUCT MAPPING:
 - Map to a relevant GetCyberRight feature ONLY if genuinely justified
 - Available: AI Scam Analyzer, GCR Scam Guard, Password Generator, Breach Monitor, Data Broker Removal, Kids Safety Hub, Senior Safety Hub, Cyber Threat Radar, Identity Theft Recovery Guide
 - Do NOT force product mentions
 
-STEP 10 - VALIDATION LAYER:
+STEP 11 - VALIDATION LAYER:
 - Is the information credible and supported by reliable sources?
 - Does the post avoid panic and fear tactics?
 - Does it provide clear, actionable guidance?
 - Is it understandable by a non-technical audience?
 - If ANY check fails, revise before output
 
-STEP 11 - CONFIDENCE SCORING:
+STEP 12 - CONFIDENCE SCORING:
 - Score 0-100 based on: source reliability, completeness of information, clarity of risk
 - If confidence_score < 70: set recommended_action to "review" (do NOT auto-publish)
 - If confidence_score >= 70: set recommended_action to "auto_publish"
@@ -995,16 +1078,32 @@ FORMATTING (CRITICAL, STRICTLY ENFORCED):
 - NEVER use hashtags on LinkedIn or Facebook posts. No #CyberSecurity, no #ScamAlert, nothing with #
 - NEVER use ALL CAPS for headers or emphasis. Write "How to protect yourself:" not "HOW TO PROTECT YOURSELF:"
 - Every post MUST have multiple \\n\\n paragraph breaks in the JSON output
-- LinkedIn: Maximum 5-7 short paragraphs, each 1-2 sentences. NEVER a single block of text
 - The first 2 lines MUST stand alone as a hook (before LinkedIn's "see more" cutoff)
 - After the hook, insert a \\n\\n break
-- Keep paragraphs to 1-2 sentences maximum. One sentence per paragraph is preferred
+- Keep paragraphs to 1-3 sentences maximum (1-2 for wire, 2-3 for insight/deep_value)
 - If using numbered items, put each on its OWN line with a \\n\\n between them
 - White space is critical. A wall of text = automatic failure. If you produce a single unbroken paragraph, you have failed
-- LinkedIn posts that exceed 50 words = failure. Think Reuters wire dispatch: 1-2 sharp sentences + link. The branded preview card does the heavy lifting. Cut ruthlessly
-- Facebook posts that exceed 45 words = failure. Even tighter than LinkedIn
 - Keep sentences under 25 words. If a sentence exceeds 25 words, split it into two
-- EVERY post must earn the click. If the post gives away the full story, you have failed. Tease, don't tell
+
+WORD LIMITS BY DEPTH (STRICTLY ENFORCED):
+
+FOR "wire" DEPTH:
+- LinkedIn: 30-50 words MAX. Think Reuters wire dispatch. 1-2 sharp sentences + link. The branded preview card does the heavy lifting. Cut ruthlessly
+- Facebook: 25-45 words MAX. Even tighter. A text message to a friend about something urgent + link
+- Instagram: 30-60 words MAX. Punchy caption, the image card IS the content
+- RULE: If the post gives away the full story, you have FAILED. Tease, don't tell
+
+FOR "insight" DEPTH:
+- LinkedIn: 80-120 words. 4-6 short paragraphs. Deliver the full insight. Write like you're sharing something fascinating with a colleague
+- Facebook: 70-100 words. 3-5 paragraphs. Write like you're telling your family group chat something important they need to know
+- Instagram: 80-120 words. 3-5 paragraphs before hashtags. The caption adds the human angle the image can't convey
+- RULE: The post must be WORTH READING even if nobody clicks anything. The value is IN the post
+
+FOR "deep_value" DEPTH:
+- LinkedIn: 100-150 words. 5-8 short paragraphs. Full educational value with specific action steps
+- Facebook: 90-130 words. 4-7 paragraphs. Practical, actionable, the kind of post people save and share with their spouse
+- Instagram: 100-150 words. 4-6 paragraphs before hashtags. Step-by-step value that people screenshot and bookmark
+- RULE: The reader should be able to ACT on this immediately. "Change this setting. Check this site. Do this tonight."
 
 WHAT NOT TO DO (ANTI-PATTERNS THAT KILL ENGAGEMENT):
 - Do not end every post with a question. Sometimes end with a strong statement
@@ -1018,15 +1117,20 @@ WHAT NOT TO DO (ANTI-PATTERNS THAT KILL ENGAGEMENT):
 - NEVER give a full summary of the article. The post is a TEASER that earns the click
 
 PLATFORM OPTIMIZATION (ALGORITHM-AWARE):
-- LinkedIn: The algorithm penalizes external links in the main body. Write the post as pure value content (insight, analysis, tip). Put the CTA link on its own final line, separated by TWO line breaks from the content. This way the valuable content appears above the "see more" fold and the link is below. The algorithm rewards posts that keep people on LinkedIn longer, so front-load the insight
-- Facebook: Similar to LinkedIn, the algorithm deprioritizes posts with external links. Write the post body as native content that provides value on its own. Place the link on a separate final line after a clear paragraph break. Do NOT embed the link mid-sentence. The more the post reads like organic content (not a link share), the more Facebook will distribute it
-- Instagram: punchy, visual-first. The image card carries the headline. Caption is the supporting context. Short, direct, with hashtags at the end. No clickable links. "Link in bio" is the only CTA. Instagram rewards saves and shares, so write captions that people want to save for later
+- LinkedIn: The algorithm penalizes external links in the main body. For wire depth, put the link on its own final line after TWO line breaks. For insight/deep_value depth, skip the link entirely or use a soft "Follow @getcyberright" mention. Posts without links get 2-3x more reach on LinkedIn. Front-load the insight above the "see more" fold
+- Facebook: The algorithm deprioritizes posts with external links. For wire depth, place the link on a separate final line. For insight/deep_value depth, write pure native content with no link. The more organic the post feels, the more Facebook distributes it. Posts that generate comments and shares get exponentially more reach
+- Instagram: Visual-first. The image carries the weight. Caption adds voice and context. For wire depth, "Link in bio" is the CTA. For insight/deep_value depth, write captions people want to SAVE. Instagram rewards saves above all other engagement signals. Hashtags always at the end, separated by two line breaks
+
+IMAGE STRATEGY BY DEPTH:
+- "wire": Use a branded card with headline overlay. The card IS the visual content on social media
+- "insight": Use an AUTHENTIC photo (stock photo or source image) WITHOUT brand overlay. Think editorial photography. A real family scene, a real person using a phone, a real situation. The authenticity is what makes people stop scrolling. Branded cards feel like ads. Real photos feel like content
+- "deep_value": Same as insight. Authentic photos. The image shows the situation being discussed, not a branded graphic. If the post is about checking privacy settings, the image should show someone on their phone, not a branded card saying "CHECK YOUR SETTINGS"
 
 GOAL: Position GetCyberRight as the most trusted, human-centered cybersecurity authority for everyday users navigating modern digital risks. Content must be immediately publishable to Buffer without edits.`,
       messages: [
         {
           role: "user",
-          content: `Run the full 11-step intelligence pipeline and create today's social media content for GetCyberRight.
+          content: `Run the full 12-step intelligence pipeline and create today's social media content for GetCyberRight.
 
 DATE: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
 ${slotContext}
@@ -1073,37 +1177,37 @@ CRITICAL VOICE RULES FOR ALL PLATFORMS:
 - NEVER open with generic corporate lines. Open with something a real person would actually say.
 - NEVER sound like a press release or marketing copy.
 
-LINKEDIN POST (30-50 words max, STRICTLY ENFORCED — posts over 50 words are rejected):
-- Think TechCrunch, Bloomberg, Reuters: the post is a TEASER, not a summary
-- The branded OG preview card does 80% of the work. Your text is the other 20%
-- IDEAL STRUCTURE: One sharp observation or hook (1-2 sentences) \\n\\n Link on its own line
+LINKEDIN POST:
+The word limit depends on the post_depth you selected:
+- "wire": 30-50 words max. Think Reuters wire dispatch. The branded OG preview card does 80% of the work. IDEAL STRUCTURE: One sharp observation (1-2 sentences) \\n\\n Link on its own line
+- "insight": 80-120 words. 4-6 short paragraphs. Deliver the full insight. Write like you're sharing something fascinating with a colleague. No link required. Optionally end with "Follow @getcyberright"
+- "deep_value": 100-150 words. 5-8 short paragraphs. Full educational value with specific actions. End with "More tips at getcyberright.com" or "Follow @getcyberright"
 - The first line MUST be under 15 words and grab attention immediately (this appears before "see more")
 - HOOK FORMULAS (rotate between these):
   * Stat-lead: "X% of [thing] now [surprising fact]."
   * Declarative: "[Strong claim]. Here's what that means for your family."
   * Contrarian: "Everyone's saying [common take]. The real story is different."
   * News-peg: "[Source] just confirmed [fact]. This changes everything."
-- Do NOT explain the whole story. Tease ONE surprising element that makes people click
-- Maximum 3 short paragraphs. One sentence per paragraph is ideal
-- Link goes on its own final line, separated by \\n\\n
+  * Story-lead (insight/deep_value): "A friend asked me why [relatable scenario]..."
+  * Celebrity-peg (insight): "[Public figure] just [did something]. Here's why that matters for your kids."
 - NEVER sound like a thought-leader parody. No "I'm excited to share" or "Here are my thoughts"
 ${partnerContextLinkedIn}
-FACEBOOK POST (25-45 words max, STRICTLY ENFORCED):
-- Even shorter than LinkedIn. This is a text message to a friend about something urgent
-- ONE sentence hook + ONE sentence context + link
-- Write like you're warning your family group chat
-- The link preview card carries the full context
-- NEVER explain what the article says. Tease why they should care
-- End with a natural bridge to the link (not "Click here" but "Full breakdown:" or "We pulled the details:")
+FACEBOOK POST:
+The word limit depends on the post_depth you selected:
+- "wire": 25-45 words max. A text message to a friend about something urgent + link. ONE sentence hook + ONE sentence context + link
+- "insight": 70-100 words. Write like you're telling your family group chat something important. 3-5 short paragraphs. Deliver the full story. No link needed
+- "deep_value": 90-130 words. Practical, shareable. The kind of post people tag their spouse in. 4-7 paragraphs with specific advice
+- For wire: End with a natural bridge to the link ("Full breakdown:" or "We pulled the details:")
+- For insight/deep_value: End naturally. Maybe "Follow us for more" or nothing. Don't force a link
 ${partnerContextFacebook}
-INSTAGRAM POST (30-60 words max, CRITICAL DIFFERENCES):
-- IMAGE-FIRST. The branded card IS the content. Your caption just adds voice
-- Lead with the most emotionally resonant aspect in ONE punchy sentence
-- 2 short paragraphs MAX before hashtags. Less is more
-- Do NOT repeat what the image card says. Add the human angle the image can't convey
-- End with "Link in bio" as the only CTA
+INSTAGRAM POST:
+The word limit depends on the post_depth you selected:
+- "wire": 30-60 words max. IMAGE-FIRST. The branded card IS the content. Caption adds voice. End with "Link in bio"
+- "insight": 80-120 words. The image is an authentic photo, NOT a branded card. Caption tells the story. 3-5 paragraphs before hashtags. End with "Follow @getcyberright for more"
+- "deep_value": 100-150 words. Authentic photo + educational caption people save. 4-6 paragraphs. End with "Follow @getcyberright" or "Save this for later"
 - Add 8-12 curated hashtags at the END, separated by two line breaks
-- Hashtags MUST include 3 broad reach tags (#cybersecurity #infosec #datasecurity), 3 niche tags relevant to the topic, and 3 audience tags (#familysafety #parentingtips #onlinesafety or similar)
+- For insight/deep_value: Mix security hashtags with crossover lifestyle hashtags (#parenting #momlife #dadlife #familylife #trending #digitalwellness)
+- For wire: Use cybersecurity-focused hashtags (#cybersecurity #infosec #datasecurity + niche + audience)
 - NEVER use generic filler hashtags like #tech #security #news
 ${partnerContextInstagram}
 
@@ -1117,11 +1221,12 @@ Format your complete output as this strict JSON with \\n for line breaks within 
   "facebook": "Post text with \\n\\n between paragraphs",
   "instagram": "Caption text with \\n\\n between paragraphs, ending with \\n\\n hashtags",
   "title": "Short tracking title under 60 chars",
+  "post_depth": "wire | insight | deep_value",
   "hashtags": ["tag1", "tag2", "tag3", "tag4"],
-  "imageHeadline": "Under 8 words for branded image card",
-  "imageSubtext": "Supporting detail under 15 words",
+  "imageHeadline": "Under 8 words for branded image card (used for wire depth)",
+  "imageSubtext": "Supporting detail under 15 words (used for wire depth)",
   "source_article_index": 1,
-  "ai_image_prompt": "Only if source article has no image. Photorealistic scene description.",
+  "ai_image_prompt": "For wire: only if source article has no image. For insight/deep_value: ALWAYS provide a prompt describing an authentic, editorial-style photorealistic scene (NOT a branded graphic). Think: real people, real situations, editorial photography.",
   "content_mode": "breaking_insight | preventative_education | myth_debunking | scenario_simulation | tool_highlight | learning_opportunity",
   "trend_analysis": {
     "summary": "One-sentence summary of the signal",
@@ -1141,7 +1246,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
     "tool_name": "Name of relevant GetCyberRight tool",
     "how_it_connects": "One sentence on why this tool helps"
   },
-  "gcr_link": "https://www.getcyberright.com/relevant-page-slug (the link used in the CTA)",
+  "gcr_link": "https://www.getcyberright.com/relevant-page-slug (only required for wire depth, optional for insight/deep_value)",
   "confidence_score": 85,
   "recommended_action": "auto_publish | review"
 }`,
@@ -1207,6 +1312,18 @@ Format your complete output as this strict JSON with \\n for line breaks within 
             ? (parsed.content_mode as ContentMode)
             : "preventative_education");
 
+    let postDepth: PostDepth = "wire";
+    if (parsed.post_depth && POST_DEPTHS.includes(parsed.post_depth)) {
+      postDepth = parsed.post_depth as PostDepth;
+    }
+    if (trendAnalysis.urgency_score >= 4 && trendAnalysis.impact_level === "high") {
+      postDepth = "wire";
+    }
+    if (contentMode === "breaking_insight" && trendAnalysis.urgency_score >= 3 && postDepth !== "wire") {
+      console.log(`[TrendEngine] Breaking insight with urgency ${trendAnalysis.urgency_score}, overriding depth to wire`);
+      postDepth = "wire";
+    }
+
     const visuals: Visual[] = Array.isArray(parsed.visuals)
       ? parsed.visuals.slice(0, 2).map((v: any) => ({
           type: (["story", "educational", "product_ui"].includes(v.type) ? v.type : "educational") as Visual["type"],
@@ -1224,14 +1341,15 @@ Format your complete output as this strict JSON with \\n for line breaks within 
     const aiHashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags.map((t: string) => t.replace(/^#/, "")) : [];
     const curatedTags = getCuratedHashtags(
       trendAnalysis.category,
-      [parsed.title || "", ...(aiHashtags.slice(0, 3))]
+      [parsed.title || "", ...(aiHashtags.slice(0, 3))],
+      postDepth
     );
     const mergedTagSet = new Set([...curatedTags, ...aiHashtags]);
     const hashtags = [...mergedTagSet].slice(0, 12);
 
-    const linkedinContent = enforceAndSanitize(parsed.linkedin, "linkedin");
-    const facebookContent = enforceAndSanitize(parsed.facebook, "facebook");
-    const instagramContent = enforceAndSanitize(parsed.instagram, "instagram");
+    const linkedinContent = enforceAndSanitize(parsed.linkedin, "linkedin", postDepth);
+    const facebookContent = enforceAndSanitize(parsed.facebook, "facebook", postDepth);
+    const instagramContent = enforceAndSanitize(parsed.instagram, "instagram", postDepth);
 
     let gcrToolReference = parsed.gcr_tool_reference
       ? {
@@ -1264,7 +1382,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
       : null;
 
     console.log(
-      `[TrendEngine] Pipeline complete: mode=${contentMode}, category=${trendAnalysis.category}, urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}, confidence=${confidenceScore}, action=${recommendedAction}${gcrToolReference ? `, tool=${gcrToolReference.tool_name}` : ""}${sourceImageUrl ? ", has source image" : aiImagePrompt ? ", will generate AI image" : ", no image source"}`
+      `[TrendEngine] Pipeline complete: depth=${postDepth}, mode=${contentMode}, category=${trendAnalysis.category}, urgency=${trendAnalysis.urgency_score}, impact=${trendAnalysis.impact_level}, confidence=${confidenceScore}, action=${recommendedAction}${gcrToolReference ? `, tool=${gcrToolReference.tool_name}` : ""}${sourceImageUrl ? ", has source image" : aiImagePrompt ? ", will generate AI image" : ", no image source"}`
     );
 
     return {
@@ -1279,6 +1397,7 @@ Format your complete output as this strict JSON with \\n for line breaks within 
       visuals,
       gcrToolReference,
       contentMode,
+      postDepth,
       confidenceScore,
       recommendedAction,
       sourceValidation: sourceCredibility,
@@ -1407,8 +1526,11 @@ async function resolvePostImage(
   templateStyle: TemplateStyle,
   title: string,
   articleUrl?: string | null,
-  category?: string | null
+  category?: string | null,
+  postDepth: PostDepth = "wire"
 ): Promise<{ mainImage: string | null; igImage: string | null; imageSource: "source" | "og" | "stock" | "ai" | "branded" }> {
+
+  const useAuthenticPhoto = postDepth === "insight" || postDepth === "deep_value";
 
   const tryBrandOverlay = async (imgPath: string, source: "source" | "og" | "stock" | "ai"): Promise<{ mainImage: string | null; igImage: string | null; imageSource: typeof source } | null> => {
     const mainPath = await applyBrandOverlay(imgPath, imageHeadline, imageSubtext, templateStyle, 1200, 630);
@@ -1419,12 +1541,23 @@ async function resolvePostImage(
     return null;
   };
 
+  const useRawPhoto = async (imgPath: string, source: "source" | "og" | "stock" | "ai"): Promise<{ mainImage: string | null; igImage: string | null; imageSource: typeof source } | null> => {
+    const publicUrl = getPublicImageUrl(imgPath);
+    if (publicUrl) {
+      console.log(`[TrendEngine] Using authentic ${source} photo (no overlay, depth=${postDepth})`);
+      return { mainImage: publicUrl, igImage: publicUrl, imageSource: source };
+    }
+    return null;
+  };
+
+  const processImage = useAuthenticPhoto ? useRawPhoto : tryBrandOverlay;
+
   if (sourceImageUrl) {
     const downloaded = await downloadSourceImage(sourceImageUrl, title);
     if (downloaded) {
-      const result = await tryBrandOverlay(downloaded, "source");
+      const result = await processImage(downloaded, "source");
       if (result) {
-        console.log(`[TrendEngine] Using source article image with brand overlay`);
+        console.log(`[TrendEngine] Using source article image${useAuthenticPhoto ? " (authentic)" : " with brand overlay"}`);
         return result;
       }
     }
@@ -1436,9 +1569,9 @@ async function resolvePostImage(
     if (ogImageUrl) {
       const downloaded = await downloadSourceImage(ogImageUrl, title);
       if (downloaded) {
-        const result = await tryBrandOverlay(downloaded, "og");
+        const result = await processImage(downloaded, "og");
         if (result) {
-          console.log(`[TrendEngine] Using og:image from article page with brand overlay`);
+          console.log(`[TrendEngine] Using og:image from article${useAuthenticPhoto ? " (authentic)" : " with brand overlay"}`);
           return result;
         }
       }
@@ -1450,9 +1583,9 @@ async function resolvePostImage(
   if (stockPhoto) {
     const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, title);
     if (imgPath) {
-      const result = await tryBrandOverlay(imgPath, "stock");
+      const result = await processImage(imgPath, "stock");
       if (result) {
-        console.log(`[TrendEngine] Using stock photo by ${stockPhoto.photographer} with brand overlay`);
+        console.log(`[TrendEngine] Using stock photo by ${stockPhoto.photographer}${useAuthenticPhoto ? " (authentic)" : " with brand overlay"}`);
         return result;
       }
     }
@@ -1462,9 +1595,9 @@ async function resolvePostImage(
   if (aiImagePrompt) {
     const aiImage = await generateAIImage(aiImagePrompt, title);
     if (aiImage) {
-      const result = await tryBrandOverlay(aiImage, "ai");
+      const result = await processImage(aiImage, "ai");
       if (result) {
-        console.log(`[TrendEngine] Using AI-generated image with brand overlay`);
+        console.log(`[TrendEngine] Using AI-generated image${useAuthenticPhoto ? " (authentic)" : " with brand overlay"}`);
         return result;
       }
     }
@@ -1475,6 +1608,10 @@ async function resolvePostImage(
   const mainImage = mainPath ? getPublicImageUrl(mainPath) : null;
   const igPath = await generateInstagramImage(imageHeadline, imageSubtext, templateStyle);
   const igImage = igPath ? getPublicImageUrl(igPath) : (mainImage ?? null);
+
+  if (useAuthenticPhoto) {
+    console.log(`[TrendEngine] No authentic photo found for ${postDepth} post, falling back to branded card`);
+  }
 
   return { mainImage, igImage, imageSource: "branded" };
 }
@@ -2288,7 +2425,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     }
 
     const templateStyle = selectTemplateForTrend(posts.trendAnalysis, posts.contentMode, defaultTemplate);
-    console.log(`[TrendEngine] Template: ${templateStyle} (mode: ${posts.contentMode}, urgency: ${posts.trendAnalysis.urgency_score})`);
+    console.log(`[TrendEngine] Template: ${templateStyle} (depth: ${posts.postDepth}, mode: ${posts.contentMode}, urgency: ${posts.trendAnalysis.urgency_score})`);
 
     const { mainImage: imageUrl, igImage: igImageUrl, imageSource } = await resolvePostImage(
       posts.sourceImageUrl,
@@ -2298,9 +2435,10 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       templateStyle,
       posts.title,
       posts.sourceArticleUrl,
-      posts.trendAnalysis.category
+      posts.trendAnalysis.category,
+      posts.postDepth
     );
-    console.log(`[TrendEngine] Image resolved: source=${imageSource}, url=${imageUrl ? "yes" : "none"}`);
+    console.log(`[TrendEngine] Image resolved: source=${imageSource}, depth=${posts.postDepth}, authentic=${posts.postDepth !== "wire"}, url=${imageUrl ? "yes" : "none"}`);
 
     const trendArticle = await generateTrendArticle(posts, postStyle);
     const articleUrl = trendArticle
@@ -2308,7 +2446,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       : "https://www.getcyberright.com/awareness-hub";
 
     if (trendArticle) {
-      console.log(`[TrendEngine] Article ready: /news/${trendArticle.slug} — social posts will link here`);
+      console.log(`[TrendEngine] Article ready: /news/${trendArticle.slug}${posts.postDepth === "wire" ? " — social posts will link here" : " — for SEO (social posts are standalone)"}`);
     } else {
       console.warn("[TrendEngine] Article generation failed, falling back to /awareness-hub");
     }
@@ -2318,8 +2456,9 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     const fixedInstagram = posts.instagram;
 
     const isLearningPost = posts.contentMode === "learning_opportunity";
+    const isStandalonePost = posts.postDepth === "insight" || posts.postDepth === "deep_value";
 
-    if (trendArticle && !isLearningPost) {
+    if (trendArticle && !isLearningPost && !isStandalonePost) {
       const gcrLinkPattern = /https?:\/\/(?:www\.)?getcyberright\.com\/[^\s)\]"',]+/gi;
       fixedLinkedin = fixedLinkedin.replace(gcrLinkPattern, articleUrl);
       fixedFacebook = fixedFacebook.replace(gcrLinkPattern, articleUrl);
@@ -2332,7 +2471,11 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     let validatedFacebook: string;
     const validatedInstagram = fixedInstagram;
 
-    if (isLearningPost) {
+    if (isStandalonePost) {
+      validatedLinkedin = fixedLinkedin;
+      validatedFacebook = fixedFacebook;
+      console.log(`[TrendEngine] Standalone ${posts.postDepth} post: skipping forced link injection (native content strategy)`);
+    } else if (isLearningPost) {
       const hasExternalLink = /https?:\/\/(?!(?:www\.)?getcyberright\.com)[^\s)\]"',]+/i;
       if (hasExternalLink.test(fixedLinkedin)) {
         validatedLinkedin = fixedLinkedin;
@@ -2420,7 +2563,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
 
         if (bufferResult.success) {
           console.log(
-            `[TrendEngine] Published ${platform}: "${posts.title}" [${posts.contentMode}|${posts.trendAnalysis.category}|urgency:${posts.trendAnalysis.urgency_score}|confidence:${posts.confidenceScore}] (Buffer ID: ${bufferResult.bufferId})`
+            `[TrendEngine] Published ${platform}: "${posts.title}" [depth:${posts.postDepth}|${posts.contentMode}|${posts.trendAnalysis.category}|urgency:${posts.trendAnalysis.urgency_score}|confidence:${posts.confidenceScore}] (Buffer ID: ${bufferResult.bufferId})`
           );
           result.published++;
           result.platforms.push(platform);

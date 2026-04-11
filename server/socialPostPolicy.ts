@@ -1,3 +1,5 @@
+export type PostDepth = "wire" | "insight" | "deep_value";
+
 export interface PlatformPolicy {
   wordLimit: number;
   maxConsecutiveLineBreaks: number;
@@ -25,6 +27,28 @@ export const PLATFORM_POLICIES: Record<string, PlatformPolicy> = {
     sentencesPerParagraph: 2,
   },
 };
+
+const DEPTH_OVERRIDES: Record<PostDepth, Record<string, Partial<PlatformPolicy>>> = {
+  wire: {},
+  insight: {
+    linkedin: { wordLimit: 120, maxParagraphs: 6, sentencesPerParagraph: 3 },
+    facebook: { wordLimit: 100, maxParagraphs: 5, sentencesPerParagraph: 3 },
+    instagram: { wordLimit: 120, maxParagraphs: 6, sentencesPerParagraph: 3 },
+  },
+  deep_value: {
+    linkedin: { wordLimit: 150, maxParagraphs: 8, sentencesPerParagraph: 3 },
+    facebook: { wordLimit: 130, maxParagraphs: 7, sentencesPerParagraph: 3 },
+    instagram: { wordLimit: 150, maxParagraphs: 8, sentencesPerParagraph: 3 },
+  },
+};
+
+function getPolicyForDepth(platform: string, depth: PostDepth = "wire"): PlatformPolicy {
+  const base = PLATFORM_POLICIES[platform];
+  if (!base) return { wordLimit: 60, maxConsecutiveLineBreaks: 3, maxParagraphs: 4, sentencesPerParagraph: 2 };
+  if (depth === "wire") return base;
+  const overrides = DEPTH_OVERRIDES[depth]?.[platform] || {};
+  return { ...base, ...overrides };
+}
 
 export interface PolicyViolation {
   rule: string;
@@ -198,9 +222,8 @@ function removeBannedPhrases(text: string): { text: string; removed: string[] } 
   return { text: result, removed };
 }
 
-export function enforcePostPolicy(text: string, platform: string): PolicyResult {
-  const policy = PLATFORM_POLICIES[platform];
-  if (!policy) return { content: text, violations: [], corrected: false };
+export function enforcePostPolicy(text: string, platform: string, depth: PostDepth = "wire"): PolicyResult {
+  const policy = getPolicyForDepth(platform, depth);
 
   const sanitized = sanitizeContent(text);
   const originalWordCount = countWords(sanitized);
@@ -212,7 +235,7 @@ export function enforcePostPolicy(text: string, platform: string): PolicyResult 
   content = bannedResult.text;
   if (bannedResult.removed.length > 0) {
     violations.push({ rule: "bannedPhrases", before: bannedResult.removed.length, after: 0 });
-    console.log(`[SocialPostPolicy] ${platform}: removed banned phrases: ${bannedResult.removed.join(", ")}`);
+    console.log(`[SocialPostPolicy] ${platform}/${depth}: removed banned phrases: ${bannedResult.removed.join(", ")}`);
   }
 
   const lineBreakResult = enforceLineBreaks(content, policy.maxConsecutiveLineBreaks);
@@ -231,7 +254,7 @@ export function enforcePostPolicy(text: string, platform: string): PolicyResult 
     const correctedWordCount = countWords(content);
     const violatedRules = violations.map(v => v.rule);
     console.log(
-      `[SocialPostPolicy] ${platform} post corrected | ` +
+      `[SocialPostPolicy] ${platform}/${depth} post corrected | ` +
       `originalWords=${originalWordCount} | correctedWords=${correctedWordCount} | ` +
       `limit=${policy.wordLimit} | violatedRules=[${violatedRules.join(", ")}] | ` +
       `details: ${violations.map(v => `${v.rule}(${v.before}->${v.after})`).join(", ")}`
@@ -241,7 +264,7 @@ export function enforcePostPolicy(text: string, platform: string): PolicyResult 
   return { content, violations, corrected: violations.length > 0 };
 }
 
-export function enforceAndSanitize(text: string, platform: string): string {
-  const result = enforcePostPolicy(text, platform);
+export function enforceAndSanitize(text: string, platform: string, depth: PostDepth = "wire"): string {
+  const result = enforcePostPolicy(text, platform, depth);
   return result.content;
 }
