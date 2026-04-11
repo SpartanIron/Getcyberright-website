@@ -6,29 +6,8 @@ import { validateAndPreparePost } from "./linkValidator";
 
 const BUFFER_GRAPHQL_URL = "https://api.buffer.com/graphql";
 const BUFFER_ORG_ID = process.env.BUFFER_ORG_ID || "69b48dd8282d615a79db2ab3";
-
-export function getPublicImageUrl(localImagePath: string): string | null {
-  if (!localImagePath) return null;
-
-  const filename = path.basename(localImagePath);
-
-  const baseUrl = process.env.PUBLIC_IMAGE_BASE_URL;
-  if (baseUrl) {
-    const cleanBase = baseUrl.replace(/\/+$/, "");
-    return `${cleanBase}/api/social-images/${filename}`;
-  }
-
-  if (process.env.NODE_ENV === "production" || process.env.REPLIT_DEPLOYMENT === "1") {
-    return `https://www.getcyberright.com/api/social-images/${filename}`;
-  }
-
-  const devDomain = process.env.REPLIT_DEV_DOMAIN;
-  if (devDomain) {
-    return `https://${devDomain}/api/social-images/${filename}`;
-  }
-
-  return `https://www.getcyberright.com/api/social-images/${filename}`;
-}
+const DAILY_POSTS_PER_PLATFORM = 2;
+const SOCIAL_IMAGES_DIR = path.join(process.cwd(), ".local", "social-images");
 
 interface BufferChannel {
   id: string;
@@ -36,13 +15,38 @@ interface BufferChannel {
   service: string;
 }
 
-interface BufferPublishResult {
+export interface BufferPublishResult {
   success: boolean;
   platform: string;
   bufferId?: string;
   error?: string;
   limitReached?: boolean;
 }
+
+const PLATFORM_RULES: Record<string, {
+  publishMode: "addToQueue" | "shareNow";
+  requiresImage: boolean;
+  supportsLinkPreview: boolean;
+  metadata?: Record<string, any>;
+}> = {
+  instagram: {
+    publishMode: "addToQueue",
+    requiresImage: true,
+    supportsLinkPreview: false,
+    metadata: { instagram: { type: "post", shouldShareToFeed: true } },
+  },
+  linkedin: {
+    publishMode: "shareNow",
+    requiresImage: false,
+    supportsLinkPreview: true,
+  },
+  facebook: {
+    publishMode: "shareNow",
+    requiresImage: false,
+    supportsLinkPreview: true,
+    metadata: { facebook: { type: "post" } },
+  },
+};
 
 function getBufferToken(): string | undefined {
   return process.env.BUFFER_API_KEY;
@@ -51,6 +55,11 @@ function getBufferToken(): string | undefined {
 export function isBufferConfigured(): boolean {
   return !!getBufferToken();
 }
+
+let cachedChannels: BufferChannel[] | null = null;
+let channelCacheTime = 0;
+const CACHE_TTL = 5 * 60 * 1000;
+let rateLimitedUntil = 0;
 
 async function graphql<T = any>(query: string, variables?: Record<string, any>): Promise<T> {
   if (Date.now() < rateLimitedUntil) {
@@ -78,17 +87,11 @@ async function graphql<T = any>(query: string, variables?: Record<string, any>):
   }
 
   const json = await res.json() as any;
-  if (json.errors && json.errors.length > 0) {
+  if (json.errors?.length > 0) {
     throw new Error(`Buffer GraphQL error: ${json.errors[0].message}`);
   }
-
   return json.data as T;
 }
-
-let cachedChannels: BufferChannel[] | null = null;
-let channelCacheTime = 0;
-const CACHE_TTL = 5 * 60 * 1000;
-let rateLimitedUntil = 0;
 
 export async function getBufferChannels(): Promise<BufferChannel[]> {
   if (cachedChannels && Date.now() - channelCacheTime < CACHE_TTL) {
@@ -116,7 +119,6 @@ export async function getBufferChannels(): Promise<BufferChannel[]> {
     console.error("[Buffer] Failed to fetch channels:", error.message);
     if (error.message?.includes("429") || error.message?.includes("RATE_LIMIT")) {
       rateLimitedUntil = Date.now() + 60 * 60 * 1000;
-      console.warn("[Buffer] Rate-limited by Buffer API. Backing off for 1 hour.");
     }
     return cachedChannels ?? [];
   }
@@ -125,63 +127,159 @@ export async function getBufferChannels(): Promise<BufferChannel[]> {
 export async function getBufferChannelsByPlatform(): Promise<Record<string, BufferChannel>> {
   const channels = await getBufferChannels();
   const map: Record<string, BufferChannel> = {};
-
-  for (const channel of channels) {
-    const service = channel.service?.toLowerCase();
-    if (service === "linkedin") map.linkedin = channel;
-    else if (service === "facebook") map.facebook = channel;
-    else if (service === "instagram") map.instagram = channel;
-    else if (service === "twitter" || service === "x") map.x = channel;
+  for (const ch of channels) {
+    const svc = ch.service?.toLowerCase();
+    if (svc === "linkedin") map.linkedin = ch;
+    else if (svc === "facebook") map.facebook = ch;
+    else if (svc === "instagram") map.instagram = ch;
+    else if (svc === "twitter" || svc === "x") map.x = ch;
   }
-
   return map;
 }
 
-export async function createBufferPost(
+export function getPublicImageUrl(imagePathOrFilename: string): string | null {
+  if (!imagePathOrFilename) return null;
+
+  let filename: string;
+  if (imagePathOrFilename.startsWith("http")) {
+    try { filename = path.basename(new URL(imagePathOrFilename).pathname); } catch { return null; }
+  } else {
+    filename = path.basename(imagePathOrFilename);
+  }
+
+  const baseUrl = process.env.PUBLIC_IMAGE_BASE_URL;
+  if (baseUrl) {
+    return `${baseUrl.replace(/\/+$/, "")}/api/social-images/${filename}`;
+  }
+  if (process.env.NODE_ENV === "production" || process.env.REPLIT_DEPLOYMENT === "1") {
+    return `https://www.getcyberright.com/api/social-images/${filename}`;
+  }
+  const devDomain = process.env.REPLIT_DEV_DOMAIN;
+  if (devDomain) {
+    return `https://${devDomain}/api/social-images/${filename}`;
+  }
+  return `https://www.getcyberright.com/api/social-images/${filename}`;
+}
+
+function isValidBrandedImage(imageUrl: string | null | undefined): boolean {
+  if (!imageUrl) return false;
+  const basename = path.basename(imageUrl.startsWith("http") ? new URL(imageUrl).pathname : imageUrl);
+  if (!basename.startsWith("branded-") && !basename.startsWith("source-")) return false;
+  if (imageUrl.startsWith("http")) return true;
+  return fs.existsSync(imageUrl);
+}
+
+async function resolveImageUrl(
+  currentImageUrl: string | null | undefined,
+  contentTitle: string,
+  contentType: string,
+  platform: string,
+  postId?: string,
+): Promise<string | undefined> {
+  if (isValidBrandedImage(currentImageUrl)) {
+    const publicUrl = getPublicImageUrl(currentImageUrl!);
+    if (publicUrl) {
+      console.log(`[Buffer] Image resolved: ${publicUrl}`);
+      return publicUrl;
+    }
+  }
+
+  console.log(`[Buffer] Generating image for "${contentTitle}" (${platform})`);
+
+  try {
+    const { searchStockPhoto, downloadSourceImage, applyBrandOverlay } = await import("./stockPhotoService");
+    const templateStyle = contentType === "threat_alert" ? "alert_card" as const
+      : contentType === "scam_intel" ? "stat_card" as const
+      : "insight_card" as const;
+    const headline = contentTitle.length > 50 ? contentTitle.slice(0, 47) + "..." : contentTitle;
+    const dims = platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
+
+    const stockPhoto = await searchStockPhoto(contentType || "default", contentTitle, { platform });
+    if (stockPhoto) {
+      const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, contentTitle);
+      if (imgPath) {
+        const overlaid = await applyBrandOverlay(imgPath, headline, "getcyberright.com", templateStyle, dims.w, dims.h);
+        if (overlaid) {
+          if (postId) await storage.updateSocialPost(postId, { imageUrl: overlaid });
+          const url = getPublicImageUrl(overlaid);
+          if (url) {
+            console.log(`[Buffer] Stock photo + overlay: ${stockPhoto.photographer} → ${url}`);
+            return url;
+          }
+        }
+      }
+    }
+  } catch (err: any) {
+    console.warn(`[Buffer] Stock photo failed: ${err.message}`);
+  }
+
+  try {
+    const { generateBrandedImage } = await import("./socialImageService");
+    const newImagePath = await generateBrandedImage(contentTitle, contentType, platform);
+    if (newImagePath) {
+      if (postId) await storage.updateSocialPost(postId, { imageUrl: newImagePath });
+      const url = getPublicImageUrl(newImagePath);
+      if (url) {
+        console.log(`[Buffer] Fallback branded card: ${url}`);
+        return url;
+      }
+    }
+  } catch (err: any) {
+    console.warn(`[Buffer] Branded card fallback failed: ${err.message}`);
+  }
+
+  return undefined;
+}
+
+function prepareContent(
+  text: string,
+  platform: string,
+): string {
+  const { content } = enforcePostPolicy(text, platform);
+  return content;
+}
+
+function shouldAttachImage(platform: string, content: string): boolean {
+  const rules = PLATFORM_RULES[platform];
+  if (!rules) return true;
+  if (!rules.supportsLinkPreview) return true;
+  const hasGcrLink = /https?:\/\/(?:www\.)?getcyberright\.com\//i.test(content);
+  if (hasGcrLink) {
+    console.log(`[Buffer] ${platform}: Link preview mode — OG card will render from article URL`);
+    return false;
+  }
+  return true;
+}
+
+async function sendToBuffer(
   channelId: string,
   text: string,
-  options: {
-    mode?: "addToQueue" | "shareNow" | "shareNext" | "customScheduled" | "recommendedTime";
-    dueAt?: string;
-    imageUrl?: string;
-    platform?: string;
-  } = {}
+  platform: string,
+  imageUrl?: string,
 ): Promise<BufferPublishResult> {
+  const rules = PLATFORM_RULES[platform] || { publishMode: "shareNow" as const };
+
+  if (platform === "instagram" && !imageUrl) {
+    return { success: false, platform, error: "Instagram requires an image" };
+  }
+
+  const input: Record<string, any> = {
+    channelId,
+    text,
+    mode: rules.publishMode,
+    schedulingType: "automatic",
+  };
+
+  if (rules.metadata) {
+    input.metadata = rules.metadata;
+  }
+
+  if (imageUrl) {
+    input.assets = { images: [{ url: imageUrl }] };
+    console.log(`[Buffer] Attaching image: ${imageUrl}`);
+  }
+
   try {
-    if (options.platform === "instagram" && !options.imageUrl) {
-      console.error(`[Buffer] BLOCKED: createBufferPost called for Instagram without an image`);
-      return { success: false, platform: "instagram", error: "Instagram requires an image — blocked at API layer" };
-    }
-
-    const mode = options.mode || "shareNow";
-
-    const input: Record<string, any> = {
-      channelId,
-      text,
-      mode,
-    };
-
-    input.schedulingType = "automatic";
-
-    if (options.dueAt) {
-      input.dueAt = options.dueAt;
-    }
-
-    if (options.platform === "facebook") {
-      input.metadata = { facebook: { type: "post" } };
-    }
-
-    if (options.platform === "instagram") {
-      input.metadata = { instagram: { type: "post", shouldShareToFeed: true } };
-    }
-
-    if (options.imageUrl) {
-      input.assets = {
-        images: [{ url: options.imageUrl }],
-      };
-      console.log(`[Buffer] Attaching image: ${options.imageUrl}`);
-    }
-
     const data = await graphql<{ createPost: any }>(
       `mutation CreatePost($input: CreatePostInput!) {
         createPost(input: $input) {
@@ -203,258 +301,109 @@ export async function createBufferPost(
     const result = data.createPost;
 
     if (result?.post) {
-      const scheduledInfo = result.post.dueAt ? ` (scheduled: ${result.post.dueAt})` : "";
-      console.log(`[Buffer] Post created on ${result.post.channelService}: ${result.post.status}${scheduledInfo}`);
-
       if (result.post.status === "error") {
-        console.error(`[Buffer] Post returned error status on ${result.post.channelService} (Buffer ID: ${result.post.id})`);
-        console.error(`[Buffer] Full error response: ${JSON.stringify(result.post)}`);
-        return {
-          success: false,
-          platform: "buffer",
-          bufferId: result.post.id,
-          error: `Buffer post error on ${result.post.channelService}: unknown reason`,
-        };
+        console.error(`[Buffer] Post error on ${result.post.channelService} (ID: ${result.post.id})`);
+        return { success: false, platform, bufferId: result.post.id, error: `Post error: ${result.post.channelService}` };
       }
-
-      return {
-        success: true,
-        platform: "buffer",
-        bufferId: result.post.id,
-      };
+      const info = result.post.dueAt ? ` (scheduled: ${result.post.dueAt})` : "";
+      console.log(`[Buffer] Post created on ${result.post.channelService}: ${result.post.status}${info}`);
+      return { success: true, platform, bufferId: result.post.id };
     }
 
     if (result?.message) {
-      const isLimitReached = result.__typename === "LimitReachedError" || result.message?.toLowerCase().includes("limit reached");
-      return {
-        success: false,
-        platform: "buffer",
-        error: result.message,
-        limitReached: isLimitReached,
-      };
+      const isLimit = result.__typename === "LimitReachedError" || result.message?.toLowerCase().includes("limit reached");
+      return { success: false, platform, error: result.message, limitReached: isLimit };
     }
 
-    return {
-      success: false,
-      platform: "buffer",
-      error: "Unexpected response from Buffer API",
-    };
+    return { success: false, platform, error: "Unexpected Buffer API response" };
   } catch (error: any) {
-    return {
-      success: false,
-      platform: "buffer",
-      error: error.message,
-    };
+    return { success: false, platform, error: error.message };
   }
 }
 
 export async function publishPostViaBuffer(postId: string): Promise<BufferPublishResult> {
   const post = await storage.getSocialPostById(postId);
-  if (!post) return { success: false, platform: "buffer", error: "Post not found" };
-
-  if (post.platform === "alert") {
-    return { success: false, platform: "buffer", error: "Alert posts are not published via Buffer" };
-  }
+  if (!post) return { success: false, platform: "unknown", error: "Post not found" };
+  if (post.platform === "alert") return { success: false, platform: "alert", error: "Alert posts are not published via Buffer" };
 
   const channels = await getBufferChannelsByPlatform();
   const channel = channels[post.platform];
-
   if (!channel) {
-    return {
-      success: false,
-      platform: post.platform,
-      error: `No Buffer channel connected for ${post.platform}. Connect it in your Buffer dashboard.`,
-    };
+    return { success: false, platform: post.platform, error: `No Buffer channel for ${post.platform}` };
   }
 
-  let imageUrl: string | undefined;
-  const isOldSvgCard = (imgPath: string) => {
-    const basename = path.basename(imgPath);
-    return basename.startsWith("social-") && !basename.startsWith("branded-") && !basename.startsWith("source-");
-  };
+  const imageUrl = await resolveImageUrl(post.imageUrl, post.contentTitle, post.contentType || "", post.platform, postId);
 
-  const isRemoteUrl = (url: string) => url.startsWith("https://") || url.startsWith("http://");
-  const isOldSvgRemote = (url: string) => {
-    try { return isOldSvgCard(new URL(url).pathname); } catch { return false; }
-  };
-
-  const isNonServablePath = (imgPath: string) => {
-    if (isRemoteUrl(imgPath)) return false;
-    const normalized = path.resolve(imgPath);
-    const socialImagesDir = path.resolve(process.cwd(), ".local", "social-images");
-    const distSocialImagesDir = path.resolve(process.cwd(), "dist", "social-images");
-    return !normalized.startsWith(socialImagesDir) && !normalized.startsWith(distSocialImagesDir);
-  };
-
-  const needsStockPhotoUpgrade =
-    !post.imageUrl ||
-    (isRemoteUrl(post.imageUrl) && isOldSvgRemote(post.imageUrl)) ||
-    (!isRemoteUrl(post.imageUrl) && isOldSvgCard(post.imageUrl)) ||
-    (!isRemoteUrl(post.imageUrl) && !fs.existsSync(post.imageUrl)) ||
-    (!isRemoteUrl(post.imageUrl) && isNonServablePath(post.imageUrl));
-
-  if (post.imageUrl && !needsStockPhotoUpgrade) {
-    if (isRemoteUrl(post.imageUrl)) {
-      const remoteFilename = path.basename(new URL(post.imageUrl).pathname);
-      const canonicalUrl = getPublicImageUrl(remoteFilename);
-      if (canonicalUrl && canonicalUrl !== post.imageUrl) {
-        imageUrl = canonicalUrl;
-        console.log(`[Buffer] Normalized remote image URL: ${post.imageUrl} → ${imageUrl}`);
-      } else {
-        imageUrl = post.imageUrl;
-      }
-      console.log(`[Buffer] Using image URL: ${imageUrl}`);
-    } else if (fs.existsSync(post.imageUrl)) {
-      const publicUrl = getPublicImageUrl(post.imageUrl);
-      if (publicUrl) {
-        imageUrl = publicUrl;
-      } else {
-        console.warn(`[Buffer] Could not resolve public URL for image: ${post.imageUrl}`);
-      }
-    }
+  if (PLATFORM_RULES[post.platform]?.requiresImage && !imageUrl) {
+    console.warn(`[Buffer] ${post.platform} requires image — keeping "${post.contentTitle}" as draft for retry`);
+    return { success: false, platform: post.platform, error: `${post.platform} requires an image` };
   }
 
-  if (!imageUrl && needsStockPhotoUpgrade) {
-    if (post.imageUrl) {
-      console.log(`[Buffer] Upgrading old SVG card image to stock photo for "${post.contentTitle}"`);
-    } else {
-      console.log(`[Buffer] No image set, generating stock photo for "${post.contentTitle}"`);
-    }
-
-    const { searchStockPhoto, downloadSourceImage, applyBrandOverlay } = await import("./stockPhotoService");
-    const templateStyle = post.contentType === "threat_alert" ? "alert_card" as const : post.contentType === "scam_intel" ? "stat_card" as const : "insight_card" as const;
-    const headline = post.contentTitle.length > 50 ? post.contentTitle.slice(0, 47) + "..." : post.contentTitle;
-    const dims = post.platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
-
-    const stockPhoto = await searchStockPhoto(post.contentType || "default", post.contentTitle, { platform: post.platform });
-    if (stockPhoto) {
-      const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, post.contentTitle);
-      if (imgPath) {
-        const overlaid = await applyBrandOverlay(imgPath, headline, "getcyberright.com", templateStyle, dims.w, dims.h);
-        if (overlaid) {
-          await storage.updateSocialPost(postId, { imageUrl: overlaid });
-          imageUrl = getPublicImageUrl(overlaid);
-          console.log(`[Buffer] Stock photo image for ${post.platform}: ${stockPhoto.photographer} → ${imageUrl}`);
-        }
-      }
-    }
-
-    if (!imageUrl) {
-      const { generateBrandedImage } = await import("./socialImageService");
-      const newImagePath = await generateBrandedImage(post.contentTitle, post.contentType, post.platform);
-      if (newImagePath) {
-        await storage.updateSocialPost(postId, { imageUrl: newImagePath });
-        const publicUrl = getPublicImageUrl(newImagePath);
-        if (publicUrl) {
-          imageUrl = publicUrl;
-          console.log(`[Buffer] Fallback SVG card for ${post.platform}: ${imageUrl}`);
-        }
-      }
-    }
-  }
-
-  if (post.platform === "instagram" && !imageUrl) {
-    console.warn(`[Buffer] Instagram requires an image — skipping post "${post.contentTitle}" (${postId}), keeping as draft for retry`);
-    return { success: false, platform: post.platform, error: "Instagram requires an image. Post kept as draft for retry." };
-  }
-
-  const validation = await validateAndPreparePost(
-    post.postContent,
-    postId,
-    post.platform,
-    post.contentTitle
-  );
+  const validation = await validateAndPreparePost(post.postContent, postId, post.platform, post.contentTitle);
   console.log(validation.validationLog);
-
   if (!validation.shouldPublish) {
-    return {
-      success: false,
-      platform: post.platform,
-      error: `Link validation failed: broken links detected. Post marked as failed.`,
-    };
+    return { success: false, platform: post.platform, error: "Link validation failed" };
   }
 
-  const policyResult = enforcePostPolicy(validation.content, post.platform);
-  const safeContent = policyResult.content;
+  const content = prepareContent(validation.content, post.platform);
+  const attachImage = shouldAttachImage(post.platform, content);
 
-  const hasGcrLink = /https?:\/\/(?:www\.)?getcyberright\.com\//i.test(safeContent);
-  const useImageAttachment =
-    post.platform === "instagram" ||
-    !hasGcrLink;
+  let result = await sendToBuffer(channel.id, content, post.platform, attachImage ? imageUrl : undefined);
 
-  if (hasGcrLink && !useImageAttachment && imageUrl) {
-    console.log(`[Buffer] ${post.platform}: Skipping image attachment to enable link preview card for GCR article link`);
-  }
-
-  const publishMode = post.platform === "instagram" ? "addToQueue" : "shareNow";
-  let result = await createBufferPost(channel.id, safeContent, {
-    mode: publishMode,
-    imageUrl: useImageAttachment ? imageUrl : undefined,
-    platform: post.platform,
-  });
-
-  if (!result.success && imageUrl && result.error?.toLowerCase().includes("image")) {
-    if (post.platform === "instagram") {
-      console.error(`[Buffer] Image rejected by Instagram for post ${postId}: ${result.error}. Cannot retry without image.`);
-    } else {
-      console.warn(`[Buffer] Image rejected for ${post.platform} post ${postId}: ${result.error}. Retrying without image...`);
-      result = await createBufferPost(channel.id, safeContent, {
-        mode: publishMode,
-        platform: post.platform,
-      });
-      if (result.success) {
-        console.log(`[Buffer] Retry without image succeeded for ${post.platform} post ${postId}`);
-      }
+  if (!result.success && imageUrl && attachImage && result.error?.toLowerCase().includes("image")) {
+    if (post.platform !== "instagram") {
+      console.warn(`[Buffer] Image rejected for ${post.platform}, retrying without image`);
+      result = await sendToBuffer(channel.id, content, post.platform);
     }
   }
 
   if (result.success) {
-    await storage.updateSocialPost(postId, {
-      status: "published",
-      publishedAt: new Date(),
-    });
-    console.log(`[Buffer] Queued ${post.platform} post: ${postId} (Buffer ID: ${result.bufferId})`);
+    await storage.updateSocialPost(postId, { status: "published", publishedAt: new Date() });
+    console.log(`[Buffer] Published ${post.platform}: "${post.contentTitle}" (${result.bufferId})`);
   } else if (result.limitReached) {
-    console.warn(`[Buffer] Limit reached, keeping ${post.platform} post ${postId} as draft for retry`);
+    console.warn(`[Buffer] Limit reached, keeping ${post.platform} post as draft`);
   } else {
-    await storage.updateSocialPost(postId, {
-      status: "failed",
-      publishError: `Buffer: ${result.error}`,
-    });
-    console.error(`[Buffer] Failed to queue ${post.platform} post: ${result.error}`);
+    await storage.updateSocialPost(postId, { status: "failed", publishError: `Buffer: ${result.error}` });
+    console.error(`[Buffer] Failed ${post.platform}: ${result.error}`);
   }
 
   return result;
 }
 
-const DAILY_POSTS_PER_PLATFORM = 2;
+export async function publishDirect(
+  channelId: string,
+  content: string,
+  platform: string,
+  imageUrl?: string,
+): Promise<BufferPublishResult> {
+  const safeContent = prepareContent(content, platform);
+  const attachImage = shouldAttachImage(platform, safeContent);
 
-async function getTodaysPublishedCountByPlatform(): Promise<Record<string, number>> {
-  const counts: Record<string, number> = {};
-  try {
-    const recentPosts = await storage.getSocialPosts("published", 100);
-    const today = new Date().toDateString();
-    for (const post of recentPosts) {
-      if (!post.publishedAt) continue;
-      if (new Date(post.publishedAt).toDateString() !== today) continue;
-      counts[post.platform] = (counts[post.platform] || 0) + 1;
-    }
-  } catch (err: any) {
-    console.error("[Buffer] Failed to check today's published counts:", err.message);
+  let resolvedImage = imageUrl;
+  if (imageUrl) {
+    const publicUrl = getPublicImageUrl(imageUrl);
+    if (publicUrl) resolvedImage = publicUrl;
   }
-  return counts;
+
+  let result = await sendToBuffer(channelId, safeContent, platform, attachImage ? resolvedImage : undefined);
+
+  if (!result.success && resolvedImage && attachImage && result.error?.toLowerCase().includes("image")) {
+    if (platform !== "instagram") {
+      console.warn(`[Buffer] Image rejected for ${platform}, retrying without image`);
+      result = await sendToBuffer(channelId, safeContent, platform);
+    }
+  }
+
+  return result;
 }
+
+export const publishWithFirstComment = publishDirect;
 
 function normalizeTitleForDedup(title: string): string {
-  return title
-    .replace(/\[.*?\]\s*/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  return title.replace(/\[.*?\]\s*/g, "").toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
 }
 
-function isDraftTitleDuplicate(draftTitle: string, publishedTitles: string[]): boolean {
+function isDuplicate(draftTitle: string, publishedTitles: string[]): boolean {
   const norm = normalizeTitleForDedup(draftTitle);
   if (!norm) return false;
   for (const pub of publishedTitles) {
@@ -465,13 +414,26 @@ function isDraftTitleDuplicate(draftTitle: string, publishedTitles: string[]): b
     const pubWords = new Set(pubNorm.split(" ").filter(w => w.length > 3));
     if (normWords.size === 0 || pubWords.size === 0) continue;
     let overlap = 0;
-    for (const w of normWords) {
-      if (pubWords.has(w)) overlap++;
-    }
-    const similarity = overlap / Math.min(normWords.size, pubWords.size);
-    if (similarity >= 0.75) return true;
+    for (const w of normWords) { if (pubWords.has(w)) overlap++; }
+    if (overlap / Math.min(normWords.size, pubWords.size) >= 0.75) return true;
   }
   return false;
+}
+
+async function getTodaysPublishedCounts(): Promise<Record<string, number>> {
+  const counts: Record<string, number> = {};
+  try {
+    const recent = await storage.getSocialPosts("published", 100);
+    const today = new Date().toDateString();
+    for (const p of recent) {
+      if (p.publishedAt && new Date(p.publishedAt).toDateString() === today) {
+        counts[p.platform] = (counts[p.platform] || 0) + 1;
+      }
+    }
+  } catch (err: any) {
+    console.error("[Buffer] Failed to check today's counts:", err.message);
+  }
+  return counts;
 }
 
 export async function publishAllDraftsViaBuffer(options?: { tier?: "guide" | "news_editorial" }): Promise<BufferPublishResult[]> {
@@ -482,62 +444,46 @@ export async function publishAllDraftsViaBuffer(options?: { tier?: "guide" | "ne
   } else if (options?.tier === "news_editorial") {
     drafts = allDrafts.filter(d => d.contentType === "news_article");
   }
-  const results: BufferPublishResult[] = [];
-  const channels = await getBufferChannelsByPlatform();
-  const connectedPlatforms = new Set(Object.keys(channels));
 
-  const nonAlertDrafts = drafts.filter(d => d.platform !== "alert");
-  if (connectedPlatforms.size === 0) {
-    console.warn(`[Buffer] No connected channels found. Cannot publish ${nonAlertDrafts.length} draft posts. Run channel check.`);
-    return results;
+  const channels = await getBufferChannelsByPlatform();
+  const connected = new Set(Object.keys(channels));
+  const publishable = drafts.filter(d => d.platform !== "alert" && connected.has(d.platform));
+
+  if (connected.size === 0) {
+    console.warn(`[Buffer] No connected channels. ${publishable.length} drafts waiting.`);
+    return [];
   }
 
   const recentPublished = await storage.getSocialPosts("published", 100);
-  const sevenDaysAgo = Date.now() - 7 * 86400000;
-  const recentPublishedTitles = recentPublished
-    .filter(p => p.publishedAt && new Date(p.publishedAt).getTime() > sevenDaysAgo)
+  const recentTitles = recentPublished
+    .filter(p => p.publishedAt && Date.now() - new Date(p.publishedAt).getTime() < 7 * 86400000)
     .map(p => p.contentTitle);
 
-  const platformCounts: Record<string, number> = {};
-  let skippedCount = 0;
-  for (const d of nonAlertDrafts) {
-    platformCounts[d.platform] = (platformCounts[d.platform] || 0) + 1;
-    if (!connectedPlatforms.has(d.platform)) skippedCount++;
-  }
-  console.log(`[Buffer] Connected platforms: ${[...connectedPlatforms].join(", ")}. Draft platforms: ${Object.entries(platformCounts).map(([p, c]) => `${p}(${c})`).join(", ")}. Skipping ${skippedCount} posts with no matching channel.`);
+  const counts = await getTodaysPublishedCounts();
+  const logCounts = Object.entries(counts).filter(([, c]) => c > 0).map(([p, c]) => `${p}(${c})`).join(", ");
+  if (logCounts) console.log(`[Buffer] Published today: ${logCounts}`);
 
-  const publishedPerPlatform = await getTodaysPublishedCountByPlatform();
-  const alreadyPublishedLog = Object.entries(publishedPerPlatform)
-    .filter(([, c]) => c > 0)
-    .map(([p, c]) => `${p}(${c})`)
-    .join(", ");
-  if (alreadyPublishedLog) {
-    console.log(`[Buffer] Already published today (DB check): ${alreadyPublishedLog}`);
-  }
+  const guides = publishable.filter(d => d.contentType !== "trend_insight" && d.contentType !== "news_article");
+  const news = publishable.filter(d => d.contentType === "news_article");
+  const sorted = [...guides, ...news];
 
-  const guideDrafts = drafts.filter(d => d.contentType !== "trend_insight" && d.contentType !== "news_article");
-  const newsDrafts = drafts.filter(d => d.contentType === "news_article");
-  const sortedDrafts = [...guideDrafts, ...newsDrafts];
+  const results: BufferPublishResult[] = [];
 
-  for (const draft of sortedDrafts) {
-    if (draft.platform === "alert") continue;
-    if (!connectedPlatforms.has(draft.platform)) continue;
-
-    const alreadyPublished = publishedPerPlatform[draft.platform] || 0;
-    if (alreadyPublished >= DAILY_POSTS_PER_PLATFORM) continue;
+  for (const draft of sorted) {
+    if ((counts[draft.platform] || 0) >= DAILY_POSTS_PER_PLATFORM) continue;
 
     if (draft.contentType === "news_article" && draft.createdAt) {
       const ageHours = (Date.now() - new Date(draft.createdAt).getTime()) / 3600000;
       if (ageHours > 48) {
-        console.warn(`[Buffer] EXPIRED: News editorial "${draft.contentTitle}" on ${draft.platform} is ${Math.round(ageHours)}h old (>48h limit). Expiring.`);
-        await storage.updateSocialPost(draft.id, { status: "failed", publishError: "Auto-expired: news editorial older than 48 hours" });
+        console.warn(`[Buffer] EXPIRED: "${draft.contentTitle}" on ${draft.platform} (${Math.round(ageHours)}h old)`);
+        await storage.updateSocialPost(draft.id, { status: "failed", publishError: "Auto-expired: older than 48 hours" });
         continue;
       }
     }
 
-    if (isDraftTitleDuplicate(draft.contentTitle, recentPublishedTitles)) {
-      console.warn(`[Buffer] DUPLICATE SKIPPED: "${draft.contentTitle}" on ${draft.platform} matches a recently published post. Deleting draft.`);
-      await storage.updateSocialPost(draft.id, { status: "failed", publishError: "Duplicate topic already published" });
+    if (isDuplicate(draft.contentTitle, recentTitles)) {
+      console.warn(`[Buffer] DUPLICATE: "${draft.contentTitle}" on ${draft.platform}`);
+      await storage.updateSocialPost(draft.id, { status: "failed", publishError: "Duplicate topic" });
       continue;
     }
 
@@ -545,61 +491,35 @@ export async function publishAllDraftsViaBuffer(options?: { tier?: "guide" | "ne
     results.push(result);
 
     if (result.success) {
-      publishedPerPlatform[draft.platform] = alreadyPublished + 1;
+      counts[draft.platform] = (counts[draft.platform] || 0) + 1;
     }
-
     if (!result.success && (result.limitReached || result.error?.toLowerCase().includes("limit reached"))) {
       console.log("[Buffer] API limit reached, stopping batch");
       break;
     }
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(r => setTimeout(r, 1000));
   }
 
-  const remaining = nonAlertDrafts.length - results.filter(r => r.success).length;
+  const remaining = sorted.length - results.filter(r => r.success).length;
   if (remaining > 0) {
-    console.log(`[Buffer] Daily limit applied (${DAILY_POSTS_PER_PLATFORM}/platform). ${remaining} drafts remaining for future runs.`);
+    console.log(`[Buffer] ${remaining} drafts remaining (${DAILY_POSTS_PER_PLATFORM}/platform/day limit)`);
   }
 
   return results;
 }
 
-export async function publishWithFirstComment(
+export async function createBufferPost(
   channelId: string,
-  content: string,
+  text: string,
   options: {
-    mode?: "addToQueue" | "shareNow" | "shareNext";
+    mode?: "addToQueue" | "shareNow" | "shareNext" | "customScheduled" | "recommendedTime";
+    dueAt?: string;
     imageUrl?: string;
     platform?: string;
-    sourceArticleUrl?: string | null;
   } = {}
 ): Promise<BufferPublishResult> {
-  const platform = options.platform || "";
-
-  if (platform === "instagram" && !options.imageUrl) {
-    console.error(`[Buffer] publishWithFirstComment: Instagram requires an image — rejecting post`);
-    return { success: false, platform, error: "Instagram requires an image" };
-  }
-
-  const policyResult = enforcePostPolicy(content, platform);
-  const safeContent = policyResult.content;
-
-  const hasGcrLink = /https?:\/\/(?:www\.)?getcyberright\.com\//i.test(safeContent);
-  const useImageAttachment =
-    platform === "instagram" ||
-    !hasGcrLink;
-
-  if (hasGcrLink && !useImageAttachment && options.imageUrl) {
-    console.log(`[Buffer] ${platform}: Skipping image attachment to enable link preview card for GCR article link`);
-  }
-
-  const result = await createBufferPost(channelId, safeContent, {
-    mode: options.mode || "shareNow",
-    imageUrl: useImageAttachment ? options.imageUrl : undefined,
-    platform: options.platform,
-  });
-
-  return result;
+  return sendToBuffer(channelId, text, options.platform || "", options.imageUrl);
 }
 
 export async function getBufferStatus(): Promise<{
@@ -619,19 +539,9 @@ export async function getBufferStatus(): Promise<{
       configured: true,
       connected: channels.length > 0,
       organizationId: BUFFER_ORG_ID,
-      channels: channels.map(c => ({
-        service: c.service,
-        name: c.name,
-        id: c.id,
-      })),
+      channels: channels.map(c => ({ service: c.service, name: c.name, id: c.id })),
     };
   } catch (error: any) {
-    return {
-      configured: true,
-      connected: false,
-      organizationId: BUFFER_ORG_ID,
-      channels: [],
-      error: error.message,
-    };
+    return { configured: true, connected: false, organizationId: BUFFER_ORG_ID, channels: [], error: error.message };
   }
 }
