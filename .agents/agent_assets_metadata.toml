@@ -437,3 +437,9 @@ id = "tOSNGBKtbd3rNKC1J7raL"
 uri = "file://attached_assets/stock_images/family-tablet-hero_3.jpg"
 type = "image"
 title = "happy family with two kids looking at tablet computer together on couch modern home"
+
+[[outputs]]
+id = "9Jvd6LPqGN6UFzOa_SZFG"
+uri = "file://GetCyberRight_Business_Profile.md"
+type = "text"
+title = "GetCyberRight Business Profile"
