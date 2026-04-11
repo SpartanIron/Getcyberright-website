@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "../../components/json-ld";
 import { notFound } from "next/navigation";
 import PageContent from "@/pages/guide-detail";
 
@@ -89,10 +90,7 @@ export default async function GuideDetailPage({ params }: PageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
-      />
+      <JsonLd data={jsonLd} />
       <PageContent />
     </>
   );

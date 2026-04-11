@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "../components/json-ld";
 import PageContent from "@/pages/browser-extension";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -68,12 +69,7 @@ export default function BrowserExtensionPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={jsonLd} />
       <PageContent />
     </>
   );

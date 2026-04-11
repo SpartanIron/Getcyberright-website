@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "../components/json-ld";
 import PageContent from "@/pages/news";
 import { getLatestNews } from "../lib/data";
 
@@ -69,12 +70,7 @@ export default async function NewsPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={jsonLd} />
       <PageContent initialNews={initialNews} />
     </>
   );

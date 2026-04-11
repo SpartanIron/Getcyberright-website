@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "../components/json-ld";
 import PageContent from "@/pages/training";
 import { getAllLearningPaths } from "../lib/data";
 
@@ -70,12 +71,7 @@ export default async function TrainingPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={jsonLd} />
       <PageContent initialPaths={initialPaths} />
     </>
   );

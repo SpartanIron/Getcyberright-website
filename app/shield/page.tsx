@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "../components/json-ld";
 import PageContent from "@/pages/shield";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -73,12 +74,7 @@ export default function ShieldPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={jsonLd} />
       <PageContent />
     </>
   );

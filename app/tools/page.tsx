@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "../components/json-ld";
 import PageContent from "@/pages/tools";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -100,12 +101,7 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={jsonLd} />
       <PageContent tab={tab} />
     </>
   );

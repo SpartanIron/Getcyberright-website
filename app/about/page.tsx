@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "../components/json-ld";
 import PageContent from "@/pages/about";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -25,7 +26,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-static";
 
 export default function AboutPage() {
   const jsonLd = [
@@ -56,12 +56,7 @@ export default function AboutPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={jsonLd} />
       <PageContent />
     </>
   );

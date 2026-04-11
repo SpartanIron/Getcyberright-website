@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "../components/json-ld";
 import Link from "next/link";
 import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays, Chrome, CreditCard } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -160,12 +161,7 @@ export default function FAQPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={jsonLd} />
       <Navigation />
       <main id="main-content" tabIndex={-1} className="min-h-screen bg-background">
         <section className="relative py-16 overflow-hidden">
