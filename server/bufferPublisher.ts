@@ -370,10 +370,19 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
   const policyResult = enforcePostPolicy(validation.content, post.platform);
   const safeContent = policyResult.content;
 
+  const hasGcrLink = /https?:\/\/(?:www\.)?getcyberright\.com\//i.test(safeContent);
+  const useImageAttachment =
+    post.platform === "instagram" ||
+    !hasGcrLink;
+
+  if (hasGcrLink && !useImageAttachment && imageUrl) {
+    console.log(`[Buffer] ${post.platform}: Skipping image attachment to enable link preview card for GCR article link`);
+  }
+
   const publishMode = post.platform === "instagram" ? "addToQueue" : "shareNow";
   let result = await createBufferPost(channel.id, safeContent, {
     mode: publishMode,
-    imageUrl,
+    imageUrl: useImageAttachment ? imageUrl : undefined,
     platform: post.platform,
   });
 
@@ -568,9 +577,18 @@ export async function publishWithFirstComment(
   const policyResult = enforcePostPolicy(content, platform);
   const safeContent = policyResult.content;
 
+  const hasGcrLink = /https?:\/\/(?:www\.)?getcyberright\.com\//i.test(safeContent);
+  const useImageAttachment =
+    platform === "instagram" ||
+    !hasGcrLink;
+
+  if (hasGcrLink && !useImageAttachment && options.imageUrl) {
+    console.log(`[Buffer] ${platform}: Skipping image attachment to enable link preview card for GCR article link`);
+  }
+
   const result = await createBufferPost(channelId, safeContent, {
     mode: options.mode || "shareNow",
-    imageUrl: options.imageUrl,
+    imageUrl: useImageAttachment ? options.imageUrl : undefined,
     platform: options.platform,
   });
 
