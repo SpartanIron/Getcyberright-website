@@ -295,8 +295,15 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
 
   if (post.imageUrl && !needsStockPhotoUpgrade) {
     if (isRemoteUrl(post.imageUrl)) {
-      imageUrl = post.imageUrl;
-      console.log(`[Buffer] Using external image URL: ${imageUrl}`);
+      const remoteFilename = path.basename(new URL(post.imageUrl).pathname);
+      const canonicalUrl = getPublicImageUrl(remoteFilename);
+      if (canonicalUrl && canonicalUrl !== post.imageUrl) {
+        imageUrl = canonicalUrl;
+        console.log(`[Buffer] Normalized remote image URL: ${post.imageUrl} → ${imageUrl}`);
+      } else {
+        imageUrl = post.imageUrl;
+      }
+      console.log(`[Buffer] Using image URL: ${imageUrl}`);
     } else if (fs.existsSync(post.imageUrl)) {
       const publicUrl = getPublicImageUrl(post.imageUrl);
       if (publicUrl) {
