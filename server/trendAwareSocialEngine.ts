@@ -410,7 +410,7 @@ const PLATFORM_POSTING_WINDOWS: Record<string, Record<number, PlatformSlotWindow
   },
 };
 
-function getCurrentSlot(): PostingSlot {
+export function getCurrentSlot(): PostingSlot {
   const et = getETComponents();
   return et.hour >= 15 ? "evening" : "morning";
 }
@@ -1725,6 +1725,31 @@ function selectTemplateForTrend(trendAnalysis: TrendAnalysis, contentMode: Conte
   return fallback;
 }
 
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function wrapText(text: string, maxCharsPerLine: number): string[] {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let currentLine = "";
+  for (const word of words) {
+    if (currentLine.length + word.length + 1 > maxCharsPerLine && currentLine.length > 0) {
+      lines.push(currentLine.trim());
+      currentLine = word;
+    } else {
+      currentLine += (currentLine ? " " : "") + word;
+    }
+  }
+  if (currentLine.trim()) lines.push(currentLine.trim());
+  return lines;
+}
+
 async function generatePostImage(
   headline: string,
   subtext: string,
@@ -2532,24 +2557,15 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
         content = linkCheck.content;
 
         const channel = channels[platform];
-        const { publishWithFirstComment } = await import("./bufferPublisher");
-        let bufferResult = await publishWithFirstComment(channel.id, content, {
-          mode: "shareNow",
-          platform,
-          imageUrl: image || undefined,
-          sourceArticleUrl: posts.sourceArticleUrl,
-        });
+        const { publishDirect } = await import("./bufferPublisher");
+        let bufferResult = await publishDirect(channel.id, content, platform, image || undefined);
 
         if (!bufferResult.success && image && bufferResult.error?.toLowerCase().includes("image")) {
           if (platform === "instagram") {
             console.error(`[TrendEngine] Image rejected by Instagram: ${bufferResult.error}. Cannot retry without image.`);
           } else {
             console.warn(`[TrendEngine] Image rejected for ${platform}: ${bufferResult.error}. Retrying without image...`);
-            bufferResult = await publishWithFirstComment(channel.id, content, {
-              mode: "shareNow",
-              platform,
-              sourceArticleUrl: posts.sourceArticleUrl,
-            });
+            bufferResult = await publishDirect(channel.id, content, platform);
             if (bufferResult.success) {
               console.log(`[TrendEngine] Retry without image succeeded for ${platform}`);
               await storage.updateSocialPost(created.id, { imageUrl: null });
