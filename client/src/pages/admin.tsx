@@ -54,7 +54,8 @@ import {
   Fingerprint,
   Key,
   Settings,
-  ChevronDown
+  ChevronDown,
+  MessageCircle
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { startRegistration, startAuthentication, browserSupportsWebAuthn } from "@simplewebauthn/browser";
@@ -3399,6 +3400,50 @@ function SocialPostGeneratorTab({ token }: { token: string }) {
     window.open(bufferUrl, "_blank", "width=800,height=600");
   };
 
+  const copyForWhatsApp = async () => {
+    if (!selectedItem) {
+      toast({ title: "Select content", description: "Please select an item first.", variant: "destructive" });
+      return;
+    }
+
+    let content: { title: string; excerpt?: string } | undefined;
+    let link = "https://www.getcyberright.com";
+
+    if (selectedContent === "article") {
+      const article = articles.find(a => a.id.toString() === selectedItem);
+      if (article) {
+        content = { title: cleanText(article.title), excerpt: cleanText(article.excerpt || "") };
+        link = `https://www.getcyberright.com/article/${selectedItem}`;
+      }
+    } else if (selectedContent === "tip") {
+      const tip = dailyTips.find((t: any) => t.id?.toString() === selectedItem);
+      if (tip) {
+        content = { title: cleanText(tip.title || tip.subject), excerpt: cleanText(tip.content || tip.body) };
+      }
+    } else if (selectedContent === "news") {
+      const newsItem = latestNews.find((n: any) => n.id?.toString() === selectedItem);
+      if (newsItem) {
+        content = { title: cleanText(newsItem.title), excerpt: cleanText(newsItem.excerpt || newsItem.description || "") };
+        link = newsItem?.url || `https://www.getcyberright.com/news`;
+      }
+    }
+
+    if (!content) {
+      toast({ title: "Error", description: "Could not find selected content.", variant: "destructive" });
+      return;
+    }
+
+    const waPost = `*${content.title}*\n\n${content.excerpt || ""}\n\nRead more: ${link}\n\n_From GetCyberRight — Free cybersecurity for families_`;
+    
+    try {
+      await navigator.clipboard.writeText(waPost);
+      toast({ title: "Copied for WhatsApp!", description: "Paste this into your WhatsApp Channel." });
+    } catch {
+      setGeneratedPost(waPost);
+      toast({ title: "Ready to copy", description: "WhatsApp post generated — copy it manually." });
+    }
+  };
+
   const platformCharLimits: Record<string, number> = {
     linkedin: 3000,
     twitter: 280,
@@ -3513,6 +3558,7 @@ function SocialPostGeneratorTab({ token }: { token: string }) {
                 disabled={!generatedPost}
                 variant="outline"
                 className="flex-1 gap-2"
+                data-testid="button-copy-post"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 {copied ? "Copied!" : "Copy"}
@@ -3521,11 +3567,21 @@ function SocialPostGeneratorTab({ token }: { token: string }) {
                 onClick={openInBuffer} 
                 disabled={!generatedPost}
                 className="flex-1 gap-2 bg-[#231F20] hover:bg-[#3a3637] text-white"
+                data-testid="button-open-buffer"
               >
                 <ExternalLink className="w-4 h-4" />
                 Open in Buffer
               </Button>
             </div>
+            <Button
+              onClick={copyForWhatsApp}
+              disabled={!selectedItem}
+              className="w-full gap-2 bg-[#25D366] hover:bg-[#1da851] text-white"
+              data-testid="button-copy-whatsapp"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Copy for WhatsApp Channel
+            </Button>
           </CardContent>
         </Card>
       </div>

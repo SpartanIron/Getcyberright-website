@@ -420,13 +420,23 @@ function isDuplicate(draftTitle: string, publishedTitles: string[]): boolean {
   return false;
 }
 
+function toETDateString(date: Date): string {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric", month: "2-digit", day: "2-digit",
+  });
+  const parts = formatter.formatToParts(date);
+  const get = (type: string) => parts.find(p => p.type === type)?.value || "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
 async function getTodaysPublishedCounts(): Promise<Record<string, number>> {
   const counts: Record<string, number> = {};
   try {
     const recent = await storage.getSocialPosts("published", 100);
-    const today = new Date().toDateString();
+    const todayET = toETDateString(new Date());
     for (const p of recent) {
-      if (p.publishedAt && new Date(p.publishedAt).toDateString() === today) {
+      if (p.publishedAt && toETDateString(new Date(p.publishedAt)) === todayET) {
         counts[p.platform] = (counts[p.platform] || 0) + 1;
       }
     }
