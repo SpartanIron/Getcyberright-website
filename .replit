@@ -8,8 +8,8 @@ packages = ["trivy"]
 
 [deployment]
 deploymentTarget = "autoscale"
-build = ["sh", "-c", "npx tsx server/migrate-runner.ts && NODE_OPTIONS='--max-old-space-size=3072' npm run build"]
-run = ["sh", "-c", "NODE_ENV=production node dist/index.js"]
+build = ["bash", "-c", "npx tsx server/migrate-runner.ts && NODE_OPTIONS='--max-old-space-size=3072' npm run build"]
+run = ["node", "dist/index.js"]
 
 [[ports]]
 localPort = 5000
@@ -66,6 +66,7 @@ FACEBOOK_APP_ID = "941199795122443"
 THREADS_APP_ID = "26126703126971508"
 STRIPE_PUBLISHABLE_KEY = "pk_live_51SvU8iKVliFwpBWfFLP70p4b8Y34Gzo30zE41O5RVX7oxbGBDfwuqRMymIzR5FJWYqKDFeg5wHnmAb549CYIGdJw00ntpYTodQ"
 GOOGLE_SITE_VERIFICATION = "Kaw5YXFeNRXezYDKiIN_OXudIQaHSmwidb4EHQD90h8"
+JWT_SECRET = "4efe12b646f83bb7c2de7c87ac6f38dd374a3773a55c01aa319f6b787e14948a5921deccac4fc4bc93c87834a8242aa34989d38f8fc03f2b941da66df860c3e2"
 
 [agent]
 integrations = ["javascript_anthropic_ai_integrations:2.0.0", "javascript_log_in_with_replit:2.0.0"]
