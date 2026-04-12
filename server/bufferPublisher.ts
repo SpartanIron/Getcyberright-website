@@ -80,8 +80,10 @@ async function graphql<T = any>(query: string, variables?: Record<string, any>):
   if (!res.ok) {
     const body = await res.text();
     if (res.status === 429) {
-      rateLimitedUntil = Date.now() + 60 * 60 * 1000;
-      console.warn("[Buffer] Rate-limited (429). Backing off for 1 hour.");
+      const retryAfter = res.headers.get("retry-after");
+      const backoffMs = retryAfter ? parseInt(retryAfter, 10) * 1000 : 5 * 60 * 1000;
+      rateLimitedUntil = Date.now() + backoffMs;
+      console.warn(`[Buffer] Rate-limited (429). Backing off for ${Math.ceil(backoffMs / 60000)} minutes.`);
     }
     throw new Error(`Buffer GraphQL HTTP error ${res.status}: ${body}`);
   }
@@ -118,7 +120,7 @@ export async function getBufferChannels(): Promise<BufferChannel[]> {
   } catch (error: any) {
     console.error("[Buffer] Failed to fetch channels:", error.message);
     if (error.message?.includes("429") || error.message?.includes("RATE_LIMIT")) {
-      rateLimitedUntil = Date.now() + 60 * 60 * 1000;
+      rateLimitedUntil = Date.now() + 5 * 60 * 1000;
     }
     return cachedChannels ?? [];
   }
@@ -487,6 +489,16 @@ export async function publishAllDraftsViaBuffer(options?: { tier?: "guide" | "ne
       if (ageHours > 48) {
         console.warn(`[Buffer] EXPIRED: "${draft.contentTitle}" on ${draft.platform} (${Math.round(ageHours)}h old)`);
         await storage.updateSocialPost(draft.id, { status: "failed", publishError: "Auto-expired: older than 48 hours" });
+        continue;
+      }
+    }
+
+    if (draft.contentType === "trend_insight" && draft.createdAt) {
+      const draftDateET = toETDateString(new Date(draft.createdAt));
+      const todayET = toETDateString(new Date());
+      if (draftDateET !== todayET) {
+        console.warn(`[Buffer] EXPIRED: reactive post "${draft.contentTitle}" on ${draft.platform} (created ${draftDateET}, today is ${todayET})`);
+        await storage.updateSocialPost(draft.id, { status: "failed", publishError: "Auto-expired: reactive post from previous day" });
         continue;
       }
     }

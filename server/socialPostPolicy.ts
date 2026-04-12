@@ -88,13 +88,19 @@ function restoreUrls(text: string, urls: string[]): string {
 export function sanitizeContent(text: string): string {
   const { cleaned, urls } = preserveUrls(text);
 
-  const processed = cleaned
+  let processed = cleaned
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/\*([^*]+)\*/g, "$1")
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^[-*]\s+/gm, "")
-    .replace(/\u2014/g, ", ")
-    .replace(/\u2013/g, ", ")
+    .replace(/\s*[\u2014\u2015\u2E3A\u2E3B]\s*/g, ". ")
+    .replace(/\s*\u2013\s*/g, " to ")
+    .replace(/\s*-{2,}\s*/g, ". ")
+    .replace(/\.\s*\./g, ".")
+    .replace(/,\s*\./g, ".")
+    .replace(/\.\s*,/g, ".")
+    .replace(/\s+([.!?,;:])/g, "$1")
+    .replace(/([.!?])\s*([a-z])/g, (_, p, c) => `${p} ${c.toUpperCase()}`)
     .replace(/[^\S\n]{2,}/g, " ")
     .replace(/\n{4,}/g, "\n\n\n")
     .trim();

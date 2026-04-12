@@ -959,8 +959,8 @@ You MUST select a post_depth for EVERY post. This determines how you write, how 
 
 THREE DEPTH LEVELS:
 A) "wire" — Breaking news wire dispatch. Short teaser (30-50 words). Always includes a GCR article link. The OG preview card does 80% of the work. Use for: urgent threats, new vulnerabilities, active attacks, breaking breach news. The post earns the click.
-B) "insight" — Standalone value post. Medium length (80-120 words). Link is OPTIONAL (soft CTA or none). Delivers the full insight in the post itself. Use for: celebrity/public figure privacy stories, relatable family scenarios, myth-busting, privacy implications of mainstream news, cultural moments tied to security. The post IS the value.
-C) "deep_value" — Full educational value. Longer form (100-150 words). No hard link. Ends with "Follow @getcyberright" or "More at getcyberright.com" (soft brand). Use for: step-by-step how-to content, "change these settings tonight" posts, practical protection walkthroughs, learning resources. The post is saveable and shareable.
+B) "insight" — Standalone value post. Medium length (80-120 words). Delivers the full insight in the post itself. ALWAYS end with a relevant GetCyberRight link on its own line after two line breaks. Use for: celebrity/public figure privacy stories, relatable family scenarios, myth-busting, privacy implications of mainstream news, cultural moments tied to security. The post IS the value, but the link gives readers a path to learn more.
+C) "deep_value" — Full educational value. Longer form (100-150 words). ALWAYS end with a relevant GetCyberRight link on its own line after two line breaks. Use for: step-by-step how-to content, "change these settings tonight" posts, practical protection walkthroughs, learning resources. The post is saveable and shareable, and the link drives traffic.
 
 DEPTH SELECTION RULES:
 - urgency_score >= 4 AND impact_level is "high" → force "wire"
@@ -988,26 +988,26 @@ FOR "wire" DEPTH:
 
 FOR "insight" DEPTH:
 - Posts deliver STANDALONE VALUE. The reader should learn something valuable just from reading the post
-- Post structure: relatable hook (1-2 sentences) > the insight/story (2-3 paragraphs) > takeaway or reflection (1 sentence) > optional soft CTA
-- Do NOT use a hard article link. Instead, optionally end with "Follow @getcyberright for more" or nothing at all
+- Post structure: relatable hook (1-2 sentences) > the insight/story (2-3 paragraphs) > takeaway or reflection (1 sentence) > relevant GCR link on its own line
+- ALWAYS end with a relevant GetCyberRight link on its own final line after two line breaks. Pick the most relevant page from the KEY TOOL PAGES list
 - Write like you're telling a friend something fascinating you learned. Not like a brand sharing content
-- The goal is engagement (likes, shares, saves, comments), not clicks
+- The goal is engagement AND traffic. The post earns the trust, the link earns the visit
 
 FOR "deep_value" DEPTH:
 - Posts deliver COMPLETE ACTIONABLE VALUE. The reader can act on the advice immediately
-- Post structure: attention hook > educational content (3-4 short paragraphs) > specific action steps > soft brand mention
-- No hard links. End with "Follow @getcyberright" or "More tips at getcyberright.com"
+- Post structure: attention hook > educational content (3-4 short paragraphs) > specific action steps > relevant GCR link on its own line
+- ALWAYS end with a relevant GetCyberRight link on its own final line after two line breaks. Pick the most relevant page from the KEY TOOL PAGES list
 - Write like a trusted expert sharing practical advice. Think "here's exactly what to do"
-- The goal is saves and shares. People bookmark this content
+- The goal is saves, shares, AND traffic back to the site
 
 LINKING RULES (ALL DEPTHS):
 - For learning_opportunity mode: You MAY link to trusted external learning resources (ISC2, Google, Microsoft Learn, CISA, Coursera, edX, etc.)
-- For wire depth: ALWAYS end with a link to a relevant GetCyberRight page
-- For insight/deep_value depth: Do NOT force a GCR article link. A soft brand mention is enough
+- For ALL depths (wire, insight, deep_value): ALWAYS end with a relevant GetCyberRight link on its own final line after two line breaks
 - ALL GetCyberRight links MUST use the www subdomain (https://www.getcyberright.com/...)
 - You may ONLY link to URLs that appear in the KEY TOOL PAGES list
-- If no specific page matches for wire depth, link to https://www.getcyberright.com/news
+- If no specific page matches, link to https://www.getcyberright.com/news
 - Links MUST appear on their own line before any hashtags
+- Every post must drive traffic. No post should go out without a path back to GetCyberRight
 
 STEP 9 - VISUAL PLANNING:
 - For "wire" depth: Suggest branded card visuals (headline on dark background). The card IS the visual
@@ -1117,9 +1117,9 @@ WHAT NOT TO DO (ANTI-PATTERNS THAT KILL ENGAGEMENT):
 - NEVER give a full summary of the article. The post is a TEASER that earns the click
 
 PLATFORM OPTIMIZATION (ALGORITHM-AWARE):
-- LinkedIn: The algorithm penalizes external links in the main body. For wire depth, put the link on its own final line after TWO line breaks. For insight/deep_value depth, skip the link entirely or use a soft "Follow @getcyberright" mention. Posts without links get 2-3x more reach on LinkedIn. Front-load the insight above the "see more" fold
-- Facebook: The algorithm deprioritizes posts with external links. For wire depth, place the link on a separate final line. For insight/deep_value depth, write pure native content with no link. The more organic the post feels, the more Facebook distributes it. Posts that generate comments and shares get exponentially more reach
-- Instagram: Visual-first. The image carries the weight. Caption adds voice and context. For wire depth, "Link in bio" is the CTA. For insight/deep_value depth, write captions people want to SAVE. Instagram rewards saves above all other engagement signals. Hashtags always at the end, separated by two line breaks
+- LinkedIn: Put the GCR link on its own final line after TWO line breaks for all depths. Front-load the insight above the "see more" fold. The link at the end does not hurt reach when the content above it is strong enough to earn engagement first
+- Facebook: Place the GCR link on a separate final line for all depths. Write the body as native content first, then add the link at the very end. Posts that generate comments and shares get exponentially more reach
+- Instagram: Visual-first. The image carries the weight. Caption adds voice and context. For all depths, end with "Link in bio" or "More at getcyberright.com". Hashtags always at the end, separated by two line breaks
 
 IMAGE STRATEGY BY DEPTH:
 - "wire": Use a branded card with headline overlay. The card IS the visual content on social media
@@ -1180,8 +1180,8 @@ CRITICAL VOICE RULES FOR ALL PLATFORMS:
 LINKEDIN POST:
 The word limit depends on the post_depth you selected:
 - "wire": 30-50 words max. Think Reuters wire dispatch. The branded OG preview card does 80% of the work. IDEAL STRUCTURE: One sharp observation (1-2 sentences) \\n\\n Link on its own line
-- "insight": 80-120 words. 4-6 short paragraphs. Deliver the full insight. Write like you're sharing something fascinating with a colleague. No link required. Optionally end with "Follow @getcyberright"
-- "deep_value": 100-150 words. 5-8 short paragraphs. Full educational value with specific actions. End with "More tips at getcyberright.com" or "Follow @getcyberright"
+- "insight": 80-120 words. 4-6 short paragraphs. Deliver the full insight. Write like you're sharing something fascinating with a colleague. End with a relevant GCR link on its own line after two line breaks
+- "deep_value": 100-150 words. 5-8 short paragraphs. Full educational value with specific actions. End with a relevant GCR link on its own line after two line breaks
 - The first line MUST be under 15 words and grab attention immediately (this appears before "see more")
 - HOOK FORMULAS (rotate between these):
   * Stat-lead: "X% of [thing] now [surprising fact]."
@@ -1195,16 +1195,16 @@ ${partnerContextLinkedIn}
 FACEBOOK POST:
 The word limit depends on the post_depth you selected:
 - "wire": 25-45 words max. A text message to a friend about something urgent + link. ONE sentence hook + ONE sentence context + link
-- "insight": 70-100 words. Write like you're telling your family group chat something important. 3-5 short paragraphs. Deliver the full story. No link needed
-- "deep_value": 90-130 words. Practical, shareable. The kind of post people tag their spouse in. 4-7 paragraphs with specific advice
+- "insight": 70-100 words. Write like you're telling your family group chat something important. 3-5 short paragraphs. Deliver the full story. End with a relevant GCR link on its own line after two line breaks
+- "deep_value": 90-130 words. Practical, shareable. The kind of post people tag their spouse in. 4-7 paragraphs with specific advice. End with a relevant GCR link on its own line after two line breaks
 - For wire: End with a natural bridge to the link ("Full breakdown:" or "We pulled the details:")
-- For insight/deep_value: End naturally. Maybe "Follow us for more" or nothing. Don't force a link
+- For insight/deep_value: End with a relevant GCR link on its own final line. Pick the most relevant page for the topic
 ${partnerContextFacebook}
 INSTAGRAM POST:
 The word limit depends on the post_depth you selected:
 - "wire": 30-60 words max. IMAGE-FIRST. The branded card IS the content. Caption adds voice. End with "Link in bio"
-- "insight": 80-120 words. The image is an authentic photo, NOT a branded card. Caption tells the story. 3-5 paragraphs before hashtags. End with "Follow @getcyberright for more"
-- "deep_value": 100-150 words. Authentic photo + educational caption people save. 4-6 paragraphs. End with "Follow @getcyberright" or "Save this for later"
+- "insight": 80-120 words. The image is an authentic photo, NOT a branded card. Caption tells the story. 3-5 paragraphs before hashtags. End with "Link in bio" or "More at getcyberright.com"
+- "deep_value": 100-150 words. Authentic photo + educational caption people save. 4-6 paragraphs. End with "Link in bio" or "More at getcyberright.com"
 - Add 8-12 curated hashtags at the END, separated by two line breaks
 - For insight/deep_value: Mix security hashtags with crossover lifestyle hashtags (#parenting #momlife #dadlife #familylife #trending #digitalwellness)
 - For wire: Use cybersecurity-focused hashtags (#cybersecurity #infosec #datasecurity + niche + audience)
@@ -2481,9 +2481,8 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     const fixedInstagram = posts.instagram;
 
     const isLearningPost = posts.contentMode === "learning_opportunity";
-    const isStandalonePost = posts.postDepth === "insight" || posts.postDepth === "deep_value";
 
-    if (trendArticle && !isLearningPost && !isStandalonePost) {
+    if (trendArticle) {
       const gcrLinkPattern = /https?:\/\/(?:www\.)?getcyberright\.com\/[^\s)\]"',]+/gi;
       fixedLinkedin = fixedLinkedin.replace(gcrLinkPattern, articleUrl);
       fixedFacebook = fixedFacebook.replace(gcrLinkPattern, articleUrl);
@@ -2496,11 +2495,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     let validatedFacebook: string;
     const validatedInstagram = fixedInstagram;
 
-    if (isStandalonePost) {
-      validatedLinkedin = fixedLinkedin;
-      validatedFacebook = fixedFacebook;
-      console.log(`[TrendEngine] Standalone ${posts.postDepth} post: skipping forced link injection (native content strategy)`);
-    } else if (isLearningPost) {
+    if (isLearningPost) {
       const hasExternalLink = /https?:\/\/(?!(?:www\.)?getcyberright\.com)[^\s)\]"',]+/i;
       if (hasExternalLink.test(fixedLinkedin)) {
         validatedLinkedin = fixedLinkedin;
