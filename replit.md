@@ -53,6 +53,15 @@ Server Components in `app/` fetch initial data through the Express API (`app/lib
 - **CI/GitHub Actions**: Build succeeds without `DATABASE_URL` because `app/lib/data.ts` fetches via API (which gracefully fails during build). Pages render with empty initial data and hydrate at runtime via ISR revalidation.
 - **Key export**: `server/trendAwareSocialEngine.ts` exports `getCurrentSlot()` and `generateAndPublishTrendAwarePosts()` for admin routes.
 
+## Security Hardening (April 2026)
+- **ReDoS fix**: Domain validation regex in `server/routes.ts` now uses non-capturing groups with bounded quantifiers (`{0,61}`) and TLD length cap (`{2,15}`) to prevent catastrophic backtracking.
+- **XSS prevention**: Browser extension `popup.js` replaced `innerHTML` with DOM API (`createElement`/`textContent`) for digest rendering.
+- **Path traversal**: `/api/social-images/:filename` adds explicit `..`, `/`, `\` rejection, length limit (255), and `path.basename()` guard.
+- **Open redirect**: Trailing-slash redirect validates path characters and rejects `//` sequences.
+- **Regex injection**: `server/brokerAdapters.ts` escapes all user-supplied names via `escapeRegex()` before building RegExp patterns.
+- **Domain length**: All extension site-reputation endpoints enforce 253-char domain limit and type check.
+- **Dependencies**: Next.js upgraded to 16.2.3, Vite at 7.3.2.
+
 ## External Dependencies
 
 - **Database**: PostgreSQL (Neon), Drizzle Kit.

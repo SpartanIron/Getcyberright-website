@@ -93,7 +93,7 @@
     "memoizee": "^0.4.17",
     "multer": "^2.0.2",
     "nanoid": "^5.1.6",
-    "next": "^16.2.2",
+    "next": "^16.2.3",
     "openai": "^6.18.0",
     "openid-client": "^6.8.2",
     "otplib": "^13.2.1",

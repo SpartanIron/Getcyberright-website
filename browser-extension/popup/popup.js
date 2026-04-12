@@ -546,18 +546,23 @@ document.addEventListener("DOMContentLoaded", () => {
       if (sitesCount === 0 && flaggedCount === 0) return;
 
       el.classList.remove("hidden");
-      let html = `<span class="digest-stat">${sitesCount} unique site${sitesCount !== 1 ? "s" : ""} visited</span>`;
+      el.textContent = "";
+      const addSpan = (cls, text) => {
+        const span = document.createElement("span");
+        span.className = cls;
+        span.textContent = text;
+        el.appendChild(span);
+      };
+      addSpan("digest-stat", `${Number(sitesCount) || 0} unique site${sitesCount !== 1 ? "s" : ""} visited`);
       if (flaggedCount > 0) {
-        html += ` <span class="digest-stat digest-stat-warn">${flaggedCount} flagged</span>`;
+        addSpan("digest-stat digest-stat-warn", `${Number(flaggedCount) || 0} flagged`);
       }
       if (threatDomains.length > 0) {
-        html += `<span class="digest-threats">Top threats: ${threatDomains.map(escapeHtml).join(", ")}</span>`;
+        addSpan("digest-threats", `Top threats: ${threatDomains.map(d => String(d)).join(", ")}`);
       }
       if (digest?.generatedAt) {
-        const ago = timeAgo(digest.generatedAt);
-        html += `<span class="digest-threats">Last digest: ${ago}</span>`;
+        addSpan("digest-threats", `Last digest: ${timeAgo(digest.generatedAt)}`);
       }
-      el.innerHTML = html;
     });
   }
 

@@ -188,7 +188,14 @@ export async function registerRoutes(
 ): Promise<Server> {
 
   app.get('/api/social-images/:filename', async (req: Request, res: Response) => {
-    const filename = req.params.filename.replace(/[^a-zA-Z0-9._-]/g, '');
+    const raw = req.params.filename;
+    if (!raw || raw.length > 255 || raw.includes('..') || raw.includes('/') || raw.includes('\\')) {
+      return res.status(400).json({ error: 'Invalid filename' });
+    }
+    const filename = raw.replace(/[^a-zA-Z0-9._-]/g, '');
+    if (!filename || filename !== path.basename(filename)) {
+      return res.status(400).json({ error: 'Invalid filename' });
+    }
     const ext = path.extname(filename).toLowerCase();
     const mimeTypes: Record<string, string> = {
       '.png': 'image/png', '.webp': 'image/webp',
@@ -5039,7 +5046,7 @@ BEHAVIORAL CONSTRAINTS
   });
 
   const hexHashRegex = /^[0-9a-f]{64}$/;
-  const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+  const domainRegex = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,15}$/;
 
   const cryptoModule = await import("crypto");
   function computeDomainHash(domain: string): string {
@@ -5079,7 +5086,7 @@ BEHAVIORAL CONSTRAINTS
   app.post("/api/extension/site-reputation/visit", standardRateLimit, async (req, res) => {
     try {
       const { domainHash, domain } = req.body;
-      if (!domainHash || !hexHashRegex.test(domainHash) || !domain || !domainRegex.test(domain)) {
+      if (!domainHash || !hexHashRegex.test(domainHash) || !domain || typeof domain !== "string" || domain.length > 253 || !domainRegex.test(domain)) {
         res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
         return;
       }
@@ -5107,7 +5114,7 @@ BEHAVIORAL CONSTRAINTS
   app.post("/api/extension/site-reputation/flag", strictRateLimit, async (req, res) => {
     try {
       const { domainHash, domain } = req.body;
-      if (!domainHash || !hexHashRegex.test(domainHash) || !domain || !domainRegex.test(domain)) {
+      if (!domainHash || !hexHashRegex.test(domainHash) || !domain || typeof domain !== "string" || domain.length > 253 || !domainRegex.test(domain)) {
         res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
         return;
       }
@@ -5140,7 +5147,7 @@ BEHAVIORAL CONSTRAINTS
   app.post("/api/extension/site-reputation/safe", standardRateLimit, async (req, res) => {
     try {
       const { domainHash, domain } = req.body;
-      if (!domainHash || !hexHashRegex.test(domainHash) || !domain || !domainRegex.test(domain)) {
+      if (!domainHash || !hexHashRegex.test(domainHash) || !domain || typeof domain !== "string" || domain.length > 253 || !domainRegex.test(domain)) {
         res.status(400).json({ error: "Valid domainHash (64-char hex) and domain required" });
         return;
       }

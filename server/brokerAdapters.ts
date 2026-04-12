@@ -1,6 +1,10 @@
 import { type DataBroker } from "@shared/schema";
 import { createUniversalAdapter } from "./universalBrokerAdapters";
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export interface ProfileSearchResult {
   found: boolean;
   profileUrl: string | null;
@@ -187,7 +191,9 @@ function createTruePeopleSearchAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const escapedFirst = escapeRegex(firstName);
+      const escapedLast = escapeRegex(lastName);
+      const namePattern = new RegExp(`(${escapedFirst}\\s+(?:\\w+\\s+)?${escapedLast})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
@@ -210,7 +216,7 @@ function createTruePeopleSearchAdapter(): BrokerAdapter {
       const relativesMatch = html.match(relativesPattern);
       const extractedRelatives = relativesMatch ? relativesMatch.slice(0, 5).map(r => r.replace(/(?:Related to|Relatives)[:\s]*/i, "").trim()) : [];
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapedFirst}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -277,7 +283,7 @@ function createFastPeopleSearchAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
@@ -296,7 +302,7 @@ function createFastPeopleSearchAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -363,7 +369,7 @@ function createSpokeoAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
@@ -382,7 +388,7 @@ function createSpokeoAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -447,7 +453,7 @@ function createWhitepagesAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
@@ -466,7 +472,7 @@ function createWhitepagesAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -529,11 +535,11 @@ function createRadarisAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
-      const profileUrlPattern = new RegExp(`href="(/p/${firstName}/${lastName}[^"]*)"`, "i");
+      const profileUrlPattern = new RegExp(`href="(/p/${escapeRegex(firstName)}/${escapeRegex(lastName)}[^"]*)"`, "i");
       const profileUrlMatch = html.match(profileUrlPattern);
       const profileUrl = profileUrlMatch ? `https://radaris.com${profileUrlMatch[1]}` : (found ? searchUrl : null);
 
@@ -549,8 +555,7 @@ function createRadarisAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const escapedFirst = firstName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapedFirst}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -610,7 +615,7 @@ function createBeenVerifiedAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
@@ -629,7 +634,7 @@ function createBeenVerifiedAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -689,7 +694,7 @@ function createInteliusAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
@@ -708,7 +713,7 @@ function createInteliusAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -768,7 +773,7 @@ function createPeopleFindersAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
@@ -787,7 +792,7 @@ function createPeopleFindersAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -847,7 +852,7 @@ function createInstantCheckmateAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
@@ -866,7 +871,7 @@ function createInstantCheckmateAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -926,11 +931,11 @@ function createTruthFinderAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -984,7 +989,7 @@ function createMyLifeAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
@@ -1000,7 +1005,7 @@ function createMyLifeAdapter(): BrokerAdapter {
         extractedState = parsed.state;
       }
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -1060,11 +1065,11 @@ function createUSPhoneBookAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {
@@ -1118,11 +1123,11 @@ function createCoclSearchAdapter(): BrokerAdapter {
 
       const html = await response.text();
 
-      const namePattern = new RegExp(`(${firstName}\\s+(?:\\w+\\s+)?${lastName})`, "gi");
+      const namePattern = new RegExp(`(${escapeRegex(firstName)}\\s+(?:\\w+\\s+)?${escapeRegex(lastName)})`, "gi");
       const nameMatches = html.match(namePattern);
       const found = nameMatches !== null && nameMatches.length > 0;
 
-      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${firstName}[^<]{0,200}`, "i"));
+      const snippetMatch = html.match(new RegExp(`[^<]{0,100}${escapeRegex(firstName)}[^<]{0,200}`, "i"));
       const rawSnippet = snippetMatch ? snippetMatch[0].substring(0, 300) : null;
 
       const result: ProfileSearchResult = {

@@ -436,7 +436,7 @@ export async function checkSSLCertificate(url: string): Promise<SSLCertificateRe
         host: parsedUrl.hostname,
         port: parsedUrl.port ? parseInt(parsedUrl.port, 10) : 443,
         servername: parsedUrl.hostname,
-        rejectUnauthorized: false, // Allow inspection of invalid certs
+        rejectUnauthorized: false, // Required: inspecting certificate details of any domain including self-signed/expired
       };
 
       const socket = tls.connect(options, () => {
