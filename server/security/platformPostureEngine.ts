@@ -53,8 +53,12 @@ function scoreToGrade(score: number): string {
 async function checkCSPHeaders(): Promise<PostureCheckResult[]> {
   const results: PostureCheckResult[] = [];
   try {
-    const middlewarePath = path.join(process.cwd(), "middleware.ts");
-    const content = fs.readFileSync(middlewarePath, "utf-8");
+    const securityPath = path.join(process.cwd(), "server", "security.ts");
+    const middlewarePath = path.join(process.cwd(), "server", "security", "middleware.ts");
+    const content = [securityPath, middlewarePath]
+      .filter(p => fs.existsSync(p))
+      .map(p => fs.readFileSync(p, "utf-8"))
+      .join("\n");
 
     const hasNonce = content.includes("nonce") || content.includes("x-nonce");
     results.push({
