@@ -62,6 +62,18 @@ Server Components in `app/` fetch initial data through the Express API (`app/lib
 - **Domain length**: All extension site-reputation endpoints enforce 253-char domain limit and type check.
 - **Dependencies**: Next.js upgraded to 16.2.3, Vite at 7.3.2.
 
+## Platform Security Posture Engine
+- **Engine**: `server/security/platformPostureEngine.ts` — proactive self-assessment system that scans the platform's own security configuration across 10 categories and 35+ individual checks.
+- **Categories scanned**: Headers & Transport, Authentication, Input Validation, DoS Protection, Data Protection, Secrets Management, Monitoring & Response, Dependencies, Extension Security, Compliance.
+- **Checks include**: CSP nonce/strict-dynamic, Helmet headers, bcrypt salt rounds, MFA, account lockout, session cookie flags, CSRF double-submit, rate limiting tiers, DOMPurify sanitization, Zod validation coverage, ReDoS regex safety, path traversal guards, open redirect protection, regex injection prevention, vault encryption, secrets config, security monitoring thresholds, bot protection, npm audit vulnerabilities, NIST 800-53 mapping, threat intelligence feeds.
+- **Scoring**: Weighted composite score (0-100) with letter grade (A+ to F). Each category is weighted by security impact.
+- **Auto-remediation**: Remediable issues can be fixed via the admin UI (e.g., npm audit fix).
+- **Scheduling**: Runs daily on startup + on-demand from admin panel.
+- **History**: `security_posture_scans` DB table tracks scores over time for trend analysis.
+- **Admin UI**: Security tab in admin panel shows score gauge, category breakdown cards (expandable), issues list with severity badges, trend chart, and "Run Scan" button.
+- **Auth**: All posture API endpoints require `isAuthenticated` + `isAdmin` middleware.
+- **API**: `GET /api/admin/security-posture/latest`, `GET /api/admin/security-posture/history`, `POST /api/admin/security-posture/scan`, `POST /api/admin/security-posture/remediate`.
+
 ## External Dependencies
 
 - **Database**: PostgreSQL (Neon), Drizzle Kit.

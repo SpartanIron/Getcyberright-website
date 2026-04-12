@@ -58,6 +58,7 @@ import {
   MessageCircle
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SecurityPostureDashboard } from "@/components/admin/security-posture-dashboard";
 import { startRegistration, startAuthentication, browserSupportsWebAuthn } from "@simplewebauthn/browser";
 import type { Article, Resource, Newsletter, DailyTipsSubscription, WeeklyDigest, SecurityAlert } from "@shared/schema";
 
@@ -3788,7 +3789,12 @@ export default function AdminPage() {
             <SocialPostGeneratorTab token={token} />
           </TabsContent>
           <TabsContent value="security">
-            <SecurityAlertsTab token={token} />
+            <div className="space-y-8">
+              <SecurityPostureDashboard token={token} />
+              <div className="border-t pt-6">
+                <SecurityAlertsTab token={token} />
+              </div>
+            </div>
           </TabsContent>
           <TabsContent value="feedback">
             <FeedbackTab />

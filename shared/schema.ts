@@ -1752,3 +1752,18 @@ export const insertEngagementOpportunitySchema = createInsertSchema(engagementOp
 
 export type EngagementOpportunity = typeof engagementOpportunities.$inferSelect;
 export type InsertEngagementOpportunity = z.infer<typeof insertEngagementOpportunitySchema>;
+
+export const securityPostureScans = pgTable("security_posture_scans", {
+  id: serial("id").primaryKey(),
+  overallScore: integer("overall_score").notNull(),
+  grade: varchar("grade", { length: 2 }).notNull(),
+  categories: jsonb("categories").notNull(),
+  issues: jsonb("issues").notNull(),
+  remediationsApplied: jsonb("remediations_applied"),
+  checksRun: integer("checks_run").notNull(),
+  checksPassed: integer("checks_passed").notNull(),
+  triggerType: varchar("trigger_type", { length: 20 }).notNull().default("scheduled"),
+  scannedAt: timestamp("scanned_at").defaultNow().notNull(),
+});
+
+export type SecurityPostureScan = typeof securityPostureScans.$inferSelect;

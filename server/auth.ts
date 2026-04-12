@@ -872,6 +872,8 @@ export const isAdmin = async (req: Request, res: Response, next: NextFunction) =
   next();
 };
 
+(globalThis as any).__gcr_auth_module = { isAuthenticated, isAdmin };
+
 // Seed admin user from environment variables on startup
 export async function seedAdminUser(): Promise<void> {
   const adminEmail = process.env.ADMIN_EMAIL;

@@ -391,6 +391,12 @@ app.use((req, res, next) => {
     console.error("Failed to start news scheduler:", err);
   });
 
+  import("./security/platformPostureEngine").then(({ startPostureScheduler }) => {
+    startPostureScheduler();
+  }).catch(err => {
+    console.error("Failed to start posture scanner:", err);
+  });
+
   httpServer.keepAliveTimeout = 61000;
   httpServer.headersTimeout = 65000;
 })();

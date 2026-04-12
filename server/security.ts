@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { checkRateLimitAlert, checkCSRFAlert, checkSuspiciousPatternAlert } from "./security-alerts";
+import { runPostureScan, getLatestScan, getScanHistory, applyRemediation } from "./security/platformPostureEngine";
 
 // Security Alert Configuration
 const SECURITY_ALERT_EMAIL = process.env.SECURITY_ALERT_EMAIL || "";
@@ -884,6 +885,67 @@ export function registerSecurityMetricsEndpoint(app: Express) {
       res.json({ success: true, message: `IP ${ip} has been unblocked` });
     } else {
       res.status(404).json({ success: false, message: `IP ${ip} was not in the blocklist` });
+    }
+  });
+
+  let _authModule: any = null;
+  function getAuth() {
+    if (!_authModule) {
+      _authModule = (globalThis as any).__gcr_auth_module;
+    }
+    return _authModule;
+  }
+
+  const postureAuth = (req: Request, res: Response, next: NextFunction) => {
+    const auth = getAuth();
+    if (!auth) return res.status(503).json({ error: "Auth not initialized" });
+    auth.isAuthenticated(req, res, (err?: any) => {
+      if (err) return;
+      auth.isAdmin(req, res, next);
+    });
+  };
+
+  app.get("/api/admin/security-posture/latest", postureAuth, async (_req: Request, res: Response) => {
+    try {
+      const result = await getLatestScan();
+      if (!result) {
+        return res.json({ scan: null, message: "No scans yet. Trigger a scan to get started." });
+      }
+      res.json({ scan: result });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to fetch posture scan", details: err?.message });
+    }
+  });
+
+  app.get("/api/admin/security-posture/history", postureAuth, async (req: Request, res: Response) => {
+    try {
+      const limit = Math.min(parseInt(String(req.query.limit)) || 30, 90);
+      const history = await getScanHistory(limit);
+      res.json({ history });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to fetch scan history", details: err?.message });
+    }
+  });
+
+  app.post("/api/admin/security-posture/scan", postureAuth, async (_req: Request, res: Response) => {
+    try {
+      const result = await runPostureScan("manual");
+      res.json({ scan: result });
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to run posture scan", details: err?.message });
+    }
+  });
+
+  app.post("/api/admin/security-posture/remediate", postureAuth, async (req: Request, res: Response) => {
+    try {
+      const { remediationId } = req.body;
+      if (!remediationId || typeof remediationId !== "string") {
+        return res.status(400).json({ error: "remediationId is required" });
+      }
+      const result = await applyRemediation(remediationId);
+      res.json(result);
+    } catch (err: any) {
+      res.status(500).json({ error: "Failed to apply remediation", details: err?.message });
     }
   });
 }
