@@ -29,6 +29,11 @@ const footerLinks = {
     { name: "Small Business", href: "/small-business" },
     { name: "Educators", href: "/educators" },
   ],
+  workWithUs: [
+    { name: "For Organizations", href: "/for-organizations" },
+    { name: "Partner With Us", href: "/advertise" },
+    { name: "Partner Deck", href: "/partner-deck" },
+  ],
   company: [
     { name: "About", href: "/about" },
     { name: "Our Mission", href: "/our-mission" },
@@ -49,7 +54,7 @@ export function Footer() {
   return (
     <footer className="bg-[#081C26] text-slate-300" role="contentinfo" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-10">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-10">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4" data-testid="footer-link-logo">
               <img src="/logo.webp" alt="GetCyberRight" className="w-8 h-8 object-contain" />
@@ -113,6 +118,23 @@ export function Footer() {
             <h4 className="font-semibold text-white text-sm mb-3">For You</h4>
             <ul className="space-y-2">
               {footerLinks.forYou.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm hover:text-white transition-colors"
+                    data-testid={`footer-link-${link.name.toLowerCase().replace(/\s/g, "-")}`}
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold text-white text-sm mb-3">Work With Us</h4>
+            <ul className="space-y-2">
+              {footerLinks.workWithUs.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}

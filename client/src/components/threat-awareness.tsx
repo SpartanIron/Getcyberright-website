@@ -1,5 +1,5 @@
 import { Link } from "@/lib/navigation";
-import { ArrowRight, AlertTriangle, DollarSign, Users, Phone, CreditCard } from "lucide-react";
+import { ArrowRight, AlertTriangle, DollarSign, Users, Phone, CreditCard, Quote, Shield, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import seniorsImg from "@/assets/images/seniors-diverse.webp";
 import { imgSrc } from "@/lib/img-src";
@@ -30,6 +30,31 @@ const threats = [
     source: "Privacy Rights Clearinghouse",
   },
 ];
+
+const sources = [
+  { name: "CISA", logo: "/logos/cisa.svg" },
+  { name: "INTERPOL", logo: "/logos/interpol.svg" },
+  { name: "Europol", logo: "/logos/europol.svg" },
+  { name: "FTC", logo: "/logos/ftc.svg" },
+  { name: "NIST", logo: "/logos/nist.svg" },
+  { name: "PhishTank", logo: "/logos/phishtank.svg" },
+  { name: "VirusTotal", logo: "/logos/virustotal.svg" },
+  { name: "FBI IC3", logo: "/logos/fbi-ic3.svg" },
+];
+
+const trustPoints = [
+  "Powered by the same threat databases used by law enforcement and security agencies",
+  "Every scan checks 8 trusted sources and gives you a clear, plain-language result",
+  "Built to internationally recognized safety standards (NIST, MITRE)",
+  "Free for everyone. No account required.",
+];
+
+const featuredStory = {
+  quote: "My father received a WhatsApp message offering a job that paid in advance. He was ready to send his ID and bank details. I checked the link here and it came back as a known fraud site. That one check protected our whole family's savings.",
+  name: "Amina O.",
+  context: "Lagos, Nigeria",
+  initials: "AO",
+};
 
 export function ThreatAwareness() {
   return (
@@ -98,6 +123,74 @@ export function ThreatAwareness() {
           className="w-full h-64 sm:h-80 object-cover"
           loading="lazy"
         />
+      </div>
+
+      <div className="bg-[#081C26] border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+            <div>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-6" data-testid="text-authority-heading">
+                Professional-Grade Protection, Built for Real People
+              </h3>
+              <div className="space-y-0">
+                {trustPoints.map((point, index) => (
+                  <div
+                    key={index}
+                    className="flex items-start gap-3 py-3.5 border-b border-white/10 last:border-b-0"
+                    data-testid={`text-trust-point-${index}`}
+                  >
+                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm sm:text-base text-white/80 leading-relaxed">{point}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div
+              className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 sm:p-8"
+              data-testid="testimonial-featured"
+            >
+              <Quote className="w-8 h-8 text-white/15 mb-4" aria-hidden="true" />
+              <blockquote className="text-white/85 leading-relaxed mb-6 text-base sm:text-lg">
+                "{featuredStory.quote}"
+              </blockquote>
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-sm font-semibold text-white/70"
+                  aria-hidden="true"
+                >
+                  {featuredStory.initials}
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-white">{featuredStory.name}</div>
+                  <div className="text-xs text-white/50">{featuredStory.context}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 pt-8 border-t border-white/10">
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <Shield className="w-5 h-5 text-primary" />
+              <span className="text-sm font-bold text-white/50 uppercase tracking-[0.15em]">
+                Trusted Safety Sources
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-12">
+              {sources.map((source) => (
+                <img
+                  key={source.name}
+                  src={source.logo}
+                  alt={source.name}
+                  className="h-7 sm:h-9 w-auto opacity-40 dark:opacity-30 dark:invert grayscale select-none"
+                  loading="lazy"
+                  draggable={false}
+                  data-testid={`logo-trust-source-${source.name.toLowerCase().replace(/\s+/g, "-")}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

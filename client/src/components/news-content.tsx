@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { NewsFilter } from "@/components/news-filter";
 import { Search, TrendingUp, ChevronLeft, ChevronRight, Newspaper, ExternalLink, Clock, RefreshCw, MapPin, Calendar, Globe, Users, Shield, AlertTriangle } from "lucide-react";
 import { LiveNewsIndicator } from "@/components/live-news-indicator";
-import { NewsPageGuidesSidebar } from "@/components/featured-guides";
+import { NewsPageGuidesSidebar } from "@/components/content-preview";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { FadeIn } from "@/components/fade-in";

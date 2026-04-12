@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Shield, Activity, AlertTriangle, BookOpen } from "lucide-react";
+import { Shield, Activity, AlertTriangle, BookOpen, Clock } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 interface PlatformStats {
@@ -49,8 +49,19 @@ function formatNumber(n: number): string {
   return n.toString();
 }
 
+function getTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "Just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${Math.floor(diffHours / 24)}d ago`;
+}
+
 export function LiveActivityBar() {
-  const { data } = useQuery<PlatformStats>({
+  const { data, dataUpdatedAt } = useQuery<PlatformStats>({
     queryKey: ['/api/platform-stats'],
     staleTime: 60 * 1000,
   });
@@ -61,6 +72,8 @@ export function LiveActivityBar() {
   const guides = useCountUp(data?.guidesPublished || 0, 800);
 
   if (!data) return null;
+
+  const lastUpdated = dataUpdatedAt ? getTimeAgo(new Date(dataUpdatedAt)) : null;
 
   return (
     <section className="bg-[#0A2A3C] border-y border-white/10" data-testid="section-live-activity">
@@ -81,9 +94,9 @@ export function LiveActivityBar() {
           </div>
 
           <div className="flex items-center gap-2" data-testid="stat-live-threats">
-            <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-            <span className="text-sm font-bold text-white tabular-nums">{threats}</span>
-            <span className="text-xs text-white/50 font-medium">threats tracked</span>
+            <AlertTriangle className="w-4 h-4 text-orange-400 flex-shrink-0" />
+            <span className="text-sm font-bold text-white tabular-nums">{formatNumber(threats)}+</span>
+            <span className="text-xs text-white/50 font-medium">threats caught</span>
           </div>
 
           <div className="flex items-center gap-2" data-testid="stat-live-alerts">
@@ -93,10 +106,17 @@ export function LiveActivityBar() {
           </div>
 
           <div className="flex items-center gap-2" data-testid="stat-live-guides">
-            <BookOpen className="w-4 h-4 text-teal-400 flex-shrink-0" />
-            <span className="text-sm font-bold text-white tabular-nums">{guides}</span>
-            <span className="text-xs text-white/50 font-medium">safety guides</span>
+            <BookOpen className="w-4 h-4 text-blue-400 flex-shrink-0" />
+            <span className="text-sm font-bold text-white tabular-nums">{guides}+</span>
+            <span className="text-xs text-white/50 font-medium">guides</span>
           </div>
+
+          {lastUpdated && (
+            <div className="flex items-center gap-1.5" data-testid="stat-last-updated">
+              <Clock className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
+              <span className="text-xs text-white/35 font-medium">Updated {lastUpdated}</span>
+            </div>
+          )}
         </div>
       </div>
     </section>
