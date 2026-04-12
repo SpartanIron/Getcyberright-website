@@ -1,5 +1,5 @@
 import { Shield, Lock, FileCheck } from "lucide-react";
-import { SiLinkedin, SiFacebook, SiYoutube, SiInstagram } from "react-icons/si";
+import { SiLinkedin, SiFacebook, SiYoutube, SiInstagram, SiWhatsapp } from "react-icons/si";
 import Link from "next/link";
 import { CookieSettingsButton } from "@/components/cookie-settings-button";
 
@@ -48,6 +48,7 @@ const socialLinks = [
   { name: "Facebook", icon: SiFacebook, href: "https://www.facebook.com/getcyberright", color: "text-[#1877F2]", hoverBg: "hover:bg-[#1877F2]" },
   { name: "Instagram", icon: SiInstagram, href: "https://www.instagram.com/getcyberright", color: "text-[#E4405F]", hoverBg: "hover:bg-[#E4405F]" },
   { name: "YouTube", icon: SiYoutube, href: "https://www.youtube.com/@getcyberright", color: "text-[#FF0000]", hoverBg: "hover:bg-[#FF0000]" },
+  { name: "WhatsApp", icon: SiWhatsapp, href: "https://whatsapp.com/channel/0029Vb7afVTHQbSDJs1PEt2p", color: "text-[#25D366]", hoverBg: "hover:bg-[#25D366]" },
 ];
 
 export function Footer() {
