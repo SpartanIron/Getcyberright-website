@@ -59,6 +59,10 @@ app.use((req, res, next) => {
   return requestSizeLimiter(102400)(req, res, next);
 });
 
+app.get("/__health", (_req, res) => {
+  res.status(200).json({ status: "ok", ts: Date.now() });
+});
+
 // Security: Parse cookies for session management
 app.use(cookieParser());
 
@@ -267,6 +271,15 @@ app.use((req, res, next) => {
     },
     () => {
       log(`serving on port ${port}`);
+
+      setTimeout(() => {
+        const warmPaths = ["/", "/scam-intelligence"];
+        warmPaths.forEach((p) => {
+          fetch(`http://127.0.0.1:${port}${p}`)
+            .then((res) => log(`[warmup] Pre-warmed ${p} (${res.status})`))
+            .catch(() => {});
+        });
+      }, 500);
 
       // Seed AI prompts on first startup
       import("./promptSeed").then(({ seedAiPrompts }) => {
