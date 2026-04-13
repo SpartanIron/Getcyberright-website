@@ -223,6 +223,10 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setHoveredPoint(point as GlobeHotspot | null);
   }, []);
 
+  const handleRetry = useCallback(() => {
+    setWebglSupported(checkWebGLSupport());
+  }, []);
+
   if (!isClient) {
     return (
       <div
@@ -233,10 +237,6 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
       </div>
     );
   }
-
-  const handleRetry = useCallback(() => {
-    setWebglSupported(checkWebGLSupport());
-  }, []);
 
   if (!webglSupported) {
     return <GlobeFallback data={data} onRetry={handleRetry} />;

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
-import dynamic from "next/dynamic";
+import { useState, useEffect, useRef, useMemo, lazy, Suspense, Component, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -19,17 +18,86 @@ function DataError({ label }: { label: string }) {
   );
 }
 
-const ScamIntelligenceGlobe = dynamic(
-  () => import("@/components/scam-intelligence-globe").then((m) => ({ default: m.ScamIntelligenceGlobe })),
-  { ssr: false, loading: () => (
+function GlobeLoadingPlaceholder() {
+  return (
     <div className="w-full aspect-square max-w-[700px] mx-auto bg-slate-800/30 rounded-xl flex items-center justify-center">
       <div className="text-center">
         <Globe className="w-10 h-10 text-cyan-400/30 mx-auto mb-2 animate-pulse" />
         <p className="text-sm text-slate-500">Loading 3D Globe...</p>
       </div>
     </div>
-  )}
-);
+  );
+}
+
+function GlobeLoadError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="w-full aspect-square max-w-[700px] mx-auto bg-slate-800/30 rounded-xl flex flex-col items-center justify-center p-6">
+      <Globe className="w-12 h-12 text-cyan-400/20 mb-3" />
+      <p className="text-sm text-slate-400 mb-1">3D Globe couldn't load</p>
+      <p className="text-xs text-slate-500 mb-4">This may be due to your browser settings or network. The rest of the dashboard still works.</p>
+      <button
+        onClick={onRetry}
+        className="text-xs bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 px-4 py-1.5 rounded-lg border border-cyan-500/30 transition-colors"
+        data-testid="globe-retry"
+      >
+        Try again
+      </button>
+    </div>
+  );
+}
+
+class GlobeBoundary extends Component<
+  { children: ReactNode; onError: () => void },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(err: Error) {
+    console.error("[ScamGlobe] Globe component error:", err);
+    this.props.onError();
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
+function createGlobeLazy() {
+  return lazy(() =>
+    Promise.race([
+      import("@/components/scam-intelligence-globe").then((m) => ({
+        default: m.ScamIntelligenceGlobe,
+      })),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Globe load timeout (15s)")), 15000)
+      ),
+    ])
+  );
+}
+
+function LazyGlobe({ data, onCountrySelect, focusCountryCode }: any) {
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
+  const GlobeComponent = useMemo(() => createGlobeLazy(), [retryKey]);
+
+  if (loadFailed) {
+    return <GlobeLoadError onRetry={() => { setLoadFailed(false); setRetryKey(k => k + 1); }} />;
+  }
+
+  return (
+    <GlobeBoundary key={retryKey} onError={() => setLoadFailed(true)}>
+      <Suspense fallback={<GlobeLoadingPlaceholder />}>
+        <GlobeComponent
+          data={data}
+          onCountrySelect={onCountrySelect}
+          focusCountryCode={focusCountryCode}
+        />
+      </Suspense>
+    </GlobeBoundary>
+  );
+}
 
 export default function ScamIntelligenceDashboard() {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -198,7 +266,7 @@ export default function ScamIntelligenceDashboard() {
                     )}
                   </div>
 
-                  <ScamIntelligenceGlobe
+                  <LazyGlobe
                     data={globeData as any}
                     onCountrySelect={handleCountrySelect}
                     focusCountryCode={effectiveFocusCode}
