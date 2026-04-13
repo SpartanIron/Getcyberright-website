@@ -5,13 +5,14 @@ import { Globe as GlobeIcon, AlertTriangle, MapPin, Share2, Copy, Check, Phone, 
 
 
 class GlobeErrorBoundary extends Component<
-  { children: ReactNode; fallback: ReactNode },
+  { children: ReactNode; fallback: ReactNode; onError?: (msg: string) => void },
   { hasError: boolean; errorMessage: string }
 > {
   state = { hasError: false, errorMessage: "" };
   static getDerivedStateFromError(error: Error) { return { hasError: true, errorMessage: error.message }; }
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.warn("[ScamGlobe] Render error caught:", error.message, info.componentStack?.slice(0, 200));
+    this.props.onError?.(error.message);
   }
   render() {
     if (this.state.hasError) return this.props.fallback;
@@ -23,13 +24,7 @@ function checkWebGLSupport(): boolean {
   try {
     const canvas = document.createElement("canvas");
     const gl = canvas.getContext("webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-    if (gl) {
-      if (gl instanceof WebGLRenderingContext || gl instanceof WebGL2RenderingContext) {
-        gl.getExtension("WEBGL_lose_context")?.loseContext();
-      }
-      return true;
-    }
-    return false;
+    return !!gl;
   } catch {
     return false;
   }
@@ -45,13 +40,17 @@ function isLikelyWebGLCapable(): boolean {
   return isDesktopChrome || isDesktopFirefox || isDesktopEdge || isSafari;
 }
 
-function GlobeFallback({ data, onRetry }: { data: any; onRetry?: () => void }) {
+function GlobeFallback({ data, onRetry, errorDetail }: { data: any; onRetry?: () => void; errorDetail?: string }) {
   const hotspots = (data?.hotspots || []).slice(0, 12);
   return (
     <div className="w-full aspect-square max-w-[700px] mx-auto bg-card dark:bg-slate-800/30 border border-border rounded-2xl flex flex-col items-center justify-center p-6" data-testid="globe-fallback">
       <GlobeIcon className="w-16 h-16 text-primary/30 mb-4" />
       <p className="text-sm text-muted-foreground mb-1">3D Globe could not load</p>
-      <p className="text-xs text-muted-foreground/70 mb-4">Your browser may not support WebGL, or the 3D engine had a problem loading. Here's the data instead:</p>
+      <p className="text-xs text-muted-foreground/70 mb-4">
+        {errorDetail
+          ? `Error: ${errorDetail}. Try refreshing or using a different browser.`
+          : "Your browser may not support WebGL, or the 3D engine had a problem loading. Here's the data instead:"}
+      </p>
       {onRetry && (
         <button
           onClick={onRetry}
@@ -422,6 +421,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const containerRef = useRef<HTMLDivElement>(null);
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
   const [loadError, setLoadError] = useState(false);
+  const [errorDetail, setErrorDetail] = useState<string>("");
   const [webglSupported, setWebglSupported] = useState(true);
   const [dimensions, setDimensions] = useState({ w: width || 600, h: height || 600 });
   const [hoveredPoint, setHoveredPoint] = useState<GlobeHotspot | null>(null);
@@ -464,7 +464,9 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
         if (!cancelled) {
           loaded = true;
           clearTimeout(timer);
-          console.error("[ScamGlobe] Failed to load react-globe.gl:", err?.message || err);
+          const msg = err?.message || String(err);
+          console.error("[ScamGlobe] Failed to load react-globe.gl:", msg);
+          setErrorDetail(msg);
           setLoadError(true);
         }
       });
@@ -535,12 +537,14 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   }, []);
 
   const handleRetry = useCallback(() => {
-    setWebglSupported(checkWebGLSupport());
+    setWebglSupported(true);
+    setLoadError(false);
+    setErrorDetail("");
     setRetryCount(c => c + 1);
   }, []);
 
   if (!webglSupported || loadError) {
-    return <GlobeFallback data={data} onRetry={handleRetry} />;
+    return <GlobeFallback data={data} onRetry={handleRetry} errorDetail={errorDetail || undefined} />;
   }
 
   if (!GlobeComponent) {
@@ -562,7 +566,10 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
 
   return (
     <div ref={containerRef} className="relative w-full max-w-[700px] mx-auto" style={{ height: dimensions.h || 600 }}>
-      <GlobeErrorBoundary fallback={<GlobeFallback data={data} onRetry={() => window.location.reload()} />}>
+      <GlobeErrorBoundary
+        fallback={<GlobeFallback data={data} onRetry={() => window.location.reload()} errorDetail="WebGL rendering failed" />}
+        onError={(msg) => console.error("[ScamGlobe] Three.js render error:", msg)}
+      >
       <GlobeComponent
         ref={globeRef}
         width={dimensions.w || 600}
