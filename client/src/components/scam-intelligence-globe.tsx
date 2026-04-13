@@ -412,7 +412,13 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hydrated = useHydrated();
-  const isMobile = useIsMobile();
+  const isMobileRaw = useIsMobile();
+  const [mobileResolved, setMobileResolved] = useState(false);
+  const isMobile = isMobileRaw;
+
+  useEffect(() => {
+    setMobileResolved(true);
+  }, []);
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
   const [loadError, setLoadError] = useState(false);
   const [webglSupported, setWebglSupported] = useState(true);
@@ -526,7 +532,21 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setRetryCount(c => c + 1);
   }, []);
 
-  if (hydrated && isMobile) {
+  if (!hydrated || !mobileResolved) {
+    return (
+      <div
+        ref={containerRef}
+        className="w-full aspect-square max-w-[700px] mx-auto bg-[#060d1a] rounded-2xl flex items-center justify-center"
+      >
+        <div className="text-center">
+          <GlobeIcon className="w-10 h-10 text-cyan-400/30 mx-auto mb-2 animate-pulse" />
+          <div className="text-cyan-400/50 text-sm">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isMobile) {
     return <MobileGlobeView data={data} onCountrySelect={onCountrySelect} focusCountryCode={focusCountryCode} />;
   }
 
