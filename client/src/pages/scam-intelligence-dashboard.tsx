@@ -204,6 +204,16 @@ export default function ScamIntelligenceDashboard() {
                 </div>
 
                 {regionalError ? <DataError label="Scam type breakdown" /> : <ScamTypeBreakdown scamTypes={(regionalData as any)?.scamTypes || []} />}
+
+                <div className="mt-6">
+                  {regionalError ? <DataError label="Regional summary" /> : (
+                    <RegionalPanel
+                      regions={(regionalData as any)?.regions || []}
+                      selectedRegion={selectedRegion}
+                      onSelectRegion={setSelectedRegion}
+                    />
+                  )}
+                </div>
               </div>
 
               <div className="lg:col-span-5 xl:col-span-4 space-y-6">
@@ -212,13 +222,6 @@ export default function ScamIntelligenceDashboard() {
                   <ToolConnectionBanner scamTypes={(regionalData as any)?.scamTypes || []} />
                 )}
                 {feedError ? <DataError label="Live threat feed" /> : <LiveFeedTicker events={(liveFeed as any)?.events || []} />}
-                {regionalError ? <DataError label="Regional summary" /> : (
-                  <RegionalPanel
-                    regions={(regionalData as any)?.regions || []}
-                    selectedRegion={selectedRegion}
-                    onSelectRegion={setSelectedRegion}
-                  />
-                )}
               </div>
             </div>
 
