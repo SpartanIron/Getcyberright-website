@@ -206,6 +206,9 @@ app.use((req, res, next) => {
   });
 
   const isDev = process.env.NODE_ENV !== "production";
+  if (!isDev) {
+    console.log("[server] Running in production mode (NODE_ENV=production)");
+  }
   const nextApp = next({ dev: isDev, dir: process.cwd() });
   const nextHandler = nextApp.getRequestHandler();
   await nextApp.prepare();

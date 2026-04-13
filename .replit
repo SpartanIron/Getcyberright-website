@@ -9,7 +9,7 @@ packages = ["trivy"]
 [deployment]
 deploymentTarget = "autoscale"
 build = ["bash", "-c", "npx tsx server/migrate-runner.ts && NODE_OPTIONS='--max-old-space-size=3072' npm run build"]
-run = ["node", "dist/index.js"]
+run = ["bash", "-c", "NODE_ENV=production node dist/index.js"]
 
 [[ports]]
 localPort = 5000
