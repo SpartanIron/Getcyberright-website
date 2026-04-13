@@ -36,8 +36,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
 export default async function NewsPage() {
   const initialNews = await getLatestNews(100);
   const jsonLd = [
