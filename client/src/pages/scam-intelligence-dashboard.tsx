@@ -87,8 +87,8 @@ export default function ScamIntelligenceDashboard() {
                 Global Scam Intelligence Dashboard
               </h1>
               <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-                Real-time visualization of scam and cyber fraud activity worldwide. Data sourced from
-                government agencies, CERTs, and trusted security organizations across {globeData?.globalStats?.countriesCovered || "40+"} countries.
+                See where scams are happening right now. This map tracks fraud activity across {globeData?.globalStats?.countriesCovered || "40+"} countries
+                using data from law enforcement, government cybersecurity teams, and trusted security organizations worldwide.
               </p>
             </div>
 
@@ -103,7 +103,7 @@ export default function ScamIntelligenceDashboard() {
                 <div className="bg-slate-900/50 border border-slate-700/50 rounded-2xl p-4 mb-6" data-testid="globe-container">
                   <div className="flex items-center gap-2 mb-3">
                     <Globe className="w-4 h-4 text-cyan-400" />
-                    <span className="text-sm font-semibold text-white">Threat Activity Map</span>
+                    <span className="text-sm font-semibold text-white">Live Scam Activity Map</span>
                     <div className="ml-auto flex items-center gap-3 text-[10px] text-slate-400">
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> Critical</span>
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> High</span>
@@ -117,8 +117,8 @@ export default function ScamIntelligenceDashboard() {
                   />
                   <div className="text-center mt-3">
                     <p className="text-[11px] text-slate-500">
-                      Click any hotspot to view country details. Arcs show cross-border scam flows.
-                      Scroll to zoom. Data refreshes every 30 minutes.
+                      Click any glowing dot to see scam details for that country. The lines show how scams spread between countries.
+                      Scroll to zoom in. Data updates every 30 minutes.
                     </p>
                   </div>
                 </div>
@@ -143,12 +143,13 @@ export default function ScamIntelligenceDashboard() {
         <section className="bg-slate-900/30 border-t border-slate-700/30 py-10">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-xl font-bold text-white mb-3">Data Sources & Methodology</h2>
+              <h2 className="text-xl font-bold text-white mb-3">Where This Data Comes From</h2>
               <p className="text-sm text-slate-400 leading-relaxed mb-6">
-                This dashboard aggregates data from government cybersecurity agencies, national CERTs, law enforcement reports,
-                and trusted security research organizations worldwide. Incident data is sourced from official published reports
-                including FBI IC3, FTC Consumer Sentinel, Action Fraud UK, ACCC Scamwatch (Australia), INTERPOL, and 20+ national
-                CERT teams. Cross-border flow data is derived from international cooperation reports and threat intelligence sharing.
+                This dashboard pulls together scam reports from official government sources, law enforcement agencies,
+                and trusted security organizations around the world. We use published data from agencies like
+                the FBI's Internet Crime Complaint Center (IC3), the FTC, Action Fraud UK, Australia's Scamwatch, INTERPOL,
+                and 20+ national cybersecurity response teams. The lines on the map show how scams move between countries,
+                based on international cooperation reports.
               </p>
               <div className="flex flex-wrap justify-center gap-3 text-[11px] text-slate-500">
                 {[

@@ -241,9 +241,9 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height }: Sc
             <span className="text-white font-semibold text-sm">{hoveredPoint.country}</span>
           </div>
           <div className="text-slate-400 text-xs">
-            {formatNumber(hoveredPoint.recentIncidents)} incidents · {hoveredPoint.riskLevel} risk
+            {formatNumber(hoveredPoint.recentIncidents)} scams reported · {hoveredPoint.riskLevel} risk level
           </div>
-          <div className="text-cyan-400 text-xs mt-1">Click for details</div>
+          <div className="text-cyan-400 text-xs mt-1">Click to learn more</div>
         </div>
       )}
 
@@ -265,18 +265,18 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height }: Sc
           <div className="grid grid-cols-2 gap-2 mb-3">
             <div className="bg-slate-800/60 rounded-lg p-2 text-center">
               <div className="text-lg font-bold text-white">{formatNumber(selectedPoint.recentIncidents)}</div>
-              <div className="text-[10px] text-slate-400">Incidents</div>
+              <div className="text-[10px] text-slate-400">Scams Reported</div>
             </div>
             <div className="bg-slate-800/60 rounded-lg p-2 text-center">
               <div className="text-lg font-bold flex items-center justify-center gap-1" style={{ color: RISK_COLORS[selectedPoint.riskLevel] }}>
                 {selectedPoint.trendDirection === "up" ? "↑" : selectedPoint.trendDirection === "down" ? "↓" : "→"}
                 {selectedPoint.trendPercent}%
               </div>
-              <div className="text-[10px] text-slate-400">Trend</div>
+              <div className="text-[10px] text-slate-400">Change</div>
             </div>
           </div>
           <div className="mb-2">
-            <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">Top Threats</div>
+            <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">Common Scams Here</div>
             <div className="flex flex-wrap gap-1">
               {selectedPoint.topScamTypes.slice(0, 4).map((t) => (
                 <span key={t} className="text-[10px] bg-slate-800 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/20">{t.replace(/-/g, " ")}</span>
@@ -285,7 +285,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height }: Sc
           </div>
           {selectedPoint.reportContact && (
             <div className="mt-2 pt-2 border-t border-slate-700">
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Report Scams</div>
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Where to Report</div>
               <div className="text-[11px] text-cyan-400">{selectedPoint.reportContact}</div>
             </div>
           )}

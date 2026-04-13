@@ -102,11 +102,11 @@ function timeAgo(dateStr: string): string {
 function GlobalStatsBar({ stats }: { stats: GlobalStats | null }) {
   if (!stats) return null;
   const items = [
-    { label: "Incidents Tracked", value: formatNumber(stats.totalIncidentsTracked), icon: Activity },
-    { label: "Countries Covered", value: stats.countriesCovered.toString(), icon: Globe },
-    { label: "Sources Monitored", value: stats.sourcesMonitored.toString(), icon: Eye },
-    { label: "Global Losses", value: stats.totalLossesTracked, icon: TrendingUp },
-    { label: "Active Scam Types", value: stats.activeScamTypes.toString(), icon: AlertTriangle },
+    { label: "Scams Reported", value: formatNumber(stats.totalIncidentsTracked), icon: Activity },
+    { label: "Countries Tracked", value: stats.countriesCovered.toString(), icon: Globe },
+    { label: "Trusted Sources", value: stats.sourcesMonitored.toString(), icon: Eye },
+    { label: "Money Lost to Scams", value: stats.totalLossesTracked, icon: TrendingUp },
+    { label: "Types of Scams", value: stats.activeScamTypes.toString(), icon: AlertTriangle },
   ];
 
   return (
@@ -129,7 +129,7 @@ function LiveFeedTicker({ events }: { events: LiveFeedEvent[] }) {
     return (
       <div className="bg-slate-800/30 rounded-xl p-6 text-center">
         <Radio className="w-6 h-6 text-slate-500 mx-auto mb-2" />
-        <p className="text-slate-400 text-sm">Loading live threat feed...</p>
+        <p className="text-slate-400 text-sm">Loading latest scam reports...</p>
       </div>
     );
   }
@@ -138,7 +138,7 @@ function LiveFeedTicker({ events }: { events: LiveFeedEvent[] }) {
     <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="live-feed-ticker">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-        <span className="text-sm font-semibold text-white">Live Threat Feed</span>
+        <span className="text-sm font-semibold text-white">Latest Scam Reports</span>
         <span className="text-xs text-slate-400 ml-auto">{events.length} events</span>
       </div>
       <div className="divide-y divide-slate-700/30 max-h-[480px] overflow-y-auto">
@@ -183,7 +183,7 @@ function ScamTypeBreakdown({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
     <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="scam-type-breakdown">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
         <BarChart3 className="w-4 h-4 text-cyan-400" />
-        <span className="text-sm font-semibold text-white">Top Active Scam Types</span>
+        <span className="text-sm font-semibold text-white">Most Common Scams Right Now</span>
       </div>
       <div className="divide-y divide-slate-700/30">
         {scamTypes.slice(0, 8).map((scam) => {
@@ -224,9 +224,9 @@ function ScamTypeBreakdown({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
                 <div className="px-4 pb-3 pl-[60px]">
                   <p className="text-xs text-slate-400 mb-2">{scam.description}</p>
                   <div className="flex flex-wrap gap-2 text-[11px]">
-                    <span className="text-slate-500">Avg Loss: <span className="text-orange-400 font-medium">{scam.averageLoss}</span></span>
+                    <span className="text-slate-500">Typical loss per victim: <span className="text-orange-400 font-medium">{scam.averageLoss}</span></span>
                     <span className="text-slate-500">·</span>
-                    <span className="text-slate-500">Top Regions: <span className="text-cyan-400">{scam.topRegions.join(", ")}</span></span>
+                    <span className="text-slate-500">Most affected: <span className="text-cyan-400">{scam.topRegions.join(", ")}</span></span>
                   </div>
                 </div>
               )}
@@ -249,7 +249,7 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
     <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="regional-panel">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
         <MapPin className="w-4 h-4 text-cyan-400" />
-        <span className="text-sm font-semibold text-white">Regional Breakdown</span>
+        <span className="text-sm font-semibold text-white">Scams by Region</span>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3">
@@ -276,11 +276,11 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
       {selected && (
         <div className="px-4 pb-4 border-t border-slate-700/30 pt-3">
           <div className="mb-3">
-            <h4 className="text-sm font-semibold text-white mb-1">{selected.region} — Key Insight</h4>
+            <h4 className="text-sm font-semibold text-white mb-1">{selected.region} — What You Should Know</h4>
             <p className="text-xs text-slate-400 leading-relaxed">{selected.keyInsight}</p>
           </div>
           <div className="mb-3">
-            <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1.5">Top Threats</div>
+            <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1.5">Biggest Scams Here</div>
             <div className="flex flex-wrap gap-1.5">
               {selected.topScamTypes.slice(0, 4).map((s) => (
                 <span key={s.type} className="text-[10px] bg-slate-700/50 text-cyan-300 px-2 py-0.5 rounded-full">
@@ -290,7 +290,7 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
             </div>
           </div>
           <div>
-            <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1.5">Top Countries</div>
+            <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1.5">Most Affected Countries</div>
             <div className="space-y-1">
               {selected.countries.slice(0, 5).map((c) => {
                 const cBadge = RISK_BADGE[c.riskLevel] || RISK_BADGE.medium;

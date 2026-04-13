@@ -492,18 +492,18 @@ const SCAM_TYPE_LABELS: Record<string, string> = {
 };
 
 const SCAM_TYPE_DESCRIPTIONS: Record<string, string> = {
-  phishing: "Deceptive emails, texts, and websites designed to steal personal information and credentials",
-  romance: "Fake romantic relationships built online to manipulate victims into sending money",
-  investment: "Fraudulent investment schemes including Ponzi schemes, fake platforms, and pump-and-dump operations",
-  "tech-support": "Scammers impersonating tech companies to gain remote access to devices and steal money",
-  impersonation: "Criminals posing as government officials, banks, or utilities to extract money or information",
-  ransomware: "Malicious software that encrypts files and demands payment for their release",
-  "identity-theft": "Stealing personal information to open accounts, make purchases, or commit fraud in someone's name",
-  "mobile-money": "Fraud targeting mobile payment systems including fake transfers and SIM swap attacks",
-  malware: "Software designed to damage, disrupt, or gain unauthorized access to computer systems",
-  "shopping-fraud": "Fake online stores, counterfeit goods, and non-delivery scams targeting online shoppers",
-  "crypto-scam": "Fraudulent cryptocurrency schemes including fake exchanges, rug pulls, and pig butchering",
-  "job-scam": "Fake job offers designed to steal personal information or advance-fee payments from job seekers",
+  phishing: "Fake emails, texts, or websites that trick you into giving away passwords, bank details, or personal information",
+  romance: "Someone pretends to be romantically interested in you online, builds trust over weeks or months, then asks for money",
+  investment: "Fake investment opportunities that promise huge returns — they look real but are designed to steal your money",
+  "tech-support": "Someone calls or pops up on your screen claiming your computer has a problem, then charges you to 'fix' it or steals your data",
+  impersonation: "Criminals pretend to be from your bank, the tax office, or a utility company to trick you into sending money or sharing details",
+  ransomware: "Harmful software that locks all your files and demands you pay to get them back — like a digital hostage situation",
+  "identity-theft": "Criminals steal your personal details to open bank accounts, take out loans, or make purchases in your name",
+  "mobile-money": "Scams that target phone-based payment apps — including tricking you into sending money or taking over your phone number",
+  malware: "Harmful software secretly installed on your device that can spy on you, steal your data, or damage your files",
+  "shopping-fraud": "Fake online shops that take your payment but never deliver, or sell counterfeit products that look like the real thing",
+  "crypto-scam": "Fake cryptocurrency platforms or 'guaranteed profit' schemes that steal your money — often starting with small gains to build trust before taking everything",
+  "job-scam": "Fake job listings that ask for personal details upfront, or require you to pay fees before you can 'start working'",
 };
 
 const SCAM_TYPE_ICONS: Record<string, string> = {
@@ -765,12 +765,12 @@ function buildRegionalData(): ScamIntelRegionalData {
 
   const regions: RegionalSummary[] = [];
   const REGION_INSIGHTS: Record<string, string> = {
-    "North America": "Investment fraud and phishing dominate, with romance scams surging 40% among seniors. FBI IC3 reports record $16.6B in losses for 2024.",
-    "Europe": "Cross-border shopping fraud and ransomware campaigns are the primary concerns, with AI-generated phishing emails becoming increasingly sophisticated.",
-    "Africa": "Mobile money fraud is the leading threat, driven by rapid fintech adoption outpacing security infrastructure. SIM swap attacks remain critical.",
-    "Asia Pacific": "Tech support scams and cryptocurrency fraud are surging, with pig butchering operations causing devastating losses across the region.",
-    "Latin America": "Banking trojans and WhatsApp-based scams dominate, with PIX payment fraud in Brazil and impersonation scams across the region.",
-    "Middle East": "Investment fraud and impersonation scams are growing, with increasing sophistication in targeting high-net-worth individuals.",
+    "North America": "Fake investment schemes and scam emails are the biggest threats. Romance scams targeting older adults have surged 40%. Americans lost a record $16.6 billion to scams in 2024 according to the FBI.",
+    "Europe": "Fake online shops and file-locking attacks are the main concerns. Scammers are now using AI to write more convincing scam emails that are harder to spot.",
+    "Africa": "Scams targeting phone-based payment apps are the top threat, as more people use mobile money before security can keep up. Phone number takeover attacks remain a serious risk.",
+    "Asia Pacific": "Fake tech support calls and cryptocurrency scams are growing fast. Long-term trust-building scams (where criminals befriend victims before stealing their savings) are causing devastating losses.",
+    "Latin America": "Scams spread through WhatsApp and harmful software hidden in fake banking apps are the main threats. Payment app fraud and impersonation scams are rising across the region.",
+    "Middle East": "Fake investment opportunities and impersonation scams are growing, with criminals increasingly targeting wealthier individuals with more convincing schemes.",
   };
 
   for (const [regionName, data] of regionMap) {

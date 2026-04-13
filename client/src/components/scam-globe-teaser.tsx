@@ -21,9 +21,9 @@ export function ScamGlobeTeaser() {
               Global Scam Intelligence Dashboard
             </h2>
             <p className="text-slate-400 mb-6 leading-relaxed">
-              See where scams are happening right now. Our real-time threat map tracks phishing campaigns,
-              romance scams, investment fraud, and more across 40+ countries — backed by data from
-              FBI IC3, INTERPOL, CISA, and national CERTs worldwide.
+              See where scams are happening right now. Our live map tracks fake emails, romance scams,
+              investment fraud, and more across 40+ countries — using data from the FBI, INTERPOL,
+              and government cybersecurity teams worldwide.
             </p>
 
             <div className="grid grid-cols-3 gap-3 mb-6">
