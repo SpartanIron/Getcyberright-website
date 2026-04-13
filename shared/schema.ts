@@ -1651,7 +1651,7 @@ export const newsArticles = pgTable("news_articles", {
   relatedToolUrl: text("related_tool_url"),
   relatedToolName: text("related_tool_name"),
   author: text("author").default("Jude Annan, CISM"),
-  authorRole: text("author_role").default("Founder & Chief Security Strategist"),
+  authorRole: text("author_role").default("Managing Partner"),
   publishedAt: timestamp("published_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
 });

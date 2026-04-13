@@ -32,7 +32,6 @@ interface NewsArticleData {
 }
 
 const AUTHOR_BIOS: Record<string, string> = {
- "Jude Annan, CISM": "Jude Annan is a Certified Information Security Manager (CISM) and the founder of GetCyberRight, a platform dedicated to making cybersecurity accessible for families, parents, and everyday people. With years of experience in information security and a passion for closing the knowledge gap between the security industry and the public, Jude translates complex threats into clear, actionable guidance.",
  "GCR Editorial Team": "The GetCyberRight Editorial Team curates educational content, learning resources, and practical guides to help families build cybersecurity skills and stay informed about digital safety.",
 };
 

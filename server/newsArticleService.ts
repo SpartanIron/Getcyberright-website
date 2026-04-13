@@ -437,7 +437,7 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
         relatedToolUrl: relatedTool?.url || null,
         relatedToolName: relatedTool?.name || null,
         author: isLearning ? "GCR Editorial Team" : "Jude Annan, CISM",
-        authorRole: isLearning ? "Education & Awareness" : "Founder & Chief Security Strategist",
+        authorRole: isLearning ? "Education & Awareness" : "Managing Partner",
         publishedAt: feedItem.pubDate ? new Date(feedItem.pubDate) : new Date(),
       });
       created++;

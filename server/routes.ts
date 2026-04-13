@@ -6269,7 +6269,7 @@ BEHAVIORAL CONSTRAINTS
         relatedToolUrl: article.relatedToolUrl,
         relatedToolName: article.relatedToolName,
         author: article.author || "Jude Annan, CISM",
-        authorRole: article.authorRole || "Founder & Chief Security Strategist",
+        authorRole: article.authorRole || "Managing Partner",
         publishedAt: article.publishedAt?.toISOString() || new Date().toISOString(),
         readTime: article.content ? Math.ceil(article.content.split(/\s+/).length / 200) : 2,
       });

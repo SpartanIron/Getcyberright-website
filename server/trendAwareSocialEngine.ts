@@ -2240,7 +2240,7 @@ Output as JSON:
 
     const isLearningContent = posts.contentMode === "learning_opportunity";
     const articleAuthor = isLearningContent ? "GCR Editorial Team" : "Jude Annan, CISM";
-    const articleAuthorRole = isLearningContent ? "Education & Awareness" : "Founder & Chief Security Strategist";
+    const articleAuthorRole = isLearningContent ? "Education & Awareness" : "Managing Partner";
 
     const articleData: InsertNewsArticle = {
       title: parsed.title.slice(0, 200),

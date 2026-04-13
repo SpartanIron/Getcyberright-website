@@ -95,7 +95,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
       author: {
         "@type": "Person",
         name: article.author || "Jude Annan, CISM",
-        jobTitle: article.authorRole || "Founder & Chief Security Strategist",
+        jobTitle: article.authorRole || "Managing Partner",
         url: BASE_URL,
         worksFor: {
           "@type": "Organization",
