@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, memo, Component, type ErrorInfo, type ReactNode } from "react";
 import Globe from "react-globe.gl";
-import { Globe as GlobeIcon, AlertTriangle, MapPin } from "lucide-react";
+import { Globe as GlobeIcon, AlertTriangle, MapPin, Share2, Copy, Check, Phone, ExternalLink, ShieldAlert } from "lucide-react";
 
 class GlobeErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -66,6 +66,10 @@ interface GlobeHotspot {
   sources: string[];
   reportContact?: string;
   lastUpdated: string;
+  emergencySteps?: string[];
+  emergencyHotline?: string;
+  emergencyReportUrl?: string;
+  emergencyFreezeCredit?: string;
 }
 
 interface GlobeArc {
@@ -97,6 +101,7 @@ interface ScamIntelligenceGlobeProps {
   onCountrySelect?: (hotspot: GlobeHotspot | null) => void;
   width?: number;
   height?: number;
+  focusCountryCode?: string | null;
 }
 
 const RISK_COLORS: Record<string, string> = {
@@ -112,7 +117,20 @@ function formatNumber(n: number): string {
   return n.toString();
 }
 
-function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height }: ScamIntelligenceGlobeProps) {
+async function shareCountryAlert(country: string, riskLevel: string, incidents: number, method: "copy" | "whatsapp" | "email"): Promise<boolean> {
+  const url = typeof window !== "undefined" ? window.location.href : "";
+  const text = `Scam alert for ${country}: ${incidents.toLocaleString()} scams reported (${riskLevel} risk). Stay safe — check the live scam map: ${url}`;
+  if (method === "copy") {
+    try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
+  } else if (method === "whatsapp") {
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+  } else if (method === "email") {
+    window.open(`mailto:?subject=${encodeURIComponent(`Scam alert: ${country}`)}&body=${encodeURIComponent(text)}`);
+  }
+  return true;
+}
+
+function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focusCountryCode }: ScamIntelligenceGlobeProps) {
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
@@ -120,6 +138,9 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height }: Sc
   const [dimensions, setDimensions] = useState({ w: width || 600, h: height || 600 });
   const [hoveredPoint, setHoveredPoint] = useState<GlobeHotspot | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<GlobeHotspot | null>(null);
+  const [copiedShare, setCopiedShare] = useState(false);
+  const [showEmergency, setShowEmergency] = useState(false);
+  const lastFocusedCodeRef = useRef<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -150,6 +171,24 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height }: Sc
     controls.maxDistance = 500;
     globe.pointOfView({ lat: 20, lng: 10, altitude: 2.2 });
   }, [isClient]);
+
+  useEffect(() => {
+    if (!focusCountryCode || !data?.hotspots || !globeRef.current || focusCountryCode === lastFocusedCodeRef.current) return;
+    const match = data.hotspots.find(h => h.countryCode === focusCountryCode);
+    if (match) {
+      const isFirstFocus = lastFocusedCodeRef.current === null;
+      lastFocusedCodeRef.current = focusCountryCode;
+      const delay = isFirstFocus ? 2000 : 300;
+      setTimeout(() => {
+        globeRef.current?.pointOfView({ lat: match.lat, lng: match.lng, altitude: 1.8 }, 1500);
+        setSelectedPoint(match);
+        setShowEmergency(false);
+        onCountrySelect?.(match);
+        const controls = globeRef.current?.controls();
+        if (controls) { controls.autoRotate = false; setTimeout(() => { controls.autoRotate = true; }, 10000); }
+      }, delay);
+    }
+  }, [focusCountryCode, data, onCountrySelect]);
 
   const handlePointClick = useCallback((point: any) => {
     const hotspot = point as GlobeHotspot;
@@ -248,14 +287,14 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height }: Sc
       )}
 
       {selectedPoint && (
-        <div className="absolute top-4 right-4 bg-slate-900/95 backdrop-blur-sm border border-cyan-500/30 rounded-xl p-4 max-w-[300px] z-10" data-testid="globe-country-detail">
+        <div className="absolute top-4 right-4 bg-slate-900/95 backdrop-blur-sm border border-cyan-500/30 rounded-xl p-4 max-w-[320px] z-10 max-h-[90%] overflow-y-auto" data-testid="globe-country-detail">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: RISK_COLORS[selectedPoint.riskLevel] }} />
               <span className="text-white font-bold text-base">{selectedPoint.country}</span>
             </div>
             <button
-              onClick={() => { setSelectedPoint(null); onCountrySelect?.(null); }}
+              onClick={() => { setSelectedPoint(null); onCountrySelect?.(null); setShowEmergency(false); }}
               className="text-slate-400 hover:text-white text-sm p-1"
               data-testid="close-country-detail"
             >
@@ -289,6 +328,100 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height }: Sc
               <div className="text-[11px] text-cyan-400">{selectedPoint.reportContact}</div>
             </div>
           )}
+
+          <div className="mt-2 pt-2 border-t border-slate-700">
+            <button
+              onClick={() => setShowEmergency(!showEmergency)}
+              className="w-full flex items-center gap-2 text-left"
+              data-testid="toggle-emergency-steps"
+            >
+              <ShieldAlert className="w-4 h-4 text-red-400" />
+              <span className="text-xs font-semibold text-red-400 flex-1">Been scammed? Here's what to do</span>
+              <span className="text-slate-400 text-xs">{showEmergency ? "▲" : "▼"}</span>
+            </button>
+            {showEmergency && (
+              <div className="mt-2 space-y-2" data-testid="emergency-steps-panel">
+                {selectedPoint.emergencySteps && selectedPoint.emergencySteps.length > 0 ? (
+                  <ol className="space-y-1.5">
+                    {selectedPoint.emergencySteps.map((step, i) => (
+                      <li key={i} className="flex gap-2 text-xs">
+                        <span className="text-cyan-400 font-bold flex-shrink-0">{i + 1}.</span>
+                        <span className="text-slate-300">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <ol className="space-y-1.5">
+                    <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold flex-shrink-0">1.</span><span className="text-slate-300">Stop all contact with the scammer immediately</span></li>
+                    <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold flex-shrink-0">2.</span><span className="text-slate-300">Contact your bank to freeze accounts and dispute charges</span></li>
+                    <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold flex-shrink-0">3.</span><span className="text-slate-300">Change passwords for any accounts that may be compromised</span></li>
+                    <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold flex-shrink-0">4.</span><span className="text-slate-300">Report the scam to your local police and national fraud center</span></li>
+                    <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold flex-shrink-0">5.</span><span className="text-slate-300">Save all evidence (messages, emails, transaction records)</span></li>
+                  </ol>
+                )}
+                {selectedPoint.emergencyHotline && (
+                  <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-lg p-2">
+                    <Phone className="w-3.5 h-3.5 text-red-400" />
+                    <div>
+                      <div className="text-[10px] text-slate-400">Emergency Hotline</div>
+                      <div className="text-xs text-red-400 font-semibold">{selectedPoint.emergencyHotline}</div>
+                    </div>
+                  </div>
+                )}
+                {selectedPoint.emergencyReportUrl && (
+                  <a
+                    href={selectedPoint.emergencyReportUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
+                    data-testid="emergency-report-link"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Report online
+                  </a>
+                )}
+                {selectedPoint.emergencyFreezeCredit && (
+                  <div className="text-[10px] text-slate-400">
+                    <span className="text-slate-500">Freeze credit:</span> {selectedPoint.emergencyFreezeCredit}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-2 pt-2 border-t border-slate-700">
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5">Warn Your Family</div>
+            <div className="flex gap-1.5">
+              <button
+                onClick={async () => {
+                  const ok = await shareCountryAlert(selectedPoint.country, selectedPoint.riskLevel, selectedPoint.recentIncidents, "copy");
+                  if (ok) { setCopiedShare(true); setTimeout(() => setCopiedShare(false), 2000); }
+                }}
+                className="flex items-center gap-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700/50 transition-colors"
+                data-testid="share-copy"
+              >
+                {copiedShare ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                {copiedShare ? "Copied" : "Copy"}
+              </button>
+              <button
+                onClick={() => shareCountryAlert(selectedPoint.country, selectedPoint.riskLevel, selectedPoint.recentIncidents, "whatsapp")}
+                className="flex items-center gap-1 text-[10px] bg-green-600/20 hover:bg-green-600/30 text-green-400 px-2.5 py-1.5 rounded-lg border border-green-500/20 transition-colors"
+                data-testid="share-whatsapp"
+              >
+                <Share2 className="w-3 h-3" />
+                WhatsApp
+              </button>
+              <button
+                onClick={() => shareCountryAlert(selectedPoint.country, selectedPoint.riskLevel, selectedPoint.recentIncidents, "email")}
+                className="flex items-center gap-1 text-[10px] bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-2.5 py-1.5 rounded-lg border border-blue-500/20 transition-colors"
+                data-testid="share-email"
+              >
+                <MapPin className="w-3 h-3" />
+                Email
+              </button>
+            </div>
+          </div>
+
           <div className="mt-2 pt-2 border-t border-slate-700">
             <div className="text-[10px] text-slate-500">Sources: {selectedPoint.sources.join(", ")}</div>
           </div>

@@ -6,7 +6,7 @@ import {
   MapPin, Clock, ExternalLink, ChevronRight, Radio,
   Mail, Heart, Monitor, Lock, Smartphone, ShoppingCart,
   Bug, Briefcase, UserX, Fingerprint, ChevronDown, ChevronUp,
-  BarChart3, Eye
+  BarChart3, Eye, Share2, Copy, Check, Flame, Sparkles, ShieldCheck
 } from "lucide-react";
 
 interface LiveFeedEvent {
@@ -33,6 +33,17 @@ interface ScamTypeSummary {
   topRegions: string[];
   averageLoss: string;
   description: string;
+  protectionTips: string[];
+}
+
+interface TrendingScam {
+  type: string;
+  label: string;
+  description: string;
+  trendPercent: number;
+  isNew: boolean;
+  affectedRegions: string[];
+  weekStarted: string;
 }
 
 interface RegionalSummary {
@@ -223,11 +234,28 @@ function ScamTypeBreakdown({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
               {isExpanded && (
                 <div className="px-4 pb-3 pl-[60px]">
                   <p className="text-xs text-slate-400 mb-2">{scam.description}</p>
-                  <div className="flex flex-wrap gap-2 text-[11px]">
+                  <div className="flex flex-wrap gap-2 text-[11px] mb-3">
                     <span className="text-slate-500">Typical loss per victim: <span className="text-orange-400 font-medium">{scam.averageLoss}</span></span>
                     <span className="text-slate-500">·</span>
                     <span className="text-slate-500">Most affected: <span className="text-cyan-400">{scam.topRegions.join(", ")}</span></span>
                   </div>
+                  {scam.protectionTips && scam.protectionTips.length > 0 && (
+                    <div className="bg-green-500/5 border border-green-500/20 rounded-lg p-2.5" data-testid={`protection-tips-${scam.type}`}>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
+                        <span className="text-[11px] font-semibold text-green-400">How to protect yourself</span>
+                      </div>
+                      <ul className="space-y-1">
+                        {scam.protectionTips.map((tip, i) => (
+                          <li key={i} className="flex gap-2 text-[11px]">
+                            <span className="text-green-400 flex-shrink-0">✓</span>
+                            <span className="text-slate-300">{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <ShareScamType scam={scam} />
                 </div>
               )}
             </div>
@@ -315,5 +343,90 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
   );
 }
 
-export { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel };
-export type { LiveFeedEvent, ScamTypeSummary, RegionalSummary, GlobalStats };
+function ShareScamType({ scam }: { scam: ScamTypeSummary }) {
+  const [copied, setCopied] = useState(false);
+
+  const shareText = `Watch out for "${scam.label}" scams — ${scam.description} Typical loss: ${scam.averageLoss}. Tips: ${scam.protectionTips?.slice(0, 2).join(". ")}. More info at GetCyberRight.`;
+
+  return (
+    <div className="mt-2 flex items-center gap-1.5" data-testid={`share-scam-${scam.type}`}>
+      <span className="text-[10px] text-slate-500 mr-1">Warn your family:</span>
+      <button
+        onClick={async () => {
+          try { await navigator.clipboard.writeText(shareText); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+        }}
+        className="flex items-center gap-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded border border-slate-700/50 transition-colors"
+        data-testid={`share-copy-${scam.type}`}
+      >
+        {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+        {copied ? "Copied" : "Copy"}
+      </button>
+      <button
+        onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank", "noopener,noreferrer")}
+        className="flex items-center gap-1 text-[10px] bg-green-600/20 hover:bg-green-600/30 text-green-400 px-2 py-1 rounded border border-green-500/20 transition-colors"
+        data-testid={`share-whatsapp-${scam.type}`}
+      >
+        <Share2 className="w-3 h-3" />
+        WhatsApp
+      </button>
+      <button
+        onClick={() => window.open(`mailto:?subject=${encodeURIComponent(`Scam alert: ${scam.label}`)}&body=${encodeURIComponent(shareText)}`)}
+        className="flex items-center gap-1 text-[10px] bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-2 py-1 rounded border border-blue-500/20 transition-colors"
+        data-testid={`share-email-${scam.type}`}
+      >
+        <Share2 className="w-3 h-3" />
+        Email
+      </button>
+    </div>
+  );
+}
+
+function TrendingSection({ trending }: { trending: TrendingScam[] }) {
+  if (!trending || trending.length === 0) return null;
+
+  return (
+    <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="trending-section">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
+        <Flame className="w-4 h-4 text-orange-400" />
+        <span className="text-sm font-semibold text-white">New This Week</span>
+        <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full border border-red-500/30 ml-auto">
+          {trending.filter(t => t.isNew).length} new
+        </span>
+      </div>
+      <div className="divide-y divide-slate-700/30">
+        {trending.map((item) => (
+          <div key={item.type} className="px-4 py-3 hover:bg-slate-700/20 transition-colors" data-testid={`trending-${item.type}`}>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                {item.isNew ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30">
+                    <Sparkles className="w-2.5 h-2.5" /> NEW
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded-full border border-orange-500/30">
+                    <TrendingUp className="w-2.5 h-2.5" /> HOT
+                  </span>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm text-white font-medium">{item.label}</span>
+                  <span className="text-[10px] text-red-400 font-bold">↑{item.trendPercent}%</span>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed mb-1.5">{item.description}</p>
+                <div className="flex flex-wrap gap-1">
+                  {item.affectedRegions.map(r => (
+                    <span key={r} className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded-full border border-slate-700/30">{r}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection };
+export type { LiveFeedEvent, ScamTypeSummary, RegionalSummary, GlobalStats, TrendingScam };

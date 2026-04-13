@@ -18,6 +18,10 @@ interface GlobeHotspot {
   sources: string[];
   reportContact?: string;
   lastUpdated: string;
+  emergencySteps?: string[];
+  emergencyHotline?: string;
+  emergencyReportUrl?: string;
+  emergencyFreezeCredit?: string;
 }
 
 interface GlobeArc {
@@ -64,6 +68,17 @@ interface ScamTypeSummary {
   topRegions: string[];
   averageLoss: string;
   description: string;
+  protectionTips: string[];
+}
+
+interface TrendingScam {
+  type: string;
+  label: string;
+  description: string;
+  trendPercent: number;
+  isNew: boolean;
+  affectedRegions: string[];
+  weekStarted: string;
 }
 
 interface GlobalStats {
@@ -90,6 +105,7 @@ export interface ScamIntelLiveFeed {
 export interface ScamIntelRegionalData {
   regions: RegionalSummary[];
   scamTypes: ScamTypeSummary[];
+  trending: TrendingScam[];
   lastUpdated: string;
 }
 
@@ -506,6 +522,216 @@ const SCAM_TYPE_DESCRIPTIONS: Record<string, string> = {
   "job-scam": "Fake job listings that ask for personal details upfront, or require you to pay fees before you can 'start working'",
 };
 
+const SCAM_PROTECTION_TIPS: Record<string, string[]> = {
+  phishing: [
+    "Never click links in unexpected emails or texts — go directly to the website by typing the address yourself",
+    "Check the sender's email address carefully — scammers often use addresses that look similar but are slightly off",
+    "If a message creates urgency ('Act now or your account will be closed!'), that's a red flag — legitimate companies don't pressure you like this",
+  ],
+  romance: [
+    "Be cautious if someone you've never met in person asks for money, gift cards, or cryptocurrency",
+    "Do a reverse image search on their profile photos — scammers steal photos from real people's social media",
+    "Never send intimate photos to someone you haven't met — they may use them to blackmail you later",
+  ],
+  investment: [
+    "If someone promises guaranteed returns or no risk, it's almost certainly a scam — all real investments carry risk",
+    "Research any investment platform independently — search the company name plus 'scam' or 'review' before investing",
+    "Be wary of pressure to invest quickly or 'before it's too late' — legitimate investments don't have artificial deadlines",
+  ],
+  "tech-support": [
+    "Real tech companies like Microsoft or Apple will never call you unsolicited about a computer problem",
+    "Never give remote access to your computer to someone who contacted you — hang up and call the company directly using their official number",
+    "Pop-ups saying 'Your computer is infected! Call this number!' are always scams — close the window and run your own antivirus",
+  ],
+  impersonation: [
+    "Government agencies and banks will never call and ask you to pay with gift cards, wire transfers, or cryptocurrency",
+    "If someone claims to be from your bank, hang up and call the number on the back of your card to verify",
+    "The tax office won't threaten you with immediate arrest over the phone — that's always a scam",
+  ],
+  ransomware: [
+    "Keep regular backups of your important files on an external drive or cloud service — this is your best defense",
+    "Don't open attachments from unknown senders, especially .zip, .exe, or .docm files",
+    "Keep your operating system and software updated — many attacks exploit known security holes that updates fix",
+  ],
+  "identity-theft": [
+    "Freeze your credit with all three credit bureaus — it's free and prevents criminals from opening accounts in your name",
+    "Use unique passwords for every account and enable two-factor authentication wherever possible",
+    "Shred documents containing personal information before discarding them",
+  ],
+  "mobile-money": [
+    "Never share your mobile money PIN or one-time codes with anyone, even if they claim to be from your provider",
+    "Verify any payment request by calling the person directly using a number you already have — don't use the number they give you",
+    "Enable transaction notifications so you're alerted immediately if money moves from your account",
+  ],
+  malware: [
+    "Only download apps from official stores (App Store, Google Play) — avoid installing software from unknown websites",
+    "Be cautious with USB drives from unknown sources — they can install harmful software automatically",
+    "Install reputable antivirus software and keep it updated — free options like Windows Defender work well for basic protection",
+  ],
+  "shopping-fraud": [
+    "If a deal looks too good to be true (e.g., 90% off brand-name products), it probably is",
+    "Check for a physical address, phone number, and return policy before buying from any unfamiliar online store",
+    "Pay with a credit card rather than a debit card or wire transfer — credit cards offer better fraud protection",
+  ],
+  "crypto-scam": [
+    "No legitimate investment can guarantee profits — anyone promising guaranteed cryptocurrency returns is lying",
+    "Be extremely cautious of someone you met online who wants to 'teach you to invest' — this is often a long-running scam",
+    "Only use well-known cryptocurrency exchanges and verify the website URL carefully before logging in",
+  ],
+  "job-scam": [
+    "A real employer will never ask you to pay money upfront for training, equipment, or background checks",
+    "Be suspicious of job offers that arrive unsolicited, especially via messaging apps, with unusually high pay for little work",
+    "Research the company independently — search for the company name plus 'scam' and verify their official website",
+  ],
+};
+
+const COUNTRY_EMERGENCY_STEPS: Record<string, { steps: string[]; hotline?: string; reportUrl?: string; freezeCredit?: string }> = {
+  "United States": {
+    steps: [
+      "Report the scam to the FTC at reportfraud.ftc.gov",
+      "File a complaint with the FBI's IC3 at ic3.gov",
+      "Contact your bank immediately to freeze suspicious transactions",
+      "Place a fraud alert or credit freeze with Equifax, Experian, and TransUnion",
+      "Change passwords on all affected accounts and enable two-factor authentication",
+    ],
+    hotline: "FTC: 1-877-382-4357 | FBI IC3: ic3.gov",
+    reportUrl: "https://reportfraud.ftc.gov",
+    freezeCredit: "Equifax: 1-800-685-1111 | Experian: 1-888-397-3742 | TransUnion: 1-888-909-8872",
+  },
+  "United Kingdom": {
+    steps: [
+      "Report to Action Fraud at actionfraud.police.uk or call 0300 123 2040",
+      "Contact your bank immediately — they may be able to recover funds",
+      "Report suspicious emails to report@phishing.gov.uk",
+      "Check your credit report for unauthorized accounts at checkmyfile.com",
+      "Change passwords and enable two-factor authentication on all accounts",
+    ],
+    hotline: "Action Fraud: 0300 123 2040",
+    reportUrl: "https://www.actionfraud.police.uk",
+  },
+  "Canada": {
+    steps: [
+      "Report to the Canadian Anti-Fraud Centre at 1-888-495-8501",
+      "File a report with your local police",
+      "Contact your bank or credit card company immediately",
+      "Place a fraud alert with Equifax Canada or TransUnion Canada",
+      "Report identity theft to both credit bureaus",
+    ],
+    hotline: "Canadian Anti-Fraud Centre: 1-888-495-8501",
+    reportUrl: "https://www.antifraudcentre-centreantifraude.ca",
+  },
+  "Australia": {
+    steps: [
+      "Report to Scamwatch at scamwatch.gov.au",
+      "Contact your bank immediately to stop any payments",
+      "Report to the Australian Cyber Security Centre at cyber.gov.au",
+      "Contact IDCARE on 1800 595 160 for identity theft support",
+      "Change passwords and secure all online accounts",
+    ],
+    hotline: "Scamwatch: 1300 795 995 | IDCARE: 1800 595 160",
+    reportUrl: "https://www.scamwatch.gov.au/report-a-scam",
+  },
+  "India": {
+    steps: [
+      "Report cyber fraud at cybercrime.gov.in or call 1930",
+      "File an FIR at your nearest police station",
+      "Contact your bank immediately to block cards and freeze accounts",
+      "Report to CERT-In at incident@cert-in.org.in",
+      "Preserve all evidence — screenshots, messages, transaction records",
+    ],
+    hotline: "Cyber Crime Helpline: 1930",
+    reportUrl: "https://cybercrime.gov.in",
+  },
+  "Germany": {
+    steps: [
+      "Report to your local police (Polizei) online or at the nearest station",
+      "Contact your bank (Hausbank) immediately to block transactions",
+      "Report phishing emails to the BSI at bsi.bund.de",
+      "File a complaint with the consumer protection agency (Verbraucherzentrale)",
+      "Change all passwords and enable two-factor authentication",
+    ],
+    hotline: "Police: 110 | BSI: bsi.bund.de",
+    reportUrl: "https://www.bsi.bund.de",
+  },
+  "France": {
+    steps: [
+      "Report at cybermalveillance.gouv.fr",
+      "File a complaint at your local police station or online via pre-plainte-en-ligne.gouv.fr",
+      "Contact your bank immediately to contest fraudulent transactions",
+      "Report phishing to signal-spam.fr",
+      "Change all passwords and secure your accounts",
+    ],
+    hotline: "Info Escroqueries: 0 805 805 817",
+    reportUrl: "https://www.cybermalveillance.gouv.fr",
+  },
+  "Nigeria": {
+    steps: [
+      "Report to the EFCC at efcc.gov.ng",
+      "Contact your bank immediately to flag the transaction",
+      "Report to the Nigeria Police Cybercrime Unit",
+      "Report to the NCC if it involved telecom fraud",
+      "Save all messages, emails, and transaction records as evidence",
+    ],
+    hotline: "EFCC: efcc.gov.ng",
+    reportUrl: "https://www.efcc.gov.ng",
+  },
+  "South Africa": {
+    steps: [
+      "Report to the South African Police Service (SAPS) at your nearest station",
+      "Contact your bank immediately to reverse or block transactions",
+      "Report to the South African Banking Risk Information Centre (SABRIC)",
+      "File a complaint at the nearest Magistrate's Court if identity theft occurred",
+      "Change all passwords and monitor your accounts",
+    ],
+    hotline: "SAPS Crime Stop: 08600 10111",
+    reportUrl: "https://www.saps.gov.za",
+  },
+  "Kenya": {
+    steps: [
+      "Report to the Communications Authority of Kenya cyber portal",
+      "Contact your mobile money provider (M-Pesa, Airtel Money) immediately",
+      "File a report with the Directorate of Criminal Investigations (DCI)",
+      "Report to KE-CIRT at ke-cirt.go.ke",
+      "Keep all transaction records and communication evidence",
+    ],
+    hotline: "DCI: 0800 722 203",
+    reportUrl: "https://www.ke-cirt.go.ke",
+  },
+  "Brazil": {
+    steps: [
+      "Register a complaint at the nearest police station (Delegacia) or online via delegaciavirtual",
+      "Contact your bank immediately to block PIX, cards, and transfers",
+      "Report to CERT.br at cert.br",
+      "File a complaint at consumidor.gov.br for online shopping fraud",
+      "Change all passwords and enable two-factor authentication",
+    ],
+    hotline: "Disque Denúncia: 181",
+    reportUrl: "https://www.cert.br",
+  },
+  "Japan": {
+    steps: [
+      "Contact the nearest police station (Keisatsu) or call #9110 for consultation",
+      "Report to the Consumer Affairs Agency at kokusen.go.jp",
+      "Contact your bank immediately to freeze suspicious transactions",
+      "Report to IPA (Information-technology Promotion Agency) at ipa.go.jp",
+      "Preserve all evidence and screenshots",
+    ],
+    hotline: "Police Consultation: #9110",
+    reportUrl: "https://www.npa.go.jp",
+  },
+  "Singapore": {
+    steps: [
+      "Call the Anti-Scam Centre at 1800-722-6688 immediately",
+      "Report at police.gov.sg/iwitness",
+      "Contact your bank to freeze transactions",
+      "Install ScamShield app for additional protection",
+      "Change all passwords and secure your accounts",
+    ],
+    hotline: "Anti-Scam Hotline: 1800-722-6688",
+    reportUrl: "https://www.scamshield.org.sg",
+  },
+};
+
 const SCAM_TYPE_ICONS: Record<string, string> = {
   phishing: "Mail",
   romance: "Heart",
@@ -638,6 +864,7 @@ function buildGlobeData(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichm
     const profile = COUNTRY_THREAT_PROFILES[country];
     if (!profile) continue;
 
+    const emergency = COUNTRY_EMERGENCY_STEPS[country];
     hotspots.push({
       id: coords.code,
       lat: coords.lat,
@@ -654,6 +881,10 @@ function buildGlobeData(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichm
       sources: profile.sources,
       reportContact: profile.reportContact,
       lastUpdated: new Date().toISOString(),
+      emergencySteps: emergency?.steps,
+      emergencyHotline: emergency?.hotline,
+      emergencyReportUrl: emergency?.reportUrl,
+      emergencyFreezeCredit: emergency?.freezeCredit,
     });
   }
 
@@ -837,10 +1068,65 @@ function buildRegionalData(): ScamIntelRegionalData {
         topRegions,
         averageLoss: SCAM_AVG_LOSSES[type] || "Unknown",
         description: SCAM_TYPE_DESCRIPTIONS[type] || "",
+        protectionTips: SCAM_PROTECTION_TIPS[type] || [],
       };
     });
 
-  return { regions, scamTypes, lastUpdated: new Date().toISOString() };
+  const trending: TrendingScam[] = [
+    {
+      type: "crypto-scam",
+      label: "AI-Powered Crypto Scams",
+      description: "Scammers are using AI-generated deepfake videos of celebrities to promote fake cryptocurrency platforms. These look incredibly convincing.",
+      trendPercent: 340,
+      isNew: true,
+      affectedRegions: ["North America", "Europe", "Asia Pacific"],
+      weekStarted: getWeekStart(),
+    },
+    {
+      type: "phishing",
+      label: "QR Code Phishing ('Quishing')",
+      description: "Fake QR codes placed on parking meters, restaurant menus, and in emails that lead to convincing login pages designed to steal your details.",
+      trendPercent: 280,
+      isNew: true,
+      affectedRegions: ["North America", "Europe"],
+      weekStarted: getWeekStart(),
+    },
+    {
+      type: "job-scam",
+      label: "Task-Based Job Scams",
+      description: "You're offered easy online 'tasks' (liking videos, reviewing products) with small payments at first, then asked to deposit money to 'unlock' higher-paying tasks.",
+      trendPercent: 190,
+      isNew: false,
+      affectedRegions: ["Asia Pacific", "Africa", "Latin America"],
+      weekStarted: getWeekStart(-1),
+    },
+    {
+      type: "impersonation",
+      label: "AI Voice Cloning Scams",
+      description: "Scammers clone the voice of a family member using AI, then call pretending to be them in an emergency asking for money. Just a few seconds of audio is enough to clone a voice.",
+      trendPercent: 250,
+      isNew: true,
+      affectedRegions: ["North America", "Europe", "Asia Pacific"],
+      weekStarted: getWeekStart(),
+    },
+    {
+      type: "romance",
+      label: "Rental & Deposit Scams",
+      description: "Fake rental listings on popular platforms ask for deposits before viewings. The properties either don't exist or the 'landlord' has no connection to them.",
+      trendPercent: 120,
+      isNew: false,
+      affectedRegions: ["Europe", "North America"],
+      weekStarted: getWeekStart(-2),
+    },
+  ];
+
+  return { regions, scamTypes, trending, lastUpdated: new Date().toISOString() };
+}
+
+function getWeekStart(weeksAgo: number = 0): string {
+  const d = new Date();
+  d.setDate(d.getDate() - d.getDay() - (weeksAgo * 7));
+  return d.toISOString().split("T")[0];
 }
 
 export async function refreshScamIntelData(): Promise<void> {
@@ -885,7 +1171,7 @@ export function getLiveFeed(): ScamIntelLiveFeed {
 
 export function getRegionalData(): ScamIntelRegionalData {
   if (!cachedRegionalData) {
-    return { regions: [], scamTypes: [], lastUpdated: new Date().toISOString() };
+    return { regions: [], scamTypes: [], trending: [], lastUpdated: new Date().toISOString() };
   }
   return cachedRegionalData;
 }
