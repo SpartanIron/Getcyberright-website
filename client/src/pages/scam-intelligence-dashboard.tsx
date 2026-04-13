@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo, lazy, Suspense, Component, type ReactNode } from "react";
+import { useState, useEffect, useRef, useMemo, Component, type ReactNode, type ComponentType } from "react";
+import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -64,23 +65,17 @@ class GlobeBoundary extends Component<
   }
 }
 
-function createGlobeLazy() {
-  return lazy(() =>
-    Promise.race([
-      import("@/components/scam-intelligence-globe").then((m) => ({
-        default: m.ScamIntelligenceGlobe,
-      })),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Globe load timeout (15s)")), 15000)
-      ),
-    ])
-  );
-}
+const ScamIntelligenceGlobe = dynamic(
+  () => import("@/components/scam-intelligence-globe").then((m) => ({ default: m.ScamIntelligenceGlobe })),
+  {
+    ssr: false,
+    loading: () => <GlobeLoadingPlaceholder />,
+  }
+);
 
 function LazyGlobe({ data, onCountrySelect, focusCountryCode }: any) {
   const [loadFailed, setLoadFailed] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
-  const GlobeComponent = useMemo(() => createGlobeLazy(), [retryKey]);
 
   if (loadFailed) {
     return <GlobeLoadError onRetry={() => { setLoadFailed(false); setRetryKey(k => k + 1); }} />;
@@ -88,13 +83,11 @@ function LazyGlobe({ data, onCountrySelect, focusCountryCode }: any) {
 
   return (
     <GlobeBoundary key={retryKey} onError={() => setLoadFailed(true)}>
-      <Suspense fallback={<GlobeLoadingPlaceholder />}>
-        <GlobeComponent
-          data={data}
-          onCountrySelect={onCountrySelect}
-          focusCountryCode={focusCountryCode}
-        />
-      </Suspense>
+      <ScamIntelligenceGlobe
+        data={data}
+        onCountrySelect={onCountrySelect}
+        focusCountryCode={focusCountryCode}
+      />
     </GlobeBoundary>
   );
 }
