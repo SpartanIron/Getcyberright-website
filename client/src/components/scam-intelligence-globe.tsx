@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, memo, Component, type ErrorInfo, type ReactNode } from "react";
-import Globe from "react-globe.gl";
 import { Globe as GlobeIcon, AlertTriangle, MapPin, Share2, Copy, Check, Phone, ExternalLink, ShieldAlert } from "lucide-react";
 
 class GlobeErrorBoundary extends Component<
@@ -150,7 +149,8 @@ async function shareCountryAlert(country: string, riskLevel: string, incidents: 
 function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focusCountryCode }: ScamIntelligenceGlobeProps) {
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isClient, setIsClient] = useState(false);
+  const [GlobeComponent, setGlobeComponent] = useState<any>(null);
+  const [loadError, setLoadError] = useState(false);
   const [webglSupported, setWebglSupported] = useState(true);
   const [dimensions, setDimensions] = useState({ w: width || 600, h: height || 600 });
   const [hoveredPoint, setHoveredPoint] = useState<GlobeHotspot | null>(null);
@@ -158,11 +158,45 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const [copiedShare, setCopiedShare] = useState(false);
   const [showEmergency, setShowEmergency] = useState(false);
   const lastFocusedCodeRef = useRef<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    setIsClient(true);
-    setWebglSupported(checkWebGLSupport());
-  }, []);
+    if (typeof window === "undefined") return;
+    const supported = checkWebGLSupport();
+    setWebglSupported(supported);
+    if (!supported) return;
+
+    setLoadError(false);
+    setGlobeComponent(null);
+    let cancelled = false;
+
+    const timer = setTimeout(() => {
+      if (!cancelled && !GlobeComponent) {
+        console.warn("[ScamGlobe] Globe library timed out after 20s");
+        setLoadError(true);
+      }
+    }, 20000);
+
+    import("react-globe.gl")
+      .then((mod) => {
+        if (!cancelled) {
+          clearTimeout(timer);
+          setGlobeComponent(() => mod.default);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          clearTimeout(timer);
+          console.error("[ScamGlobe] Failed to load react-globe.gl:", err);
+          setLoadError(true);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [retryCount]);
 
   useEffect(() => {
     if (!containerRef.current || width) return;
@@ -177,7 +211,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   }, [width]);
 
   useEffect(() => {
-    if (!globeRef.current || !isClient) return;
+    if (!globeRef.current || !GlobeComponent) return;
     const globe = globeRef.current;
     const controls = globe.controls();
     controls.autoRotate = true;
@@ -187,7 +221,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     controls.minDistance = 200;
     controls.maxDistance = 500;
     globe.pointOfView({ lat: 20, lng: 10, altitude: 2.2 });
-  }, [isClient]);
+  }, [GlobeComponent]);
 
   useEffect(() => {
     if (!focusCountryCode || !data?.hotspots || !globeRef.current || focusCountryCode === lastFocusedCodeRef.current) return;
@@ -225,21 +259,25 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
 
   const handleRetry = useCallback(() => {
     setWebglSupported(checkWebGLSupport());
+    setRetryCount(c => c + 1);
   }, []);
 
-  if (!isClient) {
+  if (!webglSupported || loadError) {
+    return <GlobeFallback data={data} onRetry={handleRetry} />;
+  }
+
+  if (!GlobeComponent) {
     return (
       <div
         ref={containerRef}
         className="w-full aspect-square max-w-[700px] mx-auto bg-[#060d1a] rounded-2xl flex items-center justify-center"
       >
-        <div className="text-cyan-400/50 text-sm">Loading globe...</div>
+        <div className="text-center">
+          <GlobeIcon className="w-10 h-10 text-cyan-400/30 mx-auto mb-2 animate-pulse" />
+          <div className="text-cyan-400/50 text-sm">Loading 3D Globe...</div>
+        </div>
       </div>
     );
-  }
-
-  if (!webglSupported) {
-    return <GlobeFallback data={data} onRetry={handleRetry} />;
   }
 
   const hotspots = data?.hotspots || [];
@@ -248,7 +286,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   return (
     <div ref={containerRef} className="relative w-full max-w-[700px] mx-auto" style={{ height: dimensions.h || 600 }}>
       <GlobeErrorBoundary fallback={<GlobeFallback data={data} onRetry={() => window.location.reload()} />}>
-      <Globe
+      <GlobeComponent
         ref={globeRef}
         width={dimensions.w || 600}
         height={dimensions.h || 600}
