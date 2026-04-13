@@ -5,12 +5,12 @@ import PageContent from "@/pages/password-generator";
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "Free Secure Password Generator — Create Strong Passwords | GetCyberRight",
-  description: "Generate strong, unique passwords instantly. Customize length, character types, and complexity. Free to use — no account required. Runs entirely in your browser.",
+  title: "Free Secure Password Generator: Create Strong Passwords | GetCyberRight",
+  description: "Generate strong, unique passwords instantly. Customize length, character types, and complexity. Free to use, no account required. Runs entirely in your browser.",
   alternates: { canonical: `${BASE_URL}/password-generator` },
   openGraph: {
-    title: "Free Secure Password Generator — Create Strong Passwords | GetCyberRight",
-    description: "Generate strong, unique passwords instantly. Customize length, character types, and complexity. Free to use — no account required.",
+    title: "Free Secure Password Generator: Create Strong Passwords | GetCyberRight",
+    description: "Generate strong, unique passwords instantly. Customize length, character types, and complexity. Free to use, no account required.",
     url: `${BASE_URL}/password-generator`,
     type: "website",
     images: [{ url: `${BASE_URL}/og/scam-guard.png`, width: 1080, height: 1080, alt: "Password Generator" }],
@@ -39,7 +39,7 @@ export default function PasswordGeneratorPage() {
         {
           "@type": "Question",
           name: "How long should a secure password be?",
-          acceptedAnswer: { "@type": "Answer", text: "Security experts recommend passwords of at least 12-16 characters. Longer passwords are exponentially harder to crack — a 16-character password with mixed characters would take millions of years to brute-force with current technology. Our generator defaults to 16 characters but you can customize the length." },
+          acceptedAnswer: { "@type": "Answer", text: "Security experts recommend passwords of at least 12-16 characters. Longer passwords are exponentially harder to crack. A 16-character password with mixed characters would take millions of years to brute-force with current technology. Our generator defaults to 16 characters but you can customize the length." },
         },
         {
           "@type": "Question",

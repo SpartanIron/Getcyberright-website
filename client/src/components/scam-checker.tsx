@@ -2769,7 +2769,7 @@ export function ScamChecker() {
                             data-testid="button-answer-context"
                           >
                             <Search className="w-4 h-4" />
-                            Help us analyze this better — answer a few questions
+                            Help us analyze this better by answering a few questions
                           </Button>
                         </div>
                       )}

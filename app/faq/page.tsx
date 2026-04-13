@@ -70,7 +70,7 @@ const faqCategories = [
     iconKey: "creditcard" as const,
     questions: [
       { q: "What features are included?", a: "Every feature on GetCyberRight is free with a registered account. That includes manual and automatic scans, browser extension protection, scan history, safety scores, family profiles, data removal tools, training courses, and more." },
-      { q: "How do I access all features?", a: "Simply create a free account to unlock full access to every tool and feature on GetCyberRight. There are no paid tiers — everything is free." },
+      { q: "How do I access all features?", a: "Simply create a free account to unlock full access to every tool and feature on GetCyberRight. There are no paid tiers. Everything is free." },
       { q: "Will GetCyberRight always be free?", a: "Yes, we are committed to making cybersecurity education and tools accessible to everyone. All features are completely free with a registered account." },
       { q: "Is there family support?", a: "Yes! Family profile support is included for free, allowing you to manage protection for multiple family members under one account." },
     ],

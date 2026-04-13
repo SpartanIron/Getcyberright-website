@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
   description:
-    "Free cybersecurity education for families. AI-powered scam detection, data broker removal, and safety training — no account or expertise needed.",
+    "Free cybersecurity education for families. AI-powered scam detection, data broker removal, and safety training. No account or expertise needed.",
   icons: {
     icon: "/favicon.png",
     apple: "/apple-touch-icon.png",

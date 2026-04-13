@@ -219,7 +219,7 @@ export default function AlertDetailPage() {
                     return (
                       <div className={`flex items-center gap-1.5 text-xs rounded-md px-2 py-1.5 mt-1 ${isFresh ? "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400" : "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400"}`} data-testid="text-freshness-status">
                         <span className={`inline-block w-1.5 h-1.5 rounded-full ${isFresh ? "bg-green-500" : "bg-amber-500"}`} />
-                        {isFresh ? `Current — updated ${daysSince === 0 ? "today" : daysSince === 1 ? "yesterday" : `${daysSince}d ago`}` : `Last updated ${daysSince}d ago`}
+                        {isFresh ? `Current, updated ${daysSince === 0 ? "today" : daysSince === 1 ? "yesterday" : `${daysSince}d ago`}` : `Last updated ${daysSince}d ago`}
                       </div>
                     );
                   })()}

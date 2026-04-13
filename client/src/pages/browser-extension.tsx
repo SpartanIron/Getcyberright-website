@@ -272,7 +272,7 @@ export default function BrowserExtensionPage() {
                   "Keep the extension enabled at all times. Most scam sites look identical to real ones, and the extension catches what your eyes cannot.",
                   "Report any confirmed scam using the community reporting feature. Your report protects thousands of other families.",
                   "Review the Scam of the Week alerts to stay ahead of trending scams. Knowledge is your strongest defense.",
-                  "Enable auto-scan to silently check every page you visit without any extra effort — it's free with your account."
+                  "Enable auto-scan to silently check every page you visit without any extra effort. It's free with your account."
                 ],
                 color: "bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800"
               },
@@ -429,7 +429,7 @@ export default function BrowserExtensionPage() {
           </div>
           <div className="space-y-4 max-w-2xl mx-auto">
             {[
-              { q: "Is the browser extension free?", a: "Yes! The extension is completely free to download and use. All features are included at no cost — automatic page scanning, notification blocking, search safety badges, redirect detection, clipboard protection, webmail scanning, and family profiles. Just create a free account to get started." },
+              { q: "Is the browser extension free?", a: "Yes! The extension is completely free to download and use. All features are included at no cost: automatic page scanning, notification blocking, search safety badges, redirect detection, clipboard protection, webmail scanning, and family profiles. Just create a free account to get started." },
               { q: "Does it track my browsing activity?", a: "No. The extension only scans content when you explicitly trigger a scan or when auto-scan is enabled. No browsing history is stored or transmitted." },
               { q: "What browsers does it work with?", a: "It works with any Chromium-based browser including Google Chrome, Brave, Microsoft Edge, Opera, and Vivaldi." },
               { q: "Is it on the Chrome Web Store?", a: "Yes! GCR Scam Guard is available on the official Chrome Web Store. Click \"Add to Chrome\" at the top of this page to install it directly. You can also download the ZIP for manual installation if you prefer." },

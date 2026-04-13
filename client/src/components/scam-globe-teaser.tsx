@@ -22,7 +22,7 @@ export function ScamGlobeTeaser() {
             </h2>
             <p className="text-slate-400 mb-6 leading-relaxed">
               See where scams are happening right now. Our live map tracks fake emails, romance scams,
-              investment fraud, and more across 40+ countries — using data from the FBI, INTERPOL,
+              investment fraud, and more across 40+ countries, using data from the FBI, INTERPOL,
               and government cybersecurity teams worldwide.
             </p>
 

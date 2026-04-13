@@ -4,12 +4,12 @@ import PageContent from "@/pages/parents";
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "Parents' Guide to Online Safety — Parental Controls & Family Protection | GetCyberRight",
+  title: "Parents' Guide to Online Safety: Parental Controls & Family Protection | GetCyberRight",
   description:
     "Free cybersecurity guides for parents. Set up parental controls, learn age-appropriate device settings, and protect your children from online threats, cyberbullying, and predators.",
   alternates: { canonical: `${BASE_URL}/parents` },
   openGraph: {
-    title: "Parents' Guide to Online Safety — Parental Controls & Family Protection | GetCyberRight",
+    title: "Parents' Guide to Online Safety: Parental Controls & Family Protection | GetCyberRight",
     description:
       "Free cybersecurity guides for parents. Set up parental controls, learn age-appropriate device settings, and protect your children from online threats, cyberbullying, and predators.",
     url: `${BASE_URL}/parents`,

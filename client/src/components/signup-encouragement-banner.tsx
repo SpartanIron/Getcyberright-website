@@ -16,7 +16,7 @@ interface SignupEncouragementBannerProps {
 const DISMISS_PREFIX = "signupBannerDismissed:";
 
 const benefits = [
-  { icon: Shield, text: "Full access to all tools — free" },
+  { icon: Shield, text: "Full access to all tools, free" },
   { icon: History, text: "Save your scan history" },
   { icon: Trash2, text: "Track data broker removals" },
   { icon: GraduationCap, text: "Earn training certificates" },

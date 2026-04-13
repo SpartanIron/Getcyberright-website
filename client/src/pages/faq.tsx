@@ -90,7 +90,7 @@ const faqCategories = [
       },
       {
         q: "How do I access all features?",
-        a: "Simply create a free account to unlock full access to every tool and feature on GetCyberRight. There are no paid tiers — everything is free."
+        a: "Simply create a free account to unlock full access to every tool and feature on GetCyberRight. There are no paid tiers. Everything is free."
       },
       {
         q: "Will GetCyberRight always be free?",

@@ -31,7 +31,7 @@ export function CTASection() {
 
           <p className="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed">
             Start protecting yourself and your family today with free tools,
-            guides, and resources — no account or technical knowledge required.
+            guides, and resources. No account or technical knowledge required.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">

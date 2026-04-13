@@ -5,12 +5,12 @@ import PageContent from "@/pages/kids";
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "Online Safety for Kids & Teens (Ages 8-16) — Free Lessons | GetCyberRight",
+  title: "Online Safety for Kids & Teens (Ages 8-16): Free Lessons | GetCyberRight",
   description:
     "Free interactive cybersecurity lessons for kids and teens ages 8 to 16. Teach your children about password safety, spotting scams, cyberbullying, and being a good digital citizen.",
   alternates: { canonical: `${BASE_URL}/kids` },
   openGraph: {
-    title: "Online Safety for Kids & Teens (Ages 8-16) — Free Lessons | GetCyberRight",
+    title: "Online Safety for Kids & Teens (Ages 8-16): Free Lessons | GetCyberRight",
     description:
       "Free interactive cybersecurity lessons for kids and teens ages 8 to 16. Teach your children about password safety, spotting scams, cyberbullying, and being a good digital citizen.",
     url: `${BASE_URL}/kids`,
@@ -71,7 +71,7 @@ export default function KidsPage() {
         {
           "@type": "Question",
           name: "How can I make a strong password that I can remember?",
-          acceptedAnswer: { "@type": "Answer", text: "Use a passphrase — a string of random words that creates a mental image. For example, 'purple-tiger-plays-piano' is much stronger than a short, complex password and easier to remember. Our password lessons teach kids to create strong, memorable passwords and understand why password reuse is dangerous." },
+          acceptedAnswer: { "@type": "Answer", text: "Use a passphrase, a string of random words that creates a mental image. For example, 'purple-tiger-plays-piano' is much stronger than a short, complex password and easier to remember. Our password lessons teach kids to create strong, memorable passwords and understand why password reuse is dangerous." },
         },
       ],
     },

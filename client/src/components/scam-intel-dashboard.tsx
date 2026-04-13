@@ -307,7 +307,7 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
       {selected && (
         <div className="px-4 pb-4 border-t border-slate-700/30 pt-3">
           <div className="mb-3">
-            <h4 className="text-sm font-semibold text-white mb-1">{selected.region} — What You Should Know</h4>
+            <h4 className="text-sm font-semibold text-white mb-1">{selected.region}: What You Should Know</h4>
             <p className="text-xs text-slate-400 leading-relaxed">{selected.keyInsight}</p>
           </div>
           <div className="mb-3">
@@ -349,7 +349,7 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
 function ShareScamType({ scam }: { scam: ScamTypeSummary }) {
   const [copied, setCopied] = useState(false);
 
-  const shareText = `Watch out for "${scam.label}" scams — ${scam.description} Typical loss: ${scam.averageLoss}. Tips: ${scam.protectionTips?.slice(0, 2).join(". ")}. More info at GetCyberRight.`;
+  const shareText = `Watch out for "${scam.label}" scams. ${scam.description} Typical loss: ${scam.averageLoss}. Tips: ${scam.protectionTips?.slice(0, 2).join(". ")}. More info at GetCyberRight.`;
 
   return (
     <div className="mt-2 flex items-center gap-1.5" data-testid={`share-scam-${scam.type}`}>
@@ -457,15 +457,15 @@ const FAMILY_TALKING_POINTS: Record<string, Record<string, string[]>> = {
   phishing: {
     kids: [
       "If you get a message saying you won something or need to click a link, show it to me first",
-      "Real companies won't ask for your password in a message — that's always a trick",
+      "Real companies won't ask for your password in a message. That's always a trick",
     ],
     teens: [
-      "Before you click any link in a DM or text, check who really sent it — scammers copy accounts of people you follow",
+      "Before you click any link in a DM or text, check who really sent it. Scammers copy accounts of people you follow",
       "If a website asks for your login after you clicked a link, close it and go directly to the real site",
     ],
     parents: [
-      "If you get an email from your bank asking you to verify something, don't click the link — call the bank directly",
-      "Look at the sender's email address carefully — scammers use addresses that look almost right but have small differences",
+      "If you get an email from your bank asking you to verify something, don't click the link. Call the bank directly",
+      "Look at the sender's email address carefully. Scammers use addresses that look almost right but have small differences",
     ],
     partner: [
       "Let's agree: neither of us clicks links in unexpected emails without checking with each other first",
@@ -473,46 +473,46 @@ const FAMILY_TALKING_POINTS: Record<string, Record<string, string[]>> = {
     ],
   },
   "crypto-scam": {
-    kids: ["If someone online tells you about an easy way to make money, it's almost always a trick — real money takes real work"],
+    kids: ["If someone online tells you about an easy way to make money, it's almost always a trick. Real money takes real work"],
     teens: [
-      "Those celebrity crypto ads on social media are deepfakes — the celebrities never actually said those things",
-      "Never send crypto to someone who promises to send back more — once it's sent, it's gone forever",
+      "Those celebrity crypto ads on social media are deepfakes. The celebrities never actually said those things",
+      "Never send crypto to someone who promises to send back more. Once it's sent, it's gone forever",
     ],
     parents: [
-      "If someone contacts you about a cryptocurrency investment, even if they seem knowledgeable, be very cautious — many are scams",
+      "If someone contacts you about a cryptocurrency investment, even if they seem knowledgeable, be very cautious. Many are scams",
       "Never let anyone you met online guide you through installing apps or sending money to 'invest'",
     ],
-    partner: ["Let's agree that any investment over $100 gets discussed together first — scammers create urgency to prevent this"],
+    partner: ["Let's agree that any investment over $100 gets discussed together first. Scammers create urgency to prevent this"],
   },
   impersonation: {
     kids: ["If someone calls saying they're a police officer or teacher and asks for information, hang up and tell me right away"],
     teens: [
-      "Scammers can now clone anyone's voice with AI — if a family member calls asking for money urgently, hang up and call them back on their real number",
+      "Scammers can now clone anyone's voice with AI. If a family member calls asking for money urgently, hang up and call them back on their real number",
     ],
     parents: [
-      "If you get a call from someone claiming to be me and I sound panicked asking for money, hang up and call me directly — scammers can clone voices now",
-      "The government will never call threatening arrest — that's always a scam",
+      "If you get a call from someone claiming to be me and I sound panicked asking for money, hang up and call me directly. Scammers can clone voices now",
+      "The government will never call threatening arrest. That's always a scam",
     ],
-    partner: ["Let's create a family code word that only we know — if someone calls pretending to be one of us, they won't know the code"],
+    partner: ["Let's create a family code word that only we know. If someone calls pretending to be one of us, they won't know the code"],
   },
   romance: {
-    kids: ["If an online friend you've never met asks personal questions or asks you to keep secrets from your parents, that's not okay — tell me"],
+    kids: ["If an online friend you've never met asks personal questions or asks you to keep secrets from your parents, that's not okay. Tell me"],
     teens: [
-      "If someone you're talking to online always has excuses for not video calling, be cautious — they may not be who they say they are",
-      "Never send personal photos to someone you haven't met in person — once sent, you lose control of them",
+      "If someone you're talking to online always has excuses for not video calling, be cautious. They may not be who they say they are",
+      "Never send personal photos to someone you haven't met in person. Once sent, you lose control of them",
     ],
     parents: [
-      "Be careful with new online friendships that move quickly to deep emotional connection — scammers build trust before asking for money",
+      "Be careful with new online friendships that move quickly to deep emotional connection. Scammers build trust before asking for money",
       "If an online partner asks for money, gift cards, or crypto, no matter the reason, it's very likely a scam",
     ],
-    partner: ["Let's keep each other informed about new online connections — a second opinion can spot what feelings might miss"],
+    partner: ["Let's keep each other informed about new online connections. A second opinion can spot what feelings might miss"],
   },
 };
 
 function getDefaultTalkingPoints(scamLabel: string, audience: string): string[] {
   const audienceLabels: Record<string, string> = { kids: "children", teens: "teenagers", parents: "older adults", partner: "your household" };
   return [
-    `There's a new scam trend called "${scamLabel}" — here's what ${audienceLabels[audience] || "everyone"} should watch out for`,
+    `There's a new scam trend called "${scamLabel}." Here's what ${audienceLabels[audience] || "everyone"} should watch out for`,
     `If something feels too urgent or too good to be true, take a pause and talk to someone you trust before acting`,
   ];
 }
@@ -659,7 +659,7 @@ function ProtectFamilyPanel({ visitorCountryName, topScamTypes, trending }: {
                       <Shield className="w-3.5 h-3.5 text-emerald-400" />
                       <div>
                         <span className="text-xs font-medium text-emerald-400 group-hover:text-emerald-300">{step.tool.name}</span>
-                        <span className="text-[10px] text-slate-400 ml-1.5">— {step.tool.description}</span>
+                        <span className="text-[10px] text-slate-400 ml-1.5">{step.tool.description}</span>
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-emerald-400/60 ml-1" />
                     </Link>
@@ -816,7 +816,7 @@ function FamilyConversationStarters({ trending, scamTypes }: {
 
       <div className="px-5 py-3 border-t border-slate-700/20 bg-slate-800/20">
         <p className="text-[11px] text-slate-500 leading-relaxed">
-          Having regular, calm conversations about online safety is one of the most effective ways to protect your family. You don't need to be a tech expert — just start the conversation.
+          Having regular, calm conversations about online safety is one of the most effective ways to protect your family. You don't need to be a tech expert. Just start the conversation.
         </p>
       </div>
     </div>

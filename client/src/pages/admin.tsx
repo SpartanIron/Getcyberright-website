@@ -3434,14 +3434,14 @@ function SocialPostGeneratorTab({ token }: { token: string }) {
       return;
     }
 
-    const waPost = `*${content.title}*\n\n${content.excerpt || ""}\n\nRead more: ${link}\n\n_From GetCyberRight — Free cybersecurity for families_`;
+    const waPost = `*${content.title}*\n\n${content.excerpt || ""}\n\nRead more: ${link}\n\n_From GetCyberRight: Free cybersecurity for families_`;
     
     try {
       await navigator.clipboard.writeText(waPost);
       toast({ title: "Copied for WhatsApp!", description: "Paste this into your WhatsApp Channel." });
     } catch {
       setGeneratedPost(waPost);
-      toast({ title: "Ready to copy", description: "WhatsApp post generated — copy it manually." });
+      toast({ title: "Ready to copy", description: "WhatsApp post generated. Copy it manually." });
     }
   };
 

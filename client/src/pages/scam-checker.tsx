@@ -126,7 +126,7 @@ export default function ScamCheckerPage() {
             <InlinePromoVideo
               src="/videos/guides/scam_checker_explainer.mp4"
               heading="See How GCR Scam Guard Works"
-              description="Watch how our AI instantly detects suspicious links, phone numbers, and scam messages — before they can harm you."
+              description="Watch how our AI instantly detects suspicious links, phone numbers, and scam messages before they can harm you."
               className="max-w-3xl mx-auto"
             />
           </div>

@@ -4,12 +4,12 @@ import PageContent from "@/pages/seniors";
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "Online Safety for Seniors & Older Adults — Free Resources | GetCyberRight",
+  title: "Online Safety for Seniors & Older Adults: Free Resources | GetCyberRight",
   description:
     "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, recognize romance fraud, protect your identity, and stay safe online.",
   alternates: { canonical: `${BASE_URL}/seniors` },
   openGraph: {
-    title: "Online Safety for Seniors & Older Adults — Free Resources | GetCyberRight",
+    title: "Online Safety for Seniors & Older Adults: Free Resources | GetCyberRight",
     description:
       "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, recognize romance fraud, protect your identity, and stay safe online.",
     url: `${BASE_URL}/seniors`,

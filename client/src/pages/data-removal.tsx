@@ -345,7 +345,7 @@ export default function DataRemoval() {
           <div className="mb-10">
             <InlinePromoVideo
               src="/videos/guides/data_removal_explainer.mp4"
-              heading="Your Data Is Being Sold — Here's How We Remove It"
+              heading="Your Data Is Being Sold. Here's How We Remove It"
               description="See how GCR Data Shield scans 500+ data broker sites, finds your exposed personal information, and sends opt-out requests to get it removed."
               className="max-w-3xl mx-auto"
             />

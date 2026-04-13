@@ -32,7 +32,7 @@ export default function DataRemovalPage() {
       {
         "@type": "Question",
         name: "How do I remove my information from data broker sites?",
-        acceptedAnswer: { "@type": "Answer", text: "Each data broker has its own opt-out process. GetCyberRight provides step-by-step opt-out instructions for over 501 data broker sites. You can search for specific brokers and follow the guided removal process — no account required to get started." },
+        acceptedAnswer: { "@type": "Answer", text: "Each data broker has its own opt-out process. GetCyberRight provides step-by-step opt-out instructions for over 501 data broker sites. You can search for specific brokers and follow the guided removal process. No account required to get started." },
       },
       {
         "@type": "Question",

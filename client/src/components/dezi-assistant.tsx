@@ -133,25 +133,25 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(what is getcyberright|about.*(this|your).*(site|website|platform)|what.*(this|your) (site|website))/.test(t),
     responses: [
-      "GetCyberRight is a family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like GCR Scam Guard to analyze suspicious messages, a Password Generator, GCR Data Shield to scan for your exposed personal data, and lots of guides tailored to different family members. All tools and features are completely free — just create an account to get full access.",
+      "GetCyberRight is a family-focused online safety platform. We help everyday people, parents, kids, seniors, and anyone else protect themselves online. We have tools like GCR Scam Guard to analyze suspicious messages, a Password Generator, GCR Data Shield to scan for your exposed personal data, and lots of guides tailored to different family members. All tools and features are completely free. Just create an account to get full access.",
     ],
   },
   {
     pattern: (t) => /(how much|pricing|price|cost|how much does)/.test(t) && /(plan|pro|family|subscribe|subscription|bundle)/.test(t),
     responses: [
-      "Great news — everything on GetCyberRight is completely free right now! All tools, features, and resources are available at no cost. Just create a free account to get full access to GCR Scam Guard, Data Shield, training courses, and everything else.",
+      "Great news: everything on GetCyberRight is completely free right now! All tools, features, and resources are available at no cost. Just create a free account to get full access to GCR Scam Guard, Data Shield, training courses, and everything else.",
     ],
   },
   {
     pattern: (t) => /(cancel|unsubscribe|stop.*(subscription|paying|plan))/.test(t),
     responses: [
-      "Good news — GetCyberRight is completely free! There's nothing to cancel. If you'd like to delete your account, head to /contact and send us a message.",
+      "Good news: GetCyberRight is completely free! There's nothing to cancel. If you'd like to delete your account, head to /contact and send us a message.",
     ],
   },
   {
     pattern: (t) => /(payment.*(fail|decline|reject|issue|problem|error|wrong)|card.*(decline|reject|fail|issue|not work)|billing.*(issue|problem|error))/.test(t),
     responses: [
-      "GetCyberRight is completely free — there should be no charges. If you're seeing unexpected billing, please contact us at /contact with your account email and we'll sort it out right away.",
+      "GetCyberRight is completely free, so there should be no charges. If you're seeing unexpected billing, please contact us at /contact with your account email and we'll sort it out right away.",
     ],
   },
   {
@@ -175,7 +175,7 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(bundle|both.*product|complete.*protection|total.*protection|scam.*guard.*data.*shield|data.*shield.*scam.*guard)/.test(t),
     responses: [
-      "Both GCR Scam Guard and GCR Data Shield are completely free right now — no bundles needed! You get full access to all features across both products. Just create a free account and everything is yours.",
+      "Both GCR Scam Guard and GCR Data Shield are completely free right now, no bundles needed! You get full access to all features across both products. Just create a free account and everything is yours.",
     ],
   },
   {

@@ -246,7 +246,7 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
             src="/videos/guides/academy_learning_explainer.mp4"
             poster="/videos/poster-training.png"
             heading="Your Cybersecurity Learning Journey"
-            description="Structured courses, interactive quizzes, and certificates designed for every member of your family — from kids to seniors."
+            description="Structured courses, interactive quizzes, and certificates designed for every member of your family, from kids to seniors."
             className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
           />
         </section>

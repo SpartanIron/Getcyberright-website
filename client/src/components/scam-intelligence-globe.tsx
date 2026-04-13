@@ -137,7 +137,7 @@ function formatNumber(n: number): string {
 
 async function shareCountryAlert(country: string, riskLevel: string, incidents: number, method: "copy" | "whatsapp" | "email"): Promise<boolean> {
   const url = typeof window !== "undefined" ? window.location.href : "";
-  const text = `Scam alert for ${country}: ${incidents.toLocaleString()} scams reported (${riskLevel} risk). Stay safe — check the live scam map: ${url}`;
+  const text = `Scam alert for ${country}: ${incidents.toLocaleString()} scams reported (${riskLevel} risk). Stay safe and check the live scam map: ${url}`;
   if (method === "copy") {
     try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
   } else if (method === "whatsapp") {
