@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, memo, Component, type ErrorInfo, type ReactNode } from "react";
 import { Globe as GlobeIcon, AlertTriangle, MapPin, Share2, Copy, Check, Phone, ExternalLink, ShieldAlert } from "lucide-react";
-import { useHydrated } from "@/hooks/use-hydrated";
-import { useIsMobile } from "@/hooks/use-mobile";
+
 
 class GlobeErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -411,14 +410,7 @@ function MobileGlobeView({ data, onCountrySelect, focusCountryCode }: ScamIntell
 function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focusCountryCode }: ScamIntelligenceGlobeProps) {
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const hydrated = useHydrated();
-  const isMobileRaw = useIsMobile();
-  const [mobileResolved, setMobileResolved] = useState(false);
-  const isMobile = isMobileRaw;
-
-  useEffect(() => {
-    setMobileResolved(true);
-  }, []);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
   const [loadError, setLoadError] = useState(false);
   const [webglSupported, setWebglSupported] = useState(true);
@@ -431,7 +423,15 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    if (!hydrated || isMobile) return;
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    const mql = window.matchMedia("(max-width: 767px)");
+    mql.addEventListener("change", checkMobile);
+    return () => mql.removeEventListener("change", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile === null || isMobile) return;
     const supported = checkWebGLSupport();
     setWebglSupported(supported);
     if (!supported) return;
@@ -466,7 +466,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [retryCount, hydrated, isMobile]);
+  }, [retryCount, isMobile]);
 
   useEffect(() => {
     if (!containerRef.current || width) return;
@@ -532,11 +532,12 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setRetryCount(c => c + 1);
   }, []);
 
-  if (!hydrated || !mobileResolved) {
+  if (isMobile === null) {
     return (
       <div
         ref={containerRef}
         className="w-full aspect-square max-w-[700px] mx-auto bg-[#060d1a] rounded-2xl flex items-center justify-center"
+        data-testid="globe-detecting"
       >
         <div className="text-center">
           <GlobeIcon className="w-10 h-10 text-cyan-400/30 mx-auto mb-2 animate-pulse" />
