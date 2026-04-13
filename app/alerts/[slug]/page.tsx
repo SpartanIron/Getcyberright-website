@@ -10,10 +10,12 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 async function fetchAlert(slug: string) {
   try {
     const res = await fetch(`${API_BASE}/api/alerts/${slug}`, {
-      next: { revalidate: 300 },
+      cache: "no-store",
     });
     if (!res.ok) return null;
     return res.json();

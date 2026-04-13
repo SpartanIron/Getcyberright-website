@@ -10,12 +10,14 @@ type PageProps = {
   params: Promise<{ lessonId: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lessonId } = await params;
 
   try {
     const res = await fetch(`${API_BASE}/api/training/lessons/${lessonId}`, {
-      next: { revalidate: 300 },
+      cache: "no-store",
     });
     if (!res.ok) {
       return {

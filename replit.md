@@ -17,7 +17,10 @@ The frontend uses React 19, TypeScript, and Next.js App Router, with TanStack Qu
 The backend runs on Express 5 with Node.js and TypeScript, providing REST endpoints and utilizing shared Zod schemas. Authentication supports email/password, TOTP MFA, Passkeys (WebAuthn), and session management. Data persistence uses Drizzle ORM for PostgreSQL. Security measures include Helmet.js, multi-tier rate limiting, CSRF protection, payload limits, XSS/SQLi detection, secure cookies, input sanitization, Google reCAPTCHA, and API anomaly detection.
 
 ### Data Layer Architecture
-Server Components fetch initial data through the Express API via `fetch()` with ISR revalidation. This decouples the Next.js build from the database.
+Server Components fetch initial data through the Express API via `fetch()` with `cache: "no-store"`. All data-fetching pages use `export const dynamic = "force-dynamic"` to ensure they always render with live production database data rather than stale build-time snapshots. This is critical because the build runs against the dev database, but production uses a separate database with different content/slugs. The `app/lib/data.ts` helper uses `cache: "no-store"` for all API fetches. Static pages without data dependencies can still use `revalidate = 3600`.
+
+### Deployment
+The deployment run command must include `NODE_ENV=production` (configured as `["bash", "-c", "NODE_ENV=production node dist/index.js"]`). Without this, Next.js runs in development mode in production, causing chunk loading failures and HMR endpoint exposure.
 
 ### Key Features
 - **AI-Powered Tools**: AI Scam Analyzer for various inputs, identifying multi-step attack patterns with context-aware analysis. Dezi AI Assistant for interactive user support.

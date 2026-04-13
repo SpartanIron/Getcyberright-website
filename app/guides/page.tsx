@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function GuidesPage() {
   const initialGuides = await getPublishedGuides();

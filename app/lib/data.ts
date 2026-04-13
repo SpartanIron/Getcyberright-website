@@ -1,8 +1,8 @@
 const API_BASE = `http://localhost:${process.env.PORT || 5000}`;
 
-async function apiFetch<T>(path: string, fallback: T, revalidate = 3600): Promise<T> {
+async function apiFetch<T>(path: string, fallback: T): Promise<T> {
   try {
-    const res = await fetch(`${API_BASE}${path}`, { next: { revalidate } });
+    const res = await fetch(`${API_BASE}${path}`, { cache: "no-store" });
     if (!res.ok) return fallback;
     return res.json();
   } catch {

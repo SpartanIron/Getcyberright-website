@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function NewsPage() {
   const initialNews = await getLatestNews(100);

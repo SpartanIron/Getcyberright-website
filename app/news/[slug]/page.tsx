@@ -10,10 +10,12 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 async function fetchArticle(slug: string) {
   try {
     const res = await fetch(`${API_BASE}/api/news/article/${slug}`, {
-      next: { revalidate: 300 },
+      cache: "no-store",
     });
     if (!res.ok) return null;
     return res.json();
