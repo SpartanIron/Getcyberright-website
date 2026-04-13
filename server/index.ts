@@ -213,10 +213,19 @@ app.use((req, res, next) => {
   if (!isDev) {
     console.log("[server] Running in production mode (NODE_ENV=production)");
   }
-  const nextApp = next({ dev: isDev, dir: process.cwd() });
-  const nextHandler = nextApp.getRequestHandler();
-  await nextApp.prepare();
-  log(`Next.js initialized in ${isDev ? "development" : "production"} mode`);
+
+  const port = parseInt(process.env.PORT || "5000", 10);
+
+  let nextReady = false;
+  let nextHandler: any = null;
+
+  if (!isDev) {
+    const nextStaticDir = path.resolve(process.cwd(), ".next/static");
+    app.use("/_next/static", express.static(nextStaticDir, {
+      maxAge: "1y",
+      immutable: true,
+    }));
+  }
 
   app.use(
     express.static(path.resolve(process.cwd(), "client/public"), {
@@ -232,10 +241,18 @@ app.use((req, res, next) => {
   );
 
   app.all("/{*path}", (req, res) => {
-    return nextHandler(req, res);
+    if (nextHandler && nextReady) {
+      return nextHandler(req, res);
+    }
+    if (req.path.startsWith("/_next/static/")) {
+      return res.status(404).end();
+    }
+    res.status(503).setHeader("Retry-After", "2").send(
+      `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="2"><title>Loading...</title></head>` +
+      `<body style="background:#060d1a;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:system-ui">` +
+      `<div style="text-align:center"><h2>Starting up...</h2><p style="opacity:.7">The server is warming up. This page will refresh automatically.</p></div></body></html>`
+    );
   });
-
-  const port = parseInt(process.env.PORT || "5000", 10);
 
   // Graceful shutdown handling
   process.on('SIGTERM', () => {
@@ -270,16 +287,24 @@ app.use((req, res, next) => {
       reusePort: true,
     },
     () => {
-      log(`serving on port ${port}`);
+      log(`serving on port ${port} (accepting requests, Next.js preparing...)`);
 
-      setTimeout(() => {
+      const nextApp = next({ dev: isDev, dir: process.cwd() });
+      nextApp.prepare().then(() => {
+        nextHandler = nextApp.getRequestHandler();
+        nextReady = true;
+        log(`Next.js ready in ${isDev ? "development" : "production"} mode`);
+
         const warmPaths = ["/", "/scam-intelligence"];
         warmPaths.forEach((p) => {
           fetch(`http://127.0.0.1:${port}${p}`)
             .then((res) => log(`[warmup] Pre-warmed ${p} (${res.status})`))
             .catch(() => {});
         });
-      }, 500);
+      }).catch((err) => {
+        log(`Next.js failed to initialize: ${err.message}`);
+        console.error(err);
+      });
 
       // Seed AI prompts on first startup
       import("./promptSeed").then(({ seedAiPrompts }) => {
