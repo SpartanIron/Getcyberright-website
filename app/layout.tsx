@@ -115,6 +115,11 @@ export default async function RootLayout({
           }}
         />
         <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var MAX=3,DELAY=1500;function retry(el){var src=el.getAttribute('src');if(!src||src.indexOf('/_next/')===- 1)return;var att=parseInt(el.getAttribute('data-retry')||'0',10);if(att>=MAX)return;att++;var s=document.createElement('script');s.src=src+(src.indexOf('?')===-1?'?':'&')+'_r='+att;s.setAttribute('data-retry',String(att));s.async=el.async;s.defer=el.defer;if(el.type)s.type=el.type;if(el.crossOrigin)s.crossOrigin=el.crossOrigin;s.onerror=function(){setTimeout(function(){retry(s)},DELAY*att)};el.parentNode&&el.parentNode.insertBefore(s,el.nextSibling)}if(typeof MutationObserver!=='undefined'){new MutationObserver(function(muts){muts.forEach(function(m){m.addedNodes.forEach(function(n){if(n.tagName==='SCRIPT'&&n.src&&n.src.indexOf('/_next/')!==-1&&!n.getAttribute('data-retry')){n.onerror=function(){setTimeout(function(){retry(n)},DELAY)}}})})}).observe(document.documentElement,{childList:true,subtree:true})}document.addEventListener('error',function(e){var el=e.target;if(el&&el.tagName==='SCRIPT')retry(el)},true)})()`,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(globalJsonLd).replace(/</g, "\\u003c"),
