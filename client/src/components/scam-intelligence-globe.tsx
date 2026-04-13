@@ -417,7 +417,8 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
   const [loadError, setLoadError] = useState(false);
   const [webglSupported, setWebglSupported] = useState(true);
-  const [isMobile] = useState(() => typeof window !== "undefined" ? isMobileDevice() : false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [deviceChecked, setDeviceChecked] = useState(false);
   const [dimensions, setDimensions] = useState({ w: width || 600, h: height || 600 });
   const [hoveredPoint, setHoveredPoint] = useState<GlobeHotspot | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<GlobeHotspot | null>(null);
@@ -427,7 +428,13 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    if (typeof window === "undefined" || isMobile) return;
+    const mobile = isMobileDevice();
+    setIsMobile(mobile);
+    setDeviceChecked(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !deviceChecked || isMobile) return;
     const supported = checkWebGLSupport();
     setWebglSupported(supported);
     if (!supported) return;
@@ -462,7 +469,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [retryCount]);
+  }, [retryCount, deviceChecked, isMobile]);
 
   useEffect(() => {
     if (!containerRef.current || width) return;
@@ -528,7 +535,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setRetryCount(c => c + 1);
   }, []);
 
-  if (isMobile) {
+  if (isMobile && deviceChecked) {
     return <MobileGlobeView data={data} onCountrySelect={onCountrySelect} focusCountryCode={focusCountryCode} />;
   }
 

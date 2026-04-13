@@ -90,6 +90,9 @@ export function ScamIntelContent({ initialScams }: { initialScams?: ScamIntel[] 
   const [detectedRegion, setDetectedRegion] = useState<Region>("global");
   const [selectedRegion, setSelectedRegion] = useState<Region>("global");
   const [regionLoading, setRegionLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     detectUserRegion().then((region) => {
@@ -356,7 +359,7 @@ export function ScamIntelContent({ initialScams }: { initialScams?: ScamIntel[] 
                           Trending
                         </Badge>
                       )}
-                      {isNewScam(scam.dateDetected) && (
+                      {mounted && isNewScam(scam.dateDetected) && (
                         <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 gap-1" data-testid={`badge-new-${scam.slug}`}>
                           <Clock className="h-3 w-3" />
                           New
@@ -393,7 +396,7 @@ export function ScamIntelContent({ initialScams }: { initialScams?: ScamIntel[] 
                           </span>
                         )}
                         {scam.dateDetected && (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1" suppressHydrationWarning>
                             <Calendar className="h-3 w-3" />
                             {formatDate(scam.dateDetected)}
                           </span>

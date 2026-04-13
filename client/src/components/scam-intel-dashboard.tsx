@@ -97,7 +97,7 @@ const ICON_MAP: Record<string, any> = {
 function formatNumber(n: number): string {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
   if (n >= 1000) return (n / 1000).toFixed(0) + "K";
-  return n.toLocaleString();
+  return n.toString();
 }
 
 function timeAgo(dateStr: string): string {
@@ -166,7 +166,7 @@ function LiveFeedTicker({ events }: { events: LiveFeedEvent[] }) {
                   <span>{event.source}</span>
                   <span>·</span>
                   <Clock className="w-3 h-3" />
-                  <span>{timeAgo(event.timestamp)}</span>
+                  <span suppressHydrationWarning>{timeAgo(event.timestamp)}</span>
                 </div>
               </div>
             </div>

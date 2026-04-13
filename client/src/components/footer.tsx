@@ -188,7 +188,7 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-400">
-            <p data-testid="text-copyright">
+            <p data-testid="text-copyright" suppressHydrationWarning>
               &copy; {new Date().getFullYear()} GetCyberRight LLC. All rights reserved.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
