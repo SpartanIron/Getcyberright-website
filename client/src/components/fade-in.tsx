@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, type ReactNode, type CSSProperties } from "react";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 interface FadeInProps {
   children: ReactNode;
@@ -22,14 +23,16 @@ export function FadeIn({
   ...rest
 }: FadeInProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const hydrated = useHydrated();
   const [isVisible, setIsVisible] = useState(false);
-  const [supportsObserver] = useState(() => typeof IntersectionObserver !== "undefined");
+  const [animReady, setAnimReady] = useState(false);
 
   useEffect(() => {
-    if (!supportsObserver) {
+    if (typeof IntersectionObserver === "undefined") {
       setIsVisible(true);
       return;
     }
+
     const el = ref.current;
     if (!el) return;
 
@@ -38,6 +41,8 @@ export function FadeIn({
       setIsVisible(true);
       return;
     }
+
+    setAnimReady(true);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -50,7 +55,7 @@ export function FadeIn({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [supportsObserver]);
+  }, []);
 
   const offsets: Record<string, string> = {
     up: "translateY(20px)",
@@ -60,7 +65,7 @@ export function FadeIn({
     none: "none",
   };
 
-  const shouldAnimate = supportsObserver && !isVisible;
+  const shouldAnimate = hydrated && animReady && !isVisible;
 
   return (
     <div
