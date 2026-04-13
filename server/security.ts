@@ -569,6 +569,7 @@ export function cspNonceMiddleware() {
       `form-action 'self'`,
       `frame-ancestors 'self'`,
       `script-src-attr 'none'`,
+      `worker-src 'self' blob:`,
     ].join("; ");
 
     res.setHeader("Content-Security-Policy", csp);

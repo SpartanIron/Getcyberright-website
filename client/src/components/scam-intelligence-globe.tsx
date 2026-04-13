@@ -6,12 +6,12 @@ import { Globe as GlobeIcon, AlertTriangle, MapPin, Share2, Copy, Check, Phone, 
 
 class GlobeErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
-  { hasError: boolean }
+  { hasError: boolean; errorMessage: string }
 > {
-  state = { hasError: false };
-  static getDerivedStateFromError() { return { hasError: true }; }
+  state = { hasError: false, errorMessage: "" };
+  static getDerivedStateFromError(error: Error) { return { hasError: true, errorMessage: error.message }; }
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.warn("[ScamGlobe] WebGL/render error caught:", error.message);
+    console.warn("[ScamGlobe] Render error caught:", error.message, info.componentStack?.slice(0, 200));
   }
   render() {
     if (this.state.hasError) return this.props.fallback;
@@ -22,26 +22,43 @@ class GlobeErrorBoundary extends Component<
 function checkWebGLSupport(): boolean {
   try {
     const canvas = document.createElement("canvas");
-    return !!(canvas.getContext("webgl") || canvas.getContext("webgl2"));
+    const gl = canvas.getContext("webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    if (gl) {
+      if (gl instanceof WebGLRenderingContext || gl instanceof WebGL2RenderingContext) {
+        gl.getExtension("WEBGL_lose_context")?.loseContext();
+      }
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }
 }
 
-function GlobeFallback({ data }: { data: any }) {
-  const hotspots = (data?.hotspots || []).slice(0, 8);
+function GlobeFallback({ data, onRetry }: { data: any; onRetry?: () => void }) {
+  const hotspots = (data?.hotspots || []).slice(0, 12);
   return (
     <div className="w-full aspect-square max-w-[700px] mx-auto bg-slate-800/30 rounded-2xl flex flex-col items-center justify-center p-6" data-testid="globe-fallback">
       <GlobeIcon className="w-16 h-16 text-cyan-400/30 mb-4" />
-      <p className="text-sm text-slate-400 mb-1">3D Globe requires WebGL support</p>
-      <p className="text-xs text-slate-500 mb-6">Your browser doesn't support WebGL rendering. Here's a summary of the data:</p>
+      <p className="text-sm text-slate-400 mb-1">3D Globe could not load</p>
+      <p className="text-xs text-slate-500 mb-4">Your browser may not support WebGL, or the 3D engine had a problem loading. Here's the data instead:</p>
+      {onRetry && (
+        <button
+          onClick={onRetry}
+          className="mb-4 text-xs bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 px-4 py-1.5 rounded-lg border border-cyan-500/30 transition-colors"
+          data-testid="globe-retry"
+        >
+          Try loading the 3D globe again
+        </button>
+      )}
       {hotspots.length > 0 && (
-        <div className="w-full max-w-sm space-y-2">
+        <div className="w-full max-w-md space-y-1.5">
           {hotspots.map((h: any) => (
             <div key={h.id} className="flex items-center gap-2 bg-slate-800/50 rounded-lg p-2 border border-slate-700/30">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: h.riskLevel === "critical" ? "#ef4444" : h.riskLevel === "high" ? "#f97316" : h.riskLevel === "medium" ? "#eab308" : "#22c55e" }} />
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: h.riskLevel === "critical" ? "#ef4444" : h.riskLevel === "high" ? "#f97316" : h.riskLevel === "medium" ? "#eab308" : "#22c55e" }} />
               <span className="text-xs text-white font-medium flex-1">{h.country}</span>
-              <span className="text-[10px] text-slate-400">{h.topScamTypes?.[0]?.replace(/-/g, " ")}</span>
+              <span className="text-[10px] text-slate-400">{formatNumber(h.recentIncidents)} scams</span>
+              <span className="text-[10px] text-slate-500">{h.topScamTypes?.[0]?.replace(/-/g, " ")}</span>
             </div>
           ))}
         </div>
@@ -217,8 +234,12 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     );
   }
 
+  const handleRetry = useCallback(() => {
+    setWebglSupported(checkWebGLSupport());
+  }, []);
+
   if (!webglSupported) {
-    return <GlobeFallback data={data} />;
+    return <GlobeFallback data={data} onRetry={handleRetry} />;
   }
 
   const hotspots = data?.hotspots || [];
@@ -226,7 +247,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
 
   return (
     <div ref={containerRef} className="relative w-full max-w-[700px] mx-auto" style={{ height: dimensions.h || 600 }}>
-      <GlobeErrorBoundary fallback={<GlobeFallback data={data} />}>
+      <GlobeErrorBoundary fallback={<GlobeFallback data={data} onRetry={() => window.location.reload()} />}>
       <Globe
         ref={globeRef}
         width={dimensions.w || 600}
