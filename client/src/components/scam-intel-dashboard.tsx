@@ -8,6 +8,7 @@ import {
   Bug, Briefcase, UserX, Fingerprint, ChevronDown, ChevronUp,
   BarChart3, Eye, Share2, Copy, Check, Flame, Sparkles, ShieldCheck
 } from "lucide-react";
+import { Link } from "@/lib/navigation";
 
 interface LiveFeedEvent {
   id: string;
@@ -428,5 +429,397 @@ function TrendingSection({ trending }: { trending: TrendingScam[] }) {
   );
 }
 
-export { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection };
+const SCAM_TO_TOOL: Record<string, { name: string; href: string; description: string }> = {
+  phishing: { name: "AI Scam Analyzer", href: "/scam-checker", description: "Paste any suspicious email, text, or link to get an instant AI analysis" },
+  "crypto-scam": { name: "AI Scam Analyzer", href: "/scam-checker", description: "Upload screenshots of crypto offers for instant fraud detection" },
+  "identity-theft": { name: "Data Shield Scanner", href: "/shield", description: "Scan 500+ data brokers to find where your personal info is exposed" },
+  ransomware: { name: "Security Guides", href: "/guides", description: "Step-by-step backup and recovery guides to protect your files" },
+  malware: { name: "Browser Extension", href: "/browser-extension", description: "Real-time protection that blocks dangerous sites before you visit them" },
+  "shopping-fraud": { name: "AI Scam Analyzer", href: "/scam-checker", description: "Check any online store or deal before you buy" },
+  romance: { name: "AI Scam Analyzer", href: "/scam-checker", description: "Analyze suspicious messages or profiles for common scam patterns" },
+  impersonation: { name: "Security Training", href: "/training", description: "Learn to spot impersonation tactics used by scammers" },
+  "tech-support": { name: "AI Scam Analyzer", href: "/scam-checker", description: "Screenshot the pop-up or paste the message to check if it's real" },
+  "mobile-money": { name: "Security Guides", href: "/guides", description: "Protect your mobile payment accounts with these security steps" },
+  investment: { name: "AI Scam Analyzer", href: "/scam-checker", description: "Check investment offers and platforms for known fraud signals" },
+  "job-scam": { name: "AI Scam Analyzer", href: "/scam-checker", description: "Paste the job listing or recruiter message to verify if it's legitimate" },
+};
+
+const FAMILY_AUDIENCES = [
+  { id: "kids", label: "Talk to Your Kids", icon: "child", ageHint: "Ages 8-14" },
+  { id: "teens", label: "Talk to Your Teens", icon: "teen", ageHint: "Ages 14-18" },
+  { id: "parents", label: "Show Your Parents", icon: "parent", ageHint: "Older adults" },
+  { id: "partner", label: "Discuss with Partner", icon: "partner", ageHint: "Household safety" },
+];
+
+const FAMILY_TALKING_POINTS: Record<string, Record<string, string[]>> = {
+  phishing: {
+    kids: [
+      "If you get a message saying you won something or need to click a link, show it to me first",
+      "Real companies won't ask for your password in a message — that's always a trick",
+    ],
+    teens: [
+      "Before you click any link in a DM or text, check who really sent it — scammers copy accounts of people you follow",
+      "If a website asks for your login after you clicked a link, close it and go directly to the real site",
+    ],
+    parents: [
+      "If you get an email from your bank asking you to verify something, don't click the link — call the bank directly",
+      "Look at the sender's email address carefully — scammers use addresses that look almost right but have small differences",
+    ],
+    partner: [
+      "Let's agree: neither of us clicks links in unexpected emails without checking with each other first",
+      "We should set up two-factor authentication on all our shared accounts this week",
+    ],
+  },
+  "crypto-scam": {
+    kids: ["If someone online tells you about an easy way to make money, it's almost always a trick — real money takes real work"],
+    teens: [
+      "Those celebrity crypto ads on social media are deepfakes — the celebrities never actually said those things",
+      "Never send crypto to someone who promises to send back more — once it's sent, it's gone forever",
+    ],
+    parents: [
+      "If someone contacts you about a cryptocurrency investment, even if they seem knowledgeable, be very cautious — many are scams",
+      "Never let anyone you met online guide you through installing apps or sending money to 'invest'",
+    ],
+    partner: ["Let's agree that any investment over $100 gets discussed together first — scammers create urgency to prevent this"],
+  },
+  impersonation: {
+    kids: ["If someone calls saying they're a police officer or teacher and asks for information, hang up and tell me right away"],
+    teens: [
+      "Scammers can now clone anyone's voice with AI — if a family member calls asking for money urgently, hang up and call them back on their real number",
+    ],
+    parents: [
+      "If you get a call from someone claiming to be me and I sound panicked asking for money, hang up and call me directly — scammers can clone voices now",
+      "The government will never call threatening arrest — that's always a scam",
+    ],
+    partner: ["Let's create a family code word that only we know — if someone calls pretending to be one of us, they won't know the code"],
+  },
+  romance: {
+    kids: ["If an online friend you've never met asks personal questions or asks you to keep secrets from your parents, that's not okay — tell me"],
+    teens: [
+      "If someone you're talking to online always has excuses for not video calling, be cautious — they may not be who they say they are",
+      "Never send personal photos to someone you haven't met in person — once sent, you lose control of them",
+    ],
+    parents: [
+      "Be careful with new online friendships that move quickly to deep emotional connection — scammers build trust before asking for money",
+      "If an online partner asks for money, gift cards, or crypto, no matter the reason, it's very likely a scam",
+    ],
+    partner: ["Let's keep each other informed about new online connections — a second opinion can spot what feelings might miss"],
+  },
+};
+
+function getDefaultTalkingPoints(scamLabel: string, audience: string): string[] {
+  const audienceLabels: Record<string, string> = { kids: "children", teens: "teenagers", parents: "older adults", partner: "your household" };
+  return [
+    `There's a new scam trend called "${scamLabel}" — here's what ${audienceLabels[audience] || "everyone"} should watch out for`,
+    `If something feels too urgent or too good to be true, take a pause and talk to someone you trust before acting`,
+  ];
+}
+
+function LocalRiskSummary({ visitorCountryName, hotspots, trending }: {
+  visitorCountryName: string | null;
+  hotspots: any[];
+  trending: TrendingScam[];
+}) {
+  const countryData = visitorCountryName
+    ? hotspots.find((h: any) => h.country === visitorCountryName)
+    : null;
+
+  const newThreats = trending.filter(t => t.isNew).length;
+  const topThreats = countryData?.topThreats?.slice(0, 3) || [];
+  const riskLevel = countryData?.riskLevel || "medium";
+  const badge = RISK_BADGE[riskLevel] || RISK_BADGE.medium;
+  const locationLabel = visitorCountryName || "your area";
+
+  return (
+    <div className="bg-gradient-to-r from-orange-500/10 via-red-500/5 to-purple-500/10 border border-orange-500/20 rounded-2xl p-5 md:p-6" data-testid="local-risk-summary">
+      <div className="flex items-start gap-4">
+        <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+          <AlertTriangle className="w-6 h-6 text-orange-400" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-2">
+            <h2 className="text-lg md:text-xl font-bold text-white">This week near {locationLabel}</h2>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${badge.bg} ${badge.text}`}>
+              {riskLevel} risk
+            </span>
+          </div>
+          <p className="text-sm md:text-base text-slate-300 leading-relaxed mb-3">
+            {newThreats > 0 ? (
+              <><span className="text-orange-400 font-semibold">{newThreats} new scam {newThreats === 1 ? "type is" : "types are"}</span> targeting families in {locationLabel} this week. </>
+            ) : (
+              <>Scam activity continues in {locationLabel}. </>
+            )}
+            {topThreats.length > 0 ? (
+              <>Watch out for <span className="text-white font-medium">{topThreats.map((t: string) => t.replace(/-/g, " ")).join(", ")}</span>.</>
+            ) : (
+              <>Stay alert for phishing, impersonation, and investment scams.</>
+            )}
+          </p>
+          {countryData && (
+            <div className="flex flex-wrap gap-3 text-xs text-slate-400">
+              <span><span className="text-white font-medium">{formatNumber(countryData.recentIncidents)}</span> reports this period</span>
+              <span className="text-slate-600">|</span>
+              <span>Trend: <span className={countryData.trend === "up" ? "text-red-400" : countryData.trend === "down" ? "text-green-400" : "text-slate-400"}>{countryData.trend === "up" ? "Rising" : countryData.trend === "down" ? "Declining" : "Stable"}</span></span>
+              {countryData.avgLossPerVictim && (
+                <><span className="text-slate-600">|</span><span>Avg loss: <span className="text-orange-400 font-medium">{countryData.avgLossPerVictim}</span></span></>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProtectFamilyPanel({ visitorCountryName, topScamTypes, trending }: {
+  visitorCountryName: string | null;
+  topScamTypes: ScamTypeSummary[];
+  trending: TrendingScam[];
+}) {
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
+
+  const topThreatTypes = topScamTypes.slice(0, 3).map(s => s.type);
+  const trendingTypes = trending.filter(t => t.isNew).map(t => t.type);
+  const relevantTypes = [...new Set([...trendingTypes, ...topThreatTypes])].slice(0, 5);
+
+  const actionSteps = relevantTypes.map((type, i) => {
+    const scam = topScamTypes.find(s => s.type === type);
+    const trend = trending.find(t => t.type === type);
+    const tool = SCAM_TO_TOOL[type];
+    const tips = scam?.protectionTips || [];
+    const label = trend?.label || scam?.label || type.replace(/-/g, " ");
+    const description = trend?.description || scam?.description || "";
+
+    return { id: i, type, label, description, tool, tips, isNew: trend?.isNew || false };
+  });
+
+  if (actionSteps.length === 0) return null;
+
+  return (
+    <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-cyan-500/10 border border-emerald-500/20 rounded-2xl overflow-hidden" data-testid="protect-family-panel">
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-emerald-500/15 bg-emerald-500/5">
+        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+          <Shield className="w-5 h-5 text-emerald-400" />
+        </div>
+        <div>
+          <h2 className="text-base md:text-lg font-bold text-white">Protect Your Family Today</h2>
+          <p className="text-xs text-slate-400">{actionSteps.length} steps based on threats near {visitorCountryName || "you"}</p>
+        </div>
+      </div>
+
+      <div className="divide-y divide-slate-700/20">
+        {actionSteps.map((step, idx) => {
+          const isExpanded = expandedStep === idx;
+          return (
+            <div key={step.type} data-testid={`action-step-${step.type}`}>
+              <button
+                onClick={() => setExpandedStep(isExpanded ? null : idx)}
+                className="w-full px-5 py-3.5 flex items-start gap-3 hover:bg-slate-700/10 transition-colors text-left"
+              >
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-sm font-bold text-emerald-400">{idx + 1}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-sm font-semibold text-white">{step.label}</span>
+                    {step.isNew && (
+                      <span className="text-[9px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30 font-medium">NEW</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400 line-clamp-1">{step.description}</p>
+                </div>
+                {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400 mt-1" /> : <ChevronDown className="w-4 h-4 text-slate-400 mt-1" />}
+              </button>
+
+              {isExpanded && (
+                <div className="px-5 pb-4 pl-[60px]">
+                  {step.tips.length > 0 && (
+                    <div className="mb-3">
+                      <div className="text-[11px] text-emerald-400 font-semibold mb-1.5 uppercase tracking-wider">Do this today:</div>
+                      <ul className="space-y-1.5">
+                        {step.tips.map((tip, i) => (
+                          <li key={i} className="flex gap-2 text-xs text-slate-300">
+                            <span className="text-emerald-400 flex-shrink-0 mt-0.5">
+                              <Check className="w-3.5 h-3.5" />
+                            </span>
+                            {tip}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {step.tool && (
+                    <Link
+                      href={step.tool.href}
+                      className="inline-flex items-center gap-2 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 rounded-lg px-3 py-2 transition-colors group"
+                      data-testid={`tool-link-${step.type}`}
+                    >
+                      <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                      <div>
+                        <span className="text-xs font-medium text-emerald-400 group-hover:text-emerald-300">{step.tool.name}</span>
+                        <span className="text-[10px] text-slate-400 ml-1.5">— {step.tool.description}</span>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-emerald-400/60 ml-1" />
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ToolConnectionBanner({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
+  const topTypes = scamTypes.slice(0, 4);
+  const toolsNeeded = topTypes.map(s => SCAM_TO_TOOL[s.type]).filter(Boolean);
+  const uniqueTools = toolsNeeded.reduce((acc: typeof toolsNeeded, t) => {
+    if (!acc.find(a => a.href === t.href)) acc.push(t);
+    return acc;
+  }, []);
+
+  if (uniqueTools.length === 0) return null;
+
+  return (
+    <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="tool-connection-banner">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
+        <ShieldCheck className="w-4 h-4 text-cyan-400" />
+        <span className="text-sm font-semibold text-white">Take Action Against These Threats</span>
+      </div>
+      <div className="p-3 space-y-2">
+        {uniqueTools.map((tool) => {
+          const relatedScams = topTypes.filter(s => SCAM_TO_TOOL[s.type]?.href === tool.href);
+          return (
+            <Link
+              key={tool.href}
+              href={tool.href}
+              className="flex items-center gap-3 p-3 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/30 hover:border-cyan-500/30 rounded-lg transition-all group"
+              data-testid={`tool-banner-${tool.href.replace(/\//g, "-")}`}
+            >
+              <div className="w-9 h-9 rounded-lg bg-cyan-500/15 flex items-center justify-center flex-shrink-0">
+                <Shield className="w-4 h-4 text-cyan-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className="text-sm font-medium text-white group-hover:text-cyan-300 transition-colors">{tool.name}</span>
+                <p className="text-[11px] text-slate-400">{tool.description}</p>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {relatedScams.map(s => (
+                    <span key={s.type} className="text-[9px] bg-slate-700/50 text-cyan-300 px-1.5 py-0.5 rounded-full">
+                      fights {s.label.toLowerCase()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FamilyConversationStarters({ trending, scamTypes }: {
+  trending: TrendingScam[];
+  scamTypes: ScamTypeSummary[];
+}) {
+  const [selectedAudience, setSelectedAudience] = useState("kids");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const topThreatTypes = trending.filter(t => t.isNew).map(t => t.type);
+  if (topThreatTypes.length === 0) {
+    topThreatTypes.push(...scamTypes.slice(0, 2).map(s => s.type));
+  }
+  const relevantTypes = [...new Set(topThreatTypes)].slice(0, 3);
+
+  const conversations = relevantTypes.map(type => {
+    const trend = trending.find(t => t.type === type);
+    const scam = scamTypes.find(s => s.type === type);
+    const label = trend?.label || scam?.label || type.replace(/-/g, " ");
+    const points = FAMILY_TALKING_POINTS[type]?.[selectedAudience] || getDefaultTalkingPoints(label, selectedAudience);
+    return { type, label, points };
+  });
+
+  const handleCopy = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {}
+  };
+
+  const audienceIcons: Record<string, any> = { kids: "child", teens: "teen", parents: "parent", partner: "partner" };
+  const audienceEmoji: Record<string, string> = { kids: "\u{1F9D2}", teens: "\u{1F9D1}", parents: "\u{1F474}", partner: "\u{1F46B}" };
+
+  return (
+    <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/5 to-blue-500/10 border border-purple-500/20 rounded-2xl overflow-hidden" data-testid="family-conversation-starters">
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-purple-500/15 bg-purple-500/5">
+        <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+          <Heart className="w-5 h-5 text-purple-400" />
+        </div>
+        <div>
+          <h2 className="text-base md:text-lg font-bold text-white">Family Conversation Starters</h2>
+          <p className="text-xs text-slate-400">Simple ways to talk about today's top threats with your family</p>
+        </div>
+      </div>
+
+      <div className="px-4 py-3 border-b border-slate-700/20">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {FAMILY_AUDIENCES.map((aud) => (
+            <button
+              key={aud.id}
+              onClick={() => setSelectedAudience(aud.id)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                selectedAudience === aud.id
+                  ? "bg-purple-500/20 border-purple-500/40 text-purple-300 border"
+                  : "bg-slate-800/50 border-slate-700/30 text-slate-400 border hover:border-slate-600"
+              }`}
+              data-testid={`audience-${aud.id}`}
+            >
+              <span>{audienceEmoji[aud.id]}</span>
+              {aud.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="divide-y divide-slate-700/20">
+        {conversations.map((convo) => (
+          <div key={convo.type} className="px-5 py-3.5" data-testid={`convo-${convo.type}-${selectedAudience}`}>
+            <div className="text-xs font-semibold text-purple-400 mb-2">About: {convo.label}</div>
+            <div className="space-y-2">
+              {convo.points.map((point, i) => {
+                const pointId = `${convo.type}-${selectedAudience}-${i}`;
+                return (
+                  <div key={i} className="flex items-start gap-2 group">
+                    <div className="flex-1 bg-slate-800/40 rounded-lg p-2.5">
+                      <p className="text-xs text-slate-300 leading-relaxed">"{point}"</p>
+                    </div>
+                    <button
+                      onClick={() => handleCopy(point, pointId)}
+                      className="mt-1 p-1.5 rounded-md bg-slate-800/60 hover:bg-purple-500/20 border border-slate-700/30 hover:border-purple-500/30 transition-all opacity-60 group-hover:opacity-100"
+                      data-testid={`copy-point-${pointId}`}
+                    >
+                      {copiedId === pointId ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3 text-slate-400" />}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="px-5 py-3 border-t border-slate-700/20 bg-slate-800/20">
+        <p className="text-[11px] text-slate-500 leading-relaxed">
+          Having regular, calm conversations about online safety is one of the most effective ways to protect your family. You don't need to be a tech expert — just start the conversation.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection, LocalRiskSummary, ProtectFamilyPanel, ToolConnectionBanner, FamilyConversationStarters };
 export type { LiveFeedEvent, ScamTypeSummary, RegionalSummary, GlobalStats, TrendingScam };

@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ScamIntelligenceGlobe } from "@/components/scam-intelligence-globe";
-import { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection } from "@/components/scam-intel-dashboard";
+import { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection, LocalRiskSummary, ProtectFamilyPanel, ToolConnectionBanner, FamilyConversationStarters } from "@/components/scam-intel-dashboard";
 import { Globe, ArrowLeft, AlertCircle, Search, X, MapPin } from "lucide-react";
 import { Link } from "@/lib/navigation";
 
@@ -120,17 +120,20 @@ export default function ScamIntelligenceDashboard() {
           </div>
         </section>
 
+        {!globeLoading && !globeError && (
+          <section className="relative pb-6">
+            <div className="container mx-auto px-4">
+              <LocalRiskSummary
+                visitorCountryName={visitorCountryName}
+                hotspots={(globeData as any)?.hotspots || []}
+                trending={(regionalData as any)?.trending || []}
+              />
+            </div>
+          </section>
+        )}
+
         <section className="relative pb-12">
           <div className="container mx-auto px-4">
-            {visitorCountryName && visitorCountryCode && countryList.some((c: any) => c.code === visitorCountryCode) && (
-              <div className="mb-4 bg-cyan-500/5 border border-cyan-500/20 rounded-xl px-4 py-3 flex items-center gap-3" data-testid="visitor-banner">
-                <MapPin className="w-5 h-5 text-cyan-400 flex-shrink-0" />
-                <div>
-                  <span className="text-sm text-white">We've focused on scam activity near <span className="font-semibold text-cyan-400">{visitorCountryName}</span>.</span>
-                  <span className="text-xs text-slate-400 ml-2">Click any country on the map to explore.</span>
-                </div>
-              </div>
-            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-7 xl:col-span-8">
@@ -204,6 +207,9 @@ export default function ScamIntelligenceDashboard() {
 
               <div className="lg:col-span-5 xl:col-span-4 space-y-6">
                 {!regionalError && <TrendingSection trending={(regionalData as any)?.trending || []} />}
+                {!regionalError && (
+                  <ToolConnectionBanner scamTypes={(regionalData as any)?.scamTypes || []} />
+                )}
                 {feedError ? <DataError label="Live threat feed" /> : <LiveFeedTicker events={(liveFeed as any)?.events || []} />}
                 {regionalError ? <DataError label="Regional summary" /> : (
                   <RegionalPanel
@@ -214,6 +220,20 @@ export default function ScamIntelligenceDashboard() {
                 )}
               </div>
             </div>
+
+            {!regionalLoading && !regionalError && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                <ProtectFamilyPanel
+                  visitorCountryName={visitorCountryName}
+                  topScamTypes={(regionalData as any)?.scamTypes || []}
+                  trending={(regionalData as any)?.trending || []}
+                />
+                <FamilyConversationStarters
+                  trending={(regionalData as any)?.trending || []}
+                  scamTypes={(regionalData as any)?.scamTypes || []}
+                />
+              </div>
+            )}
           </div>
         </section>
 
