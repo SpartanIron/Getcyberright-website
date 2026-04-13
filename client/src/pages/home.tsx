@@ -8,6 +8,7 @@ import { AudiencePaths } from "@/components/audience-paths";
 import { ContentPreview } from "@/components/content-preview";
 import { NewsletterCTA } from "@/components/newsletter-cta";
 import { Footer } from "@/components/footer";
+import { ScamGlobeTeaser } from "@/components/scam-globe-teaser";
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
         <LiveActivityBar />
         <HowItWorks />
         <ThreatAwareness />
+        <ScamGlobeTeaser />
         <PillarTiles />
         <AudiencePaths />
         <ContentPreview />

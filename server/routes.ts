@@ -288,6 +288,7 @@ export async function registerRoutes(
       { path: '/guides', changefreq: 'daily', priority: '0.8' },
       { path: '/alerts', changefreq: 'daily', priority: '0.8' },
       { path: '/scam-intel', changefreq: 'daily', priority: '0.8' },
+      { path: '/scam-intelligence', changefreq: 'daily', priority: '0.9' },
       { path: '/threat-trends', changefreq: 'daily', priority: '0.8' },
       { path: '/news', changefreq: 'daily', priority: '0.7' },
       { path: '/printable-guides', changefreq: 'monthly', priority: '0.7' },

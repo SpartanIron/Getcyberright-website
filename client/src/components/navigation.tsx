@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper, Chrome, Radio, Baby, ClipboardCheck, ShieldAlert } from "lucide-react";
+import { Menu, Shield, ShieldCheck, Users, Heart, GraduationCap, Search, Lock, AlertTriangle, FileText, ChevronRight, Sparkles, Trash2, BookOpen, Brain, Zap, Newspaper, Chrome, Radio, Baby, ClipboardCheck, ShieldAlert, Globe } from "lucide-react";
 import { Link, useLocation } from "@/lib/navigation";
 import logoImage from "@/assets/logo.webp";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -55,6 +55,7 @@ const learnItems = [
   { title: "AI Safety Guide", description: "Spot deepfakes, AI scams & protect your privacy", href: "/ai-safety", icon: Brain, color: "text-purple-500", featured: true },
   { title: "AI Prompt Library", description: "Ready-to-use AI templates for everyday life", href: "/ai-prompts", icon: Zap, color: "text-amber-500", featured: true },
   { title: "Scam Intelligence", description: "Latest scam trends, tactics & intelligence reports", href: "/scam-intel", icon: Search, color: "text-orange-500", featured: true },
+  { title: "Live Scam Map", description: "Global 3D threat map with real-time scam data", href: "/scam-intelligence", icon: Globe, color: "text-cyan-500", featured: true },
 ];
 
 const learnTopics = [

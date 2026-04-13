@@ -48,6 +48,7 @@ import {
   publishDirectToFacebook,
 } from "./facebookDirectPublisher";
 import { serveImagePath } from "./socialImageService";
+import { getGlobeData, getLiveFeed, getRegionalData } from "./scamIntelAggregator";
 import * as fs from "fs";
 import * as path from "path";
 import {
@@ -122,6 +123,41 @@ export function registerPlatformRoutes(app: Express): void {
     } catch (error: any) {
       console.error("[threat-stats] Error:", error?.message || error);
       res.status(500).json({ error: "Failed to fetch threat statistics" });
+    }
+  });
+
+  // ─── Public Scam Intelligence Globe API ──────────────────────────────
+
+  app.get("/api/scam-intelligence/globe-data", (_req: Request, res: Response) => {
+    try {
+      const data = getGlobeData();
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.json(data);
+    } catch (error: any) {
+      console.error("[scam-intel-api] Globe data error:", error?.message);
+      res.status(500).json({ error: "Failed to fetch globe data" });
+    }
+  });
+
+  app.get("/api/scam-intelligence/live-feed", (_req: Request, res: Response) => {
+    try {
+      const data = getLiveFeed();
+      res.setHeader("Cache-Control", "public, max-age=120");
+      res.json(data);
+    } catch (error: any) {
+      console.error("[scam-intel-api] Live feed error:", error?.message);
+      res.status(500).json({ error: "Failed to fetch live feed" });
+    }
+  });
+
+  app.get("/api/scam-intelligence/regional-summary", (_req: Request, res: Response) => {
+    try {
+      const data = getRegionalData();
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.json(data);
+    } catch (error: any) {
+      console.error("[scam-intel-api] Regional data error:", error?.message);
+      res.status(500).json({ error: "Failed to fetch regional data" });
     }
   });
 

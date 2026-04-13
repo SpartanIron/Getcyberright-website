@@ -397,6 +397,12 @@ app.use((req, res, next) => {
     console.error("Failed to start posture scanner:", err);
   });
 
+  import("./scamIntelAggregator").then(({ startScamIntelScheduler }) => {
+    startScamIntelScheduler();
+  }).catch(err => {
+    console.error("Failed to start scam intel aggregator:", err);
+  });
+
   httpServer.keepAliveTimeout = 61000;
   httpServer.headersTimeout = 65000;
 })();

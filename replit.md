@@ -9,70 +9,44 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Brand Identity & Design
-The platform features a premium, clean design utilizing a dark teal, deep teal, and orange color palette with Sora typography. UI elements include pill-shaped buttons, split-layout banners, and diverse human imagery. Dedicated hubs for Kids, Seniors, Parents, Educators, and Small Businesses maintain distinct thematic designs. Animations respect reduced motion settings.
+The platform features a premium, clean design utilizing a dark teal, deep teal, and orange color palette with Sora typography. UI elements include pill-shaped buttons, split-layout banners, and diverse human imagery. Dedicated hubs maintain distinct thematic designs. Animations respect reduced motion settings.
 
 ### Technical Implementation
-The frontend is built with React 19, TypeScript, and Next.js App Router, using TanStack Query for state management and Tailwind CSS with shadcn/ui for styling. Form validation is handled by React Hook Form with Zod. Next.js handles server-side rendering and routing with dedicated App Router files for each route, providing proper `generateMetadata` with OG tags, canonical URLs, JSON-LD, and robots directives. Server Components are prioritized for crawlability, with client islands for interactive elements. ISR/Static generation is configured for content pages. The backend runs on Express 5 with Node.js and TypeScript, providing REST endpoints and utilizing shared Zod schemas. Authentication supports email/password, TOTP MFA, Passkeys (WebAuthn), and session management. Data persistence uses Drizzle ORM for PostgreSQL. Security measures include Helmet.js, multi-tier rate limiting, CSRF protection, payload limits, XSS/SQLi detection, secure cookies, input sanitization, Google reCAPTCHA, and API anomaly detection.
+The frontend uses React 19, TypeScript, and Next.js App Router, with TanStack Query for state management and Tailwind CSS with shadcn/ui for styling. Form validation is handled by React Hook Form with Zod. Next.js manages server-side rendering, routing, and SEO metadata. Server Components are prioritized for crawlability, with client islands for interactivity. ISR/Static generation is configured for content pages.
+
+The backend runs on Express 5 with Node.js and TypeScript, providing REST endpoints and utilizing shared Zod schemas. Authentication supports email/password, TOTP MFA, Passkeys (WebAuthn), and session management. Data persistence uses Drizzle ORM for PostgreSQL. Security measures include Helmet.js, multi-tier rate limiting, CSRF protection, payload limits, XSS/SQLi detection, secure cookies, input sanitization, Google reCAPTCHA, and API anomaly detection.
 
 ### Data Layer Architecture
-Server Components in `app/` fetch initial data through the Express API (`app/lib/data.ts`) via `fetch()` with ISR revalidation, NOT by importing `server/db.ts` directly. This decouples the Next.js build from the database — builds succeed without `DATABASE_URL` (pages render with empty initial data, hydrated at runtime via ISR). `server/db.ts` throws immediately if `DATABASE_URL` is missing, which is correct for runtime. The API endpoints used by the data layer: `/api/guides`, `/api/scam-intel`, `/api/news/latest`, `/api/training/paths`. Detail pages (e.g., `app/guides/[slug]/page.tsx`) also use API fetch with try/catch fallback.
+Server Components fetch initial data through the Express API via `fetch()` with ISR revalidation. This decouples the Next.js build from the database.
 
 ### Key Features
-- **AI-Powered Tools**: Includes an AI Scam Analyzer with an Advanced Scam Intelligence Engine for URLs, QR codes, screenshots, and SMS, identifying multi-step attack patterns and leveraging context-aware analysis.
-- **GCR Scam Guard Browser Extension**: A Chrome Manifest V3 extension providing real-time protection with auto-scanning, safety badges, lookalike domain detection, and other protective features.
-- **Dezi AI Assistant**: A persistent, floating widget powered by Anthropic Claude AI for interactive user support.
-- **Content & Education**: Offers a Training Academy with audience-specific learning paths, Cyber Safety Guides, a Scam Intelligence Center, Cyber Threat Radar, interactive hubs with gamified learning, and AI-generated explainer videos.
-- **GCR Data Shield**: A personal data exposure scanner checking over 500 data brokers and HaveIBeenPwned databases, offering a three-tier data removal system and a Personal Data Vault with AES-256-GCM encryption.
-- **Identity Shield**: Generates cloaked-style masked identities (disposable emails, masked phone numbers).
-- **Security & Privacy Tools**: Includes Breach Monitoring, a Password Generator, and a Family Safety Codeword Generator.
-- **News & Insights Section**: Rebranded from "News" to "News & Insights" sitewide (nav, hero, breadcrumbs, JSON-LD, i18n). Category filter tags: All, Action Needed, Threat Intel, AI Safety, Tech & Privacy, Learning, Events. Author attribution via two personas: "Jude Annan, CISM" (threat/insight articles) and "GCR Editorial Team" (learning content). Author bylines and bio cards on article detail pages. Twitter Card meta tags (`summary_large_image`) on all article and listing pages. Learning content pipeline preserves external resource URLs.
-- **Automation & Governance**: Features automated weekly newsletters, AI content guardrails, automated threat intelligence, a social distribution engine integrated with Buffer, and a link validator. A Content Series Engine generates recurring content like "Weekly Threat Brief" and "Learning Spotlight."
-- **Social Publishing Pipeline** (`server/bufferPublisher.ts`): Consolidated professional-grade publisher. Platform rules config (`PLATFORM_RULES`) defines per-platform behavior: Instagram uses `addToQueue` + requires image + no link previews; LinkedIn/Facebook use `shareNow` + support OG link preview cards. Single `resolveImageUrl()` handles all image resolution (existing branded → stock photo + overlay → fallback card). Single `shouldAttachImage()` decides: if post has a GCR article link on a platform that supports link previews, skip the image so the platform renders a clickable OG card (like TechCrunch). `publishPostViaBuffer()` for DB-backed posts, `publishDirect(channelId, content, platform, imageUrl?)` for fire-and-forget trend posts (`publishWithFirstComment` is aliased for backward compat). Batch publishing via `publishAllDraftsViaBuffer()` with daily limits (2/platform), 48h news expiry, 75% title-similarity dedup. Image URLs are always normalized to production domain via `getPublicImageUrl()`.
-- **Unified Content Depth System**: Three-tier depth model in `server/trendAwareSocialEngine.ts` and `server/socialPostPolicy.ts`. Depths: `wire` (30-50 words, teaser+hard link, branded card image), `insight` (80-120 words, standalone value + GCR link at end, authentic editorial photo), `deep_value` (100-150 words, actionable how-to + GCR link at end, authentic photo). ALL depths now include a relevant GetCyberRight link on the final line to drive traffic. AI selects depth per 12-step pipeline. Image strategy: wire=branded overlay card; insight/deep_value=raw stock/source photo without overlay. Hashtag strategy: wire=security-focused; insight/deep_value=crossover lifestyle tags (#parenting #momlife #dadlife #familylife #trending #digitalwellness) to reach mainstream audiences beyond cybersecurity echo chamber.
-- **Social Content Quality**: Per-depth word limits enforced by `socialPostPolicy.ts` (`DEPTH_OVERRIDES`). Hook formulas rotate between stat-lead, declarative, contrarian, news-peg, story-lead, and celebrity-peg styles. 30+ banned corporate phrases auto-removed. Curated hashtag rotation prevents Instagram shadowbanning. Brand overlay images (wire only) with headlines, accent glow, category pills, and getcyberright.com URL.
-- **Persistent Image Storage**: Social images in Replit Object Storage (`@replit/object-storage`). `/api/social-images/:filename` serves from filesystem first, then Object Storage fallback. `getPublicImageUrl()` normalizes any URL (dev domain, local path, remote) to the correct environment-aware public URL. Bulk upload on startup syncs local images to Object Storage. Module: `server/imageStorage.ts`.
-- **Content Security Policy**: Nonce-based CSP with `strict-dynamic`. Middleware (`middleware.ts`) generates a unique nonce per request, passed via `x-nonce` header. Root layout reads it via `headers()` for dynamic rendering. All JSON-LD structured data uses `app/components/json-ld.tsx` shared component with nonce injection.
-- **SVG Image Generation** (`server/trendAwareSocialEngine.ts`): `generatePostImage()` (1200×630) and `generateInstagramImage()` (1080×1080) create branded social cards using SVG templates with Sharp. Helper functions `wrapText()` (line-breaks at character width) and `escapeXml()` (safe SVG text rendering) support headline rendering with accent-colored important terms. Five template styles: `stat_card`, `tip_card`, `alert_card`, `insight_card`, `quote_card`.
-- **Dynamic OG Images**: An `/api/og` endpoint generates branded Open Graph images on-the-fly for alerts and guides, with severity-coded accents.
+- **AI-Powered Tools**: AI Scam Analyzer for various inputs, identifying multi-step attack patterns with context-aware analysis. Dezi AI Assistant for interactive user support.
+- **GCR Scam Guard Browser Extension**: Chrome Manifest V3 extension for real-time protection, auto-scanning, safety badges, and lookalike domain detection.
+- **Content & Education**: Training Academy with audience-specific learning paths, Cyber Safety Guides, Scam Intelligence Center, Cyber Threat Radar, interactive hubs with gamified learning, and AI-generated explainer videos.
+- **GCR Data Shield**: Personal data exposure scanner checking data brokers and HaveIBeenPwned databases, offering multi-tier data removal and a Personal Data Vault with AES-256-GCM encryption.
+- **Identity Shield**: Generates cloaked-style masked identities.
+- **Security & Privacy Tools**: Breach Monitoring, Password Generator, and Family Safety Codeword Generator.
+- **News & Insights Section**: Features categorised articles with author attribution, bylines, bio cards, and rich meta tags for social sharing.
+- **Automation & Governance**: Automated newsletters, AI content guardrails, automated threat intelligence, a social distribution engine, and a link validator. A Content Series Engine generates recurring content.
+- **Social Publishing Pipeline**: Professional-grade publisher (`server/bufferPublisher.ts`) with platform-specific rules, image resolution logic, and automated batch publishing with daily limits and deduping. Supports three content depth models: `wire`, `insight`, `deep_value`, each with specific word limits, image strategies, and hashtag strategies to broaden audience reach.
+- **Persistent Image Storage**: Social images are stored in Replit Object Storage, served via a dedicated API endpoint with fallback mechanisms.
+- **Content Security Policy**: Nonce-based CSP with `strict-dynamic` for enhanced security.
+- **SVG Image Generation**: `generatePostImage()` and `generateInstagramImage()` create branded social cards using SVG templates with Sharp, supporting various template styles.
+- **Dynamic OG Images**: An `/api/og` endpoint generates branded Open Graph images on-the-fly for alerts and guides.
 - **Content Freshness Signals**: Alert detail pages display publication date, last update, verified source count, and a live freshness indicator.
 - **Engagement Discovery Engine**: Monitors RSS feeds and generates AI-suggested comments for thought leadership.
 - **Monthly Removal Reports**: Automated monthly HTML email reports detailing privacy scores and removal progress.
-- **Free Platform Model**: The platform is entirely free, with all pricing pages redirecting to the homepage and user-facing text reflecting "everything is free."
-- **Admin & SEO**: A comprehensive admin system with role-based access control, scan activity monitoring, SEO keyword database, internal linking engine, dynamic sitemap generation, and universal meta injection. Public pages are fully SSR for SEO.
-- **SEO & AEO Architecture**: Implements FAQPage, NewsArticle, and Organization JSON-LD schemas. AI bots (GPTBot, ClaudeBot, PerplexityBot) are allowed via robots.txt for AEO.
-- **Homepage Architecture**: Consolidated 8-section homepage: Hero → LiveActivityBar (with recency signal) → HowItWorks → ThreatAwareness (includes authority trust points, featured testimonial, source logos) → PillarTiles (product showcase) → AudiencePaths → ContentPreview (merged guides + alerts with weekly rotation) → NewsletterCTA (merged with closing CTA). Removed redundant sections: TrustStrip, PromoBanners, AuthoritySection, standalone Testimonials, standalone FeaturedGuide, standalone CTAFooter, inline BreachChecker.
-- **Business Pages**: `/for-organizations` (service page for schools, businesses, governments, nonprofits with inquiry form), `/advertise` (partner/advertiser page with inquiry form), `/partner-deck` (downloadable partnership deck with live stats). Footer includes "Work With Us" column linking all three.
+- **Free Platform Model**: The platform is entirely free.
+- **Admin & SEO**: Comprehensive admin system with role-based access, scan activity monitoring, SEO keyword database, internal linking, dynamic sitemap, and universal meta injection. Public pages are fully SSR for SEO. Supports FAQPage, NewsArticle, and Organization JSON-LD schemas. AI bots are allowed for AEO.
+- **Global Scam Intelligence Dashboard**: Real-time 3D globe visualization (`react-globe.gl`) showing scam activity across 40+ countries with data from FBI IC3, INTERPOL, CISA, and 20+ national CERTs. Features animated cross-border scam flow arcs, risk-colored hotspots, live threat feed, regional breakdowns, and scam type analysis. Server-side aggregator refreshes every 30 minutes. WebGL error boundary with graceful fallback for unsupported browsers.
+- **Homepage Architecture**: Consolidated 9-section homepage with Hero, Live Activity Bar, How It Works, Threat Awareness, Scam Globe Teaser, Product Showcase, Audience Paths, Content Preview, and Newsletter CTA.
+- **Business Pages**: Dedicated pages for organizations, advertising, and a downloadable partner deck.
 - **Navigation Architecture**: A two-hub structure: Protection Hub (tools) and Learning Hub (educational content).
-- **User Dashboard**: Displays safety score, activity statistics, product status cards, quick actions, recent scans, regional threats, and threat intelligence.
+- **User Dashboard**: Displays safety score, activity statistics, product status, quick actions, recent scans, regional threats, and threat intelligence.
 - **Account Settings**: Comprehensive account management including profile editing, password changes, and MFA status.
 
-## Build & Deployment
-- **Dev**: `npm run dev` → starts Express + Next.js dev server on port 5000
-- **Build**: `npx tsx server/migrate-runner.ts && NODE_OPTIONS='--max-old-space-size=3072' npm run build` (Next.js build + esbuild server bundle)
-- **Production**: `NODE_ENV=production node dist/index.js`
-- **CI/GitHub Actions**: Build succeeds without `DATABASE_URL` because `app/lib/data.ts` fetches via API (which gracefully fails during build). Pages render with empty initial data and hydrate at runtime via ISR revalidation.
-- **Key export**: `server/trendAwareSocialEngine.ts` exports `getCurrentSlot()` and `generateAndPublishTrendAwarePosts()` for admin routes.
-
-## Security Hardening (April 2026)
-- **ReDoS fix**: Domain validation regex in `server/routes.ts` now uses non-capturing groups with bounded quantifiers (`{0,61}`) and TLD length cap (`{2,15}`) to prevent catastrophic backtracking.
-- **XSS prevention**: Browser extension `popup.js` replaced `innerHTML` with DOM API (`createElement`/`textContent`) for digest rendering.
-- **Path traversal**: `/api/social-images/:filename` adds explicit `..`, `/`, `\` rejection, length limit (255), and `path.basename()` guard.
-- **Open redirect**: Trailing-slash redirect validates path characters and rejects `//` sequences.
-- **Regex injection**: `server/brokerAdapters.ts` escapes all user-supplied names via `escapeRegex()` before building RegExp patterns.
-- **Domain length**: All extension site-reputation endpoints enforce 253-char domain limit and type check.
-- **Dependencies**: Next.js upgraded to 16.2.3, Vite at 7.3.2.
-
-## Platform Security Posture Engine
-- **Engine**: `server/security/platformPostureEngine.ts` — proactive self-assessment system that scans the platform's own security configuration across 10 categories and 35+ individual checks.
-- **Categories scanned**: Headers & Transport, Authentication, Input Validation, DoS Protection, Data Protection, Secrets Management, Monitoring & Response, Dependencies, Extension Security, Compliance.
-- **Checks include**: CSP nonce/strict-dynamic, Helmet headers, bcrypt salt rounds, MFA, account lockout, session cookie flags, CSRF double-submit, rate limiting tiers, DOMPurify sanitization, Zod validation coverage, ReDoS regex safety, path traversal guards, open redirect protection, regex injection prevention, vault encryption, secrets config, security monitoring thresholds, bot protection, npm audit vulnerabilities, NIST 800-53 mapping, threat intelligence feeds.
-- **Scoring**: Weighted composite score (0-100) with letter grade (A+ to F). Each category is weighted by security impact.
-- **Auto-remediation**: Remediable issues can be fixed via the admin UI (e.g., npm audit fix).
-- **Scheduling**: Runs daily on startup + on-demand from admin panel.
-- **History**: `security_posture_scans` DB table tracks scores over time for trend analysis.
-- **Admin UI**: Security tab in admin panel shows score gauge, category breakdown cards (expandable), issues list with severity badges, trend chart, and "Run Scan" button.
-- **Auth**: All posture API endpoints require `isAuthenticated` + `isAdmin` middleware.
-- **API**: `GET /api/admin/security-posture/latest`, `GET /api/admin/security-posture/history`, `POST /api/admin/security-posture/scan`, `POST /api/admin/security-posture/remediate`.
+### Platform Security Posture Engine
+A proactive self-assessment system (`server/security/platformPostureEngine.ts`) that scans the platform's security configuration across 10 categories and 35+ checks (e.g., Headers & Transport, Authentication, Input Validation, Data Protection, Extension Security). It provides a weighted composite score (0-100) with a letter grade, tracks historical scores, and offers auto-remediation for certain issues via the admin UI.
 
 ## External Dependencies
 
