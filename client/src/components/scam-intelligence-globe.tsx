@@ -50,53 +50,105 @@ function isWebGLContextBlocked(): boolean {
   }
 }
 
+function getRiskColor(level: string) {
+  return level === "critical" ? "#ef4444" : level === "high" ? "#f97316" : level === "medium" ? "#eab308" : "#22c55e";
+}
+
 function GlobeFallback({ data, onRetry, errorDetail }: { data: any; onRetry?: () => void; errorDetail?: string }) {
-  const hotspots = (data?.hotspots || []).slice(0, 12);
+  const hotspots = (data?.hotspots || []).sort((a: any, b: any) => (b.recentIncidents || 0) - (a.recentIncidents || 0));
   const isWebGLError = errorDetail && /WebGL|context/i.test(errorDetail);
   const contextBlocked = typeof window !== "undefined" && isWebGLError && isWebGLContextBlocked();
 
+  const topByRegion: Record<string, any[]> = {};
+  hotspots.forEach((h: any) => {
+    const r = h.region || "Other";
+    if (!topByRegion[r]) topByRegion[r] = [];
+    if (topByRegion[r].length < 5) topByRegion[r].push(h);
+  });
+
+  const maxIncidents = hotspots[0]?.recentIncidents || 1;
+
   return (
-    <div className="w-full max-w-[700px] mx-auto bg-card dark:bg-slate-800/30 border border-border rounded-2xl flex flex-col items-center justify-center p-6" data-testid="globe-fallback">
-      <GlobeIcon className="w-12 h-12 text-primary/30 mb-3" />
-      <p className="text-sm text-muted-foreground mb-1">Interactive Scam Threat Map</p>
-      {contextBlocked ? (
-        <div className="text-center mb-3 max-w-sm">
-          <p className="text-xs text-amber-400/90 mb-2">
-            The 3D globe could not start because WebGL is unavailable.
+    <div className="w-full" data-testid="globe-fallback">
+      {(contextBlocked || errorDetail) && (
+        <div className="flex items-center justify-between bg-slate-800/40 border border-slate-700/40 rounded-xl px-4 py-2.5 mb-4">
+          <p className="text-xs text-muted-foreground/80">
+            {contextBlocked
+              ? "3D globe unavailable. A browser extension, hardware acceleration setting, or GPU driver may be blocking WebGL. Try Incognito mode or whitelisting this site."
+              : "The 3D globe could not render. Try refreshing or using a different browser."}
           </p>
-          <p className="text-xs text-muted-foreground/70">
-            This can happen if a browser extension is blocking WebGL, hardware acceleration is off,
-            or your GPU driver does not support it.
-            Try opening this page in an Incognito/Private window, whitelisting this site in your extensions,
-            or enabling hardware acceleration in your browser settings.
-          </p>
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              className="ml-3 flex-shrink-0 text-xs bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1 rounded-lg border border-primary/30 transition-colors"
+              data-testid="globe-retry"
+            >
+              Retry
+            </button>
+          )}
         </div>
-      ) : (
-        <p className="text-xs text-muted-foreground/70 mb-3">
-          {errorDetail
-            ? "The 3D globe could not render. Try refreshing, enabling hardware acceleration, or using a different browser."
-            : "Data is shown below. The 3D globe requires WebGL and hardware acceleration."}
-        </p>
       )}
-      {onRetry && (
-        <button
-          onClick={onRetry}
-          className="mb-4 text-xs bg-primary/10 hover:bg-primary/20 text-primary px-4 py-1.5 rounded-lg border border-primary/30 transition-colors"
-          data-testid="globe-retry"
-        >
-          Try loading the 3D globe again
-        </button>
-      )}
-      {hotspots.length > 0 && (
-        <div className="w-full max-w-md space-y-1.5">
-          {hotspots.map((h: any) => (
-            <div key={h.id} className="flex items-center gap-2 bg-secondary dark:bg-slate-800/50 rounded-lg p-2 border border-border dark:border-slate-700/30">
-              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: h.riskLevel === "critical" ? "#ef4444" : h.riskLevel === "high" ? "#f97316" : h.riskLevel === "medium" ? "#eab308" : "#22c55e" }} />
-              <span className="text-xs text-foreground font-medium flex-1">{h.country}</span>
-              <span className="text-[10px] text-muted-foreground">{formatNumber(h.recentIncidents)} scams</span>
-              <span className="text-[10px] text-muted-foreground/70">{h.topScamTypes?.[0]?.replace(/-/g, " ")}</span>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        {hotspots.slice(0, 8).map((h: any) => (
+          <div key={h.id} className="bg-slate-800/40 border border-slate-700/30 rounded-xl p-3 hover:border-slate-600/50 transition-colors" data-testid={`hotspot-card-${h.countryCode}`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: getRiskColor(h.riskLevel) }} />
+                <span className="text-sm font-semibold text-foreground">{h.country}</span>
+              </div>
+              <span className="text-[10px] uppercase tracking-wider font-medium px-1.5 py-0.5 rounded" style={{
+                backgroundColor: getRiskColor(h.riskLevel) + "20",
+                color: getRiskColor(h.riskLevel),
+              }}>
+                {h.riskLevel}
+              </span>
             </div>
-          ))}
+            <div className="mb-2">
+              <div className="flex items-baseline justify-between mb-1">
+                <span className="text-lg font-bold text-foreground">{formatNumber(h.recentIncidents)}</span>
+                <span className="text-[10px] text-muted-foreground">reported scams</span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${Math.max(5, (h.recentIncidents / maxIncidents) * 100)}%`,
+                    backgroundColor: getRiskColor(h.riskLevel),
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {(h.topScamTypes || []).slice(0, 2).map((t: string) => (
+                <span key={t} className="text-[10px] bg-slate-700/40 text-slate-300 px-1.5 py-0.5 rounded">
+                  {t.replace(/-/g, " ")}
+                </span>
+              ))}
+              {h.trendDirection === "up" && (
+                <span className="text-[10px] text-red-400">+{h.trendPercent}%</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {Object.keys(topByRegion).length > 0 && (
+        <div className="bg-slate-800/30 border border-slate-700/30 rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <MapPin className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs font-semibold text-foreground">All Tracked Countries</span>
+            <span className="text-[10px] text-muted-foreground ml-1">({hotspots.length} countries)</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1">
+            {hotspots.map((h: any) => (
+              <div key={h.id} className="flex items-center gap-1.5 py-0.5">
+                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: getRiskColor(h.riskLevel) }} />
+                <span className="text-[11px] text-slate-300 truncate flex-1">{h.country}</span>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{formatNumber(h.recentIncidents)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
