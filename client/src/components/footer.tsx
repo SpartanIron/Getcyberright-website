@@ -3,8 +3,6 @@ import { SiLinkedin, SiFacebook, SiYoutube, SiInstagram, SiWhatsapp } from "reac
 import Link from "next/link";
 import { CookieSettingsButton } from "@/components/cookie-settings-button";
 
-const COPYRIGHT_YEAR = 2026;
-
 const footerLinks = {
   learning: [
     { name: "Training Academy", href: "/training" },
@@ -191,7 +189,7 @@ export function Footer() {
 
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-400">
             <p data-testid="text-copyright">
-              &copy; {COPYRIGHT_YEAR} GetCyberRight LLC. All rights reserved.
+              &copy; {new Date().getFullYear()} GetCyberRight LLC. All rights reserved.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
