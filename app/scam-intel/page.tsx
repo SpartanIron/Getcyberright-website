@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { JsonLd } from "../components/json-ld";
 import PageContent from "@/pages/scam-intel-listing";
 import { getPublishedScamIntel } from "../lib/data";
+export const dynamic = 'force-dynamic';
 
 const BASE_URL = "https://www.getcyberright.com";
 
