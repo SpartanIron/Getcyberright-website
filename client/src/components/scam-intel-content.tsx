@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Search, ArrowRight, Loader2, AlertTriangle, Users, DollarSign, MapPin, Globe, ArrowUpDown, TrendingUp, Clock, Flag, Calendar, BarChart3 } from "lucide-react";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useMemo } from "react";
@@ -90,9 +91,7 @@ export function ScamIntelContent({ initialScams }: { initialScams?: ScamIntel[] 
   const [detectedRegion, setDetectedRegion] = useState<Region>("global");
   const [selectedRegion, setSelectedRegion] = useState<Region>("global");
   const [regionLoading, setRegionLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
+  const hydrated = useHydrated();
 
   useEffect(() => {
     detectUserRegion().then((region) => {
@@ -359,7 +358,7 @@ export function ScamIntelContent({ initialScams }: { initialScams?: ScamIntel[] 
                           Trending
                         </Badge>
                       )}
-                      {mounted && isNewScam(scam.dateDetected) && (
+                      {hydrated && isNewScam(scam.dateDetected) && (
                         <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 gap-1" data-testid={`badge-new-${scam.slug}`}>
                           <Clock className="h-3 w-3" />
                           New
@@ -396,9 +395,9 @@ export function ScamIntelContent({ initialScams }: { initialScams?: ScamIntel[] 
                           </span>
                         )}
                         {scam.dateDetected && (
-                          <span className="flex items-center gap-1" suppressHydrationWarning>
+                          <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {formatDate(scam.dateDetected)}
+                            {hydrated ? formatDate(scam.dateDetected) : ""}
                           </span>
                         )}
                       </div>

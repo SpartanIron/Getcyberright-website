@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback, memo, Component, type ErrorInfo, type ReactNode } from "react";
 import { Globe as GlobeIcon, AlertTriangle, MapPin, Share2, Copy, Check, Phone, ExternalLink, ShieldAlert } from "lucide-react";
+import { useHydrated } from "@/hooks/use-hydrated";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 class GlobeErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -144,11 +146,6 @@ async function shareCountryAlert(country: string, riskLevel: string, incidents: 
     window.open(`mailto:?subject=${encodeURIComponent(`Scam alert: ${country}`)}&body=${encodeURIComponent(text)}`);
   }
   return true;
-}
-
-function isMobileDevice(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.innerWidth < 768 || /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
 function MobileGlobeView({ data, onCountrySelect, focusCountryCode }: ScamIntelligenceGlobeProps) {
@@ -414,11 +411,11 @@ function MobileGlobeView({ data, onCountrySelect, focusCountryCode }: ScamIntell
 function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focusCountryCode }: ScamIntelligenceGlobeProps) {
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hydrated = useHydrated();
+  const isMobile = useIsMobile();
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
   const [loadError, setLoadError] = useState(false);
   const [webglSupported, setWebglSupported] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-  const [deviceChecked, setDeviceChecked] = useState(false);
   const [dimensions, setDimensions] = useState({ w: width || 600, h: height || 600 });
   const [hoveredPoint, setHoveredPoint] = useState<GlobeHotspot | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<GlobeHotspot | null>(null);
@@ -428,13 +425,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    const mobile = isMobileDevice();
-    setIsMobile(mobile);
-    setDeviceChecked(true);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !deviceChecked || isMobile) return;
+    if (!hydrated || isMobile) return;
     const supported = checkWebGLSupport();
     setWebglSupported(supported);
     if (!supported) return;
@@ -469,7 +460,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [retryCount, deviceChecked, isMobile]);
+  }, [retryCount, hydrated, isMobile]);
 
   useEffect(() => {
     if (!containerRef.current || width) return;
@@ -535,7 +526,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setRetryCount(c => c + 1);
   }, []);
 
-  if (isMobile && deviceChecked) {
+  if (hydrated && isMobile) {
     return <MobileGlobeView data={data} onCountrySelect={onCountrySelect} focusCountryCode={focusCountryCode} />;
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
+import { useHydrated } from "@/hooks/use-hydrated";
 import {
   Shield, AlertTriangle, TrendingUp, Globe, Activity,
   MapPin, Clock, ExternalLink, ChevronRight, Radio,
@@ -135,6 +136,7 @@ function GlobalStatsBar({ stats }: { stats: GlobalStats | null }) {
 }
 
 function LiveFeedTicker({ events }: { events: LiveFeedEvent[] }) {
+  const hydrated = useHydrated();
   const [visibleCount, setVisibleCount] = useState(8);
 
   if (events.length === 0) {
@@ -166,7 +168,7 @@ function LiveFeedTicker({ events }: { events: LiveFeedEvent[] }) {
                   <span>{event.source}</span>
                   <span>·</span>
                   <Clock className="w-3 h-3" />
-                  <span suppressHydrationWarning>{timeAgo(event.timestamp)}</span>
+                  <span>{hydrated ? timeAgo(event.timestamp) : ""}</span>
                 </div>
               </div>
             </div>
