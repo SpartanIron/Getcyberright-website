@@ -217,7 +217,7 @@ export default function NewsArticlePage() {
  <Card className="mb-8">
  <CardContent className="p-6 md:p-8">
  <div
- className="prose dark:prose-invert max-w-none text-base leading-relaxed"
+ className="prose dark:prose-invert max-w-none text-base leading-relaxed prose-headings:text-foreground prose-headings:font-bold prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-3 prose-p:mb-4 prose-p:text-muted-foreground prose-li:text-muted-foreground prose-ol:my-4 prose-ol:pl-6 prose-ul:my-4 prose-ul:pl-6 prose-li:my-1 prose-strong:text-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-blockquote:border-primary/50 prose-blockquote:bg-muted/30 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg"
  data-testid="text-article-content"
  dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
  />
