@@ -423,31 +423,36 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
 
   useEffect(() => {
     const supported = checkWebGLSupport();
+    console.log("[ScamGlobe] WebGL supported:", supported);
     setWebglSupported(supported);
     if (!supported) return;
 
     setLoadError(false);
     setGlobeComponent(null);
     let cancelled = false;
+    let loaded = false;
 
     const timer = setTimeout(() => {
-      if (!cancelled && !GlobeComponent) {
-        console.warn("[ScamGlobe] Globe library timed out after 20s");
+      if (!cancelled && !loaded) {
+        console.warn("[ScamGlobe] Globe library timed out after 30s");
         setLoadError(true);
       }
-    }, 20000);
+    }, 30000);
 
     import("react-globe.gl")
       .then((mod) => {
         if (!cancelled) {
+          loaded = true;
           clearTimeout(timer);
+          console.log("[ScamGlobe] react-globe.gl loaded successfully");
           setGlobeComponent(() => mod.default);
         }
       })
       .catch((err) => {
         if (!cancelled) {
+          loaded = true;
           clearTimeout(timer);
-          console.error("[ScamGlobe] Failed to load react-globe.gl:", err);
+          console.error("[ScamGlobe] Failed to load react-globe.gl:", err?.message || err);
           setLoadError(true);
         }
       });
@@ -550,8 +555,8 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
         ref={globeRef}
         width={dimensions.w || 600}
         height={dimensions.h || 600}
-        globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
-        bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+        globeImageUrl="https://unpkg.com/three-globe/example/img/earth-night.jpg"
+        bumpImageUrl="https://unpkg.com/three-globe/example/img/earth-topology.png"
         backgroundImageUrl=""
         backgroundColor="rgba(0,0,0,0)"
         showAtmosphere={true}

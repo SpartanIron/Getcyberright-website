@@ -33,7 +33,7 @@ The deployment run command must include `NODE_ENV=production` (configured as `["
 - **Automation & Governance**: Automated newsletters, AI content guardrails, automated threat intelligence, a social distribution engine, and a link validator. A Content Series Engine generates recurring content.
 - **Social Publishing Pipeline**: Professional-grade publisher (`server/bufferPublisher.ts`) with platform-specific rules, image resolution logic, and automated batch publishing with daily limits and deduping. Supports three content depth models: `wire`, `insight`, `deep_value`, each with specific word limits, image strategies, and hashtag strategies to broaden audience reach.
 - **Persistent Image Storage**: Social images are stored in Replit Object Storage, served via a dedicated API endpoint with fallback mechanisms.
-- **Content Security Policy**: Nonce-based CSP with `strict-dynamic` for enhanced security.
+- **Content Security Policy**: Nonce-based CSP with `strict-dynamic` and `unsafe-eval` (required for Three.js WebGL shader compilation in the globe component). Globe textures and connect sources include `https://unpkg.com`.
 - **SVG Image Generation**: `generatePostImage()` and `generateInstagramImage()` create branded social cards using SVG templates with Sharp, supporting various template styles.
 - **Dynamic OG Images**: An `/api/og` endpoint generates branded Open Graph images on-the-fly for alerts and guides.
 - **Content Freshness Signals**: Alert detail pages display publication date, last update, verified source count, and a live freshness indicator.
