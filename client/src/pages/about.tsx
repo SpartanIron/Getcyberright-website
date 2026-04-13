@@ -88,8 +88,8 @@ export default function About() {
 
       <main id="main-content" tabIndex={-1}>
 
-        <section className="bg-[#0A2A3C] relative overflow-hidden" aria-labelledby="about-hero-heading">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+        <section className="bg-hero relative overflow-hidden" aria-labelledby="about-hero-heading">
+          <div className="absolute inset-0 bg-gradient-to-br from-hero via-hero to-hero dark:from-[#0A2A3C] dark:via-[#0A2A3C] dark:to-[#00293C]" />
 
           <div
             className="absolute pointer-events-none hidden lg:block"
@@ -152,7 +152,7 @@ export default function About() {
                   loading="eager"
                   data-testid="img-about-family-together"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-hero/40 to-transparent dark:from-[#0A2A3C]/40" />
               </div>
             </div>
           </div>
@@ -202,7 +202,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-20 lg:py-24 bg-[#0A2A3C]" aria-labelledby="solution-heading">
+        <section className="py-16 sm:py-20 lg:py-24 bg-hero" aria-labelledby="solution-heading">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-10 sm:mb-14">
               <div className="flex items-center gap-2 mb-4">
@@ -377,7 +377,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-20 lg:py-24 bg-[#0A2A3C]" aria-labelledby="team-heading">
+        <section className="py-16 sm:py-20 lg:py-24 bg-hero" aria-labelledby="team-heading">
           <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-10 sm:mb-14">
               <div className="flex items-center gap-2 mb-4">

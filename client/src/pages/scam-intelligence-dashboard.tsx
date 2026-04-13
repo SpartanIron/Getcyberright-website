@@ -85,18 +85,18 @@ export default function ScamIntelligenceDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060d1a]">
+    <div className="min-h-screen bg-background dark:bg-[#060d1a]">
       <Navigation />
       <main>
         <section className="relative overflow-hidden pt-6 pb-8">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A2A3C] via-[#060d1a] to-[#060d1a]" />
-          <div className="absolute inset-0 opacity-20" style={{
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background dark:from-[#0A2A3C] dark:via-[#060d1a] dark:to-[#060d1a]" />
+          <div className="absolute inset-0 opacity-20 dark:opacity-20" style={{
             backgroundImage: "radial-gradient(circle at 20% 50%, rgba(34,211,238,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(168,85,247,0.06) 0%, transparent 40%)",
           }} />
 
           <div className="container mx-auto px-4 relative z-10">
             <div className="mb-4">
-              <Link href="/" className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-cyan-400 transition-colors" data-testid="link-back-home">
+              <Link href="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors" data-testid="link-back-home">
                 <ArrowLeft className="w-3 h-3" />
                 Back to Home
               </Link>
@@ -107,10 +107,10 @@ export default function ScamIntelligenceDashboard() {
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                 <span className="text-sm text-red-400 font-medium">Live Scam Intelligence</span>
               </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3" data-testid="dashboard-title">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3" data-testid="dashboard-title">
                 Global Scam Intelligence Dashboard
               </h1>
-              <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 See where scams are happening right now. This map tracks fraud activity across {globeData?.globalStats?.countriesCovered || "40+"} countries
                 using data from law enforcement, government cybersecurity teams, and trusted security organizations worldwide.
               </p>
@@ -137,11 +137,11 @@ export default function ScamIntelligenceDashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-7 xl:col-span-8">
-                <div className="bg-slate-900/50 border border-slate-700/50 rounded-2xl p-4 mb-6" data-testid="globe-container">
+                <div className="bg-card border border-border dark:bg-slate-900/50 dark:border-slate-700/50 rounded-2xl p-4 mb-6" data-testid="globe-container">
                   <div className="flex items-center gap-2 mb-3">
-                    <Globe className="w-4 h-4 text-cyan-400" />
-                    <span className="text-sm font-semibold text-white">Live Scam Activity Map</span>
-                    <div className="ml-auto flex items-center gap-3 text-[10px] text-slate-400">
+                    <Globe className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-semibold text-foreground">Live Scam Activity Map</span>
+                    <div className="ml-auto flex items-center gap-3 text-[10px] text-muted-foreground">
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> Critical</span>
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> High</span>
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> Medium</span>
@@ -159,13 +159,13 @@ export default function ScamIntelligenceDashboard() {
                         value={searchQuery}
                         onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
                         onFocus={() => setSearchOpen(true)}
-                        className="w-full bg-slate-800/60 border border-slate-700/50 rounded-lg pl-9 pr-8 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/50 focus:outline-none transition-colors"
+                        className="w-full bg-secondary border border-border rounded-lg pl-9 pr-8 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary/50 focus:outline-none transition-colors"
                         data-testid="country-search-input"
                       />
                       {searchQuery && (
                         <button
                           onClick={() => { setSearchQuery(""); setSearchOpen(false); }}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                           data-testid="clear-search"
                         >
                           <X className="w-4 h-4" />
@@ -173,15 +173,15 @@ export default function ScamIntelligenceDashboard() {
                       )}
                     </div>
                     {searchOpen && filteredCountries.length > 0 && (
-                      <div className="absolute z-20 w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden" data-testid="country-search-results">
+                      <div className="absolute z-20 w-full mt-1 bg-popover border border-border rounded-lg shadow-xl overflow-hidden" data-testid="country-search-results">
                         {filteredCountries.map((c: any) => (
                           <button
                             key={c.code}
                             onClick={() => handleCountrySearch(c.code, c.name)}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white hover:bg-slate-800 transition-colors text-left"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors text-left"
                             data-testid={`search-result-${c.code}`}
                           >
-                            <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                            <MapPin className="w-3.5 h-3.5 text-primary" />
                             {c.name}
                           </button>
                         ))}
@@ -195,7 +195,7 @@ export default function ScamIntelligenceDashboard() {
                     focusCountryCode={effectiveFocusCode}
                   />
                   <div className="text-center mt-3">
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-muted-foreground">
                       Click any glowing dot to see scam details for that country. The lines show how scams spread between countries.
                       Scroll to zoom in. Data updates every 30 minutes.
                     </p>
@@ -237,24 +237,24 @@ export default function ScamIntelligenceDashboard() {
           </div>
         </section>
 
-        <section className="bg-slate-900/30 border-t border-slate-700/30 py-10">
+        <section className="bg-secondary/50 dark:bg-slate-900/30 border-t border-border py-10">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-xl font-bold text-white mb-3">Where This Data Comes From</h2>
-              <p className="text-sm text-slate-400 leading-relaxed mb-6">
+              <h2 className="text-xl font-bold text-foreground mb-3">Where This Data Comes From</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-6">
                 This dashboard pulls together scam reports from official government sources, law enforcement agencies,
                 and trusted security organizations around the world. We use published data from agencies like
                 the FBI's Internet Crime Complaint Center (IC3), the FTC, Action Fraud UK, Australia's Scamwatch, INTERPOL,
                 and 20+ national cybersecurity response teams. The lines on the map show how scams move between countries,
                 based on international cooperation reports.
               </p>
-              <div className="flex flex-wrap justify-center gap-3 text-[11px] text-slate-500">
+              <div className="flex flex-wrap justify-center gap-3 text-[11px] text-muted-foreground">
                 {[
                   "FBI IC3", "FTC Sentinel", "CISA", "NIST NVD", "Action Fraud UK",
                   "ACCC Scamwatch", "INTERPOL", "CERT-In", "CERT.br", "BSI Germany",
                   "PhishTank", "URLhaus", "Have I Been Pwned",
                 ].map((source) => (
-                  <span key={source} className="bg-slate-800/50 border border-slate-700/30 px-2.5 py-1 rounded-full">
+                  <span key={source} className="bg-card border border-border px-2.5 py-1 rounded-full">
                     {source}
                   </span>
                 ))}

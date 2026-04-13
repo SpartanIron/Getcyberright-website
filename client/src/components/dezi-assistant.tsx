@@ -623,7 +623,7 @@ export function DeziAssistant() {
             data-testid="dezi-panel"
           >
             <Card className="shadow-2xl border-primary/20 overflow-hidden flex flex-col max-h-[70vh]">
-              <CardHeader className="pb-3 bg-[#0A2A3C] text-white flex-shrink-0">
+              <CardHeader className="pb-3 bg-hero text-hero-foreground flex-shrink-0">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 flex-shrink-0">
@@ -707,7 +707,7 @@ export function DeziAssistant() {
                           <div
                             className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
                               message.role === "user"
-                                ? "bg-[#0A2A3C] text-white rounded-br-md"
+                                ? "bg-hero text-hero-foreground rounded-br-md"
                                 : "bg-muted rounded-bl-md"
                             }`}
                           >

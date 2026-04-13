@@ -53,13 +53,13 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-[#081C26] text-slate-300" role="contentinfo" aria-label="Site footer">
+    <footer className="bg-slate-100 text-slate-600 dark:bg-[#081C26] dark:text-slate-300" role="contentinfo" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-10">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4" data-testid="footer-link-logo">
               <img src="/logo.webp" alt="GetCyberRight" className="w-8 h-8 object-contain" />
-              <span className="font-semibold text-white">GetCyberRight</span>
+              <span className="font-semibold text-foreground dark:text-white">GetCyberRight</span>
             </Link>
             <p className="text-sm leading-relaxed mb-4">
               Protecting families from online scams, identity theft, and digital threats.
@@ -71,7 +71,7 @@ export function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-8 h-8 rounded-md bg-slate-800 flex items-center justify-center ${social.color} hover:text-white ${social.hoverBg} transition-colors`}
+                  className={`w-8 h-8 rounded-md bg-slate-200 dark:bg-slate-800 flex items-center justify-center ${social.color} hover:text-white ${social.hoverBg} transition-colors`}
                   aria-label={social.name}
                   data-testid={`social-link-${social.name.toLowerCase()}`}
                 >
@@ -82,7 +82,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">Learning Hub</h4>
+            <h4 className="font-semibold text-foreground dark:text-white text-sm mb-3">Learning Hub</h4>
             <ul className="space-y-2">
               {footerLinks.learning.map((link) => (
                 <li key={link.name}>
@@ -99,7 +99,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">Protection Hub</h4>
+            <h4 className="font-semibold text-foreground dark:text-white text-sm mb-3">Protection Hub</h4>
             <ul className="space-y-2">
               {footerLinks.protection.map((link) => (
                 <li key={link.name}>
@@ -116,7 +116,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">For You</h4>
+            <h4 className="font-semibold text-foreground dark:text-white text-sm mb-3">For You</h4>
             <ul className="space-y-2">
               {footerLinks.forYou.map((link) => (
                 <li key={link.name}>
@@ -133,7 +133,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">Work With Us</h4>
+            <h4 className="font-semibold text-foreground dark:text-white text-sm mb-3">Work With Us</h4>
             <ul className="space-y-2">
               {footerLinks.workWithUs.map((link) => (
                 <li key={link.name}>
@@ -150,7 +150,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white text-sm mb-3">Company</h4>
+            <h4 className="font-semibold text-foreground dark:text-white text-sm mb-3">Company</h4>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
@@ -167,7 +167,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-slate-800">
+        <div className="mt-10 pt-6 border-t border-slate-200 dark:border-slate-800">
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-6" data-testid="footer-compliance-badges">
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <Shield className="w-3.5 h-3.5" />

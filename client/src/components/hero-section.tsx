@@ -90,11 +90,11 @@ function ThreatAlertBar() {
 export function HeroSection() {
   return (
     <section className="relative w-full" data-testid="section-hero">
-      <div className="bg-[#0A2A3C] relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+      <div className="bg-hero relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-hero via-hero to-hero dark:from-[#0A2A3C] dark:via-[#0A2A3C] dark:to-[#00293C]" />
 
         <div
-          className="absolute pointer-events-none hidden lg:block"
+          className="absolute pointer-events-none hidden dark:lg:block"
           aria-hidden="true"
           style={{
             top: 0,
@@ -180,7 +180,7 @@ export function HeroSection() {
                 <ThreatAlertBar />
               </div>
               <h1
-                className="text-[2rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-white leading-[1.05] mb-6 sm:mb-8"
+                className="text-[2rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-hero-foreground leading-[1.05] mb-6 sm:mb-8"
                 data-testid="text-hero-heading"
               >
                 Online Safety
@@ -191,7 +191,7 @@ export function HeroSection() {
               </h1>
 
               <p
-                className="text-base sm:text-xl text-white/80 leading-relaxed mb-8 sm:mb-10"
+                className="text-base sm:text-xl text-hero-foreground/80 leading-relaxed mb-8 sm:mb-10"
                 data-testid="text-hero-subtext"
               >
                 GetCyberRight makes digital protection simple for everyone. Check if that text or email is a scam, discover who has your personal data and remove it, and learn practical safety habits with guides written in plain language. Protection for the whole family, no expertise needed.
@@ -209,13 +209,13 @@ export function HeroSection() {
                     <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
                   </Link>
                 </Button>
-                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-white/70 hover:text-white/90 transition-colors group font-medium">
+                <Link href="/tools" className="inline-flex items-center gap-2 text-base text-hero-foreground/70 hover:text-hero-foreground/90 transition-colors group font-medium">
                   See all protection tools
                   <ArrowRight className="w-4 h-4 cta-arrow-right" />
                 </Link>
               </div>
 
-              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-white/60">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-hero-foreground/60">
                 <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /> No account needed</span>
                 <span className="flex items-center gap-2"><Eye className="w-4 h-4 text-primary" /> Nothing stored</span>
                 <span className="flex items-center gap-2"><Shield className="w-4 h-4 text-primary" /> Always free</span>
@@ -243,7 +243,7 @@ export function HeroSection() {
                   className="w-full h-64 sm:h-80 object-cover"
                   data-testid="img-hero-overview-mobile"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C]/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-hero/60 via-transparent to-transparent" />
               </div>
             </div>
           </div>

@@ -18,10 +18,10 @@ export function PageBanner({
 
   return (
     <section
-      className="bg-[#0A2A3C] relative overflow-hidden h-[260px] sm:h-[300px] md:h-[360px] lg:h-[400px]"
+      className="bg-hero relative overflow-hidden h-[260px] sm:h-[300px] md:h-[360px] lg:h-[400px]"
       data-testid="section-page-banner"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-hero via-hero to-hero dark:from-[#0A2A3C] dark:via-[#0A2A3C] dark:to-[#00293C]" />
 
       <div
         className="absolute pointer-events-none hidden md:block"
@@ -135,7 +135,7 @@ export function PageBanner({
                   : "linear-gradient(to left, transparent 50%, rgba(10,42,60,0.7) 100%)",
               }}
             />
-            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0A2A3C] to-transparent md:hidden" />
+            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-hero to-transparent dark:from-[#0A2A3C] md:hidden" />
           </div>
 
           <div className="flex-1 flex flex-col justify-center px-6 sm:px-8 lg:px-14 py-5 md:py-0">

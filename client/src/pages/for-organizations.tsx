@@ -269,7 +269,7 @@ export default function ForOrganizations() {
         </div>
       </section>
 
-      <section className="py-20 sm:py-24 bg-[#0A2A3C]" data-testid="section-org-audiences">
+      <section className="py-20 sm:py-24 bg-hero" data-testid="section-org-audiences">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-14">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-5" data-testid="heading-org-audiences">

@@ -77,7 +77,7 @@ export function NewsletterCTA() {
   return (
     <>
       <section
-        className="relative py-14 sm:py-18 lg:py-20 overflow-hidden bg-[#0A2A3C]"
+        className="relative py-14 sm:py-18 lg:py-20 overflow-hidden bg-hero"
         data-testid="section-newsletter-cta"
         aria-labelledby="newsletter-heading"
       >
@@ -158,7 +158,7 @@ export function NewsletterCTA() {
             loading="lazy"
             aria-hidden="true"
           />
-          <div className="absolute inset-0 bg-[#0A2A3C]/55" />
+          <div className="absolute inset-0 bg-hero/55" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">

@@ -58,7 +58,7 @@ const featuredStory = {
 
 export function ThreatAwareness() {
   return (
-    <section className="relative overflow-hidden bg-[#0A2A3C]" data-testid="section-threat-awareness" aria-labelledby="threat-heading">
+    <section className="relative overflow-hidden bg-hero" data-testid="section-threat-awareness" aria-labelledby="threat-heading">
       <div className="relative max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-[50%_50%]">
 

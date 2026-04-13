@@ -179,7 +179,7 @@ export default function ExperiencePage() {
  <Navigation />
 
  <main id="main-content" tabIndex={-1}>
- <section className="relative overflow-hidden bg-[#0A2A3C] min-h-[600px] md:min-h-[680px]" data-testid="section-experience-hero">
+ <section className="relative overflow-hidden bg-hero min-h-[600px] md:min-h-[680px]" data-testid="section-experience-hero">
  <div className="absolute inset-0">
  <img
  src={imgSrc(heroImage)}
@@ -187,7 +187,7 @@ export default function ExperiencePage() {
  className="w-full h-full object-cover opacity-30"
  loading="eager"
  />
- <div className="absolute inset-0 bg-gradient-to-t from-[#0A2A3C] via-[#0A2A3C]/80 to-[#0A2A3C]/60" />
+ <div className="absolute inset-0 bg-gradient-to-t from-hero via-hero/80 to-hero/60 dark:from-[#0A2A3C] dark:via-[#0A2A3C]/80 dark:to-[#0A2A3C]/60" />
  </div>
 
  <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
@@ -288,7 +288,7 @@ export default function ExperiencePage() {
  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
  data-testid={`card-pillar-${i}`}
  >
- <div className="w-12 h-12 rounded-xl bg-[#0A2A3C] flex items-center justify-center mb-4">
+ <div className="w-12 h-12 rounded-xl bg-hero flex items-center justify-center mb-4">
  <pillar.icon className="w-6 h-6 text-orange-400" />
  </div>
  <h3 className="text-lg font-bold text-[#0A2A3C] mb-2">{pillar.title}</h3>
@@ -322,7 +322,7 @@ export default function ExperiencePage() {
  </div>
 
  <FadeIn
- className="relative bg-[#0A2A3C] rounded-2xl p-8 md:p-10 text-white"
+ className="relative bg-hero rounded-2xl p-8 md:p-10 text-hero-foreground"
  data-testid="card-trust-promise"
  >
  <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-[60px]" />
@@ -354,8 +354,8 @@ export default function ExperiencePage() {
  </div>
  </section>
 
- <section className="py-16 md:py-24 bg-[#0A2A3C] relative overflow-hidden" data-testid="section-experience-waitlist">
- <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#00293C] to-[#0A2A3C]" />
+ <section className="py-16 md:py-24 bg-hero relative overflow-hidden" data-testid="section-experience-waitlist">
+ <div className="absolute inset-0 bg-gradient-to-br from-hero via-hero to-hero dark:from-[#0A2A3C] dark:via-[#00293C] dark:to-[#0A2A3C]" />
  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-[120px]" />
 
  <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

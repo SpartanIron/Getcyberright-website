@@ -1024,7 +1024,7 @@ function TopicContent({
 }) {
   return (
     <div className="bg-background">
-      <div className="bg-[#0A2A3C] py-10 sm:py-14">
+      <div className="bg-hero py-10 sm:py-14">
         <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8">
           <Button
             variant="ghost"

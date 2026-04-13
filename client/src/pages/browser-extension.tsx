@@ -85,7 +85,7 @@ export default function BrowserExtensionPage() {
   return (
     <div className="min-h-screen bg-background">
 
-      <section className="relative bg-[#0A2A3C] text-white overflow-hidden">
+      <section className="relative bg-hero text-hero-foreground overflow-hidden">
         <TechPatternBg />
         <div className="container max-w-6xl mx-auto px-4 py-16 md:py-24 relative z-10">
           <Link href="/scam-checker">
@@ -203,7 +203,7 @@ export default function BrowserExtensionPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {installSteps.map((s) => (
               <div key={s.step} className="flex gap-4 items-start" data-testid={`install-step-${s.step}`}>
-                <div className="w-10 h-10 rounded-full bg-[#0A2A3C] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-hero text-hero-foreground flex items-center justify-center font-bold text-sm flex-shrink-0">
                   {s.step}
                 </div>
                 <div>
@@ -215,7 +215,7 @@ export default function BrowserExtensionPage() {
           </div>
           <div className="text-center mt-10">
             <a href="https://chromewebstore.google.com/detail/gcr-scam-guard-by-getcybe/naopegeklahanndbpanhienlkaachjhk" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="bg-[#0A2A3C] hover:bg-[#0d3a52] text-white rounded-full gap-2 text-base px-8" data-testid="button-install-chrome-store-bottom">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full gap-2 text-base px-8" data-testid="button-install-chrome-store-bottom">
                 <Chrome className="w-5 h-5" />
                 Add to Chrome - It's Free
               </Button>
@@ -295,7 +295,7 @@ export default function BrowserExtensionPage() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-[#0A2A3C]">
+      <section className="py-16 md:py-24 bg-hero">
         <div className="container max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-3" style={{ letterSpacing: "-0.025em" }}>

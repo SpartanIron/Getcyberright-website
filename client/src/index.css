@@ -74,6 +74,9 @@
   --chart-4: 280 60% 55%;
   --chart-5: 0 72% 51%;
 
+  --hero: 196 30% 94%;
+  --hero-foreground: 220 45% 15%;
+
   --font-sans: 'Sora', system-ui, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
@@ -189,6 +192,9 @@
   --destructive: 0 72% 55%;
 
   --destructive-foreground: 0 0% 100%;
+
+  --hero: 200 70% 14%;
+  --hero-foreground: 0 0% 100%;
 
   --input: 200 25% 22%;
   --ring: 174 72% 50%;
@@ -424,17 +430,45 @@ button:hover .cta-arrow-right {
   transform: translateX(5px);
 }
 
+[class*="bg-hero"] {
+  color: hsl(var(--hero-foreground));
+}
+
+:root:not(.dark) [class*="bg-hero"] .text-white,
+:root:not(.dark) [class*="bg-hero"][class*="text-white"] {
+  color: hsl(var(--hero-foreground)) !important;
+}
+
+:root:not(.dark) [class*="bg-hero"] .text-white\/80,
+:root:not(.dark) [class*="bg-hero"] .text-white\/70,
+:root:not(.dark) [class*="bg-hero"] .text-white\/60 {
+  color: hsl(var(--hero-foreground) / 0.7) !important;
+}
+
+:root:not(.dark) [class*="bg-hero"] .text-slate-300,
+:root:not(.dark) [class*="bg-hero"] .text-slate-400 {
+  color: hsl(var(--hero-foreground) / 0.65) !important;
+}
+
 .grecaptcha-badge {
   bottom: 70px !important;
 }
 
 .hero-gradient-text {
-  background: linear-gradient(135deg, hsl(174 80% 58%), hsl(174 72% 46%), hsl(16 88% 54%), hsl(40 95% 55%), hsl(174 80% 58%));
+  background: linear-gradient(135deg, hsl(174 80% 38%), hsl(174 72% 36%), hsl(16 88% 48%), hsl(40 95% 45%), hsl(174 80% 38%));
   background-size: 400% 400%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: gradient-shift 6s ease-in-out infinite;
+}
+
+.dark .hero-gradient-text {
+  background: linear-gradient(135deg, hsl(174 80% 58%), hsl(174 72% 46%), hsl(16 88% 54%), hsl(40 95% 55%), hsl(174 80% 58%));
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @keyframes gradient-shift {

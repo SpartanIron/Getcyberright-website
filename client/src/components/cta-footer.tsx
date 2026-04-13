@@ -15,7 +15,7 @@ export function CTAFooter() {
           loading="lazy"
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-[#0A2A3C]/55" />
+        <div className="absolute inset-0 bg-hero/55" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">

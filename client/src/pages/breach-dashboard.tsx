@@ -209,10 +209,10 @@ export default function BreachDashboard() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-[#0A2A3C] text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <div className="container mx-auto px-4 py-12">
           <FadeIn className="max-w-2xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-yellow-500/20 text-yellow-300 px-4 py-2 rounded-full mb-6">
+            <div className="inline-flex items-center gap-2 bg-yellow-500/20 text-yellow-600 dark:text-yellow-300 px-4 py-2 rounded-full mb-6">
               <AlertTriangle className="w-5 h-5" />
               Access Required
             </div>
@@ -258,7 +258,7 @@ export default function BreachDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0A2A3C] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-500" />
           <p className="text-slate-400">Loading your dashboard...</p>
@@ -268,7 +268,7 @@ export default function BreachDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A2A3C] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 py-12">
         <FadeIn className="max-w-4xl mx-auto">
           <div className="text-center mb-8">

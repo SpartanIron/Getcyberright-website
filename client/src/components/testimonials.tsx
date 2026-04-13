@@ -41,11 +41,11 @@ const testimonials = [
 export function Testimonials() {
   return (
     <section
-      className="py-20 sm:py-28 lg:py-32 bg-[#0A2A3C] relative overflow-hidden"
+      className="py-20 sm:py-28 lg:py-32 bg-hero relative overflow-hidden"
       data-testid="section-testimonials"
       aria-labelledby="testimonials-heading"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-hero via-hero to-hero dark:from-[#0A2A3C] dark:via-[#0A2A3C] dark:to-[#00293C]" />
 
       <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-14 sm:mb-20">

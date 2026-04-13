@@ -76,7 +76,7 @@ export function LiveActivityBar() {
   const lastUpdated = dataUpdatedAt ? getTimeAgo(new Date(dataUpdatedAt)) : null;
 
   return (
-    <section className="bg-[#0A2A3C] border-y border-white/10" data-testid="section-live-activity">
+    <section className="bg-hero border-y border-white/10" data-testid="section-live-activity">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-4">
         <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:gap-x-12">
           <div className="flex items-center gap-2">

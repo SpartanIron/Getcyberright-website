@@ -105,18 +105,18 @@ export function Navigation() {
         role="banner"
       >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-[72px] items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2.5" data-testid="link-logo">
-            <img src={imgSrc(logoImage)} alt="GetCyberRight" className="w-11 h-11 object-contain" width={44} height={44} loading="lazy" />
-            <span className="font-bold text-xl text-white tracking-tight">
+        <div className="flex h-16 items-center gap-6">
+          <Link href="/" className="flex items-center gap-2 shrink-0" data-testid="link-logo">
+            <img src={imgSrc(logoImage)} alt="GetCyberRight" className="w-9 h-9 object-contain" width={36} height={36} loading="lazy" />
+            <span className="font-bold text-lg text-white tracking-tight">
               GetCyberRight
             </span>
           </Link>
 
-          <NavigationMenu className="hidden lg:flex" aria-label="Main navigation">
-            <NavigationMenuList className="gap-1">
+          <NavigationMenu className="hidden lg:flex flex-1 justify-center" aria-label="Main navigation">
+            <NavigationMenuList className="gap-0.5">
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-[15px]" data-testid="nav-who-we-help">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-sm" data-testid="nav-who-we-help">
                   Who We Help
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -155,7 +155,7 @@ export function Navigation() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-[15px]" data-testid="nav-tools">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-sm" data-testid="nav-tools">
                   Protection Hub
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -233,7 +233,7 @@ export function Navigation() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-[15px]" data-testid="nav-learn">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-sm" data-testid="nav-learn">
                   Learning Hub
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -289,10 +289,10 @@ export function Navigation() {
                 <NavigationMenuLink asChild>
                   <Link
                     href="/news"
-                    className={`group inline-flex h-9 w-max items-center justify-center gap-1.5 rounded-md bg-transparent px-4 py-2 text-[15px] font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/news' || location.startsWith('/news/') ? 'text-primary' : ''}`}
+                    className={`group inline-flex h-9 w-max items-center justify-center gap-1.5 rounded-md bg-transparent px-3 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/news' || location.startsWith('/news/') ? 'text-primary' : ''}`}
                     data-testid="nav-news"
                   >
-                    <Newspaper className="w-4 h-4" />
+                    <Newspaper className="w-3.5 h-3.5" />
                     News & Insights
                   </Link>
                 </NavigationMenuLink>
@@ -303,7 +303,7 @@ export function Navigation() {
                 <NavigationMenuLink asChild>
                   <Link
                     href="/about"
-                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-[15px] font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/about' ? 'text-primary' : ''}`}
+                    className={`group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-3 py-2 text-sm font-medium transition-colors focus:outline-none hover-elevate text-white/90 hover:text-white ${location === '/about' ? 'text-primary' : ''}`}
                     data-testid="nav-about"
                   >
                     About Us
@@ -313,10 +313,10 @@ export function Navigation() {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden lg:flex items-center gap-3 text-white">
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
             <ThemeToggle />
             <Link href="/tools">
-              <Button variant="default" size="default" data-testid="button-get-protection">
+              <Button variant="default" size="sm" className="text-sm font-medium" data-testid="button-get-protection">
                 Check If It's a Scam
               </Button>
             </Link>

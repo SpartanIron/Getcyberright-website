@@ -138,8 +138,8 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
       <Navigation />
       
       <main id="main-content" className="flex-1" tabIndex={-1}>
-        <section className="relative overflow-hidden bg-[#0A2A3C] h-[320px] sm:h-[360px] md:h-[400px] lg:h-[420px]">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+        <section className="relative overflow-hidden bg-hero h-[320px] sm:h-[360px] md:h-[400px] lg:h-[420px]">
+          <div className="absolute inset-0 bg-gradient-to-br from-hero via-hero to-hero dark:from-[#0A2A3C] dark:via-[#0A2A3C] dark:to-[#00293C]" />
 
           <div className="absolute inset-0 hidden lg:block" aria-hidden="true">
             <img
@@ -148,7 +148,7 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
               className="w-full h-full object-cover"
               loading="eager"
             />
-            <div className="absolute inset-0 bg-[#0A2A3C]/75" />
+            <div className="absolute inset-0 bg-hero/75" />
           </div>
 
           <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
@@ -164,8 +164,8 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
               <div className="lg:hidden">
                 <div className="relative h-[130px] sm:h-[150px] overflow-hidden">
                   <img src={imgSrc(bannerImage)} alt="Diverse people learning cybersecurity together" className="w-full h-full object-cover" loading="eager" />
-                  <div className="absolute inset-0 bg-[#0A2A3C]/60" />
-                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0A2A3C] to-transparent" />
+                  <div className="absolute inset-0 bg-hero/60" />
+                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-hero to-transparent dark:from-[#0A2A3C]" />
                 </div>
               </div>
               <div className="flex-1 flex flex-col justify-center px-5 sm:px-6 lg:px-8 py-6 lg:py-0 lg:max-w-[55%]">

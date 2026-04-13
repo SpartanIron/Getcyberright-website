@@ -212,7 +212,7 @@ export default function TravelSafety() {
  const selectedEmbassy = countriesForRegion.find(c => c.country === selectedCountry);
 
  return (
- <div className="min-h-screen bg-[#0A2A3C]">
+ <div className="min-h-screen bg-background">
  <div className="max-w-6xl mx-auto px-4 py-12">
  <FadeIn
  className="text-center mb-12"

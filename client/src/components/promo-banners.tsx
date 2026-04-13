@@ -56,7 +56,7 @@ const promos: PromoBanner[] = [
     secondaryCta: "Create Free Account",
     secondaryHref: "/register",
     image: imgSrc(promoShieldImg),
-    overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/75 to-transparent",
+    overlayGradient: "from-hero/95 via-hero/75 to-transparent dark:from-[#0A2A3C]/95 dark:via-[#0A2A3C]/75",
     accentColor: "bg-teal-500 hover:bg-teal-600",
   },
   {
@@ -71,7 +71,7 @@ const promos: PromoBanner[] = [
     secondaryCta: "Learn More",
     secondaryHref: "/data-removal",
     image: imgSrc(promoPrivacyImg),
-    overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/80 to-transparent",
+    overlayGradient: "from-hero/95 via-hero/80 to-transparent dark:from-[#0A2A3C]/95 dark:via-[#0A2A3C]/80",
     accentColor: "bg-blue-500 hover:bg-blue-600",
   },
   {
@@ -86,7 +86,7 @@ const promos: PromoBanner[] = [
     secondaryCta: "Browse Courses",
     secondaryHref: "/training",
     image: imgSrc(promoFamilyImg),
-    overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/70 to-transparent",
+    overlayGradient: "from-hero/95 via-hero/70 to-transparent dark:from-[#0A2A3C]/95 dark:via-[#0A2A3C]/70",
     accentColor: "bg-emerald-500 hover:bg-emerald-600",
   },
   {
@@ -101,7 +101,7 @@ const promos: PromoBanner[] = [
     secondaryCta: "Get the Extension",
     secondaryHref: "/browser-extension",
     image: imgSrc(promoAlertImg),
-    overlayGradient: "from-[#0A2A3C]/95 via-[#0A2A3C]/75 to-transparent",
+    overlayGradient: "from-hero/95 via-hero/75 to-transparent dark:from-[#0A2A3C]/95 dark:via-[#0A2A3C]/75",
     accentColor: "bg-orange-500 hover:bg-orange-600",
   },
 ];

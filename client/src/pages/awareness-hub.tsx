@@ -142,8 +142,8 @@ export default function AwarenessHub() {
       <StructuredData data={[breadcrumbs]} />
       <Navigation />
 
-      <div className="bg-[#0A2A3C] text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0A2A3C] via-[#0A2A3C] to-[#00293C]" />
+      <div className="bg-hero text-hero-foreground relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-hero via-hero to-hero dark:from-[#0A2A3C] dark:via-[#0A2A3C] dark:to-[#00293C]" />
 
         <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: "-40%", right: "2%", width: "50px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center", filter: "drop-shadow(0 0 18px rgba(13, 148, 136, 0.15))" }} />
