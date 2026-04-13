@@ -43,13 +43,13 @@ function isLikelyWebGLCapable(): boolean {
 function GlobeFallback({ data, onRetry, errorDetail }: { data: any; onRetry?: () => void; errorDetail?: string }) {
   const hotspots = (data?.hotspots || []).slice(0, 12);
   return (
-    <div className="w-full aspect-square max-w-[700px] mx-auto bg-card dark:bg-slate-800/30 border border-border rounded-2xl flex flex-col items-center justify-center p-6" data-testid="globe-fallback">
-      <GlobeIcon className="w-16 h-16 text-primary/30 mb-4" />
-      <p className="text-sm text-muted-foreground mb-1">3D Globe could not load</p>
-      <p className="text-xs text-muted-foreground/70 mb-4">
+    <div className="w-full max-w-[700px] mx-auto bg-card dark:bg-slate-800/30 border border-border rounded-2xl flex flex-col items-center justify-center p-6" data-testid="globe-fallback">
+      <GlobeIcon className="w-12 h-12 text-primary/30 mb-3" />
+      <p className="text-sm text-muted-foreground mb-1">Interactive Scam Threat Map</p>
+      <p className="text-xs text-muted-foreground/70 mb-3">
         {errorDetail
-          ? `Error: ${errorDetail}. Try refreshing or using a different browser.`
-          : "Your browser may not support WebGL, or the 3D engine had a problem loading. Here's the data instead:"}
+          ? "The 3D globe could not render in this browser. Try enabling hardware acceleration in your browser settings, or try a different browser."
+          : "Data is shown below. The 3D globe requires WebGL and hardware acceleration."}
       </p>
       {onRetry && (
         <button
@@ -439,6 +439,11 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setWebglSupported(shouldAttempt);
     if (!shouldAttempt) return;
 
+    if (typeof window !== "undefined" && (window as any).THREE) {
+      console.warn("[ScamGlobe] window.THREE detected - clearing to prevent conflict");
+      delete (window as any).THREE;
+    }
+
     setLoadError(false);
     setGlobeComponent(null);
     let cancelled = false;
@@ -447,6 +452,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     const timer = setTimeout(() => {
       if (!cancelled && !loaded) {
         console.warn("[ScamGlobe] Globe library timed out after 30s");
+        setErrorDetail("Globe library took too long to load");
         setLoadError(true);
       }
     }, 30000);
@@ -574,6 +580,11 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
         ref={globeRef}
         width={dimensions.w || 600}
         height={dimensions.h || 600}
+        rendererConfig={{
+          powerPreference: "default",
+          failIfMajorPerformanceCaveat: false,
+          preserveDrawingBuffer: false,
+        }}
         globeImageUrl="https://unpkg.com/three-globe/example/img/earth-night.jpg"
         bumpImageUrl="https://unpkg.com/three-globe/example/img/earth-topology.png"
         backgroundImageUrl=""
