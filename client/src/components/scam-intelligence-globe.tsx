@@ -40,17 +40,44 @@ function isLikelyWebGLCapable(): boolean {
   return isDesktopChrome || isDesktopFirefox || isDesktopEdge || isSafari;
 }
 
+function isWebGLContextBlocked(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
+    return !gl;
+  } catch {
+    return true;
+  }
+}
+
 function GlobeFallback({ data, onRetry, errorDetail }: { data: any; onRetry?: () => void; errorDetail?: string }) {
   const hotspots = (data?.hotspots || []).slice(0, 12);
+  const isWebGLError = errorDetail && /WebGL|context/i.test(errorDetail);
+  const contextBlocked = typeof window !== "undefined" && isWebGLError && isWebGLContextBlocked();
+
   return (
     <div className="w-full max-w-[700px] mx-auto bg-card dark:bg-slate-800/30 border border-border rounded-2xl flex flex-col items-center justify-center p-6" data-testid="globe-fallback">
       <GlobeIcon className="w-12 h-12 text-primary/30 mb-3" />
       <p className="text-sm text-muted-foreground mb-1">Interactive Scam Threat Map</p>
-      <p className="text-xs text-muted-foreground/70 mb-3">
-        {errorDetail
-          ? "The 3D globe could not render in this browser. Try enabling hardware acceleration in your browser settings, or try a different browser."
-          : "Data is shown below. The 3D globe requires WebGL and hardware acceleration."}
-      </p>
+      {contextBlocked ? (
+        <div className="text-center mb-3 max-w-sm">
+          <p className="text-xs text-amber-400/90 mb-2">
+            The 3D globe could not start because WebGL is unavailable.
+          </p>
+          <p className="text-xs text-muted-foreground/70">
+            This can happen if a browser extension is blocking WebGL, hardware acceleration is off,
+            or your GPU driver does not support it.
+            Try opening this page in an Incognito/Private window, whitelisting this site in your extensions,
+            or enabling hardware acceleration in your browser settings.
+          </p>
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground/70 mb-3">
+          {errorDetail
+            ? "The 3D globe could not render. Try refreshing, enabling hardware acceleration, or using a different browser."
+            : "Data is shown below. The 3D globe requires WebGL and hardware acceleration."}
+        </p>
+      )}
       {onRetry && (
         <button
           onClick={onRetry}
@@ -439,10 +466,15 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setWebglSupported(shouldAttempt);
     if (!shouldAttempt) return;
 
-    if (typeof window !== "undefined" && (window as any).THREE) {
-      console.warn("[ScamGlobe] window.THREE detected - clearing to prevent conflict");
-      delete (window as any).THREE;
-    }
+    try {
+      if (typeof window !== "undefined" && (window as any).THREE) {
+        const desc = Object.getOwnPropertyDescriptor(window, "THREE");
+        if (!desc || desc.configurable) {
+          console.warn("[ScamGlobe] window.THREE detected - clearing to prevent conflict");
+          delete (window as any).THREE;
+        }
+      }
+    } catch { /* ignore non-configurable property */ }
 
     setLoadError(false);
     setGlobeComponent(null);
