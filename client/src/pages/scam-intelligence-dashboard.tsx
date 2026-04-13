@@ -8,7 +8,6 @@ import { ScamIntelligenceGlobe } from "@/components/scam-intelligence-globe";
 import { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection, LocalRiskSummary, ProtectFamilyPanel, ToolConnectionBanner, FamilyConversationStarters } from "@/components/scam-intel-dashboard";
 import { Globe, ArrowLeft, AlertCircle, Search, X, MapPin } from "lucide-react";
 import { Link } from "@/lib/navigation";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 function DataError({ label }: { label: string }) {
   return (
@@ -21,7 +20,6 @@ function DataError({ label }: { label: string }) {
 }
 
 export default function ScamIntelligenceDashboard() {
-  const isMobile = useIsMobile();
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [visitorCountryCode, setVisitorCountryCode] = useState<string | null>(null);
@@ -140,75 +138,68 @@ export default function ScamIntelligenceDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-7 xl:col-span-8">
                 <div className="bg-slate-900/50 border border-slate-700/50 rounded-2xl p-4 mb-6" data-testid="globe-container">
-                  {!isMobile && (
-                    <>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Globe className="w-4 h-4 text-cyan-400" />
-                        <span className="text-sm font-semibold text-white">Live Scam Activity Map</span>
-                        <div className="ml-auto flex items-center gap-3 text-[10px] text-slate-400">
-                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> Critical</span>
-                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> High</span>
-                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> Medium</span>
-                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Low</span>
-                        </div>
-                      </div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Globe className="w-4 h-4 text-cyan-400" />
+                    <span className="text-sm font-semibold text-white">Live Scam Activity Map</span>
+                    <div className="ml-auto flex items-center gap-3 text-[10px] text-slate-400">
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> Critical</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> High</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> Medium</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Low</span>
+                    </div>
+                  </div>
 
-                      <div className="relative mb-3" data-testid="country-search">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                          <input
-                            ref={searchRef}
-                            type="text"
-                            placeholder="Search for a country..."
-                            value={searchQuery}
-                            onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
-                            onFocus={() => setSearchOpen(true)}
-                            className="w-full bg-slate-800/60 border border-slate-700/50 rounded-lg pl-9 pr-8 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/50 focus:outline-none transition-colors"
-                            data-testid="country-search-input"
-                          />
-                          {searchQuery && (
-                            <button
-                              onClick={() => { setSearchQuery(""); setSearchOpen(false); }}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-                              data-testid="clear-search"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                        {searchOpen && filteredCountries.length > 0 && (
-                          <div className="absolute z-20 w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden" data-testid="country-search-results">
-                            {filteredCountries.map((c: any) => (
-                              <button
-                                key={c.code}
-                                onClick={() => handleCountrySearch(c.code, c.name)}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white hover:bg-slate-800 transition-colors text-left"
-                                data-testid={`search-result-${c.code}`}
-                              >
-                                <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                                {c.name}
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                  <div className="relative mb-3" data-testid="country-search">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        ref={searchRef}
+                        type="text"
+                        placeholder="Search for a country..."
+                        value={searchQuery}
+                        onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
+                        onFocus={() => setSearchOpen(true)}
+                        className="w-full bg-slate-800/60 border border-slate-700/50 rounded-lg pl-9 pr-8 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/50 focus:outline-none transition-colors"
+                        data-testid="country-search-input"
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={() => { setSearchQuery(""); setSearchOpen(false); }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                          data-testid="clear-search"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                    {searchOpen && filteredCountries.length > 0 && (
+                      <div className="absolute z-20 w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden" data-testid="country-search-results">
+                        {filteredCountries.map((c: any) => (
+                          <button
+                            key={c.code}
+                            onClick={() => handleCountrySearch(c.code, c.name)}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white hover:bg-slate-800 transition-colors text-left"
+                            data-testid={`search-result-${c.code}`}
+                          >
+                            <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                            {c.name}
+                          </button>
+                        ))}
                       </div>
-                    </>
-                  )}
+                    )}
+                  </div>
 
                   <ScamIntelligenceGlobe
                     data={globeData as any}
                     onCountrySelect={handleCountrySelect}
                     focusCountryCode={effectiveFocusCode}
                   />
-
-                  {!isMobile && (
-                    <div className="text-center mt-3">
-                      <p className="text-[11px] text-slate-500">
-                        Click any glowing dot to see scam details for that country. The lines show how scams spread between countries.
-                        Scroll to zoom in. Data updates every 30 minutes.
-                      </p>
-                    </div>
-                  )}
+                  <div className="text-center mt-3">
+                    <p className="text-[11px] text-slate-500">
+                      Click any glowing dot to see scam details for that country. The lines show how scams spread between countries.
+                      Scroll to zoom in. Data updates every 30 minutes.
+                    </p>
+                  </div>
                 </div>
 
                 {regionalError ? <DataError label="Scam type breakdown" /> : <ScamTypeBreakdown scamTypes={(regionalData as any)?.scamTypes || []} />}

@@ -410,7 +410,6 @@ function MobileGlobeView({ data, onCountrySelect, focusCountryCode }: ScamIntell
 function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focusCountryCode }: ScamIntelligenceGlobeProps) {
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
   const [loadError, setLoadError] = useState(false);
   const [webglSupported, setWebglSupported] = useState(true);
@@ -423,15 +422,6 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    const mql = window.matchMedia("(max-width: 767px)");
-    mql.addEventListener("change", checkMobile);
-    return () => mql.removeEventListener("change", checkMobile);
-  }, []);
-
-  useEffect(() => {
-    if (isMobile === null || isMobile) return;
     const supported = checkWebGLSupport();
     setWebglSupported(supported);
     if (!supported) return;
@@ -466,7 +456,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [retryCount, isMobile]);
+  }, [retryCount]);
 
   useEffect(() => {
     if (!containerRef.current || width) return;
@@ -531,25 +521,6 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setWebglSupported(checkWebGLSupport());
     setRetryCount(c => c + 1);
   }, []);
-
-  if (isMobile === null) {
-    return (
-      <div
-        ref={containerRef}
-        className="w-full aspect-square max-w-[700px] mx-auto bg-[#060d1a] rounded-2xl flex items-center justify-center"
-        data-testid="globe-detecting"
-      >
-        <div className="text-center">
-          <GlobeIcon className="w-10 h-10 text-cyan-400/30 mx-auto mb-2 animate-pulse" />
-          <div className="text-cyan-400/50 text-sm">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (isMobile) {
-    return <MobileGlobeView data={data} onCountrySelect={onCountrySelect} focusCountryCode={focusCountryCode} />;
-  }
 
   if (!webglSupported || loadError) {
     return <GlobeFallback data={data} onRetry={handleRetry} />;
