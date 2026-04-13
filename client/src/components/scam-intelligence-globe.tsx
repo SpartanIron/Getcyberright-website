@@ -35,6 +35,16 @@ function checkWebGLSupport(): boolean {
   }
 }
 
+function isLikelyWebGLCapable(): boolean {
+  if (typeof window === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  const isDesktopChrome = /Chrome\/\d+/.test(ua) && !/Mobile/.test(ua);
+  const isDesktopFirefox = /Firefox\/\d+/.test(ua) && !/Mobile/.test(ua);
+  const isDesktopEdge = /Edg\/\d+/.test(ua);
+  const isSafari = /Safari\/\d+/.test(ua) && /Mac OS/.test(ua) && !/Chrome/.test(ua);
+  return isDesktopChrome || isDesktopFirefox || isDesktopEdge || isSafari;
+}
+
 function GlobeFallback({ data, onRetry }: { data: any; onRetry?: () => void }) {
   const hotspots = (data?.hotspots || []).slice(0, 12);
   return (
@@ -422,10 +432,12 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    const supported = checkWebGLSupport();
-    console.log("[ScamGlobe] WebGL supported:", supported);
-    setWebglSupported(supported);
-    if (!supported) return;
+    const directCheck = checkWebGLSupport();
+    const likelyCapable = isLikelyWebGLCapable();
+    const shouldAttempt = directCheck || likelyCapable;
+    console.log("[ScamGlobe] WebGL check:", directCheck, "| Likely capable:", likelyCapable, "| Will attempt:", shouldAttempt);
+    setWebglSupported(shouldAttempt);
+    if (!shouldAttempt) return;
 
     setLoadError(false);
     setGlobeComponent(null);

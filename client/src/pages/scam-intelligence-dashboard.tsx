@@ -8,6 +8,7 @@ import { ScamIntelligenceGlobe } from "@/components/scam-intelligence-globe";
 import { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection, LocalRiskSummary, ProtectFamilyPanel, ToolConnectionBanner, FamilyConversationStarters } from "@/components/scam-intel-dashboard";
 import { Globe, ArrowLeft, AlertCircle, Search, X, MapPin } from "lucide-react";
 import { Link } from "@/lib/navigation";
+import { useTheme } from "@/components/theme-provider";
 
 function DataError({ label }: { label: string }) {
   return (
@@ -20,6 +21,22 @@ function DataError({ label }: { label: string }) {
 }
 
 export default function ScamIntelligenceDashboard() {
+  const { theme, setTheme } = useTheme();
+  const prevThemeRef = useRef<string>(theme);
+
+  useEffect(() => {
+    prevThemeRef.current = theme;
+    if (theme !== "dark") {
+      setTheme("dark");
+    }
+    return () => {
+      const original = prevThemeRef.current;
+      if (original && original !== "dark") {
+        setTheme(original as "light" | "dark");
+      }
+    };
+  }, []);
+
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [visitorCountryCode, setVisitorCountryCode] = useState<string | null>(null);
