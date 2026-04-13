@@ -148,33 +148,33 @@ Write ONLY the comment text, nothing else.`,
 function generateFallbackComment(title: string, topic: string): string {
   const templates: Record<string, string[]> = {
     data_breach: [
-      "I've been helping people deal with breaches for years and the same advice always applies — change those passwords now, turn on two-factor auth, and check your bank statements for the next few weeks. Don't wait on the company to tell you what to do.",
+      "I've been helping people deal with breaches for years and the same advice always applies: change those passwords now, turn on two-factor auth, and check your bank statements for the next few weeks. Don't wait on the company to tell you what to do.",
       "Honestly, the number of people who reuse passwords across sites is what makes breaches like this so dangerous. If that email/password combo is the same one you use for your bank, go change it right now. Seriously, right now.",
       "My neighbor got hit by a breach like this last year and didn't find out until someone opened a credit card in her name. Freezing your credit with all three bureaus takes about 15 minutes and it's free.",
     ],
     phishing: [
-      "I tell everyone the same thing — if an email makes you feel like you need to act RIGHT NOW, that's exactly when you should slow down. Scammers bank on panic. Call the company directly using a number you look up yourself.",
+      "I tell everyone the same thing: if an email makes you feel like you need to act RIGHT NOW, that's exactly when you should slow down. Scammers bank on panic. Call the company directly using a number you look up yourself.",
       "The phishing emails going around lately are wild. I almost clicked one myself last week that looked exactly like a real shipping notification. The only giveaway was hovering over the link and seeing a weird domain.",
       "My mom got one of these last month and thankfully called me before clicking. The trick that works best is just picking up the phone and calling whoever supposedly sent you the message.",
     ],
     ransomware: [
       "The thing nobody talks about enough with ransomware is backups. A $50 external hard drive and 20 minutes a week backing up your files takes away most of the leverage these attackers have.",
-      "Seen way too many small businesses get wiped out by this. The fix isn't complicated — keep backups offline, keep your software updated, and make sure your team knows not to open weird attachments.",
+      "Seen way too many small businesses get wiped out by this. The fix isn't complicated: keep backups offline, keep your software updated, and make sure your team knows not to open weird attachments.",
     ],
     vulnerability: [
       "If you haven't updated yet, go do it now. I know update notifications are annoying but this one actually matters. Takes a couple minutes and saves you a massive headache later.",
-      "I keep telling people — turn on automatic updates and forget about it. Most of these vulnerabilities get exploited within days of being announced. The people who patch fast are the ones who don't get hit.",
+      "I keep telling people: turn on automatic updates and forget about it. Most of these vulnerabilities get exploited within days of being announced. The people who patch fast are the ones who don't get hit.",
     ],
     scam: [
-      "This one's been making the rounds. The biggest red flag is always urgency — \"act now or lose your account\" type language. Real companies don't operate that way. When in doubt, hang up and call back using the number on their actual website.",
+      "This one's been making the rounds. The biggest red flag is always urgency, like \"act now or lose your account\" type language. Real companies don't operate that way. When in doubt, hang up and call back using the number on their actual website.",
       "My uncle fell for something like this a few months back. The scammers are getting really good at sounding legit. Best thing you can do is just never act on an unsolicited call or message without verifying independently first.",
     ],
     family_safety: [
       "I've found the best thing you can do is just sit with your kids while they're online sometimes. Not hovering, just being around and asking what they're watching or who they're talking to. It opens up conversations naturally.",
-      "Had a good talk with my teenager last week about this kind of thing. The reality is they're going to be online whether we like it or not — the goal is making sure they know what to watch out for and feel comfortable telling us when something feels off.",
+      "Had a good talk with my teenager last week about this kind of thing. The reality is they're going to be online whether we like it or not. The goal is making sure they know what to watch out for and feel comfortable telling us when something feels off.",
     ],
     general: [
-      "This is worth paying attention to. The thing most people don't realize is that basic precautions — strong unique passwords, two-factor auth, and not clicking random links — stop the vast majority of attacks.",
+      "This is worth paying attention to. The thing most people don't realize is that basic precautions like strong unique passwords, two-factor auth, and not clicking random links stop the vast majority of attacks.",
       "We've been seeing a lot more of this lately. If nothing else, take five minutes today to make sure your important accounts have two-factor turned on. It's the single best thing you can do.",
     ],
   };

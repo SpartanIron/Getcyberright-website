@@ -31,7 +31,7 @@ export const additionalGuides: CriticalGuideData[] = [
       { question: "Is SMS two-factor authentication safe?", answer: "SMS-based 2FA is better than no 2FA, but it is vulnerable to SIM swapping. Use authenticator apps like Google Authenticator or Authy for stronger protection. Hardware security keys offer the best protection." },
       { question: "Can I get my money back if I am SIM swapped?", answer: "Contact your bank immediately. Many banks will reverse unauthorized transactions if reported quickly. File a report with the FBI at ic3.gov and your local police. Document everything for insurance and legal purposes." },
     ],
-    content: `SIM swapping is one of the fastest-growing cyberattacks, with the FBI reporting tens of millions in losses annually — and rising. This guide explains how SIM swapping works and exactly how to protect yourself.
+    content: `SIM swapping is one of the fastest-growing cyberattacks, with the FBI reporting tens of millions in losses annually, and rising. This guide explains how SIM swapping works and exactly how to protect yourself.
 
 ## What Is SIM Swapping?
 

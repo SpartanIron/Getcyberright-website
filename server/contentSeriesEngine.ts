@@ -47,13 +47,13 @@ const SERIES_CONFIGS: Record<SeriesType, SeriesConfig> = {
     name: "Learning Spotlight",
     frequency: "weekly",
     dayOfWeek: 3,
-    description: "Wednesday spotlight on a free or affordable cybersecurity or AI learning opportunity — real courses, certifications, workshops, and career resources",
+    description: "Wednesday spotlight on a free or affordable cybersecurity or AI learning opportunity: real courses, certifications, workshops, and career resources",
   },
   ai_skills_weekly: {
     name: "AI Skills Weekly",
     frequency: "weekly",
     dayOfWeek: 6,
-    description: "Saturday spotlight on AI literacy — free courses, practical AI skills, and understanding AI safety for families",
+    description: "Saturday spotlight on AI literacy: free courses, practical AI skills, and understanding AI safety for families",
   },
 };
 

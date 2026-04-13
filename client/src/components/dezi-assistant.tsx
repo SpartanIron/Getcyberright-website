@@ -175,7 +175,7 @@ const localResponses: LocalMatch[] = [
   {
     pattern: (t) => /(bundle|both.*product|complete.*protection|total.*protection|scam.*guard.*data.*shield|data.*shield.*scam.*guard)/.test(t),
     responses: [
-      "Both GCR Scam Guard and GCR Data Shield are completely free right now, no bundles needed! You get full access to all features across both products. Just create a free account and everything is yours.",
+      "Both GCR Scam Guard and GCR Data Shield are completely free right now. No bundles needed! You get full access to all features across both products. Just create a free account and everything is yours.",
     ],
   },
   {

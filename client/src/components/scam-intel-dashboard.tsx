@@ -512,7 +512,7 @@ const FAMILY_TALKING_POINTS: Record<string, Record<string, string[]>> = {
 function getDefaultTalkingPoints(scamLabel: string, audience: string): string[] {
   const audienceLabels: Record<string, string> = { kids: "children", teens: "teenagers", parents: "older adults", partner: "your household" };
   return [
-    `There's a new scam trend called "${scamLabel}." Here's what ${audienceLabels[audience] || "everyone"} should watch out for`,
+    `There's a new scam trend called "${scamLabel}," and here's what ${audienceLabels[audience] || "everyone"} should watch out for`,
     `If something feels too urgent or too good to be true, take a pause and talk to someone you trust before acting`,
   ];
 }
