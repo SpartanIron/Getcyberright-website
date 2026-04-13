@@ -76,18 +76,18 @@ const SEVERITY_COLORS: Record<string, string> = {
 };
 
 const SEVERITY_TEXT: Record<string, string> = {
-  critical: "text-red-400",
-  high: "text-orange-400",
-  medium: "text-yellow-400",
-  low: "text-green-400",
-  info: "text-blue-400",
+  critical: "text-red-600 dark:text-red-400",
+  high: "text-orange-600 dark:text-orange-400",
+  medium: "text-yellow-600 dark:text-yellow-400",
+  low: "text-green-600 dark:text-green-400",
+  info: "text-blue-600 dark:text-blue-400",
 };
 
 const RISK_BADGE: Record<string, { bg: string; text: string }> = {
-  critical: { bg: "bg-red-500/15 border-red-500/30", text: "text-red-400" },
-  high: { bg: "bg-orange-500/15 border-orange-500/30", text: "text-orange-400" },
-  medium: { bg: "bg-yellow-500/15 border-yellow-500/30", text: "text-yellow-400" },
-  low: { bg: "bg-green-500/15 border-green-500/30", text: "text-green-400" },
+  critical: { bg: "bg-red-500/15 border-red-500/30", text: "text-red-600 dark:text-red-400" },
+  high: { bg: "bg-orange-500/15 border-orange-500/30", text: "text-orange-600 dark:text-orange-400" },
+  medium: { bg: "bg-yellow-500/15 border-yellow-500/30", text: "text-yellow-600 dark:text-yellow-400" },
+  low: { bg: "bg-green-500/15 border-green-500/30", text: "text-green-600 dark:text-green-400" },
 };
 
 const ICON_MAP: Record<string, any> = {
@@ -95,7 +95,8 @@ const ICON_MAP: Record<string, any> = {
   Bug, Briefcase, UserX, Fingerprint, TrendingUp, AlertTriangle,
 };
 
-function formatNumber(n: number): string {
+function formatNumber(n: number | undefined | null): string {
+  if (n == null) return "0";
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
   if (n >= 1000) return (n / 1000).toFixed(0) + "K";
   return n.toString();
@@ -116,19 +117,19 @@ function GlobalStatsBar({ stats }: { stats: GlobalStats | null }) {
   if (!stats) return null;
   const items = [
     { label: "Scams Reported", value: formatNumber(stats.totalIncidentsTracked), icon: Activity },
-    { label: "Countries Tracked", value: stats.countriesCovered.toString(), icon: Globe },
-    { label: "Trusted Sources", value: stats.sourcesMonitored.toString(), icon: Eye },
-    { label: "Money Lost to Scams", value: stats.totalLossesTracked, icon: TrendingUp },
-    { label: "Types of Scams", value: stats.activeScamTypes.toString(), icon: AlertTriangle },
+    { label: "Countries Tracked", value: String(stats.countriesCovered ?? 0), icon: Globe },
+    { label: "Trusted Sources", value: String(stats.sourcesMonitored ?? 0), icon: Eye },
+    { label: "Money Lost to Scams", value: stats.totalLossesTracked || "$0", icon: TrendingUp },
+    { label: "Types of Scams", value: String(stats.activeScamTypes ?? 0), icon: AlertTriangle },
   ];
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" data-testid="global-stats-bar">
       {items.map((item) => (
-        <div key={item.label} className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-3 text-center hover:border-cyan-500/30 transition-colors">
-          <item.icon className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
-          <div className="text-xl font-bold text-white">{item.value}</div>
-          <div className="text-[11px] text-slate-400">{item.label}</div>
+        <div key={item.label} className="bg-card border border-border rounded-xl p-3 text-center hover:border-primary/30 transition-colors">
+          <item.icon className="w-4 h-4 text-primary mx-auto mb-1" />
+          <div className="text-xl font-bold text-foreground">{item.value}</div>
+          <div className="text-[11px] text-muted-foreground">{item.label}</div>
         </div>
       ))}
     </div>
@@ -141,29 +142,29 @@ function LiveFeedTicker({ events }: { events: LiveFeedEvent[] }) {
 
   if (events.length === 0) {
     return (
-      <div className="bg-slate-800/30 rounded-xl p-6 text-center">
-        <Radio className="w-6 h-6 text-slate-500 mx-auto mb-2" />
-        <p className="text-slate-400 text-sm">Loading latest scam reports...</p>
+      <div className="bg-card border border-border rounded-xl p-6 text-center">
+        <Radio className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+        <p className="text-muted-foreground text-sm">Loading latest scam reports...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="live-feed-ticker">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
+    <div className="bg-card border border-border rounded-xl overflow-hidden" data-testid="live-feed-ticker">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-secondary/50">
         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-        <span className="text-sm font-semibold text-white">Latest Scam Reports</span>
-        <span className="text-xs text-slate-400 ml-auto">{events.length} events</span>
+        <span className="text-sm font-semibold text-foreground">Latest Scam Reports</span>
+        <span className="text-xs text-muted-foreground ml-auto">{events.length} events</span>
       </div>
-      <div className="divide-y divide-slate-700/30 max-h-[480px] overflow-y-auto">
+      <div className="divide-y divide-border max-h-[480px] overflow-y-auto">
         {events.slice(0, visibleCount).map((event) => (
-          <div key={event.id} className="px-4 py-2.5 hover:bg-slate-700/20 transition-colors group">
+          <div key={event.id} className="px-4 py-2.5 hover:bg-secondary/50 transition-colors group">
             <div className="flex items-start gap-2">
-              <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${SEVERITY_COLORS[event.severity] || "bg-slate-500"}`} />
+              <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${SEVERITY_COLORS[event.severity] || "bg-muted-foreground"}`} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-white leading-tight line-clamp-2">{event.title}</p>
-                <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-400">
-                  <span className={`font-medium ${SEVERITY_TEXT[event.severity] || "text-slate-400"}`}>{event.severity}</span>
+                <p className="text-sm text-foreground leading-tight line-clamp-2">{event.title}</p>
+                <div className="flex items-center gap-2 mt-1 text-[11px] text-muted-foreground">
+                  <span className={`font-medium ${SEVERITY_TEXT[event.severity] || "text-muted-foreground"}`}>{event.severity}</span>
                   <span>·</span>
                   <span>{event.source}</span>
                   <span>·</span>
@@ -178,7 +179,7 @@ function LiveFeedTicker({ events }: { events: LiveFeedEvent[] }) {
       {visibleCount < events.length && (
         <button
           onClick={() => setVisibleCount((c) => c + 10)}
-          className="w-full py-2 text-xs text-cyan-400 hover:text-cyan-300 border-t border-slate-700/50 transition-colors"
+          className="w-full py-2 text-xs text-primary hover:text-primary/80 border-t border-border transition-colors"
           data-testid="load-more-events"
         >
           Show more events
@@ -194,12 +195,12 @@ function ScamTypeBreakdown({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
   if (scamTypes.length === 0) return null;
 
   return (
-    <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="scam-type-breakdown">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
-        <BarChart3 className="w-4 h-4 text-cyan-400" />
-        <span className="text-sm font-semibold text-white">Most Common Scams Right Now</span>
+    <div className="bg-card border border-border rounded-xl overflow-hidden" data-testid="scam-type-breakdown">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-secondary/50">
+        <BarChart3 className="w-4 h-4 text-primary" />
+        <span className="text-sm font-semibold text-foreground">Most Common Scams Right Now</span>
       </div>
-      <div className="divide-y divide-slate-700/30">
+      <div className="divide-y divide-border">
         {scamTypes.slice(0, 8).map((scam) => {
           const IconComp = ICON_MAP[scam.icon] || AlertTriangle;
           const isExpanded = expandedType === scam.type;
@@ -210,7 +211,7 @@ function ScamTypeBreakdown({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
             <div key={scam.type}>
               <button
                 onClick={() => setExpandedType(isExpanded ? null : scam.type)}
-                className="w-full px-4 py-3 hover:bg-slate-700/20 transition-colors text-left"
+                className="w-full px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
                 data-testid={`scam-type-${scam.type}`}
               >
                 <div className="flex items-center gap-3">
@@ -219,16 +220,16 @@ function ScamTypeBreakdown({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-white font-medium">{scam.label}</span>
+                      <span className="text-sm text-foreground font-medium">{scam.label}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-white font-semibold">{formatNumber(scam.count)}</span>
-                        <span className={`text-[10px] font-medium ${scam.trend === "up" ? "text-red-400" : scam.trend === "down" ? "text-green-400" : "text-slate-400"}`}>
+                        <span className="text-xs text-foreground font-semibold">{formatNumber(scam.count)}</span>
+                        <span className={`text-[10px] font-medium ${scam.trend === "up" ? "text-red-600 dark:text-red-400" : scam.trend === "down" ? "text-green-600 dark:text-green-400" : "text-muted-foreground"}`}>
                           {scam.trend === "up" ? "↑" : scam.trend === "down" ? "↓" : "→"}{scam.trendPercent}%
                         </span>
-                        {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                        {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
                       </div>
                     </div>
-                    <div className="w-full bg-slate-700/40 rounded-full h-1.5">
+                    <div className="w-full bg-secondary rounded-full h-1.5">
                       <div className="h-1.5 rounded-full transition-all duration-700" style={{ width: `${barWidth}%`, backgroundColor: scam.color }} />
                     </div>
                   </div>
@@ -236,23 +237,23 @@ function ScamTypeBreakdown({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
               </button>
               {isExpanded && (
                 <div className="px-4 pb-3 pl-[60px]">
-                  <p className="text-xs text-slate-400 mb-2">{scam.description}</p>
+                  <p className="text-xs text-muted-foreground mb-2">{scam.description}</p>
                   <div className="flex flex-wrap gap-2 text-[11px] mb-3">
-                    <span className="text-slate-500">Typical loss per victim: <span className="text-orange-400 font-medium">{scam.averageLoss}</span></span>
-                    <span className="text-slate-500">·</span>
-                    <span className="text-slate-500">Most affected: <span className="text-cyan-400">{scam.topRegions.join(", ")}</span></span>
+                    <span className="text-muted-foreground">Typical loss per victim: <span className="text-orange-600 dark:text-orange-400 font-medium">{scam.averageLoss}</span></span>
+                    <span className="text-muted-foreground">·</span>
+                    <span className="text-muted-foreground">Most affected: <span className="text-primary">{scam.topRegions.join(", ")}</span></span>
                   </div>
                   {scam.protectionTips && scam.protectionTips.length > 0 && (
                     <div className="bg-green-500/5 border border-green-500/20 rounded-lg p-2.5" data-testid={`protection-tips-${scam.type}`}>
                       <div className="flex items-center gap-1.5 mb-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
-                        <span className="text-[11px] font-semibold text-green-400">How to protect yourself</span>
+                        <ShieldCheck className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                        <span className="text-[11px] font-semibold text-green-600 dark:text-green-400">How to protect yourself</span>
                       </div>
                       <ul className="space-y-1">
                         {scam.protectionTips.map((tip, i) => (
                           <li key={i} className="flex gap-2 text-[11px]">
-                            <span className="text-green-400 flex-shrink-0">✓</span>
-                            <span className="text-slate-300">{tip}</span>
+                            <span className="text-green-600 dark:text-green-400 flex-shrink-0">✓</span>
+                            <span className="text-muted-foreground">{tip}</span>
                           </li>
                         ))}
                       </ul>
@@ -277,10 +278,10 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
   const selected = regions.find((r) => r.region === selectedRegion);
 
   return (
-    <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="regional-panel">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
-        <MapPin className="w-4 h-4 text-cyan-400" />
-        <span className="text-sm font-semibold text-white">Scams by Region</span>
+    <div className="bg-card border border-border rounded-xl overflow-hidden" data-testid="regional-panel">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-secondary/50">
+        <MapPin className="w-4 h-4 text-primary" />
+        <span className="text-sm font-semibold text-foreground">Scams by Region</span>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3">
@@ -291,11 +292,11 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
             <button
               key={region.region}
               onClick={() => onSelectRegion(isSelected ? null : region.region)}
-              className={`rounded-lg p-2.5 text-left border transition-all ${isSelected ? "border-cyan-500/50 bg-cyan-500/10" : "border-slate-700/30 bg-slate-800/30 hover:border-slate-600"}`}
+              className={`rounded-lg p-2.5 text-left border transition-all ${isSelected ? "border-primary/50 bg-primary/10" : "border-border bg-secondary/50 hover:border-primary/30"}`}
               data-testid={`region-${region.region.toLowerCase().replace(/\s/g, "-")}`}
             >
-              <div className="text-xs font-medium text-white mb-1">{region.region}</div>
-              <div className="text-lg font-bold text-white">{formatNumber(region.totalIncidents)}</div>
+              <div className="text-xs font-medium text-foreground mb-1">{region.region}</div>
+              <div className="text-lg font-bold text-foreground">{formatNumber(region.totalIncidents)}</div>
               <div className={`inline-flex text-[10px] px-1.5 py-0.5 rounded border ${badge.bg} ${badge.text}`}>
                 {region.riskLevel}
               </div>
@@ -305,31 +306,31 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
       </div>
 
       {selected && (
-        <div className="px-4 pb-4 border-t border-slate-700/30 pt-3">
+        <div className="px-4 pb-4 border-t border-border pt-3">
           <div className="mb-3">
-            <h4 className="text-sm font-semibold text-white mb-1">{selected.region}: What You Should Know</h4>
-            <p className="text-xs text-slate-400 leading-relaxed">{selected.keyInsight}</p>
+            <h4 className="text-sm font-semibold text-foreground mb-1">{selected.region}: What You Should Know</h4>
+            <p className="text-xs text-muted-foreground leading-relaxed">{selected.keyInsight}</p>
           </div>
           <div className="mb-3">
-            <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1.5">Biggest Scams Here</div>
+            <div className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5">Biggest Scams Here</div>
             <div className="flex flex-wrap gap-1.5">
               {selected.topScamTypes.slice(0, 4).map((s) => (
-                <span key={s.type} className="text-[10px] bg-slate-700/50 text-cyan-300 px-2 py-0.5 rounded-full">
+                <span key={s.type} className="text-[10px] bg-secondary text-primary px-2 py-0.5 rounded-full">
                   {s.type.replace(/-/g, " ")} ({formatNumber(s.count)})
                 </span>
               ))}
             </div>
           </div>
           <div>
-            <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1.5">Most Affected Countries</div>
+            <div className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5">Most Affected Countries</div>
             <div className="space-y-1">
               {selected.countries.slice(0, 5).map((c) => {
                 const cBadge = RISK_BADGE[c.riskLevel] || RISK_BADGE.medium;
                 return (
                   <div key={c.name} className="flex items-center justify-between text-xs">
-                    <span className="text-slate-300">{c.name}</span>
+                    <span className="text-foreground">{c.name}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-400">{formatNumber(c.incidents)}</span>
+                      <span className="text-muted-foreground">{formatNumber(c.incidents)}</span>
                       <span className={`text-[10px] px-1.5 rounded ${cBadge.bg} ${cBadge.text}`}>{c.riskLevel}</span>
                     </div>
                   </div>
@@ -337,8 +338,8 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
               })}
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-slate-700/30">
-            <div className="text-[10px] text-slate-500">Sources: {selected.sources.slice(0, 4).join(" · ")}</div>
+          <div className="mt-3 pt-2 border-t border-border">
+            <div className="text-[10px] text-muted-foreground">Sources: {selected.sources.slice(0, 4).join(" · ")}</div>
           </div>
         </div>
       )}
@@ -353,20 +354,20 @@ function ShareScamType({ scam }: { scam: ScamTypeSummary }) {
 
   return (
     <div className="mt-2 flex items-center gap-1.5" data-testid={`share-scam-${scam.type}`}>
-      <span className="text-[10px] text-slate-500 mr-1">Warn your family:</span>
+      <span className="text-[10px] text-muted-foreground mr-1">Warn your family:</span>
       <button
         onClick={async () => {
           try { await navigator.clipboard.writeText(shareText); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
         }}
-        className="flex items-center gap-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded border border-slate-700/50 transition-colors"
+        className="flex items-center gap-1 text-[10px] bg-secondary hover:bg-secondary/80 text-foreground px-2 py-1 rounded border border-border transition-colors"
         data-testid={`share-copy-${scam.type}`}
       >
-        {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+        {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
         {copied ? "Copied" : "Copy"}
       </button>
       <button
         onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank", "noopener,noreferrer")}
-        className="flex items-center gap-1 text-[10px] bg-green-600/20 hover:bg-green-600/30 text-green-400 px-2 py-1 rounded border border-green-500/20 transition-colors"
+        className="flex items-center gap-1 text-[10px] bg-green-600/20 hover:bg-green-600/30 text-green-700 dark:text-green-400 px-2 py-1 rounded border border-green-500/20 transition-colors"
         data-testid={`share-whatsapp-${scam.type}`}
       >
         <Share2 className="w-3 h-3" />
@@ -374,7 +375,7 @@ function ShareScamType({ scam }: { scam: ScamTypeSummary }) {
       </button>
       <button
         onClick={() => window.open(`mailto:?subject=${encodeURIComponent(`Scam alert: ${scam.label}`)}&body=${encodeURIComponent(shareText)}`)}
-        className="flex items-center gap-1 text-[10px] bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-2 py-1 rounded border border-blue-500/20 transition-colors"
+        className="flex items-center gap-1 text-[10px] bg-blue-600/20 hover:bg-blue-600/30 text-blue-700 dark:text-blue-400 px-2 py-1 rounded border border-blue-500/20 transition-colors"
         data-testid={`share-email-${scam.type}`}
       >
         <Share2 className="w-3 h-3" />
@@ -388,38 +389,38 @@ function TrendingSection({ trending }: { trending: TrendingScam[] }) {
   if (!trending || trending.length === 0) return null;
 
   return (
-    <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="trending-section">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
-        <Flame className="w-4 h-4 text-orange-400" />
-        <span className="text-sm font-semibold text-white">New This Week</span>
-        <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full border border-red-500/30 ml-auto">
+    <div className="bg-card border border-border rounded-xl overflow-hidden" data-testid="trending-section">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-secondary/50">
+        <Flame className="w-4 h-4 text-orange-500" />
+        <span className="text-sm font-semibold text-foreground">New This Week</span>
+        <span className="text-[10px] bg-red-500/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full border border-red-500/30 ml-auto">
           {trending.filter(t => t.isNew).length} new
         </span>
       </div>
-      <div className="divide-y divide-slate-700/30">
+      <div className="divide-y divide-border">
         {trending.map((item) => (
-          <div key={item.type} className="px-4 py-3 hover:bg-slate-700/20 transition-colors" data-testid={`trending-${item.type}`}>
+          <div key={item.type} className="px-4 py-3 hover:bg-secondary/50 transition-colors" data-testid={`trending-${item.type}`}>
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 mt-0.5">
                 {item.isNew ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30">
+                  <span className="inline-flex items-center gap-1 text-[10px] bg-red-500/20 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30">
                     <Sparkles className="w-2.5 h-2.5" /> NEW
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded-full border border-orange-500/30">
+                  <span className="inline-flex items-center gap-1 text-[10px] bg-orange-500/20 text-orange-600 dark:text-orange-400 px-1.5 py-0.5 rounded-full border border-orange-500/30">
                     <TrendingUp className="w-2.5 h-2.5" /> HOT
                   </span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm text-white font-medium">{item.label}</span>
-                  <span className="text-[10px] text-red-400 font-bold">↑{item.trendPercent}%</span>
+                  <span className="text-sm text-foreground font-medium">{item.label}</span>
+                  <span className="text-[10px] text-red-600 dark:text-red-400 font-bold">↑{item.trendPercent}%</span>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed mb-1.5">{item.description}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-1.5">{item.description}</p>
                 <div className="flex flex-wrap gap-1">
                   {item.affectedRegions.map(r => (
-                    <span key={r} className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded-full border border-slate-700/30">{r}</span>
+                    <span key={r} className="text-[10px] bg-secondary text-muted-foreground px-1.5 py-0.5 rounded-full border border-border">{r}</span>
                   ))}
                 </div>
               </div>
@@ -487,34 +488,70 @@ const FAMILY_TALKING_POINTS: Record<string, Record<string, string[]>> = {
   impersonation: {
     kids: ["If someone calls saying they're a police officer or teacher and asks for information, hang up and tell me right away"],
     teens: [
-      "Scammers can now clone anyone's voice with AI. If a family member calls asking for money urgently, hang up and call them back on their real number",
+      "If a friend texts from a different number asking for money or gift cards, call them on their real number first",
+      "No real company or government agency will ever ask for gift cards as payment",
     ],
     parents: [
-      "If you get a call from someone claiming to be me and I sound panicked asking for money, hang up and call me directly. Scammers can clone voices now",
-      "The government will never call threatening arrest. That's always a scam",
+      "If someone calls saying a grandchild is in trouble and needs money, hang up and call the grandchild directly",
+      "Government agencies like the IRS never call demanding immediate payment",
     ],
-    partner: ["Let's create a family code word that only we know. If someone calls pretending to be one of us, they won't know the code"],
+    partner: ["Let's create a family code word that only we know, so we can verify identity in an emergency call"],
+  },
+  "tech-support": {
+    kids: ["If a pop-up says your computer has a virus and gives a phone number, never call it. Close the window and tell me"],
+    teens: ["Microsoft, Apple, and Google will never call you about a problem with your computer. Those calls are always scams"],
+    parents: [
+      "If you see a scary pop-up about viruses, don't call the number shown. Just close your browser",
+      "No real tech company will ever ask you to buy gift cards to fix a computer problem",
+    ],
+    partner: ["If either of us gets a tech support call we didn't request, we should hang up and discuss it together"],
   },
   romance: {
-    kids: ["If an online friend you've never met asks personal questions or asks you to keep secrets from your parents, that's not okay. Tell me"],
+    kids: [],
     teens: [
-      "If someone you're talking to online always has excuses for not video calling, be cautious. They may not be who they say they are",
-      "Never send personal photos to someone you haven't met in person. Once sent, you lose control of them",
+      "If someone you've only talked to online suddenly asks for money or says they're in an emergency, be very careful",
+      "Real friends and partners don't ask for money through apps or gift cards",
     ],
     parents: [
-      "Be careful with new online friendships that move quickly to deep emotional connection. Scammers build trust before asking for money",
-      "If an online partner asks for money, gift cards, or crypto, no matter the reason, it's very likely a scam",
+      "Be cautious of anyone you meet online who quickly professes strong feelings but can never video chat or meet in person",
+      "Never send money to someone you haven't met face-to-face, no matter how convincing their story is",
     ],
-    partner: ["Let's keep each other informed about new online connections. A second opinion can spot what feelings might miss"],
+    partner: ["Let's talk openly about online relationships in our family. Scammers specifically target lonely or isolated people"],
   },
 };
 
-function getDefaultTalkingPoints(scamLabel: string, audience: string): string[] {
-  const audienceLabels: Record<string, string> = { kids: "children", teens: "teenagers", parents: "older adults", partner: "your household" };
-  return [
-    `There's a new scam trend called "${scamLabel}," and here's what ${audienceLabels[audience] || "everyone"} should watch out for`,
-    `If something feels too urgent or too good to be true, take a pause and talk to someone you trust before acting`,
-  ];
+function ToolConnectionBanner({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
+  const topTypes = scamTypes.slice(0, 3).map(s => s.type);
+  const tools = topTypes.map(t => SCAM_TO_TOOL[t]).filter(Boolean);
+
+  if (tools.length === 0) return null;
+
+  return (
+    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4" data-testid="tool-connection-banner">
+      <div className="flex items-center gap-2 mb-3">
+        <Shield className="w-4 h-4 text-primary" />
+        <span className="text-sm font-semibold text-foreground">Protect Your Family Now</span>
+      </div>
+      <p className="text-xs text-muted-foreground mb-3">Based on the scams trending right now, these tools can help protect you:</p>
+      <div className="space-y-2">
+        {tools.map((tool, i) => (
+          <Link
+            key={i}
+            href={tool.href}
+            className="flex items-center gap-3 bg-card border border-border rounded-lg p-3 hover:border-primary/30 transition-colors group"
+            data-testid={`tool-link-${i}`}
+          >
+            <Shield className="w-5 h-5 text-primary flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{tool.name}</div>
+              <div className="text-[11px] text-muted-foreground line-clamp-1">{tool.description}</div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function LocalRiskSummary({ visitorCountryName, hotspots, trending }: {
@@ -522,51 +559,40 @@ function LocalRiskSummary({ visitorCountryName, hotspots, trending }: {
   hotspots: any[];
   trending: TrendingScam[];
 }) {
-  const countryData = visitorCountryName
-    ? hotspots.find((h: any) => h.country === visitorCountryName)
-    : null;
+  const countryName = visitorCountryName || "your area";
+  const localHotspot = hotspots.find((h: any) =>
+    h.country?.toLowerCase() === visitorCountryName?.toLowerCase()
+  );
 
-  const newThreats = trending.filter(t => t.isNew).length;
-  const topThreats = countryData?.topThreats?.slice(0, 3) || [];
-  const riskLevel = countryData?.riskLevel || "medium";
+  const topTrending = trending.slice(0, 3);
+  const riskLevel = localHotspot?.riskLevel || "medium";
   const badge = RISK_BADGE[riskLevel] || RISK_BADGE.medium;
-  const locationLabel = visitorCountryName || "your area";
 
   return (
-    <div className="bg-gradient-to-r from-orange-500/10 via-red-500/5 to-purple-500/10 border border-orange-500/20 rounded-2xl p-5 md:p-6" data-testid="local-risk-summary">
-      <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0">
-          <AlertTriangle className="w-6 h-6 text-orange-400" />
+    <div className="bg-orange-500/5 border border-orange-500/20 rounded-xl p-5" data-testid="local-risk-summary">
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-full bg-orange-500/15 flex items-center justify-center flex-shrink-0">
+          <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-2">
-            <h2 className="text-lg md:text-xl font-bold text-white">This week near {locationLabel}</h2>
-            <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${badge.bg} ${badge.text}`}>
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <h3 className="text-base font-bold text-foreground">This week near {countryName}</h3>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full border ${badge.bg} ${badge.text} font-medium`}>
               {riskLevel} risk
             </span>
           </div>
-          <p className="text-sm md:text-base text-slate-300 leading-relaxed mb-3">
-            {newThreats > 0 ? (
-              <><span className="text-orange-400 font-semibold">{newThreats} new scam {newThreats === 1 ? "type is" : "types are"}</span> targeting families in {locationLabel} this week. </>
-            ) : (
-              <>Scam activity continues in {locationLabel}. </>
-            )}
-            {topThreats.length > 0 ? (
-              <>Watch out for <span className="text-white font-medium">{topThreats.map((t: string) => t.replace(/-/g, " ")).join(", ")}</span>.</>
-            ) : (
-              <>Stay alert for phishing, impersonation, and investment scams.</>
-            )}
+          <p className="text-sm text-muted-foreground mb-2">
+            <span className="text-orange-600 dark:text-orange-400 font-semibold">
+              {topTrending.length} new scam types are
+            </span>{" "}
+            targeting families in {countryName} this week. Stay alert for{" "}
+            {topTrending.map(t => t.label.toLowerCase()).join(", ") || "emerging"} scams.
           </p>
-          {countryData && (
-            <div className="flex flex-wrap gap-3 text-xs text-slate-400">
-              <span><span className="text-white font-medium">{formatNumber(countryData.recentIncidents)}</span> reports this period</span>
-              <span className="text-slate-600">|</span>
-              <span>Trend: <span className={countryData.trend === "up" ? "text-red-400" : countryData.trend === "down" ? "text-green-400" : "text-slate-400"}>{countryData.trend === "up" ? "Rising" : countryData.trend === "down" ? "Declining" : "Stable"}</span></span>
-              {countryData.avgLossPerVictim && (
-                <><span className="text-slate-600">|</span><span>Avg loss: <span className="text-orange-400 font-medium">{countryData.avgLossPerVictim}</span></span></>
-              )}
-            </div>
-          )}
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span>{localHotspot ? `${formatNumber(localHotspot.recentIncidents ?? localHotspot.totalIncidents)} reports this period` : "Reports being collected"}</span>
+            <span>|</span>
+            <span>Trend: {(localHotspot?.trendDirection ?? localHotspot?.trend) === "up" ? "Rising" : (localHotspot?.trendDirection ?? localHotspot?.trend) === "down" ? "Declining" : "Stable"}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -578,146 +604,54 @@ function ProtectFamilyPanel({ visitorCountryName, topScamTypes, trending }: {
   topScamTypes: ScamTypeSummary[];
   trending: TrendingScam[];
 }) {
-  const [expandedStep, setExpandedStep] = useState<number | null>(null);
-
-  const topThreatTypes = topScamTypes.slice(0, 3).map(s => s.type);
-  const trendingTypes = trending.filter(t => t.isNew).map(t => t.type);
-  const relevantTypes = [...new Set([...trendingTypes, ...topThreatTypes])].slice(0, 5);
-
-  const actionSteps = relevantTypes.map((type, i) => {
-    const scam = topScamTypes.find(s => s.type === type);
-    const trend = trending.find(t => t.type === type);
-    const tool = SCAM_TO_TOOL[type];
-    const tips = scam?.protectionTips || [];
-    const label = trend?.label || scam?.label || type.replace(/-/g, " ");
-    const description = trend?.description || scam?.description || "";
-
-    return { id: i, type, label, description, tool, tips, isNew: trend?.isNew || false };
-  });
-
-  if (actionSteps.length === 0) return null;
+  const topScamType = topScamTypes[0]?.type || "phishing";
+  const tool = SCAM_TO_TOOL[topScamType] || SCAM_TO_TOOL.phishing;
 
   return (
-    <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-cyan-500/10 border border-emerald-500/20 rounded-2xl overflow-hidden" data-testid="protect-family-panel">
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-emerald-500/15 bg-emerald-500/5">
-        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-          <Shield className="w-5 h-5 text-emerald-400" />
+    <div className="bg-card border border-border rounded-xl p-5" data-testid="protect-family-panel">
+      <div className="flex items-center gap-2 mb-4">
+        <Shield className="w-5 h-5 text-primary" />
+        <h3 className="text-base font-bold text-foreground">What You Can Do Right Now</h3>
+      </div>
+
+      <div className="space-y-4">
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+          <h4 className="text-sm font-semibold text-foreground mb-2">
+            The biggest threat near {visitorCountryName || "you"} right now
+          </h4>
+          <p className="text-xs text-muted-foreground mb-3">
+            {topScamTypes[0]?.label || "Phishing"} scams are the most reported type in your area.
+            {topScamTypes[0]?.description ? ` ${topScamTypes[0].description}` : ""}
+          </p>
+          <Link
+            href={tool.href}
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            data-testid="link-protect-tool"
+          >
+            <Shield className="w-4 h-4" />
+            {tool.name}
+            <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
+
         <div>
-          <h2 className="text-base md:text-lg font-bold text-white">Protect Your Family Today</h2>
-          <p className="text-xs text-slate-400">{actionSteps.length} steps based on threats near {visitorCountryName || "you"}</p>
+          <h4 className="text-sm font-semibold text-foreground mb-2">Quick safety checklist</h4>
+          <div className="space-y-2">
+            {[
+              "Check if your email has been in a data breach",
+              "Turn on two-factor authentication for bank and email",
+              "Talk to your family about the scams trending now",
+              "Run a scan to see if data brokers have your info",
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-2 text-sm">
+                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-[10px] text-primary font-bold">{i + 1}</span>
+                </div>
+                <span className="text-muted-foreground">{item}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-
-      <div className="divide-y divide-slate-700/20">
-        {actionSteps.map((step, idx) => {
-          const isExpanded = expandedStep === idx;
-          return (
-            <div key={step.type} data-testid={`action-step-${step.type}`}>
-              <button
-                onClick={() => setExpandedStep(isExpanded ? null : idx)}
-                className="w-full px-5 py-3.5 flex items-start gap-3 hover:bg-slate-700/10 transition-colors text-left"
-              >
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-sm font-bold text-emerald-400">{idx + 1}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-sm font-semibold text-white">{step.label}</span>
-                    {step.isNew && (
-                      <span className="text-[9px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30 font-medium">NEW</span>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-400 line-clamp-1">{step.description}</p>
-                </div>
-                {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-400 mt-1" /> : <ChevronDown className="w-4 h-4 text-slate-400 mt-1" />}
-              </button>
-
-              {isExpanded && (
-                <div className="px-5 pb-4 pl-[60px]">
-                  {step.tips.length > 0 && (
-                    <div className="mb-3">
-                      <div className="text-[11px] text-emerald-400 font-semibold mb-1.5 uppercase tracking-wider">Do this today:</div>
-                      <ul className="space-y-1.5">
-                        {step.tips.map((tip, i) => (
-                          <li key={i} className="flex gap-2 text-xs text-slate-300">
-                            <span className="text-emerald-400 flex-shrink-0 mt-0.5">
-                              <Check className="w-3.5 h-3.5" />
-                            </span>
-                            {tip}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {step.tool && (
-                    <Link
-                      href={step.tool.href}
-                      className="inline-flex items-center gap-2 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 rounded-lg px-3 py-2 transition-colors group"
-                      data-testid={`tool-link-${step.type}`}
-                    >
-                      <Shield className="w-3.5 h-3.5 text-emerald-400" />
-                      <div>
-                        <span className="text-xs font-medium text-emerald-400 group-hover:text-emerald-300">{step.tool.name}</span>
-                        <span className="text-[10px] text-slate-400 ml-1.5">{step.tool.description}</span>
-                      </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-emerald-400/60 ml-1" />
-                    </Link>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function ToolConnectionBanner({ scamTypes }: { scamTypes: ScamTypeSummary[] }) {
-  const topTypes = scamTypes.slice(0, 4);
-  const toolsNeeded = topTypes.map(s => SCAM_TO_TOOL[s.type]).filter(Boolean);
-  const uniqueTools = toolsNeeded.reduce((acc: typeof toolsNeeded, t) => {
-    if (!acc.find(a => a.href === t.href)) acc.push(t);
-    return acc;
-  }, []);
-
-  if (uniqueTools.length === 0) return null;
-
-  return (
-    <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl overflow-hidden" data-testid="tool-connection-banner">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50 bg-slate-800/50">
-        <ShieldCheck className="w-4 h-4 text-cyan-400" />
-        <span className="text-sm font-semibold text-white">Take Action Against These Threats</span>
-      </div>
-      <div className="p-3 space-y-2">
-        {uniqueTools.map((tool) => {
-          const relatedScams = topTypes.filter(s => SCAM_TO_TOOL[s.type]?.href === tool.href);
-          return (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              className="flex items-center gap-3 p-3 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/30 hover:border-cyan-500/30 rounded-lg transition-all group"
-              data-testid={`tool-banner-${tool.href.replace(/\//g, "-")}`}
-            >
-              <div className="w-9 h-9 rounded-lg bg-cyan-500/15 flex items-center justify-center flex-shrink-0">
-                <Shield className="w-4 h-4 text-cyan-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <span className="text-sm font-medium text-white group-hover:text-cyan-300 transition-colors">{tool.name}</span>
-                <p className="text-[11px] text-slate-400">{tool.description}</p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {relatedScams.map(s => (
-                    <span key={s.type} className="text-[9px] bg-slate-700/50 text-cyan-300 px-1.5 py-0.5 rounded-full">
-                      fights {s.label.toLowerCase()}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
-            </Link>
-          );
-        })}
       </div>
     </div>
   );
@@ -728,100 +662,78 @@ function FamilyConversationStarters({ trending, scamTypes }: {
   scamTypes: ScamTypeSummary[];
 }) {
   const [selectedAudience, setSelectedAudience] = useState("kids");
-  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const topThreatTypes = trending.filter(t => t.isNew).map(t => t.type);
-  if (topThreatTypes.length === 0) {
-    topThreatTypes.push(...scamTypes.slice(0, 2).map(s => s.type));
+  const relevantTypes = scamTypes.slice(0, 4).map(s => s.type);
+  const talkingPoints: { type: string; label: string; points: string[] }[] = [];
+
+  for (const type of relevantTypes) {
+    const points = FAMILY_TALKING_POINTS[type]?.[selectedAudience];
+    if (points && points.length > 0) {
+      const label = scamTypes.find(s => s.type === type)?.label || type;
+      talkingPoints.push({ type, label, points });
+    }
   }
-  const relevantTypes = [...new Set(topThreatTypes)].slice(0, 3);
-
-  const conversations = relevantTypes.map(type => {
-    const trend = trending.find(t => t.type === type);
-    const scam = scamTypes.find(s => s.type === type);
-    const label = trend?.label || scam?.label || type.replace(/-/g, " ");
-    const points = FAMILY_TALKING_POINTS[type]?.[selectedAudience] || getDefaultTalkingPoints(label, selectedAudience);
-    return { type, label, points };
-  });
-
-  const handleCopy = async (text: string, id: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch {}
-  };
-
-  const audienceIcons: Record<string, any> = { kids: "child", teens: "teen", parents: "parent", partner: "partner" };
-  const audienceEmoji: Record<string, string> = { kids: "\u{1F9D2}", teens: "\u{1F9D1}", parents: "\u{1F474}", partner: "\u{1F46B}" };
 
   return (
-    <div className="bg-gradient-to-br from-purple-500/10 via-indigo-500/5 to-blue-500/10 border border-purple-500/20 rounded-2xl overflow-hidden" data-testid="family-conversation-starters">
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-purple-500/15 bg-purple-500/5">
-        <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-          <Heart className="w-5 h-5 text-purple-400" />
-        </div>
-        <div>
-          <h2 className="text-base md:text-lg font-bold text-white">Family Conversation Starters</h2>
-          <p className="text-xs text-slate-400">Simple ways to talk about today's top threats with your family</p>
-        </div>
+    <div className="bg-card border border-border rounded-xl p-5" data-testid="family-conversation-starters">
+      <div className="flex items-center gap-2 mb-4">
+        <Heart className="w-5 h-5 text-pink-500" />
+        <h3 className="text-base font-bold text-foreground">Family Conversation Starters</h3>
       </div>
 
-      <div className="px-4 py-3 border-b border-slate-700/20">
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {FAMILY_AUDIENCES.map((aud) => (
-            <button
-              key={aud.id}
-              onClick={() => setSelectedAudience(aud.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                selectedAudience === aud.id
-                  ? "bg-purple-500/20 border-purple-500/40 text-purple-300 border"
-                  : "bg-slate-800/50 border-slate-700/30 text-slate-400 border hover:border-slate-600"
-              }`}
-              data-testid={`audience-${aud.id}`}
-            >
-              <span>{audienceEmoji[aud.id]}</span>
-              {aud.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <p className="text-xs text-muted-foreground mb-4">
+        Based on what's trending now, here are things to talk about with your family:
+      </p>
 
-      <div className="divide-y divide-slate-700/20">
-        {conversations.map((convo) => (
-          <div key={convo.type} className="px-5 py-3.5" data-testid={`convo-${convo.type}-${selectedAudience}`}>
-            <div className="text-xs font-semibold text-purple-400 mb-2">About: {convo.label}</div>
-            <div className="space-y-2">
-              {convo.points.map((point, i) => {
-                const pointId = `${convo.type}-${selectedAudience}-${i}`;
-                return (
-                  <div key={i} className="flex items-start gap-2 group">
-                    <div className="flex-1 bg-slate-800/40 rounded-lg p-2.5">
-                      <p className="text-xs text-slate-300 leading-relaxed">"{point}"</p>
-                    </div>
-                    <button
-                      onClick={() => handleCopy(point, pointId)}
-                      className="mt-1 p-1.5 rounded-md bg-slate-800/60 hover:bg-purple-500/20 border border-slate-700/30 hover:border-purple-500/30 transition-all opacity-60 group-hover:opacity-100"
-                      data-testid={`copy-point-${pointId}`}
-                    >
-                      {copiedId === pointId ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3 text-slate-400" />}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+      <div className="flex flex-wrap gap-2 mb-4">
+        {FAMILY_AUDIENCES.map((aud) => (
+          <button
+            key={aud.id}
+            onClick={() => setSelectedAudience(aud.id)}
+            className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+              selectedAudience === aud.id
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-secondary text-foreground border-border hover:border-primary/30"
+            }`}
+            data-testid={`audience-${aud.id}`}
+          >
+            {aud.label}
+            <span className="text-[10px] ml-1 opacity-60">({aud.ageHint})</span>
+          </button>
         ))}
       </div>
 
-      <div className="px-5 py-3 border-t border-slate-700/20 bg-slate-800/20">
-        <p className="text-[11px] text-slate-500 leading-relaxed">
-          Having regular, calm conversations about online safety is one of the most effective ways to protect your family. You don't need to be a tech expert. Just start the conversation.
-        </p>
+      <div className="space-y-4">
+        {talkingPoints.length > 0 ? talkingPoints.map(({ type, label, points }) => (
+          <div key={type}>
+            <div className="text-xs font-semibold text-foreground mb-2">About {label}:</div>
+            <div className="space-y-2">
+              {points.map((point, i) => (
+                <div key={i} className="flex gap-2 bg-secondary/50 rounded-lg p-3 border border-border">
+                  <span className="text-primary text-sm mt-0.5">💬</span>
+                  <p className="text-xs text-muted-foreground leading-relaxed italic">"{point}"</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )) : (
+          <div className="text-center py-4">
+            <p className="text-xs text-muted-foreground">No specific talking points for this audience yet. Check other age groups above.</p>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-export { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection, LocalRiskSummary, ProtectFamilyPanel, ToolConnectionBanner, FamilyConversationStarters };
-export type { LiveFeedEvent, ScamTypeSummary, RegionalSummary, GlobalStats, TrendingScam };
+export {
+  GlobalStatsBar,
+  LiveFeedTicker,
+  ScamTypeBreakdown,
+  RegionalPanel,
+  TrendingSection,
+  ToolConnectionBanner,
+  LocalRiskSummary,
+  ProtectFamilyPanel,
+  FamilyConversationStarters,
+};

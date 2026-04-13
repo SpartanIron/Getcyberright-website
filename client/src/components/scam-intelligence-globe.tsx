@@ -38,14 +38,14 @@ function checkWebGLSupport(): boolean {
 function GlobeFallback({ data, onRetry }: { data: any; onRetry?: () => void }) {
   const hotspots = (data?.hotspots || []).slice(0, 12);
   return (
-    <div className="w-full aspect-square max-w-[700px] mx-auto bg-slate-800/30 rounded-2xl flex flex-col items-center justify-center p-6" data-testid="globe-fallback">
-      <GlobeIcon className="w-16 h-16 text-cyan-400/30 mb-4" />
-      <p className="text-sm text-slate-400 mb-1">3D Globe could not load</p>
-      <p className="text-xs text-slate-500 mb-4">Your browser may not support WebGL, or the 3D engine had a problem loading. Here's the data instead:</p>
+    <div className="w-full aspect-square max-w-[700px] mx-auto bg-card dark:bg-slate-800/30 border border-border rounded-2xl flex flex-col items-center justify-center p-6" data-testid="globe-fallback">
+      <GlobeIcon className="w-16 h-16 text-primary/30 mb-4" />
+      <p className="text-sm text-muted-foreground mb-1">3D Globe could not load</p>
+      <p className="text-xs text-muted-foreground/70 mb-4">Your browser may not support WebGL, or the 3D engine had a problem loading. Here's the data instead:</p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="mb-4 text-xs bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 px-4 py-1.5 rounded-lg border border-cyan-500/30 transition-colors"
+          className="mb-4 text-xs bg-primary/10 hover:bg-primary/20 text-primary px-4 py-1.5 rounded-lg border border-primary/30 transition-colors"
           data-testid="globe-retry"
         >
           Try loading the 3D globe again
@@ -54,11 +54,11 @@ function GlobeFallback({ data, onRetry }: { data: any; onRetry?: () => void }) {
       {hotspots.length > 0 && (
         <div className="w-full max-w-md space-y-1.5">
           {hotspots.map((h: any) => (
-            <div key={h.id} className="flex items-center gap-2 bg-slate-800/50 rounded-lg p-2 border border-slate-700/30">
+            <div key={h.id} className="flex items-center gap-2 bg-secondary dark:bg-slate-800/50 rounded-lg p-2 border border-border dark:border-slate-700/30">
               <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: h.riskLevel === "critical" ? "#ef4444" : h.riskLevel === "high" ? "#f97316" : h.riskLevel === "medium" ? "#eab308" : "#22c55e" }} />
-              <span className="text-xs text-white font-medium flex-1">{h.country}</span>
-              <span className="text-[10px] text-slate-400">{formatNumber(h.recentIncidents)} scams</span>
-              <span className="text-[10px] text-slate-500">{h.topScamTypes?.[0]?.replace(/-/g, " ")}</span>
+              <span className="text-xs text-foreground font-medium flex-1">{h.country}</span>
+              <span className="text-[10px] text-muted-foreground">{formatNumber(h.recentIncidents)} scams</span>
+              <span className="text-[10px] text-muted-foreground/70">{h.topScamTypes?.[0]?.replace(/-/g, " ")}</span>
             </div>
           ))}
         </div>
@@ -530,7 +530,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     return (
       <div
         ref={containerRef}
-        className="w-full aspect-square max-w-[700px] mx-auto bg-[#060d1a] rounded-2xl flex items-center justify-center"
+        className="w-full aspect-square max-w-[700px] mx-auto bg-card dark:bg-[#060d1a] rounded-2xl flex items-center justify-center"
       >
         <div className="text-center">
           <GlobeIcon className="w-10 h-10 text-cyan-400/30 mx-auto mb-2 animate-pulse" />

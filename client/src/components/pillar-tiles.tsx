@@ -53,13 +53,13 @@ const features = [
 
 export function PillarTiles() {
   return (
-    <section className="py-20 sm:py-28 lg:py-32 bg-[#00293C]" data-testid="section-pillar-tiles" aria-labelledby="pillars-heading">
+    <section className="py-20 sm:py-28 lg:py-32 bg-secondary dark:bg-[#00293C]" data-testid="section-pillar-tiles" aria-labelledby="pillars-heading">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-14 sm:mb-20">
-          <h2 id="pillars-heading" className="text-4xl sm:text-5xl font-extrabold text-white mb-5" data-testid="text-pillars-heading">
+          <h2 id="pillars-heading" className="text-4xl sm:text-5xl font-extrabold text-foreground mb-5" data-testid="text-pillars-heading">
             Three Ways to Protect What Matters
           </h2>
-          <p className="text-xl text-white/75 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             Detect scams, control your personal data, and learn safety habits your whole family can use. Pick one and start in under a minute.
           </p>
         </div>
@@ -68,7 +68,7 @@ export function PillarTiles() {
           {features.map((feature) => (
             <div
               key={feature.id}
-              className="group relative rounded-2xl overflow-hidden bg-white/[0.06] border border-white/10 hover:bg-white/[0.10] hover:border-primary/30 hover:shadow-[0_8px_40px_-12px_rgba(32,205,190,0.25)] transition-all duration-300"
+              className="group relative rounded-2xl overflow-hidden bg-card border border-border dark:bg-white/[0.06] dark:border-white/10 hover:border-primary/30 hover:shadow-[0_8px_40px_-12px_rgba(32,205,190,0.25)] transition-all duration-300"
               data-testid={`card-feature-${feature.id}`}
             >
               <div className="relative h-48 overflow-hidden">
@@ -78,7 +78,7 @@ export function PillarTiles() {
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#00293C] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#00293C] via-transparent to-transparent" />
                 <div className="absolute top-4 left-4">
                   <span className={`inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white ${feature.accent} rounded-full px-3 py-1.5`}>
                     {feature.label}
@@ -89,9 +89,9 @@ export function PillarTiles() {
               <div className="p-7 sm:p-8">
                 <div className="flex items-center gap-3 mb-4">
                   <feature.icon className={`w-6 h-6 ${feature.accentText}`} />
-                  <h3 className="text-xl sm:text-2xl font-bold text-white">{feature.title}</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">{feature.title}</h3>
                 </div>
-                <p className="text-base text-white/75 leading-relaxed mb-6">{feature.description}</p>
+                <p className="text-base text-muted-foreground leading-relaxed mb-6">{feature.description}</p>
 
                 <Button
                   asChild

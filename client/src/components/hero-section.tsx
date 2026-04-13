@@ -76,7 +76,7 @@ function ThreatAlertBar() {
           </span>
           <span className="text-xs font-semibold text-red-400 uppercase tracking-wider">Active</span>
         </span>
-        <span className="text-sm text-white/70 font-medium truncate min-w-0 group-hover:text-white transition-colors">
+        <span className="text-sm text-foreground/70 font-medium truncate min-w-0 group-hover:text-foreground transition-colors">
           {threat.title}
         </span>
         <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border flex-shrink-0 ${sevClass}`}>

@@ -68,10 +68,10 @@ export function ThreatAwareness() {
             <span className="text-sm font-semibold text-red-400">The Threat Is Real</span>
           </div>
 
-          <h2 id="threat-heading" className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white leading-tight mb-5" data-testid="text-threat-heading">
+          <h2 id="threat-heading" className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-foreground leading-tight mb-5" data-testid="text-threat-heading">
             Today's scams do not look like scams anymore.
           </h2>
-          <p className="text-lg text-white/75 leading-relaxed mb-8">
+          <p className="text-lg text-muted-foreground leading-relaxed mb-8">
             That text from your bank? It could be fake. That phone call from your grandchild? It might be an AI-generated voice. Your name, address, and phone number are already on hundreds of websites you have never heard of. The good news: you can fight back.
           </p>
 
@@ -79,14 +79,14 @@ export function ThreatAwareness() {
             {threats.map((threat, i) => (
               <div
                 key={threat.stat}
-                className="bg-white/[0.06] rounded-xl p-4 sm:p-5 border-l-[3px]"
+                className="bg-card dark:bg-white/[0.06] border border-border dark:border-transparent rounded-xl p-4 sm:p-5 border-l-[3px]"
                 style={{ borderLeftColor: i % 2 === 0 ? "hsl(16, 90%, 52%)" : "#14b8a6" }}
                 data-testid={`stat-threat-${threat.stat.replace(/[^a-z0-9]/gi, "").toLowerCase()}`}
               >
-                <threat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white/40 mb-2" />
-                <div className="text-2xl sm:text-3xl font-extrabold text-white mb-1">{threat.stat}</div>
-                <div className="text-xs sm:text-sm text-white/65 leading-snug">{threat.label}</div>
-                <div className="text-[10px] sm:text-[11px] text-white/35 mt-1.5 uppercase tracking-wider font-medium">{threat.source}</div>
+                <threat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground/60 mb-2" />
+                <div className="text-2xl sm:text-3xl font-extrabold text-foreground mb-1">{threat.stat}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground leading-snug">{threat.label}</div>
+                <div className="text-[10px] sm:text-[11px] text-muted-foreground/50 mt-1.5 uppercase tracking-wider font-medium">{threat.source}</div>
               </div>
             ))}
           </div>
@@ -125,54 +125,54 @@ export function ThreatAwareness() {
         />
       </div>
 
-      <div className="bg-[#081C26] border-t border-white/10">
+      <div className="bg-secondary dark:bg-[#081C26] border-t border-border dark:border-white/10">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             <div>
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-6" data-testid="text-authority-heading">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-foreground mb-6" data-testid="text-authority-heading">
                 Professional-Grade Protection, Built for Real People
               </h3>
               <div className="space-y-0">
                 {trustPoints.map((point, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-3 py-3.5 border-b border-white/10 last:border-b-0"
+                    className="flex items-start gap-3 py-3.5 border-b border-border dark:border-white/10 last:border-b-0"
                     data-testid={`text-trust-point-${index}`}
                   >
                     <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm sm:text-base text-white/80 leading-relaxed">{point}</span>
+                    <span className="text-sm sm:text-base text-muted-foreground leading-relaxed">{point}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div
-              className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 sm:p-8"
+              className="bg-card border border-border dark:bg-white/[0.04] dark:border-white/10 rounded-2xl p-6 sm:p-8"
               data-testid="testimonial-featured"
             >
-              <Quote className="w-8 h-8 text-white/15 mb-4" aria-hidden="true" />
-              <blockquote className="text-white/85 leading-relaxed mb-6 text-base sm:text-lg">
+              <Quote className="w-8 h-8 text-muted-foreground/30 mb-4" aria-hidden="true" />
+              <blockquote className="text-foreground/85 leading-relaxed mb-6 text-base sm:text-lg">
                 "{featuredStory.quote}"
               </blockquote>
               <div className="flex items-center gap-3">
                 <div
-                  className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-sm font-semibold text-white/70"
+                  className="w-10 h-10 rounded-full bg-secondary border border-border dark:bg-white/10 dark:border-white/15 flex items-center justify-center text-sm font-semibold text-muted-foreground"
                   aria-hidden="true"
                 >
                   {featuredStory.initials}
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-white">{featuredStory.name}</div>
-                  <div className="text-xs text-white/50">{featuredStory.context}</div>
+                  <div className="text-sm font-semibold text-foreground">{featuredStory.name}</div>
+                  <div className="text-xs text-muted-foreground">{featuredStory.context}</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-10 pt-8 border-t border-white/10">
+          <div className="mt-10 pt-8 border-t border-border dark:border-white/10">
             <div className="flex items-center justify-center gap-3 mb-5">
               <Shield className="w-5 h-5 text-primary" />
-              <span className="text-sm font-bold text-white/50 uppercase tracking-[0.15em]">
+              <span className="text-sm font-bold text-muted-foreground uppercase tracking-[0.15em]">
                 Trusted Safety Sources
               </span>
             </div>

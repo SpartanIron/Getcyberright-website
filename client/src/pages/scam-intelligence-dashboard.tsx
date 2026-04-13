@@ -11,10 +11,10 @@ import { Link } from "@/lib/navigation";
 
 function DataError({ label }: { label: string }) {
   return (
-    <div className="bg-slate-800/30 border border-red-500/20 rounded-xl p-6 text-center">
+    <div className="bg-card border border-red-500/20 rounded-xl p-6 text-center">
       <AlertCircle className="w-6 h-6 text-red-400/60 mx-auto mb-2" />
-      <p className="text-sm text-slate-400">{label} data is temporarily unavailable</p>
-      <p className="text-xs text-slate-500 mt-1">Data will refresh automatically. Please check back shortly.</p>
+      <p className="text-sm text-muted-foreground">{label} data is temporarily unavailable</p>
+      <p className="text-xs text-muted-foreground/70 mt-1">Data will refresh automatically. Please check back shortly.</p>
     </div>
   );
 }
