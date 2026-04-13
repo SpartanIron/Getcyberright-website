@@ -146,12 +146,278 @@ async function shareCountryAlert(country: string, riskLevel: string, incidents: 
   return true;
 }
 
+function isMobileDevice(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.innerWidth < 768 || /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function MobileGlobeView({ data, onCountrySelect, focusCountryCode }: ScamIntelligenceGlobeProps) {
+  const [selectedPoint, setSelectedPoint] = useState<GlobeHotspot | null>(null);
+  const [copiedShare, setCopiedShare] = useState(false);
+  const [showEmergency, setShowEmergency] = useState(false);
+  const [filter, setFilter] = useState<"all" | "critical" | "high" | "medium">("all");
+  const [sortBy, setSortBy] = useState<"risk" | "incidents">("risk");
+
+  const hotspots = data?.hotspots || [];
+
+  useEffect(() => {
+    if (focusCountryCode && hotspots.length > 0) {
+      const match = hotspots.find(h => h.countryCode === focusCountryCode);
+      if (match) {
+        setSelectedPoint(match);
+        onCountrySelect?.(match);
+      }
+    }
+  }, [focusCountryCode, hotspots.length]);
+
+  const riskOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+
+  const filtered = hotspots
+    .filter(h => filter === "all" || h.riskLevel === filter)
+    .sort((a, b) => {
+      if (sortBy === "risk") return (riskOrder[a.riskLevel] ?? 3) - (riskOrder[b.riskLevel] ?? 3);
+      return b.recentIncidents - a.recentIncidents;
+    });
+
+  const riskCounts = {
+    critical: hotspots.filter(h => h.riskLevel === "critical").length,
+    high: hotspots.filter(h => h.riskLevel === "high").length,
+    medium: hotspots.filter(h => h.riskLevel === "medium").length,
+  };
+
+  const handleSelect = (h: GlobeHotspot) => {
+    const isDeselect = selectedPoint?.id === h.id;
+    setSelectedPoint(isDeselect ? null : h);
+    setShowEmergency(false);
+    onCountrySelect?.(isDeselect ? null : h);
+  };
+
+  return (
+    <div className="w-full" data-testid="mobile-globe-view">
+      <div className="flex items-center gap-2 mb-3">
+        <GlobeIcon className="w-5 h-5 text-cyan-400" />
+        <span className="text-sm font-semibold text-white">Live Threat Map</span>
+        <span className="text-[10px] text-slate-500 ml-auto">{hotspots.length} countries tracked</span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 mb-3">
+        {[
+          { key: "critical" as const, label: "Critical", color: "bg-red-500", count: riskCounts.critical },
+          { key: "high" as const, label: "High", color: "bg-orange-500", count: riskCounts.high },
+          { key: "medium" as const, label: "Medium", color: "bg-yellow-500", count: riskCounts.medium },
+        ].map(r => (
+          <button
+            key={r.key}
+            onClick={() => setFilter(filter === r.key ? "all" : r.key)}
+            className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all border ${
+              filter === r.key
+                ? "bg-slate-700/60 border-cyan-500/40 text-white"
+                : "bg-slate-800/40 border-slate-700/30 text-slate-400"
+            }`}
+            data-testid={`filter-${r.key}`}
+          >
+            <span className={`w-2 h-2 rounded-full ${r.color}`} />
+            {r.label} ({r.count})
+          </button>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-[10px] text-slate-500">Sort:</span>
+        <button
+          onClick={() => setSortBy("risk")}
+          className={`text-[10px] px-2 py-0.5 rounded ${sortBy === "risk" ? "bg-cyan-500/20 text-cyan-400" : "text-slate-400"}`}
+          data-testid="sort-risk"
+        >
+          Risk Level
+        </button>
+        <button
+          onClick={() => setSortBy("incidents")}
+          className={`text-[10px] px-2 py-0.5 rounded ${sortBy === "incidents" ? "bg-cyan-500/20 text-cyan-400" : "text-slate-400"}`}
+          data-testid="sort-incidents"
+        >
+          Most Reports
+        </button>
+      </div>
+
+      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1" data-testid="mobile-country-list">
+        {filtered.slice(0, 20).map(h => {
+          const isSelected = selectedPoint?.id === h.id;
+          const riskColor = RISK_COLORS[h.riskLevel] || "#22d3ee";
+          return (
+            <div key={h.id}>
+              <button
+                onClick={() => handleSelect(h)}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all border ${
+                  isSelected
+                    ? "bg-cyan-500/10 border-cyan-500/30"
+                    : "bg-slate-800/40 border-slate-700/30 hover:border-slate-600"
+                }`}
+                data-testid={`mobile-country-${h.countryCode}`}
+              >
+                <div className="relative flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: riskColor + "20" }}>
+                    <MapPin className="w-5 h-5" style={{ color: riskColor }} />
+                  </div>
+                  {h.trendDirection === "up" && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-[8px] text-white font-bold">!</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-white truncate">{h.country}</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full border font-medium" style={{
+                      backgroundColor: riskColor + "15",
+                      borderColor: riskColor + "30",
+                      color: riskColor,
+                    }}>
+                      {h.riskLevel}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[11px] text-slate-400">{formatNumber(h.recentIncidents)} reports</span>
+                    <span className={`text-[10px] font-medium ${h.trendDirection === "up" ? "text-red-400" : h.trendDirection === "down" ? "text-green-400" : "text-slate-500"}`}>
+                      {h.trendDirection === "up" ? "↑" : h.trendDirection === "down" ? "↓" : "→"}{h.trendPercent}%
+                    </span>
+                    <span className="text-[10px] text-slate-500 truncate">{h.topScamTypes?.[0]?.replace(/-/g, " ")}</span>
+                  </div>
+                </div>
+              </button>
+
+              {isSelected && (
+                <div className="mt-1 ml-2 mr-2 mb-2 bg-slate-900/80 border border-cyan-500/20 rounded-xl p-4 space-y-3" data-testid="mobile-country-detail">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-slate-800/60 rounded-lg p-2.5 text-center">
+                      <div className="text-lg font-bold text-white">{formatNumber(h.recentIncidents)}</div>
+                      <div className="text-[10px] text-slate-400">Scams Reported</div>
+                    </div>
+                    <div className="bg-slate-800/60 rounded-lg p-2.5 text-center">
+                      <div className="text-lg font-bold" style={{ color: riskColor }}>
+                        {h.trendDirection === "up" ? "↑" : h.trendDirection === "down" ? "↓" : "→"}{h.trendPercent}%
+                      </div>
+                      <div className="text-[10px] text-slate-400">Change</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1.5">Common Scams</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {h.topScamTypes.slice(0, 4).map(t => (
+                        <span key={t} className="text-[10px] bg-slate-800 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/20">
+                          {t.replace(/-/g, " ")}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setShowEmergency(!showEmergency)}
+                    className="w-full flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-lg p-2.5"
+                    data-testid="mobile-toggle-emergency"
+                  >
+                    <ShieldAlert className="w-4 h-4 text-red-400" />
+                    <span className="text-xs font-semibold text-red-400 flex-1">Been scammed? Here's what to do</span>
+                    <span className="text-slate-400 text-xs">{showEmergency ? "▲" : "▼"}</span>
+                  </button>
+
+                  {showEmergency && (
+                    <div className="space-y-2" data-testid="mobile-emergency-steps">
+                      {h.emergencySteps && h.emergencySteps.length > 0 ? (
+                        <ol className="space-y-1.5">
+                          {h.emergencySteps.map((step, i) => (
+                            <li key={i} className="flex gap-2 text-xs">
+                              <span className="text-cyan-400 font-bold flex-shrink-0">{i + 1}.</span>
+                              <span className="text-slate-300">{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <ol className="space-y-1.5">
+                          <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold">1.</span><span className="text-slate-300">Stop all contact with the scammer immediately</span></li>
+                          <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold">2.</span><span className="text-slate-300">Contact your bank to freeze accounts</span></li>
+                          <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold">3.</span><span className="text-slate-300">Change passwords on all accounts</span></li>
+                          <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold">4.</span><span className="text-slate-300">Report to local police and fraud center</span></li>
+                          <li className="flex gap-2 text-xs"><span className="text-cyan-400 font-bold">5.</span><span className="text-slate-300">Save all evidence</span></li>
+                        </ol>
+                      )}
+                      {h.emergencyHotline && (
+                        <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-lg p-2">
+                          <Phone className="w-3.5 h-3.5 text-red-400" />
+                          <div>
+                            <div className="text-[10px] text-slate-400">Emergency Hotline</div>
+                            <div className="text-xs text-red-400 font-semibold">{h.emergencyHotline}</div>
+                          </div>
+                        </div>
+                      )}
+                      {h.emergencyReportUrl && (
+                        <a href={h.emergencyReportUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-cyan-400" data-testid="mobile-report-link">
+                          <ExternalLink className="w-3 h-3" />
+                          Report online
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5">Warn Your Family</div>
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={async () => {
+                          const ok = await shareCountryAlert(h.country, h.riskLevel, h.recentIncidents, "copy");
+                          if (ok) { setCopiedShare(true); setTimeout(() => setCopiedShare(false), 2000); }
+                        }}
+                        className="flex items-center gap-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700/50"
+                        data-testid="mobile-share-copy"
+                      >
+                        {copiedShare ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                        {copiedShare ? "Copied" : "Copy"}
+                      </button>
+                      <button
+                        onClick={() => shareCountryAlert(h.country, h.riskLevel, h.recentIncidents, "whatsapp")}
+                        className="flex items-center gap-1 text-[10px] bg-green-600/20 text-green-400 px-2.5 py-1.5 rounded-lg border border-green-500/20"
+                        data-testid="mobile-share-whatsapp"
+                      >
+                        <Share2 className="w-3 h-3" />
+                        WhatsApp
+                      </button>
+                      <button
+                        onClick={() => shareCountryAlert(h.country, h.riskLevel, h.recentIncidents, "email")}
+                        className="flex items-center gap-1 text-[10px] bg-blue-600/20 text-blue-400 px-2.5 py-1.5 rounded-lg border border-blue-500/20"
+                        data-testid="mobile-share-email"
+                      >
+                        <MapPin className="w-3 h-3" />
+                        Email
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="text-[10px] text-slate-500">Sources: {h.sources.join(", ")}</div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {filter !== "all" && filtered.length === 0 && (
+        <div className="text-center py-6">
+          <p className="text-sm text-slate-400">No countries with {filter} risk level</p>
+          <button onClick={() => setFilter("all")} className="text-xs text-cyan-400 mt-1">Show all</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focusCountryCode }: ScamIntelligenceGlobeProps) {
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
   const [loadError, setLoadError] = useState(false);
   const [webglSupported, setWebglSupported] = useState(true);
+  const [isMobile] = useState(() => typeof window !== "undefined" ? isMobileDevice() : false);
   const [dimensions, setDimensions] = useState({ w: width || 600, h: height || 600 });
   const [hoveredPoint, setHoveredPoint] = useState<GlobeHotspot | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<GlobeHotspot | null>(null);
@@ -161,7 +427,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || isMobile) return;
     const supported = checkWebGLSupport();
     setWebglSupported(supported);
     if (!supported) return;
@@ -261,6 +527,10 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setWebglSupported(checkWebGLSupport());
     setRetryCount(c => c + 1);
   }, []);
+
+  if (isMobile) {
+    return <MobileGlobeView data={data} onCountrySelect={onCountrySelect} focusCountryCode={focusCountryCode} />;
+  }
 
   if (!webglSupported || loadError) {
     return <GlobeFallback data={data} onRetry={handleRetry} />;
