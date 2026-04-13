@@ -28,8 +28,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
 export default async function ScamIntelPage() {
   const initialScams = await getPublishedScamIntel();
   const jsonLd = [

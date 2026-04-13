@@ -28,8 +28,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
 export default async function GuidesPage() {
   const initialGuides = await getPublishedGuides();
   const jsonLd = [
