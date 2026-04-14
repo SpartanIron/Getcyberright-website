@@ -194,7 +194,7 @@ export function HeroSection() {
                 className="text-base sm:text-xl text-hero-foreground/80 leading-relaxed mb-8 sm:mb-10"
                 data-testid="text-hero-subtext"
               >
-                GetCyberRight makes digital protection simple for everyone. Check if that text or email is a scam, discover who has your personal data and remove it, and learn practical safety habits with guides written in plain language. Protection for the whole family, no expertise needed.
+              Spot scams instantly, remove your data from the internet, and build practical safety habits for the whole family. Written for real people, not IT professionals.
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 mb-8 sm:mb-10">
