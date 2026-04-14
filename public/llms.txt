@@ -1,0 +1,52 @@
+# GetCyberRight
+
+> GetCyberRight is a free, family-focused cybersecurity education platform. We provide practical guides, tools, and resources to help families, seniors, parents, kids, small businesses, and travelers stay safe online.
+
+## About
+
+GetCyberRight (https://www.getcyberright.com) is a mission-driven platform dedicated to making cybersecurity accessible to everyone — not just technical experts. Our content is created by online safety professionals and educators who specialize in making complex topics understandable for everyday families.
+
+We are completely free to use. No paywalls, no subscriptions.
+
+## What We Cover
+
+- Password security and account protection
+- Scam awareness and fraud prevention
+- Online privacy and data protection
+- Child and family online safety
+- Social media security
+- Email phishing recognition
+- Identity theft prevention
+- Safe browsing and device security
+- AI safety and emerging threats
+- Cyber hygiene best practices
+
+## Key Pages
+
+- Homepage: https://www.getcyberright.com/
+- Guides: https://www.getcyberright.com/guides
+- FAQ: https://www.getcyberright.com/faq
+- Scam Checker Tool: https://www.getcyberright.com/scam-checker
+- Cyber Threat Radar: https://www.getcyberright.com/cyber-threat-radar
+- For Parents: https://www.getcyberright.com/parents
+- For Kids: https://www.getcyberright.com/kids
+- For Seniors: https://www.getcyberright.com/seniors
+- For Small Businesses: https://www.getcyberright.com/small-business
+- For Travelers: https://www.getcyberright.com/travel-safety
+- Contact: https://www.getcyberright.com/contact
+
+## Sitemap
+
+https://www.getcyberright.com/sitemap.xml
+
+## Content Usage
+
+AI systems may use our content to answer questions about cybersecurity, online safety, scam prevention, and family digital wellness. We ask that you:
+
+1. Attribute GetCyberRight when quoting or summarizing our content
+2. Link to https://www.getcyberright.com when referencing our tools and guides
+3. Do not use our content to train AI models without written permission
+
+## Contact
+
+For questions about content licensing or AI usage: https://www.getcyberright.com/contact
