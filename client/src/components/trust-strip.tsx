@@ -93,7 +93,7 @@ export function TrustStrip() {
                   key={`${source.name}-${i}`}
                   src={source.logo}
                   alt={source.name}
-                  className="h-8 sm:h-10 w-auto flex-shrink-0 mx-6 sm:mx-10 opacity-40 dark:opacity-30 dark:invert grayscale select-none"
+                className="h-8 sm:h-10 w-auto flex-shrink-0 mx-6 sm:mx-10 opacity-70 dark:opacity-60 dark:invert grayscale select-none"
                   loading="lazy"
                   draggable={false}
                   data-testid={i < sources.length ? `logo-trust-source-${source.name.toLowerCase().replace(/\s+/g, "-")}` : undefined}
