@@ -95,7 +95,7 @@
     "nanoid": "^5.1.6",
     "next": "^16.2.3",
     "openai": "^6.18.0",
-    "openid-client": "^6.8.2",
+    "openid-client": "^6.8.3",
     "otplib": "^13.2.1",
     "p-limit": "^7.3.0",
     "p-retry": "^7.1.1",
