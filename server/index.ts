@@ -1,3 +1,4 @@
+import { Sentry } from "./instrument";
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import compression from "compression";
@@ -349,4 +350,6 @@ function startBackgroundJobs() {
   import("./scamIntelAggregator").then(({ startScamIntelScheduler }) => {
     startScamIntelScheduler();
   }).catch(err => console.error("Failed to start scam intel aggregator:", err));
+  // Sentry error handler must be registered after all routes
+  Sentry.setupExpressErrorHandler(app);
 }
