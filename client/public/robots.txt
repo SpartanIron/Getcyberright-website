@@ -118,3 +118,4 @@ User-agent: DotBot
 Disallow: /
 
 Sitemap: https://www.getcyberright.com/sitemap.xml
+LLMs: https://www.getcyberright.com/llms.txt
