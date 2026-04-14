@@ -1,10 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays, Chrome, CreditCard } from "lucide-react";
+import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays, Chrome, CreditCard, Search } from "lucide-react";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { Link } from "@/lib/navigation";
 import { StructuredData } from "@/components/structured-data";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 const faqCategories = [
   {
@@ -192,6 +194,22 @@ export default function FAQ() {
           cat.questions.map(q => ({ question: q.q, answer: q.a }))
                                                    );
 
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const filteredCategories = searchQuery.trim()
+      ? faqCategories
+              .map((cat) => ({
+                          ...cat,
+                          questions: cat.questions.filter(
+                                        (q) =>
+                                                        q.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                                        q.a.toLowerCase().includes(searchQuery.toLowerCase())
+                                                    ),
+              }))
+              .filter((cat) => cat.questions.length > 0)
+          : faqCategories;
+  
+
   return (
         <main id="main-content" tabIndex={-1} className="min-h-screen bg-background">
               <StructuredData data={{
@@ -218,11 +236,23 @@ export default function FAQ() {
                                 </div>div>
                       </div>div>
               </section>section>
-        
+
+                    <div className="container mx-auto px-4 max-w-2xl py-6">
+                                <div className="relative">
+                                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                              <Input
+                                                                placeholder="Search all questions..."
+                                                                value={searchQuery}
+                                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                                className="pl-10 bg-background border-border"
+                                                                aria-label="Search FAQ"
+                                                              />
+                                </div>div>
+                    </div>div></div>
               <section className="py-16">
                       <div className="container mx-auto px-4 max-w-4xl">
                                 <div className="space-y-8">
-                                  {faqCategories.map((category, categoryIndex) => (
+                                  {filteredCategories.map((category, categoryIndex) => (
                         <Card key={categoryIndex} className="overflow-hidden">
                                         <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-4">
                                                           <div className="flex items-center gap-3">
