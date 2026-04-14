@@ -49,8 +49,8 @@ export default function Home() {
                         <AudiencePaths />
                         <ContentPreview />
                         <NewsletterCTA />
-                </main>main>
+                </main>
                 <Footer />
-          </div>div>
+          </div>
         );
-}</div>
+}
