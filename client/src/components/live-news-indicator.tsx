@@ -20,16 +20,16 @@ export function LiveNewsIndicator({ showRefresh = false, onRefresh }: LiveNewsIn
     refetch();
     onRefresh?.();
   };
-
+  const articleCount = liveNews && (liveNews as any)?.articles?.length;
   return (
     <div className="flex items-center space-x-2">
       <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-300">
         <Zap className="h-3 w-3 mr-1" />
         Live Feed
       </Badge>
-      {liveNews && (liveNews as any)?.articles && (
+      {articleCount > 0 && (
         <span className="text-xs text-muted-foreground">
-          {(liveNews as any).articles.length} fresh articles
+          {articleCount} fresh {articleCount === 1 ? "article" : "articles"}
         </span>
       )}
       {showRefresh && (
