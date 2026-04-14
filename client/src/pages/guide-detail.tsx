@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { StructuredData, type BlogPostingData, type FAQData, type BreadcrumbData } from "@/components/structured-data";
@@ -120,6 +121,29 @@ export default function GuideDetailPage() {
   const readTime = guide.readingTimeMinutes || Math.ceil((guide.wordCount || 0) / 200);
   const publishDate = guide.publishedAt || guide.updatedAt;
 
+    const [activeSection, setActiveSection] = useState<string>("");
+
+    useEffect(() => {
+          if (toc.length === 0) return;
+          const headingIds = toc.map((item, i) => item.id || `section-${i}`);
+          const observer = new IntersectionObserver(
+                  (entries) => {
+                            entries.forEach((entry) => {
+                                        if (entry.isIntersecting) {
+                                                      setActiveSection(entry.target.id);
+                                        }
+                            });
+                  },
+            { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
+                );
+          headingIds.forEach((id) => {
+                  const el = document.getElementById(id);
+                  if (el) observer.observe(el);
+          });
+          return () => observer.disconnect();
+    }, [toc]);
+  
+
   return (
     <div className="min-h-screen bg-background">
       <StructuredData data={structuredDataItems} />
@@ -182,7 +206,7 @@ export default function GuideDetailPage() {
                 <nav className="space-y-1" data-testid="nav-toc">
                   {toc.map((item, i) => (
                     <a
-                      key={i}
+                className={`block text-sm py-1 transition-colors ${activeSection === (item.id || `section-${i}`) ? "text-teal-600 dark:text-teal-400 font-semibold border-l-2 border-teal-600 dark:border-teal-400 pl-2" : "text-muted-foreground hover:text-teal-600 dark:hover:text-teal-400"}`}
                       href={`#${item.id || `section-${i}`}`}
                       className="block text-sm text-muted-foreground hover:text-teal-600 dark:hover:text-teal-400 py-1 transition-colors"
                       style={{ paddingLeft: ((item.level || 2) - 2) * 12 }}
