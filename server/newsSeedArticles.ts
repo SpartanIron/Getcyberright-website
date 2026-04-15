@@ -1,13 +1,45 @@
 import { storage } from "./storage";
+import { db } from "./db";
+import { sql } from "drizzle-orm";
 
 /**
  * Seeds the news_articles table with an initial set of high-quality,
  * plain-language cybersecurity articles. These are written for everyday
  * internet users, not security professionals.
  *
- * Called once on startup when the table is empty.
+ * Creates the table if it does not exist, then seeds only when empty.
  */
 export async function seedNewsArticles(): Promise<number> {
+  // Ensure the news_articles table exists
+  try {
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS "news_articles" (
+        "id" varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+        "title" text NOT NULL,
+        "slug" varchar(255) NOT NULL UNIQUE,
+        "excerpt" text NOT NULL,
+        "content" text,
+        "category" text NOT NULL DEFAULT 'Cybersecurity',
+        "source" text NOT NULL,
+        "source_url" text NOT NULL,
+        "original_title" text,
+        "image_url" text,
+        "thumbnail_url" text,
+        "urgency_level" integer DEFAULT 1,
+        "related_tool_url" text,
+        "related_tool_name" text,
+        "author" text DEFAULT 'Jude Annan, CISM',
+        "author_role" text DEFAULT 'Managing Partner',
+        "published_at" timestamp DEFAULT now(),
+        "created_at" timestamp DEFAULT now()
+      )
+    `);
+    console.log("[news-seed] Ensured news_articles table exists.");
+  } catch (err: any) {
+    console.error("[news-seed] Failed to ensure table:", err.message);
+    return 0;
+  }
+
   try {
     const existing = await storage.getNewsArticles(undefined, 1);
     if (existing.length > 0) {
