@@ -1,4 +1,3 @@
-import { storage } from "./storage";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 
@@ -8,6 +7,7 @@ import { sql } from "drizzle-orm";
  * internet users, not security professionals.
  *
  * Creates the table if it does not exist, then seeds only when empty.
+ * Uses raw SQL throughout to avoid Drizzle ORM timing issues on fresh tables.
  */
 export async function seedNewsArticles(): Promise<number> {
   // Ensure the news_articles table exists
@@ -36,147 +36,207 @@ export async function seedNewsArticles(): Promise<number> {
     `);
     console.log("[news-seed] Ensured news_articles table exists.");
   } catch (err: any) {
-    console.error("[news-seed] Failed to ensure table:", err.message);
+    console.error("[news-seed] Failed to create table:", err.message);
     return 0;
   }
 
+  // Check if articles already exist using raw SQL
   try {
-    const existing = await storage.getNewsArticles(undefined, 1);
-    if (existing.length > 0) {
-      console.log("[news-seed] Articles already exist, skipping seed.");
+    const result = await db.execute(sql`SELECT COUNT(*)::int AS cnt FROM "news_articles"`);
+    const rows = result as any;
+    const count = rows?.[0]?.cnt ?? rows?.rows?.[0]?.cnt ?? 0;
+    if (count > 0) {
+      console.log(`[news-seed] Already have ${count} articles. Skipping seed.`);
       return 0;
     }
-  } catch (error: any) {
-    console.error("[news-seed] Could not check existing articles:", error.message);
+  } catch (err: any) {
+    console.error("[news-seed] Count check failed:", err.message);
     return 0;
   }
 
-  console.log("[news-seed] Seeding initial news articles...");
-
   const articles = getSeedArticles();
-  let created = 0;
+  let inserted = 0;
 
   for (const article of articles) {
     try {
-      await storage.createNewsArticle(article);
-      created++;
+      // Escape single quotes in text values
+      const esc = (s: string) => s.replace(/'/g, "''");
+      await db.execute(sql`
+        INSERT INTO "news_articles" (
+          "title", "slug", "excerpt", "content", "category",
+          "source", "source_url", "original_title", "image_url",
+          "urgency_level", "related_tool_url", "related_tool_name",
+          "author", "author_role", "published_at"
+        ) VALUES (
+          ${article.title},
+          ${article.slug},
+          ${article.excerpt},
+          ${article.content},
+          ${article.category},
+          ${article.source},
+          ${article.sourceUrl},
+          ${article.originalTitle},
+          ${article.imageUrl || null},
+          ${article.urgencyLevel},
+          ${article.relatedToolUrl || null},
+          ${article.relatedToolName || null},
+          ${article.author},
+          ${article.authorRole},
+          ${article.publishedAt}
+        )
+        ON CONFLICT ("slug") DO NOTHING
+      `);
+      inserted++;
     } catch (err: any) {
-      console.error("[news-seed] Failed to create article:", article.slug, err.message);
+      console.error(`[news-seed] Failed to insert "${article.title}": ${err.message}`);
     }
   }
 
-  console.log(`[news-seed] Seeded ${created} of ${articles.length} articles.`);
-  return created;
+  console.log(`[news-seed] Seeded ${inserted} of ${articles.length} articles.`);
+  return inserted;
+}
+
+function hoursAgo(h: number): string {
+  return new Date(Date.now() - h * 3600000).toISOString();
 }
 
 function getSeedArticles() {
-  const now = new Date();
-  const hoursAgo = (h: number) => new Date(now.getTime() - h * 60 * 60 * 1000).toISOString();
-
   return [
     {
-      title: "What Password Managers Do and Why You Need One",
-      slug: "what-password-managers-do-and-why-you-need-one",
-      excerpt: "Reusing passwords is one of the most common ways people get hacked. A password manager creates and stores strong, unique passwords for every account so you do not have to remember them.",
-      content: "If you use the same password for your email, your bank, and your streaming service, you are not alone. Most people do it because remembering dozens of passwords feels impossible. But when one site gets breached, attackers try that same password everywhere else. This is called credential stuffing, and it works far more often than you might expect.\n\nA password manager solves this by generating a random, complex password for each account and storing them all behind one master password. Think of it like a secure digital vault. You only need to remember one key, and the manager handles the rest.\n\nPopular options include Bitwarden (free and open-source), 1Password, and the built-in managers in Chrome, Safari, and Firefox. Most work across your phone, tablet, and computer, so your passwords follow you everywhere.\n\nThe single most impactful thing you can do for your online security today is to start using a password manager and change your most important passwords to unique ones.",
-      category: "Cybersecurity",
-      source: "GetCyberRight",
+      title: "Why You Need a Password Manager (and How to Pick One)",
+      slug: "why-you-need-a-password-manager",
+      excerpt: "If you are reusing passwords across sites, you are one data breach away from losing access to everything. Here is how a password manager keeps you safe.",
+      content: `Most people use the same handful of passwords everywhere. That is a serious problem because when one site gets hacked, criminals try those same passwords on banking sites, email accounts, and social media.\n\nA password manager solves this by creating and remembering a unique, complex password for every account you own. You only need to remember one master password.\n\nWhat to look for in a password manager:\n\n1. End-to-end encryption so even the company cannot read your passwords\n2. Cross-device syncing between your phone, tablet, and computer\n3. A built-in password generator that creates strong random passwords\n4. Breach monitoring that alerts you if any saved password appears in a known data leak\n\nPopular options include Bitwarden (free and open source), 1Password, and Dashlane. Most browsers also offer built-in password managers, though dedicated apps tend to offer more features and better security.\n\nGetting started takes about 15 minutes. Install the app, create your master password (make it long, like a short sentence you will remember), and start saving your logins as you visit sites throughout the week.`,
+      category: "Online Safety",
+      source: "GetCyberRight Editorial",
       sourceUrl: "https://www.getcyberright.com/guides",
+      originalTitle: "Why You Need a Password Manager (and How to Pick One)",
+      imageUrl: null,
+      urgencyLevel: 2,
+      relatedToolUrl: "/scam-guard",
+      relatedToolName: "Scam Guard",
       author: "Jude Annan, CISM",
       authorRole: "Managing Partner",
-      urgencyLevel: 2,
       publishedAt: hoursAgo(2),
     },
     {
       title: "How to Spot a Phishing Email Before You Click",
-      slug: "how-to-spot-a-phishing-email-before-you-click",
-      excerpt: "Phishing emails trick you into giving away your personal information or clicking dangerous links. Here is how to recognize them and stay safe.",
-      content: "Phishing is the most common type of cyberattack, and it starts with an email, text, or message designed to look like it came from someone you trust. The goal is to get you to click a link, download a file, or enter your login details on a fake website.\n\nHere are the warning signs to watch for. First, check the sender's email address carefully. A message claiming to be from your bank but sent from a random Gmail address is a red flag. Second, look for urgency. Phrases like 'Your account will be suspended in 24 hours' are designed to make you panic and act without thinking.\n\nThird, hover over links before clicking. On a computer, your browser shows the actual destination in the bottom corner. If the link does not match where it claims to go, do not click it. Fourth, watch for poor grammar and spelling. While phishing messages have gotten more sophisticated, many still contain noticeable errors.\n\nIf you are unsure about an email, do not click anything inside it. Instead, go directly to the company's website by typing the address into your browser. When in doubt, call the organization directly using a phone number you find on their official website.",
-      category: "Cybersecurity",
-      source: "GetCyberRight",
+      slug: "how-to-spot-phishing-email",
+      excerpt: "Phishing emails are getting harder to detect. Learn the five red flags that give away even the most convincing fakes.",
+      content: `Phishing is when someone sends you a fake email designed to steal your login credentials, credit card number, or personal information. These messages often look like they come from companies you trust: your bank, Amazon, Netflix, or even your employer.\n\nFive red flags to watch for:\n\n1. Urgency or threats. "Your account will be suspended in 24 hours" is a classic pressure tactic. Real companies rarely threaten you over email.\n2. Suspicious sender address. The display name might say "PayPal" but the actual email address is something like support@paypa1-secure.com. Always check the full address.\n3. Generic greetings. "Dear Customer" instead of your actual name often signals a mass phishing attempt.\n4. Links that do not match. Hover over any link before clicking. If the text says "paypal.com" but the link points to a different domain, do not click.\n5. Unexpected attachments. Be especially cautious of .zip, .exe, or .docm files you did not request.\n\nIf you suspect an email is fake, do not click any links. Instead, open your browser and go directly to the company's website by typing the address yourself.`,
+      category: "Phishing",
+      source: "GetCyberRight Editorial",
       sourceUrl: "https://www.getcyberright.com/guides",
+      originalTitle: "How to Spot a Phishing Email Before You Click",
+      imageUrl: null,
+      urgencyLevel: 3,
+      relatedToolUrl: "/scam-guard",
+      relatedToolName: "Scam Guard",
       author: "Jude Annan, CISM",
       authorRole: "Managing Partner",
-      urgencyLevel: 3,
       publishedAt: hoursAgo(5),
     },
     {
-      title: "Two-Factor Authentication: Your Second Line of Defense",
-      slug: "two-factor-authentication-your-second-line-of-defense",
-      excerpt: "Even if someone steals your password, two-factor authentication can stop them from getting into your account. Here is what it is and how to turn it on.",
-      content: "Two-factor authentication, often called 2FA or MFA, adds a second step when you log in. After entering your password, you also need to prove your identity another way, usually with a code from your phone or a tap on an authentication app.\n\nThink of it like a deadbolt on your front door. Your password is the doorknob lock. Even if someone picks it, they still cannot get through the deadbolt. That second layer makes a huge difference.\n\nThe easiest way to set it up is with an authenticator app like Google Authenticator, Microsoft Authenticator, or Authy. These generate a new six-digit code every 30 seconds. When you log in, you enter your password and then type in the current code.\n\nText message codes are another option, but security experts consider them less secure because phone numbers can be hijacked through SIM swapping. Authenticator apps are the better choice when available.\n\nStart with your most important accounts: email, banking, and social media. Most major services support 2FA. Look in your account settings under Security or Privacy to find the option. It takes less than five minutes to set up and dramatically reduces the chance of someone breaking into your accounts.",
-      category: "Cybersecurity",
-      source: "GetCyberRight",
+      title: "Two-Factor Authentication Explained in Plain English",
+      slug: "two-factor-authentication-explained",
+      excerpt: "Two-factor authentication is one of the best ways to protect your accounts, and it is easier to set up than you think.",
+      content: `Two-factor authentication (2FA) adds a second step when you log in to an account. Even if someone steals your password, they cannot get in without that second factor.\n\nThink of it like your front door. Your password is the key, and 2FA is a deadbolt that requires a separate code. A thief with a copy of your key still cannot get in.\n\nTypes of 2FA from least to most secure:\n\n1. SMS codes. A text message with a 6-digit code. Better than nothing, but criminals can intercept texts through SIM-swapping attacks.\n2. Authenticator apps. Apps like Google Authenticator, Authy, or Microsoft Authenticator generate codes that change every 30 seconds. These are much harder to intercept.\n3. Hardware keys. Physical devices like YubiKey that you plug into your computer or tap against your phone. This is the gold standard used by security professionals.\n\nStart with your most important accounts: email, banking, and social media. Most major services support 2FA. Look for it under Settings, then Security or Login Options.\n\nThe extra 10 seconds per login is worth the protection. Accounts with 2FA are almost never compromised through password theft alone.`,
+      category: "Online Safety",
+      source: "GetCyberRight Editorial",
       sourceUrl: "https://www.getcyberright.com/guides",
+      originalTitle: "Two-Factor Authentication Explained in Plain English",
+      imageUrl: null,
+      urgencyLevel: 2,
+      relatedToolUrl: null,
+      relatedToolName: null,
       author: "Jude Annan, CISM",
       authorRole: "Managing Partner",
-      urgencyLevel: 2,
       publishedAt: hoursAgo(8),
     },
     {
-      title: "Public Wi-Fi: What You Need to Know Before Connecting",
-      slug: "public-wifi-what-you-need-to-know-before-connecting",
-      excerpt: "Coffee shop Wi-Fi is convenient, but it can expose your personal data to anyone on the same network. Here is how to stay safe when using public wireless networks.",
-      content: "Free Wi-Fi at airports, hotels, and coffee shops is convenient, but it comes with real risks. On an open network, someone sitting nearby could potentially see what websites you visit, intercept your login details, or even set up a fake network that looks legitimate.\n\nThe most important rule is to never access sensitive accounts, like your bank or email, on public Wi-Fi unless you are using a VPN. A Virtual Private Network encrypts all the data leaving your device, so even if someone is watching the network, they cannot read your traffic.\n\nIf you do not have a VPN, you can still take precautions. Only visit websites that use HTTPS, which you can verify by looking for the padlock icon in your browser's address bar. Avoid logging into anything important. And turn off the setting that automatically connects to available Wi-Fi networks, since your device could connect to a malicious one without you knowing.\n\nFor most people, the simplest option is to use your phone's mobile data instead of public Wi-Fi for anything sensitive. Your cellular connection is significantly harder to intercept than an open wireless network.",
-      category: "Cybersecurity",
-      source: "GetCyberRight",
+      title: "Is Public Wi-Fi Actually Dangerous? What You Need to Know",
+      slug: "is-public-wifi-dangerous",
+      excerpt: "Coffee shop Wi-Fi might be convenient, but here is what hackers can see when you connect to an unprotected network.",
+      content: `Public Wi-Fi at coffee shops, airports, and hotels is convenient, but it comes with real risks. When you connect to an open network, anyone on that same network can potentially see your traffic.\n\nThe biggest risks on public Wi-Fi:\n\n1. Man-in-the-middle attacks. A hacker positions themselves between you and the Wi-Fi router, intercepting everything you send and receive.\n2. Evil twin networks. Someone creates a fake Wi-Fi network with a name like "Starbucks_Free" to trick you into connecting. Once connected, they can monitor your activity.\n3. Packet sniffing. Software tools can capture data packets flowing across the network, potentially revealing passwords and personal information sent without encryption.\n\nHow to stay safe:\n\n1. Use a VPN (Virtual Private Network). This encrypts all your internet traffic, making it unreadable to anyone snooping on the network. Good options include Mullvad, ProtonVPN, and NordVPN.\n2. Stick to HTTPS websites. Look for the padlock icon in your browser's address bar. Most major websites use HTTPS by default now.\n3. Avoid sensitive tasks. Do not log in to your bank or make purchases on public Wi-Fi unless you are using a VPN.\n4. Turn off auto-connect. Prevent your phone from automatically joining open networks.\n5. Forget the network when done. This prevents your device from reconnecting automatically next time.`,
+      category: "Online Safety",
+      source: "GetCyberRight Editorial",
       sourceUrl: "https://www.getcyberright.com/guides",
+      originalTitle: "Is Public Wi-Fi Actually Dangerous? What You Need to Know",
+      imageUrl: null,
+      urgencyLevel: 2,
+      relatedToolUrl: null,
+      relatedToolName: null,
       author: "Jude Annan, CISM",
       authorRole: "Managing Partner",
-      urgencyLevel: 2,
       publishedAt: hoursAgo(12),
     },
     {
-      title: "Software Updates Are Not Optional: Why Patching Matters",
-      slug: "software-updates-are-not-optional-why-patching-matters",
-      excerpt: "Those software update notifications you keep dismissing could be protecting you from active cyberattacks. Here is why keeping your devices up to date is one of the simplest ways to stay safe.",
-      content: "Every time you see a notification to update your phone, computer, or apps, it is tempting to hit 'Remind me later.' But those updates often contain security patches that fix vulnerabilities attackers are actively exploiting.\n\nWhen a software company discovers a security flaw, they race to release a fix before criminals can take advantage of it. The window between discovery and patch is when you are most vulnerable. Delaying updates extends that window.\n\nThe easiest approach is to turn on automatic updates for your operating system, web browser, and apps. On your phone, go to Settings and look for Software Update or App Store settings. On your computer, enable automatic updates in System Preferences or Windows Settings.\n\nPay special attention to your web browser and any apps that handle sensitive data. These are the most common targets for attackers. Keeping them current is one of the simplest, most effective security habits you can build.",
-      category: "Cybersecurity",
-      source: "GetCyberRight",
+      title: "Why Software Updates Matter More Than You Think",
+      slug: "why-software-updates-matter",
+      excerpt: "That update notification you keep dismissing could be the one thing standing between you and a hacker. Here is why updates are your first line of defense.",
+      content: `We all dismiss software update notifications. They pop up at the worst times, and restarting your computer feels like an interruption. But those updates are often patching security holes that hackers are actively exploiting.\n\nWhen a company discovers a vulnerability in its software, it races to release a patch before criminals can take advantage. The window between when a vulnerability becomes known and when you install the update is when you are most at risk.\n\nReal-world examples of what happens when updates are skipped:\n\n1. The WannaCry ransomware attack in 2017 affected hundreds of thousands of computers worldwide. Microsoft had released a patch two months earlier, but many organizations had not installed it.\n2. The Equifax data breach that exposed 147 million Americans' personal data happened because the company failed to patch a known vulnerability for over two months.\n\nHow to make updates painless:\n\n1. Turn on automatic updates for your operating system (Windows, macOS, iOS, Android)\n2. Enable auto-update for your apps, especially browsers and email clients\n3. Restart your devices at least once a week to ensure pending updates get installed\n4. Replace devices that no longer receive security updates. If your phone's manufacturer has stopped providing updates, it is time for an upgrade.`,
+      category: "Online Safety",
+      source: "GetCyberRight Editorial",
       sourceUrl: "https://www.getcyberright.com/guides",
-      author: "Jude Annan, CISM",
-      authorRole: "Managing Partner",
-      urgencyLevel: 3,
-      publishedAt: hoursAgo(16),
-    },
-    {
-      title: "What to Do If You Think You Have Been Hacked",
-      slug: "what-to-do-if-you-think-you-have-been-hacked",
-      excerpt: "Suspicious activity on your accounts can be frightening. Here is a step-by-step guide for what to do immediately if you think someone has broken into your accounts.",
-      content: "Discovering that one of your accounts may have been compromised is stressful, but acting quickly can limit the damage. Here is what to do.\n\nFirst, change your password immediately for the affected account. If you use the same password anywhere else, change those too. This is the single fastest way to lock an attacker out.\n\nSecond, enable two-factor authentication if you have not already. This prevents the attacker from getting back in even if they know your new password.\n\nThird, check for unauthorized activity. Look at recent logins, purchases, or messages sent from your account. Most services let you see a list of active sessions and sign out of all devices.\n\nFourth, if the compromised account is your email, check your email forwarding rules. Attackers sometimes set up rules to forward your messages to their own address, which lets them intercept password reset links for your other accounts.\n\nFifth, run a full malware scan on your devices using your antivirus software. If you do not have antivirus, Windows Defender (built into Windows) or Malwarebytes (free version) are reliable options.\n\nFinally, if financial accounts are affected, contact your bank immediately. They can freeze your accounts and help you dispute unauthorized transactions. Consider placing a fraud alert with the credit bureaus if you believe your identity has been stolen.",
-      category: "Breaking",
-      source: "GetCyberRight",
-      sourceUrl: "https://www.getcyberright.com/guides",
-      author: "Jude Annan, CISM",
-      authorRole: "Managing Partner",
-      urgencyLevel: 4,
-      publishedAt: hoursAgo(20),
-    },
-    {
-      title: "Social Media Privacy Settings You Should Change Today",
-      slug: "social-media-privacy-settings-you-should-change-today",
-      excerpt: "Your social media profiles may be sharing more about you than you realize. A few minutes adjusting your privacy settings can make a big difference.",
-      content: "Social media platforms are designed to encourage sharing, and their default settings often make your information more public than you might expect. Scammers and identity thieves regularly mine social media for details they can use against you.\n\nYour full birthday, hometown, workplace, and family member names are all pieces of the puzzle that criminals use for social engineering attacks or to answer your security questions.\n\nOn Facebook, go to Settings, then Privacy, and set your future posts to Friends Only. Review who can see your friends list, your email, and your phone number. On Instagram, consider switching to a private account if you do not need public visibility. On LinkedIn, be careful about what personal details you include beyond your professional information.\n\nAcross all platforms, disable location sharing on your posts. Broadcasting your real-time location tells people when you are away from home and reveals your daily patterns.\n\nTake 15 minutes this week to review the privacy settings on each social media platform you use. The interfaces change frequently, so settings you adjusted a year ago may have been reset or new options may have been added.",
-      category: "Cybersecurity",
-      source: "GetCyberRight",
-      sourceUrl: "https://www.getcyberright.com/guides",
-      author: "Jude Annan, CISM",
-      authorRole: "Managing Partner",
+      originalTitle: "Why Software Updates Matter More Than You Think",
+      imageUrl: null,
       urgencyLevel: 2,
+      relatedToolUrl: null,
+      relatedToolName: null,
+      author: "Jude Annan, CISM",
+      authorRole: "Managing Partner",
+      publishedAt: hoursAgo(18),
+    },
+    {
+      title: "I Think I Have Been Hacked: A Step-by-Step Recovery Guide",
+      slug: "what-to-do-if-hacked",
+      excerpt: "If you suspect your account has been compromised, do not panic. Follow these steps immediately to limit the damage and take back control.",
+      content: `Discovering that one of your accounts has been hacked is stressful, but acting quickly can limit the damage. Here is exactly what to do, step by step.\n\nImmediate actions (do these right now):\n\n1. Change your password on the affected account. If you cannot log in, use the "Forgot Password" option. If that does not work, contact the service's support team directly.\n2. Change passwords on any other accounts where you used the same or a similar password. This is the most important step because hackers try stolen credentials everywhere.\n3. Enable two-factor authentication on the affected account and any accounts that share the password.\n4. Check for unauthorized changes. Look for new forwarding rules in email, changed recovery phone numbers, or unfamiliar connected apps.\n\nNext steps (within 24 hours):\n\n1. Check haveibeenpwned.com to see which of your email addresses appear in known data breaches.\n2. Review your bank and credit card statements for unauthorized charges.\n3. If financial accounts are affected, contact your bank immediately. Most banks have a fraud department available 24/7.\n4. Consider placing a fraud alert or credit freeze with the three major credit bureaus (Equifax, Experian, TransUnion).\n\nLonger-term protection:\n\n1. Set up a password manager and create unique passwords for every account.\n2. Sign up for credit monitoring if your Social Security number may have been exposed.\n3. File a report at identitytheft.gov if you believe you are a victim of identity theft.`,
+      category: "Data Breaches",
+      source: "GetCyberRight Editorial",
+      sourceUrl: "https://www.getcyberright.com/guides",
+      originalTitle: "I Think I Have Been Hacked: A Step-by-Step Recovery Guide",
+      imageUrl: null,
+      urgencyLevel: 4,
+      relatedToolUrl: "/scam-guard",
+      relatedToolName: "Scam Guard",
+      author: "Jude Annan, CISM",
+      authorRole: "Managing Partner",
       publishedAt: hoursAgo(24),
     },
     {
-      title: "How Ransomware Works and How to Protect Your Files",
-      slug: "how-ransomware-works-and-how-to-protect-your-files",
-      excerpt: "Ransomware locks your files and demands payment to unlock them. Understanding how it spreads is the first step to making sure it never happens to you.",
-      content: "Ransomware is a type of malicious software that encrypts your files, making them completely inaccessible, and then demands a payment, usually in cryptocurrency, to give you the decryption key. It has become one of the most profitable forms of cybercrime, affecting individuals, businesses, and even hospitals.\n\nMost ransomware arrives through phishing emails with infected attachments, malicious downloads, or compromised websites. Once it is on your computer, it works quickly, often encrypting your entire hard drive within minutes.\n\nThe best defense is a good backup strategy. Follow the 3-2-1 rule: keep 3 copies of your important files, on 2 different types of storage, with 1 copy stored offsite or in the cloud. If ransomware strikes, you can wipe your computer and restore from your backup without paying a cent.\n\nAdditional protective steps include keeping your software updated, being cautious with email attachments, and using reputable antivirus software. If you are hit by ransomware, security experts and law enforcement generally advise against paying the ransom, since there is no guarantee you will get your files back, and payment funds further criminal activity.\n\nFree decryption tools are available for some ransomware variants at nomoreransom.org, a project supported by Europol and major security companies.",
-      category: "Cybersecurity",
-      source: "GetCyberRight",
+      title: "Social Media Privacy Settings You Should Change Today",
+      slug: "social-media-privacy-settings",
+      excerpt: "Your social media profiles might be sharing more than you realize. These quick changes take five minutes and dramatically reduce your exposure.",
+      content: `Social media platforms are designed to encourage sharing, which means the default privacy settings are usually more open than most people would prefer. Taking five minutes to adjust these settings can significantly reduce your digital footprint.\n\nFacebook:\n1. Go to Settings, then Privacy. Change "Who can see your future posts" to "Friends" instead of "Public"\n2. Under "How People Find and Contact You," limit who can look you up by email and phone number\n3. Review your Timeline and Tagging settings to require your approval before posts appear on your profile\n4. Check the Apps and Websites section and remove any apps you no longer use\n\nInstagram:\n1. Consider switching to a private account (Settings, then Privacy, then Account Privacy)\n2. Turn off Activity Status so people cannot see when you are online\n3. Review and remove third-party app access under Settings, then Security, then Apps and Websites\n\nLinkedIn:\n1. Adjust your public profile visibility under Settings, then Visibility\n2. Turn off "Share profile updates with your network" to prevent broadcasting every profile change\n3. Control who can see your connections list\n\nGeneral tips for all platforms:\n1. Disable location sharing on posts\n2. Be cautious about quizzes and games that request access to your profile information\n3. Regularly review your friends or followers list and remove people you do not know\n4. Remember that anything you post can be screenshotted and shared, even from a "private" account`,
+      category: "Online Safety",
+      source: "GetCyberRight Editorial",
       sourceUrl: "https://www.getcyberright.com/guides",
+      originalTitle: "Social Media Privacy Settings You Should Change Today",
+      imageUrl: null,
+      urgencyLevel: 2,
+      relatedToolUrl: null,
+      relatedToolName: null,
       author: "Jude Annan, CISM",
       authorRole: "Managing Partner",
-      urgencyLevel: 3,
       publishedAt: hoursAgo(30),
+    },
+    {
+      title: "Ransomware: What It Is and How Families Can Protect Themselves",
+      slug: "ransomware-family-protection-guide",
+      excerpt: "Ransomware locks your files and demands payment. It is not just a business problem. Here is how to protect your family's photos, documents, and memories.",
+      content: `Ransomware is a type of malicious software that encrypts your files, making them inaccessible until you pay a ransom, usually in cryptocurrency. While it often targets businesses, home users are increasingly at risk.\n\nHow ransomware gets on your computer:\n\n1. Email attachments. A fake invoice, shipping notification, or document that installs the ransomware when opened.\n2. Malicious links. Clicking a link in a phishing email or on a compromised website.\n3. Software vulnerabilities. Unpatched operating systems or applications can be exploited remotely.\n4. Infected USB drives. Plugging in an unknown USB drive can trigger an automatic installation.\n\nHow to protect your family:\n\n1. Back up your important files regularly. Use both a cloud service (Google Drive, iCloud, OneDrive) and a physical external hard drive. Keep the external drive disconnected when not backing up.\n2. Keep all software updated. Enable automatic updates on every device in your home.\n3. Install reputable antivirus software. Windows Defender (built into Windows) is actually quite good. For extra protection, consider Malwarebytes or Bitdefender.\n4. Be extremely cautious with email attachments and links, especially from unknown senders.\n5. Educate everyone in your household. Kids and older family members are common targets.\n\nIf you are hit by ransomware:\n1. Disconnect the infected device from Wi-Fi and your home network immediately.\n2. Do not pay the ransom. There is no guarantee you will get your files back, and payment funds criminal operations.\n3. Report it to local law enforcement and the FBI's Internet Crime Complaint Center (IC3) at ic3.gov.\n4. If you have backups, wipe the device and restore from backup. If not, consult a professional data recovery service.`,
+      category: "Ransomware",
+      source: "GetCyberRight Editorial",
+      sourceUrl: "https://www.getcyberright.com/guides",
+      originalTitle: "Ransomware: What It Is and How Families Can Protect Themselves",
+      imageUrl: null,
+      urgencyLevel: 3,
+      relatedToolUrl: null,
+      relatedToolName: null,
+      author: "Jude Annan, CISM",
+      authorRole: "Managing Partner",
+      publishedAt: hoursAgo(36),
     },
   ];
 }
