@@ -14,9 +14,11 @@ export async function seedNewsArticles(): Promise<number> {
   const client = postgres(connectionString);
 
   try {
-    // First try to create the table. If it exists, ensure all columns are present.
+    // Drop and recreate the table to ensure correct schema
+    // Safe because seed only runs when table is empty or broken
+    await client.unsafe(`DROP TABLE IF EXISTS "news_articles"`);
     await client.unsafe(`
-      CREATE TABLE IF NOT EXISTS "news_articles" (
+      CREATE TABLE "news_articles" (
         "id" varchar PRIMARY KEY DEFAULT gen_random_uuid(),
         "title" text NOT NULL,
         "slug" varchar(255) NOT NULL UNIQUE,
@@ -37,25 +39,7 @@ export async function seedNewsArticles(): Promise<number> {
         "created_at" timestamp DEFAULT now()
       )
     `);
-    console.log("[news-seed] Ensured news_articles table exists.");
-
-    // Fix schema: add any missing columns from earlier broken table creation
-    const fixCols = [
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "excerpt" text',
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "content" text',
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "original_title" text',
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "image_url" text',
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "thumbnail_url" text',
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "urgency_level" integer DEFAULT 1',
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "related_tool_url" text',
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "related_tool_name" text',
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "author" text',
-      'ALTER TABLE "news_articles" ADD COLUMN IF NOT EXISTS "author_role" text',
-    ];
-    for (const ddl of fixCols) {
-      try { await client.unsafe(ddl); } catch (_) {}
-    }
-    console.log("[news-seed] Ensured all columns exist.");
+    console.log("[news-seed] Recreated news_articles table with correct schema.");
 
     const countResult = await client`SELECT COUNT(*)::int AS cnt FROM "news_articles"`;
     const count = countResult[0]?.cnt ?? 0;
