@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
 import { JsonLd } from "../components/json-ld";
-import Link from "next/link";
-import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays, Chrome, CreditCard } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Card, CardContent } from "@/components/ui/card";
+import { HelpCircle, CalendarDays } from "lucide-react";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { FAQSearch } from "./faq-search";
+import { FAQSearchableContent } from "./faq-search";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -116,17 +113,6 @@ const faqCategories = [
   },
 ];
 
-const iconMap = {
-  shield: Shield,
-  mail: Mail,
-  chrome: Chrome,
-  creditcard: CreditCard,
-  lock: Lock,
-  users: Users,
-  alert: AlertTriangle,
-  globe: Globe,
-};
-
 const LAST_REVIEWED = "March 2026";
 
 const flatFaqItems = faqCategories.flatMap((cat) => cat.questions);
@@ -188,79 +174,7 @@ export default function FAQPage() {
           </div>
         </section>
 
-          <FAQSearch>{(searchQuery) => {
-            const filteredCategories = searchQuery.trim()
-              ? faqCategories
-                  .map(cat => ({
-                    ...cat,
-                    questions: cat.questions.filter(
-                      q => q.q.toLowerCase().includes(searchQuery.toLowerCase()) || q.a.toLowerCase().includes(searchQuery.toLowerCase())
-                    ),
-                  }))
-                  .filter(cat => cat.questions.length > 0)
-              : faqCategories;
-            return (
-              <>
-        <section className="py-16">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <div className="space-y-8">
-              {filteredCategories.map((category, categoryIndex) => {
-                const IconComponent = iconMap[category.iconKey];
-                return (
-                  <Card key={categoryIndex} className="overflow-hidden" data-testid={`card-faq-category-${categoryIndex}`}>
-                    <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-br from-cyan-500 to-emerald-500 rounded-lg">
-                          <IconComponent className="w-5 h-5 text-white" />
-                        </div>
-                        <h2 className="text-xl font-semibold text-white">{category.title}</h2>
-                      </div>
-                    </div>
-                    <CardContent className="p-0">
-                      <Accordion type="single" collapsible className="w-full">
-                        {category.questions.map((item, itemIndex) => (
-                          <AccordionItem key={itemIndex} value={`${categoryIndex}-${itemIndex}`} className="border-b last:border-b-0">
-                            <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 text-left" data-testid={`button-faq-${categoryIndex}-${itemIndex}`}>
-                              <span className="font-medium">{item.q}</span>
-                            </AccordionTrigger>
-                            <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed" data-testid={`text-faq-answer-${categoryIndex}-${itemIndex}`}>
-                              {item.a}
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-            {filteredCategories.length === 0 && searchQuery.trim() && (
-              <div className="text-center py-12">
-                <p className="text-lg text-slate-400">No questions found matching your search.</p>
-                <p className="text-sm text-slate-500 mt-2">Try a different search term.</p>
-              </div>
-            )}
-
-            <Card className="mt-12 bg-gradient-to-br from-slate-800 to-slate-900 text-white">
-              <CardContent className="p-8 text-center">
-                <h3 className="text-2xl font-bold mb-4">Still Have Questions?</h3>
-                <p className="text-slate-300 mb-6">
-                  We are here to help. Reach out to us and we will get back to you as soon as possible.
-                </p>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-                  data-testid="link-faq-contact"
-                >
-                  Contact Us
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-              </>
-            );
-          }}</FAQSearch>
+          <FAQSearchableContent categories={faqCategories} lastReviewed={LAST_REVIEWED} />
       </main>
       <Footer />
     </>
