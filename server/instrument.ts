@@ -1,15 +1,16 @@
-import * as Sentry from "@sentry/node";
+// Sentry instrumentation stub - @sentry/node removed to fix deployment
+// Re-add @sentry/node to package.json and package-lock.json to restore error tracking
 
-// Only initialize Sentry if DSN is configured
-if (process.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    environment: process.env.NODE_ENV || "production",
-    // Capture 100% of transactions in production
-    tracesSampleRate: 1.0,
-    // Send default PII like IP addresses
-    sendDefaultPii: false,
-  });
-}
+const Sentry = {
+  init: () => {},
+  captureException: (err: unknown) => { console.error("[Sentry stub]", err); },
+  captureMessage: (msg: string) => { console.log("[Sentry stub]", msg); },
+  setUser: () => {},
+  setTag: () => {},
+  setExtra: () => {},
+  withScope: (fn: (scope: any) => void) => { fn({ setTag: () => {}, setExtra: () => {}, setLevel: () => {} }); },
+  startTransaction: () => ({ finish: () => {} }),
+  getCurrentHub: () => ({ getScope: () => null }),
+};
 
 export { Sentry };
