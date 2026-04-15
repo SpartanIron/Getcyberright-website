@@ -40,9 +40,10 @@ export async function seedNewsArticles(): Promise<number> {
     `);
     console.log("[news-seed] Ensured news_articles table exists.");
 
-    // Ensure social_posts table exists (required by GrowthOrchestrator, ContentTier, NewsSocial)
+    // Drop and recreate social_posts table (schema mismatch from initial migration)
+    await client.unsafe(`DROP TABLE IF EXISTS "social_posts"`);
     await client.unsafe(`
-      CREATE TABLE IF NOT EXISTS "social_posts" (
+      CREATE TABLE "social_posts" (
         "id" varchar PRIMARY KEY DEFAULT gen_random_uuid(),
         "content_type" text NOT NULL,
         "content_id" varchar NOT NULL,
@@ -61,11 +62,12 @@ export async function seedNewsArticles(): Promise<number> {
         "created_at" timestamp DEFAULT now()
       )
     `);
-    console.log("[news-seed] Ensured social_posts table exists.");
+    console.log("[news-seed] Recreated social_posts table with correct schema.");
 
-    // Ensure growth_tasks table exists (required by GrowthOrchestrator)
+    // Drop and recreate growth_tasks table (schema mismatch from initial migration)
+    await client.unsafe(`DROP TABLE IF EXISTS "growth_tasks"`);
     await client.unsafe(`
-      CREATE TABLE IF NOT EXISTS "growth_tasks" (
+      CREATE TABLE "growth_tasks" (
         "id" varchar PRIMARY KEY DEFAULT gen_random_uuid(),
         "task_type" text NOT NULL,
         "task_name" text NOT NULL,
@@ -82,11 +84,12 @@ export async function seedNewsArticles(): Promise<number> {
         "created_at" timestamp DEFAULT now()
       )
     `);
-    console.log("[news-seed] Ensured growth_tasks table exists.");
+    console.log("[news-seed] Recreated growth_tasks table with correct schema.");
 
-    // Ensure platform_metrics table exists (required by GrowthOrchestrator dashboard)
+    // Drop and recreate platform_metrics table (schema mismatch from initial migration)
+    await client.unsafe(`DROP TABLE IF EXISTS "platform_metrics"`);
     await client.unsafe(`
-      CREATE TABLE IF NOT EXISTS "platform_metrics" (
+      CREATE TABLE "platform_metrics" (
         "id" varchar PRIMARY KEY DEFAULT gen_random_uuid(),
         "metric_date" timestamp NOT NULL,
         "articles_published" integer DEFAULT 0,
@@ -101,7 +104,7 @@ export async function seedNewsArticles(): Promise<number> {
         "created_at" timestamp DEFAULT now()
       )
     `);
-    console.log("[news-seed] Ensured platform_metrics table exists.");
+    console.log("[news-seed] Recreated platform_metrics table with correct schema.");
 
     const countResult = await client`SELECT COUNT(*)::int AS cnt FROM "news_articles"`;
     const count = countResult[0].cnt;
