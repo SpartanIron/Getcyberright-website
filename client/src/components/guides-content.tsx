@@ -176,4 +176,4 @@ export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
               )}
         </main>
       );
-}</main>
+}
