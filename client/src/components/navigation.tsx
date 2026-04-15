@@ -316,7 +316,7 @@ export function Navigation() {
           <div className="hidden lg:flex items-center gap-2 shrink-0">
             <ThemeToggle />
             <Link href="/tools">
-              <Button variant="default" size="sm" className="text-sm font-medium" data-testid="button-get-protection">
+              <Button size="sm" className="text-sm font-medium bg-accent text-accent-foreground hover:bg-accent/90" data-testid="button-get-protection">
                 Check If It's a Scam
               </Button>
             </Link>
@@ -452,7 +452,7 @@ export function Navigation() {
                 <div className="flex items-center justify-between pt-4">
                   <ThemeToggle />
                   <Link href="/tools" onClick={() => setMobileMenuOpen(false)}>
-                    <Button data-testid="mobile-button-get-protection">
+                    <Button className="bg-accent text-accent-foreground hover:bg-accent/90 w-full" data-testid="mobile-button-get-protection">
                       Check If It's a Scam
                     </Button>
                   </Link>
