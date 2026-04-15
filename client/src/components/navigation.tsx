@@ -106,14 +106,14 @@ export function Navigation() {
       >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center gap-6">
-          <Link href="/" className="flex items-center gap-2 shrink-0" data-testid="link-logo">
+          <Link href="/" className="flex items-center gap-2 shrink-0 lg:flex-1" data-testid="link-logo">
             <img src={imgSrc(logoImage)} alt="GetCyberRight" className="w-9 h-9 object-contain" width={36} height={36} loading="lazy" />
             <span className="font-bold text-lg text-white tracking-tight">
               GetCyberRight
             </span>
           </Link>
 
-          <NavigationMenu className="hidden lg:flex flex-1 justify-center" aria-label="Main navigation">
+          <NavigationMenu className="hidden lg:flex flex-none justify-center" aria-label="Main navigation">
             <NavigationMenuList className="gap-0.5">
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white data-[state=open]:text-white text-sm" data-testid="nav-who-we-help">
@@ -313,7 +313,7 @@ export function Navigation() {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden lg:flex items-center gap-2 shrink-0">
+          <div className="hidden lg:flex items-center gap-2 shrink-0 lg:flex-1 lg:justify-end">
             <ThemeToggle />
             <Link href="/tools">
               <Button size="sm" className="text-sm font-medium bg-accent text-accent-foreground hover:bg-accent/90" data-testid="button-get-protection">
