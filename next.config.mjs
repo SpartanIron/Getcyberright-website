@@ -7,6 +7,22 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const nextConfig = {
   reactStrictMode: false,
 
+  async redirects() {
+    return [
+      {
+        source: '/partner-with-us',
+        destination: '/advertise',
+        permanent: true,
+      },
+      {
+        source: '/scam-guard',
+        destination: '/scam-checker',
+        permanent: true,
+      },
+    ];
+  },
+
+
   allowedDevOrigins: [
     "924e6b5f-16e9-49c9-929b-489d2a4ca32f-00-bgwqvqdliqo1.kirk.replit.dev",
     "*.kirk.replit.dev",
