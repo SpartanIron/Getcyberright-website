@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { FAQSearch } from "./faq-search";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -187,10 +188,23 @@ export default function FAQPage() {
           </div>
         </section>
 
+          <FAQSearch>{(searchQuery) => {
+            const filteredCategories = searchQuery.trim()
+              ? faqCategories
+                  .map(cat => ({
+                    ...cat,
+                    questions: cat.questions.filter(
+                      q => q.q.toLowerCase().includes(searchQuery.toLowerCase()) || q.a.toLowerCase().includes(searchQuery.toLowerCase())
+                    ),
+                  }))
+                  .filter(cat => cat.questions.length > 0)
+              : faqCategories;
+            return (
+              <>
         <section className="py-16">
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="space-y-8">
-              {faqCategories.map((category, categoryIndex) => {
+              {filteredCategories.map((category, categoryIndex) => {
                 const IconComponent = iconMap[category.iconKey];
                 return (
                   <Card key={categoryIndex} className="overflow-hidden" data-testid={`card-faq-category-${categoryIndex}`}>
@@ -220,6 +234,12 @@ export default function FAQPage() {
                 );
               })}
             </div>
+            {filteredCategories.length === 0 && searchQuery.trim() && (
+              <div className="text-center py-12">
+                <p className="text-lg text-slate-400">No questions found matching your search.</p>
+                <p className="text-sm text-slate-500 mt-2">Try a different search term.</p>
+              </div>
+            )}
 
             <Card className="mt-12 bg-gradient-to-br from-slate-800 to-slate-900 text-white">
               <CardContent className="p-8 text-center">
@@ -238,6 +258,9 @@ export default function FAQPage() {
             </Card>
           </div>
         </section>
+              </>
+            );
+          }}</FAQSearch>
       </main>
       <Footer />
     </>
