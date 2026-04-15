@@ -3,6 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import { runMigrations } from "./migrate";
+import { seedNewsArticles } from "./newsSeedArticles";
 import { registerRoutes } from "./routes";
 import { createServer } from "http";
 import {
@@ -206,6 +207,9 @@ async function bootstrapFullApp() {
     });
 
     await runMigrations();
+
+    // Seed initial news articles if the table is empty
+    seedNewsArticles().catch((err) => console.error("[startup] News seed failed:", err.message));
 
     registerSecurityEndpoints(app);
     registerSecurityMetricsEndpoint(app);
