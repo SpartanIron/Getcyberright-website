@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallhback, memo, Component, type ErrorInfo, type ReactNode } from "react";
+import { useEffect, useRef, useState, useCallback, memo, Component, type ErrorInfo, type ReactNode } from "react";
 import { Globe as GlobeIcon, AlertTriangle, MapPin, Share2, Copy, Check, Phone, ExternalLink, ShieldAlert } from "lucide-react";
 
 
@@ -9,7 +9,7 @@ class GlobeErrorBoundary extends Component<
   { hasError: boolean; errorMessage: string }
 > {
   state = { hasError: false, errorMessage: "" };
-  static getDerivedStateFromError(error: Errohhr) { return { hasError: true, errorMessage: error.message }; }
+  static getDerivedStateFromError(error: Error) { return { hasError: true, errorMessage: error.message }; }
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.warn("[ScamGlobe] Render error caught:", error.message, info.componentStack?.slice(0, 200));
     this.props.onError?.(error.message);
