@@ -12,6 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { BookOpen, Clock, Calendar, ArrowLeft, User, HelpCircle, Loader2, ArrowRight, PlayCircle } from "lucide-react";
 import { renderMarkdown } from "@/lib/markdown";
 import { GuideVideoPlayer, getGuideVideoUrl } from "@/components/guide-video-player";
+import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
 
 interface GuideDetail {
   id: string;
@@ -291,6 +292,31 @@ export default function GuideDetailPage() {
                 </div>
               </section>
             )}
+
+            {/* Internal Linking: Recommended Tools & Related Guides */}
+                        <RelatedResources
+                                        title="Explore Related Tools & Guides"
+                                        subtitle={`More resources related to ${guide.category} topics`}
+                                        resources={[
+                                                          ...(guide.category?.toLowerCase().includes('phishing') || guide.category?.toLowerCase().includes('scam')
+                                                                                ? [RESOURCE_LINKS.scamChecker, RESOURCE_LINKS.phishingGuide, RESOURCE_LINKS.emergencyHelp]
+                                                                                : []),
+                                                          ...(guide.category?.toLowerCase().includes('password') || guide.category?.toLowerCase().includes('security')
+                                                                                ? [RESOURCE_LINKS.passwordGenerator, RESOURCE_LINKS.passwordGuide, RESOURCE_LINKS.breachDashboard]
+                                                                                : []),
+                                                          ...(guide.category?.toLowerCase().includes('privacy') || guide.category?.toLowerCase().includes('identity')
+                                                                                ? [RESOURCE_LINKS.dataRemoval, RESOURCE_LINKS.privacyGuide, RESOURCE_LINKS.identityTheftGuide]
+                                                                                : []),
+                                                          ...(guide.category?.toLowerCase().includes('family') || guide.category?.toLowerCase().includes('senior') || guide.category?.toLowerCase().includes('kid')
+                                                                                ? [RESOURCE_LINKS.kidsHub, RESOURCE_LINKS.seniorsHub, RESOURCE_LINKS.parentsHub]
+                                                                                : []),
+                                                          ...(guide.category?.toLowerCase().includes('social')
+                                                                                ? [RESOURCE_LINKS.dataRemoval, RESOURCE_LINKS.privacyGuide, RESOURCE_LINKS.scamChecker]
+                                                                                : []),
+                                                          RESOURCE_LINKS.allTools,
+                                                          RESOURCE_LINKS.allGuides,
+                                                        ].filter((v, i, a) => a.findIndex(t => t.href === v.href) === i).slice(0, 6)}
+                                      />
           </div>
         </div>
       </main>
