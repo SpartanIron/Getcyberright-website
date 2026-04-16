@@ -18,6 +18,8 @@ import { TechPatternBg } from "@/components/tech-pattern-bg";
 import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
 import { useToast } from "@/hooks/use-toast";
 import { useRecaptcha } from "@/hooks/use-recaptcha";
+import { Navigation } from "@/components/navigation";
+import { Footer } from "@/components/footer";
 
 interface ScamTrend {
   scamType: string;
@@ -86,6 +88,7 @@ export default function ScamCheckerPage() {
 
   return (
     <main id="main-content" tabIndex={-1} className="relative min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 overflow-hidden">
+      <Navigation />
       <TechPatternBg variant="radar" />
       
       {/* Back Navigation */}
@@ -98,7 +101,7 @@ export default function ScamCheckerPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 sm:py-12">
+      <div className="container mx-auto px-4 py-4 sm:py-6">
         <div className="max-w-4xl mx-auto">
           {/* Intro Section */}
           <div className="text-center mb-8">
@@ -449,6 +452,7 @@ export default function ScamCheckerPage() {
           RESOURCE_LINKS.allGuides,
         ]}
       />
+      <Footer />
     </main>
   );
 }

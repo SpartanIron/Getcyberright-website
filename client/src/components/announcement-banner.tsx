@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { PlatformAnnouncement } from "@shared/schema";
 
 const DISMISSED_KEY = "gcr_dismissed_announcements";
+const DISMISS_ALL_KEY = "gcr_dismiss_all_announcements";
 
 function getDismissedIds(): string[] {
   if (typeof window === "undefined") return [];
@@ -17,6 +18,13 @@ function getDismissedIds(): string[] {
   } catch {
     return [];
   }
+
+
+function dismissAllAnnouncements() {
+  try {
+    localStorage.setItem(DISMISS_ALL_KEY, "true");
+  } catch {}
+}
 }
 
 function dismissAnnouncement(id: string) {
@@ -47,6 +55,7 @@ const typeConfig: Record<string, { icon: typeof Megaphone; accent: string; dot: 
 
 export function AnnouncementBanner() {
   const [dismissedIds, setDismissedIds] = useState<string[]>(getDismissedIds);
+  const [allDismissed, setAllDismissed] = useState(() => { try { if (typeof window === "undefined") return false; return localStorage.getItem(DISMISS_ALL_KEY) === "true"; } catch { return false; } });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoRotate, setAutoRotate] = useState(true);
 
@@ -77,6 +86,13 @@ export function AnnouncementBanner() {
     dismissAnnouncement(id);
     setDismissedIds(getDismissedIds());
   };
+
+  const handleDismissAll = () => {
+    dismissAllAnnouncements();
+    setAllDismissed(true);
+  };
+
+  if (allDismissed) return null;
 
   if (visibleAnnouncements.length === 0) return null;
 
@@ -176,8 +192,8 @@ export function AnnouncementBanner() {
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => handleDismiss(current.id)}
-                aria-label="Dismiss announcement"
+                onClick={() => handleDismissAll()}
+                aria-label="Dismiss all announcements"
                 data-testid="button-dismiss-announcement"
                 className="text-white/60 ml-0.5"
               >

@@ -451,7 +451,8 @@ button:hover .cta-arrow-right {
 }
 
 .grecaptcha-badge {
-  bottom: 70px !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 .hero-gradient-text {
@@ -520,5 +521,20 @@ button:hover .cta-arrow-right {
   }
   .max-w-4xl {
     max-width: 1200px;
+  }
+}
+
+/* Floating element z-index and position management */
+@media (max-width: 640px) {
+  .feedback-widget-container {
+    bottom: 16px !important;
+    left: 16px !important;
+    z-index: 40 !important;
+  }
+  
+  .dezi-assistant-container {
+    bottom: 16px !important;
+    right: 16px !important;
+    z-index: 40 !important;
   }
 }
