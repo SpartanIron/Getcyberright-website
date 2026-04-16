@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { HelpCircle, Shield, Mail, Lock, Users, Globe, AlertTriangle, CalendarDays, Chrome, CreditCard, Search } from "lucide-react";
 import { AnimatedCyberBackground } from "@/components/animated-cyber-background";
 import { Link } from "@/lib/navigation";
-import { StructuredData } from "@/components/structured-data";
+import { StructuredData, type BreadcrumbData } from "@/components/structured-data";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
@@ -215,6 +215,13 @@ export default function FAQ() {
               <StructuredData data={{
                   type: "FAQPage",
                   items: faqSchemaItems
+        }} />
+                  <StructuredData data={{
+                    type: "BreadcrumbList",
+                    items: [
+                      { name: "Home", url: "https://www.getcyberright.com/" },
+                      { name: "FAQ", url: "https://www.getcyberright.com/faq" }
+                                ]
         }} />
               <section className="relative py-16 overflow-hidden">
                       <AnimatedCyberBackground />
