@@ -57,7 +57,7 @@ export function FeedbackWidget() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 left-4 sm:left-6 z-50 flex items-center gap-2 bg-teal-600 text-white px-4 py-3 rounded-full shadow-lg transition-shadow hover:shadow-xl"
+        className="feedback-widget-container fixed bottom-4 left-4 sm:left-6 z-50 flex items-center gap-2 bg-teal-600 text-white px-4 py-3 rounded-full shadow-lg transition-shadow hover:shadow-xl"
         aria-label="Send feedback"
         data-testid="button-open-feedback"
       >
