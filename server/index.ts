@@ -114,6 +114,17 @@ async function bootstrapFullApp() {
 
     app.use(corsConfig);
 
+        // Serve _next/static files early, before heavy middleware, to prevent 503 on concurrent requests
+        if (!isDev) {
+                const nextStaticDir = path.resolve(process.cwd(), ".next/static");
+                app.use("/_next/static", express.static(nextStaticDir, {
+                          maxAge: "1y",
+                          immutable: true,
+                          fallthrough: true,
+                }));
+                log("Full app: _next/static mounted before middleware");
+        }
+
     app.use(compression({
       level: 6,
       threshold: 1024,
