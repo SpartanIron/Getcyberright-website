@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "../client/src/index.css";
 import Providers from "./providers";
 import AppShell from "./app-shell";
+import GoogleAnalytics from "../client/src/components/google-analytics";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -17,6 +18,17 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION || "",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   keywords:
     "cybersecurity, online safety, scam detection, identity theft protection, data broker removal, family security, senior safety, phishing protection",
@@ -127,6 +139,7 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        <GoogleAnalytics />
         <div id="root">
           <Providers><AppShell>{children}</AppShell></Providers>
         </div>
