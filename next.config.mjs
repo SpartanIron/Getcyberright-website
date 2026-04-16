@@ -19,6 +19,11 @@ const nextConfig = {
         destination: '/scam-checker',
         permanent: true,
       },
+      {
+                source: '/educate',
+                destination: '/educators',
+                permanent: true,
+      },
     ];
   },
 
