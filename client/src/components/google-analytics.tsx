@@ -24,7 +24,7 @@ export default function GoogleAnalytics() {
                                                                                             cookie_flags: 'SameSite=None;Secure',
                                                                                                       });
                                                                                                               `}
-              </Script>Script>
+              </Script>
         </>>
       );
 }</>
