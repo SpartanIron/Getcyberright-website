@@ -5,11 +5,11 @@ export function middleware(request: NextRequest) {
 
   const cspHeader = [
     `default-src 'self'`,
-    `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://www.recaptcha.net https://js.stripe.com`,
+    `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://recaptcha.google.com`,
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-    `img-src 'self' data: blob: https://images.unsplash.com https://source.unsplash.com https://images.pexels.com https://www.getcyberright.com https://*.googleusercontent.com https://www.google-analytics.com https://www.googletagmanager.com https://lh3.googleusercontent.com https://picsum.photos https://fastly.picsum.photos https://*.stripe.com https://unpkg.com`,
+    `img-src 'self' data: blob: https://source.unsplash.com https://images.unsplash.com https://images.pexels.com https://www.getcyberright.com https://www.google-analytics.com`,
     `font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com`,
-    `connect-src 'self' https://ipapi.co https://checkurl.phishtank.com https://urlhaus-api.abuse.ch https://haveibeenpwned.com https://www.google-analytics.com https://analytics.google.com https://www.google.com https://www.recaptcha.net https://api.stripe.com https://api.openai.com https://api.anthropic.com https://api.unsplash.com https://api.pexels.com https://unpkg.com wss://*.replit.dev wss://*.replit.app wss://*.repl.co wss://www.getcyberright.com`,
+    `connect-src 'self' https://ipapi.co https://checkurl.phishtank.com https://urlhaus-api.abuse.ch https://haveibeenpwned.com https://www.google-analytics.com https://region1.google-analytics.com`,
     `media-src 'self'`,
     `frame-src https://js.stripe.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net`,
     `worker-src 'self' blob:`,
@@ -32,10 +32,22 @@ export function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isStaticAsset = pathname.startsWith("/_next/static/");
+
+  // SEO-friendly caching: allow Google to cache public pages
+  // Only apply no-cache to authenticated/dynamic routes
+  const privatePaths = ["/account", "/admin", "/dashboard", "/login", "/register", "/checkout-success", "/preferences", "/extension-auth"];
+  const isPrivatePath = privatePaths.some(p => pathname.startsWith(p));
+
   if (!isStaticAsset) {
-    response.headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
-    response.headers.set("Pragma", "no-cache");
-    response.headers.set("Expires", "0");
+    if (isPrivatePath) {
+      // Private pages: prevent caching
+      response.headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+      response.headers.set("Pragma", "no-cache");
+      response.headers.set("Expires", "0");
+    } else {
+      // Public pages: allow search engines and CDN to cache
+      response.headers.set("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
+    }
   }
 
   return response;
