@@ -514,96 +514,12 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     const directCheck = checkWebGLSupport();
     const likelyCapable = isLikelyWebGLCapable();
 
-      // Globe texture URLs with multi-CDN fallback
-      const [globeTextureUrl, setGlobeTextureUrl] = useState("https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg");
-      const [bumpTextureUrl, setBumpTextureUrl] = useState("https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png");
-
-      // Generate a procedural dark earth texture as last-resort fallback
-      const generateFallbackTexture = useCallback((): string => {
-            try {
-                    const canvas = document.createElement("canvas");
-                    canvas.width = 1024;
-                    canvas.height = 512;
-                    const ctx = canvas.getContext("2d");
-                    if (!ctx) return "";
-                    // Dark background
-                    ctx.fillStyle = "#0a1628";
-                    ctx.fillRect(0, 0, 1024, 512);
-                    // Add subtle grid lines for longitude/latitude
-                    ctx.strokeStyle = "rgba(34, 211, 238, 0.08)";
-                    ctx.lineWidth = 0.5;
-                    for (let i = 0; i < 1024; i += 64) {
-                              ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 512); ctx.stroke();
-                    }
-                    for (let i = 0; i < 512; i += 64) {
-                              ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(1024, i); ctx.stroke();
-                    }
-                    // Add some continent-like shapes with subtle glow
-                    const continents = [
-                      { x: 480, y: 180, rx: 80, ry: 60 }, // Europe/Africa
-                      { x: 280, y: 200, rx: 100, ry: 80 }, // Americas
-                      { x: 720, y: 220, rx: 120, ry: 70 }, // Asia
-                      { x: 800, y: 350, rx: 60, ry: 40 }, // Australia
-                            ];
-                    continents.forEach(c => {
-                              ctx.fillStyle = "rgba(34, 211, 238, 0.06)";
-                              ctx.beginPath();
-                              ctx.ellipse(c.x, c.y, c.rx, c.ry, 0, 0, Math.PI * 2);
-                              ctx.fill();
-                              ctx.strokeStyle = "rgba(34, 211, 238, 0.12)";
-                              ctx.lineWidth = 1;
-                              ctx.stroke();
-                    });
-                    return canvas.toDataURL("image/jpeg", 0.8);
-            } catch {
-                    return "";
-            }
-      }, []);
-
-      // Preload globe textures with fallback chain
-      useEffect(() => {
-            const primaryGlobe = "https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg";
-            const fallbackGlobe = "https://unpkg.com/three-globe/example/img/earth-night.jpg";
-            const primaryBump = "https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png";
-            const fallbackBump = "https://unpkg.com/three-globe/example/img/earth-topology.png";
-
-            function tryLoadImage(urls: string[], onSuccess: (url: string) => void, onAllFail: () => void) {
-                    let idx = 0;
-                    function attempt() {
-                              if (idx >= urls.length) { onAllFail(); return; }
-                              const img = new Image();
-                              img.crossOrigin = "anonymous";
-                              img.onload = () => { onSuccess(urls[idx]); };
-                              img.onerror = () => { idx++; attempt(); };
-                              img.src = urls[idx];
-                    }
-                    attempt();
-            }
-
-            tryLoadImage(
-                    [primaryGlobe, fallbackGlobe],
-                    (url) => { setGlobeTextureUrl(url); console.log("[ScamGlobe] Globe texture loaded from:", url); },
-                    () => {
-                              const fallback = generateFallbackTexture();
-                              if (fallback) {
-                                          setGlobeTextureUrl(fallback);
-                                          console.warn("[ScamGlobe] Using procedural fallback globe texture");
-                              }
-                    }
-                  );
-
-            tryLoadImage(
-                    [primaryBump, fallbackBump],
-                    (url) => { setBumpTextureUrl(url); console.log("[ScamGlobe] Bump texture loaded from:", url); },
-                    () => { setBumpTextureUrl(""); console.warn("[ScamGlobe] Bump texture unavailable, skipping"); }
-                  );
-      }, [generateFallbackTexture]);
-    const shouldAttempt = directCheck || likelyCapable;
-    console.log("[ScamGlobe] WebGL check:", directCheck, "| Likely capable:", likelyCapable, "| Will attempt:", shouldAttempt);
-    setWebglSupported(shouldAttempt);
-    if (!shouldAttempt) return;
-
-    try {
+          const shouldAttempt = directCheck || likelyCapable;
+        console.log("[ScamGlobe] WebGL check:", directCheck, "| Likely capable:", likelyCapable, "| Will attempt:", shouldAttempt);
+        setWebglSupported(shouldAttempt);
+        if (!shouldAttempt) return;
+    
+        try {
       if (typeof window !== "undefined" && (window as any).THREE) {
         const desc = Object.getOwnPropertyDescriptor(window, "THREE");
         if (!desc || desc.configurable) {
@@ -754,8 +670,8 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
           failIfMajorPerformanceCaveat: false,
           preserveDrawingBuffer: false,
         }}
-        globeImageUrl={globeTextureUrl}
-        bumpImageUrl={bumpTextureUrl || undefined}
+        globeImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg"
+        bumpImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png"
         backgroundImageUrl=""
         backgroundColor="rgba(0,0,0,0)"
         showAtmosphere={true}
