@@ -34,3 +34,28 @@ export default function DataRemovalPage() {
         name: "How do I remove my information from data broker sites?",
         acceptedAnswer: { "@type": "Answer", text: "Each data broker has its own opt-out process. GetCyberRight provides step-by-step opt-out instructions for over 501 data broker sites. You can search for specific brokers and follow the guided removal process. No account required to get started." },
       },
+      {
+        "@type": "Question",
+        name: "How long does data broker removal take?",
+        acceptedAnswer: { "@type": "Answer", text: "Most data brokers process removal requests within 30 to 45 days, though some may take longer. A few brokers remove your data within 24 to 48 hours. You may need to follow up periodically as brokers can re-collect your information over time." },
+      },
+      {
+        "@type": "Question",
+        name: "Is data broker removal free?",
+        acceptedAnswer: { "@type": "Answer", text: "Yes. GetCyberRight provides free opt-out guides for all 501+ data broker sites. You can search for brokers, view their opt-out instructions, and submit removal requests at no cost." },
+      },
+      {
+        "@type": "Question",
+        name: "Can data brokers re-add my information after I remove it?",
+        acceptedAnswer: { "@type": "Answer", text: "Yes, data brokers can re-collect your information from public sources over time. It's recommended to check back every few months and re-submit opt-out requests as needed. Some people set calendar reminders to do this quarterly." },
+      },
+    ],
+  };
+
+  return (
+    <>
+      <JsonLd data={jsonLd} />
+      <PageContent />
+    </>
+  );
+}
