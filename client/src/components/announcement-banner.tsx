@@ -19,14 +19,6 @@ function getDismissedIds(): string[] {
     return [];
   }
 
-function isAllDismissed(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return localStorage.getItem(DISMISS_ALL_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
 
 function dismissAllAnnouncements() {
   try {
@@ -63,7 +55,7 @@ const typeConfig: Record<string, { icon: typeof Megaphone; accent: string; dot: 
 
 export function AnnouncementBanner() {
   const [dismissedIds, setDismissedIds] = useState<string[]>(getDismissedIds);
-  const [allDismissed, setAllDismissed] = useState(isAllDismissed);
+  const [allDismissed, setAllDismissed] = useState(() => { try { if (typeof window === "undefined") return false; return localStorage.getItem(DISMISS_ALL_KEY) === "true"; } catch { return false; } });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoRotate, setAutoRotate] = useState(true);
 
