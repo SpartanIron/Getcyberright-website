@@ -320,13 +320,11 @@ export function ArticleCard({ article, featured = false, compact = false }: Arti
 
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-shadow">
-      {article.imageUrl && (
-        <img
-          src={article.imageUrl}
+      <img
+        src={getThumbnailUrl(article)}
           alt={article.title}
           className="w-full h-40 object-cover"
-        />
-      )}
+          />
       <CardContent className="p-6">
         <div className="flex items-center space-x-3 mb-3">
           <Badge className={getCategoryColor(article.category)} variant="secondary">
