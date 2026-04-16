@@ -826,7 +826,7 @@ export function DeziAssistant() {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="fixed bottom-4 right-4 sm:right-6 z-50"
+        className="dezi-assistant-container fixed bottom-4 right-4 sm:right-6 z-50"
       >
         <Button
           onClick={() => setIsOpen(!isOpen)}
