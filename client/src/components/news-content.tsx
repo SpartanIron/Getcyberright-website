@@ -54,6 +54,7 @@ interface NewsItem {
  urgencyLevel?: number;
  relatedToolUrl?: string | null;
  relatedToolName?: string | null;
+ tags?: string[] | null;
 }
 
 export interface NewsResponse {
@@ -424,13 +425,14 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
  const [searchQuery, setSearchQuery] = useState("");
  const [activeFilter, setActiveFilter] = useState("all");
  const [currentPage, setCurrentPage] = useState(1);
- const [location] = useLocation();
+ const [location, navigate] = useLocation();
  
  const ARTICLES_PER_PAGE = 12;
 
 
  const urlParams = new URLSearchParams(location.split("?")[1] || "");
  const urlSearch = urlParams.get("search");
+ const urlTag = urlParams.get("tag");
 
  // Fetch all news or category-specific news (skip if showing events)
  const { data: newsData, isLoading, refetch } = useQuery<NewsResponse | CategoryNewsResponse>({
@@ -481,17 +483,17 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
  };
 
  const getArticles = (): NewsItem[] => {
+ let articles: NewsItem[] = [];
  if (urlSearch || searchQuery) {
- return searchData?.results || [];
+ articles = searchData?.results || [];
+ } else if (newsData && 'articles' in newsData) {
+ articles = newsData.articles;
  }
- 
- if (!newsData) return [];
- 
- if ('articles' in newsData) {
- return newsData.articles;
+ if (urlTag) {
+ const t = urlTag.toLowerCase();
+ articles = articles.filter(a => (a.tags || []).some(x => x.toLowerCase() === t));
  }
- 
- return [];
+ return articles;
  };
 
  const allArticles = getArticles();
@@ -577,6 +579,24 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
  Search
  </Button>
  </form>
+ )}
+
+ {/* Active tag filter banner */}
+ {urlTag && !isEventsView && (
+ <div className="mb-4 flex items-center gap-3 rounded-md border border-primary/30 bg-primary/5 px-4 py-2.5" data-testid="banner-tag-filter">
+ <span className="text-sm">
+ Filtered by topic: <span className="font-semibold text-primary">{urlTag}</span>
+ </span>
+ <Button
+ size="sm"
+ variant="ghost"
+ className="ml-auto h-7"
+ onClick={() => navigate("/news")}
+ data-testid="button-clear-tag"
+ >
+ Clear
+ </Button>
+ </div>
  )}
 
  {/* Filters and Stats */}
