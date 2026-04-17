@@ -1656,6 +1656,7 @@ export const newsArticles = pgTable("news_articles", {
   tags: text("tags").array().default(sql`ARRAY[]::text[]`),
   keyTakeaways: text("key_takeaways").array().default(sql`ARRAY[]::text[]`),
   publishedAt: timestamp("published_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

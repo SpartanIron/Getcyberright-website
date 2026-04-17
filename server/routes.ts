@@ -6296,6 +6296,7 @@ BEHAVIORAL CONSTRAINTS
         tags: (article as any).tags || [],
         keyTakeaways: (article as any).keyTakeaways || [],
         publishedAt: article.publishedAt?.toISOString() || new Date().toISOString(),
+        updatedAt: (article as any).updatedAt ? (article as any).updatedAt.toISOString() : null,
         readTime: article.content ? Math.ceil(article.content.split(/\s+/).length / 200) : 2,
         relatedArticles: related,
       });

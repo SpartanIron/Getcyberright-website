@@ -52,6 +52,7 @@ interface NewsArticleData {
   tags: string[];
   keyTakeaways: string[];
   publishedAt: string;
+  updatedAt: string | null;
   readTime: number;
   relatedArticles: RelatedArticle[];
 }
@@ -553,7 +554,18 @@ export default function NewsArticlePage() {
                 </p>
               )}
               <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground flex-wrap">
-                <span data-testid="text-article-date">{formatDate(article.publishedAt)}</span>
+                <span data-testid="text-article-date">
+                  Published {formatDate(article.publishedAt)}
+                </span>
+                {article.updatedAt &&
+                  new Date(article.updatedAt).getTime() - new Date(article.publishedAt).getTime() > 60_000 && (
+                    <>
+                      <span aria-hidden>·</span>
+                      <span className="italic" data-testid="text-article-updated">
+                        Updated {formatDate(article.updatedAt)}
+                      </span>
+                    </>
+                  )}
                 <span aria-hidden>·</span>
                 <span className="flex items-center gap-1" data-testid="text-article-readtime">
                   <Clock className="h-3 w-3" />
