@@ -524,7 +524,10 @@ export default function NewsArticlePage() {
             {article.title}
           </h1>
 
-          <p className="text-lg text-muted-foreground leading-relaxed mb-5" data-testid="text-article-excerpt">
+          <p
+            className="text-xl md:text-2xl font-semibold italic leading-relaxed mb-5 text-foreground/90 border-l-4 border-primary pl-4 py-1"
+            data-testid="text-article-excerpt"
+          >
             {article.excerpt}
           </p>
 
