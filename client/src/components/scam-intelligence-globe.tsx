@@ -696,8 +696,8 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
           failIfMajorPerformanceCaveat: false,
           preserveDrawingBuffer: false,
         }}
-        globeImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg"
-        bumpImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png"
+        globeImageUrl="/textures/earth-night.jpg"
+        bumpImageUrl="/textures/earth-topology.png"
         backgroundImageUrl=""
         backgroundColor="rgba(0,0,0,0)"
         showAtmosphere={true}
