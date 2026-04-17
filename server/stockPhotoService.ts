@@ -313,7 +313,7 @@ async function searchUnsplashPhoto(query: string): Promise<{ url: string; photog
 
     const validPhotos = data.results.filter((p: any) => (p.width || 0) >= 1200 && (p.height || 0) >= 630);
     const pool = validPhotos.length > 0 ? validPhotos : data.results;
-    const photo = pool[Math.floor(Math.random() * Math.min(pool.length, 5))];
+    const photo = pool[0];
     const photoUrl = photo.urls?.raw ? `${photo.urls.raw}&w=2400&q=85&fm=jpg` : photo.urls?.full || photo.urls?.regular;
     const photographer = photo.user?.name || "Unsplash";
 
@@ -357,7 +357,7 @@ async function searchShutterstockPhoto(query: string): Promise<{ url: string; ph
     });
 
     const pool = photos.length > 0 ? photos : data.data;
-    const photo = pool[Math.floor(Math.random() * Math.min(pool.length, 5))];
+    const photo = pool[0];
     const asset = photo.assets?.huge || photo.assets?.preview_1500 || photo.assets?.preview || {};
     const photoUrl = asset.url;
     const photographer = photo.contributor?.id ? `Shutterstock #${photo.id}` : "Shutterstock";
@@ -400,7 +400,7 @@ async function searchPexelsPhoto(query: string, category: string): Promise<{ url
         });
 
         const pool = validPhotos.length > 0 ? validPhotos : data.photos;
-        const photo = pool[Math.floor(Math.random() * Math.min(pool.length, 5))];
+        const photo = pool[0];
         const photoUrl = photo.src.original || photo.src.large2x || photo.src.large;
         console.log(`[StockPhoto] Pexels stock photo: "${photo.alt}" by ${photo.photographer} (query: "${query}", ${photo.width}x${photo.height})`);
         return { url: photoUrl, photographer: photo.photographer };
@@ -421,7 +421,7 @@ async function searchPexelsPhoto(query: string, category: string): Promise<{ url
       if (fbResponse.ok) {
         const fbData: any = await fbResponse.json();
         if (fbData.photos?.length) {
-          const photo = fbData.photos[Math.floor(Math.random() * Math.min(fbData.photos.length, 5))];
+          const photo = fbData.photos[0];
           const photoUrl = photo.src.original || photo.src.large2x || photo.src.large;
           console.log(`[StockPhoto] Pexels fallback: "${photo.alt}" by ${photo.photographer} (query: "${fallbackQuery}")`);
           return { url: photoUrl, photographer: photo.photographer };
@@ -477,22 +477,21 @@ Examples of good queries:
 }
 
 export async function searchStockPhoto(category: string, title: string, options?: { platform?: string }): Promise<{ url: string; photographer: string; localPath?: string } | null> {
-  const queries = extractSearchQuery(title, category);
-
-  for (const query of queries) {
-    const unsplashResult = await searchUnsplashPhoto(query);
-    if (unsplashResult) return unsplashResult;
-
-    const pexelsResult = await searchPexelsPhoto(query, category);
-    if (pexelsResult) return pexelsResult;
-  }
-
   const aiQuery = await generateAISearchQuery(title, category);
   if (aiQuery) {
     const unsplashResult = await searchUnsplashPhoto(aiQuery);
     if (unsplashResult) return unsplashResult;
 
     const pexelsResult = await searchPexelsPhoto(aiQuery, category);
+    if (pexelsResult) return pexelsResult;
+  }
+
+  const queries = extractSearchQuery(title, category);
+  for (const query of queries) {
+    const unsplashResult = await searchUnsplashPhoto(query);
+    if (unsplashResult) return unsplashResult;
+
+    const pexelsResult = await searchPexelsPhoto(query, category);
     if (pexelsResult) return pexelsResult;
   }
 

@@ -88,6 +88,15 @@ export function tagAllGcrLinks(
   });
 }
 
+function canonicalPathOf(url: string): string {
+  try {
+    const u = new URL(url);
+    return u.pathname.replace(/\/+$/, "");
+  } catch {
+    return "";
+  }
+}
+
 export function ensureGcrLink(
   text: string,
   canonicalUrl: string,
@@ -97,10 +106,33 @@ export function ensureGcrLink(
   postStyle?: string
 ): string {
   if (platform === "instagram" || platform === "alert") return text;
-  const hasLink = /https?:\/\/(?:www\.)?getcyberright\.com/i.test(text);
-  if (hasLink) return text;
+
+  const canonicalPath = canonicalPathOf(canonicalUrl);
+  const linkPattern = /https?:\/\/(?:www\.)?getcyberright\.com(\/[^\s)\]"',]*)?/gi;
+
+  let canonicalSeen = false;
+  const stripped = text.replace(linkPattern, (match) => {
+    const cleanUrl = match.replace(/[.,;:!?)]+$/, "");
+    const trailing = match.slice(cleanUrl.length);
+    const matchPath = canonicalPathOf(cleanUrl);
+    if (canonicalPath && matchPath === canonicalPath) {
+      canonicalSeen = true;
+      return match;
+    }
+    return trailing;
+  });
+
+  const cleaned = stripped
+    .split("\n")
+    .map((line) => line.replace(/[ \t]+$/g, ""))
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  if (canonicalSeen) return cleaned;
+
   const taggedUrl = tagSingleUrl(canonicalUrl, platform, contentType, contentSlug, postStyle);
-  return text.trimEnd() + "\n\n" + taggedUrl;
+  return cleaned + "\n\n" + taggedUrl;
 }
 
 export function tagSingleUrl(
