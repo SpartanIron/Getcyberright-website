@@ -1652,6 +1652,9 @@ export const newsArticles = pgTable("news_articles", {
   relatedToolName: text("related_tool_name"),
   author: text("author").default("Jude Annan, CISM"),
   authorRole: text("author_role").default("Managing Partner"),
+  authorAvatarUrl: text("author_avatar_url"),
+  tags: text("tags").array().default(sql`ARRAY[]::text[]`),
+  keyTakeaways: text("key_takeaways").array().default(sql`ARRAY[]::text[]`),
   publishedAt: timestamp("published_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -1663,6 +1666,31 @@ export const insertNewsArticleSchema = createInsertSchema(newsArticles).omit({
 
 export type NewsArticle = typeof newsArticles.$inferSelect;
 export type InsertNewsArticle = z.infer<typeof insertNewsArticleSchema>;
+
+export const articleComments = pgTable("article_comments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  articleId: varchar("article_id").notNull().references(() => newsArticles.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull(),
+  authorName: text("author_name").notNull(),
+  authorEmail: text("author_email"),
+  content: text("content").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("approved"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertArticleCommentSchema = createInsertSchema(articleComments).omit({
+  id: true,
+  createdAt: true,
+  status: true,
+  authorName: true,
+  authorEmail: true,
+  userId: true,
+}).extend({
+  content: z.string().min(2).max(2000),
+});
+
+export type ArticleComment = typeof articleComments.$inferSelect;
+export type InsertArticleComment = z.infer<typeof insertArticleCommentSchema>;
 
 export const maskedIdentities = pgTable("masked_identities", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

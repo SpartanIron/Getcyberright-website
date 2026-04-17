@@ -192,8 +192,17 @@ function getEstimatedReadTime(content?: string, excerpt?: string): number {
  return Math.max(2, Math.ceil(wordCount / 200));
 }
 
+const NEWS_CARD_FALLBACK_IMAGES: Record<string, string> = {
+  Cybersecurity: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=800&h=450&fit=crop&q=80",
+  AI: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=450&fit=crop&q=80",
+  Tech: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=450&fit=crop&q=80",
+  Learning: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=450&fit=crop&q=80",
+  "Action Needed": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=450&fit=crop&q=80",
+};
+const NEWS_CARD_DEFAULT_IMAGE = "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=450&fit=crop&q=80";
+
 function NewsCard({ article }: { article: NewsItem }) {
- const imageUrl = article.imageUrl || article.thumbnailUrl;
+ const imageUrl = article.imageUrl || article.thumbnailUrl || NEWS_CARD_FALLBACK_IMAGES[article.category] || NEWS_CARD_DEFAULT_IMAGE;
  const [imgError, setImgError] = useState(false);
  const audience = detectAudience(article.title, article.excerpt);
  const actionTip = getActionTip(article.title, article.excerpt);

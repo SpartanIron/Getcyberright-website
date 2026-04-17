@@ -48,6 +48,9 @@ The deployment run command must include `NODE_ENV=production` (configured as `["
 - **User Dashboard**: Displays safety score, activity statistics, product status, quick actions, recent scans, regional threats, and threat intelligence.
 - **Account Settings**: Comprehensive account management including profile editing, password changes, and MFA status.
 
+### News & Articles System (Apr 2026 redesign)
+Articles now use a publication-grade detail page (`client/src/pages/news-article.tsx`): hero image with category-based fallback (Unsplash by category), author avatar with initials, estimated read time, share bar (X/Facebook/LinkedIn/Reddit/WhatsApp/Email + copy link), inline newsletter CTA mid-article, "Key Takeaways" callout, "Protect Yourself" CTA, tags/topics, "More articles" related grid, and an in-house comments system. Comment list is public; posting/deleting requires auth (`isAuthenticated`); owners and admins may delete. Schema: `newsArticles` gained `authorAvatarUrl`, `tags[]`, `keyTakeaways[]`. New table `articleComments` (article_id, user_id, author_name, author_email, content, status, created_at) with indexes on (article_id, created_at desc) and (user_id). News index cards now fall back to category-based hero images instead of icon placeholders.
+
 ### Platform Security Posture Engine
 A proactive self-assessment system (`server/security/platformPostureEngine.ts`) that scans the platform's security configuration across 10 categories and 35+ checks (e.g., Headers & Transport, Authentication, Input Validation, Data Protection, Extension Security). It provides a weighted composite score (0-100) with a letter grade, tracks historical scores, and offers auto-remediation for certain issues via the admin UI.
 

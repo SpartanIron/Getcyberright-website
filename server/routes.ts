@@ -6254,6 +6254,28 @@ BEHAVIORAL CONSTRAINTS
       if (!article) {
         return res.status(404).json({ error: "Article not found" });
       }
+      const allArticles = await storage.getNewsArticles(undefined, 50);
+      const articleTags = (article as any).tags || [];
+      const related = allArticles
+        .filter(a => a.id !== article.id)
+        .map(a => {
+          const aTags = (a as any).tags || [];
+          const tagOverlap = aTags.filter((t: string) => articleTags.includes(t)).length;
+          const sameCategory = a.category === article.category ? 2 : 0;
+          return { article: a, score: tagOverlap * 3 + sameCategory };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .map(({ article: a }) => ({
+          id: a.id,
+          title: a.title,
+          slug: a.slug,
+          excerpt: a.excerpt,
+          category: a.category,
+          imageUrl: a.imageUrl,
+          publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
+          readTime: a.content ? Math.ceil(a.content.split(/\s+/).length / 200) : 2,
+        }));
       res.json({
         id: article.id,
         title: article.title,
@@ -6270,12 +6292,95 @@ BEHAVIORAL CONSTRAINTS
         relatedToolName: article.relatedToolName,
         author: article.author || "Jude Annan, CISM",
         authorRole: article.authorRole || "Managing Partner",
+        authorAvatarUrl: (article as any).authorAvatarUrl || null,
+        tags: (article as any).tags || [],
+        keyTakeaways: (article as any).keyTakeaways || [],
         publishedAt: article.publishedAt?.toISOString() || new Date().toISOString(),
         readTime: article.content ? Math.ceil(article.content.split(/\s+/).length / 200) : 2,
+        relatedArticles: related,
       });
     } catch (error: any) {
       console.error("[news] Article fetch failed:", error.message);
       res.status(500).json({ error: "Failed to fetch article" });
+    }
+  });
+
+  app.get("/api/news/article/:slug/comments", async (req: Request, res: Response) => {
+    try {
+      const article = await storage.getNewsArticleBySlug(req.params.slug);
+      if (!article) return res.status(404).json({ error: "Article not found" });
+      const { db } = await import("./db");
+      const { articleComments } = await import("@shared/schema");
+      const { eq, and, desc } = await import("drizzle-orm");
+      const rows = await db.select().from(articleComments)
+        .where(and(eq(articleComments.articleId, article.id), eq(articleComments.status, "approved")))
+        .orderBy(desc(articleComments.createdAt))
+        .limit(200);
+      res.json({ comments: rows.map(c => ({
+        id: c.id,
+        userId: c.userId,
+        authorName: c.authorName,
+        content: c.content,
+        createdAt: c.createdAt?.toISOString() || new Date().toISOString(),
+      })) });
+    } catch (error: any) {
+      console.error("[comments] List failed:", error.message);
+      res.status(500).json({ error: "Failed to load comments" });
+    }
+  });
+
+  app.post("/api/news/article/:slug/comments", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const article = await storage.getNewsArticleBySlug(req.params.slug);
+      if (!article) return res.status(404).json({ error: "Article not found" });
+      const content = String(req.body?.content || "").trim();
+      if (content.length < 2 || content.length > 2000) {
+        return res.status(400).json({ error: "Comment must be between 2 and 2000 characters" });
+      }
+      const userId = req.session.userId;
+      const { db } = await import("./db");
+      const { articleComments, users } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      if (!user) return res.status(401).json({ error: "User not found" });
+      const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || (user.email?.split("@")[0] ?? "Reader");
+      const [inserted] = await db.insert(articleComments).values({
+        articleId: article.id,
+        userId,
+        authorName: fullName,
+        authorEmail: user.email || null,
+        content,
+        status: "approved",
+      }).returning();
+      res.status(201).json({
+        id: inserted.id,
+        authorName: inserted.authorName,
+        content: inserted.content,
+        createdAt: inserted.createdAt?.toISOString() || new Date().toISOString(),
+      });
+    } catch (error: any) {
+      console.error("[comments] Post failed:", error.message);
+      res.status(500).json({ error: "Failed to post comment" });
+    }
+  });
+
+  app.delete("/api/news/comments/:id", isAuthenticated, async (req: any, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      const { db } = await import("./db");
+      const { articleComments, users } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      const [comment] = await db.select().from(articleComments).where(eq(articleComments.id, req.params.id));
+      if (!comment) return res.status(404).json({ error: "Comment not found" });
+      if (comment.userId !== userId && !user?.isAdmin) {
+        return res.status(403).json({ error: "Not allowed" });
+      }
+      await db.delete(articleComments).where(eq(articleComments.id, req.params.id));
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("[comments] Delete failed:", error.message);
+      res.status(500).json({ error: "Failed to delete comment" });
     }
   });
 
