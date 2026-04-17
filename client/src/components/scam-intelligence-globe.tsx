@@ -785,6 +785,24 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setRetryCount(c => c + 1);
   }, []);
 
+  const handleKey = useCallback((e: React.KeyboardEvent) => {
+    if (!hotspots.length) return;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const next = (keyboardIndex + 1) % hotspots.length;
+      setKeyboardIndex(next);
+      handlePointClick(hotspots[next]);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const next = (keyboardIndex - 1 + hotspots.length) % hotspots.length;
+      setKeyboardIndex(next);
+      handlePointClick(hotspots[next]);
+    } else if (e.key === "Escape") {
+      setSelectedPoint(null);
+      onCountrySelect?.(null);
+    }
+  }, [hotspots, keyboardIndex, handlePointClick, onCountrySelect]);
+
   if (!webglSupported || loadError) {
     return <GlobeFallback data={data} onRetry={handleRetry} errorDetail={errorDetail || undefined} />;
   }
@@ -812,23 +830,6 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     ? [...pulsingRings.filter(p => p.id !== selectedPoint.id), selectedPoint]
     : pulsingRings;
 
-  const handleKey = useCallback((e: React.KeyboardEvent) => {
-    if (!hotspots.length) return;
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-      e.preventDefault();
-      const next = (keyboardIndex + 1) % hotspots.length;
-      setKeyboardIndex(next);
-      handlePointClick(hotspots[next]);
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-      e.preventDefault();
-      const next = (keyboardIndex - 1 + hotspots.length) % hotspots.length;
-      setKeyboardIndex(next);
-      handlePointClick(hotspots[next]);
-    } else if (e.key === "Escape") {
-      setSelectedPoint(null);
-      onCountrySelect?.(null);
-    }
-  }, [hotspots, keyboardIndex, handlePointClick, onCountrySelect]);
 
   return (
     <div
