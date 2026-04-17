@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft, Clock, ExternalLink, Shield, AlertTriangle, Loader2, User,
   Tag, CheckCircle2, MessageSquare, Send, Trash2, Mail, Facebook, Linkedin, Link2, Check,
+  ChevronRight, Home, Sparkles,
 } from "lucide-react";
 import { SiX, SiReddit, SiWhatsapp, SiFlipboard } from "react-icons/si";
 import { Navigation } from "@/components/navigation";
@@ -182,7 +183,7 @@ function StickyShareSidebar({ title, url }: { title: string; url: string }) {
 
   return (
     <aside
-      className="hidden xl:flex fixed left-[max(1rem,calc((100vw-48rem)/2-5rem))] top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 p-2 rounded-full border border-border bg-background/80 backdrop-blur-sm shadow-sm"
+      className="hidden 2xl:flex fixed left-[max(1rem,calc((100vw-72rem)/2-5rem))] top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 p-2 rounded-full border border-border bg-background/80 backdrop-blur-sm shadow-sm"
       aria-label="Share this article"
       data-testid="sticky-share-sidebar"
     >
@@ -491,12 +492,30 @@ export default function NewsArticlePage() {
     <div className="min-h-screen bg-background">
       <Navigation />
       <StickyShareSidebar title={article.title} url={articleUrl} />
-      <article className="container mx-auto px-4 py-6 sm:py-8 max-w-3xl">
+      <article className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
         <FadeIn>
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center text-xs sm:text-sm text-muted-foreground mb-4 flex-wrap"
+            data-testid="breadcrumbs"
+          >
+            <Link href="/" className="flex items-center gap-1 hover:text-foreground transition-colors" data-testid="breadcrumb-home">
+              <Home className="h-3.5 w-3.5" />
+              <span>Home</span>
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5 mx-1.5 flex-shrink-0" aria-hidden />
+            <Link href="/news" className="hover:text-foreground transition-colors" data-testid="breadcrumb-news">
+              News &amp; Insights
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5 mx-1.5 flex-shrink-0" aria-hidden />
+            <span className="text-foreground font-medium truncate max-w-[16rem] sm:max-w-md" data-testid="breadcrumb-current">
+              {article.title}
+            </span>
+          </nav>
           <Link href="/news">
             <Button variant="ghost" className="mb-4 text-muted-foreground hover:text-foreground -ml-2" data-testid="link-back-to-news">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to News & Insights
+              Back to News &amp; Insights
             </Button>
           </Link>
         </FadeIn>
@@ -530,6 +549,9 @@ export default function NewsArticlePage() {
             </div>
           </div>
         </FadeIn>
+
+        <div className="lg:grid lg:grid-cols-3 lg:gap-8" data-testid="article-layout">
+          <div className="lg:col-span-2 min-w-0">
 
         <FadeIn className="mb-6">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight tracking-tight" data-testid="text-article-title">
@@ -757,6 +779,72 @@ export default function NewsArticlePage() {
         </FadeIn>
 
         <CommentsSection slug={article.slug} />
+
+          </div>
+
+          <aside className="lg:col-span-1 mt-10 lg:mt-0" aria-label="Article sidebar" data-testid="article-sidebar">
+            <div className="lg:sticky lg:top-24 space-y-5">
+              {article.relatedArticles && article.relatedArticles.length > 0 && (
+                <Card data-testid="sidebar-editors-choice">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Editor's Choice</h3>
+                    </div>
+                    <ul className="space-y-3">
+                      {article.relatedArticles.slice(0, 4).map(r => (
+                        <li key={r.id}>
+                          <Link href={`/news/${r.slug}`} className="group flex gap-3" data-testid={`sidebar-article-${r.id}`}>
+                            <div className="relative flex-shrink-0 w-16 h-16 overflow-hidden rounded-md bg-muted">
+                              <img
+                                src={r.imageUrl || CATEGORY_FALLBACK_IMAGES[r.category] || DEFAULT_HERO}
+                                alt={r.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                loading="lazy"
+                                onError={(e) => { (e.currentTarget as HTMLImageElement).src = DEFAULT_HERO; }}
+                              />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <Badge className={`${getCategoryColor(r.category)} text-[9px] mb-1 px-1.5 py-0`}>
+                                {r.category}
+                              </Badge>
+                              <p className="text-xs font-semibold leading-snug line-clamp-3 group-hover:text-primary transition-colors">
+                                {r.title}
+                              </p>
+                            </div>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
+              <NewsletterInline
+                title="Free weekly digest"
+                description="Cybersecurity threats explained in plain language. No spam."
+                testIdSuffix="sidebar"
+              />
+
+              <Card className="border-primary/30 bg-gradient-to-br from-primary/15 to-primary/5" data-testid="sidebar-shield-cta">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className="h-5 w-5 text-primary" />
+                    <h3 className="font-bold text-sm">GCR Shield</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                    Free family cybersecurity tools. Check links, scan for breached accounts, and run a personalized risk assessment.
+                  </p>
+                  <Link href="/protection-hub">
+                    <Button size="sm" className="w-full" data-testid="sidebar-cta-button">
+                      Open Protection Hub
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </aside>
+        </div>
 
         <FadeIn className="mt-8">
           <NewsletterInline
