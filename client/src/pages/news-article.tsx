@@ -515,6 +515,13 @@ export default function NewsArticlePage() {
                   {urgencyBadge.label}
                 </Badge>
               )}
+              <Badge
+                className="backdrop-blur-sm bg-white/90 dark:bg-black/70 border text-foreground font-semibold uppercase tracking-wide text-[11px]"
+                data-testid="badge-readtime-hero"
+              >
+                <Clock className="h-3 w-3 mr-1" />
+                {article.readTime} min read
+              </Badge>
             </div>
           </div>
         </FadeIn>
