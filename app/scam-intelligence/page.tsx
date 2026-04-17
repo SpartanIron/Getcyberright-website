@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 // Client-only component: use dynamic import with ssr:false to prevent hydration mismatch
 import dynamic from "next/dynamic";
-const PageContent = dynamic(() => import("../../../client/src/pages/scam-intelligence-dashboard"), { ssr: false, loading: () => null });
+const PageContent = dynamic(() => import("@/pages/scam-intelligence-dashboard"), { ssr: false, loading: () => null });
 
 const BASE_URL = "https://www.getcyberright.com";
 
