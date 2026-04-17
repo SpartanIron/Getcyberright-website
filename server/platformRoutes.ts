@@ -1,9 +1,47 @@
 import { type Express, type Request, type Response } from "express";
+import { randomUUID } from "crypto";
+import rateLimit from "express-rate-limit";
+import fs from "fs";
+import path from "path";
 import { storage } from "./storage";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { isAuthenticated } from "./auth";
 import { isAdminMiddleware } from "./admin";
+
+const exportRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: "Export rate limit exceeded",
+    message: "You have reached the hourly export limit (60 per hour). Please try again later or contact press@getcyberright.com for bulk access.",
+    retryAfter: "1 hour",
+  },
+  handler: (req: Request, res: Response) => {
+    res.status(429).json({
+      error: "Export rate limit exceeded",
+      message: "You have reached the hourly export limit (60 per hour). Please try again later or contact press@getcyberright.com for bulk access.",
+      retryAfter: "1 hour",
+    });
+  },
+});
+
+const embedPingRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const EMBED_PING_LOG = path.join(process.cwd(), "data", "embed-pings.jsonl");
+function ensureEmbedLogDir() {
+  try {
+    fs.mkdirSync(path.dirname(EMBED_PING_LOG), { recursive: true });
+  } catch {}
+}
+ensureEmbedLogDir();
 
 const escapeHtml = (str: string) =>
   str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
@@ -204,18 +242,23 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/scam-intelligence/export.json", (_req: Request, res: Response) => {
+  app.get("/api/scam-intelligence/export.json", exportRateLimit, (_req: Request, res: Response) => {
     try {
       const globe = getGlobeData();
       const feed = getLiveFeed();
       const regional = getRegionalData();
+      const generationId = randomUUID();
+      const ATTRIBUTION = "GetCyberRight";
+      const stamp = <T extends object>(o: T) => ({ ...o, _attribution: ATTRIBUTION, _generationId: generationId });
       const payload = {
         dataAsOf: globe.dataAsOf,
         generatedAt: new Date().toISOString(),
         license: "CC BY 4.0 with attribution to GetCyberRight (https://www.getcyberright.com/scam-intelligence)",
         methodologyUrl: "https://www.getcyberright.com/scam-intelligence/methodology",
-        globalStats: globe.globalStats,
-        hotspots: globe.hotspots.map(h => ({
+        attribution: ATTRIBUTION,
+        generationId,
+        globalStats: stamp(globe.globalStats),
+        hotspots: globe.hotspots.map(h => stamp({
           country: h.country,
           countryCode: h.countryCode,
           region: h.region,
@@ -228,7 +271,7 @@ export function registerPlatformRoutes(app: Express): void {
           reportContact: h.reportContact,
           citations: h.citations,
         })),
-        arcs: globe.arcs.map(a => ({
+        arcs: globe.arcs.map(a => stamp({
           originCountry: a.originCountry,
           originCountryCode: a.originCountryCode,
           targetCountry: a.targetCountry,
@@ -237,11 +280,12 @@ export function registerPlatformRoutes(app: Express): void {
           volume: a.volume,
           originCitations: a.originCitations,
         })),
-        liveEvents: feed.events,
-        regions: regional.regions,
+        liveEvents: feed.events.map(e => stamp(e as any)),
+        regions: regional.regions.map(r => stamp(r as any)),
       };
       res.setHeader("Cache-Control", "public, max-age=300");
       res.setHeader("Content-Type", "application/json");
+      res.setHeader("X-GCR-Generation-Id", generationId);
       res.setHeader("Content-Disposition", `attachment; filename="scam-intelligence-${new Date().toISOString().split("T")[0]}.json"`);
       res.send(JSON.stringify(payload, null, 2));
     } catch (e: any) {
@@ -250,10 +294,12 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/scam-intelligence/export.csv", (_req: Request, res: Response) => {
+  app.get("/api/scam-intelligence/export.csv", exportRateLimit, (_req: Request, res: Response) => {
     try {
       const globe = getGlobeData();
       const feed = getLiveFeed();
+      const generationId = randomUUID();
+      const ATTRIBUTION = "GetCyberRight";
       const esc = (v: any) => {
         if (v === null || v === undefined) return "";
         const s = String(v).replace(/"/g, '""');
@@ -264,9 +310,11 @@ export function registerPlatformRoutes(app: Express): void {
       lines.push(`# dataAsOf,${esc(globe.dataAsOf)}`);
       lines.push(`# license,CC BY 4.0 with attribution to GetCyberRight`);
       lines.push(`# methodology,https://www.getcyberright.com/scam-intelligence/methodology`);
+      lines.push(`# attribution,${ATTRIBUTION}`);
+      lines.push(`# generationId,${generationId}`);
       lines.push("");
       lines.push("# HOTSPOTS");
-      lines.push(["country","countryCode","region","riskLevel","riskScore","recentIncidents","trendDirection","trendPercent","topScamTypes","primarySource","primarySourceUrl","primarySourceDatePublished","accessedAt"].join(","));
+      lines.push(["country","countryCode","region","riskLevel","riskScore","recentIncidents","trendDirection","trendPercent","topScamTypes","primarySource","primarySourceUrl","primarySourceDatePublished","accessedAt","attribution","generationId"].join(","));
       for (const h of globe.hotspots) {
         const c = h.citations[0];
         lines.push([
@@ -275,11 +323,12 @@ export function registerPlatformRoutes(app: Express): void {
           esc(h.trendDirection), esc(h.trendPercent),
           esc(h.topScamTypes.join("|")),
           esc(c?.publisher || ""), esc(c?.url || ""), esc(c?.datePublished || ""), esc(c?.accessedAt || ""),
+          esc(ATTRIBUTION), esc(generationId),
         ].join(","));
       }
       lines.push("");
       lines.push("# ARCS (cross-border scam flows)");
-      lines.push(["originCountry","originCode","targetCountry","targetCode","scamType","volume","originPrimarySource","originPrimarySourceUrl"].join(","));
+      lines.push(["originCountry","originCode","targetCountry","targetCode","scamType","volume","originPrimarySource","originPrimarySourceUrl","attribution","generationId"].join(","));
       for (const a of globe.arcs) {
         const c = a.originCitations[0];
         lines.push([
@@ -287,20 +336,23 @@ export function registerPlatformRoutes(app: Express): void {
           esc(a.targetCountry), esc(a.targetCountryCode),
           esc(a.scamType), esc(a.volume),
           esc(c?.publisher || ""), esc(c?.url || ""),
+          esc(ATTRIBUTION), esc(generationId),
         ].join(","));
       }
       lines.push("");
       lines.push("# LIVE EVENTS");
-      lines.push(["timestamp","type","title","severity","region","source","sourceUrl","scamCategory","synthetic"].join(","));
+      lines.push(["timestamp","type","title","severity","region","source","sourceUrl","scamCategory","synthetic","attribution","generationId"].join(","));
       for (const e of feed.events) {
         lines.push([
           esc(e.timestamp), esc(e.type), esc(e.title), esc(e.severity), esc(e.region),
           esc(e.source), esc(e.sourceUrl || ""), esc(e.scamCategory || ""), esc(e.synthetic ? "true" : "false"),
+          esc(ATTRIBUTION), esc(generationId),
         ].join(","));
       }
       const csv = lines.join("\n");
       res.setHeader("Cache-Control", "public, max-age=300");
       res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader("X-GCR-Generation-Id", generationId);
       res.setHeader("Content-Disposition", `attachment; filename="scam-intelligence-${new Date().toISOString().split("T")[0]}.csv"`);
       res.send(csv);
     } catch (e: any) {
@@ -310,6 +362,36 @@ export function registerPlatformRoutes(app: Express): void {
   });
 
   const subscribeRateLimit = new Map<string, number[]>();
+  app.get("/api/scam-intelligence/embed/ping", embedPingRateLimit, (req: Request, res: Response) => {
+    try {
+      const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
+      const referer = (req.get("referer") || (req.query.ref as string) || "").toString().slice(0, 500);
+      const userAgent = (req.get("user-agent") || "").toString().slice(0, 300);
+      let host = "";
+      try { host = referer ? new URL(referer).hostname : ""; } catch {}
+      const entry = {
+        t: new Date().toISOString(),
+        ip,
+        host,
+        referer,
+        userAgent,
+        country: (req.query.country as string)?.toString().slice(0, 8) || null,
+      };
+      console.log(`[embed-ping] ${JSON.stringify(entry)}`);
+      try {
+        fs.appendFileSync(EMBED_PING_LOG, JSON.stringify(entry) + "\n");
+      } catch (err: any) {
+        console.warn("[embed-ping] log write failed:", err?.message);
+      }
+      res.setHeader("Cache-Control", "no-store");
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.status(204).end();
+    } catch (e: any) {
+      console.error("[embed-ping] error:", e?.message);
+      res.status(204).end();
+    }
+  });
+
   app.post("/api/scam-intelligence/alerts/subscribe", async (req: Request, res: Response) => {
     try {
       const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";

@@ -1,0 +1,3 @@
+{"t":"2026-04-17T11:18:05.394Z","ip":"127.0.0.1","host":"example.com","referer":"https://example.com/article","userAgent":"curl/8.14.1","country":"US"}
+{"t":"2026-04-17T11:18:23.898Z","ip":"127.0.0.1","host":"localhost","referer":"http://localhost:5000/scam-intelligence/embed?country=US","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.0.0 Safari/537.36","country":null}
+{"t":"2026-04-17T11:18:23.920Z","ip":"127.0.0.1","host":"localhost","referer":"http://localhost:5000/scam-intelligence/embed?country=US","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.0.0 Safari/537.36","country":"US"}

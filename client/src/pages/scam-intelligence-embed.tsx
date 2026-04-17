@@ -26,6 +26,18 @@ export default function ScamIntelligenceEmbed({ countryCode }: EmbedProps) {
     if (c) setCode(c.toUpperCase());
   }, [countryCode]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const ref = (() => { try { return window.parent !== window ? document.referrer : window.location.href; } catch { return document.referrer; } })();
+      const params = new URLSearchParams();
+      if (ref) params.set("ref", ref);
+      if (code) params.set("country", code);
+      const url = `/api/scam-intelligence/embed/ping${params.toString() ? `?${params}` : ""}`;
+      fetch(url, { method: "GET", credentials: "omit", keepalive: true }).catch(() => {});
+    } catch {}
+  }, [code]);
+
   const { data: globeData } = useQuery({
     queryKey: ["/api/scam-intelligence/globe-data"],
     staleTime: 5 * 60 * 1000,
