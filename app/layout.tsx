@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import "../client/src/index.css";
 import Providers from "./providers";
 import AppShell from "./app-shell";
@@ -66,6 +67,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const nonce = (await headers()).get("x-nonce") || undefined;
   const globalJsonLd = [
     {
       "@context": "https://schema.org",
@@ -122,17 +124,20 @@ export default async function RootLayout({
         <meta httpEquiv="Pragma" content="no-cache" />
         <meta httpEquiv="Expires" content="0" />
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})()`,
           }}
         />
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
-            __html: `(function(){var MAX=3,DELAY=1500;function retry(el){var src=el.getAttribute('src');if(!src||src.indexOf('/_next/')===- 1)return;var att=parseInt(el.getAttribute('data-retry')||'0',10);if(att>=MAX)return;att++;var s=document.createElement('script');s.src=src+(src.indexOf('?')===-1?'?':'&')+'_r='+att;s.setAttribute('data-retry',String(att));s.async=el.async;s.defer=el.defer;if(el.type)s.type=el.type;if(el.crossOrigin)s.crossOrigin=el.crossOrigin;s.onerror=function(){setTimeout(function(){retry(s)},DELAY*att)};el.parentNode&&el.parentNode.insertBefore(s,el.nextSibling)}if(typeof MutationObserver!=='undefined'){new MutationObserver(function(muts){muts.forEach(function(m){m.addedNodes.forEach(function(n){if(n.tagName==='SCRIPT'&&n.src&&n.src.indexOf('/_next/')!==-1&&!n.getAttribute('data-retry')){n.onerror=function(){setTimeout(function(){retry(n)},DELAY)}}})})}).observe(document.documentElement,{childList:true,subtree:true})}document.addEventListener('error',function(e){var el=e.target;if(el&&el.tagName==='SCRIPT')retry(el)},true)})()`,
+            __html: `(function(){var MAX=2,DELAY=1500;function retry(el){try{var src=el.getAttribute&&el.getAttribute('src');if(!src||src.indexOf('/_next/')===-1)return;var att=parseInt(el.getAttribute('data-retry')||'0',10);if(att>=MAX)return;att++;setTimeout(function(){var s=document.createElement('script');s.src=src+(src.indexOf('?')===-1?'?':'&')+'_r='+att;s.setAttribute('data-retry',String(att));s.async=el.async;s.defer=el.defer;if(el.type)s.type=el.type;if(el.crossOrigin)s.crossOrigin=el.crossOrigin;el.parentNode&&el.parentNode.insertBefore(s,el.nextSibling)},DELAY*att)}catch(e){}}document.addEventListener('error',function(e){var el=e.target;if(el&&el.tagName==='SCRIPT')retry(el)},true)})()`,
           }}
         />
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(globalJsonLd).replace(/</g, "\\u003c"),
           }}
