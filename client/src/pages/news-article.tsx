@@ -639,6 +639,62 @@ export default function NewsArticlePage() {
         )}
 
         <FadeIn className="space-y-4">
+          {(article.category === "Action Needed" || article.urgencyLevel >= 3) &&
+            article.keyTakeaways && article.keyTakeaways.length > 0 && (
+              <Card
+                className="border-2 border-red-500/40 bg-gradient-to-br from-red-50 to-amber-50 dark:from-red-950/30 dark:to-amber-950/20"
+                data-testid="card-action-required"
+              >
+                <CardContent className="p-5 sm:p-6">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-600 flex items-center justify-center">
+                      <AlertTriangle className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold uppercase tracking-wider text-red-700 dark:text-red-400 mb-1">
+                        Action Required
+                      </p>
+                      <h3 className="font-bold text-lg mb-3">What You Should Do</h3>
+                      <ol className="space-y-2.5 mb-4">
+                        {article.keyTakeaways.slice(0, 5).map((step, i) => (
+                          <li
+                            key={i}
+                            className="flex gap-3 text-sm"
+                            data-testid={`action-step-${i}`}
+                          >
+                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center mt-0.5">
+                              {i + 1}
+                            </span>
+                            <span className="leading-relaxed">{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                      <div className="flex flex-wrap gap-2">
+                        {article.relatedToolUrl && article.relatedToolName ? (
+                          <Link href={article.relatedToolUrl.replace("https://www.getcyberright.com", "")}>
+                            <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white" data-testid="link-action-tool">
+                              {article.relatedToolName}
+                            </Button>
+                          </Link>
+                        ) : (
+                          <Link href="/scam-checker">
+                            <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white" data-testid="link-action-checker">
+                              Check if you're affected
+                            </Button>
+                          </Link>
+                        )}
+                        <Link href="/protection-hub">
+                          <Button size="sm" variant="outline" data-testid="link-action-hub">
+                            Protection Hub
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
           <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-transparent">
             <CardContent className="p-5 sm:p-6">
               <div className="flex items-start gap-3">
