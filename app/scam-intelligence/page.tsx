@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-// Client-only component: use dynamic import with ssr:false to prevent hydration mismatch
-import dynamic from "next/dynamic";
-const PageContent = dynamic(() => import("@/pages/scam-intelligence-dashboard"), { ssr: false, loading: () => null });
+import ScamIntelligenceClient from "./ScamIntelligenceClient";
+
+
+
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -34,5 +35,5 @@ export const metadata: Metadata = {
 };
 
 export default function ScamIntelligencePage() {
-  return <PageContent />;
+  return <ScamIntelligenceClient />;
 }
