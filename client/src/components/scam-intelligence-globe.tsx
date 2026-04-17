@@ -785,6 +785,15 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     setRetryCount(c => c + 1);
   }, []);
 
+  const hotspots = data?.hotspots || [];
+  const arcs = data?.arcs || [];
+  const showHotspots = viewMode !== "heatmap";
+  const showHeatmap = viewMode === "heatmap" || viewMode === "both";
+  const pulsingRings = hotspots.filter(h => h.riskLevel === "critical" || h.riskLevel === "high");
+  const ringsData = selectedPoint
+    ? [...pulsingRings.filter(p => p.id !== selectedPoint.id), selectedPoint]
+    : pulsingRings;
+
   const handleKey = useCallback((e: React.KeyboardEvent) => {
     if (!hotspots.length) return;
     if (e.key === "ArrowRight" || e.key === "ArrowDown") {
@@ -821,14 +830,6 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     );
   }
 
-  const hotspots = data?.hotspots || [];
-  const arcs = data?.arcs || [];
-  const showHotspots = viewMode !== "heatmap";
-  const showHeatmap = viewMode === "heatmap" || viewMode === "both";
-  const pulsingRings = hotspots.filter(h => h.riskLevel === "critical" || h.riskLevel === "high");
-  const ringsData = selectedPoint
-    ? [...pulsingRings.filter(p => p.id !== selectedPoint.id), selectedPoint]
-    : pulsingRings;
 
 
   return (
