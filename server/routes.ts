@@ -228,6 +228,33 @@ export async function registerRoutes(
     } catch (e) {
     }
 
+    const socialMatch = filename.match(/^social-(.+)\.png$/i);
+    if (socialMatch) {
+      try {
+        const articleId = socialMatch[1];
+        const { newsArticles } = await import("@shared/schema");
+        const rows = await db.select().from(newsArticles).where(eq(newsArticles.id, articleId)).limit(1);
+        const article = rows[0];
+        if (article) {
+          const { generateSocialImage } = await import("./socialImageGenerator");
+          const generatedPath = await generateSocialImage(
+            article.id,
+            article.title,
+            article.category || "Cybersecurity",
+            (article as any).urgencyLevel ?? 2,
+            article.source || "GetCyberRight",
+          );
+          if (generatedPath && fs.existsSync(generatedPath)) {
+            res.setHeader('Content-Type', 'image/png');
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
+            return res.sendFile(path.resolve(generatedPath), { dotfiles: 'allow' });
+          }
+        }
+      } catch (e) {
+        console.error('[social-images] on-demand generation failed', e);
+      }
+    }
+
     res.status(404).json({ error: 'Image not found' });
   });
 
