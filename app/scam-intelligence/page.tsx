@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-const PageContent = dynamic(() => import("@pages/scam-intelligence-dashboard"), { ssr: false, loading: () => null });
+const PageContent = dynamic(() => import("../../../client/src/pages/scam-intelligence-dashboard"), { ssr: false, loading: () => null });
 
 const BASE_URL = "https://www.getcyberright.com";
 
