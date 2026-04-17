@@ -19,6 +19,7 @@ import { registerChatRoutes } from "./replit_integrations/chat";
 import { registerStripeRoutes, registerStripeWebhook } from "./stripe";
 import { decryptVaultData } from "./vaultEncryption";
 import { handleArticleOgImage } from "./og-image-service";
+import { handleNewsRss } from "./rss-feed";
 import { logVaultAccess, extractRequestContext } from "./vaultAuditLog";
 import { 
   checkGoogleSafeBrowsing, 
@@ -6250,6 +6251,8 @@ BEHAVIORAL CONSTRAINTS
   });
 
   app.get("/og/article/:slug", handleArticleOgImage);
+
+  app.get(["/rss.xml", "/feed.xml", "/news/rss.xml", "/news/feed.xml"], handleNewsRss);
 
   app.get("/api/news/article/:slug", async (req: Request, res: Response) => {
     try {

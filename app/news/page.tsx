@@ -10,7 +10,14 @@ export const metadata: Metadata = {
   title: "News & Insights | Cybersecurity Updates for Families | GetCyberRight",
   description:
     "Stay informed with the latest cybersecurity news, threat intelligence, AI safety insights, learning opportunities, and security advisories. Expert analysis curated for families.",
-  alternates: { canonical: `${BASE_URL}/news` },
+  alternates: {
+    canonical: `${BASE_URL}/news`,
+    types: {
+      "application/rss+xml": [
+        { url: `${BASE_URL}/rss.xml`, title: "GetCyberRight News & Insights RSS" },
+      ],
+    },
+  },
   openGraph: {
     title: "News & Insights | Cybersecurity Updates for Families | GetCyberRight",
     description:
