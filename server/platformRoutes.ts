@@ -204,6 +204,111 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  app.get("/api/scam-intelligence/export.json", (_req: Request, res: Response) => {
+    try {
+      const globe = getGlobeData();
+      const feed = getLiveFeed();
+      const regional = getRegionalData();
+      const payload = {
+        dataAsOf: globe.dataAsOf,
+        generatedAt: new Date().toISOString(),
+        license: "CC BY 4.0 with attribution to GetCyberRight (https://www.getcyberright.com/scam-intelligence)",
+        methodologyUrl: "https://www.getcyberright.com/scam-intelligence/methodology",
+        globalStats: globe.globalStats,
+        hotspots: globe.hotspots.map(h => ({
+          country: h.country,
+          countryCode: h.countryCode,
+          region: h.region,
+          riskLevel: h.riskLevel,
+          riskScore: Math.round(h.intensity * 100),
+          recentIncidents: h.recentIncidents,
+          trendDirection: h.trendDirection,
+          trendPercent: h.trendPercent,
+          topScamTypes: h.topScamTypes,
+          reportContact: h.reportContact,
+          citations: h.citations,
+        })),
+        arcs: globe.arcs.map(a => ({
+          originCountry: a.originCountry,
+          originCountryCode: a.originCountryCode,
+          targetCountry: a.targetCountry,
+          targetCountryCode: a.targetCountryCode,
+          scamType: a.scamType,
+          volume: a.volume,
+          originCitations: a.originCitations,
+        })),
+        liveEvents: feed.events,
+        regions: regional.regions,
+      };
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Content-Disposition", `attachment; filename="scam-intelligence-${new Date().toISOString().split("T")[0]}.json"`);
+      res.send(JSON.stringify(payload, null, 2));
+    } catch (e: any) {
+      console.error("[scam-intel-api] Export JSON error:", e?.message);
+      res.status(500).json({ error: "Failed to export JSON" });
+    }
+  });
+
+  app.get("/api/scam-intelligence/export.csv", (_req: Request, res: Response) => {
+    try {
+      const globe = getGlobeData();
+      const feed = getLiveFeed();
+      const esc = (v: any) => {
+        if (v === null || v === undefined) return "";
+        const s = String(v).replace(/"/g, '""');
+        return /[",\n]/.test(s) ? `"${s}"` : s;
+      };
+      const lines: string[] = [];
+      lines.push(`# GetCyberRight Scam Intelligence Export`);
+      lines.push(`# dataAsOf,${esc(globe.dataAsOf)}`);
+      lines.push(`# license,CC BY 4.0 with attribution to GetCyberRight`);
+      lines.push(`# methodology,https://www.getcyberright.com/scam-intelligence/methodology`);
+      lines.push("");
+      lines.push("# HOTSPOTS");
+      lines.push(["country","countryCode","region","riskLevel","riskScore","recentIncidents","trendDirection","trendPercent","topScamTypes","primarySource","primarySourceUrl","primarySourceDatePublished","accessedAt"].join(","));
+      for (const h of globe.hotspots) {
+        const c = h.citations[0];
+        lines.push([
+          esc(h.country), esc(h.countryCode), esc(h.region), esc(h.riskLevel),
+          esc(Math.round(h.intensity * 100)), esc(h.recentIncidents),
+          esc(h.trendDirection), esc(h.trendPercent),
+          esc(h.topScamTypes.join("|")),
+          esc(c?.publisher || ""), esc(c?.url || ""), esc(c?.datePublished || ""), esc(c?.accessedAt || ""),
+        ].join(","));
+      }
+      lines.push("");
+      lines.push("# ARCS (cross-border scam flows)");
+      lines.push(["originCountry","originCode","targetCountry","targetCode","scamType","volume","originPrimarySource","originPrimarySourceUrl"].join(","));
+      for (const a of globe.arcs) {
+        const c = a.originCitations[0];
+        lines.push([
+          esc(a.originCountry), esc(a.originCountryCode),
+          esc(a.targetCountry), esc(a.targetCountryCode),
+          esc(a.scamType), esc(a.volume),
+          esc(c?.publisher || ""), esc(c?.url || ""),
+        ].join(","));
+      }
+      lines.push("");
+      lines.push("# LIVE EVENTS");
+      lines.push(["timestamp","type","title","severity","region","source","sourceUrl","scamCategory","synthetic"].join(","));
+      for (const e of feed.events) {
+        lines.push([
+          esc(e.timestamp), esc(e.type), esc(e.title), esc(e.severity), esc(e.region),
+          esc(e.source), esc(e.sourceUrl || ""), esc(e.scamCategory || ""), esc(e.synthetic ? "true" : "false"),
+        ].join(","));
+      }
+      const csv = lines.join("\n");
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader("Content-Disposition", `attachment; filename="scam-intelligence-${new Date().toISOString().split("T")[0]}.csv"`);
+      res.send(csv);
+    } catch (e: any) {
+      console.error("[scam-intel-api] Export CSV error:", e?.message);
+      res.status(500).json({ error: "Failed to export CSV" });
+    }
+  });
+
   const subscribeRateLimit = new Map<string, number[]>();
   app.post("/api/scam-intelligence/alerts/subscribe", async (req: Request, res: Response) => {
     try {

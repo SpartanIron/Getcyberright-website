@@ -169,7 +169,7 @@ export default function ScamIntelligenceDashboard() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-5 export-exclude">
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-2 export-exclude">
               <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
               <button
                 onClick={handleExportPng}
@@ -181,6 +181,24 @@ export default function ScamIntelligenceDashboard() {
                 {exporting ? <ImageIcon className="w-3 h-3 animate-pulse" /> : <Download className="w-3 h-3" />}
                 {exporting ? "Capturing..." : "Export PNG"}
               </button>
+              <a
+                href="/api/scam-intelligence/export.csv"
+                className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-border bg-card hover:bg-secondary text-foreground transition-colors"
+                data-testid="export-csv"
+                aria-label="Download raw data as CSV"
+              >
+                <Download className="w-3 h-3" />
+                Export CSV
+              </a>
+              <a
+                href="/api/scam-intelligence/export.json"
+                className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-border bg-card hover:bg-secondary text-foreground transition-colors"
+                data-testid="export-json"
+                aria-label="Download raw data as JSON"
+              >
+                <Download className="w-3 h-3" />
+                Export JSON
+              </a>
               <button
                 onClick={handleCopyEmbed}
                 className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-border bg-card hover:bg-secondary text-foreground transition-colors"
@@ -191,6 +209,12 @@ export default function ScamIntelligenceDashboard() {
                 {embedCopied ? "Embed code copied" : "Copy embed code"}
               </button>
             </div>
+
+            {(globeData as any)?.dataAsOf && (
+              <p className="text-center text-[10px] text-muted-foreground mb-5 export-exclude" data-testid="text-data-as-of">
+                Data as of {new Date((globeData as any).dataAsOf).toUTCString()}
+              </p>
+            )}
 
             <div ref={captureRef}>
               <GlobalStatsBar stats={(globeData as any)?.globalStats || null} visitorCountryCode={visitorCountryCode} />
@@ -398,6 +422,32 @@ export default function ScamIntelligenceDashboard() {
                 </div>
               )}
             </div>
+          </div>
+        </section>
+
+        <section className="border-t border-border/50 py-6 export-exclude">
+          <div className="container mx-auto px-4">
+            <nav
+              className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[11px] text-muted-foreground"
+              aria-label="Press resources"
+              data-testid="press-footer-links"
+            >
+              <Link href="/scam-intelligence/methodology" className="hover:text-primary transition-colors" data-testid="link-methodology">
+                Methodology
+              </Link>
+              <span aria-hidden="true">&middot;</span>
+              <Link href="/scam-intelligence/press" className="hover:text-primary transition-colors" data-testid="link-press-kit">
+                Press Kit
+              </Link>
+              <span aria-hidden="true">&middot;</span>
+              <a href="/api/scam-intelligence/export.csv" className="hover:text-primary transition-colors" data-testid="link-export-csv">
+                Export CSV
+              </a>
+              <span aria-hidden="true">&middot;</span>
+              <a href="/api/scam-intelligence/export.json" className="hover:text-primary transition-colors" data-testid="link-export-json">
+                Export JSON
+              </a>
+            </nav>
           </div>
         </section>
       </main>

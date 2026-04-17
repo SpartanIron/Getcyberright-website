@@ -1046,6 +1046,9 @@ function ForecastSparkline({ countryCode, height = 60 }: { countryCode: string; 
         <span>history</span>
         <span style={{ color: trendColor }}>forecast {data.trend === "up" ? "↑" : data.trend === "down" ? "↓" : "→"}</span>
       </div>
+      <p className="text-[9px] italic text-muted-foreground/70 mt-0.5" data-testid={`forecast-disclaimer-${countryCode}`}>
+        Indicative projection, not a prediction
+      </p>
     </div>
   );
 }

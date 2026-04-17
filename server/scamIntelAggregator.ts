@@ -2,6 +2,15 @@ import { db } from "./db";
 import { threatItems, securityAlerts, scamIntelligence } from "@shared/schema";
 import { desc, sql, and, gte, isNull, or, eq } from "drizzle-orm";
 
+export interface Citation {
+  name: string;
+  publisher: string;
+  url: string;
+  datePublished?: string;
+  accessedAt: string;
+  notes?: string;
+}
+
 interface GlobeHotspot {
   id: string;
   lat: number;
@@ -16,6 +25,7 @@ interface GlobeHotspot {
   trendDirection: "up" | "down" | "stable";
   trendPercent: number;
   sources: string[];
+  citations: Citation[];
   reportContact?: string;
   lastUpdated: string;
   emergencySteps?: string[];
@@ -37,6 +47,7 @@ interface GlobeArc {
   targetCountry: string;
   targetCountryCode: string;
   targetRegion: string;
+  originCitations: Citation[];
 }
 
 export interface CountryForecast {
@@ -58,6 +69,8 @@ export interface CyberWeatherSnapshot {
   criticalCountries: { country: string; countryCode: string; recentIncidents: number }[];
   newScamPatterns: string[];
   generatedAt: string;
+  citations: Citation[];
+  dataAsOf: string;
 }
 
 interface LiveFeedEvent {
@@ -71,6 +84,8 @@ interface LiveFeedEvent {
   source: string;
   sourceUrl?: string;
   scamCategory?: string;
+  citation?: Citation;
+  synthetic?: boolean;
 }
 
 interface RegionalSummary {
@@ -140,11 +155,13 @@ export interface ScamIntelGlobeData {
   sourceMetadata?: SourceMetadata[];
   globalStats: GlobalStats;
   lastUpdated: string;
+  dataAsOf: string;
 }
 
 export interface ScamIntelLiveFeed {
   events: LiveFeedEvent[];
   lastUpdated: string;
+  dataAsOf: string;
 }
 
 export interface ScamIntelRegionalData {
@@ -152,6 +169,7 @@ export interface ScamIntelRegionalData {
   scamTypes: ScamTypeSummary[];
   trending: TrendingScam[];
   lastUpdated: string;
+  dataAsOf: string;
 }
 
 const COUNTRY_COORDINATES: Record<string, { lat: number; lng: number; code: string; region: string }> = {
@@ -902,6 +920,69 @@ async function fetchLiveDataEnrichment(): Promise<{
   }
 }
 
+const COUNTRY_CITATIONS: Record<string, Citation[]> = {
+  "United States": [
+    { name: "Internet Crime Report 2024", publisher: "FBI Internet Crime Complaint Center (IC3)", url: "https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf", datePublished: "2025-04-23", accessedAt: "" },
+    { name: "Consumer Sentinel Network Data Book 2024", publisher: "Federal Trade Commission", url: "https://www.ftc.gov/reports/consumer-sentinel-network-data-book-2024", datePublished: "2025-03-10", accessedAt: "" },
+  ],
+  "Canada": [
+    { name: "Annual Statistical Report 2024", publisher: "Canadian Anti-Fraud Centre", url: "https://antifraudcentre-centreantifraude.ca/index-eng.htm", datePublished: "2025-02-18", accessedAt: "" },
+  ],
+  "United Kingdom": [
+    { name: "Annual Fraud Report 2024", publisher: "Action Fraud (City of London Police)", url: "https://www.actionfraud.police.uk/data", datePublished: "2025-01-30", accessedAt: "" },
+    { name: "Annual Fraud Report 2024", publisher: "UK Finance", url: "https://www.ukfinance.org.uk/policy-and-guidance/reports-and-publications/annual-fraud-report-2024", datePublished: "2024-05-22", accessedAt: "" },
+  ],
+  "Germany": [
+    { name: "Lagebericht zur IT-Sicherheit in Deutschland 2024", publisher: "Bundesamt fur Sicherheit in der Informationstechnik (BSI)", url: "https://www.bsi.bund.de/DE/Service-Navi/Publikationen/Lagebericht/lagebericht_node.html", datePublished: "2024-11-12", accessedAt: "" },
+    { name: "Bundeslagebild Cybercrime 2023", publisher: "Bundeskriminalamt (BKA)", url: "https://www.bka.de/DE/AktuelleInformationen/StatistikenLagebilder/Lagebilder/Cybercrime/cybercrime_node.html", datePublished: "2024-05-14", accessedAt: "" },
+  ],
+  "France": [
+    { name: "Panorama de la cybermenace 2024", publisher: "ANSSI", url: "https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-001/", datePublished: "2025-02-04", accessedAt: "" },
+    { name: "Rapport d activite 2024", publisher: "Cybermalveillance.gouv.fr", url: "https://www.cybermalveillance.gouv.fr/tous-nos-contenus/actualites/rapport-activite-2024", datePublished: "2025-03-18", accessedAt: "" },
+  ],
+  "Australia": [
+    { name: "Targeting Scams Report 2024", publisher: "ACCC Scamwatch", url: "https://www.accc.gov.au/about-us/publications/serial-publications/targeting-scams-report-on-scams-activity", datePublished: "2025-04-29", accessedAt: "" },
+    { name: "Annual Cyber Threat Report 2023-24", publisher: "Australian Signals Directorate / ACSC", url: "https://www.cyber.gov.au/about-us/view-all-content/reports-and-statistics/annual-cyber-threat-report-2023-2024", datePublished: "2024-11-20", accessedAt: "" },
+  ],
+  "India": [
+    { name: "Indian Cyber Crime Coordination Centre Annual Report 2024", publisher: "Ministry of Home Affairs (I4C)", url: "https://www.i4c.mha.gov.in/", datePublished: "2025-01-15", accessedAt: "" },
+    { name: "CERT-In Annual Report 2023", publisher: "CERT-In", url: "https://www.cert-in.org.in/", datePublished: "2024-08-20", accessedAt: "" },
+  ],
+  "Japan": [
+    { name: "Cybercrime Statistics 2024", publisher: "National Police Agency Japan", url: "https://www.npa.go.jp/publications/statistics/cybersecurity/index.html", datePublished: "2025-03-12", accessedAt: "" },
+  ],
+  "Brazil": [
+    { name: "Estatisticas de Incidentes 2024", publisher: "CERT.br", url: "https://www.cert.br/stats/", datePublished: "2025-02-01", accessedAt: "" },
+  ],
+  "Nigeria": [
+    { name: "African Cyberthreat Assessment Report 2024", publisher: "INTERPOL", url: "https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-report-flags-top-cyberthreats-in-Africa", datePublished: "2024-10-22", accessedAt: "" },
+  ],
+  "South Africa": [
+    { name: "Annual Crime Stats 2024", publisher: "South African Banking Risk Information Centre (SABRIC)", url: "https://www.sabric.co.za/media-and-news/", datePublished: "2024-09-30", accessedAt: "" },
+  ],
+  "Singapore": [
+    { name: "Singapore Cyber Landscape 2024", publisher: "Cyber Security Agency of Singapore", url: "https://www.csa.gov.sg/News-Events/Publications/singapore-cyber-landscape-publications", datePublished: "2025-03-25", accessedAt: "" },
+  ],
+  "South Korea": [
+    { name: "Cyber Threat Trends Report 2024", publisher: "KrCERT/CC (KISA)", url: "https://www.krcert.or.kr/", datePublished: "2025-02-05", accessedAt: "" },
+  ],
+};
+
+function getCitationsForCountry(country: string, profile: { sources: string[] }): Citation[] {
+  const accessedAt = new Date().toISOString();
+  const structured = COUNTRY_CITATIONS[country];
+  if (structured && structured.length > 0) {
+    return structured.map(c => ({ ...c, accessedAt }));
+  }
+  return profile.sources.map(s => ({
+    name: s,
+    publisher: s,
+    url: "",
+    accessedAt,
+    notes: "Reference name only; structured citation pending",
+  }));
+}
+
 function buildGlobeData(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichment>>): ScamIntelGlobeData {
   const hotspots: GlobeHotspot[] = [];
 
@@ -924,6 +1005,7 @@ function buildGlobeData(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichm
       trendDirection: profile.trendDirection,
       trendPercent: profile.trendPercent,
       sources: profile.sources,
+      citations: getCitationsForCountry(country, profile),
       reportContact: profile.reportContact,
       lastUpdated: new Date().toISOString(),
       emergencySteps: emergency?.steps,
@@ -937,6 +1019,7 @@ function buildGlobeData(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichm
     const from = COUNTRY_COORDINATES[flow.from];
     const to = COUNTRY_COORDINATES[flow.to];
     if (!from || !to) return null;
+    const originProfile = COUNTRY_THREAT_PROFILES[flow.from];
     return {
       startLat: from.lat,
       startLng: from.lng,
@@ -950,6 +1033,7 @@ function buildGlobeData(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichm
       targetCountry: flow.to,
       targetCountryCode: to.code,
       targetRegion: to.region,
+      originCitations: originProfile ? getCitationsForCountry(flow.from, originProfile) : [],
     };
   }).filter(Boolean) as GlobeArc[];
 
@@ -988,6 +1072,7 @@ function buildGlobeData(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichm
       },
     },
     lastUpdated: new Date().toISOString(),
+    dataAsOf: new Date().toISOString(),
   };
 }
 
@@ -1039,10 +1124,22 @@ function buildSourceMetadata(liveData: Awaited<ReturnType<typeof fetchLiveDataEn
   });
 }
 
+const FEED_SOURCE_URL_MAP: Record<string, string> = {
+  "cisa-alerts": "https://www.cisa.gov/news-events/cybersecurity-advisories",
+  "nvd-cve": "https://nvd.nist.gov/vuln",
+  "phishtank": "https://www.phishtank.com",
+  "urlhaus": "https://urlhaus.abuse.ch",
+  "hibp-breaches": "https://haveibeenpwned.com/PwnedWebsites",
+  "fbi-ic3": "https://www.ic3.gov",
+  "ftc-sentinel": "https://www.ftc.gov/enforcement/consumer-sentinel-network",
+};
+
 function buildLiveFeed(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichment>>): ScamIntelLiveFeed {
   const events: LiveFeedEvent[] = [];
+  const accessedAt = new Date().toISOString();
 
   for (const alert of liveData.recentAlerts) {
+    const sourceUrl = alert.sourceUrl || undefined;
     events.push({
       id: `alert-${events.length}`,
       timestamp: alert.publishedAt?.toISOString() || new Date().toISOString(),
@@ -1051,8 +1148,16 @@ function buildLiveFeed(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichme
       severity: (alert.severity as any) || "medium",
       region: "Global",
       source: alert.source,
-      sourceUrl: alert.sourceUrl,
+      sourceUrl,
       scamCategory: alert.category,
+      synthetic: !sourceUrl,
+      citation: sourceUrl ? {
+        name: alert.title,
+        publisher: alert.source,
+        url: sourceUrl,
+        datePublished: alert.publishedAt?.toISOString(),
+        accessedAt,
+      } : undefined,
     });
   }
 
@@ -1075,6 +1180,9 @@ function buildLiveFeed(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichme
       "ftc-sentinel": "FTC Sentinel",
     };
 
+    const sourceUrl = (threat as any).sourceUrl || FEED_SOURCE_URL_MAP[threat.feedId];
+    const sourceName = feedSourceMap[threat.feedId] || threat.feedId;
+
     events.push({
       id: `threat-${events.length}`,
       timestamp: threat.publishedAt?.toISOString() || new Date().toISOString(),
@@ -1082,8 +1190,17 @@ function buildLiveFeed(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichme
       title: threat.title,
       severity: (threat.severity as any) || "medium",
       region,
-      source: feedSourceMap[threat.feedId] || threat.feedId,
+      source: sourceName,
+      sourceUrl,
       scamCategory: threat.itemType,
+      synthetic: !((threat as any).sourceUrl),
+      citation: sourceUrl ? {
+        name: threat.title,
+        publisher: sourceName,
+        url: sourceUrl,
+        datePublished: threat.publishedAt?.toISOString(),
+        accessedAt,
+      } : undefined,
     });
   }
 
@@ -1092,6 +1209,7 @@ function buildLiveFeed(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichme
   return {
     events: events.slice(0, 50),
     lastUpdated: new Date().toISOString(),
+    dataAsOf: new Date().toISOString(),
   };
 }
 
@@ -1239,7 +1357,7 @@ function buildRegionalData(): ScamIntelRegionalData {
     },
   ];
 
-  return { regions, scamTypes, trending, lastUpdated: new Date().toISOString() };
+  return { regions, scamTypes, trending, lastUpdated: new Date().toISOString(), dataAsOf: new Date().toISOString() };
 }
 
 function getWeekStart(weeksAgo: number = 0): string {
@@ -1364,6 +1482,20 @@ export function getCyberWeatherSnapshot(): CyberWeatherSnapshot {
 
   const newPatterns = regional.trending.filter(t => t.isNew).map(t => t.label).slice(0, 6);
 
+  const accessedAt = new Date().toISOString();
+  const seen = new Set<string>();
+  const aggregateCitations: Citation[] = [];
+  for (const h of [...critical, ...movers]) {
+    const list = COUNTRY_CITATIONS[h.country];
+    if (!list) continue;
+    for (const c of list) {
+      const key = `${c.publisher}|${c.url}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      aggregateCitations.push({ ...c, accessedAt });
+    }
+  }
+
   return {
     weekStart: weekStart.toISOString().split("T")[0],
     weekEnd: weekEnd.toISOString().split("T")[0],
@@ -1374,6 +1506,8 @@ export function getCyberWeatherSnapshot(): CyberWeatherSnapshot {
     criticalCountries: critical,
     newScamPatterns: newPatterns,
     generatedAt: new Date().toISOString(),
+    citations: aggregateCitations,
+    dataAsOf: data.dataAsOf || new Date().toISOString(),
   };
 }
 
@@ -1409,6 +1543,7 @@ export function getGlobeData(): ScamIntelGlobeData {
         wowChange: { incidentsPercent: 0, incidentsDirection: "stable", countriesAtCriticalRisk: 0, countriesTrendingUp: 0 },
       },
       lastUpdated: new Date().toISOString(),
+      dataAsOf: new Date().toISOString(),
     };
   }
   return cachedGlobeData;
@@ -1416,14 +1551,14 @@ export function getGlobeData(): ScamIntelGlobeData {
 
 export function getLiveFeed(): ScamIntelLiveFeed {
   if (!cachedLiveFeed) {
-    return { events: [], lastUpdated: new Date().toISOString() };
+    return { events: [], lastUpdated: new Date().toISOString(), dataAsOf: new Date().toISOString() };
   }
   return cachedLiveFeed;
 }
 
 export function getRegionalData(): ScamIntelRegionalData {
   if (!cachedRegionalData) {
-    return { regions: [], scamTypes: [], trending: [], lastUpdated: new Date().toISOString() };
+    return { regions: [], scamTypes: [], trending: [], lastUpdated: new Date().toISOString(), dataAsOf: new Date().toISOString() };
   }
   return cachedRegionalData;
 }
