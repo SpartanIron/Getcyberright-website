@@ -128,7 +128,7 @@ export function registerPlatformRoutes(app: Express): void {
 
   // ─── Public Scam Intelligence Globe API ──────────────────────────────
 
-  app.get("/api/scam-intelligence/globe-data", (_req: Request, res: Response) => {
+  app.get(["/api/scam-intelligence/globe-data", "/api/scam-intelligence/globe-data/:range"], (_req: Request, res: Response) => {
     try {
       const data = getGlobeData();
       res.setHeader("Cache-Control", "public, max-age=300");
@@ -139,10 +139,10 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/scam-intelligence/live-feed", (req: Request, res: Response) => {
+  app.get(["/api/scam-intelligence/live-feed", "/api/scam-intelligence/live-feed/:range"], (req: Request, res: Response) => {
     try {
       const data = getLiveFeed();
-      const rangeParam = String(req.query.range || "all").toLowerCase();
+      const rangeParam = String(req.params.range || req.query.range || "all").toLowerCase();
       const RANGE_MS: Record<string, number> = {
         "1h": 60 * 60 * 1000,
         "24h": 24 * 60 * 60 * 1000,
@@ -167,7 +167,7 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/scam-intelligence/regional-summary", (_req: Request, res: Response) => {
+  app.get(["/api/scam-intelligence/regional-summary", "/api/scam-intelligence/regional-summary/:range"], (_req: Request, res: Response) => {
     try {
       const data = getRegionalData();
       res.setHeader("Cache-Control", "public, max-age=300");
