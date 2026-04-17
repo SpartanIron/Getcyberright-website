@@ -115,20 +115,10 @@ function getInitials(name: string): string {
   return name.split(" ").filter(Boolean).slice(0, 2).map(n => n[0]?.toUpperCase()).join("");
 }
 
-function ShareBar({ title, url }: { title: string; url: string }) {
-  const [copied, setCopied] = useState(false);
+function getShareButtons(title: string, url: string) {
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {}
-  };
-
-  const buttons = [
+  return [
     { name: "X", icon: SiX, href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`, color: "hover:bg-black hover:text-white" },
     { name: "Facebook", icon: Facebook, href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, color: "hover:bg-blue-600 hover:text-white" },
     { name: "LinkedIn", icon: Linkedin, href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, color: "hover:bg-blue-700 hover:text-white" },
@@ -136,6 +126,18 @@ function ShareBar({ title, url }: { title: string; url: string }) {
     { name: "WhatsApp", icon: SiWhatsapp, href: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`, color: "hover:bg-green-600 hover:text-white" },
     { name: "Email", icon: Mail, href: `mailto:?subject=${encodedTitle}&body=${encodedUrl}`, color: "hover:bg-slate-700 hover:text-white" },
   ];
+}
+
+function ShareBar({ title, url }: { title: string; url: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  };
+  const buttons = getShareButtons(title, url);
 
   return (
     <div className="flex items-center gap-2 flex-wrap" data-testid="share-bar">
@@ -162,6 +164,49 @@ function ShareBar({ title, url }: { title: string; url: string }) {
         {copied ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
       </button>
     </div>
+  );
+}
+
+function StickyShareSidebar({ title, url }: { title: string; url: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  };
+  const buttons = getShareButtons(title, url);
+
+  return (
+    <aside
+      className="hidden xl:flex fixed left-[max(1rem,calc((100vw-48rem)/2-5rem))] top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 p-2 rounded-full border border-border bg-background/80 backdrop-blur-sm shadow-sm"
+      aria-label="Share this article"
+      data-testid="sticky-share-sidebar"
+    >
+      <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1 pt-1">Share</span>
+      {buttons.map(b => (
+        <a
+          key={b.name}
+          href={b.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Share on ${b.name}`}
+          className={`w-9 h-9 inline-flex items-center justify-center rounded-full border border-border text-muted-foreground transition-colors ${b.color}`}
+          data-testid={`sticky-share-${b.name.toLowerCase()}`}
+        >
+          <b.icon className="h-4 w-4" />
+        </a>
+      ))}
+      <button
+        onClick={handleCopy}
+        aria-label="Copy link"
+        className="w-9 h-9 inline-flex items-center justify-center rounded-full border border-border text-muted-foreground hover:bg-primary hover:text-white transition-colors"
+        data-testid="sticky-share-copy-link"
+      >
+        {copied ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
+      </button>
+    </aside>
   );
 }
 
@@ -439,6 +484,7 @@ export default function NewsArticlePage() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      <StickyShareSidebar title={article.title} url={articleUrl} />
       <article className="container mx-auto px-4 py-6 sm:py-8 max-w-3xl">
         <FadeIn>
           <Link href="/news">
