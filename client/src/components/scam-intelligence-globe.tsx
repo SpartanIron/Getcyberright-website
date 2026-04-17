@@ -58,6 +58,7 @@ function GlobeFallback({ data, onRetry, errorDetail }: { data: any; onRetry?: ()
   const hotspots = (data?.hotspots || []).sort((a: any, b: any) => (b.recentIncidents || 0) - (a.recentIncidents || 0));
   const isWebGLError = errorDetail && /WebGL|context/i.test(errorDetail);
   const contextBlocked = typeof window !== "undefined" && isWebGLError && isWebGLContextBlocked();
+  const dataLoading = !data || !Array.isArray(data?.hotspots);
 
   const topByRegion: Record<string, any[]> = {};
   hotspots.forEach((h: any) => {
@@ -70,22 +71,47 @@ function GlobeFallback({ data, onRetry, errorDetail }: { data: any; onRetry?: ()
 
   return (
     <div className="w-full" data-testid="globe-fallback">
-      {(contextBlocked || errorDetail) && (
-        <div className="flex items-center justify-between bg-slate-800/40 border border-slate-700/40 rounded-xl px-4 py-2.5 mb-4">
-          <p className="text-xs text-muted-foreground/80">
-            {contextBlocked
-              ? "3D globe unavailable. A browser extension, hardware acceleration setting, or GPU driver may be blocking WebGL. Try Incognito mode or whitelisting this site."
-              : "The 3D globe could not render. Try refreshing or using a different browser."}
-          </p>
-          {onRetry && (
-            <button
-              onClick={onRetry}
-              className="ml-3 flex-shrink-0 text-xs bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1 rounded-lg border border-primary/30 transition-colors"
-              data-testid="globe-retry"
-            >
-              Retry
-            </button>
-          )}
+      <div className="flex items-center justify-between bg-slate-800/40 border border-slate-700/40 rounded-xl px-4 py-2.5 mb-4">
+        <p className="text-xs text-muted-foreground/80">
+          {contextBlocked
+            ? "3D globe unavailable. A browser extension, hardware acceleration setting, or GPU driver may be blocking WebGL. Try Incognito mode or whitelisting this site."
+            : errorDetail
+            ? "The 3D globe could not render. Try refreshing or using a different browser."
+            : "Showing the country list view. The 3D globe is unavailable in this browser."}
+        </p>
+        {onRetry && (
+          <button
+            onClick={onRetry}
+            className="ml-3 flex-shrink-0 text-xs bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1 rounded-lg border border-primary/30 transition-colors"
+            data-testid="globe-retry"
+          >
+            Retry
+          </button>
+        )}
+      </div>
+
+      {dataLoading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4" data-testid="globe-fallback-loading">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="bg-slate-800/30 border border-slate-700/30 rounded-xl p-3 animate-pulse">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700" />
+                  <div className="h-3 w-24 bg-slate-700 rounded" />
+                </div>
+                <div className="h-3 w-12 bg-slate-700 rounded" />
+              </div>
+              <div className="h-5 w-16 bg-slate-700 rounded mb-2" />
+              <div className="w-full h-1.5 bg-slate-700/50 rounded-full" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!dataLoading && hotspots.length === 0 && (
+        <div className="bg-slate-800/30 border border-slate-700/30 rounded-xl p-6 text-center">
+          <GlobeIcon className="w-8 h-8 text-cyan-400/40 mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">No country data available right now. Please refresh in a moment.</p>
         </div>
       )}
 
