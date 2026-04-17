@@ -24,6 +24,48 @@ uri = "file://client/src/assets/images/hero-family-protected-v2.png"
 type = "image"
 title = "family-shield-hero"
 
+[[generated]]
+id = "t0UDHHVNYW1w8jg6jHomH"
+uri = "file://public/article-images/defender-vulnerabilities.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "2JWr5pP1waz_X2a68PTk_"
+uri = "file://public/article-images/security-update-system.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "lMkLupk4OdACGwKRlI15Z"
+uri = "file://public/article-images/executive-phishing.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "D1bIwriUCR0imJDVPjGdQ"
+uri = "file://public/article-images/apple-ai-guardrails.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "o8ML2JVtX5jEURn61qlmQ"
+uri = "file://public/article-images/lockheed-data-breach.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "tfl6N1ExUb4fZZIVXnLpU"
+uri = "file://public/article-images/financial-breach-ssn.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "5K72dbZ2smqUeMKek90mt"
+uri = "file://public/article-images/astrazeneca-hack.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "rZqQKOOCV-y0ksJa4V7mQ"
 uri = "file://.local/traffic-growth-analysis.md"
