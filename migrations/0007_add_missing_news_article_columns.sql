@@ -12,3 +12,5 @@ ALTER TABLE "news_articles" ALTER COLUMN "urgency_level" TYPE varchar(20) USING 
   ELSE 'normal'
 END;
 ALTER TABLE "news_articles" ALTER COLUMN "urgency_level" SET DEFAULT 'normal';
+
+-- Migration applied
