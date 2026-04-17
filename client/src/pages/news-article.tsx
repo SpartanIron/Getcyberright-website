@@ -212,7 +212,11 @@ function StickyShareSidebar({ title, url }: { title: string; url: string }) {
   );
 }
 
-function NewsletterInline() {
+function NewsletterInline({
+  title = "Stay one step ahead of scammers",
+  description = "Weekly cybersecurity briefings for families. No spam, just the threats that matter and what to do about them.",
+  testIdSuffix = "inline",
+}: { title?: string; description?: string; testIdSuffix?: string } = {}) {
   const [email, setEmail] = useState("");
   const { toast } = useToast();
   const mutation = useMutation({
@@ -226,13 +230,13 @@ function NewsletterInline() {
     },
   });
   return (
-    <Card className="my-8 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent" data-testid="newsletter-inline">
+    <Card className="my-8 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent" data-testid={`newsletter-${testIdSuffix}`}>
       <CardContent className="p-6 sm:p-7">
         <div className="flex items-start gap-3 mb-3">
           <Mail className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
           <div>
-            <h3 className="font-bold text-base mb-1">Stay one step ahead of scammers</h3>
-            <p className="text-sm text-muted-foreground">Weekly cybersecurity briefings for families. No spam, just the threats that matter and what to do about them.</p>
+            <h3 className="font-bold text-base mb-1">{title}</h3>
+            <p className="text-sm text-muted-foreground">{description}</p>
           </div>
         </div>
         <form
@@ -246,9 +250,9 @@ function NewsletterInline() {
             onChange={(e) => setEmail(e.target.value)}
             required
             className="flex-1"
-            data-testid="input-newsletter-inline"
+            data-testid={`input-newsletter-${testIdSuffix}`}
           />
-          <Button type="submit" disabled={mutation.isPending} data-testid="button-newsletter-inline">
+          <Button type="submit" disabled={mutation.isPending} data-testid={`button-newsletter-${testIdSuffix}`}>
             {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Subscribe"}
           </Button>
         </form>
@@ -753,6 +757,14 @@ export default function NewsArticlePage() {
         </FadeIn>
 
         <CommentsSection slug={article.slug} />
+
+        <FadeIn className="mt-8">
+          <NewsletterInline
+            title="Stay ahead of cyber threats"
+            description="Get our free weekly digest. Real threats, plain language, what to do about them. No spam, ever."
+            testIdSuffix="bottom"
+          />
+        </FadeIn>
 
         {article.relatedArticles && article.relatedArticles.length > 0 && (
           <FadeIn className="mt-10">
