@@ -538,6 +538,10 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   const lastFocusedCodeRef = useRef<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
+  const [borderGeo, setBorderGeo] = useState<any[] | null>(null);
+  const [keyboardIndex, setKeyboardIndex] = useState<number>(-1);
+  const interactionTimerRef = useRef<any>(null);
+
   useEffect(() => {
     const directCheck = checkWebGLSupport();
     const likelyCapable = isLikelyWebGLCapable();
@@ -607,10 +611,6 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, [width]);
-
-  const [borderGeo, setBorderGeo] = useState<any[] | null>(null);
-  const [keyboardIndex, setKeyboardIndex] = useState<number>(-1);
-  const interactionTimerRef = useRef<any>(null);
 
   useEffect(() => {
     if (!globeRef.current || !GlobeComponent) return;
