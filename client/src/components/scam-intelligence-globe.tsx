@@ -857,8 +857,8 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
           preserveDrawingBuffer: true,
           antialias: true,
         }}
-        globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
-        bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+        globeImageUrl="/earth-night.jpg"
+        bumpImageUrl="/earth-topology.png"
         backgroundImageUrl=""
         backgroundColor="rgba(0,0,0,0)"
         showAtmosphere={true}
