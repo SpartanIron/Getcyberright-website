@@ -377,6 +377,4 @@ function startBackgroundJobs() {
   import("./cyberWeatherArticleService").then(({ startCyberWeatherScheduler }) => {
     startCyberWeatherScheduler();
   }).catch(err => console.error("Failed to start cyber weather scheduler:", err));
-  // Sentry error handler must be registered after all routes
-  Sentry.setupExpressErrorHandler(app);
 }

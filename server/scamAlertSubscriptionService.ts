@@ -55,10 +55,10 @@ async function sendVerificationEmail(email: string, token: string, countryCode: 
   const verifyUrl = `${APP_BASE_URL}/api/scam-intelligence/alerts/verify?token=${token}`;
   const region = countryCode ? ` for ${countryCode.toUpperCase()}` : "";
   await sendEmail({
-    to: email,
+    to: [email],
     subject: "Confirm your GetCyberRight scam alerts",
-    text: `Confirm your subscription to scam alerts${region}: ${verifyUrl}`,
-    html: `
+    textBody: `Confirm your subscription to scam alerts${region}: ${verifyUrl}`,
+    htmlBody: `
 <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#0f172a">
   <h2 style="margin:0 0 12px">Confirm your scam alerts${region}</h2>
   <p style="line-height:1.55">You asked GetCyberRight to email you when new high-severity scam activity is detected${region}. Click below to confirm.</p>
@@ -109,10 +109,10 @@ export async function dispatchAlertDigests(): Promise<{ sent: number }> {
     const html = renderDigestHtml({ hotspots: matchedHotspots.slice(0, 5), events: matchedEvents.slice(0, 8), unsubUrl, filterLabel });
     try {
       await sendEmail({
-        to: sub.email,
+        to: [sub.email],
         subject: `GetCyberRight scam alerts (${filterLabel}) - ${matchedHotspots.length} hotspots, ${matchedEvents.length} new`,
-        html,
-        text: `${matchedHotspots.length} hotspots and ${matchedEvents.length} new alerts. View: ${APP_BASE_URL}/scam-intelligence`,
+        htmlBody: html,
+        textBody: `${matchedHotspots.length} hotspots and ${matchedEvents.length} new alerts. View: ${APP_BASE_URL}/scam-intelligence`,
       });
       await db.update(scamAlertSubscriptions).set({ lastSentAt: new Date() }).where(eq(scamAlertSubscriptions.id, sub.id));
       sent++;
