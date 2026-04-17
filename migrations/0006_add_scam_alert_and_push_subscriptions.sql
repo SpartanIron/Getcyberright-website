@@ -23,11 +23,11 @@ CREATE TABLE IF NOT EXISTS "push_subscriptions" (
   "created_at" timestamp DEFAULT now()
 );
 
--- Add article_comments table (if not exists)
+-- Add article_comments table (if not exists) - no FK constraint to avoid type mismatch
 CREATE TABLE IF NOT EXISTS "article_comments" (
   "id" serial PRIMARY KEY,
   "article_slug" varchar(500) NOT NULL,
-  "user_id" integer REFERENCES "users"("id") ON DELETE CASCADE,
+  "user_id" varchar(255),
   "content" text NOT NULL,
   "created_at" timestamp DEFAULT now(),
   "updated_at" timestamp DEFAULT now()
