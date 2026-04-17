@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `${article.title} | GetCyberRight News`;
   const description = article.excerpt || article.title;
   const url = `${BASE_URL}/news/${article.slug}`;
-  const ogImage = article.imageUrl || `${BASE_URL}/api/social-images/social-${article.id}.png`;
+  const ogImage = `${BASE_URL}/og/article/${article.slug}`;
 
   const authorName = article.author || "Jude Annan, CISM";
 

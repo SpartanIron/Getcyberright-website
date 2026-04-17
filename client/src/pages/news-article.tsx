@@ -18,6 +18,7 @@ import { SiX, SiReddit, SiWhatsapp, SiFlipboard } from "react-icons/si";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { FadeIn } from "@/components/fade-in";
+import { SEOHead } from "@/components/seo-head";
 import { renderMarkdown } from "@/lib/markdown";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -490,6 +491,13 @@ export default function NewsArticlePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title={article.title}
+        description={article.excerpt || article.title}
+        ogImage={`https://www.getcyberright.com/og/article/${article.slug}`}
+        ogType="article"
+        canonical={`https://www.getcyberright.com/news/${article.slug}`}
+      />
       <Navigation />
       <StickyShareSidebar title={article.title} url={articleUrl} />
       <article className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">

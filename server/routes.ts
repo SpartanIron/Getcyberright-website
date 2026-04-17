@@ -18,6 +18,7 @@ import { registerPlatformRoutes } from "./platformRoutes";
 import { registerChatRoutes } from "./replit_integrations/chat";
 import { registerStripeRoutes, registerStripeWebhook } from "./stripe";
 import { decryptVaultData } from "./vaultEncryption";
+import { handleArticleOgImage } from "./og-image-service";
 import { logVaultAccess, extractRequestContext } from "./vaultAuditLog";
 import { 
   checkGoogleSafeBrowsing, 
@@ -6247,6 +6248,8 @@ BEHAVIORAL CONSTRAINTS
       res.status(500).json({ error: "Image generation failed" });
     }
   });
+
+  app.get("/og/article/:slug", handleArticleOgImage);
 
   app.get("/api/news/article/:slug", async (req: Request, res: Response) => {
     try {

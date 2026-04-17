@@ -49,8 +49,13 @@ export function SEOHead({
     updateMeta("og:title", fullTitle, true);
     updateMeta("og:description", description, true);
     updateMeta("og:image", absoluteOgImage, true);
+    updateMeta("og:image:width", "1200", true);
+    updateMeta("og:image:height", "630", true);
+    updateMeta("og:image:alt", title || fullTitle, true);
     updateMeta("og:type", ogType, true);
     updateMeta("og:url", canonicalUrl, true);
+    updateMeta("og:site_name", "GetCyberRight", true);
+    updateMeta("twitter:card", "summary_large_image");
     updateMeta("twitter:title", fullTitle);
     updateMeta("twitter:description", description);
     updateMeta("twitter:image", absoluteOgImage);
