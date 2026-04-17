@@ -6252,7 +6252,7 @@ BEHAVIORAL CONSTRAINTS
 
   app.get("/og/article/:slug", handleArticleOgImage);
 
-  app.get(["/rss.xml", "/feed.xml", "/news/rss.xml", "/news/feed.xml"], handleNewsRss);
+  app.get(["/rss.xml", "/feed.xml", "/news/rss.xml", "/news/feed.xml", "/api/rss.xml"], handleNewsRss);
 
   app.get("/api/news/article/:slug", async (req: Request, res: Response) => {
     try {
