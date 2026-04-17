@@ -6090,6 +6090,10 @@ BEHAVIORAL CONSTRAINTS
     }
   });
 
+  app.get("/api/events", async (_req: Request, res: Response) => {
+    res.json({ events: [], count: 0 });
+  });
+
   app.get("/api/news/latest", async (req: Request, res: Response) => {
     try {
       const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
