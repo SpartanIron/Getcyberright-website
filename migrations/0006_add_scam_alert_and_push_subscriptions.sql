@@ -23,12 +23,14 @@ CREATE TABLE IF NOT EXISTS "push_subscriptions" (
   "created_at" timestamp DEFAULT now()
 );
 
--- Add article_comments table (if not exists) - no FK constraint to avoid type mismatch
+-- Add article_comments table matching the Drizzle schema
 CREATE TABLE IF NOT EXISTS "article_comments" (
-  "id" serial PRIMARY KEY,
-  "article_slug" varchar(500) NOT NULL,
-  "user_id" varchar(255),
+  "id" varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+  "article_id" varchar NOT NULL REFERENCES "news_articles"("id") ON DELETE CASCADE,
+  "user_id" varchar NOT NULL,
+  "author_name" text NOT NULL,
+  "author_email" text,
   "content" text NOT NULL,
-  "created_at" timestamp DEFAULT now(),
-  "updated_at" timestamp DEFAULT now()
+  "status" varchar(20) NOT NULL DEFAULT 'approved',
+  "created_at" timestamp DEFAULT now()
 );
