@@ -9,6 +9,8 @@ export interface Citation {
   datePublished?: string;
   accessedAt: string;
   notes?: string;
+  tier?: "A" | "B" | "C";
+  verifiedAt?: string;
 }
 
 interface GlobeHotspot {
@@ -920,51 +922,50 @@ async function fetchLiveDataEnrichment(): Promise<{
   }
 }
 
-const COUNTRY_CITATIONS: Record<string, Citation[]> = {
+export const COUNTRY_CITATIONS: Record<string, Citation[]> = {
   "United States": [
-    { name: "Internet Crime Report 2024", publisher: "FBI Internet Crime Complaint Center (IC3)", url: "https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf", datePublished: "2025-04-23", accessedAt: "" },
-    { name: "Consumer Sentinel Network Data Book 2024", publisher: "Federal Trade Commission", url: "https://www.ftc.gov/reports/consumer-sentinel-network-data-book-2024", datePublished: "2025-03-10", accessedAt: "" },
+    { tier: "A", name: "2024 Internet Crime Report", publisher: "FBI Internet Crime Complaint Center (IC3)", url: "https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf", datePublished: "2025-04-23", verifiedAt: "2026-04-17", accessedAt: "" },
+    { tier: "A", name: "Consumer Sentinel Network Data Book 2024", publisher: "Federal Trade Commission", url: "https://www.ftc.gov/reports/consumer-sentinel-network-data-book-2024", datePublished: "2025-03-10", verifiedAt: "2026-04-17", accessedAt: "" },
   ],
   "Canada": [
-    { name: "Annual Statistical Report 2024", publisher: "Canadian Anti-Fraud Centre", url: "https://antifraudcentre-centreantifraude.ca/index-eng.htm", datePublished: "2025-02-18", accessedAt: "" },
+    { tier: "A", name: "CAFC 2024 Annual Statistical Report", publisher: "Canadian Anti-Fraud Centre (RCMP)", url: "https://antifraudcentre-centreantifraude.ca/annual-reports-2024-rapports-annuels-eng.htm", datePublished: "2025-10-24", verifiedAt: "2026-04-17", accessedAt: "" },
   ],
   "United Kingdom": [
-    { name: "Annual Fraud Report 2024", publisher: "Action Fraud (City of London Police)", url: "https://www.actionfraud.police.uk/data", datePublished: "2025-01-30", accessedAt: "" },
-    { name: "Annual Fraud Report 2024", publisher: "UK Finance", url: "https://www.ukfinance.org.uk/policy-and-guidance/reports-and-publications/annual-fraud-report-2024", datePublished: "2024-05-22", accessedAt: "" },
+    { tier: "A", name: "Annual Fraud Report 2025", publisher: "UK Finance", url: "https://www.ukfinance.org.uk/policy-and-guidance/reports-and-publications/annual-fraud-report-2025", datePublished: "2025-05-27", verifiedAt: "2026-04-17", accessedAt: "" },
+    { tier: "B", name: "Report Fraud (replaces Action Fraud from December 2025)", publisher: "City of London Police", url: "https://www.cityoflondon.police.uk/news/city-of-london/news/2025/april/city-of-london-police-over-649m-lost-to-investment-fraud-in-2024-with-cryptocurrency-fraud-on-the-rise/", datePublished: "2025-04-15", verifiedAt: "2026-04-17", accessedAt: "", notes: "Action Fraud platform was replaced by Report Fraud in December 2025." },
   ],
   "Germany": [
-    { name: "Lagebericht zur IT-Sicherheit in Deutschland 2024", publisher: "Bundesamt fur Sicherheit in der Informationstechnik (BSI)", url: "https://www.bsi.bund.de/DE/Service-Navi/Publikationen/Lagebericht/lagebericht_node.html", datePublished: "2024-11-12", accessedAt: "" },
-    { name: "Bundeslagebild Cybercrime 2023", publisher: "Bundeskriminalamt (BKA)", url: "https://www.bka.de/DE/AktuelleInformationen/StatistikenLagebilder/Lagebilder/Cybercrime/cybercrime_node.html", datePublished: "2024-05-14", accessedAt: "" },
+    { tier: "A", name: "Die Lage der IT-Sicherheit in Deutschland 2025", publisher: "Bundesamt fur Sicherheit in der Informationstechnik (BSI)", url: "https://medien.bsi.bund.de/lagebericht/en/", datePublished: "2025-11-11", verifiedAt: "2026-04-17", accessedAt: "" },
+    { tier: "A", name: "Bundeslagebild Cybercrime 2024", publisher: "Bundeskriminalamt (BKA)", url: "https://www.bka.de/DE/AktuelleInformationen/StatistikenLagebilder/Lagebilder/Cybercrime/2024/CC_2024.html", datePublished: "2025-06-02", verifiedAt: "2026-04-17", accessedAt: "" },
   ],
   "France": [
-    { name: "Panorama de la cybermenace 2024", publisher: "ANSSI", url: "https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-001/", datePublished: "2025-02-04", accessedAt: "" },
-    { name: "Rapport d activite 2024", publisher: "Cybermalveillance.gouv.fr", url: "https://www.cybermalveillance.gouv.fr/tous-nos-contenus/actualites/rapport-activite-2024", datePublished: "2025-03-18", accessedAt: "" },
+    { tier: "A", name: "Panorama de la cybermenace 2024", publisher: "ANSSI / CERT-FR", url: "https://cyber.gouv.fr/publications/panorama-de-la-cybermenace-2024", datePublished: "2025-03-01", verifiedAt: "2026-04-17", accessedAt: "" },
+    { tier: "A", name: "Rapport d'activite 2024", publisher: "Cybermalveillance.gouv.fr", url: "https://www.cybermalveillance.gouv.fr/tous-nos-contenus/actualites/rapport-activite-2024", datePublished: "2025-03-27", verifiedAt: "2026-04-17", accessedAt: "" },
   ],
   "Australia": [
-    { name: "Targeting Scams Report 2024", publisher: "ACCC Scamwatch", url: "https://www.accc.gov.au/about-us/publications/serial-publications/targeting-scams-report-on-scams-activity", datePublished: "2025-04-29", accessedAt: "" },
-    { name: "Annual Cyber Threat Report 2023-24", publisher: "Australian Signals Directorate / ACSC", url: "https://www.cyber.gov.au/about-us/view-all-content/reports-and-statistics/annual-cyber-threat-report-2023-2024", datePublished: "2024-11-20", accessedAt: "" },
+    { tier: "A", name: "Targeting Scams Report 2024", publisher: "ACCC Scamwatch", url: "https://www.scamwatch.gov.au/research-and-resources/targeting-scams-report", datePublished: "2025-04-28", verifiedAt: "2026-04-17", accessedAt: "" },
+    { tier: "A", name: "Annual Cyber Threat Report 2024-2025", publisher: "Australian Signals Directorate / ACSC", url: "https://www.cyber.gov.au/about-us/view-all-content/reports-and-statistics/annual-cyber-threat-report-2024-2025", datePublished: "2025-10-14", verifiedAt: "2026-04-17", accessedAt: "" },
   ],
   "India": [
-    { name: "Indian Cyber Crime Coordination Centre Annual Report 2024", publisher: "Ministry of Home Affairs (I4C)", url: "https://www.i4c.mha.gov.in/", datePublished: "2025-01-15", accessedAt: "" },
-    { name: "CERT-In Annual Report 2023", publisher: "CERT-In", url: "https://www.cert-in.org.in/", datePublished: "2024-08-20", accessedAt: "" },
+    { tier: "B", name: "Indian Cybercrime Coordination Centre", publisher: "Ministry of Home Affairs (I4C)", url: "https://i4c.mha.gov.in/", datePublished: "2024-07-01", verifiedAt: "2026-04-17", accessedAt: "", notes: "I4C became an MHA attached office in July 2024. Statistics published via PIB releases rather than a single annual PDF." },
   ],
   "Japan": [
-    { name: "Cybercrime Statistics 2024", publisher: "National Police Agency Japan", url: "https://www.npa.go.jp/publications/statistics/cybersecurity/index.html", datePublished: "2025-03-12", accessedAt: "" },
+    { tier: "B", name: "National Police Agency cybercrime publications", publisher: "National Police Agency Japan", url: "https://www.npa.go.jp/", verifiedAt: "2026-04-17", accessedAt: "", notes: "NPA publishes the Reiwa-era annual Crime Situation report; cybercrime statistics integrated within wider crime reporting." },
   ],
   "Brazil": [
-    { name: "Estatisticas de Incidentes 2024", publisher: "CERT.br", url: "https://www.cert.br/stats/", datePublished: "2025-02-01", accessedAt: "" },
+    { tier: "B", name: "CERT.br Incident Statistics (live portal)", publisher: "CERT.br / NIC.br", url: "https://stats.cert.br/incidentes/", verifiedAt: "2026-04-17", accessedAt: "", notes: "CERT.br does not publish a single annual PDF; figures come from a continuously updated public statistics portal." },
   ],
   "Nigeria": [
-    { name: "African Cyberthreat Assessment Report 2024", publisher: "INTERPOL", url: "https://www.interpol.int/en/News-and-Events/News/2024/INTERPOL-report-flags-top-cyberthreats-in-Africa", datePublished: "2024-10-22", accessedAt: "" },
+    { tier: "A", name: "INTERPOL Africa Cyberthreat Assessment Report 2025 (4th Edition)", publisher: "INTERPOL", url: "https://www.interpol.int/content/download/23094/file/INTERPOL_Africa_Cyberthreat_Assessment_Report_2025.pdf", datePublished: "2025-05-01", verifiedAt: "2026-04-17", accessedAt: "" },
   ],
   "South Africa": [
-    { name: "Annual Crime Stats 2024", publisher: "South African Banking Risk Information Centre (SABRIC)", url: "https://www.sabric.co.za/media-and-news/", datePublished: "2024-09-30", accessedAt: "" },
+    { tier: "A", name: "SABRIC Annual Crime Statistics 2024", publisher: "South African Banking Risk Information Centre (SABRIC)", url: "https://www.sabric.co.za/media-statement-sabric-annual-crime-statistics-2024/", datePublished: "2025-08-28", verifiedAt: "2026-04-17", accessedAt: "" },
   ],
   "Singapore": [
-    { name: "Singapore Cyber Landscape 2024", publisher: "Cyber Security Agency of Singapore", url: "https://www.csa.gov.sg/News-Events/Publications/singapore-cyber-landscape-publications", datePublished: "2025-03-25", accessedAt: "" },
+    { tier: "A", name: "Singapore Cyber Landscape 2024/2025", publisher: "Cyber Security Agency of Singapore (CSA)", url: "https://www.csa.gov.sg/resources/publications/singapore-cyber-landscape-2024-2025/", datePublished: "2025-09-03", verifiedAt: "2026-04-17", accessedAt: "" },
   ],
   "South Korea": [
-    { name: "Cyber Threat Trends Report 2024", publisher: "KrCERT/CC (KISA)", url: "https://www.krcert.or.kr/", datePublished: "2025-02-05", accessedAt: "" },
+    { tier: "B", name: "KrCERT/CC publications", publisher: "Korea Internet & Security Agency (KISA / KrCERT/CC)", url: "https://www.krcert.or.kr/", verifiedAt: "2026-04-17", accessedAt: "", notes: "KISA publishes periodic threat trend reports rather than a single fixed annual edition; cite the publications listing." },
   ],
 };
 

@@ -195,7 +195,7 @@ interface GlobeHotspot {
   trendDirection: "up" | "down" | "stable";
   trendPercent: number;
   sources: string[];
-  citations?: { name: string; publisher: string; url: string; datePublished?: string; accessedAt: string; notes?: string }[];
+  citations?: { name: string; publisher: string; url: string; datePublished?: string; accessedAt: string; notes?: string; tier?: "A" | "B" | "C"; verifiedAt?: string }[];
   reportContact?: string;
   lastUpdated: string;
   emergencySteps?: string[];
@@ -1084,7 +1084,13 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
   );
 }
 
-function CountrySourcesAccordion({ citations }: { citations: { name: string; publisher: string; url: string; datePublished?: string; accessedAt: string }[] }) {
+const TIER_STYLES: Record<string, { label: string; cls: string; title: string }> = {
+  A: { label: "Tier A", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40", title: "Tier A: official annual fraud or cybercrime report from a national authority" },
+  B: { label: "Tier B", cls: "bg-amber-500/15 text-amber-300 border-amber-500/40", title: "Tier B: national CERT, police bulletin, central bank or live statistics portal" },
+  C: { label: "Tier C", cls: "bg-slate-500/15 text-slate-300 border-slate-500/40", title: "Tier C: regional aggregate or supplementary reference; primary national source pending" },
+};
+
+function CountrySourcesAccordion({ citations }: { citations: { name: string; publisher: string; url: string; datePublished?: string; accessedAt: string; notes?: string; tier?: "A" | "B" | "C"; verifiedAt?: string }[] }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="mt-2 pt-2 border-t border-slate-700" data-testid="country-sources-accordion">
@@ -1099,23 +1105,36 @@ function CountrySourcesAccordion({ citations }: { citations: { name: string; pub
       </button>
       {open && (
         <ol className="mt-2 space-y-1.5" data-testid="country-sources-list">
-          {citations.map((c, i) => (
-            <li key={i} className="text-[10px] leading-snug text-slate-300" data-testid={`country-source-${i}`}>
-              <span className="text-slate-500 mr-1">[{i + 1}]</span>
-              <span className="font-semibold text-slate-200">{c.publisher}</span>
-              {c.name && c.name !== c.publisher && <span> &middot; {c.name}</span>}
-              {c.datePublished && <span className="text-slate-500"> ({c.datePublished.slice(0, 10)})</span>}
-              {c.url && (
-                <>
-                  {" "}
-                  <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 underline break-all" data-testid={`country-source-link-${i}`}>
-                    link
-                  </a>
-                </>
-              )}
-              {c.accessedAt && <span className="text-slate-600"> &middot; accessed {c.accessedAt.slice(0, 10)}</span>}
-            </li>
-          ))}
+          {citations.map((c, i) => {
+            const tierStyle = c.tier ? TIER_STYLES[c.tier] : null;
+            return (
+              <li key={i} className="text-[10px] leading-snug text-slate-300" data-testid={`country-source-${i}`}>
+                <span className="text-slate-500 mr-1">[{i + 1}]</span>
+                {tierStyle && (
+                  <span
+                    className={`inline-block mr-1 px-1.5 py-[1px] text-[9px] font-semibold uppercase tracking-wider rounded border ${tierStyle.cls}`}
+                    title={tierStyle.title}
+                    data-testid={`country-source-tier-${i}`}
+                  >
+                    {tierStyle.label}
+                  </span>
+                )}
+                <span className="font-semibold text-slate-200">{c.publisher}</span>
+                {c.name && c.name !== c.publisher && <span> &middot; {c.name}</span>}
+                {c.datePublished && <span className="text-slate-500"> (published {c.datePublished.slice(0, 10)})</span>}
+                {c.url && (
+                  <>
+                    {" "}
+                    <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300 underline break-all" data-testid={`country-source-link-${i}`}>
+                      link
+                    </a>
+                  </>
+                )}
+                {c.verifiedAt && <span className="text-slate-600"> &middot; verified {c.verifiedAt.slice(0, 10)}</span>}
+                {c.notes && <div className="text-slate-500 italic mt-0.5">{c.notes}</div>}
+              </li>
+            );
+          })}
         </ol>
       )}
     </div>

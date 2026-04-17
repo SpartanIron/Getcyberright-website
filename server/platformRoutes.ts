@@ -361,6 +361,21 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  app.get("/api/scam-intelligence/source-freshness", async (_req: Request, res: Response) => {
+    try {
+      const { getFreshnessSnapshot } = await import("./sourceFreshnessMonitor");
+      const snap = getFreshnessSnapshot();
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.json({
+        ...snap,
+        notice: "Daily automated check of every cited publisher URL. 'stale' means the page content hash changed since last verification and the citation should be re-confirmed.",
+      });
+    } catch (e: any) {
+      console.error("[scam-intel-api] source-freshness error:", e?.message);
+      res.status(500).json({ error: "Failed to load freshness snapshot" });
+    }
+  });
+
   const subscribeRateLimit = new Map<string, number[]>();
   app.get("/api/scam-intelligence/embed/ping", embedPingRateLimit, (req: Request, res: Response) => {
     try {

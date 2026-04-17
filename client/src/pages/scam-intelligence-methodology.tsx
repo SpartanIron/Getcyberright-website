@@ -5,46 +5,62 @@ import { Footer } from "@/components/footer";
 import { Link } from "@/lib/navigation";
 import { ArrowLeft, FileText, BookOpen, AlertTriangle, RefreshCw, Calculator, Database } from "lucide-react";
 
-const PRIMARY_SOURCES: { region: string; entries: { publisher: string; report: string; url: string; updated: string }[] }[] = [
+const PRIMARY_SOURCES: { region: string; entries: { publisher: string; report: string; url: string; updated: string; tier: "A" | "B" | "C" }[] }[] = [
   {
     region: "North America",
     entries: [
-      { publisher: "FBI Internet Crime Complaint Center (IC3)", report: "Internet Crime Report 2024", url: "https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf", updated: "2025-04" },
-      { publisher: "Federal Trade Commission", report: "Consumer Sentinel Network Data Book 2024", url: "https://www.ftc.gov/reports/consumer-sentinel-network-data-book-2024", updated: "2025-03" },
-      { publisher: "Canadian Anti-Fraud Centre", report: "Annual Statistical Report 2024", url: "https://antifraudcentre-centreantifraude.ca/index-eng.htm", updated: "2025-02" },
+      { tier: "A", publisher: "FBI Internet Crime Complaint Center (IC3)", report: "2024 Internet Crime Report", url: "https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf", updated: "2025-04-23" },
+      { tier: "A", publisher: "Federal Trade Commission", report: "Consumer Sentinel Network Data Book 2024", url: "https://www.ftc.gov/reports/consumer-sentinel-network-data-book-2024", updated: "2025-03-10" },
+      { tier: "A", publisher: "Canadian Anti-Fraud Centre (RCMP)", report: "CAFC 2024 Annual Statistical Report", url: "https://antifraudcentre-centreantifraude.ca/annual-reports-2024-rapports-annuels-eng.htm", updated: "2025-10-24" },
     ],
   },
   {
     region: "Europe",
     entries: [
-      { publisher: "Action Fraud (City of London Police)", report: "Annual Fraud Report 2024", url: "https://www.actionfraud.police.uk/data", updated: "2025-01" },
-      { publisher: "UK Finance", report: "Annual Fraud Report 2024", url: "https://www.ukfinance.org.uk/policy-and-guidance/reports-and-publications/annual-fraud-report-2024", updated: "2024-05" },
-      { publisher: "BSI Germany", report: "Lagebericht zur IT-Sicherheit 2024", url: "https://www.bsi.bund.de/", updated: "2024-11" },
-      { publisher: "ANSSI France", report: "Panorama de la cybermenace 2024", url: "https://www.cert.ssi.gouv.fr/", updated: "2025-02" },
+      { tier: "A", publisher: "UK Finance", report: "Annual Fraud Report 2025", url: "https://www.ukfinance.org.uk/policy-and-guidance/reports-and-publications/annual-fraud-report-2025", updated: "2025-05-27" },
+      { tier: "B", publisher: "City of London Police", report: "Report Fraud (replaces Action Fraud Dec 2025)", url: "https://www.cityoflondon.police.uk/news/city-of-london/news/2025/april/city-of-london-police-over-649m-lost-to-investment-fraud-in-2024-with-cryptocurrency-fraud-on-the-rise/", updated: "2025-04-15" },
+      { tier: "A", publisher: "BSI Germany", report: "Die Lage der IT-Sicherheit in Deutschland 2025", url: "https://medien.bsi.bund.de/lagebericht/en/", updated: "2025-11-11" },
+      { tier: "A", publisher: "Bundeskriminalamt (BKA)", report: "Bundeslagebild Cybercrime 2024", url: "https://www.bka.de/DE/AktuelleInformationen/StatistikenLagebilder/Lagebilder/Cybercrime/2024/CC_2024.html", updated: "2025-06-02" },
+      { tier: "A", publisher: "ANSSI / CERT-FR", report: "Panorama de la cybermenace 2024", url: "https://cyber.gouv.fr/publications/panorama-de-la-cybermenace-2024", updated: "2025-03-01" },
+      { tier: "A", publisher: "Cybermalveillance.gouv.fr", report: "Rapport d'activite 2024", url: "https://www.cybermalveillance.gouv.fr/tous-nos-contenus/actualites/rapport-activite-2024", updated: "2025-03-27" },
     ],
   },
   {
     region: "Asia-Pacific",
     entries: [
-      { publisher: "ACCC Scamwatch", report: "Targeting Scams Report 2024", url: "https://www.accc.gov.au/about-us/publications/serial-publications/targeting-scams-report-on-scams-activity", updated: "2025-04" },
-      { publisher: "Australian Signals Directorate / ACSC", report: "Annual Cyber Threat Report 2023-24", url: "https://www.cyber.gov.au/about-us/view-all-content/reports-and-statistics/annual-cyber-threat-report-2023-2024", updated: "2024-11" },
-      { publisher: "I4C / Ministry of Home Affairs (India)", report: "Annual Report 2024", url: "https://www.i4c.mha.gov.in/", updated: "2025-01" },
-      { publisher: "National Police Agency Japan", report: "Cybercrime Statistics 2024", url: "https://www.npa.go.jp/", updated: "2025-03" },
-      { publisher: "KrCERT/CC", report: "Cyber Threat Trends 2024", url: "https://www.krcert.or.kr/", updated: "2025-02" },
-      { publisher: "Cyber Security Agency of Singapore", report: "Singapore Cyber Landscape 2024", url: "https://www.csa.gov.sg/News-Events/Publications/singapore-cyber-landscape-publications", updated: "2025-03" },
+      { tier: "A", publisher: "ACCC Scamwatch", report: "Targeting Scams Report 2024", url: "https://www.scamwatch.gov.au/research-and-resources/targeting-scams-report", updated: "2025-04-28" },
+      { tier: "A", publisher: "Australian Signals Directorate / ACSC", report: "Annual Cyber Threat Report 2024-2025", url: "https://www.cyber.gov.au/about-us/view-all-content/reports-and-statistics/annual-cyber-threat-report-2024-2025", updated: "2025-10-14" },
+      { tier: "A", publisher: "Cyber Security Agency of Singapore (CSA)", report: "Singapore Cyber Landscape 2024/2025", url: "https://www.csa.gov.sg/resources/publications/singapore-cyber-landscape-2024-2025/", updated: "2025-09-03" },
+      { tier: "B", publisher: "Ministry of Home Affairs (I4C)", report: "Indian Cybercrime Coordination Centre", url: "https://i4c.mha.gov.in/", updated: "2024-07-01" },
+      { tier: "B", publisher: "National Police Agency Japan", report: "NPA cybercrime publications", url: "https://www.npa.go.jp/", updated: "Continuous" },
+      { tier: "B", publisher: "KISA / KrCERT/CC", report: "KrCERT/CC publications", url: "https://www.krcert.or.kr/", updated: "Continuous" },
+    ],
+  },
+  {
+    region: "Africa, LatAm and global",
+    entries: [
+      { tier: "A", publisher: "INTERPOL", report: "Africa Cyberthreat Assessment Report 2025 (4th Edition)", url: "https://www.interpol.int/content/download/23094/file/INTERPOL_Africa_Cyberthreat_Assessment_Report_2025.pdf", updated: "2025-05-01" },
+      { tier: "A", publisher: "South African Banking Risk Information Centre (SABRIC)", report: "SABRIC Annual Crime Statistics 2024", url: "https://www.sabric.co.za/media-statement-sabric-annual-crime-statistics-2024/", updated: "2025-08-28" },
+      { tier: "B", publisher: "CERT.br / NIC.br", report: "CERT.br Incident Statistics (live portal)", url: "https://stats.cert.br/incidentes/", updated: "Continuous" },
     ],
   },
   {
     region: "Real-time feeds",
     entries: [
-      { publisher: "CISA", report: "Cybersecurity Advisories", url: "https://www.cisa.gov/news-events/cybersecurity-advisories", updated: "Continuous" },
-      { publisher: "NIST", report: "National Vulnerability Database", url: "https://nvd.nist.gov/vuln", updated: "Continuous" },
-      { publisher: "abuse.ch", report: "URLhaus", url: "https://urlhaus.abuse.ch", updated: "Continuous" },
-      { publisher: "PhishTank", report: "Verified phishing URLs", url: "https://www.phishtank.com", updated: "Continuous" },
-      { publisher: "Have I Been Pwned", report: "Breach corpus", url: "https://haveibeenpwned.com/PwnedWebsites", updated: "Continuous" },
+      { tier: "B", publisher: "CISA", report: "Cybersecurity Advisories", url: "https://www.cisa.gov/news-events/cybersecurity-advisories", updated: "Continuous" },
+      { tier: "B", publisher: "NIST", report: "National Vulnerability Database", url: "https://nvd.nist.gov/vuln", updated: "Continuous" },
+      { tier: "B", publisher: "abuse.ch", report: "URLhaus", url: "https://urlhaus.abuse.ch", updated: "Continuous" },
+      { tier: "B", publisher: "PhishTank", report: "Verified phishing URLs", url: "https://www.phishtank.com", updated: "Continuous" },
+      { tier: "B", publisher: "Have I Been Pwned", report: "Breach corpus", url: "https://haveibeenpwned.com/PwnedWebsites", updated: "Continuous" },
     ],
   },
 ];
+
+const TIER_BADGE: Record<"A" | "B" | "C", string> = {
+  A: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+  B: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+  C: "bg-slate-500/15 text-slate-300 border-slate-500/30",
+};
 
 const RISK_THRESHOLDS = [
   { level: "Critical", color: "bg-red-500", range: "Risk score >= 80" },
@@ -103,9 +119,12 @@ export default function ScamIntelligenceMethodology() {
                   <tbody>
                     {group.entries.map((e) => (
                       <tr key={e.url} className="border-b border-border/20 last:border-0">
-                        <td className="py-1.5 pr-3 text-foreground align-top">{e.publisher}</td>
+                        <td className="py-1.5 pr-3 text-foreground align-top">
+                          <span className={`inline-block mr-1.5 px-1.5 py-[1px] text-[9px] font-semibold uppercase tracking-wider rounded border ${TIER_BADGE[e.tier]}`}>Tier {e.tier}</span>
+                          {e.publisher}
+                        </td>
                         <td className="py-1.5 pr-3 align-top">
-                          <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                          <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
                             {e.report}
                           </a>
                         </td>
@@ -116,6 +135,42 @@ export default function ScamIntelligenceMethodology() {
                 </table>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="mb-10" aria-labelledby="coverage-heading">
+          <h2 id="coverage-heading" className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Database className="w-5 h-5 text-primary" />
+            Source coverage and freshness
+          </h2>
+          <div className="bg-card border border-border rounded-xl p-5 mb-4">
+            <p className="text-xs text-muted-foreground mb-3">
+              Every publisher URL we cite is hashed daily by an automated freshness monitor. If a publisher's page content changes since the last verification, the citation is flagged stale and re-verified by an editor before any number on the dashboard is updated.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="border border-emerald-500/30 bg-emerald-500/5 rounded-md p-3">
+                <div className="font-semibold text-emerald-400 mb-1">Tier A</div>
+                <div className="text-muted-foreground">Official annual fraud or cybercrime report from a national authority (FBI IC3, FTC, UK Finance, BSI, BKA, ANSSI, ACCC, ACSC, CSA Singapore, SABRIC, INTERPOL).</div>
+              </div>
+              <div className="border border-amber-500/30 bg-amber-500/5 rounded-md p-3">
+                <div className="font-semibold text-amber-400 mb-1">Tier B</div>
+                <div className="text-muted-foreground">National CERT, police bulletin, central bank or live statistics portal where no single annual PDF is published (CERT.br stats, KISA/KrCERT, NPA Japan, I4C India, Report Fraud UK).</div>
+              </div>
+              <div className="border border-slate-500/30 bg-slate-500/5 rounded-md p-3">
+                <div className="font-semibold text-slate-300 mb-1">Tier C</div>
+                <div className="text-muted-foreground">Regional aggregate or supplementary reference. Used only as a placeholder while a verified primary national source is being sought; numbers from Tier C sources are not surfaced on country cards.</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-5 mb-4">
+            <h3 className="text-sm font-semibold text-foreground mb-2">Verification rules</h3>
+            <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-5">
+              <li>No citation ships with a fabricated title, date, or URL. Each entry is verified against a live publisher page before merge.</li>
+              <li>Each citation carries a verifiedAt date and a tier label, both visible in the country source drawer on the dashboard.</li>
+              <li>The freshness monitor performs a daily fetch of every publisher URL, computes a SHA-256 hash, and compares it to the previous baseline. Any change moves the citation to "stale" until re-verified.</li>
+              <li>Live snapshot of the freshness state is exposed at <code className="text-foreground bg-secondary/40 px-1 py-0.5 rounded">/api/scam-intelligence/source-freshness</code>.</li>
+              <li>If a publisher restructures or replaces their reporting (for example, UK Action Fraud was replaced by Report Fraud in December 2025), we update the citation and note the transition rather than silently keeping the old URL.</li>
+            </ul>
           </div>
         </section>
 

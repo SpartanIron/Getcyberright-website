@@ -226,6 +226,24 @@ async function bootstrapFullApp() {
     registerSecurityMetricsEndpoint(app);
     await registerRoutes(httpServer, app);
 
+    try {
+      const { startFreshnessMonitor } = await import("./sourceFreshnessMonitor");
+      const { COUNTRY_CITATIONS } = await import("./scamIntelAggregator");
+      const seen = new Set<string>();
+      const flat: Array<{ url: string; publisher: string; country: string; citationName: string; tier?: "A" | "B" | "C" }> = [];
+      for (const [country, list] of Object.entries(COUNTRY_CITATIONS)) {
+        for (const c of list) {
+          if (!c.url || seen.has(c.url)) continue;
+          seen.add(c.url);
+          flat.push({ url: c.url, publisher: c.publisher, country, citationName: c.name, tier: c.tier });
+        }
+      }
+      startFreshnessMonitor(() => flat, 24 * 60 * 60 * 1000);
+      log(`Source freshness monitor armed with ${flat.length} unique publisher URLs`);
+    } catch (err: any) {
+      console.error("[startup] Freshness monitor failed to start:", err?.message);
+    }
+
     app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
