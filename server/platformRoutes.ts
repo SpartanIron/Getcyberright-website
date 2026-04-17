@@ -178,6 +178,137 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  app.get("/api/scam-intelligence/forecast", async (req: Request, res: Response) => {
+    try {
+      const { getCountryForecast } = await import("./scamIntelAggregator");
+      const country = String(req.query.country || "").toUpperCase();
+      if (!country || country.length !== 2) return res.status(400).json({ error: "country (ISO-2) required" });
+      const f = getCountryForecast(country);
+      if (!f) return res.status(404).json({ error: "country not tracked" });
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.json(f);
+    } catch (e: any) {
+      console.error("[scam-intel-api] Forecast error:", e?.message);
+      res.status(500).json({ error: "Failed to fetch forecast" });
+    }
+  });
+
+  app.get("/api/scam-intelligence/cyber-weather", async (_req: Request, res: Response) => {
+    try {
+      const { getCyberWeatherSnapshot } = await import("./scamIntelAggregator");
+      res.setHeader("Cache-Control", "public, max-age=600");
+      res.json(getCyberWeatherSnapshot());
+    } catch (e: any) {
+      console.error("[scam-intel-api] Cyber weather error:", e?.message);
+      res.status(500).json({ error: "Failed to fetch cyber weather" });
+    }
+  });
+
+  const subscribeRateLimit = new Map<string, number[]>();
+  app.post("/api/scam-intelligence/alerts/subscribe", async (req: Request, res: Response) => {
+    try {
+      const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
+      const emailKey = (req.body?.email || "").toString().trim().toLowerCase();
+      const now = Date.now();
+      const windowMs = 60 * 60 * 1000;
+      const maxPerHour = 5;
+      for (const key of [`ip:${ip}`, `email:${emailKey}`]) {
+        if (!key.endsWith(":")) {
+          const arr = (subscribeRateLimit.get(key) || []).filter(t => now - t < windowMs);
+          if (arr.length >= maxPerHour) {
+            return res.status(429).json({ error: "Too many subscription attempts. Try again later." });
+          }
+          arr.push(now);
+          subscribeRateLimit.set(key, arr);
+        }
+      }
+      const { subscribeToScamAlerts } = await import("./scamAlertSubscriptionService");
+      const { insertScamAlertSubscriptionSchema } = await import("@shared/schema");
+      const parsed = insertScamAlertSubscriptionSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ error: "Invalid input", details: parsed.error.flatten() });
+      const result = await subscribeToScamAlerts({
+        email: parsed.data.email,
+        countryCode: parsed.data.countryCode || undefined,
+        scamType: parsed.data.scamType || undefined,
+        severityMin: parsed.data.severityMin,
+        frequency: parsed.data.frequency,
+      });
+      res.json({ ok: true, alreadyVerified: result.alreadyVerified, message: result.alreadyVerified ? "You're already subscribed." : "Check your email to confirm." });
+    } catch (e: any) {
+      console.error("[scam-alerts] subscribe error:", e?.message);
+      res.status(500).json({ error: "Failed to subscribe" });
+    }
+  });
+
+  app.get("/api/scam-intelligence/alerts/verify", async (req: Request, res: Response) => {
+    try {
+      const { verifyScamAlertSubscription } = await import("./scamAlertSubscriptionService");
+      const token = String(req.query.token || "");
+      if (!token) return res.status(400).send("Missing token");
+      const ok = await verifyScamAlertSubscription(token);
+      const html = ok
+        ? `<html><body style="font-family:system-ui;padding:48px;text-align:center"><h1>Subscription confirmed</h1><p>You'll start receiving scam alerts. <a href="/scam-intelligence">Back to dashboard</a></p></body></html>`
+        : `<html><body style="font-family:system-ui;padding:48px;text-align:center"><h1>Invalid or expired link</h1><p><a href="/scam-intelligence">Back to dashboard</a></p></body></html>`;
+      res.status(ok ? 200 : 400).type("html").send(html);
+    } catch (e: any) {
+      res.status(500).send("Verification failed");
+    }
+  });
+
+  app.get("/api/scam-intelligence/alerts/unsubscribe", async (req: Request, res: Response) => {
+    try {
+      const { unsubscribeScamAlerts } = await import("./scamAlertSubscriptionService");
+      const token = String(req.query.token || "");
+      const ok = await unsubscribeScamAlerts(token);
+      res.type("html").send(`<html><body style="font-family:system-ui;padding:48px;text-align:center"><h1>${ok ? "Unsubscribed" : "Already unsubscribed"}</h1><p><a href="/scam-intelligence">Back to dashboard</a></p></body></html>`);
+    } catch (e: any) {
+      res.status(500).send("Unsubscribe failed");
+    }
+  });
+
+  app.get("/api/scam-intelligence/push/vapid-key", async (_req: Request, res: Response) => {
+    try {
+      const { getVapidPublicKey, isPushConfigured } = await import("./pushNotificationService");
+      res.json({ configured: isPushConfigured(), publicKey: getVapidPublicKey() });
+    } catch (e: any) {
+      res.status(500).json({ configured: false, publicKey: null });
+    }
+  });
+
+  app.post("/api/scam-intelligence/push/subscribe", async (req: Request, res: Response) => {
+    try {
+      const { db } = await import("./db");
+      const { pushSubscriptions, insertPushSubscriptionSchema } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const parsed = insertPushSubscriptionSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ error: "Invalid input" });
+      const existing = await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.endpoint, parsed.data.endpoint)).limit(1);
+      if (existing[0]) {
+        await db.update(pushSubscriptions).set({ active: true, p256dh: parsed.data.p256dh, auth: parsed.data.auth, countryCode: parsed.data.countryCode || null, severityMin: parsed.data.severityMin || "critical" }).where(eq(pushSubscriptions.id, existing[0].id));
+        return res.json({ ok: true, updated: true });
+      }
+      await db.insert(pushSubscriptions).values(parsed.data);
+      res.json({ ok: true, created: true });
+    } catch (e: any) {
+      console.error("[push] subscribe error:", e?.message);
+      res.status(500).json({ error: "Failed to subscribe" });
+    }
+  });
+
+  app.post("/api/scam-intelligence/push/unsubscribe", async (req: Request, res: Response) => {
+    try {
+      const { db } = await import("./db");
+      const { pushSubscriptions } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      const endpoint = String(req.body?.endpoint || "");
+      if (!endpoint) return res.status(400).json({ error: "endpoint required" });
+      await db.update(pushSubscriptions).set({ active: false }).where(eq(pushSubscriptions.endpoint, endpoint));
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ error: "Failed to unsubscribe" });
+    }
+  });
+
   // ─── Public Guide Routes ───────────────────────────────────────────
 
   app.get("/api/guides", async (_req: Request, res: Response) => {

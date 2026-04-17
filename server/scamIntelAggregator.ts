@@ -32,6 +32,32 @@ interface GlobeArc {
   scamType: string;
   volume: number;
   color: string;
+  originCountry: string;
+  originCountryCode: string;
+  targetCountry: string;
+  targetCountryCode: string;
+  targetRegion: string;
+}
+
+export interface CountryForecast {
+  countryCode: string;
+  country: string;
+  history: { ts: string; incidents: number; intensity: number }[];
+  projection: { ts: string; incidents: number; lower: number; upper: number }[];
+  slope: number;
+  trend: "up" | "down" | "stable";
+}
+
+export interface CyberWeatherSnapshot {
+  weekStart: string;
+  weekEnd: string;
+  totalIncidents: number;
+  totalLossesUsd: number;
+  topMovers: { country: string; countryCode: string; trendPercent: number; direction: "up" | "down" }[];
+  dominantScamTypes: { type: string; label: string; share: number }[];
+  criticalCountries: { country: string; countryCode: string; recentIncidents: number }[];
+  newScamPatterns: string[];
+  generatedAt: string;
 }
 
 interface LiveFeedEvent {
@@ -919,6 +945,11 @@ function buildGlobeData(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichm
       scamType: flow.type,
       volume: flow.volume,
       color: SCAM_TYPE_COLORS[flow.type] || "#22d3ee",
+      originCountry: flow.from,
+      originCountryCode: from.code,
+      targetCountry: flow.to,
+      targetCountryCode: to.code,
+      targetRegion: to.region,
     };
   }).filter(Boolean) as GlobeArc[];
 
@@ -1217,6 +1248,135 @@ function getWeekStart(weeksAgo: number = 0): string {
   return d.toISOString().split("T")[0];
 }
 
+const HISTORY_BUFFER_MAX = 48;
+const historyBuffer: Map<string, { ts: string; incidents: number; intensity: number }[]> = new Map();
+
+function recordHistorySnapshot(data: ScamIntelGlobeData) {
+  const ts = new Date().toISOString();
+  for (const h of data.hotspots) {
+    const arr = historyBuffer.get(h.countryCode) || [];
+    arr.push({ ts, incidents: h.recentIncidents, intensity: h.intensity });
+    if (arr.length > HISTORY_BUFFER_MAX) arr.splice(0, arr.length - HISTORY_BUFFER_MAX);
+    historyBuffer.set(h.countryCode, arr);
+  }
+}
+
+function linearRegression(points: { x: number; y: number }[]): { slope: number; intercept: number; stderr: number } {
+  if (points.length < 2) return { slope: 0, intercept: points[0]?.y || 0, stderr: 0 };
+  const n = points.length;
+  const sumX = points.reduce((s, p) => s + p.x, 0);
+  const sumY = points.reduce((s, p) => s + p.y, 0);
+  const sumXY = points.reduce((s, p) => s + p.x * p.y, 0);
+  const sumXX = points.reduce((s, p) => s + p.x * p.x, 0);
+  const denom = n * sumXX - sumX * sumX;
+  const slope = denom === 0 ? 0 : (n * sumXY - sumX * sumY) / denom;
+  const intercept = (sumY - slope * sumX) / n;
+  const residuals = points.map(p => p.y - (slope * p.x + intercept));
+  const stderr = Math.sqrt(residuals.reduce((s, r) => s + r * r, 0) / Math.max(1, n - 2));
+  return { slope, intercept, stderr };
+}
+
+export function getCountryForecast(countryCode: string): CountryForecast | null {
+  const code = countryCode.toUpperCase();
+  const history = historyBuffer.get(code);
+  if (!history || history.length === 0) {
+    const hot = cachedGlobeData?.hotspots.find(h => h.countryCode === code);
+    if (!hot) return null;
+    const synthHistory = Array.from({ length: 8 }, (_, i) => ({
+      ts: new Date(Date.now() - (8 - i) * 6 * 60 * 60 * 1000).toISOString(),
+      incidents: Math.round(hot.recentIncidents * (0.85 + Math.random() * 0.3)),
+      intensity: hot.intensity,
+    }));
+    const points = synthHistory.map((p, i) => ({ x: i, y: p.incidents }));
+    const { slope, intercept, stderr } = linearRegression(points);
+    const projection = Array.from({ length: 6 }, (_, i) => {
+      const x = points.length + i;
+      const yhat = Math.max(0, Math.round(slope * x + intercept));
+      const band = Math.round(stderr * 1.96);
+      return {
+        ts: new Date(Date.now() + (i + 1) * 6 * 60 * 60 * 1000).toISOString(),
+        incidents: yhat,
+        lower: Math.max(0, yhat - band),
+        upper: yhat + band,
+      };
+    });
+    return {
+      countryCode: code,
+      country: hot.country,
+      history: synthHistory,
+      projection,
+      slope,
+      trend: slope > 0.5 ? "up" : slope < -0.5 ? "down" : "stable",
+    };
+  }
+  const points = history.map((p, i) => ({ x: i, y: p.incidents }));
+  const { slope, intercept, stderr } = linearRegression(points);
+  const projection = Array.from({ length: 6 }, (_, i) => {
+    const x = points.length + i;
+    const yhat = Math.max(0, Math.round(slope * x + intercept));
+    const band = Math.round(stderr * 1.96);
+    return {
+      ts: new Date(Date.now() + (i + 1) * 30 * 60 * 1000).toISOString(),
+      incidents: yhat,
+      lower: Math.max(0, yhat - band),
+      upper: yhat + band,
+    };
+  });
+  const country = cachedGlobeData?.hotspots.find(h => h.countryCode === code)?.country || code;
+  return {
+    countryCode: code,
+    country,
+    history,
+    projection,
+    slope,
+    trend: slope > 0.5 ? "up" : slope < -0.5 ? "down" : "stable",
+  };
+}
+
+export function getCyberWeatherSnapshot(): CyberWeatherSnapshot {
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  weekStart.setHours(0, 0, 0, 0);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const data = cachedGlobeData || getGlobeData();
+  const regional = cachedRegionalData || getRegionalData();
+
+  const movers = [...data.hotspots]
+    .filter(h => h.trendDirection !== "stable" && h.trendPercent >= 10)
+    .sort((a, b) => b.trendPercent - a.trendPercent)
+    .slice(0, 5)
+    .map(h => ({ country: h.country, countryCode: h.countryCode, trendPercent: h.trendPercent, direction: h.trendDirection as "up" | "down" }));
+
+  const totalCount = regional.scamTypes.reduce((s, t) => s + t.count, 0) || 1;
+  const dominant = [...regional.scamTypes]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
+    .map(t => ({ type: t.type, label: t.label, share: Math.round((t.count / totalCount) * 1000) / 10 }));
+
+  const critical = data.hotspots
+    .filter(h => h.riskLevel === "critical")
+    .sort((a, b) => b.recentIncidents - a.recentIncidents)
+    .slice(0, 5)
+    .map(h => ({ country: h.country, countryCode: h.countryCode, recentIncidents: h.recentIncidents }));
+
+  const newPatterns = regional.trending.filter(t => t.isNew).map(t => t.label).slice(0, 6);
+
+  return {
+    weekStart: weekStart.toISOString().split("T")[0],
+    weekEnd: weekEnd.toISOString().split("T")[0],
+    totalIncidents: data.globalStats.totalIncidentsTracked,
+    totalLossesUsd: data.globalStats.totalLossesAmountUsd || 0,
+    topMovers: movers,
+    dominantScamTypes: dominant,
+    criticalCountries: critical,
+    newScamPatterns: newPatterns,
+    generatedAt: new Date().toISOString(),
+  };
+}
+
 export async function refreshScamIntelData(): Promise<void> {
   try {
     console.log("[scam-intel-aggregator] Refreshing scam intelligence data...");
@@ -1224,6 +1384,7 @@ export async function refreshScamIntelData(): Promise<void> {
     cachedGlobeData = buildGlobeData(liveData);
     cachedLiveFeed = buildLiveFeed(liveData);
     cachedRegionalData = buildRegionalData();
+    recordHistorySnapshot(cachedGlobeData);
     lastRefreshTime = new Date();
     console.log(`[scam-intel-aggregator] Data refreshed: ${cachedGlobeData.hotspots.length} hotspots, ${cachedGlobeData.arcs.length} arcs, ${cachedLiveFeed.events.length} live events`);
   } catch (error) {

@@ -9,6 +9,7 @@ import {
   GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection,
   LocalRiskSummary, ProtectFamilyPanel, ToolConnectionBanner, FamilyConversationStarters,
   TimeRangeSelector, SourceTransparencyDrawer,
+  CountryCompareDrawer, SankeyFlowPanel, ScamAlertSignup, PushAlertOptIn, CyberWeatherStrip,
   type TimeRange,
 } from "@/components/scam-intel-dashboard";
 import { Globe, ArrowLeft, AlertCircle, Search, X, MapPin, Download, Code2, Image as ImageIcon, Layers, Map as MapIcon } from "lucide-react";
@@ -194,6 +195,10 @@ export default function ScamIntelligenceDashboard() {
             <div ref={captureRef}>
               <GlobalStatsBar stats={(globeData as any)?.globalStats || null} visitorCountryCode={visitorCountryCode} />
             </div>
+
+            <div className="mt-4">
+              <CyberWeatherStrip />
+            </div>
           </div>
         </section>
 
@@ -313,6 +318,16 @@ export default function ScamIntelligenceDashboard() {
                   </div>
                 </div>
 
+                {!globeError && (globeData as any)?.hotspots?.length > 0 && (
+                  <div className="mb-6">
+                    <CountryCompareDrawer hotspots={(globeData as any).hotspots} />
+                  </div>
+                )}
+                {!globeError && (globeData as any)?.arcs?.length > 0 && (
+                  <div className="mb-6">
+                    <SankeyFlowPanel arcs={(globeData as any).arcs} />
+                  </div>
+                )}
                 {regionalError ? <DataError label="Scam type breakdown" /> : <ScamTypeBreakdown scamTypes={(regionalData as any)?.scamTypes || []} />}
 
                 <div className="mt-6">
@@ -327,6 +342,13 @@ export default function ScamIntelligenceDashboard() {
               </div>
 
               <div className="lg:col-span-5 xl:col-span-4 space-y-6">
+                <PushAlertOptIn visitorCountryCode={visitorCountryCode} />
+                {!regionalError && (
+                  <ScamAlertSignup
+                    visitorCountryCode={visitorCountryCode}
+                    scamTypes={(regionalData as any)?.scamTypes || []}
+                  />
+                )}
                 {!regionalError && <TrendingSection trending={(regionalData as any)?.trending || []} />}
                 {!regionalError && (
                   <ToolConnectionBanner scamTypes={(regionalData as any)?.scamTypes || []} />

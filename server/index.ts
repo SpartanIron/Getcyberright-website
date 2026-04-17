@@ -365,6 +365,18 @@ function startBackgroundJobs() {
   import("./scamIntelAggregator").then(({ startScamIntelScheduler }) => {
     startScamIntelScheduler();
   }).catch(err => console.error("Failed to start scam intel aggregator:", err));
+
+  import("./pushNotificationService").then(({ startPushScheduler }) => {
+    startPushScheduler();
+  }).catch(err => console.error("Failed to start push scheduler:", err));
+
+  import("./scamAlertSubscriptionService").then(({ startScamAlertDispatcher }) => {
+    startScamAlertDispatcher();
+  }).catch(err => console.error("Failed to start scam alert dispatcher:", err));
+
+  import("./cyberWeatherArticleService").then(({ startCyberWeatherScheduler }) => {
+    startCyberWeatherScheduler();
+  }).catch(err => console.error("Failed to start cyber weather scheduler:", err));
   // Sentry error handler must be registered after all routes
   Sentry.setupExpressErrorHandler(app);
 }

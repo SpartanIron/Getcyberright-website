@@ -995,6 +995,424 @@ function FamilyConversationStarters({ trending, scamTypes }: {
   );
 }
 
+function ForecastSparkline({ countryCode, height = 60 }: { countryCode: string; height?: number }) {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (!countryCode) return;
+    let cancel = false;
+    setLoading(true);
+    fetch(`/api/scam-intelligence/forecast?country=${countryCode}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (!cancel) setData(d); })
+      .catch(() => {})
+      .finally(() => { if (!cancel) setLoading(false); });
+    return () => { cancel = true; };
+  }, [countryCode]);
+  if (loading || !data) {
+    return <div className="h-[60px] bg-secondary/40 rounded animate-pulse" data-testid={`sparkline-loading-${countryCode}`} />;
+  }
+  const all: number[] = [
+    ...(data.history || []).map((p: any) => p.incidents),
+    ...(data.projection || []).map((p: any) => p.incidents),
+  ];
+  if (all.length < 2) return <div className="text-[10px] text-muted-foreground">Not enough data</div>;
+  const max = Math.max(...all, ...(data.projection || []).map((p: any) => p.upper));
+  const min = Math.min(...all, 0);
+  const range = max - min || 1;
+  const w = 220;
+  const histLen = data.history.length;
+  const projLen = data.projection.length;
+  const total = histLen + projLen;
+  const xStep = w / Math.max(1, total - 1);
+  const y = (v: number) => height - ((v - min) / range) * (height - 8) - 4;
+  const histPath = data.history.map((p: any, i: number) => `${i === 0 ? "M" : "L"}${(i * xStep).toFixed(1)},${y(p.incidents).toFixed(1)}`).join(" ");
+  const projPath = data.projection.length
+    ? `M${((histLen - 1) * xStep).toFixed(1)},${y(data.history[histLen - 1].incidents).toFixed(1)} ` +
+      data.projection.map((p: any, i: number) => `L${((histLen + i) * xStep).toFixed(1)},${y(p.incidents).toFixed(1)}`).join(" ")
+    : "";
+  const bandTop = data.projection.map((p: any, i: number) => `${(histLen + i) * xStep},${y(p.upper)}`).join(" ");
+  const bandBottom = data.projection.map((p: any, i: number) => `${(histLen + i) * xStep},${y(p.lower)}`).reverse().join(" ");
+  const bandPoly = bandTop && bandBottom ? `${bandTop} ${bandBottom}` : "";
+  const trendColor = data.trend === "up" ? "#ef4444" : data.trend === "down" ? "#22c55e" : "#06b6d4";
+  return (
+    <div className="relative" data-testid={`sparkline-${countryCode}`}>
+      <svg width="100%" height={height} viewBox={`0 0 ${w} ${height}`} preserveAspectRatio="none">
+        {bandPoly && <polygon points={bandPoly} fill={trendColor} fillOpacity="0.12" />}
+        <path d={histPath} stroke="#94a3b8" strokeWidth="1.5" fill="none" />
+        {projPath && <path d={projPath} stroke={trendColor} strokeWidth="1.5" strokeDasharray="3 3" fill="none" />}
+      </svg>
+      <div className="flex justify-between text-[9px] text-muted-foreground mt-0.5">
+        <span>history</span>
+        <span style={{ color: trendColor }}>forecast {data.trend === "up" ? "↑" : data.trend === "down" ? "↓" : "→"}</span>
+      </div>
+    </div>
+  );
+}
+
+function CountryCompareDrawer({ hotspots }: { hotspots: any[] }) {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [search, setSearch] = useState("");
+  const max = 3;
+  const choices = hotspots.filter(h =>
+    !selected.includes(h.countryCode) &&
+    (search ? h.country.toLowerCase().includes(search.toLowerCase()) : true)
+  ).slice(0, 8);
+  const compared = selected.map(c => hotspots.find(h => h.countryCode === c)).filter(Boolean);
+  const add = (code: string) => { if (selected.length < max) { setSelected([...selected, code]); setSearch(""); } };
+  const remove = (code: string) => setSelected(selected.filter(c => c !== code));
+  return (
+    <div className="bg-card border border-border rounded-xl overflow-hidden" data-testid="country-compare">
+      <button onClick={() => setOpen(o => !o)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/40 transition-colors" aria-expanded={open}>
+        <span className="flex items-center gap-2 text-sm font-semibold text-foreground"><BarChart3 className="w-4 h-4 text-primary" />Compare countries side-by-side</span>
+        <span className="text-xs text-muted-foreground">{selected.length}/{max} selected{open ? "" : " (click to open)"}</span>
+      </button>
+      {open && (
+        <div className="px-4 pb-4 border-t border-border">
+          <div className="flex flex-wrap gap-1.5 mt-3 mb-2">
+            {selected.map(code => {
+              const h = hotspots.find(x => x.countryCode === code);
+              return (
+                <span key={code} className="inline-flex items-center gap-1 bg-primary/15 border border-primary/30 text-primary text-xs px-2 py-0.5 rounded-full" data-testid={`compare-chip-${code}`}>
+                  {h?.country || code}
+                  <button onClick={() => remove(code)} className="hover:text-foreground" aria-label={`Remove ${h?.country}`}>×</button>
+                </span>
+              );
+            })}
+            {selected.length === 0 && <span className="text-xs text-muted-foreground">Pick up to {max} countries to compare.</span>}
+          </div>
+          {selected.length < max && (
+            <div className="relative mb-3">
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Add a country..."
+                className="w-full bg-secondary border border-border rounded-lg px-3 py-1.5 text-xs text-foreground placeholder-muted-foreground focus:border-primary/50 focus:outline-none"
+                data-testid="compare-search"
+              />
+              {search && choices.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  {choices.map(h => (
+                    <button key={h.countryCode} onClick={() => add(h.countryCode)} className="w-full text-left px-3 py-1.5 text-xs hover:bg-secondary text-foreground" data-testid={`compare-add-${h.countryCode}`}>
+                      {h.country} <span className="text-muted-foreground">({h.region})</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {compared.length > 0 && (
+            <div className={`grid grid-cols-1 ${compared.length === 2 ? "sm:grid-cols-2" : compared.length >= 3 ? "sm:grid-cols-3" : ""} gap-3`}>
+              {compared.map(h => (
+                <div key={h.countryCode} className="bg-secondary/40 border border-border rounded-lg p-3 space-y-2" data-testid={`compare-card-${h.countryCode}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-foreground">{h.country}</span>
+                    <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded ${h.riskLevel === "critical" ? "bg-red-500/20 text-red-400" : h.riskLevel === "high" ? "bg-orange-500/20 text-orange-400" : h.riskLevel === "medium" ? "bg-yellow-500/20 text-yellow-400" : "bg-green-500/20 text-green-400"}`}>{h.riskLevel}</span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground space-y-0.5">
+                    <div>Reports: <span className="text-foreground font-medium">{formatNumber(h.recentIncidents)}</span></div>
+                    <div>Trend: <span className={h.trendDirection === "up" ? "text-red-400" : h.trendDirection === "down" ? "text-green-400" : "text-muted-foreground"}>{h.trendDirection === "up" ? "↑" : h.trendDirection === "down" ? "↓" : "→"} {h.trendPercent}%</span></div>
+                    <div>Top scams: <span className="text-foreground">{(h.topScamTypes || []).slice(0, 2).map((t: string) => t.replace(/-/g, " ")).join(", ")}</span></div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-muted-foreground mb-1">7-day forecast</div>
+                    <ForecastSparkline countryCode={h.countryCode} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SankeyFlowPanel({ arcs }: { arcs: any[] }) {
+  const [open, setOpen] = useState(false);
+  if (!arcs || arcs.length === 0) return null;
+  const flowsByPair: Record<string, { origin: string; target: string; volume: number; types: Record<string, number> }> = {};
+  for (const a of arcs) {
+    if (!a.originCountry || !a.targetCountry) continue;
+    const key = `${a.originCountry}>>${a.targetCountry}`;
+    if (!flowsByPair[key]) flowsByPair[key] = { origin: a.originCountry, target: a.targetCountry, volume: 0, types: {} };
+    flowsByPair[key].volume += a.volume || 0;
+    flowsByPair[key].types[a.scamType] = (flowsByPair[key].types[a.scamType] || 0) + (a.volume || 0);
+  }
+  const flows = Object.values(flowsByPair).sort((a, b) => b.volume - a.volume).slice(0, 12);
+  if (flows.length === 0) return null;
+  const origins = Array.from(new Set(flows.map(f => f.origin)));
+  const targets = Array.from(new Set(flows.map(f => f.target)));
+  const w = 600, h = Math.max(220, Math.max(origins.length, targets.length) * 28);
+  const colY = (i: number, n: number) => 20 + (i + 0.5) * ((h - 40) / Math.max(1, n));
+  const originPos = Object.fromEntries(origins.map((o, i) => [o, colY(i, origins.length)]));
+  const targetPos = Object.fromEntries(targets.map((t, i) => [t, colY(i, targets.length)]));
+  const maxVol = Math.max(...flows.map(f => f.volume));
+  return (
+    <div className="bg-card border border-border rounded-xl overflow-hidden" data-testid="sankey-flow">
+      <button onClick={() => setOpen(o => !o)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/40 transition-colors" aria-expanded={open}>
+        <span className="flex items-center gap-2 text-sm font-semibold text-foreground"><Share2 className="w-4 h-4 text-primary" />Origin → Target scam flows</span>
+        <span className="text-xs text-muted-foreground">{flows.length} top flows {open ? "" : "(expand)"}</span>
+      </button>
+      {open && (
+        <div className="px-4 pb-4 border-t border-border pt-3 overflow-x-auto">
+          <svg width="100%" viewBox={`0 0 ${w} ${h}`} className="min-w-[420px]" data-testid="sankey-svg">
+            {flows.map((f, i) => {
+              const sy = originPos[f.origin], ty = targetPos[f.target];
+              const stroke = Math.max(1, (f.volume / maxVol) * 14);
+              const sx = 110, tx = w - 110;
+              const cx1 = sx + (tx - sx) * 0.45;
+              const cx2 = sx + (tx - sx) * 0.55;
+              return (
+                <g key={i}>
+                  <path
+                    d={`M${sx},${sy} C${cx1},${sy} ${cx2},${ty} ${tx},${ty}`}
+                    stroke="#06b6d4"
+                    strokeOpacity={0.25 + 0.5 * (f.volume / maxVol)}
+                    strokeWidth={stroke}
+                    fill="none"
+                  >
+                    <title>{`${f.origin} → ${f.target}: ${f.volume} (${Object.keys(f.types).slice(0, 2).join(", ")})`}</title>
+                  </path>
+                </g>
+              );
+            })}
+            {origins.map(o => (
+              <g key={`o-${o}`}>
+                <rect x="10" y={originPos[o] - 8} width="100" height="16" fill="#1e293b" stroke="#475569" rx="3" />
+                <text x="60" y={originPos[o] + 4} textAnchor="middle" fontSize="10" fill="#e2e8f0">{o.length > 14 ? o.slice(0, 13) + "..." : o}</text>
+              </g>
+            ))}
+            {targets.map(t => (
+              <g key={`t-${t}`}>
+                <rect x={w - 110} y={targetPos[t] - 8} width="100" height="16" fill="#0f172a" stroke="#475569" rx="3" />
+                <text x={w - 60} y={targetPos[t] + 4} textAnchor="middle" fontSize="10" fill="#e2e8f0">{t.length > 14 ? t.slice(0, 13) + "..." : t}</text>
+              </g>
+            ))}
+            <text x={60} y="14" textAnchor="middle" fontSize="9" fill="#64748b" fontWeight="600">ORIGIN</text>
+            <text x={w - 60} y="14" textAnchor="middle" fontSize="9" fill="#64748b" fontWeight="600">TARGET</text>
+          </svg>
+          <p className="text-[10px] text-muted-foreground mt-2 text-center">Stroke width is proportional to detected cross-border scam volume. Hover a flow for details.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const SEVERITY_OPTIONS = [
+  { v: "critical", l: "Critical only" },
+  { v: "high", l: "High and above" },
+  { v: "medium", l: "Medium and above" },
+];
+const FREQUENCY_OPTIONS = [
+  { v: "instant", l: "As they happen" },
+  { v: "daily", l: "Daily digest" },
+  { v: "weekly", l: "Weekly digest" },
+];
+
+function ScamAlertSignup({ visitorCountryCode, scamTypes }: { visitorCountryCode: string | null; scamTypes: ScamTypeSummary[] }) {
+  const [email, setEmail] = useState("");
+  const [country, setCountry] = useState(visitorCountryCode || "");
+  const [scamType, setScamType] = useState("");
+  const [severity, setSeverity] = useState("high");
+  const [frequency, setFrequency] = useState("daily");
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => { if (visitorCountryCode && !country) setCountry(visitorCountryCode); }, [visitorCountryCode]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || submitting) return;
+    setSubmitting(true); setMessage(null); setError(null);
+    try {
+      const r = await fetch("/api/scam-intelligence/alerts/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          countryCode: country || undefined,
+          scamType: scamType || undefined,
+          severityMin: severity,
+          frequency,
+        }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data?.error || "Subscription failed");
+      setMessage(data.message || "Check your email to confirm.");
+      setEmail("");
+    } catch (e: any) {
+      setError(e?.message || "Could not subscribe.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="bg-card border border-border rounded-xl p-4" data-testid="scam-alert-signup">
+      <div className="flex items-center gap-2 mb-2">
+        <Mail className="w-4 h-4 text-primary" />
+        <h3 className="text-sm font-semibold text-foreground">Get scam alerts by email</h3>
+      </div>
+      <p className="text-xs text-muted-foreground mb-3">Tell us where you live and what you want to hear about. We'll send a digest only when something matters.</p>
+      <form onSubmit={submit} className="space-y-2">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          className="w-full bg-secondary border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary/50 focus:outline-none"
+          data-testid="alert-email"
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            value={country}
+            onChange={e => setCountry(e.target.value.toUpperCase().slice(0, 2))}
+            placeholder="Country (US, GB, ...)"
+            maxLength={2}
+            className="bg-secondary border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary/50 focus:outline-none uppercase"
+            data-testid="alert-country"
+          />
+          <select value={scamType} onChange={e => setScamType(e.target.value)} className="bg-secondary border border-border rounded-lg px-2 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none" data-testid="alert-type">
+            <option value="">Any scam type</option>
+            {scamTypes.slice(0, 12).map(t => <option key={t.type} value={t.type}>{t.label}</option>)}
+          </select>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <select value={severity} onChange={e => setSeverity(e.target.value)} className="bg-secondary border border-border rounded-lg px-2 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none" data-testid="alert-severity">
+            {SEVERITY_OPTIONS.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+          </select>
+          <select value={frequency} onChange={e => setFrequency(e.target.value)} className="bg-secondary border border-border rounded-lg px-2 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none" data-testid="alert-frequency">
+            {FREQUENCY_OPTIONS.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+          </select>
+        </div>
+        <button
+          type="submit"
+          disabled={submitting || !email}
+          className="w-full bg-primary text-primary-foreground rounded-lg py-2 text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+          data-testid="alert-submit"
+        >
+          {submitting ? "Submitting..." : "Subscribe to alerts"}
+        </button>
+        {message && <p className="text-xs text-green-400" data-testid="alert-success">{message}</p>}
+        {error && <p className="text-xs text-red-400" data-testid="alert-error">{error}</p>}
+      </form>
+    </div>
+  );
+}
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const raw = atob(base64);
+  const out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; ++i) out[i] = raw.charCodeAt(i);
+  return out;
+}
+
+function PushAlertOptIn({ visitorCountryCode }: { visitorCountryCode: string | null }) {
+  const [status, setStatus] = useState<"idle" | "checking" | "subscribed" | "unsupported" | "denied" | "unconfigured">("checking");
+  const [busy, setBusy] = useState(false);
+  const [vapidKey, setVapidKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    fetch("/api/scam-intelligence/push/vapid-key").then(r => r.json()).then(d => {
+      if (!d.configured || !d.publicKey) { setStatus("unconfigured"); return; }
+      setVapidKey(d.publicKey);
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) { setStatus("unsupported"); return; }
+      if (Notification.permission === "denied") { setStatus("denied"); return; }
+      navigator.serviceWorker.ready.then(reg => reg.pushManager.getSubscription()).then(sub => {
+        setStatus(sub ? "subscribed" : "idle");
+      }).catch(() => setStatus("idle"));
+    }).catch(() => setStatus("unconfigured"));
+  }, []);
+
+  const subscribe = async () => {
+    if (!vapidKey || busy) return;
+    setBusy(true);
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") { setStatus(perm === "denied" ? "denied" : "idle"); return; }
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(vapidKey) });
+      const j = sub.toJSON() as any;
+      await fetch("/api/scam-intelligence/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, countryCode: visitorCountryCode || undefined, severityMin: "critical" }),
+      });
+      setStatus("subscribed");
+    } catch (e) {
+      console.error("[push] subscribe failed", e);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const unsubscribe = async () => {
+    setBusy(true);
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) {
+        await fetch("/api/scam-intelligence/push/unsubscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) });
+        await sub.unsubscribe();
+      }
+      setStatus("idle");
+    } finally { setBusy(false); }
+  };
+
+  if (status === "unconfigured" || status === "unsupported") return null;
+  return (
+    <div className="bg-card border border-border rounded-xl p-3 flex items-center gap-3" data-testid="push-opt-in">
+      <Radio className="w-4 h-4 text-primary flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-semibold text-foreground">Browser alerts for critical scams</div>
+        <div className="text-[10px] text-muted-foreground truncate">Get a notification when {visitorCountryCode || "your country"} hits critical risk.</div>
+      </div>
+      {status === "subscribed" ? (
+        <button onClick={unsubscribe} disabled={busy} className="text-[11px] px-2.5 py-1 rounded border border-border bg-secondary text-muted-foreground hover:text-foreground" data-testid="push-disable">
+          Turn off
+        </button>
+      ) : status === "denied" ? (
+        <span className="text-[10px] text-muted-foreground">Blocked in browser settings</span>
+      ) : (
+        <button onClick={subscribe} disabled={busy || !vapidKey} className="text-[11px] px-2.5 py-1 rounded bg-primary text-primary-foreground font-medium disabled:opacity-50" data-testid="push-enable">
+          {busy ? "Working..." : "Enable"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function CyberWeatherStrip() {
+  const [data, setData] = useState<any>(null);
+  useEffect(() => {
+    fetch("/api/scam-intelligence/cyber-weather").then(r => r.ok ? r.json() : null).then(setData).catch(() => {});
+  }, []);
+  if (!data) return null;
+  return (
+    <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-3 flex flex-wrap items-center gap-3 text-xs" data-testid="cyber-weather-strip">
+      <span className="inline-flex items-center gap-1 font-semibold text-cyan-400"><Sparkles className="w-3.5 h-3.5" />Cyber Weather</span>
+      <span className="text-muted-foreground">Week of {data.weekStart}:</span>
+      {data.topMovers?.[0] && (
+        <span className="text-foreground"><strong>{data.topMovers[0].country}</strong> {data.topMovers[0].direction === "up" ? "↑" : "↓"}{data.topMovers[0].trendPercent}%</span>
+      )}
+      {data.dominantScamTypes?.[0] && (
+        <span className="text-muted-foreground">Top: <span className="text-foreground">{data.dominantScamTypes[0].label}</span> ({data.dominantScamTypes[0].share}%)</span>
+      )}
+      {data.criticalCountries?.length > 0 && (
+        <span className="text-muted-foreground">Critical: <span className="text-red-400">{data.criticalCountries.length}</span></span>
+      )}
+    </div>
+  );
+}
+
 export {
   GlobalStatsBar,
   LiveFeedTicker,
@@ -1007,4 +1425,10 @@ export {
   FamilyConversationStarters,
   TimeRangeSelector,
   SourceTransparencyDrawer,
+  ForecastSparkline,
+  CountryCompareDrawer,
+  SankeyFlowPanel,
+  ScamAlertSignup,
+  PushAlertOptIn,
+  CyberWeatherStrip,
 };

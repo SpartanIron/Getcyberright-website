@@ -1796,3 +1796,55 @@ export const securityPostureScans = pgTable("security_posture_scans", {
 });
 
 export type SecurityPostureScan = typeof securityPostureScans.$inferSelect;
+
+export const scamAlertSubscriptions = pgTable("scam_alert_subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull(),
+  countryCode: varchar("country_code", { length: 2 }),
+  scamType: varchar("scam_type", { length: 50 }),
+  severityMin: varchar("severity_min", { length: 10 }).notNull().default("high"),
+  frequency: varchar("frequency", { length: 20 }).notNull().default("daily"),
+  verified: boolean("verified").notNull().default(false),
+  verifyToken: varchar("verify_token", { length: 64 }).notNull(),
+  unsubscribeToken: varchar("unsubscribe_token", { length: 64 }).notNull(),
+  lastSentAt: timestamp("last_sent_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertScamAlertSubscriptionSchema = createInsertSchema(scamAlertSubscriptions).omit({
+  id: true,
+  verified: true,
+  verifyToken: true,
+  unsubscribeToken: true,
+  lastSentAt: true,
+  createdAt: true,
+}).extend({
+  email: z.string().email(),
+  severityMin: z.enum(["critical", "high", "medium", "low"]).default("high"),
+  frequency: z.enum(["instant", "daily", "weekly"]).default("daily"),
+});
+
+export type ScamAlertSubscription = typeof scamAlertSubscriptions.$inferSelect;
+export type InsertScamAlertSubscription = z.infer<typeof insertScamAlertSubscriptionSchema>;
+
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  countryCode: varchar("country_code", { length: 2 }),
+  severityMin: varchar("severity_min", { length: 10 }).notNull().default("critical"),
+  active: boolean("active").notNull().default(true),
+  lastNotifiedAt: timestamp("last_notified_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions).omit({
+  id: true,
+  active: true,
+  lastNotifiedAt: true,
+  createdAt: true,
+});
+
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;
