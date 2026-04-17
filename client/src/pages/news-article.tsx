@@ -531,24 +531,29 @@ export default function NewsArticlePage() {
             {article.excerpt}
           </p>
 
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <div className="flex items-center gap-2.5">
-              <Avatar className="w-9 h-9">
-                <AvatarImage src={article.authorAvatarUrl ?? undefined} alt={article.author || ""} />
-                <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">{authorInitials}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-semibold leading-tight" data-testid="text-article-author">{article.author}</p>
-                {article.authorRole && <p className="text-xs text-muted-foreground">{article.authorRole}</p>}
+          <div className="flex items-start gap-3 mb-4" data-testid="byline">
+            <Avatar className="w-12 h-12 ring-2 ring-primary/20">
+              <AvatarImage src={article.authorAvatarUrl ?? undefined} alt={article.author || ""} />
+              <AvatarFallback className="text-sm bg-gradient-to-br from-primary to-primary/60 text-white font-bold">{authorInitials}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold leading-tight" data-testid="text-article-author">
+                By {article.author}
+              </p>
+              {article.authorRole && (
+                <p className="text-xs text-muted-foreground mt-0.5" data-testid="text-article-author-role">
+                  {article.authorRole}
+                </p>
+              )}
+              <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground flex-wrap">
+                <span data-testid="text-article-date">{formatDate(article.publishedAt)}</span>
+                <span aria-hidden>·</span>
+                <span className="flex items-center gap-1" data-testid="text-article-readtime">
+                  <Clock className="h-3 w-3" />
+                  {article.readTime} min read
+                </span>
               </div>
             </div>
-            <span className="text-muted-foreground">•</span>
-            <span className="text-sm text-muted-foreground" data-testid="text-article-date">{formatDate(article.publishedAt)}</span>
-            <span className="text-muted-foreground">•</span>
-            <span className="text-sm text-muted-foreground flex items-center gap-1.5" data-testid="text-article-readtime">
-              <Clock className="h-3.5 w-3.5" />
-              {article.readTime} min read
-            </span>
           </div>
 
           <div className="border-t border-b border-border py-3">
