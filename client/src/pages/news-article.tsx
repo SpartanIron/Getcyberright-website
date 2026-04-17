@@ -13,7 +13,7 @@ import {
   ArrowLeft, Clock, ExternalLink, Shield, AlertTriangle, Loader2, User,
   Tag, CheckCircle2, MessageSquare, Send, Trash2, Mail, Facebook, Linkedin, Link2, Check,
 } from "lucide-react";
-import { SiX, SiReddit, SiWhatsapp } from "react-icons/si";
+import { SiX, SiReddit, SiWhatsapp, SiFlipboard } from "react-icons/si";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { FadeIn } from "@/components/fade-in";
@@ -119,10 +119,11 @@ function getShareButtons(title: string, url: string) {
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
   return [
-    { name: "X", icon: SiX, href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`, color: "hover:bg-black hover:text-white" },
     { name: "Facebook", icon: Facebook, href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, color: "hover:bg-blue-600 hover:text-white" },
+    { name: "X", icon: SiX, href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`, color: "hover:bg-black hover:text-white" },
     { name: "LinkedIn", icon: Linkedin, href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, color: "hover:bg-blue-700 hover:text-white" },
     { name: "Reddit", icon: SiReddit, href: `https://www.reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`, color: "hover:bg-orange-600 hover:text-white" },
+    { name: "Flipboard", icon: SiFlipboard, href: `https://share.flipboard.com/bookmarklet/popout?v=2&title=${encodedTitle}&url=${encodedUrl}`, color: "hover:bg-red-600 hover:text-white" },
     { name: "WhatsApp", icon: SiWhatsapp, href: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`, color: "hover:bg-green-600 hover:text-white" },
     { name: "Email", icon: Mail, href: `mailto:?subject=${encodedTitle}&body=${encodedUrl}`, color: "hover:bg-slate-700 hover:text-white" },
   ];
@@ -637,6 +638,16 @@ export default function NewsArticlePage() {
                     </Link>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-dashed border-border bg-muted/30" data-testid="bottom-share-card">
+            <CardContent className="p-5 sm:p-6 text-center">
+              <h3 className="font-bold text-base mb-1">Found this useful?</h3>
+              <p className="text-sm text-muted-foreground mb-4">Share it with someone who could use a heads-up.</p>
+              <div className="flex justify-center">
+                <ShareBar title={article.title} url={articleUrl} />
               </div>
             </CardContent>
           </Card>
