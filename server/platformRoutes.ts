@@ -139,11 +139,28 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/scam-intelligence/live-feed", (_req: Request, res: Response) => {
+  app.get("/api/scam-intelligence/live-feed", (req: Request, res: Response) => {
     try {
       const data = getLiveFeed();
+      const rangeParam = String(req.query.range || "all").toLowerCase();
+      const RANGE_MS: Record<string, number> = {
+        "1h": 60 * 60 * 1000,
+        "24h": 24 * 60 * 60 * 1000,
+        "7d": 7 * 24 * 60 * 60 * 1000,
+        "30d": 30 * 24 * 60 * 60 * 1000,
+      };
+      const windowMs = RANGE_MS[rangeParam];
+      const filtered = windowMs
+        ? {
+            ...data,
+            events: data.events.filter(e => {
+              const t = new Date(e.timestamp).getTime();
+              return Number.isFinite(t) && (Date.now() - t) <= windowMs;
+            }),
+          }
+        : data;
       res.setHeader("Cache-Control", "public, max-age=120");
-      res.json(data);
+      res.json(filtered);
     } catch (error: any) {
       console.error("[scam-intel-api] Live feed error:", error?.message);
       res.status(500).json({ error: "Failed to fetch live feed" });

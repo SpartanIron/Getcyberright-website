@@ -233,6 +233,8 @@ interface ScamIntelligenceGlobeProps {
   width?: number;
   height?: number;
   focusCountryCode?: string | null;
+  viewMode?: "hotspots" | "heatmap" | "both";
+  bordersOn?: boolean;
 }
 
 const RISK_COLORS: Record<string, string> = {
@@ -521,7 +523,7 @@ function MobileGlobeView({ data, onCountrySelect, focusCountryCode }: ScamIntell
   );
 }
 
-function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focusCountryCode }: ScamIntelligenceGlobeProps) {
+function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focusCountryCode, viewMode = "hotspots", bordersOn = false }: ScamIntelligenceGlobeProps) {
   const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
@@ -606,6 +608,10 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     return () => observer.disconnect();
   }, [width]);
 
+  const [borderGeo, setBorderGeo] = useState<any[] | null>(null);
+  const [keyboardIndex, setKeyboardIndex] = useState<number>(-1);
+  const interactionTimerRef = useRef<any>(null);
+
   useEffect(() => {
     if (!globeRef.current || !GlobeComponent) return;
     const globe = globeRef.current;
@@ -617,7 +623,126 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
     controls.minDistance = 200;
     controls.maxDistance = 500;
     globe.pointOfView({ lat: 20, lng: 10, altitude: 2.2 });
+
+    const renderer = globe.renderer?.();
+    if (renderer && typeof window !== "undefined") {
+      try { renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); } catch {}
+    }
+
+    const scheduleResume = () => {
+      if (interactionTimerRef.current) clearTimeout(interactionTimerRef.current);
+      controls.autoRotate = false;
+      interactionTimerRef.current = setTimeout(() => {
+        if (controls) controls.autoRotate = true;
+      }, 5000);
+    };
+    controls.addEventListener?.("start", scheduleResume);
+
+    let starField: any = null;
+    let cloudMesh: any = null;
+    let rafId: number | null = null;
+    let cancelled = false;
+    (async () => {
+      try {
+        const THREE = await import("three");
+        const scene = globe.scene?.();
+        if (!scene) return;
+
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 2200;
+        const positions = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount; i++) {
+          const r = 800 + Math.random() * 400;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+          positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+          positions[i * 3 + 2] = r * Math.cos(phi);
+        }
+        starGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.2, transparent: true, opacity: 0.75, sizeAttenuation: true });
+        starField = new THREE.Points(starGeo, starMat);
+        starField.userData.isStarField = true;
+        scene.add(starField);
+
+        const globeRadius = globe.getGlobeRadius?.() || 100;
+        const cloudGeo = new THREE.SphereGeometry(globeRadius * 1.012, 64, 32);
+        const cloudCanvas = document.createElement("canvas");
+        cloudCanvas.width = 1024; cloudCanvas.height = 512;
+        const ctx = cloudCanvas.getContext("2d");
+        if (ctx) {
+          ctx.fillStyle = "rgba(0,0,0,0)";
+          ctx.fillRect(0, 0, 1024, 512);
+          for (let i = 0; i < 280; i++) {
+            const x = Math.random() * 1024;
+            const y = Math.random() * 512;
+            const r = 8 + Math.random() * 50;
+            const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+            g.addColorStop(0, `rgba(255,255,255,${0.18 + Math.random() * 0.18})`);
+            g.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+        const cloudTex = new THREE.CanvasTexture(cloudCanvas);
+        const cloudMat = new THREE.MeshPhongMaterial({ map: cloudTex, transparent: true, opacity: 0.55, depthWrite: false });
+        cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+        cloudMesh.userData.isClouds = true;
+        scene.add(cloudMesh);
+
+        let last = performance.now();
+        const animate = () => {
+          if (cancelled || !cloudMesh || !cloudMesh.parent) return;
+          const now = performance.now();
+          const dt = (now - last) / 1000; last = now;
+          cloudMesh.rotation.y += dt * 0.01;
+          rafId = requestAnimationFrame(animate);
+        };
+        rafId = requestAnimationFrame(animate);
+      } catch (e) {
+        console.warn("[ScamGlobe] Could not enhance scene:", (e as any)?.message);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      if (rafId != null) cancelAnimationFrame(rafId);
+      controls.removeEventListener?.("start", scheduleResume);
+      if (interactionTimerRef.current) clearTimeout(interactionTimerRef.current);
+      const scene = globe.scene?.();
+      if (scene && starField) try { scene.remove(starField); starField.geometry?.dispose?.(); starField.material?.dispose?.(); } catch {}
+      if (scene && cloudMesh) try { scene.remove(cloudMesh); cloudMesh.geometry?.dispose?.(); cloudMesh.material?.map?.dispose?.(); cloudMesh.material?.dispose?.(); } catch {}
+    };
   }, [GlobeComponent]);
+
+  useEffect(() => {
+    if (!bordersOn || borderGeo) return;
+    let cancelled = false;
+    fetch("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json")
+      .then(r => r.ok ? r.json() : null)
+      .then(async (topo) => {
+        if (!topo || cancelled) return;
+        try {
+          const t = await import("topojson-client").catch(() => null as any);
+          if (t && (topo as any).objects?.countries) {
+            const fc = t.feature(topo, (topo as any).objects.countries);
+            if (!cancelled) setBorderGeo((fc as any).features || []);
+            return;
+          }
+        } catch {}
+        try {
+          const r = await fetch("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson");
+          if (r.ok) {
+            const gj = await r.json();
+            if (!cancelled) setBorderGeo(gj.features || []);
+          }
+        } catch (e) {
+          console.warn("[ScamGlobe] Could not load borders:", (e as any)?.message);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [bordersOn, borderGeo]);
 
   useEffect(() => {
     if (!focusCountryCode || !data?.hotspots || !globeRef.current || focusCountryCode === lastFocusedCodeRef.current) return;
@@ -680,9 +805,42 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
 
   const hotspots = data?.hotspots || [];
   const arcs = data?.arcs || [];
+  const showHotspots = viewMode !== "heatmap";
+  const showHeatmap = viewMode === "heatmap" || viewMode === "both";
+  const pulsingRings = hotspots.filter(h => h.riskLevel === "critical" || h.riskLevel === "high");
+  const ringsData = selectedPoint
+    ? [...pulsingRings.filter(p => p.id !== selectedPoint.id), selectedPoint]
+    : pulsingRings;
+
+  const handleKey = useCallback((e: React.KeyboardEvent) => {
+    if (!hotspots.length) return;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const next = (keyboardIndex + 1) % hotspots.length;
+      setKeyboardIndex(next);
+      handlePointClick(hotspots[next]);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const next = (keyboardIndex - 1 + hotspots.length) % hotspots.length;
+      setKeyboardIndex(next);
+      handlePointClick(hotspots[next]);
+    } else if (e.key === "Escape") {
+      setSelectedPoint(null);
+      onCountrySelect?.(null);
+    }
+  }, [hotspots, keyboardIndex, handlePointClick, onCountrySelect]);
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-[700px] mx-auto" style={{ height: dimensions.h || 600 }}>
+    <div
+      ref={containerRef}
+      className="relative w-full max-w-[700px] mx-auto outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 rounded-2xl"
+      style={{ height: dimensions.h || 600 }}
+      tabIndex={0}
+      role="application"
+      aria-label="Interactive 3D scam intelligence globe. Use arrow keys to cycle countries. Press Escape to clear selection."
+      onKeyDown={handleKey}
+      data-testid="globe-canvas"
+    >
       <GlobeErrorBoundary
         fallback={<GlobeFallback data={data} onRetry={() => window.location.reload()} errorDetail="WebGL rendering failed" />}
         onError={(msg) => console.error("[ScamGlobe] Three.js render error:", msg)}
@@ -692,49 +850,72 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
         width={dimensions.w || 600}
         height={dimensions.h || 600}
         rendererConfig={{
-          powerPreference: "default",
+          powerPreference: "high-performance",
           failIfMajorPerformanceCaveat: false,
-          preserveDrawingBuffer: false,
+          preserveDrawingBuffer: true,
+          antialias: true,
         }}
-        globeImageUrl="/textures/earth-night.jpg"
-        bumpImageUrl="/textures/earth-topology.png"
+        globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
+        bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
         backgroundImageUrl=""
         backgroundColor="rgba(0,0,0,0)"
         showAtmosphere={true}
-        atmosphereColor="#22d3ee"
-        atmosphereAltitude={0.18}
+        atmosphereColor="#1e90ff"
+        atmosphereAltitude={0.28}
         animateIn={true}
-        pointsData={hotspots}
+        pointsData={showHotspots ? hotspots : []}
         pointLat="lat"
         pointLng="lng"
-        pointAltitude={(d: any) => d.intensity * 0.12}
-        pointRadius={(d: any) => Math.max(0.3, d.intensity * 1.2)}
+        pointAltitude={(d: any) => 0.01 + d.intensity * 0.14}
+        pointRadius={(d: any) => Math.max(0.35, d.intensity * 1.4)}
         pointColor={(d: any) => RISK_COLORS[d.riskLevel] || "#22d3ee"}
         pointsMerge={false}
         onPointClick={handlePointClick}
         onPointHover={handlePointHover}
+        hexBinPointsData={showHeatmap ? hotspots : []}
+        hexBinPointLat="lat"
+        hexBinPointLng="lng"
+        hexBinPointWeight={(d: any) => Math.max(1, (d.recentIncidents || 0) / 100)}
+        hexBinResolution={3}
+        hexAltitude={({ sumWeight }: any) => Math.min(0.35, 0.02 + sumWeight * 0.0008)}
+        hexTopColor={({ sumWeight }: any) => sumWeight > 200 ? "#ef4444" : sumWeight > 80 ? "#f97316" : sumWeight > 30 ? "#eab308" : "#22c55e"}
+        hexSideColor={({ sumWeight }: any) => sumWeight > 200 ? "rgba(239,68,68,0.55)" : sumWeight > 80 ? "rgba(249,115,22,0.5)" : sumWeight > 30 ? "rgba(234,179,8,0.45)" : "rgba(34,197,94,0.4)"}
+        hexBinMerge={false}
+        hexLabel={(d: any) => `<div style='background:rgba(15,23,42,0.92);color:#fff;padding:6px 10px;border-radius:6px;font-size:11px;border:1px solid rgba(34,211,238,0.4)'>${d.points.length} hotspots · weight ${Math.round(d.sumWeight)}</div>`}
+        polygonsData={bordersOn && borderGeo ? borderGeo : []}
+        polygonCapColor={() => "rgba(0,0,0,0)"}
+        polygonSideColor={() => "rgba(0,0,0,0)"}
+        polygonStrokeColor={() => "rgba(34,211,238,0.45)"}
+        polygonAltitude={0.005}
         arcsData={arcs}
         arcStartLat="startLat"
         arcStartLng="startLng"
         arcEndLat="endLat"
         arcEndLng="endLng"
-        arcColor="color"
-        arcAltitude={0.15}
-        arcStroke={(d: any) => Math.max(0.3, (d.volume / 100) * 1.5)}
-        arcDashLength={0.4}
-        arcDashGap={0.2}
-        arcDashAnimateTime={3000}
-        ringsData={selectedPoint ? [selectedPoint] : []}
+        arcColor={(d: any) => {
+          const c = d.color || "#22d3ee";
+          return [`${c}cc`, `${c}33`];
+        }}
+        arcAltitudeAutoScale={0.5}
+        arcStroke={(d: any) => Math.max(0.4, Math.min(2.4, (d.volume / 100) * 2.2))}
+        arcDashLength={0.35}
+        arcDashGap={0.18}
+        arcDashAnimateTime={(d: any) => Math.max(1500, 4000 - d.volume * 8)}
+        arcsTransitionDuration={1200}
+        ringsData={ringsData}
         ringLat="lat"
         ringLng="lng"
-        ringColor={() => "#22d3ee"}
-        ringMaxRadius={5}
-        ringPropagationSpeed={3}
-        ringRepeatPeriod={800}
+        ringColor={(d: any) => {
+          const base = RISK_COLORS[d.riskLevel] || "#22d3ee";
+          return (t: number) => `${base}${Math.round((1 - t) * 200).toString(16).padStart(2, "0")}`;
+        }}
+        ringMaxRadius={(d: any) => d.riskLevel === "critical" ? 6 : d.riskLevel === "high" ? 4.5 : 3.5}
+        ringPropagationSpeed={(d: any) => d.riskLevel === "critical" ? 4 : 3}
+        ringRepeatPeriod={(d: any) => d.riskLevel === "critical" ? 700 : 1100}
       />
 
       <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{
-        background: "radial-gradient(circle at center, transparent 35%, rgba(6,13,26,0.7) 100%)",
+        background: "radial-gradient(circle at center, transparent 38%, rgba(6,13,26,0.78) 100%)",
       }} />
       </GlobeErrorBoundary>
 

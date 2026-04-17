@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ScamIntelligenceGlobe } from "@/components/scam-intelligence-globe";
-import { GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection, LocalRiskSummary, ProtectFamilyPanel, ToolConnectionBanner, FamilyConversationStarters } from "@/components/scam-intel-dashboard";
-import { Globe, ArrowLeft, AlertCircle, Search, X, MapPin } from "lucide-react";
+import {
+  GlobalStatsBar, LiveFeedTicker, ScamTypeBreakdown, RegionalPanel, TrendingSection,
+  LocalRiskSummary, ProtectFamilyPanel, ToolConnectionBanner, FamilyConversationStarters,
+  TimeRangeSelector, SourceTransparencyDrawer,
+  type TimeRange,
+} from "@/components/scam-intel-dashboard";
+import { Globe, ArrowLeft, AlertCircle, Search, X, MapPin, Download, Code2, Image as ImageIcon, Layers, Map as MapIcon } from "lucide-react";
 import { Link } from "@/lib/navigation";
 
 function DataError({ label }: { label: string }) {
@@ -19,6 +24,8 @@ function DataError({ label }: { label: string }) {
   );
 }
 
+export type GlobeViewMode = "hotspots" | "heatmap" | "both";
+
 export default function ScamIntelligenceDashboard() {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
@@ -27,22 +34,28 @@ export default function ScamIntelligenceDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchFocusCode, setSearchFocusCode] = useState<string | null>(null);
+  const [timeRange, setTimeRange] = useState<TimeRange>("7d");
+  const [viewMode, setViewMode] = useState<GlobeViewMode>("hotspots");
+  const [bordersOn, setBordersOn] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [embedCopied, setEmbedCopied] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const captureRef = useRef<HTMLDivElement>(null);
 
   const { data: globeData, isLoading: globeLoading, isError: globeError } = useQuery({
-    queryKey: ["/api/scam-intelligence/globe-data"],
+    queryKey: ["/api/scam-intelligence/globe-data", timeRange],
     staleTime: 5 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
   });
 
   const { data: liveFeed, isLoading: feedLoading, isError: feedError } = useQuery({
-    queryKey: ["/api/scam-intelligence/live-feed"],
+    queryKey: ["/api/scam-intelligence/live-feed", timeRange],
     staleTime: 2 * 60 * 1000,
     refetchInterval: 2 * 60 * 1000,
   });
 
   const { data: regionalData, isLoading: regionalLoading, isError: regionalError } = useQuery({
-    queryKey: ["/api/scam-intelligence/regional-summary"],
+    queryKey: ["/api/scam-intelligence/regional-summary", timeRange],
     staleTime: 5 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000,
   });
@@ -79,10 +92,48 @@ export default function ScamIntelligenceDashboard() {
 
   const handleCountrySelect = (hotspot: any) => {
     setSelectedCountry(hotspot);
-    if (hotspot) {
-      setSelectedRegion(hotspot.region);
-    }
+    if (hotspot) setSelectedRegion(hotspot.region);
   };
+
+  const sources = useMemo(() => (globeData as any)?.sourceMetadata || [], [globeData]);
+
+  const handleExportPng = useCallback(async () => {
+    if (!captureRef.current || exporting) return;
+    setExporting(true);
+    try {
+      const { toPng } = await import("html-to-image");
+      const dataUrl = await toPng(captureRef.current, {
+        backgroundColor: "#060d1a",
+        cacheBust: true,
+        pixelRatio: 2,
+        filter: (node) => {
+          const el = node as HTMLElement;
+          if (!el?.classList) return true;
+          return !el.classList.contains("export-exclude");
+        },
+      });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `scam-intelligence-${new Date().toISOString().split("T")[0]}.png`;
+      a.click();
+    } catch (err) {
+      console.error("[dashboard] Export PNG failed:", err);
+    } finally {
+      setExporting(false);
+    }
+  }, [exporting]);
+
+  const handleCopyEmbed = useCallback(async () => {
+    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/scam-intelligence/embed${visitorCountryCode ? `?country=${visitorCountryCode}` : ""}`;
+    const snippet = `<iframe src="${url}" width="480" height="320" frameborder="0" style="border:0;border-radius:12px;" title="GetCyberRight live scam intelligence"></iframe>`;
+    try {
+      await navigator.clipboard.writeText(snippet);
+      setEmbedCopied(true);
+      setTimeout(() => setEmbedCopied(false), 2500);
+    } catch (e) {
+      console.error("[dashboard] Copy embed failed:", e);
+    }
+  }, [visitorCountryCode]);
 
   return (
     <div className="dark">
@@ -103,7 +154,7 @@ export default function ScamIntelligenceDashboard() {
               </Link>
             </div>
 
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
               <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-full px-4 py-1.5 mb-4">
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                 <span className="text-sm text-red-400 font-medium">Live Scam Intelligence</span>
@@ -111,13 +162,38 @@ export default function ScamIntelligenceDashboard() {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3" data-testid="dashboard-title">
                 Global Scam Intelligence Dashboard
               </h1>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                See where scams are happening right now. This map tracks fraud activity across {globeData?.globalStats?.countriesCovered || "40+"} countries
+              <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+                See where scams are happening right now. This map tracks fraud activity across {(globeData as any)?.globalStats?.countriesCovered || "40+"} countries
                 using data from law enforcement, government cybersecurity teams, and trusted security organizations worldwide.
               </p>
             </div>
 
-            <GlobalStatsBar stats={(globeData as any)?.globalStats || null} />
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-5 export-exclude">
+              <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
+              <button
+                onClick={handleExportPng}
+                disabled={exporting}
+                className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-border bg-card hover:bg-secondary text-foreground transition-colors disabled:opacity-50"
+                data-testid="export-png"
+                aria-label="Export dashboard as PNG image"
+              >
+                {exporting ? <ImageIcon className="w-3 h-3 animate-pulse" /> : <Download className="w-3 h-3" />}
+                {exporting ? "Capturing..." : "Export PNG"}
+              </button>
+              <button
+                onClick={handleCopyEmbed}
+                className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg border border-border bg-card hover:bg-secondary text-foreground transition-colors"
+                data-testid="copy-embed"
+                aria-label="Copy embed code"
+              >
+                <Code2 className="w-3 h-3" />
+                {embedCopied ? "Embed code copied" : "Copy embed code"}
+              </button>
+            </div>
+
+            <div ref={captureRef}>
+              <GlobalStatsBar stats={(globeData as any)?.globalStats || null} visitorCountryCode={visitorCountryCode} />
+            </div>
           </div>
         </section>
 
@@ -139,15 +215,45 @@ export default function ScamIntelligenceDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-7 xl:col-span-8">
                 <div className="bg-card border border-border dark:bg-slate-900/50 dark:border-slate-700/50 rounded-2xl p-4 mb-6" data-testid="globe-container">
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
                     <Globe className="w-4 h-4 text-primary" />
                     <span className="text-sm font-semibold text-foreground">Live Scam Activity Map</span>
-                    <div className="ml-auto flex items-center gap-3 text-[10px] text-muted-foreground">
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> Critical</span>
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> High</span>
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> Medium</span>
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Low</span>
+                    <div className="ml-auto flex flex-wrap items-center gap-2">
+                      <div className="inline-flex items-center bg-secondary border border-border rounded-md p-0.5" role="tablist" aria-label="Map view mode">
+                        {([
+                          { v: "hotspots" as GlobeViewMode, l: "Pins", icon: MapIcon },
+                          { v: "heatmap" as GlobeViewMode, l: "Heatmap", icon: Layers },
+                          { v: "both" as GlobeViewMode, l: "Both", icon: Globe },
+                        ]).map(({ v, l, icon: Icon }) => (
+                          <button
+                            key={v}
+                            role="tab"
+                            aria-selected={viewMode === v}
+                            onClick={() => setViewMode(v)}
+                            className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-1 rounded ${viewMode === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                            data-testid={`view-mode-${v}`}
+                          >
+                            <Icon className="w-3 h-3" />
+                            {l}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        onClick={() => setBordersOn(b => !b)}
+                        className={`text-[10px] px-2 py-1 rounded border transition-colors ${bordersOn ? "bg-primary/15 border-primary/40 text-primary" : "bg-secondary border-border text-muted-foreground hover:text-foreground"}`}
+                        aria-pressed={bordersOn}
+                        data-testid="toggle-borders"
+                      >
+                        Borders {bordersOn ? "On" : "Off"}
+                      </button>
                     </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground mb-3">
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> Critical</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> High</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> Medium</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Low</span>
                   </div>
 
                   <div className="relative mb-3" data-testid="country-search">
@@ -162,12 +268,14 @@ export default function ScamIntelligenceDashboard() {
                         onFocus={() => setSearchOpen(true)}
                         className="w-full bg-secondary border border-border rounded-lg pl-9 pr-8 py-2 text-sm text-foreground placeholder-muted-foreground focus:border-primary/50 focus:outline-none transition-colors"
                         data-testid="country-search-input"
+                        aria-label="Search countries"
                       />
                       {searchQuery && (
                         <button
                           onClick={() => { setSearchQuery(""); setSearchOpen(false); }}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                           data-testid="clear-search"
+                          aria-label="Clear search"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -194,11 +302,13 @@ export default function ScamIntelligenceDashboard() {
                     data={globeData as any}
                     onCountrySelect={handleCountrySelect}
                     focusCountryCode={effectiveFocusCode}
+                    viewMode={viewMode}
+                    bordersOn={bordersOn}
                   />
                   <div className="text-center mt-3">
                     <p className="text-[11px] text-muted-foreground">
                       Click any glowing dot to see scam details for that country. The lines show how scams spread between countries.
-                      Scroll to zoom in. Data updates every 30 minutes.
+                      Use Tab to focus the map, then arrow keys to cycle through countries. Data updates every 30 minutes.
                     </p>
                   </div>
                 </div>
@@ -221,7 +331,7 @@ export default function ScamIntelligenceDashboard() {
                 {!regionalError && (
                   <ToolConnectionBanner scamTypes={(regionalData as any)?.scamTypes || []} />
                 )}
-                {feedError ? <DataError label="Live threat feed" /> : <LiveFeedTicker events={(liveFeed as any)?.events || []} />}
+                {feedError ? <DataError label="Live threat feed" /> : <LiveFeedTicker events={(liveFeed as any)?.events || []} timeRange={timeRange} />}
               </div>
             </div>
 
@@ -243,26 +353,28 @@ export default function ScamIntelligenceDashboard() {
 
         <section className="bg-secondary/50 dark:bg-slate-900/30 border-t border-border py-10">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-xl font-bold text-foreground mb-3">Where This Data Comes From</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-                This dashboard pulls together scam reports from official government sources, law enforcement agencies,
-                and trusted security organizations around the world. We use published data from agencies like
-                the FBI's Internet Crime Complaint Center (IC3), the FTC, Action Fraud UK, Australia's Scamwatch, INTERPOL,
-                and 20+ national cybersecurity response teams. The lines on the map show how scams move between countries,
-                based on international cooperation reports.
-              </p>
-              <div className="flex flex-wrap justify-center gap-3 text-[11px] text-muted-foreground">
-                {[
-                  "FBI IC3", "FTC Sentinel", "CISA", "NIST NVD", "Action Fraud UK",
-                  "ACCC Scamwatch", "INTERPOL", "CERT-In", "CERT.br", "BSI Germany",
-                  "PhishTank", "URLhaus", "Have I Been Pwned",
-                ].map((source) => (
-                  <span key={source} className="bg-card border border-border px-2.5 py-1 rounded-full">
-                    {source}
-                  </span>
-                ))}
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-5">
+                <h2 className="text-xl font-bold text-foreground mb-2">Where This Data Comes From</h2>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  This dashboard pulls together scam reports from official government sources, law enforcement agencies,
+                  and trusted security organizations around the world. Expand the panel below to see every source,
+                  when it was last fetched, and how many records it has contributed.
+                </p>
               </div>
+              {sources.length > 0 ? (
+                <SourceTransparencyDrawer sources={sources} />
+              ) : (
+                <div className="flex flex-wrap justify-center gap-3 text-[11px] text-muted-foreground">
+                  {[
+                    "FBI IC3", "FTC Sentinel", "CISA", "NIST NVD", "Action Fraud UK",
+                    "ACCC Scamwatch", "INTERPOL", "CERT-In", "CERT.br", "BSI Germany",
+                    "PhishTank", "URLhaus", "Have I Been Pwned",
+                  ].map((source) => (
+                    <span key={source} className="bg-card border border-border px-2.5 py-1 rounded-full">{source}</span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>

@@ -7,7 +7,8 @@ import {
   MapPin, Clock, ExternalLink, ChevronRight, Radio,
   Mail, Heart, Monitor, Lock, Smartphone, ShoppingCart,
   Bug, Briefcase, UserX, Fingerprint, ChevronDown, ChevronUp,
-  BarChart3, Eye, Share2, Copy, Check, Flame, Sparkles, ShieldCheck
+  BarChart3, Eye, Share2, Copy, Check, Flame, Sparkles, ShieldCheck,
+  ArrowUp, ArrowDown, Minus, Database, CheckCircle2, AlertCircle, Filter
 } from "lucide-react";
 import { Link } from "@/lib/navigation";
 
@@ -64,7 +65,91 @@ interface GlobalStats {
   sourcesMonitored: number;
   lastRefresh: string;
   totalLossesTracked: string;
+  totalLossesAmountUsd?: number;
   activeScamTypes: number;
+  wowChange?: {
+    incidentsPercent: number;
+    incidentsDirection: "up" | "down" | "stable";
+    countriesAtCriticalRisk: number;
+    countriesTrendingUp: number;
+  };
+}
+
+export interface SourceMetadata {
+  id: string;
+  name: string;
+  category: "law-enforcement" | "government" | "research" | "industry" | "open-data";
+  countryCode?: string;
+  url?: string;
+  lastFetched: string;
+  recordsContributed: number;
+  status: "live" | "delayed" | "stale";
+}
+
+export type TimeRange = "1h" | "24h" | "7d" | "30d" | "all";
+
+export const TIME_RANGE_LABEL: Record<TimeRange, string> = {
+  "1h": "Last hour",
+  "24h": "Last 24h",
+  "7d": "Last 7 days",
+  "30d": "Last 30 days",
+  "all": "All-time",
+};
+
+const TIME_RANGE_MS: Record<TimeRange, number> = {
+  "1h": 60 * 60 * 1000,
+  "24h": 24 * 60 * 60 * 1000,
+  "7d": 7 * 24 * 60 * 60 * 1000,
+  "30d": 30 * 24 * 60 * 60 * 1000,
+  "all": Number.POSITIVE_INFINITY,
+};
+
+const CURRENCY_BY_COUNTRY: Record<string, { code: string; symbol: string; rate: number; locale: string }> = {
+  US: { code: "USD", symbol: "$", rate: 1, locale: "en-US" },
+  CA: { code: "CAD", symbol: "C$", rate: 1.36, locale: "en-CA" },
+  GB: { code: "GBP", symbol: "£", rate: 0.79, locale: "en-GB" },
+  EU: { code: "EUR", symbol: "€", rate: 0.92, locale: "en-IE" },
+  DE: { code: "EUR", symbol: "€", rate: 0.92, locale: "de-DE" },
+  FR: { code: "EUR", symbol: "€", rate: 0.92, locale: "fr-FR" },
+  ES: { code: "EUR", symbol: "€", rate: 0.92, locale: "es-ES" },
+  IT: { code: "EUR", symbol: "€", rate: 0.92, locale: "it-IT" },
+  NL: { code: "EUR", symbol: "€", rate: 0.92, locale: "nl-NL" },
+  IE: { code: "EUR", symbol: "€", rate: 0.92, locale: "en-IE" },
+  AU: { code: "AUD", symbol: "A$", rate: 1.52, locale: "en-AU" },
+  NZ: { code: "NZD", symbol: "NZ$", rate: 1.65, locale: "en-NZ" },
+  IN: { code: "INR", symbol: "₹", rate: 83.2, locale: "en-IN" },
+  JP: { code: "JPY", symbol: "¥", rate: 150, locale: "ja-JP" },
+  CN: { code: "CNY", symbol: "¥", rate: 7.2, locale: "zh-CN" },
+  KR: { code: "KRW", symbol: "₩", rate: 1340, locale: "ko-KR" },
+  SG: { code: "SGD", symbol: "S$", rate: 1.34, locale: "en-SG" },
+  HK: { code: "HKD", symbol: "HK$", rate: 7.81, locale: "en-HK" },
+  BR: { code: "BRL", symbol: "R$", rate: 5.05, locale: "pt-BR" },
+  MX: { code: "MXN", symbol: "Mex$", rate: 17, locale: "es-MX" },
+  ZA: { code: "ZAR", symbol: "R", rate: 18.5, locale: "en-ZA" },
+  NG: { code: "NGN", symbol: "₦", rate: 1500, locale: "en-NG" },
+  AE: { code: "AED", symbol: "AED", rate: 3.67, locale: "ar-AE" },
+  SA: { code: "SAR", symbol: "SAR", rate: 3.75, locale: "ar-SA" },
+  CH: { code: "CHF", symbol: "CHF", rate: 0.88, locale: "de-CH" },
+  SE: { code: "SEK", symbol: "kr", rate: 10.5, locale: "sv-SE" },
+};
+
+export function localizeLoss(usdAmount: number | undefined, countryCode: string | null | undefined): string {
+  if (!usdAmount || usdAmount <= 0) return "$0";
+  const cfg = (countryCode && CURRENCY_BY_COUNTRY[countryCode]) || CURRENCY_BY_COUNTRY.US;
+  const local = usdAmount * cfg.rate;
+  if (local >= 1e12) return `${cfg.symbol}${(local / 1e12).toFixed(2)}T+`;
+  if (local >= 1e9) return `${cfg.symbol}${(local / 1e9).toFixed(1)}B+`;
+  if (local >= 1e6) return `${cfg.symbol}${(local / 1e6).toFixed(1)}M+`;
+  return `${cfg.symbol}${Math.round(local).toLocaleString(cfg.locale)}`;
+}
+
+export function filterEventsByRange<T extends { timestamp: string }>(events: T[], range: TimeRange): T[] {
+  if (range === "all") return events;
+  const cutoff = Date.now() - TIME_RANGE_MS[range];
+  return events.filter(e => {
+    const t = new Date(e.timestamp).getTime();
+    return Number.isFinite(t) && t >= cutoff;
+  });
 }
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -113,51 +198,235 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`;
 }
 
-function GlobalStatsBar({ stats }: { stats: GlobalStats | null }) {
+function DeltaBadge({ percent, direction, suffix = "vs last week" }: { percent: number; direction: "up" | "down" | "stable"; suffix?: string }) {
+  if (direction === "stable" || Math.abs(percent) < 0.5) {
+    return (
+      <div className="inline-flex items-center gap-1 text-[10px] text-muted-foreground" data-testid="stat-delta-stable">
+        <Minus className="w-2.5 h-2.5" />
+        <span>flat {suffix}</span>
+      </div>
+    );
+  }
+  const up = direction === "up";
+  return (
+    <div className={`inline-flex items-center gap-1 text-[10px] font-semibold ${up ? "text-red-500" : "text-emerald-500"}`} data-testid={`stat-delta-${direction}`}>
+      {up ? <ArrowUp className="w-2.5 h-2.5" /> : <ArrowDown className="w-2.5 h-2.5" />}
+      <span>{up ? "+" : ""}{percent.toFixed(1)}% {suffix}</span>
+    </div>
+  );
+}
+
+function GlobalStatsBar({ stats, visitorCountryCode }: { stats: GlobalStats | null; visitorCountryCode?: string | null }) {
   if (!stats) return null;
-  const items = [
-    { label: "Scams Reported", value: formatNumber(stats.totalIncidentsTracked), icon: Activity },
-    { label: "Countries Tracked", value: String(stats.countriesCovered ?? 0), icon: Globe },
-    { label: "Trusted Sources", value: String(stats.sourcesMonitored ?? 0), icon: Eye },
-    { label: "Money Lost to Scams", value: stats.totalLossesTracked || "$0", icon: TrendingUp },
-    { label: "Types of Scams", value: String(stats.activeScamTypes ?? 0), icon: AlertTriangle },
+  const wow = stats.wowChange;
+  const localizedLoss = stats.totalLossesAmountUsd
+    ? localizeLoss(stats.totalLossesAmountUsd, visitorCountryCode)
+    : (stats.totalLossesTracked || "$0");
+
+  const items: Array<{ label: string; value: string; icon: any; delta?: { percent: number; direction: "up" | "down" | "stable"; suffix?: string }; testid: string }> = [
+    {
+      label: "Scams Reported", value: formatNumber(stats.totalIncidentsTracked), icon: Activity, testid: "stat-incidents",
+      delta: wow ? { percent: wow.incidentsPercent, direction: wow.incidentsDirection } : undefined,
+    },
+    { label: "Countries Tracked", value: String(stats.countriesCovered ?? 0), icon: Globe, testid: "stat-countries" },
+    { label: "Trusted Sources", value: String(stats.sourcesMonitored ?? 0), icon: Eye, testid: "stat-sources" },
+    { label: "Money Lost to Scams", value: localizedLoss, icon: TrendingUp, testid: "stat-losses" },
+    {
+      label: "Countries Trending Up", value: String(wow?.countriesTrendingUp ?? stats.activeScamTypes ?? 0), icon: AlertTriangle, testid: "stat-trending",
+      delta: wow ? { percent: wow.countriesAtCriticalRisk, direction: wow.countriesAtCriticalRisk > 0 ? "up" : "stable", suffix: "at critical risk" } : undefined,
+    },
   ];
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" data-testid="global-stats-bar">
       {items.map((item) => (
-        <div key={item.label} className="bg-card border border-border rounded-xl p-3 text-center hover:border-primary/30 transition-colors">
+        <div key={item.label} className="bg-card border border-border rounded-xl p-3 text-center hover:border-primary/30 transition-colors" data-testid={item.testid}>
           <item.icon className="w-4 h-4 text-primary mx-auto mb-1" />
           <div className="text-xl font-bold text-foreground">{item.value}</div>
-          <div className="text-[11px] text-muted-foreground">{item.label}</div>
+          <div className="text-[11px] text-muted-foreground mb-1">{item.label}</div>
+          {item.delta && <DeltaBadge percent={item.delta.percent} direction={item.delta.direction} suffix={item.delta.suffix} />}
         </div>
       ))}
     </div>
   );
 }
 
-function LiveFeedTicker({ events }: { events: LiveFeedEvent[] }) {
+function TimeRangeSelector({ value, onChange }: { value: TimeRange; onChange: (v: TimeRange) => void }) {
+  const ranges: TimeRange[] = ["1h", "24h", "7d", "30d", "all"];
+  return (
+    <div className="inline-flex items-center gap-1 bg-card border border-border rounded-lg p-1" role="tablist" aria-label="Time range" data-testid="time-range-selector">
+      <Clock className="w-3.5 h-3.5 text-muted-foreground ml-1.5 mr-0.5" aria-hidden="true" />
+      {ranges.map(r => (
+        <button
+          key={r}
+          role="tab"
+          aria-selected={value === r}
+          onClick={() => onChange(r)}
+          className={`text-[11px] px-2.5 py-1 rounded-md font-medium transition-colors ${
+            value === r ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+          }`}
+          data-testid={`time-range-${r}`}
+        >
+          {r === "all" ? "All-time" : r.replace("h", "h").replace("d", "d")}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+const SOURCE_CATEGORY_LABEL: Record<string, string> = {
+  "law-enforcement": "Law enforcement",
+  government: "Government / CERT",
+  research: "Research / NGO",
+  industry: "Industry partner",
+  "open-data": "Open data feed",
+};
+
+function SourceTransparencyDrawer({ sources }: { sources: SourceMetadata[] }) {
+  const [open, setOpen] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const hydrated = useHydrated();
+
+  const filtered = filterCategory === "all" ? sources : sources.filter(s => s.category === filterCategory);
+  const categories = Array.from(new Set(sources.map(s => s.category)));
+  const liveCount = sources.filter(s => s.status === "live").length;
+  const totalRecords = sources.reduce((s, src) => s + src.recordsContributed, 0);
+
+  return (
+    <div className="bg-card border border-border rounded-xl overflow-hidden" data-testid="source-transparency-drawer">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
+        aria-expanded={open}
+        aria-controls="source-list"
+        data-testid="toggle-source-drawer"
+      >
+        <Database className="w-4 h-4 text-primary flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-semibold text-foreground">Where this data comes from</div>
+          <div className="text-[11px] text-muted-foreground">
+            {sources.length} sources tracked · {liveCount} updating live · {formatNumber(totalRecords)} records ingested
+          </div>
+        </div>
+        {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+      </button>
+
+      {open && (
+        <div id="source-list" className="border-t border-border">
+          <div className="flex flex-wrap items-center gap-1.5 px-4 py-2 border-b border-border bg-secondary/30">
+            <Filter className="w-3 h-3 text-muted-foreground" aria-hidden="true" />
+            <button
+              onClick={() => setFilterCategory("all")}
+              className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
+                filterCategory === "all" ? "bg-primary/15 border-primary/40 text-primary" : "bg-card border-border text-muted-foreground hover:text-foreground"
+              }`}
+              data-testid="source-filter-all"
+            >
+              All ({sources.length})
+            </button>
+            {categories.map(c => {
+              const count = sources.filter(s => s.category === c).length;
+              return (
+                <button
+                  key={c}
+                  onClick={() => setFilterCategory(c)}
+                  className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
+                    filterCategory === c ? "bg-primary/15 border-primary/40 text-primary" : "bg-card border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                  data-testid={`source-filter-${c}`}
+                >
+                  {SOURCE_CATEGORY_LABEL[c] || c} ({count})
+                </button>
+              );
+            })}
+          </div>
+          <div className="max-h-[420px] overflow-y-auto divide-y divide-border">
+            {filtered.map(s => (
+              <div key={s.id} className="px-4 py-2.5 hover:bg-secondary/40 transition-colors" data-testid={`source-row-${s.id}`}>
+                <div className="flex items-start gap-2.5">
+                  <div className="mt-0.5 flex-shrink-0">
+                    {s.status === "live" ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" aria-label="live" />
+                    ) : s.status === "delayed" ? (
+                      <Clock className="w-3.5 h-3.5 text-amber-500" aria-label="delayed" />
+                    ) : (
+                      <AlertCircle className="w-3.5 h-3.5 text-muted-foreground" aria-label="stale" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {s.url ? (
+                        <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-foreground hover:text-primary inline-flex items-center gap-1">
+                          {s.name}
+                          <ExternalLink className="w-3 h-3 opacity-60" />
+                        </a>
+                      ) : (
+                        <span className="text-sm font-medium text-foreground">{s.name}</span>
+                      )}
+                      {s.countryCode && (
+                        <span className="text-[10px] uppercase tracking-wider bg-secondary text-muted-foreground px-1.5 py-0.5 rounded border border-border">
+                          {s.countryCode}
+                        </span>
+                      )}
+                      <span className="text-[10px] text-muted-foreground">{SOURCE_CATEGORY_LABEL[s.category] || s.category}</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-0.5 text-[11px] text-muted-foreground">
+                      <span>Last fetched {hydrated ? timeAgo(s.lastFetched) : "..."}</span>
+                      <span>·</span>
+                      <span>{formatNumber(s.recordsContributed)} records</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {filtered.length === 0 && (
+              <div className="px-4 py-6 text-center text-xs text-muted-foreground">No sources match this filter.</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LiveFeedTicker({ events, timeRange = "7d" }: { events: LiveFeedEvent[]; timeRange?: TimeRange }) {
   const hydrated = useHydrated();
   const [visibleCount, setVisibleCount] = useState(8);
+  const filtered = filterEventsByRange(events, timeRange);
+  const [announcement, setAnnouncement] = useState("");
+  const lastTopIdRef = (typeof window !== "undefined" ? (window as any).__lastFeedRef : undefined) || { current: null as string | null };
 
-  if (events.length === 0) {
+  useEffect(() => {
+    if (!hydrated || filtered.length === 0) return;
+    const topId = filtered[0]?.id;
+    if (topId && lastTopIdRef.current && topId !== lastTopIdRef.current) {
+      const recentCount = filterEventsByRange(events, "1h").length;
+      setAnnouncement(`${recentCount} new scam alerts in the last hour. ${filtered[0]?.title?.slice(0, 100) || ""}`);
+    }
+    lastTopIdRef.current = topId;
+  }, [filtered.length > 0 ? filtered[0]?.id : null, hydrated]);
+
+  if (filtered.length === 0) {
     return (
-      <div className="bg-card border border-border rounded-xl p-6 text-center">
+      <div className="bg-card border border-border rounded-xl p-6 text-center" data-testid="live-feed-ticker-empty">
         <Radio className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
-        <p className="text-muted-foreground text-sm">Loading latest scam reports...</p>
+        <p className="text-muted-foreground text-sm">
+          {events.length === 0 ? "Loading latest scam reports..." : `No scam reports in ${TIME_RANGE_LABEL[timeRange].toLowerCase()}.`}
+        </p>
       </div>
     );
   }
 
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden" data-testid="live-feed-ticker">
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only" data-testid="live-feed-aria">{announcement}</div>
       <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-secondary/50">
         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
         <span className="text-sm font-semibold text-foreground">Latest Scam Reports</span>
-        <span className="text-xs text-muted-foreground ml-auto">{events.length} events</span>
+        <span className="text-xs text-muted-foreground ml-auto">{filtered.length} in {TIME_RANGE_LABEL[timeRange].toLowerCase()}</span>
       </div>
       <div className="divide-y divide-border max-h-[480px] overflow-y-auto">
-        {events.slice(0, visibleCount).map((event) => (
+        {filtered.slice(0, visibleCount).map((event) => (
           <div key={event.id} className="px-4 py-2.5 hover:bg-secondary/50 transition-colors group">
             <div className="flex items-start gap-2">
               <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${SEVERITY_COLORS[event.severity] || "bg-muted-foreground"}`} />
@@ -176,7 +445,7 @@ function LiveFeedTicker({ events }: { events: LiveFeedEvent[] }) {
           </div>
         ))}
       </div>
-      {visibleCount < events.length && (
+      {visibleCount < filtered.length && (
         <button
           onClick={() => setVisibleCount((c) => c + 10)}
           className="w-full py-2 text-xs text-primary hover:text-primary/80 border-t border-border transition-colors"
@@ -736,4 +1005,6 @@ export {
   LocalRiskSummary,
   ProtectFamilyPanel,
   FamilyConversationStarters,
+  TimeRangeSelector,
+  SourceTransparencyDrawer,
 };
