@@ -542,7 +542,7 @@ function ScamIntelligenceGlobeInner({ data, onCountrySelect, width, height, focu
       }
     }, 30000);
 
-    import("react-globe.gl")
+    (async () => { for (let i = 1; i <= 5; i++) { try { return await import("react-globe.gl"); } catch (e) { if (i === 5) throw e; await new Promise(r => setTimeout(r, 1000 * i)); } } })()
       .then((mod) => {
         if (!cancelled) {
           loaded = true;
