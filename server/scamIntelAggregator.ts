@@ -871,7 +871,7 @@ async function fetchLiveDataEnrichment(): Promise<{
   dbThreatCount: number;
   dbScamIntelCount: number;
   recentAlerts: { title: string; severity: string; source: string; sourceUrl: string; publishedAt: Date | null; category: string }[];
-  recentThreats: { title: string; severity: string | null; regions: string | null; publishedAt: Date | null; itemType: string; feedId: string }[];
+  recentThreats: { title: string; severity: string | null; regions: string | null; publishedAt: Date | null; itemType: string; feedId: string; sourceUrl: string | null }[];
 }> {
   try {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -897,6 +897,7 @@ async function fetchLiveDataEnrichment(): Promise<{
         publishedAt: threatItems.publishedAt,
         itemType: threatItems.itemType,
         feedId: threatItems.feedId,
+        sourceUrl: threatItems.sourceUrl,
       }).from(threatItems)
         .where(eq(threatItems.isActive, true))
         .orderBy(desc(threatItems.ingestedAt))
@@ -969,19 +970,13 @@ export const COUNTRY_CITATIONS: Record<string, Citation[]> = {
   ],
 };
 
-function getCitationsForCountry(country: string, profile: { sources: string[] }): Citation[] {
+function getCitationsForCountry(country: string, _profile: { sources: string[] }): Citation[] {
   const accessedAt = new Date().toISOString();
   const structured = COUNTRY_CITATIONS[country];
   if (structured && structured.length > 0) {
     return structured.map(c => ({ ...c, accessedAt }));
   }
-  return profile.sources.map(s => ({
-    name: s,
-    publisher: s,
-    url: "",
-    accessedAt,
-    notes: "Reference name only; structured citation pending",
-  }));
+  return [];
 }
 
 function buildGlobeData(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichment>>): ScamIntelGlobeData {

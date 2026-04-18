@@ -31,7 +31,7 @@ const scamGuardTools = [
   { title: "Browser Extension", description: "12 protection features including notification blocking, search safety badges, redirect detection, and clipboard protection. Install on Chrome, Edge, Brave, or Opera.", href: "/browser-extension", icon: Chrome, badge: "Free" },
   { title: "Report a Scam", description: "Spotted a scam? Report it to help protect the entire GetCyberRight community. Your report feeds our threat intelligence.", href: "/report-scam", icon: ShieldAlert },
   { title: "Password Generator", description: "Create strong, unique passwords with customizable length and complexity. Runs entirely in your browser.", icon: Lock, badge: "Free", inline: "password" as const },
-  { title: "Voice Deepfake Detector", description: "Upload an audio clip to detect signs of AI-generated voice cloning. Useful for verifying suspicious voicemails or calls.", icon: Radio, badge: "Free", inline: "voice-clone" as const },
+  { title: "Voice Verification Helper", description: "Got a suspicious voicemail or call? Walk through six things to listen for and learn how to verify the caller in a way a scammer cannot fake. We do not pretend to give you an AI verdict, because reliable voice clone detection does not exist yet.", icon: Radio, badge: "Free", inline: "voice-clone" as const },
 ];
 
 const dataShieldTools = [
