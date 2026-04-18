@@ -1,10 +1,10 @@
 {
-  "lastRunAt": "2026-04-18T12:07:59.418Z",
+  "lastRunAt": "2026-04-18T18:32:58.020Z",
   "lastRunSummary": {
     "total": 18,
     "fresh": 7,
-    "stale": 7,
-    "unreachable": 4,
+    "stale": 8,
+    "unreachable": 3,
     "unverified": 0
   },
   "records": [
@@ -14,10 +14,10 @@
       "country": "United States",
       "citationName": "2024 Internet Crime Report",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.402Z",
+      "lastCheckedAt": "2026-04-18T18:32:45.974Z",
       "status": "fresh",
       "contentHash": "ba494b0a1bd991c722cf65619eb518329175b898fb508e8c84fc7dd12e07cac0",
-      "lastSuccessAt": "2026-04-18T12:07:47.402Z",
+      "lastSuccessAt": "2026-04-18T18:32:45.974Z",
       "httpStatus": 200
     },
     {
@@ -26,12 +26,12 @@
       "country": "United States",
       "citationName": "Consumer Sentinel Network Data Book 2024",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.404Z",
+      "lastCheckedAt": "2026-04-18T18:32:45.979Z",
       "status": "stale",
-      "contentHash": "7afe5045c9599c5f50a5cfc2f98960e6bc23aa1628e0e0598504e5df829556af",
-      "lastSuccessAt": "2026-04-18T12:07:47.404Z",
+      "contentHash": "1114206e3d8fed2cee0abc5045c37defe704365d49586862d6c4e8cb8235e2b2",
+      "lastSuccessAt": "2026-04-18T18:32:45.979Z",
       "httpStatus": 200,
-      "changedAt": "2026-04-18T12:07:47.404Z",
+      "changedAt": "2026-04-18T18:32:45.979Z",
       "notes": "Publisher page changed since last verification; re-verify citation."
     },
     {
@@ -40,10 +40,10 @@
       "country": "Canada",
       "citationName": "CAFC 2024 Annual Statistical Report",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.406Z",
+      "lastCheckedAt": "2026-04-18T18:32:45.981Z",
       "status": "fresh",
       "contentHash": "cc6f6bca5f998d54198178fa0ab9a323ae6b4baba9e34503c21262e484b3f816",
-      "lastSuccessAt": "2026-04-18T12:07:47.406Z",
+      "lastSuccessAt": "2026-04-18T18:32:45.981Z",
       "httpStatus": 200
     },
     {
@@ -52,12 +52,12 @@
       "country": "United Kingdom",
       "citationName": "Annual Fraud Report 2025",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.407Z",
+      "lastCheckedAt": "2026-04-18T18:32:45.983Z",
       "status": "stale",
-      "contentHash": "f25e18435490721be9decc1c461c8ee809325f9b775b28798620e50e3ad21970",
-      "lastSuccessAt": "2026-04-18T12:07:47.407Z",
+      "contentHash": "13e82b2d324ceedac64585482ef4093c3cf490a61aa99d753fd345d5bcf9a4fe",
+      "lastSuccessAt": "2026-04-18T18:32:45.983Z",
       "httpStatus": 200,
-      "changedAt": "2026-04-18T12:02:19.868Z",
+      "changedAt": "2026-04-18T18:32:45.983Z",
       "notes": "Publisher page changed since last verification; re-verify citation."
     },
     {
@@ -66,7 +66,7 @@
       "country": "United Kingdom",
       "citationName": "Report Fraud (replaces Action Fraud from December 2025)",
       "tier": "B",
-      "lastCheckedAt": "2026-04-18T12:07:47.409Z",
+      "lastCheckedAt": "2026-04-18T18:32:45.989Z",
       "status": "unreachable",
       "httpStatus": 403,
       "notes": "HTTP 403"
@@ -77,10 +77,10 @@
       "country": "Germany",
       "citationName": "Die Lage der IT-Sicherheit in Deutschland 2025",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.410Z",
+      "lastCheckedAt": "2026-04-18T18:32:45.991Z",
       "status": "fresh",
       "contentHash": "cbe164db241fc966951ff5d1d563be0d5c57ac11efc54ade3bce7047e4768e77",
-      "lastSuccessAt": "2026-04-18T12:07:47.410Z",
+      "lastSuccessAt": "2026-04-18T18:32:45.991Z",
       "httpStatus": 200
     },
     {
@@ -89,13 +89,13 @@
       "country": "Germany",
       "citationName": "Bundeslagebild Cybercrime 2024",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.411Z",
-      "status": "unreachable",
-      "contentHash": "4aac0b99197cbafd51365f1d8dc3963398c346c35f91de547ded9b9e753b7f5e",
-      "lastSuccessAt": "2026-04-18T12:02:19.883Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.011Z",
+      "status": "stale",
+      "contentHash": "8667cf0aa026c34e6863243fc8eb22b7752d2c2add794e36ab27013e4fc7e986",
+      "lastSuccessAt": "2026-04-18T18:32:46.011Z",
       "httpStatus": 200,
-      "changedAt": "2026-04-18T12:02:19.883Z",
-      "notes": "fetch failed"
+      "changedAt": "2026-04-18T18:32:46.011Z",
+      "notes": "Publisher page changed since last verification; re-verify citation."
     },
     {
       "url": "https://cyber.gouv.fr/publications/panorama-de-la-cybermenace-2024",
@@ -103,12 +103,12 @@
       "country": "France",
       "citationName": "Panorama de la cybermenace 2024",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.412Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.014Z",
       "status": "stale",
-      "contentHash": "75013e101b748cbed5f1f20a69a316a84986bc5a18645872fcc5398889d1f7ab",
-      "lastSuccessAt": "2026-04-18T12:07:47.412Z",
+      "contentHash": "14ab9fa302ef590155724b875d831adc8c5b494edd2d425b5888a9e294b5e07c",
+      "lastSuccessAt": "2026-04-18T18:32:46.014Z",
       "httpStatus": 200,
-      "changedAt": "2026-04-18T12:07:47.412Z",
+      "changedAt": "2026-04-18T18:32:46.014Z",
       "notes": "Publisher page changed since last verification; re-verify citation."
     },
     {
@@ -117,12 +117,12 @@
       "country": "France",
       "citationName": "Rapport d'activite 2024",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.414Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.015Z",
       "status": "stale",
-      "contentHash": "745cf57f7a5f2ca48add7c474441e2c1ddf0ea1262ecfca7419f929247ae43ab",
-      "lastSuccessAt": "2026-04-18T12:07:47.414Z",
+      "contentHash": "803e79af02773586ffcb054be67d689b4c5ca48cbb3705fa9029fff8da5be163",
+      "lastSuccessAt": "2026-04-18T18:32:46.015Z",
       "httpStatus": 200,
-      "changedAt": "2026-04-18T12:07:47.414Z",
+      "changedAt": "2026-04-18T18:32:46.015Z",
       "notes": "Publisher page changed since last verification; re-verify citation."
     },
     {
@@ -131,12 +131,12 @@
       "country": "Australia",
       "citationName": "Targeting Scams Report 2024",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.415Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.016Z",
       "status": "stale",
-      "contentHash": "ce0ace859620661e672ac8a10132fdc7eb24c5f8d3c96023e77c3891cecf2a10",
-      "lastSuccessAt": "2026-04-18T12:07:47.415Z",
+      "contentHash": "ff9c5c8c6bb56b3a910c434b775e6ccba9e455f0a090a4a19cdb57c06de4b7bb",
+      "lastSuccessAt": "2026-04-18T18:32:46.016Z",
       "httpStatus": 200,
-      "changedAt": "2026-04-18T12:07:47.415Z",
+      "changedAt": "2026-04-18T18:32:46.016Z",
       "notes": "Publisher page changed since last verification; re-verify citation."
     },
     {
@@ -145,7 +145,7 @@
       "country": "Australia",
       "citationName": "Annual Cyber Threat Report 2024-2025",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.416Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.017Z",
       "status": "unreachable",
       "notes": "Request timed out"
     },
@@ -155,7 +155,7 @@
       "country": "India",
       "citationName": "Indian Cybercrime Coordination Centre",
       "tier": "B",
-      "lastCheckedAt": "2026-04-18T12:07:47.418Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.018Z",
       "status": "unreachable",
       "notes": "fetch failed"
     },
@@ -165,10 +165,10 @@
       "country": "Japan",
       "citationName": "National Police Agency cybercrime publications",
       "tier": "B",
-      "lastCheckedAt": "2026-04-18T12:07:47.419Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.019Z",
       "status": "fresh",
       "contentHash": "501383683796227d167d81f93169a81563d3aceac48146a2153d15754738c49f",
-      "lastSuccessAt": "2026-04-18T12:07:47.419Z",
+      "lastSuccessAt": "2026-04-18T18:32:46.019Z",
       "httpStatus": 200
     },
     {
@@ -177,10 +177,10 @@
       "country": "Brazil",
       "citationName": "CERT.br Incident Statistics (live portal)",
       "tier": "B",
-      "lastCheckedAt": "2026-04-18T12:07:47.421Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.020Z",
       "status": "fresh",
       "contentHash": "6629bc7155240f694a0ab4a939b2205d839ffb9b1e16a238db0b0958f22a6437",
-      "lastSuccessAt": "2026-04-18T12:07:47.421Z",
+      "lastSuccessAt": "2026-04-18T18:32:46.020Z",
       "httpStatus": 200
     },
     {
@@ -189,10 +189,10 @@
       "country": "Nigeria",
       "citationName": "INTERPOL Africa Cyberthreat Assessment Report 2025 (4th Edition)",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.422Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.021Z",
       "status": "fresh",
       "contentHash": "3899a9d377720f2c8359b50770afb9f37d2029b1ec7806467079978df212a22e",
-      "lastSuccessAt": "2026-04-18T12:07:47.422Z",
+      "lastSuccessAt": "2026-04-18T18:32:46.021Z",
       "httpStatus": 200
     },
     {
@@ -201,12 +201,12 @@
       "country": "South Africa",
       "citationName": "SABRIC Annual Crime Statistics 2024",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.425Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.025Z",
       "status": "stale",
-      "contentHash": "06924aaaab67da371988ccc8ffb7edf9848f8781f8543be427e946f5daf8e879",
-      "lastSuccessAt": "2026-04-18T12:07:47.425Z",
+      "contentHash": "daf3735667dc74b61633e724a61a9298446566a60260116fda33d025ca401959",
+      "lastSuccessAt": "2026-04-18T18:32:46.025Z",
       "httpStatus": 200,
-      "changedAt": "2026-04-18T12:02:19.890Z",
+      "changedAt": "2026-04-18T18:32:46.025Z",
       "notes": "Publisher page changed since last verification; re-verify citation."
     },
     {
@@ -215,10 +215,10 @@
       "country": "Singapore",
       "citationName": "Singapore Cyber Landscape 2024/2025",
       "tier": "A",
-      "lastCheckedAt": "2026-04-18T12:07:47.427Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.027Z",
       "status": "fresh",
       "contentHash": "2f91cbf479f9904a20675ab4a0b394c5fcc48195dc68791f7d9f1e67b4fc51ea",
-      "lastSuccessAt": "2026-04-18T12:07:47.427Z",
+      "lastSuccessAt": "2026-04-18T18:32:46.027Z",
       "httpStatus": 200
     },
     {
@@ -227,12 +227,12 @@
       "country": "South Korea",
       "citationName": "KrCERT/CC publications",
       "tier": "B",
-      "lastCheckedAt": "2026-04-18T12:07:47.428Z",
+      "lastCheckedAt": "2026-04-18T18:32:46.027Z",
       "status": "stale",
-      "contentHash": "3e29ccdc6e27c58280717abd61516b243b74b5cbde762c0a704023c73ca29d0c",
-      "lastSuccessAt": "2026-04-18T12:07:47.428Z",
+      "contentHash": "24cdf1ac7a35f3b9ee0a393af7de151ee63cead05e4563c34b8adf7f6e4386f7",
+      "lastSuccessAt": "2026-04-18T18:32:46.027Z",
       "httpStatus": 200,
-      "changedAt": "2026-04-18T12:07:47.428Z",
+      "changedAt": "2026-04-18T18:32:46.027Z",
       "notes": "Publisher page changed since last verification; re-verify citation."
     }
   ]
