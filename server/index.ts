@@ -220,7 +220,7 @@ async function bootstrapFullApp() {
     await runMigrations();
 
     // Seed initial news articles if the table is empty
-    seedNewsArticles().catch((err) => console.error("[startup] News seed failed:", err.message));
+    await seedNewsArticles().catch((err) => console.error("[startup] News seed failed:", err.message));
 
     registerSecurityEndpoints(app);
     registerSecurityMetricsEndpoint(app);
