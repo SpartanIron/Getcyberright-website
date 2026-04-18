@@ -712,7 +712,7 @@ const SCAM_TO_TOOL: Record<string, { name: string; href: string; description: st
   impersonation: { name: "Security Training", href: "/training", description: "Learn to spot impersonation tactics used by scammers" },
   "tech-support": { name: "AI Scam Analyzer", href: "/scam-checker", description: "Screenshot the pop-up or paste the message to check if it's real" },
   "mobile-money": { name: "Security Guides", href: "/guides", description: "Protect your mobile payment accounts with these security steps" },
-  investment: { name: "AI Scam Analyzer", href: "/scam-checker", description: "Check investment offers and platforms for known fraud signals" },
+      investment: { name: "GCR Scam Guard", href: "/scam-checker", description: "Check investment offers and platforms for known fraud signals" },
   "job-scam": { name: "AI Scam Analyzer", href: "/scam-checker", description: "Paste the job listing or recruiter message to verify if it's legitimate" },
 };
 
