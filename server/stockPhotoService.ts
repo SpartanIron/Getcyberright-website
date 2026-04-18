@@ -289,7 +289,16 @@ export function extractSearchQuery(title: string, category: string): string[] {
   return searchTerms;
 }
 
-async function searchUnsplashPhoto(query: string): Promise<{ url: string; photographer: string } | null> {
+function stableSeed(seed: string | undefined, mod: number): number {
+  if (!seed || mod <= 0) return 0;
+  let h = 5381;
+  for (let i = 0; i < seed.length; i++) {
+    h = ((h << 5) + h + seed.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h) % mod;
+}
+
+async function searchUnsplashPhoto(query: string, diversitySeed?: string): Promise<{ url: string; photographer: string } | null> {
   const accessKey = process.env.UNSPLASH_ACCESS_KEY;
   if (!accessKey) return null;
 
@@ -313,7 +322,8 @@ async function searchUnsplashPhoto(query: string): Promise<{ url: string; photog
 
     const validPhotos = data.results.filter((p: any) => (p.width || 0) >= 1200 && (p.height || 0) >= 630);
     const pool = validPhotos.length > 0 ? validPhotos : data.results;
-    const photo = pool[0];
+    const idx = stableSeed(diversitySeed, Math.min(pool.length, 5));
+    const photo = pool[idx];
     const photoUrl = photo.urls?.raw ? `${photo.urls.raw}&w=2400&q=85&fm=jpg` : photo.urls?.full || photo.urls?.regular;
     const photographer = photo.user?.name || "Unsplash";
 
@@ -357,7 +367,7 @@ async function searchShutterstockPhoto(query: string): Promise<{ url: string; ph
     });
 
     const pool = photos.length > 0 ? photos : data.data;
-    const photo = pool[0];
+    const photo = pool[stableSeed(diversitySeed, Math.min(pool.length, 5))];
     const asset = photo.assets?.huge || photo.assets?.preview_1500 || photo.assets?.preview || {};
     const photoUrl = asset.url;
     const photographer = photo.contributor?.id ? `Shutterstock #${photo.id}` : "Shutterstock";
@@ -372,7 +382,7 @@ async function searchShutterstockPhoto(query: string): Promise<{ url: string; ph
   }
 }
 
-async function searchPexelsPhoto(query: string, category: string): Promise<{ url: string; photographer: string } | null> {
+async function searchPexelsPhoto(query: string, category: string, diversitySeed?: string): Promise<{ url: string; photographer: string } | null> {
   const pexelsApiKey = process.env.PEXELS_API_KEY;
   const pexelsHeaders: Record<string, string> = { "Accept": "*/*" };
   if (pexelsApiKey) {
@@ -400,7 +410,7 @@ async function searchPexelsPhoto(query: string, category: string): Promise<{ url
         });
 
         const pool = validPhotos.length > 0 ? validPhotos : data.photos;
-        const photo = pool[0];
+        const photo = pool[stableSeed(diversitySeed, Math.min(pool.length, 5))];
         const photoUrl = photo.src.original || photo.src.large2x || photo.src.large;
         console.log(`[StockPhoto] Pexels stock photo: "${photo.alt}" by ${photo.photographer} (query: "${query}", ${photo.width}x${photo.height})`);
         return { url: photoUrl, photographer: photo.photographer };
@@ -421,7 +431,7 @@ async function searchPexelsPhoto(query: string, category: string): Promise<{ url
       if (fbResponse.ok) {
         const fbData: any = await fbResponse.json();
         if (fbData.photos?.length) {
-          const photo = fbData.photos[0];
+          const photo = fbData.photos[stableSeed(diversitySeed, Math.min(fbData.photos.length, 5))];
           const photoUrl = photo.src.original || photo.src.large2x || photo.src.large;
           console.log(`[StockPhoto] Pexels fallback: "${photo.alt}" by ${photo.photographer} (query: "${fallbackQuery}")`);
           return { url: photoUrl, photographer: photo.photographer };
@@ -476,22 +486,23 @@ Examples of good queries:
   }
 }
 
-export async function searchStockPhoto(category: string, title: string, options?: { platform?: string }): Promise<{ url: string; photographer: string; localPath?: string } | null> {
+export async function searchStockPhoto(category: string, title: string, options?: { platform?: string; diversitySeed?: string }): Promise<{ url: string; photographer: string; localPath?: string } | null> {
+  const seed = options?.diversitySeed;
   const aiQuery = await generateAISearchQuery(title, category);
   if (aiQuery) {
-    const unsplashResult = await searchUnsplashPhoto(aiQuery);
+    const unsplashResult = await searchUnsplashPhoto(aiQuery, seed);
     if (unsplashResult) return unsplashResult;
 
-    const pexelsResult = await searchPexelsPhoto(aiQuery, category);
+    const pexelsResult = await searchPexelsPhoto(aiQuery, category, seed);
     if (pexelsResult) return pexelsResult;
   }
 
   const queries = extractSearchQuery(title, category);
   for (const query of queries) {
-    const unsplashResult = await searchUnsplashPhoto(query);
+    const unsplashResult = await searchUnsplashPhoto(query, seed);
     if (unsplashResult) return unsplashResult;
 
-    const pexelsResult = await searchPexelsPhoto(query, category);
+    const pexelsResult = await searchPexelsPhoto(query, category, seed);
     if (pexelsResult) return pexelsResult;
   }
 

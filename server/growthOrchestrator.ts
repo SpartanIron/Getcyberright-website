@@ -94,21 +94,55 @@ async function executeTask(taskId: string, taskType: string, payload: Record<str
         return { skipped: true, reason: "Auto-publish disabled" };
       }
       const maxPublish = (payload?.count as number) || 3;
+      const MAX_PER_CATEGORY_PER_DAY = 2;
+
       const allDrafts = await storage.getAllGuides("draft");
-      const draftGuides = allDrafts.slice(0, maxPublish);
+
+      const startOfDay = new Date();
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      const allPublished = await storage.getAllGuides("published");
+      const todayCategoryCounts = new Map<string, number>();
+      for (const g of allPublished) {
+        const pub = g.publishedAt ? new Date(g.publishedAt) : null;
+        if (pub && pub >= startOfDay) {
+          const key = (g.category || "uncategorized").toLowerCase();
+          todayCategoryCounts.set(key, (todayCategoryCounts.get(key) || 0) + 1);
+        }
+      }
+
+      const selected: typeof allDrafts = [];
+      const sessionCategoryCounts = new Map<string, number>(todayCategoryCounts);
+      const skippedByCategory: { title: string; category: string; count: number }[] = [];
+      for (const draft of allDrafts) {
+        if (selected.length >= maxPublish) break;
+        const key = (draft.category || "uncategorized").toLowerCase();
+        const current = sessionCategoryCounts.get(key) || 0;
+        if (current >= MAX_PER_CATEGORY_PER_DAY) {
+          skippedByCategory.push({ title: draft.title, category: key, count: current });
+          continue;
+        }
+        selected.push(draft);
+        sessionCategoryCounts.set(key, current + 1);
+      }
+
+      if (skippedByCategory.length > 0) {
+        console.log(`[GrowthOrchestrator] Skipped ${skippedByCategory.length} draft(s) to avoid topic spam:`,
+          skippedByCategory.map(s => `"${s.title}" (${s.category} already at ${s.count})`).join("; "));
+      }
+
       let published = 0;
-      for (const guide of draftGuides) {
+      for (const guide of selected) {
         try {
           await storage.updateGuide(guide.id, { status: "published", publishedAt: new Date() } as any);
           await distributeGuideContent(guide);
           published++;
-          console.log(`[GrowthOrchestrator] Auto-published guide: "${guide.title}"`);
+          console.log(`[GrowthOrchestrator] Auto-published guide: "${guide.title}" (category: ${guide.category})`);
         } catch (err: any) {
           console.error(`[GrowthOrchestrator] Failed to auto-publish guide ${guide.id}:`, err.message);
         }
       }
       await publishAllDraftsViaBuffer();
-      return { published, total: draftGuides.length };
+      return { published, total: selected.length, skippedForTopicDiversity: skippedByCategory.length };
     }
 
     default:

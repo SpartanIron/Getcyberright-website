@@ -325,7 +325,7 @@ async function getConnectedPlatforms(): Promise<Set<string>> {
   }
 }
 
-async function generateImageForPost(title: string, contentType: string, platform: string, category?: string, severity?: string): Promise<string | null> {
+async function generateImageForPost(title: string, contentType: string, platform: string, category?: string, severity?: string, contentId?: string): Promise<string | null> {
   try {
     const searchCategory = category || contentType || "default";
     const templateStyle: TemplateStyle = contentType === "threat_alert" ? "alert_card" : contentType === "scam_intel" ? "stat_card" : "insight_card";
@@ -333,7 +333,7 @@ async function generateImageForPost(title: string, contentType: string, platform
     const subtext = "getcyberright.com";
     const dims = platform === "instagram" ? { w: 1080, h: 1080 } : { w: 1200, h: 630 };
 
-    const stockPhoto = await searchStockPhoto(searchCategory, title, { platform });
+    const stockPhoto = await searchStockPhoto(searchCategory, title, { platform, diversitySeed: contentId });
     if (stockPhoto) {
       const imgPath = stockPhoto.localPath || await downloadSourceImage(stockPhoto.url, title);
       if (imgPath) {
@@ -390,7 +390,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 
   for (const { platform, content } of platforms) {
     if (!content) continue;
-    const imagePath = await generateImageForPost(guide.title, "guide", platform, guide.category);
+    const imagePath = await generateImageForPost(guide.title, "guide", platform, guide.category, undefined, guide.id);
     const post: InsertSocialPost = {
       contentType: "guide",
       contentId: guide.id,
@@ -445,7 +445,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
   const alertCampaignId = buildCampaignId("threat_alert", "multi");
   for (const { platform, content } of platforms) {
     if (!content) continue;
-    const imagePath = await generateImageForPost(alert.threatName, "threat_alert", platform, alert.threatCategory, alert.riskLevel);
+    const imagePath = await generateImageForPost(alert.threatName, "threat_alert", platform, alert.threatCategory, alert.riskLevel, alert.id);
     const post: InsertSocialPost = {
       contentType: "threat_alert",
       contentId: alert.id,
@@ -500,7 +500,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
   const scamCampaignId = buildCampaignId("scam_intel", "multi");
   for (const { platform, content } of platforms) {
     if (!content) continue;
-    const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform, scam.category || scam.scamCategory);
+    const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform, scam.category || scam.scamCategory, undefined, scam.id);
     const post: InsertSocialPost = {
       contentType: "scam_intel",
       contentId: scam.id,
