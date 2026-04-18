@@ -230,7 +230,7 @@ function GlobalStatsBar({ stats, visitorCountryCode }: { stats: GlobalStats | nu
     },
     { label: "Countries Tracked", value: String(stats.countriesCovered ?? 0), icon: Globe, testid: "stat-countries" },
     { label: "Trusted Sources", value: String(stats.sourcesMonitored ?? 0), icon: Eye, testid: "stat-sources" },
-    { label: "Money Lost to Scams", value: localizedLoss, icon: TrendingUp, testid: "stat-losses" },
+    { label: "Est. Fraud Losses", value: localizedLoss, icon: TrendingUp, testid: "stat-losses" },
     {
       label: "Countries Trending Up", value: String(wow?.countriesTrendingUp ?? stats.activeScamTypes ?? 0), icon: AlertTriangle, testid: "stat-trending",
       delta: wow ? { percent: wow.countriesAtCriticalRisk, direction: wow.countriesAtCriticalRisk > 0 ? "up" : "stable", suffix: "at critical risk" } : undefined,
