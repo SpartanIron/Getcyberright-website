@@ -2664,12 +2664,14 @@ export function ScamChecker() {
                               <Badge variant="outline" className="text-xs">
                                 {getFriendlyContentType(aiResult.contentTypeDetected)}
                               </Badge>
-                              <Badge variant="secondary" className="text-xs font-mono">
-                                {aiResult.confidenceLevel}
-                              </Badge>
                             </div>
-                            <p className="text-sm font-medium text-foreground mb-1">{getFriendlyVerdict(aiResult.scamRiskLevel)}</p>
-                            <p className="text-sm text-muted-foreground">{aiResult.summary}</p>
+                            {aiResult.confidenceLevel && (
+                              <p className="text-xs text-muted-foreground italic mb-2 break-words" data-testid="text-confidence">
+                                {aiResult.confidenceLevel}
+                              </p>
+                            )}
+                            <p className="text-sm font-medium text-foreground mb-1 break-words">{getFriendlyVerdict(aiResult.scamRiskLevel)}</p>
+                            <p className="text-sm text-muted-foreground break-words">{aiResult.summary}</p>
                             {(aiResult.scamRiskLevel === "Critical" || aiResult.scamRiskLevel === "High") && (
                               <div className="mt-3 flex flex-wrap gap-2">
                                 <Button
