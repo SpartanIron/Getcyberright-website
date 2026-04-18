@@ -2587,6 +2587,137 @@ export function ScamChecker() {
           </div>
         )}
 
+        {(result?.overallRisk || aiResult) && (() => {
+          const aiLevel = aiResult?.scamRiskLevel;
+          const patternLevel = result?.overallRisk;
+          const patternToTitle: Record<string, string> = { low: "Low", medium: "Moderate", high: "High", critical: "Critical" };
+          const rank: Record<string, number> = { Low: 0, Moderate: 1, High: 2, Critical: 3 };
+          const fromAi = aiLevel ?? null;
+          const fromPattern = patternLevel ? patternToTitle[patternLevel] ?? null : null;
+          const reputationDangerous = Object.values(urlReputations).some((r: any) => r?.threatLevel === "dangerous");
+          let unifiedLevel: "Low" | "Moderate" | "High" | "Critical" = "Low";
+          [fromAi, fromPattern].forEach((lvl) => {
+            if (lvl && rank[lvl] > rank[unifiedLevel]) unifiedLevel = lvl as any;
+          });
+          if (reputationDangerous) unifiedLevel = "Critical";
+
+          const verdictLabel: Record<string, string> = {
+            Low: "Safe to proceed",
+            Moderate: "Be careful",
+            High: "Don't trust this",
+            Critical: "Don't open this",
+          };
+          const oneLiner: Record<string, string> = {
+            Low: "We checked this against multiple sources and found no signs of fraud.",
+            Moderate: "We found some warning signs. Verify through official channels before you act.",
+            High: "Multiple checks flagged this as a likely scam. We recommend you avoid it.",
+            Critical: "This matches a confirmed threat. Do not click, reply, or share any information.",
+          };
+          const friendlySummary = aiResult?.summary || result?.summary || oneLiner[unifiedLevel];
+          const firstUrl = result?.urls?.[0]?.url || content.match(/https?:\/\/[^\s]+/)?.[0] || "";
+
+          const aiRan = !!aiResult && !isAiAnalyzing;
+          const patternRan = !!result?.overallRisk;
+          const reputationRan = Object.keys(urlReputations).length > 0;
+          const sslRan = Object.keys(sslResults).length > 0;
+          const checks = [
+            { ran: aiRan, label: "AI scam analysis", source: "Anthropic Claude" },
+            { ran: patternRan, label: `${threatPatterns.length} known scam patterns`, source: "GCR pattern library" },
+            { ran: reputationRan, label: "Threat databases", source: "Google Safe Browsing + URLhaus" },
+            { ran: sslRan, label: "SSL certificate", source: "Live HTTPS handshake" },
+          ];
+          const ranCount = checks.filter((c) => c.ran).length;
+
+          return (
+            <div className={`p-6 rounded-xl border-2 ${getAIRiskBg(unifiedLevel)}`} role="alert" aria-live="polite" data-testid="result-hero-verdict">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 mt-1">{getAIRiskIcon(unifiedLevel)}</div>
+                <div className="flex-1 min-w-0">
+                  <h2 className={`text-2xl font-bold mb-1 ${getAIRiskColor(unifiedLevel)}`} data-testid="text-hero-verdict">
+                    {verdictLabel[unifiedLevel]}
+                  </h2>
+                  <p className="text-sm text-foreground/90 break-words mb-4" data-testid="text-hero-summary">
+                    {friendlySummary}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {unifiedLevel === "Low" && firstUrl && (
+                      <Button asChild size="sm" className="font-semibold" data-testid="button-hero-visit">
+                        <a href={firstUrl} target="_blank" rel="noopener noreferrer">
+                          <LinkIcon className="w-4 h-4 mr-1.5" />
+                          Open the site
+                        </a>
+                      </Button>
+                    )}
+                    {unifiedLevel === "Moderate" && (
+                      <Button size="sm" variant="outline" className="font-semibold" onClick={() => {
+                        const el = document.querySelector('[data-testid="result-ai-analysis-inline"], [data-testid="result-pattern-analysis"]');
+                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                      }} data-testid="button-hero-review">
+                        <Shield className="w-4 h-4 mr-1.5" />
+                        Review the warning signs
+                      </Button>
+                    )}
+                    {(unifiedLevel === "High" || unifiedLevel === "Critical") && (
+                      <>
+                        <Button size="sm" variant="destructive" className="font-semibold" onClick={() => {
+                          const url = firstUrl;
+                          navigator.clipboard.writeText(
+                            `GCR Scam Guard Scan Result: ${verdictLabel[unifiedLevel]}\n\n${friendlySummary}\n\n${url ? "Link scanned: " + url + "\n\n" : ""}Protect yourself and your family. Getcyberright.com`
+                          );
+                          toast({ title: "Copied to clipboard", description: "Share this warning with people you trust." });
+                        }} data-testid="button-hero-warn">
+                          <AlertTriangle className="w-4 h-4 mr-1.5" />
+                          Warn others
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => {
+                          const el = document.querySelector('[data-testid="button-report-community"]');
+                          if (el) el.scrollIntoView({ behavior: "smooth" });
+                        }} data-testid="button-hero-report">
+                          <Shield className="w-4 h-4 mr-1.5" />
+                          Report this threat
+                        </Button>
+                      </>
+                    )}
+                    <Button size="sm" variant="ghost" onClick={() => {
+                      const el = document.querySelector('[data-testid="result-ai-analysis-inline"], [data-testid="result-pattern-analysis"]');
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }} data-testid="button-hero-details">
+                      See full details
+                    </Button>
+                  </div>
+                  <div className="border-t border-foreground/10 pt-3">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">
+                      Verified against {ranCount} {ranCount === 1 ? "source" : "sources"}:
+                    </p>
+                    <ul className="space-y-1">
+                      {checks.map((c, i) => (
+                        <li key={i} className="text-xs flex items-start gap-2" data-testid={`check-${i}`}>
+                          {c.ran ? (
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                          ) : (
+                            <span className="w-3.5 h-3.5 rounded-full border border-muted-foreground/30 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                          )}
+                          <span className={c.ran ? "text-foreground/80" : "text-muted-foreground/60"}>
+                            <span className="font-medium">{c.label}</span>
+                            <span className="text-muted-foreground/80"> · {c.source}</span>
+                            {!c.ran && <span className="italic"> (not run for this scan)</span>}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    {!aiRan && isAiAnalyzing && (
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Deep AI analysis still running. The verdict may update.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {result && result.overallRisk && (
           <div className="space-y-4" role="region" aria-label="Pattern analysis results" aria-live="polite" data-testid="result-pattern-analysis">
             {(!aiResult || isAiAnalyzing) && (
