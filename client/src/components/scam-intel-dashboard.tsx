@@ -855,7 +855,7 @@ function LocalRiskSummary({ visitorCountryName, hotspots, trending }: {
               {topTrending.length} new scam types are
             </span>{" "}
             targeting families in {countryName} this week. Stay alert for{" "}
-            {topTrending.map(t => t.label.toLowerCase()).join(", ") || "emerging"} scams.
+            {topTrending.map(t => t.label.replace(/\s*scams?$/i, '')).join(", ") || "emerging"} scams.
           </p>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span>{localHotspot ? `${formatNumber(localHotspot.recentIncidents ?? localHotspot.totalIncidents)} reports this period` : "Reports being collected"}</span>
