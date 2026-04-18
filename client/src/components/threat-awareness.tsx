@@ -27,7 +27,7 @@ const threats = [
     icon: CreditCard,
     stat: "4,000+",
     label: "Data brokers selling your information",
-    source: "Privacy Rights Clearinghouse",
+        source: "Data Privacy Research",
   },
 ];
 
