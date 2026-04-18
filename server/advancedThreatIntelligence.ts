@@ -1027,71 +1027,84 @@ export function calculateDomainReputation(
 }
 
 // ============================================================================
-// DARK WEB MONITORING (Educational Simulation)
+// BREACH EXPOSURE RISK ASSESSMENT
+// (Inferred from HIBP breach count. We do NOT scan the dark web ourselves —
+// claims are framed as inferred risk, not direct observation.)
 // ============================================================================
 
-export interface DarkWebMonitoringResult {
+export interface BreachExposureRiskResult {
   email: string;
   exposureLevel: "none" | "low" | "medium" | "high" | "critical";
-  potentialExposures: {
+  inferredRisks: {
     type: string;
     description: string;
     risk: string;
   }[];
   recommendations: string[];
+  source: string;
   disclaimer: string;
 }
 
-export function simulateDarkWebMonitoring(email: string, breachCount: number): DarkWebMonitoringResult {
-  const potentialExposures: { type: string; description: string; risk: string }[] = [];
-  
-  // Simulate based on breach history
+/** @deprecated Use BreachExposureRiskResult. Kept for compatibility. */
+export type DarkWebMonitoringResult = BreachExposureRiskResult & {
+  /** @deprecated alias for inferredRisks */
+  potentialExposures: BreachExposureRiskResult["inferredRisks"];
+};
+
+export function assessBreachExposureRisk(email: string, breachCount: number): BreachExposureRiskResult {
+  const inferredRisks: { type: string; description: string; risk: string }[] = [];
   let exposureLevel: "none" | "low" | "medium" | "high" | "critical" = "none";
-  
+
   if (breachCount >= 10) {
     exposureLevel = "critical";
-    potentialExposures.push(
-      { type: "Credential Trading", description: "Email found in multiple breach compilations traded on dark web forums", risk: "Very High" },
-      { type: "Combo Lists", description: "Likely included in password combo lists used for credential stuffing", risk: "High" },
-      { type: "Identity Theft Risk", description: "High probability of personal data being available for purchase", risk: "Critical" }
+    inferredRisks.push(
+      { type: "High breach volume", description: `Email appears in ${breachCount} known public breaches indexed by HIBP. Emails in 10+ breaches are statistically likely to appear in credential-stuffing lists.`, risk: "Very High" },
+      { type: "Credential reuse risk", description: "If the same password was reused across breached accounts, attackers can attempt automated logins on other services.", risk: "High" },
+      { type: "Targeted phishing risk", description: "Heavily breached emails are common targets for personalised phishing using leaked context.", risk: "High" }
     );
   } else if (breachCount >= 5) {
     exposureLevel = "high";
-    potentialExposures.push(
-      { type: "Breach Compilations", description: "Email may appear in compiled breach databases", risk: "High" },
-      { type: "Phishing Target", description: "Known breached emails are often targeted for phishing", risk: "Medium" }
+    inferredRisks.push(
+      { type: "Multiple known breaches", description: `Email appears in ${breachCount} known public breaches indexed by HIBP.`, risk: "High" },
+      { type: "Phishing target risk", description: "Emails with multiple breach hits are frequently targeted for phishing.", risk: "Medium" }
     );
   } else if (breachCount >= 2) {
     exposureLevel = "medium";
-    potentialExposures.push(
-      { type: "Basic Exposure", description: "Email may circulate in older breach datasets", risk: "Medium" }
+    inferredRisks.push(
+      { type: "Repeat exposure", description: `Email appears in ${breachCount} known public breaches indexed by HIBP.`, risk: "Medium" }
     );
   } else if (breachCount >= 1) {
     exposureLevel = "low";
-    potentialExposures.push(
-      { type: "Limited Exposure", description: "Single breach exposure, monitor for unusual activity", risk: "Low" }
+    inferredRisks.push(
+      { type: "Single known breach", description: "Email appears in 1 known public breach indexed by HIBP.", risk: "Low" }
     );
   }
-  
+
   const recommendations: string[] = [];
   if (exposureLevel !== "none") {
-    recommendations.push("Enable two-factor authentication on all accounts");
-    recommendations.push("Use unique passwords for every account");
-    recommendations.push("Consider using a password manager");
+    recommendations.push("Enable two-factor authentication on all important accounts");
+    recommendations.push("Use a unique password for every account (a password manager makes this practical)");
     if (exposureLevel === "high" || exposureLevel === "critical") {
-      recommendations.push("Monitor your credit report for unauthorized activity");
+      recommendations.push("Monitor your credit report for unauthorised activity");
       recommendations.push("Consider a credit freeze if concerned about identity theft");
       recommendations.push("Set up fraud alerts with credit bureaus");
     }
   }
-  
+
   return {
     email,
     exposureLevel,
-    potentialExposures,
+    inferredRisks,
     recommendations,
-    disclaimer: "This is an educational assessment based on known breach data. For comprehensive dark web monitoring, consider specialized services like SpyCloud, Hudson Rock, or Identity Guard."
+    source: "Have I Been Pwned (HIBP) breach count — https://haveibeenpwned.com",
+    disclaimer: "This is a risk score inferred from your public-breach count. GetCyberRight does not crawl dark-web marketplaces. For active dark-web monitoring, use a specialist service such as SpyCloud, Hudson Rock, or Identity Guard."
   };
+}
+
+/** @deprecated Use assessBreachExposureRisk. Kept for backward compatibility. */
+export function simulateDarkWebMonitoring(email: string, breachCount: number): DarkWebMonitoringResult {
+  const r = assessBreachExposureRisk(email, breachCount);
+  return { ...r, potentialExposures: r.inferredRisks };
 }
 
 // ============================================================================

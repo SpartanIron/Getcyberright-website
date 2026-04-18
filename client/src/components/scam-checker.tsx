@@ -2690,21 +2690,21 @@ export function ScamChecker() {
                       Verified against {ranCount} {ranCount === 1 ? "source" : "sources"}:
                     </p>
                     <ul className="space-y-1">
-                      {checks.map((c, i) => (
+                      {checks.filter((c) => c.ran).map((c, i) => (
                         <li key={i} className="text-xs flex items-start gap-2" data-testid={`check-${i}`}>
-                          {c.ran ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                          ) : (
-                            <span className="w-3.5 h-3.5 rounded-full border border-muted-foreground/30 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                          )}
-                          <span className={c.ran ? "text-foreground/80" : "text-muted-foreground/60"}>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                          <span className="text-foreground/80">
                             <span className="font-medium">{c.label}</span>
                             <span className="text-muted-foreground/80"> · {c.source}</span>
-                            {!c.ran && <span className="italic"> (not run for this scan)</span>}
                           </span>
                         </li>
                       ))}
                     </ul>
+                    {ranCount < checks.length && !isAiAnalyzing && (
+                      <p className="text-[11px] text-muted-foreground/70 mt-2">
+                        Other checks were not applicable to this input type.
+                      </p>
+                    )}
                     {!aiRan && isAiAnalyzing && (
                       <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
                         <Loader2 className="w-3 h-3 animate-spin" />

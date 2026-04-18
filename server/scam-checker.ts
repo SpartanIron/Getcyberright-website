@@ -8,6 +8,7 @@ import { logger } from "./logger";
 import { db } from "./db";
 import { communityScamReports, scamReports } from "@shared/schema";
 import { sql, ilike } from "drizzle-orm";
+import { checkDomainAge } from "./threatIntelligence";
 
 const log = logger.child('ScamChecker');
 
@@ -1606,13 +1607,19 @@ export async function analyzeURL(url: string): Promise<URLAnalysisResult> {
       result = analyzeURLInternal(url);
     }
     
-    // Run external API checks + community reports in parallel
-    const [safeBrowsingResult, phishTankResult, urlhausResult, communityReportData] = await Promise.all([
+    // Run external API checks + community reports + domain age in parallel
+    const finalDomain = (() => {
+      try { return new URL(urlToCheck).hostname; } catch { return domain; }
+    })();
+    const [safeBrowsingResult, phishTankResult, urlhausResult, communityReportData, domainAgeResult] = await Promise.all([
       checkGoogleSafeBrowsing(urlToCheck),
       checkPhishTank(urlToCheck),
       checkURLhaus(urlToCheck),
-      getCommunityReportCount(urlToCheck)
+      getCommunityReportCount(urlToCheck),
+      checkDomainAge(finalDomain),
     ]);
+
+    (result as any)._domainAge = domainAgeResult;
 
     (result as any)._communityReportCount = communityReportData.reportCount;
 
@@ -1676,7 +1683,26 @@ export async function analyzeURL(url: string): Promise<URLAnalysisResult> {
       result.warnings.unshift(`URLhaus malware database alert${threatInfo}${tagInfo}`);
       result.recommendations.unshift('This URL is known to distribute malware. Do not visit or download anything from this site.');
     }
-    
+
+    // Integrate RDAP domain-age signal (newly registered domains are a common phishing red flag)
+    if (domainAgeResult.checked && typeof domainAgeResult.ageInDays === 'number') {
+      const ageDays = domainAgeResult.ageInDays;
+      const dn = domainAgeResult.domain || finalDomain;
+      if (ageDays < 30) {
+        result.isSuspicious = true;
+        if (result.riskLevel === 'safe' || result.riskLevel === 'low' || result.riskLevel === 'medium') {
+          result.riskLevel = 'high';
+        }
+        result.warnings.unshift(`Domain ${dn} was registered ${ageDays} day${ageDays === 1 ? '' : 's'} ago (RDAP). Most phishing sites are under 30 days old.`);
+        result.recommendations.unshift('Treat this site with high caution. Newly registered domains are commonly used in scams.');
+      } else if (ageDays < 90) {
+        if (result.riskLevel === 'safe') {
+          result.riskLevel = 'low';
+        }
+        result.warnings.push(`Domain ${dn} was registered ${ageDays} days ago (RDAP) — relatively new.`);
+      }
+    }
+
     return result;
   } catch (error) {
     return {
