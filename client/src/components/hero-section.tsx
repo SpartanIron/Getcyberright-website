@@ -41,6 +41,78 @@ function detectRegion(): string {
   }
 }
 
+type HeroCopy = {
+  line1: string;
+  line2: string;
+  accent: string;
+  subtext: string;
+};
+
+const HERO_COPY_ROTATION: HeroCopy[] = [
+  {
+    line1: "Online Safety",
+    line2: "Should Not Require",
+    accent: "a Tech Degree.",
+    subtext: "Spot scams instantly, remove your data from the internet, and build practical safety habits for the whole family. Written for real people, not IT professionals.",
+  },
+  {
+    line1: "One Click",
+    line2: "Can Cost Your Family",
+    accent: "Everything.",
+    subtext: "Learn how to spot the scam texts and emails landing in your inbox this week, before anyone in your family clicks the wrong link. Free, plain language, no signup.",
+  },
+  {
+    line1: "Your Kids Are Online.",
+    line2: "Make Sure They Are",
+    accent: "Safe There.",
+    subtext: "Practical, no jargon guides for parents who want their kids exploring the internet without the risks. Built for families, not engineers.",
+  },
+  {
+    line1: "Your Personal Info",
+    line2: "Is For Sale.",
+    accent: "Take It Back.",
+    subtext: "Find out where your name, address, and phone number have leaked, then remove them from the internet for good. No tech background required.",
+  },
+  {
+    line1: "If It Sounds Urgent,",
+    line2: "Slow Down.",
+    accent: "It's Probably a Scam.",
+    subtext: "The latest scams target families through fake delivery texts, voice clones, and bogus refunds. Learn to spot them before they cost you.",
+  },
+  {
+    line1: "Cybersecurity",
+    line2: "Without the",
+    accent: "Confusion.",
+    subtext: "Real protection for everyday families. Plain language, working tools, and habits that actually stick. No jargon, no fear, no upselling.",
+  },
+  {
+    line1: "Small Habits,",
+    line2: "Strong Defenses,",
+    accent: "Whole Family.",
+    subtext: "Build the simple online safety habits that protect everyone you love. Three minutes a week, one practical step at a time.",
+  },
+  {
+    line1: "Real Threats.",
+    line2: "Plain Answers.",
+    accent: "Free For Families.",
+    subtext: "Spot scams, lock down your accounts, and keep your family safe online. Backed by official sources, written for real people.",
+  },
+];
+
+function getIsoWeekIndex(date: Date): number {
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return (d.getUTCFullYear() * 53) + weekNo;
+}
+
+function getWeeklyHeroCopy(now: Date = new Date()): HeroCopy {
+  const idx = getIsoWeekIndex(now) % HERO_COPY_ROTATION.length;
+  return HERO_COPY_ROTATION[idx];
+}
+
 const severityColors: Record<string, string> = {
   critical: "bg-red-500/20 text-red-400 border-red-500/30",
   high: "bg-orange-500/20 text-orange-400 border-orange-500/30",
@@ -88,6 +160,10 @@ function ThreatAlertBar() {
 }
 
 export function HeroSection() {
+  const [heroCopy, setHeroCopy] = useState<HeroCopy>(HERO_COPY_ROTATION[0]);
+  useEffect(() => {
+    setHeroCopy(getWeeklyHeroCopy());
+  }, []);
   return (
     <section className="relative w-full" data-testid="section-hero">
       <div className="bg-hero relative overflow-hidden">
@@ -183,18 +259,18 @@ export function HeroSection() {
                 className="text-[2rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-hero-foreground leading-[1.05] mb-6 sm:mb-8"
                 data-testid="text-hero-heading"
               >
-                Online Safety
+                {heroCopy.line1}
                 <br />
-                Should Not Require
+                {heroCopy.line2}
                 <br />
-                <span className="hero-gradient-text">a Tech Degree.</span>
+                <span className="hero-gradient-text">{heroCopy.accent}</span>
               </h1>
 
               <p
                 className="text-base sm:text-xl text-hero-foreground/80 leading-relaxed mb-8 sm:mb-10"
                 data-testid="text-hero-subtext"
               >
-              Spot scams instantly, remove your data from the internet, and build practical safety habits for the whole family. Written for real people, not IT professionals.
+                {heroCopy.subtext}
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 mb-8 sm:mb-10">
