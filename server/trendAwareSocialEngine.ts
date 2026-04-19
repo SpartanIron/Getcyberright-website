@@ -2519,18 +2519,38 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     let validatedLinkedin: string;
     let validatedFacebook: string;
     const validatedInstagram = fixedInstagram;
+    let learningLinkAuditNote: string | null = null;
 
     if (isLearningPost) {
       const hasExternalLink = /https?:\/\/(?!(?:www\.)?getcyberright\.com)[^\s)\]"',]+/i;
-      if (hasExternalLink.test(fixedLinkedin)) {
+      // Detect when the body claims a *specific* external resource (e.g.
+      // "Harvard offers...", "CS50's Introduction to AI...", "Coursera course...").
+      // If so, the post MUST carry that resource's real URL — silently
+      // substituting a generic /training link would mislead readers.
+      const NAMED_EXTERNAL_PROVIDERS = /\b(?:Harvard|MIT|Stanford|Yale|Princeton|Oxford|Cambridge|CS50|Coursera|edX|Udemy|Udacity|Khan Academy|Pluralsight|LinkedIn Learning|ISC2|\(ISC\)2|CompTIA|SANS|EC-Council|Cisco(?: Networking Academy)?|Google(?: Cloud)?(?: Skills Boost)?|Microsoft Learn|AWS(?: Skill Builder)?|IBM(?: SkillsBuild)?|Oracle University|Fortinet(?: NSE)?|CISA(?: training| course)|NIST(?: course| training))\b/i;
+      const namesExternalResource = NAMED_EXTERNAL_PROVIDERS.test(fixedLinkedin) || NAMED_EXTERNAL_PROVIDERS.test(fixedFacebook);
+
+      const linkedinHasExt = hasExternalLink.test(fixedLinkedin);
+      const facebookHasExt = hasExternalLink.test(fixedFacebook);
+
+      if (namesExternalResource && (!linkedinHasExt || !facebookHasExt)) {
+        // Refuse to publish this post with a fallback link — leave both copies
+        // unmodified so the missing external URL is obvious during admin review.
+        learningLinkAuditNote =
+          "Post mentions a specific external learning resource (e.g. Harvard, CS50, Coursera) but no external URL was provided. Add the real resource link before approving — do NOT publish with the generic /training fallback.";
         validatedLinkedin = fixedLinkedin;
-      } else {
-        validatedLinkedin = ensureGcrLink(tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle), "https://www.getcyberright.com/training", "linkedin", "trend_insight", contentSlug, postStyle);
-      }
-      if (hasExternalLink.test(fixedFacebook)) {
         validatedFacebook = fixedFacebook;
       } else {
-        validatedFacebook = ensureGcrLink(tagAllGcrLinks(fixedFacebook, "facebook", "trend_insight", contentSlug, postStyle), "https://www.getcyberright.com/training", "facebook", "trend_insight", contentSlug, postStyle);
+        if (linkedinHasExt) {
+          validatedLinkedin = fixedLinkedin;
+        } else {
+          validatedLinkedin = ensureGcrLink(tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle), "https://www.getcyberright.com/training", "linkedin", "trend_insight", contentSlug, postStyle);
+        }
+        if (facebookHasExt) {
+          validatedFacebook = fixedFacebook;
+        } else {
+          validatedFacebook = ensureGcrLink(tagAllGcrLinks(fixedFacebook, "facebook", "trend_insight", contentSlug, postStyle), "https://www.getcyberright.com/training", "facebook", "trend_insight", contentSlug, postStyle);
+        }
       }
     } else {
       validatedLinkedin = ensureGcrLink(tagAllGcrLinks(fixedLinkedin, "linkedin", "trend_insight", contentSlug, postStyle), canonicalUrl, "linkedin", "trend_insight", contentSlug, postStyle);
@@ -2588,7 +2608,11 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
             : [],
           imageSource: imageSource || null,
           reviewExpiresAt,
-          auditVerdict: "pending_review",
+          auditVerdict: learningLinkAuditNote ? "fail" : "pending_review",
+          auditFailures: learningLinkAuditNote
+            ? [{ kind: "link_mismatch", claim: posts.title, reason: learningLinkAuditNote }]
+            : [],
+          publishError: learningLinkAuditNote || undefined,
           extractedClaims: (() => {
             try {
               const { _internals } = require("./socialClaimAuditor") as typeof import("./socialClaimAuditor");
