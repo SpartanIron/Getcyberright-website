@@ -103,8 +103,9 @@ const scamIntelUpdateSchema = insertScamIntelligenceSchema.partial();
 const threatAlertUpdateSchema = insertCyberThreatAlertSchema.partial();
 
 const socialPostUpdateSchema = z.object({
-  status: z.enum(["draft", "scheduled", "published", "failed"]).optional(),
+  status: z.enum(["draft", "scheduled", "published", "failed", "review_pending", "rejected"]).optional(),
   scheduledFor: z.string().datetime().nullable().optional(),
+  postContent: z.string().min(1).max(5000).optional(),
 }).strict();
 
 const scheduleTaskSchema = z.object({

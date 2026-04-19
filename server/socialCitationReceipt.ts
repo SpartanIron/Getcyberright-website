@@ -84,8 +84,13 @@ export function formatShortReceipt(
   const deduped = dedupeCitations(citations);
   const primary = deduped.find((c) => c.url !== canonicalUrl) || deduped[0];
   const publisher = primary?.publisher || "GetCyberRight";
+  const date = primary ? (formatDate(primary.datePublished) || formatDate(primary.accessedAt)) : "";
+  const name = primary?.name?.trim();
   const verifyUrl = sourcesUrl || canonicalUrl;
-  return `Source: ${publisher}. Full sources: ${verifyUrl}`;
+  // Compact but structured: name (when present), publisher, date, verify URL.
+  // Keeps under typical 280-char budgets while preserving the citation contract.
+  const head = [name, publisher, date].filter(Boolean).join(" | ") || publisher;
+  return `Source: ${head}. Verify: ${verifyUrl}`;
 }
 
 /**

@@ -2544,7 +2544,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     if (channels.instagram && allowedPlatforms.includes("instagram") && (!platformFilter || platformFilter === "instagram")) platformPosts.push({ platform: "instagram", content: validatedInstagram, image: igImageUrl || imageUrl });
 
     // GOLD-STANDARD CHANGE (Task #17): Reactive posts pulled from trending news no longer
-    // publish directly. They are queued as "review_pending" with a 60-minute expiry.
+    // publish directly. They are queued as "review_pending" with a 30-minute expiry.
     // Admins approve via the social posts admin surface; expired drafts are auto-discarded
     // by the review sweeper. Excellence or silence — we never ship unaudited reactive content.
     const REVIEW_WINDOW_MS = 30 * 60 * 1000;
