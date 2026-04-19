@@ -9,3 +9,4 @@ vite.config.ts.*
 .replit
 .upm
 .agents/skills
+data/source-freshness.json
