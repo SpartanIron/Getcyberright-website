@@ -2567,7 +2567,15 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
           extractedClaims: (() => {
             try {
               const { _internals } = require("./socialClaimAuditor") as typeof import("./socialClaimAuditor");
-              return _internals.extractClaims(content);
+              const sourceCorpus = [
+                posts.title,
+                typeof posts.trendAnalysis === "object" && posts.trendAnalysis
+                  ? JSON.stringify(posts.trendAnalysis)
+                  : "",
+              ]
+                .filter((s) => typeof s === "string" && s.trim().length > 0)
+                .join("\n\n");
+              return _internals.extractClaims(sourceCorpus);
             } catch {
               return [];
             }

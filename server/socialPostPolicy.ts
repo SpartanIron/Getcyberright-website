@@ -381,8 +381,8 @@ export function validatePostContent(
     return m && typeof m.index === "number" ? m.index + (m[1] ? m[1].length : 0) : -1;
   })();
   const bodyForUrlCheck = receiptStart >= 0 ? text.slice(0, receiptStart) : text;
-  const urls = extractAllUrls(bodyForUrlCheck);
-  for (const url of urls) {
+  const bodyUrls = extractAllUrls(bodyForUrlCheck);
+  for (const url of bodyUrls) {
     if (!isGcrUrl(url)) {
       issues.push({
         code: "non_gcr_url",
@@ -392,6 +392,11 @@ export function validatePostContent(
     }
   }
 
+  // Canonical-link presence is checked across the WHOLE post (body + receipt)
+  // because the deterministic citation receipt is where the canonical GCR URL
+  // is appended for receipt-style posts.
+  const allUrls = extractAllUrls(text);
+
   if (requireCanonical && canonicalUrl) {
     let canonicalPath = "";
     try {
@@ -399,7 +404,7 @@ export function validatePostContent(
     } catch {
       canonicalPath = "";
     }
-    const seen = urls.some((u) => {
+    const seen = allUrls.some((u) => {
       try {
         const p = new URL(u.startsWith("http") ? u : `https://${u}`).pathname.replace(/\/+$/, "");
         return p === canonicalPath;
