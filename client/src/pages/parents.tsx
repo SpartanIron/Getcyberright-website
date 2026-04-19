@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Link } from "@/lib/navigation";
 import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
+import { AudienceFAQ, parentsAudienceFAQ } from "@/components/audience-faq";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -1119,6 +1120,30 @@ export default function Parents() {
           <span>Content last reviewed: February 2026</span>
         </div>
       </main>
+
+      <AudienceFAQ
+        heading="Common Questions From Parents"
+        description="Plain-language answers to the questions parents ask us most."
+        items={parentsAudienceFAQ}
+        testIdPrefix="faq-parents"
+      />
+
+      <section className="max-w-3xl mx-auto px-4 pb-8">
+        <div className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-5 flex flex-col sm:flex-row items-center gap-4 justify-between" data-testid="cta-parents-assessment">
+          <div>
+            <h3 className="font-semibold mb-1">Not sure where your family stands?</h3>
+            <p className="text-sm text-muted-foreground">Take our free 5-minute Family Safety Check and see what to fix first.</p>
+          </div>
+          <Link
+            href="/quick-assessment"
+            className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 font-semibold whitespace-nowrap"
+            data-testid="link-parents-assessment"
+          >
+            Take the Safety Check
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
 
       <RelatedResources
         title="More Family Safety Resources"

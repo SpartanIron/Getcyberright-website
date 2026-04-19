@@ -6,11 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Send } from "lucide-react";
+import { Send, AlertTriangle } from "lucide-react";
 import { useRecaptcha } from "@/hooks/use-recaptcha";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { NEWSLETTER_REGIONS, type NewsletterRegion } from "@shared/schema";
 
 export function NewsletterSignup() {
   const [email, setEmail] = useState("");
+  const [region, setRegion] = useState<NewsletterRegion>("US");
   const [formTimestamp, setFormTimestamp] = useState<number>(0);
   const { toast } = useToast();
   const { getRecaptchaToken } = useRecaptcha();
@@ -44,7 +48,7 @@ export function NewsletterSignup() {
           "Content-Type": "application/json",
           "x-csrf-token": csrfToken
         },
-        body: JSON.stringify({ email, _timestamp: formTimestamp.toString(), recaptchaToken }),
+        body: JSON.stringify({ email, region, _timestamp: formTimestamp.toString(), recaptchaToken }),
         credentials: "include"
       });
       if (!response.ok) {
@@ -88,11 +92,18 @@ export function NewsletterSignup() {
   return (
     <section className="cyber-gradient rounded-2xl p-8 md:p-12 text-white mb-16">
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-4">Stay Ahead of Cyber Threats</h2>
-        <p className="text-blue-100 text-lg mb-8">
-          Get the latest cybersecurity news, expert insights, and exclusive resources delivered to your inbox weekly.
+        <h2 className="text-3xl font-bold mb-4">Get the Week's Top Scam Alerts Delivered Free</h2>
+        <p className="text-blue-100 text-lg mb-6">
+          One short email a week with the scams trending in your region and the steps to keep your family safe.
         </p>
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+        <div className="max-w-md mx-auto mb-5 rounded-lg border border-white/15 bg-white/5 text-left px-4 py-3" data-testid="newsletter-subject-preview">
+          <p className="text-[11px] uppercase tracking-wider text-blue-100/70 mb-1">Sample subject line</p>
+          <p className="text-white text-sm flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-[var(--security-green)] mt-0.5 flex-shrink-0" />
+            <span>"This week: 3 new scam texts hitting US inboxes (and how to spot them)"</span>
+          </p>
+        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-md mx-auto" data-testid="form-newsletter-signup">
           <Input
             type="email"
             placeholder="Enter your email address"
@@ -100,18 +111,41 @@ export function NewsletterSignup() {
             onChange={(e) => setEmail(e.target.value)}
             className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-blue-100 focus:ring-2 focus:ring-white focus:border-transparent"
             disabled={subscribeMutation.isPending}
+            data-testid="input-newsletter-email"
+            required
           />
+          <div>
+            <Label htmlFor="newsletter-region-signup" className="sr-only">Your region</Label>
+            <Select value={region} onValueChange={(v) => setRegion(v as NewsletterRegion)}>
+              <SelectTrigger
+                id="newsletter-region-signup"
+                className="bg-white/10 border-white/20 text-white"
+                data-testid="select-newsletter-region"
+                aria-label="Your region"
+              >
+                <SelectValue placeholder="Your region" />
+              </SelectTrigger>
+              <SelectContent>
+                {NEWSLETTER_REGIONS.map((r) => (
+                  <SelectItem key={r} value={r} data-testid={`option-region-${r.toLowerCase()}`}>
+                    {r}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <Button
             type="submit"
             disabled={subscribeMutation.isPending}
             className="bg-[var(--security-green)] hover:bg-[var(--security-green-dark)] text-white font-semibold whitespace-nowrap"
+            data-testid="button-newsletter-subscribe"
           >
-            {subscribeMutation.isPending ? "Subscribing..." : "Subscribe"}
+            {subscribeMutation.isPending ? "Subscribing..." : "Send Me Free Alerts"}
             <Send className="ml-2 h-4 w-4" />
           </Button>
         </form>
         <p className="text-blue-200 text-sm mt-4">
-          Join 15,000+ cybersecurity professionals. Unsubscribe anytime.
+          Free, no spam. Unsubscribe anytime.
         </p>
         <p className="text-blue-300/70 text-xs mt-2">
           This site is protected by reCAPTCHA and the Google{' '}

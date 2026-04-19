@@ -18,10 +18,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: `${BASE_URL}/og/education.png`,
-        width: 1080,
-        height: 1080,
-        alt: "Senior Online Safety",
+        url: `${BASE_URL}/og/seniors.png`,
+        width: 1200,
+        height: 630,
+        alt: "Online safety resources for seniors and older adults",
       },
     ],
   },

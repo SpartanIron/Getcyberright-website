@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@/lib/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Clock, Search, ArrowRight, Loader2, BookMarked, Shield, Lock, Smartphone, Users, Globe, Brain } from "lucide-react";
+import { BookOpen, Clock, Search, ArrowRight, Loader2, BookMarked, Shield, Lock, Smartphone, Users, Globe, Brain, CalendarCheck, UserCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
@@ -51,6 +51,23 @@ function formatCategoryLabel(slug: string): string {
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+}
+
+function formatReviewedDate(iso?: string): string {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+function deriveAudience(category: string, tags: string[] = []): string | null {
+    const haystack = [category, ...(tags || [])].map((s) => (s || "").toLowerCase());
+    if (haystack.some((t) => t.includes("senior"))) return "Seniors";
+    if (haystack.some((t) => t.includes("kid") || t.includes("teen") || t.includes("child"))) return "Kids and Teens";
+    if (haystack.some((t) => t.includes("parent") || t.includes("family"))) return "Parents and Families";
+    if (haystack.some((t) => t.includes("business") || t.includes("smb") || t.includes("work"))) return "Small Business";
+    if (haystack.some((t) => t.includes("educator") || t.includes("school") || t.includes("teacher"))) return "Educators";
+    return "Everyone";
 }
 
 export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
@@ -158,15 +175,36 @@ export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
                                                                                 <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
                                                                                   {guide.metaDescription}
                                                                                 </p>
-                                                                                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                                                                                    <div className="flex items-center gap-1">
+                                                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground mb-3" data-testid={`meta-guide-${guide.slug}`}>
+                                                                                                    <span className="flex items-center gap-1">
                                                                                                                           <Clock className="h-3 w-3" />
                                                                                                                           <span>{guide.readingTimeMinutes || Math.ceil((guide.wordCount || 0) / 200)} min read</span>
-                                                                                                      </div>
-                                                                                                    <div className="flex items-center gap-1 text-teal-600 dark:text-teal-400">
-                                                                                                                          <span>Read more</span>
-                                                                                                                          <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
-                                                                                                      </div>
+                                                                                                    </span>
+                                                                                                    {guide.publishedAt && (
+                                                                                                      <span className="flex items-center gap-1" data-testid={`meta-reviewed-${guide.slug}`}>
+                                                                                                                          <CalendarCheck className="h-3 w-3" />
+                                                                                                                          <span>Reviewed {formatReviewedDate(guide.publishedAt)}</span>
+                                                                                                      </span>
+                                                                                                    )}
+                                                                                                    <span className="flex items-center gap-1" data-testid={`meta-audience-${guide.slug}`}>
+                                                                                                                          <UserCircle2 className="h-3 w-3" />
+                                                                                                                          <span>For {deriveAudience(guide.category, guide.tags)}</span>
+                                                                                                    </span>
+                                                                                </div>
+                                                                                {guide.tags && guide.tags.length > 0 && (
+                                                                                  <div className="flex flex-wrap gap-1.5 mb-3" data-testid={`tags-guide-${guide.slug}`}>
+                                                                                    {guide.tags.slice(0, 3).map((tag) => (
+                                                                                      <span key={tag} className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                                                                                        {tag}
+                                                                                      </span>
+                                                                                    ))}
+                                                                                  </div>
+                                                                                )}
+                                                                                <div className="flex items-center justify-end text-xs">
+                                                                                  <span className="flex items-center gap-1 text-teal-600 dark:text-teal-400 font-medium">
+                                                                                    <span>Read guide</span>
+                                                                                    <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
+                                                                                  </span>
                                                                                 </div>
                                                               </CardContent>
                                   </Card>

@@ -610,6 +610,22 @@ export default function SmallBusiness() {
         </div>
       </main>
 
+      <section className="max-w-3xl mx-auto px-4 pb-10">
+        <div className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-5 flex flex-col sm:flex-row items-center gap-4 justify-between" data-testid="cta-smb-assessment">
+          <div>
+            <h3 className="font-semibold mb-1">Not sure where your business stands?</h3>
+            <p className="text-sm text-muted-foreground">Take our 5-minute Safety Check to spot the gaps an attacker would exploit first.</p>
+          </div>
+          <a
+            href="/quick-assessment"
+            className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 font-semibold whitespace-nowrap"
+            data-testid="link-smb-assessment"
+          >
+            Check your security posture
+          </a>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );

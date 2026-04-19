@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: `${BASE_URL}/og/education.png`,
+        url: `${BASE_URL}/og/kids.png`,
         width: 1080,
         height: 1080,
         alt: "Kids Online Safety",

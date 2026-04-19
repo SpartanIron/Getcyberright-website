@@ -12,6 +12,7 @@ import { StructuredData } from "@/components/structured-data";
 import type { FAQData, BreadcrumbData } from "@/components/structured-data";
 import { Link } from "@/lib/navigation";
 import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
+import { AudienceFAQ, seniorsAudienceFAQ } from "@/components/audience-faq";
 import {
   Shield, Lock, Phone, Heart, Mail, CreditCard,
   CheckCircle, BookOpen, AlertTriangle,
@@ -1305,6 +1306,30 @@ export default function Seniors() {
           </>
         )}
       </main>
+
+      <AudienceFAQ
+        heading="Common Questions From Seniors and Their Families"
+        description="Quick, plain-language answers to the questions we hear most often."
+        items={seniorsAudienceFAQ}
+        testIdPrefix="faq-seniors"
+      />
+
+      <section className="max-w-3xl mx-auto px-4 pb-8">
+        <div className="rounded-xl border border-teal-500/30 bg-teal-500/5 p-5 flex flex-col sm:flex-row items-center gap-4 justify-between" data-testid="cta-seniors-tools">
+          <div>
+            <h3 className="font-semibold mb-1">Got a suspicious link, email, or text?</h3>
+            <p className="text-sm text-muted-foreground">Run it through our free Scam Guard before you click or reply.</p>
+          </div>
+          <Link
+            href="/tools"
+            className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 font-semibold whitespace-nowrap"
+            data-testid="link-seniors-scam-guard"
+          >
+            Use our Scam Guard
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
 
       <RelatedResources
         title="Keep Exploring"

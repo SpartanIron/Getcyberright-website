@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     images: [
       {
         url: `${BASE_URL}/og/scam-guard.png`,
-        width: 1080,
-        height: 1080,
-        alt: "GetCyberRight Tools",
+        width: 1200,
+        height: 630,
+        alt: "GCR Scam Guard and free cybersecurity tools",
       },
     ],
   },

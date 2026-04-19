@@ -16,7 +16,7 @@ export const metadata: Metadata = {
       "Cybersecurity resources for small businesses. Employee awareness training, security policy templates, and incident response guides.",
     url: `${BASE_URL}/small-business`,
     type: "website",
-    images: [{ url: `${BASE_URL}/og/training.png`, width: 1080, height: 1080, alt: "Small Business Cybersecurity" }],
+    images: [{ url: `${BASE_URL}/og/small-business.png`, width: 1200, height: 630, alt: "Affordable cybersecurity for small businesses" }],
   },
 };
 

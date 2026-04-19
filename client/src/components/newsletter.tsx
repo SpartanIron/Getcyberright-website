@@ -17,11 +17,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertNewsletterSubscriberSchema } from "@shared/schema";
 import { z } from "zod";
-import { Mail, CheckCircle2 } from "lucide-react";
+import { Mail, CheckCircle2, AlertTriangle } from "lucide-react";
 import { useRecaptcha } from "@/hooks/use-recaptcha";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { NEWSLETTER_REGIONS } from "@shared/schema";
 
 const newsletterFormSchema = insertNewsletterSubscriberSchema.extend({
   email: z.string().email("Please enter a valid email address"),
+  region: z.enum(NEWSLETTER_REGIONS).default("US"),
 });
 
 type NewsletterFormData = z.infer<typeof newsletterFormSchema>;
@@ -52,6 +55,7 @@ export function Newsletter() {
     resolver: zodResolver(newsletterFormSchema),
     defaultValues: {
       email: "",
+      region: "US",
     },
   });
 
@@ -109,12 +113,15 @@ export function Newsletter() {
             <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
               <Mail className="w-5 h-5 text-primary" />
               <h3 className="text-xl font-semibold text-foreground">
-                Stay Protected
+                Get the Week's Top Scam Alerts Delivered Free
               </h3>
             </div>
             <p className="text-muted-foreground max-w-md">
-              Get weekly cybersecurity tips, scam alerts, and protection
-              strategies delivered to your inbox.
+              One short email a week with the scams trending in your region and the steps that keep your family safe.
+            </p>
+            <p className="text-xs text-muted-foreground mt-2 flex items-start gap-2 max-w-md" data-testid="newsletter-subject-preview">
+              <AlertTriangle className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+              <span><span className="uppercase tracking-wider">Sample subject:</span> "This week: 3 new scam texts hitting US inboxes (and how to spot them)"</span>
             </p>
           </div>
 

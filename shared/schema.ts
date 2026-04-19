@@ -114,16 +114,23 @@ export const insertContactMessageSchema = createInsertSchema(contactMessages).pi
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
 export type ContactMessage = typeof contactMessages.$inferSelect;
 
+export const NEWSLETTER_REGIONS = ["US", "UK", "Canada", "Australia", "Nigeria", "Kenya", "Other"] as const;
+export type NewsletterRegion = (typeof NEWSLETTER_REGIONS)[number];
+
 export const newsletterSubscribers = pgTable("newsletter_subscribers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: text("email").notNull().unique(),
   isActive: boolean("is_active").default(true),
   preferences: text("preferences").array(),
+  region: text("region").default("US"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertNewsletterSubscriberSchema = createInsertSchema(newsletterSubscribers).pick({
   email: true,
+  region: true,
+}).extend({
+  region: z.enum(NEWSLETTER_REGIONS).optional().default("US"),
 });
 
 export type InsertNewsletterSubscriber = z.infer<typeof insertNewsletterSubscriberSchema>;
