@@ -1908,6 +1908,7 @@ export function ScamChecker() {
   const aiAbortRef = useRef<AbortController | null>(null);
   const qrInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const contentInputRef = useRef<HTMLTextAreaElement>(null);
   const [isProcessingQR, setIsProcessingQR] = useState(false);
   const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -2208,6 +2209,10 @@ export function ScamChecker() {
     setContextAnswers({ didInitiate: null, hasAccount: null, expectingEmail: null, madeRecentPurchase: null, recognizeSender: null });
     setContextResult(null);
     setIsContextScanning(false);
+    autoScanRef.current = false;
+    requestAnimationFrame(() => {
+      contentInputRef.current?.focus();
+    });
   };
 
   const handleContextScan = async () => {
@@ -2354,6 +2359,7 @@ export function ScamChecker() {
       </CardHeader>
       <CardContent className="space-y-6">
         <Textarea
+          ref={contentInputRef}
           placeholder={"Paste anything suspicious here: a text message, email, email headers, URL, or any combination.\n\nWe'll automatically detect the content type and analyze it for threats using pattern matching and AI.\n\nExamples:\n\u2022 'URGENT: Your bank account has been compromised! Click bit.ly/secure-now'\n\u2022 A full email with headers and body\n\u2022 https://amaz0n-security.com/verify-account"}
           value={content}
           onChange={(e) => setContent(e.target.value)}

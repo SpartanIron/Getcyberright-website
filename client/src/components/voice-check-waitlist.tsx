@@ -33,7 +33,7 @@ export function VoiceCheckWaitlist() {
       } else {
         setError(data?.message || "Could not join the waitlist. Please try again.");
       }
-    } catch (err: any) {
+    } catch {
       setError("Could not join the waitlist. Please try again in a moment.");
     } finally {
       setSubmitting(false);
