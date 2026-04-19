@@ -134,12 +134,31 @@ function extractClaims(text: string): ExtractedClaim[] {
   return out;
 }
 
-function isClaimSupported(claim: ExtractedClaim, allowedSet: Set<string>, corpus: string): boolean {
-  const norm = claim.text.toLowerCase().replace(/\s+/g, "");
-  for (const allowed of allowedSet) {
-    if (allowed.replace(/\s+/g, "") === norm) return true;
+// Strict verbatim allowlist match.
+// Normalization: lowercase, strip whitespace. For numeric kinds we additionally
+// strip currency/percent symbols and commas so that "$2,400" in allowlist
+// covers an extracted bare "2,400" number derived from the same figure.
+function normalizeClaim(text: string, kind: ExtractedClaim["kind"]): string {
+  let s = text.toLowerCase().replace(/\s+/g, "");
+  if (kind === "dollar" || kind === "percent" || kind === "number") {
+    s = s.replace(/[$,%]/g, "");
   }
-  return corpus.toLowerCase().replace(/\s+/g, "").includes(norm);
+  return s;
+}
+
+function isAllowedVerbatim(claim: ExtractedClaim, allowedSet: Set<string>): boolean {
+  const norm = normalizeClaim(claim.text, claim.kind);
+  if (!norm) return false;
+  for (const allowed of allowedSet) {
+    if (normalizeClaim(allowed, claim.kind) === norm) return true;
+    // Also tolerate allowlist entries that *contain* the numeric token
+    // (e.g. allowlist "$2,400" should also cover bare "2,400").
+    if ((claim.kind === "dollar" || claim.kind === "percent" || claim.kind === "number")
+        && normalizeClaim(allowed, claim.kind).includes(norm)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export function auditPostContent(content: string, bundle: SourceBundle): ClaimAuditResult {
@@ -161,53 +180,36 @@ export function auditPostContent(content: string, bundle: SourceBundle): ClaimAu
   const allowedSet = new Set(bundle.allowedClaims.map((c) => c.toLowerCase()));
   const corpus = bundle.contextForLLM;
 
+  // High-stakes kinds: must match the source-bundle allowlist character-for-character
+  // (case + whitespace insensitive). No fuzzy corpus fallback for these.
+  const STRICT_KINDS: ExtractedClaim["kind"][] = [
+    "dollar", "percent", "number", "year", "cve", "date", "actor", "agency",
+  ];
+
   for (const claim of extracted) {
-    if (claim.kind === "agency" || claim.kind === "actor" || claim.kind === "company") {
-      if (corpusContains(corpus, claim.text)) {
+    if (STRICT_KINDS.includes(claim.kind)) {
+      if (isAllowedVerbatim(claim, allowedSet)) {
         matched.push(claim.text);
       } else {
         failures.push({
           claim: claim.text,
           kind: claim.kind,
-          reason: `Named ${claim.kind} "${claim.text}" not present in source bundle (potential fabricated attribution)`,
+          reason: `${claim.kind} "${claim.text}" not in source-bundle allowlist (verbatim match required)`,
         });
       }
       continue;
     }
 
-    if (claim.kind === "date") {
-      if (corpusContains(corpus, claim.text)) {
-        matched.push(claim.text);
-      } else {
-        failures.push({
-          claim: claim.text,
-          kind: claim.kind,
-          reason: `Date "${claim.text}" not present in source bundle`,
-        });
-      }
-      continue;
-    }
-
-    if (claim.kind === "year") {
-      if (corpusContains(corpus, claim.text)) {
-        matched.push(claim.text);
-      } else {
-        failures.push({
-          claim: claim.text,
-          kind: claim.kind,
-          reason: `Year "${claim.text}" not present in source bundle`,
-        });
-      }
-      continue;
-    }
-
-    if (isClaimSupported(claim, allowedSet, corpus)) {
+    // Company / proper-noun: allowlist OR exact whitespace-normalized appearance
+    // in the source corpus context (proper nouns are often present in source
+    // titles/excerpts without being separately extracted).
+    if (isAllowedVerbatim(claim, allowedSet) || corpusContains(corpus, claim.text)) {
       matched.push(claim.text);
     } else {
       failures.push({
         claim: claim.text,
         kind: claim.kind,
-        reason: `Claim "${claim.text}" (${claim.kind}) not found verbatim in source bundle`,
+        reason: `Named ${claim.kind} "${claim.text}" not present in source bundle (potential fabricated attribution)`,
       });
     }
   }

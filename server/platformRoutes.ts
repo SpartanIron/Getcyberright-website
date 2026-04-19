@@ -1025,7 +1025,11 @@ export function registerPlatformRoutes(app: Express): void {
       const verdict = req.query.verdict as string | undefined;
       const all = await storage.getSocialPosts(undefined, limit * 2);
       const filtered = all
-        .filter((p) => p.auditVerdict || (p.auditFailures && (p.auditFailures as any[]).length > 0))
+        .filter((p) => {
+          if (p.auditVerdict) return true;
+          const f = p.auditFailures;
+          return Array.isArray(f) && f.length > 0;
+        })
         .filter((p) => (verdict ? p.auditVerdict === verdict : true))
         .slice(0, limit)
         .map((p) => ({
