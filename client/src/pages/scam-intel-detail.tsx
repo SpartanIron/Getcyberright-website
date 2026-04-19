@@ -12,6 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ShareButtons } from "@/components/share-buttons";
 import { AlertTriangle, ArrowLeft, Eye, CheckCircle, Shield, MessageSquareWarning, HelpCircle, Loader2, ArrowRight, Users, DollarSign, MapPin, BookOpen, Flag, Search, Share2, Calendar } from "lucide-react";
 import { getAllScamSlugs, getScamBySlug } from "@shared/scam-content";
+import { SourcesReceiptLink } from "@/components/sources-receipt-link";
 
 interface ScamIntelDetail {
   id: string;
@@ -237,6 +238,14 @@ export default function ScamIntelDetailPage() {
                   `Detected ${new Date(scam.dateDetected).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`}
               </span>
             )}
+          </div>
+
+          <div className="mt-6">
+            <SourcesReceiptLink
+              recordType="scam_intel"
+              recordId={scam.id}
+              className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+            />
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShieldAlert, ArrowLeft, Calendar, Globe, Shield, AlertTriangle, CheckCircle, ExternalLink, Loader2, ArrowRight, BadgeCheck, Clock } from "lucide-react";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { SourcesReceiptLink } from "@/components/sources-receipt-link";
 
 interface AlertDetail {
   id: string;
@@ -163,6 +164,14 @@ export default function AlertDetailPage() {
             {alert.affectedPlatforms?.map((p) => (
               <Badge key={p} variant="outline" className="border-white/20 text-white/70">{p}</Badge>
             ))}
+          </div>
+
+          <div className="mt-6">
+            <SourcesReceiptLink
+              recordType="alert"
+              recordId={alert.id}
+              className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+            />
           </div>
         </div>
       </div>

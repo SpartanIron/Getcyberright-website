@@ -690,6 +690,32 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  // Lookup the latest published social post for a given source record so
+  // article detail pages (guides / threat alerts / scam intel writeups) can
+  // surface the same "See the sources behind our post" trust signal that the
+  // awareness hub shows. Responds 404 with `{ error: "Not found" }` when
+  // there is no published post — drafts/blocked posts must never leak
+  // through this endpoint, and the success response is intentionally
+  // minimal (just the post id) so deep-link pages can build the
+  // /social/p/:id/sources URL without exposing extras.
+  app.get("/api/social/posts/by-source/:type/:id", async (req: Request, res: Response) => {
+    try {
+      const allowedTypes = new Set(["guide", "alert", "scam_intel", "trending_news", "trend_insight"]);
+      const type = String(req.params.type || "").trim();
+      const id = String(req.params.id || "").trim();
+      if (!type || !id || id.length > 128 || !allowedTypes.has(type)) {
+        return res.status(404).json({ error: "Not found" });
+      }
+      const post = await storage.getPublishedSocialPostBySource(type, id);
+      if (!post) return res.status(404).json({ error: "Not found" });
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.json({ id: post.id });
+    } catch (error: any) {
+      console.error("[social-sources-lookup] error:", error?.message || error);
+      res.status(500).json({ error: "Failed to look up sources" });
+    }
+  });
+
   // Public sources panel for a published social post. Returns 404 unless the
   // post exists AND has been actually published — drafts/blocked posts must
   // never leak through this endpoint.

@@ -13,6 +13,7 @@ import { BookOpen, Clock, Calendar, ArrowLeft, User, HelpCircle, Loader2, ArrowR
 import { renderMarkdown } from "@/lib/markdown";
 import { GuideVideoPlayer, getGuideVideoUrl } from "@/components/guide-video-player";
 import { RelatedResources, RESOURCE_LINKS } from "@/components/related-resources";
+import { SourcesReceiptLink } from "@/components/sources-receipt-link";
 
 interface GuideDetail {
   id: string;
@@ -195,6 +196,14 @@ export default function GuideDetailPage() {
               ))}
             </div>
           )}
+
+          <div className="mt-6">
+            <SourcesReceiptLink
+              recordType="guide"
+              recordId={guide.id}
+              className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+            />
+          </div>
         </div>
       </div>
 
