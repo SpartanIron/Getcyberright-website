@@ -9,9 +9,32 @@ import { buildPartnerContext } from "./socialEngagementService";
 import { enforceAndSanitize, sanitizeContent, validatePostContent } from "./socialPostPolicy";
 import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stockPhotoService";
 import type { TemplateStyle } from "./stockPhotoService";
-import { buildGuideBundle, buildAlertBundle, buildScamBundle, type SourceBundle } from "./socialSourceBundle";
+import { buildGuideBundle, buildAlertBundle, buildScamBundle, isBundleSubstantive, type SourceBundle } from "./socialSourceBundle";
 import { auditPostContent, type ClaimAuditResult } from "./socialClaimAuditor";
 import { appendCitationReceipt } from "./socialCitationReceipt";
+
+interface EmptyCycleEvent {
+  ts: string;
+  recordType: string;
+  title: string;
+  reason: string;
+}
+const EMPTY_CYCLES: EmptyCycleEvent[] = [];
+const EMPTY_CYCLE_CAP = 200;
+function recordEmptyCycle(recordType: string, title: string, reason: string) {
+  EMPTY_CYCLES.unshift({ ts: new Date().toISOString(), recordType, title, reason });
+  if (EMPTY_CYCLES.length > EMPTY_CYCLE_CAP) EMPTY_CYCLES.length = EMPTY_CYCLE_CAP;
+}
+export function getEmptyCycleEvents(limit = 50): EmptyCycleEvent[] {
+  return EMPTY_CYCLES.slice(0, limit);
+}
+export function getEmptyCycleStats() {
+  const last24h = Date.now() - 24 * 60 * 60 * 1000;
+  const recent = EMPTY_CYCLES.filter((e) => new Date(e.ts).getTime() > last24h);
+  const byType: Record<string, number> = {};
+  for (const e of recent) byType[e.recordType] = (byType[e.recordType] || 0) + 1;
+  return { totalLast24h: recent.length, byType };
+}
 
 interface AuditedPostBuild {
   platform: string;
@@ -419,6 +442,7 @@ async function generateImageForPost(title: string, contentType: string, platform
 export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<string[]> {
   const bundle = buildGuideBundle(guide);
   const url = bundle.canonicalUrl;
+  { const sub = isBundleSubstantive(bundle); if (!sub.ok) { console.warn(`[SocialDistribution] SKIP guide "${guide.title}": ${sub.reason}`); recordEmptyCycle("guide", guide.title, sub.reason); return []; } }
   const posts = await generateSocialPosts(
     "cybersecurity guide",
     guide.title,
@@ -449,7 +473,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 
   for (const { platform, content: rawContent } of platforms) {
     if (!rawContent) continue;
-    const content = appendCitationReceipt(rawContent, bundle.citations, platform);
+    const content = appendCitationReceipt(rawContent, bundle.citations, platform, bundle.canonicalUrl);
     const requireCanonical = platform !== "instagram";
     const validation = validatePostContent(content, url, { requireCanonical, minChars: platform === "alert" ? 40 : 80 });
     if (!validation.ok) {
@@ -480,6 +504,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 export async function distributeThreatAlertContent(alert: CyberThreatAlert): Promise<string[]> {
   const bundle = buildAlertBundle(alert);
   const url = bundle.canonicalUrl;
+  { const sub = isBundleSubstantive(bundle); if (!sub.ok) { console.warn(`[SocialDistribution] SKIP alert "${alert.threatName}": ${sub.reason}`); recordEmptyCycle("alert", alert.threatName, sub.reason); return []; } }
   const posts = await generateSocialPosts(
     "cyber threat alert",
     alert.threatName,
@@ -510,7 +535,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
 
   for (const { platform, content: rawContent } of platforms) {
     if (!rawContent) continue;
-    const content = appendCitationReceipt(rawContent, bundle.citations, platform);
+    const content = appendCitationReceipt(rawContent, bundle.citations, platform, bundle.canonicalUrl);
     const requireCanonical = platform !== "instagram";
     const validation = validatePostContent(content, url, { requireCanonical, minChars: platform === "alert" ? 40 : 80 });
     if (!validation.ok) {
@@ -541,6 +566,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
 export async function distributeScamIntelContent(scam: ScamIntelligence): Promise<string[]> {
   const bundle = buildScamBundle(scam);
   const url = bundle.canonicalUrl;
+  { const sub = isBundleSubstantive(bundle); if (!sub.ok) { console.warn(`[SocialDistribution] SKIP scam "${scam.scamName}": ${sub.reason}`); recordEmptyCycle("scam_intel", scam.scamName, sub.reason); return []; } }
   const posts = await generateSocialPosts(
     "scam intelligence report",
     scam.scamName,
@@ -571,7 +597,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
 
   for (const { platform, content: rawContent } of platforms) {
     if (!rawContent) continue;
-    const content = appendCitationReceipt(rawContent, bundle.citations, platform);
+    const content = appendCitationReceipt(rawContent, bundle.citations, platform, bundle.canonicalUrl);
     const requireCanonical = platform !== "instagram";
     const validation = validatePostContent(content, url, { requireCanonical, minChars: platform === "alert" ? 40 : 80 });
     if (!validation.ok) {
@@ -582,7 +608,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
       continue;
     }
     const audit = auditPostContent(content, bundle);
-    const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform, (scam as any).category || scam.scamCategory, undefined, scam.id);
+    const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform, scam.scamCategory, undefined, scam.id);
     const id = await persistAuditedPost({
       bundle,
       contentType: "scam_intel",

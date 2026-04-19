@@ -12,6 +12,23 @@ export interface SourceBundle {
   contextForLLM: string;
 }
 
+/**
+ * Thin-source refusal gate. If a bundle does not have at least one of:
+ *  - 600 chars of substantive corpus, OR
+ *  - 1 allowed numeric claim AND 200 chars of corpus,
+ * we refuse to generate posts. Excellence or silence — we won't ship a post
+ * that has nothing to anchor its claims against.
+ */
+export function isBundleSubstantive(bundle: SourceBundle): { ok: boolean; reason?: string } {
+  const corpusLen = bundle.contextForLLM?.length || 0;
+  if (corpusLen >= 600) return { ok: true };
+  if (bundle.allowedClaims.length >= 1 && corpusLen >= 200) return { ok: true };
+  return {
+    ok: false,
+    reason: `thin source: corpus=${corpusLen} chars, allowedClaims=${bundle.allowedClaims.length} — refusing to generate (excellence or silence)`,
+  };
+}
+
 function cleanHtml(text: string | null | undefined): string {
   if (!text) return "";
   return text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();

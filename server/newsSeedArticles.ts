@@ -63,7 +63,7 @@ export async function seedNewsArticles(): Promise<number> {
         "source_record_type" text,
         "citations" jsonb,
         "extracted_claims" jsonb,
-        "matched_claims" jsonb,
+        "matched_claims" text[] DEFAULT '{}',
         "audit_verdict" text,
         "audit_failures" jsonb,
         "image_source" text,

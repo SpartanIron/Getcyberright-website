@@ -2522,7 +2522,7 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     // publish directly. They are queued as "review_pending" with a 60-minute expiry.
     // Admins approve via the social posts admin surface; expired drafts are auto-discarded
     // by the review sweeper. Excellence or silence — we never ship unaudited reactive content.
-    const REVIEW_WINDOW_MS = 60 * 60 * 1000;
+    const REVIEW_WINDOW_MS = 30 * 60 * 1000;
     const reviewExpiresAt = new Date(Date.now() + REVIEW_WINDOW_MS);
 
     for (const { platform, content, image } of platformPosts) {

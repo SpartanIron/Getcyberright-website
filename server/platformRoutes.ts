@@ -916,6 +916,52 @@ export function registerPlatformRoutes(app: Express): void {
       if (post.status !== "review_pending") {
         return res.status(400).json({ error: `Post is not in review_pending state (current: ${post.status})` });
       }
+
+      // Re-run claim auditor + quality gate at approval time. Excellence or silence:
+      // an admin can never bypass the audit, only confirm a passing audit.
+      const { runSocialQualityGate } = await import("./socialQualityGate");
+      const { auditPostContent } = await import("./socialClaimAuditor");
+      const { buildGuideBundle, buildAlertBundle, buildScamBundle } = await import("./socialSourceBundle");
+
+      let bundle: any = null;
+      if (post.contentType === "guide" && post.contentId) {
+        const g = await storage.getGuideById(post.contentId);
+        if (g) bundle = buildGuideBundle(g);
+      } else if (post.contentType === "threat_alert" && post.contentId) {
+        const a = await storage.getThreatAlertById(post.contentId);
+        if (a) bundle = buildAlertBundle(a);
+      } else if (post.contentType === "scam_intel" && post.contentId) {
+        const s = await storage.getScamIntelById(post.contentId);
+        if (s) bundle = buildScamBundle(s);
+      }
+
+      if (bundle) {
+        const audit = auditPostContent(post.postContent, bundle);
+        if (audit.verdict !== "pass") {
+          await storage.updateSocialPost(req.params.id, {
+            status: "blocked",
+            auditVerdict: "fail_on_approval",
+            auditFailures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
+            publishError: "Re-audit failed at approval time",
+          });
+          return res.status(400).json({
+            success: false,
+            error: "Re-audit failed at approval time. Post blocked.",
+            failures: audit.failures,
+          });
+        }
+      }
+
+      const gateError = await runSocialQualityGate({
+        platform: post.platform,
+        postContent: post.postContent,
+        contentType: post.contentType,
+        contentId: post.contentId,
+      });
+      if (gateError) {
+        return res.status(400).json({ success: false, error: gateError });
+      }
+
       await storage.updateSocialPost(req.params.id, { status: "draft", auditVerdict: "approved_by_admin" });
       const result = await publishPost(req.params.id);
       res.json({ success: result.success, externalId: result.externalId, error: result.error, platform: result.platform });
@@ -969,6 +1015,41 @@ export function registerPlatformRoutes(app: Express): void {
       res.json(filtered);
     } catch (error: any) {
       res.status(500).json({ error: "Failed to fetch audit log" });
+    }
+  });
+
+  app.get("/api/admin/social-posts/empty-cycles", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const { getEmptyCycleEvents, getEmptyCycleStats } = await import("./socialDistributionService");
+      res.json({ stats: getEmptyCycleStats(), events: getEmptyCycleEvents(50) });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/admin/social-posts/quarantine-legacy", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const dryRun = req.body?.dryRun !== false;
+      const all = await storage.getSocialPosts(undefined, 5000);
+      // Bad legacy = published or draft with no auditVerdict (pre-Gold-Standard era)
+      const bad = all.filter(
+        (p) => (p.status === "published" || p.status === "draft") && !p.auditVerdict,
+      );
+      if (dryRun) {
+        return res.json({ dryRun: true, candidates: bad.length, sample: bad.slice(0, 5).map((p) => ({ id: p.id, title: p.contentTitle, platform: p.platform, status: p.status })) });
+      }
+      let quarantined = 0;
+      for (const p of bad) {
+        await storage.updateSocialPost(p.id, {
+          status: "blocked",
+          auditVerdict: "quarantined_legacy",
+          publishError: "Pre-Gold-Standard post; no audit trail. Quarantined.",
+        });
+        quarantined++;
+      }
+      res.json({ dryRun: false, quarantined });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 
