@@ -653,7 +653,7 @@ export function registerPlatformRoutes(app: Express): void {
 
   // ─── Public Threat Alert Routes ────────────────────────────────────
 
-  app.get("/api/alerts", async (_req: Request, res: Response) => {
+  app.get(["/api/alerts", "/api/admin/alerts"], async (_req: Request, res: Response) => {
     try {
       const category = _req.query.category as string | undefined;
       const limit = _req.query.limit ? parseInt(_req.query.limit as string) : 50;
@@ -1181,7 +1181,7 @@ export function registerPlatformRoutes(app: Express): void {
 
   // ─── Gold-Standard Social Engine: Review Queue + Audit Log ─────────
 
-  app.get("/api/admin/social-posts/review-queue", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+  app.get(["/api/admin/social-posts/review-queue", "/api/admin/review-queue"], isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
     try {
       const posts = await storage.getSocialPosts("review_pending", 100);
       res.json(posts);
