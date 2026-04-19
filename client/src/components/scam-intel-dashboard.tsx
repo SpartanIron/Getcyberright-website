@@ -608,7 +608,42 @@ function RegionalPanel({ regions, selectedRegion, onSelectRegion }: {
             </div>
           </div>
           <div className="mt-3 pt-2 border-t border-border">
-            <div className="text-[10px] text-muted-foreground">Sources: {selected.sources.slice(0, 4).join(" · ")}</div>
+            <details data-testid={`drawer-sources-${selected.id}`}>
+              <summary className="text-[10px] text-muted-foreground cursor-pointer select-none hover:text-foreground transition-colors">
+                Sources ({selected.citations?.length || selected.sources.length})
+              </summary>
+              <ul className="mt-2 space-y-1.5">
+                {selected.citations && selected.citations.length > 0 ? (
+                  selected.citations.map((c, i) => (
+                    <li key={`${c.url}-${i}`} className="text-[10px] leading-tight" data-testid={`drawer-citation-${selected.id}-${i}`}>
+                      <a
+                        href={c.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-foreground hover:underline inline-flex items-center gap-1"
+                      >
+                        <span className="font-medium">{c.publisher}</span>
+                        <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+                      </a>
+                      <div className="text-muted-foreground">{c.name}</div>
+                      {(c.datePublished || c.accessedAt) && (
+                        <div className="text-muted-foreground/70 text-[9px]">
+                          {c.datePublished ? `Published ${new Date(c.datePublished).toLocaleDateString()}` : ""}
+                          {c.datePublished && c.accessedAt ? " · " : ""}
+                          {c.accessedAt ? `Accessed ${new Date(c.accessedAt).toLocaleDateString()}` : ""}
+                        </div>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  selected.sources.map((s, i) => (
+                    <li key={`${s}-${i}`} className="text-[10px] text-muted-foreground" data-testid={`drawer-source-${selected.id}-${i}`}>
+                      {s}
+                    </li>
+                  ))
+                )}
+              </ul>
+            </details>
           </div>
         </div>
       )}

@@ -1176,7 +1176,7 @@ function buildLiveFeed(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichme
       "ftc-sentinel": "FTC Sentinel",
     };
 
-    const sourceUrl = (threat as any).sourceUrl || FEED_SOURCE_URL_MAP[threat.feedId];
+    const sourceUrl = threat.sourceUrl || FEED_SOURCE_URL_MAP[threat.feedId];
     const sourceName = feedSourceMap[threat.feedId] || threat.feedId;
 
     events.push({
@@ -1189,7 +1189,7 @@ function buildLiveFeed(liveData: Awaited<ReturnType<typeof fetchLiveDataEnrichme
       source: sourceName,
       sourceUrl,
       scamCategory: threat.itemType,
-      synthetic: !((threat as any).sourceUrl),
+      synthetic: !threat.sourceUrl,
       citation: sourceUrl ? {
         name: threat.title,
         publisher: sourceName,
