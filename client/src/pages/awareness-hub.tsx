@@ -1,4 +1,5 @@
 import { Link } from "@/lib/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { StructuredData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -7,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import {
   Shield, BookOpen, CheckSquare, AlertTriangle, Eye, Lock,
   Users, Download, ArrowRight, Smartphone, Wifi, Mail,
-  CreditCard, Globe, FileText, GraduationCap, Heart
+  CreditCard, Globe, FileText, GraduationCap, Heart, ExternalLink
 } from "lucide-react";
+import type { SocialPost } from "@shared/schema";
 
 const infographicBlocks = [
   {
@@ -128,6 +130,15 @@ const quickLinks = [
 ];
 
 export default function AwarenessHub() {
+  const { data: socialPosts, isLoading: socialPostsLoading } = useQuery<SocialPost[]>({
+    queryKey: ["/api/social-posts", "awareness-hub"],
+    queryFn: async () => {
+      const res = await fetch("/api/social-posts?limit=6", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to load social posts");
+      return res.json();
+    },
+  });
+  const publishedPosts = (socialPosts || []).filter((p) => p.status === "published").slice(0, 6);
 
   const breadcrumbs: BreadcrumbData = {
     type: "BreadcrumbList",
@@ -287,6 +298,61 @@ export default function AwarenessHub() {
             ))}
           </div>
         </section>
+
+        {(socialPostsLoading || publishedPosts.length > 0) && (
+          <section data-testid="section-sourced-social-posts">
+            <h2 className="text-2xl font-bold text-center mb-2" data-testid="heading-sourced-social-posts">Recent Posts With Receipts</h2>
+            <p className="text-center text-muted-foreground mb-8 max-w-xl mx-auto">
+              Every social post we publish is backed by independent sources. See the receipts behind our recent posts.
+            </p>
+            {socialPostsLoading ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[0, 1, 2].map((i) => (
+                  <Card key={i} className="animate-pulse" data-testid={`skeleton-social-post-${i}`}>
+                    <CardHeader>
+                      <div className="h-5 w-3/4 bg-muted rounded" />
+                      <div className="h-4 w-1/2 bg-muted rounded mt-2" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-9 w-full bg-muted rounded" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {publishedPosts.map((post) => (
+                  <Card key={post.id} className="flex flex-col hover:shadow-lg transition-shadow" data-testid={`card-social-post-${post.id}`}>
+                    <CardHeader>
+                      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                        <span data-testid={`text-platform-${post.id}`}>{post.platform}</span>
+                        {post.publishedAt && (
+                          <>
+                            <span aria-hidden="true">·</span>
+                            <span data-testid={`text-published-${post.id}`}>
+                              {new Date(post.publishedAt).toLocaleDateString()}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      <CardTitle className="text-base leading-snug" data-testid={`text-title-${post.id}`}>
+                        {post.contentTitle}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="mt-auto">
+                      <Link href={`/social/p/${post.id}/sources`}>
+                        <Button variant="outline" size="sm" className="w-full gap-2" data-testid={`link-sources-${post.id}`}>
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          See the sources behind our post
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         <section className="bg-gradient-to-r from-slate-900 to-teal-900 rounded-2xl p-8 md:p-12 text-white text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4" data-testid="heading-stay-informed">Stay Informed</h2>
