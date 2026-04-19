@@ -70,7 +70,11 @@ function countWords(text: string, excludeUrls: boolean = true): number {
 
 function preserveUrls(text: string): { cleaned: string; urls: string[] } {
   const urls: string[] = [];
-  const cleaned = text.replace(/https?:\/\/[^\s)]+/g, (url) => {
+  // Preserve full URLs AND bare-domain URLs like getcyberright.com/guides/foo
+  // so the sentence-case rule in sanitizeContent can't corrupt them into
+  // "Getcyberright. Com/guides/foo".
+  const URL_PATTERN = /(?:https?:\/\/[^\s)]+|(?:www\.)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/[^\s)]*)?)/gi;
+  const cleaned = text.replace(URL_PATTERN, (url) => {
     urls.push(url);
     return `__POLICYURL_${urls.length - 1}__`;
   });
@@ -273,4 +277,135 @@ export function enforcePostPolicy(text: string, platform: string, depth: PostDep
 export function enforceAndSanitize(text: string, platform: string, depth: PostDepth = "wire"): string {
   const result = enforcePostPolicy(text, platform, depth);
   return result.content;
+}
+
+const PLACEHOLDER_PATTERNS: RegExp[] = [
+  /\[link\]/i,
+  /\[LINK\]/,
+  /\[url\]/i,
+  /\{link\}/i,
+  /\{url\}/i,
+  /<link>/i,
+  /<url>/i,
+  /\(link\)/i,
+  /\bINSERT[_ ]LINK\b/i,
+  /\bTODO\b/,
+  /\bplaceholder\b/i,
+];
+
+const GCR_HOST_RE = /(^|\/\/)(www\.)?getcyberright\.com(\/|$)/i;
+
+export function extractAllUrls(text: string): string[] {
+  const found: string[] = [];
+  // Full URLs first
+  const fullRe = /https?:\/\/[^\s)\]"',]+/gi;
+  let m: RegExpExecArray | null;
+  while ((m = fullRe.exec(text)) !== null) {
+    found.push(m[0].replace(/[.,;:!?)]+$/, ""));
+  }
+  // Bare-domain URLs (must look like real domains, must contain at least one dot)
+  const bareRe = /(?<![a-zA-Z0-9@\/])((?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/[^\s)\]"',]*)?)/gi;
+  while ((m = bareRe.exec(text)) !== null) {
+    const candidate = m[1];
+    // Skip if it's actually a sentence end like "details." or "OK."
+    if (!candidate.includes("/") && !/\.(com|org|net|io|co|gov|edu|app|dev|info|us|uk|ca|au)$/i.test(candidate)) {
+      continue;
+    }
+    if (candidate.startsWith("http")) continue;
+    found.push(candidate.replace(/[.,;:!?)]+$/, ""));
+  }
+  return Array.from(new Set(found));
+}
+
+function isGcrUrl(url: string): boolean {
+  if (GCR_HOST_RE.test(url)) return true;
+  const u = url.toLowerCase();
+  return u.startsWith("getcyberright.com") || u.startsWith("www.getcyberright.com");
+}
+
+export interface ContentValidationIssue {
+  code:
+    | "placeholder_token"
+    | "non_gcr_url"
+    | "missing_canonical_link"
+    | "wrong_canonical_path"
+    | "too_short";
+  message: string;
+  detail?: string;
+}
+
+export interface ContentValidationResult {
+  ok: boolean;
+  issues: ContentValidationIssue[];
+}
+
+/**
+ * Validates that a generated social post is publish-safe:
+ * - no placeholder tokens like [link]
+ * - no foreign URLs (only getcyberright.com is allowed)
+ * - the canonical URL is present in the body
+ * - the body has a minimum length (catches empty/blank generations)
+ */
+export function validatePostContent(
+  text: string,
+  canonicalUrl: string,
+  opts: { minChars?: number; requireCanonical?: boolean } = {},
+): ContentValidationResult {
+  const minChars = opts.minChars ?? 40;
+  const requireCanonical = opts.requireCanonical ?? true;
+  const issues: ContentValidationIssue[] = [];
+
+  if (!text || text.trim().length < minChars) {
+    issues.push({
+      code: "too_short",
+      message: `Post is too short (${text?.trim().length || 0} chars, need at least ${minChars}).`,
+    });
+  }
+
+  for (const pat of PLACEHOLDER_PATTERNS) {
+    const m = text.match(pat);
+    if (m) {
+      issues.push({
+        code: "placeholder_token",
+        message: `Post contains an unresolved placeholder: "${m[0]}".`,
+      });
+      break;
+    }
+  }
+
+  const urls = extractAllUrls(text);
+  for (const url of urls) {
+    if (!isGcrUrl(url)) {
+      issues.push({
+        code: "non_gcr_url",
+        message: `Post contains a non-GetCyberRight URL: ${url}`,
+        detail: url,
+      });
+    }
+  }
+
+  if (requireCanonical && canonicalUrl) {
+    let canonicalPath = "";
+    try {
+      canonicalPath = new URL(canonicalUrl).pathname.replace(/\/+$/, "");
+    } catch {
+      canonicalPath = "";
+    }
+    const seen = urls.some((u) => {
+      try {
+        const p = new URL(u.startsWith("http") ? u : `https://${u}`).pathname.replace(/\/+$/, "");
+        return p === canonicalPath;
+      } catch {
+        return false;
+      }
+    });
+    if (!seen) {
+      issues.push({
+        code: "missing_canonical_link",
+        message: `Post is missing the canonical link (${canonicalUrl}).`,
+      });
+    }
+  }
+
+  return { ok: issues.length === 0, issues };
 }

@@ -1,6 +1,7 @@
 import { storage } from "./storage";
 import { getImageAsBase64 } from "./socialImageService";
 import { isBufferConfigured, publishPostViaBuffer, publishAllDraftsViaBuffer } from "./bufferPublisher";
+import { runSocialQualityGate as preFlightCheck } from "./socialQualityGate";
 import { runPostPublishEngagement } from "./socialEngagementService";
 import * as fs from "fs";
 
@@ -287,6 +288,13 @@ export async function publishPost(postId: string): Promise<PublishResult> {
   const post = await storage.getSocialPostById(postId);
   if (!post) return { success: false, platform: "unknown", error: "Post not found" };
 
+  const blockReason = await preFlightCheck(post as any);
+  if (blockReason) {
+    await storage.updateSocialPost(postId, { status: "failed", publishError: blockReason });
+    console.warn(`[SocialPublisher] BLOCKED ${post.platform} post ${postId}: ${blockReason}`);
+    return { success: false, platform: post.platform, error: blockReason };
+  }
+
   if (isBufferConfigured() && post.platform !== "alert") {
     const bufferResult = await publishPostViaBuffer(postId);
     if (bufferResult.success) {
@@ -378,7 +386,14 @@ export async function publishAllDrafts(): Promise<PublishResult[]> {
   return results;
 }
 
-async function publishPostDirect(post: { id: string; platform: string; postContent: string; imageUrl: string | null }): Promise<PublishResult> {
+async function publishPostDirect(post: { id: string; platform: string; postContent: string; imageUrl: string | null; contentType?: string | null; contentId?: string | null }): Promise<PublishResult> {
+  const blockReason = await preFlightCheck(post);
+  if (blockReason) {
+    await storage.updateSocialPost(post.id, { status: "failed", publishError: blockReason });
+    console.warn(`[SocialPublisher] BLOCKED ${post.platform} post ${post.id}: ${blockReason}`);
+    return { success: false, platform: post.platform, error: blockReason };
+  }
+
   let result: PublishResult;
 
   switch (post.platform) {

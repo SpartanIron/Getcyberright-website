@@ -2,6 +2,7 @@ import { storage } from "./storage";
 import * as path from "path";
 import * as fs from "fs";
 import { enforcePostPolicy } from "./socialPostPolicy";
+import { runSocialQualityGate } from "./socialQualityGate";
 import { validateAndPreparePost } from "./linkValidator";
 
 const BUFFER_GRAPHQL_URL = "https://api.buffer.com/graphql";
@@ -327,6 +328,15 @@ export async function publishPostViaBuffer(postId: string): Promise<BufferPublis
   const post = await storage.getSocialPostById(postId);
   if (!post) return { success: false, platform: "unknown", error: "Post not found" };
   if (post.platform === "alert") return { success: false, platform: "alert", error: "Alert posts are not published via Buffer" };
+
+  // Quality gate: refuse to send anything with broken links, placeholder
+  // tokens, foreign URLs, or a missing canonical link.
+  const blockReason = await runSocialQualityGate(post);
+  if (blockReason) {
+    await storage.updateSocialPost(postId, { status: "failed", publishError: blockReason });
+    console.warn(`[Buffer] BLOCKED ${post.platform} post ${postId}: ${blockReason}`);
+    return { success: false, platform: post.platform, error: blockReason };
+  }
 
   const channels = await getBufferChannelsByPlatform();
   const channel = channels[post.platform];

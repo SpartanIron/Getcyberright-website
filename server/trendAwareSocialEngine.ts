@@ -2551,6 +2551,19 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
         }
         content = linkCheck.content;
 
+        const { runSocialQualityGate } = await import("./socialQualityGate");
+        const gateBlock = await runSocialQualityGate({
+          platform,
+          postContent: content,
+          contentType: socialPost.contentType,
+          contentId: socialPost.contentId,
+        });
+        if (gateBlock) {
+          console.error(`[TrendEngine] Quality gate BLOCKED ${platform}: "${posts.title}" — ${gateBlock}`);
+          await storage.updateSocialPost(created.id, { status: "failed", publishError: gateBlock });
+          continue;
+        }
+
         const channel = channels[platform];
         const { publishDirect } = await import("./bufferPublisher");
         let bufferResult = await publishDirect(channel.id, content, platform, image || undefined);

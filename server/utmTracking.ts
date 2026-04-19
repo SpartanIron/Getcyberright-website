@@ -105,7 +105,11 @@ export function ensureGcrLink(
   contentSlug?: string,
   postStyle?: string
 ): string {
-  if (platform === "instagram" || platform === "alert") return text;
+  // Instagram strips URLs from captions in feed (only "link in bio" works),
+  // so appending a canonical URL there is wasted text. Every other platform
+  // (including our internal "alert" template) MUST end with the canonical link
+  // so readers always have somewhere to go.
+  if (platform === "instagram") return text;
 
   const canonicalPath = canonicalPathOf(canonicalUrl);
   const linkPattern = /https?:\/\/(?:www\.)?getcyberright\.com(\/[^\s)\]"',]*)?/gi;

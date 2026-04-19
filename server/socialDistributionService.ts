@@ -6,7 +6,7 @@ import { generateBrandedImage, generateStatCard, serveImagePath } from "./social
 import { getBufferChannelsByPlatform } from "./bufferPublisher";
 import { tagAllGcrLinks, tagSingleUrl, buildCampaignId, ensureGcrLink } from "./utmTracking";
 import { buildPartnerContext } from "./socialEngagementService";
-import { enforceAndSanitize, sanitizeContent } from "./socialPostPolicy";
+import { enforceAndSanitize, sanitizeContent, validatePostContent } from "./socialPostPolicy";
 import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stockPhotoService";
 import type { TemplateStyle } from "./stockPhotoService";
 
@@ -153,7 +153,13 @@ ${buildPartnerContext("linkedin", tags[0] || "general_awareness")}${buildPartner
 
 6. HASHTAGS: 6-10 relevant hashtags
 
-CRITICAL: Every post MUST include the article link (${url}) on its own final line before hashtags.
+CRITICAL LINK & STAT RULES (zero tolerance, non-negotiable):
+- The ONLY URL allowed in any post is: ${url}
+- Do NOT include any other URL of any kind. No comptia.org, no nist.gov, no fbi.gov, no news outlets, no Wikipedia, no shorteners. If you mention an organisation by name, do NOT link to it.
+- Do NOT use placeholder tokens like [link], [LINK], (link), {url}, "INSERT_LINK", "TODO", or "<link>". If you cannot include the real URL, do not write a CTA at all.
+- Every post (except Instagram) MUST end with the bare URL ${url} on its own final line.
+- Statistics, dollar amounts, percentages, body counts, dates, breach sizes, and named studies are ONLY allowed if the exact figure or name appears verbatim in the SOURCE MATERIAL above. If a number is not in the source material, omit it. Do not estimate. Do not generalise. Do not say "billions" or "millions" without an exact figure from source material.
+- If the source material has no usable statistic, write a qualitative observation instead. Vague is acceptable. Fabricated is not.
 
 Format as JSON:
 {
@@ -390,6 +396,15 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
 
   for (const { platform, content } of platforms) {
     if (!content) continue;
+    const requireCanonical = platform !== "instagram";
+    const validation = validatePostContent(content, url, { requireCanonical, minChars: platform === "alert" ? 40 : 80 });
+    if (!validation.ok) {
+      console.warn(
+        `[SocialDistribution] REJECTED ${platform} draft for guide "${guide.title}": ` +
+        validation.issues.map((i) => `${i.code}: ${i.message}`).join(" | ")
+      );
+      continue;
+    }
     const imagePath = await generateImageForPost(guide.title, "guide", platform, guide.category, undefined, guide.id);
     const post: InsertSocialPost = {
       contentType: "guide",
@@ -407,7 +422,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
     createdIds.push(created.id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} UTM-tagged social posts with images for guide: "${guide.title}"`);
+  console.log(`[SocialDistribution] Generated ${createdIds.length} validated social posts for guide: "${guide.title}"`);
   return createdIds;
 }
 
@@ -445,6 +460,15 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
   const alertCampaignId = buildCampaignId("threat_alert", "multi");
   for (const { platform, content } of platforms) {
     if (!content) continue;
+    const requireCanonical = platform !== "instagram";
+    const validation = validatePostContent(content, url, { requireCanonical, minChars: platform === "alert" ? 40 : 80 });
+    if (!validation.ok) {
+      console.warn(
+        `[SocialDistribution] REJECTED ${platform} draft for threat alert "${alert.threatName}": ` +
+        validation.issues.map((i) => `${i.code}: ${i.message}`).join(" | ")
+      );
+      continue;
+    }
     const imagePath = await generateImageForPost(alert.threatName, "threat_alert", platform, alert.threatCategory, alert.riskLevel, alert.id);
     const post: InsertSocialPost = {
       contentType: "threat_alert",
@@ -462,7 +486,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
     createdIds.push(created.id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} UTM-tagged social posts with images for alert: "${alert.threatName}"`);
+  console.log(`[SocialDistribution] Generated ${createdIds.length} validated social posts for alert: "${alert.threatName}"`);
   return createdIds;
 }
 
@@ -500,6 +524,15 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
   const scamCampaignId = buildCampaignId("scam_intel", "multi");
   for (const { platform, content } of platforms) {
     if (!content) continue;
+    const requireCanonical = platform !== "instagram";
+    const validation = validatePostContent(content, url, { requireCanonical, minChars: platform === "alert" ? 40 : 80 });
+    if (!validation.ok) {
+      console.warn(
+        `[SocialDistribution] REJECTED ${platform} draft for scam intel "${scam.scamName}": ` +
+        validation.issues.map((i) => `${i.code}: ${i.message}`).join(" | ")
+      );
+      continue;
+    }
     const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform, scam.category || scam.scamCategory, undefined, scam.id);
     const post: InsertSocialPost = {
       contentType: "scam_intel",
