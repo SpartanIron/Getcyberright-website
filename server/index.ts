@@ -345,6 +345,10 @@ function startBackgroundJobs() {
     startGrowthOrchestrator();
   }).catch(err => console.error("Failed to start growth orchestrator:", err));
 
+  import("./socialReviewSweeper").then(({ startReviewSweeper }) => {
+    startReviewSweeper();
+  }).catch(err => console.error("Failed to start social review sweeper:", err));
+
   import("./engagementDiscoveryService").then(({ startEngagementDiscoveryScheduler }) => {
     startEngagementDiscoveryScheduler();
   }).catch(err => console.error("Failed to start engagement discovery scheduler:", err));

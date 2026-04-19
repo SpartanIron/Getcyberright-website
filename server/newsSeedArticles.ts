@@ -59,10 +59,19 @@ export async function seedNewsArticles(): Promise<number> {
         "engagement_metrics" jsonb,
         "utm_campaign" text,
         "post_style" text,
+        "source_record_id" varchar,
+        "source_record_type" text,
+        "citations" jsonb,
+        "extracted_claims" jsonb,
+        "matched_claims" jsonb,
+        "audit_verdict" text,
+        "audit_failures" jsonb,
+        "image_source" text,
+        "review_expires_at" timestamp,
         "created_at" timestamp DEFAULT now()
       )
     `);
-    console.log("[news-seed] Recreated social_posts table with correct schema.");
+    console.log("[news-seed] Recreated social_posts table with correct schema (incl. audit columns).");
 
     // Drop and recreate growth_tasks table (schema mismatch from initial migration)
     await client.unsafe(`DROP TABLE IF EXISTS "growth_tasks"`);

@@ -1416,6 +1416,15 @@ export const socialPosts = pgTable("social_posts", {
   engagementMetrics: jsonb("engagement_metrics").$type<{ views?: number; clicks?: number; shares?: number }>(),
   utmCampaign: text("utm_campaign"),
   postStyle: text("post_style"),
+  sourceRecordId: varchar("source_record_id"),
+  sourceRecordType: text("source_record_type"),
+  citations: jsonb("citations").$type<{ name: string; publisher: string; url: string; datePublished?: string; accessedAt: string }[]>().default([]),
+  extractedClaims: jsonb("extracted_claims").$type<{ text: string; kind: string; context: string }[]>().default([]),
+  matchedClaims: text("matched_claims").array().default([]),
+  auditVerdict: text("audit_verdict"),
+  auditFailures: jsonb("audit_failures").$type<{ claim: string; kind: string; reason: string }[]>().default([]),
+  imageSource: text("image_source"),
+  reviewExpiresAt: timestamp("review_expires_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

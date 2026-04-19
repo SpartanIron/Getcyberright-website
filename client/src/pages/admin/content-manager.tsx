@@ -435,6 +435,47 @@ function SocialPostCard({ post, onPublish, isPublishing }: { post: any; onPublis
             </div>
           )}
 
+          {(post.auditVerdict || (post.citations && post.citations.length > 0)) && (
+            <div className="text-xs space-y-1 border-t pt-2" data-testid={`audit-${post.id}`}>
+              {post.auditVerdict && (
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Audit:</span>
+                  <Badge
+                    variant={post.auditVerdict === "passed" || post.auditVerdict === "approved_by_admin" ? "default" : "destructive"}
+                    className="text-[10px]"
+                  >
+                    {post.auditVerdict}
+                  </Badge>
+                  {post.imageSource && <span className="text-muted-foreground">img: {post.imageSource}</span>}
+                </div>
+              )}
+              {post.auditFailures && post.auditFailures.length > 0 && (
+                <div className="text-red-600 dark:text-red-400">
+                  {post.auditFailures.slice(0, 3).map((f: string, i: number) => (
+                    <div key={i} className="line-clamp-1">• {f}</div>
+                  ))}
+                </div>
+              )}
+              {post.citations && post.citations.length > 0 && (
+                <div className="text-muted-foreground">
+                  Sources:{" "}
+                  {post.citations.slice(0, 3).map((c: any, i: number) => (
+                    <span key={i}>
+                      {i > 0 && ", "}
+                      {c.url ? (
+                        <a href={c.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                          {c.publisher || c.name}
+                        </a>
+                      ) : (
+                        c.publisher || c.name
+                      )}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex items-center gap-2 pt-1">
             {post.status === "published" ? (
               <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
@@ -596,6 +637,99 @@ function SocialPostsTab() {
   );
 }
 
+function ReviewQueueTab() {
+  const { toast } = useToast();
+  const [actingId, setActingId] = useState<string | null>(null);
+
+  const { data: posts = [], isLoading } = useQuery<any[]>({
+    queryKey: ["/api/admin/social-posts/review-queue"],
+    refetchInterval: 30000,
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: async (id: string) => {
+      setActingId(id);
+      const res = await apiRequest("POST", `/api/admin/social-posts/${id}/approve`);
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: data.success ? "Approved & Published" : "Approved (publish failed)",
+        description: data.success ? `Sent to ${data.platform}` : data.error || "Manual retry needed",
+        variant: data.success ? "default" : "destructive",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts/review-queue"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts"] });
+      setActingId(null);
+    },
+    onError: () => { toast({ title: "Error", description: "Approve failed", variant: "destructive" }); setActingId(null); },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async (id: string) => {
+      setActingId(id);
+      const res = await apiRequest("POST", `/api/admin/social-posts/${id}/reject`, { reason: "Rejected from review queue" });
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Rejected", description: "Post discarded" });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts/review-queue"] });
+      setActingId(null);
+    },
+    onError: () => { toast({ title: "Error", description: "Reject failed", variant: "destructive" }); setActingId(null); },
+  });
+
+  if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading review queue...</div>;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Eye className="w-5 h-5" /> Review Queue ({posts.length})
+        </CardTitle>
+        <p className="text-xs text-muted-foreground">Reactive trend posts awaiting admin approval. Auto-discard after 60 minutes.</p>
+      </CardHeader>
+      <CardContent>
+        {posts.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">No posts pending review.</p>
+        ) : (
+          <div className="grid gap-3">
+            {posts.map((post: any) => (
+              <div key={post.id} className="space-y-2">
+                <SocialPostCard post={post} onPublish={() => {}} isPublishing={false} />
+                <div className="flex items-center gap-2 px-2">
+                  <Button
+                    size="sm"
+                    onClick={() => approveMutation.mutate(post.id)}
+                    disabled={actingId === post.id}
+                    data-testid={`button-approve-${post.id}`}
+                  >
+                    <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve & Publish
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => rejectMutation.mutate(post.id)}
+                    disabled={actingId === post.id}
+                    data-testid={`button-reject-${post.id}`}
+                  >
+                    <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
+                  </Button>
+                  {post.reviewExpiresAt && (
+                    <span className="text-xs text-muted-foreground">
+                      Expires {new Date(post.reviewExpiresAt).toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AdminContentManager() {
   const { user, isLoading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
@@ -626,15 +760,17 @@ export default function AdminContentManager() {
         </div>
 
         <Tabs defaultValue="guides" className="w-full">
-          <TabsList className="grid w-full grid-cols-4" data-testid="tabs-content-manager">
+          <TabsList className="grid w-full grid-cols-5" data-testid="tabs-content-manager">
             <TabsTrigger value="guides" data-testid="tab-guides">Guides</TabsTrigger>
             <TabsTrigger value="scam-intel" data-testid="tab-scam-intel">Scam Intel</TabsTrigger>
             <TabsTrigger value="alerts" data-testid="tab-alerts">Alerts</TabsTrigger>
+            <TabsTrigger value="review-queue" data-testid="tab-review-queue">Review Queue</TabsTrigger>
             <TabsTrigger value="social" data-testid="tab-social">Social Posts</TabsTrigger>
           </TabsList>
           <TabsContent value="guides"><GuidesTab /></TabsContent>
           <TabsContent value="scam-intel"><ScamIntelTab /></TabsContent>
           <TabsContent value="alerts"><AlertsTab /></TabsContent>
+          <TabsContent value="review-queue"><ReviewQueueTab /></TabsContent>
           <TabsContent value="social"><SocialPostsTab /></TabsContent>
         </Tabs>
       </div>

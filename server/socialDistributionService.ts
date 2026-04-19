@@ -9,6 +9,60 @@ import { buildPartnerContext } from "./socialEngagementService";
 import { enforceAndSanitize, sanitizeContent, validatePostContent } from "./socialPostPolicy";
 import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stockPhotoService";
 import type { TemplateStyle } from "./stockPhotoService";
+import { buildGuideBundle, buildAlertBundle, buildScamBundle, type SourceBundle } from "./socialSourceBundle";
+import { auditPostContent, type ClaimAuditResult } from "./socialClaimAuditor";
+import { appendCitationReceipt } from "./socialCitationReceipt";
+
+interface AuditedPostBuild {
+  platform: string;
+  content: string;
+  audit: ClaimAuditResult;
+}
+
+async function persistAuditedPost(args: {
+  bundle: SourceBundle;
+  contentType: string;
+  build: AuditedPostBuild;
+  hashtags: string[];
+  imagePath: string | null;
+  imageSource: string | null;
+  utmCampaign: string;
+}): Promise<string | null> {
+  const { bundle, contentType, build, hashtags, imagePath, imageSource, utmCampaign } = args;
+  const auditPassed = build.audit.verdict === "pass";
+  const status = auditPassed ? "draft" : "blocked";
+  const post: InsertSocialPost = {
+    contentType,
+    contentId: bundle.recordId,
+    contentTitle: bundle.title,
+    platform: build.platform,
+    postContent: build.content,
+    hashtags,
+    imageUrl: imagePath || undefined,
+    status,
+    utmCampaign,
+    sourceRecordId: bundle.recordId,
+    sourceRecordType: bundle.recordType,
+    citations: bundle.citations,
+    extractedClaims: build.audit.extracted,
+    matchedClaims: build.audit.matchedClaims,
+    auditVerdict: build.audit.verdict,
+    auditFailures: build.audit.failures,
+    imageSource: imageSource || undefined,
+    publishError: auditPassed
+      ? undefined
+      : `Claim audit failed: ${build.audit.failures.map((f) => f.reason).slice(0, 3).join(" | ")}`,
+  };
+  const created = await storage.createSocialPost(post);
+  if (!auditPassed) {
+    console.warn(
+      `[SocialDistribution] AUDIT BLOCKED ${build.platform} post for "${bundle.title}": ` +
+        build.audit.failures.map((f) => `${f.kind}:${f.claim}`).join(", "),
+    );
+    return null;
+  }
+  return created.id;
+}
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
@@ -363,18 +417,21 @@ async function generateImageForPost(title: string, contentType: string, platform
 }
 
 export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<string[]> {
-  const url = `https://www.getcyberright.com/guides/${guide.slug}`;
-  const context = buildGuideContext(guide);
+  const bundle = buildGuideBundle(guide);
+  const url = bundle.canonicalUrl;
   const posts = await generateSocialPosts(
     "cybersecurity guide",
     guide.title,
     guide.metaDescription,
     url,
     guide.tags || [],
-    context
+    bundle.contextForLLM,
   );
 
-  if (!posts) return [];
+  if (!posts) {
+    console.warn(`[SocialDistribution] AI returned no posts for guide "${guide.title}" — silence over hallucination`);
+    return [];
+  }
 
   const createdIds: string[] = [];
   const connectedPlatforms = await getConnectedPlatforms();
@@ -388,57 +445,54 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
     { platform: "alert", content: posts.shortAlert },
   ];
 
-  const platforms = allPlatforms.filter(p => connectedPlatforms.has(p.platform));
-  const skipped = allPlatforms.filter(p => !connectedPlatforms.has(p.platform)).map(p => p.platform);
-  if (skipped.length > 0) {
-    console.log(`[SocialDistribution] Skipping disconnected platforms: ${skipped.join(", ")}`);
-  }
+  const platforms = allPlatforms.filter((p) => connectedPlatforms.has(p.platform));
 
-  for (const { platform, content } of platforms) {
-    if (!content) continue;
+  for (const { platform, content: rawContent } of platforms) {
+    if (!rawContent) continue;
+    const content = appendCitationReceipt(rawContent, bundle.citations, platform);
     const requireCanonical = platform !== "instagram";
     const validation = validatePostContent(content, url, { requireCanonical, minChars: platform === "alert" ? 40 : 80 });
     if (!validation.ok) {
       console.warn(
         `[SocialDistribution] REJECTED ${platform} draft for guide "${guide.title}": ` +
-        validation.issues.map((i) => `${i.code}: ${i.message}`).join(" | ")
+          validation.issues.map((i) => `${i.code}: ${i.message}`).join(" | "),
       );
       continue;
     }
+    const audit = auditPostContent(content, bundle);
     const imagePath = await generateImageForPost(guide.title, "guide", platform, guide.category, undefined, guide.id);
-    const post: InsertSocialPost = {
+    const id = await persistAuditedPost({
+      bundle,
       contentType: "guide",
-      contentId: guide.id,
-      contentTitle: guide.title,
-      platform,
-      postContent: content,
+      build: { platform, content, audit },
       hashtags: posts.hashtags,
-      imageUrl: imagePath || undefined,
-      status: "draft",
+      imagePath,
+      imageSource: imagePath ? "stock_or_branded" : null,
       utmCampaign: campaignId,
-    };
-
-    const created = await storage.createSocialPost(post);
-    createdIds.push(created.id);
+    });
+    if (id) createdIds.push(id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} validated social posts for guide: "${guide.title}"`);
+  console.log(`[SocialDistribution] Guide "${guide.title}": ${createdIds.length} audit-pass drafts created`);
   return createdIds;
 }
 
 export async function distributeThreatAlertContent(alert: CyberThreatAlert): Promise<string[]> {
-  const url = `https://www.getcyberright.com/alerts/${alert.slug}`;
-  const context = buildAlertContext(alert);
+  const bundle = buildAlertBundle(alert);
+  const url = bundle.canonicalUrl;
   const posts = await generateSocialPosts(
     "cyber threat alert",
     alert.threatName,
     alert.description,
     url,
     alert.affectedPlatforms || [],
-    context
+    bundle.contextForLLM,
   );
 
-  if (!posts) return [];
+  if (!posts) {
+    console.warn(`[SocialDistribution] AI returned no posts for alert "${alert.threatName}" — silence over hallucination`);
+    return [];
+  }
 
   const createdIds: string[] = [];
   const connectedPlatforms = await getConnectedPlatforms();
@@ -451,58 +505,55 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
     { platform: "alert", content: posts.shortAlert },
   ];
 
-  const platforms = allPlatforms.filter(p => connectedPlatforms.has(p.platform));
-  const skipped = allPlatforms.filter(p => !connectedPlatforms.has(p.platform)).map(p => p.platform);
-  if (skipped.length > 0) {
-    console.log(`[SocialDistribution] Skipping disconnected platforms: ${skipped.join(", ")}`);
-  }
-
+  const platforms = allPlatforms.filter((p) => connectedPlatforms.has(p.platform));
   const alertCampaignId = buildCampaignId("threat_alert", "multi");
-  for (const { platform, content } of platforms) {
-    if (!content) continue;
+
+  for (const { platform, content: rawContent } of platforms) {
+    if (!rawContent) continue;
+    const content = appendCitationReceipt(rawContent, bundle.citations, platform);
     const requireCanonical = platform !== "instagram";
     const validation = validatePostContent(content, url, { requireCanonical, minChars: platform === "alert" ? 40 : 80 });
     if (!validation.ok) {
       console.warn(
         `[SocialDistribution] REJECTED ${platform} draft for threat alert "${alert.threatName}": ` +
-        validation.issues.map((i) => `${i.code}: ${i.message}`).join(" | ")
+          validation.issues.map((i) => `${i.code}: ${i.message}`).join(" | "),
       );
       continue;
     }
+    const audit = auditPostContent(content, bundle);
     const imagePath = await generateImageForPost(alert.threatName, "threat_alert", platform, alert.threatCategory, alert.riskLevel, alert.id);
-    const post: InsertSocialPost = {
+    const id = await persistAuditedPost({
+      bundle,
       contentType: "threat_alert",
-      contentId: alert.id,
-      contentTitle: alert.threatName,
-      platform,
-      postContent: content,
+      build: { platform, content, audit },
       hashtags: posts.hashtags,
-      imageUrl: imagePath || undefined,
-      status: "draft",
+      imagePath,
+      imageSource: imagePath ? "stock_or_branded" : null,
       utmCampaign: alertCampaignId,
-    };
-
-    const created = await storage.createSocialPost(post);
-    createdIds.push(created.id);
+    });
+    if (id) createdIds.push(id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} validated social posts for alert: "${alert.threatName}"`);
+  console.log(`[SocialDistribution] Alert "${alert.threatName}": ${createdIds.length} audit-pass drafts created`);
   return createdIds;
 }
 
 export async function distributeScamIntelContent(scam: ScamIntelligence): Promise<string[]> {
-  const url = `https://www.getcyberright.com/scam-intel/${scam.slug}`;
-  const context = buildScamContext(scam);
+  const bundle = buildScamBundle(scam);
+  const url = bundle.canonicalUrl;
   const posts = await generateSocialPosts(
     "scam intelligence report",
     scam.scamName,
     scam.metaDescription || `New ${scam.scamCategory} scam detected targeting ${(scam.targetAudience || []).join(", ")}`,
     url,
     scam.platformUsed || [],
-    context
+    bundle.contextForLLM,
   );
 
-  if (!posts) return [];
+  if (!posts) {
+    console.warn(`[SocialDistribution] AI returned no posts for scam "${scam.scamName}" — silence over hallucination`);
+    return [];
+  }
 
   const createdIds: string[] = [];
   const connectedPlatforms = await getConnectedPlatforms();
@@ -515,42 +566,36 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
     { platform: "alert", content: posts.shortAlert },
   ];
 
-  const platforms = allPlatforms.filter(p => connectedPlatforms.has(p.platform));
-  const skipped = allPlatforms.filter(p => !connectedPlatforms.has(p.platform)).map(p => p.platform);
-  if (skipped.length > 0) {
-    console.log(`[SocialDistribution] Skipping disconnected platforms: ${skipped.join(", ")}`);
-  }
-
+  const platforms = allPlatforms.filter((p) => connectedPlatforms.has(p.platform));
   const scamCampaignId = buildCampaignId("scam_intel", "multi");
-  for (const { platform, content } of platforms) {
-    if (!content) continue;
+
+  for (const { platform, content: rawContent } of platforms) {
+    if (!rawContent) continue;
+    const content = appendCitationReceipt(rawContent, bundle.citations, platform);
     const requireCanonical = platform !== "instagram";
     const validation = validatePostContent(content, url, { requireCanonical, minChars: platform === "alert" ? 40 : 80 });
     if (!validation.ok) {
       console.warn(
         `[SocialDistribution] REJECTED ${platform} draft for scam intel "${scam.scamName}": ` +
-        validation.issues.map((i) => `${i.code}: ${i.message}`).join(" | ")
+          validation.issues.map((i) => `${i.code}: ${i.message}`).join(" | "),
       );
       continue;
     }
-    const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform, scam.category || scam.scamCategory, undefined, scam.id);
-    const post: InsertSocialPost = {
+    const audit = auditPostContent(content, bundle);
+    const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform, (scam as any).category || scam.scamCategory, undefined, scam.id);
+    const id = await persistAuditedPost({
+      bundle,
       contentType: "scam_intel",
-      contentId: scam.id,
-      contentTitle: scam.scamName,
-      platform,
-      postContent: content,
+      build: { platform, content, audit },
       hashtags: posts.hashtags,
-      imageUrl: imagePath || undefined,
-      status: "draft",
+      imagePath,
+      imageSource: imagePath ? "stock_or_branded" : null,
       utmCampaign: scamCampaignId,
-    };
-
-    const created = await storage.createSocialPost(post);
-    createdIds.push(created.id);
+    });
+    if (id) createdIds.push(id);
   }
 
-  console.log(`[SocialDistribution] Generated ${createdIds.length} UTM-tagged social posts with images for scam: "${scam.scamName}"`);
+  console.log(`[SocialDistribution] Scam "${scam.scamName}": ${createdIds.length} audit-pass drafts created`);
   return createdIds;
 }
 

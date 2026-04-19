@@ -2518,7 +2518,14 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
     if (channels.facebook && allowedPlatforms.includes("facebook") && (!platformFilter || platformFilter === "facebook")) platformPosts.push({ platform: "facebook", content: validatedFacebook, image: imageUrl });
     if (channels.instagram && allowedPlatforms.includes("instagram") && (!platformFilter || platformFilter === "instagram")) platformPosts.push({ platform: "instagram", content: validatedInstagram, image: igImageUrl || imageUrl });
 
-    for (let { platform, content, image } of platformPosts) {
+    // GOLD-STANDARD CHANGE (Task #17): Reactive posts pulled from trending news no longer
+    // publish directly. They are queued as "review_pending" with a 60-minute expiry.
+    // Admins approve via the social posts admin surface; expired drafts are auto-discarded
+    // by the review sweeper. Excellence or silence — we never ship unaudited reactive content.
+    const REVIEW_WINDOW_MS = 60 * 60 * 1000;
+    const reviewExpiresAt = new Date(Date.now() + REVIEW_WINDOW_MS);
+
+    for (const { platform, content, image } of platformPosts) {
       if (platform === "instagram" && !image) {
         console.warn(`[TrendEngine] Skipping Instagram reactive post "${posts.title}" — Instagram requires an image`);
         continue;
@@ -2532,76 +2539,41 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
           platform,
           postContent: content,
           hashtags: posts.hashtags,
-          status: "published",
+          status: "review_pending",
           utmCampaign: buildCampaignId("trend_insight", platform, postStyle),
           postStyle,
           imageUrl: image || undefined,
+          sourceRecordType: "trending_news",
+          sourceRecordId: trendArticle?.slug || null,
+          citations: posts.sourceArticleUrl
+            ? [
+                {
+                  name: posts.title,
+                  publisher: (() => {
+                    try {
+                      return new URL(posts.sourceArticleUrl).hostname.replace(/^www\./, "");
+                    } catch {
+                      return "external_source";
+                    }
+                  })(),
+                  url: posts.sourceArticleUrl,
+                  accessedAt: new Date().toISOString(),
+                },
+              ]
+            : [],
+          imageSource: imageSource || null,
+          reviewExpiresAt,
+          auditVerdict: "pending_review",
         };
 
         const created = await storage.createSocialPost(socialPost);
-        await storage.updateSocialPost(created.id, { publishedAt: new Date() });
 
-        const { validateAndPreparePost } = await import("./linkValidator");
-        const linkCheck = await validateAndPreparePost(content, created.id, platform, posts.title);
-        console.log(linkCheck.validationLog);
-
-        if (!linkCheck.shouldPublish) {
-          console.error(`[TrendEngine] Post blocked by link validation for ${platform}: "${posts.title}"`);
-          continue;
-        }
-        content = linkCheck.content;
-
-        const { runSocialQualityGate } = await import("./socialQualityGate");
-        const gateBlock = await runSocialQualityGate({
-          platform,
-          postContent: content,
-          contentType: socialPost.contentType,
-          contentId: socialPost.contentId,
-        });
-        if (gateBlock) {
-          console.error(`[TrendEngine] Quality gate BLOCKED ${platform}: "${posts.title}" — ${gateBlock}`);
-          await storage.updateSocialPost(created.id, { status: "failed", publishError: gateBlock });
-          continue;
-        }
-
-        const channel = channels[platform];
-        const { publishDirect } = await import("./bufferPublisher");
-        let bufferResult = await publishDirect(channel.id, content, platform, image || undefined);
-
-        if (!bufferResult.success && image && bufferResult.error?.toLowerCase().includes("image")) {
-          if (platform === "instagram") {
-            console.error(`[TrendEngine] Image rejected by Instagram: ${bufferResult.error}. Cannot retry without image.`);
-          } else {
-            console.warn(`[TrendEngine] Image rejected for ${platform}: ${bufferResult.error}. Retrying without image...`);
-            bufferResult = await publishDirect(channel.id, content, platform);
-            if (bufferResult.success) {
-              console.log(`[TrendEngine] Retry without image succeeded for ${platform}`);
-              await storage.updateSocialPost(created.id, { imageUrl: null });
-            }
-          }
-        }
-
-        if (!bufferResult.success) {
-          console.log(`[TrendEngine] Reactive post failed for ${platform}. Discarding (reactive posts are publish-now-or-discard).`);
-        }
-
-        if (bufferResult.success) {
-          console.log(
-            `[TrendEngine] Published ${platform}: "${posts.title}" [depth:${posts.postDepth}|${posts.contentMode}|${posts.trendAnalysis.category}|urgency:${posts.trendAnalysis.urgency_score}|confidence:${posts.confidenceScore}] (Buffer ID: ${bufferResult.bufferId})`
-          );
-          result.published++;
-          result.platforms.push(platform);
-        } else {
-          await storage.updateSocialPost(created.id, {
-            status: "failed",
-            publishError: `Buffer: ${bufferResult.error}`,
-          });
-          console.error(`[TrendEngine] Buffer publish failed for ${platform}: ${bufferResult.error}`);
-        }
-
-        await new Promise((r) => setTimeout(r, 1500));
+        console.log(
+          `[TrendEngine] QUEUED FOR REVIEW ${platform}: "${posts.title}" [expires: ${reviewExpiresAt.toISOString()}] [depth:${posts.postDepth}|${posts.contentMode}|urgency:${posts.trendAnalysis.urgency_score}|confidence:${posts.confidenceScore}]`,
+        );
+        result.platforms.push(platform);
       } catch (err: any) {
-        console.error(`[TrendEngine] Failed to publish ${platform} post:`, err.message);
+        console.error(`[TrendEngine] Failed to queue ${platform} post for review:`, err.message);
       }
     }
 

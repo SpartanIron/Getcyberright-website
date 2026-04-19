@@ -898,6 +898,90 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  // ─── Gold-Standard Social Engine: Review Queue + Audit Log ─────────
+
+  app.get("/api/admin/social-posts/review-queue", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const posts = await storage.getSocialPosts("review_pending", 100);
+      res.json(posts);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch review queue" });
+    }
+  });
+
+  app.post("/api/admin/social-posts/:id/approve", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const post = await storage.getSocialPostById(req.params.id);
+      if (!post) return res.status(404).json({ error: "Post not found" });
+      if (post.status !== "review_pending") {
+        return res.status(400).json({ error: `Post is not in review_pending state (current: ${post.status})` });
+      }
+      await storage.updateSocialPost(req.params.id, { status: "draft", auditVerdict: "approved_by_admin" });
+      const result = await publishPost(req.params.id);
+      res.json({ success: result.success, externalId: result.externalId, error: result.error, platform: result.platform });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to approve post" });
+    }
+  });
+
+  app.post("/api/admin/social-posts/:id/reject", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const reason = (req.body?.reason as string | undefined) || "Rejected by admin";
+      const post = await storage.updateSocialPost(req.params.id, {
+        status: "discarded",
+        auditVerdict: "rejected_by_admin",
+        publishError: reason,
+      });
+      if (!post) return res.status(404).json({ error: "Post not found" });
+      res.json({ success: true, post });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to reject post" });
+    }
+  });
+
+  app.get("/api/admin/social-posts/audit-log", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+      const verdict = req.query.verdict as string | undefined;
+      const all = await storage.getSocialPosts(undefined, limit * 2);
+      const filtered = all
+        .filter((p) => p.auditVerdict || (p.auditFailures && (p.auditFailures as any[]).length > 0))
+        .filter((p) => (verdict ? p.auditVerdict === verdict : true))
+        .slice(0, limit)
+        .map((p) => ({
+          id: p.id,
+          contentTitle: p.contentTitle,
+          platform: p.platform,
+          contentType: p.contentType,
+          status: p.status,
+          auditVerdict: p.auditVerdict,
+          auditFailures: p.auditFailures,
+          extractedClaims: p.extractedClaims,
+          matchedClaims: p.matchedClaims,
+          citations: p.citations,
+          imageSource: p.imageSource,
+          sourceRecordId: p.sourceRecordId,
+          sourceRecordType: p.sourceRecordType,
+          createdAt: p.createdAt,
+          publishedAt: p.publishedAt,
+          publishError: p.publishError,
+        }));
+      res.json(filtered);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to fetch audit log" });
+    }
+  });
+
+  app.post("/api/admin/social-posts/sweep-review", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
+    try {
+      const { sweepExpiredReviewPosts } = await import("./socialReviewSweeper");
+      const swept = await sweepExpiredReviewPosts();
+      res.json({ swept });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.post("/api/admin/social-posts/publish-all", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
     try {
       const results = await publishAllDrafts();
