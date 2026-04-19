@@ -922,8 +922,9 @@ export function registerPlatformRoutes(app: Express): void {
       const { runSocialQualityGate } = await import("./socialQualityGate");
       const { auditPostContent } = await import("./socialClaimAuditor");
       const { buildGuideBundle, buildAlertBundle, buildScamBundle } = await import("./socialSourceBundle");
+      type SourceBundleT = import("./socialSourceBundle").SourceBundle;
 
-      let bundle: any = null;
+      let bundle: SourceBundleT | null = null;
       if (post.contentType === "guide" && post.contentId) {
         const g = await storage.getGuideById(post.contentId);
         if (g) bundle = buildGuideBundle(g);
@@ -933,23 +934,49 @@ export function registerPlatformRoutes(app: Express): void {
       } else if (post.contentType === "scam_intel" && post.contentId) {
         const s = await storage.getScamIntelById(post.contentId);
         if (s) bundle = buildScamBundle(s);
+      } else if (post.contentType === "trend_insight") {
+        // Reactive trend posts persist their bundle on the post row at queue time.
+        const stored = (post.citations || []) as SourceBundle["citations"];
+        const corpus = (post.extractedClaims || [])
+          .map((c) => (c && typeof c === "object" && "context" in c ? String((c as { context?: string }).context ?? "") : ""))
+          .join(" ");
+        if (stored.length > 0) {
+          bundle = {
+            recordId: post.contentId || post.id,
+            recordType: "trend_insight",
+            title: post.contentTitle,
+            corpus,
+            citations: stored,
+            primaryUrl: stored[0]?.url || "",
+          } satisfies SourceBundle;
+        }
       }
 
-      if (bundle) {
-        const audit = auditPostContent(post.postContent, bundle);
-        if (audit.verdict !== "pass") {
-          await storage.updateSocialPost(req.params.id, {
-            status: "blocked",
-            auditVerdict: "fail_on_approval",
-            auditFailures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
-            publishError: "Re-audit failed at approval time",
-          });
-          return res.status(400).json({
-            success: false,
-            error: "Re-audit failed at approval time. Post blocked.",
-            failures: audit.failures,
-          });
-        }
+      if (!bundle) {
+        await storage.updateSocialPost(req.params.id, {
+          status: "blocked",
+          auditVerdict: "fail_on_approval",
+          publishError: "No auditable source bundle at approval time",
+        });
+        return res.status(400).json({
+          success: false,
+          error: "Cannot approve: no auditable source bundle. Excellence or silence.",
+        });
+      }
+
+      const audit = auditPostContent(post.postContent, bundle);
+      if (audit.verdict !== "pass") {
+        await storage.updateSocialPost(req.params.id, {
+          status: "blocked",
+          auditVerdict: "fail_on_approval",
+          auditFailures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
+          publishError: "Re-audit failed at approval time",
+        });
+        return res.status(400).json({
+          success: false,
+          error: "Re-audit failed at approval time. Post blocked.",
+          failures: audit.failures,
+        });
       }
 
       const gateError = await runSocialQualityGate({

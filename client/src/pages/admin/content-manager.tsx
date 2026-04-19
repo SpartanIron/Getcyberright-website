@@ -687,7 +687,7 @@ function ReviewQueueTab() {
         <CardTitle className="flex items-center gap-2">
           <Eye className="w-5 h-5" /> Review Queue ({posts.length})
         </CardTitle>
-        <p className="text-xs text-muted-foreground">Reactive trend posts awaiting admin approval. Auto-discard after 60 minutes.</p>
+        <p className="text-xs text-muted-foreground">Reactive trend posts awaiting admin approval. Auto-discard after 30 minutes.</p>
       </CardHeader>
       <CardContent>
         {posts.length === 0 ? (

@@ -29,11 +29,19 @@ export function getEmptyCycleEvents(limit = 50): EmptyCycleEvent[] {
   return EMPTY_CYCLES.slice(0, limit);
 }
 export function getEmptyCycleStats() {
-  const last24h = Date.now() - 24 * 60 * 60 * 1000;
-  const recent = EMPTY_CYCLES.filter((e) => new Date(e.ts).getTime() > last24h);
+  const now = Date.now();
+  const last7d = now - 7 * 24 * 60 * 60 * 1000;
+  const last24h = now - 24 * 60 * 60 * 1000;
+  const recent7d = EMPTY_CYCLES.filter((e) => new Date(e.ts).getTime() > last7d);
+  const recent24h = EMPTY_CYCLES.filter((e) => new Date(e.ts).getTime() > last24h);
   const byType: Record<string, number> = {};
-  for (const e of recent) byType[e.recordType] = (byType[e.recordType] || 0) + 1;
-  return { totalLast24h: recent.length, byType };
+  for (const e of recent7d) byType[e.recordType] = (byType[e.recordType] || 0) + 1;
+  return {
+    windowDays: 7,
+    totalLast7d: recent7d.length,
+    totalLast24h: recent24h.length,
+    byType,
+  };
 }
 
 interface AuditedPostBuild {

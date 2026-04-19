@@ -65,16 +65,23 @@ export function formatShortReceipt(citations: Citation[], canonicalUrl: string):
  */
 export function appendCitationReceipt(content: string, citations: Citation[], platform: string, canonicalUrl: string): string {
   if (!canonicalUrl) return content;
-  if (content.includes("Sources:") || content.includes("Source:") || content.includes(canonicalUrl)) {
-    return content;
-  }
 
   const isShortForm = platform === "x" || platform === "instagram" || platform === "alert";
   const receipt = isShortForm
     ? formatShortReceipt(citations, canonicalUrl)
     : formatLongReceipt(citations, canonicalUrl);
 
-  return `${content}\n\n${receipt}`;
+  let body = content;
+  const sourcesIdx = body.search(/(^|\n)\s*(Sources?:)/);
+  if (sourcesIdx >= 0) {
+    body = body.slice(0, sourcesIdx).replace(/\s+$/, "");
+  } else if (canonicalUrl) {
+    const urlEsc = canonicalUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const linkLineRe = new RegExp(`(^|\\n)[^\\n]*${urlEsc}[^\\n]*`, "g");
+    body = body.replace(linkLineRe, "").replace(/\n{3,}/g, "\n\n").replace(/\s+$/, "");
+  }
+
+  return `${body}\n\n${receipt}`;
 }
 
 // Legacy helper kept for backward compat with any older callers.
