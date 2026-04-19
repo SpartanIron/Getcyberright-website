@@ -343,11 +343,18 @@ export function DeziAssistant() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [showWelcomeBubble, setShowWelcomeBubble] = useState(false);
-  const [messages, setMessages] = useState<Message[]>(loadMessages);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [conversationId, setConvId] = useState<number | null>(getConversationId);
+  const [conversationId, setConvId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const restored = loadMessages();
+    if (restored.length > 0) setMessages(restored);
+    const restoredConvId = getConversationId();
+    if (restoredConvId !== null) setConvId(restoredConvId);
+  }, []);
   const [aiAvailable, setAiAvailable] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

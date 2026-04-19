@@ -27,11 +27,7 @@ function AnalyticsProvider({ children }: { children: ReactNode }) {
 }
 
 export function ClientShell({ children }: { children: ReactNode }) {
-  const [isClient, setIsClient] = useState(false);
-
   useEffect(() => {
-    setIsClient(true);
-
     const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
     if (gaMeasurementId) {
       initGA();
@@ -56,13 +52,9 @@ export function ClientShell({ children }: { children: ReactNode }) {
           {children}
         </AnalyticsProvider>
       </ErrorBoundary>
-      {isClient && (
-        <>
-          <DeziAssistant />
-          <FeedbackWidget />
-          <CookieConsent />
-        </>
-      )}
+      <DeziAssistant />
+      <FeedbackWidget />
+      <CookieConsent />
     </>
   );
 }
