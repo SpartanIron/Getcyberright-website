@@ -40,6 +40,70 @@ import { AdminLayout } from "@/components/admin/admin-layout";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
+function ClientDate({
+  value,
+  mode = "date",
+  placeholder = "—",
+}: {
+  value?: string | Date | null;
+  mode?: "date" | "time" | "datetime";
+  placeholder?: string;
+}) {
+  const [text, setText] = useState<string | null>(null);
+  useEffect(() => {
+    if (!value) {
+      setText("");
+      return;
+    }
+    const d = value instanceof Date ? value : new Date(value);
+    if (isNaN(d.getTime())) {
+      setText("");
+      return;
+    }
+    if (mode === "time") setText(d.toLocaleTimeString());
+    else if (mode === "datetime") setText(d.toLocaleString());
+    else setText(d.toLocaleDateString());
+  }, [value, mode]);
+  if (text === null) return <span suppressHydrationWarning>{placeholder}</span>;
+  return <span suppressHydrationWarning>{text}</span>;
+}
+
+function TabErrorState({
+  label,
+  error,
+  onRetry,
+  isRetrying,
+}: {
+  label: string;
+  error: unknown;
+  onRetry: () => void;
+  isRetrying: boolean;
+}) {
+  const message = error instanceof Error ? error.message : "Could not load data.";
+  return (
+    <Card data-testid={`error-${label.toLowerCase().replace(/\s+/g, "-")}`}>
+      <CardContent className="p-8 text-center space-y-3">
+        <XCircle className="w-8 h-8 mx-auto text-red-500" />
+        <p className="text-sm font-medium">Couldn't load {label}.</p>
+        <p className="text-xs text-muted-foreground line-clamp-2">{message}</p>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onRetry}
+          disabled={isRetrying}
+          data-testid={`button-retry-${label.toLowerCase().replace(/\s+/g, "-")}`}
+        >
+          {isRetrying ? (
+            <><RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" /> Retrying…</>
+          ) : (
+            <><RefreshCw className="w-3.5 h-3.5 mr-1" /> Retry</>
+          )}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 function StatusBadge({ status }: { status: string }) {
   const variants: Record<string, string> = {
     published: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
@@ -74,7 +138,7 @@ function RiskBadge({ level }: { level: string }) {
 
 function GuidesTab() {
   const { toast } = useToast();
-  const { data: guides = [], isLoading } = useQuery<any[]>({
+  const { data: guides = [], isLoading, isError, error, refetch, isFetching } = useQuery<any[]>({
     queryKey: ["/api/guides"],
   });
 
@@ -92,6 +156,7 @@ function GuidesTab() {
   });
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading guides...</div>;
+  if (isError) return <TabErrorState label="Guides" error={error} onRetry={() => refetch()} isRetrying={isFetching} />;
 
   return (
     <Card>
@@ -129,7 +194,7 @@ function GuidesTab() {
                   </TableCell>
                   <TableCell><StatusBadge status={guide.status} /></TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {guide.publishedAt ? new Date(guide.publishedAt).toLocaleDateString() : "Not yet"}
+                    {guide.publishedAt ? <ClientDate value={guide.publishedAt} /> : "Not yet"}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
@@ -165,7 +230,7 @@ function GuidesTab() {
 
 function ScamIntelTab() {
   const { toast } = useToast();
-  const { data: scams = [], isLoading } = useQuery<any[]>({
+  const { data: scams = [], isLoading, isError, error, refetch, isFetching } = useQuery<any[]>({
     queryKey: ["/api/scam-intel"],
   });
 
@@ -183,6 +248,7 @@ function ScamIntelTab() {
   });
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading scam intelligence...</div>;
+  if (isError) return <TabErrorState label="Scam Intel" error={error} onRetry={() => refetch()} isRetrying={isFetching} />;
 
   return (
     <Card>
@@ -254,7 +320,7 @@ function ScamIntelTab() {
 
 function AlertsTab() {
   const { toast } = useToast();
-  const { data: alerts = [], isLoading } = useQuery<any[]>({
+  const { data: alerts = [], isLoading, isError, error, refetch, isFetching } = useQuery<any[]>({
     queryKey: ["/api/alerts"],
   });
 
@@ -272,6 +338,7 @@ function AlertsTab() {
   });
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading alerts...</div>;
+  if (isError) return <TabErrorState label="Alerts" error={error} onRetry={() => refetch()} isRetrying={isFetching} />;
 
   return (
     <Card>
@@ -307,7 +374,7 @@ function AlertsTab() {
                   <TableCell><RiskBadge level={alert.riskLevel || "medium"} /></TableCell>
                   <TableCell><StatusBadge status={alert.status} /></TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {alert.publishedAt ? new Date(alert.publishedAt).toLocaleDateString() : "Not yet"}
+                    {alert.publishedAt ? <ClientDate value={alert.publishedAt} /> : "Not yet"}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
@@ -411,7 +478,7 @@ function SocialPostCard({ post, onPublish, isPublishing }: { post: any; onPublis
               <StatusBadge status={post.status} />
             </div>
             <span className="text-xs text-muted-foreground">
-              {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}
+              {post.createdAt ? <ClientDate value={post.createdAt} /> : ""}
             </span>
           </div>
 
@@ -522,7 +589,11 @@ function SocialPostCard({ post, onPublish, isPublishing }: { post: any; onPublis
             {post.status === "published" ? (
               <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                 <CheckCircle className="w-3.5 h-3.5" /> Published
-                {post.publishedAt && ` on ${new Date(post.publishedAt).toLocaleDateString()}`}
+                {post.publishedAt && (
+                  <>
+                    {" "}on <ClientDate value={post.publishedAt} />
+                  </>
+                )}
               </span>
             ) : post.platform !== "alert" ? (
               <Button
@@ -552,7 +623,7 @@ function SocialPostsTab() {
   const [publishingId, setPublishingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
 
-  const { data: posts = [], isLoading } = useQuery<any[]>({
+  const { data: posts = [], isLoading, isError, error, refetch, isFetching } = useQuery<any[]>({
     queryKey: ["/api/admin/social-posts"],
   });
 
@@ -602,6 +673,7 @@ function SocialPostsTab() {
   const failedCount = posts.filter((p: any) => p.status === "failed").length;
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading social posts...</div>;
+  if (isError) return <TabErrorState label="Social Posts" error={error} onRetry={() => refetch()} isRetrying={isFetching} />;
 
   return (
     <div className="space-y-4">
@@ -683,7 +755,7 @@ function ReviewQueueTab() {
   const { toast } = useToast();
   const [actingId, setActingId] = useState<string | null>(null);
 
-  const { data: posts = [], isLoading } = useQuery<any[]>({
+  const { data: posts = [], isLoading, isError, error, refetch, isFetching } = useQuery<any[]>({
     queryKey: ["/api/admin/social-posts/review-queue"],
     refetchInterval: 30000,
   });
@@ -737,6 +809,7 @@ function ReviewQueueTab() {
   });
 
   if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading review queue...</div>;
+  if (isError) return <TabErrorState label="Review Queue" error={error} onRetry={() => refetch()} isRetrying={isFetching} />;
 
   return (
     <Card>
@@ -812,18 +885,17 @@ function ReviewQueueTab() {
                     </Button>
                     {post.reviewExpiresAt && (
                       <span className="text-xs text-muted-foreground">
-                        Expires {new Date(post.reviewExpiresAt).toLocaleTimeString()}
+                        Expires <ClientDate value={post.reviewExpiresAt} mode="time" />
                       </span>
                     )}
                     {post.notifiedAt ? (
                       <Badge
                         variant="secondary"
                         className="text-xs"
-                        title={`Email digest sent ${new Date(post.notifiedAt).toLocaleString()}`}
                         data-testid={`badge-notified-${post.id}`}
                       >
                         <Send className="w-3 h-3 mr-1" />
-                        Notified {new Date(post.notifiedAt).toLocaleTimeString()}
+                        Notified <ClientDate value={post.notifiedAt} mode="time" />
                       </Badge>
                     ) : (
                       <Badge
