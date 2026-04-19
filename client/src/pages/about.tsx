@@ -452,6 +452,74 @@ export default function About() {
           </div>
         </section>
 
+        <section className="py-16 sm:py-20 lg:py-24 bg-muted/30" aria-labelledby="trust-heading" data-testid="section-about-trust">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+            <div className="max-w-2xl mb-10 sm:mb-14">
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+                <span className="text-sm font-semibold text-primary uppercase tracking-wider">Built on Trust</span>
+              </div>
+              <h2 id="trust-heading" className="text-3xl sm:text-4xl font-bold text-foreground mb-4" data-testid="text-trust-heading">
+                Security and Privacy You Can Verify
+              </h2>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                We hold ourselves to the same standards we teach. Here is how we build, secure, and operate the platform.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="bg-card border border-border rounded-xl p-6" data-testid="trust-badge-owasp">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <ShieldAlert className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1.5">OWASP Top 10 Addressed</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Our application defenses cover the OWASP Top 10 most critical web security risks.
+                </p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-6" data-testid="trust-badge-nist">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Award className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1.5">NIST Cybersecurity Framework Aligned</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Our practices map to the NIST CSF functions: Identify, Protect, Detect, Respond, and Recover.
+                </p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-6" data-testid="trust-badge-privacy">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Eye className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1.5">Privacy by Design</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  We never sell your data. Personal information is collected only when needed and minimized by default.
+                </p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-6" data-testid="trust-badge-tls">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Lock className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1.5">SSL/TLS Encrypted</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  All data in transit is encrypted with industry-standard TLS, end to end.
+                </p>
+              </div>
+            </div>
+            <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-card border border-border rounded-xl p-6">
+              <div>
+                <p className="font-semibold text-foreground mb-1">Want to partner with us?</p>
+                <p className="text-sm text-muted-foreground">
+                  Schools, libraries, employers, and community groups can bring GetCyberRight to their people.
+                </p>
+              </div>
+              <Link href="/for-organizations">
+                <Button variant="default" data-testid="button-trust-partner-cta">
+                  Partner With Us <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         <section className="relative py-20 sm:py-24 overflow-hidden">
           <img
             src={imgSrc(ctaBackgroundImage)}

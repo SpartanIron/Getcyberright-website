@@ -31,6 +31,8 @@ import {
   History,
   Share2,
   ThumbsUp,
+  ThumbsDown,
+  RotateCcw,
   Flag,
   MessageSquareWarning,
   Smartphone,
@@ -3505,6 +3507,13 @@ export function ScamChecker() {
                 ))}
               </ul>
             </div>
+
+            <ScamCheckerFeedback
+              key={shareId || `${result.overallRisk}-${result.threats.length}`}
+              riskLevel={result.overallRisk}
+              shareId={shareId}
+              onCheckAnother={handleClear}
+            />
           </div>
         )}
 
@@ -3853,3 +3862,95 @@ export function ScamChecker() {
     </Card>
   );
 }
+
+type FeedbackProps = {
+  riskLevel: string;
+  shareId: string | null;
+  onCheckAnother: () => void;
+};
+
+function ScamCheckerFeedback({ riskLevel, shareId, onCheckAnother }: FeedbackProps) {
+  const { toast } = useToast();
+  const [submitted, setSubmitted] = useState<"helpful" | "not-helpful" | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const send = async (verdict: "helpful" | "not-helpful") => {
+    if (submitted || submitting) return;
+    setSubmitting(true);
+    try {
+      const messageParts = [
+        `[Scam Checker rating: ${verdict === "helpful" ? "Helpful" : "Not helpful"}]`,
+        `Risk level shown: ${riskLevel}.`,
+        shareId ? `Share ID: ${shareId}.` : null,
+      ].filter(Boolean);
+      await apiRequest("POST", "/api/feedback", {
+        category: verdict === "helpful" ? "praise" : "other",
+        message: messageParts.join(" "),
+        page: typeof window !== "undefined" ? window.location.pathname : "/scam-checker",
+      });
+      setSubmitted(verdict);
+      toast({
+        title: verdict === "helpful" ? "Thanks for the feedback" : "Thanks, we will review",
+        description: verdict === "helpful"
+          ? "Glad this was useful. Share it with someone who needs it."
+          : "We use feedback to keep the scam checker accurate.",
+      });
+    } catch {
+      toast({
+        title: "Could not send feedback",
+        description: "Please try again in a moment.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div
+      className="mt-2 rounded-lg border border-border bg-muted/30 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+      data-testid="section-scam-checker-feedback"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <p className="text-sm font-medium" data-testid="text-feedback-prompt">
+          {submitted ? "Thanks for the feedback." : "Was this result helpful?"}
+        </p>
+        {!submitted && (
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => send("helpful")}
+              disabled={submitting}
+              data-testid="button-feedback-helpful"
+              aria-label="Mark this result as helpful"
+            >
+              <ThumbsUp className="w-4 h-4 mr-1.5" /> Helpful
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => send("not-helpful")}
+              disabled={submitting}
+              data-testid="button-feedback-not-helpful"
+              aria-label="Mark this result as not helpful"
+            >
+              <ThumbsDown className="w-4 h-4 mr-1.5" /> Not helpful
+            </Button>
+          </div>
+        )}
+      </div>
+      <Button
+        type="button"
+        size="sm"
+        onClick={onCheckAnother}
+        data-testid="button-check-another"
+      >
+        <RotateCcw className="w-4 h-4 mr-1.5" /> Check another
+      </Button>
+    </div>
+  );
+}
+

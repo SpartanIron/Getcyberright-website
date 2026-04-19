@@ -1,5 +1,10 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import { Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
+import { useRecaptcha } from "@/hooks/use-recaptcha";
 import { StructuredData, type BreadcrumbData } from "@/components/structured-data";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -194,12 +199,12 @@ export default function AwarenessHub() {
             A comprehensive, easy-to-follow guide covering online safety basics, device security, social media privacy, and how to talk to your kids about cyber threats. Perfect for printing and sharing.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/printable-guides">
+            <a href="/family-cyber-safety-checklist" target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="gap-2" data-testid="button-download-guide">
                 <Download className="h-5 w-5" />
                 Download Free Guide
               </Button>
-            </Link>
+            </a>
             <Link href="/guides">
               <Button size="lg" variant="outline" className="gap-2" data-testid="button-browse-guides">
                 <BookOpen className="h-5 w-5" />
@@ -207,7 +212,13 @@ export default function AwarenessHub() {
               </Button>
             </Link>
           </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            Opens a printable Family Cyber Safety checklist in a new tab. Print or save as PDF from your browser.
+          </p>
         </section>
+
+        <WeeklySafetyTipsSignup />
+
 
         <section>
           <h2 className="text-2xl font-bold text-center mb-2" data-testid="heading-infographics">Visual Safety Guides</h2>
@@ -378,5 +389,110 @@ export default function AwarenessHub() {
 
       <Footer />
     </div>
+  );
+}
+
+function WeeklySafetyTipsSignup() {
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const formTimestamp = useMemo(() => Date.now(), []);
+  const { getRecaptchaToken } = useRecaptcha();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      setError("Please enter your email.");
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    try {
+      const recaptchaToken = await getRecaptchaToken("newsletter_subscribe");
+      const res = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          _timestamp: formTimestamp.toString(),
+          recaptchaToken,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && (data?.success ?? true)) {
+        setSubmitted(true);
+      } else {
+        setError(data?.message || data?.error || "Could not subscribe. Please try again.");
+      }
+    } catch {
+      setError("Could not subscribe. Please try again in a moment.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <section
+      className="rounded-2xl border border-teal-200 dark:border-teal-800/40 bg-teal-50/60 dark:bg-teal-950/20 p-6 md:p-8"
+      data-testid="section-weekly-safety-tips"
+      aria-labelledby="weekly-tips-heading"
+    >
+      <div className="grid md:grid-cols-2 gap-6 items-center">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 dark:bg-white/5 text-teal-700 dark:text-teal-300 text-xs font-medium mb-3">
+            <Mail className="h-3.5 w-3.5" /> Weekly Safety Tips
+          </div>
+          <h2 id="weekly-tips-heading" className="text-2xl md:text-3xl font-bold mb-2">
+            One short safety tip in your inbox each week
+          </h2>
+          <p className="text-muted-foreground">
+            Plain-language tips your whole family can use. Unsubscribe with one click any time.
+          </p>
+        </div>
+        <div>
+          {submitted ? (
+            <div
+              className="rounded-lg bg-white dark:bg-background border border-teal-300 dark:border-teal-800/60 p-5"
+              data-testid="status-weekly-tips-submitted"
+            >
+              <p className="font-semibold mb-1">Thanks for joining.</p>
+              <p className="text-sm text-muted-foreground">
+                Watch for our first weekly tip soon. You can unsubscribe any time.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-3" data-testid="form-weekly-safety-tips">
+              <label htmlFor="weekly-tips-email" className="sr-only">
+                Email address
+              </label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  id="weekly-tips-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  data-testid="input-weekly-tips-email"
+                />
+                <Button type="submit" disabled={submitting} data-testid="button-weekly-tips-subscribe">
+                  {submitting ? "Subscribing..." : "Subscribe"}
+                </Button>
+              </div>
+              {error && (
+                <p className="text-sm text-destructive" role="alert" data-testid="text-weekly-tips-error">
+                  {error}
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Free. We will never sell or share your email.
+              </p>
+            </form>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

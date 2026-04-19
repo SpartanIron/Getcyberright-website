@@ -112,10 +112,40 @@ const competencyDomains = [
 ];
 
 const certificationLevels = [
-  { level: "foundation", name: "Digital Safety Aware", hours: "2-3", badge: "Bronze", description: "Core concepts every person should know" },
-  { level: "intermediate", name: "Cyber Defender", hours: "4-5", badge: "Silver", description: "Advanced threat recognition and prevention" },
-  { level: "advanced", name: "Security Champion", hours: "6-8", badge: "Gold", description: "Expert-level security practices and leadership" }
+  { level: "foundation", name: "Digital Safety Aware", hours: "~45 minutes", badge: "Bronze", description: "Core concepts every person should know" },
+  { level: "intermediate", name: "Cyber Defender", hours: "~1.5 hours", badge: "Silver", description: "Advanced threat recognition and prevention" },
+  { level: "advanced", name: "Security Champion", hours: "~2 hours", badge: "Gold", description: "Expert-level security practices and leadership" }
 ];
+
+const pathDurationByLevel: Record<string, string> = {
+  foundation: "6 modules \u00b7 ~45 min total",
+  intermediate: "8 modules \u00b7 ~1.5 hours total",
+  advanced: "10 modules \u00b7 ~2 hours total",
+};
+
+function getPathDuration(level: string | null | undefined): string {
+  if (!level) return "Self-paced";
+  return pathDurationByLevel[level.toLowerCase()] || "Self-paced";
+}
+
+function getPathPreview(path: LearningPath): { module: string; objective: string } {
+  const audience = path.audience;
+  const moduleByAudience: Record<string, string> = {
+    kids: "Module 1: What is Personal Information?",
+    parents: "Module 1: Setting Up a Safer Family Device",
+    seniors: "Module 1: Spotting a Phone Scam in 30 Seconds",
+    educators: "Module 1: Teaching Digital Citizenship",
+    "small-business": "Module 1: The Anatomy of a Business Email Compromise",
+    everyone: "Module 1: Your First Line of Defense",
+  };
+  const objective = path.learningOutcomes && path.learningOutcomes.length > 0
+    ? path.learningOutcomes[0]
+    : "Recognize the most common online threats and what to do about them.";
+  return {
+    module: moduleByAudience[audience] || "Module 1: Getting Started",
+    objective,
+  };
+}
 
 export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[] }) {
   const [selectedAudience, setSelectedAudience] = useState<string>("all");
@@ -294,6 +324,20 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
               })}
             </div>
 
+            {!userProgress && (
+              <div
+                className="max-w-3xl mx-auto mb-6 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 flex items-start gap-3"
+                data-testid="notice-progress-saves"
+                role="status"
+              >
+                <CheckCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-foreground">
+                  <span className="font-semibold">Progress saves automatically.</span>{" "}
+                  Your place in each course is kept on this device. Create a free account to sync progress across devices and earn shareable certificates.
+                </p>
+              </div>
+            )}
+
             <Tabs defaultValue="paths" className="w-full">
               <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
                 <TabsTrigger value="paths" data-testid="tab-learning-paths">Learning Paths</TabsTrigger>
@@ -320,8 +364,9 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
                     {filteredPaths.map(path => {
                       const info = audienceInfo[path.audience as keyof typeof audienceInfo];
                       const Icon = info?.icon || BookOpen;
+                      const preview = getPathPreview(path);
                       return (
-                        <Card key={path.id} className="hover-elevate overflow-hidden" data-testid={`card-path-${path.id}`}>
+                        <Card key={path.id} className="hover-elevate overflow-hidden flex flex-col" data-testid={`card-path-${path.id}`}>
                           <div className={`h-2 bg-gradient-to-r ${info?.color || "from-primary to-accent"}`} />
                           <CardHeader>
                             <div className="flex items-start justify-between">
@@ -333,18 +378,32 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
                             <CardTitle className="mt-3">{path.title}</CardTitle>
                             <CardDescription>{path.description}</CardDescription>
                           </CardHeader>
-                          <CardContent>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                              <span className="flex items-center gap-1">
+                          <CardContent className="flex flex-col flex-1">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mb-4">
+                              <span className="flex items-center gap-1" data-testid={`text-path-duration-${path.id}`}>
                                 <Clock className="w-4 h-4" />
-                                {path.estimatedHours} hours
+                                {getPathDuration(path.level)}
                               </span>
-                              <span className="flex items-center gap-1">
-                                <Award className="w-4 h-4" />
-                                {path.certificateName}
-                              </span>
+                              {path.certificateName && (
+                                <span className="flex items-center gap-1">
+                                  <Award className="w-4 h-4" />
+                                  {path.certificateName}
+                                </span>
+                              )}
                             </div>
-                            <Link href={`/training/${path.id}`}>
+                            <div
+                              className="rounded-lg border border-border bg-muted/30 p-3 mb-4"
+                              data-testid={`preview-path-${path.id}`}
+                            >
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                                Preview this course
+                              </p>
+                              <p className="text-sm font-medium text-foreground mb-1">{preview.module}</p>
+                              <p className="text-xs text-muted-foreground leading-snug">
+                                You will learn: {preview.objective}
+                              </p>
+                            </div>
+                            <Link href={`/training/${path.id}`} className="mt-auto">
                               <Button className="w-full" data-testid={`button-start-path-${path.id}`}>
                                 Start Path
                                 <ChevronRight className="w-4 h-4 ml-1" />
@@ -373,7 +432,7 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
               </TabsContent>
 
               <TabsContent value="certifications">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                   {certificationLevels.map(cert => (
                     <Card key={cert.level} className="relative overflow-hidden" data-testid={`card-cert-${cert.level}`}>
                       <div className={`absolute top-0 right-0 w-24 h-24 rounded-full -mr-12 -mt-12 ${
@@ -389,11 +448,44 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
                       <CardContent>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Clock className="w-4 h-4" />
-                          <span>{cert.hours} hours to complete</span>
+                          <span>{cert.hours} to complete</span>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+
+                <div className="max-w-2xl mx-auto" data-testid="section-certificate-preview">
+                  <p className="text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+                    What your certificate looks like
+                  </p>
+                  <div
+                    className="relative rounded-xl border-2 border-amber-300 dark:border-amber-700/60 bg-gradient-to-br from-amber-50 via-white to-amber-50 dark:from-amber-950/20 dark:via-background dark:to-amber-950/20 p-8 md:p-10 text-center shadow-sm"
+                    role="img"
+                    aria-label="Sample certificate of completion"
+                  >
+                    <div className="absolute top-3 left-3 w-12 h-12 rounded-full border-2 border-amber-400 dark:border-amber-600/70 flex items-center justify-center">
+                      <Award className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-amber-700 dark:text-amber-400 mb-2">
+                      Certificate of Completion
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-1">This certifies that</p>
+                    <p className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-3">
+                      [Your Name]
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-1">has successfully completed the</p>
+                    <p className="text-lg font-semibold text-foreground mb-4">
+                      Cyber Defender Learning Path
+                    </p>
+                    <div className="flex justify-center items-center gap-6 text-xs text-muted-foreground border-t border-amber-200 dark:border-amber-800/60 pt-4">
+                      <span>Issued by GetCyberRight</span>
+                      <span>Verifiable ID: GCR-DEMO-0001</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground text-center mt-3">
+                    Sample only. Real certificates include your name, completion date, and a verifiable ID you can share on LinkedIn.
+                  </p>
                 </div>
               </TabsContent>
             </Tabs>

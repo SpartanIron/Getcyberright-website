@@ -6,35 +6,40 @@ const testimonials = [
       "My father received a WhatsApp message offering a job that paid in advance. He was ready to send his ID and bank details. I checked the link here and it came back as a known fraud site. That one check protected our whole family's savings.",
     name: "Amina O.",
     context: "Lagos, Nigeria",
+    role: "Family Caregiver",
     initials: "AO",
   },
   {
     quote:
-      "Someone contacted my grandmother on LINE pretending to be a government tax officer, saying she owed money. The guides here explained exactly how that scam works. We reported it and she never sent a single yen.",
-    name: "Kenji T.",
-    context: "Osaka, Japan",
-    initials: "KT",
+      "My teenager almost handed over his school login on a fake portal a friend forwarded him. We sat down with the family training pack and now he checks every link before clicking. It changed how we talk about the internet at home.",
+    name: "Robert M.",
+    context: "Chicago, USA",
+    role: "Parent",
+    initials: "RM",
   },
   {
     quote:
-      "I got a parcel delivery text with a tracking link that looked exactly like Royal Mail. I pasted it into the GCR Scam Guard and it flagged it immediately. I would have clicked that link without thinking twice.",
-    name: "Rachel D.",
-    context: "Manchester, UK",
-    initials: "RD",
+      "I got a call saying my Social Security number was being suspended and that I had to act right away. The seniors guides walked me through what to listen for. I hung up, called the real office, and confirmed it was a scam. I felt prepared instead of scared.",
+    name: "Sandra K.",
+    context: "Phoenix, USA",
+    role: "Senior",
+    initials: "SK",
   },
   {
     quote:
-      "After a data breach at a local retailer, I used the password tool and found three of my accounts were using the same exposed password. I changed them all that evening. Simple tool, but it caught something I missed for years.",
-    name: "Carlos M.",
-    context: "Bogota, Colombia",
-    initials: "CM",
+      "We rolled out the small business training to our seven-person team after a fake invoice cost us money. A few months later, two of my staff caught a vendor impersonation attempt before anything was paid. The cost of that earlier lesson disappeared overnight.",
+    name: "James T.",
+    context: "Austin, USA",
+    role: "Small Business Owner",
+    initials: "JT",
   },
   {
     quote:
-      "My son's school had no safety curriculum for kids online. I shared the training materials from here with his teacher and they now use them every term. Finally, something that speaks to parents and kids at the same level.",
-    name: "Priya S.",
-    context: "Mumbai, India",
-    initials: "PS",
+      "I teach Grade 7 and the kids' lessons fit perfectly into our digital citizenship unit. The activities are clear, age-appropriate, and the students actually engage with them. Several parents have asked me where to find more.",
+    name: "Ms. Patricia W.",
+    context: "Toronto, Canada",
+    role: "Educator",
+    initials: "PW",
   },
 ];
 
@@ -61,8 +66,8 @@ export function Testimonials() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6">
-          {testimonials.slice(0, 3).map((testimonial) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testimonials.map((testimonial) => (
             <div
               key={testimonial.initials}
               className="bg-white/[0.06] border border-white/10 rounded-2xl p-7 sm:p-8 flex flex-col"
@@ -81,55 +86,9 @@ export function Testimonials() {
                 </div>
                 <div>
                   <p className="font-semibold text-white text-sm">{testimonial.name}</p>
-                  <p className="text-sm text-white/50">{testimonial.context}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-          <div
-            className="hidden 3xl:flex bg-white/[0.06] border border-white/10 rounded-2xl p-7 sm:p-8 flex-col"
-            data-testid={`testimonial-card-${testimonials[3].initials.toLowerCase()}`}
-          >
-            <Quote className="w-8 h-8 text-white/15 mb-5 flex-shrink-0" aria-hidden="true" />
-            <blockquote className="text-white/85 leading-relaxed mb-8 flex-1">
-              {testimonials[3].quote}
-            </blockquote>
-            <div className="flex items-center gap-3 mt-auto">
-              <div
-                className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-sm font-semibold text-white/70"
-                aria-hidden="true"
-              >
-                {testimonials[3].initials}
-              </div>
-              <div>
-                <p className="font-semibold text-white text-sm">{testimonials[3].name}</p>
-                <p className="text-sm text-white/50">{testimonials[3].context}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 mt-6 lg:max-w-[calc(66.666%+0.75rem)] 3xl:hidden">
-          {testimonials.slice(3, 5).map((testimonial) => (
-            <div
-              key={testimonial.initials}
-              className="bg-white/[0.06] border border-white/10 rounded-2xl p-7 sm:p-8 flex flex-col"
-              data-testid={`testimonial-card-${testimonial.initials.toLowerCase()}`}
-            >
-              <Quote className="w-8 h-8 text-white/15 mb-5 flex-shrink-0" aria-hidden="true" />
-              <blockquote className="text-white/85 leading-relaxed mb-8 flex-1">
-                {testimonial.quote}
-              </blockquote>
-              <div className="flex items-center gap-3 mt-auto">
-                <div
-                  className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-sm font-semibold text-white/70"
-                  aria-hidden="true"
-                >
-                  {testimonial.initials}
-                </div>
-                <div>
-                  <p className="font-semibold text-white text-sm">{testimonial.name}</p>
-                  <p className="text-sm text-white/50">{testimonial.context}</p>
+                  <p className="text-sm text-white/50">
+                    {testimonial.role} &middot; {testimonial.context}
+                  </p>
                 </div>
               </div>
             </div>

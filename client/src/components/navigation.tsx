@@ -25,6 +25,7 @@ const whoWeHelp = [
 
 const scamGuardNav = [
   { title: "AI Scam Scanner", description: "Check URLs, emails, phone numbers, and more", href: "/tools", icon: Search, badge: "Popular" },
+  { title: "Password Generator", description: "Create strong, unique passwords instantly", href: "/password-generator", icon: Lock, badge: "Free" },
   { title: "Browser Extension", description: "Real-time protection while you browse", href: "/browser-extension", icon: Chrome },
   { title: "Report a Scam", description: "Help protect the community by reporting threats", href: "/report-scam", icon: ShieldAlert },
 ];
@@ -37,8 +38,7 @@ const dataShieldNav = [
 
 const scamGuardNavFull = [
   ...scamGuardNav,
-  { title: "Password Generator", description: "Create strong, unique passwords instantly", href: "/tools?tab=password", icon: Lock },
-  { title: "Voice Deepfake Detector", description: "Detect AI-generated voice clones", href: "/tools?tab=voice-clone", icon: Radio },
+  { title: "Voice Check (Coming Soon)", description: "Detect AI-generated voice clones", href: "/tools?tab=voice-clone", icon: Radio },
 ];
 
 const dataShieldNavFull = [

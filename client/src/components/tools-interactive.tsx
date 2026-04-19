@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InlinePromoVideo } from "@/components/inline-promo-video";
 import { PasswordGenerator } from "@/components/password-generator";
 import { ScamChecker } from "@/components/scam-checker";
-import { AudioDeepfakeDetector } from "@/components/audio-deepfake-detector";
+import { VoiceCheckWaitlist } from "@/components/voice-check-waitlist";
 import {
   Shield,
   ShieldCheck,
@@ -149,7 +149,7 @@ export function ToolsInteractive({ tab: tabParam }: { tab?: string }) {
                   </TabsContent>
                   <TabsContent value="voice-clone">
                     <div className="max-w-4xl mx-auto">
-                      <AudioDeepfakeDetector />
+                      <VoiceCheckWaitlist />
                     </div>
                   </TabsContent>
                 </Tabs>
