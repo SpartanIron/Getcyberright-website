@@ -2564,6 +2564,14 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
           imageSource: imageSource || null,
           reviewExpiresAt,
           auditVerdict: "pending_review",
+          extractedClaims: (() => {
+            try {
+              const { _internals } = require("./socialClaimAuditor") as typeof import("./socialClaimAuditor");
+              return _internals.extractClaims(content);
+            } catch {
+              return [];
+            }
+          })(),
         };
 
         const created = await storage.createSocialPost(socialPost);

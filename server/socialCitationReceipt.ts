@@ -38,7 +38,7 @@ export function formatLongReceipt(citations: Citation[], canonicalUrl: string, m
     if (c.name) segments.push(c.name);
     if (c.publisher) segments.push(c.publisher);
     if (date) segments.push(date);
-    const head = segments.join(" — ") || c.publisher || c.url;
+    const head = segments.join(" | ") || c.publisher || c.url;
     lines.push(`• ${head}: ${c.url}`);
   }
   if (!deduped.some((c) => c.url === canonicalUrl)) {

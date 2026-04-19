@@ -33,7 +33,9 @@ import {
   Hash,
   XCircle,
   RefreshCw,
+  Pencil,
 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -665,6 +667,21 @@ function ReviewQueueTab() {
     onError: () => { toast({ title: "Error", description: "Approve failed", variant: "destructive" }); setActingId(null); },
   });
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draftContent, setDraftContent] = useState("");
+  const editMutation = useMutation({
+    mutationFn: async ({ id, postContent }: { id: string; postContent: string }) => {
+      const res = await apiRequest("PATCH", `/api/admin/social-posts/${id}`, { postContent });
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Saved", description: "Post content updated. Re-audit will run on approve." });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts/review-queue"] });
+      setEditingId(null);
+    },
+    onError: () => { toast({ title: "Error", description: "Save failed", variant: "destructive" }); },
+  });
+
   const rejectMutation = useMutation({
     mutationFn: async (id: string) => {
       setActingId(id);
@@ -697,30 +714,69 @@ function ReviewQueueTab() {
             {posts.map((post: any) => (
               <div key={post.id} className="space-y-2">
                 <SocialPostCard post={post} onPublish={() => {}} isPublishing={false} />
-                <div className="flex items-center gap-2 px-2">
-                  <Button
-                    size="sm"
-                    onClick={() => approveMutation.mutate(post.id)}
-                    disabled={actingId === post.id}
-                    data-testid={`button-approve-${post.id}`}
-                  >
-                    <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve & Publish
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => rejectMutation.mutate(post.id)}
-                    disabled={actingId === post.id}
-                    data-testid={`button-reject-${post.id}`}
-                  >
-                    <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
-                  </Button>
-                  {post.reviewExpiresAt && (
-                    <span className="text-xs text-muted-foreground">
-                      Expires {new Date(post.reviewExpiresAt).toLocaleTimeString()}
-                    </span>
-                  )}
-                </div>
+                {editingId === post.id ? (
+                  <div className="px-2 space-y-2" data-testid={`editor-${post.id}`}>
+                    <Textarea
+                      value={draftContent}
+                      onChange={(e) => setDraftContent(e.target.value)}
+                      rows={6}
+                      className="font-mono text-xs"
+                      data-testid={`textarea-edit-${post.id}`}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => editMutation.mutate({ id: post.id, postContent: draftContent })}
+                        disabled={editMutation.isPending || draftContent.trim().length < 20}
+                        data-testid={`button-save-edit-${post.id}`}
+                      >
+                        <CheckCircle className="w-3.5 h-3.5 mr-1" /> Save
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => { setEditingId(null); setDraftContent(""); }}
+                        data-testid={`button-cancel-edit-${post.id}`}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-2">
+                    <Button
+                      size="sm"
+                      onClick={() => approveMutation.mutate(post.id)}
+                      disabled={actingId === post.id}
+                      data-testid={`button-approve-${post.id}`}
+                    >
+                      <CheckCircle className="w-3.5 h-3.5 mr-1" /> Approve & Publish
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => { setEditingId(post.id); setDraftContent(post.postContent || ""); }}
+                      disabled={actingId === post.id}
+                      data-testid={`button-edit-${post.id}`}
+                    >
+                      <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => rejectMutation.mutate(post.id)}
+                      disabled={actingId === post.id}
+                      data-testid={`button-reject-${post.id}`}
+                    >
+                      <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
+                    </Button>
+                    {post.reviewExpiresAt && (
+                      <span className="text-xs text-muted-foreground">
+                        Expires {new Date(post.reviewExpiresAt).toLocaleTimeString()}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
