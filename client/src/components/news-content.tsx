@@ -435,7 +435,7 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
  const urlTag = urlParams.get("tag");
 
  // Fetch all news or category-specific news (skip if showing events)
- const { data: newsData, isLoading, refetch } = useQuery<NewsResponse | CategoryNewsResponse>({
+ const { data: newsData, isLoading, isError: newsError, refetch } = useQuery<NewsResponse | CategoryNewsResponse>({
  queryKey: activeFilter === "all" 
  ? ["/api/news/latest"] 
  : ["/api/news/category", activeFilter],
@@ -466,7 +466,7 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
  });
 
  // Search query - disabled in events view
- const { data: searchData, isLoading: searchLoading } = useQuery<SearchNewsResponse>({
+ const { data: searchData, isLoading: searchLoading, isError: searchError } = useQuery<SearchNewsResponse>({
  queryKey: ["/api/news/search", urlSearch || searchQuery],
  queryFn: async () => {
  const q = urlSearch || searchQuery;
@@ -649,6 +649,20 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
  <p className="text-muted-foreground">Check back soon for upcoming tech conferences and events.</p>
  </div>
  )
+ ) : (newsError || searchError) && allArticles.length === 0 ? (
+ <Card data-testid="news-error-state">
+ <CardContent className="p-12 text-center">
+ <AlertTriangle className="h-16 w-16 text-orange-500 mx-auto mb-4" />
+ <h3 className="text-xl font-semibold mb-2">We couldn't load the latest news</h3>
+ <p className="text-muted-foreground mb-4">
+ The news feed didn't respond. This is usually temporary. Please try again in a moment.
+ </p>
+ <Button onClick={() => refetch()} variant="default" data-testid="button-retry-news">
+ <RefreshCw className="h-4 w-4 mr-2" />
+ Try again
+ </Button>
+ </CardContent>
+ </Card>
  ) : displayedArticles.length > 0 ? (
  <>
  <FadeIn 

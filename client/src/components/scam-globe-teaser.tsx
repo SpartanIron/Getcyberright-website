@@ -2,6 +2,7 @@
 
 import { Globe, ArrowRight, Radio, Shield, TrendingUp, MapPin } from "lucide-react";
 import { Link } from "@/lib/navigation";
+import { SITE_STATS } from "../../../app/lib/site-stats";
 
 export function ScamGlobeTeaser() {
   return (
@@ -22,21 +23,21 @@ export function ScamGlobeTeaser() {
             </h2>
             <p className="text-muted-foreground mb-6 leading-relaxed">
               See where scams are happening right now. Our live map tracks fake emails, romance scams,
-              investment fraud, and more across 40+ countries, using data from the FBI, INTERPOL,
+              investment fraud, and more across {SITE_STATS.countriesTracked} countries, using data from the FBI, INTERPOL,
               and government cybersecurity teams worldwide.
             </p>
 
             <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="bg-card border border-border dark:bg-slate-800/40 dark:border-slate-700/30 rounded-lg p-3 text-center">
-                <div className="text-xl font-bold text-primary">40+</div>
+              <div className="bg-card border border-border dark:bg-slate-800/40 dark:border-slate-700/30 rounded-lg p-3 text-center" data-testid="stat-countries">
+                <div className="text-xl font-bold text-primary">{SITE_STATS.countriesTracked}</div>
                 <div className="text-[11px] text-muted-foreground">Countries</div>
               </div>
-              <div className="bg-card border border-border dark:bg-slate-800/40 dark:border-slate-700/30 rounded-lg p-3 text-center">
-                <div className="text-xl font-bold text-primary">12</div>
+              <div className="bg-card border border-border dark:bg-slate-800/40 dark:border-slate-700/30 rounded-lg p-3 text-center" data-testid="stat-scam-types">
+                <div className="text-xl font-bold text-primary">{SITE_STATS.scamTypes}</div>
                 <div className="text-[11px] text-muted-foreground">Scam Types</div>
               </div>
-              <div className="bg-card border border-border dark:bg-slate-800/40 dark:border-slate-700/30 rounded-lg p-3 text-center">
-                <div className="text-xl font-bold text-primary">28+</div>
+              <div className="bg-card border border-border dark:bg-slate-800/40 dark:border-slate-700/30 rounded-lg p-3 text-center" data-testid="stat-sources">
+                <div className="text-xl font-bold text-primary">{SITE_STATS.trustedSources}</div>
                 <div className="text-[11px] text-muted-foreground">Sources</div>
               </div>
             </div>

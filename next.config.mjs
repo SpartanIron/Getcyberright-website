@@ -24,6 +24,16 @@ const nextConfig = {
                 destination: '/educators',
                 permanent: true,
       },
+      {
+        source: '/protection-hub',
+        destination: '/tools',
+        permanent: true,
+      },
+      {
+        source: '/pricing',
+        destination: '/gcr-guard-pricing',
+        permanent: false,
+      },
     ];
   },
 

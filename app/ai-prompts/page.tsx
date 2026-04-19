@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import PageContent from "@/pages/ai-prompts";
+import type { DbPrompt } from "@/pages/ai-prompts";
+import { FALLBACK_PROMPTS } from "../lib/ai-prompts-fallback";
 
 const BASE_URL = "https://www.getcyberright.com";
+const API_BASE = `http://localhost:${process.env.PORT || 5000}`;
 
 export const metadata: Metadata = {
   title: "406+ AI Cybersecurity Prompts | GetCyberRight",
@@ -17,8 +20,21 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
-export default function AIPromptsPage() {
-  return <PageContent />;
+async function fetchPrompts(): Promise<DbPrompt[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/prompts`, { cache: "no-store" });
+    if (!res.ok) return FALLBACK_PROMPTS;
+    const data = (await res.json()) as DbPrompt[];
+    if (!Array.isArray(data) || data.length === 0) return FALLBACK_PROMPTS;
+    return data;
+  } catch {
+    return FALLBACK_PROMPTS;
+  }
+}
+
+export default async function AIPromptsPage() {
+  const initialPrompts = await fetchPrompts();
+  return <PageContent initialPrompts={initialPrompts} />;
 }

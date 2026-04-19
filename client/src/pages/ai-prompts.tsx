@@ -49,7 +49,7 @@ import { imgSrc } from "@/lib/img-src";
 type Audience = "all" | "everyday" | "families" | "seniors" | "students" | "business";
 type Category = "all" | "productivity" | "communication" | "safety" | "health" | "finance" | "learning" | "work" | "tech";
 
-interface DbPrompt {
+export interface DbPrompt {
   id: string;
   slug: string;
   title: string;
@@ -230,19 +230,21 @@ function PromptCard({ prompt: p }: { prompt: Prompt }) {
   );
 }
 
-export default function AIPrompts() {
+export default function AIPrompts({ initialPrompts }: { initialPrompts?: DbPrompt[] } = {}) {
   const [selectedAudience, setSelectedAudience] = useState<Audience>("all");
   const [selectedCategory, setSelectedCategory] = useState<Category>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: dbPrompts, isLoading } = useQuery<DbPrompt[]>({
     queryKey: ["/api/prompts"],
+    initialData: initialPrompts && initialPrompts.length > 0 ? initialPrompts : undefined,
   });
 
   const prompts: Prompt[] = useMemo(() => {
-    if (!dbPrompts || dbPrompts.length === 0) return [];
-    return dbPrompts.map(mapDbPromptToPrompt);
-  }, [dbPrompts]);
+    const source = dbPrompts && dbPrompts.length > 0 ? dbPrompts : (initialPrompts || []);
+    if (source.length === 0) return [];
+    return source.map(mapDbPromptToPrompt);
+  }, [dbPrompts, initialPrompts]);
 
   const filteredPrompts = useMemo(() => {
     return prompts.filter(p => {
