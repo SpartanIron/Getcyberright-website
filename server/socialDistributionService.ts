@@ -11,7 +11,7 @@ import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stoc
 import type { ImageSource } from "./socialImageSource";
 import type { TemplateStyle } from "./stockPhotoService";
 import { buildGuideBundle, buildAlertBundle, buildScamBundle, isBundleSubstantive, type SourceBundle } from "./socialSourceBundle";
-import { auditPostContent, type ClaimAuditResult } from "./socialClaimAuditor";
+import { auditPostContent, deriveAuditedPostState, type ClaimAuditResult } from "./socialClaimAuditor";
 import { stripCitationReceipt } from "./socialCitationReceipt";
 import { appendCitationReceipt, buildSourcesPanelUrl } from "./socialCitationReceipt";
 import { randomUUID } from "crypto";
@@ -63,8 +63,9 @@ async function persistAuditedPost(args: {
   utmCampaign: string;
 }): Promise<string | null> {
   const { bundle, contentType, build, hashtags, imagePath, imageSource, utmCampaign } = args;
-  const auditPassed = build.audit.verdict === "pass";
-  const status = auditPassed ? "draft" : "blocked";
+  const state = deriveAuditedPostState(build.audit);
+  const auditPassed = state.auditVerdict === "pass";
+  const status = state.status;
   // Pre-generate the post id so we can bake the public sources-panel URL into
   // the post body. This guarantees every published post — including X /
   // Instagram where citations don't fit — links to a verifiable receipt.
@@ -96,9 +97,7 @@ async function persistAuditedPost(args: {
     auditVerdict: build.audit.verdict,
     auditFailures: build.audit.failures,
     imageSource: imageSource || undefined,
-    publishError: auditPassed
-      ? undefined
-      : `Claim audit failed: ${build.audit.failures.map((f) => f.reason).slice(0, 3).join(" | ")}`,
+    publishError: state.publishError,
   };
   const created = await storage.createSocialPost(post);
   if (!auditPassed) {

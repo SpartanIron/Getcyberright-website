@@ -5,7 +5,7 @@
  * Locks in the eight required hallucination-blocking failure modes
  * for the Gold-Standard Social Engine.
  */
-import { auditPostContent } from "../server/socialClaimAuditor";
+import { auditPostContent, deriveAuditedPostState } from "../server/socialClaimAuditor";
 import type { SourceBundle } from "../server/socialSourceBundle";
 
 const baseBundle: SourceBundle = {
@@ -105,21 +105,58 @@ const failures: string[] = [];
 for (const c of cases) {
   const result = auditPostContent(c.content, baseBundle);
   const didFail = result.verdict === "fail";
-  const ok =
-    didFail === c.expectFail &&
-    (!c.expectReasonContains ||
-      result.failures.some(
-        (f) =>
-          f.claim.toLowerCase().includes(c.expectReasonContains!.toLowerCase()) ||
-          f.reason.toLowerCase().includes(c.expectReasonContains!.toLowerCase()),
-      ));
+
+  // Mirror what persistAuditedPost (server/socialDistributionService.ts) writes
+  // to the social_posts row. This is the load-bearing safety contract: a post
+  // that fails the audit must NEVER be persisted with status='draft' (which is
+  // what publishers pick up). It must be persisted with status='blocked' and a
+  // non-'pass' auditVerdict, with a publishError set.
+  const persisted = deriveAuditedPostState(result);
+
+  const verdictOk = didFail === c.expectFail;
+  const reasonOk =
+    !c.expectReasonContains ||
+    result.failures.some(
+      (f) =>
+        f.claim.toLowerCase().includes(c.expectReasonContains!.toLowerCase()) ||
+        f.reason.toLowerCase().includes(c.expectReasonContains!.toLowerCase()),
+    );
+
+  // Safety-contract assertions on the persisted state.
+  let persistOk = true;
+  let persistDetail = "";
+  if (c.expectFail) {
+    if (persisted.status !== "blocked") {
+      persistOk = false;
+      persistDetail = `expected status='blocked' got '${persisted.status}'`;
+    } else if (persisted.auditVerdict === "pass") {
+      persistOk = false;
+      persistDetail = `expected auditVerdict !== 'pass' got 'pass'`;
+    } else if (!persisted.publishError) {
+      persistOk = false;
+      persistDetail = `expected publishError to be set on a blocked post`;
+    }
+  } else {
+    if (persisted.status !== "draft") {
+      persistOk = false;
+      persistDetail = `expected status='draft' got '${persisted.status}'`;
+    } else if (persisted.auditVerdict !== "pass") {
+      persistOk = false;
+      persistDetail = `expected auditVerdict='pass' got '${persisted.auditVerdict}'`;
+    } else if (persisted.publishError) {
+      persistOk = false;
+      persistDetail = `expected no publishError on a passing post`;
+    }
+  }
+
+  const ok = verdictOk && reasonOk && persistOk;
 
   if (ok) {
     passed++;
     console.log(`PASS  ${c.name}`);
   } else {
     failed++;
-    const detail = `verdict=${result.verdict} expectedFail=${c.expectFail} failures=${JSON.stringify(
+    const detail = `verdict=${result.verdict} expectedFail=${c.expectFail} status=${persisted.status} auditVerdict=${persisted.auditVerdict} ${persistDetail} failures=${JSON.stringify(
       result.failures.map((f) => `${f.kind}:${f.claim}`),
     )}`;
     failures.push(`FAIL  ${c.name}\n      ${detail}`);

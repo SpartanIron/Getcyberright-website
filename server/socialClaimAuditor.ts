@@ -224,3 +224,27 @@ export function auditPostContent(content: string, bundle: SourceBundle): ClaimAu
 
 // Re-export normalize helper for callers wanting to test source coverage themselves.
 export const _internals = { normalize, corpusContains, extractClaims };
+
+/**
+ * Pure helper used by persistAuditedPost (server/socialDistributionService.ts)
+ * to translate a ClaimAuditResult into the persisted social_post row's
+ * status + auditVerdict + publishError fields.
+ *
+ * Extracted so the safety contract ("any audit failure -> status='blocked',
+ * auditVerdict !== 'pass', and a publishError describing why") can be locked
+ * in by tests without spinning up the full distribution pipeline.
+ */
+export function deriveAuditedPostState(audit: ClaimAuditResult): {
+  status: "draft" | "blocked";
+  auditVerdict: "pass" | "fail";
+  publishError?: string;
+} {
+  const passed = audit.verdict === "pass";
+  return {
+    status: passed ? "draft" : "blocked",
+    auditVerdict: audit.verdict,
+    publishError: passed
+      ? undefined
+      : `Claim audit failed: ${audit.failures.map((f) => f.reason).slice(0, 3).join(" | ")}`,
+  };
+}
