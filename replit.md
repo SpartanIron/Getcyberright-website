@@ -22,6 +22,14 @@ Server Components fetch initial data through the Express API via `fetch()` with 
 ### Deployment
 The deployment run command must include `NODE_ENV=production` (configured as `["bash", "-c", "NODE_ENV=production node dist/index.js"]`). Without this, Next.js runs in development mode in production, causing chunk loading failures and HMR endpoint exposure.
 
+### Pre-release Safety-Net Tests
+A consolidated test runner lives at `scripts/run-tests.ts`. It auto-discovers every `*.test.ts` file under `tests/` and exits non-zero on any failure, which blocks shipping. The deploy build command in `.replit` runs it before the migration step and the Next/Express build, so a failing audit test prevents the release from being published.
+
+- **Run locally:** `npx tsx scripts/run-tests.ts`
+- **Run a single test:** `npx tsx tests/socialClaimAuditor.test.ts`
+- The runner pings `http://localhost:5000` (override with `TEST_SERVER_URL`) and skips integration suites that need a live server (currently `shield-security.test.ts`) when the server is unreachable. The social-claim auditor — the load-bearing guard against fabricated stats reaching social posts — has no server dependency and always runs.
+- A `test` script in `package.json` (so `npm test` works as the canonical entry point) is intentionally not added here; adding it requires explicit user approval to edit `package.json`.
+
 ### Key Features
 - **AI-Powered Tools**: AI Scam Analyzer for various inputs, identifying multi-step attack patterns with context-aware analysis. Dezi AI Assistant for interactive user support.
 - **GCR Scam Guard Browser Extension**: Chrome Manifest V3 extension for real-time protection, auto-scanning, safety badges, and lookalike domain detection.
