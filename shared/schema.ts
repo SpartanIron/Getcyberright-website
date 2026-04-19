@@ -1438,6 +1438,26 @@ export const insertSocialPostSchema = createInsertSchema(socialPosts).omit({
 export type SocialPost = typeof socialPosts.$inferSelect;
 export type InsertSocialPost = z.infer<typeof insertSocialPostSchema>;
 
+// Analytics: visits to the public /social/p/:id/sources receipts panel.
+// One row per pageview, captured by a client-side ping after the page mounts.
+export const socialPostSourceViews = pgTable("social_post_source_views", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  postId: varchar("post_id").notNull(),
+  platform: varchar("platform", { length: 50 }),
+  referrer: text("referrer"),
+  referrerHost: varchar("referrer_host", { length: 255 }),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertSocialPostSourceViewSchema = createInsertSchema(socialPostSourceViews).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SocialPostSourceView = typeof socialPostSourceViews.$inferSelect;
+export type InsertSocialPostSourceView = z.infer<typeof insertSocialPostSourceViewSchema>;
+
 // Growth Orchestrator - Automation task tracking
 export const growthTasks = pgTable("growth_tasks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

@@ -35,6 +35,57 @@ const embedPingRateLimit = rateLimit({
   legacyHeaders: false,
 });
 
+const sourcesPingRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const REFERRER_HOST_TO_PLATFORM: Record<string, string> = {
+  "linkedin.com": "linkedin",
+  "www.linkedin.com": "linkedin",
+  "lnkd.in": "linkedin",
+  "facebook.com": "facebook",
+  "www.facebook.com": "facebook",
+  "m.facebook.com": "facebook",
+  "l.facebook.com": "facebook",
+  "lm.facebook.com": "facebook",
+  "fb.me": "facebook",
+  "twitter.com": "x",
+  "www.twitter.com": "x",
+  "x.com": "x",
+  "www.x.com": "x",
+  "t.co": "x",
+  "instagram.com": "instagram",
+  "www.instagram.com": "instagram",
+  "l.instagram.com": "instagram",
+  "t.me": "telegram",
+  "www.t.me": "telegram",
+  "reddit.com": "reddit",
+  "www.reddit.com": "reddit",
+  "old.reddit.com": "reddit",
+  "out.reddit.com": "reddit",
+  "youtube.com": "youtube",
+  "www.youtube.com": "youtube",
+  "m.youtube.com": "youtube",
+  "google.com": "google",
+  "www.google.com": "google",
+  "news.google.com": "google",
+  "bing.com": "bing",
+  "www.bing.com": "bing",
+  "duckduckgo.com": "duckduckgo",
+};
+
+function classifySourcesPlatform(referrerHost: string, hint: string): string {
+  const host = referrerHost.toLowerCase();
+  if (host && REFERRER_HOST_TO_PLATFORM[host]) return REFERRER_HOST_TO_PLATFORM[host];
+  const cleanHint = hint.trim().toLowerCase().slice(0, 50);
+  if (cleanHint) return cleanHint.replace(/[^a-z0-9_-]/g, "").slice(0, 50) || "other";
+  if (host) return "other";
+  return "direct";
+}
+
 const EMBED_PING_LOG = path.join(process.cwd(), "data", "embed-pings.jsonl");
 function ensureEmbedLogDir() {
   try {
@@ -672,6 +723,173 @@ export function registerPlatformRoutes(app: Express): void {
     } catch (error: any) {
       console.error("[social-sources] error:", error?.message || error);
       res.status(500).json({ error: "Failed to load sources" });
+    }
+  });
+
+  // Lightweight analytics ping for the public sources panel. Fired by the
+  // /social/p/:id/sources page after it mounts in the browser so we can
+  // measure how often readers click through to the receipts and which
+  // platforms drive verifiers. Always responds 204 so it never blocks the
+  // page render and never leaks whether a post id exists.
+  app.post("/api/social/posts/:id/sources/ping", sourcesPingRateLimit, async (req: Request, res: Response) => {
+    res.setHeader("Cache-Control", "no-store");
+    try {
+      const id = String(req.params.id || "").trim();
+      if (!id || id.length > 64) return res.status(204).end();
+
+      const post = await storage.getSocialPostById(id);
+      if (!post || post.status !== "published") return res.status(204).end();
+
+      const body = (req.body && typeof req.body === "object") ? req.body : {};
+      const referrer = String(body.referrer || req.get("referer") || "").slice(0, 500);
+      let referrerHost = "";
+      try { referrerHost = referrer ? new URL(referrer).hostname.slice(0, 255) : ""; } catch {}
+
+      const platform = classifySourcesPlatform(referrerHost, String(body.platform || ""));
+      const userAgent = (req.get("user-agent") || "").slice(0, 500);
+
+      const { socialPostSourceViews } = await import("@shared/schema");
+      await db.insert(socialPostSourceViews).values({
+        postId: id,
+        platform,
+        referrer: referrer || null,
+        referrerHost: referrerHost || null,
+        userAgent: userAgent || null,
+      });
+
+      res.status(204).end();
+    } catch (error: any) {
+      console.error("[social-sources-ping] error:", error?.message || error);
+      res.status(204).end();
+    }
+  });
+
+  // ─── Admin: Sources panel analytics ────────────────────────────────
+
+  // Aggregate summary across all posts. Useful as the starting "do people
+  // actually click the receipts?" view in the admin UI / for quick checks.
+  app.get("/api/admin/social/sources-analytics", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { socialPostSourceViews, socialPosts: socialPostsTable } = await import("@shared/schema");
+      const { sql, gte, inArray, desc } = await import("drizzle-orm");
+      const days = Math.max(1, Math.min(365, parseInt(String(req.query.days || "30"), 10) || 30));
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+      const platformKey = sql<string>`coalesce(${socialPostSourceViews.platform}, 'direct')`;
+      const hostKey = sql<string>`coalesce(${socialPostSourceViews.referrerHost}, '(direct)')`;
+      const countCol = sql<number>`count(*)::int`;
+
+      const [totalRow, platformRows, hostRows, postRows] = await Promise.all([
+        db.select({ total: countCol })
+          .from(socialPostSourceViews)
+          .where(gte(socialPostSourceViews.createdAt, since)),
+        db.select({ key: platformKey, count: countCol })
+          .from(socialPostSourceViews)
+          .where(gte(socialPostSourceViews.createdAt, since))
+          .groupBy(platformKey)
+          .orderBy(desc(countCol))
+          .limit(10),
+        db.select({ key: hostKey, count: countCol })
+          .from(socialPostSourceViews)
+          .where(gte(socialPostSourceViews.createdAt, since))
+          .groupBy(hostKey)
+          .orderBy(desc(countCol))
+          .limit(10),
+        db.select({ postId: socialPostSourceViews.postId, count: countCol })
+          .from(socialPostSourceViews)
+          .where(gte(socialPostSourceViews.createdAt, since))
+          .groupBy(socialPostSourceViews.postId)
+          .orderBy(desc(countCol))
+          .limit(10),
+      ]);
+
+      let topPosts: Array<{ postId: string; title: string; platform: string; views: number }> = [];
+      if (postRows.length > 0) {
+        const ids = postRows.map((r) => r.postId);
+        const posts = await db
+          .select({
+            id: socialPostsTable.id,
+            contentTitle: socialPostsTable.contentTitle,
+            platform: socialPostsTable.platform,
+          })
+          .from(socialPostsTable)
+          .where(inArray(socialPostsTable.id, ids));
+        const byId = new Map(posts.map((p) => [p.id, p]));
+        topPosts = postRows.map((r) => ({
+          postId: r.postId,
+          title: byId.get(r.postId)?.contentTitle || "(unknown)",
+          platform: byId.get(r.postId)?.platform || "",
+          views: r.count,
+        }));
+      }
+
+      res.setHeader("Cache-Control", "no-store");
+      res.json({
+        rangeDays: days,
+        totalViews: totalRow[0]?.total ?? 0,
+        topPlatforms: platformRows,
+        topReferrers: hostRows,
+        topPosts,
+      });
+    } catch (error: any) {
+      console.error("[sources-analytics] aggregate error:", error?.message || error);
+      res.status(500).json({ error: "Failed to load sources analytics" });
+    }
+  });
+
+  // Per-post analytics for the receipts panel.
+  app.get("/api/admin/social/posts/:id/sources/analytics", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const id = String(req.params.id || "").trim();
+      if (!id) return res.status(400).json({ error: "Missing post id" });
+
+      const post = await storage.getSocialPostById(id);
+      if (!post) return res.status(404).json({ error: "Post not found" });
+
+      const { socialPostSourceViews } = await import("@shared/schema");
+      const { sql, and, eq: dEq, gte, desc } = await import("drizzle-orm");
+      const days = Math.max(1, Math.min(365, parseInt(String(req.query.days || "90"), 10) || 90));
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+      const platformKey = sql<string>`coalesce(${socialPostSourceViews.platform}, 'direct')`;
+      const hostKey = sql<string>`coalesce(${socialPostSourceViews.referrerHost}, '(direct)')`;
+      const countCol = sql<number>`count(*)::int`;
+
+      const [totalRow, allTimeRow, platformRows, hostRows] = await Promise.all([
+        db.select({ total: countCol })
+          .from(socialPostSourceViews)
+          .where(and(dEq(socialPostSourceViews.postId, id), gte(socialPostSourceViews.createdAt, since))),
+        db.select({ total: countCol })
+          .from(socialPostSourceViews)
+          .where(dEq(socialPostSourceViews.postId, id)),
+        db.select({ key: platformKey, count: countCol })
+          .from(socialPostSourceViews)
+          .where(and(dEq(socialPostSourceViews.postId, id), gte(socialPostSourceViews.createdAt, since)))
+          .groupBy(platformKey)
+          .orderBy(desc(countCol))
+          .limit(10),
+        db.select({ key: hostKey, count: countCol })
+          .from(socialPostSourceViews)
+          .where(and(dEq(socialPostSourceViews.postId, id), gte(socialPostSourceViews.createdAt, since)))
+          .groupBy(hostKey)
+          .orderBy(desc(countCol))
+          .limit(10),
+      ]);
+
+      res.setHeader("Cache-Control", "no-store");
+      res.json({
+        postId: id,
+        title: post.contentTitle,
+        platform: post.platform,
+        rangeDays: days,
+        totalViews: totalRow[0]?.total ?? 0,
+        allTimeViews: allTimeRow[0]?.total ?? 0,
+        topPlatforms: platformRows,
+        topReferrers: hostRows,
+      });
+    } catch (error: any) {
+      console.error("[sources-analytics] per-post error:", error?.message || error);
+      res.status(500).json({ error: "Failed to load post sources analytics" });
     }
   });
 

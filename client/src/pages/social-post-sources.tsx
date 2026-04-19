@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useParams, Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Navigation } from "@/components/navigation";
@@ -49,6 +50,30 @@ export default function SocialPostSourcesPage() {
     enabled: !!postId,
     retry: false,
   });
+
+  useEffect(() => {
+    if (!postId || typeof window === "undefined") return;
+    let referrer = "";
+    let platform = "";
+    try {
+      referrer = document.referrer || "";
+      const sp = new URLSearchParams(window.location.search);
+      platform =
+        sp.get("utm_source") ||
+        sp.get("src") ||
+        sp.get("platform") ||
+        "";
+    } catch {}
+    try {
+      fetch(`/api/social/posts/${encodeURIComponent(postId)}/sources/ping`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ referrer, platform }),
+        keepalive: true,
+        credentials: "omit",
+      }).catch(() => {});
+    } catch {}
+  }, [postId]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
