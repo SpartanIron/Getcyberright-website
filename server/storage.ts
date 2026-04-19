@@ -117,7 +117,7 @@ export interface IStorage {
   deleteThreatAlert(id: string): Promise<boolean>;
   getThreatAlertCount(status?: string): Promise<number>;
 
-  createSocialPost(post: InsertSocialPost): Promise<SocialPost>;
+  createSocialPost(post: InsertSocialPost & { id?: string }): Promise<SocialPost>;
   getSocialPosts(status?: string, limit?: number): Promise<SocialPost[]>;
   getSocialPostById(id: string): Promise<SocialPost | undefined>;
   getSocialPostsByContentId(contentType: string, contentId: string): Promise<SocialPost[]>;
@@ -478,7 +478,7 @@ export class DatabaseStorage implements IStorage {
     return Number(result[0].count);
   }
 
-  async createSocialPost(post: InsertSocialPost): Promise<SocialPost> {
+  async createSocialPost(post: InsertSocialPost & { id?: string }): Promise<SocialPost> {
     const result = await db.insert(socialPosts).values(post).returning();
     return result[0];
   }

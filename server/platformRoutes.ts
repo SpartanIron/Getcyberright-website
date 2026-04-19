@@ -638,6 +638,42 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  // Public sources panel for a published social post. Returns 404 unless the
+  // post exists AND has been actually published — drafts/blocked posts must
+  // never leak through this endpoint.
+  app.get("/api/social/posts/:id/sources", async (req: Request, res: Response) => {
+    try {
+      const id = String(req.params.id || "").trim();
+      if (!id) return res.status(404).json({ error: "Not found" });
+      const post = await storage.getSocialPostById(id);
+      if (!post || post.status !== "published") {
+        return res.status(404).json({ error: "Not found" });
+      }
+      const seen = new Set<string>();
+      const citations = (post.citations || [])
+        .filter((c) => c && c.url && !seen.has(c.url.toLowerCase()) && (seen.add(c.url.toLowerCase()), true))
+        .map((c) => ({
+          name: c.name || "",
+          publisher: c.publisher || "",
+          url: c.url,
+          datePublished: c.datePublished || null,
+          accessedAt: c.accessedAt || null,
+        }));
+      res.setHeader("Cache-Control", "public, max-age=300");
+      res.json({
+        id: post.id,
+        title: post.contentTitle,
+        platform: post.platform,
+        contentType: post.contentType,
+        publishedAt: post.publishedAt,
+        citations,
+      });
+    } catch (error: any) {
+      console.error("[social-sources] error:", error?.message || error);
+      res.status(500).json({ error: "Failed to load sources" });
+    }
+  });
+
   // ─── Admin Guide Management ────────────────────────────────────────
 
   app.get("/api/admin/guides", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {

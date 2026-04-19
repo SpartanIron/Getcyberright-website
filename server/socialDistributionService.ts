@@ -12,7 +12,8 @@ import type { TemplateStyle } from "./stockPhotoService";
 import { buildGuideBundle, buildAlertBundle, buildScamBundle, isBundleSubstantive, type SourceBundle } from "./socialSourceBundle";
 import { auditPostContent, type ClaimAuditResult } from "./socialClaimAuditor";
 import { stripCitationReceipt } from "./socialCitationReceipt";
-import { appendCitationReceipt } from "./socialCitationReceipt";
+import { appendCitationReceipt, buildSourcesPanelUrl } from "./socialCitationReceipt";
+import { randomUUID } from "crypto";
 
 interface EmptyCycleEvent {
   ts: string;
@@ -63,12 +64,25 @@ async function persistAuditedPost(args: {
   const { bundle, contentType, build, hashtags, imagePath, imageSource, utmCampaign } = args;
   const auditPassed = build.audit.verdict === "pass";
   const status = auditPassed ? "draft" : "blocked";
-  const post: InsertSocialPost = {
+  // Pre-generate the post id so we can bake the public sources-panel URL into
+  // the post body. This guarantees every published post — including X /
+  // Instagram where citations don't fit — links to a verifiable receipt.
+  const postId = randomUUID();
+  const sourcesUrl = buildSourcesPanelUrl(postId);
+  const finalContent = appendCitationReceipt(
+    stripCitationReceipt(build.content),
+    bundle.citations,
+    build.platform,
+    bundle.canonicalUrl,
+    sourcesUrl,
+  );
+  const post: InsertSocialPost & { id: string } = {
+    id: postId,
     contentType,
     contentId: bundle.recordId,
     contentTitle: bundle.title,
     platform: build.platform,
-    postContent: build.content,
+    postContent: finalContent,
     hashtags,
     imageUrl: imagePath || undefined,
     status,

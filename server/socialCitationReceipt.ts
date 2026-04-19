@@ -24,52 +24,90 @@ function dedupeCitations(citations: Citation[]): Citation[] {
   return out;
 }
 
+const PUBLIC_BASE_URL = "https://www.getcyberright.com";
+
+/**
+ * Build the public sources panel URL for a persisted social post.
+ * Every published post links to this page so readers can independently
+ * verify every claim — Cybernews/KnowBe4-grade transparency.
+ */
+export function buildSourcesPanelUrl(postId: string): string {
+  return `${PUBLIC_BASE_URL}/social/p/${postId}/sources`;
+}
+
 /**
  * Long-form deterministic receipt: name + publisher + date + url, one per line.
- * Used for LinkedIn / Facebook / Email / web canonical pages.
+ * Used for LinkedIn / Facebook / Email / web canonical pages. When `sourcesUrl`
+ * is provided (i.e. the post id is known), an extra "Verify all sources" line
+ * is appended pointing at the public sources panel.
  */
-export function formatLongReceipt(citations: Citation[], canonicalUrl: string, maxLines = 4): string {
+export function formatLongReceipt(
+  citations: Citation[],
+  canonicalUrl: string,
+  maxLines = 4,
+  sourcesUrl?: string,
+): string {
   const deduped = dedupeCitations(citations).slice(0, maxLines);
-  if (deduped.length === 0) return `Sources:\n• GetCyberRight: ${canonicalUrl}`;
   const lines: string[] = ["Sources:"];
-  for (const c of deduped) {
-    const date = formatDate(c.datePublished) || formatDate(c.accessedAt);
-    const segments: string[] = [];
-    if (c.name) segments.push(c.name);
-    if (c.publisher) segments.push(c.publisher);
-    if (date) segments.push(date);
-    const head = segments.join(" | ") || c.publisher || c.url;
-    lines.push(`• ${head}: ${c.url}`);
+  if (deduped.length === 0) {
+    lines.push(`• GetCyberRight: ${canonicalUrl}`);
+  } else {
+    for (const c of deduped) {
+      const date = formatDate(c.datePublished) || formatDate(c.accessedAt);
+      const segments: string[] = [];
+      if (c.name) segments.push(c.name);
+      if (c.publisher) segments.push(c.publisher);
+      if (date) segments.push(date);
+      const head = segments.join(" | ") || c.publisher || c.url;
+      lines.push(`• ${head}: ${c.url}`);
+    }
+    if (canonicalUrl && !deduped.some((c) => c.url === canonicalUrl)) {
+      lines.push(`• Full analysis: ${canonicalUrl}`);
+    }
   }
-  if (!deduped.some((c) => c.url === canonicalUrl)) {
-    lines.push(`• Full analysis: ${canonicalUrl}`);
+  if (sourcesUrl) {
+    lines.push(`• Verify all sources: ${sourcesUrl}`);
   }
   return lines.join("\n");
 }
 
 /**
  * Short-form deterministic receipt for character-constrained platforms (X/IG/alert subject lines).
- * Always includes a publisher attribution AND the canonical GCR link so claims are verifiable.
+ * Always includes a publisher attribution AND a verifiable URL — the public
+ * sources panel when available, else the canonical article URL.
  */
-export function formatShortReceipt(citations: Citation[], canonicalUrl: string): string {
+export function formatShortReceipt(
+  citations: Citation[],
+  canonicalUrl: string,
+  sourcesUrl?: string,
+): string {
   const deduped = dedupeCitations(citations);
   const primary = deduped.find((c) => c.url !== canonicalUrl) || deduped[0];
   const publisher = primary?.publisher || "GetCyberRight";
-  return `Source: ${publisher}. Full sources: ${canonicalUrl}`;
+  const verifyUrl = sourcesUrl || canonicalUrl;
+  return `Source: ${publisher}. Full sources: ${verifyUrl}`;
 }
 
 /**
  * Append a citation receipt to post content. Receipt is REQUIRED on every publishable surface
  * — gold-standard means every claim is verifiable. Long format on LinkedIn/Facebook,
- * compact format on X/Instagram/Email.
+ * compact format on X/Instagram/Email. Pass `sourcesUrl` (the public sources panel for
+ * the post) so readers always have a single, branded place to verify every claim — this
+ * is what allows X/Instagram to surface citations that don't fit in the post body.
  */
-export function appendCitationReceipt(content: string, citations: Citation[], platform: string, canonicalUrl: string): string {
-  if (!canonicalUrl) return content;
+export function appendCitationReceipt(
+  content: string,
+  citations: Citation[],
+  platform: string,
+  canonicalUrl: string,
+  sourcesUrl?: string,
+): string {
+  if (!canonicalUrl && !sourcesUrl) return content;
 
   const isShortForm = platform === "x" || platform === "instagram" || platform === "alert";
   const receipt = isShortForm
-    ? formatShortReceipt(citations, canonicalUrl)
-    : formatLongReceipt(citations, canonicalUrl);
+    ? formatShortReceipt(citations, canonicalUrl, sourcesUrl)
+    : formatLongReceipt(citations, canonicalUrl, 4, sourcesUrl);
 
   let body = content;
   const sourcesIdx = body.search(/(^|\n)\s*(Sources?:)/);
