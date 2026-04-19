@@ -37,21 +37,48 @@ function ShieldPage() {
   const [pollStatus, setPollStatus] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  function validate(): boolean {
+  function validate(): { ok: boolean; errors: Record<string, string>; firstErrorField: string | null } {
     const newErrors: Record<string, string> = {};
     if (!firstName.trim()) newErrors.firstName = "First name is required";
     if (!lastName.trim()) newErrors.lastName = "Last name is required";
     if (!email.trim()) newErrors.email = "Email address is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
       newErrors.email = "Please enter a valid email address";
-    if (!consentGiven) newErrors.consent = "You must confirm this is your own personal information";
+    if (!consentGiven) newErrors.consent = "Please tick the box to confirm this is your own personal information.";
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const order = ["firstName", "lastName", "email", "consent"];
+    const firstErrorField = order.find((k) => newErrors[k]) || null;
+    return { ok: Object.keys(newErrors).length === 0, errors: newErrors, firstErrorField };
+  }
+
+  function focusFirstError(field: string | null) {
+    if (!field) return;
+    const idMap: Record<string, string> = {
+      firstName: "shield-first-name",
+      lastName: "shield-last-name",
+      email: "shield-email",
+      consent: "shield-consent",
+    };
+    const elementId = idMap[field];
+    if (!elementId) return;
+    requestAnimationFrame(() => {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      try { (el as HTMLElement).focus({ preventScroll: true }); } catch {}
+    });
   }
 
   const scanMutation = useMutation({
     mutationFn: async () => {
-      if (!validate()) throw new Error("Please fix the errors above");
+      const v = validate();
+      if (!v.ok) {
+        focusFirstError(v.firstErrorField);
+        const description = Object.values(v.errors).join(" ");
+        const err = new Error(description);
+        (err as any).validationFailed = true;
+        throw err;
+      }
 
       const res = await apiRequest("POST", "/api/scan", {
         firstName: firstName.trim(),
@@ -70,7 +97,7 @@ function ShieldPage() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Scan could not start",
+        title: (error as any).validationFailed ? "Please complete the form" : "Scan could not start",
         description: error.message,
         variant: "destructive",
       });
@@ -256,7 +283,7 @@ function ShieldPage() {
                     </div>
                   </div>
 
-                  <div className="border rounded-lg p-4 bg-muted/30 space-y-3">
+                  <div className={`border-2 rounded-lg p-4 space-y-3 transition-colors ${errors.consent ? "border-red-500 bg-red-50 dark:bg-red-950/20" : "border-border bg-muted/30"}`}>
                     <div className="flex items-start gap-3">
                       <Checkbox
                         id="shield-consent"
@@ -265,7 +292,7 @@ function ShieldPage() {
                           setConsentGiven(checked === true);
                           setErrors((p) => ({ ...p, consent: "" }));
                         }}
-                        className="mt-0.5 min-w-[20px] min-h-[20px]"
+                        className={`mt-0.5 min-w-[20px] min-h-[20px] ${errors.consent ? "border-red-500" : ""}`}
                         data-testid="checkbox-shield-consent"
                       />
                       <label
