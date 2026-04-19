@@ -386,7 +386,7 @@ export async function publishAllDrafts(): Promise<PublishResult[]> {
   return results;
 }
 
-async function publishPostDirect(post: { id: string; platform: string; postContent: string; imageUrl: string | null; contentType?: string | null; contentId?: string | null }): Promise<PublishResult> {
+async function publishPostDirect(post: { id: string; platform: string; postContent: string; imageUrl: string | null; contentType?: string | null; contentId?: string | null; auditFailures?: unknown }): Promise<PublishResult> {
   const blockReason = await preFlightCheck(post);
   if (blockReason) {
     await storage.updateSocialPost(post.id, { status: "failed", publishError: blockReason });

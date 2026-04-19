@@ -1172,6 +1172,22 @@ export function registerPlatformRoutes(app: Express): void {
         return res.status(400).json({ error: `Post is not in review_pending state (current: ${post.status})` });
       }
 
+      // Hard block: posts flagged at generation time for naming an external
+      // learning resource without a real URL must NOT be approvable until an
+      // admin has actually edited in the correct external link.
+      const existingFailures = (post.auditFailures || []) as Array<{ kind?: string; reason?: string }>;
+      const linkMismatch = existingFailures.find((f) => f && f.kind === "link_mismatch");
+      if (linkMismatch) {
+        const stillNoExternalLink = !/https?:\/\/(?!(?:www\.)?getcyberright\.com)[^\s)\]"',]+/i.test(post.postContent || "");
+        if (stillNoExternalLink) {
+          return res.status(400).json({
+            success: false,
+            error: "This post was flagged for missing an external learning-resource link. Edit the post to include the real URL (e.g. https://cs50.harvard.edu/) before approving.",
+            failures: existingFailures,
+          });
+        }
+      }
+
       // Re-run claim auditor + quality gate at approval time. Excellence or silence:
       // an admin can never bypass the audit, only confirm a passing audit.
       const { runSocialQualityGate } = await import("./socialQualityGate");

@@ -6,9 +6,21 @@ export interface QualityGateInput {
   postContent: string;
   contentType?: string | null;
   contentId?: string | null;
+  auditFailures?: unknown;
 }
 
 export async function runSocialQualityGate(post: QualityGateInput): Promise<string | null> {
+  // Hard gate: never publish a post that was flagged at generation time for
+  // naming a specific external learning resource without a real URL. The
+  // admin must edit a real external link into the body before this can ship.
+  const failures = Array.isArray(post.auditFailures) ? (post.auditFailures as Array<{ kind?: string }>) : [];
+  if (failures.some((f) => f && f.kind === "link_mismatch")) {
+    const hasExternalLink = /https?:\/\/(?!(?:www\.)?getcyberright\.com)[^\s)\]"',]+/i.test(post.postContent || "");
+    if (!hasExternalLink) {
+      return "Quality gate: post names a specific external learning resource but no external URL is present. Add the real resource link before publishing.";
+    }
+  }
+
   let canonicalUrl = "";
   try {
     if (post.contentType === "guide" && post.contentId) {

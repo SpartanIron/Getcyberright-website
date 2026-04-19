@@ -2527,8 +2527,16 @@ export async function generateAndPublishTrendAwarePosts(options?: { skipRateLimi
       // "Harvard offers...", "CS50's Introduction to AI...", "Coursera course...").
       // If so, the post MUST carry that resource's real URL — silently
       // substituting a generic /training link would mislead readers.
-      const NAMED_EXTERNAL_PROVIDERS = /\b(?:Harvard|MIT|Stanford|Yale|Princeton|Oxford|Cambridge|CS50|Coursera|edX|Udemy|Udacity|Khan Academy|Pluralsight|LinkedIn Learning|ISC2|\(ISC\)2|CompTIA|SANS|EC-Council|Cisco(?: Networking Academy)?|Google(?: Cloud)?(?: Skills Boost)?|Microsoft Learn|AWS(?: Skill Builder)?|IBM(?: SkillsBuild)?|Oracle University|Fortinet(?: NSE)?|CISA(?: training| course)|NIST(?: course| training))\b/i;
-      const namesExternalResource = NAMED_EXTERNAL_PROVIDERS.test(fixedLinkedin) || NAMED_EXTERNAL_PROVIDERS.test(fixedFacebook);
+      // Two-part check to avoid false positives:
+      //  (a) the post names a known external learning provider, AND
+      //  (b) the post is actually pitching a resource (course/class/cert/training/etc.).
+      // Both must be true for us to consider this a learning-resource recommendation
+      // that requires a real external URL.
+      const NAMED_EXTERNAL_PROVIDERS = /\b(?:Harvard|MIT|Stanford|Yale|Princeton|Oxford|Cambridge|CS50|Coursera|edX|Udemy|Udacity|Khan Academy|Pluralsight|LinkedIn Learning|ISC2|\(ISC\)2|CompTIA|EC-Council|Cisco Networking Academy|Google Cloud Skills Boost|Google Skills Boost|Microsoft Learn|AWS Skill Builder|IBM SkillsBuild|Oracle University|Fortinet NSE)\b/i;
+      const RESOURCE_CONTEXT_WORDS = /\b(?:course|class|certification|certificate|cert|training|workshop|bootcamp|MOOC|tutorial|module|lesson|curriculum|program|enroll|sign up|register|free)\b/i;
+      const linkedinNames = NAMED_EXTERNAL_PROVIDERS.test(fixedLinkedin) && RESOURCE_CONTEXT_WORDS.test(fixedLinkedin);
+      const facebookNames = NAMED_EXTERNAL_PROVIDERS.test(fixedFacebook) && RESOURCE_CONTEXT_WORDS.test(fixedFacebook);
+      const namesExternalResource = linkedinNames || facebookNames;
 
       const linkedinHasExt = hasExternalLink.test(fixedLinkedin);
       const facebookHasExt = hasExternalLink.test(fixedFacebook);
