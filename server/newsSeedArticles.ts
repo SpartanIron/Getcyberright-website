@@ -68,6 +68,7 @@ export async function seedNewsArticles(): Promise<number> {
         "audit_failures" jsonb,
         "image_source" text,
         "review_expires_at" timestamp,
+        "notified_at" timestamp,
         "created_at" timestamp DEFAULT now()
       )
     `);

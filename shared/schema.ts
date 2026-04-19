@@ -1425,6 +1425,7 @@ export const socialPosts = pgTable("social_posts", {
   auditFailures: jsonb("audit_failures").$type<{ claim: string; kind: string; reason: string }[]>().default([]),
   imageSource: text("image_source"),
   reviewExpiresAt: timestamp("review_expires_at"),
+  notifiedAt: timestamp("notified_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -1432,6 +1433,7 @@ export const insertSocialPostSchema = createInsertSchema(socialPosts).omit({
   id: true,
   publishedAt: true,
   engagementMetrics: true,
+  notifiedAt: true,
   createdAt: true,
 });
 

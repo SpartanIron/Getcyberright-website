@@ -815,6 +815,25 @@ function ReviewQueueTab() {
                         Expires {new Date(post.reviewExpiresAt).toLocaleTimeString()}
                       </span>
                     )}
+                    {post.notifiedAt ? (
+                      <Badge
+                        variant="secondary"
+                        className="text-xs"
+                        title={`Email digest sent ${new Date(post.notifiedAt).toLocaleString()}`}
+                        data-testid={`badge-notified-${post.id}`}
+                      >
+                        <Send className="w-3 h-3 mr-1" />
+                        Notified {new Date(post.notifiedAt).toLocaleTimeString()}
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="text-xs"
+                        data-testid={`badge-not-notified-${post.id}`}
+                      >
+                        Awaiting digest
+                      </Badge>
+                    )}
                   </div>
                 )}
               </div>

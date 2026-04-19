@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { db } from "./db";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, inArray, isNull } from "drizzle-orm";
 import { socialPosts, users } from "@shared/schema";
 import type { SocialPost } from "@shared/schema";
 import { storage } from "./storage";
@@ -10,16 +10,6 @@ import { logger } from "./logger";
 const log = logger.child("SocialReviewNotifier");
 
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
-const NOTIFY_DEDUPE_TTL_MS = 6 * 60 * 60 * 1000;
-
-const notifiedPostIds = new Map<string, number>();
-
-function pruneNotifiedCache() {
-  const cutoff = Date.now() - NOTIFY_DEDUPE_TTL_MS;
-  for (const [id, ts] of notifiedPostIds.entries()) {
-    if (ts < cutoff) notifiedPostIds.delete(id);
-  }
-}
 
 function getSigningSecret(): string {
   const secret = process.env.SESSION_SECRET;
@@ -177,51 +167,61 @@ function buildDigestEmail(posts: SocialPost[]): { subject: string; htmlBody: str
   return { subject, htmlBody, textBody };
 }
 
-export async function notifyPendingReviewQueue(): Promise<{ notified: number; recipients: number }> {
-  pruneNotifiedCache();
-  const now = new Date();
-  let pending: SocialPost[] = [];
+async function markPostsNotified(ids: string[], at: Date): Promise<boolean> {
+  if (ids.length === 0) return true;
   try {
-    pending = await db
+    await db.update(socialPosts).set({ notifiedAt: at }).where(inArray(socialPosts.id, ids));
+    return true;
+  } catch (err: any) {
+    log.error("Failed to persist notifiedAt", { error: err?.message, count: ids.length });
+    return false;
+  }
+}
+
+export async function notifyPendingReviewQueue(): Promise<{ notified: number; recipients: number }> {
+  const now = new Date();
+  let fresh: SocialPost[] = [];
+  try {
+    fresh = await db
       .select()
       .from(socialPosts)
-      .where(and(eq(socialPosts.status, "review_pending"), gt(socialPosts.reviewExpiresAt, now)));
+      .where(
+        and(
+          eq(socialPosts.status, "review_pending"),
+          gt(socialPosts.reviewExpiresAt, now),
+          isNull(socialPosts.notifiedAt),
+        ),
+      );
   } catch (err: any) {
     log.error("Failed to query review_pending posts", { error: err?.message });
     return { notified: 0, recipients: 0 };
   }
 
-  if (pending.length === 0) {
-    return { notified: 0, recipients: 0 };
-  }
-
-  const fresh = pending.filter((p) => !notifiedPostIds.has(p.id));
   if (fresh.length === 0) {
     return { notified: 0, recipients: 0 };
   }
 
   const recipients = await getAdminRecipients();
   if (recipients.length === 0) {
-    log.warn("No admin recipients configured for review notification");
-    for (const p of pending) notifiedPostIds.set(p.id, Date.now());
+    log.warn("No admin recipients configured for review notification", { pending: fresh.length });
     return { notified: 0, recipients: 0 };
   }
 
-  const { subject, htmlBody, textBody } = buildDigestEmail(pending);
+  const { subject, htmlBody, textBody } = buildDigestEmail(fresh);
   const ok = await sendEmail({ to: recipients, subject, htmlBody, textBody });
   if (!ok) {
-    log.error("Email provider rejected review digest", { posts: pending.length });
+    log.error("Email provider rejected review digest", { posts: fresh.length });
     return { notified: 0, recipients: recipients.length };
   }
 
-  for (const p of pending) notifiedPostIds.set(p.id, Date.now());
+  const persisted = await markPostsNotified(fresh.map((p) => p.id), now);
   log.info("Sent review digest", {
-    posts: pending.length,
-    fresh: fresh.length,
+    posts: fresh.length,
     recipients: recipients.length,
     emailConfigured: isEmailConfigured(),
+    notifiedAtPersisted: persisted,
   });
-  return { notified: pending.length, recipients: recipients.length };
+  return { notified: persisted ? fresh.length : 0, recipients: recipients.length };
 }
 
 export interface ReviewActionResult {
@@ -333,5 +333,3 @@ export async function executeReviewAction(postId: string, action: ReviewAction):
     return { ok: false, status: 500, message: err?.message || "Failed to process action" };
   }
 }
-
-export const _internals = { notifiedPostIds };
