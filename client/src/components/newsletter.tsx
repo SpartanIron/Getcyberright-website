@@ -156,12 +156,35 @@ export function Newsletter() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="region"
+                  render={({ field }) => (
+                    <FormItem className="sm:w-40">
+                      <FormControl>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger data-testid="select-newsletter-region" aria-label="Your region">
+                            <SelectValue placeholder="Region" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {NEWSLETTER_REGIONS.map((r) => (
+                              <SelectItem key={r} value={r} data-testid={`option-region-${r.toLowerCase()}`}>
+                                {r}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <Button
                   type="submit"
                   disabled={mutation.isPending}
-                  data-testid="button-subscribe"
+                  data-testid="button-newsletter-subscribe"
                 >
-                  {mutation.isPending ? "Subscribing..." : "Subscribe"}
+                  {mutation.isPending ? "Subscribing..." : "Send Me Free Alerts"}
                 </Button>
               </form>
             </Form>

@@ -1172,10 +1172,7 @@ export default function Seniors() {
 
   const seniorsFaqSchema: FAQData = {
     type: "FAQPage",
-    items: seniorSafetyTopics.map(t => ({
-      question: t.title + " - what are the warning signs?",
-      answer: t.content.intro + " Key points: " + t.content.keyPoints.slice(0, 3).join(". ") + ".",
-    })),
+    items: seniorsAudienceFAQ.map(f => ({ question: f.question, answer: f.answer })),
   };
 
   const seniorsBreadcrumbs: BreadcrumbData = {

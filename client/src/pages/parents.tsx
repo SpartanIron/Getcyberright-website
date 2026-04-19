@@ -1087,10 +1087,7 @@ export default function Parents() {
 
   const parentsFaqSchema: FAQData = {
     type: "FAQPage",
-    items: parentTopics.map(topic => ({
-      question: `How can I help my child with ${topic.title.toLowerCase()}?`,
-      answer: topic.content.intro,
-    })),
+    items: parentsAudienceFAQ.map(f => ({ question: f.question, answer: f.answer })),
   };
 
   const parentsBreadcrumbs: BreadcrumbData = {

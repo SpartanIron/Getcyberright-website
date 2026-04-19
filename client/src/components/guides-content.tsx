@@ -60,14 +60,25 @@ function formatReviewedDate(iso?: string): string {
     return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
 
-function deriveAudience(category: string, tags: string[] = []): string | null {
+function deriveAudience(category: string, tags: string[] = []): "Everyone" | "Parents" | "Seniors" | "Small Business" | "Kids" {
     const haystack = [category, ...(tags || [])].map((s) => (s || "").toLowerCase());
     if (haystack.some((t) => t.includes("senior"))) return "Seniors";
-    if (haystack.some((t) => t.includes("kid") || t.includes("teen") || t.includes("child"))) return "Kids and Teens";
-    if (haystack.some((t) => t.includes("parent") || t.includes("family"))) return "Parents and Families";
+    if (haystack.some((t) => t.includes("kid") || t.includes("teen") || t.includes("child"))) return "Kids";
+    if (haystack.some((t) => t.includes("parent") || t.includes("family"))) return "Parents";
     if (haystack.some((t) => t.includes("business") || t.includes("smb") || t.includes("work"))) return "Small Business";
-    if (haystack.some((t) => t.includes("educator") || t.includes("school") || t.includes("teacher"))) return "Educators";
     return "Everyone";
+}
+
+function deriveKeyTakeaways(meta: string, title: string): string[] {
+    const text = (meta || "").trim();
+    if (!text) return [];
+    const sentences = text
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 12 && s.length < 200);
+    if (sentences.length >= 2) return sentences.slice(0, 3);
+    return [];
 }
 
 export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
@@ -191,15 +202,20 @@ export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
                                                                                                                           <span>For {deriveAudience(guide.category, guide.tags)}</span>
                                                                                                     </span>
                                                                                 </div>
-                                                                                {guide.tags && guide.tags.length > 0 && (
-                                                                                  <div className="flex flex-wrap gap-1.5 mb-3" data-testid={`tags-guide-${guide.slug}`}>
-                                                                                    {guide.tags.slice(0, 3).map((tag) => (
-                                                                                      <span key={tag} className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
-                                                                                        {tag}
-                                                                                      </span>
-                                                                                    ))}
-                                                                                  </div>
-                                                                                )}
+                                                                                {(() => {
+                                                                                  const takeaways = deriveKeyTakeaways(guide.metaDescription, guide.title);
+                                                                                  if (takeaways.length === 0) return null;
+                                                                                  return (
+                                                                                    <div className="mb-3" data-testid={`takeaways-guide-${guide.slug}`}>
+                                                                                      <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5 font-medium">Key takeaways</p>
+                                                                                      <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-4">
+                                                                                        {takeaways.map((t, idx) => (
+                                                                                          <li key={idx} className="line-clamp-2">{t}</li>
+                                                                                        ))}
+                                                                                      </ul>
+                                                                                    </div>
+                                                                                  );
+                                                                                })()}
                                                                                 <div className="flex items-center justify-end text-xs">
                                                                                   <span className="flex items-center gap-1 text-teal-600 dark:text-teal-400 font-medium">
                                                                                     <span>Read guide</span>

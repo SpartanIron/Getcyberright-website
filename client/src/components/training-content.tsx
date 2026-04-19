@@ -532,6 +532,11 @@ export function TrainingContent({ initialPaths }: { initialPaths?: LearningPath[
                   }}>
                     Get Started
                   </Button>
+                  <Link href="/guides">
+                    <Button size="lg" variant="outline" data-testid="button-read-guides-first">
+                      Read our guides first
+                    </Button>
+                  </Link>
                   <Link href="/resources">
                     <Button size="lg" variant="outline" data-testid="button-view-resources">
                       Browse Resources
