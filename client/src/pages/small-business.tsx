@@ -483,7 +483,123 @@ export default function SmallBusiness() {
             {activeTab === "assessment" && <SecurityPostureAssessment items={assessmentItems} />}
             {activeTab === "phishing" && <PhishingSimulationTrainer scenarios={phishingScenarios} />}
             {activeTab === "policies" && <PolicyTemplateBuilder templates={policyTemplates} />}
-            {activeTab === "incidents" && <IncidentResponseFlowchart incidents={incidentTypes} />}
+            {activeTab === "incidents" && (
+              <div className="space-y-8">
+                <Card className="border-2 border-red-200 dark:border-red-900 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-red-500 flex items-center justify-center shadow-lg">
+                        <AlertTriangle className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-2xl">Your Business Just Got Hacked</CardTitle>
+                        <CardDescription className="text-base">
+                          An eight-step playbook for the first 72 hours. Print this page and keep it with your incident response plan.
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ol className="space-y-4">
+                      {[
+                        {
+                          title: "Stay calm and document the time",
+                          body: "Write down the exact time you noticed the issue, what you saw, and which devices or accounts are affected. This first record becomes the timeline your insurer and any investigator will rely on."
+                        },
+                        {
+                          title: "Contain the damage",
+                          body: "Disconnect affected machines from the network (unplug ethernet, turn off Wi-Fi). Do not power them off, as that destroys evidence. Change the passwords on any accounts you suspect have been used."
+                        },
+                        {
+                          title: "Call your cyber insurance hotline",
+                          body: "Most policies require notice within 24 to 72 hours. Their breach coach will recommend an approved forensics firm and walk you through preserving your coverage."
+                        },
+                        {
+                          title: "Notify a small, trusted internal group",
+                          body: "Owner or CEO, IT lead, finance lead, and an attorney if you have one. Keep the circle tight. Do not announce externally yet."
+                        },
+                        {
+                          title: "Preserve evidence",
+                          body: "Do not delete suspicious emails, files, or logs. Take screenshots of ransom notes, fraudulent invoices, or unfamiliar transactions. Save them to a separate, clean device."
+                        },
+                        {
+                          title: "Report to law enforcement",
+                          body: "File with the FBI Internet Crime Complaint Center (ic3.gov) for any wire fraud or business email compromise. Local police can take a report for insurance even if they cannot investigate directly."
+                        },
+                        {
+                          title: "Notify customers, vendors, and regulators if required",
+                          body: "Most U.S. states require notification when personal data is exposed. Coordinate the message with your attorney before sending anything. Be honest, plain, and brief."
+                        },
+                        {
+                          title: "Run a post-incident review within two weeks",
+                          body: "Document what happened, what worked, and what to change. Update passwords and MFA across the business, patch any exploited software, and turn the lessons into a written policy update."
+                        }
+                      ].map((step, i) => (
+                        <li key={i} className="flex gap-4 bg-white dark:bg-card rounded-lg p-4 border border-red-100 dark:border-red-900/40">
+                          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-red-500 text-white font-bold flex items-center justify-center">
+                            {i + 1}
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-foreground mb-1">{step.title}</h4>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{step.body}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 border-amber-200 dark:border-amber-900 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg">
+                        <Building className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-2xl">Case study: Maria's Bakery</CardTitle>
+                        <CardDescription className="text-base">
+                          A composite story drawn from common business email compromise patterns reported to the FBI IC3.
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-5 text-sm leading-relaxed">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">What happened</h4>
+                      <p className="text-muted-foreground">
+                        Maria runs a six-person bakery and supplies three local cafes. On a Tuesday morning her bookkeeper received an email that looked like it came from their flour supplier with a routine invoice and a note that the supplier had switched banks. The reply-to address used a domain one letter different from the real supplier. The bookkeeper, used to paying that vendor weekly, wired $12,000 to the new account. Two days later the real supplier called asking why the invoice had not been paid.
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">What it cost</h4>
+                      <p className="text-muted-foreground">
+                        The $12,000 wire was traced to a money mule account and only $2,400 was recovered. Maria's cyber policy covered $7,500 after the deductible. Out of pocket, the bakery lost roughly $2,100, plus a week of her time and her bookkeeper's time working with the bank, the FBI, and the insurer.
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">What she did right after</h4>
+                      <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                        <li>Called the bank within an hour and triggered a fraud recall on the wire.</li>
+                        <li>Filed an IC3 report the same day with the wire details and email headers.</li>
+                        <li>Reset every email account password and turned on multi-factor authentication.</li>
+                        <li>Wrote a one-page payment policy: any change to vendor payment details must be confirmed by phone using the number on file, never the number in the email.</li>
+                      </ul>
+                    </div>
+                    <div className="bg-white dark:bg-card rounded-lg p-4 border border-amber-200 dark:border-amber-900/40">
+                      <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <Lightbulb className="w-4 h-4 text-amber-600" />
+                        Takeaway for any small business
+                      </h4>
+                      <p className="text-muted-foreground">
+                        The single control that would have stopped this attack costs nothing: a written rule that any change to where a vendor gets paid must be verified by phone using a known number. Pair it with multi-factor authentication on email and a cyber insurance policy you have actually read, and you are ahead of most small businesses.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <IncidentResponseFlowchart incidents={incidentTypes} />
+              </div>
+            )}
             {activeTab === "budget" && <SecurityBudgetCalculator tools={securityTools} />}
           </div>
         </div>

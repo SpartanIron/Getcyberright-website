@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description:
     "Free cybersecurity resources designed for seniors and older adults. Learn to spot phone scams, recognize romance fraud, protect your identity, and stay safe online.",
   alternates: { canonical: `${BASE_URL}/seniors` },
+  keywords:
+    "online safety for seniors, senior scam prevention, romance scams older adults, grandparent scam, Medicare scams, tech support scam seniors, IRS impersonation scam, AARP fraud watch, fraud help for older adults, senior identity theft protection",
   openGraph: {
     title: "Online Safety for Seniors & Older Adults: Free Resources | GetCyberRight",
     description:

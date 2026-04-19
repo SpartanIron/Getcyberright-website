@@ -1365,6 +1365,58 @@ export default function Kids() {
           />
         )}
 
+        <section className="py-12 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20">
+          <div className="max-w-3xl mx-auto px-4">
+            <Card className="border-2 border-emerald-300 dark:border-emerald-800 shadow-lg">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center shadow-md">
+                    <Shield className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl">Our Privacy Promise to Kids and Families</CardTitle>
+                    <CardDescription className="text-base">A short, plain-language promise. Read it together.</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3 text-base leading-relaxed">
+                <ul className="space-y-3">
+                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>We do not ask kids to make an account to use any lesson on this site.</span></li>
+                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>We do not collect names, emails, photos, or schoolwork from kids.</span></li>
+                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>We do not show ads on this site, and we never sell anyone's information.</span></li>
+                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>If a quiz keeps your score, it stays on your device only. We don't see it.</span></li>
+                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" /><span>If you ever feel unsafe online, tell a trusted adult right away. You won't be in trouble for asking for help.</span></li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <section className="py-12 bg-background">
+          <div className="max-w-3xl mx-auto px-4">
+            <Card className="border-2">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-slate-700 dark:bg-slate-600 flex items-center justify-center shadow-md">
+                    <BookOpen className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl">For School Administrators</CardTitle>
+                    <CardDescription className="text-base">A one-minute summary you can share for board approval.</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4 text-sm leading-relaxed">
+                <p className="text-muted-foreground"><span className="text-foreground font-semibold">No student accounts.</span> Every lesson on this page is viewable without signing in. Students never need to create an account on getcyberright.com to participate.</p>
+                <p className="text-muted-foreground"><span className="text-foreground font-semibold">No personal data collected from students.</span> We do not knowingly collect personal information from children under 13. COPPA verifiable parental consent is therefore not triggered by classroom use of these materials.</p>
+                <p className="text-muted-foreground"><span className="text-foreground font-semibold">No FERPA records received.</span> We are not a school official under FERPA. We do not receive student grades, schedules, or other education records.</p>
+                <p className="text-muted-foreground"><span className="text-foreground font-semibold">Local-only progress.</span> Quiz results and progress (if any) are stored in the student's browser using local storage and are never transmitted to our servers.</p>
+                <p className="text-muted-foreground"><span className="text-foreground font-semibold">Questions or formal review.</span> District administrators can email <span className="text-foreground font-medium">privacy@getcyberright.com</span> for a one-page privacy summary on letterhead.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         <ParentSection />
         <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground py-4">
           <CalendarDays className="w-3 h-3" />

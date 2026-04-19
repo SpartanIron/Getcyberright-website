@@ -679,6 +679,66 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
             <TabsContent value="activities" className="space-y-8">
               <div>
                 <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-5 h-5 text-amber-600" />
+                  <h2 className="text-xl font-bold text-foreground">Family Activities You Can Run This Weekend</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Four short, hands-on activities designed to spark conversation and build real digital safety skills together. Each one takes 15 to 30 minutes.</p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {[
+                    {
+                      title: "Password Strength Challenge",
+                      time: "20 minutes",
+                      ages: "Ages 8 and up",
+                      color: "bg-blue-500",
+                      icon: Shield,
+                      desc: "Each family member writes down what they think is a strong password. Use a public strength tester (like the one at bitwarden.com/password-strength) to compare results. Then build a shared family rule: at least 14 characters, a passphrase of four random words, and never reuse for email or banking. Finish by helping younger kids create their first real password for a non-critical account."
+                    },
+                    {
+                      title: "Spot the Scam",
+                      time: "15 minutes",
+                      ages: "Ages 10 and up",
+                      color: "bg-red-500",
+                      icon: AlertTriangle,
+                      desc: "Pull up five real-looking texts and emails (use our scam checker examples or screenshots from your own spam folder) and have each person score them on a 1 to 5 'how suspicious' scale. Then reveal which were scams and discuss the giveaway clues: urgency, weird sender, links that don't match, requests for gift cards or codes."
+                    },
+                    {
+                      title: "Privacy Settings Family Audit",
+                      time: "30 minutes",
+                      ages: "All ages, parent-led",
+                      color: "bg-purple-500",
+                      icon: Eye,
+                      desc: "Pick one app per person (Instagram, TikTok, a game, a school app) and walk through the privacy settings together. Turn off location sharing where it's not needed, set accounts to private by default for kids under 16, and review who can send messages or friend requests. Write down the changes you made so you can repeat the audit every six months."
+                    },
+                    {
+                      title: "What Would You Do?",
+                      time: "15 minutes",
+                      ages: "Ages 7 and up",
+                      color: "bg-emerald-500",
+                      icon: MessageCircle,
+                      desc: "Read a scenario out loud and let everyone answer before discussing. Examples: 'A stranger in a game asks for your real name', 'A friend sends you a screenshot of someone else's text', 'You see a video that scares you'. The goal is not to be right, it's to practice talking about hard online moments before they happen."
+                    }
+                  ].map((a) => (
+                    <Card key={a.title} className="border-2 hover:shadow-md transition-shadow" data-testid={`activity-card-${a.title.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`w-10 h-10 rounded-lg ${a.color} flex items-center justify-center flex-shrink-0`}>
+                            <a.icon className="w-5 h-5 text-white" />
+                          </div>
+                          <h3 className="font-semibold text-foreground">{a.title}</h3>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <Badge variant="secondary" className="text-xs"><Clock className="w-3 h-3 mr-1" />{a.time}</Badge>
+                          <Badge variant="outline" className="text-xs">{a.ages}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{a.desc}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
                   <ClipboardCheck className="w-5 h-5 text-blue-600" />
                   <h2 className="text-xl font-bold text-foreground">Device Safety Audit</h2>
                 </div>
@@ -698,6 +758,66 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
 
             <TabsContent value="tools" className="space-y-8">
               <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Settings className="w-5 h-5 text-blue-600" />
+                  <h2 className="text-xl font-bold text-foreground">Tools We Actually Recommend</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">A short, opinionated list. We don't take affiliate money for any of these. Pick the one that fits your devices and your family's comfort level.</p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {[
+                    {
+                      name: "Google Family Link",
+                      tag: "Free",
+                      best: "Android households and any Google account for kids under 13",
+                      desc: "Set screen time limits, approve app downloads, see what apps your child uses, and lock the device remotely. Works on Android phones and Chromebooks. Limited support on iPhone.",
+                      url: "https://families.google.com/familylink/"
+                    },
+                    {
+                      name: "Apple Screen Time",
+                      tag: "Built in, free",
+                      best: "iPhone and iPad families using Family Sharing",
+                      desc: "Built into iOS. Set Downtime, App Limits, and Communication Limits per child. Approve purchases and downloads from your phone. Use Screen Distance and Communication Safety to flag inappropriate images.",
+                      url: "https://support.apple.com/en-us/HT208982"
+                    },
+                    {
+                      name: "Circle Home Plus",
+                      tag: "$9.99/mo or $129/yr",
+                      best: "Households with mixed devices and gaming consoles",
+                      desc: "A small box that plugs into your router and applies time limits, content filters, and bedtime pauses to every device on your Wi-Fi, including smart TVs and game consoles. Works without installing apps on each device.",
+                      url: "https://meetcircle.com/"
+                    },
+                    {
+                      name: "NextDNS",
+                      tag: "Free up to 300k queries/mo",
+                      best: "Tech-comfortable parents who want a network-level filter",
+                      desc: "A configurable DNS service that blocks adult sites, malware, trackers, and specific apps for everyone on your network. Set it up on your router or per device. Includes detailed logs so you can see what was blocked.",
+                      url: "https://nextdns.io/"
+                    }
+                  ].map((t) => (
+                    <Card key={t.name} className="border-2 hover:shadow-md transition-shadow" data-testid={`tool-card-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <h3 className="font-semibold text-foreground">{t.name}</h3>
+                          <Badge variant="secondary" className="text-xs">{t.tag}</Badge>
+                        </div>
+                        <p className="text-xs text-primary font-medium mb-2">Best for: {t.best}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed mb-3">{t.desc}</p>
+                        <a
+                          href={t.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                          data-testid={`link-tool-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}
+                        >
+                          Visit official site <ArrowRight className="w-3.5 h-3.5" />
+                        </a>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-8">
                 <div className="flex items-center gap-2 mb-2">
                   <MessageCircle className="w-5 h-5 text-purple-600" />
                   <h2 className="text-xl font-bold text-foreground">Conversation Starter Generator</h2>

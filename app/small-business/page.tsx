@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description:
     "Cybersecurity resources for small businesses. Employee awareness training, security policy templates, and incident response guides.",
   alternates: { canonical: `${BASE_URL}/small-business` },
+  keywords:
+    "small business cybersecurity, business email compromise prevention, employee phishing training, cyber insurance small business, security policy templates, incident response plan small business, ransomware small business, multi-factor authentication for business, vendor wire fraud prevention, cybersecurity for SMB",
   openGraph: {
     title: "Small Business Cybersecurity | GetCyberRight",
     description:

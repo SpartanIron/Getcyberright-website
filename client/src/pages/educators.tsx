@@ -37,6 +37,7 @@ import {
   classroomMaterials
 } from "@/components/educators-hub/activity-data";
 import { imgSrc } from "@/lib/img-src";
+import { SchoolPresentationForm } from "@/components/school-presentation-form";
 
 interface EducatorResource {
   id: string;
@@ -549,6 +550,185 @@ export default function Educators() {
                 {activeTab === "materials" && (
                   <ClassroomMaterialsGallery materials={classroomMaterials} />
                 )}
+
+                <div className="mt-12 space-y-12">
+                  <section>
+                    <div className="flex items-center gap-2 mb-4">
+                      <ClipboardList className="w-6 h-6 text-indigo-600" />
+                      <h2 className="text-2xl font-bold text-foreground">Featured Lesson Plans</h2>
+                    </div>
+                    <p className="text-muted-foreground mb-6">Three classroom-ready lessons aligned to ISTE Standards for Students 2 (Digital Citizen). Each includes objectives, materials, a 45-minute flow, and an assessment idea.</p>
+                    <div className="grid md:grid-cols-3 gap-5">
+                      {[
+                        {
+                          id: "digital-citizenship-3-5",
+                          title: "Digital Citizenship Fundamentals",
+                          grade: "Grades 3 to 5",
+                          duration: "45 minutes",
+                          color: "bg-blue-500",
+                          icon: Users,
+                          objective: "Students will define digital citizenship and identify three responsible online behaviors.",
+                          materials: "Chart paper, markers, printed scenario cards (provided), one device per pair (optional).",
+                          flow: [
+                            "Hook (5 min): Share a short story of a kind comment versus an unkind one online and ask which made the day better.",
+                            "Direct teach (10 min): Define digital citizenship with three pillars: respect, responsibility, safety.",
+                            "Practice (20 min): In pairs, students sort 12 scenario cards into the three pillars and pick one card to act out.",
+                            "Reflect (10 min): Each student writes one promise they'll keep online this week and posts it on a class chart."
+                          ],
+                          assessment: "Exit ticket: 'Name one thing a good digital citizen does and one thing they avoid'.",
+                          standard: "ISTE Standards for Students 2: Digital Citizen"
+                        },
+                        {
+                          id: "password-security-6-8",
+                          title: "Password Security and Account Safety",
+                          grade: "Grades 6 to 8",
+                          duration: "45 minutes",
+                          color: "bg-emerald-500",
+                          icon: Shield,
+                          objective: "Students will create a 14-character passphrase, explain why reusing passwords is risky, and turn on multi-factor authentication on a sample account.",
+                          materials: "Projector, sample 'data breach' headlines, paper, optional sandbox account for MFA demo.",
+                          flow: [
+                            "Hook (5 min): Show a real news headline about a major breach. Ask: 'If this site was breached and you used the same password elsewhere, what could happen?'",
+                            "Direct teach (10 min): Demonstrate the four-random-words passphrase technique and the math of long versus complex passwords.",
+                            "Practice (20 min): Each student drafts their own passphrase (not a real one they'll use) and tests it on a public strength meter. Then walks through enabling MFA on a teacher-provided demo account.",
+                            "Reflect (10 min): Class discussion: which of your real accounts most need MFA tonight, and why?"
+                          ],
+                          assessment: "Short response: 'Explain why a 14-character passphrase made of common words is stronger than P@ssw0rd!'",
+                          standard: "ISTE Standards for Students 2: Digital Citizen"
+                        },
+                        {
+                          id: "phishing-9-12",
+                          title: "Phishing and Misinformation",
+                          grade: "Grades 9 to 12",
+                          duration: "45 minutes",
+                          color: "bg-rose-500",
+                          icon: AlertTriangle,
+                          objective: "Students will identify five phishing red flags, explain how AI-generated content makes detection harder, and apply a verification checklist to three real-world examples.",
+                          materials: "Projector, printed handouts of five phishing emails (sanitized), the SIFT method one-pager.",
+                          flow: [
+                            "Hook (5 min): Show two emails side by side, one real and one phishing. Vote anonymously which is which, then reveal.",
+                            "Direct teach (10 min): The five red flags (urgency, mismatched sender, unusual link, request for credentials or money, generic greeting) plus the SIFT method (Stop, Investigate the source, Find better coverage, Trace claims).",
+                            "Practice (20 min): In small groups, students apply the checklist to three live examples and rate confidence.",
+                            "Reflect (10 min): Each student writes the rule they'll teach a family member tonight."
+                          ],
+                          assessment: "Performance task: students score a fourth example on the checklist and justify their rating in 3 sentences.",
+                          standard: "ISTE Standards for Students 2: Digital Citizen"
+                        }
+                      ].map((l) => (
+                        <Card key={l.id} className="border-2 hover:shadow-lg transition-shadow flex flex-col" data-testid={`lesson-card-${l.id}`}>
+                          <CardHeader>
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className={`w-10 h-10 rounded-lg ${l.color} flex items-center justify-center flex-shrink-0`}>
+                                <l.icon className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <CardTitle className="text-base leading-tight">{l.title}</CardTitle>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                  <Badge variant="secondary" className="text-xs">{l.grade}</Badge>
+                                  <Badge variant="outline" className="text-xs"><CalendarDays className="w-3 h-3 mr-1" />{l.duration}</Badge>
+                                </div>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-3 text-sm flex-1">
+                            <div>
+                              <p className="font-semibold text-foreground mb-1">Objective</p>
+                              <p className="text-muted-foreground">{l.objective}</p>
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground mb-1">Materials</p>
+                              <p className="text-muted-foreground">{l.materials}</p>
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground mb-1">Lesson Flow</p>
+                              <ul className="space-y-1 text-muted-foreground list-disc list-inside marker:text-primary">
+                                {l.flow.map((step, i) => <li key={i}>{step}</li>)}
+                              </ul>
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground mb-1">Assessment</p>
+                              <p className="text-muted-foreground">{l.assessment}</p>
+                            </div>
+                            <div className="pt-2 border-t border-border">
+                              <p className="text-xs text-primary font-medium">Aligned to: {l.standard}</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section>
+                    <Card className="border-2 border-indigo-200 dark:border-indigo-900 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/20 dark:to-purple-950/20">
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center shadow-lg">
+                            <Presentation className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-2xl">Request a Free School Presentation</CardTitle>
+                            <CardDescription className="text-base">
+                              We offer free virtual and in-person sessions for K to 12 schools and public libraries. Pick a grade range and a format and we'll follow up.
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <SchoolPresentationForm />
+                      </CardContent>
+                    </Card>
+                  </section>
+
+                  <section>
+                    <Card className="border-2">
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-teal-500 flex items-center justify-center shadow-lg">
+                            <School className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-2xl">For School Administrators</CardTitle>
+                            <CardDescription className="text-base">
+                              How GetCyberRight handles student data, COPPA, and FERPA when our materials are used in your classrooms.
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-5 text-sm leading-relaxed">
+                        <div>
+                          <h4 className="font-semibold text-foreground mb-1">Our materials are designed to be used without student accounts</h4>
+                          <p className="text-muted-foreground">
+                            All lesson plans, activities, and printable handouts on this site can be downloaded and used offline. No login is required for any student-facing content. Students do not need to create accounts on getcyberright.com to participate in any of our lessons.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-foreground mb-1">COPPA (Children's Online Privacy Protection Act)</h4>
+                          <p className="text-muted-foreground">
+                            Because we do not collect personal information from children under 13 through our website, COPPA verifiable parental consent is not triggered by classroom use of our printable resources. If you embed any third-party tool referenced in our lessons, follow that vendor's COPPA process separately.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-foreground mb-1">FERPA (Family Educational Rights and Privacy Act)</h4>
+                          <p className="text-muted-foreground">
+                            We are not a school official under FERPA and we do not receive student education records. Teachers retain full control of any student work generated during our lessons. Do not submit student names, IDs, or work samples through our contact forms.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-foreground mb-1">What we collect from educators</h4>
+                          <p className="text-muted-foreground">
+                            When an educator submits a presentation request or contact form, we store the educator's name, email, and message so we can respond. We do not sell or share that information. Adult contact data is retained for 24 months and then deleted.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-foreground mb-1">Questions or formal review</h4>
+                          <p className="text-muted-foreground">
+                            District administrators reviewing our resources for board approval can email <span className="text-foreground font-medium">privacy@getcyberright.com</span>. We are happy to provide a one-page privacy summary on letterhead.
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </section>
+                </div>
 
                 <div className="mt-8 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
                   <div className="flex items-start gap-3">

@@ -3,7 +3,18 @@
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Link } from "@/lib/navigation";
-import { ArrowLeft, FileText, BookOpen, AlertTriangle, RefreshCw, Calculator, Database } from "lucide-react";
+import { ArrowLeft, FileText, BookOpen, AlertTriangle, RefreshCw, Calculator, Database, ShieldCheck, EyeOff, CheckCircle2, XCircle } from "lucide-react";
+
+const NAMED_SOURCES: { name: string; type: string; updated: string; what: string; url: string }[] = [
+  { name: "VirusTotal", type: "URL & file reputation", updated: "Real time (60-second cache)", what: "Aggregates 70+ antivirus engines and URL/domain blocklists. We use it to check whether a URL or file hash is already known malicious.", url: "https://www.virustotal.com" },
+  { name: "PhishTank", type: "Verified phishing URLs", updated: "Continuous", what: "Community-verified database of phishing URLs run by Cisco Talos. We cross-reference reported URLs against the verified list.", url: "https://www.phishtank.com" },
+  { name: "Google Safe Browsing", type: "Malicious URL list", updated: "Continuous (lookup cached 5 minutes)", what: "Google's index of unsafe sites: phishing, malware, social engineering, and unwanted software. Used as a primary URL classifier.", url: "https://safebrowsing.google.com" },
+  { name: "FBI IC3", type: "Annual fraud report", updated: "Annually (April release)", what: "Internet Crime Complaint Center annual report. We use it for U.S. loss totals, top scam categories, and victim demographics.", url: "https://www.ic3.gov" },
+  { name: "CISA", type: "Live advisories", updated: "Continuous", what: "Cybersecurity and Infrastructure Security Agency advisories. We surface consumer-relevant alerts (e.g., active phishing campaigns).", url: "https://www.cisa.gov/news-events/cybersecurity-advisories" },
+  { name: "INTERPOL", type: "Regional cyberthreat reports", updated: "Annually", what: "Cross-border cybercrime trend reports, especially the Africa Cyberthreat Assessment. Used for region-level scam typology.", url: "https://www.interpol.int" },
+  { name: "AARP Fraud Watch Network", type: "Senior-targeted scam alerts", updated: "Weekly", what: "Curated alerts on scams disproportionately targeting older adults. Feeds our Seniors hub and senior-specific scam guides.", url: "https://www.aarp.org/money/scams-fraud/" },
+  { name: "FTC Consumer Sentinel", type: "Consumer complaint database", updated: "Quarterly data book + live access", what: "Federal Trade Commission's database of consumer fraud reports. Source for U.S. complaint volumes by scam category and state.", url: "https://www.ftc.gov/enforcement/consumer-sentinel-network" },
+];
 
 const PRIMARY_SOURCES: { region: string; entries: { publisher: string; report: string; url: string; updated: string; tier: "A" | "B" | "C" }[] }[] = [
   {
@@ -99,10 +110,72 @@ export default function ScamIntelligenceMethodology() {
           </p>
         </header>
 
+        <section className="mb-10" aria-labelledby="named-sources-heading">
+          <h2 id="named-sources-heading" className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-primary" />
+            What we use to detect and classify scams
+          </h2>
+          <p className="text-sm text-muted-foreground mb-5">
+            Our scam checker, alerts, and country-level dashboard pull from the eight named sources below. Each one is independent of GetCyberRight, and we do not pay for placement on this list.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {NAMED_SOURCES.map((s) => (
+              <div key={s.name} className="bg-card border border-border rounded-xl p-4" data-testid={`named-source-${s.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-foreground hover:text-primary hover:underline">
+                    {s.name}
+                  </a>
+                  <span className="text-[10px] uppercase tracking-wider px-1.5 py-[1px] rounded border border-primary/30 bg-primary/10 text-primary whitespace-nowrap">{s.type}</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-2">{s.what}</p>
+                <p className="text-[11px] text-muted-foreground"><RefreshCw className="w-3 h-3 inline mr-1" />Update frequency: <span className="text-foreground">{s.updated}</span></p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-10" aria-labelledby="detect-heading">
+          <h2 id="detect-heading" className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+            What we detect, and what we cannot
+          </h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="bg-card border border-emerald-500/30 rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-emerald-400 mb-3 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                We can usually detect
+              </h3>
+              <ul className="space-y-2 text-xs text-muted-foreground list-disc pl-4">
+                <li>URLs that match known phishing or malware blocklists (PhishTank, Google Safe Browsing, VirusTotal).</li>
+                <li>Domains registered in the last 30 days that mimic well-known brands.</li>
+                <li>Email and SMS patterns that match documented scam templates (gift card requests, fake IRS, package redelivery, romance opening lines).</li>
+                <li>Crypto wallet addresses that appear in published scam reports or sanctions lists.</li>
+                <li>Fraud trends at the country level reported by national authorities (FBI IC3, ACCC Scamwatch, UK Finance, etc.).</li>
+              </ul>
+            </div>
+            <div className="bg-card border border-red-500/30 rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-red-400 mb-3 flex items-center gap-2">
+                <XCircle className="w-4 h-4" />
+                We cannot reliably detect
+              </h3>
+              <ul className="space-y-2 text-xs text-muted-foreground list-disc pl-4">
+                <li>Brand-new scam URLs in the first hours before they appear in any blocklist.</li>
+                <li>Highly targeted spear-phishing crafted for one specific individual.</li>
+                <li>In-person, phone, or voicemail scams (we score the script, not the call).</li>
+                <li>Scams conducted entirely inside encrypted messaging apps we have no visibility into.</li>
+                <li>Whether a real person on the other end actually intends to defraud you, even when the message itself looks clean.</li>
+              </ul>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            A "looks clean" result from our checker is not a guarantee. Treat it as one signal alongside your own judgment, the source of the message, and what is being asked of you.
+          </p>
+        </section>
+
         <section className="mb-10" aria-labelledby="sources-heading">
           <h2 id="sources-heading" className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
             <Database className="w-5 h-5 text-primary" />
-            Primary data sources
+            Primary data sources by region
           </h2>
           <div className="space-y-6">
             {PRIMARY_SOURCES.map((group) => (
@@ -243,6 +316,27 @@ export default function ScamIntelligenceMethodology() {
             <li>Forecast lines are linear projections from a short history buffer and do not account for seasonality, policy interventions, or law-enforcement actions.</li>
             <li>Live feed entries are filtered for relevance to consumer scam intelligence; not every advisory from the upstream feed appears on the dashboard.</li>
           </ul>
+        </section>
+
+        <section className="mb-10" aria-labelledby="privacy-heading">
+          <h2 id="privacy-heading" className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <EyeOff className="w-5 h-5 text-primary" />
+            Privacy and our no-storage policy
+          </h2>
+          <div className="bg-card border border-border rounded-xl p-5 space-y-3 text-sm text-muted-foreground">
+            <p>
+              When you submit a URL, message, email, or wallet address to our scam checker, we do not save what you submitted to our database. Your input is sent to the relevant detection sources (such as VirusTotal or Google Safe Browsing) for evaluation, the result is returned to your browser, and the submission is discarded.
+            </p>
+            <p>
+              We do keep short-lived, anonymized counters of how many checks were run and what category of result they returned (clean, suspicious, malicious). These counters are used to size our infrastructure and publish the aggregate "X scams flagged this week" stat. They contain no submitted content and no information about who submitted them.
+            </p>
+            <p>
+              We do not require you to log in to use the scam checker. We do not place advertising trackers on the checker page. Our session cookies are limited to the strictly necessary set described in our privacy policy.
+            </p>
+            <p>
+              If you opt in to receive an alert about a scam variant, the email address you provide is stored separately for that subscription only. You can unsubscribe and have it deleted at any time from the link in any alert email.
+            </p>
+          </div>
         </section>
 
         <section aria-labelledby="changelog-heading">

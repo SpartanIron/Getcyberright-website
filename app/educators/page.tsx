@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description:
     "Cybersecurity teaching resources for educators. Access lesson plans, classroom activities, printable guides, and curriculum materials.",
   alternates: { canonical: `${BASE_URL}/educators` },
+  keywords:
+    "K-12 cybersecurity curriculum, digital citizenship lesson plans, ISTE digital citizen standards, classroom cyberbullying lesson, password security lesson middle school, phishing lesson high school, free cybersecurity lesson plans, COPPA classroom resources, school cybersecurity presentation, teacher cybersecurity training",
   openGraph: {
     title: "Educator Cybersecurity Resources | GetCyberRight",
     description:

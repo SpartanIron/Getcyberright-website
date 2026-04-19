@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description:
     "Free cybersecurity guides for parents. Set up parental controls, learn age-appropriate device settings, and protect your children from online threats, cyberbullying, and predators.",
   alternates: { canonical: `${BASE_URL}/parents` },
+  keywords:
+    "parental controls guide, family digital safety, screen time limits, cyberbullying prevention parents, child online predator protection, kids first phone safety, gaming safety for kids, social media age limits, COPPA for parents, family device audit, Google Family Link, Apple Screen Time setup",
   openGraph: {
     title: "Parents' Guide to Online Safety: Parental Controls & Family Protection | GetCyberRight",
     description:

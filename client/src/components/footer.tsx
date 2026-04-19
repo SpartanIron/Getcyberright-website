@@ -37,6 +37,7 @@ const footerLinks = {
   company: [
     { name: "About", href: "/about" },
     { name: "Our Mission", href: "/our-mission" },
+    { name: "Press", href: "/press" },
     { name: "Emergency Help", href: "/emergency-help" },
     { name: "Contact", href: "/contact" },
     { name: "FAQ", href: "/faq" },
