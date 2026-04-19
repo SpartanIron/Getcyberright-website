@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Mail, Newspaper, Download, Quote, BarChart3, Image as ImageIcon, ExternalLink, Building } from "lucide-react";
 import { Link } from "@/lib/navigation";
 import { MediaInquiryForm } from "@/components/media-inquiry-form";
-import { SITE_STATS } from "../../../app/lib/site-stats";
+import { SITE_STATS } from "@shared/site-stats";
 
 const PRESS_EMAIL = "press@getcyberright.com";
 
