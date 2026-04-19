@@ -69,16 +69,32 @@ function deriveAudience(category: string, tags: string[] = []): "Everyone" | "Pa
     return "Everyone";
 }
 
-function deriveKeyTakeaways(meta: string, title: string): string[] {
+function deriveKeyTakeaways(meta: string, title: string, category: string, audience: string): string[] {
     const text = (meta || "").trim();
-    if (!text) return [];
     const sentences = text
-      .replace(/\s+/g, " ")
-      .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
-      .map((s) => s.trim())
-      .filter((s) => s.length > 12 && s.length < 200);
+      ? text
+          .replace(/\s+/g, " ")
+          .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
+          .map((s) => s.trim())
+          .filter((s) => s.length > 12 && s.length < 220)
+      : [];
     if (sentences.length >= 2) return sentences.slice(0, 3);
-    return [];
+
+    const out: string[] = [];
+    if (sentences.length === 1) out.push(sentences[0]);
+    if (text && out.length === 0) out.push(text);
+
+    const topic = (categoryIcons[category]?.label || formatCategoryLabel(category || "")).trim();
+    const fallbacks = [
+      topic ? `Learn the warning signs of ${topic.toLowerCase()} before they reach you.` : `Learn the warning signs covered in this guide before they reach you.`,
+      `Get clear, step-by-step actions you can take today to stay safer online.`,
+      `Written for ${audience.toLowerCase()}, in plain language with no scary jargon.`,
+    ];
+    for (const f of fallbacks) {
+      if (out.length >= 3) break;
+      if (!out.some((existing) => existing.toLowerCase() === f.toLowerCase())) out.push(f);
+    }
+    return out.slice(0, 3);
 }
 
 export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
@@ -203,7 +219,8 @@ export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
                                                                                                     </span>
                                                                                 </div>
                                                                                 {(() => {
-                                                                                  const takeaways = deriveKeyTakeaways(guide.metaDescription, guide.title);
+                                                                                  const audience = deriveAudience(guide.category, guide.tags);
+                                                                                  const takeaways = deriveKeyTakeaways(guide.metaDescription, guide.title, guide.category, audience);
                                                                                   if (takeaways.length === 0) return null;
                                                                                   return (
                                                                                     <div className="mb-3" data-testid={`takeaways-guide-${guide.slug}`}>
