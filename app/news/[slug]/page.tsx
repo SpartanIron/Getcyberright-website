@@ -123,7 +123,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <PageContent />
+      <PageContent initialArticle={article} />
     </>
   );
 }

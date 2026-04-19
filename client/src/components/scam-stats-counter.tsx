@@ -41,7 +41,7 @@ function AnimatedStat({ value, label, icon: Icon, iconColor, testId }: {
     >
       <Icon className={`w-4 h-4 ${iconColor}`} />
       <span className="text-white font-bold tabular-nums">
-        {formatNumber(count)}
+        {count > 0 ? formatNumber(count) : formatNumber(value)}
       </span>
       <span className="text-slate-300">{label}</span>
     </div>

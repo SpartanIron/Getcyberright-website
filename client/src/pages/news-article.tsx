@@ -392,9 +392,9 @@ function CommentsSection({ slug }: { slug: string }) {
   );
 }
 
-export default function NewsArticlePage() {
+export default function NewsArticlePage({ initialArticle }: { initialArticle?: NewsArticleData } = {}) {
   const [, params] = useRoute("/news/:slug");
-  const slug = params?.slug;
+  const slug = params?.slug || initialArticle?.slug;
 
   const { data: article, isLoading, error } = useQuery<NewsArticleData>({
     queryKey: ["/api/news/article", slug],
@@ -404,6 +404,7 @@ export default function NewsArticlePage() {
       return res.json();
     },
     enabled: !!slug,
+    initialData: initialArticle && initialArticle.slug === slug ? initialArticle : undefined,
   });
 
   const { data: latestArticles } = useQuery<NewsArticleData[]>({
