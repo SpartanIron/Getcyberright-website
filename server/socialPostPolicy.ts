@@ -373,12 +373,20 @@ export function validatePostContent(
     }
   }
 
-  const urls = extractAllUrls(text);
+  // External citation URLs are permitted only inside the deterministic citation
+  // receipt section ("Sources:" or "Source:" trailer). We strip that section
+  // before URL-allowlist enforcement so receipts can carry source links.
+  const receiptStart = (() => {
+    const m = text.match(/(^|\n)\s*Sources?:/);
+    return m && typeof m.index === "number" ? m.index + (m[1] ? m[1].length : 0) : -1;
+  })();
+  const bodyForUrlCheck = receiptStart >= 0 ? text.slice(0, receiptStart) : text;
+  const urls = extractAllUrls(bodyForUrlCheck);
   for (const url of urls) {
     if (!isGcrUrl(url)) {
       issues.push({
         code: "non_gcr_url",
-        message: `Post contains a non-GetCyberRight URL: ${url}`,
+        message: `Post contains a non-GetCyberRight URL outside the citation receipt: ${url}`,
         detail: url,
       });
     }

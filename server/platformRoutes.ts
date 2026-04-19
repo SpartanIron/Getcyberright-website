@@ -923,6 +923,7 @@ export function registerPlatformRoutes(app: Express): void {
       const { auditPostContent } = await import("./socialClaimAuditor");
       const { buildGuideBundle, buildAlertBundle, buildScamBundle } = await import("./socialSourceBundle");
       type SourceBundleT = import("./socialSourceBundle").SourceBundle;
+      type CitationT = import("./scamIntelAggregator").Citation;
 
       let bundle: SourceBundleT | null = null;
       if (post.contentType === "guide" && post.contentId) {
@@ -936,19 +937,24 @@ export function registerPlatformRoutes(app: Express): void {
         if (s) bundle = buildScamBundle(s);
       } else if (post.contentType === "trend_insight") {
         // Reactive trend posts persist their bundle on the post row at queue time.
-        const stored = (post.citations || []) as SourceBundle["citations"];
-        const corpus = (post.extractedClaims || [])
-          .map((c) => (c && typeof c === "object" && "context" in c ? String((c as { context?: string }).context ?? "") : ""))
+        const storedCitations = (post.citations || []) as CitationT[];
+        const storedClaims = (post.extractedClaims || []) as { text?: string; context?: string }[];
+        const allowedClaims = storedClaims.map((c) => String(c?.text ?? "").trim()).filter(Boolean);
+        const contextForLLM = storedClaims
+          .map((c) => String(c?.context ?? "").trim())
+          .filter(Boolean)
           .join(" ");
-        if (stored.length > 0) {
+        if (storedCitations.length > 0) {
           bundle = {
             recordId: post.contentId || post.id,
             recordType: "trend_insight",
             title: post.contentTitle,
-            corpus,
-            citations: stored,
-            primaryUrl: stored[0]?.url || "",
-          } satisfies SourceBundle;
+            canonicalUrl: storedCitations[0]?.url || "",
+            category: "trend",
+            citations: storedCitations,
+            allowedClaims,
+            contextForLLM,
+          };
         }
       }
 

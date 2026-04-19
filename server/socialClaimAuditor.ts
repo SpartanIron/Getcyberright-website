@@ -103,10 +103,33 @@ function extractClaims(text: string): ExtractedClaim[] {
     while ((m = re.exec(text)) !== null) push(m[0], "agency", grabContext(m.index, m[0].length));
   }
 
-  // Named companies / victim orgs: ProperNoun (Inc|Corp|Ltd|LLC|Group|Bank|Hospital|University|Holdings|Healthcare)
+  // Named companies / victim orgs with explicit suffix.
   const orgRe =
     /\b[A-Z][A-Za-z0-9&'.\-]+(?:\s+[A-Z][A-Za-z0-9&'.\-]+){0,3}\s+(?:Inc|Corp|Corporation|Ltd|LLC|Group|Bank|Hospital|University|Holdings|Healthcare|Systems|Networks|Solutions|Technologies)\b/g;
   while ((m = orgRe.exec(text)) !== null) push(m[0], "company", grabContext(m.index, m[0].length));
+
+  // Generic ProperNoun extraction: 2-4 consecutive Capitalized words, anywhere in
+  // the body. Catches arbitrary named victims/actors/products/agencies that are
+  // NOT in our hand-curated allowlists. We then verify each against the source
+  // bundle in auditPostContent — anything unsupported = fabricated entity = fail.
+  const STOPWORDS = new Set([
+    "The","A","An","This","That","These","Those","Our","Your","Their","His","Her","Its",
+    "Source","Sources","Full","Watch","Tip","Tips","Update","Alert","Warning","Family",
+    "Stay","Keep","Visit","Read","Learn","Get","Cyber","Right","GetCyberRight","Source:",
+    "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday",
+    "January","February","March","April","May","June","July","August","September","October","November","December",
+  ]);
+  const properNounRe = /\b([A-Z][A-Za-z0-9.&'\-]+(?:\s+[A-Z][A-Za-z0-9.&'\-]+){1,3})\b/g;
+  while ((m = properNounRe.exec(text)) !== null) {
+    const phrase = m[0].trim();
+    const tokens = phrase.split(/\s+/);
+    if (tokens.every((t) => STOPWORDS.has(t))) continue;
+    if (/^[A-Z][a-z]+$/.test(tokens[0]) && tokens.length === 2 && /^[A-Z][a-z]+$/.test(tokens[1])) {
+      // Skip bare "First Last" name pairs unless one token looks org-y; still extract
+      // multi-word names that include uppercase acronyms or 3+ tokens.
+    }
+    push(phrase, "company", grabContext(m.index, m[0].length));
+  }
 
   return out;
 }

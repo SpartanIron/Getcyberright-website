@@ -3,7 +3,7 @@ import type { CyberSafetyGuide, CyberThreatAlert, ScamIntelligence } from "@shar
 
 export interface SourceBundle {
   recordId: string;
-  recordType: "guide" | "alert" | "scam_intel";
+  recordType: "guide" | "alert" | "scam_intel" | "trend_insight";
   title: string;
   canonicalUrl: string;
   category: string;

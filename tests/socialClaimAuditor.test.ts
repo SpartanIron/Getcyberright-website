@@ -89,6 +89,13 @@ const cases: Case[] = [
       "Romance scam losses reported in 2025 averaged $2,400 per family, with 37% of victims over 60. Read more at https://www.getcyberright.com/guides/test-guide",
     expectFail: false,
   },
+  {
+    name: "10. Invented multi-word org name (no allowlist match) is blocked",
+    content:
+      "Acme Northwind Industries reported a $2,400 breach in 2025. Read more at https://www.getcyberright.com/guides/test-guide",
+    expectFail: true,
+    expectReasonContains: "Acme Northwind",
+  },
 ];
 
 let passed = 0;
