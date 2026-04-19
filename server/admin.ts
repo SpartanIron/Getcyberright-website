@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db } from "./db";
 import { storage } from "./storage";
-import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks, shieldScans, exposureScans, exposureFindings } from "@shared/schema";
+import { users, contactMessages, newsletterSubscribers, scamReports, toolUsage, insertToolUsageSchema, platformAnnouncements, insertAnnouncementSchema, trendingThreats, insertTrendingThreatSchema, userFeedback, cyberSafetyGuides, cyberThreatAlerts, scamIntelligence, socialPosts, growthTasks, shieldScans, exposureScans, exposureFindings, adminNotificationSettings, adminNotificationSettingsSchema } from "@shared/schema";
 import { isAuthenticated } from "./auth";
 import { eq, desc, count, sql, and, lte, or, isNull, gte } from "drizzle-orm";
 import { securityLogger } from "./security";
@@ -600,6 +600,59 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error("Admin scam checks error:", error);
       res.status(500).json({ error: "Failed to fetch scam check data" });
+    }
+  });
+
+  // Admin notification destinations (Slack/webhook) for review-queue digests
+  app.get("/api/admin/notification-settings", isAuthenticated, isAdminMiddleware, async (_req, res) => {
+    try {
+      const rows = await db.select().from(adminNotificationSettings).limit(1);
+      const row = rows[0];
+      res.json({
+        slackWebhookUrl: row?.slackWebhookUrl || "",
+        webhookUrl: row?.webhookUrl || "",
+        updatedAt: row?.updatedAt || null,
+        updatedBy: row?.updatedBy || null,
+      });
+    } catch (error) {
+      console.error("Admin get notification settings error:", error);
+      res.status(500).json({ error: "Failed to fetch notification settings" });
+    }
+  });
+
+  app.put("/api/admin/notification-settings", isAuthenticated, isAdminMiddleware, requireRole("admin"), async (req: any, res) => {
+    try {
+      const parsed = adminNotificationSettingsSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid data", details: parsed.error.errors });
+      }
+      const slackWebhookUrl = (parsed.data.slackWebhookUrl || "").trim() || null;
+      const webhookUrl = (parsed.data.webhookUrl || "").trim() || null;
+
+      const existing = await db.select().from(adminNotificationSettings).limit(1);
+      if (existing[0]) {
+        await db
+          .update(adminNotificationSettings)
+          .set({ slackWebhookUrl, webhookUrl, updatedAt: new Date(), updatedBy: req.user.id })
+          .where(eq(adminNotificationSettings.id, existing[0].id));
+      } else {
+        await db.insert(adminNotificationSettings).values({
+          id: "global",
+          slackWebhookUrl,
+          webhookUrl,
+          updatedBy: req.user.id,
+        });
+      }
+
+      securityLogger.info("Admin updated notification settings", {
+        adminId: req.user.id,
+        slackConfigured: Boolean(slackWebhookUrl),
+        webhookConfigured: Boolean(webhookUrl),
+      });
+      res.json({ slackWebhookUrl: slackWebhookUrl || "", webhookUrl: webhookUrl || "" });
+    } catch (error) {
+      console.error("Admin update notification settings error:", error);
+      res.status(500).json({ error: "Failed to update notification settings" });
     }
   });
 }

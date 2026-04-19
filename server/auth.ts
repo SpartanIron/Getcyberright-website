@@ -452,9 +452,39 @@ export function registerAuthRoutes(app: Express) {
       shieldSubscriptionExpiresAt: user.shieldSubscriptionExpiresAt,
       isAdmin: user.isAdmin,
       emailVerified: user.emailVerified,
+      notifyReviewQueueEmail: user.notifyReviewQueueEmail !== false,
       createdAt: user.createdAt,
       freeAccessPeriod: freeAccess
     });
+  });
+
+  // Update notification preferences for the current user
+  app.patch("/api/auth/notification-prefs", isAuthenticated, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const schema = z.object({
+        notifyReviewQueueEmail: z.boolean().optional(),
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid data", details: parsed.error.errors });
+      }
+      const updates: Partial<typeof users.$inferInsert> = { updatedAt: new Date() };
+      if (typeof parsed.data.notifyReviewQueueEmail === "boolean") {
+        updates.notifyReviewQueueEmail = parsed.data.notifyReviewQueueEmail;
+      }
+      if (Object.keys(updates).length === 1) {
+        return res.status(400).json({ error: "No preference fields supplied" });
+      }
+      await db.update(users).set(updates).where(eq(users.id, user.id));
+      const [refreshed] = await db.select().from(users).where(eq(users.id, user.id));
+      res.json({
+        notifyReviewQueueEmail: refreshed?.notifyReviewQueueEmail !== false,
+      });
+    } catch (error) {
+      console.error("Notification prefs update error:", error);
+      res.status(500).json({ error: "Failed to update notification preferences" });
+    }
   });
   
   // Logout

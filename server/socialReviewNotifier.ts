@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { db } from "./db";
 import { and, eq, gt, inArray, isNull } from "drizzle-orm";
-import { socialPosts, users } from "@shared/schema";
+import { socialPosts, users, adminNotificationSettings } from "@shared/schema";
 import type { SocialPost } from "@shared/schema";
 import { storage } from "./storage";
 import { sendEmail, isEmailConfigured } from "./email-service";
@@ -66,13 +66,19 @@ async function getAdminRecipients(): Promise<string[]> {
   const recipients = new Set<string>();
   try {
     const rows = await db
-      .select({ email: users.email, isAdmin: users.isAdmin, role: users.role })
+      .select({
+        email: users.email,
+        isAdmin: users.isAdmin,
+        role: users.role,
+        notifyReviewQueueEmail: users.notifyReviewQueueEmail,
+      })
       .from(users);
     for (const r of rows) {
       if (!r.email) continue;
-      if (r.isAdmin || r.role === "admin" || r.role === "super_admin") {
-        recipients.add(r.email.toLowerCase());
-      }
+      if (!(r.isAdmin || r.role === "admin" || r.role === "super_admin")) continue;
+      // Per-admin opt-out: skip if explicitly disabled
+      if (r.notifyReviewQueueEmail === false) continue;
+      recipients.add(r.email.toLowerCase());
     }
   } catch (err: any) {
     log.error("Failed to load admin users", { error: err?.message });
@@ -80,6 +86,92 @@ async function getAdminRecipients(): Promise<string[]> {
   const fallback = process.env.ADMIN_NOTIFY_EMAIL || process.env.ADMIN_EMAIL;
   if (fallback) recipients.add(fallback.toLowerCase());
   return Array.from(recipients);
+}
+
+interface AdminWebhookDestinations {
+  slackWebhookUrl?: string | null;
+  webhookUrl?: string | null;
+}
+
+async function getAdminWebhookDestinations(): Promise<AdminWebhookDestinations> {
+  let row: AdminWebhookDestinations | null = null;
+  try {
+    const rows = await db.select().from(adminNotificationSettings).limit(1);
+    if (rows[0]) {
+      row = { slackWebhookUrl: rows[0].slackWebhookUrl, webhookUrl: rows[0].webhookUrl };
+    }
+  } catch (err: any) {
+    log.error("Failed to load admin notification settings", { error: err?.message });
+  }
+  return {
+    slackWebhookUrl: row?.slackWebhookUrl || process.env.REVIEW_NOTIFY_SLACK_WEBHOOK || null,
+    webhookUrl: row?.webhookUrl || process.env.REVIEW_NOTIFY_WEBHOOK || null,
+  };
+}
+
+function buildSlackPayload(posts: SocialPost[], baseUrl: string): Record<string, unknown> {
+  const lines = posts.map((p) => {
+    const approveUrl = `${baseUrl}/api/social-posts/review-action?token=${signReviewActionToken(p.id, "approve")}`;
+    const rejectUrl = `${baseUrl}/api/social-posts/review-action?token=${signReviewActionToken(p.id, "reject")}`;
+    return `• *[${p.platform} · ${p.contentType}]* ${p.contentTitle}\n   <${approveUrl}|Approve> | <${rejectUrl}|Reject>`;
+  });
+  return {
+    text: `${posts.length} reactive post${posts.length === 1 ? "" : "s"} awaiting approval`,
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*GCR review queue:* ${posts.length} post${posts.length === 1 ? "" : "s"} need approval\n${lines.join("\n")}`,
+        },
+      },
+    ],
+  };
+}
+
+async function postJson(url: string, payload: unknown): Promise<boolean> {
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      log.warn("Webhook returned non-OK status", { url, status: res.status });
+      return false;
+    }
+    return true;
+  } catch (err: any) {
+    log.error("Webhook delivery failed", { url, error: err?.message });
+    return false;
+  }
+}
+
+async function deliverWebhookNotifications(posts: SocialPost[]): Promise<{ slack: boolean; webhook: boolean }> {
+  const dests = await getAdminWebhookDestinations();
+  const baseUrl = getPublicBaseUrl();
+  const result = { slack: false, webhook: false };
+
+  if (dests.slackWebhookUrl) {
+    result.slack = await postJson(dests.slackWebhookUrl, buildSlackPayload(posts, baseUrl));
+  }
+  if (dests.webhookUrl) {
+    const payload = {
+      type: "review_queue_digest",
+      count: posts.length,
+      posts: posts.map((p) => ({
+        id: p.id,
+        platform: p.platform,
+        contentType: p.contentType,
+        contentTitle: p.contentTitle,
+        reviewExpiresAt: p.reviewExpiresAt,
+        approveUrl: `${baseUrl}/api/social-posts/review-action?token=${signReviewActionToken(p.id, "approve")}`,
+        rejectUrl: `${baseUrl}/api/social-posts/review-action?token=${signReviewActionToken(p.id, "reject")}`,
+      })),
+    };
+    result.webhook = await postJson(dests.webhookUrl, payload);
+  }
+  return result;
 }
 
 function getPublicBaseUrl(): string {
@@ -202,15 +294,30 @@ export async function notifyPendingReviewQueue(): Promise<{ notified: number; re
   }
 
   const recipients = await getAdminRecipients();
-  if (recipients.length === 0) {
-    log.warn("No admin recipients configured for review notification", { pending: fresh.length });
+  const dests = await getAdminWebhookDestinations();
+  const hasWebhookDestination = Boolean(dests.slackWebhookUrl || dests.webhookUrl);
+
+  if (recipients.length === 0 && !hasWebhookDestination) {
+    log.warn("No admin recipients or webhooks configured for review notification", { pending: fresh.length });
     return { notified: 0, recipients: 0 };
   }
 
-  const { subject, htmlBody, textBody } = buildDigestEmail(fresh);
-  const ok = await sendEmail({ to: recipients, subject, htmlBody, textBody });
-  if (!ok) {
-    log.error("Email provider rejected review digest", { posts: fresh.length });
+  let emailOk = recipients.length === 0; // treat as success if no email recipients
+  if (recipients.length > 0) {
+    const { subject, htmlBody, textBody } = buildDigestEmail(fresh);
+    emailOk = await sendEmail({ to: recipients, subject, htmlBody, textBody });
+    if (!emailOk) {
+      log.error("Email provider rejected review digest", { posts: fresh.length });
+    }
+  }
+
+  const webhookResults = hasWebhookDestination
+    ? await deliverWebhookNotifications(fresh)
+    : { slack: false, webhook: false };
+
+  const anyDeliverySucceeded =
+    (recipients.length > 0 && emailOk) || webhookResults.slack || webhookResults.webhook;
+  if (!anyDeliverySucceeded) {
     return { notified: 0, recipients: recipients.length };
   }
 
@@ -219,6 +326,8 @@ export async function notifyPendingReviewQueue(): Promise<{ notified: number; re
     posts: fresh.length,
     recipients: recipients.length,
     emailConfigured: isEmailConfigured(),
+    slackDelivered: webhookResults.slack,
+    webhookDelivered: webhookResults.webhook,
     notifiedAtPersisted: persisted,
   });
   return { notified: persisted ? fresh.length : 0, recipients: recipients.length };

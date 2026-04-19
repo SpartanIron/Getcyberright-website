@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import {
  User,
  Lock,
@@ -25,6 +26,7 @@ import {
  Mail,
  KeyRound,
  ShieldCheck,
+ Bell,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "@/lib/navigation";
@@ -54,6 +56,8 @@ export default function Account() {
  const [firstName, setFirstName] = useState("");
  const [lastName, setLastName] = useState("");
 
+ const [notifyReviewQueueEmail, setNotifyReviewQueueEmail] = useState(true);
+
  const [currentPassword, setCurrentPassword] = useState("");
  const [newPassword, setNewPassword] = useState("");
  const [confirmPassword, setConfirmPassword] = useState("");
@@ -63,8 +67,28 @@ export default function Account() {
  if (user) {
  setFirstName(user.firstName || "");
  setLastName(user.lastName || "");
+ setNotifyReviewQueueEmail(user.notifyReviewQueueEmail !== false);
  }
  }, [user]);
+
+ const notifyPrefMutation = useMutation({
+ mutationFn: async (data: { notifyReviewQueueEmail: boolean }) => {
+ const res = await apiRequest("PATCH", "/api/auth/notification-prefs", data);
+ return res.json();
+ },
+ onSuccess: () => {
+ queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+ toast({ title: "Notification preferences updated" });
+ },
+ onError: (err: Error) => {
+ toast({ title: "Update failed", description: err.message, variant: "destructive" });
+ },
+ });
+
+ const handleNotifyToggle = (value: boolean) => {
+ setNotifyReviewQueueEmail(value);
+ notifyPrefMutation.mutate({ notifyReviewQueueEmail: value });
+ };
 
  const profileMutation = useMutation({
  mutationFn: async (data: { firstName: string; lastName: string }) => {
@@ -300,6 +324,42 @@ export default function Account() {
  </CardContent>
  </Card>
  </FadeIn>
+
+ {user.isAdmin && (
+ <FadeIn>
+ <Card data-testid="card-admin-notifications">
+ <CardHeader>
+ <CardTitle className="text-lg flex items-center gap-2">
+ <Bell className="w-5 h-5" />
+ Admin Notifications
+ </CardTitle>
+ <CardDescription>Choose which admin alerts land in your inbox</CardDescription>
+ </CardHeader>
+ <CardContent>
+ <div className="flex items-start justify-between gap-4 p-4 rounded-lg border">
+ <div className="flex-1">
+ <h3 className="text-sm font-semibold text-foreground">Reactive post review queue</h3>
+ <p className="text-xs text-muted-foreground mt-1">
+ Get the digest email when reactive social posts enter the 60-minute review window.
+ </p>
+ <p className="text-xs text-muted-foreground mt-1">
+ Site-wide Slack and webhook destinations can be configured under{" "}
+ <Link href="/admin/notifications" className="underline">
+ Admin → Notifications
+ </Link>.
+ </p>
+ </div>
+ <Switch
+ checked={notifyReviewQueueEmail}
+ onCheckedChange={handleNotifyToggle}
+ disabled={notifyPrefMutation.isPending}
+ data-testid="switch-notify-review-queue"
+ />
+ </div>
+ </CardContent>
+ </Card>
+ </FadeIn>
+ )}
 
  <FadeIn>
  <Card data-testid="card-subscriptions">

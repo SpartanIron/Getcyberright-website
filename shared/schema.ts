@@ -6,6 +6,23 @@ import { z } from "zod";
 // Export auth models (custom email/password authentication with MFA)
 export * from "./models/auth";
 
+// Admin-configurable destinations for review-queue and other admin notifications
+export const adminNotificationSettings = pgTable("admin_notification_settings", {
+  id: varchar("id").primaryKey().default("global"),
+  slackWebhookUrl: text("slack_webhook_url"),
+  webhookUrl: text("webhook_url"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedBy: varchar("updated_by"),
+});
+
+export const adminNotificationSettingsSchema = z.object({
+  slackWebhookUrl: z.string().url().nullable().optional().or(z.literal("")),
+  webhookUrl: z.string().url().nullable().optional().or(z.literal("")),
+});
+
+export type AdminNotificationSettings = typeof adminNotificationSettings.$inferSelect;
+export type AdminNotificationSettingsInput = z.infer<typeof adminNotificationSettingsSchema>;
+
 // Gamification - User Progress
 export const userProgress = pgTable("user_progress", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

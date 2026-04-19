@@ -96,7 +96,10 @@ export const users = pgTable("users", {
   // Admin
   isAdmin: boolean("is_admin").default(false),
   role: varchar("role").default("user"),
-  
+
+  // Admin notification preferences
+  notifyReviewQueueEmail: boolean("notify_review_queue_email").default(true),
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -17,7 +17,8 @@ import {
   MessageSquare,
   FileText,
   ScanSearch,
-  Search
+  Search,
+  Bell
 } from "lucide-react";
 import logoImage from "@/assets/logo.webp";
 import { imgSrc } from "@/lib/img-src";
@@ -39,6 +40,7 @@ const navItems = [
   { href: "/admin/trending-threats", label: "Trending Threats", icon: TrendingUp },
   { href: "/admin/feedback", label: "Feedback", icon: MessageSquare },
   { href: "/admin/engagement", label: "Engagement", icon: Search },
+  { href: "/admin/notifications", label: "Notifications", icon: Bell },
   { href: "/admin/security", label: "Security", icon: Shield },
 ];
 
