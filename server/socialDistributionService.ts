@@ -11,6 +11,7 @@ import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stoc
 import type { TemplateStyle } from "./stockPhotoService";
 import { buildGuideBundle, buildAlertBundle, buildScamBundle, isBundleSubstantive, type SourceBundle } from "./socialSourceBundle";
 import { auditPostContent, type ClaimAuditResult } from "./socialClaimAuditor";
+import { stripCitationReceipt } from "./socialCitationReceipt";
 import { appendCitationReceipt } from "./socialCitationReceipt";
 
 interface EmptyCycleEvent {
@@ -491,7 +492,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
       );
       continue;
     }
-    const audit = auditPostContent(content, bundle);
+    const audit = auditPostContent(stripCitationReceipt(content), bundle);
     const imagePath = await generateImageForPost(guide.title, "guide", platform, guide.category, undefined, guide.id);
     const id = await persistAuditedPost({
       bundle,
@@ -553,7 +554,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
       );
       continue;
     }
-    const audit = auditPostContent(content, bundle);
+    const audit = auditPostContent(stripCitationReceipt(content), bundle);
     const imagePath = await generateImageForPost(alert.threatName, "threat_alert", platform, alert.threatCategory, alert.riskLevel, alert.id);
     const id = await persistAuditedPost({
       bundle,
@@ -615,7 +616,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
       );
       continue;
     }
-    const audit = auditPostContent(content, bundle);
+    const audit = auditPostContent(stripCitationReceipt(content), bundle);
     const imagePath = await generateImageForPost(scam.scamName, "scam_intel", platform, scam.scamCategory, undefined, scam.id);
     const id = await persistAuditedPost({
       bundle,

@@ -921,6 +921,7 @@ export function registerPlatformRoutes(app: Express): void {
       // an admin can never bypass the audit, only confirm a passing audit.
       const { runSocialQualityGate } = await import("./socialQualityGate");
       const { auditPostContent } = await import("./socialClaimAuditor");
+      const { stripCitationReceipt } = await import("./socialCitationReceipt");
       const { buildGuideBundle, buildAlertBundle, buildScamBundle } = await import("./socialSourceBundle");
       type SourceBundleT = import("./socialSourceBundle").SourceBundle;
       type CitationT = import("./scamIntelAggregator").Citation;
@@ -970,7 +971,7 @@ export function registerPlatformRoutes(app: Express): void {
         });
       }
 
-      const audit = auditPostContent(post.postContent, bundle);
+      const audit = auditPostContent(stripCitationReceipt(post.postContent), bundle);
       if (audit.verdict !== "pass") {
         await storage.updateSocialPost(req.params.id, {
           status: "blocked",

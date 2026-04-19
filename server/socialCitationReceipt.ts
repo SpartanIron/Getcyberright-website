@@ -85,6 +85,19 @@ export function appendCitationReceipt(content: string, citations: Citation[], pl
 }
 
 // Legacy helper kept for backward compat with any older callers.
+/**
+ * Strip the trailing deterministic citation receipt ("Sources:" or "Source:")
+ * so downstream auditors see only the body. Receipt dates and external citation
+ * URLs would otherwise be (mis)treated as claims.
+ */
+export function stripCitationReceipt(content: string): string {
+  if (!content) return content;
+  const m = content.match(/(^|\n)\s*Sources?:/);
+  if (!m || typeof m.index !== "number") return content;
+  const sliceAt = m.index + (m[1] ? m[1].length : 0);
+  return content.slice(0, sliceAt).replace(/\s+$/, "");
+}
+
 export function formatCitationReceipt(citations: Citation[], maxLines = 3): string {
   return formatLongReceipt(citations, "", maxLines);
 }
