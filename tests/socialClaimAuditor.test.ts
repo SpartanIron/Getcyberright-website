@@ -5,7 +5,7 @@
  * Locks in the eight required hallucination-blocking failure modes
  * for the Gold-Standard Social Engine.
  */
-import { auditPostContent, deriveAuditedPostState } from "../server/socialClaimAuditor";
+import { auditPostContent, deriveAuditedPostState, _internals } from "../server/socialClaimAuditor";
 import type { SourceBundle } from "../server/socialSourceBundle";
 
 const baseBundle: SourceBundle = {
@@ -96,6 +96,39 @@ const cases: Case[] = [
     expectFail: true,
     expectReasonContains: "Acme Northwind",
   },
+  // ---------------------------------------------------------------------------
+  // Plain-prose hallucination cases (Task #26).
+  // These contain NO numeric / proper-noun / agency / actor / multi-word org
+  // tokens, so the legacy extractors let them through. The new prose-grounding
+  // gate must catch them by comparing assertive sentences to the source bundle.
+  // ---------------------------------------------------------------------------
+  {
+    name: "11. Plain-prose fabricated event (hospital breach) is blocked",
+    content:
+      "A leading hospital in texas was breached last week and patient files leaked online. Read more at https://www.getcyberright.com/guides/test-guide",
+    expectFail: true,
+    expectReasonContains: "hospital",
+  },
+  {
+    name: "12. Plain-prose fabricated trend (deepfake voices) is blocked",
+    content:
+      "Scammers are now using deepfake voices of grandchildren to demand emergency wire transfers. Read more at https://www.getcyberright.com/guides/test-guide",
+    expectFail: true,
+    expectReasonContains: "deepfake",
+  },
+  {
+    name: "13. Plain-prose fabricated stat (spelled-out) is blocked",
+    content:
+      "The average grandparent loses three hours per scam call to confused phone conversations. Read more at https://www.getcyberright.com/guides/test-guide",
+    expectFail: true,
+    expectReasonContains: "grandparent",
+  },
+  {
+    name: "14. Plain-prose claim grounded in source passes",
+    content:
+      "Average romance scam losses reported to GetCyberRight by victims over 60 reached the figures we tracked in 2025. Read more at https://www.getcyberright.com/guides/test-guide",
+    expectFail: false,
+  },
 ];
 
 let passed = 0;
@@ -167,5 +200,80 @@ for (const c of cases) {
 console.log(`\n${passed}/${cases.length} passed, ${failed} failed.`);
 if (failed > 0) {
   console.error("\nFailing cases:\n" + failures.join("\n"));
+  process.exit(1);
+}
+
+// ---------------------------------------------------------------------------
+// False-positive rate: prose-grounding gate measured on 20 known-good posts.
+// Each entry is a realistic grounded sentence paired with the source-bundle
+// corpus it would have been written from. The prose gate must NOT raise
+// failures on these (FP rate < 10%).
+// ---------------------------------------------------------------------------
+interface Good {
+  sentence: string;
+  corpus: string;
+}
+const knownGood: Good[] = [
+  { sentence: "Romance scammers often build trust over weeks before asking for money.",
+    corpus: "Romance scammers build trust slowly with victims over weeks and months before requesting money transfers." },
+  { sentence: "Phishing emails frequently impersonate banks to steal login credentials.",
+    corpus: "Phishing emails often impersonate banks and credit unions to steal login credentials and account numbers." },
+  { sentence: "Deepfake voice scams target grandparents by mimicking family members in distress.",
+    corpus: "Deepfake voice scams target older adults and grandparents by mimicking the voices of family members in fake emergencies." },
+  { sentence: "Ransomware groups now publish stolen data to pressure victims into paying.",
+    corpus: "Ransomware groups have moved to double-extortion: encrypting data and publishing stolen files to pressure victims into paying ransoms." },
+  { sentence: "Smishing attacks use fake delivery notifications to harvest credit card numbers.",
+    corpus: "Smishing attacks send fake package delivery notifications by SMS to harvest credit card numbers and personal data." },
+  { sentence: "Business email compromise schemes exploit invoice workflows inside finance teams.",
+    corpus: "Business email compromise (BEC) schemes target finance teams by hijacking invoice workflows and redirecting payments." },
+  { sentence: "Tech support scams pressure seniors into installing remote access tools.",
+    corpus: "Tech support scams pressure seniors into installing remote access software so attackers can drain bank accounts." },
+  { sentence: "Investment scams promise unrealistic returns to lure retail investors into fake platforms.",
+    corpus: "Investment scams promise unrealistic returns and lure retail investors onto fake trading platforms before disappearing with deposits." },
+  { sentence: "Account takeover attacks reuse credentials leaked from earlier breaches.",
+    corpus: "Account takeover attacks rely on credentials reused across sites that were leaked in earlier data breaches." },
+  { sentence: "Multi-factor authentication blocks the majority of automated credential attacks.",
+    corpus: "Enabling multi-factor authentication blocks the vast majority of automated credential stuffing and brute force attacks." },
+  { sentence: "QR code scams place fake stickers over legitimate parking meter codes.",
+    corpus: "QR code scams place fake stickers over legitimate parking meter QR codes to redirect drivers to phishing pages." },
+  { sentence: "Crypto recovery scams target previous fraud victims with fake reimbursement offers.",
+    corpus: "Crypto recovery scams contact previous fraud victims with fake reimbursement offers and demand upfront fees." },
+  { sentence: "Fake job offers harvest personal information through bogus onboarding forms.",
+    corpus: "Fake job offers ask candidates to fill out bogus onboarding forms that harvest personal information and identity data." },
+  { sentence: "Scammers exploit grief by impersonating funeral homes after public obituaries.",
+    corpus: "Scammers monitor public obituaries and impersonate funeral homes to exploit grieving families with fake invoices." },
+  { sentence: "SIM swap attacks let criminals intercept authentication codes sent by text.",
+    corpus: "SIM swap attacks port a victim's phone number to a new SIM, letting criminals intercept authentication codes sent by SMS." },
+  { sentence: "Charity scams surge after natural disasters when donors are less skeptical.",
+    corpus: "Charity scams surge after natural disasters and major news events when donors are less skeptical and act on emotion." },
+  { sentence: "Marketplace scams ship empty boxes after collecting payment outside the platform.",
+    corpus: "Marketplace scams convince buyers to pay outside the platform, then ship empty boxes or nothing at all." },
+  { sentence: "Password managers reduce reuse and surface breach exposure to families.",
+    corpus: "Password managers reduce password reuse and surface breach exposure alerts so families can rotate compromised credentials." },
+  { sentence: "Sextortion scams send threatening emails claiming to have webcam footage.",
+    corpus: "Sextortion scams send threatening emails claiming to have webcam footage and demand cryptocurrency to keep it private." },
+  { sentence: "Romance scam losses reported by victims over 60 climbed across the year.",
+    corpus: "Romance scam losses reported by older victims, particularly those over 60, climbed steadily across the year." },
+];
+
+let fpCount = 0;
+const fpDetails: string[] = [];
+for (const g of knownGood) {
+  const fails = _internals.checkProseGrounding(g.sentence, g.corpus);
+  if (fails.length > 0) {
+    fpCount++;
+    fpDetails.push(`  - "${g.sentence}" -> ${fails.map((f) => f.reason).join(" | ")}`);
+  }
+}
+const fpRate = fpCount / knownGood.length;
+console.log(
+  `\nProse-grounding false-positive rate: ${fpCount}/${knownGood.length} (${(fpRate * 100).toFixed(1)}%) on ${knownGood.length} known-good posts.`,
+);
+if (fpDetails.length > 0) {
+  console.log("False positives:\n" + fpDetails.join("\n"));
+}
+const FP_BUDGET = 0.1;
+if (fpRate > FP_BUDGET) {
+  console.error(`\nFalse-positive rate ${(fpRate * 100).toFixed(1)}% exceeds budget of ${(FP_BUDGET * 100).toFixed(0)}%.`);
   process.exit(1);
 }

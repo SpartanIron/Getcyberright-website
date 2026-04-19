@@ -161,6 +161,131 @@ function isAllowedVerbatim(claim: ExtractedClaim, allowedSet: Set<string>): bool
   return false;
 }
 
+// ---------------------------------------------------------------------------
+// Plain-prose hallucination layer
+// ---------------------------------------------------------------------------
+// The token-based extractors above only catch claims with a recognisable
+// surface form: numbers, percentages, years, CVE ids, dates, named agencies /
+// threat actors, multi-word capitalised orgs. They miss assertive prose
+// fabrications like:
+//   - "a leading hospital in Texas was breached last week"
+//   - "scammers are now using deepfake voices of grandchildren"
+//   - "the average grandparent loses three hours per scam call"
+// None of those contain a numeric/proper-noun token, yet each asserts a
+// specific factual claim that, if wrong, looks just as authoritative as a
+// real one.
+//
+// We add a semantic-grounding gate: split the post into sentences, drop CTAs
+// / imperatives / questions / link lines, then for each remaining declarative
+// sentence verify that its content keywords have meaningful overlap with the
+// source bundle's contextForLLM corpus. A sentence with too few of its
+// content words supported by the corpus is treated as a fabricated claim.
+
+const PROSE_STOPWORDS = new Set([
+  "the","a","an","and","or","but","of","in","on","at","to","for","with","from",
+  "by","as","is","are","was","were","be","been","being","this","that","these","those",
+  "it","its","they","them","their","there","here","than","then","also","too",
+  "into","onto","over","under","more","most","much","many","some","any","all","every","each",
+  "your","you","yours","our","ours","we","us","my","me","his","her","hers","him","she","he",
+  "what","when","where","why","how","who","whom","which","whose",
+  "if","else","while","because","since","so","not","no","yes","just","only","very","quite",
+  "can","could","may","might","will","would","should","shall","must","do","does","did",
+  "have","has","had","being","get","got","gets","getting","make","makes","made","take","takes","took",
+  "per","via","about","without","within","across","through","between","after","before","during",
+  "such","other","another","one","two","three","four","five","six","seven","eight","nine","ten",
+  "really","actually","still","now","new","old","big","small","good","bad","best","worst",
+  "post","posts","read","more","link","bio","follow","share","like","tweet","tweets",
+  "say","says","said","saying","tell","tells","told",
+  "thing","things","stuff","kind","kinds","sort","sorts","way","ways","time","times","today","tomorrow","yesterday",
+]);
+
+const PROSE_CTA_OR_LINK_RE = [
+  /https?:\/\//i,
+  /\bread more\b/i,
+  /\blearn more\b/i,
+  /\blink in bio\b/i,
+  /\bclick here\b/i,
+  /\bwe broke this down\b/i,
+  /\bfull (?:article|guide|breakdown|story)\b/i,
+  /\bsource[s]?:/i,
+  /^source:/i,
+];
+
+const PROSE_IMPERATIVE_STARTERS = new Set([
+  "don't","do","never","always","avoid","use","check","verify","enable","install","update",
+  "stop","start","remember","try","consider","watch","beware","stay","keep","make","take",
+  "give","send","ask","share","report","set","turn","click","tap","open","close",
+  "save","delete","add","remove","create","build","find","look","listen","let","let's",
+  "follow","subscribe","join","visit","read","learn","see","go","talk","speak","call",
+  "if","when","before","after","while","unless","whenever",
+  "here","here's",
+  "tip","tips","reminder","note","warning","alert",
+]);
+
+function splitSentences(text: string): string[] {
+  // Strip URLs first so they don't end up as nonsense "sentences".
+  const noUrls = text.replace(/https?:\/\/\S+/g, " ");
+  return noUrls
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
+function isAssertiveProse(sentence: string): boolean {
+  if (sentence.length < 25) return false;
+  if (sentence.endsWith("?")) return false;
+  for (const re of PROSE_CTA_OR_LINK_RE) if (re.test(sentence)) return false;
+  const firstToken = sentence.toLowerCase().split(/\s+/)[0]?.replace(/[^a-z']/g, "");
+  if (firstToken && PROSE_IMPERATIVE_STARTERS.has(firstToken)) return false;
+  return true;
+}
+
+function proseKeywords(sentence: string): string[] {
+  return sentence
+    .toLowerCase()
+    .replace(/[^a-z0-9\s']/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length >= 4 && !PROSE_STOPWORDS.has(w));
+}
+
+function checkProseGrounding(content: string, corpus: string): AuditFailure[] {
+  const failures: AuditFailure[] = [];
+  if (!corpus || corpus.length < 50) return failures;
+  const corpusLower = corpus.toLowerCase();
+  const corpusFlat = corpusLower.replace(/[^a-z0-9]+/g, "");
+
+  const seen = new Set<string>();
+  for (const sentence of splitSentences(content)) {
+    if (!isAssertiveProse(sentence)) continue;
+    const keywords = proseKeywords(sentence);
+    if (keywords.length < 5) continue;
+
+    let supported = 0;
+    for (const k of keywords) {
+      // 4-char prefix stem catches morphological variants
+      // (scammers↔scam, victims↔victim, averaged↔average).
+      const stem = k.length >= 5 ? k.slice(0, 4) : k;
+      if (stem.length >= 4 && corpusLower.includes(stem)) { supported++; continue; }
+      // For numeric tokens, check the punctuation-stripped corpus too so
+      // "2,400" in source supports a bare "2400" token in post.
+      if (/\d/.test(k) && corpusFlat.includes(k)) { supported++; continue; }
+    }
+    const ratio = supported / keywords.length;
+    if (supported < 2 || ratio < 0.3) {
+      const display = sentence.length > 140 ? sentence.slice(0, 137) + "..." : sentence;
+      const key = display.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      failures.push({
+        claim: display,
+        kind: "phrase",
+        reason: `Plain-prose claim lacks source support (${supported}/${keywords.length} content keywords found in source bundle): "${sentence.slice(0, 120)}"`,
+      });
+    }
+  }
+  return failures;
+}
+
 export function auditPostContent(content: string, bundle: SourceBundle): ClaimAuditResult {
   const failures: AuditFailure[] = [];
   const matched: string[] = [];
@@ -214,6 +339,13 @@ export function auditPostContent(content: string, bundle: SourceBundle): ClaimAu
     }
   }
 
+  // Plain-prose grounding gate. Runs after the token-based extractors so that
+  // every persisted failure already carries a kind + claim snippet, and the
+  // final verdict reflects every layer.
+  for (const f of checkProseGrounding(content, bundle.contextForLLM)) {
+    failures.push(f);
+  }
+
   return {
     verdict: failures.length === 0 ? "pass" : "fail",
     extracted,
@@ -223,7 +355,7 @@ export function auditPostContent(content: string, bundle: SourceBundle): ClaimAu
 }
 
 // Re-export normalize helper for callers wanting to test source coverage themselves.
-export const _internals = { normalize, corpusContains, extractClaims };
+export const _internals = { normalize, corpusContains, extractClaims, checkProseGrounding };
 
 /**
  * Pure helper used by persistAuditedPost (server/socialDistributionService.ts)
