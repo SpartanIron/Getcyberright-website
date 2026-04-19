@@ -54,20 +54,20 @@ const cards: SafetyCard[] = [
     accent: "from-amber-500/10 to-orange-500/10",
   },
   {
-    id: "card-marketplace-scam",
-    category: "scam-alerts",
-    title: "Marketplace red flags",
-    body: "Out-of-app payment links, shipping-only deals, and prices well below market are classic scam patterns.",
-    icon: AlertTriangle,
-    accent: "from-yellow-500/10 to-amber-500/10",
-  },
-  {
     id: "card-business-email",
     category: "scam-alerts",
     title: "Small business: verify wire requests",
     body: "Spoofed CEO emails asking for urgent wires hit small businesses every day. Confirm by phone on a known number before sending.",
     icon: Briefcase,
     accent: "from-slate-500/10 to-zinc-500/10",
+  },
+  {
+    id: "card-campaign-protect-parents",
+    category: "awareness-campaigns",
+    title: "Protect a parent or grandparent today",
+    body: "Send them one safety card from this page. One tip, sent today, is worth more than a hundred tips they never read.",
+    icon: Users,
+    accent: "from-pink-500/10 to-rose-500/10",
   },
   // Quick Tips
   {
@@ -95,22 +95,6 @@ const cards: SafetyCard[] = [
     accent: "from-violet-500/10 to-purple-500/10",
   },
   {
-    id: "card-pause-before-paying",
-    category: "quick-tips",
-    title: "Pause before you pay",
-    body: "If a message creates urgency about money, stop. Verify on a phone number you already trust, not the one in the message.",
-    icon: CreditCard,
-    accent: "from-rose-500/10 to-amber-500/10",
-  },
-  {
-    id: "card-app-permissions",
-    category: "quick-tips",
-    title: "Audit your app permissions",
-    body: "Most apps do not need your contacts, microphone, or location. Review and revoke what looks excessive.",
-    icon: Smartphone,
-    accent: "from-indigo-500/10 to-blue-500/10",
-  },
-  {
     id: "card-data-brokers",
     category: "quick-tips",
     title: "Get yourself off data broker sites",
@@ -118,31 +102,7 @@ const cards: SafetyCard[] = [
     icon: Database,
     accent: "from-cyan-500/10 to-teal-500/10",
   },
-  {
-    id: "card-public-wifi",
-    category: "quick-tips",
-    title: "Public Wi-Fi without a VPN? Skip the bank app",
-    body: "On open networks, save sensitive logins for mobile data or a trusted connection.",
-    icon: Globe,
-    accent: "from-cyan-500/10 to-sky-500/10",
-  },
   // Safety Stats
-  {
-    id: "card-stat-phishing",
-    category: "safety-stats",
-    title: "Over 90% of breaches start with phishing",
-    body: "One careful pause before clicking is the single highest-impact habit your family can build this year.",
-    icon: BarChart3,
-    accent: "from-blue-500/10 to-indigo-500/10",
-  },
-  {
-    id: "card-stat-seniors",
-    category: "safety-stats",
-    title: "Seniors lose more per scam than any other age group",
-    body: "Talk to the older adults in your life about romance, grandparent, and tech support scams. A two-minute chat saves thousands.",
-    icon: BarChart3,
-    accent: "from-purple-500/10 to-violet-500/10",
-  },
   {
     id: "card-stat-mfa",
     category: "safety-stats",
@@ -159,22 +119,6 @@ const cards: SafetyCard[] = [
     body: "Pick one dinner. Cover safe-words, money asks, and what to do if a stranger messages your kids. Print our checklist to guide it.",
     icon: Megaphone,
     accent: "from-teal-500/10 to-emerald-500/10",
-  },
-  {
-    id: "card-campaign-protect-parents",
-    category: "awareness-campaigns",
-    title: "Protect a parent or grandparent today",
-    body: "Send them one safety card from this page. One tip, sent today, is worth more than a hundred tips they never read.",
-    icon: Users,
-    accent: "from-pink-500/10 to-rose-500/10",
-  },
-  {
-    id: "card-campaign-share",
-    category: "awareness-campaigns",
-    title: "Spot a scam? Tell five people",
-    body: "Scammers reuse the same playbook on neighborhoods, schools, and workplaces. Sharing once can stop the next victim.",
-    icon: Share2,
-    accent: "from-amber-500/10 to-yellow-500/10",
   },
 ];
 
