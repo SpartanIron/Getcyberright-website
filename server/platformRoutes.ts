@@ -1056,6 +1056,50 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  // ─── Signed one-click approve/reject from admin notification email ──────
+  // Token is HMAC-signed with SESSION_SECRET, scoped to a single post + action,
+  // and expires after 24h. The endpoint is intentionally unauthenticated because
+  // possession of a valid token from the admin inbox is the auth factor.
+  app.get("/api/social-posts/review-action", async (req: Request, res: Response) => {
+    const token = (req.query.token as string | undefined) || "";
+    const renderPage = (title: string, message: string, statusOk: boolean, detail?: string) => {
+      const accent = statusOk ? "#0d9488" : "#dc2626";
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#f1f5f9; padding:48px 16px;">
+  <div style="max-width:520px; margin:0 auto; background:#fff; border-radius:12px; padding:32px; box-shadow:0 4px 12px rgba(15,23,42,0.08);">
+    <div style="height:6px; width:60px; background:${accent}; border-radius:999px; margin-bottom:18px;"></div>
+    <h1 style="margin:0 0 12px; color:#0f172a; font-size:22px;">${escapeHtml(title)}</h1>
+    <p style="margin:0 0 8px; color:#334155; font-size:15px;">${escapeHtml(message)}</p>
+    ${detail ? `<p style="margin:8px 0 0; color:#64748b; font-size:13px;">${escapeHtml(detail)}</p>` : ""}
+  </div>
+</body></html>`;
+    };
+
+    if (!token) {
+      return res.status(400).type("html").send(renderPage("Invalid link", "Missing action token.", false));
+    }
+
+    const { verifyReviewActionToken, executeReviewAction } = await import("./socialReviewNotifier");
+    const verified = verifyReviewActionToken(token);
+    if (!verified) {
+      return res
+        .status(400)
+        .type("html")
+        .send(renderPage("Invalid or expired link", "This approval link is invalid or has expired.", false));
+    }
+
+    const result = await executeReviewAction(verified.postId, verified.action);
+    const title = result.ok
+      ? verified.action === "approve"
+        ? "Post approved"
+        : "Post rejected"
+      : "Action could not be completed";
+    return res
+      .status(result.status)
+      .type("html")
+      .send(renderPage(title, result.message, result.ok, result.detail));
+  });
+
   app.get("/api/admin/social-posts/audit-log", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
