@@ -16,7 +16,7 @@ export const metadata: Metadata = {
       "Cybersecurity teaching resources for educators. Access lesson plans, classroom activities, printable guides, and curriculum materials.",
     url: `${BASE_URL}/educators`,
     type: "website",
-    images: [{ url: `${BASE_URL}/og/educators.png`, width: 1200, height: 630, alt: "Free K-12 cybersecurity curriculum and lesson plans for educators" }],
+    images: [{ url: `${BASE_URL}/og/education.png`, width: 1200, height: 630, alt: "Free K-12 cybersecurity curriculum and lesson plans for educators" }],
   },
 };
 
