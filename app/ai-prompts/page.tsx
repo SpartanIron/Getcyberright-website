@@ -7,13 +7,13 @@ const BASE_URL = "https://www.getcyberright.com";
 const API_BASE = `http://localhost:${process.env.PORT || 5000}`;
 
 export const metadata: Metadata = {
-  title: "406+ AI Cybersecurity Prompts | GetCyberRight",
+  title: "AI Cybersecurity Prompts | GetCyberRight",
   description:
-    "Browse 406+ expertly crafted AI prompts for cybersecurity. Use with ChatGPT, Claude, and other AI tools to analyze threats and protect your digital life.",
+    "Expertly crafted AI prompts for cybersecurity. Use with ChatGPT, Claude, and other AI tools to analyze threats and protect your digital life.",
   alternates: { canonical: `${BASE_URL}/ai-prompts` },
   openGraph: {
-    title: "406+ AI Cybersecurity Prompts | GetCyberRight",
-    description: "Browse 406+ expertly crafted AI prompts for cybersecurity. Use with ChatGPT, Claude, and other AI tools to analyze threats and protect your digital life.",
+    title: "AI Cybersecurity Prompts | GetCyberRight",
+    description: "Expertly crafted AI prompts for cybersecurity. Use with ChatGPT, Claude, and other AI tools to analyze threats and protect your digital life.",
     url: `${BASE_URL}/ai-prompts`,
     type: "website",
     images: [{ url: `${BASE_URL}/og/training.png`, width: 1080, height: 1080, alt: "AI Cybersecurity Prompts" }],
@@ -22,19 +22,21 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-async function fetchPrompts(): Promise<DbPrompt[]> {
+async function fetchPrompts(): Promise<{ prompts: DbPrompt[]; usingFallback: boolean }> {
   try {
     const res = await fetch(`${API_BASE}/api/prompts`, { cache: "no-store" });
-    if (!res.ok) return FALLBACK_PROMPTS;
+    if (!res.ok) return { prompts: FALLBACK_PROMPTS, usingFallback: true };
     const data = (await res.json()) as DbPrompt[];
-    if (!Array.isArray(data) || data.length === 0) return FALLBACK_PROMPTS;
-    return data;
+    if (!Array.isArray(data) || data.length === 0) {
+      return { prompts: FALLBACK_PROMPTS, usingFallback: true };
+    }
+    return { prompts: data, usingFallback: false };
   } catch {
-    return FALLBACK_PROMPTS;
+    return { prompts: FALLBACK_PROMPTS, usingFallback: true };
   }
 }
 
 export default async function AIPromptsPage() {
-  const initialPrompts = await fetchPrompts();
-  return <PageContent initialPrompts={initialPrompts} />;
+  const { prompts, usingFallback } = await fetchPrompts();
+  return <PageContent initialPrompts={prompts} usingFallback={usingFallback} />;
 }

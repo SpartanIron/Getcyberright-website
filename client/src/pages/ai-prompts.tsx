@@ -230,7 +230,7 @@ function PromptCard({ prompt: p }: { prompt: Prompt }) {
   );
 }
 
-export default function AIPrompts({ initialPrompts }: { initialPrompts?: DbPrompt[] } = {}) {
+export default function AIPrompts({ initialPrompts, usingFallback = false }: { initialPrompts?: DbPrompt[]; usingFallback?: boolean } = {}) {
   const [selectedAudience, setSelectedAudience] = useState<Audience>("all");
   const [selectedCategory, setSelectedCategory] = useState<Category>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -286,8 +286,13 @@ export default function AIPrompts({ initialPrompts }: { initialPrompts?: DbPromp
           <div className="max-w-3xl mx-auto text-center mb-12">
             <Badge variant="outline" className="mb-4" data-testid="badge-prompt-count">
               <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-              {prompts.length} Prompts
+              {prompts.length} {prompts.length === 1 ? "Prompt" : "Prompts"}
             </Badge>
+            {usingFallback && (
+              <p className="text-xs text-muted-foreground mb-4" data-testid="text-fallback-notice">
+                Showing curated essentials. The full library will return shortly.
+              </p>
+            )}
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4" data-testid="heading-prompt-library">
               AI Made Simple
             </h2>
