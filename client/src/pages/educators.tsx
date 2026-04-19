@@ -576,6 +576,11 @@ export default function Educators() {
                             "Reflect (10 min): Each student writes one promise they'll keep online this week and posts it on a class chart."
                           ],
                           assessment: "Exit ticket: 'Name one thing a good digital citizen does and one thing they avoid'.",
+                          discussion: [
+                            "What does it feel like to read an unkind comment online? How is that different from hearing it in person?",
+                            "If a friend posts something embarrassing about another student, what is a kind way to respond?",
+                            "Why is it important to ask permission before sharing a photo or video of someone else?"
+                          ],
                           standard: "ISTE Standards for Students 2: Digital Citizen"
                         },
                         {
@@ -594,6 +599,11 @@ export default function Educators() {
                             "Reflect (10 min): Class discussion: which of your real accounts most need MFA tonight, and why?"
                           ],
                           assessment: "Short response: 'Explain why a 14-character passphrase made of common words is stronger than P@ssw0rd!'",
+                          discussion: [
+                            "If a website you use is breached, what is the first account you would change a password on, and why?",
+                            "Why might someone reuse passwords even though they know it's risky? What would make MFA easier to adopt?",
+                            "Which is more important to protect: your email account or your social media account? Defend your choice."
+                          ],
                           standard: "ISTE Standards for Students 2: Digital Citizen"
                         },
                         {
@@ -612,6 +622,11 @@ export default function Educators() {
                             "Reflect (10 min): Each student writes the rule they'll teach a family member tonight."
                           ],
                           assessment: "Performance task: students score a fourth example on the checklist and justify their rating in 3 sentences.",
+                          discussion: [
+                            "How does AI-generated text and imagery change the way you evaluate whether a message or article is real?",
+                            "Have you ever almost fallen for a phishing message? What red flag did you eventually notice?",
+                            "Whose responsibility is it to slow the spread of misinformation: platforms, governments, or individuals? Defend your view."
+                          ],
                           standard: "ISTE Standards for Students 2: Digital Citizen"
                         }
                       ].map((l) => (
@@ -648,6 +663,12 @@ export default function Educators() {
                             <div>
                               <p className="font-semibold text-foreground mb-1">Assessment</p>
                               <p className="text-muted-foreground">{l.assessment}</p>
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground mb-1">Discussion Questions</p>
+                              <ul className="space-y-1 text-muted-foreground list-disc list-inside marker:text-primary" data-testid={`list-discussion-${l.id}`}>
+                                {l.discussion.map((q, i) => <li key={i}>{q}</li>)}
+                              </ul>
                             </div>
                             <div className="pt-2 border-t border-border">
                               <p className="text-xs text-primary font-medium">Aligned to: {l.standard}</p>

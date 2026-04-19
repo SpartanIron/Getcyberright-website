@@ -770,28 +770,32 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
                       tag: "Free",
                       best: "Android households and any Google account for kids under 13",
                       desc: "Set screen time limits, approve app downloads, see what apps your child uses, and lock the device remotely. Works on Android phones and Chromebooks. Limited support on iPhone.",
-                      url: "https://families.google.com/familylink/"
+                      setupTime: "About 15 minutes",
+                      url: "https://support.google.com/families/answer/7101025"
                     },
                     {
                       name: "Apple Screen Time",
                       tag: "Built in, free",
                       best: "iPhone and iPad families using Family Sharing",
                       desc: "Built into iOS. Set Downtime, App Limits, and Communication Limits per child. Approve purchases and downloads from your phone. Use Screen Distance and Communication Safety to flag inappropriate images.",
-                      url: "https://support.apple.com/en-us/HT208982"
+                      setupTime: "About 10 minutes",
+                      url: "https://support.apple.com/en-us/HT201304"
                     },
                     {
                       name: "Circle Home Plus",
                       tag: "$9.99/mo or $129/yr",
                       best: "Households with mixed devices and gaming consoles",
                       desc: "A small box that plugs into your router and applies time limits, content filters, and bedtime pauses to every device on your Wi-Fi, including smart TVs and game consoles. Works without installing apps on each device.",
-                      url: "https://meetcircle.com/"
+                      setupTime: "About 30 minutes (hardware setup)",
+                      url: "https://meetcircle.com/pages/circle-home-plus-setup"
                     },
                     {
                       name: "NextDNS",
                       tag: "Free up to 300k queries/mo",
                       best: "Tech-comfortable parents who want a network-level filter",
                       desc: "A configurable DNS service that blocks adult sites, malware, trackers, and specific apps for everyone on your network. Set it up on your router or per device. Includes detailed logs so you can see what was blocked.",
-                      url: "https://nextdns.io/"
+                      setupTime: "About 20 minutes",
+                      url: "https://nextdns.io/help"
                     }
                   ].map((t) => (
                     <Card key={t.name} className="border-2 hover:shadow-md transition-shadow" data-testid={`tool-card-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
@@ -802,6 +806,9 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
                         </div>
                         <p className="text-xs text-primary font-medium mb-2">Best for: {t.best}</p>
                         <p className="text-sm text-muted-foreground leading-relaxed mb-3">{t.desc}</p>
+                        <p className="text-xs text-muted-foreground mb-3" data-testid={`text-setup-time-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
+                          <span className="font-medium text-foreground">Setup time:</span> {t.setupTime}
+                        </p>
                         <a
                           href={t.url}
                           target="_blank"
@@ -809,7 +816,7 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
                           className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                           data-testid={`link-tool-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}
                         >
-                          Visit official site <ArrowRight className="w-3.5 h-3.5" />
+                          Open setup guide <ArrowRight className="w-3.5 h-3.5" />
                         </a>
                       </CardContent>
                     </Card>

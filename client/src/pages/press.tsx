@@ -9,15 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Mail, Newspaper, Download, Quote, BarChart3, Image as ImageIcon, ExternalLink, Building } from "lucide-react";
 import { Link } from "@/lib/navigation";
 import { MediaInquiryForm } from "@/components/media-inquiry-form";
-
-const SITE_STATS = {
-  countriesTracked: 47,
-  trustedSources: 54,
-  scamTypes: 52,
-  databrokers: 4000,
-  aiPrompts: 406,
-  safetyGuides: 125,
-} as const;
+import { SITE_STATS } from "../../../app/lib/site-stats";
 
 const PRESS_EMAIL = "press@getcyberright.com";
 

@@ -309,6 +309,9 @@ export default function ScamIntelligenceMethodology() {
             <AlertTriangle className="w-5 h-5 text-primary" />
             Limitations
           </h2>
+          <p className="text-sm text-foreground font-semibold mb-3" data-testid="text-no-tool-100-percent">
+            No automated tool is 100% reliable. Always combine these signals with your own judgment, and when in doubt, contact the company through a channel you already trust.
+          </p>
           <ul className="space-y-2 text-sm text-muted-foreground list-disc pl-5">
             <li>Reported incident volumes are <em>reported</em> incidents, not <em>actual</em> incidents. Underreporting varies by country and by scam type.</li>
             <li>Reporting authorities use different definitions of fraud, scam, and cybercrime. We have normalized to the closest equivalent of "consumer-facing scam"; figures are not strictly comparable across jurisdictions.</li>
