@@ -1528,9 +1528,10 @@ async function resolvePostImage(
   articleUrl?: string | null,
   category?: string | null,
   postDepth: PostDepth = "wire"
-): Promise<{ mainImage: string | null; igImage: string | null; imageSource: "source" | "og" | "stock" | "ai" | "branded" }> {
+): Promise<{ mainImage: string | null; igImage: string | null; imageSource: import("./socialImageSource").ImageSource }> {
 
   const useAuthenticPhoto = postDepth === "insight" || postDepth === "deep_value";
+  const { normalizeImageSource } = await import("./socialImageSource");
 
   const tryBrandOverlay = async (imgPath: string, source: "source" | "og" | "stock" | "ai"): Promise<{ mainImage: string | null; igImage: string | null; imageSource: typeof source } | null> => {
     const mainPath = await applyBrandOverlay(imgPath, imageHeadline, imageSubtext, templateStyle, 1200, 630);
@@ -1558,12 +1559,15 @@ async function resolvePostImage(
       const result = await processImage(downloaded, "source");
       if (result) {
         console.log(`[TrendEngine] Using source article image${useAuthenticPhoto ? " (authentic)" : " with brand overlay"}`);
-        return result;
+        return { ...result, imageSource: normalizeImageSource("source_artifact") };
       }
     }
     console.warn(`[TrendEngine] Source image processing failed`);
   }
 
+  // Tier 1b (source_artifact): og:image from the source article. Both this
+  // and the direct sourceImageUrl above are classified as source_artifact, so
+  // they must be tried before the data_chart tier.
   if (articleUrl) {
     const ogImageUrl = await fetchOgImageFromArticle(articleUrl);
     if (ogImageUrl) {
@@ -1572,11 +1576,32 @@ async function resolvePostImage(
         const result = await processImage(downloaded, "og");
         if (result) {
           console.log(`[TrendEngine] Using og:image from article${useAuthenticPhoto ? " (authentic)" : " with brand overlay"}`);
-          return result;
+          return { ...result, imageSource: normalizeImageSource("source_artifact") };
         }
       }
     }
     console.warn(`[TrendEngine] og:image not available`);
+  }
+
+  // Tier 2 (data_chart): server-rendered chart from real GCR data. Only fires
+  // when the post topic is a quantifiable scam-intel trend AND the aggregator
+  // has live data. Otherwise null and we fall through to licensed_photo.
+  try {
+    const { selectEvidenceChartForPost } = await import("./evidenceChartSelector");
+    const { renderEvidenceChart } = await import("./evidenceChartRenderer");
+    const spec = selectEvidenceChartForPost({ category: category || null, title, contentType: "trend" });
+    if (spec) {
+      const chartPath = await renderEvidenceChart(spec);
+      if (chartPath) {
+        const url = getPublicImageUrl(chartPath);
+        if (url) {
+          console.log(`[TrendEngine] Using evidence data chart (${spec.kind}): ${url}`);
+          return { mainImage: url, igImage: url, imageSource: normalizeImageSource("data_chart") };
+        }
+      }
+    }
+  } catch (err: any) {
+    console.warn(`[TrendEngine] Evidence chart pipeline error: ${err?.message || err}`);
   }
 
   const stockPhoto = await searchStockPhoto(category || "default", title, { platform: "instagram" });
@@ -1586,7 +1611,7 @@ async function resolvePostImage(
       const result = await processImage(imgPath, "stock");
       if (result) {
         console.log(`[TrendEngine] Using stock photo by ${stockPhoto.photographer}${useAuthenticPhoto ? " (authentic)" : " with brand overlay"}`);
-        return result;
+        return { ...result, imageSource: normalizeImageSource("licensed_photo") };
       }
     }
     console.warn(`[TrendEngine] Stock photo processing failed`);
@@ -1597,8 +1622,8 @@ async function resolvePostImage(
     if (aiImage) {
       const result = await processImage(aiImage, "ai");
       if (result) {
-        console.log(`[TrendEngine] Using AI-generated image${useAuthenticPhoto ? " (authentic)" : " with brand overlay"}`);
-        return result;
+        console.warn(`[TrendEngine] AI_FALLBACK_USED depth=${postDepth} title="${title.slice(0, 80)}"`);
+        return { ...result, imageSource: normalizeImageSource("illustration_ai") };
       }
     }
     console.warn(`[TrendEngine] AI image generation failed, falling back to branded card...`);
@@ -1613,7 +1638,7 @@ async function resolvePostImage(
     console.log(`[TrendEngine] No authentic photo found for ${postDepth} post, falling back to branded card`);
   }
 
-  return { mainImage, igImage, imageSource: "branded" };
+  return { mainImage, igImage, imageSource: normalizeImageSource("branded_card") };
 }
 
 

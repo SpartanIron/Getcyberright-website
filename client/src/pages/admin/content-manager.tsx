@@ -448,7 +448,47 @@ function SocialPostCard({ post, onPublish, isPublishing }: { post: any; onPublis
                   >
                     {post.auditVerdict}
                   </Badge>
-                  {post.imageSource && <span className="text-muted-foreground">img: {post.imageSource}</span>}
+                  {post.imageSource && (() => {
+                    const labels: Record<string, string> = {
+                      source_artifact: "Source artifact",
+                      data_chart: "Data chart",
+                      licensed_photo: "Licensed photo",
+                      branded_card: "Branded card",
+                      illustration_ai: "AI illustration",
+                      stock_or_branded: "Branded card",
+                      branded: "Branded card",
+                      stock: "Licensed photo",
+                      source: "Source artifact",
+                      og: "Source artifact",
+                      ai: "AI illustration",
+                    };
+                    const tone: Record<string, string> = {
+                      source_artifact: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+                      data_chart: "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
+                      licensed_photo: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+                      branded_card: "bg-slate-100 text-slate-800 dark:bg-slate-800/50 dark:text-slate-200",
+                      illustration_ai: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
+                    };
+                    const legacyToTyped: Record<string, string> = {
+                      stock_or_branded: "branded_card",
+                      branded: "branded_card",
+                      stock: "licensed_photo",
+                      source: "source_artifact",
+                      og: "source_artifact",
+                      ai: "illustration_ai",
+                    };
+                    const typedKey = legacyToTyped[post.imageSource] || post.imageSource;
+                    const cls = tone[typedKey] || tone.branded_card;
+                    return (
+                      <Badge
+                        variant="outline"
+                        className={`text-[10px] ${cls}`}
+                        data-testid={`badge-image-source-${post.id}`}
+                      >
+                        img: {labels[post.imageSource] || post.imageSource}
+                      </Badge>
+                    );
+                  })()}
                 </div>
               )}
               {post.auditFailures && post.auditFailures.length > 0 && (

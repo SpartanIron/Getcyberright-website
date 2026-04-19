@@ -8,6 +8,7 @@ import { tagAllGcrLinks, tagSingleUrl, buildCampaignId, ensureGcrLink } from "./
 import { buildPartnerContext } from "./socialEngagementService";
 import { enforceAndSanitize, sanitizeContent, validatePostContent } from "./socialPostPolicy";
 import { searchStockPhoto, downloadSourceImage, applyBrandOverlay } from "./stockPhotoService";
+import type { ImageSource } from "./socialImageSource";
 import type { TemplateStyle } from "./stockPhotoService";
 import { buildGuideBundle, buildAlertBundle, buildScamBundle, isBundleSubstantive, type SourceBundle } from "./socialSourceBundle";
 import { auditPostContent, type ClaimAuditResult } from "./socialClaimAuditor";
@@ -58,7 +59,7 @@ async function persistAuditedPost(args: {
   build: AuditedPostBuild;
   hashtags: string[];
   imagePath: string | null;
-  imageSource: string | null;
+  imageSource: ImageSource | null;
   utmCampaign: string;
 }): Promise<string | null> {
   const { bundle, contentType, build, hashtags, imagePath, imageSource, utmCampaign } = args;
@@ -514,7 +515,7 @@ export async function distributeGuideContent(guide: CyberSafetyGuide): Promise<s
       build: { platform, content, audit },
       hashtags: posts.hashtags,
       imagePath,
-      imageSource: imagePath ? "stock_or_branded" : null,
+      imageSource: imagePath ? "branded_card" : null,
       utmCampaign: campaignId,
     });
     if (id) createdIds.push(id);
@@ -576,7 +577,7 @@ export async function distributeThreatAlertContent(alert: CyberThreatAlert): Pro
       build: { platform, content, audit },
       hashtags: posts.hashtags,
       imagePath,
-      imageSource: imagePath ? "stock_or_branded" : null,
+      imageSource: imagePath ? "branded_card" : null,
       utmCampaign: alertCampaignId,
     });
     if (id) createdIds.push(id);
@@ -638,7 +639,7 @@ export async function distributeScamIntelContent(scam: ScamIntelligence): Promis
       build: { platform, content, audit },
       hashtags: posts.hashtags,
       imagePath,
-      imageSource: imagePath ? "stock_or_branded" : null,
+      imageSource: imagePath ? "branded_card" : null,
       utmCampaign: scamCampaignId,
     });
     if (id) createdIds.push(id);
