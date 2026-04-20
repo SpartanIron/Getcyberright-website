@@ -10,7 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
+import {
+ Select,
+ SelectContent,
+ SelectItem,
+ SelectTrigger,
+ SelectValue,
+} from "@/components/ui/select";
 import {
  User,
  Lock,
@@ -57,6 +63,7 @@ export default function Account() {
  const [lastName, setLastName] = useState("");
 
  const [notifyReviewQueueEmail, setNotifyReviewQueueEmail] = useState(true);
+ const [reviewQueueNotifyMode, setReviewQueueNotifyMode] = useState<"all" | "urgent" | "mute">("all");
 
  const [currentPassword, setCurrentPassword] = useState("");
  const [newPassword, setNewPassword] = useState("");
@@ -68,11 +75,17 @@ export default function Account() {
  setFirstName(user.firstName || "");
  setLastName(user.lastName || "");
  setNotifyReviewQueueEmail(user.notifyReviewQueueEmail !== false);
+ const incomingMode = user.reviewQueueNotifyMode;
+ if (incomingMode === "all" || incomingMode === "urgent" || incomingMode === "mute") {
+ setReviewQueueNotifyMode(incomingMode);
+ } else {
+ setReviewQueueNotifyMode(user.notifyReviewQueueEmail === false ? "mute" : "all");
+ }
  }
  }, [user]);
 
  const notifyPrefMutation = useMutation({
- mutationFn: async (data: { notifyReviewQueueEmail: boolean }) => {
+ mutationFn: async (data: { notifyReviewQueueEmail?: boolean; reviewQueueNotifyMode?: "all" | "urgent" | "mute" }) => {
  const res = await apiRequest("PATCH", "/api/auth/notification-prefs", data);
  return res.json();
  },
@@ -85,9 +98,10 @@ export default function Account() {
  },
  });
 
- const handleNotifyToggle = (value: boolean) => {
- setNotifyReviewQueueEmail(value);
- notifyPrefMutation.mutate({ notifyReviewQueueEmail: value });
+ const handleNotifyModeChange = (value: "all" | "urgent" | "mute") => {
+ setReviewQueueNotifyMode(value);
+ setNotifyReviewQueueEmail(value !== "mute");
+ notifyPrefMutation.mutate({ reviewQueueNotifyMode: value });
  };
 
  const profileMutation = useMutation({
@@ -340,7 +354,8 @@ export default function Account() {
  <div className="flex-1">
  <h3 className="text-sm font-semibold text-foreground">Reactive post review queue</h3>
  <p className="text-xs text-muted-foreground mt-1">
- Get the digest email when reactive social posts enter the 60-minute review window.
+ Choose how often reactive social posts page you. "Only urgent" notifies you only when the
+ 60-minute review window is within 15 minutes of expiring.
  </p>
  <p className="text-xs text-muted-foreground mt-1">
  Site-wide Slack and webhook destinations can be configured under{" "}
@@ -349,12 +364,20 @@ export default function Account() {
  </Link>.
  </p>
  </div>
- <Switch
- checked={notifyReviewQueueEmail}
- onCheckedChange={handleNotifyToggle}
+ <Select
+ value={reviewQueueNotifyMode}
+ onValueChange={(v) => handleNotifyModeChange(v as "all" | "urgent" | "mute")}
  disabled={notifyPrefMutation.isPending}
- data-testid="switch-notify-review-queue"
- />
+ >
+ <SelectTrigger className="w-[180px]" data-testid="select-notify-review-queue-mode">
+ <SelectValue placeholder="Select mode" />
+ </SelectTrigger>
+ <SelectContent>
+ <SelectItem value="all" data-testid="option-notify-all">All review posts</SelectItem>
+ <SelectItem value="urgent" data-testid="option-notify-urgent">Only urgent (near expiry)</SelectItem>
+ <SelectItem value="mute" data-testid="option-notify-mute">Mute</SelectItem>
+ </SelectContent>
+ </Select>
  </div>
  </CardContent>
  </Card>

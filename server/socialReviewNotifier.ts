@@ -3,6 +3,11 @@ import { db } from "./db";
 import { and, eq, gt, inArray, isNull } from "drizzle-orm";
 import { socialPosts, users, adminNotificationSettings } from "@shared/schema";
 import type { SocialPost } from "@shared/schema";
+import {
+  URGENT_REVIEW_WINDOW_MS,
+  normalizeReviewQueueNotifyMode,
+  type ReviewQueueNotifyMode,
+} from "@shared/models/auth";
 import { storage } from "./storage";
 import { sendEmail, isEmailConfigured } from "./email-service";
 import { logger } from "./logger";
@@ -62,8 +67,13 @@ export function verifyReviewActionToken(token: string): VerifiedReviewAction | n
   }
 }
 
-async function getAdminRecipients(): Promise<string[]> {
-  const recipients = new Set<string>();
+interface AdminRecipient {
+  email: string;
+  mode: ReviewQueueNotifyMode;
+}
+
+async function getAdminRecipients(): Promise<AdminRecipient[]> {
+  const byEmail = new Map<string, AdminRecipient>();
   try {
     const rows = await db
       .select({
@@ -71,21 +81,43 @@ async function getAdminRecipients(): Promise<string[]> {
         isAdmin: users.isAdmin,
         role: users.role,
         notifyReviewQueueEmail: users.notifyReviewQueueEmail,
+        reviewQueueNotifyMode: users.reviewQueueNotifyMode,
       })
       .from(users);
     for (const r of rows) {
       if (!r.email) continue;
       if (!(r.isAdmin || r.role === "admin" || r.role === "super_admin")) continue;
-      // Per-admin opt-out: skip if explicitly disabled
-      if (r.notifyReviewQueueEmail === false) continue;
-      recipients.add(r.email.toLowerCase());
+      // Honor legacy boolean opt-out as "mute"
+      const legacyMute = r.notifyReviewQueueEmail === false;
+      const mode = legacyMute ? "mute" : normalizeReviewQueueNotifyMode(r.reviewQueueNotifyMode);
+      if (mode === "mute") continue;
+      byEmail.set(r.email.toLowerCase(), { email: r.email.toLowerCase(), mode });
     }
   } catch (err: any) {
     log.error("Failed to load admin users", { error: err?.message });
   }
   const fallback = process.env.ADMIN_NOTIFY_EMAIL || process.env.ADMIN_EMAIL;
-  if (fallback) recipients.add(fallback.toLowerCase());
-  return Array.from(recipients);
+  if (fallback) {
+    const key = fallback.toLowerCase();
+    if (!byEmail.has(key)) byEmail.set(key, { email: key, mode: "all" });
+  }
+  return Array.from(byEmail.values());
+}
+
+function isUrgentPost(post: SocialPost, now: Date): boolean {
+  if (!post.reviewExpiresAt) return false;
+  const expires = new Date(post.reviewExpiresAt).getTime();
+  return expires - now.getTime() <= URGENT_REVIEW_WINDOW_MS;
+}
+
+function postsForRecipient(
+  posts: SocialPost[],
+  mode: ReviewQueueNotifyMode,
+  now: Date,
+): SocialPost[] {
+  if (mode === "mute") return [];
+  if (mode === "urgent") return posts.filter((p) => isUrgentPost(p, now));
+  return posts;
 }
 
 interface AdminWebhookDestinations {
@@ -302,26 +334,44 @@ export async function notifyPendingReviewQueue(): Promise<{ notified: number; re
     return { notified: 0, recipients: 0 };
   }
 
-  let emailOk = recipients.length === 0; // treat as success if no email recipients
-  if (recipients.length > 0) {
-    const { subject, htmlBody, textBody } = buildDigestEmail(fresh);
-    emailOk = await sendEmail({ to: recipients, subject, htmlBody, textBody });
-    if (!emailOk) {
-      log.error("Email provider rejected review digest", { posts: fresh.length });
+  // Group recipients by which posts they should see (so urgent-only admins
+  // don't get the full digest).
+  const groups = new Map<string, { posts: SocialPost[]; emails: string[] }>();
+  for (const r of recipients) {
+    const visiblePosts = postsForRecipient(fresh, r.mode, now);
+    if (visiblePosts.length === 0) continue;
+    const key = visiblePosts.map((p) => p.id).sort().join("|");
+    const bucket = groups.get(key) || { posts: visiblePosts, emails: [] };
+    bucket.emails.push(r.email);
+    groups.set(key, bucket);
+  }
+
+  const deliveredPostIds = new Set<string>();
+  for (const bucket of Array.from(groups.values())) {
+    const { subject, htmlBody, textBody } = buildDigestEmail(bucket.posts);
+    const ok = await sendEmail({ to: bucket.emails, subject, htmlBody, textBody });
+    if (ok) {
+      bucket.posts.forEach((p) => deliveredPostIds.add(p.id));
+    } else {
+      log.error("Email provider rejected review digest", {
+        posts: bucket.posts.length,
+        recipients: bucket.emails.length,
+      });
     }
   }
 
   const webhookResults = hasWebhookDestination
     ? await deliverWebhookNotifications(fresh)
     : { slack: false, webhook: false };
+  if (webhookResults.slack || webhookResults.webhook) {
+    fresh.forEach((p) => deliveredPostIds.add(p.id));
+  }
 
-  const anyDeliverySucceeded =
-    (recipients.length > 0 && emailOk) || webhookResults.slack || webhookResults.webhook;
-  if (!anyDeliverySucceeded) {
+  if (deliveredPostIds.size === 0) {
     return { notified: 0, recipients: recipients.length };
   }
 
-  const persisted = await markPostsNotified(fresh.map((p) => p.id), now);
+  const persisted = await markPostsNotified(Array.from(deliveredPostIds), now);
   log.info("Sent review digest", {
     posts: fresh.length,
     recipients: recipients.length,
@@ -330,7 +380,7 @@ export async function notifyPendingReviewQueue(): Promise<{ notified: number; re
     webhookDelivered: webhookResults.webhook,
     notifiedAtPersisted: persisted,
   });
-  return { notified: persisted ? fresh.length : 0, recipients: recipients.length };
+  return { notified: persisted ? deliveredPostIds.size : 0, recipients: recipients.length };
 }
 
 export async function resendReviewDigest(

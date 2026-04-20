@@ -99,6 +99,7 @@ export const users = pgTable("users", {
 
   // Admin notification preferences
   notifyReviewQueueEmail: boolean("notify_review_queue_email").default(true),
+  reviewQueueNotifyMode: varchar("review_queue_notify_mode").default("all"),
 
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -165,3 +166,19 @@ export type MfaVerifyInput = z.infer<typeof mfaVerifySchema>;
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Review queue notification modes
+export const REVIEW_QUEUE_NOTIFY_MODES = ["all", "urgent", "mute"] as const;
+export type ReviewQueueNotifyMode = typeof REVIEW_QUEUE_NOTIFY_MODES[number];
+
+// Threshold (ms) for what counts as an "urgent" review window
+export const URGENT_REVIEW_WINDOW_MS = 15 * 60 * 1000;
+
+export function normalizeReviewQueueNotifyMode(
+  value: unknown,
+  fallback: ReviewQueueNotifyMode = "all",
+): ReviewQueueNotifyMode {
+  return REVIEW_QUEUE_NOTIFY_MODES.includes(value as ReviewQueueNotifyMode)
+    ? (value as ReviewQueueNotifyMode)
+    : fallback;
+}

@@ -6,7 +6,7 @@ import speakeasy from "speakeasy";
 import QRCode from "qrcode";
 import crypto from "crypto";
 import { db } from "./db";
-import { users, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema, changePasswordSchema, mfaVerifySchema, isFreeAccessPeriod } from "@shared/schema";
+import { users, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema, changePasswordSchema, mfaVerifySchema, isFreeAccessPeriod, REVIEW_QUEUE_NOTIFY_MODES, normalizeReviewQueueNotifyMode } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { securityLogger, failedLoginTracker, ipBlocklist } from "./security";
 import { sendEmailVerification } from "./email-service";
@@ -453,6 +453,9 @@ export function registerAuthRoutes(app: Express) {
       isAdmin: user.isAdmin,
       emailVerified: user.emailVerified,
       notifyReviewQueueEmail: user.notifyReviewQueueEmail !== false,
+      reviewQueueNotifyMode: user.notifyReviewQueueEmail === false
+        ? "mute"
+        : normalizeReviewQueueNotifyMode(user.reviewQueueNotifyMode),
       createdAt: user.createdAt,
       freeAccessPeriod: freeAccess
     });
@@ -464,6 +467,7 @@ export function registerAuthRoutes(app: Express) {
       const user = (req as any).user;
       const schema = z.object({
         notifyReviewQueueEmail: z.boolean().optional(),
+        reviewQueueNotifyMode: z.enum(REVIEW_QUEUE_NOTIFY_MODES).optional(),
       });
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) {
@@ -472,6 +476,22 @@ export function registerAuthRoutes(app: Express) {
       const updates: Partial<typeof users.$inferInsert> = { updatedAt: new Date() };
       if (typeof parsed.data.notifyReviewQueueEmail === "boolean") {
         updates.notifyReviewQueueEmail = parsed.data.notifyReviewQueueEmail;
+        // Keep mode in sync so legacy boolean-only clients can still toggle
+        // the recipient state. We don't downgrade an existing "urgent" setting
+        // when the boolean is true: that case keeps the user's chosen mode.
+        if (parsed.data.notifyReviewQueueEmail === false) {
+          updates.reviewQueueNotifyMode = "mute";
+        } else if (
+          !parsed.data.reviewQueueNotifyMode &&
+          (user.reviewQueueNotifyMode === "mute" || !user.reviewQueueNotifyMode)
+        ) {
+          updates.reviewQueueNotifyMode = "all";
+        }
+      }
+      if (parsed.data.reviewQueueNotifyMode) {
+        updates.reviewQueueNotifyMode = parsed.data.reviewQueueNotifyMode;
+        // Keep legacy boolean in sync so older code paths still behave
+        updates.notifyReviewQueueEmail = parsed.data.reviewQueueNotifyMode !== "mute";
       }
       if (Object.keys(updates).length === 1) {
         return res.status(400).json({ error: "No preference fields supplied" });
@@ -480,6 +500,9 @@ export function registerAuthRoutes(app: Express) {
       const [refreshed] = await db.select().from(users).where(eq(users.id, user.id));
       res.json({
         notifyReviewQueueEmail: refreshed?.notifyReviewQueueEmail !== false,
+        reviewQueueNotifyMode: refreshed?.notifyReviewQueueEmail === false
+          ? "mute"
+          : normalizeReviewQueueNotifyMode(refreshed?.reviewQueueNotifyMode),
       });
     } catch (error) {
       console.error("Notification prefs update error:", error);
