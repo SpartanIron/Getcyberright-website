@@ -41,12 +41,15 @@ export default function GoogleAdsense() {
   if (!isAdAllowedPath(pathname)) return null;
 
   return (
-    <Script
-      id="google-adsense"
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-      strategy="afterInteractive"
-      crossOrigin="anonymous"
-      async
-    />
+    <>
+      <meta name="google-adsense-account" content={ADSENSE_CLIENT} />
+      <Script
+        id="google-adsense"
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+        strategy="afterInteractive"
+        crossOrigin="anonymous"
+        async
+      />
+    </>
   );
 }
