@@ -404,7 +404,10 @@ export default function AdminEngagementOpportunities() {
     onSuccess: (data: any) => {
       setPostingId(null);
       if (data?.manual) {
-        const platform = data.platform ? data.platform.charAt(0).toUpperCase() + data.platform.slice(1) : "the platform";
+        const platformLabels: Record<string, string> = { linkedin: "LinkedIn", facebook: "Facebook" };
+        const platform = data.platform
+          ? platformLabels[data.platform] || (data.platform.charAt(0).toUpperCase() + data.platform.slice(1))
+          : "the platform";
         toast({
           title: "Post draft saved",
           description: `Copy the text from the card to post on ${platform} manually.`,
