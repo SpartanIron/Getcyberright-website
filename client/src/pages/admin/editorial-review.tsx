@@ -216,8 +216,16 @@ function ArticleReviewCard({
       const out = await res.json();
       return out;
     },
-    onSuccess: () => {
-      toast({ title: "Approved", description: `Spine published for "${article.title.slice(0, 40)}..."` });
+    onSuccess: (out: { reviewed?: boolean }) => {
+      if (out?.reviewed) {
+        toast({ title: "Approved", description: `Spine published for "${article.title.slice(0, 40)}..."` });
+      } else {
+        toast({
+          title: "Saved, still pending",
+          description: "Some required fields are missing or invalid; row stays in the queue.",
+          variant: "destructive",
+        });
+      }
       // Refresh queue + public news feeds so /news and /news/[slug] reflect change.
       queryClient.invalidateQueries({ queryKey: ["/api/admin/news"] });
       queryClient.invalidateQueries({ queryKey: ["/api/news/tracks"] });

@@ -6681,6 +6681,13 @@ BEHAVIORAL CONSTRAINTS
       // Merge into any existing stored proposal: only overwrite fields that
       // were requested in this call. This makes per-field regenerate safe.
       const existing = article.proposedSpine || null;
+      // Drop any pre-existing flag prefixed with one of the regenerated
+      // field names so successful regenerations clear stale warnings.
+      const fieldPrefixes = fieldsRequested.map((f) => `${f}:`);
+      const survivingFlags = (existing?.flags || []).filter(
+        (flag: string) => !fieldPrefixes.some((p) => flag.startsWith(p)),
+      );
+
       const merged = {
         whatChanged: fieldsRequested.includes("whatChanged")
           ? fresh.whatChanged
@@ -6694,12 +6701,18 @@ BEHAVIORAL CONSTRAINTS
         curatedTopic: fieldsRequested.includes("curatedTopic")
           ? fresh.curatedTopic
           : existing?.curatedTopic ?? null,
-        // Flags from this call replace flags scoped to the regenerated fields;
-        // for simplicity we keep the union and let the UI dedupe visually.
-        flags: [...(existing?.flags || []), ...fresh.flags],
-        needsAuthorInput: fresh.needsAuthorInput || (existing?.needsAuthorInput ?? false),
+        flags: [...survivingFlags, ...fresh.flags],
+        needsAuthorInput: false, // recomputed below from final merged state
         generatedAt: fresh.generatedAt,
       };
+      // Recompute needsAuthorInput from the final merged shape so a
+      // successful regenerate of a previously-failed field can clear the
+      // banner.
+      merged.needsAuthorInput =
+        merged.whatChanged === null ||
+        merged.whyThisMatters === null ||
+        merged.actionThisWeek === null ||
+        merged.curatedTopic === null;
       await storage.updateNewsArticle(article.id, { proposedSpine: merged });
 
       return res.json({ articleId: article.id, proposal: merged });
