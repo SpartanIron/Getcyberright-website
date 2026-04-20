@@ -6676,6 +6676,10 @@ BEHAVIORAL CONSTRAINTS
         ? req.body.fields.filter((f: unknown): f is string => typeof f === "string")
         : ["whatChanged", "whyThisMatters", "actionThisWeek", "curatedTopic"];
 
+      // Design note: AI-classified curatedTopic is intentionally stored on the
+      // proposal only. It is NOT written to news_articles.curated_topic until
+      // the human reviewer approves it via the editorial review screen. This
+      // keeps the public /news feed authoritative until a human signs off.
       const fresh = await generateSpineProposal(article, fieldsRequested);
 
       // Merge into any existing stored proposal: only overwrite fields that
