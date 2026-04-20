@@ -247,8 +247,8 @@ const ANCHOR_WHY: string[] = [
 ];
 
 const ANCHOR_ACTION = {
-  label: "Run a Voice Check on a recent suspicious call",
-  href: "/tools/voice-check",
+  label: "Check a suspicious call or message in the Scam Checker",
+  href: "/scam-checker",
 };
 
 export async function seedAnchorArticle(): Promise<void> {
