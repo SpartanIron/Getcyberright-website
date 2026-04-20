@@ -576,36 +576,67 @@ export default function NewsArticlePage({ initialArticle }: { initialArticle?: N
             {article.excerpt}
           </p>
 
-          <div className="flex items-start gap-3 mb-4" data-testid="byline">
-            <Avatar className="w-12 h-12 ring-2 ring-primary/20">
-              <AvatarImage src={article.authorAvatarUrl ?? undefined} alt={article.author || ""} />
-              <AvatarFallback className="text-sm bg-gradient-to-br from-primary to-primary/60 text-white font-bold">{authorInitials}</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold leading-tight" data-testid="text-article-author">
-                By {article.author}
-              </p>
-              {article.authorRole && (
-                <p className="text-xs text-muted-foreground mt-0.5" data-testid="text-article-author-role">
-                  {article.authorRole}
-                </p>
-              )}
-              {article.articleType === "curated" ? (
-                <p className="text-[11px] text-teal-700 dark:text-teal-400 mt-0.5 font-semibold" data-testid="text-article-attribution">
-                  GetCyberRight Original &middot; Plain-English guidance for families
-                </p>
-              ) : (
-                <p className="text-[11px] text-muted-foreground mt-0.5" data-testid="text-article-attribution">
-                  Reporting aggregated from{" "}
-                  <a
-                    href={article.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:text-teal-600 dark:hover:text-teal-400 font-medium"
-                  >
+          {article.articleType === "aggregated" && (() => {
+            let domain: string | null = null;
+            try { domain = new URL(article.sourceUrl).hostname.replace(/^www\./, ""); } catch { domain = null; }
+            return (
+              <a
+                href={article.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 mb-4 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 hover:border-teal-500 dark:hover:border-teal-400 transition-colors group"
+                data-testid="aggregated-source-block"
+              >
+                {domain && (
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
+                    alt=""
+                    width={32}
+                    height={32}
+                    className="rounded-md flex-shrink-0"
+                  />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Source</p>
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-teal-600 dark:group-hover:text-teal-400 truncate" data-testid="text-aggregated-source">
                     {article.source}
-                  </a>
-                  . Plain-English summary by GetCyberRight.
+                  </p>
+                  {article.originalTitle && article.originalTitle !== article.title && (
+                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                      Original headline: {article.originalTitle}
+                    </p>
+                  )}
+                </div>
+                <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-teal-600 dark:group-hover:text-teal-400 flex-shrink-0" />
+              </a>
+            );
+          })()}
+
+          <div className="flex items-start gap-3 mb-4" data-testid="byline">
+            {article.articleType === "curated" ? (
+              <Avatar className="w-12 h-12 ring-2 ring-primary/20">
+                <AvatarImage src={article.authorAvatarUrl ?? undefined} alt={article.author || ""} />
+                <AvatarFallback className="text-sm bg-gradient-to-br from-primary to-primary/60 text-white font-bold">{authorInitials}</AvatarFallback>
+              </Avatar>
+            ) : null}
+            <div className="min-w-0 flex-1">
+              {article.articleType === "curated" ? (
+                <>
+                  <p className="text-sm font-bold leading-tight" data-testid="text-article-author">
+                    By {article.author}
+                  </p>
+                  {article.authorRole && (
+                    <p className="text-xs text-muted-foreground mt-0.5" data-testid="text-article-author-role">
+                      {article.authorRole}
+                    </p>
+                  )}
+                  <p className="text-[11px] text-teal-700 dark:text-teal-400 mt-0.5 font-semibold" data-testid="text-article-attribution">
+                    GetCyberRight Original &middot; Plain-English guidance for families
+                  </p>
+                </>
+              ) : (
+                <p className="text-[11px] text-muted-foreground" data-testid="text-article-attribution">
+                  Plain-English summary by GetCyberRight. Read the full report at the source above.
                 </p>
               )}
               <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground flex-wrap">

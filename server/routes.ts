@@ -6220,7 +6220,14 @@ BEHAVIORAL CONSTRAINTS
         .filter((a) => !breakingIds.has(a.id) && !trendingArticleIds.has(a.id))
         .slice(0, 18);
 
-      const fromGetCyberRight: Record<string, TrackArticle[]> = {
+      type CuratedTopicKey = keyof typeof CURATED_TOPIC_LABELS;
+      const TOPIC_KEYS: CuratedTopicKey[] = [
+        "spot-the-scam",
+        "protect-parents",
+        "keep-kids-safe",
+        "this-weeks-threat",
+      ];
+      const fromGetCyberRight: Record<CuratedTopicKey, TrackArticle[]> = {
         "spot-the-scam": [],
         "protect-parents": [],
         "keep-kids-safe": [],
@@ -6228,9 +6235,11 @@ BEHAVIORAL CONSTRAINTS
       };
       for (const a of mapped) {
         if (a.articleType !== "curated") continue;
-        const topic = a.curatedTopic || "this-weeks-threat";
-        if (fromGetCyberRight[topic] && fromGetCyberRight[topic].length < 6) {
-          fromGetCyberRight[topic].push(a);
+        const topicKey = (TOPIC_KEYS as string[]).includes(a.curatedTopic || "")
+          ? (a.curatedTopic as CuratedTopicKey)
+          : "this-weeks-threat";
+        if (fromGetCyberRight[topicKey].length < 6) {
+          fromGetCyberRight[topicKey].push(a);
         }
       }
 

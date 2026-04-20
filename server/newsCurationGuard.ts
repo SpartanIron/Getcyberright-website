@@ -70,11 +70,32 @@ export function annotateInlineDefinitions(text: string): string {
   return out;
 }
 
-/** For curated GCR pieces: the contract is "no jargon". Returns ok=false when
- *  blocked terms remain, so the caller can skip publishing. */
-export function gateCuratedPlainEnglish(title: string, excerpt: string, content: string): JargonScan {
+/** For curated GCR pieces: the contract is "every blocked term must be either
+ *  absent or accompanied by a plain-English definition in parentheses on its
+ *  first occurrence". Returns ok=false only when undefined occurrences remain. */
+export function gateCuratedPlainEnglish(
+  title: string,
+  excerpt: string,
+  content: string,
+): JargonScan {
   const combined = [title, excerpt, content].filter(Boolean).join("\n");
-  return scanJargon(combined);
+  if (!combined) return { ok: true, blockedTerms: [] };
+  const undefined_: string[] = [];
+  for (const { term } of JARGON_BLOCKLIST) {
+    const re = new RegExp(term.source, term.flags.includes("g") ? term.flags : term.flags + "g");
+    let match: RegExpExecArray | null;
+    let firstSeen = false;
+    while ((match = re.exec(combined)) !== null) {
+      if (firstSeen) continue;
+      firstSeen = true;
+      // Allow the term if a parenthetical definition follows within 80 chars.
+      const after = combined.slice(match.index + match[0].length, match.index + match[0].length + 200);
+      if (!/^\s*\([^)]{8,}\)/.test(after)) {
+        undefined_.push(match[0].toLowerCase());
+      }
+    }
+  }
+  return { ok: undefined_.length === 0, blockedTerms: [...new Set(undefined_)] };
 }
 
 export function classifyCuratedTopic(

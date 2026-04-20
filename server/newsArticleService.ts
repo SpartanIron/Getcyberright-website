@@ -436,46 +436,44 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
       ? "curated"
       : "aggregated";
 
-    // Hash actual image bytes (not URL) so the same image hosted at two URLs
-    // is still detected as a duplicate.
+    // Image content uniqueness is a curated-track requirement only. Aggregated
+    // pieces always keep the publisher's og:image as-is.
     let imageHash: string | null = null;
-    if (resolvedImage) {
-      const fetched = await fetchAndHashImage(resolvedImage);
-      imageHash = fetched.hash;
-      if (!imageHash) resolvedImage = null;
-    }
-
-    if (imageHash) {
-      try {
-        const { db } = await import("./db");
-        const { newsArticles } = await import("@shared/schema");
-        const { eq } = await import("drizzle-orm");
-        const dup = await db
-          .select({ id: newsArticles.id })
-          .from(newsArticles)
-          .where(eq(newsArticles.imageHash, imageHash))
-          .limit(1);
-        if (dup.length > 0) {
-          console.log(
-            `[NewsService] Duplicate image content for "${(article.familyTitle || feedItem.title).slice(0, 40)}..." — replacing with unique branded card`,
-          );
-          resolvedImage = null;
-          imageHash = null;
-        }
-      } catch (err) {
-        console.warn(`[NewsService] Image hash dedup check failed: ${(err as Error).message}`);
+    if (articleType === "curated") {
+      if (resolvedImage) {
+        const fetched = await fetchAndHashImage(resolvedImage);
+        imageHash = fetched.hash;
+        if (!imageHash) resolvedImage = null;
       }
-    }
-
-    // Curated pieces must always have a unique visual. If the og:image is
-    // missing or duplicated, generate a branded SVG card seeded by title.
-    if (articleType === "curated" && !resolvedImage) {
-      const card = generateBrandedCardSvg(
-        article.familyTitle || feedItem.title,
-        category,
-      );
-      resolvedImage = card.dataUrl;
-      imageHash = card.hash;
+      if (imageHash) {
+        try {
+          const { db } = await import("./db");
+          const { newsArticles } = await import("@shared/schema");
+          const { eq } = await import("drizzle-orm");
+          const dup = await db
+            .select({ id: newsArticles.id })
+            .from(newsArticles)
+            .where(eq(newsArticles.imageHash, imageHash))
+            .limit(1);
+          if (dup.length > 0) {
+            console.log(
+              `[NewsService] Duplicate image content for curated "${(article.familyTitle || feedItem.title).slice(0, 40)}..." — replacing with unique branded card`,
+            );
+            resolvedImage = null;
+            imageHash = null;
+          }
+        } catch (err) {
+          console.warn(`[NewsService] Image hash dedup check failed: ${(err as Error).message}`);
+        }
+      }
+      if (!resolvedImage) {
+        const card = generateBrandedCardSvg(
+          article.familyTitle || feedItem.title,
+          category,
+        );
+        resolvedImage = card.dataUrl;
+        imageHash = card.hash;
+      }
     }
 
     const titleForStore = article.familyTitle || feedItem.title;

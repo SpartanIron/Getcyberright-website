@@ -58,6 +58,56 @@ function formatTimeAgo(dateString: string): string {
   return date.toLocaleDateString();
 }
 
+const PUBLISHER_DOMAINS: Record<string, string> = {
+  "BleepingComputer": "bleepingcomputer.com",
+  "SC Media / Cyber Daily": "scmagazine.com",
+  "SC Media": "scmagazine.com",
+  "The Hacker News": "thehackernews.com",
+  "Krebs on Security": "krebsonsecurity.com",
+  "Dark Reading": "darkreading.com",
+  "CISA Advisories": "cisa.gov",
+  "CISA News": "cisa.gov",
+  "US-CERT Alerts": "cisa.gov",
+  "ACCC Scamwatch": "scamwatch.gov.au",
+  "UK Finance": "ukfinance.org.uk",
+  "Federal Trade Commission": "ftc.gov",
+};
+
+function publisherDomain(source: string, sourceUrl?: string): string | null {
+  if (PUBLISHER_DOMAINS[source]) return PUBLISHER_DOMAINS[source];
+  if (sourceUrl) {
+    try {
+      return new URL(sourceUrl).hostname.replace(/^www\./, "");
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function PublisherBadge({ source, sourceUrl, size = "sm" }: { source: string; sourceUrl?: string; size?: "sm" | "md" }) {
+  const domain = publisherDomain(source, sourceUrl);
+  const px = size === "md" ? 24 : 16;
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 border border-slate-200/50 dark:border-slate-700/50 rounded-md px-2 py-1 text-[11px] font-semibold shadow-md"
+      data-testid="publisher-badge"
+    >
+      {domain && (
+        <img
+          src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
+          alt=""
+          width={px}
+          height={px}
+          className="rounded-sm"
+          loading="lazy"
+        />
+      )}
+      <span>{source}</span>
+    </span>
+  );
+}
+
 function getCategoryGradient(category: string): string {
   switch (category) {
     case "Cybersecurity":
@@ -204,12 +254,10 @@ function ArticleCard({
             {variant === "curated" ? (
               <Badge className="bg-teal-600 text-white border-0 text-[10px] font-semibold shadow-md">
                 <PenLine className="h-3 w-3 mr-1" />
-                GetCyberRight
+                GetCyberRight Original
               </Badge>
             ) : (
-              <Badge className="bg-white/95 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 border-0 text-[10px] font-semibold shadow-md">
-                {article.source}
-              </Badge>
+              <PublisherBadge source={article.source} sourceUrl={article.url} />
             )}
             {isUrgent && (
               <Badge className="bg-orange-600 text-white border-0 text-[10px] font-semibold shadow-md animate-pulse">
