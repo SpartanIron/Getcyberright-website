@@ -40,6 +40,7 @@ import {
   microTransactionStats
 } from "@/components/parents-hub/quiz-data";
 import { imgSrc } from "@/lib/img-src";
+import { HubPillarHero, PillarIntro, PillarLead, PILLARS, ANCHOR_HREF, COMPANION_HREFS } from "@/components/pillar-hub/pillars";
 
 interface PlatformGuide {
   platform: string;
@@ -618,28 +619,80 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
         colorVariant="blue"
       />
 
-      <div className="py-16 sm:py-20 bg-background">
+      <HubPillarHero audience="parents" />
+
+      <div className="py-12 sm:py-16 bg-background">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-          <Tabs defaultValue="guides" className="mb-12">
+          <Tabs defaultValue="new-reality" className="mb-12">
             <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-8">
-              <TabsTrigger value="guides" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-guides">
-                <BookOpen className="w-4 h-4" /> Guides
-              </TabsTrigger>
-              <TabsTrigger value="activities" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-activities">
-                <Brain className="w-4 h-4" /> Activities
-              </TabsTrigger>
-              <TabsTrigger value="tools" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-tools">
-                <Sparkles className="w-4 h-4" /> Tools
-              </TabsTrigger>
-              <TabsTrigger value="legal" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-legal">
-                <Scale className="w-4 h-4" /> Legal
-              </TabsTrigger>
-              <TabsTrigger value="stats" className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm" data-testid="tab-stats">
-                <BarChart3 className="w-4 h-4" /> Stats
-              </TabsTrigger>
+              {PILLARS.map((p) => (
+                <TabsTrigger
+                  key={p.id}
+                  value={p.id}
+                  className="gap-1.5 px-3 py-2 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  data-testid={`tab-pillar-${p.id}`}
+                >
+                  <p.icon className="w-4 h-4" /> {p.shortLabel}
+                </TabsTrigger>
+              ))}
             </TabsList>
 
-            <TabsContent value="guides">
+            <TabsContent value="new-reality" className="space-y-8">
+              <PillarIntro pillar="new-reality" audience="parents" />
+              <PillarLead href={ANCHOR_HREF} label="The New Reality: How AI Is Changing Digital Safety" testId="link-pillar-anchor-new-reality" />
+              <Card className="border-2 border-primary/20">
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-lg text-foreground mb-2">The companion piece for parents</h3>
+                  <p className="text-muted-foreground mb-4">Why the parental controls you set five years ago no longer cover the apps your kids actually use today.</p>
+                  <Link href={COMPANION_HREFS.parentalControls} className="inline-flex items-center gap-2 text-primary font-medium hover:underline" data-testid="link-companion-parental-controls">
+                    Read: Why Parental Controls Are Not Enough Anymore <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-lg text-foreground mb-2">Also relevant for your family</h3>
+                  <ul className="space-y-2 text-sm">
+                    <li>
+                      <Link href={COMPANION_HREFS.ageVerification} className="text-primary hover:underline" data-testid="link-companion-age-verification">
+                        The Age Verification Tradeoff: What Families Should Ask
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href={COMPANION_HREFS.aiConfidant} className="text-primary hover:underline" data-testid="link-companion-ai-confidant">
+                        When Your Kid Tells the AI Things They Will Not Tell You
+                      </Link>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="old-advice" className="space-y-6">
+              <PillarIntro pillar="old-advice" audience="parents" />
+              <PillarLead href={COMPANION_HREFS.parentalControls} label="Why Parental Controls Are Not Enough Anymore" testId="link-pillar-lead-old-advice" />
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  { old: "\"Set the parental controls and you are covered.\"", why: "Controls only cover the apps you know about. New apps and AI chat features ship faster than any control suite can keep up." },
+                  { old: "\"My kid would never give out personal info.\"", why: "AI chatbots build rapport over weeks. Kids tell them things they would never tell a stranger because it does not feel like a stranger." },
+                  { old: "\"If I check their phone weekly, I will see problems.\"", why: "Disappearing messages, secondary accounts, and in-game DMs leave no trace by the time you check." },
+                  { old: "\"They know not to talk to strangers.\"", why: "Voice cloning means the \u201cfriend\u201d on the line may not be the friend. The instinct of \u201cI know this voice\u201d is no longer reliable." },
+                ].map((row) => (
+                  <Card key={row.old} className="border-2" data-testid={`card-old-advice-${row.old.slice(0, 12).replace(/[^a-z]+/gi, "-").toLowerCase()}`}>
+                    <CardContent className="p-5">
+                      <p className="text-sm font-semibold text-muted-foreground mb-2">Old advice</p>
+                      <p className="text-foreground mb-3">{row.old}</p>
+                      <p className="text-sm font-semibold text-muted-foreground mb-2">Why it falls short</p>
+                      <p className="text-foreground text-sm leading-relaxed">{row.why}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="proactive" className="space-y-8">
+              <PillarIntro pillar="proactive" audience="parents" />
+              <PillarLead href={COMPANION_HREFS.parentalControls} label="Why Parental Controls Are Not Enough Anymore" testId="link-pillar-lead-proactive" />
               <div className="grid md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6">
                 {parentTopics.map((topic) => (
                   <Card
@@ -675,15 +728,121 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
                   </Card>
                 ))}
               </div>
+
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <ClipboardCheck className="w-5 h-5 text-blue-600" />
+                  <h2 className="text-xl font-bold text-foreground">Device Safety Audit</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Walk through each device your family uses and check that all safety settings are properly configured. Your progress is saved automatically.</p>
+                <DeviceAuditChecklist audits={deviceAudits} />
+              </div>
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Settings className="w-5 h-5 text-blue-600" />
+                  <h2 className="text-xl font-bold text-foreground">Tools We Actually Recommend</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">A short, opinionated list. We don't take affiliate money for any of these. Pick the one that fits your devices and your family's comfort level.</p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {[
+                    { name: "Google Family Link", tag: "Free", best: "Android households and any Google account for kids under 13", desc: "Set screen time limits, approve app downloads, see what apps your child uses, and lock the device remotely. Works on Android phones and Chromebooks. Limited support on iPhone.", setupTime: "About 15 minutes", url: "https://support.google.com/families/answer/7101025" },
+                    { name: "Apple Screen Time", tag: "Built in, free", best: "iPhone and iPad families using Family Sharing", desc: "Built into iOS. Set Downtime, App Limits, and Communication Limits per child. Approve purchases and downloads from your phone. Use Screen Distance and Communication Safety to flag inappropriate images.", setupTime: "About 10 minutes", url: "https://support.apple.com/en-us/HT201304" },
+                    { name: "Circle Home Plus", tag: "$9.99/mo or $129/yr", best: "Households with mixed devices and gaming consoles", desc: "A small box that plugs into your router and applies time limits, content filters, and bedtime pauses to every device on your Wi-Fi, including smart TVs and game consoles. Works without installing apps on each device.", setupTime: "About 30 minutes (hardware setup)", url: "https://meetcircle.com/pages/circle-home-plus-setup" },
+                    { name: "NextDNS", tag: "Free up to 300k queries/mo", best: "Tech-comfortable parents who want a network-level filter", desc: "A configurable DNS service that blocks adult sites, malware, trackers, and specific apps for everyone on your network. Set it up on your router or per device. Includes detailed logs so you can see what was blocked.", setupTime: "About 20 minutes", url: "https://nextdns.io/help" }
+                  ].map((t) => (
+                    <Card key={t.name} className="border-2 hover:shadow-md transition-shadow" data-testid={`tool-card-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <h3 className="font-semibold text-foreground">{t.name}</h3>
+                          <Badge variant="secondary" className="text-xs">{t.tag}</Badge>
+                        </div>
+                        <p className="text-xs text-primary font-medium mb-2">Best for: {t.best}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed mb-3">{t.desc}</p>
+                        <p className="text-xs text-muted-foreground mb-3" data-testid={`text-setup-time-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
+                          <span className="font-medium text-foreground">Setup time:</span> {t.setupTime}
+                        </p>
+                        <a href={t.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline" data-testid={`link-tool-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
+                          Open setup guide <ArrowRight className="w-3.5 h-3.5" />
+                        </a>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Globe className="w-5 h-5 text-teal-600" />
+                  <h2 className="text-xl font-bold text-foreground">ISP Parental Control Guides</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Step-by-step instructions for setting up parental controls at the internet provider level. These controls apply to all devices on your home network.</p>
+                <ISPControlGuides guides={ispGuides} />
+              </div>
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Brain className="w-5 h-5 text-purple-600" />
+                  <h2 className="text-xl font-bold text-foreground">Parenting Scenario Quiz</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Test your knowledge with real-world parenting scenarios. Each question includes detailed feedback explaining the best approach.</p>
+                <ParentingQuiz questions={parentingQuizQuestions} />
+              </div>
             </TabsContent>
 
-            <TabsContent value="activities" className="space-y-8">
+            <TabsContent value="real-time" className="space-y-8">
+              <PillarIntro pillar="real-time" audience="parents" />
+              <PillarLead href={COMPANION_HREFS.aiConfidant} label="When Your Kid Tells the AI Things They Will Not Tell You" testId="link-pillar-lead-real-time" />
+
+              <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border border-purple-200 dark:border-purple-800">
+                <CardContent className="p-8">
+                  <div className="flex flex-col md:flex-row items-center gap-6">
+                    <div className="flex-shrink-0">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                        <Shield className="w-8 h-8 text-white" />
+                      </div>
+                    </div>
+                    <div className="flex-1 text-center md:text-left">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-xl font-semibold text-foreground">Child Safety Conversation Scanner</h3>
+                        <Badge className="bg-purple-500">NEW</Badge>
+                      </div>
+                      <p className="text-muted-foreground">Paste a conversation your child shared and get an instant risk read with the next steps to take.</p>
+                    </div>
+                    <Link href="/parents/child-safety-scanner">
+                      <Button className="bg-purple-600 rounded-full" data-testid="button-child-safety-scanner-pillar">
+                        <Shield className="w-4 h-4 mr-2" /> Open Scanner
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-amber-600" />
-                  <h2 className="text-xl font-bold text-foreground">Family Activities You Can Run This Weekend</h2>
+                  <MessageCircle className="w-5 h-5 text-purple-600" />
+                  <h2 className="text-xl font-bold text-foreground">Conversation Starter Generator</h2>
                 </div>
-                <p className="text-muted-foreground mb-5">Four short, hands-on activities designed to spark conversation and build real digital safety skills together. Each one takes 15 to 30 minutes.</p>
+                <p className="text-muted-foreground mb-5">Pick your child's age and a topic to get a tailored script with opening lines, dos and don'ts, and follow-up questions for the conversation you need to have today.</p>
+                <ConversationGenerator scripts={conversationScripts} />
+              </div>
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Smartphone className="w-5 h-5 text-pink-600" />
+                  <h2 className="text-xl font-bold text-foreground">App Safety Reviews</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Quick safety reads on the apps your kid is asking to install today. Filter by region.</p>
+                <AppSafetyReview apps={appSafetyCards} />
+              </div>
+
+              <div className="border-t pt-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-5 h-5 text-amber-600" />
+                  <h2 className="text-xl font-bold text-foreground">Practice Together This Weekend</h2>
+                </div>
+                <p className="text-muted-foreground mb-5">Short, hands-on activities so the family rehearses the moment a real scam shows up. Each takes 15 to 30 minutes.</p>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {[
                     {
@@ -738,132 +897,22 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
                 </div>
               </div>
 
-              <div className="border-t pt-8">
-                <div className="flex items-center gap-2 mb-2">
-                  <ClipboardCheck className="w-5 h-5 text-blue-600" />
-                  <h2 className="text-xl font-bold text-foreground">Device Safety Audit</h2>
-                </div>
-                <p className="text-muted-foreground mb-5">Walk through each device your family uses and check that all safety settings are properly configured. Your progress is saved automatically.</p>
-                <DeviceAuditChecklist audits={deviceAudits} />
-              </div>
-
-              <div className="border-t pt-8">
-                <div className="flex items-center gap-2 mb-2">
-                  <Brain className="w-5 h-5 text-purple-600" />
-                  <h2 className="text-xl font-bold text-foreground">Parenting Scenario Quiz</h2>
-                </div>
-                <p className="text-muted-foreground mb-5">Test your knowledge with real-world parenting scenarios. Each question includes detailed feedback explaining the best approach.</p>
-                <ParentingQuiz questions={parentingQuizQuestions} />
-              </div>
             </TabsContent>
 
-            <TabsContent value="tools" className="space-y-8">
+            <TabsContent value="tradeoffs" className="space-y-8">
+              <PillarIntro pillar="tradeoffs" audience="parents" />
+              <PillarLead href={COMPANION_HREFS.ageVerification} label="The Age Verification Tradeoff: What Families Should Ask" testId="link-pillar-lead-tradeoffs" />
+
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Settings className="w-5 h-5 text-blue-600" />
-                  <h2 className="text-xl font-bold text-foreground">Tools We Actually Recommend</h2>
+                  <Scale className="w-5 h-5 text-indigo-600" />
+                  <h2 className="text-xl font-bold text-foreground">Children's Online Privacy Laws</h2>
                 </div>
-                <p className="text-muted-foreground mb-5">A short, opinionated list. We don't take affiliate money for any of these. Pick the one that fits your devices and your family's comfort level.</p>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {[
-                    {
-                      name: "Google Family Link",
-                      tag: "Free",
-                      best: "Android households and any Google account for kids under 13",
-                      desc: "Set screen time limits, approve app downloads, see what apps your child uses, and lock the device remotely. Works on Android phones and Chromebooks. Limited support on iPhone.",
-                      setupTime: "About 15 minutes",
-                      url: "https://support.google.com/families/answer/7101025"
-                    },
-                    {
-                      name: "Apple Screen Time",
-                      tag: "Built in, free",
-                      best: "iPhone and iPad families using Family Sharing",
-                      desc: "Built into iOS. Set Downtime, App Limits, and Communication Limits per child. Approve purchases and downloads from your phone. Use Screen Distance and Communication Safety to flag inappropriate images.",
-                      setupTime: "About 10 minutes",
-                      url: "https://support.apple.com/en-us/HT201304"
-                    },
-                    {
-                      name: "Circle Home Plus",
-                      tag: "$9.99/mo or $129/yr",
-                      best: "Households with mixed devices and gaming consoles",
-                      desc: "A small box that plugs into your router and applies time limits, content filters, and bedtime pauses to every device on your Wi-Fi, including smart TVs and game consoles. Works without installing apps on each device.",
-                      setupTime: "About 30 minutes (hardware setup)",
-                      url: "https://meetcircle.com/pages/circle-home-plus-setup"
-                    },
-                    {
-                      name: "NextDNS",
-                      tag: "Free up to 300k queries/mo",
-                      best: "Tech-comfortable parents who want a network-level filter",
-                      desc: "A configurable DNS service that blocks adult sites, malware, trackers, and specific apps for everyone on your network. Set it up on your router or per device. Includes detailed logs so you can see what was blocked.",
-                      setupTime: "About 20 minutes",
-                      url: "https://nextdns.io/help"
-                    }
-                  ].map((t) => (
-                    <Card key={t.name} className="border-2 hover:shadow-md transition-shadow" data-testid={`tool-card-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
-                      <CardContent className="p-5">
-                        <div className="flex items-start justify-between gap-3 mb-2">
-                          <h3 className="font-semibold text-foreground">{t.name}</h3>
-                          <Badge variant="secondary" className="text-xs">{t.tag}</Badge>
-                        </div>
-                        <p className="text-xs text-primary font-medium mb-2">Best for: {t.best}</p>
-                        <p className="text-sm text-muted-foreground leading-relaxed mb-3">{t.desc}</p>
-                        <p className="text-xs text-muted-foreground mb-3" data-testid={`text-setup-time-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
-                          <span className="font-medium text-foreground">Setup time:</span> {t.setupTime}
-                        </p>
-                        <a
-                          href={t.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                          data-testid={`link-tool-${t.name.toLowerCase().replace(/[^a-z]+/g, '-')}`}
-                        >
-                          Open setup guide <ArrowRight className="w-3.5 h-3.5" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                <p className="text-muted-foreground mb-5">Know your rights as a parent. These laws protect your child's personal data online. Each entry includes practical actions you can take and a quick knowledge check.</p>
+                <LegalAwarenessModule laws={legalInfoData} />
               </div>
 
               <div className="border-t pt-8">
-                <div className="flex items-center gap-2 mb-2">
-                  <MessageCircle className="w-5 h-5 text-purple-600" />
-                  <h2 className="text-xl font-bold text-foreground">Conversation Starter Generator</h2>
-                </div>
-                <p className="text-muted-foreground mb-5">Select your child's age group and a topic to get a tailored conversation script with opening lines, dos and don'ts, and follow-up questions.</p>
-                <ConversationGenerator scripts={conversationScripts} />
-              </div>
-
-              <div className="border-t pt-8">
-                <div className="flex items-center gap-2 mb-2">
-                  <Smartphone className="w-5 h-5 text-pink-600" />
-                  <h2 className="text-xl font-bold text-foreground">App Safety Reviews</h2>
-                </div>
-                <p className="text-muted-foreground mb-5">Detailed safety reviews of popular apps and platforms your child may use. Filter by region to see locally relevant platforms.</p>
-                <AppSafetyReview apps={appSafetyCards} />
-              </div>
-
-              <div className="border-t pt-8">
-                <div className="flex items-center gap-2 mb-2">
-                  <Globe className="w-5 h-5 text-teal-600" />
-                  <h2 className="text-xl font-bold text-foreground">ISP Parental Control Guides</h2>
-                </div>
-                <p className="text-muted-foreground mb-5">Step-by-step instructions for setting up parental controls at the internet provider level. These controls apply to all devices on your home network.</p>
-                <ISPControlGuides guides={ispGuides} />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="legal" className="space-y-6">
-              <div className="flex items-center gap-2 mb-2">
-                <Scale className="w-5 h-5 text-indigo-600" />
-                <h2 className="text-xl font-bold text-foreground">Children's Online Privacy Laws</h2>
-              </div>
-              <p className="text-muted-foreground mb-5">Know your rights as a parent. These laws protect your child's personal data online. Each entry includes practical actions you can take and a quick knowledge check.</p>
-              <LegalAwarenessModule laws={legalInfoData} />
-            </TabsContent>
-
-            <TabsContent value="stats" className="space-y-8">
-              <div>
                 <div className="flex items-center gap-2 mb-2">
                   <BarChart3 className="w-5 h-5 text-blue-600" />
                   <h2 className="text-xl font-bold text-foreground">Family Cybersecurity Statistics</h2>
@@ -876,6 +925,7 @@ function ParentsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
                 <MicroTransactionAwareness stats={microTransactionStats} />
               </div>
             </TabsContent>
+
           </Tabs>
 
           <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border border-purple-200 dark:border-purple-800 mb-6">

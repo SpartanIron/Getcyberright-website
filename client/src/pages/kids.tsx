@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { HubPillarHero, PillarIntro, PillarLead, PILLARS, ANCHOR_HREF, COMPANION_HREFS } from "@/components/pillar-hub/pillars";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -57,7 +58,7 @@ function FloatingShapes() {
 
 type AgeGroup = "6-10" | "11-13" | "14-16" | null;
 type ActiveModule = string | null;
-type ActiveTab = "lessons" | "activities" | "stats";
+type ActiveTab = "new-reality" | "old-advice" | "proactive" | "real-time" | "tradeoffs";
 
 interface LessonTopic {
   id: string;
@@ -794,7 +795,7 @@ function LearningTrack({
   onBack: () => void;
 }) {
   const [activeModule, setActiveModule] = useState<ActiveModule>(null);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("lessons");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("new-reality");
   const [progress, setProgress] = useState(loadProgress());
 
   const config = ageGroupConfig[ageGroup];
@@ -881,19 +882,53 @@ function LearningTrack({
           </div>
 
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ActiveTab)} className="mt-6">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="lessons" className="flex items-center gap-2" data-testid="tab-lessons">
-                <BookOpen className="w-4 h-4" /> Lessons
-              </TabsTrigger>
-              <TabsTrigger value="activities" className="flex items-center gap-2" data-testid="tab-activities">
-                <Sparkles className="w-4 h-4" /> Activities
-              </TabsTrigger>
-              <TabsTrigger value="stats" className="flex items-center gap-2" data-testid="tab-stats">
-                <Zap className="w-4 h-4" /> Facts
-              </TabsTrigger>
+            <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-6 w-full">
+              {PILLARS.map((p) => (
+                <TabsTrigger key={p.id} value={p.id} className="flex items-center gap-1.5 px-3 py-2" data-testid={`tab-pillar-${p.id}`}>
+                  <p.icon className="w-4 h-4" /> {p.shortLabel}
+                </TabsTrigger>
+              ))}
             </TabsList>
 
-            <TabsContent value="lessons">
+            <TabsContent value="new-reality" className="space-y-6">
+              <PillarIntro pillar="new-reality" audience="kids" />
+              <PillarLead href={ANCHOR_HREF} label="The New Reality: How AI Is Changing Digital Safety" testId="link-pillar-anchor-new-reality-kids" />
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-bold text-foreground mb-2">Want to read more (with a parent)?</h3>
+                  <ul className="space-y-2 text-base">
+                    <li><a href={COMPANION_HREFS.aiConfidant} className="text-primary hover:underline" data-testid="link-companion-ai-confidant-kids">When Your Kid Tells the AI Things They Will Not Tell You</a></li>
+                    <li><a href={COMPANION_HREFS.parentalControls} className="text-primary hover:underline" data-testid="link-companion-parental-controls-kids">Why Parental Controls Are Not Enough Anymore</a></li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="old-advice" className="space-y-6">
+              <PillarIntro pillar="old-advice" audience="kids" />
+              <PillarLead href={ANCHOR_HREF} label="The New Reality: How AI Is Changing Digital Safety" testId="link-pillar-lead-old-advice-kids" />
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  { old: "\"A video proves it really happened.\"", why: "Computers can now make fake videos that look real. If a video looks shocking or asks you to do something quickly, check before you share." },
+                  { old: "\"If they sound like my friend, it is them.\"", why: "Voices can be copied. If a friend sends a weird message asking for money or codes, talk to them in person or on a call you start yourself." },
+                  { old: "\"The AI chatbot is just a friend to talk to.\"", why: "AI can feel like a friend, but it remembers what you tell it and the company that runs it can use that. Save the personal stuff for a real person you trust." },
+                  { old: "\"My account is private so I am safe.\"", why: "Anything you send can be screenshot. \u2018Private\u2019 only means who can see your posts, not what they do with them." },
+                ].map((row) => (
+                  <Card key={row.old} className="border-2">
+                    <CardContent className="p-5">
+                      <p className="text-sm font-semibold text-muted-foreground mb-2">Old idea</p>
+                      <p className="text-foreground mb-3">{row.old}</p>
+                      <p className="text-sm font-semibold text-muted-foreground mb-2">What is true now</p>
+                      <p className="text-foreground text-sm leading-relaxed">{row.why}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="proactive" className="space-y-6">
+              <PillarIntro pillar="proactive" audience="kids" />
+              <PillarLead href={ANCHOR_HREF} label="The New Reality: How AI Is Changing Digital Safety" testId="link-pillar-lead-proactive-kids" />
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {topics.map((topic) => {
                   const isCompleted = completedModules.includes(topic.id);
@@ -957,7 +992,9 @@ function LearningTrack({
               )}
             </TabsContent>
 
-            <TabsContent value="activities">
+            <TabsContent value="real-time">
+              <PillarIntro pillar="real-time" audience="kids" />
+              <PillarLead href={COMPANION_HREFS.aiConfidant} label="When Your Kid Tells the AI Things They Will Not Tell You" testId="link-pillar-lead-real-time-kids" />
               <div className="space-y-8">
                 <div>
                   <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
@@ -1032,7 +1069,9 @@ function LearningTrack({
               </div>
             </TabsContent>
 
-            <TabsContent value="stats">
+            <TabsContent value="tradeoffs">
+              <PillarIntro pillar="tradeoffs" audience="kids" />
+              <PillarLead href={COMPANION_HREFS.parentalControls} label="Why Parental Controls Are Not Enough Anymore" testId="link-pillar-lead-tradeoffs-kids" />
               <div className="space-y-8">
                 <CyberStatsInfographic ageGroup={ageGroup} />
                 <PlatformSafetyGuide ageGroup={ageGroup} />

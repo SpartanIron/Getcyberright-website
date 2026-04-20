@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { HubPillarHero, PillarIntro, PillarLead, PILLARS, ANCHOR_HREF, COMPANION_HREFS } from "@/components/pillar-hub/pillars";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
@@ -801,6 +802,8 @@ function SeniorsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
         colorVariant="teal"
       />
 
+      <HubPillarHero audience="seniors" />
+
       <section className="py-8 bg-muted/30">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-6">
@@ -1214,84 +1217,97 @@ export default function Seniors() {
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-8">
                       <TabsTrigger value="guides" className="gap-2 px-4 py-2.5" data-testid="tab-guides">
-                        <BookOpen className="w-4 h-4" />
-                        Guides
+                        <BookOpen className="w-4 h-4" /> Topics
                       </TabsTrigger>
-                      <TabsTrigger value="exercises" className="gap-2 px-4 py-2.5" data-testid="tab-exercises">
-                        <Search className="w-4 h-4" />
-                        Scam Exercises
-                      </TabsTrigger>
-                      <TabsTrigger value="deepdives" className="gap-2 px-4 py-2.5" data-testid="tab-deepdives">
-                        <Shield className="w-4 h-4" />
-                        Deep Dives
-                      </TabsTrigger>
-                      <TabsTrigger value="checklists" className="gap-2 px-4 py-2.5" data-testid="tab-checklists">
-                        <CheckCircle className="w-4 h-4" />
-                        Checklists
-                      </TabsTrigger>
-                      <TabsTrigger value="emergency" className="gap-2 px-4 py-2.5" data-testid="tab-emergency">
-                        <AlertTriangle className="w-4 h-4" />
-                        Emergency
-                      </TabsTrigger>
-                      <TabsTrigger value="stats" className="gap-2 px-4 py-2.5" data-testid="tab-stats">
-                        <BarChart3 className="w-4 h-4" />
-                        Stats
-                      </TabsTrigger>
-                      <TabsTrigger value="family" className="gap-2 px-4 py-2.5" data-testid="tab-family">
-                        <Users className="w-4 h-4" />
-                        Family
-                      </TabsTrigger>
+                      {PILLARS.map((p) => (
+                        <TabsTrigger key={p.id} value={p.id} className="gap-2 px-4 py-2.5" data-testid={`tab-pillar-${p.id}`}>
+                          <p.icon className="w-4 h-4" /> {p.shortLabel}
+                        </TabsTrigger>
+                      ))}
                     </TabsList>
 
-                    <TabsContent value="exercises">
-                      <div className="space-y-6">
-                        <div>
-                          <h2 className="text-2xl font-bold text-foreground mb-2">Is This a Scam?</h2>
-                          <p className="text-muted-foreground">Practice identifying scams with realistic scenarios from your region. Read each scenario carefully and decide if it is a scam or legitimate.</p>
-                        </div>
-                        <ScamScenarioExercise scenarios={scamScenarios} />
+                    <TabsContent value="new-reality" className="space-y-6">
+                      <PillarIntro pillar="new-reality" audience="seniors" />
+                      <PillarLead href={ANCHOR_HREF} label="The New Reality: How AI Is Changing Digital Safety" testId="link-pillar-anchor-new-reality" />
+                      <Card>
+                        <CardContent className="p-6">
+                          <h3 className="text-lg font-bold text-foreground mb-2">Companion reading for older adults and their families</h3>
+                          <ul className="space-y-2">
+                            <li><a href={COMPANION_HREFS.ageVerification} className="text-primary hover:underline text-base" data-testid="link-companion-age-verification-seniors">The Age Verification Tradeoff: What Families Should Ask</a></li>
+                            <li><a href={COMPANION_HREFS.parentalControls} className="text-primary hover:underline text-base" data-testid="link-companion-parental-controls-seniors">Why Parental Controls Are Not Enough Anymore (relevant for grandparents helping with grandkids)</a></li>
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="old-advice" className="space-y-6">
+                      <PillarIntro pillar="old-advice" audience="seniors" />
+                      <PillarLead href={ANCHOR_HREF} label="The New Reality: How AI Is Changing Digital Safety" testId="link-pillar-lead-old-advice-seniors" />
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        {[
+                          { old: "\"If the caller ID shows a name I know, it is them.\"", why: "Caller ID can be spoofed in seconds. The number on your screen is not proof of who is calling. Always hang up and call back on a number you already have." },
+                          { old: "\"My bank would never ask me for my password.\"", why: "True. But scammers calling from a number that looks like your bank may ask you to \u201cverify\u201d a code, move money to a \u201csafe account,\u201d or read out a one-time code. Treat any urgency as the warning sign." },
+                          { old: "\"I would recognize my grandchild's voice.\"", why: "Voice cloning needs only a few seconds of audio from social media. The voice on the line may sound exactly right and still not be them. Agree on a family code word." },
+                          { old: "\"I check that the website URL is secure.\"", why: "The padlock and https only mean the connection is encrypted, not that the site is real. Scam sites copy the look perfectly. Type the address yourself or use a saved bookmark." },
+                        ].map((row) => (
+                          <Card key={row.old} className="border-2">
+                            <CardContent className="p-5">
+                              <p className="text-sm font-semibold text-muted-foreground mb-2">Old advice</p>
+                              <p className="text-foreground text-base mb-3">{row.old}</p>
+                              <p className="text-sm font-semibold text-muted-foreground mb-2">Why it falls short</p>
+                              <p className="text-foreground text-base leading-relaxed">{row.why}</p>
+                            </CardContent>
+                          </Card>
+                        ))}
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="deepdives">
+                    <TabsContent value="proactive" className="space-y-8">
+                      <PillarIntro pillar="proactive" audience="seniors" />
+                      <PillarLead href={COMPANION_HREFS.parentalControls} label="Why Parental Controls Are Not Enough Anymore" testId="link-pillar-lead-proactive-seniors" />
                       <div className="space-y-6">
                         <div>
                           <h2 className="text-2xl font-bold text-foreground mb-2">Scam Deep Dives</h2>
-                          <p className="text-muted-foreground">Interactive modules that take you deeper into specific scam types. Learn through practice scenarios and build your detection skills.</p>
+                          <p className="text-muted-foreground text-base">Interactive modules that take you deeper into specific scam types. Learn through practice scenarios and build your detection skills.</p>
                         </div>
                         <ScamDeepDive modules={deepDiveModules} />
                       </div>
-                    </TabsContent>
-
-                    <TabsContent value="checklists">
-                      <div className="space-y-6">
+                      <div className="space-y-6 border-t pt-8">
                         <div>
                           <h2 className="text-2xl font-bold text-foreground mb-2">Safety Checklists</h2>
-                          <p className="text-muted-foreground">Step-by-step security audits for your phone, finances, social media, and email. Check off each step as you complete it. Your progress is saved automatically.</p>
+                          <p className="text-muted-foreground text-base">Step-by-step security audits for your phone, finances, social media, and email. Check off each step as you complete it. Your progress is saved automatically.</p>
                         </div>
                         <SafetyChecklist checklists={safetyChecklists} />
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="emergency">
+                    <TabsContent value="real-time" className="space-y-8">
+                      <PillarIntro pillar="real-time" audience="seniors" />
+                      <PillarLead href={ANCHOR_HREF} label="The New Reality: How AI Is Changing Digital Safety" testId="link-pillar-lead-real-time-seniors" />
                       <div className="space-y-6">
                         <div>
+                          <h2 className="text-2xl font-bold text-foreground mb-2">Is This a Scam?</h2>
+                          <p className="text-muted-foreground text-base">Practice identifying scams with realistic scenarios from your region. Read each scenario carefully and decide if it is a scam or legitimate.</p>
+                        </div>
+                        <ScamScenarioExercise scenarios={scamScenarios} />
+                      </div>
+                      <div className="space-y-6 border-t pt-8">
+                        <div>
                           <h2 className="text-2xl font-bold text-foreground mb-2">I Think I Have Been Scammed</h2>
-                          <p className="text-muted-foreground">Answer a few questions about what happened and get specific, actionable steps for your situation. Includes reporting contacts for different regions.</p>
+                          <p className="text-muted-foreground text-base">Answer a few questions about what happened and get specific, actionable steps for your situation. Includes reporting contacts for different regions.</p>
                         </div>
                         <EmergencyFlowchart steps={emergencyFlowSteps} />
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="stats">
+                    <TabsContent value="tradeoffs" className="space-y-8">
+                      <PillarIntro pillar="tradeoffs" audience="seniors" />
+                      <PillarLead href={COMPANION_HREFS.ageVerification} label="The Age Verification Tradeoff: What Families Should Ask" testId="link-pillar-lead-tradeoffs-seniors" />
                       <ScamStatsInfographic stats={scamStats} />
-                    </TabsContent>
-
-                    <TabsContent value="family">
-                      <div className="space-y-6">
+                      <div className="space-y-6 border-t pt-8">
                         <div>
                           <h2 className="text-2xl font-bold text-foreground mb-2">Family Communication Toolkit</h2>
-                          <p className="text-muted-foreground">Guides for adult children helping aging parents discuss scam risks. Learn how to have these conversations respectfully, without being condescending.</p>
+                          <p className="text-muted-foreground text-base">Guides for adult children helping aging parents discuss scam risks. Learn how to have these conversations respectfully, without being condescending.</p>
                         </div>
                         <FamilyCommunicationToolkit conversations={familyConversations} />
                       </div>
