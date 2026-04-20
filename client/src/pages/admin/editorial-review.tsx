@@ -196,6 +196,12 @@ function ArticleReviewCard({
 
   const approveMutation = useMutation({
     mutationFn: async () => {
+      // Send the topic FIRST so the server-side approval invariant in the
+      // spine PATCH sees the new curatedTopic when deciding whether to flip
+      // spineReviewedByHuman to true.
+      if (topic && topic !== article.curatedTopic) {
+        await apiRequest("PATCH", `/api/admin/news/${article.id}/topic`, { curatedTopic: topic });
+      }
       // Filter out empty bullets before submit.
       const cleanBullets = whyBullets.map((b) => b.trim()).filter((b) => b.length >= 2);
       const payload = {
@@ -208,10 +214,6 @@ function ArticleReviewCard({
       };
       const res = await apiRequest("PATCH", `/api/admin/news/${article.id}`, payload);
       const out = await res.json();
-      // If topic changed, push it through the dedicated endpoint.
-      if (topic && topic !== article.curatedTopic) {
-        await apiRequest("PATCH", `/api/admin/news/${article.id}/topic`, { curatedTopic: topic });
-      }
       return out;
     },
     onSuccess: () => {

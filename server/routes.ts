@@ -1,5 +1,7 @@
 import express from "express";
 import type { Express, Request, Response } from "express";
+import { ACTION_LINK_ALLOWLIST, SPINE_LIMITS } from "./editorialSpine";
+import { generateSpineProposal } from "./editorialSpineGenerator";
 import { createServer, type Server } from "http";
 import path from "path";
 import fs from "fs";
@@ -6535,8 +6537,8 @@ BEHAVIORAL CONSTRAINTS
             whyThisMatters: spine.whyThisMatters,
             actionThisWeek: spine.actionThisWeek,
             editorialSpinePending: spine.editorialSpinePending,
-            spineReviewedByHuman: (a as any).spineReviewedByHuman === true,
-            proposedSpine: (a as any).proposedSpine || null,
+            spineReviewedByHuman: a.spineReviewedByHuman === true,
+            proposedSpine: a.proposedSpine ?? null,
           };
         }),
       });
@@ -6581,18 +6583,50 @@ BEHAVIORAL CONSTRAINTS
           parsed.data.actionThisWeek !== undefined;
         if (wroteSomething) patch.editorialSpinePending = false;
       }
-      // When the spine is being written (not just toggling pending), mark it
-      // as reviewed by a human and clear any stored AI proposal.
+      // When the spine is being written (not just toggling pending), enforce
+      // approval invariants: all three spine fields must be present and valid,
+      // and a curated topic must already be set on the article (or be set in
+      // this same request via the topic patch). Otherwise we keep the row
+      // pending and do NOT mark it as human-reviewed.
       const wroteSpineFields =
         parsed.data.whatChanged !== undefined ||
         parsed.data.whyThisMatters !== undefined ||
         parsed.data.actionThisWeek !== undefined;
       if (wroteSpineFields) {
-        (patch as any).spineReviewedByHuman = true;
-        (patch as any).proposedSpine = null;
+        const finalWhatChanged =
+          parsed.data.whatChanged !== undefined ? parsed.data.whatChanged : existing.whatChanged;
+        const finalWhy =
+          parsed.data.whyThisMatters !== undefined ? parsed.data.whyThisMatters : existing.whyThisMatters;
+        const finalAction =
+          parsed.data.actionThisWeek !== undefined ? parsed.data.actionThisWeek : existing.actionThisWeek;
+        const allFieldsPresent =
+          typeof finalWhatChanged === "string" &&
+          finalWhatChanged.trim().length > 0 &&
+          Array.isArray(finalWhy) &&
+          finalWhy.length === SPINE_LIMITS.whyCount &&
+          finalWhy.every((b: string) => typeof b === "string" && b.trim().length >= 2) &&
+          finalAction !== null &&
+          typeof finalAction === "object" &&
+          typeof finalAction.label === "string" &&
+          finalAction.label.trim().length > 0 &&
+          ACTION_LINK_ALLOWLIST.includes(finalAction.href);
+        const topicPresent = typeof existing.curatedTopic === "string" && existing.curatedTopic.length > 0;
+        if (allFieldsPresent && topicPresent) {
+          patch.spineReviewedByHuman = true;
+          patch.proposedSpine = null;
+          patch.editorialSpinePending = false;
+        } else {
+          // Partial save: keep pending, do not mark reviewed.
+          patch.editorialSpinePending = true;
+          patch.spineReviewedByHuman = false;
+        }
       }
       const updated = await storage.updateNewsArticle(existing.id, patch);
-      res.json({ success: true, article: updated });
+      res.json({
+        success: true,
+        article: updated,
+        reviewed: patch.spineReviewedByHuman === true,
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       console.error("[admin/news] patch failed:", message);
@@ -6632,217 +6666,36 @@ BEHAVIORAL CONSTRAINTS
   });
 
   // AI generation: propose editorial spine + curated topic for a single article.
-  // Returns the proposal without persisting; reviewer edits, then submits via PATCH.
+  // Persists the proposal to proposed_spine and returns it for the reviewer.
   app.post("/api/admin/news/:id/generate-spine", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const article = await storage.getNewsArticleById(req.params.id);
       if (!article) return res.status(404).json({ error: "Article not found" });
 
-      const { ACTION_LINK_ALLOWLIST, SPINE_LIMITS } = await import("./editorialSpine");
-      const { CURATED_TOPIC_LABELS, gateCuratedPlainEnglish, classifyCuratedTopic } =
-        await import("./newsCurationGuard");
-      const Anthropic = (await import("@anthropic-ai/sdk")).default;
-
-      const client = new Anthropic({
-        apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
-        baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
-      });
-
       const fieldsRequested: string[] = Array.isArray(req.body?.fields)
-        ? req.body.fields.filter((f: any) => typeof f === "string")
+        ? req.body.fields.filter((f: unknown): f is string => typeof f === "string")
         : ["whatChanged", "whyThisMatters", "actionThisWeek", "curatedTopic"];
 
-      const allowlistList = ACTION_LINK_ALLOWLIST.map((r) => `  - ${r}`).join("\n");
-      const topicList = Object.entries(CURATED_TOPIC_LABELS)
-        .map(([k, v]) => `  - "${k}" (${v})`)
-        .join("\n");
+      const proposal = await generateSpineProposal(article, fieldsRequested);
+      await storage.updateNewsArticle(article.id, { proposedSpine: proposal });
 
-      const prompt = `You are an editor for GetCyberRight, a family-focused cybersecurity site by Jude Annan, CISM. You are filling the "editorial spine" for an existing curated article. You DO NOT rewrite the article. You write three short framing fields plus a topic tag.
-
-Source article:
-TITLE: ${article.title}
-CATEGORY: ${article.category}
-SOURCE: ${article.source}
-EXCERPT: ${article.excerpt}
-BODY:
-${(article.content || "").slice(0, 4000)}
-
-Output a single JSON object with these fields (only include the ones requested below; null any you cannot honestly write from the article alone):
-- "whatChanged": one plain-English sentence, MAX ${SPINE_LIMITS.whatChangedMax} characters, describing what is new or what readers should now know. No marketing fluff. No fabrication.
-- "whyThisMatters": array of EXACTLY ${SPINE_LIMITS.whyCount} short bullets, each MAX ${SPINE_LIMITS.whyEachMax} characters, each tied to a real family situation (parents, kids, seniors, or household accounts).
-- "actionThisWeek": object { "label": string MAX ${SPINE_LIMITS.actionLabelMax} chars, "href": string }. The href MUST be one of these exact internal routes:
-${allowlistList}
-  Pick the route most useful for the reader given the article. Do not invent routes.
-- "curatedTopic": one of:
-${topicList}
-  Choose the best fit ONLY if the article clearly belongs to that topic. If you are not confident, return null. Do not guess.
-- "topicConfidence": "high" | "low". Set "low" if you would not stake a reviewer's time on the topic choice; in that case curatedTopic must be null.
-
-Requested fields this call: ${fieldsRequested.join(", ")}.
-
-WRITING RULES (strict):
-- NEVER use em dashes (—), en dashes (–), or double hyphens (--). Use periods, commas, semicolons, or colons instead.
-- NEVER fabricate statistics, dollar amounts, dates, names, or quotes. If the article does not state it, do not write it.
-- If a needed fact is missing, set the relevant field to null. Do not invent.
-- Avoid security jargon (zero-day, threat actor, APT, RCE, CVE, lateral movement, payload, exfiltrate, SOC, SIEM, IoC, C2). If you must use one, define it in plain English in parentheses on first use, e.g. "RCE (remote takeover of a device)".
-- Plain, calm, direct. No filler like "studies show" or "experts say".
-
-Output ONLY the JSON object. No markdown, no commentary.`;
-
-      const response = await client.messages.create({
-        model: "claude-sonnet-4-5",
-        max_tokens: 1200,
-        messages: [{ role: "user", content: prompt }],
-      });
-
-      const text = response.content[0].type === "text" ? response.content[0].text : "";
-      const cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-      let parsed: any = {};
-      try {
-        parsed = JSON.parse(cleaned);
-      } catch (e) {
-        console.error("[admin/news/generate-spine] JSON parse failed:", cleaned.slice(0, 200));
-        return res.status(502).json({ error: "AI returned invalid JSON" });
-      }
-
-      const stripDashes = (s: string): string =>
-        s.replace(/\s*[\u2014\u2013]\s*/g, ". ").replace(/\s*--\s*/g, ". ").replace(/\.\.\s/g, ". ").trim();
-
-      const proposal: {
-        whatChanged: string | null;
-        whyThisMatters: string[] | null;
-        actionThisWeek: { label: string; href: string } | null;
-        curatedTopic: string | null;
-        flags: string[];
-        needsAuthorInput: boolean;
-      } = {
-        whatChanged: null,
-        whyThisMatters: null,
-        actionThisWeek: null,
-        curatedTopic: null,
-        flags: [],
-        needsAuthorInput: false,
-      };
-
-      if (typeof parsed.whatChanged === "string" && parsed.whatChanged.trim()) {
-        const v = stripDashes(parsed.whatChanged).slice(0, SPINE_LIMITS.whatChangedMax);
-        proposal.whatChanged = v;
-      } else if (parsed.whatChanged === null) {
-        proposal.needsAuthorInput = true;
-        proposal.flags.push("whatChanged: model declined (needs author input)");
-      }
-
-      if (Array.isArray(parsed.whyThisMatters)) {
-        const cleanedBullets = parsed.whyThisMatters
-          .filter((b: any) => typeof b === "string" && b.trim().length >= 2)
-          .map((b: string) => stripDashes(b).slice(0, SPINE_LIMITS.whyEachMax))
-          .slice(0, SPINE_LIMITS.whyCount);
-        if (cleanedBullets.length > 0) proposal.whyThisMatters = cleanedBullets;
-      } else if (parsed.whyThisMatters === null) {
-        proposal.needsAuthorInput = true;
-        proposal.flags.push("whyThisMatters: model declined (needs author input)");
-      }
-
-      if (parsed.actionThisWeek && typeof parsed.actionThisWeek === "object") {
-        const rawLabel = typeof parsed.actionThisWeek.label === "string" ? parsed.actionThisWeek.label : "";
-        const rawHref = typeof parsed.actionThisWeek.href === "string" ? parsed.actionThisWeek.href : "";
-        const label = stripDashes(rawLabel).slice(0, SPINE_LIMITS.actionLabelMax);
-        let href = rawHref.trim();
-        if (!ACTION_LINK_ALLOWLIST.includes(href)) {
-          // Replace with the closest allowlisted route by simple keyword overlap.
-          const text = `${article.title} ${article.excerpt} ${article.category}`.toLowerCase();
-          const scored = ACTION_LINK_ALLOWLIST.map((route) => {
-            const tokens = route.replace(/^\//, "").split(/[\/-]/).filter(Boolean);
-            let score = 0;
-            for (const t of tokens) if (text.includes(t)) score += 1;
-            return { route, score };
-          }).sort((a, b) => b.score - a.score);
-          const replacement = scored[0]?.score > 0 ? scored[0].route : "/news";
-          proposal.flags.push(
-            `actionThisWeek.href "${href}" was off-allowlist; replaced with "${replacement}". Please confirm.`,
-          );
-          href = replacement;
-        }
-        if (label && href) {
-          proposal.actionThisWeek = { label, href };
-        }
-      } else if (parsed.actionThisWeek === null) {
-        proposal.needsAuthorInput = true;
-        proposal.flags.push("actionThisWeek: model declined (needs author input)");
-      }
-
-      const lowConfidence = parsed.topicConfidence === "low";
-      if (
-        !lowConfidence &&
-        typeof parsed.curatedTopic === "string" &&
-        parsed.curatedTopic in CURATED_TOPIC_LABELS
-      ) {
-        proposal.curatedTopic = parsed.curatedTopic;
-      } else {
-        // Low confidence (or missing/invalid). Leave null and surface for review.
-        proposal.curatedTopic = null;
-        proposal.needsAuthorInput = true;
-        proposal.flags.push(
-          "curatedTopic: low confidence; reviewer must select the topic manually.",
-        );
-      }
-
-      // Per-field plain-English gate. Any field that fails is nulled out and
-      // surfaced as needs-author-input rather than passed through with a flag.
-      const checkField = (label: string, text: string) => {
-        const g = gateCuratedPlainEnglish("", "", text);
-        return g.ok ? null : `${label}: jargon detected (${g.blockedTerms.join(", ")}). Define in plain English on first use.`;
-      };
-      if (proposal.whatChanged) {
-        const f = checkField("whatChanged", proposal.whatChanged);
-        if (f) {
-          proposal.whatChanged = null;
-          proposal.needsAuthorInput = true;
-          proposal.flags.push(f);
-        }
-      }
-      if (proposal.whyThisMatters) {
-        const joined = proposal.whyThisMatters.join("\n");
-        const f = checkField("whyThisMatters", joined);
-        if (f) {
-          proposal.whyThisMatters = null;
-          proposal.needsAuthorInput = true;
-          proposal.flags.push(f);
-        }
-      }
-      if (proposal.actionThisWeek) {
-        const f = checkField("actionThisWeek.label", proposal.actionThisWeek.label);
-        if (f) {
-          proposal.actionThisWeek = null;
-          proposal.needsAuthorInput = true;
-          proposal.flags.push(f);
-        }
-      }
-
-      // Persist the proposal so the reviewer queue and the per-article approve
-      // flow can read it independently of any single browser session.
-      const persisted = {
-        ...proposal,
-        generatedAt: new Date().toISOString(),
-      };
-      await storage.updateNewsArticle(article.id, { proposedSpine: persisted } as any);
-
-      res.json({
-        articleId: article.id,
-        proposal: persisted,
-      });
+      return res.json({ articleId: article.id, proposal });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       console.error("[admin/news/generate-spine] failed:", message);
-      res.status(500).json({ error: `Failed to generate spine: ${message}` });
+      return res.status(500).json({ error: `Failed to generate spine: ${message}` });
     }
   });
 
-  // Batch worker: generate proposals for every curated article that does not
+  // Old inline generation logic removed; see generateSpineProposal.
+
+  // Batch worker: generates proposals for every curated article that does not
   // yet have one (or whose spine is still pending). Persists to proposed_spine.
+  // Calls generateSpineProposal directly (no self-HTTP) and bounds concurrency.
   app.post("/api/admin/news/generate-spine-batch", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const limit = Math.min(Math.max(Number(req.body?.limit) || 50, 1), 100);
+      const concurrency = Math.min(Math.max(Number(req.body?.concurrency) || 3, 1), 5);
       const force = req.body?.force === true;
       const all = await storage.getNewsArticles(undefined, 500);
       const curated = all.filter(
@@ -6851,54 +6704,46 @@ Output ONLY the JSON object. No markdown, no commentary.`;
       const targets = curated
         .filter((a) => {
           if (force) return true;
-          const reviewed = (a as any).spineReviewedByHuman === true;
-          const hasProposal = !!(a as any).proposedSpine;
-          const pending = (a as any).editorialSpinePending === true;
+          const reviewed = a.spineReviewedByHuman === true;
+          const hasProposal = !!a.proposedSpine;
+          const pending = a.editorialSpinePending === true;
           return !reviewed && !hasProposal && pending;
         })
         .slice(0, limit);
 
-      const results: Array<{ id: string; ok: boolean; needsAuthorInput?: boolean; flags?: string[]; error?: string }> = [];
-      for (const article of targets) {
-        try {
-          // Reuse the per-article endpoint logic by issuing an internal call.
-          const fakeReq = {
-            params: { id: article.id },
-            body: {},
-          } as any;
-          let captured: any = null;
-          let status = 200;
-          const fakeRes = {
-            json: (v: any) => { captured = v; return fakeRes; },
-            status: (s: number) => { status = s; return fakeRes; },
-          } as any;
-          // The handler is registered on the router; easiest path is to inline
-          // a function call by re-fetching the article and invoking the same
-          // logic. Instead, we POST to ourselves through the route handler by
-          // calling app._router.handle is brittle, so we duplicate the minimal
-          // generation by calling the endpoint via fetch on localhost.
-          const port = process.env.PORT || "5000";
-          const cookie = req.headers.cookie || "";
-          const r = await fetch(`http://127.0.0.1:${port}/api/admin/news/${article.id}/generate-spine`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", cookie },
-            body: JSON.stringify({}),
-          });
-          if (!r.ok) {
-            results.push({ id: article.id, ok: false, error: `HTTP ${r.status}` });
-            continue;
+      type BatchResult = {
+        id: string;
+        ok: boolean;
+        needsAuthorInput?: boolean;
+        flags?: string[];
+        error?: string;
+      };
+      const results: BatchResult[] = [];
+
+      // Bounded concurrency: process the queue with `concurrency` workers.
+      let cursor = 0;
+      const worker = async () => {
+        while (cursor < targets.length) {
+          const article = targets[cursor++];
+          try {
+            const proposal = await generateSpineProposal(article);
+            await storage.updateNewsArticle(article.id, { proposedSpine: proposal });
+            results.push({
+              id: article.id,
+              ok: true,
+              needsAuthorInput: proposal.needsAuthorInput,
+              flags: proposal.flags,
+            });
+          } catch (e) {
+            results.push({
+              id: article.id,
+              ok: false,
+              error: e instanceof Error ? e.message : "Unknown error",
+            });
           }
-          const body: any = await r.json();
-          results.push({
-            id: article.id,
-            ok: true,
-            needsAuthorInput: body?.proposal?.needsAuthorInput === true,
-            flags: body?.proposal?.flags || [],
-          });
-        } catch (e) {
-          results.push({ id: article.id, ok: false, error: (e as Error).message });
         }
-      }
+      };
+      await Promise.all(Array.from({ length: concurrency }, () => worker()));
 
       res.json({
         attempted: targets.length,
