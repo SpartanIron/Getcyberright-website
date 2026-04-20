@@ -2795,6 +2795,15 @@ BEHAVIORAL CONSTRAINTS
 
   (async () => {
     try {
+      const { seedAnchorArticle } = await import("./anchorArticleSeed");
+      await seedAnchorArticle();
+    } catch (err: any) {
+      console.error("Failed to seed anchor article:", err.message);
+    }
+  })();
+
+  (async () => {
+    try {
       await seedDataBrokers(db);
       const allBrokers = await db.select({
         id: dataBrokers.id,
@@ -6135,6 +6144,7 @@ BEHAVIORAL CONSTRAINTS
       const { clusterTrending, CURATED_TOPIC_LABELS, isCuratedSource, buildPlainEnglishSummary } = await import(
         "./newsCurationGuard"
       );
+      const { buildSpineFromArticle } = await import("./editorialSpine");
       const articles = await storage.getNewsArticles(undefined, 200);
 
       interface TrackArticle {
@@ -6155,6 +6165,9 @@ BEHAVIORAL CONSTRAINTS
         curatedTopic: string | null;
         clusterId: string | null;
         plainEnglishSummary: string | null;
+        whatChanged: string | null;
+        actionThisWeek: { label: string; href: string } | null;
+        editorialSpinePending: boolean;
       }
 
       const mapBase = (a: NewsArticle): TrackArticle => {
@@ -6165,6 +6178,7 @@ BEHAVIORAL CONSTRAINTS
             : isCuratedSource(a.source)
               ? "curated"
               : "aggregated";
+        const spine = buildSpineFromArticle(a as any);
         return {
           id: a.id,
           title: a.title,
@@ -6186,6 +6200,9 @@ BEHAVIORAL CONSTRAINTS
             articleType === "aggregated"
               ? buildPlainEnglishSummary([a.title || "", a.excerpt || ""].join("\n"))
               : null,
+          whatChanged: spine.whatChanged,
+          actionThisWeek: spine.actionThisWeek,
+          editorialSpinePending: spine.editorialSpinePending,
         };
       };
 
@@ -6451,6 +6468,78 @@ BEHAVIORAL CONSTRAINTS
     }
   });
 
+  // ---- Admin: editorial spine editor for curated news articles ----
+  app.get("/api/admin/news", isAuthenticated, isAdmin, async (_req: Request, res: Response) => {
+    try {
+      const all = await storage.getNewsArticles(undefined, 500);
+      const { buildSpineFromArticle } = await import("./editorialSpine");
+      const curated = all.filter(
+        (a) =>
+          a.articleType === "curated" || /getcyberright|gcr/i.test(a.source || ""),
+      );
+      res.json({
+        articles: curated.map((a) => {
+          const spine = buildSpineFromArticle(a as any);
+          return {
+            id: a.id,
+            slug: a.slug,
+            title: a.title,
+            category: a.category,
+            curatedTopic: a.curatedTopic,
+            publishedAt: a.publishedAt?.toISOString() || null,
+            whatChanged: spine.whatChanged,
+            whyThisMatters: spine.whyThisMatters,
+            actionThisWeek: spine.actionThisWeek,
+            editorialSpinePending: spine.editorialSpinePending,
+          };
+        }),
+      });
+    } catch (err: any) {
+      console.error("[admin/news] list failed:", err.message);
+      res.status(500).json({ error: "Failed to list curated articles" });
+    }
+  });
+
+  app.patch("/api/admin/news/:id", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { editorialSpineSchema, ACTION_LINK_ALLOWLIST } = await import("./editorialSpine");
+      const parsed = editorialSpineSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          error: "Invalid spine payload",
+          issues: parsed.error.issues,
+          allowlist: ACTION_LINK_ALLOWLIST,
+        });
+      }
+      const existing = await storage.getNewsArticleById(req.params.id);
+      if (!existing) return res.status(404).json({ error: "Article not found" });
+      const patch: any = {};
+      if (parsed.data.whatChanged !== undefined) patch.whatChanged = parsed.data.whatChanged;
+      if (parsed.data.whyThisMatters !== undefined) patch.whyThisMatters = parsed.data.whyThisMatters;
+      if (parsed.data.actionThisWeek !== undefined) patch.actionThisWeek = parsed.data.actionThisWeek;
+      if (parsed.data.editorialSpinePending !== undefined) {
+        patch.editorialSpinePending = parsed.data.editorialSpinePending;
+      } else {
+        // If editor supplied any spine field at all, clear the pending flag.
+        const wroteSomething =
+          parsed.data.whatChanged !== undefined ||
+          parsed.data.whyThisMatters !== undefined ||
+          parsed.data.actionThisWeek !== undefined;
+        if (wroteSomething) patch.editorialSpinePending = false;
+      }
+      const updated = await storage.updateNewsArticle(existing.id, patch);
+      res.json({ success: true, article: updated });
+    } catch (err: any) {
+      console.error("[admin/news] patch failed:", err.message);
+      res.status(500).json({ error: "Failed to update article" });
+    }
+  });
+
+  app.get("/api/admin/news/allowlist", isAuthenticated, isAdmin, async (_req, res) => {
+    const { ACTION_LINK_ALLOWLIST, SPINE_LIMITS } = await import("./editorialSpine");
+    res.json({ allowlist: ACTION_LINK_ALLOWLIST, limits: SPINE_LIMITS });
+  });
+
   app.get("/og/article/:slug", handleArticleOgImage);
 
   app.get(["/rss.xml", "/feed.xml", "/news/rss.xml", "/news/feed.xml", "/api/rss.xml"], handleNewsRss);
@@ -6484,6 +6573,8 @@ BEHAVIORAL CONSTRAINTS
           publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
           readTime: a.content ? Math.ceil(a.content.split(/\s+/).length / 200) : 2,
         }));
+      const { buildSpineFromArticle } = await import("./editorialSpine");
+      const spine = buildSpineFromArticle(article as any);
       res.json({
         id: article.id,
         title: article.title,
@@ -6510,6 +6601,10 @@ BEHAVIORAL CONSTRAINTS
               ? "curated"
               : "aggregated",
         curatedTopic: article.curatedTopic || null,
+        whatChanged: spine.whatChanged,
+        whyThisMatters: spine.whyThisMatters,
+        actionThisWeek: spine.actionThisWeek,
+        editorialSpinePending: spine.editorialSpinePending,
         plainEnglishSummary:
           (article.articleType === "aggregated" || !article.articleType)
             ? buildPlainEnglishSummary([article.title || "", article.excerpt || ""].join("\n"))

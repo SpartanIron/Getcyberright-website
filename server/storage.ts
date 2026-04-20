@@ -151,7 +151,9 @@ export interface IStorage {
   createNewsArticle(article: InsertNewsArticle): Promise<NewsArticle>;
   getNewsArticles(category?: string, limit?: number): Promise<NewsArticle[]>;
   getNewsArticleBySlug(slug: string): Promise<NewsArticle | undefined>;
+  getNewsArticleById(id: string): Promise<NewsArticle | undefined>;
   getNewsArticleBySourceUrl(sourceUrl: string): Promise<NewsArticle | undefined>;
+  updateNewsArticle(id: string, patch: Partial<InsertNewsArticle>): Promise<NewsArticle | undefined>;
   searchNewsArticles(query: string, limit?: number): Promise<NewsArticle[]>;
   getNewsArticleCount(): Promise<number>;
 
@@ -672,8 +674,22 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async getNewsArticleById(id: string): Promise<NewsArticle | undefined> {
+    const result = await db.select().from(newsArticles).where(eq(newsArticles.id, id));
+    return result[0];
+  }
+
   async getNewsArticleBySourceUrl(sourceUrl: string): Promise<NewsArticle | undefined> {
     const result = await db.select().from(newsArticles).where(eq(newsArticles.sourceUrl, sourceUrl));
+    return result[0];
+  }
+
+  async updateNewsArticle(id: string, patch: Partial<InsertNewsArticle>): Promise<NewsArticle | undefined> {
+    const result = await db
+      .update(newsArticles)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(newsArticles.id, id))
+      .returning();
     return result[0];
   }
 

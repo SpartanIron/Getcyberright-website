@@ -25,6 +25,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { LiveNewsIndicator } from "@/components/live-news-indicator";
+import { EditorialSpineMini } from "@/components/editorial-spine";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { FadeIn } from "@/components/fade-in";
@@ -160,6 +161,9 @@ interface NewsItem {
   articleType?: "curated" | "aggregated";
   curatedTopic?: string | null;
   plainEnglishSummary?: string | null;
+  whatChanged?: string | null;
+  actionThisWeek?: { label: string; href: string } | null;
+  editorialSpinePending?: boolean;
 }
 
 interface TrendingCluster {
@@ -305,6 +309,12 @@ function ArticleCard({
             >
               {article.plainEnglishSummary}
             </p>
+          )}
+          {variant === "curated" && (article.whatChanged || article.actionThisWeek) && (
+            <EditorialSpineMini
+              whatChanged={article.whatChanged}
+              actionThisWeek={article.actionThisWeek || undefined}
+            />
           )}
           <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-muted-foreground">
             {variant === "curated" ? (

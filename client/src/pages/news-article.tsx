@@ -22,6 +22,7 @@ import { SEOHead } from "@/components/seo-head";
 import { renderMarkdown } from "@/lib/markdown";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { EditorialSpine } from "@/components/editorial-spine";
 
 interface RelatedArticle {
   id: string;
@@ -55,6 +56,10 @@ interface NewsArticleData {
   keyTakeaways: string[];
   articleType: "curated" | "aggregated";
   curatedTopic: string | null;
+  whatChanged?: string | null;
+  whyThisMatters?: string[] | null;
+  actionThisWeek?: { label: string; href: string } | null;
+  editorialSpinePending?: boolean;
   publishedAt: string;
   updatedAt: string | null;
   readTime: number;
@@ -668,6 +673,17 @@ export default function NewsArticlePage({ initialArticle }: { initialArticle?: N
             <ShareBar title={article.title} url={articleUrl} />
           </div>
         </FadeIn>
+
+        {article.articleType === "curated" && (
+          <FadeIn>
+            <EditorialSpine
+              whatChanged={article.whatChanged}
+              whyThisMatters={article.whyThisMatters || undefined}
+              actionThisWeek={article.actionThisWeek || undefined}
+              pending={article.editorialSpinePending}
+            />
+          </FadeIn>
+        )}
 
         {article.keyTakeaways && article.keyTakeaways.length > 0 && (
           <FadeIn>
