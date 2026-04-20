@@ -158,6 +158,7 @@ interface NewsItem {
   authorRole?: string;
   articleType?: "curated" | "aggregated";
   curatedTopic?: string | null;
+  hasJargon?: boolean;
 }
 
 interface TrendingCluster {
@@ -286,12 +287,28 @@ function ArticleCard({
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
             {decodeHtmlEntities(article.excerpt)}
           </p>
+          {variant === "aggregated" && article.hasJargon && (
+            <p
+              className="mt-2 text-[11px] inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-medium"
+              data-testid="badge-plain-english-summary"
+            >
+              Plain English summary inside
+            </p>
+          )}
           <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-muted-foreground">
             {variant === "curated" ? (
-              <span className="flex items-center gap-1.5">
-                <PenLine className="h-3 w-3 text-teal-600 dark:text-teal-400" />
-                <span className="font-medium text-slate-700 dark:text-slate-300">
-                  {article.author || "Jude Annan, CISM"}
+              <span className="flex items-center gap-2">
+                <Avatar className="h-7 w-7 ring-1 ring-teal-500/30">
+                  <AvatarImage src="/jude-annan.jpg" alt="Jude Annan" />
+                  <AvatarFallback className="text-[10px] bg-teal-600 text-white font-bold">JA</AvatarFallback>
+                </Avatar>
+                <span className="leading-tight">
+                  <span className="block font-semibold text-slate-800 dark:text-slate-200">
+                    {article.author || "Jude Annan, CISM"}
+                  </span>
+                  <span className="block text-[10px] text-muted-foreground">
+                    {article.authorRole || "Managing Partner, GetCyberRight"}
+                  </span>
                 </span>
               </span>
             ) : (

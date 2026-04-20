@@ -633,6 +633,9 @@ export default function NewsArticlePage({ initialArticle }: { initialArticle?: N
                   <p className="text-[11px] text-teal-700 dark:text-teal-400 mt-0.5 font-semibold" data-testid="text-article-attribution">
                     GetCyberRight Original &middot; Plain-English guidance for families
                   </p>
+                  <p className="text-[11px] text-muted-foreground mt-1 italic" data-testid="text-author-bio">
+                    Cybersecurity practitioner translating real-world threats into steps families can act on today.
+                  </p>
                 </>
               ) : (
                 <p className="text-[11px] text-muted-foreground" data-testid="text-article-attribution">

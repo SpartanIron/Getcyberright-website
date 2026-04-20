@@ -71,6 +71,33 @@ export async function seedNewsArticles(): Promise<number> {
     `);
     console.log("[news-seed] Backfilled article_type from source.");
 
+    // Curated pieces must always carry a unique GetCyberRight branded card.
+    // Backfill any curated rows whose image is missing or still points at an
+    // external publisher URL (i.e. not a data: URL).
+    try {
+      const { generateBrandedCardSvg } = await import("./newsCurationGuard");
+      const stale = await client.unsafe(`
+        SELECT id, title, category, image_url
+          FROM news_articles
+         WHERE article_type = 'curated'
+           AND (image_url IS NULL OR image_url NOT LIKE 'data:%')
+      `);
+      let updated = 0;
+      for (const row of stale as Array<{ id: string; title: string; category: string }>) {
+        const card = generateBrandedCardSvg(row.title, row.category);
+        await client.unsafe(
+          `UPDATE news_articles SET image_url = $1, image_hash = $2 WHERE id = $3`,
+          [card.dataUrl, card.hash, row.id],
+        );
+        updated++;
+      }
+      if (updated > 0) {
+        console.log(`[news-seed] Branded ${updated} curated article(s) with GetCyberRight card.`);
+      }
+    } catch (err) {
+      console.warn(`[news-seed] Curated image backfill skipped: ${(err as Error).message}`);
+    }
+
     // Drop and recreate social_posts table (schema mismatch from initial migration)
     await client.unsafe(`DROP TABLE IF EXISTS "social_posts"`);
     await client.unsafe(`

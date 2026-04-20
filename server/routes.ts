@@ -6132,7 +6132,7 @@ BEHAVIORAL CONSTRAINTS
 
   app.get("/api/news/tracks", async (_req: Request, res: Response) => {
     try {
-      const { clusterTrending, CURATED_TOPIC_LABELS, isCuratedSource } = await import(
+      const { clusterTrending, CURATED_TOPIC_LABELS, isCuratedSource, scanJargon } = await import(
         "./newsCurationGuard"
       );
       const articles = await storage.getNewsArticles(undefined, 200);
@@ -6154,6 +6154,7 @@ BEHAVIORAL CONSTRAINTS
         articleType: "curated" | "aggregated";
         curatedTopic: string | null;
         clusterId: string | null;
+        hasJargon: boolean;
       }
 
       const mapBase = (a: NewsArticle): TrackArticle => {
@@ -6181,6 +6182,10 @@ BEHAVIORAL CONSTRAINTS
           articleType,
           curatedTopic: (a.curatedTopic as string | null) ?? null,
           clusterId: (a.clusterId as string | null) ?? null,
+          hasJargon:
+            articleType === "aggregated"
+              ? scanJargon([a.title || "", a.excerpt || ""].join("\n")).blockedTerms.length > 0
+              : false,
         };
       };
 
@@ -6259,10 +6264,10 @@ BEHAVIORAL CONSTRAINTS
           latest,
         },
         fromGetCyberRight: {
-          topics: Object.entries(fromGetCyberRight).map(([key, items]) => ({
+          topics: TOPIC_KEYS.map((key) => ({
             key,
-            label: (CURATED_TOPIC_LABELS as any)[key] || key,
-            articles: items,
+            label: CURATED_TOPIC_LABELS[key],
+            articles: fromGetCyberRight[key],
           })),
           author: {
             name: "Jude Annan, CISM",
@@ -6434,6 +6439,7 @@ BEHAVIORAL CONSTRAINTS
 
   app.get("/api/news/article/:slug", async (req: Request, res: Response) => {
     try {
+      const { scanJargon } = await import("./newsCurationGuard");
       const article = await storage.getNewsArticleBySlug(req.params.slug);
       if (!article) {
         return res.status(404).json({ error: "Article not found" });
@@ -6486,6 +6492,10 @@ BEHAVIORAL CONSTRAINTS
               ? "curated"
               : "aggregated",
         curatedTopic: article.curatedTopic || null,
+        hasJargon:
+          (article.articleType === "aggregated" || !article.articleType)
+            ? scanJargon([article.title || "", article.excerpt || "", article.content || ""].join("\n")).blockedTerms.length > 0
+            : false,
         publishedAt: article.publishedAt?.toISOString() || new Date().toISOString(),
         updatedAt: article.updatedAt ? article.updatedAt.toISOString() : null,
         readTime: article.content ? Math.ceil(article.content.split(/\s+/).length / 200) : 2,
