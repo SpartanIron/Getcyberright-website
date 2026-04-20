@@ -6591,7 +6591,205 @@ BEHAVIORAL CONSTRAINTS
 
   app.get("/api/admin/news/allowlist", isAuthenticated, isAdmin, async (_req, res) => {
     const { ACTION_LINK_ALLOWLIST, SPINE_LIMITS } = await import("./editorialSpine");
-    res.json({ allowlist: ACTION_LINK_ALLOWLIST, limits: SPINE_LIMITS });
+    const { CURATED_TOPIC_LABELS } = await import("./newsCurationGuard");
+    res.json({
+      allowlist: ACTION_LINK_ALLOWLIST,
+      limits: SPINE_LIMITS,
+      curatedTopics: CURATED_TOPIC_LABELS,
+    });
+  });
+
+  // Update curated topic (separate from spine fields).
+  app.patch("/api/admin/news/:id/topic", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const { CURATED_TOPIC_LABELS } = await import("./newsCurationGuard");
+      const validTopics = Object.keys(CURATED_TOPIC_LABELS);
+      const topic = req.body?.curatedTopic;
+      if (topic !== null && (typeof topic !== "string" || !validTopics.includes(topic))) {
+        return res.status(400).json({ error: "Invalid curatedTopic", validTopics });
+      }
+      const existing = await storage.getNewsArticleById(req.params.id);
+      if (!existing) return res.status(404).json({ error: "Article not found" });
+      const updated = await storage.updateNewsArticle(existing.id, { curatedTopic: topic });
+      res.json({ success: true, article: updated });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("[admin/news/topic] failed:", message);
+      res.status(500).json({ error: "Failed to update topic" });
+    }
+  });
+
+  // AI generation: propose editorial spine + curated topic for a single article.
+  // Returns the proposal without persisting; reviewer edits, then submits via PATCH.
+  app.post("/api/admin/news/:id/generate-spine", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const article = await storage.getNewsArticleById(req.params.id);
+      if (!article) return res.status(404).json({ error: "Article not found" });
+
+      const { ACTION_LINK_ALLOWLIST, SPINE_LIMITS } = await import("./editorialSpine");
+      const { CURATED_TOPIC_LABELS, gateCuratedPlainEnglish, classifyCuratedTopic } =
+        await import("./newsCurationGuard");
+      const Anthropic = (await import("@anthropic-ai/sdk")).default;
+
+      const client = new Anthropic({
+        apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+        baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
+      });
+
+      const fieldsRequested: string[] = Array.isArray(req.body?.fields)
+        ? req.body.fields.filter((f: any) => typeof f === "string")
+        : ["whatChanged", "whyThisMatters", "actionThisWeek", "curatedTopic"];
+
+      const allowlistList = ACTION_LINK_ALLOWLIST.map((r) => `  - ${r}`).join("\n");
+      const topicList = Object.entries(CURATED_TOPIC_LABELS)
+        .map(([k, v]) => `  - "${k}" (${v})`)
+        .join("\n");
+
+      const prompt = `You are an editor for GetCyberRight, a family-focused cybersecurity site by Jude Annan, CISM. You are filling the "editorial spine" for an existing curated article. You DO NOT rewrite the article. You write three short framing fields plus a topic tag.
+
+Source article:
+TITLE: ${article.title}
+CATEGORY: ${article.category}
+SOURCE: ${article.source}
+EXCERPT: ${article.excerpt}
+BODY:
+${(article.content || "").slice(0, 4000)}
+
+Output a single JSON object with these fields (only include the ones requested below; null any you cannot honestly write from the article alone):
+- "whatChanged": one plain-English sentence, MAX ${SPINE_LIMITS.whatChangedMax} characters, describing what is new or what readers should now know. No marketing fluff. No fabrication.
+- "whyThisMatters": array of EXACTLY ${SPINE_LIMITS.whyCount} short bullets, each MAX ${SPINE_LIMITS.whyEachMax} characters, each tied to a real family situation (parents, kids, seniors, or household accounts).
+- "actionThisWeek": object { "label": string MAX ${SPINE_LIMITS.actionLabelMax} chars, "href": string }. The href MUST be one of these exact internal routes:
+${allowlistList}
+  Pick the route most useful for the reader given the article. Do not invent routes.
+- "curatedTopic": one of:
+${topicList}
+  Choose the best fit. Use "this-weeks-threat" only as a fallback.
+
+Requested fields this call: ${fieldsRequested.join(", ")}.
+
+WRITING RULES (strict):
+- NEVER use em dashes (—), en dashes (–), or double hyphens (--). Use periods, commas, semicolons, or colons instead.
+- NEVER fabricate statistics, dollar amounts, dates, names, or quotes. If the article does not state it, do not write it.
+- If a needed fact is missing, set the relevant field to null. Do not invent.
+- Avoid security jargon (zero-day, threat actor, APT, RCE, CVE, lateral movement, payload, exfiltrate, SOC, SIEM, IoC, C2). If you must use one, define it in plain English in parentheses on first use, e.g. "RCE (remote takeover of a device)".
+- Plain, calm, direct. No filler like "studies show" or "experts say".
+
+Output ONLY the JSON object. No markdown, no commentary.`;
+
+      const response = await client.messages.create({
+        model: "claude-sonnet-4-5",
+        max_tokens: 1200,
+        messages: [{ role: "user", content: prompt }],
+      });
+
+      const text = response.content[0].type === "text" ? response.content[0].text : "";
+      const cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+      let parsed: any = {};
+      try {
+        parsed = JSON.parse(cleaned);
+      } catch (e) {
+        console.error("[admin/news/generate-spine] JSON parse failed:", cleaned.slice(0, 200));
+        return res.status(502).json({ error: "AI returned invalid JSON" });
+      }
+
+      const stripDashes = (s: string): string =>
+        s.replace(/\s*[\u2014\u2013]\s*/g, ". ").replace(/\s*--\s*/g, ". ").replace(/\.\.\s/g, ". ").trim();
+
+      const proposal: {
+        whatChanged: string | null;
+        whyThisMatters: string[] | null;
+        actionThisWeek: { label: string; href: string } | null;
+        curatedTopic: string | null;
+        flags: string[];
+        needsAuthorInput: boolean;
+      } = {
+        whatChanged: null,
+        whyThisMatters: null,
+        actionThisWeek: null,
+        curatedTopic: null,
+        flags: [],
+        needsAuthorInput: false,
+      };
+
+      if (typeof parsed.whatChanged === "string" && parsed.whatChanged.trim()) {
+        const v = stripDashes(parsed.whatChanged).slice(0, SPINE_LIMITS.whatChangedMax);
+        proposal.whatChanged = v;
+      } else if (parsed.whatChanged === null) {
+        proposal.needsAuthorInput = true;
+        proposal.flags.push("whatChanged: model declined (needs author input)");
+      }
+
+      if (Array.isArray(parsed.whyThisMatters)) {
+        const cleanedBullets = parsed.whyThisMatters
+          .filter((b: any) => typeof b === "string" && b.trim().length >= 2)
+          .map((b: string) => stripDashes(b).slice(0, SPINE_LIMITS.whyEachMax))
+          .slice(0, SPINE_LIMITS.whyCount);
+        if (cleanedBullets.length > 0) proposal.whyThisMatters = cleanedBullets;
+      } else if (parsed.whyThisMatters === null) {
+        proposal.needsAuthorInput = true;
+        proposal.flags.push("whyThisMatters: model declined (needs author input)");
+      }
+
+      if (parsed.actionThisWeek && typeof parsed.actionThisWeek === "object") {
+        const rawLabel = typeof parsed.actionThisWeek.label === "string" ? parsed.actionThisWeek.label : "";
+        const rawHref = typeof parsed.actionThisWeek.href === "string" ? parsed.actionThisWeek.href : "";
+        const label = stripDashes(rawLabel).slice(0, SPINE_LIMITS.actionLabelMax);
+        let href = rawHref.trim();
+        if (!ACTION_LINK_ALLOWLIST.includes(href)) {
+          // Replace with the closest allowlisted route by simple keyword overlap.
+          const text = `${article.title} ${article.excerpt} ${article.category}`.toLowerCase();
+          const scored = ACTION_LINK_ALLOWLIST.map((route) => {
+            const tokens = route.replace(/^\//, "").split(/[\/-]/).filter(Boolean);
+            let score = 0;
+            for (const t of tokens) if (text.includes(t)) score += 1;
+            return { route, score };
+          }).sort((a, b) => b.score - a.score);
+          const replacement = scored[0]?.score > 0 ? scored[0].route : "/news";
+          proposal.flags.push(
+            `actionThisWeek.href "${href}" was off-allowlist; replaced with "${replacement}". Please confirm.`,
+          );
+          href = replacement;
+        }
+        if (label && href) {
+          proposal.actionThisWeek = { label, href };
+        }
+      } else if (parsed.actionThisWeek === null) {
+        proposal.needsAuthorInput = true;
+        proposal.flags.push("actionThisWeek: model declined (needs author input)");
+      }
+
+      if (typeof parsed.curatedTopic === "string" && parsed.curatedTopic in CURATED_TOPIC_LABELS) {
+        proposal.curatedTopic = parsed.curatedTopic;
+      } else {
+        // Heuristic fallback so the dropdown is never empty.
+        proposal.curatedTopic = classifyCuratedTopic(article.title, article.excerpt, article.category);
+        proposal.flags.push(`curatedTopic fell back to heuristic ("${proposal.curatedTopic}")`);
+      }
+
+      // Run jargon gate over what we plan to surface so the reviewer sees blockers up front.
+      const gate = gateCuratedPlainEnglish(
+        "",
+        proposal.whatChanged || "",
+        [
+          ...(proposal.whyThisMatters || []),
+          proposal.actionThisWeek?.label || "",
+        ].join("\n"),
+      );
+      if (!gate.ok) {
+        proposal.flags.push(
+          `Plain-English gate flagged: ${gate.blockedTerms.join(", ")}. Define each in parentheses on first use.`,
+        );
+      }
+
+      res.json({
+        articleId: article.id,
+        proposal,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("[admin/news/generate-spine] failed:", message);
+      res.status(500).json({ error: `Failed to generate spine: ${message}` });
+    }
   });
 
   app.get("/og/article/:slug", handleArticleOgImage);

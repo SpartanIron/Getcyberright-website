@@ -18,7 +18,8 @@ import {
   FileText,
   ScanSearch,
   Search,
-  Bell
+  Bell,
+  PenLine
 } from "lucide-react";
 import logoImage from "@/assets/logo.webp";
 import { imgSrc } from "@/lib/img-src";
@@ -30,6 +31,7 @@ interface AdminLayoutProps {
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/content", label: "Content Manager", icon: FileText },
+  { href: "/admin/editorial-review", label: "Editorial Review", icon: PenLine },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/subscribers", label: "Subscribers", icon: Newspaper },
