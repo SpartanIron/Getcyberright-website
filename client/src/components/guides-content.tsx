@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Clock, Search, ArrowRight, Loader2, BookMarked, Shield, Lock, Smartphone, Users, Globe, Brain, CalendarCheck, UserCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, Fragment } from "react";
+import AdSlot from "@/components/ad-slot";
 
 export interface Guide {
     id: string;
@@ -184,8 +185,17 @@ export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-6" data-testid="grid-guides">
-                    {filtered.map((guide) => (
-                                <Link key={guide.id} href={`/guides/${guide.slug}`}>
+                    {filtered.map((guide, idx) => (
+                      <Fragment key={guide.id}>
+                        {idx === 3 && process.env.NEXT_PUBLIC_ADSENSE_SLOT_GUIDES_INLINE && (
+                          <AdSlot
+                            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_GUIDES_INLINE}
+                            format="in-article"
+                            className="md:col-span-2 lg:col-span-3 3xl:col-span-4 my-2"
+                            testId="ad-guides-inline"
+                          />
+                        )}
+                                <Link href={`/guides/${guide.slug}`}>
                                               <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer group" data-testid={`card-guide-${guide.slug}`}>
                                                 {guide.featuredImage && (
                                                     <div className="h-48 overflow-hidden rounded-t-lg">
@@ -242,7 +252,8 @@ export function GuidesContent({ initialGuides }: { initialGuides?: Guide[] }) {
                                                               </CardContent>
                                   </Card>
                                 </Link>
-                              ))}
+                      </Fragment>
+                    ))}
                   </div>
               )}
         </main>

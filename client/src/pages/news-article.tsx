@@ -18,6 +18,7 @@ import { SiX, SiReddit, SiWhatsapp, SiFlipboard } from "react-icons/si";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { FadeIn } from "@/components/fade-in";
+import AdSlot from "@/components/ad-slot";
 import { SEOHead } from "@/components/seo-head";
 import { renderMarkdown } from "@/lib/markdown";
 import { useToast } from "@/hooks/use-toast";
@@ -724,6 +725,17 @@ export default function NewsArticlePage({ initialArticle }: { initialArticle?: N
                 )}
               </CardContent>
             </Card>
+          </FadeIn>
+        )}
+
+        {process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE_MULTIPLEX && (
+          <FadeIn>
+            <AdSlot
+              slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE_MULTIPLEX}
+              format="multiplex"
+              className="mb-6"
+              testId="ad-article-multiplex"
+            />
           </FadeIn>
         )}
 

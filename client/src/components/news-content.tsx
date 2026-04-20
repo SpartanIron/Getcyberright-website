@@ -29,6 +29,7 @@ import { EditorialSpineMini } from "@/components/editorial-spine";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { FadeIn } from "@/components/fade-in";
+import AdSlot from "@/components/ad-slot";
 import newsBannerImage from "@assets/generated_images/realistic_breaking_news_broadcast_background.png";
 import { imgSrc } from "@/lib/img-src";
 
@@ -715,13 +716,36 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
               />
               {(tracks?.whatsHappening.latest.length || 0) === 0 ? (
                 <EmptyState message="No recent stories yet. Check back soon." />
-              ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {tracks!.whatsHappening.latest.map((a) => (
-                    <ArticleCard key={a.id} article={a} variant="aggregated" />
-                  ))}
-                </div>
-              )}
+              ) : (() => {
+                const newsInlineSlot = process.env.NEXT_PUBLIC_ADSENSE_SLOT_NEWS_INLINE;
+                const items = tracks!.whatsHappening.latest;
+                const firstRow = items.slice(0, 3);
+                const restRows = items.slice(3);
+                return (
+                  <>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {firstRow.map((a) => (
+                        <ArticleCard key={a.id} article={a} variant="aggregated" />
+                      ))}
+                    </div>
+                    {newsInlineSlot && restRows.length > 0 && (
+                      <AdSlot
+                        slot={newsInlineSlot}
+                        format="in-article"
+                        className="my-6"
+                        testId="ad-news-inline"
+                      />
+                    )}
+                    {restRows.length > 0 && (
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
+                        {restRows.map((a) => (
+                          <ArticleCard key={a.id} article={a} variant="aggregated" />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </section>
           </div>
         ) : (

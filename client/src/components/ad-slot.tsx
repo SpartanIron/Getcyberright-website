@@ -1,20 +1,25 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+
+export type AdFormat =
+  | "in-article"
+  | "multiplex"
+  | "leaderboard"
+  | "sidebar"
+  | "auto";
 
 interface AdSlotProps {
   slot: string;
-  format?: "auto" | "fluid" | "rectangle" | "horizontal" | "vertical";
-  layout?: string;
-  layoutKey?: string;
-  responsive?: boolean;
+  format?: AdFormat;
   className?: string;
-  style?: React.CSSProperties;
   testId?: string;
 }
 
 const ADSENSE_CLIENT =
   process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-4503226092429202";
+
+const FORMATS_WITH_LABEL: AdFormat[] = ["in-article", "leaderboard"];
 
 declare global {
   interface Window {
@@ -25,42 +30,64 @@ declare global {
 export default function AdSlot({
   slot,
   format = "auto",
-  layout,
-  layoutKey,
-  responsive = true,
   className,
-  style,
   testId,
 }: AdSlotProps) {
-  const insRef = useRef<HTMLModElement | null>(null);
-
   useEffect(() => {
     if (!ADSENSE_CLIENT || !slot) return;
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
-      // AdSense script may not be loaded yet on first render; ignore.
+      // adsbygoogle.js may not be loaded yet on first render; silently ignore.
     }
   }, [slot]);
 
   if (!ADSENSE_CLIENT || !slot) return null;
 
+  const insStyle: React.CSSProperties = { display: "block" };
+  let dataAdFormat = "auto";
+  let dataAdLayout: string | undefined;
+  const dataFullWidthResponsive = "true";
+
+  switch (format) {
+    case "in-article":
+      dataAdFormat = "fluid";
+      dataAdLayout = "in-article";
+      insStyle.textAlign = "center";
+      break;
+    case "multiplex":
+      dataAdFormat = "autorelaxed";
+      break;
+    case "leaderboard":
+    case "sidebar":
+    case "auto":
+    default:
+      dataAdFormat = "auto";
+      break;
+  }
+
+  const containerClass = ["ad-container", className].filter(Boolean).join(" ");
+
   return (
     <div
-      className={className}
+      className={containerClass}
       data-testid={testId || `ad-slot-${slot}`}
       aria-label="Advertisement"
+      style={{ minHeight: 50 }}
     >
+      {FORMATS_WITH_LABEL.includes(format) && (
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground text-center mb-1">
+          Advertisement
+        </div>
+      )}
       <ins
-        ref={insRef}
         className="adsbygoogle"
-        style={{ display: "block", ...style }}
+        style={insStyle}
         data-ad-client={ADSENSE_CLIENT}
         data-ad-slot={slot}
-        data-ad-format={format}
-        data-ad-layout={layout}
-        data-ad-layout-key={layoutKey}
-        data-full-width-responsive={responsive ? "true" : "false"}
+        data-ad-format={dataAdFormat}
+        {...(dataAdLayout ? { "data-ad-layout": dataAdLayout } : {})}
+        data-full-width-responsive={dataFullWidthResponsive}
       />
     </div>
   );
