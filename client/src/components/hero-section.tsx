@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MapPin, Shield, AlertTriangle, ShieldCheck, Eye } from "lucide-react";
-import { Link, useLocation } from "@/lib/navigation";
+import { ArrowRight, Shield, AlertTriangle, ShieldCheck, Eye } from "lucide-react";
+import { Link } from "@/lib/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { TrendingThreat } from "@shared/schema";
 import heroFamilyImg from "@/assets/images/hero-family-protected.webp";
@@ -41,77 +41,12 @@ function detectRegion(): string {
   }
 }
 
-type HeroCopy = {
-  line1: string;
-  line2: string;
-  accent: string;
-  subtext: string;
-};
-
-const HERO_COPY_ROTATION: HeroCopy[] = [
-  {
-    line1: "Online Safety",
-    line2: "Should Not Require",
-    accent: "a Tech Degree.",
-    subtext: "Spot scams instantly, remove your data from the internet, and build practical safety habits for the whole family. Written for real people, not IT professionals.",
-  },
-  {
-    line1: "One Click",
-    line2: "Can Cost Your Family",
-    accent: "Everything.",
-    subtext: "Learn how to spot the scam texts and emails landing in your inbox this week, before anyone in your family clicks the wrong link. Free, plain language, no signup.",
-  },
-  {
-    line1: "Your Kids Are Online.",
-    line2: "Make Sure They Are",
-    accent: "Safe There.",
-    subtext: "Practical, no jargon guides for parents who want their kids exploring the internet without the risks. Built for families, not engineers.",
-  },
-  {
-    line1: "Your Personal Info",
-    line2: "Is For Sale.",
-    accent: "Take It Back.",
-    subtext: "Find out where your name, address, and phone number have leaked, then remove them from the internet for good. No tech background required.",
-  },
-  {
-    line1: "If It Sounds Urgent,",
-    line2: "Slow Down.",
-    accent: "It's Probably a Scam.",
-    subtext: "The latest scams target families through fake delivery texts, voice clones, and bogus refunds. Learn to spot them before they cost you.",
-  },
-  {
-    line1: "Cybersecurity",
-    line2: "Without the",
-    accent: "Confusion.",
-    subtext: "Real protection for everyday families. Plain language, working tools, and habits that actually stick. No jargon, no fear, no upselling.",
-  },
-  {
-    line1: "Small Habits,",
-    line2: "Strong Defenses,",
-    accent: "Whole Family.",
-    subtext: "Build the simple online safety habits that protect everyone you love. Three minutes a week, one practical step at a time.",
-  },
-  {
-    line1: "Real Threats.",
-    line2: "Plain Answers.",
-    accent: "Free For Families.",
-    subtext: "Spot scams, lock down your accounts, and keep your family safe online. Backed by official sources, written for real people.",
-  },
-];
-
-function getIsoWeekIndex(date: Date): number {
-  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-  return (d.getUTCFullYear() * 53) + weekNo;
-}
-
-function getWeeklyHeroCopy(now: Date = new Date()): HeroCopy {
-  const idx = getIsoWeekIndex(now) % HERO_COPY_ROTATION.length;
-  return HERO_COPY_ROTATION[idx];
-}
+const HERO_HEADLINE_LINE1 = "Old advice was built for an internet";
+const HERO_HEADLINE_LINE2 = "that no longer";
+const HERO_HEADLINE_ACCENT = "exists.";
+const HERO_SUBTEXT =
+  "AI changed who is at risk, what counts as harm, and how fast it spreads. We help families build a new mental model, with plain language guides and working tools.";
+const ANCHOR_ARTICLE_HREF = "/news/the-new-reality-ai-changing-digital-safety";
 
 const severityColors: Record<string, string> = {
   critical: "bg-red-500/20 text-red-400 border-red-500/30",
@@ -160,10 +95,6 @@ function ThreatAlertBar() {
 }
 
 export function HeroSection() {
-  const [heroCopy, setHeroCopy] = useState<HeroCopy>(HERO_COPY_ROTATION[0]);
-  useEffect(() => {
-    setHeroCopy(getWeeklyHeroCopy());
-  }, []);
   return (
     <section className="relative w-full" data-testid="section-hero">
       <div className="bg-hero relative overflow-hidden">
@@ -259,18 +190,18 @@ export function HeroSection() {
                 className="text-[2rem] sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-hero-foreground leading-[1.05] mb-6 sm:mb-8"
                 data-testid="text-hero-heading"
               >
-                {heroCopy.line1}
+                {HERO_HEADLINE_LINE1}
                 <br />
-                {heroCopy.line2}
+                {HERO_HEADLINE_LINE2}
                 <br />
-                <span className="hero-gradient-text">{heroCopy.accent}</span>
+                <span className="hero-gradient-text">{HERO_HEADLINE_ACCENT}</span>
               </h1>
 
               <p
                 className="text-base sm:text-xl text-hero-foreground/80 leading-relaxed mb-8 sm:mb-10"
                 data-testid="text-hero-subtext"
               >
-                {heroCopy.subtext}
+                {HERO_SUBTEXT}
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 mb-8 sm:mb-10">
@@ -280,13 +211,13 @@ export function HeroSection() {
                   className="bg-accent text-accent-foreground border-accent-border font-semibold px-8 text-base shadow-[0_4px_24px_-4px] shadow-accent/40 hover:shadow-[0_6px_32px_-4px] hover:shadow-accent/50 hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
                   data-testid="button-hero-primary-cta"
                 >
-                  <Link href="/scam-checker">
-                    Check a Scam Now
+                  <Link href={ANCHOR_ARTICLE_HREF}>
+                    Read the new reality
                     <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
                   </Link>
                 </Button>
                 <Link href="/tools" className="inline-flex items-center gap-2 text-base text-hero-foreground/70 hover:text-hero-foreground/90 transition-colors group font-medium">
-                  See all protection tools
+                  Or jump straight to the tools
                   <ArrowRight className="w-4 h-4 cta-arrow-right" />
                 </Link>
               </div>

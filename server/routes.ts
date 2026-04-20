@@ -6470,6 +6470,46 @@ BEHAVIORAL CONSTRAINTS
     }
   });
 
+  // ---- Public: curated articles for /perspectives index ----
+  app.get("/api/news/curated", async (_req: Request, res: Response) => {
+    try {
+      const all = await storage.getNewsArticles(undefined, 500);
+      const { buildSpineFromArticle } = await import("./editorialSpine");
+      const curated = all
+        .filter(
+          (a) =>
+            a.articleType === "curated" || /getcyberright|gcr/i.test(a.source || ""),
+        )
+        .sort((a, b) => {
+          const ta = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+          const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+          return tb - ta;
+        });
+      res.json({
+        articles: curated.map((a) => {
+          const spine = buildSpineFromArticle(a);
+          return {
+            id: a.id,
+            slug: a.slug,
+            title: a.title,
+            category: a.category,
+            curatedTopic: a.curatedTopic,
+            excerpt: a.excerpt,
+            imageUrl: a.imageUrl,
+            publishedAt: a.publishedAt?.toISOString() || null,
+            whatChanged: spine.whatChanged,
+            whyThisMatters: spine.whyThisMatters,
+            actionThisWeek: spine.actionThisWeek,
+          };
+        }),
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("[news/curated] list failed:", message);
+      res.status(500).json({ error: "Failed to list curated articles" });
+    }
+  });
+
   // ---- Admin: editorial spine editor for curated news articles ----
   app.get("/api/admin/news", isAuthenticated, isAdmin, async (_req: Request, res: Response) => {
     try {

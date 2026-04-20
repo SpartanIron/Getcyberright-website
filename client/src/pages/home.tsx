@@ -1,7 +1,7 @@
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/hero-section";
+import { RealityDoors } from "@/components/reality-doors";
 import { LiveActivityBar } from "@/components/live-activity-bar";
-import { HowItWorks } from "@/components/how-it-works";
 import { ThreatAwareness } from "@/components/threat-awareness";
 import { PillarTiles } from "@/components/pillar-tiles";
 import { AudiencePaths } from "@/components/audience-paths";
@@ -16,8 +16,8 @@ export default function Home() {
                 <Navigation />
                 <main id="main-content" role="main" aria-label="Main content" tabIndex={-1}>
                         <HeroSection />
+                        <RealityDoors />
                         <LiveActivityBar />
-                        <HowItWorks />
                         <ThreatAwareness />
                         <ScamGlobeTeaser />
                         <PillarTiles />

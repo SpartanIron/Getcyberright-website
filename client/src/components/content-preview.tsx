@@ -126,12 +126,23 @@ function getWeeklyRotation(): FeaturedGuide {
   return EVERGREEN_GUIDES[weekNumber % EVERGREEN_GUIDES.length];
 }
 
-export function ContentPreview() {
-  const { data: guidesData } = useQuery<any[]>({ queryKey: ["/api/guides"], staleTime: 10 * 60 * 1000 });
-  const { data: alertsData } = useQuery<any[]>({ queryKey: ["/api/alerts"], staleTime: 10 * 60 * 1000 });
+type CuratedLead = {
+  slug: string;
+  title: string;
+  publishedAt: string | null;
+  whatChanged: string | null;
+  curatedTopic: string | null;
+};
 
-  const hasLiveGuides = guidesData && guidesData.length > 0;
+export function ContentPreview() {
+  const { data: alertsData } = useQuery<any[]>({ queryKey: ["/api/alerts"], staleTime: 10 * 60 * 1000 });
+  const { data: curatedData } = useQuery<{ articles: CuratedLead[] }>({
+    queryKey: ["/api/news/curated"],
+    staleTime: 10 * 60 * 1000,
+  });
+
   const hasLiveAlerts = alertsData && alertsData.length > 0;
+  const curatedLead = curatedData?.articles?.[0] || null;
 
   const [featured] = useState(getWeeklyRotation);
   const otherGuides = EVERGREEN_GUIDES.filter(g => g.id !== featured.id).slice(0, 2);
@@ -142,21 +153,56 @@ export function ContentPreview() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-14 sm:mb-16">
           <h2 id="content-heading" className="text-4xl sm:text-5xl font-extrabold text-foreground mb-5" data-testid="text-content-heading">
-            Know What to Watch For
+            Latest from the Lab
           </h2>
           <p className="text-xl text-muted-foreground leading-relaxed">
-            New scam alerts and safety guides every week, written so your whole family can understand and act on them.
+            Original editorial from the GetCyberRight team, plus the safety guides and active alerts your family needs this week.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-[1fr_380px] gap-10 lg:gap-14 items-start">
           <div>
+            {curatedLead && (
+              <div className="mb-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+                      <BookOpen className="w-4 h-4 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-bold text-foreground">From the Lab</h3>
+                  </div>
+                  <Link href="/perspectives">
+                    <span className="text-sm font-semibold text-primary hover:underline flex items-center gap-1.5" data-testid="link-all-perspectives">
+                      All perspectives <ArrowRight className="w-3.5 h-3.5 cta-arrow-right" />
+                    </span>
+                  </Link>
+                </div>
+                <Link href={`/news/${curatedLead.slug}`} className="block">
+                  <div className="rounded-2xl bg-gradient-to-br from-primary/10 to-primary/0 border border-primary/20 p-6 sm:p-8 hover:border-primary/40 transition-colors" data-testid="curated-lead-card">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge variant="secondary" className="text-[10px]">Editorial</Badge>
+                      {curatedLead.curatedTopic && (
+                        <Badge variant="outline" className="text-[10px]">{curatedLead.curatedTopic}</Badge>
+                      )}
+                    </div>
+                    <h4 className="text-xl sm:text-2xl font-bold text-foreground mb-3">{curatedLead.title}</h4>
+                    {curatedLead.whatChanged && (
+                      <p className="text-base text-muted-foreground leading-relaxed line-clamp-3 mb-4">{curatedLead.whatChanged}</p>
+                    )}
+                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                      Read the piece <ArrowRight className="w-4 h-4 cta-arrow-right" />
+                    </span>
+                  </div>
+                </Link>
+              </div>
+            )}
+
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <BookOpen className="w-4 h-4 text-primary" />
                 </div>
-                <h3 className="text-lg font-bold text-foreground">This Week's Essential Read</h3>
+                <h3 className="text-lg font-bold text-foreground">This Week's Essential Guide</h3>
               </div>
               <Link href="/guides">
                 <span className="text-sm font-semibold text-primary hover:underline flex items-center gap-1.5" data-testid="link-all-guides">
