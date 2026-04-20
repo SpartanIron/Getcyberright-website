@@ -5,7 +5,21 @@ import { Link } from "@/lib/navigation";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Compass, FileText } from "lucide-react";
+import { ArrowRight, Compass, FileText, Sparkles } from "lucide-react";
+
+const NEW_REALITY_SERIES_SLUGS: readonly string[] = [
+  "the-new-reality-ai-changing-digital-safety",
+  "the-age-verification-tradeoff-what-families-should-ask",
+  "why-parental-controls-are-not-enough-anymore",
+  "when-your-kid-tells-the-ai-things-they-will-not-tell-you",
+];
+
+const SERIES_LABELS: Record<string, string> = {
+  "the-new-reality-ai-changing-digital-safety": "Part 1 · The thesis",
+  "the-age-verification-tradeoff-what-families-should-ask": "Part 2 · Age verification",
+  "why-parental-controls-are-not-enough-anymore": "Part 3 · Beyond device controls",
+  "when-your-kid-tells-the-ai-things-they-will-not-tell-you": "Part 4 · The AI confidant",
+};
 
 type CuratedArticle = {
   id: string;
@@ -34,11 +48,27 @@ export default function Perspectives() {
     queryKey: ["/api/news/curated"],
   });
 
-  const articles = (data?.articles || []).slice().sort((a, b) => {
-    const ta = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
-    const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-    return tb - ta;
-  });
+  const all = data?.articles || [];
+
+  const seriesLookup = NEW_REALITY_SERIES_SLUGS
+    .map((slug) => all.find((a) => a.slug === slug));
+  // Only render the series module when the full set of four pieces is live.
+  // A partial series would mislead readers about the editorial arc.
+  const seriesComplete = seriesLookup.every((a): a is CuratedArticle => !!a);
+  const seriesArticles: CuratedArticle[] = seriesComplete
+    ? (seriesLookup as CuratedArticle[])
+    : [];
+
+  const seriesSlugSet = new Set(seriesArticles.map((a) => a.slug));
+
+  const articles = all
+    .filter((a) => !seriesSlugSet.has(a.slug))
+    .slice()
+    .sort((a, b) => {
+      const ta = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+      const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+      return tb - ta;
+    });
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,7 +97,51 @@ export default function Perspectives() {
               </div>
             )}
 
-            {!isLoading && articles.length === 0 && (
+            {!isLoading && seriesArticles.length > 0 && (
+              <div className="mb-12" data-testid="section-new-reality-series">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                    The New Reality series
+                  </span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3" data-testid="text-series-heading">
+                  Four pieces, in reading order.
+                </h2>
+                <p className="text-base text-muted-foreground leading-relaxed mb-6 max-w-3xl">
+                  Start with the thesis, then walk through the three loops it leaves open: age verification, the limits of device controls, and what kids tell AI that they will not tell you.
+                </p>
+                <ol className="grid gap-4 sm:grid-cols-2">
+                  {seriesArticles.map((article, idx) => (
+                    <li key={article.id}>
+                      <Link
+                        href={`/news/${article.slug}`}
+                        className="group block h-full rounded-2xl border border-border bg-card p-5 hover:border-primary/40 hover:shadow-md transition-all"
+                        data-testid={`card-series-${article.slug}`}
+                      >
+                        <div className="text-[11px] font-semibold uppercase tracking-wider text-primary mb-2">
+                          {SERIES_LABELS[article.slug] || `Part ${idx + 1}`}
+                        </div>
+                        <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors leading-snug">
+                          {article.title}
+                        </h3>
+                        {article.whatChanged && (
+                          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-3">
+                            {article.whatChanged}
+                          </p>
+                        )}
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                          Read part {idx + 1}
+                          <ArrowRight className="w-3.5 h-3.5 cta-arrow-right" />
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {!isLoading && articles.length === 0 && seriesArticles.length === 0 && (
               <div className="text-muted-foreground text-center py-16" data-testid="status-perspectives-empty">
                 No perspectives published yet. Check back soon.
               </div>

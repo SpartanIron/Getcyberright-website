@@ -2797,9 +2797,11 @@ BEHAVIORAL CONSTRAINTS
     try {
       const { seedAnchorArticle } = await import("./anchorArticleSeed");
       await seedAnchorArticle();
+      const { seedCompanionArticles } = await import("./companionArticleSeed");
+      await seedCompanionArticles();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
-      console.error("Failed to seed anchor article:", message);
+      console.error("Failed to seed anchor or companion articles:", message);
     }
   })();
 
