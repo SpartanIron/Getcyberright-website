@@ -6535,6 +6535,8 @@ BEHAVIORAL CONSTRAINTS
             whyThisMatters: spine.whyThisMatters,
             actionThisWeek: spine.actionThisWeek,
             editorialSpinePending: spine.editorialSpinePending,
+            spineReviewedByHuman: (a as any).spineReviewedByHuman === true,
+            proposedSpine: (a as any).proposedSpine || null,
           };
         }),
       });
@@ -6578,6 +6580,16 @@ BEHAVIORAL CONSTRAINTS
           parsed.data.whyThisMatters !== undefined ||
           parsed.data.actionThisWeek !== undefined;
         if (wroteSomething) patch.editorialSpinePending = false;
+      }
+      // When the spine is being written (not just toggling pending), mark it
+      // as reviewed by a human and clear any stored AI proposal.
+      const wroteSpineFields =
+        parsed.data.whatChanged !== undefined ||
+        parsed.data.whyThisMatters !== undefined ||
+        parsed.data.actionThisWeek !== undefined;
+      if (wroteSpineFields) {
+        (patch as any).spineReviewedByHuman = true;
+        (patch as any).proposedSpine = null;
       }
       const updated = await storage.updateNewsArticle(existing.id, patch);
       res.json({ success: true, article: updated });
@@ -6663,7 +6675,8 @@ ${allowlistList}
   Pick the route most useful for the reader given the article. Do not invent routes.
 - "curatedTopic": one of:
 ${topicList}
-  Choose the best fit. Use "this-weeks-threat" only as a fallback.
+  Choose the best fit ONLY if the article clearly belongs to that topic. If you are not confident, return null. Do not guess.
+- "topicConfidence": "high" | "low". Set "low" if you would not stake a reviewer's time on the topic choice; in that case curatedTopic must be null.
 
 Requested fields this call: ${fieldsRequested.join(", ")}.
 
@@ -6758,37 +6771,145 @@ Output ONLY the JSON object. No markdown, no commentary.`;
         proposal.flags.push("actionThisWeek: model declined (needs author input)");
       }
 
-      if (typeof parsed.curatedTopic === "string" && parsed.curatedTopic in CURATED_TOPIC_LABELS) {
+      const lowConfidence = parsed.topicConfidence === "low";
+      if (
+        !lowConfidence &&
+        typeof parsed.curatedTopic === "string" &&
+        parsed.curatedTopic in CURATED_TOPIC_LABELS
+      ) {
         proposal.curatedTopic = parsed.curatedTopic;
       } else {
-        // Heuristic fallback so the dropdown is never empty.
-        proposal.curatedTopic = classifyCuratedTopic(article.title, article.excerpt, article.category);
-        proposal.flags.push(`curatedTopic fell back to heuristic ("${proposal.curatedTopic}")`);
-      }
-
-      // Run jargon gate over what we plan to surface so the reviewer sees blockers up front.
-      const gate = gateCuratedPlainEnglish(
-        "",
-        proposal.whatChanged || "",
-        [
-          ...(proposal.whyThisMatters || []),
-          proposal.actionThisWeek?.label || "",
-        ].join("\n"),
-      );
-      if (!gate.ok) {
+        // Low confidence (or missing/invalid). Leave null and surface for review.
+        proposal.curatedTopic = null;
+        proposal.needsAuthorInput = true;
         proposal.flags.push(
-          `Plain-English gate flagged: ${gate.blockedTerms.join(", ")}. Define each in parentheses on first use.`,
+          "curatedTopic: low confidence; reviewer must select the topic manually.",
         );
       }
 
+      // Per-field plain-English gate. Any field that fails is nulled out and
+      // surfaced as needs-author-input rather than passed through with a flag.
+      const checkField = (label: string, text: string) => {
+        const g = gateCuratedPlainEnglish("", "", text);
+        return g.ok ? null : `${label}: jargon detected (${g.blockedTerms.join(", ")}). Define in plain English on first use.`;
+      };
+      if (proposal.whatChanged) {
+        const f = checkField("whatChanged", proposal.whatChanged);
+        if (f) {
+          proposal.whatChanged = null;
+          proposal.needsAuthorInput = true;
+          proposal.flags.push(f);
+        }
+      }
+      if (proposal.whyThisMatters) {
+        const joined = proposal.whyThisMatters.join("\n");
+        const f = checkField("whyThisMatters", joined);
+        if (f) {
+          proposal.whyThisMatters = null;
+          proposal.needsAuthorInput = true;
+          proposal.flags.push(f);
+        }
+      }
+      if (proposal.actionThisWeek) {
+        const f = checkField("actionThisWeek.label", proposal.actionThisWeek.label);
+        if (f) {
+          proposal.actionThisWeek = null;
+          proposal.needsAuthorInput = true;
+          proposal.flags.push(f);
+        }
+      }
+
+      // Persist the proposal so the reviewer queue and the per-article approve
+      // flow can read it independently of any single browser session.
+      const persisted = {
+        ...proposal,
+        generatedAt: new Date().toISOString(),
+      };
+      await storage.updateNewsArticle(article.id, { proposedSpine: persisted } as any);
+
       res.json({
         articleId: article.id,
-        proposal,
+        proposal: persisted,
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       console.error("[admin/news/generate-spine] failed:", message);
       res.status(500).json({ error: `Failed to generate spine: ${message}` });
+    }
+  });
+
+  // Batch worker: generate proposals for every curated article that does not
+  // yet have one (or whose spine is still pending). Persists to proposed_spine.
+  app.post("/api/admin/news/generate-spine-batch", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      const limit = Math.min(Math.max(Number(req.body?.limit) || 50, 1), 100);
+      const force = req.body?.force === true;
+      const all = await storage.getNewsArticles(undefined, 500);
+      const curated = all.filter(
+        (a) => a.articleType === "curated" || /getcyberright|gcr/i.test(a.source || ""),
+      );
+      const targets = curated
+        .filter((a) => {
+          if (force) return true;
+          const reviewed = (a as any).spineReviewedByHuman === true;
+          const hasProposal = !!(a as any).proposedSpine;
+          const pending = (a as any).editorialSpinePending === true;
+          return !reviewed && !hasProposal && pending;
+        })
+        .slice(0, limit);
+
+      const results: Array<{ id: string; ok: boolean; needsAuthorInput?: boolean; flags?: string[]; error?: string }> = [];
+      for (const article of targets) {
+        try {
+          // Reuse the per-article endpoint logic by issuing an internal call.
+          const fakeReq = {
+            params: { id: article.id },
+            body: {},
+          } as any;
+          let captured: any = null;
+          let status = 200;
+          const fakeRes = {
+            json: (v: any) => { captured = v; return fakeRes; },
+            status: (s: number) => { status = s; return fakeRes; },
+          } as any;
+          // The handler is registered on the router; easiest path is to inline
+          // a function call by re-fetching the article and invoking the same
+          // logic. Instead, we POST to ourselves through the route handler by
+          // calling app._router.handle is brittle, so we duplicate the minimal
+          // generation by calling the endpoint via fetch on localhost.
+          const port = process.env.PORT || "5000";
+          const cookie = req.headers.cookie || "";
+          const r = await fetch(`http://127.0.0.1:${port}/api/admin/news/${article.id}/generate-spine`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", cookie },
+            body: JSON.stringify({}),
+          });
+          if (!r.ok) {
+            results.push({ id: article.id, ok: false, error: `HTTP ${r.status}` });
+            continue;
+          }
+          const body: any = await r.json();
+          results.push({
+            id: article.id,
+            ok: true,
+            needsAuthorInput: body?.proposal?.needsAuthorInput === true,
+            flags: body?.proposal?.flags || [],
+          });
+        } catch (e) {
+          results.push({ id: article.id, ok: false, error: (e as Error).message });
+        }
+      }
+
+      res.json({
+        attempted: targets.length,
+        succeeded: results.filter((r) => r.ok).length,
+        needsAuthorInput: results.filter((r) => r.needsAuthorInput).length,
+        results,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("[admin/news/generate-spine-batch] failed:", message);
+      res.status(500).json({ error: `Batch generation failed: ${message}` });
     }
   });
 

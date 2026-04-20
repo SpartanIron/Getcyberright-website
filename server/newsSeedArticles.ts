@@ -50,7 +50,9 @@ export async function seedNewsArticles(): Promise<number> {
         ADD COLUMN IF NOT EXISTS "curated_topic" text,
         ADD COLUMN IF NOT EXISTS "image_hash" text,
         ADD COLUMN IF NOT EXISTS "cluster_id" text,
-        ADD COLUMN IF NOT EXISTS "updated_at" timestamp
+        ADD COLUMN IF NOT EXISTS "updated_at" timestamp,
+        ADD COLUMN IF NOT EXISTS "proposed_spine" jsonb,
+        ADD COLUMN IF NOT EXISTS "spine_reviewed_by_human" boolean DEFAULT false
     `);
     await client.unsafe(`
       CREATE INDEX IF NOT EXISTS "idx_news_articles_image_hash" ON "news_articles" ("image_hash");

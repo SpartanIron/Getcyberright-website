@@ -29,6 +29,16 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
+interface ProposedSpine {
+  whatChanged: string | null;
+  whyThisMatters: string[] | null;
+  actionThisWeek: { label: string; href: string } | null;
+  curatedTopic: string | null;
+  flags: string[];
+  needsAuthorInput: boolean;
+  generatedAt?: string;
+}
+
 interface AdminCuratedArticle {
   id: string;
   slug: string;
@@ -40,6 +50,8 @@ interface AdminCuratedArticle {
   whyThisMatters: string[];
   actionThisWeek: { label: string; href: string } | null;
   editorialSpinePending: boolean;
+  spineReviewedByHuman: boolean;
+  proposedSpine: ProposedSpine | null;
 }
 
 interface ArticleDetail {
@@ -108,8 +120,28 @@ function ArticleReviewCard({
   const [actionLabel, setActionLabel] = useState(article.actionThisWeek?.label || "");
   const [actionHref, setActionHref] = useState(article.actionThisWeek?.href || allowlist[0] || "/news");
   const [topic, setTopic] = useState<string>(article.curatedTopic || "");
-  const [flags, setFlags] = useState<string[]>([]);
-  const [needsAuthorInput, setNeedsAuthorInput] = useState(false);
+  const [flags, setFlags] = useState<string[]>(article.proposedSpine?.flags || []);
+  const [needsAuthorInput, setNeedsAuthorInput] = useState(
+    article.proposedSpine?.needsAuthorInput === true,
+  );
+
+  // If a stored proposal exists and the human has not reviewed yet, prefill any
+  // empty fields from the proposal so the reviewer sees the AI suggestion.
+  useEffect(() => {
+    const p = article.proposedSpine;
+    if (!p || article.spineReviewedByHuman) return;
+    if (!whatChanged && p.whatChanged) setWhatChanged(p.whatChanged);
+    if (whyBullets.every((b) => !b.trim()) && p.whyThisMatters && p.whyThisMatters.length > 0) {
+      setWhyBullets([...p.whyThisMatters, "", "", ""].slice(0, limits.whyCount));
+    }
+    if (!actionLabel && p.actionThisWeek) {
+      setActionLabel(p.actionThisWeek.label);
+      setActionHref(p.actionThisWeek.href);
+    }
+    if (!topic && p.curatedTopic) setTopic(p.curatedTopic);
+    // We intentionally only run on mount-equivalent (article id change).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [article.id]);
 
   // Fetch the source article so reviewer sees full excerpt + body alongside the form.
   const { data: detail } = useQuery<ArticleDetail>({
@@ -460,7 +492,24 @@ export default function EditorialReviewPage() {
   const { user, isLoading: authLoading } = useAuth();
   const [, navigate] = useLocation();
   const [page, setPage] = useState(0);
-  const [filter, setFilter] = useState<"pending" | "all">("pending");
+  const [filter, setFilter] = useState<"pending" | "awaiting-review" | "all">("pending");
+  const { toast } = useToast();
+  const batchMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/admin/news/generate-spine-batch`, { limit: 50 });
+      return await res.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Batch generation complete",
+        description: `${data.succeeded}/${data.attempted} proposals stored. ${data.needsAuthorInput} need author input.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/news"] });
+    },
+    onError: (err: any) => {
+      toast({ title: "Batch failed", description: err?.message || "Try again.", variant: "destructive" });
+    },
+  });
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/login");
@@ -489,7 +538,12 @@ export default function EditorialReviewPage() {
 
   const sortedFiltered = useMemo(() => {
     const all = articlesData?.articles || [];
-    const filtered = filter === "pending" ? all.filter((a) => a.editorialSpinePending) : all;
+    let filtered = all;
+    if (filter === "pending") {
+      filtered = all.filter((a) => a.editorialSpinePending && !a.spineReviewedByHuman);
+    } else if (filter === "awaiting-review") {
+      filtered = all.filter((a) => !a.spineReviewedByHuman && !!a.proposedSpine);
+    }
     // Oldest first per task brief: sort ascending by publishedAt.
     return filtered.slice().sort((a, b) => {
       const ta = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
@@ -499,6 +553,9 @@ export default function EditorialReviewPage() {
   }, [articlesData, filter]);
 
   const pendingCount = (articlesData?.articles || []).filter((a) => a.editorialSpinePending).length;
+  const awaitingReviewCount = (articlesData?.articles || []).filter(
+    (a) => !a.spineReviewedByHuman && !!a.proposedSpine,
+  ).length;
   const totalCount = (articlesData?.articles || []).length;
   const noTopicCount = (articlesData?.articles || []).filter((a) => !a.curatedTopic).length;
 
@@ -529,12 +586,29 @@ export default function EditorialReviewPage() {
             <Badge variant="outline" data-testid="badge-pending-count">
               {pendingCount} pending
             </Badge>
+            <Badge variant="outline" data-testid="badge-awaiting-count">
+              {awaitingReviewCount} awaiting review
+            </Badge>
             <Badge variant="outline" data-testid="badge-no-topic-count">
               {noTopicCount} missing topic
             </Badge>
             <Badge variant="outline" data-testid="badge-total-count">
               {totalCount} total curated
             </Badge>
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => batchMutation.mutate()}
+              disabled={batchMutation.isPending || pendingCount === 0}
+              data-testid="button-generate-all"
+            >
+              {batchMutation.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+              ) : (
+                <Sparkles className="h-3.5 w-3.5 mr-1" />
+              )}
+              Generate all pending
+            </Button>
             <div className="flex items-center gap-1 ml-2">
               <Button
                 size="sm"
@@ -546,6 +620,17 @@ export default function EditorialReviewPage() {
                 data-testid="filter-pending"
               >
                 Pending
+              </Button>
+              <Button
+                size="sm"
+                variant={filter === "awaiting-review" ? "default" : "outline"}
+                onClick={() => {
+                  setFilter("awaiting-review");
+                  setPage(0);
+                }}
+                data-testid="filter-awaiting-review"
+              >
+                Awaiting review
               </Button>
               <Button
                 size="sm"

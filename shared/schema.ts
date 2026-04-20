@@ -1718,6 +1718,16 @@ export const newsArticles = pgTable("news_articles", {
   whyThisMatters: jsonb("why_this_matters").$type<string[] | null>(),
   actionThisWeek: jsonb("action_this_week").$type<{ label: string; href: string } | null>(),
   editorialSpinePending: boolean("editorial_spine_pending").default(false),
+  proposedSpine: jsonb("proposed_spine").$type<{
+    whatChanged: string | null;
+    whyThisMatters: string[] | null;
+    actionThisWeek: { label: string; href: string } | null;
+    curatedTopic: string | null;
+    flags: string[];
+    needsAuthorInput: boolean;
+    generatedAt: string;
+  } | null>(),
+  spineReviewedByHuman: boolean("spine_reviewed_by_human").default(false),
   publishedAt: timestamp("published_at").defaultNow(),
   updatedAt: timestamp("updated_at"),
   createdAt: timestamp("created_at").defaultNow(),
