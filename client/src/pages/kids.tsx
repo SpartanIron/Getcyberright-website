@@ -863,11 +863,6 @@ function LearningTrack({
       <FloatingShapes />
       <div className="relative py-8">
         <div className="max-w-5xl mx-auto px-4">
-          <Button variant="ghost" onClick={onBack} className="mb-6" data-testid="button-back-to-ages">
-            <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-            Back to Age Selection
-          </Button>
-
           <ProgressDashboard
             ageGroup={ageGroup}
             completedModules={completedModules}
@@ -1381,7 +1376,7 @@ function ParentSection() {
 }
 
 export default function Kids() {
-  const [selectedAge, setSelectedAge] = useState<AgeGroup>(null);
+  const [selectedAge, setSelectedAge] = useState<NonNullable<AgeGroup>>("11-13");
 
   return (
     <div className="min-h-screen bg-background">
@@ -1389,20 +1384,38 @@ export default function Kids() {
       <main id="main-content" tabIndex={-1}>
         <PageBanner
           title="Kids Digital Safety Hub"
-          subtitle="Fun, interactive lessons to help young people stay safe online. Choose your age group and start learning today."
+          subtitle="Fun, interactive lessons to help young people stay safe online. Pick a topic, then choose your age."
           colorVariant="teal"
           imageSrc={imgSrc(kidsBannerImage)}
           imageAlt="Children learning about internet safety on computers"
         />
 
-        {selectedAge === null ? (
-          <KidsLanding onSelectAge={setSelectedAge} />
-        ) : (
-          <LearningTrack
-            ageGroup={selectedAge}
-            onBack={() => setSelectedAge(null)}
-          />
-        )}
+        <HubPillarHero audience="kids" />
+
+        <div className="max-w-5xl mx-auto px-4 pt-6">
+          <div className="rounded-xl border-2 bg-muted/30 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <span className="text-sm font-semibold text-foreground">Show content for age:</span>
+            <div className="flex flex-wrap gap-2">
+              {(["6-10","11-13","14-16"] as const).map((age) => (
+                <Button
+                  key={age}
+                  size="sm"
+                  variant={selectedAge === age ? "default" : "outline"}
+                  onClick={() => setSelectedAge(age)}
+                  data-testid={`button-age-${age}`}
+                >
+                  Ages {age}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <LearningTrack
+          key={selectedAge}
+          ageGroup={selectedAge}
+          onBack={() => setSelectedAge("11-13")}
+        />
 
         <section className="py-12 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20">
           <div className="max-w-3xl mx-auto px-4">

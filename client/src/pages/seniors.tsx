@@ -885,7 +885,7 @@ function SeniorsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
           <div className="grid sm:grid-cols-3 gap-4 mb-8">
             <Card
               className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary/30"
-              onClick={() => onSwitchTab("exercises")}
+              onClick={() => onSwitchTab("real-time")}
               data-testid="card-cta-exercises"
             >
               <CardContent className="p-5 text-center">
@@ -898,7 +898,7 @@ function SeniorsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
             </Card>
             <Card
               className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary/30"
-              onClick={() => onSwitchTab("emergency")}
+              onClick={() => onSwitchTab("real-time")}
               data-testid="card-cta-emergency"
             >
               <CardContent className="p-5 text-center">
@@ -911,7 +911,7 @@ function SeniorsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
             </Card>
             <Card
               className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-primary/30"
-              onClick={() => onSwitchTab("checklists")}
+              onClick={() => onSwitchTab("proactive")}
               data-testid="card-cta-checklists"
             >
               <CardContent className="p-5 text-center">
@@ -940,7 +940,7 @@ function SeniorsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
                     If you think you have been scammed or need immediate assistance, our Emergency Guidance section can help you take the right steps.
                   </p>
                 </div>
-                <Button variant="outline" className="border-amber-300 dark:border-amber-700" onClick={() => onSwitchTab("emergency")} data-testid="button-emergency-help">
+                <Button variant="outline" className="border-amber-300 dark:border-amber-700" onClick={() => onSwitchTab("real-time")} data-testid="button-emergency-help">
                   Get Help
                 </Button>
               </div>
@@ -972,7 +972,7 @@ function SeniorsLanding({ onSelectTopic, onSwitchTab }: { onSelectTopic: (id: st
                 </div>
               </div>
               <div className="mt-4">
-                <Button variant="outline" className="border-red-300 dark:border-red-700" onClick={() => onSwitchTab("emergency")} data-testid="button-seniors-emergency">
+                <Button variant="outline" className="border-red-300 dark:border-red-700" onClick={() => onSwitchTab("real-time")} data-testid="button-seniors-emergency">
                   Full Emergency Guidance
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -1161,7 +1161,7 @@ function TopicContent({
 
 export default function Seniors() {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("guides");
+  const [activeTab, setActiveTab] = useState("new-reality");
 
   const currentTopic = selectedTopic 
     ? seniorSafetyTopics.find(t => t.id === selectedTopic) 
@@ -1199,11 +1199,7 @@ export default function Seniors() {
           />
         ) : (
           <>
-            {activeTab === "guides" && (
-              <SeniorsLanding onSelectTopic={setSelectedTopic} onSwitchTab={handleSwitchTab} />
-            )}
-
-            {activeTab !== "guides" && (
+            {(
               <>
                 <PageBanner
                   title="Stay Safe and Connected Online"
@@ -1216,9 +1212,6 @@ export default function Seniors() {
                 <div className="max-w-5xl mx-auto px-4 py-8">
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-8">
-                      <TabsTrigger value="guides" className="gap-2 px-4 py-2.5" data-testid="tab-guides">
-                        <BookOpen className="w-4 h-4" /> Topics
-                      </TabsTrigger>
                       {PILLARS.map((p) => (
                         <TabsTrigger key={p.id} value={p.id} className="gap-2 px-4 py-2.5" data-testid={`tab-pillar-${p.id}`}>
                           <p.icon className="w-4 h-4" /> {p.shortLabel}
@@ -1238,6 +1231,35 @@ export default function Seniors() {
                           </ul>
                         </CardContent>
                       </Card>
+                      <div>
+                        <h2 className="text-2xl font-bold text-foreground mb-2">Scam Topics To Know Today</h2>
+                        <p className="text-muted-foreground text-base mb-4">In-depth guides on the scam patterns that target older adults right now. Tap any topic for a full walkthrough.</p>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {seniorSafetyTopics.map((topic) => (
+                            <Card
+                              key={topic.id}
+                              className="cursor-pointer transition-shadow hover:shadow-lg border-2"
+                              onClick={() => setSelectedTopic(topic.id)}
+                              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setSelectedTopic(topic.id))}
+                              tabIndex={0}
+                              role="button"
+                              aria-label={`Learn about ${topic.title}`}
+                              data-testid={`card-topic-${topic.id}`}
+                            >
+                              <CardContent className="p-5">
+                                <div className={`w-12 h-12 rounded-xl ${topic.color} flex items-center justify-center mb-3 shadow`}>
+                                  <topic.icon className="w-6 h-6 text-white" />
+                                </div>
+                                <h3 className="font-semibold text-lg text-foreground mb-2">{topic.title}</h3>
+                                <p className="text-muted-foreground text-sm">{topic.description}</p>
+                                <span className="inline-flex items-center gap-1 text-sm font-medium text-primary mt-3">
+                                  View full guide <ArrowRight className="w-3.5 h-3.5" />
+                                </span>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
                     </TabsContent>
 
                     <TabsContent value="old-advice" className="space-y-6">
