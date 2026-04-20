@@ -46,7 +46,7 @@ export async function seedNewsArticles(): Promise<number> {
         ADD COLUMN IF NOT EXISTS "author_avatar_url" text,
         ADD COLUMN IF NOT EXISTS "tags" text[] DEFAULT ARRAY[]::text[],
         ADD COLUMN IF NOT EXISTS "key_takeaways" text[] DEFAULT ARRAY[]::text[],
-        ADD COLUMN IF NOT EXISTS "article_type" text DEFAULT 'curated',
+        ADD COLUMN IF NOT EXISTS "article_type" text DEFAULT 'aggregated',
         ADD COLUMN IF NOT EXISTS "curated_topic" text,
         ADD COLUMN IF NOT EXISTS "image_hash" text,
         ADD COLUMN IF NOT EXISTS "cluster_id" text,
@@ -58,6 +58,18 @@ export async function seedNewsArticles(): Promise<number> {
       CREATE INDEX IF NOT EXISTS "idx_news_articles_article_type" ON "news_articles" ("article_type");
     `);
     console.log("[news-seed] Added curated/track columns to news_articles if missing.");
+
+    // Backfill article_type from source: GetCyberRight-authored pieces are
+    // curated, all other ingested feed items are aggregated reporting.
+    await client.unsafe(`
+      UPDATE "news_articles"
+        SET "article_type" = CASE
+          WHEN "source" ILIKE '%getcyberright%' OR "source" ILIKE '%gcr%' THEN 'curated'
+          ELSE 'aggregated'
+        END
+        WHERE "article_type" IS NULL OR "article_type" = 'curated' AND "source" NOT ILIKE '%getcyberright%'
+    `);
+    console.log("[news-seed] Backfilled article_type from source.");
 
     // Drop and recreate social_posts table (schema mismatch from initial migration)
     await client.unsafe(`DROP TABLE IF EXISTS "social_posts"`);

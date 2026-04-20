@@ -1710,7 +1710,7 @@ export const newsArticles = pgTable("news_articles", {
   authorAvatarUrl: text("author_avatar_url"),
   tags: text("tags").array().default(sql`ARRAY[]::text[]`),
   keyTakeaways: text("key_takeaways").array().default(sql`ARRAY[]::text[]`),
-  articleType: text("article_type").default("curated"),
+  articleType: text("article_type").default("aggregated"),
   curatedTopic: text("curated_topic"),
   imageHash: text("image_hash"),
   clusterId: text("cluster_id"),

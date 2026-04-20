@@ -6132,61 +6132,95 @@ BEHAVIORAL CONSTRAINTS
 
   app.get("/api/news/tracks", async (_req: Request, res: Response) => {
     try {
-      const { clusterTrending, CURATED_TOPIC_LABELS } = await import("./newsCurationGuard");
+      const { clusterTrending, CURATED_TOPIC_LABELS, isCuratedSource } = await import(
+        "./newsCurationGuard"
+      );
       const articles = await storage.getNewsArticles(undefined, 200);
 
-      const mapBase = (a: any) => ({
-        id: a.id,
-        title: a.title,
-        slug: a.slug,
-        excerpt: a.excerpt,
-        category: a.category,
-        source: a.source,
-        url: a.sourceUrl,
-        imageUrl: a.imageUrl,
-        thumbnailUrl: a.thumbnailUrl,
-        publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
-        urgencyLevel: a.urgencyLevel,
-        author: a.author,
-        authorRole: a.authorRole,
-        articleType: (a as any).articleType || "curated",
-        curatedTopic: (a as any).curatedTopic || null,
-        clusterId: (a as any).clusterId || null,
-      });
+      interface TrackArticle {
+        id: string;
+        title: string;
+        slug: string;
+        excerpt: string;
+        category: string;
+        source: string;
+        url: string;
+        imageUrl: string | null;
+        thumbnailUrl: string | null;
+        publishedAt: string;
+        urgencyLevel: number;
+        author: string | null;
+        authorRole: string | null;
+        articleType: "curated" | "aggregated";
+        curatedTopic: string | null;
+        clusterId: string | null;
+      }
+
+      const mapBase = (a: NewsArticle): TrackArticle => {
+        const stored = a.articleType as string | null | undefined;
+        const articleType: "curated" | "aggregated" =
+          stored === "curated" || stored === "aggregated"
+            ? stored
+            : isCuratedSource(a.source)
+              ? "curated"
+              : "aggregated";
+        return {
+          id: a.id,
+          title: a.title,
+          slug: a.slug,
+          excerpt: a.excerpt,
+          category: a.category,
+          source: a.source,
+          url: a.sourceUrl,
+          imageUrl: a.imageUrl,
+          thumbnailUrl: a.thumbnailUrl,
+          publishedAt: (a.publishedAt || new Date()).toISOString(),
+          urgencyLevel: a.urgencyLevel ?? 1,
+          author: a.author,
+          authorRole: a.authorRole,
+          articleType,
+          curatedTopic: (a.curatedTopic as string | null) ?? null,
+          clusterId: (a.clusterId as string | null) ?? null,
+        };
+      };
 
       const mapped = articles.map(mapBase);
       const now = Date.now();
-      const within = (a: any, hours: number) => {
-        const t = new Date(a.publishedAt).getTime();
+      const within = (publishedAtIso: string, hours: number) => {
+        const t = new Date(publishedAtIso).getTime();
         return now - t <= hours * 3600 * 1000;
       };
 
-      const breaking = mapped
-        .filter((a) => (a.urgencyLevel || 0) >= 4 && within(a, 72))
+      const aggregatedOnly = mapped.filter((a) => a.articleType === "aggregated");
+
+      const breaking = aggregatedOnly
+        .filter((a) => a.urgencyLevel >= 4 && within(a.publishedAt, 72))
         .slice(0, 6);
 
       const clusters = clusterTrending(
-        articles.map((a) => ({
-          id: a.id,
-          title: a.title,
-          source: a.source,
-          publishedAt: a.publishedAt || null,
-          slug: a.slug,
-          imageUrl: a.imageUrl || null,
-          category: a.category,
-          excerpt: a.excerpt,
-        })),
+        articles
+          .filter((a) => !isCuratedSource(a.source))
+          .map((a) => ({
+            id: a.id,
+            title: a.title,
+            source: a.source,
+            publishedAt: a.publishedAt || null,
+            slug: a.slug,
+            imageUrl: a.imageUrl || null,
+            category: a.category,
+            excerpt: a.excerpt,
+          })),
         48,
       ).slice(0, 6);
 
       const trendingArticleIds = new Set(clusters.flatMap((c) => c.articleIds));
       const breakingIds = new Set(breaking.map((b) => b.id));
 
-      const latest = mapped
+      const latest = aggregatedOnly
         .filter((a) => !breakingIds.has(a.id) && !trendingArticleIds.has(a.id))
         .slice(0, 18);
 
-      const fromGetCyberRight: Record<string, any[]> = {
+      const fromGetCyberRight: Record<string, TrackArticle[]> = {
         "spot-the-scam": [],
         "protect-parents": [],
         "keep-kids-safe": [],
@@ -6433,11 +6467,18 @@ BEHAVIORAL CONSTRAINTS
         relatedToolName: article.relatedToolName,
         author: article.author || "Jude Annan, CISM",
         authorRole: article.authorRole || "Managing Partner",
-        authorAvatarUrl: (article as any).authorAvatarUrl || null,
-        tags: (article as any).tags || [],
-        keyTakeaways: (article as any).keyTakeaways || [],
+        authorAvatarUrl: article.authorAvatarUrl || null,
+        tags: article.tags || [],
+        keyTakeaways: article.keyTakeaways || [],
+        articleType:
+          article.articleType === "curated" || article.articleType === "aggregated"
+            ? article.articleType
+            : /getcyberright|gcr/i.test(article.source)
+              ? "curated"
+              : "aggregated",
+        curatedTopic: article.curatedTopic || null,
         publishedAt: article.publishedAt?.toISOString() || new Date().toISOString(),
-        updatedAt: (article as any).updatedAt ? (article as any).updatedAt.toISOString() : null,
+        updatedAt: article.updatedAt ? article.updatedAt.toISOString() : null,
         readTime: article.content ? Math.ceil(article.content.split(/\s+/).length / 200) : 2,
         relatedArticles: related,
       });

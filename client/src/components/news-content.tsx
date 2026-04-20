@@ -264,9 +264,9 @@ function ArticleCard({
 }
 
 function TrendingClusterCard({ cluster }: { cluster: TrendingCluster }) {
+  const [, navigate] = useLocation();
   const lead = cluster.articles[0];
   if (!lead) return null;
-  const [, navigate] = useLocation();
   return (
     <Card
       className="overflow-hidden border border-amber-200 dark:border-amber-900/50 bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/30 dark:to-slate-900 hover:shadow-md transition-shadow"
@@ -327,13 +327,15 @@ function TrendingClusterCard({ cluster }: { cluster: TrendingCluster }) {
   );
 }
 
+type IconType = React.ComponentType<{ className?: string }>;
+
 function SectionHeader({
   icon: Icon,
   title,
   subtitle,
   badge,
 }: {
-  icon: any;
+  icon: IconType;
   title: string;
   subtitle?: string;
   badge?: string;

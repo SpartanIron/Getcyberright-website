@@ -5,9 +5,13 @@ import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
 import type { InsertNewsArticle, NewsArticle } from "@shared/schema";
 import { generateSocialPostsForNewsBatch } from "./newsSocialEngine";
 import {
-  validateAndCleanPlainEnglish,
+  scanJargon,
+  annotateInlineDefinitions,
+  gateCuratedPlainEnglish,
   classifyCuratedTopic,
-  computeImageHash,
+  fetchAndHashImage,
+  generateBrandedCardSvg,
+  isCuratedSource,
 } from "./newsCurationGuard";
 
 async function fetchOgImage(url: string): Promise<string | null> {
@@ -320,18 +324,16 @@ function sanitizeArticleText(text: string): string {
 }
 
 function sanitizeArticle(article: ProcessedArticle): ProcessedArticle {
-  const cleanTitle = validateAndCleanPlainEnglish(sanitizeArticleText(article.familyTitle)).cleaned;
-  const cleanExcerpt = validateAndCleanPlainEnglish(sanitizeArticleText(article.excerpt)).cleaned;
-  const contentResult = validateAndCleanPlainEnglish(sanitizeArticleText(article.content));
-  if (contentResult.blockedTerms.length > 0) {
-    console.log(`[NewsService] Jargon blocklist swapped: ${[...new Set(contentResult.blockedTerms)].slice(0, 5).join(", ")}`);
+  // Aggregated copy keeps original wording but inlines plain-English definitions
+  // for any blocked jargon (e.g. "RCE (remote takeover of a device)") on first use.
+  const title = sanitizeArticleText(article.familyTitle);
+  const excerpt = annotateInlineDefinitions(sanitizeArticleText(article.excerpt));
+  const content = annotateInlineDefinitions(sanitizeArticleText(article.content));
+  const scan = scanJargon([title, excerpt, content].join("\n"));
+  if (scan.blockedTerms.length > 0) {
+    console.log(`[NewsService] Inline-defined jargon: ${scan.blockedTerms.slice(0, 5).join(", ")}`);
   }
-  return {
-    ...article,
-    familyTitle: cleanTitle,
-    excerpt: cleanExcerpt,
-    content: contentResult.cleaned,
-  };
+  return { ...article, familyTitle: title, excerpt, content };
 }
 
 function createFallbackArticle(item: RawFeedItem, index: number): ProcessedArticle {
@@ -429,8 +431,19 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
     const urlHash = createHash("md5").update(feedItem.link).digest("hex").slice(0, 8);
     const slug = `${baseSlug}-${urlHash}`;
     const rawImage = ogImages[article.index] || null;
-    let resolvedImage = rawImage?.replace(/^http:\/\//i, 'https://') || null;
-    let imageHash = computeImageHash(resolvedImage);
+    let resolvedImage = rawImage?.replace(/^http:\/\//i, "https://") || null;
+    const articleType: "curated" | "aggregated" = isCuratedSource(feedItem.source)
+      ? "curated"
+      : "aggregated";
+
+    // Hash actual image bytes (not URL) so the same image hosted at two URLs
+    // is still detected as a duplicate.
+    let imageHash: string | null = null;
+    if (resolvedImage) {
+      const fetched = await fetchAndHashImage(resolvedImage);
+      imageHash = fetched.hash;
+      if (!imageHash) resolvedImage = null;
+    }
 
     if (imageHash) {
       try {
@@ -443,28 +456,59 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
           .where(eq(newsArticles.imageHash, imageHash))
           .limit(1);
         if (dup.length > 0) {
-          console.log(`[NewsService] Duplicate image hash detected for "${article.familyTitle?.slice(0, 40)}..." — falling back to category gradient`);
+          console.log(
+            `[NewsService] Duplicate image content for "${(article.familyTitle || feedItem.title).slice(0, 40)}..." — replacing with unique branded card`,
+          );
           resolvedImage = null;
           imageHash = null;
         }
-      } catch (err: any) {
-        console.warn(`[NewsService] Image hash dedup check failed: ${err.message}`);
+      } catch (err) {
+        console.warn(`[NewsService] Image hash dedup check failed: ${(err as Error).message}`);
       }
     }
 
-    const curatedTopic = classifyCuratedTopic(
-      article.familyTitle || feedItem.title,
-      article.excerpt || feedItem.summary,
-      category,
-    );
+    // Curated pieces must always have a unique visual. If the og:image is
+    // missing or duplicated, generate a branded SVG card seeded by title.
+    if (articleType === "curated" && !resolvedImage) {
+      const card = generateBrandedCardSvg(
+        article.familyTitle || feedItem.title,
+        category,
+      );
+      resolvedImage = card.dataUrl;
+      imageHash = card.hash;
+    }
+
+    const titleForStore = article.familyTitle || feedItem.title;
+    const excerptForStore = article.excerpt || feedItem.summary.substring(0, 200);
+    const contentForStore = article.content || null;
+
+    // Curated pieces are gated by the no-jargon contract. If any blocked terms
+    // remain after AI processing, skip publication and log for editorial review.
+    if (articleType === "curated") {
+      const gate = gateCuratedPlainEnglish(titleForStore, excerptForStore, contentForStore || "");
+      if (!gate.ok) {
+        console.warn(
+          `[NewsService] Curated piece blocked by jargon gate (${gate.blockedTerms.join(", ")}): "${titleForStore.slice(0, 60)}"`,
+        );
+        continue;
+      }
+    }
+
+    const curatedTopic =
+      articleType === "curated"
+        ? classifyCuratedTopic(titleForStore, excerptForStore, category)
+        : null;
 
     try {
-      const isLearning = category === "Learning" || (article.familyTitle || feedItem.title).toLowerCase().includes("training") || (article.familyTitle || feedItem.title).toLowerCase().includes("certification");
+      const isLearning =
+        category === "Learning" ||
+        titleForStore.toLowerCase().includes("training") ||
+        titleForStore.toLowerCase().includes("certification");
       const stored = await storage.createNewsArticle({
-        title: article.familyTitle || feedItem.title,
+        title: titleForStore,
         slug,
-        excerpt: article.excerpt || feedItem.summary.substring(0, 200),
-        content: article.content || null,
+        excerpt: excerptForStore,
+        content: contentForStore,
         category,
         source: feedItem.source,
         sourceUrl: feedItem.link,
@@ -474,9 +518,19 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
         urgencyLevel: urgency,
         relatedToolUrl: relatedTool?.url || null,
         relatedToolName: relatedTool?.name || null,
-        author: isLearning ? "GCR Editorial Team" : "Jude Annan, CISM",
-        authorRole: isLearning ? "Education & Awareness" : "Managing Partner",
-        articleType: "curated",
+        author:
+          articleType === "curated"
+            ? "Jude Annan, CISM"
+            : isLearning
+              ? "GCR Editorial Team"
+              : "Jude Annan, CISM",
+        authorRole:
+          articleType === "curated"
+            ? "Managing Partner, GetCyberRight"
+            : isLearning
+              ? "Education & Awareness"
+              : "Managing Partner",
+        articleType,
         curatedTopic,
         imageHash,
         publishedAt: feedItem.pubDate ? new Date(feedItem.pubDate) : new Date(),

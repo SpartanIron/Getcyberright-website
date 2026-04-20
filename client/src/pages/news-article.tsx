@@ -53,6 +53,8 @@ interface NewsArticleData {
   authorAvatarUrl: string | null;
   tags: string[];
   keyTakeaways: string[];
+  articleType: "curated" | "aggregated";
+  curatedTopic: string | null;
   publishedAt: string;
   updatedAt: string | null;
   readTime: number;
@@ -588,9 +590,24 @@ export default function NewsArticlePage({ initialArticle }: { initialArticle?: N
                   {article.authorRole}
                 </p>
               )}
-              <p className="text-[11px] text-muted-foreground mt-0.5" data-testid="text-article-attribution">
-                Reporting aggregated from <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-teal-600 dark:hover:text-teal-400 font-medium">{article.source}</a>. Plain-English summary by GetCyberRight.
-              </p>
+              {article.articleType === "curated" ? (
+                <p className="text-[11px] text-teal-700 dark:text-teal-400 mt-0.5 font-semibold" data-testid="text-article-attribution">
+                  GetCyberRight Original &middot; Plain-English guidance for families
+                </p>
+              ) : (
+                <p className="text-[11px] text-muted-foreground mt-0.5" data-testid="text-article-attribution">
+                  Reporting aggregated from{" "}
+                  <a
+                    href={article.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-teal-600 dark:hover:text-teal-400 font-medium"
+                  >
+                    {article.source}
+                  </a>
+                  . Plain-English summary by GetCyberRight.
+                </p>
+              )}
               <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground flex-wrap">
                 <span data-testid="text-article-date">
                   Published {formatDate(article.publishedAt)}
