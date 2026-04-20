@@ -1209,6 +1209,8 @@ export default function Seniors() {
                   colorVariant="teal"
                 />
 
+                <HubPillarHero audience="seniors" />
+
                 <div className="max-w-5xl mx-auto px-4 py-8">
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="flex flex-wrap h-auto gap-1.5 bg-muted/50 p-1.5 rounded-xl mb-8">
