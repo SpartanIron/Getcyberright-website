@@ -25,7 +25,8 @@ import {
   CheckCircle2,
   XCircle,
   Activity,
-  Zap
+  Zap,
+  Eye
 } from "lucide-react";
 import { Link } from "@/lib/navigation";
 import { AdminLayout } from "@/components/admin/admin-layout";
@@ -88,6 +89,17 @@ export default function AdminDashboard() {
 
   const { data: taskStats } = useQuery<TaskStats>({
     queryKey: ["/api/admin/growth/task-stats"],
+    enabled: adminCheck?.isAdmin === true,
+  });
+
+  const { data: sourcesAnalytics, isLoading: sourcesLoading, isError: sourcesError } = useQuery<{
+    rangeDays: number;
+    totalViews: number;
+    topPlatforms: Array<{ key: string; count: number }>;
+    topReferrers: Array<{ key: string; count: number }>;
+    topPosts: Array<{ postId: string; title: string; platform: string; views: number }>;
+  }>({
+    queryKey: ["/api/admin/social/sources-analytics"],
     enabled: adminCheck?.isAdmin === true,
   });
 
@@ -265,6 +277,80 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Eye className="w-5 h-5 text-primary" />
+            Sources Receipts (last {sourcesAnalytics?.rangeDays ?? 30} days)
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total Source-Panel Views
+                </CardTitle>
+                <Eye className="w-5 h-5 text-indigo-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold" data-testid="stat-source-panel-views">
+                  {sourcesLoading ? "..." : (sourcesAnalytics?.totalViews ?? 0).toLocaleString()}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  visits to /social/p/:id/sources
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="lg:col-span-2">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Top 5 Referring Platforms</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {sourcesLoading ? (
+                  <div className="text-sm text-muted-foreground">Loading...</div>
+                ) : sourcesError ? (
+                  <div
+                    className="text-sm text-red-600 dark:text-red-400"
+                    data-testid="text-source-platforms-error"
+                  >
+                    Failed to load sources analytics. Try refreshing.
+                  </div>
+                ) : (sourcesAnalytics?.topPlatforms?.length ?? 0) === 0 ? (
+                  <div className="text-sm text-muted-foreground" data-testid="text-no-source-platforms">
+                    No source-panel views yet.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {sourcesAnalytics!.topPlatforms.slice(0, 5).map((row) => {
+                      const max = sourcesAnalytics!.topPlatforms[0]?.count || 1;
+                      const pct = Math.max(4, Math.round((row.count / max) * 100));
+                      return (
+                        <div
+                          key={row.key}
+                          className="flex items-center gap-3 text-sm"
+                          data-testid={`row-source-platform-${row.key}`}
+                        >
+                          <span className="w-24 capitalize text-muted-foreground truncate">
+                            {row.key}
+                          </span>
+                          <div className="flex-1 h-2 rounded bg-muted overflow-hidden">
+                            <div
+                              className="h-full bg-indigo-500"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className="w-12 text-right font-medium tabular-nums">
+                            {row.count.toLocaleString()}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
 

@@ -34,8 +34,16 @@ import {
   XCircle,
   RefreshCw,
   Pencil,
+  BarChart3,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -451,6 +459,118 @@ function ConnectedPlatforms() {
   );
 }
 
+function PostSourcesAnalyticsDialog({ post }: { post: any }) {
+  const [open, setOpen] = useState(false);
+  const { data, isLoading, isError } = useQuery<{
+    postId: string;
+    title: string;
+    platform: string;
+    rangeDays: number;
+    totalViews: number;
+    allTimeViews: number;
+    topPlatforms: Array<{ key: string; count: number }>;
+    topReferrers: Array<{ key: string; count: number }>;
+  }>({
+    queryKey: ["/api/admin/social/posts", post.id, "sources/analytics"],
+    enabled: open,
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 text-xs"
+          data-testid={`button-sources-analytics-${post.id}`}
+        >
+          <BarChart3 className="w-3 h-3 mr-1" /> Source clicks
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-lg" data-testid={`dialog-sources-analytics-${post.id}`}>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Source-panel views
+          </DialogTitle>
+        </DialogHeader>
+        {isLoading ? (
+          <div className="py-6 text-center text-muted-foreground text-sm">Loading...</div>
+        ) : isError || !data ? (
+          <div
+            className="py-6 text-center text-sm text-red-600 dark:text-red-400"
+            data-testid={`text-sources-analytics-error-${post.id}`}
+          >
+            Failed to load source-panel analytics. Try again.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground line-clamp-2">{data.title}</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded border p-3">
+                <div className="text-xs text-muted-foreground">Last {data.rangeDays} days</div>
+                <div
+                  className="text-2xl font-bold"
+                  data-testid={`stat-post-sources-range-${post.id}`}
+                >
+                  {data.totalViews.toLocaleString()}
+                </div>
+              </div>
+              <div className="rounded border p-3">
+                <div className="text-xs text-muted-foreground">All time</div>
+                <div
+                  className="text-2xl font-bold"
+                  data-testid={`stat-post-sources-alltime-${post.id}`}
+                >
+                  {data.allTimeViews.toLocaleString()}
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="text-sm font-medium mb-2">Top platforms</div>
+              {data.topPlatforms.length === 0 ? (
+                <div className="text-xs text-muted-foreground">No views in this window.</div>
+              ) : (
+                <div className="space-y-1">
+                  {data.topPlatforms.map((row) => (
+                    <div
+                      key={row.key}
+                      className="flex justify-between text-xs"
+                      data-testid={`row-post-platform-${post.id}-${row.key}`}
+                    >
+                      <span className="capitalize text-muted-foreground">{row.key}</span>
+                      <span className="font-medium tabular-nums">{row.count.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div>
+              <div className="text-sm font-medium mb-2">Top referrer hosts</div>
+              {data.topReferrers.length === 0 ? (
+                <div className="text-xs text-muted-foreground">No referrer data.</div>
+              ) : (
+                <div className="space-y-1">
+                  {data.topReferrers.map((row) => (
+                    <div
+                      key={row.key}
+                      className="flex justify-between text-xs"
+                      data-testid={`row-post-referrer-${post.id}-${row.key.replace(/[^a-z0-9]/gi, "-")}`}
+                    >
+                      <span className="text-muted-foreground truncate max-w-[70%]">{row.key}</span>
+                      <span className="font-medium tabular-nums">{row.count.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function SocialPostCard({ post, onPublish, isPublishing }: { post: any; onPublish: (id: string) => void; isPublishing: boolean }) {
   const platformColor = PLATFORM_COLORS[post.platform] || "bg-muted text-muted-foreground";
   const content = post.postContent || post.content || "";
@@ -595,16 +715,19 @@ function SocialPostCard({ post, onPublish, isPublishing }: { post: any; onPublis
             </div>
           )}
 
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2 pt-1 flex-wrap">
             {post.status === "published" ? (
-              <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-                <CheckCircle className="w-3.5 h-3.5" /> Published
-                {post.publishedAt && (
-                  <>
-                    {" "}on <ClientDate value={post.publishedAt} />
-                  </>
-                )}
-              </span>
+              <>
+                <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                  <CheckCircle className="w-3.5 h-3.5" /> Published
+                  {post.publishedAt && (
+                    <>
+                      {" "}on <ClientDate value={post.publishedAt} />
+                    </>
+                  )}
+                </span>
+                <PostSourcesAnalyticsDialog post={post} />
+              </>
             ) : post.platform !== "alert" ? (
               <Button
                 size="sm"
