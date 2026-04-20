@@ -6130,6 +6130,110 @@ BEHAVIORAL CONSTRAINTS
     }
   });
 
+  app.get("/api/news/tracks", async (_req: Request, res: Response) => {
+    try {
+      const { clusterTrending, CURATED_TOPIC_LABELS } = await import("./newsCurationGuard");
+      const articles = await storage.getNewsArticles(undefined, 200);
+
+      const mapBase = (a: any) => ({
+        id: a.id,
+        title: a.title,
+        slug: a.slug,
+        excerpt: a.excerpt,
+        category: a.category,
+        source: a.source,
+        url: a.sourceUrl,
+        imageUrl: a.imageUrl,
+        thumbnailUrl: a.thumbnailUrl,
+        publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
+        urgencyLevel: a.urgencyLevel,
+        author: a.author,
+        authorRole: a.authorRole,
+        articleType: (a as any).articleType || "curated",
+        curatedTopic: (a as any).curatedTopic || null,
+        clusterId: (a as any).clusterId || null,
+      });
+
+      const mapped = articles.map(mapBase);
+      const now = Date.now();
+      const within = (a: any, hours: number) => {
+        const t = new Date(a.publishedAt).getTime();
+        return now - t <= hours * 3600 * 1000;
+      };
+
+      const breaking = mapped
+        .filter((a) => (a.urgencyLevel || 0) >= 4 && within(a, 72))
+        .slice(0, 6);
+
+      const clusters = clusterTrending(
+        articles.map((a) => ({
+          id: a.id,
+          title: a.title,
+          source: a.source,
+          publishedAt: a.publishedAt || null,
+          slug: a.slug,
+          imageUrl: a.imageUrl || null,
+          category: a.category,
+          excerpt: a.excerpt,
+        })),
+        48,
+      ).slice(0, 6);
+
+      const trendingArticleIds = new Set(clusters.flatMap((c) => c.articleIds));
+      const breakingIds = new Set(breaking.map((b) => b.id));
+
+      const latest = mapped
+        .filter((a) => !breakingIds.has(a.id) && !trendingArticleIds.has(a.id))
+        .slice(0, 18);
+
+      const fromGetCyberRight: Record<string, any[]> = {
+        "spot-the-scam": [],
+        "protect-parents": [],
+        "keep-kids-safe": [],
+        "this-weeks-threat": [],
+      };
+      for (const a of mapped) {
+        if (a.articleType !== "curated") continue;
+        const topic = a.curatedTopic || "this-weeks-threat";
+        if (fromGetCyberRight[topic] && fromGetCyberRight[topic].length < 6) {
+          fromGetCyberRight[topic].push(a);
+        }
+      }
+
+      res.json({
+        whatsHappening: {
+          breaking,
+          trending: clusters.map((c) => ({
+            clusterId: c.clusterId,
+            keywords: c.keywords,
+            sources: c.sources,
+            sourceCount: c.sources.length,
+            size: c.size,
+            articles: c.articleIds
+              .map((id) => mapped.find((m) => m.id === id))
+              .filter(Boolean),
+          })),
+          latest,
+        },
+        fromGetCyberRight: {
+          topics: Object.entries(fromGetCyberRight).map(([key, items]) => ({
+            key,
+            label: (CURATED_TOPIC_LABELS as any)[key] || key,
+            articles: items,
+          })),
+          author: {
+            name: "Jude Annan, CISM",
+            role: "Managing Partner, GetCyberRight",
+          },
+        },
+        lastUpdated: articles[0]?.createdAt?.toISOString() || null,
+      });
+    } catch (error: any) {
+      console.error("[news/tracks] failed:", error.message);
+      res.status(500).json({ error: "Failed to load news tracks" });
+    }
+  });
+
   app.get("/api/news/category/:category", async (req: Request, res: Response) => {
     try {
       const categoryMap: Record<string, string> = {

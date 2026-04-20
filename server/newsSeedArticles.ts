@@ -40,6 +40,25 @@ export async function seedNewsArticles(): Promise<number> {
     `);
     console.log("[news-seed] Ensured news_articles table exists.");
 
+    // Add curated track + image dedup columns if missing (Task #57)
+    await client.unsafe(`
+      ALTER TABLE "news_articles"
+        ADD COLUMN IF NOT EXISTS "author_avatar_url" text,
+        ADD COLUMN IF NOT EXISTS "tags" text[] DEFAULT ARRAY[]::text[],
+        ADD COLUMN IF NOT EXISTS "key_takeaways" text[] DEFAULT ARRAY[]::text[],
+        ADD COLUMN IF NOT EXISTS "article_type" text DEFAULT 'curated',
+        ADD COLUMN IF NOT EXISTS "curated_topic" text,
+        ADD COLUMN IF NOT EXISTS "image_hash" text,
+        ADD COLUMN IF NOT EXISTS "cluster_id" text,
+        ADD COLUMN IF NOT EXISTS "updated_at" timestamp
+    `);
+    await client.unsafe(`
+      CREATE INDEX IF NOT EXISTS "idx_news_articles_image_hash" ON "news_articles" ("image_hash");
+      CREATE INDEX IF NOT EXISTS "idx_news_articles_curated_topic" ON "news_articles" ("curated_topic");
+      CREATE INDEX IF NOT EXISTS "idx_news_articles_article_type" ON "news_articles" ("article_type");
+    `);
+    console.log("[news-seed] Added curated/track columns to news_articles if missing.");
+
     // Drop and recreate social_posts table (schema mismatch from initial migration)
     await client.unsafe(`DROP TABLE IF EXISTS "social_posts"`);
     await client.unsafe(`

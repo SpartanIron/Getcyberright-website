@@ -588,6 +588,9 @@ export default function NewsArticlePage({ initialArticle }: { initialArticle?: N
                   {article.authorRole}
                 </p>
               )}
+              <p className="text-[11px] text-muted-foreground mt-0.5" data-testid="text-article-attribution">
+                Reporting aggregated from <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-teal-600 dark:hover:text-teal-400 font-medium">{article.source}</a>. Plain-English summary by GetCyberRight.
+              </p>
               <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground flex-wrap">
                 <span data-testid="text-article-date">
                   Published {formatDate(article.publishedAt)}

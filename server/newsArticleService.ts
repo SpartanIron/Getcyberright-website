@@ -4,6 +4,11 @@ import { storage } from "./storage";
 import { fetchRealThreats, type RawFeedItem } from "./trendingThreatService";
 import type { InsertNewsArticle, NewsArticle } from "@shared/schema";
 import { generateSocialPostsForNewsBatch } from "./newsSocialEngine";
+import {
+  validateAndCleanPlainEnglish,
+  classifyCuratedTopic,
+  computeImageHash,
+} from "./newsCurationGuard";
 
 async function fetchOgImage(url: string): Promise<string | null> {
   const userAgents = [
@@ -315,11 +320,17 @@ function sanitizeArticleText(text: string): string {
 }
 
 function sanitizeArticle(article: ProcessedArticle): ProcessedArticle {
+  const cleanTitle = validateAndCleanPlainEnglish(sanitizeArticleText(article.familyTitle)).cleaned;
+  const cleanExcerpt = validateAndCleanPlainEnglish(sanitizeArticleText(article.excerpt)).cleaned;
+  const contentResult = validateAndCleanPlainEnglish(sanitizeArticleText(article.content));
+  if (contentResult.blockedTerms.length > 0) {
+    console.log(`[NewsService] Jargon blocklist swapped: ${[...new Set(contentResult.blockedTerms)].slice(0, 5).join(", ")}`);
+  }
   return {
     ...article,
-    familyTitle: sanitizeArticleText(article.familyTitle),
-    excerpt: sanitizeArticleText(article.excerpt),
-    content: sanitizeArticleText(article.content),
+    familyTitle: cleanTitle,
+    excerpt: cleanExcerpt,
+    content: contentResult.cleaned,
   };
 }
 
@@ -418,7 +429,34 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
     const urlHash = createHash("md5").update(feedItem.link).digest("hex").slice(0, 8);
     const slug = `${baseSlug}-${urlHash}`;
     const rawImage = ogImages[article.index] || null;
-    const resolvedImage = rawImage?.replace(/^http:\/\//i, 'https://') || null;
+    let resolvedImage = rawImage?.replace(/^http:\/\//i, 'https://') || null;
+    let imageHash = computeImageHash(resolvedImage);
+
+    if (imageHash) {
+      try {
+        const { db } = await import("./db");
+        const { newsArticles } = await import("@shared/schema");
+        const { eq } = await import("drizzle-orm");
+        const dup = await db
+          .select({ id: newsArticles.id })
+          .from(newsArticles)
+          .where(eq(newsArticles.imageHash, imageHash))
+          .limit(1);
+        if (dup.length > 0) {
+          console.log(`[NewsService] Duplicate image hash detected for "${article.familyTitle?.slice(0, 40)}..." — falling back to category gradient`);
+          resolvedImage = null;
+          imageHash = null;
+        }
+      } catch (err: any) {
+        console.warn(`[NewsService] Image hash dedup check failed: ${err.message}`);
+      }
+    }
+
+    const curatedTopic = classifyCuratedTopic(
+      article.familyTitle || feedItem.title,
+      article.excerpt || feedItem.summary,
+      category,
+    );
 
     try {
       const isLearning = category === "Learning" || (article.familyTitle || feedItem.title).toLowerCase().includes("training") || (article.familyTitle || feedItem.title).toLowerCase().includes("certification");
@@ -438,6 +476,9 @@ async function processAndStoreArticles(feedItems: RawFeedItem[]): Promise<number
         relatedToolName: relatedTool?.name || null,
         author: isLearning ? "GCR Editorial Team" : "Jude Annan, CISM",
         authorRole: isLearning ? "Education & Awareness" : "Managing Partner",
+        articleType: "curated",
+        curatedTopic,
+        imageHash,
         publishedAt: feedItem.pubDate ? new Date(feedItem.pubDate) : new Date(),
       });
       created++;
