@@ -14,12 +14,20 @@ import { logger } from "./logger";
 
 const log = logger.child("SocialReviewNotifier");
 
-const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+// 7 days. Token security is the HMAC secret, not the expiry — admins routinely
+// click queued digest emails days later, and shorter windows just produce
+// confusing "invalid link" failures.
+const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+// Prefer a dedicated secret so SESSION_SECRET can be rotated (which logs users
+// out) without silently invalidating every outstanding signed review email.
+// Falls back to SESSION_SECRET so existing deployments keep working.
 function getSigningSecret(): string {
-  const secret = process.env.SESSION_SECRET;
+  const secret = process.env.REVIEW_ACTION_SECRET || process.env.SESSION_SECRET;
   if (!secret) {
-    throw new Error("SESSION_SECRET is required to sign social review action tokens");
+    throw new Error(
+      "REVIEW_ACTION_SECRET (or SESSION_SECRET) is required to sign social review action tokens",
+    );
   }
   return secret;
 }
@@ -49,22 +57,81 @@ export interface VerifiedReviewAction {
   exp: number;
 }
 
-export function verifyReviewActionToken(token: string): VerifiedReviewAction | null {
-  try {
-    const [payloadB64, sigB64] = token.split(".");
-    if (!payloadB64 || !sigB64) return null;
-    const expectedSig = crypto.createHmac("sha256", getSigningSecret()).update(payloadB64).digest();
-    const providedSig = base64UrlDecode(sigB64);
-    if (expectedSig.length !== providedSig.length) return null;
-    if (!crypto.timingSafeEqual(expectedSig, providedSig)) return null;
-    const payload = JSON.parse(base64UrlDecode(payloadB64).toString("utf8"));
-    if (typeof payload?.postId !== "string") return null;
-    if (payload.action !== "approve" && payload.action !== "reject") return null;
-    if (typeof payload.exp !== "number" || payload.exp < Date.now()) return null;
-    return { postId: payload.postId, action: payload.action, exp: payload.exp };
-  } catch {
-    return null;
+export type ReviewTokenFailureReason =
+  | "empty"
+  | "malformed"
+  | "bad_signature"
+  | "bad_payload"
+  | "bad_action"
+  | "expired";
+
+export interface VerifyReviewActionTokenResult {
+  verified: VerifiedReviewAction | null;
+  reason?: ReviewTokenFailureReason;
+}
+
+export function verifyReviewActionTokenDetailed(rawToken: string): VerifyReviewActionTokenResult {
+  // Some inbox safety scanners (Outlook Safe Links, Gmail proxies) append a
+  // trailing space or wrap the URL — strip benign whitespace before parsing.
+  const token = (rawToken || "").trim();
+  if (!token) return { verified: null, reason: "empty" };
+
+  const [payloadB64, sigB64] = token.split(".");
+  if (!payloadB64 || !sigB64) {
+    log.warn("review-action token rejected", { reason: "malformed", tokenLen: token.length });
+    return { verified: null, reason: "malformed" };
   }
+
+  let providedSig: Buffer;
+  try {
+    providedSig = base64UrlDecode(sigB64);
+  } catch {
+    log.warn("review-action token rejected", { reason: "malformed", stage: "sig_decode" });
+    return { verified: null, reason: "malformed" };
+  }
+
+  const expectedSig = crypto.createHmac("sha256", getSigningSecret()).update(payloadB64).digest();
+  if (
+    expectedSig.length !== providedSig.length ||
+    !crypto.timingSafeEqual(expectedSig, providedSig)
+  ) {
+    log.warn("review-action token rejected", {
+      reason: "bad_signature",
+      hint: "SESSION_SECRET/REVIEW_ACTION_SECRET likely rotated since the email was sent",
+    });
+    return { verified: null, reason: "bad_signature" };
+  }
+
+  let payload: any;
+  try {
+    payload = JSON.parse(base64UrlDecode(payloadB64).toString("utf8"));
+  } catch {
+    log.warn("review-action token rejected", { reason: "bad_payload" });
+    return { verified: null, reason: "bad_payload" };
+  }
+
+  if (typeof payload?.postId !== "string") {
+    return { verified: null, reason: "bad_payload" };
+  }
+  if (payload.action !== "approve" && payload.action !== "reject") {
+    return { verified: null, reason: "bad_action" };
+  }
+  if (typeof payload.exp !== "number" || payload.exp < Date.now()) {
+    log.info("review-action token rejected", {
+      reason: "expired",
+      ageMs: typeof payload.exp === "number" ? Date.now() - payload.exp : null,
+    });
+    return { verified: null, reason: "expired" };
+  }
+
+  return {
+    verified: { postId: payload.postId, action: payload.action, exp: payload.exp },
+  };
+}
+
+// Backwards-compatible thin wrapper.
+export function verifyReviewActionToken(token: string): VerifiedReviewAction | null {
+  return verifyReviewActionTokenDetailed(token).verified;
 }
 
 interface AdminRecipient {
@@ -275,7 +342,7 @@ function buildDigestEmail(posts: SocialPost[]): { subject: string; htmlBody: str
         <h1 style="color:#0f172a; font-size:22px; margin:0 0 6px;">Reactive posts need your review</h1>
         <p style="color:#475569; margin:0 0 18px; font-size:14px;">${posts.length} post${posts.length === 1 ? "" : "s"} entered the 60-minute review window. Approve or reject below — the buttons are signed and tied to each post.</p>
         ${postBlocks}
-        <p style="color:#94a3b8; font-size:12px; margin-top:18px;">Links expire in 24 hours. Posts auto-discard if the review window lapses.</p>
+        <p style="color:#94a3b8; font-size:12px; margin-top:18px;">Links expire in 7 days. Posts auto-discard if the review window lapses sooner.</p>
       </div>
     </body></html>
   `;

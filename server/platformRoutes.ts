@@ -1339,13 +1339,19 @@ export function registerPlatformRoutes(app: Express): void {
       return res.status(400).type("html").send(renderPage("Invalid link", "Missing action token.", false));
     }
 
-    const { verifyReviewActionToken, executeReviewAction } = await import("./socialReviewNotifier");
-    const verified = verifyReviewActionToken(token);
+    const { verifyReviewActionTokenDetailed, executeReviewAction } = await import("./socialReviewNotifier");
+    const { verified, reason } = verifyReviewActionTokenDetailed(token);
     if (!verified) {
+      const isExpired = reason === "expired";
+      const title = isExpired ? "Link expired" : "Invalid or expired link";
+      const message = isExpired
+        ? "This review link has expired. Open the admin review queue to approve or reject the post directly."
+        : "This review link could not be verified. It may have been rewritten by your email provider, or the signing secret was rotated since the email was sent. Open the admin review queue to take action.";
+      const detail = `Reason: ${reason || "unknown"}. Sign in and visit /admin/editorial-review to approve or reject the post.`;
       return res
         .status(400)
         .type("html")
-        .send(renderPage("Invalid or expired link", "This approval link is invalid or has expired.", false));
+        .send(renderPage(title, message, false, detail));
     }
 
     const result = await executeReviewAction(verified.postId, verified.action);
