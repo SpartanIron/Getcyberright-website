@@ -333,6 +333,38 @@ export async function notifyPendingReviewQueue(): Promise<{ notified: number; re
   return { notified: persisted ? fresh.length : 0, recipients: recipients.length };
 }
 
+export async function resendReviewDigest(
+  postIds?: string[],
+): Promise<{ cleared: number; notified: number; recipients: number }> {
+  const now = new Date();
+  let cleared = 0;
+  try {
+    const conditions = [
+      eq(socialPosts.status, "review_pending"),
+      gt(socialPosts.reviewExpiresAt, now),
+    ];
+    if (postIds && postIds.length > 0) {
+      conditions.push(inArray(socialPosts.id, postIds));
+    }
+    const result = await db
+      .update(socialPosts)
+      .set({ notifiedAt: null })
+      .where(and(...conditions))
+      .returning({ id: socialPosts.id });
+    cleared = result.length;
+  } catch (err: any) {
+    log.error("Failed to clear notifiedAt for resend", { error: err?.message });
+    return { cleared: 0, notified: 0, recipients: 0 };
+  }
+
+  if (cleared === 0) {
+    return { cleared: 0, notified: 0, recipients: 0 };
+  }
+
+  const { notified, recipients } = await notifyPendingReviewQueue();
+  return { cleared, notified, recipients };
+}
+
 export interface ReviewActionResult {
   ok: boolean;
   status: number;

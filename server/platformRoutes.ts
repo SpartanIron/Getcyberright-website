@@ -1442,6 +1442,20 @@ export function registerPlatformRoutes(app: Express): void {
     }
   });
 
+  app.post("/api/admin/social-posts/resend-digest", isAuthenticated, isAdminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const rawIds = Array.isArray(req.body?.postIds) ? req.body.postIds : undefined;
+      const postIds = rawIds
+        ? rawIds.filter((id: unknown): id is string => typeof id === "string" && id.length > 0)
+        : undefined;
+      const { resendReviewDigest } = await import("./socialReviewNotifier");
+      const result = await resendReviewDigest(postIds);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error?.message || "Failed to resend digest" });
+    }
+  });
+
   app.post("/api/admin/social-posts/publish-all", isAuthenticated, isAdminMiddleware, async (_req: Request, res: Response) => {
     try {
       const results = await publishAllDrafts();

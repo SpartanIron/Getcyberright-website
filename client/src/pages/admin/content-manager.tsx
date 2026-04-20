@@ -927,6 +927,39 @@ function ReviewQueueTab() {
     onError: () => { toast({ title: "Error", description: "Save failed", variant: "destructive" }); },
   });
 
+  const resendDigestMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/admin/social-posts/resend-digest", {});
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      const cleared = data?.cleared ?? 0;
+      const recipients = data?.recipients ?? 0;
+      const notified = data?.notified ?? 0;
+      if (cleared === 0) {
+        toast({
+          title: "Nothing to resend",
+          description: "No active review-pending posts found.",
+        });
+      } else if (notified === 0) {
+        toast({
+          title: "Resend attempted",
+          description: `Cleared ${cleared} post${cleared === 1 ? "" : "s"}, but the digest could not be delivered.`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Digest resent",
+          description: `Emailed ${recipients} recipient${recipients === 1 ? "" : "s"} about ${notified} post${notified === 1 ? "" : "s"}.`,
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/social-posts/review-queue"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to resend digest", variant: "destructive" });
+    },
+  });
+
   const rejectMutation = useMutation({
     mutationFn: async (id: string) => {
       setActingId(id);
@@ -947,10 +980,27 @@ function ReviewQueueTab() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Eye className="w-5 h-5" /> Review Queue ({posts.length})
-        </CardTitle>
-        <p className="text-xs text-muted-foreground">Reactive trend posts awaiting admin approval. Auto-discard after 30 minutes.</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5" /> Review Queue ({posts.length})
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">Reactive trend posts awaiting admin approval. Auto-discard after 30 minutes.</p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => resendDigestMutation.mutate()}
+            disabled={resendDigestMutation.isPending || posts.length === 0}
+            data-testid="button-resend-digest"
+          >
+            {resendDigestMutation.isPending ? (
+              <><RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" /> Resending…</>
+            ) : (
+              <><Send className="w-3.5 h-3.5 mr-1" /> Resend digest</>
+            )}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {posts.length === 0 ? (
