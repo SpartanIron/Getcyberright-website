@@ -3,6 +3,8 @@ import { Footer } from "@/components/footer";
 import { PageBanner } from "@/components/page-banner";
 import { SignupEncouragementBanner } from "@/components/signup-encouragement-banner";
 import { ToolsInteractive } from "@/components/tools-interactive";
+import { Link } from "@/lib/navigation";
+import { ShieldCheck, ArrowRight } from "lucide-react";
 import bannerImage from "@/assets/banners/tools-banner.webp";
 import { imgSrc } from "@/lib/img-src";
 
@@ -20,6 +22,21 @@ export default function Tools({ tab }: { tab?: string }) {
           imagePosition="left"
           colorVariant="teal"
         />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <Link
+            href="/parents"
+            className="flex items-start gap-3 p-4 rounded-lg border border-teal-500/30 bg-teal-500/5 hover-elevate"
+            data-testid="link-proactive-pointer"
+          >
+            <ShieldCheck className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-semibold text-sm text-foreground">Want to set things up before something goes wrong?</p>
+              <p className="text-sm text-muted-foreground">Start with the Proactive Protection guides for parents, kids, and seniors. Most problems can be prevented in a single weekend.</p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-teal-600 flex-shrink-0 mt-0.5" />
+          </Link>
+        </div>
 
         <ToolsInteractive tab={tab} />
       </main>

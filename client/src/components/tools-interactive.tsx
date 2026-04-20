@@ -250,20 +250,23 @@ export function ToolsInteractive({ tab: tabParam }: { tab?: string }) {
             <div className="space-y-8">
               <div id="inline-tool-area" className="scroll-mt-24">
                 <Tabs value={inlineTool} onValueChange={(v) => setInlineTool(v as any)}>
-                  <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3 mb-6" data-testid="tabs-scam-guard-tools">
-                    <TabsTrigger value="scanner" className="gap-1.5 text-xs sm:text-sm" data-testid="tab-scanner">
-                      <Search className="w-4 h-4" />
-                      <span>Scam Scanner</span>
+                  <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-3 h-auto" data-testid="tabs-scam-guard-tools">
+                    <TabsTrigger value="scanner" className="flex flex-col gap-0.5 py-2 text-xs sm:text-sm h-auto" data-testid="tab-scanner">
+                      <span className="flex items-center gap-1.5"><Search className="w-4 h-4" /><span className="font-semibold">Is this a scam?</span></span>
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground/80">Scam Scanner</span>
                     </TabsTrigger>
-                    <TabsTrigger value="password" className="gap-1.5 text-xs sm:text-sm" data-testid="tab-password">
-                      <Lock className="w-4 h-4" />
-                      <span>Passwords</span>
+                    <TabsTrigger value="password" className="flex flex-col gap-0.5 py-2 text-xs sm:text-sm h-auto" data-testid="tab-password">
+                      <span className="flex items-center gap-1.5"><Lock className="w-4 h-4" /><span className="font-semibold">I need a password</span></span>
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground/80">Password Generator</span>
                     </TabsTrigger>
-                    <TabsTrigger value="voice-clone" className="gap-1.5 text-xs sm:text-sm" data-testid="tab-voice-clone">
-                      <Radio className="w-4 h-4" />
-                      <span>Voice Check</span>
+                    <TabsTrigger value="voice-clone" className="flex flex-col gap-0.5 py-2 text-xs sm:text-sm h-auto" data-testid="tab-voice-clone">
+                      <span className="flex items-center gap-1.5"><Radio className="w-4 h-4" /><span className="font-semibold">Was that really them?</span></span>
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground/80">Voice Check</span>
                     </TabsTrigger>
                   </TabsList>
+                  <p className="text-center text-sm text-muted-foreground mb-6 max-w-xl mx-auto">
+                    Pick the situation you are in. Each tool below tells you what it can and cannot do.
+                  </p>
 
                   <TabsContent value="scanner">
                     <div className="max-w-4xl mx-auto">
