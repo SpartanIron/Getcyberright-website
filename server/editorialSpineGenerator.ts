@@ -119,25 +119,30 @@ export async function generateSpineProposal(
     generatedAt: new Date().toISOString(),
   };
 
-  if (typeof raw.whatChanged === "string" && raw.whatChanged.trim()) {
+  const wantWhatChanged = fields.includes("whatChanged");
+  const wantWhy = fields.includes("whyThisMatters");
+  const wantAction = fields.includes("actionThisWeek");
+  const wantTopic = fields.includes("curatedTopic");
+
+  if (wantWhatChanged && typeof raw.whatChanged === "string" && raw.whatChanged.trim()) {
     proposal.whatChanged = stripDashes(raw.whatChanged).slice(0, SPINE_LIMITS.whatChangedMax);
-  } else if (raw.whatChanged === null) {
+  } else if (wantWhatChanged && raw.whatChanged === null) {
     proposal.needsAuthorInput = true;
     proposal.flags.push("whatChanged: model declined (needs author input)");
   }
 
-  if (Array.isArray(raw.whyThisMatters)) {
+  if (wantWhy && Array.isArray(raw.whyThisMatters)) {
     const cleanedBullets = raw.whyThisMatters
       .filter((b): b is string => typeof b === "string" && b.trim().length >= 2)
       .map((b) => stripDashes(b).slice(0, SPINE_LIMITS.whyEachMax))
       .slice(0, SPINE_LIMITS.whyCount);
     if (cleanedBullets.length > 0) proposal.whyThisMatters = cleanedBullets;
-  } else if (raw.whyThisMatters === null) {
+  } else if (wantWhy && raw.whyThisMatters === null) {
     proposal.needsAuthorInput = true;
     proposal.flags.push("whyThisMatters: model declined (needs author input)");
   }
 
-  if (raw.actionThisWeek && typeof raw.actionThisWeek === "object") {
+  if (wantAction && raw.actionThisWeek && typeof raw.actionThisWeek === "object") {
     const rawLabel = typeof raw.actionThisWeek.label === "string" ? raw.actionThisWeek.label : "";
     const rawHref = typeof raw.actionThisWeek.href === "string" ? raw.actionThisWeek.href : "";
     const label = stripDashes(rawLabel).slice(0, SPINE_LIMITS.actionLabelMax);
@@ -150,24 +155,26 @@ export async function generateSpineProposal(
       href = replacement;
     }
     if (label && href) proposal.actionThisWeek = { label, href };
-  } else if (raw.actionThisWeek === null) {
+  } else if (wantAction && raw.actionThisWeek === null) {
     proposal.needsAuthorInput = true;
     proposal.flags.push("actionThisWeek: model declined (needs author input)");
   }
 
-  const lowConfidence = raw.topicConfidence === "low";
-  if (
-    !lowConfidence &&
-    typeof raw.curatedTopic === "string" &&
-    raw.curatedTopic in CURATED_TOPIC_LABELS
-  ) {
-    proposal.curatedTopic = raw.curatedTopic;
-  } else {
-    proposal.curatedTopic = null;
-    proposal.needsAuthorInput = true;
-    proposal.flags.push(
-      "curatedTopic: low confidence; reviewer must select the topic manually.",
-    );
+  if (wantTopic) {
+    const lowConfidence = raw.topicConfidence === "low";
+    if (
+      !lowConfidence &&
+      typeof raw.curatedTopic === "string" &&
+      raw.curatedTopic in CURATED_TOPIC_LABELS
+    ) {
+      proposal.curatedTopic = raw.curatedTopic;
+    } else {
+      proposal.curatedTopic = null;
+      proposal.needsAuthorInput = true;
+      proposal.flags.push(
+        "curatedTopic: low confidence; reviewer must select the topic manually.",
+      );
+    }
   }
 
   // Per-field plain-English gate. Any field that fails is nulled out.

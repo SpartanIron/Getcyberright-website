@@ -6676,10 +6676,33 @@ BEHAVIORAL CONSTRAINTS
         ? req.body.fields.filter((f: unknown): f is string => typeof f === "string")
         : ["whatChanged", "whyThisMatters", "actionThisWeek", "curatedTopic"];
 
-      const proposal = await generateSpineProposal(article, fieldsRequested);
-      await storage.updateNewsArticle(article.id, { proposedSpine: proposal });
+      const fresh = await generateSpineProposal(article, fieldsRequested);
 
-      return res.json({ articleId: article.id, proposal });
+      // Merge into any existing stored proposal: only overwrite fields that
+      // were requested in this call. This makes per-field regenerate safe.
+      const existing = article.proposedSpine || null;
+      const merged = {
+        whatChanged: fieldsRequested.includes("whatChanged")
+          ? fresh.whatChanged
+          : existing?.whatChanged ?? null,
+        whyThisMatters: fieldsRequested.includes("whyThisMatters")
+          ? fresh.whyThisMatters
+          : existing?.whyThisMatters ?? null,
+        actionThisWeek: fieldsRequested.includes("actionThisWeek")
+          ? fresh.actionThisWeek
+          : existing?.actionThisWeek ?? null,
+        curatedTopic: fieldsRequested.includes("curatedTopic")
+          ? fresh.curatedTopic
+          : existing?.curatedTopic ?? null,
+        // Flags from this call replace flags scoped to the regenerated fields;
+        // for simplicity we keep the union and let the UI dedupe visually.
+        flags: [...(existing?.flags || []), ...fresh.flags],
+        needsAuthorInput: fresh.needsAuthorInput || (existing?.needsAuthorInput ?? false),
+        generatedAt: fresh.generatedAt,
+      };
+      await storage.updateNewsArticle(article.id, { proposedSpine: merged });
+
+      return res.json({ articleId: article.id, proposal: merged });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       console.error("[admin/news/generate-spine] failed:", message);
