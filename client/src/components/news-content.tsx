@@ -158,7 +158,7 @@ interface NewsItem {
   authorRole?: string;
   articleType?: "curated" | "aggregated";
   curatedTopic?: string | null;
-  hasJargon?: boolean;
+  plainEnglishSummary?: string | null;
 }
 
 interface TrendingCluster {
@@ -207,7 +207,8 @@ function ArticleCard({
   const [imgError, setImgError] = useState(false);
   const [, navigate] = useLocation();
   const hasSlug = !!article.slug;
-  const showImage = !!article.imageUrl && !imgError;
+  const effectiveImage = article.imageUrl || article.thumbnailUrl || null;
+  const showImage = !!effectiveImage && !imgError;
   const CategoryIcon = getCategoryIcon(article.category);
   const isUrgent = (article.urgencyLevel || 0) >= 4;
 
@@ -234,7 +235,7 @@ function ArticleCard({
           {showImage ? (
             <>
               <img
-                src={article.imageUrl as string}
+                src={effectiveImage as string}
                 alt={article.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={() => setImgError(true)}
@@ -287,12 +288,12 @@ function ArticleCard({
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
             {decodeHtmlEntities(article.excerpt)}
           </p>
-          {variant === "aggregated" && article.hasJargon && (
+          {variant === "aggregated" && article.plainEnglishSummary && (
             <p
-              className="mt-2 text-[11px] inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-medium"
-              data-testid="badge-plain-english-summary"
+              className="mt-2 text-[12px] leading-snug text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/40 border-l-2 border-teal-500 pl-2 py-1 rounded-sm line-clamp-3"
+              data-testid="text-plain-english-summary"
             >
-              Plain English summary inside
+              {article.plainEnglishSummary}
             </p>
           )}
           <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-muted-foreground">
@@ -322,6 +323,19 @@ function ArticleCard({
               <ChevronRight className="h-3 w-3" />
             </span>
           </div>
+          {variant === "aggregated" && (
+            <a
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="mt-2 inline-flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 underline-offset-2 hover:underline"
+              data-testid={`link-source-${article.id}`}
+            >
+              <ExternalLink className="h-3 w-3" />
+              Read original at {article.source}
+            </a>
+          )}
         </CardContent>
       </Card>
     </a>

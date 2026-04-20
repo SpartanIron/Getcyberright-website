@@ -6132,7 +6132,7 @@ BEHAVIORAL CONSTRAINTS
 
   app.get("/api/news/tracks", async (_req: Request, res: Response) => {
     try {
-      const { clusterTrending, CURATED_TOPIC_LABELS, isCuratedSource, scanJargon } = await import(
+      const { clusterTrending, CURATED_TOPIC_LABELS, isCuratedSource, buildPlainEnglishSummary } = await import(
         "./newsCurationGuard"
       );
       const articles = await storage.getNewsArticles(undefined, 200);
@@ -6154,7 +6154,7 @@ BEHAVIORAL CONSTRAINTS
         articleType: "curated" | "aggregated";
         curatedTopic: string | null;
         clusterId: string | null;
-        hasJargon: boolean;
+        plainEnglishSummary: string | null;
       }
 
       const mapBase = (a: NewsArticle): TrackArticle => {
@@ -6182,10 +6182,10 @@ BEHAVIORAL CONSTRAINTS
           articleType,
           curatedTopic: (a.curatedTopic as string | null) ?? null,
           clusterId: (a.clusterId as string | null) ?? null,
-          hasJargon:
+          plainEnglishSummary:
             articleType === "aggregated"
-              ? scanJargon([a.title || "", a.excerpt || ""].join("\n")).blockedTerms.length > 0
-              : false,
+              ? buildPlainEnglishSummary([a.title || "", a.excerpt || ""].join("\n"))
+              : null,
         };
       };
 
@@ -6331,21 +6331,39 @@ BEHAVIORAL CONSTRAINTS
         return res.json({ query, results: [], count: 0 });
       }
       const limit = Math.min(parseInt(req.query.limit as string) || 30, 50);
+      const { isCuratedSource, buildPlainEnglishSummary } = await import("./newsCurationGuard");
       const articles = await storage.searchNewsArticles(query, limit);
-      const mapped = articles.map(a => ({
-        id: a.id,
-        title: a.title,
-        excerpt: a.excerpt,
-        content: a.content,
-        category: a.category,
-        source: a.source,
-        url: a.sourceUrl,
-        imageUrl: a.imageUrl,
-        thumbnailUrl: a.thumbnailUrl,
-        publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
-        readTime: a.content ? Math.ceil(a.content.split(/\s+/).length / 200) : 2,
-        slug: a.slug,
-      }));
+      const mapped = articles.map(a => {
+        const stored = a.articleType as string | null | undefined;
+        const articleType: "curated" | "aggregated" =
+          stored === "curated" || stored === "aggregated"
+            ? stored
+            : isCuratedSource(a.source)
+              ? "curated"
+              : "aggregated";
+        return {
+          id: a.id,
+          title: a.title,
+          excerpt: a.excerpt,
+          content: a.content,
+          category: a.category,
+          source: a.source,
+          url: a.sourceUrl,
+          imageUrl: a.imageUrl,
+          thumbnailUrl: a.thumbnailUrl,
+          publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
+          readTime: a.content ? Math.ceil(a.content.split(/\s+/).length / 200) : 2,
+          slug: a.slug,
+          articleType,
+          author: a.author,
+          authorRole: a.authorRole,
+          curatedTopic: (a.curatedTopic as string | null) ?? null,
+          plainEnglishSummary:
+            articleType === "aggregated"
+              ? buildPlainEnglishSummary([a.title || "", a.excerpt || ""].join("\n"))
+              : null,
+        };
+      });
       res.json({ query, results: mapped, count: mapped.length });
     } catch (error: any) {
       console.error("[news] Search failed:", error.message);
@@ -6439,7 +6457,7 @@ BEHAVIORAL CONSTRAINTS
 
   app.get("/api/news/article/:slug", async (req: Request, res: Response) => {
     try {
-      const { scanJargon } = await import("./newsCurationGuard");
+      const { buildPlainEnglishSummary } = await import("./newsCurationGuard");
       const article = await storage.getNewsArticleBySlug(req.params.slug);
       if (!article) {
         return res.status(404).json({ error: "Article not found" });
@@ -6492,10 +6510,10 @@ BEHAVIORAL CONSTRAINTS
               ? "curated"
               : "aggregated",
         curatedTopic: article.curatedTopic || null,
-        hasJargon:
+        plainEnglishSummary:
           (article.articleType === "aggregated" || !article.articleType)
-            ? scanJargon([article.title || "", article.excerpt || "", article.content || ""].join("\n")).blockedTerms.length > 0
-            : false,
+            ? buildPlainEnglishSummary([article.title || "", article.excerpt || ""].join("\n"))
+            : null,
         publishedAt: article.publishedAt?.toISOString() || new Date().toISOString(),
         updatedAt: article.updatedAt ? article.updatedAt.toISOString() : null,
         readTime: article.content ? Math.ceil(article.content.split(/\s+/).length / 200) : 2,

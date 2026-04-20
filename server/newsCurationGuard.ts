@@ -53,6 +53,25 @@ export function scanJargon(text: string): JargonScan {
   return { ok: blocked.length === 0, blockedTerms: [...new Set(blocked)] };
 }
 
+/** Build a single-sentence plain-English summary that defines each piece of
+ *  jargon detected in an aggregated headline/excerpt. Returns null when no
+ *  blocked terms are present. */
+export function buildPlainEnglishSummary(text: string): string | null {
+  if (!text) return null;
+  const seen = new Map<string, string>();
+  for (const { term, definition } of JARGON_BLOCKLIST) {
+    const matches = text.match(term);
+    if (!matches) continue;
+    for (const m of matches) {
+      const key = m.toLowerCase();
+      if (!seen.has(key)) seen.set(key, definition);
+    }
+  }
+  if (seen.size === 0) return null;
+  const parts = Array.from(seen.entries()).map(([term, def]) => `"${term}" means ${def}`);
+  return `In plain English: ${parts.join("; ")}.`;
+}
+
 /** For aggregated content: keep original wording but add an inline plain-English
  *  definition the first time each blocked term appears. Never silently rewrites. */
 export function annotateInlineDefinitions(text: string): string {
