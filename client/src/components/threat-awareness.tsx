@@ -1,8 +1,6 @@
 import { Link } from "@/lib/navigation";
 import { ArrowRight, AlertTriangle, Quote, Shield, CheckCircle, Camera, MessageCircle, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import seniorsImg from "@/assets/images/seniors-diverse.webp";
-import { imgSrc } from "@/lib/img-src";
 
 const ANCHOR_HREF = "/news/the-new-reality-ai-changing-digital-safety";
 
@@ -11,7 +9,9 @@ const examples = [
     icon: Camera,
     tag: "In schools",
     title: "Deepfake nudes of classmates",
-    body: "Old advice was about talking to strangers. Today a child's face can be cloned by another student in a few minutes, then shared inside a class group chat.",
+    body: "Old advice was about talking to strangers. Today a child's face can be cloned by another student in minutes, then shared in a class group chat.",
+    stat: "3M+",
+    statLabel: "sexualized AI images traced to a single tool, including thousands of minors (CCDH)",
     href: `${ANCHOR_HREF}#deepfakes-in-schools`,
     accent: "hsl(16, 90%, 52%)",
   },
@@ -19,7 +19,9 @@ const examples = [
     icon: MessageCircle,
     tag: "At home",
     title: "AI as a 24/7 confidant",
-    body: "Old advice was about screen time limits. Today kids are telling AI assistants things they will not tell parents, teachers, or friends, with no one watching.",
+    body: "Old advice was about screen time limits. Today kids tell AI assistants things they will not tell parents, teachers, or friends, with no one watching.",
+    stat: "86%",
+    statLabel: "of students used AI tools in the 2024 to 2025 school year (Education Week)",
     href: `${ANCHOR_HREF}#ai-as-confidant`,
     accent: "#14b8a6",
   },
@@ -27,7 +29,9 @@ const examples = [
     icon: Scale,
     tag: "In the law",
     title: "Age verification tradeoffs",
-    body: "Old advice was about parental controls. Today the only way platforms can verify a child is by collecting documents from every adult, turning safety into a privacy tax.",
+    body: "Old advice was about parental controls. Today the only way platforms can verify a child is by collecting documents from every adult.",
+    stat: "+50%",
+    statLabel: "rise in reported AI harm cases between 2022 and 2024 (TIME)",
     href: `${ANCHOR_HREF}#age-verification`,
     accent: "hsl(220, 70%, 55%)",
   },
@@ -61,80 +65,59 @@ const featuredStory = {
 export function ThreatAwareness() {
   return (
     <section className="relative overflow-hidden bg-hero" data-testid="section-threat-awareness" aria-labelledby="threat-heading">
-      <div className="relative max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-[50%_50%]">
-
-        <div className="px-5 sm:px-6 lg:pl-8 lg:pr-12 py-16 sm:py-20 lg:py-24">
+      <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+        <div className="max-w-3xl mb-10">
           <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-full px-4 py-2 mb-6">
             <AlertTriangle className="w-4 h-4 text-red-400" />
             <span className="text-sm font-semibold text-red-400">Why old advice falls short</span>
           </div>
-
           <h2 id="threat-heading" className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-foreground leading-tight mb-5" data-testid="text-threat-heading">
             The advice your family grew up with was written for a different internet.
           </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             "Don't talk to strangers." "Don't click weird links." "Limit screen time." None of that was wrong. It is just no longer enough. Three short examples from the new reality:
           </p>
+        </div>
 
-          <div className="space-y-4 mb-10">
-            {examples.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.title}
-                  href={item.href}
-                  className="block bg-card dark:bg-white/[0.06] border border-border dark:border-transparent rounded-xl p-4 sm:p-5 border-l-[3px] hover:border-primary/40 transition-colors"
-                  style={{ borderLeftColor: item.accent }}
-                  data-testid={`example-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-foreground/70" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">{item.tag}</div>
-                      <div className="text-base sm:text-lg font-bold text-foreground mb-1">{item.title}</div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{item.body}</p>
-                    </div>
+        <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-10">
+          {examples.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="group flex flex-col bg-card dark:bg-white/[0.06] border border-border dark:border-transparent rounded-xl p-5 sm:p-6 border-t-[3px] hover:border-primary/40 transition-colors"
+                style={{ borderTopColor: item.accent }}
+                data-testid={`example-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-5 h-5 text-foreground/70" />
                   </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          <Button
-            asChild
-            size="lg"
-            className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold text-base shadow-[0_4px_24px_-4px] shadow-accent/40 hover:shadow-[0_6px_32px_-4px] hover:shadow-accent/50 hover:scale-[1.02] transition-all duration-300"
-            data-testid="button-threat-cta"
-          >
-            <Link href={ANCHOR_HREF}>
-              Read the full thesis
-              <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
-            </Link>
-          </Button>
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{item.tag}</div>
+                </div>
+                <div className="text-base sm:text-lg font-bold text-foreground mb-2">{item.title}</div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">{item.body}</p>
+                <div className="pt-4 border-t border-border dark:border-white/10">
+                  <div className="text-2xl sm:text-3xl font-extrabold text-foreground tabular-nums" style={{ color: item.accent }}>{item.stat}</div>
+                  <div className="text-[11px] text-muted-foreground leading-snug mt-1">{item.statLabel}</div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
-        <div className="hidden lg:block">
-          <img
-            src={imgSrc(seniorsImg)}
-            alt="Diverse group of people learning about online safety"
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </div>
-
-        </div>
-      </div>
-
-      <div className="lg:hidden">
-        <img
-          src={imgSrc(seniorsImg)}
-          alt="Diverse group of people learning about online safety"
-          className="w-full h-64 sm:h-80 object-cover"
-          loading="lazy"
-        />
+        <Button
+          asChild
+          size="lg"
+          className="bg-accent text-accent-foreground border-accent-border rounded-full px-8 font-semibold text-base shadow-[0_4px_24px_-4px] shadow-accent/40 hover:shadow-[0_6px_32px_-4px] hover:shadow-accent/50 hover:scale-[1.02] transition-all duration-300"
+          data-testid="button-threat-cta"
+        >
+          <Link href={ANCHOR_HREF}>
+            Read the full thesis
+            <ArrowRight className="ml-2 w-5 h-5 cta-arrow-right" />
+          </Link>
+        </Button>
       </div>
 
       <div className="bg-secondary dark:bg-[#081C26] border-t border-border dark:border-white/10">

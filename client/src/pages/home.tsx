@@ -18,8 +18,8 @@ export default function Home() {
                         <HeroSection />
                         <RealityDoors />
                         <LiveActivityBar />
-                        <ThreatAwareness />
                         <ScamGlobeTeaser />
+                        <ThreatAwareness />
                         <PillarTiles />
                         <AudiencePaths />
                         <ContentPreview />
