@@ -137,6 +137,12 @@ export async function generateSpineProposal(
       .map((b) => stripDashes(b).slice(0, SPINE_LIMITS.whyEachMax))
       .slice(0, SPINE_LIMITS.whyCount);
     if (cleanedBullets.length > 0) proposal.whyThisMatters = cleanedBullets;
+    if (cleanedBullets.length !== SPINE_LIMITS.whyCount) {
+      proposal.needsAuthorInput = true;
+      proposal.flags.push(
+        `whyThisMatters: expected ${SPINE_LIMITS.whyCount} bullets, got ${cleanedBullets.length}; reviewer must complete.`,
+      );
+    }
   } else if (wantWhy && raw.whyThisMatters === null) {
     proposal.needsAuthorInput = true;
     proposal.flags.push("whyThisMatters: model declined (needs author input)");
