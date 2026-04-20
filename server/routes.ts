@@ -2797,8 +2797,9 @@ BEHAVIORAL CONSTRAINTS
     try {
       const { seedAnchorArticle } = await import("./anchorArticleSeed");
       await seedAnchorArticle();
-    } catch (err: any) {
-      console.error("Failed to seed anchor article:", err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("Failed to seed anchor article:", message);
     }
   })();
 
@@ -6479,7 +6480,7 @@ BEHAVIORAL CONSTRAINTS
       );
       res.json({
         articles: curated.map((a) => {
-          const spine = buildSpineFromArticle(a as any);
+          const spine = buildSpineFromArticle(a);
           return {
             id: a.id,
             slug: a.slug,
@@ -6494,8 +6495,9 @@ BEHAVIORAL CONSTRAINTS
           };
         }),
       });
-    } catch (err: any) {
-      console.error("[admin/news] list failed:", err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("[admin/news] list failed:", message);
       res.status(500).json({ error: "Failed to list curated articles" });
     }
   });
@@ -6521,14 +6523,13 @@ BEHAVIORAL CONSTRAINTS
       }
       const existing = await storage.getNewsArticleById(req.params.id);
       if (!existing) return res.status(404).json({ error: "Article not found" });
-      const patch: any = {};
+      const patch: Partial<InsertNewsArticle> = {};
       if (parsed.data.whatChanged !== undefined) patch.whatChanged = parsed.data.whatChanged;
       if (parsed.data.whyThisMatters !== undefined) patch.whyThisMatters = parsed.data.whyThisMatters;
       if (parsed.data.actionThisWeek !== undefined) patch.actionThisWeek = parsed.data.actionThisWeek;
       if (parsed.data.editorialSpinePending !== undefined) {
         patch.editorialSpinePending = parsed.data.editorialSpinePending;
       } else {
-        // If editor supplied any spine field at all, clear the pending flag.
         const wroteSomething =
           parsed.data.whatChanged !== undefined ||
           parsed.data.whyThisMatters !== undefined ||
@@ -6537,9 +6538,11 @@ BEHAVIORAL CONSTRAINTS
       }
       const updated = await storage.updateNewsArticle(existing.id, patch);
       res.json({ success: true, article: updated });
-    } catch (err: any) {
-      console.error("[admin/news] patch failed:", err.message);
-      res.status(500).json({ error: "Failed to update article" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("[admin/news] patch failed:", message);
+      const isValidation = /allowlist|exceeds|must/.test(message);
+      res.status(isValidation ? 400 : 500).json({ error: isValidation ? message : "Failed to update article" });
     }
   });
 

@@ -653,6 +653,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createNewsArticle(article: InsertNewsArticle): Promise<NewsArticle> {
+    const { assertSpineFieldsValid } = await import("./editorialSpine");
+    assertSpineFieldsValid(article);
     const result = await db.insert(newsArticles).values(article).returning();
     return result[0];
   }
@@ -685,6 +687,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateNewsArticle(id: string, patch: Partial<InsertNewsArticle>): Promise<NewsArticle | undefined> {
+    const { assertSpineFieldsValid } = await import("./editorialSpine");
+    assertSpineFieldsValid(patch);
     const result = await db
       .update(newsArticles)
       .set({ ...patch, updatedAt: new Date() })

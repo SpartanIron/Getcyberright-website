@@ -102,6 +102,58 @@ export function buildSpineFromArticle(a: {
   };
 }
 
+/**
+ * Validates spine fields on any news article create/update payload.
+ * Throws when whatChanged exceeds limit, whyThisMatters has too many or
+ * over-length entries, or actionThisWeek points outside the allowlist.
+ * Fields not present on the patch are skipped.
+ */
+export function assertSpineFieldsValid(patch: {
+  whatChanged?: string | null;
+  whyThisMatters?: string[] | null | unknown;
+  actionThisWeek?: { label: string; href: string } | null | unknown;
+}): void {
+  if (typeof patch.whatChanged === "string" && patch.whatChanged.length > SPINE_LIMITS.whatChangedMax) {
+    throw new Error(
+      `whatChanged exceeds ${SPINE_LIMITS.whatChangedMax} characters`,
+    );
+  }
+  if (patch.whyThisMatters !== undefined && patch.whyThisMatters !== null) {
+    if (!Array.isArray(patch.whyThisMatters)) {
+      throw new Error("whyThisMatters must be an array of strings or null");
+    }
+    if (patch.whyThisMatters.length > SPINE_LIMITS.whyCount) {
+      throw new Error(`whyThisMatters allows at most ${SPINE_LIMITS.whyCount} entries`);
+    }
+    for (const entry of patch.whyThisMatters) {
+      if (typeof entry !== "string") {
+        throw new Error("whyThisMatters entries must be strings");
+      }
+      if (entry.length > SPINE_LIMITS.whyEachMax) {
+        throw new Error(
+          `whyThisMatters entry exceeds ${SPINE_LIMITS.whyEachMax} characters`,
+        );
+      }
+    }
+  }
+  if (patch.actionThisWeek !== undefined && patch.actionThisWeek !== null) {
+    const action = patch.actionThisWeek as { label?: unknown; href?: unknown };
+    if (typeof action.label !== "string" || typeof action.href !== "string") {
+      throw new Error("actionThisWeek must have string label and href");
+    }
+    if (action.label.length > SPINE_LIMITS.actionLabelMax) {
+      throw new Error(
+        `actionThisWeek.label exceeds ${SPINE_LIMITS.actionLabelMax} characters`,
+      );
+    }
+    if (!ACTION_LINK_ALLOWLIST.includes(action.href)) {
+      throw new Error(
+        `actionThisWeek.href "${action.href}" is not in the approved route allowlist`,
+      );
+    }
+  }
+}
+
 export function spineHasContent(s: EditorialSpine): boolean {
   return (
     !!(s.whatChanged && s.whatChanged.trim().length > 0) ||

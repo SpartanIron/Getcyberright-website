@@ -1715,7 +1715,7 @@ export const newsArticles = pgTable("news_articles", {
   imageHash: text("image_hash"),
   clusterId: text("cluster_id"),
   whatChanged: text("what_changed"),
-  whyThisMatters: jsonb("why_this_matters").$type<string[]>().default(sql`'[]'::jsonb`),
+  whyThisMatters: jsonb("why_this_matters").$type<string[] | null>(),
   actionThisWeek: jsonb("action_this_week").$type<{ label: string; href: string } | null>(),
   editorialSpinePending: boolean("editorial_spine_pending").default(false),
   publishedAt: timestamp("published_at").defaultNow(),

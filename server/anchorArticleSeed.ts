@@ -282,11 +282,12 @@ export async function seedAnchorArticle(): Promise<void> {
       publishedAt: new Date(),
     };
 
+    const insertPayload: InsertNewsArticle = payload;
     if (existing) {
-      await storage.updateNewsArticle(existing.id, payload as any);
+      await storage.updateNewsArticle(existing.id, insertPayload);
       console.log(`[anchorArticleSeed] Updated anchor article ${ANCHOR_SLUG}`);
     } else {
-      await storage.createNewsArticle(payload as InsertNewsArticle);
+      await storage.createNewsArticle(insertPayload);
       console.log(`[anchorArticleSeed] Created anchor article ${ANCHOR_SLUG}`);
     }
 
@@ -303,7 +304,8 @@ export async function seedAnchorArticle(): Promise<void> {
           AND (${newsArticles.actionThisWeek} IS NULL)
           AND (${newsArticles.whyThisMatters} IS NULL OR jsonb_array_length(${newsArticles.whyThisMatters}) = 0)`,
       );
-  } catch (err: any) {
-    console.error("[anchorArticleSeed] Failed:", err.message);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("[anchorArticleSeed] Failed:", message);
   }
 }
