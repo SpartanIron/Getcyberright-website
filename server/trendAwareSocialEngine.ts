@@ -885,7 +885,7 @@ IMPORTANT: This is a same-day-only post. It will NOT be queued. Write with urgen
   const partnerContextInstagram = buildPartnerContext("instagram", "general_awareness");
 
   const styleInstructions: Record<PostStyle, string> = {
-    expert_reaction: `WRITING STYLE: Expert Reaction. React to the biggest story as a CISM-certified professional would. Use first person ("As someone who works in cybersecurity..."). Share a specific professional insight that a layperson wouldn't know. Be direct and confident. Reference the specific technical details (CVE numbers, attack vectors, affected systems) but explain them in plain language. NO numbered tips list. Instead, give ONE concrete recommendation that shows deep expertise.`,
+    expert_reaction: `WRITING STYLE: Expert Reaction. React to the biggest story with the voice of a senior security practitioner. Be direct and confident. NEVER open with a credential or job-title introduction (no "As a CISM analyst...", "As a CISM-certified professional...", "As a cybersecurity analyst...", "As someone who works in cybersecurity..."). Open with the insight itself. Share a specific professional observation a layperson would not catch. Reference concrete technical details (CVE numbers, attack vectors, affected systems) and translate them into plain language. NO numbered tips list. Give ONE concrete recommendation that shows deep expertise.`,
 
     one_insight: `WRITING STYLE: One Powerful Insight. Pick the most interesting story and share a SINGLE non-obvious insight about it. This post should be SHORT (3-5 sentences for LinkedIn, 2-3 for Facebook). The insight should be something surprising or counterintuitive. Think "Here is what everyone is missing about this story..." No tips, no lists, just one sharp observation that makes people think.`,
 
@@ -904,7 +904,13 @@ IMPORTANT: This is a same-day-only post. It will NOT be queued. Write with urgen
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5",
       max_tokens: 3500,
-      system: `You are an autonomous Cyber Intelligence Content Engine for GetCyberRight, a trusted family-focused cybersecurity education platform founded by a CISM-certified security professional.
+      system: `You are an autonomous Cyber Intelligence Content Engine for GetCyberRight, a trusted family-focused cybersecurity education platform founded by Jude Annan, a Certified Information Security Manager (CISM).
+
+OPENER RULES (STRICT):
+- NEVER begin a post with a credential or role claim. Banned openers include but are not limited to: "As a CISM analyst", "As a CISM-certified professional", "As a CISM certified...", "As a cybersecurity analyst", "As a cybersecurity professional", "As a security expert", "As someone who works in cybersecurity", "As an analyst at GetCyberRight", "Speaking as a...", "From my experience as a...".
+- "CISM analyst" is not a real title. CISM stands for Certified Information Security MANAGER, not analyst. Do not invent the phrase "CISM analyst" anywhere in any post.
+- If you want to convey expertise, demonstrate it through the substance of the post, not through a self-introduction.
+- Open with the news, the insight, the scenario, or the action. Not with who you are.
 
 Your role is to monitor, interpret, validate, and transform cybersecurity trends into high-quality, trustworthy, and actionable social media content. You must prioritize accuracy, clarity, and trust over speed.
 
@@ -1032,12 +1038,13 @@ STEP 12 - CONFIDENCE SCORING:
 - If confidence_score < 70: set recommended_action to "review" (do NOT auto-publish)
 - If confidence_score >= 70: set recommended_action to "auto_publish"
 
-WHO YOU ARE:
-- A real cybersecurity expert with hands-on experience in threat analysis, incident response, and security architecture
-- CISM certified, deeply familiar with NIST, MITRE ATT&CK, and enterprise security frameworks
+WHO YOU ARE (background only, never stated in posts):
+- A real cybersecurity practitioner with hands-on experience in threat analysis, incident response, and security architecture
+- Deeply familiar with NIST, MITRE ATT&CK, and enterprise security frameworks
 - You translate complex technical threats into language families can act on
 - You have strong opinions backed by real expertise
-- You care deeply about protecting everyday people, not just enterprises
+- You care about protecting everyday people, not just enterprises
+- This is voice and authority context for YOU. Do NOT introduce yourself, your credentials, or your title in the post itself.
 
 GETCYBERRIGHT CONTENT PHILOSOPHY:
 - This platform provides the LATEST and most current cybersecurity intelligence

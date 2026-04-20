@@ -52,6 +52,31 @@ export default function GuideDetailPage() {
     enabled: !!slug,
   });
 
+  // Hooks must run on every render. Compute toc lazily so the effect can
+  // safely run during the loading render (it bails when toc is empty).
+  const toc = guide?.tableOfContents || guide?.headings || [];
+  const [activeSection, setActiveSection] = useState<string>("");
+
+  useEffect(() => {
+    if (toc.length === 0) return;
+    const headingIds = toc.map((item, i) => item.id || `section-${i}`);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
+    );
+    headingIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [toc]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -119,32 +144,8 @@ export default function GuideDetailPage() {
     structuredDataItems.push({ type: "FAQPage", items: guide.faq });
   }
 
-  const toc = guide.tableOfContents || guide.headings || [];
   const readTime = guide.readingTimeMinutes || Math.ceil((guide.wordCount || 0) / 200);
   const publishDate = guide.publishedAt || guide.updatedAt;
-
-    const [activeSection, setActiveSection] = useState<string>("");
-
-    useEffect(() => {
-          if (toc.length === 0) return;
-          const headingIds = toc.map((item, i) => item.id || `section-${i}`);
-          const observer = new IntersectionObserver(
-                  (entries) => {
-                            entries.forEach((entry) => {
-                                        if (entry.isIntersecting) {
-                                                      setActiveSection(entry.target.id);
-                                        }
-                            });
-                  },
-            { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
-                );
-          headingIds.forEach((id) => {
-                  const el = document.getElementById(id);
-                  if (el) observer.observe(el);
-          });
-          return () => observer.disconnect();
-    }, [toc]);
-  
 
   return (
     <div className="min-h-screen bg-background">
@@ -214,17 +215,25 @@ export default function GuideDetailPage() {
               <div className="sticky top-24">
                 <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3">Table of Contents</h3>
                 <nav className="space-y-1" data-testid="nav-toc">
-                  {toc.map((item, i) => (
-                    <a
-                className={`block text-sm py-1 transition-colors ${activeSection === (item.id || `section-${i}`) ? "text-teal-600 dark:text-teal-400 font-semibold border-l-2 border-teal-600 dark:border-teal-400 pl-2" : "text-muted-foreground hover:text-teal-600 dark:hover:text-teal-400"}`}
-                      href={`#${item.id || `section-${i}`}`}
-                      className="block text-sm text-muted-foreground hover:text-teal-600 dark:hover:text-teal-400 py-1 transition-colors"
-                      style={{ paddingLeft: ((item.level || 2) - 2) * 12 }}
-                      data-testid={`link-toc-${i}`}
-                    >
-                      {item.text}
-                    </a>
-                  ))}
+                  {toc.map((item, i) => {
+                    const sectionId = item.id || `section-${i}`;
+                    const isActive = activeSection === sectionId;
+                    return (
+                      <a
+                        key={sectionId}
+                        href={`#${sectionId}`}
+                        className={`block text-sm py-1 transition-colors ${
+                          isActive
+                            ? "text-teal-600 dark:text-teal-400 font-semibold border-l-2 border-teal-600 dark:border-teal-400 pl-2"
+                            : "text-muted-foreground hover:text-teal-600 dark:hover:text-teal-400"
+                        }`}
+                        style={{ paddingLeft: ((item.level || 2) - 2) * 12 }}
+                        data-testid={`link-toc-${i}`}
+                      >
+                        {item.text}
+                      </a>
+                    );
+                  })}
                   {guide.faq && guide.faq.length > 0 && (
                     <a href="#faq" className="block text-sm text-muted-foreground hover:text-teal-600 dark:hover:text-teal-400 py-1 transition-colors">
                       FAQ
