@@ -6179,7 +6179,7 @@ BEHAVIORAL CONSTRAINTS
             : isCuratedSource(a.source)
               ? "curated"
               : "aggregated";
-        const spine = buildSpineFromArticle(a as any);
+        const spine = buildSpineFromArticle(a);
         return {
           id: a.id,
           title: a.title,
@@ -6585,7 +6585,7 @@ BEHAVIORAL CONSTRAINTS
           readTime: a.content ? Math.ceil(a.content.split(/\s+/).length / 200) : 2,
         }));
       const { buildSpineFromArticle } = await import("./editorialSpine");
-      const spine = buildSpineFromArticle(article as any);
+      const spine = buildSpineFromArticle(article);
       res.json({
         id: article.id,
         title: article.title,
