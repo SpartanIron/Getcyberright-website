@@ -5,13 +5,13 @@ export function middleware(request: NextRequest) {
 
   const cspHeader = [
     `default-src 'self'`,
-    `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://recaptcha.google.com`,
+    `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://recaptcha.google.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.googletagservices.com https://adservice.google.com`,
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-    `img-src 'self' data: blob: https://source.unsplash.com https://images.unsplash.com https://images.pexels.com https://www.getcyberright.com https://www.google-analytics.com`,
+    `img-src 'self' data: blob: https://source.unsplash.com https://images.unsplash.com https://images.pexels.com https://www.getcyberright.com https://www.google-analytics.com https://*.googlesyndication.com https://*.doubleclick.net https://*.g.doubleclick.net https://*.google.com`,
     `font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com`,
-    `connect-src 'self' https://ipapi.co https://checkurl.phishtank.com https://urlhaus-api.abuse.ch https://haveibeenpwned.com https://www.google-analytics.com https://region1.google-analytics.com`,
+    `connect-src 'self' https://ipapi.co https://checkurl.phishtank.com https://urlhaus-api.abuse.ch https://haveibeenpwned.com https://www.google-analytics.com https://region1.google-analytics.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net`,
     `media-src 'self'`,
-    `frame-src https://js.stripe.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net`,
+    `frame-src https://js.stripe.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.googlesyndication.com`,
     `worker-src 'self' blob:`,
     `object-src 'none'`,
     `base-uri 'self'`,
