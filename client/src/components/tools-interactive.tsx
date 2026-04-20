@@ -27,18 +27,23 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-type ToolCopy = {
+type BaseToolCopy = {
   title: string;
   situation: string;
   subline: string;
   whenToUse: string[];
-  href?: string;
   icon: typeof Shield;
   badge?: string;
-  inline?: "scanner" | "password" | "voice-clone";
 };
 
-const scamGuardTools: ToolCopy[] = [
+type ScamGuardTool = BaseToolCopy & (
+  | { href: string; inline?: undefined }
+  | { href?: undefined; inline: "scanner" | "password" | "voice-clone" }
+);
+
+type DataShieldTool = BaseToolCopy & { href: string };
+
+const scamGuardTools: ScamGuardTool[] = [
   {
     title: "Browser Extension",
     situation: "When the next sketchy link is one click away",
@@ -92,7 +97,7 @@ const scamGuardTools: ToolCopy[] = [
   },
 ];
 
-const dataShieldTools: ToolCopy[] = [
+const dataShieldTools: DataShieldTool[] = [
   {
     title: "Data Exposure Scan",
     situation: "When you wonder how scammers keep finding you",
