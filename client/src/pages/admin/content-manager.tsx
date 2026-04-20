@@ -560,9 +560,19 @@ function SocialPostCard({ post, onPublish, isPublishing }: { post: any; onPublis
               )}
               {post.auditFailures && post.auditFailures.length > 0 && (
                 <div className="text-red-600 dark:text-red-400">
-                  {post.auditFailures.slice(0, 3).map((f: string, i: number) => (
-                    <div key={i} className="line-clamp-1">• {f}</div>
-                  ))}
+                  {post.auditFailures.slice(0, 3).map((f: any, i: number) => {
+                    let label: string;
+                    if (typeof f === "string") {
+                      label = f;
+                    } else if (f && typeof f === "object") {
+                      label = f.reason || f.claim || f.message || f.detail || JSON.stringify(f);
+                    } else {
+                      label = String(f);
+                    }
+                    return (
+                      <div key={i} className="line-clamp-1" data-testid={`audit-failure-${post.id}-${i}`}>• {label}</div>
+                    );
+                  })}
                 </div>
               )}
               {post.citations && post.citations.length > 0 && (

@@ -393,11 +393,25 @@ export default function AdminEngagementOpportunities() {
   });
 
   const createPostMutation = useMutation({
-    mutationFn: ({ id, comment }: { id: string; comment: string }) =>
-      apiRequest("POST", `/api/admin/engagement-opportunities/${id}/post`, { comment }),
-    onSuccess: () => {
+    mutationFn: async ({ id, comment }: { id: string; comment: string }) => {
+      const res = await apiRequest("POST", `/api/admin/engagement-opportunities/${id}/post`, { comment });
+      try {
+        return await res.json();
+      } catch {
+        return {};
+      }
+    },
+    onSuccess: (data: any) => {
       setPostingId(null);
-      toast({ title: "Response post created", description: "Your post has been queued in Buffer." });
+      if (data?.manual) {
+        const platform = data.platform ? data.platform.charAt(0).toUpperCase() + data.platform.slice(1) : "the platform";
+        toast({
+          title: "Post draft saved",
+          description: `Copy the text from the card to post on ${platform} manually.`,
+        });
+      } else {
+        toast({ title: "Response post created", description: "Your post has been queued in Buffer." });
+      }
       queryClient.invalidateQueries({ queryKey: ["/api/admin/engagement-opportunities"] });
     },
     onError: (err: Error) => {

@@ -97,7 +97,18 @@ function scoreRelevance(title: string, snippet: string, source: string): number 
   return Math.min(100, score);
 }
 
-async function generateSuggestedComment(title: string, snippet: string, topic: string, source: string): Promise<string> {
+async function generateSuggestedComment(
+  title: string,
+  snippet: string,
+  topic: string,
+  source: string,
+  platform: string,
+): Promise<string> {
+  const platformTone =
+    platform === "linkedin"
+      ? `Tone: professional but human, 2-3 sentences. Like a thoughtful security practitioner replying on LinkedIn. Plain prose, no hashtags, no emojis. Slightly more polished sentence structure.`
+      : `Tone: warm and conversational, 2-3 sentences. Like talking to a neighbor on Facebook who's worried about staying safe online. Friendly, plain language, no hashtags, no emojis, no jargon.`;
+
   try {
     const Anthropic = (await import("@anthropic-ai/sdk")).default;
     const client = new Anthropic({
@@ -111,20 +122,19 @@ async function generateSuggestedComment(title: string, snippet: string, topic: s
       messages: [
         {
           role: "user",
-          content: `Write a short comment (2-3 sentences) responding to this ${topic}-related article, as if you're a real person who works in cybersecurity and genuinely cares about helping everyday people stay safe online.
+          content: `Write a short comment (2-3 sentences) for ${platform} responding to this ${topic}-related article, as if you're a real person who works in cybersecurity and genuinely cares about helping everyday people stay safe online.
 
 Article: "${title}"
 Source: ${source}
 Context: ${snippet?.slice(0, 200) || "N/A"}
 
+${platformTone}
+
 Critical rules for sounding human:
-- Write like you're texting a friend about something important, not writing a press release
 - Use contractions naturally (don't, it's, that's, we've)
-- Start with a reaction a real person would have ("This one hits close to home" or "Saw this coming" or "My parents almost fell for something like this last month")
+- Start with a reaction a real person would have, not a corporate opener
 - Share ONE specific, practical thing someone can actually do right now
 - Vary your sentence lengths. Mix short punchy ones with longer ones.
-- It's okay to be slightly informal, slightly opinionated, or to show real concern
-- Reference personal experience or "I've seen this happen" type language occasionally
 - Do NOT say "Great article" or "Important read" or any generic praise
 - Do NOT use corporate phrases like "It's crucial that" or "It is imperative" or "This underscores the importance"
 - Do NOT use hashtags, emojis, or exclamation marks
@@ -138,47 +148,77 @@ Write ONLY the comment text, nothing else.`,
     });
 
     const textBlock = response.content.find((b: any) => b.type === "text");
-    return textBlock?.text?.trim() || generateFallbackComment(title, topic);
+    return textBlock?.text?.trim() || generateFallbackComment(title, topic, platform);
   } catch (error: any) {
     console.warn(`[EngagementDiscovery] AI comment generation failed: ${error.message}`);
-    return generateFallbackComment(title, topic);
+    return generateFallbackComment(title, topic, platform);
   }
 }
 
-function generateFallbackComment(title: string, topic: string): string {
-  const templates: Record<string, string[]> = {
+function generateFallbackComment(title: string, topic: string, platform: string): string {
+  const linkedinTemplates: Record<string, string[]> = {
     data_breach: [
-      "I've been helping people deal with breaches for years and the same advice always applies: change those passwords now, turn on two-factor auth, and check your bank statements for the next few weeks. Don't wait on the company to tell you what to do.",
-      "Honestly, the number of people who reuse passwords across sites is what makes breaches like this so dangerous. If that email/password combo is the same one you use for your bank, go change it right now. Seriously, right now.",
-      "My neighbor got hit by a breach like this last year and didn't find out until someone opened a credit card in her name. Freezing your credit with all three bureaus takes about 15 minutes and it's free.",
+      "Breaches like this are a good reminder to rotate any passwords reused across accounts and turn on multi-factor authentication where it isn't already enabled. A quick credit freeze with the three bureaus is also worth the fifteen minutes it takes.",
+      "The pattern here is familiar: one exposed credential set ends up unlocking a dozen unrelated accounts. If your team hasn't audited password reuse recently, this is a reasonable nudge to do it this week.",
     ],
     phishing: [
-      "I tell everyone the same thing: if an email makes you feel like you need to act RIGHT NOW, that's exactly when you should slow down. Scammers bank on panic. Call the company directly using a number you look up yourself.",
-      "The phishing emails going around lately are wild. I almost clicked one myself last week that looked exactly like a real shipping notification. The only giveaway was hovering over the link and seeing a weird domain.",
-      "My mom got one of these last month and thankfully called me before clicking. The trick that works best is just picking up the phone and calling whoever supposedly sent you the message.",
+      "Worth flagging to non-technical colleagues and family. The reliable defense is still the same: when a message pushes urgency, slow down and verify through a channel you trust, not the one in the message.",
+      "Phishing kits keep getting better, and the visual tells we used to rely on are mostly gone. Hovering links and confirming sender domains is a habit worth building into everyday email triage.",
     ],
     ransomware: [
-      "The thing nobody talks about enough with ransomware is backups. A $50 external hard drive and 20 minutes a week backing up your files takes away most of the leverage these attackers have.",
-      "Seen way too many small businesses get wiped out by this. The fix isn't complicated: keep backups offline, keep your software updated, and make sure your team knows not to open weird attachments.",
+      "Tested, offline backups remain the single biggest factor in how quickly an organization recovers from incidents like this. Worth confirming yours actually restore, not just that they exist.",
+      "Most of the ransomware cases I have seen up close started with an unpatched edge device or a reused admin credential. The basics still carry most of the weight.",
     ],
     vulnerability: [
-      "If you haven't updated yet, go do it now. I know update notifications are annoying but this one actually matters. Takes a couple minutes and saves you a massive headache later.",
-      "I keep telling people: turn on automatic updates and forget about it. Most of these vulnerabilities get exploited within days of being announced. The people who patch fast are the ones who don't get hit.",
+      "If your environment is affected, prioritizing the patch this week is the right call. The window between disclosure and active exploitation keeps shrinking.",
+      "A good moment to confirm your inventory actually reflects what is deployed. The hard part of vulnerability response is usually knowing where the affected component is running.",
     ],
     scam: [
-      "This one's been making the rounds. The biggest red flag is always urgency, like \"act now or lose your account\" type language. Real companies don't operate that way. When in doubt, hang up and call back using the number on their actual website.",
-      "My uncle fell for something like this a few months back. The scammers are getting really good at sounding legit. Best thing you can do is just never act on an unsolicited call or message without verifying independently first.",
+      "The consistent thread across these scams is manufactured urgency. Building a habit of pausing and calling back through a number you look up yourself defuses most of them.",
+      "Worth sharing with family members who may be targeted by these. The advice that actually sticks is simple: never act on an unsolicited message without independently verifying it first.",
     ],
     family_safety: [
-      "I've found the best thing you can do is just sit with your kids while they're online sometimes. Not hovering, just being around and asking what they're watching or who they're talking to. It opens up conversations naturally.",
-      "Had a good talk with my teenager last week about this kind of thing. The reality is they're going to be online whether we like it or not. The goal is making sure they know what to watch out for and feel comfortable telling us when something feels off.",
+      "The conversations that work best with kids are the ongoing low-pressure ones, not the formal sit-downs. Asking what they are watching or who they are talking to opens the door naturally.",
+      "Helpful framing for parents. The goal is not to restrict access entirely, but to make sure kids feel comfortable telling you when something online feels off.",
     ],
     general: [
-      "This is worth paying attention to. The thing most people don't realize is that basic precautions like strong unique passwords, two-factor auth, and not clicking random links stop the vast majority of attacks.",
-      "We've been seeing a lot more of this lately. If nothing else, take five minutes today to make sure your important accounts have two-factor turned on. It's the single best thing you can do.",
+      "Useful read. The fundamentals still cover the majority of risk: unique passwords, multi-factor authentication, and skepticism toward unsolicited messages.",
+      "Worth a few minutes today to confirm multi-factor authentication is on for your important accounts. It remains the highest-leverage thing most people can do.",
     ],
   };
 
+  const facebookTemplates: Record<string, string[]> = {
+    data_breach: [
+      "Saw this and wanted to share. If you reuse the same password anywhere, today is a good day to change it on the important accounts. Turning on two-step login takes a couple of minutes and helps a lot.",
+      "My neighbor got hit by something like this last year. Freezing your credit at the three big bureaus is free and only takes about fifteen minutes. Worth doing.",
+    ],
+    phishing: [
+      "The scam emails going around right now are really convincing. If a message is rushing you to do something, slow down and call the company directly using a number from their real website.",
+      "My mom almost clicked one of these last week. Easiest rule that actually works: pick up the phone and call whoever supposedly sent the message before you do anything.",
+    ],
+    ransomware: [
+      "Quick reminder for anyone running a small business or working from home. A cheap external drive and a few minutes of backups every week takes most of the power away from these attacks.",
+      "Seen this hit too many small shops. Keep a backup that is not always plugged in, keep your software updated, and you are ahead of most of the danger.",
+    ],
+    vulnerability: [
+      "If you have been ignoring those update notifications, this is your sign. Takes a few minutes and saves a real headache later.",
+      "Honest tip: turn on automatic updates and forget about it. Most of the people who get hit are the ones who waited.",
+    ],
+    scam: [
+      "Heads up, this one is making the rounds. The biggest tell is always urgency, like act now or lose your account. Real companies do not work that way.",
+      "My uncle nearly fell for something like this. Best thing you can do is hang up or close the message and call back using a number you find yourself.",
+    ],
+    family_safety: [
+      "Found that just sitting near the kids while they are online, not hovering, makes them way more comfortable telling you when something feels weird.",
+      "Had a really good talk with my teenager about this kind of thing last week. Knowing they can come to me without getting in trouble matters more than any rule.",
+    ],
+    general: [
+      "Good reminder. Take five minutes today and turn on two-step login for your email and bank. It is the single best thing most of us can do.",
+      "Sharing because this matters. Strong unique passwords and being slow to click on stuff stops almost everything before it starts.",
+    ],
+  };
+
+  const templates = platform === "facebook" ? facebookTemplates : linkedinTemplates;
   const options = templates[topic] || templates.general;
   return options[Math.floor(Math.random() * options.length)];
 }
@@ -280,17 +320,18 @@ export async function discoverEngagementOpportunities(): Promise<{
 
         if (relevance < 45) continue;
 
-        const suggestedComment = await generateSuggestedComment(
-          item.title,
-          item.description,
-          topic,
-          feed.source
-        );
-
         const platforms = ["linkedin", "facebook"];
 
         for (const platform of platforms) {
           const searchUrl = generatePlatformSearchUrl(platform, item.title, item.link);
+
+          const suggestedComment = await generateSuggestedComment(
+            item.title,
+            item.description,
+            topic,
+            feed.source,
+            platform,
+          );
 
           const opportunity: InsertEngagementOpportunity = {
             platform,
@@ -357,7 +398,7 @@ export async function dismissOpportunity(id: string): Promise<boolean> {
 export async function createResponsePost(
   id: string,
   editedComment?: string
-): Promise<{ success: boolean; error?: string; platforms?: string[] }> {
+): Promise<{ success: boolean; error?: string; platforms?: string[]; manual?: boolean; platform?: string; content?: string }> {
   const opp = await storage.getEngagementOpportunityById(id);
   if (!opp) return { success: false, error: "Opportunity not found" };
 
@@ -422,7 +463,21 @@ Write ONLY the post text for ${opp.platform}, nothing else.`,
 
     const channels = await getBufferChannelsByPlatform();
     const channel = channels[opp.platform];
-    if (!channel) return { success: false, error: `No Buffer channel configured for ${opp.platform}` };
+    if (!channel) {
+      await storage.updateEngagementOpportunity(id, {
+        status: "approved",
+        approvedComment: postContent,
+        approvedAt: new Date(),
+      });
+      console.log(`[EngagementDiscovery] No Buffer channel for ${opp.platform}; saved manual draft for "${opp.sourceTitle.slice(0, 50)}..."`);
+      return {
+        success: true,
+        manual: true,
+        platform: opp.platform,
+        content: postContent,
+        platforms: [opp.platform],
+      };
+    }
 
     const result = await publishWithFirstComment(channel.id, postContent, {
       mode: "addToQueue",
