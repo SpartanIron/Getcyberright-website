@@ -169,7 +169,13 @@ The audit is not a one-time thing. Repeat it the first weekend of every month. E
 
 ## What to do this week
 
-Run the audit. Then formalize whatever it surfaces in our family safety checklist so the next pass starts where this one ended. The point is not to abandon parental controls. The point is to stop pretending they are the whole answer.
+Run the audit, then close the two gaps it almost always surfaces.
+
+First, tighten what the device controls already give you. Our [parental controls guides on the parent hub](/parents) walk through the per-platform settings most worth revisiting (the ones that change often and break silently after every update).
+
+Second, layer on something the device controls cannot do alone. Run our [Child Safety Scanner](/parents/child-safety-scanner). It looks at the cross-platform exposure your audit just surfaced, the kind that lives across schools, friends, and AI tools rather than on a single phone.
+
+The point is not to abandon parental controls. The point is to stop pretending they are the whole answer.
 
 ## Sources
 
@@ -197,8 +203,8 @@ Run the audit. Then formalize whatever it surfaces in our family safety checklis
     "Schools, peers, and free chatbots are all in the threat path now.",
   ],
   actionThisWeek: {
-    label: "Run the 15-minute household safety check",
-    href: "/family-cyber-safety-checklist",
+    label: "Run the Child Safety Scanner this weekend",
+    href: "/parents/child-safety-scanner",
   },
 };
 
@@ -260,7 +266,11 @@ The script works because it does not ask your child to defend themselves. It ask
 
 ## What to do this week
 
-Have the conversation once this week. Then bookmark our kids safety hub together. The hub has the family technology agreement template referenced above and a short list of conversation starters for the next week, the next month, and the moment something does not feel right.
+Have the conversation once this week. Then put two tools where your child can see them.
+
+If a message, link, or chat ever feels off (from a stranger, a classmate, or a chatbot pretending to be either), use our [conversation and message scanner](/scam-checker) together. It is built to be used in the moment, not after.
+
+Then download our [Family Technology Agreement template](/family-cyber-safety-checklist) and fill it in together. It is one page. It covers what gets shared with AI, what does not, and what triggers a conversation with you instead. The point is not to enforce it like a contract. The point is to have written down, in your child's handwriting and yours, what the rule actually is.
 
 ## Sources
 
@@ -288,8 +298,8 @@ Have the conversation once this week. Then bookmark our kids safety hub together
     "A one-sided bond with a bot can form before a real one with a person.",
   ],
   actionThisWeek: {
-    label: "Open the kids safety hub with your child tonight",
-    href: "/kids",
+    label: "Scan a worrying message with your child",
+    href: "/scam-checker",
   },
 };
 

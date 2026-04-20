@@ -24,6 +24,7 @@ export const ACTION_LINK_ALLOWLIST: readonly string[] = [
   "/emergency-help",
   "/travel-safety",
   "/parents",
+  "/parents/child-safety-scanner",
   "/seniors",
   "/kids",
   "/training",
