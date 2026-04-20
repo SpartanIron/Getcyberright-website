@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Search,
   TrendingUp,
@@ -222,12 +223,21 @@ function ArticleCard({
   const heightClass = size === "lg" ? "h-64" : size === "sm" ? "h-36" : "h-44";
 
   return (
-    <a
-      href={hasSlug ? `/news/${article.slug}` : article.url}
-      target={hasSlug ? undefined : "_blank"}
-      rel={hasSlug ? undefined : "noopener noreferrer"}
+    <div
+      role="link"
+      tabIndex={0}
       onClick={handleClick}
-      className="block group"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (hasSlug && article.slug) {
+            navigate(`/news/${article.slug}`);
+          } else {
+            window.open(article.url, "_blank", "noopener,noreferrer");
+          }
+        }
+      }}
+      className="block group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-lg"
       data-testid={`news-card-${article.id}`}
     >
       <Card className="h-full overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
@@ -338,7 +348,7 @@ function ArticleCard({
           )}
         </CardContent>
       </Card>
-    </a>
+    </div>
   );
 }
 
