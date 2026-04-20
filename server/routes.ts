@@ -6202,6 +6202,7 @@ BEHAVIORAL CONSTRAINTS
               ? buildPlainEnglishSummary([a.title || "", a.excerpt || ""].join("\n"))
               : null,
           whatChanged: spine.whatChanged,
+          whyThisMatters: spine.whyThisMatters,
           actionThisWeek: spine.actionThisWeek,
           editorialSpinePending: spine.editorialSpinePending,
         };

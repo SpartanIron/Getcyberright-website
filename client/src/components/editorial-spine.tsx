@@ -110,7 +110,7 @@ export function EditorialSpineMini({
   whatChanged?: string | null;
   actionThisWeek?: { label: string; href: string } | null;
 }) {
-  if (!whatChanged && !actionThisWeek) return null;
+  if (!whatChanged) return null;
   return (
     <div
       className="mt-2 text-[12px] leading-snug text-teal-900 dark:text-teal-200 bg-teal-50 dark:bg-teal-950/40 border-l-2 border-teal-500 pl-2 py-1 rounded-sm"
