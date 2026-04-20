@@ -531,10 +531,27 @@ export async function executeReviewAction(postId: string, action: ReviewAction):
       const storedCitations = (post.citations || []) as CitationT[];
       const storedClaims = (post.extractedClaims || []) as { text?: string; context?: string }[];
       const allowedClaims = storedClaims.map((c) => String(c?.text ?? "").trim()).filter(Boolean);
-      const contextForLLM = storedClaims
-        .map((c) => String(c?.context ?? "").trim())
-        .filter(Boolean)
-        .join(" ");
+      // Original draft-time corpus was the source title + trendAnalysis JSON.
+      // We don't persist that, so reconstruct as broadly as possible from
+      // everything we DO persist: post title, every citation's name /
+      // publisher / URL, plus the small ±30-char context windows captured
+      // around each originally-extracted claim. Without the citation titles
+      // here, proper nouns like "Roblox", "Metamask", "Apple App Store"
+      // would not be found in the corpus and the re-audit would block
+      // legitimate posts whose entities are clearly in the cited articles.
+      const corpusParts: string[] = [];
+      if (post.contentTitle) corpusParts.push(post.contentTitle);
+      for (const c of storedCitations) {
+        const cAny = c as any;
+        for (const f of [cAny?.name, cAny?.title, cAny?.publisher, cAny?.url]) {
+          if (typeof f === "string" && f.trim()) corpusParts.push(f.trim());
+        }
+      }
+      for (const c of storedClaims) {
+        const ctx = String(c?.context ?? "").trim();
+        if (ctx) corpusParts.push(ctx);
+      }
+      const contextForLLM = corpusParts.join(" ");
       if (storedCitations.length > 0) {
         bundle = {
           recordId: post.contentId || post.id,
@@ -560,13 +577,29 @@ export async function executeReviewAction(postId: string, action: ReviewAction):
 
     const audit = auditPostContent(stripCitationReceipt(post.postContent), bundle);
     if (audit.verdict !== "pass") {
+      const failureLines = audit.failures.map((f) => `${f.kind}: ${f.reason}`);
       await storage.updateSocialPost(postId, {
         status: "blocked",
         auditVerdict: "fail_on_approval",
-        auditFailures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
+        auditFailures: failureLines,
         publishError: "Re-audit failed at approval time",
       });
-      return { ok: false, status: 400, message: "Re-audit failed at approval time. Post blocked." };
+      log.warn("Re-audit failed at approval time", {
+        postId,
+        platform: post.platform,
+        contentType: post.contentType,
+        failureCount: audit.failures.length,
+        firstFailures: failureLines.slice(0, 5),
+      });
+      const detail = failureLines.length
+        ? `Blocking claim${failureLines.length === 1 ? "" : "s"}: ${failureLines.slice(0, 3).join(" | ")}${failureLines.length > 3 ? ` (+${failureLines.length - 3} more)` : ""}. Open /admin/editorial-review to review and override.`
+        : undefined;
+      return {
+        ok: false,
+        status: 400,
+        message: "Re-audit failed at approval time. Post blocked.",
+        detail,
+      };
     }
 
     const gateError = await runSocialQualityGate({
