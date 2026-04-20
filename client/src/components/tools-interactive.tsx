@@ -27,20 +27,148 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-const scamGuardTools = [
-  { title: "Browser Extension", description: "12 protection features including notification blocking, search safety badges, redirect detection, and clipboard protection. Install on Chrome, Edge, Brave, or Opera.", href: "/browser-extension", icon: Chrome, badge: "Free" },
-  { title: "Report a Scam", description: "Spotted a scam? Report it to help protect the entire GetCyberRight community. Your report feeds our threat intelligence.", href: "/report-scam", icon: ShieldAlert },
-  { title: "Password Generator", description: "Create strong, unique passwords with customizable length and complexity. Runs entirely in your browser.", icon: Lock, badge: "Free", inline: "password" as const },
-  { title: "Voice Verification Helper", description: "Got a suspicious voicemail or call? Walk through six things to listen for and learn how to verify the caller in a way a scammer cannot fake. We do not pretend to give you an AI verdict, because reliable voice clone detection does not exist yet.", icon: Radio, badge: "Free", inline: "voice-clone" as const },
+type ToolCopy = {
+  title: string;
+  situation: string;
+  subline: string;
+  whenToUse: string[];
+  href?: string;
+  icon: typeof Shield;
+  badge?: string;
+  inline?: "scanner" | "password" | "voice-clone";
+};
+
+const scamGuardTools: ToolCopy[] = [
+  {
+    title: "Browser Extension",
+    situation: "When the next sketchy link is one click away",
+    subline: "Adds safety badges to search results, blocks pop-ups, and warns you before redirects on Chrome, Edge, Brave, and Opera.",
+    whenToUse: [
+      "You searched for a help line and the top result looks off",
+      "A site keeps trying to copy something to your clipboard",
+      "You want a second opinion before you click",
+    ],
+    href: "/browser-extension",
+    icon: Chrome,
+    badge: "Free",
+  },
+  {
+    title: "Report a Scam",
+    situation: "When you want to make sure no one else falls for it",
+    subline: "Send us the message, link, or call you saw so the next family does not get hit by the same one.",
+    whenToUse: [
+      "You spotted a scam aimed at parents or grandparents",
+      "A new fake message is going around your group chat",
+      "Your kid was contacted by someone suspicious",
+    ],
+    href: "/report-scam",
+    icon: ShieldAlert,
+  },
+  {
+    title: "Password Generator",
+    situation: "When you need a real password right now and your brain is empty",
+    subline: "Builds a strong, one-of-a-kind password in your browser. Nothing is sent anywhere.",
+    whenToUse: [
+      "You are signing up for a new account",
+      "A site asks you to reset after a breach",
+      "You are setting up a shared family account",
+    ],
+    icon: Lock,
+    badge: "Free",
+    inline: "password",
+  },
+  {
+    title: "Voice Verification Helper",
+    situation: "When a phone call sounds like family but feels off",
+    subline: "Walks you through six things to listen for and ways to verify the caller a scammer cannot fake. No AI verdict, because reliable voice clone detection does not exist yet.",
+    whenToUse: [
+      "A grandchild calls asking for money in a hurry",
+      "A voicemail sounds like your boss but the request is strange",
+      "A loved one calls from an unknown number with bad news",
+    ],
+    icon: Radio,
+    badge: "Free",
+    inline: "voice-clone",
+  },
 ];
 
-const dataShieldTools = [
-  { title: "Data Exposure Scan", description: "Find your personal information across 500+ data broker sites and breach databases. See exactly who has your data.", href: "/shield", icon: ShieldCheck, badge: "Free" },
-  { title: "Data Removal Center", description: "Remove your data from brokers with guided self-removal, automated opt-outs, and continuous monitoring. Includes Identity Shield and Personal Vault.", href: "/data-removal", icon: Trash2 },
-  { title: "Breach Monitor", description: "Get alerted immediately when your email or personal data appears in a new data breach.", href: "/breach-dashboard", icon: AlertTriangle },
-  { title: "Safety Score Assessment", description: "Answer a few quick questions about your digital habits and get a personalized safety score with actionable recommendations.", href: "/quick-assessment", icon: ClipboardCheck, badge: "Free" },
-  { title: "Cyber Hygiene Checklist", description: "A practical daily checklist of security habits. Track your progress and build a safer routine over time.", href: "/cyber-hygiene", icon: Shield, badge: "Free" },
-  { title: "Child Safety Scanner", description: "Check if websites, apps, and online services are safe for your children. Designed for parents and guardians.", href: "/parents/child-safety-scanner", icon: Baby, badge: "Free" },
+const dataShieldTools: ToolCopy[] = [
+  {
+    title: "Data Exposure Scan",
+    situation: "When you wonder how scammers keep finding you",
+    subline: "Searches more than 500 data broker sites and breach databases for your name, email, and phone.",
+    whenToUse: [
+      "You started getting more spam calls and texts",
+      "A scammer knew details only family should know",
+      "You want a clear baseline before you clean things up",
+    ],
+    href: "/shield",
+    icon: ShieldCheck,
+    badge: "Free",
+  },
+  {
+    title: "Data Removal Center",
+    situation: "When you want your name off the people-search sites",
+    subline: "Guided removal, automated opt-outs, and ongoing monitoring with Identity Shield and Personal Vault.",
+    whenToUse: [
+      "Your home address shows up in a Google search",
+      "You moved jobs and want a clean digital footprint",
+      "An ex or stalker is finding you online",
+    ],
+    href: "/data-removal",
+    icon: Trash2,
+  },
+  {
+    title: "Breach Monitor",
+    situation: "When a company you used gets hacked",
+    subline: "Alerts you the moment your email or personal info shows up in a new breach.",
+    whenToUse: [
+      "You used the same password on more than one site",
+      "You shop on smaller sites and want a heads-up",
+      "You manage accounts for an older parent",
+    ],
+    href: "/breach-dashboard",
+    icon: AlertTriangle,
+  },
+  {
+    title: "Safety Score Assessment",
+    situation: "When you want to know what to fix first",
+    subline: "A few short questions about your habits, then a clear score and the next three things to do.",
+    whenToUse: [
+      "You feel overwhelmed by safety advice online",
+      "You want a baseline before changing anything",
+      "A family member asked for a starting point",
+    ],
+    href: "/quick-assessment",
+    icon: ClipboardCheck,
+    badge: "Free",
+  },
+  {
+    title: "Cyber Hygiene Checklist",
+    situation: "When you want a routine that actually sticks",
+    subline: "A practical daily and weekly checklist you can tick off as you go. Progress is saved for you.",
+    whenToUse: [
+      "You want to build safer habits without a course",
+      "You are setting up a new device the right way",
+      "You just helped a parent or grandparent get online",
+    ],
+    href: "/cyber-hygiene",
+    icon: Shield,
+    badge: "Free",
+  },
+  {
+    title: "Child Safety Scanner",
+    situation: "When your kid asks if they can use a new app or site",
+    subline: "Plain-language safety check for websites, apps, and services, written for parents and guardians.",
+    whenToUse: [
+      "A new app is going around the school chat",
+      "Your kid wants to install something you have not heard of",
+      "You are reviewing what is already on their phone",
+    ],
+    href: "/parents/child-safety-scanner",
+    icon: Baby,
+    badge: "Free",
+  },
 ];
 
 export function ToolsInteractive({ tab: tabParam }: { tab?: string }) {
@@ -174,12 +302,24 @@ export function ToolsInteractive({ tab: tabParam }: { tab?: string }) {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-medium text-sm">{tool.title}</h4>
+                              <h4 className="font-semibold text-sm leading-snug">{tool.situation}</h4>
                               {tool.badge && (
                                 <Badge variant="secondary" className="text-[10px] no-default-hover-elevate no-default-active-elevate">{tool.badge}</Badge>
                               )}
                             </div>
-                            <p className="text-xs text-muted-foreground leading-relaxed mb-2.5">{tool.description}</p>
+                            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/80 mb-1">{tool.title}</p>
+                            <p className="text-xs text-muted-foreground leading-relaxed mb-2">{tool.subline}</p>
+                            <div className="mb-2.5">
+                              <p className="text-[11px] font-semibold text-foreground mb-1">When to use this</p>
+                              <ul className="space-y-0.5">
+                                {tool.whenToUse.map((s) => (
+                                  <li key={s} className="text-xs text-muted-foreground leading-snug flex gap-1.5">
+                                    <span className="text-accent mt-0.5">&bull;</span>
+                                    <span>{s}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
                             {tool.href ? (
                               <Link href={tool.href}>
                                 <Button variant="outline" size="sm" className="h-7 text-xs" data-testid={`button-tool-${tool.title.toLowerCase().replace(/\s/g, "-")}`}>
@@ -256,13 +396,25 @@ export function ToolsInteractive({ tab: tabParam }: { tab?: string }) {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-medium text-sm">{tool.title}</h4>
+                              <h4 className="font-semibold text-sm leading-snug">{tool.situation}</h4>
                               {tool.badge && (
                                 <Badge variant="secondary" className="text-[10px] no-default-hover-elevate no-default-active-elevate">{tool.badge}</Badge>
                               )}
                             </div>
-                            <p className="text-xs text-muted-foreground leading-relaxed mb-2.5">{tool.description}</p>
-                            <Link href={tool.href}>
+                            <p className="text-[11px] uppercase tracking-wider text-muted-foreground/80 mb-1">{tool.title}</p>
+                            <p className="text-xs text-muted-foreground leading-relaxed mb-2">{tool.subline}</p>
+                            <div className="mb-2.5">
+                              <p className="text-[11px] font-semibold text-foreground mb-1">When to use this</p>
+                              <ul className="space-y-0.5">
+                                {tool.whenToUse.map((s) => (
+                                  <li key={s} className="text-xs text-muted-foreground leading-snug flex gap-1.5">
+                                    <span className="text-teal-500 mt-0.5">&bull;</span>
+                                    <span>{s}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <Link href={tool.href!}>
                               <Button variant="outline" size="sm" className="h-7 text-xs" data-testid={`button-tool-${tool.title.toLowerCase().replace(/\s/g, "-")}`}>
                                 Open <ArrowRight className="w-3 h-3 ml-1" />
                               </Button>
@@ -354,19 +506,21 @@ export function ToolsInteractive({ tab: tabParam }: { tab?: string }) {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-red-50 dark:bg-red-950/20">
+      <section className="py-16 sm:py-20 bg-red-600 dark:bg-red-700 border-y-4 border-red-700 dark:border-red-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
-            Been Scammed? Get Help Now
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/15 mb-5">
+            <AlertTriangle className="w-9 h-9 text-white" />
+          </div>
+          <p className="text-xs font-bold tracking-widest uppercase text-white/80 mb-3">Right Now</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+            I Think Something Is Wrong
           </h2>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            If you think you've been scammed, don't panic. We have step-by-step guidance
-            on what to do next to minimize damage and report the scam.
+          <p className="text-white/90 mb-7 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+            Money just left your account. A stranger has photos of your kid. A loved one was just on a call that did not feel right. Start here and we will walk you through the next ten minutes.
           </p>
           <Link href="/emergency-help">
-            <Button size="lg" variant="destructive" data-testid="button-emergency-help">
-              Get Emergency Help
+            <Button size="lg" variant="secondary" className="bg-white text-red-700 hover:bg-white/90 font-semibold" data-testid="button-emergency-help">
+              Get Help Now
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
