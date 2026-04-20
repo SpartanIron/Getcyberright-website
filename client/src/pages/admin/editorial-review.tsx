@@ -526,7 +526,7 @@ export default function EditorialReviewPage() {
   }, [authLoading, user, navigate]);
 
   const { data: adminCheck, isLoading: adminCheckLoading } = useQuery<{ isAdmin: boolean }>({
-    queryKey: ["/api/auth/admin-check"],
+    queryKey: ["/api/admin/check"],
     enabled: !!user,
   });
 
