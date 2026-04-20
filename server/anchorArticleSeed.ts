@@ -300,7 +300,8 @@ export async function seedAnchorArticle(): Promise<void> {
           AND (${newsArticles.articleType} = 'curated'
                OR ${newsArticles.source} ILIKE '%getcyberright%')
           AND (${newsArticles.whatChanged} IS NULL OR ${newsArticles.whatChanged} = '')
-          AND (${newsArticles.actionThisWeek} IS NULL)`,
+          AND (${newsArticles.actionThisWeek} IS NULL)
+          AND (${newsArticles.whyThisMatters} IS NULL OR jsonb_array_length(${newsArticles.whyThisMatters}) = 0)`,
       );
   } catch (err: any) {
     console.error("[anchorArticleSeed] Failed:", err.message);

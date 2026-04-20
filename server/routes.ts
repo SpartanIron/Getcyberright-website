@@ -6511,6 +6511,14 @@ BEHAVIORAL CONSTRAINTS
           allowlist: ACTION_LINK_ALLOWLIST,
         });
       }
+      const hasAnyField =
+        parsed.data.whatChanged !== undefined ||
+        parsed.data.whyThisMatters !== undefined ||
+        parsed.data.actionThisWeek !== undefined ||
+        parsed.data.editorialSpinePending !== undefined;
+      if (!hasAnyField) {
+        return res.status(400).json({ error: "Provide at least one spine field to update" });
+      }
       const existing = await storage.getNewsArticleById(req.params.id);
       if (!existing) return res.status(404).json({ error: "Article not found" });
       const patch: any = {};

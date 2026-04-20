@@ -11,7 +11,7 @@ export interface EditorialSpineProps {
 }
 
 function isInternal(href: string): boolean {
-  return href.startsWith("/");
+  return href.startsWith("/") && !href.startsWith("//");
 }
 
 export function EditorialSpine({
