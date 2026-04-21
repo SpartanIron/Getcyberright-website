@@ -84,7 +84,7 @@ export default async function ScamIntelDetailPage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <PageContent />
+      <PageContent initialScamIntel={scam} />
     </>
   );
 }
