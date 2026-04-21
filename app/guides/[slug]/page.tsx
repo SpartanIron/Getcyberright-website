@@ -93,7 +93,7 @@ export default async function GuideDetailPage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <PageContent />
+      <PageContent initialGuide={guide} />
     </>
   );
 }
