@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { JsonLd } from "../components/json-ld";
 import PageContent from "@/pages/alerts-listing";
+import { getThreatAlerts } from "../lib/data";
 
 const BASE_URL = "https://www.getcyberright.com";
 
@@ -28,7 +29,9 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-export default function AlertsPage() {
+export default async function AlertsPage() {
+  const initialAlerts = (await getThreatAlerts()) as unknown[];
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -46,7 +49,7 @@ export default function AlertsPage() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <PageContent />
+      <PageContent initialAlerts={initialAlerts as never} />
     </>
   );
 }

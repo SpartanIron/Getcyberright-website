@@ -38,3 +38,7 @@ export async function getNewsTracks() {
 export async function getAllLearningPaths() {
   return apiFetch("/api/training/paths", []);
 }
+
+export async function getThreatAlerts() {
+  return apiFetch("/api/alerts", [] as unknown[]);
+}
