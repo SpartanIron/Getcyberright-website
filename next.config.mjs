@@ -31,8 +31,8 @@ const nextConfig = {
       },
       {
         source: '/pricing',
-        destination: '/gcr-guard-pricing',
-        permanent: false,
+        destination: '/',
+        permanent: true,
       },
     ];
   },
