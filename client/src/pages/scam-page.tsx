@@ -11,6 +11,7 @@ import { AlertTriangle, Shield, Search, ChevronRight, ExternalLink, ArrowLeft, M
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import AdSlot from "@/components/ad-slot";
 
 interface ScamIntelMatch {
   slug: string;
@@ -42,7 +43,7 @@ export default function ScamPage() {
           <AlertTriangle className="h-16 w-16 text-orange-500 mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-4" data-testid="text-not-found">Scam Guide Not Found</h1>
           <p className="text-muted-foreground mb-8">The scam guide you are looking for does not exist or has been moved.</p>
-          <Link href="/scam-checker" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium" data-testid="link-scam-checker">
+          <Link href="/scam-checker" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-medium">
             <Search className="h-4 w-4 mr-2" />
             Try GCR Scam Guard
           </Link>
@@ -94,16 +95,16 @@ export default function ScamPage() {
       <Navigation />
 
       <div className="bg-hero text-hero-foreground relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-hero via-hero to-hero dark:from-[#0A2A3C] dark:via-[#0A2A3C] dark:to-[#00293C]" />
-        <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, width: "55%", height: "100%", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: "-40%", right: "2%", width: "50px", height: "220%", background: "linear-gradient(180deg, #003A52 0%, #0D4D66 50%, #003A52 100%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
-          <div style={{ position: "absolute", top: "-40%", right: "10%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 10%, rgba(45, 212, 191, 0.4) 50%, transparent 90%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
-          <div style={{ position: "absolute", top: "-35%", right: "18%", width: "35px", height: "220%", background: "linear-gradient(180deg, #5eead4 0%, #2dd4bf 35%, #14b8a6 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.55 }} />
-          <div style={{ position: "absolute", top: "-35%", right: "26%", width: "2px", height: "220%", background: "linear-gradient(180deg, transparent 15%, hsla(16, 95%, 58%, 0.35) 50%, transparent 85%)", transform: "rotate(20deg)", transformOrigin: "top center" }} />
-          <div style={{ position: "absolute", top: "-30%", right: "32%", width: "50px", height: "220%", background: "linear-gradient(180deg, hsl(16, 100%, 62%) 0%, hsl(16, 95%, 52%) 40%, hsl(16, 90%, 42%) 100%)", transform: "rotate(20deg)", transformOrigin: "top center", opacity: 0.5 }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-hero via-hero to-hero dark:from-[#0A2A3C] dark:to-hero opacity-90" />
+        <div className="absolute pointer-events-none hidden md:block" aria-hidden="true" style={{ top: 0, right: 0, bottom: 0, width: "40%" }}>
+          <div style={{ position: "absolute", top: "-40%", right: "2%", width: "50px", height: "220%", background: "rgba(255,255,255,0.03)", transform: "rotate(15deg)" }} />
+          <div style={{ position: "absolute", top: "-40%", right: "10%", width: "50px", height: "220%", background: "rgba(255,255,255,0.02)", transform: "rotate(15deg)" }} />
+          <div style={{ position: "absolute", top: "-35%", right: "18%", width: "35px", height: "220%", background: "rgba(255,255,255,0.02)", transform: "rotate(15deg)" }} />
+          <div style={{ position: "absolute", top: "-35%", right: "26%", width: "2px", height: "220%", background: "rgba(255,255,255,0.03)", transform: "rotate(15deg)" }} />
+          <div style={{ position: "absolute", top: "-30%", right: "32%", width: "50px", height: "220%", background: "rgba(255,255,255,0.02)", transform: "rotate(15deg)" }} />
         </div>
         <div className="container mx-auto px-4 py-12 relative z-10">
-          <Link href="/scam-checker" className="inline-flex items-center text-white/60 hover:text-white text-sm mb-6 transition-colors" data-testid="link-back-scam-checker">
+          <Link href="/scam-checker" className="inline-flex items-center text-white/60 hover:text-white text-sm mb-6 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to GCR Scam Guard
           </Link>
@@ -113,8 +114,8 @@ export default function ScamPage() {
               <AlertTriangle className="h-8 w-8 text-orange-400" />
             </div>
             <div>
-              <h1 className="text-[1.75rem] sm:text-3xl md:text-4xl font-extrabold tracking-[-0.025em]" data-testid="text-scam-title">{scam.title}</h1>
-              <p className="text-white/60 mt-2">Last updated: {new Date(scam.lastUpdated).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+              <h1 className="text-[1.75rem] sm:text-3xl md:text-4xl font-extrabold tracking-[-0.025em]" data-testid="heading-scam-title">{scam.title}</h1>
+              <p className="text-white/60 mt-2">Last updated: {new Date(scam.lastUpdated).toLocaleDateString("en-US", { year: "numeric", month: "long" })}</p>
             </div>
           </div>
 
@@ -148,7 +149,7 @@ export default function ScamPage() {
                 <Shield className="h-5 w-5 text-teal-600 mb-2" />
                 <h4 className="font-medium text-sm mb-1">Got a suspicious message?</h4>
                 <p className="text-xs text-muted-foreground mb-3">Paste it into our AI-powered GCR Scam Guard for instant analysis.</p>
-                <Link href="/scam-checker" className="text-sm text-teal-600 hover:text-teal-700 font-medium" data-testid="link-sidebar-scam-checker">
+                <Link href="/scam-checker" className="text-sm text-teal-600 hover:text-teal-700 font-medium">
                   Check Now →
                 </Link>
               </div>
@@ -172,7 +173,7 @@ export default function ScamPage() {
               <div className="space-y-3">
                 {scam.howItWorks.map((step, i) => (
                   <div key={i} className="flex gap-3 items-start">
-                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 flex items-center justify-center text-sm font-bold">{i + 1}</span>
+                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 font-bold flex items-center justify-center text-sm">{i + 1}</span>
                     <p className="text-muted-foreground" data-testid={`text-step-${i}`}>{step}</p>
                   </div>
                 ))}
@@ -196,18 +197,27 @@ export default function ScamPage() {
               </div>
             </section>
 
+            {process.env.NEXT_PUBLIC_ADSENSE_SLOT_SCAMS_INLINE && (
+              <AdSlot
+                slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_SCAMS_INLINE}
+                format="in-article"
+                className="my-2"
+                testId="ad-scams-inline-1"
+              />
+            )}
+
             <section id="examples">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2" data-testid="heading-examples">
                 <MessageSquareWarning className="h-6 w-6 text-red-500" />
                 Real Scam Examples
               </h2>
-              <p className="text-sm text-muted-foreground mb-4">These are examples of messages used in this type of scam. Recognizing the patterns helps you stay safe.</p>
+              <p className="text-sm text-muted-foreground mb-4">These are examples of messages used in this type of scam.</p>
               <div className="space-y-4">
                 {scam.exampleMessages.map((example, i) => (
-                  <Card key={i} className="border-red-200 dark:border-red-800/40 bg-red-50/50 dark:bg-red-900/10">
+                  <Card key={i} className="border-red-200 dark:border-red-800/40 bg-red-50/50 dark:bg-red-950/10">
                     <CardContent className="p-4">
                       <Badge variant="outline" className="mb-2 border-red-300 text-red-700 dark:text-red-400">{example.type}</Badge>
-                      <p className="text-sm italic text-muted-foreground" data-testid={`text-example-${i}`}>"{example.content}"</p>
+                      <p className="text-sm italic text-muted-foreground" data-testid={`text-example-${i}`}>{example.content}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -224,7 +234,7 @@ export default function ScamPage() {
                   <Card key={i}>
                     <CardContent className="p-4">
                       <h3 className="font-semibold mb-1 flex items-center gap-2" data-testid={`text-prevention-title-${i}`}>
-                        <span className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</span>
+                        <span className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 font-bold flex items-center justify-center text-sm flex-shrink-0">{i + 1}</span>
                         {step.title}
                       </h3>
                       <p className="text-sm text-muted-foreground ml-8" data-testid={`text-prevention-desc-${i}`}>{step.description}</p>
@@ -233,6 +243,15 @@ export default function ScamPage() {
                 ))}
               </div>
             </section>
+
+            {process.env.NEXT_PUBLIC_ADSENSE_SLOT_SCAMS_INLINE && (
+              <AdSlot
+                slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_SCAMS_INLINE}
+                format="in-article"
+                className="my-2"
+                testId="ad-scams-inline-2"
+              />
+            )}
 
             <section id="faq">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2" data-testid="heading-faq">
@@ -251,16 +270,16 @@ export default function ScamPage() {
               </Accordion>
             </section>
 
-            <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg p-6 text-center">
+            <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-xl p-6">
               <Shield className="h-10 w-10 text-teal-600 mx-auto mb-3" />
               <h3 className="text-lg font-bold mb-2">Think you have received a scam like this?</h3>
-              <p className="text-sm text-muted-foreground mb-4">Paste the suspicious message into our free AI-powered GCR Scam Guard for instant analysis.</p>
+              <p className="text-sm text-muted-foreground mb-4">Paste the suspicious message into our free AI-powered scam analyzer.</p>
               <div className="flex flex-wrap justify-center gap-3">
-                <Link href="/scam-checker" className="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium" data-testid="link-cta-scam-checker">
+                <Link href="/scam-checker" className="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 font-medium">
                   <Search className="h-4 w-4 mr-2" />
                   Check a Suspicious Message
                 </Link>
-                <Link href="/emergency-help" className="inline-flex items-center px-4 py-2 border border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors text-sm font-medium" data-testid="link-cta-emergency">
+                <Link href="/emergency-help" className="inline-flex items-center px-4 py-2 border border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 font-medium">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   I Have Been Scammed
                 </Link>
@@ -279,7 +298,7 @@ export default function ScamPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {relatedIntel.map((intel) => (
                     <Link key={intel.slug} href={`/scam-intel/${intel.slug}`}>
-                      <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-teal-500" data-testid={`link-intel-${intel.slug}`}>
+                      <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-teal-500">
                         <CardContent className="p-4 flex items-center justify-between">
                           <div>
                             <span className="text-sm font-medium">{intel.scamName}</span>
@@ -307,6 +326,16 @@ export default function ScamPage() {
           </div>
         </div>
       </main>
+
+      {process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE_MULTIPLEX && (
+        <div className="container mx-auto px-4 pb-6">
+          <AdSlot
+            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE_MULTIPLEX}
+            format="multiplex"
+            testId="ad-scams-multiplex"
+          />
+        </div>
+      )}
 
       <Footer />
     </div>
