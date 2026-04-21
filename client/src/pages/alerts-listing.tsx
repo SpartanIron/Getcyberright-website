@@ -37,7 +37,7 @@ const riskBorder: Record<string, string> = {
   low: "border-l-green-500",
 };
 
-export default function AlertsListing() {
+export default function AlertsListing({ initialAlerts = [] }: { initialAlerts?: ThreatAlert[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -51,6 +51,7 @@ export default function AlertsListing() {
 
   const { data: alerts = [], isLoading, isError } = useQuery<ThreatAlert[]>({
     queryKey: ["/api/alerts"],
+        initialData: initialAlerts.length > 0 ? initialAlerts : undefined,
   });
 
   const categories = Array.from(new Set(alerts.map((a) => a.threatCategory).filter(Boolean)));
