@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     "Share your feedback to help improve GetCyberRight. We value your suggestions and ideas.",
   alternates: { canonical: `${BASE_URL}/feedback` },
-  openGraph: {
+  robots: { index: false, follow: false },  openGraph: {
     title: "Feedback | GetCyberRight",
     description:
       "Share your feedback to help improve GetCyberRight. We value your suggestions and ideas.",
