@@ -101,7 +101,7 @@ export default async function AlertDetailPage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <PageContent />
+      <PageContent initialAlert={alert} />
     </>
   );
 }
