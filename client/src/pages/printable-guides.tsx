@@ -260,7 +260,7 @@ export default function PrintableGuides() {
  <CardContent className="p-5">
  {/* Hidden printable content */}
  <div id={`checklist-${checklist.id}`} className="hidden">
- <h1>{checklist.title}</h1>
+ <h2>{checklist.title}</h2>
  <h2>{checklist.subtitle} - For {checklist.audience}</h2>
  <ul>
  {checklist.items.map((item, i) => (
