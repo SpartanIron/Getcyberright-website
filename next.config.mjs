@@ -20,9 +20,9 @@ const nextConfig = {
         permanent: true,
       },
       {
-                source: '/educate',
-                destination: '/educators',
-                permanent: true,
+        source: '/educate',
+        destination: '/educators',
+        permanent: true,
       },
       {
         source: '/protection-hub',
@@ -32,6 +32,11 @@ const nextConfig = {
       {
         source: '/pricing',
         destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/privacy-policy',
+        destination: '/privacy',
         permanent: true,
       },
     ];
