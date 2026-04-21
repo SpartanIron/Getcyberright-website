@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { JsonLd } from "../../components/json-ld";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import PageContent from "@/pages/news-article";
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -74,7 +74,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
     notFound();
   }
 
-  const jsonLd = [
+  if (article.slug !== slug) {    permanentRedirect(`/news/${article.slug}`);  }  const jsonLd = [
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
