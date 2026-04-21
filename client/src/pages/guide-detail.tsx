@@ -38,7 +38,7 @@ interface GuideDetail {
   relatedToolPaths: string[];
 }
 
-export default function GuideDetailPage() {
+export default function GuideDetailPage({ initialGuide }: { initialGuide?: GuideDetail | null } = {}) {
   const params = useParams<{ slug: string }>();
   const slug = params.slug || "";
 
@@ -49,7 +49,7 @@ export default function GuideDetailPage() {
       if (!res.ok) throw new Error("Guide not found");
       return res.json();
     },
-    enabled: !!slug,
+    initialData: initialGuide ?? undefined,    enabled: !!slug,
   });
 
   // Hooks must run on every render. Compute toc lazily so the effect can
