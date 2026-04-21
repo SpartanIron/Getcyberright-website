@@ -55,12 +55,12 @@ const riskColors: Record<string, string> = {
   low: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
 };
 
-export default function ScamIntelDetailPage() {
+export default function ScamIntelDetailPage({ initialScamIntel }: { initialScamIntel?: ScamIntelDetail | null } = {}) {
   const params = useParams<{ slug: string }>();
   const slug = params.slug || "";
 
   const { data: scam, isLoading, error } = useQuery<ScamIntelDetail>({
-    queryKey: ["/api/scam-intel", slug],
+    queryKey: ["/api/scam-intel", slug],    initialData: initialScamIntel ?? undefined,
     queryFn: async () => {
       const res = await fetch(`/api/scam-intel/${slug}`);
       if (!res.ok) throw new Error("Scam not found");
