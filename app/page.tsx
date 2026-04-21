@@ -5,13 +5,13 @@ const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
   title:
-    "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
+    "GetCyberRight: Free Cybersecurity Education for Families",
   description:
     "Free cybersecurity education for families. AI-powered scam detection, data broker removal, and safety training. No account or expertise needed.",
-  alternates: { canonical: BASE_URL },
+  alternates: { canonical: "https://www.getcyberright.com/" },
   openGraph: {
     title:
-      "GetCyberRight: Free Cybersecurity Education for Families, Parents, Kids & Seniors",
+      "GetCyberRight: Free Cybersecurity Education for Families",
     description:
       "Free cybersecurity education for families. AI-powered scam detection, data broker removal, and safety training. No account or expertise needed.",
     url: BASE_URL,
