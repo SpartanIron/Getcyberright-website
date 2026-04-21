@@ -22,7 +22,7 @@ interface AlertDetail {
   indicators: Array<{ type: string; value: string; description: string }>;
   mitigationSteps: string[];
   sourceUrls: string[];
-  cveIds: string[];
+  cveIds: string[];h
   regions: string[];
   targetAudience: string;
   metaDescription: string;
@@ -41,7 +41,7 @@ const riskConfig: Record<string, { bg: string; icon: string; border: string; lab
   info: { bg: "bg-blue-500/20", icon: "text-blue-400", border: "border-blue-500", label: "ADVISORY", pulse: false },
 };
 
-export default function AlertDetailPage() {
+export default function AlertDetailPage({ initialAlert }: { initialAlert?: AlertDetail | null } = {}) {
   const params = useParams<{ slug: string }>();
   const slug = params.slug || "";
 
@@ -52,7 +52,7 @@ export default function AlertDetailPage() {
       if (!res.ok) throw new Error("Alert not found");
       return res.json();
     },
-    enabled: !!slug,
+        initialData: initialAlert ?? undefined,    enabled: !!slug,
   });
 
   if (isLoading) {
