@@ -5,14 +5,14 @@ import PageContent from "@/pages/kids";
 const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
-  title: "Online Safety for Kids & Teens (Ages 8-16): Free Lessons | GetCyberRight",
+  title: "Online Safety for Kids & Teens: Free Lessons | GetCyberRight",
   description:
     "Free interactive cybersecurity lessons for kids and teens ages 8 to 16. Teach your children about password safety, spotting scams, cyberbullying, and being a good digital citizen.",
   alternates: { canonical: `${BASE_URL}/kids` },
   keywords:
     "online safety for kids, cybersecurity for teens, password safety for children, kids cyberbullying, digital citizenship for kids, internet safety lessons ages 8 to 16, free safety lessons no signup, COPPA-friendly kids resources, parent-led online safety, kids safe internet activities",
   openGraph: {
-    title: "Online Safety for Kids & Teens (Ages 8-16): Free Lessons | GetCyberRight",
+    title: "Online Safety for Kids & Teens: Free Lessons | GetCyberRight",
     description:
       "Free interactive cybersecurity lessons for kids and teens ages 8 to 16. Teach your children about password safety, spotting scams, cyberbullying, and being a good digital citizen.",
     url: `${BASE_URL}/kids`,
