@@ -306,7 +306,7 @@ export async function registerRoutes(
       { path: '/seniors', changefreq: 'weekly', priority: '0.9' },
       { path: '/parents', changefreq: 'weekly', priority: '0.9' },
       { path: '/emergency-help', changefreq: 'monthly', priority: '0.9' },
-      { path: '/breach-dashboard', changefreq: 'weekly', priority: '0.8' },
+      
       { path: '/ai-prompts', changefreq: 'weekly', priority: '0.8' },
       { path: '/ai-safety', changefreq: 'weekly', priority: '0.8' },
       { path: '/training', changefreq: 'weekly', priority: '0.8' },
@@ -331,7 +331,7 @@ export async function registerRoutes(
       { path: '/parents/child-safety-scanner', changefreq: 'monthly', priority: '0.7' },
       { path: '/parent-guide', changefreq: 'monthly', priority: '0.6' },
       { path: '/contact', changefreq: 'monthly', priority: '0.6' },
-      { path: '/pricing', changefreq: 'monthly', priority: '0.6' },
+      { path: '/for-organizations', changefreq: 'monthly', priority: '0.8' },    { path: '/perspectives', changefreq: 'weekly', priority: '0.7' },
       { path: '/support', changefreq: 'monthly', priority: '0.6' },
       { path: '/support-the-mission', changefreq: 'monthly', priority: '0.6' },
       { path: '/our-mission', changefreq: 'monthly', priority: '0.5' },
@@ -343,9 +343,9 @@ export async function registerRoutes(
       { path: '/accessibility', changefreq: 'yearly', priority: '0.4' },
       { path: '/advertise', changefreq: 'monthly', priority: '0.4' },
       { path: '/partner-deck', changefreq: 'monthly', priority: '0.4' },
-      { path: '/experience', changefreq: 'weekly', priority: '0.6' },
+      
       { path: '/browser-extension', changefreq: 'monthly', priority: '0.7' },
-      { path: '/gcr-guard-pricing', changefreq: 'monthly', priority: '0.6' },
+      
     ];
 
     const scamSlugs = getAllScamSlugs();
