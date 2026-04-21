@@ -63,5 +63,7 @@ export default async function AlertsPage() {
               <JsonLd data={jsonLd} />
               <PageContent initialAlerts={initialAlerts} />
         </>>
+        );
+}
       );
 }</>
