@@ -182,7 +182,7 @@ interface TopicGroup {
   articles: NewsItem[];
 }
 
-interface TracksResponse {
+export interface TracksResponse {
   whatsHappening: {
     breaking: NewsItem[];
     trending: TrendingCluster[];
@@ -226,25 +226,23 @@ function ArticleCard({
   };
 
   const heightClass = size === "lg" ? "h-64" : size === "sm" ? "h-36" : "h-44";
+  const linkHref = hasSlug && article.slug ? `/news/${article.slug}` : article.url;
+  const isInternal = hasSlug;
 
   return (
     <div
-      role="link"
-      tabIndex={0}
-      onClick={handleClick}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          if (hasSlug && article.slug) {
-            navigate(`/news/${article.slug}`);
-          } else {
-            window.open(article.url, "_blank", "noopener,noreferrer");
-          }
-        }
-      }}
-      className="block group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-lg"
+      className="relative group rounded-lg focus-within:ring-2 focus-within:ring-teal-500"
       data-testid={`news-card-${article.id}`}
     >
+      <a
+        href={linkHref}
+        onClick={handleClick}
+        target={isInternal ? undefined : "_blank"}
+        rel={isInternal ? undefined : "noopener noreferrer"}
+        className="absolute inset-0 z-10 rounded-lg focus:outline-none"
+        aria-label={article.title}
+        data-testid={`link-news-card-${article.id}`}
+      />
       <Card className="h-full overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
         <div className={`relative ${heightClass} overflow-hidden`}>
           {showImage ? (
@@ -350,7 +348,7 @@ function ArticleCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="mt-2 inline-flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 underline-offset-2 hover:underline"
+              className="relative z-20 mt-2 inline-flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 underline-offset-2 hover:underline"
               data-testid={`link-source-${article.id}`}
             >
               <ExternalLink className="h-3 w-3" />
@@ -487,7 +485,11 @@ export interface NewsResponse {
   stats: { categories: string[]; totalArticles: number; lastFetch: string | null };
 }
 
-export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null }) {
+export function NewsContent({
+  initialTracks,
+}: {
+  initialTracks?: TracksResponse | null;
+}) {
   const [activeTrack, setActiveTrack] = useState<"happening" | "gcr">("happening");
   const [searchQuery, setSearchQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
@@ -500,6 +502,7 @@ export function NewsContent({ initialNews }: { initialNews?: NewsResponse | null
       if (!res.ok) throw new Error("Failed to load news");
       return res.json();
     },
+    initialData: initialTracks ?? undefined,
     refetchInterval: 300000,
     staleTime: 60000,
   });

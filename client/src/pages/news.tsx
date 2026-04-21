@@ -1,5 +1,9 @@
-import { NewsContent, type NewsResponse } from "@/components/news-content";
+import { NewsContent, type TracksResponse } from "@/components/news-content";
 
-export default function News({ initialNews }: { initialNews?: NewsResponse | null }) {
-  return <NewsContent initialNews={initialNews} />;
+export default function News({
+  initialTracks,
+}: {
+  initialTracks?: TracksResponse | null;
+}) {
+  return <NewsContent initialTracks={initialTracks} />;
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { JsonLd } from "../components/json-ld";
 import PageContent from "@/pages/news";
-import { getLatestNews } from "../lib/data";
+import { getNewsTracks } from "../lib/data";
 export const dynamic = 'force-dynamic';
 
 const BASE_URL = "https://www.getcyberright.com";
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewsPage() {
-  const initialNews = await getLatestNews(100);
+  const initialTracks = await getNewsTracks();
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -77,7 +77,7 @@ export default async function NewsPage() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <PageContent initialNews={initialNews} />
+      <PageContent initialTracks={initialTracks} />
     </>
   );
 }

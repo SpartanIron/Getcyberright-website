@@ -23,6 +23,18 @@ export async function getLatestNews(limit = 100) {
   return apiFetch(`/api/news/latest?limit=${limit}`, fallback);
 }
 
+export async function getNewsTracks() {
+  const fallback = {
+    lastUpdated: null,
+    whatsHappening: { breaking: [], trending: [], latest: [] },
+    fromGetCyberRight: {
+      author: { name: "Jude Annan, CISM", role: "Managing Partner, GetCyberRight" },
+      topics: [],
+    },
+  };
+  return apiFetch(`/api/news/tracks`, fallback);
+}
+
 export async function getAllLearningPaths() {
   return apiFetch("/api/training/paths", []);
 }
