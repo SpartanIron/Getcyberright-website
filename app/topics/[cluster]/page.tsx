@@ -2,22 +2,32 @@ import type { Metadata } from "next";
 import PageContent from "@/pages/topic-hub";
 
 const BASE_URL = "https://www.getcyberright.com";
+const API_BASE = `http://localhost:${process.env.PORT || 5000}`;
 
 type PageProps = {
   params: Promise<{ cluster: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
+async function fetchAll(path: string): Promise<any[]> {
+  try {
+    const r = await fetch(`${API_BASE}${path}`, { cache: "no-store" });
+    return r.ok ? r.json() : [];
+  } catch { return []; }
+}
+
 const TOPIC_META: Record<string, { title: string; description: string }> = {
-  "identity-theft": { title: "Identity Theft Prevention | GetCyberRight", description: "Comprehensive resources on identity theft prevention, detection, and recovery. Learn how to protect your personal information and what to do if your identity is stolen." },
-  "online-scams": { title: "Online Scams: Recognize & Avoid | GetCyberRight", description: "Learn about the latest online scams, how they work, and how to protect yourself. Covers phishing, romance scams, tech support fraud, and more." },
-  "phishing-attacks": { title: "Phishing Attacks: Spot & Stop Them | GCR", description: "Everything you need to know about phishing attacks. Learn to identify phishing emails, texts, and websites before they compromise your accounts." },
-  "cyber-safety-seniors": { title: "Cyber Safety for Seniors | GetCyberRight", description: "Cybersecurity resources designed specifically for older adults. Covers phone scams, identity theft, romance fraud, and technology safety." },
-  "cyber-safety-kids": { title: "Cyber Safety for Kids | GetCyberRight", description: "Help keep children safe online with age-appropriate cybersecurity education, parental controls guidance, and digital citizenship lessons." },
-  "password-security": { title: "Password Security Tips | GetCyberRight", description: "Learn password security best practices. Create strong passwords, use password managers, and protect your accounts from credential theft." },
-  "privacy-protection": { title: "Privacy Protection | GetCyberRight", description: "Take control of your online privacy. Learn about data brokers, privacy settings, data removal, and how to minimize your digital footprint." },
-  "device-security": { title: "Device Security Guide | GetCyberRight", description: "Secure all your devices from phones to smart home gadgets. Covers updates, antivirus, encryption, and safe device setup." },
-  "data-breaches": { title: "Data Breaches: Respond & Recover | GCR", description: "Stay informed about data breaches affecting your accounts. Learn how to check for breaches, respond quickly, and protect yourself." },
-  "social-media-security": { title: "Social Media Security | GetCyberRight", description: "Secure your social media accounts and protect your privacy. Covers account settings, scam awareness, and safe sharing practices." },
+  "identity-theft": { title: "Identity Theft Prevention | GetCyberRight", description: "Comprehensive resources on identity theft prevention, detection, and recovery. Learn how to protect yourself from identity theft with our expert guides, real-time scam alerts, and practical tools." },
+  "online-scams": { title: "Online Scams: Recognize & Avoid | GetCyberRight", description: "Learn about the latest online scams, how they work, and how to protect yourself. Covers phishing, romance scams, shopping fraud, and more." },
+  "phishing-attacks": { title: "Phishing Attacks: Spot & Stop Them | GCR", description: "Everything you need to know about phishing attacks. Learn to identify phishing emails, texts, and websites before they trick you." },
+  "cyber-safety-seniors": { title: "Cyber Safety for Seniors | GetCyberRight", description: "Cybersecurity resources designed specifically for older adults. Simple, clear guidance on avoiding scams, protecting personal information, and staying safe online." },
+  "cyber-safety-kids": { title: "Cyber Safety for Kids | GetCyberRight", description: "Help keep children safe online with age-appropriate cybersecurity education, parental controls guidance, and online predator awareness." },
+  "password-security": { title: "Password Security Tips | GetCyberRight", description: "Learn password security best practices. Create strong passwords, use password managers, and protect your accounts." },
+  "privacy-protection": { title: "Privacy Protection | GetCyberRight", description: "Take control of your digital privacy. Guides and tools to manage your online footprint, limit data collection, remove personal information from data brokers." },
+  "device-security": { title: "Device Security Guide | GetCyberRight", description: "Secure all your devices from smartphones to laptops. Learn about malware protection, software updates, secure configurations." },
+  "data-breaches": { title: "Data Breaches: Respond & Recover | GCR", description: "Understand data breaches, how they happen, and what to do when your information is exposed." },
+  "social-media-security": { title: "Social Media Security | GetCyberRight", description: "Protect your social media accounts and personal information. Learn about privacy settings, account security, recognizing fake profiles." },
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -45,6 +55,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function TopicClusterPage() {
-  return <PageContent />;
+export default async function TopicHubPage({ params }: PageProps) {
+  const { cluster } = await params;
+  const [initialGuides, initialScamIntel, initialAlerts] = await Promise.all([
+    fetchAll("/api/guides"),
+    fetchAll("/api/scam-intel"),
+    fetchAll("/api/alerts"),
+  ]);
+  return <PageContent initialGuides={initialGuides} initialScamIntel={initialScamIntel} initialAlerts={initialAlerts} />;
 }
