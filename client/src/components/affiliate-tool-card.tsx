@@ -96,4 +96,4 @@ export function AffiliateToolCard({
                 </div>
           </div>
         );
-}</a>
+}
