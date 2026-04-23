@@ -12,7 +12,8 @@ const footerLinks = {
     { name: "AI Prompt Library", href: "/ai-prompts" },
     { name: "Scam Intelligence", href: "/scam-intel" },
     { name: "Cyber Threat Radar", href: "/cyber-threat-radar" },
-    { name: "Resource Library", href: "/resources" },      { name: "Recommended Tools", href: "/recommended-tools" }", href: "/resources" },", href: "/resources" },
+    { name: "Resource Library", href: "/resources" },
+    { name: "Recommended Tools", href: "/recommended-tools" },
   ],
   protection: [
     { name: "GCR Scam Guard", href: "/tools" },
