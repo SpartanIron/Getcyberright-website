@@ -177,7 +177,8 @@ function applyCancellation(product: ProductType) {
   };
 }
 
-  // Register all routes but return 503 if Stripe is not yet configured
+  export function registerStripeRoutes(app: Express) {
+    // Register all routes but return 503 if Stripe is not yet configured
   const stripeConfigured = !!STRIPE_SECRET_KEY;
   if (!stripeConfigured) {
         console.log("Stripe routes registered in degraded mode: STRIPE_SECRET_KEY not set");
