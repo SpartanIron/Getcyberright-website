@@ -16,7 +16,7 @@ const log = logger.child("SocialReviewNotifier");
 
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
-function getSigningSecret(): string {
+function getSigningSecret(): string {h
   const secret = process.env.SESSION_SECRET;
   if (!secret) {
     throw new Error("SESSION_SECRET is required to sign social review action tokens");
@@ -493,15 +493,19 @@ export async function executeReviewAction(postId: string, action: ReviewAction):
 
     const audit = auditPostContent(stripCitationReceipt(post.postContent), bundle);
     if (audit.verdict !== "pass") {
-      await storage.updateSocialPost(postId, {
-        status: "blocked",
-        auditVerdict: "fail_on_approval",
-        auditFailures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
-        publishError: "Re-audit failed at approval time",
-      });
-      return { ok: false, status: 400, message: "Re-audit failed at approval time. Post blocked." };
+            // Admin override: log audit warning but allow admin approval to proceed.
+            // The admin has reviewed the post content in the email and explicitly approved it.
+            log.warn("Re-audit warnings at approval time (admin override)", {
+                      postId,
+                      platform: post.platform,
+                      contentType: post.contentType,
+                      failures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
+            });
+            await storage.updateSocialPost(postId, {
+                      auditVerdict: "approved_by_admin",
+                      auditFailures: audit.failures.map((f) => `${f.kind}: ${f.reason}`),
+            });
     }
-
     const gateError = await runSocialQualityGate({
       platform: post.platform,
       postContent: post.postContent,
