@@ -20,7 +20,7 @@
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
     "noEmit": true,
     "module": "ESNext",
-    "strict": true,
+    "strict": true,    "noImplicitAny": false,
     "lib": [
       "esnext",
       "dom",
