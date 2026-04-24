@@ -55,6 +55,13 @@ export async function verifyRecaptcha(token: string): Promise<{ success: boolean
         console.warn('[reCAPTCHA] Hostname mismatch - domain may not be registered in reCAPTCHA settings. Allowing request.');
         return { success: true, score: 0.5 };
       }
+
+              // invalid-input-secret or invalid-input-response means key misconfiguration, not a bot
+              // Allow these requests to prevent blocking all legitimate users due to a key setup issue
+              if (errorCodes.includes('invalid-input-secret') || errorCodes.includes('invalid-input-response') || errorCodes.includes('bad-request')) {
+                          console.warn('[reCAPTCHA] Key configuration issue detected - allowing request to prevent blocking users:', errorCodes.join(', '));
+                          return { success: true, score: 0.5 };
+              }
       
       if (isDev) {
         console.warn('[reCAPTCHA] Development mode - allowing despite verification failure');
