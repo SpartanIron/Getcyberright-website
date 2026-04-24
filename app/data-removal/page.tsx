@@ -6,11 +6,11 @@ const BASE_URL = "https://www.getcyberright.com";
 
 export const metadata: Metadata = {
   title: "Free Data Broker Removal: Opt Out from 501+ Sites | GetCyberRight",
-  description: "Free data broker removal service. Remove your personal information from 501+ data broker sites with step-by-step opt-out guides. No account or payment needed.",
+      description: "Your personal data is being sold right now. Remove yourself from 501+ data broker sites with free step-by-step opt-out guides. No account or payment needed. Start in 60 seconds.",
   alternates: { canonical: `${BASE_URL}/data-removal` },
   openGraph: {
     title: "Free Data Broker Removal: Opt Out from 501+ Sites | GetCyberRight",
-    description: "Free data broker removal service. Remove your personal information from 501+ data broker sites with step-by-step opt-out guides. No account or payment needed.",
+          description: "Your personal data is being sold right now. Remove yourself from 501+ data broker sites with free step-by-step opt-out guides. No account or payment needed. Start in 60 seconds.",
     url: `${BASE_URL}/data-removal`,
     type: "website",
     images: [{ url: `${BASE_URL}/og/data-shield.png`, width: 1080, height: 1080, alt: "Data Broker Removal" }],
