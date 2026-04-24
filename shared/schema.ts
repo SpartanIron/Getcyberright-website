@@ -1672,7 +1672,7 @@ export const siteReputation = pgTable("site_reputation", {
   flagCount: integer("flag_count").default(0),
   safeCount: integer("safe_count").default(0),
   communityScore: integer("community_score").default(50),
-  lastVisited: timestamp("last_visited").defaultNow(),
+  lastVisited: timestamp("last_visited_at").defaultNow(),
   lastFlagged: timestamp("last_flagged"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
