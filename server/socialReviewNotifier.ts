@@ -468,7 +468,7 @@ export async function executeReviewAction(postId: string, action: ReviewAction):
         .map((c) => String(c?.context ?? "").trim())
         .filter(Boolean)
         .join(" ");
-      if (storedCitations.length > 0) {
+      if (storedCitations.length > 0 || post.citations?.length > 0) {
         bundle = {
           recordId: post.contentId || post.id,
           recordType: "trend_insight",
