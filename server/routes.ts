@@ -5719,7 +5719,7 @@ BEHAVIORAL CONSTRAINTS
     if (isFreeAccessPeriod()) return { level: "full", tier: "professional" };
     if (!user) return { level: "free", tier: "free" };
 
-    const shieldTier = user.shieldSubscriptionTier || "free";
+    const shieldTier = isFreeAccessPeriod() ? "professional" : (user.shieldSubscriptionTier || "free");
 
     if (hasTierAccess(shieldTier, SUBSCRIPTION_TIERS.PROFESSIONAL)) {
       return { level: "full", tier: "professional" };
