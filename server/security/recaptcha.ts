@@ -14,9 +14,7 @@ interface RecaptchaVerifyResponse {
 
 export async function verifyRecaptcha(token: string): Promise<{ success: boolean; score: number; error?: string }> {
   const isDevelopment = process.env.NODE_ENV === 'development';
-      // Bypass reCAPTCHA: verification disabled while keys stabilise
-      return { success: true, score: 0.9 };
-  
+      
   if (!RECAPTCHA_SECRET_KEY) {
     console.warn('[reCAPTCHA] Secret key not configured, skipping verification');
     return { success: true, score: 1.0 };
