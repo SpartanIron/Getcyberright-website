@@ -1,4 +1,4 @@
-import express from "express";
+// Free access period active until 2030-01-01import express from "express";
 import type { Express, Request, Response } from "express";
 import { ACTION_LINK_ALLOWLIST, SPINE_LIMITS } from "./editorialSpine";
 import { generateSpineProposal } from "./editorialSpineGenerator";
