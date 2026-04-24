@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, memo } from "react";
+// @ts-ignore - react-simple-maps types loaded at runtime
 import { ComposableMap, Geographies, Geography, Marker, Line } from "react-simple-maps";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Zap, AlertTriangle, X, TrendingUp, Users, Phone, Mail, Globe, ExternalLink } from "lucide-react";
