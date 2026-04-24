@@ -47,7 +47,7 @@ const typeConfig: Record<string, { icon: typeof Megaphone; accent: string; dot: 
     dot: "bg-emerald-400",
   },
   update: {
-    icon: Megaphone,
+icon: Megaphone,
     accent: "text-sky-300",
     dot: "bg-sky-400",
   },
