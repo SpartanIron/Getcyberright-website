@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = `${article.title} | GetCyberRight News`;
-      const description = article.excerpt || `${article.title}. Cybersecurity analysis and threat intelligence from GetCyberRight, your trusted source for cyber awareness.`;
+        const description = article.excerpt || `${article.title}. Cybersecurity analysis and threat intelligence from GetCyberRight, your trusted source for cyber awareness.`;
   const url = `${BASE_URL}/news/${article.slug}`;
   const ogImage = `${BASE_URL}/og/article/${article.slug}`;
 
@@ -91,7 +91,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
       headline: article.title,
       description: article.excerpt || article.title,
       url: `${BASE_URL}/news/${article.slug}`,
-      datePublished: article.publishedAt || new Date().toISOString(),h
+      datePublished: article.publishedAt || new Date().toISOString(),
       dateModified: article.updatedAt || article.publishedAt || new Date().toISOString(),
       author: {
         "@type": "Person",
