@@ -5141,11 +5141,11 @@ BEHAVIORAL CONSTRAINTS
       }
       const masked = maskDomain(domain);
       await db.execute(sql`
-        INSERT INTO site_reputation (id, domain_hash, domain, visit_count, safe_count, flag_count, community_score, last_visited, created_at, updated_at)
+        INSERT INTO site_reputation (id, domain_hash, domain, visit_count, safe_count, flag_count, community_score, last_visited_at, created_at, updated_at)
         VALUES (gen_random_uuid(), ${domainHash}, ${masked}, 1, 0, 0, 50, NOW(), NOW(), NOW())
         ON CONFLICT (domain_hash) DO UPDATE SET
           visit_count = site_reputation.visit_count + 1,
-          last_visited = NOW(),
+          last_visited_at = NOW(),
           updated_at = NOW()
       `);
       res.json({ success: true });
